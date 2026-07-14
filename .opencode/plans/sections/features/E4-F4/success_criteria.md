@@ -1,12 +1,16 @@
 # Success Criteria
 
-- [ ] Warp conductivity, resistance, and corrected rates match CPU equations.
+- [x] Warp conductivity, resistance, and corrected helper rates match CPU
+  equations, including exact zero-latent isothermal helper identity.
 - [ ] Correction refreshes from E4-F1/F2 state in all four E4-F3 substeps.
 - [ ] Omitted/zero latent preserves isothermal results and existing API behavior.
 - [ ] Whole-call `(n_boxes, n_species)` energy remains on device and satisfies
   signed `Q = Σ(Δm_applied L)` for condensation, evaporation, zero, and clamps.
-- [ ] Shape, dtype, device, finiteness, and sign validation precedes all work.
-- [ ] Supplied buffers retain identity; no hidden host transfer/schema change.
+- [x] Shape, dtype, device, finiteness, and sign validation of supplied P1
+  sidecars precedes environment normalization, allocation, refresh, launch,
+  and caller-owned mutation.
+- [x] Supplied P1 sidecars retain identity and contents; no hidden host
+  transfer/schema change was introduced.
 - [ ] Warp CPU passes and optional CUDA passes or skips cleanly.
 - [ ] Gas conservation remains E4-F5 scope and complete evidence E4-F6 scope.
 

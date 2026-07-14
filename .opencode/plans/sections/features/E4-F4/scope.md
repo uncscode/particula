@@ -4,9 +4,15 @@ Deliver an fp64 Warp port of the CPU latent-heat correction, apply it during
 every fixed condensation substep, and expose deterministic signed whole-call
 energy bookkeeping from applied mass transfer.
 
+**Delivered P1 boundary:** The formula port and validation-only sidecar API are
+complete. Applying the correction, consuming thermal work, and energy
+bookkeeping remain explicitly deferred to P2/P3.
+
 **In scope:**
-- Warp thermal-conductivity and thermal-resistance calculations matching CPU.
-- Fixed-shape per-species latent configuration and pre-mutation validation.
+- Private Warp thermal-conductivity, thermal-resistance, and latent-rate
+  calculations matching CPU, including exact zero-latent helper identity.
+- Fixed-shape per-species `latent_heat` and `thermal_work` pre-mutation
+  validation; P1 does not consume either sidecar.
 - Reuse of E4-F1 refreshed saturation pressure, E4-F2 activity/Kelvin surface
   pressure, and E4-F3 four-substep scratch and accumulation contracts.
 - Correction per substep and exact zero-latent isothermal fallback.

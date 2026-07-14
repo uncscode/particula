@@ -12,7 +12,8 @@ buffer, updates box-level environment properties, proposes transfer from the
 current particle mass, and applies a mass-clamped transfer. Float32
 temperatures are cast to a step-owned float64 device buffer for refresh. Kernel
 launches operate on GPU-resident Warp arrays and update particle masses
-in-place.
+in-place. P1 accepts, validates, and leaves caller-owned latent-heat and
+thermal-work sidecars unused; the path remains isothermal.
 """
 
 # pyright: basic
@@ -874,21 +875,21 @@ def condensation_step_gpu(  # noqa: C901
             retains legacy unit activity and species-indexed static tension.
         scratch_buffers: Optional frozen caller-owned buffers. Supplied
             transfer fields have shape ``(n_boxes, n_particles, n_species)``;
-             supplied property fields have shape ``(n_boxes,)``. Every supplied
-             field must be active-device ``wp.float64``. Fields may be omitted
-             independently and use step-local fallback allocation. A supplied
-             total transfer buffer is returned by identity. Work retains the
-             final raw proposal and total accumulates clamped applied transfers.
-             Validation is performed before allocation or mutation. Arrays must
-             remain alive and unmodified until launched work completes and may
-             be reused only after a successful completion.
+            supplied property fields have shape ``(n_boxes,)``. Every supplied
+            field must be active-device ``wp.float64``. Fields may be omitted
+            independently and use step-local fallback allocation. A supplied
+            total transfer buffer is returned by identity. Work retains the
+            final raw proposal and total accumulates clamped applied transfers.
+            Validation is performed before allocation or mutation. Arrays must
+            remain alive and unmodified until launched work completes and may
+            be reused only after a successful completion.
         latent_heat: Optional caller-owned per-species latent heat [J/kg] as an
-            active-device ``wp.float64`` array shaped ``(n_species,)``. It is
-            validated but not consumed during this isothermal phase.
+            active-device ``wp.float64`` array shaped ``(n_species,)``. P1
+            validates it but does not consume it; the path remains isothermal.
         thermal_work: Optional caller-owned per-species thermal-work operation
             sidecar [J/kg] as an active-device ``wp.float64`` array shaped
-            ``(n_species,)``. It is validated but not allocated, initialized,
-            modified, or consumed during this phase.
+            ``(n_species,)``. P1 validates it but does not allocate,
+            initialize, modify, or consume it.
 
     Returns:
         Tuple of the particle data with in-place updated masses and accumulated,
@@ -957,10 +958,10 @@ def condensation_step_gpu(  # noqa: C901
         those buffers. Refresh evaluation and all production calculations stay
         device-resident.
 
-        Supplied latent sidecars are caller-owned. Their validation can read
-        device values but does not allocate, initialize, modify, or consume
-        either sidecar in this phase. Invalid metadata or values leave physical
-        state and all caller-owned work state unchanged.
+        Supplied latent sidecars are caller-owned. P1 validation can read device
+        values but does not allocate, initialize, modify, or consume either
+        sidecar. Invalid metadata or values leave physical state and all
+        caller-owned work state unchanged.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)

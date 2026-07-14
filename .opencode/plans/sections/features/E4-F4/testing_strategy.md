@@ -5,9 +5,13 @@ Tests ship with each implementation phase in
 `particula/gpu/kernels/tests/condensation_test.py`; coverage thresholds are
 never lowered.
 
-- **P1:** In `condensation_funcs_test.py` and `condensation_test.py`, compare
-  fp64 Warp conductivity/resistance with CPU references. Cover finite,
-  nonnegative, shape, dtype, device, and no-mutation failures.
+- **P1 (shipped, issue #1297):** `condensation_funcs_test.py` compares fp64
+  Warp conductivity, resistance, and latent-corrected rates with CPU references
+  for positive and negative pressure deltas, and verifies exact zero-latent
+  isothermal identity. `_condensation_test_support.py` covers valid single- and
+  multi-species sidecars, both sidecars together, finite/nonnegative/shape/
+  dtype/device/non-Warp failures, and atomic no-allocation/no-launch/
+  no-mutation preflight. CUDA device mismatch remains optional with clean skips.
 - **P2:** In `condensation_test.py`, compare corrected rates with CPU, verify
   rate reduction, exact zero-latent fallback, four refreshes, determinism, and
   scratch identity.

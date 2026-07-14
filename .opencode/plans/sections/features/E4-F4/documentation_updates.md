@@ -9,4 +9,6 @@
 - State that E4-F4 neither evolves temperature nor proves gas/system
   conservation; link to E4-F5/E4-F6.
 - Update `AGENTS.md` only if the public low-level invocation changes materially.
-- Update these sections and phase statuses as implementation ships.
+- P1 shipped without public documentation changes; its private helpers and
+  validation-only sidecars are intentionally deferred to the P4 documentation
+  update. These plan sections record the delivered contract.

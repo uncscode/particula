@@ -1,14 +1,14 @@
 # Implementation Tasks
 
 ### GPU Physics
-- [ ] In `particula/gpu/dynamics/condensation_funcs.py`, add private fp64 Warp
+- [x] In `particula/gpu/dynamics/condensation_funcs.py`, add private fp64 Warp
   helpers equivalent to CPU `get_thermal_resistance_factor()` and
   `get_mass_transfer_rate_latent_heat()` (roughly 60--100 production LOC), with
   the same zero-latent isothermal limit and no reduced-order approximation.
-- [ ] In `particula/gpu/kernels/condensation.py`, add keyword-only latent-heat,
-  thermal-work, and optional energy-sidecar preflight (roughly 20--40 LOC);
-  reject nonfinite/negative values and wrong `(n_species,)` or
-  `(n_boxes, n_species)` fp64/device contracts before allocation or mutation.
+- [x] In `particula/gpu/kernels/condensation.py`, add keyword-only
+  `(n_species,)` latent-heat and thermal-work preflight; reject nonfinite or
+  negative values and wrong shape, fp64 dtype, device, or non-Warp inputs
+  before allocation or mutation. P1 does not add or validate an energy sidecar.
 - [ ] Feed the E4-F2 activity-adjusted Kelvin surface pressure into the new
   latent-rate helper from the existing `condensation_step_gpu()` calculate
   launch, so the isothermal and latent paths use one surface-pressure value.
@@ -26,10 +26,10 @@
   operation sidecars.
 
 ### Tooling / Tests
-- [ ] In `particula/gpu/dynamics/tests/condensation_funcs_test.py`, add
+- [x] In `particula/gpu/dynamics/tests/condensation_funcs_test.py`, add
   NumPy-reference fixtures for conductivity, thermal factor, corrected rate,
   and zero-latent identity.
-- [ ] In `particula/gpu/kernels/tests/condensation_test.py`, snapshot all mutable
+- [x] In `particula/gpu/kernels/tests/condensation_test.py`, snapshot all mutable
   buffers before nonfinite/negative latent and sidecar shape/dtype/device
   rejections, then assert pre-mutation failure.
 - [ ] Cover positive, negative, zero, clamped, and multi-box/species transfers
