@@ -60,6 +60,9 @@ describe("adw_spec_read wrapper", () => {
     const execute = await loadToolExecute("../../adw_spec_read.ts");
     const result = await execute({ command: "read", adw_id: "a1b2c3d4" });
     expect(result).toBe("raw-content");
+    expect(getInvocations().at(-1)?.args.join(" ")).toBe(
+      "uv run --active adw spec read --adw-id a1b2c3d4 --raw",
+    );
   });
 
   it("preserves successful read payloads that begin with ERROR:", async () => {
@@ -83,12 +86,14 @@ describe("adw_spec_read wrapper", () => {
     expect(result).toBe("null\n");
   });
 
-  it("preserves successful non-raw present-null reads instead of treating them as missing", async () => {
-    setSpawnResponse({ stdout: "Field: spec_content\nADW ID: a1b2c3d4\nNone\n", exitCode: 0 });
+  it("uses raw output for present-null reads by default", async () => {
+    setSpawnResponse({ stdout: "null\n", exitCode: 0 });
     const execute = await loadToolExecute("../../adw_spec_read.ts");
     const result = await execute({ command: "read", adw_id: "a1b2c3d4", field: "spec_content" });
-    expect(String(result)).toContain("Field: spec_content");
-    expect(String(result)).toContain("None");
+    expect(result).toBe("null\n");
+    expect(getInvocations().at(-1)?.args.join(" ")).toBe(
+      "uv run --active adw spec read --adw-id a1b2c3d4 --field spec_content --raw",
+    );
   });
 
   it("still returns deterministic delegated failure envelopes for absent fields", async () => {
@@ -99,10 +104,10 @@ describe("adw_spec_read wrapper", () => {
     expect(String(result)).toContain("Field 'missing' not found");
   });
 
-  it("adds --field and --raw when provided for read", async () => {
+  it("keeps the explicit raw option as a compatibility no-op", async () => {
     const execute = await loadToolExecute("../../adw_spec_read.ts");
     await execute({ command: "read", adw_id: "a1b2c3d4", field: "spec_content", options: "raw" });
-    expect(getInvocations().at(-1)?.args.join(" ")).toContain(
+    expect(getInvocations().at(-1)?.args.join(" ")).toBe(
       "uv run --active adw spec read --adw-id a1b2c3d4 --field spec_content --raw",
     );
   });

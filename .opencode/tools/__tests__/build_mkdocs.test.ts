@@ -193,15 +193,14 @@ describe("build_mkdocs wrapper family", () => {
 
   it("resolves relative configFile paths against cwd before confinement checks", async () => {
     const execute = await loadToolExecute("../../build_mkdocs_validate.ts");
-    const repoRoot = path.resolve(import.meta.dir, "../../..");
-    const cwd = path.join(repoRoot, ".opencode");
+    const cwd = import.meta.dir;
 
-    const result = await execute({ cwd, configFile: "tools/build_mkdocs.py" });
+    const result = await execute({ cwd, configFile: "build_mkdocs.test.ts" });
     expect(result).toBe("ok");
 
     const cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
     expect(cmd).toContain("--cwd=");
-    expect(cmd).toContain("--config-file=tools/build_mkdocs.py");
+    expect(cmd).toContain("--config-file=build_mkdocs.test.ts");
   });
 
   it("preserves sanitized ENOENT diagnostics", async () => {
