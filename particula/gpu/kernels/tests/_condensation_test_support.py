@@ -532,6 +532,7 @@ def _make_condensation_stiffness_cases() -> tuple[
             particle_mass_scale=0.15,
             gas_concentration_scale=4.0,
             vapor_pressure_scale=0.6,
+            zero_mass_particles=((0, 0),),
         ),
         CondensationStiffnessCase(
             name="accumulation_mode",
@@ -659,12 +660,30 @@ class CondensationStiffnessTrialRecord:
     environment_input_mode: str
     classification: CondensationStiffnessClassification
     gas_unchanged: bool
+    initial_gas_concentration: np.ndarray
+    final_gas_concentration: np.ndarray
+    initial_vapor_pressure: np.ndarray
+    final_vapor_pressure: np.ndarray
+    expected_vapor_pressure: np.ndarray
     reuses_caller_mass_transfer_buffer: bool
+    reuses_work_mass_transfer_buffer: bool
+    reuses_total_mass_transfer_buffer: bool
+    reuses_dynamic_viscosity_buffer: bool
+    reuses_mean_free_path_buffer: bool
+    reuses_all_scratch_buffers: bool
+    returned_total_is_scratch_total: bool
     mass_transfer_has_nonzero_values: bool
     mass_transfer_changed_from_previous_trial: bool
+    values_finite: bool
+    zero_mass_stable: bool
+    vapor_pressure_refreshed: bool
     final_masses: np.ndarray
     initial_masses: np.ndarray
     mass_transfer_values: np.ndarray
+    reference_final_masses: np.ndarray
+    repeated_final_masses: np.ndarray
+    repeated_mass_transfer_values: np.ndarray
+    repeated_final_vapor_pressure: np.ndarray
 
 
 def _validate_stiffness_case_metadata(
@@ -1411,16 +1430,44 @@ def _copy_condensation_stiffness_trial_record(
         environment_input_mode=record.environment_input_mode,
         classification=record.classification,
         gas_unchanged=record.gas_unchanged,
+        initial_gas_concentration=record.initial_gas_concentration.copy(),
+        final_gas_concentration=record.final_gas_concentration.copy(),
+        initial_vapor_pressure=record.initial_vapor_pressure.copy(),
+        final_vapor_pressure=record.final_vapor_pressure.copy(),
+        expected_vapor_pressure=record.expected_vapor_pressure.copy(),
         reuses_caller_mass_transfer_buffer=(
             record.reuses_caller_mass_transfer_buffer
         ),
+        reuses_work_mass_transfer_buffer=(
+            record.reuses_work_mass_transfer_buffer
+        ),
+        reuses_total_mass_transfer_buffer=(
+            record.reuses_total_mass_transfer_buffer
+        ),
+        reuses_dynamic_viscosity_buffer=(
+            record.reuses_dynamic_viscosity_buffer
+        ),
+        reuses_mean_free_path_buffer=record.reuses_mean_free_path_buffer,
+        reuses_all_scratch_buffers=record.reuses_all_scratch_buffers,
+        returned_total_is_scratch_total=record.returned_total_is_scratch_total,
         mass_transfer_has_nonzero_values=record.mass_transfer_has_nonzero_values,
         mass_transfer_changed_from_previous_trial=(
             record.mass_transfer_changed_from_previous_trial
         ),
+        values_finite=record.values_finite,
+        zero_mass_stable=record.zero_mass_stable,
+        vapor_pressure_refreshed=record.vapor_pressure_refreshed,
         final_masses=record.final_masses.copy(),
         initial_masses=record.initial_masses.copy(),
         mass_transfer_values=record.mass_transfer_values.copy(),
+        reference_final_masses=record.reference_final_masses.copy(),
+        repeated_final_masses=record.repeated_final_masses.copy(),
+        repeated_mass_transfer_values=(
+            record.repeated_mass_transfer_values.copy()
+        ),
+        repeated_final_vapor_pressure=(
+            record.repeated_final_vapor_pressure.copy()
+        ),
     )
 
 
@@ -1919,13 +1966,12 @@ def _record_condensation_stiffness_trials(
 def _record_condensation_stiffness_trials_uncached(
     case: CondensationStiffnessCase,
     device: str,
+    time_steps: tuple[float, ...] | None = None,
 ) -> list[CondensationStiffnessTrialRecord]:
     """Run the recorded timestep grid for one deterministic stiffness case.
 
-    The helper rebuilds fresh particle, gas, and vapor-pressure inputs for each
-    recorded timestep, reuses a caller-owned Warp ``mass_transfer`` buffer
-    across the full sweep, and records whether the particle-only path leaves the
-    CPU gas concentration unchanged.
+    The helper rebuilds fresh inputs for each execution, while one complete
+    caller-owned scratch sidecar is reused sequentially for the entire sweep.
 
     Args:
         case: Deterministic stiffness case to execute.
@@ -1934,12 +1980,11 @@ def _record_condensation_stiffness_trials_uncached(
     Returns:
         Ordered recorded-grid trial records for the requested case.
     """
-    recorded_timesteps = _RECORDED_TIMESTEP_GRID_BY_CASE[case.name]
-    mass_transfer = wp.zeros(
-        (case.n_boxes, case.n_particles, case.n_species),
-        dtype=wp.float64,
-        device=device,
+    recorded_timesteps = (
+        time_steps or _RECORDED_TIMESTEP_GRID_BY_CASE[case.name]
     )
+    shape = (case.n_boxes, case.n_particles, case.n_species)
+    scratch = _make_condensation_scratch_buffers(shape, device)
     previous_mass_transfer_values: np.ndarray | None = None
     environment_input_mode = "direct_warp_arrays"
     temperature: float | Any = case.temperature
@@ -1960,30 +2005,113 @@ def _record_condensation_stiffness_trials_uncached(
 
     records: list[CondensationStiffnessTrialRecord] = []
     for timestep_index, time_step in enumerate(recorded_timesteps):
-        particles = case.build_particle_data()
-        gas = case.build_gas_data()
-        vapor_pressure = case.build_vapor_pressure()
-        initial_masses = particles.masses.copy()
-        initial_gas_concentration = gas.concentration.copy()
 
-        gpu_result, returned_mass_transfer, executed_gas = _run_gpu_step(
-            particles,
-            gas,
-            vapor_pressure,
-            temperature=temperature,
-            pressure=pressure,
-            time_step=time_step,
-            device=device,
-            mass_transfer=mass_transfer,
-            return_gas_state=True,
-        )
+        def run_once(
+            trial_time_step: float,
+        ) -> tuple[
+            np.ndarray,
+            np.ndarray,
+            np.ndarray,
+            np.ndarray,
+            np.ndarray,
+            np.ndarray,
+            Any,
+            tuple[bool, bool, bool, bool],
+        ]:
+            particles = case.build_particle_data()
+            gas = case.build_gas_data()
+            stale_vapor_pressure = case.build_vapor_pressure()
+            gpu_particles = to_warp_particle_data(particles, device=device)
+            gpu_gas = to_warp_gas_data(
+                gas, device=device, vapor_pressure=stale_vapor_pressure
+            )
+            thermodynamics = _make_thermodynamics_config(gpu_gas)
+            work_mass_transfer = scratch.work_mass_transfer
+            total_mass_transfer = scratch.total_mass_transfer
+            dynamic_viscosity = scratch.dynamic_viscosity
+            mean_free_path = scratch.mean_free_path
+            _, returned = condensation_step_gpu(
+                gpu_particles,
+                gpu_gas,
+                temperature=temperature,
+                pressure=pressure,
+                time_step=trial_time_step,
+                thermodynamics=thermodynamics,
+                scratch_buffers=scratch,
+            )
+            return (
+                particles.masses.copy(),
+                gas.concentration.copy(),
+                stale_vapor_pressure.copy(),
+                from_warp_particle_data(gpu_particles, sync=True).masses.copy(),
+                gpu_gas.concentration.numpy().copy(),
+                gpu_gas.vapor_pressure.numpy().copy(),
+                (returned, thermodynamics),
+                (
+                    scratch.work_mass_transfer is work_mass_transfer,
+                    scratch.total_mass_transfer is total_mass_transfer,
+                    scratch.dynamic_viscosity is dynamic_viscosity,
+                    scratch.mean_free_path is mean_free_path,
+                ),
+            )
+
+        (
+            initial_masses,
+            initial_gas_concentration,
+            initial_vapor_pressure,
+            final_masses,
+            final_gas_concentration,
+            final_vapor_pressure,
+            first_runtime,
+            scratch_identities,
+        ) = run_once(time_step)
+        returned_mass_transfer, thermodynamics = first_runtime
         mass_transfer_values = returned_mass_transfer.numpy().copy()
+        (
+            _,
+            _,
+            _,
+            repeated_final_masses,
+            _,
+            repeated_final_vapor_pressure,
+            repeated_runtime,
+            repeated_scratch_identities,
+        ) = run_once(time_step)
+        repeated_mass_transfer = repeated_runtime[0].numpy().copy()
+        temperature_array = (
+            np.array([case.temperature], dtype=np.float64)
+            if case.n_boxes == 1
+            else case.temperature_array()
+        )
+        expected_vapor_pressure = _evaluate_vapor_pressure_config(
+            thermodynamics, temperature_array
+        )
+        reference_particles = case.build_particle_data()
+        reference_gas = case.build_gas_data()
+        reference_final_masses, _, _ = _cpu_four_substep_oracle(
+            reference_particles,
+            reference_gas,
+            initial_vapor_pressure,
+            surface_tension=np.full(case.n_species, 0.072, dtype=np.float64),
+            mass_accommodation=np.ones(case.n_species, dtype=np.float64),
+            diffusion_coefficient_vapor=np.full(
+                case.n_species, 2.0e-5, dtype=np.float64
+            ),
+            temperature=(
+                case.temperature if case.n_boxes == 1 else temperature_array
+            ),
+            pressure=(
+                case.pressure if case.n_boxes == 1 else case.pressure_array()
+            ),
+            time_step=time_step,
+            thermodynamics=thermodynamics,
+        )
         classification = _classify_particle_only_condensation_stiffness(
             case,
             initial_masses,
-            gpu_result.masses,
-            gas,
-            vapor_pressure,
+            final_masses,
+            reference_gas,
+            final_vapor_pressure,
             max_fractional_change=_RECORDED_STIFFNESS_THRESHOLD,
         )
         records.append(
@@ -1996,12 +2124,26 @@ def _record_condensation_stiffness_trials_uncached(
                 classification=classification,
                 gas_unchanged=bool(
                     np.array_equal(
-                        executed_gas.concentration,
+                        final_gas_concentration,
                         initial_gas_concentration,
                     )
                 ),
+                initial_gas_concentration=initial_gas_concentration,
+                final_gas_concentration=final_gas_concentration,
+                initial_vapor_pressure=initial_vapor_pressure,
+                final_vapor_pressure=final_vapor_pressure,
+                expected_vapor_pressure=expected_vapor_pressure,
                 reuses_caller_mass_transfer_buffer=(
-                    returned_mass_transfer is mass_transfer
+                    returned_mass_transfer is scratch.total_mass_transfer
+                ),
+                reuses_work_mass_transfer_buffer=scratch_identities[0],
+                reuses_total_mass_transfer_buffer=scratch_identities[1],
+                reuses_dynamic_viscosity_buffer=scratch_identities[2],
+                reuses_mean_free_path_buffer=scratch_identities[3],
+                reuses_all_scratch_buffers=all(scratch_identities)
+                and all(repeated_scratch_identities),
+                returned_total_is_scratch_total=(
+                    returned_mass_transfer is scratch.total_mass_transfer
                 ),
                 mass_transfer_has_nonzero_values=bool(
                     np.any(mass_transfer_values != 0.0)
@@ -2013,14 +2155,151 @@ def _record_condensation_stiffness_trials_uncached(
                         previous_mass_transfer_values,
                     )
                 ),
-                final_masses=gpu_result.masses.copy(),
+                values_finite=_particle_values_are_finite(
+                    final_masses, mass_transfer_values, final_vapor_pressure
+                ),
+                zero_mass_stable=_zero_mass_entries_remain_stable(
+                    initial_masses, final_masses
+                ),
+                vapor_pressure_refreshed=bool(
+                    np.array_equal(
+                        final_vapor_pressure,
+                        expected_vapor_pressure,
+                    )
+                    and not np.array_equal(
+                        initial_vapor_pressure,
+                        expected_vapor_pressure,
+                    )
+                ),
+                final_masses=final_masses,
                 initial_masses=initial_masses,
                 mass_transfer_values=mass_transfer_values,
+                reference_final_masses=reference_final_masses,
+                repeated_final_masses=repeated_final_masses,
+                repeated_mass_transfer_values=repeated_mass_transfer,
+                repeated_final_vapor_pressure=repeated_final_vapor_pressure,
             )
         )
         previous_mass_transfer_values = mass_transfer_values
 
     return records
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("case_name", "time_step"),
+    tuple(
+        (case.name, time_step)
+        for case in _make_condensation_stiffness_cases()
+        for time_step in _RECORDED_TIMESTEP_GRID_BY_CASE[case.name]
+    ),
+)
+def test_condensation_production_stiffness_recorded_contract(
+    warp_cpu_device: str,
+    case_name: str,
+    time_step: float,
+) -> None:
+    """Check the limited fixed-four production stiffness contract."""
+    records = _record_condensation_stiffness_trials(
+        _get_condensation_stiffness_case(case_name), warp_cpu_device
+    )
+    record = next(record for record in records if record.time_step == time_step)
+    npt.assert_allclose(
+        record.final_masses,
+        record.reference_final_masses,
+        rtol=5.0e-2,
+        atol=0.0,
+        err_msg=(
+            "Recorded case-specific stiffness evidence is not a general "
+            "parity or conservation tolerance."
+        ),
+    )
+    positive_reference = (record.reference_final_masses > 0.0) & np.isfinite(
+        record.reference_final_masses
+    )
+    if np.any(positive_reference):
+        maximum_relative_error = np.max(
+            np.abs(
+                record.final_masses[positive_reference]
+                - record.reference_final_masses[positive_reference]
+            )
+            / record.reference_final_masses[positive_reference]
+        )
+        assert maximum_relative_error <= 5.0e-2
+    zero_reference = record.reference_final_masses == 0.0
+    npt.assert_array_equal(
+        record.final_masses[zero_reference],
+        np.zeros(np.count_nonzero(zero_reference), dtype=np.float64),
+    )
+    assert record.environment_input_mode == (
+        "scalar_inputs" if case_name != "droplet_like" else "direct_warp_arrays"
+    )
+    assert record.gas_unchanged
+    assert record.reuses_caller_mass_transfer_buffer
+    assert record.reuses_work_mass_transfer_buffer
+    assert record.reuses_total_mass_transfer_buffer
+    assert record.reuses_dynamic_viscosity_buffer
+    assert record.reuses_mean_free_path_buffer
+    assert record.reuses_all_scratch_buffers
+    assert record.returned_total_is_scratch_total
+    assert record.mass_transfer_has_nonzero_values
+    assert record.values_finite
+    assert np.all(record.final_masses >= 0.0)
+    assert record.zero_mass_stable
+    assert record.vapor_pressure_refreshed
+    npt.assert_array_equal(
+        record.final_gas_concentration,
+        record.initial_gas_concentration,
+    )
+    npt.assert_array_equal(
+        record.final_vapor_pressure,
+        record.expected_vapor_pressure,
+    )
+    npt.assert_array_equal(record.final_masses, record.repeated_final_masses)
+    npt.assert_array_equal(
+        record.mass_transfer_values, record.repeated_mass_transfer_values
+    )
+    npt.assert_array_equal(
+        record.final_vapor_pressure, record.repeated_final_vapor_pressure
+    )
+
+
+@pytest.mark.cuda
+@pytest.mark.gpu_parity
+def test_condensation_production_stiffness_cuda_slice(cuda_device: str) -> None:
+    """Check one CUDA slice when the optional device is available."""
+    case = _get_condensation_stiffness_case("droplet_like")
+    record = _record_condensation_stiffness_trials_uncached(
+        case, cuda_device, time_steps=(case.time_step,)
+    )[0]
+    npt.assert_allclose(
+        record.final_masses,
+        record.reference_final_masses,
+        rtol=5.0e-2,
+        atol=0.0,
+        err_msg=(
+            "CUDA stiffness evidence uses the recorded case-specific bound."
+        ),
+    )
+    assert record.gas_unchanged
+    assert record.reuses_all_scratch_buffers
+    assert record.reuses_work_mass_transfer_buffer
+    assert record.reuses_total_mass_transfer_buffer
+    assert record.reuses_dynamic_viscosity_buffer
+    assert record.reuses_mean_free_path_buffer
+    assert record.returned_total_is_scratch_total
+    assert record.mass_transfer_has_nonzero_values
+    assert record.values_finite
+    assert np.all(record.final_masses >= 0.0)
+    assert record.vapor_pressure_refreshed
+    npt.assert_array_equal(
+        record.final_vapor_pressure,
+        record.expected_vapor_pressure,
+    )
+    npt.assert_array_equal(record.final_masses, record.repeated_final_masses)
+    npt.assert_array_equal(
+        record.final_vapor_pressure, record.repeated_final_vapor_pressure
+    )
 
 
 def test_condensation_step_gpu_signature_keeps_keyword_only_inputs() -> None:
@@ -2924,7 +3203,7 @@ def test_run_gpu_step_can_round_trip_executed_gas_state(device: str) -> None:
     assert executed_gas is not gas
 
 
-def test_recorded_condensation_trials_detect_executed_gas_mutation(
+def _recorded_condensation_trials_detect_executed_gas_mutation(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
 ) -> None:
