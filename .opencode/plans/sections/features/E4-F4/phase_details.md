@@ -41,8 +41,18 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     box/species aggregation, atomic metadata failure, disabled behavior, and
     cleanly skippable CUDA parity.
 
-- [ ] **E4-F4-P4:** Warp integration regressions and documentation updates
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Compose sibling contracts and document issue #1272 behavior.
-  - Files: GPU condensation tests, `docs/Features/Roadmap/data-oriented-gpu.md`
-  - Tests: Warp CPU integration, optional CUDA parity, docs validation.
+- [x] **E4-F4-P4:** Warp integration regressions and documentation updates
+  - Issue: #1300 | Size: S | Status: Shipped (2026-07-14)
+  - Delivered: composed fresh-state scalar and explicit-environment routes on
+    mandatory Warp CPU, each checked against the four-substep CPU oracle for
+    final mass, applied transfer, signed energy, output identity, zero-latent
+    energy, and unchanged gas concentration. Optional CUDA uses `cuda_device`
+    for clean availability skips. Three GPU feature documents now describe the
+    shipped issue #1272 diagnostic and bounded contract.
+  - Files: `particula/gpu/kernels/tests/_condensation_test_support.py`;
+    `particula/gpu/kernels/tests/condensation_test.py`;
+    `docs/Features/Roadmap/data-oriented-gpu.md`;
+    `docs/Features/data-containers-and-gpu-foundations.md`;
+    `docs/Features/condensation_strategy_system.md`.
+  - Tests: focused Warp-CPU `-Werror` suite and optional `warp and cuda`
+    `-Werror` suite.

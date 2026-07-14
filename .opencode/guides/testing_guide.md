@@ -180,6 +180,7 @@ the shipped release-validation commands whenever Warp is installed:
 pytest particula/gpu/tests/cuda_availability_test.py -q
 pytest particula/gpu/kernels/tests/environment_test.py -q
 pytest particula/gpu/kernels/tests/thermodynamics_test.py -q -Werror
+pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and gpu_parity"
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and stochastic"
 ```
@@ -191,6 +192,7 @@ CUDA is absent:
 
 ```bash
 pytest particula/gpu/kernels/tests/environment_test.py -q -m "warp and cuda"
+pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
 ```
 
 These commands match the shipped marker and helper contract:

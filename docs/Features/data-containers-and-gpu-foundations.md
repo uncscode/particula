@@ -345,12 +345,15 @@ particle-plus-gas conservation for this uncoupled direct step.
 
 The direct step accepts optional keyword-only caller-owned active-device
 `wp.float64` `latent_heat` with shape `(n_species,)`. For species `i`, its
-shipped latent-rate correction is the source implementation's
+shipped latent-rate correction is
 `dm_i/dt = isothermal_rate_i / correction_i`, where
-`correction_i = thermal_factor_i / (R_specific_i * T)` and
-`thermal_factor_i` is the thermal-resistance expression evaluated from `D_i`,
-`L_i`, surface vapor pressure, thermal conductivity, `T`, and molar mass. An
-omitted sidecar, or `L_i = 0`, follows the exact isothermal branch.
+`isothermal_rate_i = k_i * Delta_p_i * M_i / (R * T)`,
+`R_specific_i = R / M_i`, and
+`correction_i = thermal_factor_i / (R_specific_i * T)`. The source thermal
+factor is
+`thermal_factor_i = (D_i * L_i * p_surface_i / (T * k_thermal)) * (L_i / (T * R_specific_i) - 1) + R_specific_i * T`.
+Here `p_surface_i` is the activity- and Kelvin-adjusted surface vapor pressure.
+An omitted sidecar, or exactly `L_i = 0`, follows the exact isothermal branch.
 
 Optional keyword-only `energy_transfer` is a caller-owned active-device
 `wp.float64`, `(n_boxes, n_species)`, write-only output. It requires valid

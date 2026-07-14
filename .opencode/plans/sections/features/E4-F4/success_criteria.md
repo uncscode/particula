@@ -11,9 +11,12 @@
   and caller-owned mutation.
 - [x] Supplied P1 sidecars retain identity and contents; no hidden host
   transfer/schema change was introduced.
-- [x] Warp CPU CPU-oracle parity, deterministic behavior, validation atomicity,
-  and scratch identity/reuse regressions cover the P2 path; optional CUDA is
-  not required evidence for this shipped phase.
+- [x] Warp-CPU four-substep oracle regressions cover composed scalar and
+  explicit-environment routes, including signed energy, applied transfer,
+  zero-latent energy, output identity, and unchanged gas concentration; optional
+  CUDA coverage is additive and skips cleanly when unavailable.
+- [x] Three GPU feature documents state the issue #1272 energy identity,
+  sidecar ownership/units, focused commands, and supported limits.
 - [ ] Gas conservation remains E4-F5 scope and complete evidence E4-F6 scope.
 
 | Metric | Baseline | Target | Source |

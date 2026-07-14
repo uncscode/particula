@@ -80,6 +80,18 @@ may be reused across calls. A failed preflight, including missing or
 device-incompatible thermodynamics, leaves caller-owned simulation and output
 buffers unchanged.
 
+The direct condensation kernel also accepts optional keyword-only,
+active-device `wp.float64` sidecars: `latent_heat`, shaped `(n_species,)`, and
+the caller-owned write-only `energy_transfer`, shaped `(n_boxes, n_species)`.
+Nonzero latent heat applies the per-species rate correction during each of the
+four fixed substeps; omitting it, or setting a species entry to zero, preserves
+that species' isothermal rate path. `energy_transfer` requires `latent_heat`
+and is overwritten after successful preflight with signed, mass-clamped applied
+transfer times latent heat. It remains caller-owned rather than becoming a
+third return item. See the
+[Data Containers and GPU Foundations guide](./docs/Features/data-containers-and-gpu-foundations.md)
+for ownership, units, and direct-step limits.
+
 ## Code Structure
 
 ```

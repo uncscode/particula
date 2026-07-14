@@ -168,13 +168,14 @@ print(result)
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
   explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
-   current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
-   such as coagulation `rng_states` and condensation thermodynamics. GPU
-   condensation requires keyword-only `thermodynamics=ThermodynamicsConfig` and
-   refreshes caller-owned `WarpGasData.vapor_pressure` from the current
-   device-resident temperature before mass transfer. For a runnable
-   direct-kernel walkthrough, use
-   `python docs/Examples/gpu_direct_kernels_quick_start.py`.
+  current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
+  such as coagulation `rng_states` and condensation thermodynamics. GPU
+  condensation requires keyword-only `thermodynamics=ThermodynamicsConfig`,
+  optionally accepts `latent_heat` rate correction and its write-only signed
+  `energy_transfer` diagnostic, and refreshes caller-owned
+  `WarpGasData.vapor_pressure` from the current device-resident temperature
+  before mass transfer. For a runnable direct-kernel walkthrough, use
+  `python docs/Examples/gpu_direct_kernels_quick_start.py`.
 - [ParticleData and GasData migration guide](Features/particle-data-migration.md)
   — migration workflow and before/after examples for moving from legacy facades
   to the canonical data-container contract documented in the foundation guide.

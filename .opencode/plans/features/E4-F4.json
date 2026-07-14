@@ -2,7 +2,7 @@
   "id": "E4-F4",
   "type": "feature",
   "title": "Warp latent-heat correction and energy diagnostics",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -75,11 +75,11 @@
     {
       "id": "E4-F4-P4",
       "title": "Warp integration regressions and documentation updates",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
-      "issue_number": null,
+      "issue_number": 1300,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-14",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -87,5 +87,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
