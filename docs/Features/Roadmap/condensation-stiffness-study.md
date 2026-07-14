@@ -1,18 +1,26 @@
 # Condensation Stiffness Study and Recommendation Record
 
-This note is the canonical decision record for future GPU condensation
-integration work. It separates the current shipped runtime boundary, the
-measured P2/P3 evidence, and the final P4 recommendation derived from that
-evidence. The current production GPU path remains particle-only and `float64`
-bounded; this page does not claim that gas-coupled production condensation has
-shipped.
+This note is the canonical decision record for GPU condensation integration.
+The shipped production path uses four fixed equal substeps; P2/P3 candidate
+comparisons remain historical evidence only. The current production GPU path
+remains particle-only and `float64` bounded; this page does not claim that
+gas-coupled production condensation has shipped.
 
 ## Current Runtime Scope
 
-- Production path: explicit fixed-step GPU condensation.
+- Production path: explicit fixed-four GPU condensation. Every successful
+  `condensation_step_gpu(...)` call performs exactly four `time_step / 4.0`
+  substeps.
 - Particle update: particle masses are clamped to remain non-negative.
 - Gas update: the current Warp path is particle-only and does not yet update gas
   concentrations during production condensation.
+- Per-substep order: optionally refresh composition-weighted surface tension,
+  overwrite `gas.vapor_pressure`, refresh environment properties, produce a raw
+  transfer proposal, then apply and accumulate its mass-clamped transfer.
+- Transfer buffers: the resolved total transfer is cleared once after preflight
+  and accumulates applied clamped transfer over all four substeps. A supplied
+  total buffer is returned by identity; the separate work buffer retains only
+  the final raw proposal.
 - Baseline backend for this phase: `np.float64` inputs and Warp CPU execution.
 - Accepted study inputs: scalar `temperature` and `pressure`, direct Warp
   arrays with shape `(n_boxes,)`, and the tested hybrid mode where one direct
@@ -118,7 +126,7 @@ and not a general stable-timestep limit for other cases.
 
 ## Candidate Evaluation Evidence
 
-This phase adds two deterministic prototype candidates implemented in
+P2/P3 recorded two deterministic prototype candidates implemented in
 `particula/gpu/kernels/tests/_condensation_test_support.py` and collected
 through `particula/gpu/kernels/tests/condensation_stiffness_test.py`. They
 remain test-local evidence only; the public `condensation_step_gpu(...)`
@@ -127,7 +135,7 @@ hook shipped, and no new private production helper was added.
 
 | Candidate | Family | Buffer reuse | Determinism | Finite/non-negative masses | CPU-reference agreement | Graph capture | Autodiff note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `fixed_count_substeps_4` | Fixed-count explicit sub-stepping | Pass: one caller-owned `mass_transfer` array plus fixed-shape `work`/`accumulator` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 5e-2` at the baseline timestep and `max relative error <= 5e-2` across the recorded grid. These recorded bounds are evidence, not a shipped production tolerance. | Pass: fixed loop count (`4`) and fixed-shape scratch keep the prototype graph-capture-friendly. | Clamp boundaries are still non-smooth, but there are no data-dependent loop counts. |
+| `fixed_count_substeps_4` | Historical P2/P3 fixed-count explicit sub-stepping evidence; its fixed-four behavior is now shipped. | Pass: one caller-owned `mass_transfer` array plus fixed-shape `work`/`accumulator` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 5e-2` at the baseline timestep and `max relative error <= 5e-2` across the recorded grids for `nanometer`, `accumulation_mode`, and `droplet_like`. These bounds are case-specific evidence, not a general accuracy tolerance or stable-timestep limit. | Not evaluated as production graph-capture evidence. | Not evaluated as production autodiff evidence. |
 | `asymptotic_relaxation` | Asymptotic first-order bounded relaxation | Pass: one caller-owned `mass_transfer` array plus one fixed-shape `work` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 3.5e-1` at the baseline timestep and `max relative error <= 3.5e-1` across the recorded grid. This looser bound is recorded as prototype evidence only and is not suitable for a production recommendation by itself. | Pass: fixed-shape algebra with no adaptive search or variable-length loops. | `exp(...)` relaxation remains differentiable away from the same clamp boundary, so it is a plausible autodiff target but not yet production-qualified. |
 
 ### Phase Boundary Decision
@@ -148,41 +156,39 @@ hook shipped, and no new private production helper was added.
 
 ## Final Recommendation
 
-### Recommended implementation foundation
+### Shipped fixed-four implementation
 
-Later GPU condensation implementation phases should build on
-`fixed_count_substeps_4` as the preferred integration foundation.
+`fixed_count_substeps_4` is the shipped production integration behavior of
+`condensation_step_gpu(...)`, not a future prototype. Each valid call uses four
+equal substeps, updates particle masses in place, leaves
+`gas.concentration` unchanged, and keeps production calculations device
+resident.
 
 Why this is the recommended path:
 
-- It has the strongest recorded agreement with the current CPU/explicit
-  reference, with documented `rtol <= 5e-2` at the baseline timestep and
-  `max relative error <= 5e-2` across the recorded grid.
-- It preserves deterministic fixed-shape execution with caller-owned buffer
-  reuse and fixed scratch layouts across repeated runs.
-- Its fixed loop count (`4`) is graph-capture-friendly in a way adaptive or
-  data-dependent loop counts are not.
-- It fits Warp autodiff expectations better than dynamic-loop schemes because
-  the repeated work is statically bounded even though clamp boundaries remain
-  non-smooth.
-- Its evidence quality is materially stronger than the asymptotic alternative,
-  so it provides the clearest foundation for later production work.
+- The historical P2/P3 comparison recorded `rtol <= 5e-2` at the baseline
+  timestep and maximum relative error `<= 5e-2` only for the named
+  `nanometer`, `accumulation_mode`, and `droplet_like` grids.
+- Successful calls preserve supplied total-buffer identity, clear that total
+  once after preflight, and accumulate applied mass-clamped transfer. A
+  separate work buffer retains the final raw proposal.
+- `CondensationScratchBuffers` remains a concrete-module-only sidecar. Its
+  supplied active-device, stable-shape `wp.float64` fields may be omitted
+  independently, in which case the step allocates fallback buffers.
+- This shipped behavior does not establish graph capture/replay or autodiff
+  readiness.
 
 ### Alternatives considered but not selected
 
-- **Current single-step explicit update:** keep as the shipped baseline only.
-  It is still useful as the production reference path, but it is not a strong
-  forward-looking foundation for broader stiffness handling across the recorded
-  particle-size range.
+- **Historical single-step explicit update:** retained only as a P2/P3
+  comparison baseline; it is not the shipped production path.
 - **`asymptotic_relaxation`:** retain as evidence-only. It remains interesting
   for differentiability because the algebra is smooth away from clamp
   boundaries, but the measured CPU-reference agreement is materially looser
   (`rtol <= 3.5e-1` / `max relative error <= 3.5e-1`) than the fixed-count
   candidate.
-- **Adaptive or dynamic-loop schemes:** defer. They conflict with the fixed
-  iteration count and stable allocation layout preferred for Warp graph capture,
-  and they complicate autodiff replay because backward passes do not reliably
-  mirror data-dependent loop structure.
+- **Adaptive or dynamic-loop schemes:** deferred; no adaptive-stepping support
+  is documented by this record.
 
 ### Gas-coupled follow-up gate
 
@@ -193,7 +199,12 @@ plus same-issue particle-plus-gas conservation regression coverage in
 Until that gate lands, roadmap and implementation guidance must not claim that
 GPU condensation updates gas concentrations in production.
 
-### Dependency boundaries that still limit the recommendation
+### Downstream gates and dependency boundaries
+
+The following work remains downstream of E4-F3: E4-F4 latent heat, E4-F5 gas
+coupling and particle-plus-gas conservation, E4-F6 independent-device plus
+graph/autodiff evidence, and E4-F7 final support work. None is implied by the
+fixed-four production step.
 
 - **E2-F2 environment-shape dependency:** the recommendation assumes the shipped
   contract for scalar inputs and explicit direct Warp `(n_boxes,)` environment
@@ -211,6 +222,7 @@ This record does **not** publish:
 - generalized stable timestep limits
 - gas-coupled conservation claims that the current production path does not yet
   satisfy
+- latent-heat, independent-device, graph-capture/replay, or autodiff claims
 
 Later phases can build on this measured baseline and recommendation without
 redefining case shapes, metric names, threshold meaning, or the current

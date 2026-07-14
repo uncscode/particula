@@ -623,6 +623,47 @@ aerosol, gas = selective.step(
 5. **Sub-step when composing processes**: Increase `sub_steps` to reduce
    operator-splitting error when coupling with wall loss or coagulation.
 
+### Low-level Warp GPU condensation
+
+This is a direct low-level Warp path, separate from the CPU strategies and the
+`MassCondensation` runnable described above. Its canonical step import is:
+
+```python
+from particula.gpu.kernels import condensation_step_gpu
+```
+
+When reusable scratch is needed, import `CondensationScratchBuffers` only from
+`particula.gpu.kernels.condensation`. That concrete-module-only sidecar is not
+a second step entry point. Its transfer fields have shape
+`(n_boxes, n_particles, n_species)` and its property fields have shape
+`(n_boxes,)`. Each supplied field must be active-device, stable-shape
+`wp.float64`; fields may be omitted independently and use fallback allocations.
+Supplied buffers preserve identity and callers must keep them alive and
+unmodified through launch completion.
+
+Every successful call executes exactly four `time_step / 4.0` substeps. Each
+substep optionally refreshes composition-weighted surface tension, overwrites
+`gas.vapor_pressure`, refreshes environment properties, produces a raw transfer
+proposal, and applies and accumulates its mass-clamped transfer. The resolved
+total transfer buffer is cleared once after preflight, accumulates applied
+clamped transfer, and is returned by identity when supplied. Work storage keeps
+only the final raw proposal. Particle masses are mutated in place, while
+`gas.concentration` remains unchanged. Production calculations make no hidden
+CPU↔Warp transfers; validation-only device reads do not transfer or mutate
+caller buffers.
+
+This direct step does not claim CPU-strategy parity, `Runnable` composition,
+adaptive stepping, gas coupling or conservation, latent heat, graph
+capture/replay, or autodiff readiness. For its focused coverage, run:
+
+```bash
+pytest particula/gpu/kernels/tests/condensation_test.py \
+  particula/gpu/kernels/tests/condensation_stiffness_test.py -q
+```
+
+Warp-backed tests may skip when Warp is missing. CUDA evidence is optional when
+CUDA is unavailable; a skip is not GPU execution.
+
 ## Limitations
 
 - Staggered solver is Gauss-Seidel only; other solvers are not exposed.

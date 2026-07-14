@@ -9,13 +9,15 @@
   test-only regression coverage. Test names and assertion messages label the
   `5e-2` bound as recorded case-specific stiffness evidence, not a general
   parity or conservation tolerance.
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` with E4-F3 completion,
-  scratch ownership, E4-F1 refresh placement, and downstream gates.
-- Update `docs/Features/Roadmap/warp-autodiff-limitations.md` if validation
-  confirms static-loop replay/graph-capture claims.
-- Do not add a package export, README/API page, or standalone usage example for
-  P1; the sidecar is imported only from the concrete condensation module.
-- Add or update a focused usage example only if the public scratch API is
-  intended for users; avoid introducing a second canonical entry point.
-- The plan section status and change log record P3 as shipped; P4 remains the
-  planned development-documentation phase.
+- P4 / issue #1295 updated `docs/Features/Roadmap/condensation-stiffness-study.md`
+  with the shipped fixed-four behavior, case-bounded recorded evidence, transfer
+  semantics, particle-only scope, and downstream E4-F4 through E4-F7 gates.
+- P4 updated `docs/Features/Roadmap/data-oriented-gpu.md` with shipped E4-F3
+  ownership, the package step versus concrete-sidecar distinction, scratch
+  ownership/lifetime, fixed-four ordering, and bounded limitations.
+- P4 added a clearly separate low-level Warp note to
+  `docs/Features/condensation_strategy_system.md`, including the focused
+  discoverable test command and guarded Warp/CUDA skip guidance.
+- No package export, second step entry point, standalone high-level API, graph
+  replay, or autodiff claim was added. `warp-autodiff-limitations.md` remains
+  unchanged.
