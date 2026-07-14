@@ -17,7 +17,18 @@
   ownership/lifetime, fixed-four ordering, and bounded limitations.
 - P4 added a clearly separate low-level Warp note to
   `docs/Features/condensation_strategy_system.md`, including the focused
-  discoverable test command and guarded Warp/CUDA skip guidance.
+  discoverable test command and guarded Warp/CUDA skip guidance:
+  ```bash
+  pytest particula/gpu/kernels/tests/condensation_test.py \
+    particula/gpu/kernels/tests/condensation_stiffness_test.py -q
+  ```
+  Missing Warp may skip; CUDA evidence is optional when CUDA is unavailable,
+  and a skip is not GPU execution.
+- The P4 scope remains bounded: it does not claim CPU-strategy parity,
+  `Runnable` composition, adaptive stepping, gas coupling or conservation,
+  latent heat, graph capture/replay, or autodiff readiness. The recorded
+  stiffness bounds apply only to the named cases, not general accuracy or
+  conservation.
 - No package export, second step entry point, standalone high-level API, graph
   replay, or autodiff claim was added. `warp-autodiff-limitations.md` remains
   unchanged.

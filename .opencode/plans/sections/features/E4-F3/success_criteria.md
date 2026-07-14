@@ -22,8 +22,9 @@
 - [x] P3 changed test-only support and discovery files; it introduced no
   production container-schema, fp64, direct-import, or hidden-transfer change
   (issue #1294).
-- [ ] Documentation states limits: fixed count, no adaptive integration, no gas
-  coupling, and `5e-2` as recorded evidence rather than universal tolerance.
+- [x] P4 / issue #1295 documentation states fixed-count limits, no adaptive
+  integration or gas coupling, and `5e-2` as recorded evidence rather than a
+  universal tolerance.
 
 ## Metrics
 

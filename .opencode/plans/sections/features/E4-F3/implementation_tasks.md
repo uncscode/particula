@@ -40,6 +40,7 @@
 
 ## Documentation
 
-- [ ] Update the stiffness study from test-local recommendation to shipped
-  production contract, retaining evidence and limitations.
-- [ ] Update the data-oriented GPU roadmap and user-facing scratch guidance.
+- [x] Update the stiffness study from test-local recommendation to shipped
+  production contract, retaining evidence and limitations (issue #1295).
+- [x] Update the data-oriented GPU roadmap and user-facing scratch guidance,
+  including the bounded low-level Warp note (issue #1295).
