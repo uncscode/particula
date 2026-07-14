@@ -23,9 +23,9 @@ export default tool({
 
 COMMANDS:
 - list: list adw_state fields
-- read: read a field value (default spec_content)
+- read: read a raw field value (default spec_content)
 
-No contract change versus legacy adw_spec behavior for read semantics.`,
+Focused reads use raw output by default; broad list displays retain CLI redaction.`,
 
   args: {
     command: tool.schema.enum(["list", "read"]),
@@ -55,9 +55,9 @@ No contract change versus legacy adw_spec behavior for read semantics.`,
       if (normalizedField) {
         cmdParts.push("--field", normalizedField);
       }
-      if (parsedOptions.options.raw) {
-        cmdParts.push("--raw");
-      }
+      // Focused field reads are machine-to-machine state handoffs. Keep broad
+      // list/status displays redacted, but return the selected field verbatim.
+      cmdParts.push("--raw");
     }
 
     const result = runAdwSpecCommand(command, cmdParts, sanitizedEnv());

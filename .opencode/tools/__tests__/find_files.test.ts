@@ -14,7 +14,7 @@ import {
 } from "./helpers/tool_harness";
 import { inspectWrapperSourceText } from "../tooling/wrapper_schema_inventory";
 
-const TOOL_CWD = path.resolve(import.meta.dir, "../..");
+const TOOL_CWD = process.cwd();
 const REAL_REPO_ROOT = path.resolve(import.meta.dir, "../../..");
 const FIXTURE_DIR = path.join(import.meta.dir, "fixtures/search_scope");
 const FIXTURE_FILE = path.join(FIXTURE_DIR, "alpha.ts");
@@ -187,7 +187,7 @@ describe("find_files wrapper", () => {
 
     try {
       const result = await execute({ pattern: "**/*.ts", options: "max-results=2 compact-output" });
-      expect(String(result)).toBe(`tools/__tests__/fixtures/search_scope/newest.ts\ntools/__tests__/fixtures/search_scope/middle.ts\n\n${
+      expect(String(result)).toBe(`${path.relative(TOOL_CWD, newestFile)}\n${path.relative(TOOL_CWD, middleFile)}\n\n${
         '[WARNING: Results truncated to 2 files (3 total found). Use options: "max-results=<n>" to increase limit.]'
       }`);
     } finally {

@@ -10,7 +10,8 @@ Focused ADW spec wrapper for read-oriented operations.
 - Validates `adw_id` fail-closed
   - missing, blank, null, and non-string values fail as required-input errors before format validation or spawn
   - malformed non-blank strings still fail the 8-character-hex validation path
-- `read` supports optional `field` plus bounded `options: "raw"`
+- `read` returns the selected field as raw content by default
+- `read` still accepts bounded `options: "raw"` as a compatibility no-op
 - `list` supports bounded `options: "json"`
 - Sparse option behavior: blank `field` is omitted, and non-blank `field` is trimmed before forwarding
 
@@ -21,7 +22,7 @@ Focused ADW spec wrapper for read-oriented operations.
 ```
 
 ```json
-{ "command": "read", "adw_id": "abc12345", "field": "worktree_path", "options": "raw" }
+{ "command": "read", "adw_id": "abc12345", "field": "worktree_path" }
 ```
 
 ```json
@@ -29,10 +30,10 @@ Focused ADW spec wrapper for read-oriented operations.
 ```
 
 ## Contract Note
-- `read` returns raw field content on success (including content that may begin with `ERROR:`).
+- `read` always delegates through the CLI's focused `--raw` path and returns raw field content on success (including content that may begin with `ERROR:`).
+- Broad `list` and workflow-status display surfaces retain their existing redaction behavior.
 - Present fields whose value is `null` are treated as successful reads, not missing-field failures.
-- `read --field ... --options raw` forwards delegated `null` output as payload (for example `null\n`).
-- Non-raw present-null reads still succeed and return the delegated field/value rendering.
+- Present-null reads forward delegated `null` output as payload (for example `null\n`).
 - Absent fields still fail through the deterministic delegated error envelope.
 - `list` returns envelope format: `ADW Spec Command: list\n\n<stdout>`.
 - Failures remain deterministic: `ERROR: adw spec <command> failed (exit N)` for non-zero exits,
