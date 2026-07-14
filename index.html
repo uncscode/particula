@@ -14650,9 +14650,12 @@
   latent-heat energy-density bookkeeping, and the
   <code>CondensationLatentHeat</code> strategy with latent-heat-corrected
   <code>mass_transfer_rate()</code>/<code>rate()</code> plus a <code>step()</code> that tracks per-step
-  latent heat diagnostics. The shipped support boundary is CPU-only and
-  does not claim GPU latent-heat parity or temperature-feedback runtime
-  support.</li>
+   latent heat diagnostics. The bounded, low-level direct GPU condensation
+   path optionally applies a latent-rate correction during each of its four
+   equal substeps, with CPU-oracle/Warp parity coverage. Omitted latent heat,
+   or a zero per-species value, retains that species' isothermal rate path.
+    Broader temperature feedback, gas coupling/conservation, and
+    strategy/runnable-level support remain deferred.</li>
 <li><strong>Interrogating your experimental data</strong> to validate and expand your impact.</li>
 <li><strong>Fostering open-source collaboration</strong> to share ideas and build on each other’s work.</li>
 </ul>
@@ -14760,13 +14763,14 @@
 <li><a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
   — canonical reference for <code>ParticleData</code>, <code>GasData</code>, <code>EnvironmentData</code>,
   explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
-   current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
-   such as coagulation <code>rng_states</code> and condensation thermodynamics. GPU
-   condensation requires keyword-only <code>thermodynamics=ThermodynamicsConfig</code> and
-   refreshes caller-owned <code>WarpGasData.vapor_pressure</code> from the current
-   device-resident temperature before mass transfer. For a runnable
-   direct-kernel walkthrough, use
-   <code>python docs/Examples/gpu_direct_kernels_quick_start.py</code>.</li>
+  current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
+  such as coagulation <code>rng_states</code> and condensation thermodynamics. GPU
+  condensation requires keyword-only <code>thermodynamics=ThermodynamicsConfig</code>,
+  optionally accepts <code>latent_heat</code> rate correction and its write-only signed
+  <code>energy_transfer</code> diagnostic, and refreshes caller-owned
+  <code>WarpGasData.vapor_pressure</code> from the current device-resident temperature
+  before mass transfer. For a runnable direct-kernel walkthrough, use
+  <code>python docs/Examples/gpu_direct_kernels_quick_start.py</code>.</li>
 <li><a href="Features/particle-data-migration/">ParticleData and GasData migration guide</a>
   — migration workflow and before/after examples for moving from legacy facades
   to the canonical data-container contract documented in the foundation guide.</li>

@@ -14873,10 +14873,14 @@ plus same-issue particle-plus-gas conservation regression coverage in
 Until that gate lands, roadmap and implementation guidance must not claim that
 GPU condensation updates gas concentrations in production.</p>
 <h3 id="downstream-gates-and-dependency-boundaries">Downstream gates and dependency boundaries<a class="headerlink" href="#downstream-gates-and-dependency-boundaries" title="Permanent link">&para;</a></h3>
-<p>The following work remains downstream of E4-F3: E4-F4 latent heat, E4-F5 gas
-coupling and particle-plus-gas conservation, E4-F6 independent-device plus
-graph/autodiff evidence, and E4-F7 final support work. None is implied by the
-fixed-four production step.</p>
+<p>E4-F4 P2 ships a low-level, per-substep latent-heat rate correction with
+CPU-oracle/Warp parity. Issue #1272 also ships its caller-owned, signed
+<code>energy_transfer</code> diagnostic: after successful preflight, its active-device
+<code>wp.float64</code> <code>(n_boxes, n_species)</code> output is overwritten with mass-clamped
+applied transfer times latent heat. It does not add temperature-state feedback,
+E4-F5 gas coupling and particle-plus-gas conservation, E4-F6
+independent-device plus graph/autodiff evidence, or E4-F7 strategy/runnable
+and final support work.</p>
 <ul>
 <li><strong>E2-F2 environment-shape dependency:</strong> the recommendation assumes the shipped
   contract for scalar inputs and explicit direct Warp <code>(n_boxes,)</code> environment
@@ -14893,7 +14897,11 @@ fixed-four production step.</p>
 <li>generalized stable timestep limits</li>
 <li>gas-coupled conservation claims that the current production path does not yet
   satisfy</li>
-<li>latent-heat, independent-device, graph-capture/replay, or autodiff claims</li>
+<li>P3/P4 temperature-feedback claims; E4-F5 gas coupling or conservation
+  claims; or E4-F6 independent-device, graph-capture/replay, or autodiff
+  claims. Issue #1272's caller-owned signed <code>energy_transfer</code> diagnostic is
+  shipped bookkeeping, not temperature feedback.</li>
+<li>strategy/runnable-level latent-heat support</li>
 </ul>
 <p>Later phases can build on this measured baseline and recommendation without
 redefining case shapes, metric names, threshold meaning, or the current

@@ -11486,6 +11486,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#latent-rate-correction-and-energy-diagnostic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Latent-rate correction and energy diagnostic
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -14560,6 +14571,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#latent-rate-correction-and-energy-diagnostic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Latent-rate correction and energy diagnostic
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -15073,8 +15095,9 @@ ordered-molar-mass compatibility contract. The frozen dataclass prevents field
 rebinding, not mutation of its arrays. Callers retain those arrays and must not
 mutate them concurrently with a launch.</p>
 <p>Successful direct calls mutate particle masses in place, overwrite the derived
-GPU-only vapor-pressure buffer, and return raw transfer before particle clamping.
-They do <strong>not</strong> couple or update gas concentration. Validation is atomic:
+GPU-only vapor-pressure buffer, and return accumulated <strong>applied, mass-clamped</strong>
+transfer. Scratch work storage contains only the final raw proposal. They do
+<strong>not</strong> couple or update gas concentration. Validation is atomic:
 unsupported sidecars fail with <code>ValueError</code> before mutation. Unsupported
 activity or surface strategies are not silently copied or approximated; passing
 <code>activity_surface=None</code> retains legacy unit activity and static tension.</p>
@@ -15088,6 +15111,30 @@ particle mass, refreshed vapor pressure, and unchanged gas concentration;
 tighter ownership invariants separately verify
 <code>final_mass == maximum(initial_mass + raw_transfer, 0)</code>. They do not claim
 particle-plus-gas conservation for this uncoupled direct step.</p>
+<h3 id="latent-rate-correction-and-energy-diagnostic">Latent-rate correction and energy diagnostic<a class="headerlink" href="#latent-rate-correction-and-energy-diagnostic" title="Permanent link">&para;</a></h3>
+<p>The direct step accepts optional keyword-only caller-owned active-device
+<code>wp.float64</code> <code>latent_heat</code> with shape <code>(n_species,)</code>. For species <code>i</code>, its
+shipped latent-rate correction is
+<code>dm_i/dt = isothermal_rate_i / correction_i</code>, where
+<code>isothermal_rate_i = k_i * Delta_p_i * M_i / (R * T)</code>,
+<code>R_specific_i = R / M_i</code>, and
+<code>correction_i = thermal_factor_i / (R_specific_i * T)</code>. The source thermal
+factor is
+<code>thermal_factor_i = (D_i * L_i * p_surface_i / (T * k_thermal)) * (L_i / (T * R_specific_i) - 1) + R_specific_i * T</code>.
+Here <code>p_surface_i</code> is the activity- and Kelvin-adjusted surface vapor pressure.
+An omitted sidecar, or exactly <code>L_i = 0</code>, follows the exact isothermal branch.</p>
+<p>Optional keyword-only <code>energy_transfer</code> is a caller-owned active-device
+<code>wp.float64</code>, <code>(n_boxes, n_species)</code>, write-only output. It requires valid
+<code>latent_heat</code>, is overwritten only after successful preflight, and is not a
+third return value. Its signed whole-call diagnostic, shipped in issue #1272,
+is <code>Q[box, species] = sum_particles(Delta m_applied) * L[species]</code>: <code>Delta m</code>
+is applied transfer in kg, <code>L</code> is latent heat in J/kg, and <code>Q</code> is J. Thus
+condensation is positive and evaporation is negative. The strict #1272
+energy-regression tolerance is <code>rtol=1e-12, atol=1e-18</code>.</p>
+<p><code>thermal_work</code> has the same validated sidecar shape but remains deferred and
+unused. This diagnostic does not evolve temperature, mutate gas concentration,
+establish gas/full-system conservation, or add a <code>Runnable</code>, adaptive
+substeps, graph capture/replay, autodiff, or E4-F6 cross-device certification.</p>
 <p>Use <code>to_warp_*</code> and <code>from_warp_*</code> as the sole CPU↔Warp boundary. There is no
 hidden transfer and no high-level <code>Aerosol</code> or <code>Runnable</code> GPU path. Deterministic
 fp64 tests compare an independent NumPy reference with explicit parity
@@ -15096,7 +15143,7 @@ required whenever Warp is installed; CUDA is optional, availability-guarded,
 and separately marked. Warp-dependent test imports are lazy, so marker-
 deselected collection does not require Warp:</p>
 <div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>--collect-only<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not warp&quot;</span>
-pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and gpu_parity and not cuda&quot;</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
 </code></pre></div>
 <h2 id="current-shipped-support-boundaries">Current shipped support boundaries<a class="headerlink" href="#current-shipped-support-boundaries" title="Permanent link">&para;</a></h2>

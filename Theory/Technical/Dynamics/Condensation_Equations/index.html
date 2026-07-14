@@ -14531,31 +14531,64 @@
 <h2 id="condensation-with-latent-heat">Condensation with Latent Heat<a class="headerlink" href="#condensation-with-latent-heat" title="Permanent link">&para;</a></h2>
 <p>When condensation results in significant heat release or absorption, the latent heat of vaporization must be considered. This scenario is critical in cloud droplet formation, where the heat effects can influence the condensation rate and local temperature.</p>
 <p>Derivation from Topping, D., &amp; Bane, M. (2022) equation 2.36.</p>
-<p><strong>Equation 5: Rate of Mass Change with Latent Heat</strong></p>
-<p>dm/dt = [N × 4 × π × radius_wet × Dᵢ × (pᵢ, gas − pᵢ, particle surface)] / { [ (Dᵢ × Lᵢ × pᵢ) / (κ × T) ] × [ (Lᵢ / (R × T)) − 1 ] + Rᵢ × T }</p>
+<p><strong>Equation 5: Shipped Rate of Mass Change with Latent Heat</strong></p>
+<p>For species <code>i</code>, the shipped latent-heat path first calculates the
+isothermal rate and then divides it by a dimensionless correction:</p>
+<p><code>dm_i/dt = isothermal_rate_i / correction_i</code></p>
+<p><code>isothermal_rate_i = k_i × Delta_p_i × M_i / (R × T)</code></p>
+<p><code>correction_i = thermal_factor_i / (R_specific_i × T)</code></p>
+<p><code>thermal_factor_i = [D_i × L_i × p_surface_i / (T × κ)] × [L_i / (T × R_specific_i) − 1] + R_specific_i × T</code></p>
+<p><code>R_specific_i = R / M_i</code></p>
 <p><strong>Where:</strong></p>
 <ul>
-<li><strong>dm/dt</strong>: Rate of change of mass of the droplet.</li>
-<li><strong>m</strong>: Mass of the droplet.</li>
-<li><strong>radius_wet</strong>: Wet radius of the droplet.</li>
-<li><strong>Dᵢ</strong>: Diffusion coefficient of species <strong>i</strong>.</li>
+<li><strong>dm_i/dt</strong>: Rate of change of particle-phase mass of species <strong>i</strong>
+  [kg/s]. A positive rate is condensation and a negative rate is evaporation.</li>
+<li><strong>isothermal_rate_i</strong>: The isothermal mass-transfer rate [kg/s].</li>
+<li><strong>correction_i</strong>: Dimensionless latent-heat correction.</li>
+<li><strong>thermal_factor_i</strong>: Thermal resistance factor [J/kg].</li>
+<li><strong>k_i</strong>: First-order mass-transport coefficient [m³/s].</li>
+<li><strong>Delta_p_i</strong>: <code>p_i, gas − p_i, particle surface</code>, the pressure driving
+  force [Pa].</li>
+<li><strong>Dᵢ</strong>: Diffusion coefficient of species <strong>i</strong> [m²/s].</li>
 <li><strong>pᵢ, gas</strong>: Partial pressure of species <strong>i</strong> in the gas phase.</li>
-<li><strong>pᵢ, particle surface</strong>: Partial pressure at the particle surface.</li>
-<li><strong>Lᵢ</strong>: Latent heat of vaporization for species <strong>i</strong>.</li>
-<li><strong>κ</strong>: Thermal conductivity of air.</li>
-<li><strong>T</strong>: Temperature.</li>
-<li><strong>Rᵢ</strong>: Specific gas constant for species <strong>i</strong> (<strong>R / molar massᵢ</strong>).</li>
+<li><strong>p_surface_i</strong>: Activity- and Kelvin-adjusted partial pressure at the
+  particle surface [Pa].</li>
+<li><strong>Lᵢ</strong>: Latent heat of vaporization for species <strong>i</strong> [J/kg].</li>
+<li><strong>κ</strong>: Thermal conductivity of air [W/(m K)].</li>
+<li><strong>T</strong>: Temperature [K].</li>
+<li><strong>M_i</strong>: Molar mass of species <strong>i</strong> [kg/mol].</li>
+<li><strong>R</strong>: Universal ideal-gas constant [J/(mol K)].</li>
+<li><strong>R_specific_i</strong>: Specific gas constant for species <strong>i</strong> [J/(kg K)],
+  defined as <code>R / M_i</code>.</li>
 </ul>
 <p><strong>Description:</strong></p>
-<p>This equation modifies the isothermal rate to include thermal effects due to latent heat. The denominator accounts for the additional resistance to mass transfer caused by the temperature gradient established from heat release or absorption during phase change.</p>
+<p>This expression modifies the isothermal rate to include thermal resistance due
+to latent heat. In particular, the per-species term is
+<code>L_i / (T × R_specific_i)</code>, not <code>L_i / (R × T)</code>: <code>L_i</code> is expressed per unit
+mass and must therefore use the species-specific gas constant. When <code>L_i = 0</code>,
+the thermal factor is <code>R_specific_i × T</code>, <code>correction_i = 1</code>, and the shipped
+path is exactly isothermal.</p>
 <p><strong>Implementation status:</strong></p>
 <ul>
 <li>The CPU implementation is available through <code>CondensationLatentHeat</code>,
   <code>get_mass_transfer_rate_latent_heat</code>, and
   <code>get_latent_heat_energy_released</code>.</li>
-<li>A Warp-backed GPU implementation of this latent-heat equation is still
-  planned. Track this work in the
-  <a href="../../../../Features/Roadmap/data-oriented-gpu/">Data-Oriented Design and GPU Roadmap</a>.</li>
+<li>The direct Warp GPU condensation step applies an optional latent-heat rate
+  correction in each of its four fixed substeps, with CPU-oracle/Warp parity
+  coverage. Omitted latent heat or zero per-species entries retain exact
+  isothermal behavior. E4-F4/#1272 ships optional caller-owned active-device
+  <code>wp.float64</code> <code>latent_heat</code> with shape <code>(n_species,)</code> and optional
+  caller-owned active-device <code>wp.float64</code> <code>energy_transfer</code> with shape
+  <code>(n_boxes, n_species)</code>. <code>energy_transfer</code> requires valid <code>latent_heat</code>, is
+  overwritten only after successful preflight, and is not a third return item.
+  It is a signed whole-call diagnostic:
+  <code>Q[box, species] = sum_particles(Delta m_applied) * L[species]</code>, where
+  applied <code>Delta m</code> is in kg, <code>L</code> is in J/kg, and <code>Q</code> is in J; condensation is
+  positive and evaporation is negative. <code>thermal_work</code> remains validated but
+  deferred and unused. This bookkeeping does not evolve temperature, mutate
+  gas concentration, establish gas/full-system conservation, add adaptive
+  substeps or a high-level <code>Runnable</code>, or guarantee graph capture/replay,
+  autodiff, or complete E4-F6 cross-device certification.</li>
 </ul>
 <h2 id="additional-parameters">Additional Parameters<a class="headerlink" href="#additional-parameters" title="Permanent link">&para;</a></h2>
 <h3 id="first-order-condensation-coefficient">First-Order Condensation Coefficient<a class="headerlink" href="#first-order-condensation-coefficient" title="Permanent link">&para;</a></h3>
