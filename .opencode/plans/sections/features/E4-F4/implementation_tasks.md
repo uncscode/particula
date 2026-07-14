@@ -41,3 +41,10 @@
 - [x] Add energy-output overwrite/reuse, NaN/Inf write-only storage,
   oracle/clamp parity, aggregation, atomic preflight, disabled-path, and CUDA
   parity tests.
+- [x] Add composed scalar and explicit-`WarpEnvironmentData` Warp-CPU
+  four-substep-oracle regressions, plus optional `cuda_device` coverage. Assert
+  applied-transfer and signed-energy identities, output identity, unchanged gas
+  concentration, and exact zero-latent energy columns for each route.
+- [x] Update the three GPU feature documents with the shipped equation, units,
+  issue #1272 mapping, sidecar ownership, supported limits, and focused CPU/CUDA
+  reproduction commands.

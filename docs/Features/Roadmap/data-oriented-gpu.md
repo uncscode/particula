@@ -22,7 +22,7 @@ documentation conventions.
 | 1 | [Epic A: Data-Model and Numerical Foundations](#epic-a-data-model-and-numerical-foundations) | Shipped | E2 |
 | 2 | [Epic B: Non-Isothermal Condensation Public API (CPU)](#epic-b-non-isothermal-condensation-public-api-cpu) | Shipped | E1 |
 | 3 | [Epic C: GPU Kernel Correctness and Low-Level API Hardening](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening) | Shipped | E3 |
-| 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | In progress | E4-F2 |
+| 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | In progress | E4-F4 |
 | 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Pending | not scheduled |
 | 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Pending | not scheduled |
 | 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Pending | not scheduled |
@@ -972,7 +972,11 @@ The current executable CPU integration baseline remains
 The direct step applies an optional latent-heat rate correction in each of its
 four fixed substeps, with CPU-oracle/Warp parity coverage. The shipped source
 rate is `dm_i/dt = isothermal_rate_i / correction_i`, where
-`correction_i = thermal_factor_i / (R_specific_i * T)`. Omitted latent heat or
+`isothermal_rate_i = k_i * Delta_p_i * M_i / (R * T)`,
+`R_specific_i = R / M_i`,
+`correction_i = thermal_factor_i / (R_specific_i * T)`, and
+`thermal_factor_i = (D_i * L_i * p_surface_i / (T * k_thermal)) * (L_i / (T * R_specific_i) - 1) + R_specific_i * T`.
+`p_surface_i` is activity- and Kelvin-adjusted. Omitted latent heat or exactly
 zero per-species entries retain exact isothermal behavior.
 
 E4-F3 is shipped. Import its only step entry point with
@@ -1015,7 +1019,7 @@ pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -W
 
 Remaining feature ownership:
 
-1. E4-F4: remaining temperature-feedback integration, including the CPU
+1. Unassigned future work: temperature-feedback integration, including the CPU
    reference context in the [condensation
    equations](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat).
 2. E4-F5: gas-coupled inventory, partitioning, and conservation evidence.

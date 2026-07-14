@@ -28,8 +28,15 @@ never lowered.
   failures for missing latent heat and invalid output metadata, no energy
   kernels when omitted, and optional `cuda`/`gpu_parity` multi-box oracle
   coverage with clean skips.
-- **P4:** Compose E4-F1/F2/F3 on mandatory Warp CPU and optional CUDA with
-  clean skips; retain scalar/environment API regressions.
+- **P4 (shipped, issue #1300):** `condensation_test.py` runs fresh-state
+  composed scalar and explicit-`WarpEnvironmentData` routes on Warp CPU against
+  the independent four-substep oracle. Each route verifies final mass, applied
+  accumulated transfer, signed `(n_boxes, n_species)` energy, sidecar identity,
+  exact zero-latent energy, unchanged gas concentration, finite nonnegative
+  mass, and the unchanged two-item return. A separate `cuda`/`gpu_parity` test
+  uses `cuda_device` only, so CUDA is additive and skips cleanly when absent.
+  The focused commands are `pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror`
+  and `pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror`.
 
 Preserve issue #1272 bookkeeping tolerances (`rtol=1e-12`, `atol=1e-18`) where
 fp64 representation permits. Record separate justified full-physics parity

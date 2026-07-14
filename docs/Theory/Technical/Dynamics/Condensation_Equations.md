@@ -35,26 +35,51 @@ When condensation results in significant heat release or absorption, the latent 
 
 Derivation from Topping, D., & Bane, M. (2022) equation 2.36.
 
-**Equation 5: Rate of Mass Change with Latent Heat**
+**Equation 5: Shipped Rate of Mass Change with Latent Heat**
 
-dm/dt = [N × 4 × π × radius_wet × Dᵢ × (pᵢ, gas − pᵢ, particle surface)] / { [ (Dᵢ × Lᵢ × pᵢ) / (κ × T) ] × [ (Lᵢ / (R × T)) − 1 ] + Rᵢ × T }
+For species `i`, the shipped latent-heat path first calculates the
+isothermal rate and then divides it by a dimensionless correction:
+
+`dm_i/dt = isothermal_rate_i / correction_i`
+
+`isothermal_rate_i = k_i × Delta_p_i × M_i / (R × T)`
+
+`correction_i = thermal_factor_i / (R_specific_i × T)`
+
+`thermal_factor_i = [D_i × L_i × p_surface_i / (T × κ)] × [L_i / (T × R_specific_i) − 1] + R_specific_i × T`
+
+`R_specific_i = R / M_i`
 
 **Where:**
 
-- **dm/dt**: Rate of change of mass of the droplet.
-- **m**: Mass of the droplet.
-- **radius_wet**: Wet radius of the droplet.
-- **Dᵢ**: Diffusion coefficient of species **i**.
+- **dm_i/dt**: Rate of change of particle-phase mass of species **i**
+  [kg/s]. A positive rate is condensation and a negative rate is evaporation.
+- **isothermal_rate_i**: The isothermal mass-transfer rate [kg/s].
+- **correction_i**: Dimensionless latent-heat correction.
+- **thermal_factor_i**: Thermal resistance factor [J/kg].
+- **k_i**: First-order mass-transport coefficient [m³/s].
+- **Delta_p_i**: `p_i, gas − p_i, particle surface`, the pressure driving
+  force [Pa].
+- **Dᵢ**: Diffusion coefficient of species **i** [m²/s].
 - **pᵢ, gas**: Partial pressure of species **i** in the gas phase.
-- **pᵢ, particle surface**: Partial pressure at the particle surface.
-- **Lᵢ**: Latent heat of vaporization for species **i**.
-- **κ**: Thermal conductivity of air.
-- **T**: Temperature.
-- **Rᵢ**: Specific gas constant for species **i** (**R / molar massᵢ**).
+- **p_surface_i**: Activity- and Kelvin-adjusted partial pressure at the
+  particle surface [Pa].
+- **Lᵢ**: Latent heat of vaporization for species **i** [J/kg].
+- **κ**: Thermal conductivity of air [W/(m K)].
+- **T**: Temperature [K].
+- **M_i**: Molar mass of species **i** [kg/mol].
+- **R**: Universal ideal-gas constant [J/(mol K)].
+- **R_specific_i**: Specific gas constant for species **i** [J/(kg K)],
+  defined as `R / M_i`.
 
 **Description:**
 
-This equation modifies the isothermal rate to include thermal effects due to latent heat. The denominator accounts for the additional resistance to mass transfer caused by the temperature gradient established from heat release or absorption during phase change.
+This expression modifies the isothermal rate to include thermal resistance due
+to latent heat. In particular, the per-species term is
+`L_i / (T × R_specific_i)`, not `L_i / (R × T)`: `L_i` is expressed per unit
+mass and must therefore use the species-specific gas constant. When `L_i = 0`,
+the thermal factor is `R_specific_i × T`, `correction_i = 1`, and the shipped
+path is exactly isothermal.
 
 **Implementation status:**
 
@@ -64,8 +89,19 @@ This equation modifies the isothermal rate to include thermal effects due to lat
 - The direct Warp GPU condensation step applies an optional latent-heat rate
   correction in each of its four fixed substeps, with CPU-oracle/Warp parity
   coverage. Omitted latent heat or zero per-species entries retain exact
-  isothermal behavior. Temperature feedback, gas coupling, and energy
-  bookkeeping remain deferred.
+  isothermal behavior. E4-F4/#1272 ships optional caller-owned active-device
+  `wp.float64` `latent_heat` with shape `(n_species,)` and optional
+  caller-owned active-device `wp.float64` `energy_transfer` with shape
+  `(n_boxes, n_species)`. `energy_transfer` requires valid `latent_heat`, is
+  overwritten only after successful preflight, and is not a third return item.
+  It is a signed whole-call diagnostic:
+  `Q[box, species] = sum_particles(Delta m_applied) * L[species]`, where
+  applied `Delta m` is in kg, `L` is in J/kg, and `Q` is in J; condensation is
+  positive and evaporation is negative. `thermal_work` remains validated but
+  deferred and unused. This bookkeeping does not evolve temperature, mutate
+  gas concentration, establish gas/full-system conservation, add adaptive
+  substeps or a high-level `Runnable`, or guarantee graph capture/replay,
+  autodiff, or complete E4-F6 cross-device certification.
 
 
 ## Additional Parameters

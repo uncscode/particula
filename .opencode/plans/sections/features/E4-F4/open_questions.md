@@ -35,4 +35,10 @@
   - Resolved 2026-07-14: after successful atomic preflight, clear the
     caller-owned `(n_boxes, n_species)` output once and use one writer per
     box/species after all four substeps to reduce accumulated bounded transfer
-    times latent heat. Output contents are write-only and never validated/read.
+     times latent heat. Output contents are write-only and never validated/read.
+- [x] Do composed scalar and explicit-environment routes preserve the P2/P3
+  latent and energy contracts?
+  - Resolved 2026-07-14 (issue #1300): independent fresh-state Warp-CPU oracle
+    regressions cover both routes; optional CUDA uses the existing
+    `cuda_device` availability skip. Both retain applied-transfer accounting,
+    signed energy, unchanged gas concentration, and a zero-latent energy column.

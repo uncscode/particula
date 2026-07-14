@@ -30,7 +30,15 @@ caller-owned, active-device `wp.float64` `energy_transfer` storage shaped
 the output once, then after all four substeps each box/species has one writer
 that reduces bounded accumulated particle transfer times latent heat. The
 output is overwritten by identity, remains device-only, and is not a third
-return item. Omitted output adds no energy allocation or kernel work.
+ return item. Omitted output adds no energy allocation or kernel work.
+
+**P4 Delivered (issue #1300):** Fresh-state composed regressions now validate
+both scalar temperature/pressure and explicit `WarpEnvironmentData` routes on
+Warp CPU against the four-substep CPU oracle. They cover applied transfer,
+signed caller-owned energy output, zero-latent energy, sidecar identity, and
+unchanged gas concentration; equivalent CUDA coverage is additive through the
+existing availability-skipped fixture. The three GPU feature documents now
+state the shipped equation, ownership, commands, and bounded non-goals.
 
 **User Stories:**
 - As a simulation user, I want latent heat to reduce GPU condensation rates so

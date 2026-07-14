@@ -661,10 +661,15 @@ caller buffers.
 This direct low-level GPU step uses an optional keyword-only caller-owned
 active-device `wp.float64` `latent_heat` sidecar with shape `(n_species,)` in
 each fixed substep. Its shipped rate is
-`dm_i/dt = isothermal_rate_i / correction_i`, with
-`correction_i = thermal_factor_i / (R_specific_i * T)` from the source thermal
-resistance expression. Omitting latent heat, or setting a species entry to
-zero, takes that species through the exact isothermal branch.
+`dm_i/dt = isothermal_rate_i / correction_i`, where
+`isothermal_rate_i = k_i * Delta_p_i * M_i / (R * T)`,
+`R_specific_i = R / M_i`, and
+`correction_i = thermal_factor_i / (R_specific_i * T)`. The source thermal
+resistance expression is
+`thermal_factor_i = (D_i * L_i * p_surface_i / (T * k_thermal)) * (L_i / (T * R_specific_i) - 1) + R_specific_i * T`,
+using the activity- and Kelvin-adjusted `p_surface_i`. Omitting latent heat, or
+setting a species entry to exactly zero, takes that species through the exact
+isothermal branch.
 
 Issue #1272 also ships optional keyword-only caller-owned active-device
 `wp.float64` `energy_transfer`, shape `(n_boxes, n_species)`, as write-only

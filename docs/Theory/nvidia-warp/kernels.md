@@ -433,7 +433,7 @@ def test_diffusion_gpu_matches_numpy():
 6. **`wp.synchronize()`** — always call before `.numpy()`
 
 For full details, see the
-[Testing Guide](../../../adw-docs/testing_guide.md#testing-nvidia-warp-kernels).
+[Testing Guide](../../../.opencode/guides/testing_guide.md#nvidia-warp-tests).
 
 ## See Also
 

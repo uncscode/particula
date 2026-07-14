@@ -21,7 +21,8 @@ four-substep latent correction, and opt-in energy bookkeeping are complete.
   for signed whole-call bounded applied transfer times latent heat, with atomic
   preflight, one clear, and one final single-writer reduction.
 - CPU-oracle/Warp parity, validation atomicity, deterministic scratch-reuse
-  regressions, and focused production-docstring updates.
+  regressions, composed scalar/environment route coverage, optional CUDA
+  coverage, and focused production/documentation updates.
 
 **Out of scope:**
 - Gas mutation, inventory limits, and full system conservation (E4-F5).

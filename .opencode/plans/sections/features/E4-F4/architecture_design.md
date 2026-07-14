@@ -11,8 +11,8 @@ validated latent heat + thermal-work sidecars
       -> use that pressure for the pressure delta and fp64 thermal correction
       -> bound transfer against available particle mass
       -> mutate mass and accumulate transfer
-  -> preserve existing particle/transfer return
-  -> P3 may add deferred energy accounting
+  -> P3: reduce signed applied transfer times latent heat into optional energy output
+  -> P4: exercise scalar and explicit-environment routes against the same oracle
 ```
 
 P1 provides private fp64 conductivity, thermal-resistance, and latent-rate
@@ -21,8 +21,9 @@ substeps. The supplied sidecars are validated atomically before environment
 normalization, allocation, refresh, launch, or mutation; valid arrays remain
 unchanged. A supplied latent array is passed by identity; omitted latent heat
 uses an unread existing fp64 placeholder without allocation. `thermal_work`
-is still validated but deferred. P3, if implemented, derives energy from
-transfer actually applied after clamping.
+is still validated but deferred. P3 derives energy from transfer actually
+applied after clamping; P4 confirms that composed scalar and explicit
+environment inputs retain that contract without host transfer.
 
 ### Data / API / Workflow Changes
 

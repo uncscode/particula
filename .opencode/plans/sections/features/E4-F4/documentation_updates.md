@@ -1,13 +1,16 @@
 # Documentation Updates
 
-## P3 implementation record (issue #1299)
+## P4 implementation record (issue #1300)
 
-The production `condensation_step_gpu()` docstring now documents the
-caller-owned, write-only `energy_transfer` contract: active-device fp64
-`(n_boxes, n_species)` output, overwrite-after-preflight semantics, valid
-stale NaN/Inf storage, no third return item, and no hidden host transfer. No
-user-facing documentation files changed for P3 because issue #1299 explicitly
-scoped P4 documentation work out.
+Issue #1300 updated `docs/Features/Roadmap/data-oriented-gpu.md`,
+`docs/Features/data-containers-and-gpu-foundations.md`, and
+`docs/Features/condensation_strategy_system.md`. The documents now record the
+shipped per-species latent-rate correction, issue #1272 signed diagnostic
+`Q[box, species] = sum_particles(Delta m_applied) * L[species]`, units and
+signs, optional caller-owned fp64 sidecars, overwrite-after-preflight behavior,
+and the exact omitted/zero-latent isothermal fallback. They also publish the
+required Warp-CPU and availability-skipped CUDA commands and retain the stated
+non-goals (including temperature evolution and gas coupling).
 
 - P2 updated the user-facing `docs/index.md` and
   `docs/Features/condensation_strategy_system.md` to document the optional
@@ -16,9 +19,8 @@ scoped P4 documentation work out.
 - Production docstrings now state that latent heat is applied per fixed
   substep and that `thermal_work` is validated but deferred P3 state.
 - Guidance in `docs/Theory/Technical/Dynamics/Condensation_Equations.md` and
-  the GPU roadmap in `docs/Features/Roadmap/data-oriented-gpu.md` now record
-  the shipped correction/parity boundary and defer temperature feedback, gas
-  coupling/conservation, and energy bookkeeping.
+  the GPU roadmap record the shipped correction/parity boundary; temperature
+  feedback and gas coupling/conservation remain deferred.
 - The user-facing contract remains bounded: no temperature evolution, gas
-  mutation/conservation claim, energy diagnostic, or hidden host transfer;
-  signed energy accounting remains P3/P4 scope.
+  mutation/conservation claim, adaptive stepping, high-level runnable, graph
+  capture/replay, autodiff guarantee, or hidden host transfer.
