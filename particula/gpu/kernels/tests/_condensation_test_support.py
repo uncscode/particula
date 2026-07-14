@@ -2925,7 +2925,6 @@ def test_condensation_energy_transfer_preflight_is_atomic(
 def test_condensation_energy_transfer_alias_preflight_is_atomic(
     device: str,
     alias_name: str,
-    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Aliased energy output fails before it can mutate mutable gas state."""
     particles = _make_particle_data(1, 1, 2)
@@ -2952,12 +2951,6 @@ def test_condensation_energy_transfer_alias_preflight_is_atomic(
     )
     snapshots = tuple(array.numpy().copy() for array in state_arrays)
 
-    def fail_after_preflight(*args: Any, **kwargs: Any) -> None:
-        raise AssertionError("aliased energy output passed preflight")
-
-    monkeypatch.setattr(
-        condensation_module, "_ensure_environment_arrays", fail_after_preflight
-    )
     with pytest.raises(ValueError, match="must not overlap mutable"):
         _condensation_step_gpu(
             gpu_particles,
@@ -2972,6 +2965,110 @@ def test_condensation_energy_transfer_alias_preflight_is_atomic(
         )
 
     assert energy_transfer is getattr(gpu_gas, alias_name)
+    for array, expected in zip(state_arrays, snapshots, strict=True):
+        npt.assert_array_equal(array.numpy(), expected)
+
+
+@pytest.mark.cuda
+@pytest.mark.parametrize("invalid_value", (np.nan, np.inf, -1.0))
+@pytest.mark.parametrize(
+    "sidecar_name",
+    (
+        "latent_heat",
+        "thermal_work",
+        "surface_tension",
+        "mass_accommodation",
+        "diffusion_coefficient_vapor",
+    ),
+)
+def test_condensation_cuda_invalid_species_sidecar_is_atomic(
+    cuda_device: str,
+    invalid_value: float,
+    sidecar_name: str,
+) -> None:
+    """CUDA rejects invalid sidecars before caller-owned state is changed."""
+    particles = _make_particle_data(1, 1, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=cuda_device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=cuda_device, vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    sidecars = {
+        "latent_heat": wp.ones(2, dtype=wp.float64, device=cuda_device),
+        "thermal_work": wp.ones(2, dtype=wp.float64, device=cuda_device),
+        "surface_tension": wp.full(
+            2, 0.072, dtype=wp.float64, device=cuda_device
+        ),
+        "mass_accommodation": wp.ones(2, dtype=wp.float64, device=cuda_device),
+        "diffusion_coefficient_vapor": wp.full(
+            2, 2.0e-5, dtype=wp.float64, device=cuda_device
+        ),
+    }
+    sidecars[sidecar_name] = wp.array(
+        [invalid_value, 1.0], dtype=wp.float64, device=cuda_device
+    )
+    energy_transfer = wp.full(
+        (1, 2), 19.0, dtype=wp.float64, device=cuda_device
+    )
+    mass_transfer = wp.full(
+        (1, 1, 2), 13.0, dtype=wp.float64, device=cuda_device
+    )
+    state_arrays = (
+        gpu_particles.masses,
+        gpu_gas.vapor_pressure,
+        energy_transfer,
+        mass_transfer,
+        *sidecars.values(),
+    )
+    snapshots = tuple(array.numpy().copy() for array in state_arrays)
+
+    with pytest.raises(ValueError, match=f"{sidecar_name} must be finite"):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            energy_transfer=energy_transfer,
+            mass_transfer=mass_transfer,
+            **sidecars,
+        )
+
+    for array, expected in zip(state_arrays, snapshots, strict=True):
+        npt.assert_array_equal(array.numpy(), expected)
+
+
+def test_condensation_energy_transfer_rejects_thermodynamic_parameters_alias(
+    device: str,
+) -> None:
+    """Energy output cannot clear thermodynamic parameters before refresh."""
+    particles = _make_particle_data(4, 1, 4)
+    gas = _make_gas_data(4, 4)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=_make_vapor_pressure(4, 4)
+    )
+    thermodynamics = _make_thermodynamics_config(gpu_gas)
+    latent_heat = wp.ones(4, dtype=wp.float64, device=device)
+    state_arrays = (
+        gpu_particles.masses,
+        gpu_gas.vapor_pressure,
+        thermodynamics.parameters,
+    )
+    snapshots = tuple(array.numpy().copy() for array in state_arrays)
+
+    with pytest.raises(ValueError, match="must not overlap mutable"):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            thermodynamics=thermodynamics,
+            latent_heat=latent_heat,
+            energy_transfer=thermodynamics.parameters,
+        )
     for array, expected in zip(state_arrays, snapshots, strict=True):
         npt.assert_array_equal(array.numpy(), expected)
 

@@ -320,8 +320,8 @@ restored = from_warp_environment_data(gpu_environment)
   optional caller-owned active-device `wp.float64` `energy_transfer` output
   shaped `(n_boxes, n_species)` requires `latent_heat`; after successful
   preflight it records signed whole-call, mass-clamped transfer times latent
-  heat and is not returned as a third tuple item. `thermal_work` has the same
-  validated sidecar shape but remains deferred, unused P3 state.
+  heat and is not returned as a third tuple item. `thermal_work` has validated
+  per-species shape `(n_species,)` but remains deferred, unused state.
 - This direct particle-only step does not establish CPU-strategy parity, a
   `Runnable` API, adaptive stepping, gas coupling/conservation, graph
   capture/replay, autodiff, or general accuracy claims. See
