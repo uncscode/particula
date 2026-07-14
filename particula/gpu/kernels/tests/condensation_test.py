@@ -103,6 +103,17 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
         in EXPORTED_CONDENSATION_TESTS
     )
     assert (
+        "test_condensation_composed_scalar_route_matches_four_substep_oracle"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_composed_environment_route_matches_four_substep_oracle"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert "test_condensation_composed_cuda_matches_four_substep_oracle" in (
+        EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
         "test_condensation_step_gpu_without_energy_transfer_skips_energy_kernels"
         in EXPORTED_CONDENSATION_TESTS
     )
