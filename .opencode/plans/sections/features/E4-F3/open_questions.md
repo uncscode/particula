@@ -10,11 +10,10 @@
     zero-required-allocation path, and P1 also supports partial sidecars by
     allocating only omitted fields after the atomic validation gate.
 - [x] Should `mass_transfer` be both work storage and the total accumulator?
-  - Resolved 2026-07-13: for P1, retain legacy `mass_transfer` as the single
-    work/result buffer by identity. Scratch work and total fields both receive
-    the one-update raw pre-clamp transfer; `mass_transfer` conflicts only with
-    a supplied scratch transfer field. P2 owns accumulated applied-transfer
-    semantics.
+  - Resolved 2026-07-13: P2 retains legacy `mass_transfer` as the total buffer
+    by identity when scratch transfer fields are absent. Total is cleared once
+    and accumulates clamped applied transfer across four substeps; distinct work
+    storage retains only the final raw proposal.
 - [x] Can E4-F1 refresh reuse the same `(n_boxes,)` environment-property
   buffers across all four substeps?
   - Resolved 2026-07-13: yes. Complete structural validation before the loop,

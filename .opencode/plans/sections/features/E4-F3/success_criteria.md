@@ -1,19 +1,21 @@
 # Success Criteria
 
-- [ ] E4-F1 is shipped and its thermodynamic refresh executes before transfer
-  calculation in each of exactly four substeps.
-- [ ] Every substep uses `time_step / 4` and reads current particle state.
+- [x] E4-F1 thermodynamic refresh executes before transfer calculation in each
+  of exactly four substeps (P2, issue #1293).
+- [x] Every substep uses `time_step / 4` and reads current particle state (P2,
+  issue #1293).
 - [x] Complete fp64 `CondensationScratchBuffers` sidecars eliminate required
   allocation of the two transfer and two property stable shapes and preserve
   caller identity and shape (P1, issue #1292).
 - [x] All supplied scratch fields validate before allocation, normalization,
   refresh, launch, clear, particle mutation, or caller-buffer mutation (P1,
   issue #1292).
-- [ ] Returned mass transfer is the accumulated applied transfer for the full
-  call; particle mass remains finite and nonnegative.
-- [ ] Repeated identical runs are deterministic and gas concentration is
-  unchanged.
-- [ ] Scalar, Warp-array, hybrid, and explicit environment input contracts pass.
+- [x] Returned mass transfer is the accumulated applied transfer for the full
+  call; particle mass remains finite and nonnegative (P2, issue #1293).
+- [x] Repeated identical runs are deterministic and gas concentration is
+  unchanged (P2, issue #1293).
+- [x] Scalar, Warp-array, hybrid, and explicit environment input contracts pass
+  fixed-four integration coverage (P2, issue #1293).
 - [ ] Recorded nanometer, accumulation-mode, and droplet-like stiffness grids
   preserve issue #1272 validation signals on Warp CPU; optional CUDA skips or
   passes cleanly.

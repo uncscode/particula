@@ -10,11 +10,12 @@
   without breaking existing positional calls (issue #1292).
 - [x] Resolve partial sidecars only after validation; preserve legacy
   `mass_transfer` identity and reject transfer-storage overlap (issue #1292).
-- [ ] Launch E4-F1 refresh and applicable environment preparation inside each
-  of four equal substeps.
-- [ ] Calculate, clamp, apply, and accumulate transfer each iteration.
-- [ ] Return accumulated total transfer by caller-owned identity and preserve
-  gas concentration unchanged.
+- [x] Launch E4-F1 refresh and applicable environment preparation inside each
+  of four equal substeps (issue #1293).
+- [x] Calculate, clamp, apply, and accumulate transfer each iteration (issue
+  #1293).
+- [x] Return accumulated total transfer by caller-owned identity and preserve
+  gas concentration unchanged (issue #1293).
 - [ ] Confirm the all-scratch-supplied path performs no required allocation or
   hidden CPU/Warp synchronization.
 
@@ -26,9 +27,10 @@
   `particula/gpu/kernels/tests/condensation_test.py` (issue #1292).
 - [ ] Promote fixed-four candidate cases through
   `condensation_stiffness_test.py` against the production entry point.
-- [ ] Assert exactly four equal iterations and per-substep E4-F1 refresh.
-- [ ] Assert deterministic, finite, nonnegative, total-transfer, and unchanged
-  gas semantics on repeated calls.
+- [x] Assert exactly four equal iterations and per-substep E4-F1 refresh
+  (issue #1293).
+- [x] Assert deterministic, finite, nonnegative, total-transfer, and unchanged
+  gas semantics on repeated calls (issue #1293).
 - [ ] Preserve the recorded nanometer, accumulation-mode, and droplet-like
   timestep-grid bound of `5e-2` without presenting it as universal tolerance.
 - [ ] Run Warp CPU coverage and optional CUDA coverage with clean skips.

@@ -1,10 +1,10 @@
 # Documentation Updates
 
-- P1 documentation is intentionally limited to the API docstrings in
+- P1/P2 documentation is intentionally limited to the API docstrings/comments in
   `particula/gpu/kernels/condensation.py`: this is a concrete-module-only
   sidecar API. The docstrings state ownership/lifetime, active-device fp64 and
-  stable-shape requirements, identity semantics, one-update P1 behavior, and
-  the pre-mutation failure guarantee.
+  stable-shape requirements, identity semantics, fixed-four work-versus-total
+  transfer behavior, and the pre-mutation failure guarantee.
 - Update `docs/Features/Roadmap/condensation-stiffness-study.md` to mark
   fixed-count four-substep integration as production behavior, document total
   transfer semantics, and retain recorded-grid evidence and caveats.
