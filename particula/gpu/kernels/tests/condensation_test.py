@@ -146,3 +146,11 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
         "test_finalize_inventory_rejects_p2_sidecar_aliases_atomically"
         in EXPORTED_CONDENSATION_TESTS
     )
+    assert (
+        "test_condensation_step_gpu_couples_four_substeps_to_numpy_oracle"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_step_gpu_rejects_p2_vapor_pressure_alias_atomically"
+        in EXPORTED_CONDENSATION_TESTS
+    )
