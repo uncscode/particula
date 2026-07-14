@@ -4,9 +4,9 @@ Deliver an fp64 Warp port of the CPU latent-heat correction, apply it during
 every fixed condensation substep, and expose deterministic signed whole-call
 energy bookkeeping from applied mass transfer.
 
-**Delivered P1/P2 boundary:** The formula port, sidecar validation, and
-four-substep latent correction are complete. `thermal_work` consumption and
-energy bookkeeping remain explicitly deferred to P3.
+**Delivered P1/P2/P3 boundary:** The formula port, sidecar validation,
+four-substep latent correction, and opt-in energy bookkeeping are complete.
+`thermal_work` consumption remains explicitly deferred.
 
 **In scope:**
 - Private Warp thermal-conductivity, thermal-resistance, and latent-rate
@@ -17,6 +17,9 @@ energy bookkeeping remain explicitly deferred to P3.
 - Reuse of E4-F1 refreshed saturation pressure, E4-F2 activity/Kelvin surface
   pressure, and E4-F3 four-substep scratch and accumulation contracts.
 - Correction per substep and exact zero-latent isothermal fallback.
+- Optional caller-owned, device-only fp64 `(n_boxes, n_species)` energy output
+  for signed whole-call bounded applied transfer times latent heat, with atomic
+  preflight, one clear, and one final single-writer reduction.
 - CPU-oracle/Warp parity, validation atomicity, deterministic scratch-reuse
   regressions, and focused production-docstring updates.
 
@@ -26,4 +29,5 @@ energy bookkeeping remain explicitly deferred to P3.
 - Temperature evolution, adaptive substeps, BAT support, hidden host reduction,
   telemetry, logging, or additional diagnostics.
 - Complete cross-device epic evidence (E4-F6).
-- On-device energy output or energy accumulation (P3).
+- `thermal_work` consumption, temperature evolution, or a persistent energy
+  accumulator/result-object API.

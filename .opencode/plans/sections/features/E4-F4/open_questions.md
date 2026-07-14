@@ -30,4 +30,9 @@
   isothermal contract?
   - Resolved 2026-07-14: yes. All four launches receive the latent sidecar and
     enabled flag; omitted latent heat and exact zero entries use the original
-    isothermal arithmetic. `thermal_work` remains validated and deferred.
+   isothermal arithmetic. `thermal_work` remains validated and deferred.
+- [x] How does P3 aggregate and initialize opt-in energy output?
+  - Resolved 2026-07-14: after successful atomic preflight, clear the
+    caller-owned `(n_boxes, n_species)` output once and use one writer per
+    box/species after all four substeps to reduce accumulated bounded transfer
+    times latent heat. Output contents are write-only and never validated/read.

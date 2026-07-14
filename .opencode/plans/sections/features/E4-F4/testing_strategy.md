@@ -21,9 +21,13 @@ never lowered.
   latent/thermal-work atomic rejection, four launch ordering, determinism, and
   complete caller-owned scratch/returned-total identity reuse. Optional CUDA
   remains cleanly skippable.
-- **P3:** In `condensation_test.py`, verify positive/negative/zero energy and
-  whole-call per-box/species `Q = sum(bounded Δm * L)`, including clamped and
-  isolated cases.
+- **P3 (shipped, issue #1299):** `_condensation_test_support.py`, exercised by
+  `condensation_test.py`, verifies caller-output identity/reuse and overwrite,
+  valid NaN/Inf write-only storage, four-substep condensation/evaporation/zero/
+  clamp oracle parity, and box/species aggregation. It also verifies atomic
+  failures for missing latent heat and invalid output metadata, no energy
+  kernels when omitted, and optional `cuda`/`gpu_parity` multi-box oracle
+  coverage with clean skips.
 - **P4:** Compose E4-F1/F2/F3 on mandatory Warp CPU and optional CUDA with
   clean skips; retain scalar/environment API regressions.
 

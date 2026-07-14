@@ -4,7 +4,7 @@
   equations, including exact zero-latent isothermal helper identity.
 - [x] Correction refreshes from E4-F1/F2 state in all four E4-F3 substeps.
 - [x] Omitted/zero latent preserves isothermal results and existing API behavior.
-- [ ] Whole-call `(n_boxes, n_species)` energy remains on device and satisfies
+- [x] Whole-call `(n_boxes, n_species)` energy remains on device and satisfies
   signed `Q = Σ(Δm_applied L)` for condensation, evaporation, zero, and clamps.
 - [x] Shape, dtype, device, finiteness, and sign validation of supplied P1
   sidecars precedes environment normalization, allocation, refresh, launch,

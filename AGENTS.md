@@ -316,12 +316,15 @@ restored = from_warp_environment_data(gpu_environment)
   Fields may be omitted independently, which uses fallback allocations.
 - An optional active-device `wp.float64` `latent_heat` sidecar shaped
   `(n_species,)` applies a per-substep rate correction. Omitting it, or using
-  a zero entry for a species, preserves that species' isothermal rate path.
-  `thermal_work` has the same validated sidecar shape but remains deferred,
-  unused P3 state.
+  a zero entry for a species, preserves that species' isothermal rate path. An
+  optional caller-owned active-device `wp.float64` `energy_transfer` output
+  shaped `(n_boxes, n_species)` requires `latent_heat`; after successful
+  preflight it records signed whole-call, mass-clamped transfer times latent
+  heat and is not returned as a third tuple item. `thermal_work` has the same
+  validated sidecar shape but remains deferred, unused P3 state.
 - This direct particle-only step does not establish CPU-strategy parity, a
-  `Runnable` API, adaptive stepping, gas coupling/conservation, energy
-  accumulation, graph capture/replay, autodiff, or general accuracy claims. See
+  `Runnable` API, adaptive stepping, gas coupling/conservation, graph
+  capture/replay, autodiff, or general accuracy claims. See
   `docs/Features/condensation_strategy_system.md` and
   `docs/Features/Roadmap/condensation-stiffness-study.md` for its bounded
   contract and case-specific evidence.
