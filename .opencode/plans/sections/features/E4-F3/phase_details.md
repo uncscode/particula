@@ -52,8 +52,16 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
   - Delivered: Documented the package-level step import and the
     concrete-module-only scratch sidecar; fixed-four refresh and transfer
     semantics; caller ownership; particle-only scope; and bounded limitations.
+    The step remains distinct from a high-level API: it does not establish CPU
+    strategy parity, `Runnable` composition, adaptive stepping, gas coupling or
+    conservation, latent heat, graph capture/replay, or autodiff readiness.
   - Files: `docs/Features/Roadmap/condensation-stiffness-study.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Features/condensation_strategy_system.md`
-  - Tests: verified Markdown links and focused discoverable condensation test
-    commands, including the guarded Warp/CUDA behavior.
+  - Tests: verified Markdown links and the focused discoverable command:
+    ```bash
+    pytest particula/gpu/kernels/tests/condensation_test.py \
+      particula/gpu/kernels/tests/condensation_stiffness_test.py -q
+    ```
+    Warp may skip when unavailable; CUDA evidence is optional when CUDA is
+    unavailable, and a skip is not GPU execution.

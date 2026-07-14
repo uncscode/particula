@@ -294,12 +294,32 @@ restored = from_warp_environment_data(gpu_environment)
 - Accepted direct/environment `temperature` and `pressure` inputs, plus direct
   coagulation `volume` inputs, are validated as positive finite physical
   values before launch.
+- Import the low-level step with
+  `from particula.gpu.kernels import condensation_step_gpu`. The optional
+  `CondensationScratchBuffers` sidecar is concrete-module-only at
+  `particula.gpu.kernels.condensation`; it is not a second step entry point.
 - `condensation_step_gpu(...)` requires keyword-only
-  `thermodynamics=ThermodynamicsConfig`. After its environment, thermodynamics,
-  optional-buffer, and mass-transfer inputs validate, every successful call
-  overwrites caller-owned `WarpGasData.vapor_pressure` using the normalized
-  current per-box temperature before mass transfer. The vapor-pressure buffer
-  is therefore derived step state, not a caller-supplied physics source.
+  `thermodynamics=ThermodynamicsConfig`. Each successful call executes exactly
+  four equal `time_step / 4.0` substeps. In each substep, it optionally refreshes
+  composition-weighted surface tension, overwrites caller-owned
+  `WarpGasData.vapor_pressure` from normalized current per-box temperature,
+  refreshes environment properties, produces a raw proposal, then applies its
+  mass-clamped transfer. Vapor pressure is derived step state, not a
+  caller-supplied physics source.
+- The total-transfer buffer is cleared once after preflight, accumulates applied
+  clamped transfers, and is returned by identity when supplied. Work storage
+  retains only the final raw proposal. Particle masses mutate in place while
+  `gas.concentration` remains unchanged.
+- Supplied `CondensationScratchBuffers` fields must be active-device,
+  stable-shape `wp.float64`: transfer fields use
+  `(n_boxes, n_particles, n_species)` and property fields use `(n_boxes,)`.
+  Fields may be omitted independently, which uses fallback allocations.
+- This direct particle-only step does not establish CPU-strategy parity, a
+  `Runnable` API, adaptive stepping, latent heat, gas coupling/conservation,
+  graph capture/replay, autodiff, or general accuracy claims. See
+  `docs/Features/condensation_strategy_system.md` and
+  `docs/Features/Roadmap/condensation-stiffness-study.md` for its bounded
+  contract and case-specific evidence.
 - Scalar temperatures, direct Warp temperature arrays, and
   `WarpEnvironmentData` all drive this refresh. Non-`wp.float64` temperature
   arrays are cast into a device-local float64 buffer; no host vapor-pressure
