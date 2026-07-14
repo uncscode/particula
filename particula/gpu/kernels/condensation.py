@@ -9,7 +9,8 @@ Warp launch, vapor-pressure refresh, or mutation of caller-owned state. A
 required keyword-only ``ThermodynamicsConfig`` then executes exactly four
 equal substeps. Each substep refreshes the caller-owned pure-vapor-pressure
 buffer, updates box-level environment properties, proposes transfer from the
-current particle mass, and applies a mass-clamped transfer. Float32
+current particle mass, gates disabled species and zero-concentration slots,
+and applies a mass-clamped transfer. Float32
 temperatures are cast to a step-owned float64 device buffer for refresh. Kernel
 launches operate on GPU-resident Warp arrays and update particle masses
  in-place. Latent heat, when supplied, corrects each fixed substep. An optional
@@ -134,8 +135,8 @@ class CondensationScratchBuffers:
     fields are
     step-local fallback allocations, while successful calls preserve every
     supplied object's identity. Transfer roles are deliberately separate: work
-    retains the raw proposal from the final substep, while total records the
-    applied transfer over the complete four-substep step.
+    retains the gated raw proposal from the final substep, while total records
+    the applied transfer over the complete four-substep step.
 
     Each call performs four fixed updates. The total buffer is cleared once
     after preflight and accumulates the mass-clamped transfer applied in each
@@ -704,13 +705,14 @@ def _apply_and_accumulate_mass_transfer_kernel(
 ) -> None:
     """Apply a clamped proposal and accumulate its applied transfer.
 
-    ``work_mass_transfer`` remains the current raw proposal, so it retains the
-    final raw proposal after four substeps. The total buffer is cleared once per
-    successful step and records each mass-clamped applied transfer.
+    ``work_mass_transfer`` remains the current gated raw proposal, so it
+    retains the final gated proposal after four substeps. The total buffer is
+    cleared once per successful step and records each mass-clamped applied
+    transfer.
 
     Args:
         masses: Particle masses updated in place.
-        work_mass_transfer: Raw proposal from the current substep.
+        work_mass_transfer: Gated raw proposal from the current substep.
         total_mass_transfer: Accumulator of applied transfers for all substeps.
     """
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
@@ -1169,7 +1171,8 @@ def condensation_step_gpu(  # noqa: C901
             field must be active-device ``wp.float64``. Fields may be omitted
             independently and use step-local fallback allocation. A supplied
             total transfer buffer is returned by identity. Work retains the
-            final raw proposal and total accumulates clamped applied transfers.
+            final gated raw proposal and total accumulates clamped applied
+            transfers.
             P2 limiting sidecars have shape ``(n_boxes, n_species)`` and are
             metadata-validated only; P1 does not allocate, read, clear, or
             write them.
@@ -1239,8 +1242,10 @@ def condensation_step_gpu(  # noqa: C901
 
         Exactly four equal substeps run for every valid timestep. The returned
         transfer buffer accumulates the applied, mass-clamped transfer from all
-        four substeps. A supplied scratch work buffer holds only the final raw
-        proposal. This direct step does not couple transfer to
+        four substeps. A supplied scratch work buffer holds only the final
+        gated raw proposal. Each proposal is zeroed before application for
+        disabled ``gas.partitioning`` species and zero-concentration particle
+        slots. This direct step does not couple transfer to
         ``gas.concentration``.
 
         ``environment`` remains keyword-only so existing positional scalar
@@ -1255,16 +1260,17 @@ def condensation_step_gpu(  # noqa: C901
         allocation, output clearing, vapor-pressure refresh, or physical
         mutation.
         Each substep overwrites ``gas.vapor_pressure`` from the normalized
-        current temperature, prepares box-level properties, calculates a raw
-        proposal from current particle mass, then applies and accumulates the
-        mass-clamped transfer. Float32 temperature arrays are cast device-side
-        to float64 for refresh.
+        current temperature, prepares box-level properties, calculates and
+        gates a raw proposal from current particle mass, then applies and
+        accumulates the mass-clamped transfer. Float32 temperature arrays are
+        cast device-side to float64 for refresh.
 
         A supplied work and/or total scratch transfer field conflicts with
         ``mass_transfer`` because they overlap its legacy output role; a
         property-only sidecar can be used with ``mass_transfer``. The resolved
         total buffer is cleared once and returned by identity when supplied.
-        Work is separate from total so it can retain the final raw proposal.
+        Work is separate from total so it can retain the final gated raw
+        proposal.
         With no scratch transfer fields, legacy ``mass_transfer`` remains the
         returned total by identity.
 

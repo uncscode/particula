@@ -1,14 +1,17 @@
 # Success Criteria
 
-- [ ] `partitioning == 0` leaves particle and gas species strictly unchanged.
+- [x] Issue #1302: `partitioning == 0` leaves particle species strictly
+  unchanged; `gas.concentration` remains unchanged for the particle-only path.
 - [ ] Finalized uptake never exceeds current gas plus same-substep evaporation.
 - [ ] Evaporation never exceeds per-particle or aggregate particle inventory.
 - [ ] Particle gain equals gas loss for every box/species at tight tolerance.
 - [ ] Gas and particle inventories remain finite and nonnegative; inactive slots are unchanged.
 - [ ] All four fixed substeps consume current, already-updated gas state.
 - [ ] Returned transfer and E4-F4 heat use the exact finalized applied transfer.
-- [ ] All shape/device/value failures occur before state mutation.
-- [ ] No hidden host transfer, schema change, or required allocation when all scratch is supplied.
+- [x] Issue #1302: partitioning and supplied P2-sidecar
+  shape/device/dtype/value failures occur before observable state mutation.
+- [x] Issue #1302: binary-mask checking uses only a private status readback; no
+  container/data transfer, schema change, or caller-scratch allocation occurs.
 - [ ] Production hook and issue #1272 conservation regression land together.
 - [ ] CPU reference and Warp CPU pass; CUDA parity passes when available.
 

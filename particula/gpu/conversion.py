@@ -275,9 +275,9 @@ def to_warp_gas_data(
         The 'name' field from GasData is excluded (strings are not
         GPU-compatible). Use index mapping for species identification.
 
-        The species-level CPU ``partitioning`` field is expanded across boxes
-        and converted from bool to int32 (1 = True, 0 = False) for GPU
-        compatibility.
+        The shared species-level CPU ``partitioning`` field is expanded to an
+        identical per-box ``(n_boxes, n_species)`` mask and converted from bool
+        to binary int32 (1 = True, 0 = False) for GPU compatibility.
 
         ``WarpGasData`` requires a ``vapor_pressure`` buffer even though CPU
         ``GasData`` does not own that field. Callers may supply the
@@ -450,10 +450,10 @@ def from_warp_gas_data(
         reconstructing ``GasData``. Placeholder names are generated only
         when ``name`` is omitted or explicitly set to ``None``.
 
-        Restored ``partitioning`` values must remain binary ``0``/``1`` and
-        identical in every box because CPU ``GasData`` owns one shared
-        species mask. Any incompatible mask raises ``ValueError`` before a
-        ``GasData`` instance is returned.
+        Restored ``partitioning`` must be a binary ``(n_boxes, n_species)``
+        mask that is identical in every box because CPU ``GasData`` owns one
+        shared species mask. Any incompatible values or layout raise
+        ``ValueError`` before a ``GasData`` instance is returned.
 
     Args:
         gpu_data: GPU-resident WarpGasData container.
@@ -471,8 +471,8 @@ def from_warp_gas_data(
     Raises:
         ValueError: If ``name`` is not ``None`` or a ``list[str]``.
         ValueError: If the supplied name count does not match ``n_species``.
-        ValueError: If restored ``partitioning`` contains values other than
-            ``0`` or ``1``.
+        ValueError: If restored ``partitioning`` is non-binary, is not a
+            two-dimensional ``(n_boxes, n_species)`` mask, or differs by box.
 
     Example:
         >>> # With caller-supplied ordered names

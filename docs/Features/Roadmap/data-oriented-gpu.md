@@ -233,8 +233,9 @@ E2 closed the foundation scope needed by later GPU roadmap epics:
   transfer boundary. Kernels and runnables still do not perform hidden
   CPU/GPU synchronization or movement.
 - Gas CPU/GPU restore semantics are locked down: `GasData.name` is CPU-only
-  ordered metadata, `partitioning` converts `bool` on CPU to `int32` on GPU,
-  and `WarpGasData.vapor_pressure` is GPU helper state dropped on CPU restore.
+  ordered metadata, shared CPU `partitioning` expands to an active-device,
+  binary `wp.int32` mask indexed by box and species on GPU, and
+  `WarpGasData.vapor_pressure` is GPU helper state dropped on CPU restore.
 - The low-level GPU condensation and coagulation environment inputs now share
   a scalar-or-per-box normalization contract, including explicit
   `WarpEnvironmentData` inputs.
@@ -291,7 +292,7 @@ implying broader test coverage.
 | `WarpGasData` | `molar_mass` | `WarpGasData` | `(n_species,)` | `wp.float64` | Stored, mutable GPU mirror of `GasData.molar_mass` shared across boxes | Declared as `wp.array(dtype=wp.float64)`; populated by `to_warp_gas_data()` from CPU gas state | Restores the same numeric field through `from_warp_gas_data()` within the intentionally lossy gas boundary (`name` remains CPU-only and `vapor_pressure` is still dropped on CPU restore) | Source: `particula/gpu/warp_types.py:131`, `particula/gpu/conversion.py:214-216,228-230,354`; tests: `particula/gpu/tests/warp_types_test.py:168-184,218-232`, `particula/gpu/tests/conversion_test.py:583-595` |
 | `WarpGasData` | `concentration` | `WarpGasData` | `(n_boxes, n_species)` | `wp.float64` | Stored, mutable GPU mirror of `GasData.concentration` | Declared as `wp.array2d(dtype=wp.float64)`; populated by `to_warp_gas_data()` from CPU gas state | Restores the same box-batched numeric field through `from_warp_gas_data()` within the intentionally lossy gas boundary (`name` remains caller-managed CPU metadata and `vapor_pressure` stays GPU-only) | Source: `particula/gpu/warp_types.py:132`, `particula/gpu/conversion.py:217-219,231-233,355`; tests: `particula/gpu/tests/warp_types_test.py:180-184,229-231`, `particula/gpu/tests/conversion_test.py:593-595` |
 | `WarpGasData` | `vapor_pressure` | `WarpGasData` | `(n_boxes, n_species)` | `wp.float64` | Stored, mutable GPU-only helper state for condensation kernels | `to_warp_gas_data()` validates an optional provided shape or creates a zero-filled default when `vapor_pressure` is `None` | Present only on the GPU container; `from_warp_gas_data()` always drops it because `GasData` has no matching field, so CPU restore is intentionally lossy | Source: `WarpGasData` plus `to_warp_gas_data()` / `from_warp_gas_data()` in `particula/gpu/warp_types.py` and `particula/gpu/conversion.py`; tests: `particula/gpu/tests/warp_types_test.py:177-183,225-231`, `particula/gpu/tests/conversion_test.py:200-229,484-496,588-595` |
-| `WarpGasData` | `partitioning` | `WarpGasData` | `(n_species,)` | `wp.int32` | Stored, mutable GPU mirror/helper mask; shared across boxes | Declared as `wp.array(dtype=wp.int32)`; `to_warp_gas_data()` converts `GasData.partitioning` from `bool` to `int32` | `from_warp_gas_data()` restores `int32 → bool` into `GasData.partitioning` | Source: `particula/gpu/warp_types.py:134`, `particula/gpu/conversion.py:159-160,208-209,223-239,347-356`; tests: `particula/gpu/tests/warp_types_test.py:178-184,218-232,322-338`, `particula/gpu/tests/conversion_test.py:189-199,609-619` |
+| `WarpGasData` | `partitioning` | `WarpGasData` | `(n_boxes, n_species)` | Active-device binary `wp.int32` | Stored, mutable per-box/per-species GPU helper mask | Declared as `wp.array2d(dtype=wp.int32)`; `to_warp_gas_data()` expands the shared CPU `bool` mask per box and converts it to binary `int32` | Kernels index `[box, species]`; CPU restore converts `int32 → bool` only when every box agrees | Source: `particula/gpu/warp_types.py`; `particula/gpu/conversion.py`; tests: `particula/gpu/tests/warp_types_test.py`, `particula/gpu/tests/conversion_test.py` |
 
 Derived `ParticleData` accessors are intentionally separate from the stored
 schema above: `radii`, `total_mass`, `effective_density`, and
@@ -334,9 +335,9 @@ future GPU environment state.
 | `GasData.name` | Owned by CPU `GasData` as authoritative species-name metadata | `len == n_species` | Not owned on GPU | `list[str]` | Mutable CPU metadata only | Does not survive transfer on its own; CPU restore requires caller-supplied ordered species names from external metadata, but the current `from_warp_gas_data()` implementation validates only name-list length before reconstructing `GasData`, so ordering must be preserved by the caller rather than inferred or checked during restore | CPU-facing reporting, facade compatibility, and any restore path back to `GasData` | `particula/gas/gas_data.py:52-73`; `particula/gpu/warp_types.py:82-99`; `particula/gpu/conversion.py:155-157,301-345`; `particula/gas/tests/gas_data_test.py:119-127`; `particula/gpu/tests/conversion_test.py:600-640` |
 | `GasData.molar_mass` | Owned by `GasData` as authoritative gas species molar-mass state | `(n_species,)` | `(n_species,)` via `WarpGasData.molar_mass` | `float64` / `wp.float64` | Mutable stored state on both containers | Must round-trip with the same numeric values inside the documented gas restore boundary (`name` still requires caller-managed ordered metadata and `vapor_pressure` still has no CPU field) | Gas property calculations, condensation, and GPU gas kernels | `particula/gas/gas_data.py:53-67,75-108`; `particula/gpu/warp_types.py:100-111,131`; `particula/gpu/conversion.py:214-216,354`; `particula/gpu/tests/warp_types_test.py:168-184,218-232`; `particula/gpu/tests/conversion_test.py:583-595` |
 | `GasData.concentration` | Owned by `GasData` as authoritative per-box gas concentration state | `(n_boxes, n_species)` | `(n_boxes, n_species)` via `WarpGasData.concentration` | `float64` / `wp.float64` | Mutable stored state on both containers | Must round-trip without shape drift | Condensation, gas-phase workflows, and future GPU-resident gas updates | `particula/gas/gas_data.py:55-57,76-101`; `particula/gpu/warp_types.py:104-105,132`; `particula/gpu/conversion.py:217-219,355`; `particula/gas/tests/gas_data_test.py:99-117`; `particula/gpu/tests/conversion_test.py:593-595` |
-| `GasData.partitioning` | Owned by `GasData` as authoritative shared-across-boxes partitioning eligibility state | `(n_species,)` | `(n_species,)` via `WarpGasData.partitioning` | `bool` on CPU / `wp.int32` on GPU | Mutable stored state on both containers | Must round-trip with explicit `bool → int32 → bool` conversion | Condensation partitioning decisions and GPU kernels that require a numeric mask | `particula/gas/gas_data.py:57-58,79-115`; `particula/gpu/warp_types.py:96-111,134`; `particula/gpu/conversion.py:159-160,208-209,223-239,347-356`; `particula/gas/tests/gas_data_test.py:77-97`; `particula/gpu/tests/conversion_test.py:189-199,609-619` |
+| `GasData.partitioning` | Owned by `GasData` as authoritative shared-across-boxes partitioning eligibility state | `(n_species,)` | `(n_boxes, n_species)` via `WarpGasData.partitioning` | `bool` on CPU / active-device binary `wp.int32` on GPU | Mutable stored state on both containers | CPU transfer expands `bool` per box; kernels index `[box, species]`; CPU restore converts back only when every box agrees | Condensation partitioning decisions and GPU kernels that require a numeric mask | `particula/gas/gas_data.py`; `particula/gpu/warp_types.py`; `particula/gpu/conversion.py`; `particula/gas/tests/gas_data_test.py`; `particula/gpu/tests/conversion_test.py` |
 | `WarpParticleData` numeric mirrors | Owned on GPU only as mirrors of authoritative `ParticleData` fields, not as a separate source of truth | Mirrors CPU particle shapes | Stored on GPU as declared in `WarpParticleData` | `wp.float64` | Mutable GPU working state | Must restore to the corresponding `ParticleData` fields without adding or dropping particle schema | GPU-resident particle workflows and parity tests | `particula/gpu/warp_types.py:73-77`; `particula/gpu/conversion.py:111-137,281-287`; `particula/gpu/tests/warp_types_test.py:38-58,100-118,302-320`; `particula/gpu/tests/conversion_test.py:512-548` |
-| `WarpGasData.molar_mass` / `concentration` / `partitioning` | Owned on GPU only as numeric mirrors/helpers of authoritative CPU `GasData` state | `(n_species,)`, `(n_boxes, n_species)`, `(n_species,)` | Same declared GPU shapes | `wp.float64` / `wp.float64` / `wp.int32` | Mutable GPU working state | Must restore to `GasData` numeric state, with explicit `int32 → bool` recovery for `partitioning` | GPU condensation and other gas-kernel workflows | `particula/gpu/warp_types.py:82-99,100-111,131-134`; `particula/gpu/conversion.py:142-241,290-357`; `particula/gpu/tests/warp_types_test.py:168-184,218-232,322-338`; `particula/gpu/tests/conversion_test.py:189-229,583-619` |
+| `WarpGasData.molar_mass` / `concentration` / `partitioning` | Owned on GPU only as numeric mirrors/helpers of authoritative CPU `GasData` state | `(n_species,)`, `(n_boxes, n_species)`, `(n_boxes, n_species)` | Same declared GPU shapes | `wp.float64` / `wp.float64` / active-device binary `wp.int32` | Mutable GPU working state | CPU partitioning expands per box; kernels index `[box, species]`; restore recovers `bool` only when every box agrees | GPU condensation and other gas-kernel workflows | `particula/gpu/warp_types.py`; `particula/gpu/conversion.py`; `particula/gpu/tests/warp_types_test.py`; `particula/gpu/tests/conversion_test.py` |
 | `WarpGasData.vapor_pressure` | Owned by no CPU container; treated as GPU-helper/process state rather than authoritative `GasData` or shipped CPU `EnvironmentData` state | Not owned on CPU containers | `(n_boxes, n_species)` via `WarpGasData.vapor_pressure` | `wp.float64` | Mutable GPU helper state | Must be recomputed from the current authoritative thermodynamic inputs, explicitly provided, or carried as sidecar state; update order must prevent mixed stale/new state, and CPU restore from `WarpGasData` remains intentionally lossy because `from_warp_gas_data()` drops it | GPU condensation kernels and future on-device thermodynamic updates | `particula/gpu/warp_types.py:98-108,133`; `particula/gpu/conversion.py:162-206,220-241,301-304`; `particula/gpu/tests/warp_types_test.py:177-183,225-231`; `particula/gpu/tests/conversion_test.py:200-229,484-496,588-595` |
 | EnvironmentData.temperature | Owned by shipped CPU `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via shipped `WarpEnvironmentData` | `float64` on CPU / `wp.float64` on GPU | Mutable per-box thermodynamic state | Round-trips through `to_warp_environment_data()` / `from_warp_environment_data()`; broader GPU-resident runtime ownership remains future work | Parcel/expansion workflows, latent-heat condensation, and other per-box thermodynamic updates | `particula/gas/environment_data.py`; `particula/gpu/warp_types.py`; `particula/gpu/conversion.py`; `particula/gpu/tests/conversion_test.py` |
 | EnvironmentData.pressure | Owned by shipped CPU `EnvironmentData`, not by `ParticleData` or `GasData` | `(n_boxes,)` | `(n_boxes,)` via shipped `WarpEnvironmentData` | `float64` on CPU / `wp.float64` on GPU | Mutable per-box thermodynamic state | Round-trips through `to_warp_environment_data()` / `from_warp_environment_data()`; broader GPU-resident runtime ownership remains future work | Parcel/expansion workflows, kernel inputs, and per-box forcing profiles | `particula/gas/environment_data.py`; `particula/gpu/warp_types.py`; `particula/gpu/conversion.py`; `particula/gpu/tests/conversion_test.py` |
@@ -371,6 +372,7 @@ Concrete example shapes backed by current constructors and tests:
 - `ParticleData.concentration -> (1, n_particles)`
 - `GasData.concentration -> (1, n_species)`
 - `ParticleData.density -> (n_species,)`
+- `WarpGasData.partitioning -> (n_boxes, n_species)`
 - `WarpGasData.vapor_pressure -> (n_boxes, n_species)`
 
 Verification evidence for the shape claims in this subsection:
@@ -455,6 +457,7 @@ Per-box fields:
 | Field | Shape | Notes |
 | --- | --- | --- |
 | `concentration` | `(n_boxes, n_species)` | GPU mirror of gas concentration. |
+| `partitioning` | `(n_boxes, n_species)` | Active-device binary `wp.int32` mask, indexed by box and species. |
 | `vapor_pressure` | `(n_boxes, n_species)` | GPU-only helper state; not restored to CPU `GasData`. |
 
 Shared-across-box fields:
@@ -462,7 +465,6 @@ Shared-across-box fields:
 | Field | Shape | Notes |
 | --- | --- | --- |
 | `molar_mass` | `(n_species,)` | GPU mirror of shared gas molar mass. |
-| `partitioning` | `(n_species,)` | GPU mirror/helper mask; stored as `int32` on GPU. |
 
 #### Current CPU execution limits for multi-box-ready containers
 
@@ -534,12 +536,14 @@ downstream implementers; it does not add new schema semantics.
   `temperature -> (n_boxes,)`, `pressure -> (n_boxes,)`, and
   `saturation_ratio -> (n_boxes, n_species)`; do not add an extra volume field
   or an implicit transfer path.
-- `E2-F4`: inherit that `GasData.name` remains CPU-only ordered metadata,
-  `GasData.partitioning` stays `bool` on CPU and `int32` on GPU, and
-  `WarpGasData.vapor_pressure -> (n_boxes, n_species)` remains explicit
-  GPU-helper state dropped on CPU restore; callers must preserve ordered
-  species names outside `WarpGasData` and pass them back on restore because
-  GPU→CPU restore is intentionally lossy for gas metadata and helper state.
+- `E2-F4`: inherit that `GasData.name` remains CPU-only ordered metadata and
+  `GasData.partitioning` stays `bool` on CPU while `WarpGasData.partitioning`
+  is an active-device binary `wp.int32` `(n_boxes, n_species)` mask indexed by
+  box and species. `WarpGasData.vapor_pressure -> (n_boxes, n_species)` remains
+  explicit GPU-helper state dropped on CPU restore; callers must preserve
+  ordered species names outside `WarpGasData` and pass them back on restore
+  because GPU→CPU restore is intentionally lossy for gas metadata and helper
+  state.
 - `E2-F5`: inherit the single-box leading-dimension contract for per-box arrays
   such as `ParticleData.masses -> (1, n_particles, n_species)`,
   `ParticleData.concentration -> (1, n_particles)`, and

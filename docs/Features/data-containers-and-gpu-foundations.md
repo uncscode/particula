@@ -244,7 +244,7 @@ Across this boundary, shapes stay fixed:
 | `name` | Ordered species names | Not stored | Restore requires caller-supplied ordered names, or placeholder names such as `species_0`. |
 | `molar_mass` | `(n_species,)` | `(n_species,)` | Round-trips without shape drift. |
 | `concentration` | `(n_boxes, n_species)` | `(n_boxes, n_species)` | Round-trips without shape drift. |
-| `partitioning` | `bool`, shape `(n_species,)` | `int32`, shape `(n_species,)` | Converts `bool → int32 → bool`; restored GPU values must remain binary. |
+| `partitioning` | `bool`, shape `(n_species,)` | Active-device binary `wp.int32`, shape `(n_boxes, n_species)` | CPU masks expand per box as `bool → int32`; kernels index `[box, species]`. CPU restore converts back to `bool` and requires every box to agree. |
 | `vapor_pressure` | Not owned by `GasData` | `(n_boxes, n_species)` | GPU-only helper state. Pass it explicitly when needed; CPU restore always drops it. |
 
 This makes GPU→CPU gas restore intentionally lossy unless the caller preserves
