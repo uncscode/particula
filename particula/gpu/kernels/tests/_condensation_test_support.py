@@ -20,6 +20,7 @@ import pytest
 from particula.dynamics.condensation.mass_transfer import (
     get_first_order_mass_transport_k,
     get_mass_transfer_rate,
+    get_mass_transfer_rate_latent_heat,
 )
 from particula.gas.environment_data import EnvironmentData
 from particula.gas.gas_data import GasData
@@ -31,6 +32,9 @@ from particula.gas.properties.mean_free_path import (
 )
 from particula.gas.properties.pressure_function import (
     get_partial_pressure,
+)
+from particula.gas.properties.thermal_conductivity import (
+    get_thermal_conductivity,
 )
 from particula.particles.particle_data import ParticleData
 from particula.particles.properties.aerodynamic_mobility_module import (
@@ -45,9 +49,6 @@ from particula.particles.properties.kelvin_effect_module import (
 )
 from particula.particles.properties.knudsen_number_module import (
     get_knudsen_number,
-)
-from particula.particles.properties.partial_pressure_module import (
-    get_partial_pressure_delta,
 )
 from particula.particles.properties.slip_correction_module import (
     get_cunningham_slip_correction,
@@ -835,6 +836,7 @@ def _cpu_mass_transfer(  # noqa: C901
     surface_tension_mode: int | None = None,
     water_species_index: int = 0,
     kappas: np.ndarray | None = None,
+    latent_heat: np.ndarray | None = None,
 ) -> np.ndarray:
     """Compute CPU mass transfer matching refreshed GPU kernel physics."""
     n_boxes, n_particles, n_species = particles.masses.shape
@@ -968,19 +970,32 @@ def _cpu_mass_transfer(  # noqa: C901
                                 )
                                 / water_volume
                             )
-                pressure_delta = get_partial_pressure_delta(
-                    partial_pressure_gas=partial_pressure_gas,
-                    partial_pressure_particle=(
-                        activity_factor * vapor_pressure[box_idx, species_idx]
-                    ),
-                    kelvin_term=kelvin_term,
+                surface_vapor_pressure = (
+                    activity_factor
+                    * vapor_pressure[box_idx, species_idx]
+                    * kelvin_term
                 )
-                mass_rate = get_mass_transfer_rate(
-                    pressure_delta=pressure_delta,
-                    first_order_mass_transport=mass_transport,
-                    temperature=box_temperature,
-                    molar_mass=gas.molar_mass[species_idx],
-                )
+                pressure_delta = partial_pressure_gas - surface_vapor_pressure
+                if latent_heat is None or latent_heat[species_idx] == 0.0:
+                    mass_rate = get_mass_transfer_rate(
+                        pressure_delta=pressure_delta,
+                        first_order_mass_transport=mass_transport,
+                        temperature=box_temperature,
+                        molar_mass=gas.molar_mass[species_idx],
+                    )
+                else:
+                    mass_rate = get_mass_transfer_rate_latent_heat(
+                        pressure_delta=pressure_delta,
+                        first_order_mass_transport=mass_transport,
+                        temperature=box_temperature,
+                        molar_mass=gas.molar_mass[species_idx],
+                        latent_heat=latent_heat[species_idx],
+                        thermal_conductivity=get_thermal_conductivity(
+                            box_temperature
+                        ),
+                        vapor_pressure_surface=surface_vapor_pressure,
+                        diffusion_coefficient=diffusion_value,
+                    )
                 mass_transfer[box_idx, particle_idx, species_idx] = (
                     mass_rate * time_step
                 )
@@ -2320,12 +2335,12 @@ def test_condensation_step_gpu_signature_keeps_keyword_only_inputs() -> None:
     "sidecar_arguments",
     ["latent_heat", "thermal_work", "both"],
 )
-def test_latent_sidecars_preserve_isothermal_condensation(
+def test_zero_latent_or_thermal_work_sidecars_preserve_isothermal_condensation(
     device: str,
     n_species: int,
     sidecar_arguments: str,
 ) -> None:
-    """Valid P1 sidecars preserve the existing isothermal transfer."""
+    """Zero latent heat and deferred thermal work preserve transfer exactly."""
     particles = _make_particle_data(1, 2, n_species)
     gas = _make_gas_data(1, n_species)
     vapor_pressure = _make_vapor_pressure(1, n_species)
@@ -2337,9 +2352,7 @@ def test_latent_sidecars_preserve_isothermal_condensation(
     legacy_gas = to_warp_gas_data(
         gas, device=device, vapor_pressure=vapor_pressure
     )
-    latent_heat = wp.array(
-        np.linspace(0.0, 2.0e6, n_species), dtype=wp.float64, device=device
-    )
+    latent_heat = wp.zeros(n_species, dtype=wp.float64, device=device)
     thermal_work = wp.array(
         np.linspace(0.0, 10.0, n_species), dtype=wp.float64, device=device
     )
@@ -2381,6 +2394,227 @@ def test_latent_sidecars_preserve_isothermal_condensation(
     )
     npt.assert_array_equal(latent_heat.numpy(), latent_snapshot)
     npt.assert_array_equal(thermal_work.numpy(), thermal_snapshot)
+
+
+@pytest.mark.gpu_parity
+def test_condensation_latent_heat_matches_four_substep_oracle(
+    device: str,
+) -> None:
+    """Latent-corrected Warp transfers match the independent CPU oracle."""
+    temperature = 298.15
+    pressure = 101325.0
+    time_step = 0.1
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    vapor_pressure = _make_vapor_pressure(1, 2)
+    surface_tension = np.array([0.072, 0.09], dtype=np.float64)
+    mass_accommodation = np.array([1.0, 0.8], dtype=np.float64)
+    diffusion = np.array([2.0e-5, 1.5e-5], dtype=np.float64)
+    latent_values = np.array([2.2e6, 1.5e6], dtype=np.float64)
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    thermodynamics = _make_thermodynamics_config(gpu_gas)
+    expected_masses, expected_total, expected_work = _cpu_four_substep_oracle(
+        particles,
+        gas,
+        vapor_pressure,
+        surface_tension,
+        mass_accommodation,
+        diffusion,
+        temperature,
+        pressure,
+        time_step,
+        thermodynamics=thermodynamics,
+        latent_heat=latent_values,
+    )
+    latent_heat = wp.array(latent_values, dtype=wp.float64, device=device)
+    thermal_work = wp.full(2, 9.0, dtype=wp.float64, device=device)
+    scratch = _make_condensation_scratch_buffers((1, 2, 2), device)
+    latent_snapshot = latent_heat.numpy().copy()
+    thermal_snapshot = thermal_work.numpy().copy()
+
+    _, transfer = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=time_step,
+        surface_tension=wp.array(
+            surface_tension, dtype=wp.float64, device=device
+        ),
+        mass_accommodation=wp.array(
+            mass_accommodation, dtype=wp.float64, device=device
+        ),
+        diffusion_coefficient_vapor=wp.array(
+            diffusion, dtype=wp.float64, device=device
+        ),
+        thermodynamics=thermodynamics,
+        latent_heat=latent_heat,
+        thermal_work=thermal_work,
+        scratch_buffers=scratch,
+    )
+
+    # Warp CPU and the NumPy oracle execute the same deterministic fp64 model.
+    npt.assert_allclose(
+        gpu_particles.masses.numpy(), expected_masses, rtol=1e-12, atol=0.0
+    )
+    npt.assert_allclose(transfer.numpy(), expected_total, rtol=1e-12, atol=0.0)
+    npt.assert_allclose(
+        scratch.work_mass_transfer.numpy(), expected_work, rtol=1e-12, atol=0.0
+    )
+    assert np.all(np.isfinite(gpu_particles.masses.numpy()))
+    assert np.all(gpu_particles.masses.numpy() >= 0.0)
+    npt.assert_array_equal(latent_heat.numpy(), latent_snapshot)
+    npt.assert_array_equal(thermal_work.numpy(), thermal_snapshot)
+
+
+@pytest.mark.gpu_parity
+def test_condensation_mixed_latent_heat_with_activity_matches_oracle(
+    device: str,
+) -> None:
+    """Mixed latent species use shared activity/Kelvin surface pressure."""
+    temperature = 298.15
+    pressure = 101325.0
+    time_step = 0.1
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    gas.concentration[:] = np.array([[1.0e-2, 2.0e-2]])
+    vapor_pressure = _make_vapor_pressure(1, 2)
+    surface_tension = np.array([0.04, 0.09], dtype=np.float64)
+    mass_accommodation = np.array([1.0, 0.8], dtype=np.float64)
+    diffusion = np.array([2.0e-5, 1.5e-5], dtype=np.float64)
+    latent_values = np.array([0.0, 2.2e6], dtype=np.float64)
+    kappas = np.array([0.0, 0.5], dtype=np.float64)
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    thermodynamics = _make_thermodynamics_config(gpu_gas)
+    expected_masses, expected_total, expected_work = _cpu_four_substep_oracle(
+        particles,
+        gas,
+        vapor_pressure,
+        surface_tension,
+        mass_accommodation,
+        diffusion,
+        temperature,
+        pressure,
+        time_step,
+        thermodynamics=thermodynamics,
+        activity_mode=int(ACTIVITY_MODE_KAPPA),
+        surface_tension_mode=int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+        kappas=kappas,
+        latent_heat=latent_values,
+    )
+    _, _, isothermal_work = _cpu_four_substep_oracle(
+        particles,
+        gas,
+        vapor_pressure,
+        surface_tension,
+        mass_accommodation,
+        diffusion,
+        temperature,
+        pressure,
+        time_step,
+        thermodynamics=thermodynamics,
+        activity_mode=int(ACTIVITY_MODE_KAPPA),
+        surface_tension_mode=int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+        kappas=kappas,
+    )
+    activity_surface = CondensationActivitySurfaceConfig(
+        activity_mode=int(ACTIVITY_MODE_KAPPA),
+        surface_tension_mode=int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+        water_species_index=0,
+        kappas=wp.array(kappas, dtype=wp.float64, device=device),
+        molar_mass_reference=wp.array(
+            gas.molar_mass, dtype=wp.float64, device=device
+        ),
+    )
+    scratch = _make_condensation_scratch_buffers((1, 2, 2), device)
+
+    _, total = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=time_step,
+        surface_tension=wp.array(
+            surface_tension, dtype=wp.float64, device=device
+        ),
+        mass_accommodation=wp.array(
+            mass_accommodation, dtype=wp.float64, device=device
+        ),
+        diffusion_coefficient_vapor=wp.array(
+            diffusion, dtype=wp.float64, device=device
+        ),
+        thermodynamics=thermodynamics,
+        activity_surface=activity_surface,
+        latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
+        scratch_buffers=scratch,
+    )
+
+    npt.assert_allclose(
+        gpu_particles.masses.numpy(), expected_masses, rtol=1e-12, atol=0.0
+    )
+    npt.assert_allclose(total.numpy(), expected_total, rtol=1e-12, atol=0.0)
+    npt.assert_allclose(
+        scratch.work_mass_transfer.numpy(), expected_work, rtol=1e-12, atol=0.0
+    )
+    assert np.all(gpu_particles.masses.numpy() >= 0.0)
+    assert np.all(np.isfinite(gpu_particles.masses.numpy()))
+    assert np.all(expected_work[:, :, 1] < isothermal_work[:, :, 1])
+    assert np.all(
+        scratch.work_mass_transfer.numpy()[:, :, 1] < isothermal_work[:, :, 1]
+    )
+
+
+def test_condensation_isolated_zero_latent_species_matches_baseline(
+    device: str,
+) -> None:
+    """A zero-latent branch stays exactly isothermal when isolated."""
+    particles = _make_particle_data(1, 1, 2)
+    particles.masses[:, :, 1] = 0.0
+    gas = _make_gas_data(1, 2)
+    gas.concentration[:, 1] = 0.0
+    vapor_pressure = _make_vapor_pressure(1, 2)
+    baseline_particles = to_warp_particle_data(particles, device=device)
+    baseline_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    latent_particles = to_warp_particle_data(particles, device=device)
+    latent_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+
+    _, baseline_total = _condensation_step_gpu(
+        baseline_particles,
+        baseline_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=_make_thermodynamics_config(baseline_gas),
+    )
+    _, latent_total = _condensation_step_gpu(
+        latent_particles,
+        latent_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=_make_thermodynamics_config(latent_gas),
+        latent_heat=wp.array([0.0, 2.2e6], dtype=wp.float64, device=device),
+    )
+
+    npt.assert_array_equal(
+        latent_particles.masses.numpy()[:, :, 0],
+        baseline_particles.masses.numpy()[:, :, 0],
+    )
+    npt.assert_array_equal(
+        latent_total.numpy()[:, :, 0], baseline_total.numpy()[:, :, 0]
+    )
 
 
 @pytest.mark.parametrize("sidecar_name", ["latent_heat", "thermal_work"])
@@ -4466,13 +4700,15 @@ def test_condensation_step_gpu_zero_timestep_runs_four_ordered_cycles(
     )
     launch_names: list[str] = []
     transfer_time_steps: list[float] = []
+    latent_enabled_flags: list[int] = []
     original_launch = condensation_module.wp.launch
 
     def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
         name = getattr(kernel, "key", str(kernel))
         launch_names.append(name)
         if name == "condensation_mass_transfer_kernel":
-            transfer_time_steps.append(float(kwargs["inputs"][21]))
+            latent_enabled_flags.append(int(kwargs["inputs"][17]))
+            transfer_time_steps.append(float(kwargs["inputs"][23]))
         return original_launch(kernel, *args, **kwargs)
 
     monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
@@ -4483,6 +4719,7 @@ def test_condensation_step_gpu_zero_timestep_runs_four_ordered_cycles(
         pressure=101325.0,
         time_step=0.0,
         mass_transfer=total,
+        latent_heat=wp.array([2.2e6], dtype=wp.float64, device=device),
     )
 
     assert returned is total
@@ -4498,6 +4735,7 @@ def test_condensation_step_gpu_zero_timestep_runs_four_ordered_cycles(
         * 4
     )
     assert transfer_time_steps == [0.0] * 4
+    assert latent_enabled_flags == [1] * 4
     npt.assert_array_equal(gpu_particles.masses.numpy(), initial_masses)
     npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
     npt.assert_array_equal(total.numpy(), np.zeros_like(initial_masses))

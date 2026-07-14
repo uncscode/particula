@@ -3,8 +3,8 @@
 These functions mirror NumPy implementations in
 ``particula.particles.properties`` and
 ``particula.dynamics.condensation.mass_transfer``. Private thermal helpers
-use fp64 equations for the P1 latent-heat foundation; P1 does not integrate
-their latent correction into the condensation step.
+use fp64 equations for the latent-heat correction integrated by the fixed
+substeps in ``particula.gpu.kernels.condensation``.
 """
 
 import warp as wp

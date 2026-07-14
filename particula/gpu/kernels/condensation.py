@@ -12,8 +12,8 @@ buffer, updates box-level environment properties, proposes transfer from the
 current particle mass, and applies a mass-clamped transfer. Float32
 temperatures are cast to a step-owned float64 device buffer for refresh. Kernel
 launches operate on GPU-resident Warp arrays and update particle masses
-in-place. P1 accepts, validates, and leaves caller-owned latent-heat and
-thermal-work sidecars unused; the path remains isothermal.
+in-place. Latent heat, when supplied, corrects each fixed substep while
+thermal-work remains validated caller-owned state reserved for later work.
 """
 
 # pyright: basic
@@ -38,6 +38,8 @@ except ImportError as exc:  # pragma: no cover - handled via import guards
     ) from exc
 
 from particula.gpu.dynamics.condensation_funcs import (
+    _mass_transfer_rate_latent_heat_wp,
+    _thermal_conductivity_wp,
     diffusion_coefficient_wp,
     effective_surface_tension_wp,
     first_order_mass_transport_k_wp,
@@ -68,7 +70,6 @@ from particula.gpu.properties.particle_properties import (
     kelvin_radius_wp,
     kelvin_term_wp,
     knudsen_number_wp,
-    partial_pressure_delta_wp,
     vapor_transition_correction_wp,
 )
 
@@ -346,6 +347,8 @@ def condensation_mass_transfer_kernel(  # noqa: C901
     water_species_index: wp.int32,
     mass_accommodation: Any,
     diffusion_coefficient_vapor: Any,
+    latent_heat: Any,
+    latent_heat_enabled: wp.int32,
     dynamic_viscosity: Any,
     mean_free_path: Any,
     gas_constant: Any,
@@ -377,6 +380,8 @@ def condensation_mass_transfer_kernel(  # noqa: C901
         water_species_index: Index of the sole activity-adjusted species.
         mass_accommodation: Per-species mass accommodation coefficients.
         diffusion_coefficient_vapor: Per-species vapor diffusion coefficients.
+        latent_heat: Per-species latent heat [J/kg], unread when disabled.
+        latent_heat_enabled: Flag selecting latent-heat rate correction.
         dynamic_viscosity: Per-box gas dynamic viscosity [Pa·s].
         mean_free_path: Per-box gas mean free path [m].
         gas_constant: Universal gas constant [J/(mol·K)].
@@ -423,6 +428,9 @@ def condensation_mass_transfer_kernel(  # noqa: C901
         mobility,
         boltzmann_constant,
     )
+    thermal_conductivity = wp.float64(0.0)
+    if latent_heat_enabled == wp.int32(1):
+        thermal_conductivity = _thermal_conductivity_wp(temperature_value)
 
     for species_idx in range(n_species):
         transition = vapor_transition_correction_wp(
@@ -477,18 +485,33 @@ def condensation_mass_transfer_kernel(  # noqa: C901
                     particle_idx,
                     water_species_index_int,
                 )
-        pressure_delta = partial_pressure_delta_wp(
-            partial_pressure_gas,
-            activity_factor * vapor_pressure[box_idx, species_idx],
-            kelvin_term,
+        surface_vapor_pressure = (
+            activity_factor * vapor_pressure[box_idx, species_idx] * kelvin_term
         )
-        mass_rate = mass_transfer_rate_wp(
-            pressure_delta,
-            mass_transport,
-            temperature_value,
-            molar_mass[species_idx],
-            gas_constant,
-        )
+        pressure_delta = partial_pressure_gas - surface_vapor_pressure
+        species_latent_heat = wp.float64(0.0)
+        if latent_heat_enabled == wp.int32(1):
+            species_latent_heat = latent_heat[species_idx]
+        if species_latent_heat == wp.float64(0.0):
+            mass_rate = mass_transfer_rate_wp(
+                pressure_delta,
+                mass_transport,
+                temperature_value,
+                molar_mass[species_idx],
+                gas_constant,
+            )
+        else:
+            mass_rate = _mass_transfer_rate_latent_heat_wp(
+                pressure_delta,
+                mass_transport,
+                temperature_value,
+                molar_mass[species_idx],
+                species_latent_heat,
+                thermal_conductivity,
+                surface_vapor_pressure,
+                diffusion_value,
+                gas_constant,
+            )
         mass_transfer[box_idx, particle_idx, species_idx] = (
             mass_rate * time_step
         )
@@ -884,12 +907,13 @@ def condensation_step_gpu(  # noqa: C901
             remain alive and unmodified until launched work completes and may
             be reused only after a successful completion.
         latent_heat: Optional caller-owned per-species latent heat [J/kg] as an
-            active-device ``wp.float64`` array shaped ``(n_species,)``. P1
-            validates it but does not consume it; the path remains isothermal.
+            active-device ``wp.float64`` array shaped ``(n_species,)``. When
+            supplied, it is consumed in every fixed substep; zero entries use
+            the exact isothermal rate path.
         thermal_work: Optional caller-owned per-species thermal-work operation
             sidecar [J/kg] as an active-device ``wp.float64`` array shaped
-            ``(n_species,)``. P1 validates it but does not allocate,
-            initialize, modify, or consume it.
+            ``(n_species,)``. It is validated but deferred and unused P3 state;
+            this step does not allocate, initialize, modify, or consume it.
 
     Returns:
         Tuple of the particle data with in-place updated masses and accumulated,
@@ -958,10 +982,10 @@ def condensation_step_gpu(  # noqa: C901
         those buffers. Refresh evaluation and all production calculations stay
         device-resident.
 
-        Supplied latent sidecars are caller-owned. P1 validation can read device
-        values but does not allocate, initialize, modify, or consume either
-        sidecar. Invalid metadata or values leave physical state and all
-        caller-owned work state unchanged.
+        Supplied latent sidecars are caller-owned. Latent heat is consumed per
+        fixed substep without mutation; thermal work is validated but unused.
+        Invalid metadata or values leave physical state and all caller-owned
+        work state unchanged.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)
@@ -1001,6 +1025,12 @@ def condensation_step_gpu(  # noqa: C901
             device,
             nonnegative=True,
         )
+
+    latent_heat_enabled = wp.int32(0)
+    latent_heat_values = gas.molar_mass
+    if latent_heat is not None:
+        latent_heat_values = latent_heat
+        latent_heat_enabled = wp.int32(1)
 
     if activity_surface is not None:
         activity_surface = validate_condensation_activity_surface_config(
@@ -1223,6 +1253,8 @@ def condensation_step_gpu(  # noqa: C901
                 water_species_index,
                 mass_accommodation,
                 diffusion_coefficient_vapor,
+                latent_heat_values,
+                latent_heat_enabled,
                 dynamic_viscosity,
                 mean_free_path,
                 wp.float64(constants.GAS_CONSTANT),
