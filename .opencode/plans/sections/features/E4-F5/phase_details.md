@@ -15,14 +15,17 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
   - Tests: mask shape/device/dtype/binary-value and P2-sidecar atomicity,
     disabled/inactive gate behavior, and CPU↔Warp partitioning conversion
 
-- [ ] **E4-F5-P2:** Deterministic gas and particle inventory limits with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-   - Goal: Finalize transfer through per-particle bounds and fp64 per-box/species
-     reduction/scale buffers; limit this new limiting pipeline to roughly 100
-     production LOC before tests.
-   - Files: `particula/gpu/kernels/condensation.py` (private reduction, scale,
-     and apply launches) and `particula/gpu/kernels/tests/condensation_test.py`
-  - Tests: insufficient gas, evaporation, mixed signs, zero concentration, multi-box isolation
+- [x] **E4-F5-P2:** Deterministic gas and particle inventory limits with unit tests
+  - Issue: #1303 | Size: S | Status: Shipped (2026-07-14)
+   - Delivered: private direct-test-only fp64 finalization of already P1-gated
+     proposals: owned-mass evaporation bounds, ordered per-box/species demand
+     and release accounting, and gas-plus-release uptake scaling. It mutates
+     direct-helper particle masses only; public gas coupling is deferred.
+   - Files: `particula/gpu/kernels/condensation.py` and
+     `particula/gpu/kernels/tests/_condensation_test_support.py`
+   - Tests: explicit fp64 NumPy oracle cases for ample/insufficient/zero gas,
+     evaporation, mixed signs, inactive and pre-gated entries, and multi-box/
+     species isolation; atomic preflight and P1 public-isolation regressions.
 
 - [ ] **E4-F5-P3:** Four-substep coupled gas mutation and conserved transfer with unit tests
   - Issue: TBD | Size: S | Status: Not Started

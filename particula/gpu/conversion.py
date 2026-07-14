@@ -6,25 +6,10 @@ equivalents. The conversion functions enable manual control over device
 selection, copy behavior, and synchronization for long GPU-resident
 simulations.
 
-Example:
-    >>> from particula.gpu import (
-    ...     to_warp_environment_data,
-    ...     to_warp_gas_data,
-    ...     to_warp_particle_data,
-    ... )
-    >>> gpu_particles = to_warp_particle_data(particles, device="cuda")
-    >>> vapor_pressure = np.zeros(gas.concentration.shape, dtype=np.float64)
-    >>> gpu_gas = to_warp_gas_data(
-    ...     gas,
-    ...     device="cuda",
-    ...     vapor_pressure=vapor_pressure,
-    ... )
-    >>> gpu_environment = to_warp_environment_data(environment, device="cuda")
-    >>> # Run GPU simulation loop with caller-owned vapor-pressure state.
-    >>> for _ in range(10000):
-    ...     gpu_particles = condensation_step(
-    ...         gpu_particles, gpu_gas, gpu_environment, dt
-    ...     )
+The ``WarpGasData.partitioning`` mirror is a binary per-box int32 mask. CPU
+conversion expands the shared ``GasData`` species mask to every box; restoring
+requires those box masks to remain identical before collapsing them to the CPU
+representation.
 """
 
 from __future__ import annotations
@@ -153,9 +138,8 @@ def to_warp_particle_data(
     Example:
         >>> from particula.gpu import to_warp_particle_data
         >>> gpu_data = to_warp_particle_data(particles, device="cuda")
-        >>> for _ in range(10000):
-        ...     gpu_data = condensation_step(gpu_data, gas, dt)
-        >>> result = from_warp_particle_data(gpu_data)
+        >>> len(gpu_data.masses.shape)
+        3
     """
     wp = _ensure_warp_available()
     _validate_device(wp, device)
@@ -280,14 +264,17 @@ def to_warp_gas_data(
         to binary int32 (1 = True, 0 = False) for GPU compatibility.
 
         ``WarpGasData`` requires a ``vapor_pressure`` buffer even though CPU
-        ``GasData`` does not own that field. Callers may supply the
-        authoritative ``(n_boxes, n_species)`` vapor-pressure array when GPU
-        kernels need physical vapor-pressure values.
+        ``GasData`` does not own that field. Callers may supply an initial
+        ``(n_boxes, n_species)`` vapor-pressure array for kernels that consume
+        it directly. ``condensation_step_gpu()`` instead refreshes this buffer
+        from its thermodynamic configuration on every substep.
 
         If ``vapor_pressure`` is omitted, this helper allocates a zero-filled
         ``(n_boxes, n_species)`` GPU buffer on the selected device. That
-        default keeps the transfer schema valid, but condensation callers that
-        need physical vapor-pressure values must provide them explicitly.
+        default keeps the transfer schema valid. It is suitable for
+        ``condensation_step_gpu()``, which overwrites vapor pressure before
+        calculating transfer, but not for kernels that consume the field
+        without refreshing it.
 
     Args:
         data: CPU-side GasData container.
@@ -312,7 +299,7 @@ def to_warp_gas_data(
         >>> from particula.gpu import to_warp_gas_data
         >>> # Omitted vapor pressure allocates zeros for schema parity only.
         >>> gpu_gas = to_warp_gas_data(gas_data, device="cuda")
-        >>> # Provide physical vapor pressure explicitly when kernels need it:
+        >>> # Supply initial vapor pressure for kernels that do not refresh it:
         >>> vp = np.array([[1000.0, 500.0, 200.0], [1000.0, 500.0, 200.0]])
         >>> gpu_gas = to_warp_gas_data(gas_data, vapor_pressure=vp)
     """

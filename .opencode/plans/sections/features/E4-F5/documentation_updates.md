@@ -4,8 +4,11 @@
   docstrings with the binary `(n_boxes, n_species)` partitioning contract,
   P1-only sidecar validation, atomic `ValueError` behavior, and the unchanged
   particle-only/no-gas-mutation contract.
-- Do not update user-facing roadmap text yet: inventory limiting, in-place gas
-  mutation, finalized coupled transfer, and conservation remain P2--P4 work.
+- Issue #1303 adds only a short private-helper docstring stating that input is
+  already gated and public gas coupling is deferred; it makes no user-facing
+  documentation change.
+- Do not update user-facing roadmap text yet: in-place gas mutation, finalized
+  public coupled transfer, and conservation remain P3--P4 work.
 - P5 remains responsible for recording scratch ownership, no-hidden-transfer
   rules, Warp CPU support, and optional CUDA behavior in the GPU feature guide.
 - Preserve issue #1272 wording: do not claim gas-coupled production support

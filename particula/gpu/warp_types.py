@@ -99,17 +99,22 @@ class WarpGasData:
           names are omitted.
         - The ``partitioning`` field is an active-device, per-box
           ``(n_boxes, n_species)`` int32 mask rather than a CPU bool vector.
-          Its values must remain binary (1 = True, 0 = False) for condensation
-          and CPU restore. CPU restore additionally requires every box to have
-          the same mask because ``GasData`` owns one shared species mask.
+          Its values must remain binary (1 = True, 0 = False). The public
+          condensation step gates raw proposals with this mask; its private P2
+          inventory finalizer instead requires an already gated proposal. CPU
+          restore additionally requires every box to have the same mask because
+          ``GasData`` owns one shared species mask.
         - ``vapor_pressure`` is GPU-only helper state for condensation-style
           kernels and is not part of CPU ``GasData`` ownership.
           ``to_warp_gas_data()`` accepts caller-supplied values with shape
           ``(n_boxes, n_species)`` or allocates zeros when omitted. Those
           zeros keep the Warp schema valid but do not provide physical
-          vapor-pressure inputs by themselves. CPU restore helpers drop this
-          field intentionally from restored ``GasData``, while the retained GPU
-          container can still expose it until the caller discards that object.
+          vapor-pressure inputs for kernels that consume the field directly.
+          ``condensation_step_gpu()`` refreshes the field from its
+          thermodynamic configuration before transfer. CPU restore helpers drop
+          this field intentionally from restored ``GasData``, while the
+          retained GPU container can still expose it until the caller discards
+          that object.
 
     Attributes:
         molar_mass: Molar masses in kg/mol.
@@ -120,8 +125,8 @@ class WarpGasData:
         vapor_pressure: Vapor pressures in Pa.
             Shape: (n_boxes, n_species)
             GPU-only helper state for condensation kernels.
-        partitioning: Binary mask of species allowed to partition to particles
-            in each box.
+        partitioning: Binary mask used by the public condensation step to allow
+            species proposals to partition to particles in each box.
             Shape: (n_boxes, n_species)
             Uses int32 (1=True, 0=False) for GPU compatibility.
 

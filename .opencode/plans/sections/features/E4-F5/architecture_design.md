@@ -14,19 +14,26 @@ transfer, then a private Warp gate zeros it for a disabled
 before application. Enabled active entries retain the existing clamp and
 accounting behavior. `gas.concentration` remains unchanged.
 
-The following deterministic gas-coupling pipeline remains P2--P4 work:
+Issue #1303 implements the first four operations below as private kernels and
+`_finalize_inventory_limited_mass_transfer(...)`, a direct-test-only helper.
+Its already-gated fp64 proposal is read-only; it validates all inputs before
+launch, bounds evaporation, reduces in fixed particle-index order without
+atomics, writes finalized transfer and resolved P2 sidecars, and mutates only
+particle masses. Gas remains read-only. `condensation_step_gpu()` does not call
+this helper or launch its kernels, so coupled orchestration remains P3--P4 work:
 
 1. Reduce concentration-weighted positive and negative transfer independently
    into `(n_boxes, n_species)` fp64 scratch.
 2. Add same-substep evaporation to available gas and calculate a `[0, 1]`
    positive-transfer scale for each box/species.
-3. Apply positive scales, derive the exact finalized aggregate transfer, and
-   update particle mass and gas concentration with opposite signs.
-4. Accumulate finalized transfer for return and E4-F4 energy bookkeeping, then
-   refresh gas-dependent physics before the next substep.
+3. Apply positive scales and derive the exact finalized aggregate transfer.
+4. In P3--P4, update gas concentration with the opposite aggregate, accumulate
+   finalized transfer for return and E4-F4 energy bookkeeping, and refresh
+   gas-dependent physics before the next substep.
 
-P1-only sidecars are validated but neither allocated, read, cleared, nor
-written. Later reductions must be deterministic and retain this transactional
-preflight boundary. Gas concentration remains kg/m3 and particle mass remains
-per particle, so future concentration weighting and box-volume conventions must
-match the CPU reference explicitly.
+The public P1 path validates P2 sidecars but neither allocates, reads, clears,
+nor writes them; issue #1303's helper resolves only its three P2 reduction,
+release, and scale sidecars. Later public reductions must retain this
+transactional preflight boundary. Gas concentration remains kg/m3 and particle
+mass remains per particle, so future concentration weighting and box-volume
+conventions must match the CPU reference explicitly.

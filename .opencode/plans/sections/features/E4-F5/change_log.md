@@ -1,5 +1,16 @@
 # Change Log
 
+## 2026-07-14 — E4-F5-P2 shipped (issue #1303)
+- Added private, direct-test-only fp64 inventory finalization for already
+  P1-gated transfer proposals: owned-mass evaporation bounds, deterministic
+  per-box/species demand and release reduction, and gas-plus-release uptake
+  scaling.
+- Added independent direct-helper oracle and atomic-preflight coverage, plus
+  launch-spy/sentinel evidence that the public four-substep P1 path neither
+  launches P2 kernels nor touches P2 sidecars.
+- Preserved the boundary: no public API, gas coupling, return/energy semantic,
+  or user-documentation change; P3--P5 retain those responsibilities.
+
 ## 2026-07-14 — E4-F5-P1 shipped (issue #1302)
 - Validated active-device binary per-box `WarpGasData.partitioning` masks and
   optional P2 sidecar metadata atomically before mutable condensation work.

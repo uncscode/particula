@@ -23,7 +23,12 @@
     preflight and inspect manually constructed Warp masks with a private
     status-only device validation launch/readback. Nonbinary values raise
     `ValueError` before mutable work; conversion restoration also rejects
-    nonbinary values.
+     nonbinary values.
+- [x] Can P2 finalize inventory transfer without changing the public contract?
+  - Resolved 2026-07-14 by issue #1303: yes. Keep finalization private and
+    direct-test-only, require an already P1-gated proposal, and leave
+    `condensation_step_gpu()`, `gas.concentration`, public return semantics,
+    and energy handling unchanged. P3--P4 own public orchestration.
 
 Diagnostics requested: none. These questions must not weaken the issue #1272
 production-hook and conservation gates.
