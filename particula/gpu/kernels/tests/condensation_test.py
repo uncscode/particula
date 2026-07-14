@@ -94,3 +94,22 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
         "test_condensation_activity_surface_cuda_matches_numpy_reference"
         in EXPORTED_CONDENSATION_TESTS
     )
+    assert (
+        "test_condensation_step_gpu_energy_transfer_reuses_and_overwrites_output"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_step_gpu_energy_transfer_aggregates_by_box_and_species"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_step_gpu_without_energy_transfer_skips_energy_kernels"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert "test_condensation_energy_transfer_preflight_is_atomic" in (
+        EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_energy_transfer_cuda_matches_box_species_oracle"
+        in EXPORTED_CONDENSATION_TESTS
+    )

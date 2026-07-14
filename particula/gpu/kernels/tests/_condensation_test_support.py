@@ -2327,6 +2327,7 @@ def test_condensation_step_gpu_signature_keeps_keyword_only_inputs() -> None:
     assert parameters["activity_surface"].kind is inspect.Parameter.KEYWORD_ONLY
     assert parameters["scratch_buffers"].kind is inspect.Parameter.KEYWORD_ONLY
     assert parameters["latent_heat"].kind is inspect.Parameter.KEYWORD_ONLY
+    assert parameters["energy_transfer"].kind is inspect.Parameter.KEYWORD_ONLY
     assert parameters["thermal_work"].kind is inspect.Parameter.KEYWORD_ONLY
 
 
@@ -2511,6 +2512,330 @@ def test_condensation_latent_heat_matches_four_substep_oracle(
     )
     npt.assert_allclose(
         repeated_transfer.numpy(), expected_total, rtol=1e-12, atol=0.0
+    )
+
+
+@pytest.mark.gpu_parity
+def test_condensation_step_gpu_energy_transfer_reuses_and_overwrites_output(
+    device: str,
+) -> None:
+    """Energy output is caller-owned, overwritten, and not a return value."""
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    vapor_pressure = _make_vapor_pressure(1, 2)
+    latent_values = np.array([2.2e6, 1.5e6], dtype=np.float64)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    energy_transfer = wp.full((1, 2), 17.0, dtype=wp.float64, device=device)
+    output_identity = energy_transfer
+    result = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=_make_thermodynamics_config(gpu_gas),
+        latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
+        energy_transfer=energy_transfer,
+    )
+    assert len(result) == 2
+    assert result[0] is gpu_particles
+    assert energy_transfer is output_identity
+    assert np.any(energy_transfer.numpy() != 17.0)
+    expected_energy = result[1].numpy().sum(axis=1) * latent_values[None, :]
+    npt.assert_allclose(
+        energy_transfer.numpy(), expected_energy, rtol=1e-12, atol=1e-18
+    )
+
+    energy_transfer = wp.array(
+        [[np.nan, np.inf]], dtype=wp.float64, device=device
+    )
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    _, total = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=_make_thermodynamics_config(gpu_gas),
+        latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
+        energy_transfer=energy_transfer,
+    )
+    assert np.all(np.isfinite(energy_transfer.numpy()))
+    npt.assert_allclose(
+        energy_transfer.numpy(),
+        total.numpy().sum(axis=1) * latent_values[None, :],
+        rtol=1e-12,
+        atol=1e-18,
+    )
+
+
+def test_condensation_step_gpu_without_energy_transfer_skips_energy_kernels(
+    device: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Omitting energy output preserves the legacy launch profile."""
+    particles = _make_particle_data(1, 1, 1)
+    gas = _make_gas_data(1, 1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=_make_vapor_pressure(1, 1)
+    )
+    launched_kernels: list[Any] = []
+    original_launch = condensation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        launched_kernels.append(kernel)
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
+    result = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=_make_thermodynamics_config(gpu_gas),
+    )
+
+    assert len(result) == 2
+    assert (
+        condensation_module._clear_energy_transfer_kernel
+        not in launched_kernels
+    )
+    assert (
+        condensation_module._reduce_energy_transfer_kernel
+        not in launched_kernels
+    )
+
+
+@pytest.mark.gpu_parity
+def test_condensation_step_gpu_energy_transfer_aggregates_by_box_and_species(
+    device: str,
+) -> None:
+    """Energy reduction isolates each box/species while summing particles."""
+    particles = _make_particle_data(2, 2, 2)
+    gas = _make_gas_data(2, 2)
+    gas.concentration[:] = np.array([[1.0e-2, 2.0e-2], [3.0e-2, 4.0e-2]])
+    vapor_pressure = _make_vapor_pressure(2, 2)
+    latent_values = np.array([1.1e6, 2.3e6], dtype=np.float64)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    energy_transfer = wp.zeros((2, 2), dtype=wp.float64, device=device)
+    _, total = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=_make_thermodynamics_config(gpu_gas),
+        latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
+        energy_transfer=energy_transfer,
+    )
+    expected = total.numpy().sum(axis=1) * latent_values[None, :]
+    npt.assert_allclose(
+        energy_transfer.numpy(), expected, rtol=1e-12, atol=1e-18
+    )
+    assert not np.allclose(energy_transfer.numpy(), expected.sum(axis=0))
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("gas_concentration", "time_step"),
+    [
+        (1.0e-2, 0.1),
+        (1.0e-6, 0.1),
+        (1.0e-2, 0.0),
+    ],
+    ids=("condensation", "evaporation", "zero-transfer"),
+)
+def test_condensation_energy_transfer_matches_four_substep_oracle(
+    device: str,
+    gas_concentration: float,
+    time_step: float,
+) -> None:
+    """Energy output uses the signed bounded four-substep transfer."""
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    gas.concentration.fill(gas_concentration)
+    vapor_pressure = _make_vapor_pressure(1, 2)
+    latent_values = np.array([1.1e6, 2.3e6], dtype=np.float64)
+    expected_final, expected_total, _ = _cpu_four_substep_oracle(
+        particles,
+        gas,
+        vapor_pressure,
+        surface_tension=np.full(2, 0.072, dtype=np.float64),
+        mass_accommodation=np.full(2, 1.0, dtype=np.float64),
+        diffusion_coefficient_vapor=np.full(2, 2.0e-5, dtype=np.float64),
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=time_step,
+        latent_heat=latent_values,
+    )
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    energy_transfer = wp.full(
+        (1, 2), wp.float64(13.0), dtype=wp.float64, device=device
+    )
+
+    _, total = _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=time_step,
+        thermodynamics=_make_thermodynamics_config(gpu_gas),
+        latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
+        energy_transfer=energy_transfer,
+    )
+
+    expected_energy = expected_total.sum(axis=1) * latent_values[None, :]
+    npt.assert_allclose(
+        gpu_particles.masses.numpy(), expected_final, rtol=1e-12, atol=1e-18
+    )
+    npt.assert_allclose(total.numpy(), expected_total, rtol=1e-12, atol=1e-18)
+    npt.assert_allclose(
+        energy_transfer.numpy(), expected_energy, rtol=1e-12, atol=1e-18
+    )
+
+
+@pytest.mark.parametrize(
+    ("energy_transfer", "match"),
+    [
+        (None, "requires latent_heat"),
+        ([0.0, 0.0], "must be a Warp array"),
+        (np.zeros((1, 2), dtype=np.float32), "must use dtype"),
+        (np.zeros((2,), dtype=np.float64), "shape"),
+        (np.zeros((1, 1), dtype=np.float64), "shape"),
+    ],
+    ids=["missing-latent", "non-warp", "float32", "rank", "shape"],
+)
+def test_condensation_energy_transfer_preflight_is_atomic(
+    device: str,
+    energy_transfer: Any,
+    match: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Invalid energy output metadata fails before allocations or mutation."""
+    particles = _make_particle_data(1, 1, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    if energy_transfer is None:
+        energy_transfer = wp.full((1, 2), 19.0, dtype=wp.float64, device=device)
+    if isinstance(energy_transfer, np.ndarray):
+        energy_transfer = wp.array(
+            energy_transfer,
+            dtype=wp.float32
+            if energy_transfer.dtype == np.float32
+            else wp.float64,
+            device=device,
+        )
+    latent_heat = wp.ones(2, dtype=wp.float64, device=device)
+    scratch = _make_condensation_scratch_buffers((1, 1, 2), device)
+    assert scratch.work_mass_transfer is not None
+    assert scratch.total_mass_transfer is not None
+    assert scratch.dynamic_viscosity is not None
+    assert scratch.mean_free_path is not None
+    output_arrays = (
+        (energy_transfer,) if hasattr(energy_transfer, "numpy") else ()
+    )
+    state_arrays = (
+        gpu_particles.masses,
+        gpu_gas.concentration,
+        gpu_gas.vapor_pressure,
+        *output_arrays,
+        scratch.work_mass_transfer,
+        scratch.total_mass_transfer,
+        scratch.dynamic_viscosity,
+        scratch.mean_free_path,
+    )
+    snapshots = tuple(array.numpy().copy() for array in state_arrays)
+
+    def fail_after_preflight(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("invalid energy output passed preflight")
+
+    monkeypatch.setattr(
+        condensation_module, "_ensure_environment_arrays", fail_after_preflight
+    )
+    with pytest.raises(ValueError, match=match):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            latent_heat=None
+            if match == "requires latent_heat"
+            else latent_heat,
+            energy_transfer=energy_transfer,
+            scratch_buffers=scratch,
+        )
+    for array, expected in zip(state_arrays, snapshots, strict=True):
+        npt.assert_array_equal(array.numpy(), expected)
+
+
+@pytest.mark.cuda
+def test_condensation_energy_transfer_device_mismatch_is_atomic(
+    warp_cpu_device: str,
+    cuda_device: str,
+) -> None:
+    """A cross-device energy output fails before caller state is changed."""
+    particles = _make_particle_data(1, 1, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=warp_cpu_device,
+        vapor_pressure=_make_vapor_pressure(1, 2),
+    )
+    latent_heat = wp.ones(2, dtype=wp.float64, device=warp_cpu_device)
+    energy_transfer = wp.full(
+        (1, 2), wp.float64(19.0), dtype=wp.float64, device=cuda_device
+    )
+    state_arrays = (
+        gpu_particles.masses,
+        gpu_gas.vapor_pressure,
+        energy_transfer,
+    )
+    snapshots = tuple(array.numpy().copy() for array in state_arrays)
+
+    with pytest.raises(ValueError, match="energy_transfer device"):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            latent_heat=latent_heat,
+            energy_transfer=energy_transfer,
+        )
+
+    for array, expected in zip(state_arrays, snapshots, strict=True):
+        npt.assert_array_equal(array.numpy(), expected)
+
+
+@pytest.mark.cuda
+@pytest.mark.gpu_parity
+def test_condensation_energy_transfer_cuda_matches_box_species_oracle(
+    cuda_device: str,
+) -> None:
+    """Optional CUDA energy reduction matches the multi-box CPU-side oracle."""
+    test_condensation_step_gpu_energy_transfer_aggregates_by_box_and_species(
+        cuda_device
     )
 
 
@@ -4921,11 +5246,12 @@ def test_condensation_forced_evaporation_accumulates_applied_transfer(
     device: str,
     use_scratch: bool,
 ) -> None:
-    """Forced evaporation preserves total/work roles and mass conservation."""
+    """Forced evaporation reports bounded applied mass and energy transfer."""
     case = P4_CASES[0]
     particles = case.build_particle_data()
     gas = case.build_gas_data()
     initial_mass = particles.masses.copy()
+    latent_values = np.array([2.2e6, 1.5e6], dtype=np.float64)
     expected_mass, expected_total, expected_work = _cpu_four_substep_oracle(
         particles,
         gas,
@@ -4937,6 +5263,7 @@ def test_condensation_forced_evaporation_accumulates_applied_transfer(
         pressure=case.pressure,
         time_step=1000.0,
         kappas=P4_THERMODYNAMICS.kappas,
+        latent_heat=latent_values,
     )
     gpu_particles = to_warp_particle_data(particles, device=device)
     gpu_gas = to_warp_gas_data(
@@ -4960,6 +5287,9 @@ def test_condensation_forced_evaporation_accumulates_applied_transfer(
             device=device,
         )
     )
+    energy_transfer = wp.full(
+        (1, 2), wp.float64(31.0), dtype=wp.float64, device=device
+    )
 
     _, returned_total = condensation_step_gpu(
         gpu_particles,
@@ -4972,6 +5302,8 @@ def test_condensation_forced_evaporation_accumulates_applied_transfer(
         activity_surface=activity_surface,
         mass_transfer=legacy_total,
         scratch_buffers=scratch,
+        latent_heat=wp.array(latent_values, dtype=wp.float64, device=device),
+        energy_transfer=energy_transfer,
     )
 
     expected_total_buffer = (
@@ -4983,6 +5315,16 @@ def test_condensation_forced_evaporation_accumulates_applied_transfer(
         gpu_particles.masses.numpy(), expected_mass, rtol=1.0e-10
     )
     npt.assert_allclose(returned_total.numpy(), expected_total, rtol=1.0e-10)
+    npt.assert_allclose(
+        energy_transfer.numpy(),
+        expected_total.sum(axis=1) * latent_values[None, :],
+        rtol=1e-12,
+        atol=1e-18,
+    )
+    assert not np.array_equal(
+        energy_transfer.numpy(),
+        expected_work.sum(axis=1) * latent_values[None, :],
+    )
     npt.assert_allclose(
         gpu_particles.masses.numpy(),
         initial_mass + returned_total.numpy(),

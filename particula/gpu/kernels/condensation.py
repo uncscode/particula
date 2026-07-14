@@ -650,6 +650,36 @@ def _clear_mass_transfer_kernel(
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
+def _clear_energy_transfer_kernel(
+    energy_transfer: Any,
+) -> None:
+    """Clear caller-owned whole-call energy diagnostic storage."""
+    box_idx = wp.tid()  # type: ignore[misc]
+    for species_idx in range(energy_transfer.shape[1]):
+        energy_transfer[box_idx, species_idx] = wp.float64(0.0)
+
+
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
+def _reduce_energy_transfer_kernel(
+    total_mass_transfer: Any,
+    latent_heat: Any,
+    energy_transfer: Any,
+) -> None:
+    """Reduce applied transfer into one signed energy value per box/species."""
+    box_idx, species_idx = wp.tid()  # type: ignore[misc]
+    total_transfer = wp.float64(0.0)
+    for particle_idx in range(total_mass_transfer.shape[1]):
+        total_transfer += total_mass_transfer[
+            box_idx, particle_idx, species_idx
+        ]
+    energy_transfer[box_idx, species_idx] = (
+        total_transfer * latent_heat[species_idx]
+    )
+
+
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
 def _apply_and_accumulate_mass_transfer_kernel(
     masses: Any,
     work_mass_transfer: Any,
@@ -768,6 +798,29 @@ def _validate_mass_transfer_buffer(
         raise ValueError(f"mass_transfer must use dtype {wp.float64}")
 
 
+def _validate_energy_transfer_buffer(
+    energy_transfer: Any,
+    expected_shape: tuple[int, int],
+    expected_device: Any,
+) -> None:
+    """Validate metadata for caller-owned write-only energy output storage."""
+    if not _is_warp_array_like(energy_transfer):
+        raise ValueError("energy_transfer must be a Warp array")
+    if energy_transfer.shape != expected_shape:
+        raise ValueError(
+            f"energy_transfer shape {energy_transfer.shape} does not match "
+            f"expected {expected_shape}"
+        )
+    if getattr(energy_transfer, "device", None) is None or str(
+        energy_transfer.device
+    ) != str(expected_device):
+        raise ValueError(
+            "energy_transfer device does not match particle device"
+        )
+    if energy_transfer.dtype != wp.float64:
+        raise ValueError(f"energy_transfer must use dtype {wp.float64}")
+
+
 def _validate_particle_arrays(
     particles: Any,
     n_boxes: int,
@@ -874,6 +927,7 @@ def condensation_step_gpu(  # noqa: C901
     activity_surface: CondensationActivitySurfaceConfig | Any | None = None,
     scratch_buffers: CondensationScratchBuffers | Any | None = None,
     latent_heat: Any | None = None,
+    energy_transfer: Any | None = None,
     thermal_work: Any | None = None,
 ) -> tuple[Any, Any]:
     """Execute a fixed four-substep condensation timestep on the GPU.
@@ -920,6 +974,12 @@ def condensation_step_gpu(  # noqa: C901
             active-device ``wp.float64`` array shaped ``(n_species,)``. When
             supplied, it is consumed in every fixed substep; zero entries use
             the exact isothermal rate path.
+        energy_transfer: Optional caller-owned write-only energy output [J]
+            shaped ``(n_boxes, n_species)``. After successful preflight it is
+            overwritten with the signed whole-call, bounded applied transfer
+            times ``latent_heat``. Its contents, including stale NaN/Inf, are
+            not validated because it is output storage. It is not returned as
+            a third tuple item.
         thermal_work: Optional caller-owned per-species thermal-work sidecar
             [J/kg] as an active-device ``wp.float64`` array shaped
             ``(n_species,)``. It is validated but deferred and unused P3 state;
@@ -950,6 +1010,9 @@ def condensation_step_gpu(  # noqa: C901
         ValueError: If ``latent_heat`` or ``thermal_work`` is not a finite,
             non-negative active-device ``wp.float64`` array shaped
             ``(n_species,)``.
+        ValueError: If ``energy_transfer`` is supplied without valid
+            ``latent_heat`` or lacks active-device ``wp.float64``
+            ``(n_boxes, n_species)`` metadata.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
@@ -996,6 +1059,11 @@ def condensation_step_gpu(  # noqa: C901
         species preserves that species' isothermal arithmetic. Thermal work is
         validated but unused. Invalid metadata or values leave physical state
         and all caller-owned work state unchanged.
+
+        Energy transfer is caller-owned, allocation-stable diagnostic storage.
+        It is cleared and overwritten only after successful preflight, is
+        reconstructible on each successful whole call, and is deliberately not
+        content-validated because the step only writes it.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)
@@ -1026,6 +1094,14 @@ def condensation_step_gpu(  # noqa: C901
             n_species,
             device,
             nonnegative=True,
+        )
+    if energy_transfer is not None:
+        if latent_heat is None:
+            raise ValueError("energy_transfer requires latent_heat")
+        _validate_energy_transfer_buffer(
+            energy_transfer,
+            (n_boxes, n_species),
+            device,
         )
     if thermal_work is not None:
         _validate_float64_species_array(
@@ -1217,6 +1293,13 @@ def condensation_step_gpu(  # noqa: C901
         inputs=[total_mass_transfer],
         device=device,
     )
+    if energy_transfer is not None:
+        wp.launch(
+            _clear_energy_transfer_kernel,
+            dim=n_boxes,
+            inputs=[energy_transfer],
+            device=device,
+        )
     substep_time_step = wp.float64(time_step / 4.0)
     for _ in range(4):
         if surface_tension_mode == SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED:
@@ -1279,6 +1362,14 @@ def condensation_step_gpu(  # noqa: C901
             _apply_and_accumulate_mass_transfer_kernel,
             dim=(n_boxes, n_particles),
             inputs=[particles.masses, work_mass_transfer, total_mass_transfer],
+            device=device,
+        )
+
+    if energy_transfer is not None:
+        wp.launch(
+            _reduce_energy_transfer_kernel,
+            dim=(n_boxes, n_species),
+            inputs=[total_mass_transfer, latent_heat, energy_transfer],
             device=device,
         )
 
