@@ -49,16 +49,17 @@ FEATURE_DIRECT_GPU_CONTRACT_SNIPPETS = (
     "optional per-species latent-rate correction in each of its four equal",
     "substeps, with CPU-oracle/Warp parity coverage.",
     "using a zero entry for a species, retains that species' isothermal rate",
-    "This does not provide broader temperature feedback, gas coupling or",
-    "conservation, energy bookkeeping, or strategy/runnable-level latent-heat",
-    "support; those remain deferred.",
+    "Issue #1272 also ships optional keyword-only caller-owned active-device",
+    "This is diagnostic bookkeeping, not temperature feedback, gas mutation or",
+    "gas/full-system conservation.",
 )
 ROADMAP_CPU_BASELINE_SNIPPET = "current executable CPU integration baseline"
 ROADMAP_DIRECT_GPU_CONTRACT_SNIPPETS = (
-    "Bounded direct GPU condensation applies an optional Warp-backed latent-heat",
-    "rate correction during each fixed substep.",
-    "It does not provide temperature",
-    "feedback, gas coupling or conservation, or energy bookkeeping.",
+    "The direct step applies an optional latent-heat rate correction in each"
+    " of its",
+    "four fixed substeps, with CPU-oracle/Warp parity coverage.",
+    "E4-F4's #1272 signed diagnostic is shipped: optional keyword-only caller-owned",
+    "This leaves temperature feedback, gas mutation",
 )
 
 
@@ -146,7 +147,7 @@ def test_condensation_feature_page_keeps_direct_gpu_latent_heat_boundary() -> (
     assert FEATURE_CPU_BASELINE_SNIPPET in content
     for snippet in FEATURE_DIRECT_GPU_CONTRACT_SNIPPETS:
         assert snippet in content
-    assert "thermal_work" not in content
+    assert "`thermal_work` is validated but remains" in content
 
 
 def test_roadmap_records_bounded_direct_gpu_latent_heat_support() -> None:
@@ -157,5 +158,5 @@ def test_roadmap_records_bounded_direct_gpu_latent_heat_support() -> None:
     assert CPU_BASELINE_TEST_PATH in content
     for snippet in ROADMAP_DIRECT_GPU_CONTRACT_SNIPPETS:
         assert snippet in content
-    assert "thermal_work" not in content
+    assert "`thermal_work` remains" in content
     assert "with per-box temperature feedback through the" not in content
