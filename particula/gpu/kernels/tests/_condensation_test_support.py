@@ -2787,6 +2787,91 @@ def test_condensation_energy_transfer_preflight_is_atomic(
         npt.assert_array_equal(array.numpy(), expected)
 
 
+@pytest.mark.parametrize(
+    "alias_name",
+    ("concentration", "vapor_pressure"),
+)
+def test_condensation_energy_transfer_alias_preflight_is_atomic(
+    device: str,
+    alias_name: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Aliased energy output fails before it can mutate mutable gas state."""
+    particles = _make_particle_data(1, 1, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    energy_transfer = getattr(gpu_gas, alias_name)
+    latent_heat = wp.ones(2, dtype=wp.float64, device=device)
+    scratch = _make_condensation_scratch_buffers((1, 1, 2), device)
+    assert scratch.work_mass_transfer is not None
+    assert scratch.total_mass_transfer is not None
+    assert scratch.dynamic_viscosity is not None
+    assert scratch.mean_free_path is not None
+    state_arrays = (
+        gpu_particles.masses,
+        gpu_gas.concentration,
+        gpu_gas.vapor_pressure,
+        scratch.work_mass_transfer,
+        scratch.total_mass_transfer,
+        scratch.dynamic_viscosity,
+        scratch.mean_free_path,
+    )
+    snapshots = tuple(array.numpy().copy() for array in state_arrays)
+
+    def fail_after_preflight(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("aliased energy output passed preflight")
+
+    monkeypatch.setattr(
+        condensation_module, "_ensure_environment_arrays", fail_after_preflight
+    )
+    with pytest.raises(ValueError, match="must not overlap mutable"):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            latent_heat=latent_heat,
+            energy_transfer=energy_transfer,
+            scratch_buffers=scratch,
+        )
+
+    assert energy_transfer is getattr(gpu_gas, alias_name)
+    for array, expected in zip(state_arrays, snapshots, strict=True):
+        npt.assert_array_equal(array.numpy(), expected)
+
+
+def test_condensation_energy_transfer_rejects_partial_storage_overlap(
+    device: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Distinct Warp arrays with overlapping storage are rejected."""
+    energy_transfer = wp.zeros((1, 2), dtype=wp.float64, device=device)
+    mutable_state = wp.zeros((1, 2), dtype=wp.float64, device=device)
+
+    def overlapping_ranges(array: Any) -> tuple[int, int]:
+        """Return deterministic partially overlapping byte ranges."""
+        if array is energy_transfer:
+            return 0, 16
+        return 8, 24
+
+    monkeypatch.setattr(
+        condensation_module,
+        "_warp_array_memory_range",
+        overlapping_ranges,
+    )
+
+    with pytest.raises(ValueError, match="must not overlap mutable"):
+        condensation_module._validate_energy_transfer_ownership(
+            energy_transfer,
+            (mutable_state,),
+        )
+
+
 @pytest.mark.cuda
 def test_condensation_energy_transfer_device_mismatch_is_atomic(
     warp_cpu_device: str,
