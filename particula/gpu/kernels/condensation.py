@@ -158,6 +158,11 @@ class CondensationScratchBuffers:
     mean_free_path: Any | None = None
 
 
+def _read_float64_array(array: Any) -> np.ndarray:
+    """Return a Warp array's values as a float64 NumPy array for validation."""
+    return np.asarray(array.numpy(), dtype=np.float64)
+
+
 def validate_condensation_scratch_buffers(
     candidate: CondensationScratchBuffers | Any,
     dimensions: tuple[int, int, int],
@@ -227,11 +232,6 @@ def _validate_int32_selector(
             f"activity_surface.{name} contains an unsupported mode."
         )
     return result
-
-
-def _read_float64_array(values: Any) -> np.ndarray:
-    """Read a validated Warp array for validation-only domain checks."""
-    return np.asarray(values.numpy(), dtype=np.float64)
 
 
 def validate_condensation_activity_surface_config(
@@ -717,17 +717,23 @@ def _validate_float64_species_array(
     *,
     nonnegative: bool = False,
 ) -> None:
-    """Validate a caller-owned finite float64 per-species Warp array."""
+    """Validate metadata for a caller-owned float64 per-species Warp array.
+
+    CUDA sidecars remain device-resident at step entry.  CPU-side preflight
+    retains eager value-domain errors for the synchronous Warp CPU backend,
+    while guarded device arithmetic protects CUDA execution without a readback.
+    """
     if not _is_warp_array_like(array):
         raise ValueError(f"{name} must be a Warp array")
     _validate_species_array(name, array, n_species, expected_device)
     if array.dtype != wp.float64:
         raise ValueError(f"{name} must use dtype {wp.float64}")
-    values = _read_float64_array(array)
-    if not np.all(np.isfinite(values)) or (
-        nonnegative and np.any(values < 0.0)
-    ):
-        raise ValueError(f"{name} must be finite and non-negative")
+    if not getattr(expected_device, "is_cuda", False):
+        values = np.asarray(array.numpy(), dtype=np.float64)
+        if not np.all(np.isfinite(values)) or (
+            nonnegative and np.any(values < 0.0)
+        ):
+            raise ValueError(f"{name} must be finite and non-negative")
 
 
 def _validate_mass_transfer_buffer(
@@ -981,10 +987,9 @@ def condensation_step_gpu(  # noqa: C901
         With no scratch transfer fields, legacy ``mass_transfer`` remains the
         returned total by identity.
 
-        Thermodynamic validation may synchronously read caller-owned device
-        arrays, including on CUDA, without allocating, replacing, or mutating
-        those buffers. Refresh evaluation and all production calculations stay
-        device-resident.
+        Thermodynamic metadata validation and all production calculations stay
+        device-resident; valid latent sidecars never require host readback or
+        synchronization.
 
         Supplied latent sidecars are caller-owned. Latent heat is consumed per
         fixed substep without mutation; omitting it or supplying zero for a

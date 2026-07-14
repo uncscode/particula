@@ -2457,6 +2457,13 @@ def test_condensation_latent_heat_matches_four_substep_oracle(
         scratch_buffers=scratch,
     )
 
+    assert transfer is scratch.total_mass_transfer
+    scratch_arrays = (
+        scratch.work_mass_transfer,
+        scratch.total_mass_transfer,
+        scratch.dynamic_viscosity,
+        scratch.mean_free_path,
+    )
     # Warp CPU and the NumPy oracle execute the same deterministic fp64 model.
     npt.assert_allclose(
         gpu_particles.masses.numpy(), expected_masses, rtol=1e-12, atol=0.0
@@ -2469,6 +2476,42 @@ def test_condensation_latent_heat_matches_four_substep_oracle(
     assert np.all(gpu_particles.masses.numpy() >= 0.0)
     npt.assert_array_equal(latent_heat.numpy(), latent_snapshot)
     npt.assert_array_equal(thermal_work.numpy(), thermal_snapshot)
+
+    repeated_particles = to_warp_particle_data(particles, device=device)
+    repeated_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=vapor_pressure
+    )
+    _, repeated_transfer = _condensation_step_gpu(
+        repeated_particles,
+        repeated_gas,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=time_step,
+        surface_tension=wp.array(
+            surface_tension, dtype=wp.float64, device=device
+        ),
+        mass_accommodation=wp.array(
+            mass_accommodation, dtype=wp.float64, device=device
+        ),
+        diffusion_coefficient_vapor=wp.array(
+            diffusion, dtype=wp.float64, device=device
+        ),
+        thermodynamics=_make_thermodynamics_config(repeated_gas),
+        latent_heat=latent_heat,
+        thermal_work=thermal_work,
+        scratch_buffers=scratch,
+    )
+    assert repeated_transfer is scratch.total_mass_transfer
+    assert scratch.work_mass_transfer is scratch_arrays[0]
+    assert scratch.total_mass_transfer is scratch_arrays[1]
+    assert scratch.dynamic_viscosity is scratch_arrays[2]
+    assert scratch.mean_free_path is scratch_arrays[3]
+    npt.assert_allclose(
+        repeated_particles.masses.numpy(), expected_masses, rtol=1e-12, atol=0.0
+    )
+    npt.assert_allclose(
+        repeated_transfer.numpy(), expected_total, rtol=1e-12, atol=0.0
+    )
 
 
 @pytest.mark.gpu_parity

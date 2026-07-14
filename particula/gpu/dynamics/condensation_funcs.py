@@ -187,14 +187,21 @@ def _mass_transfer_rate_latent_heat_wp(
     References:
         Topping, D. O., & Bane, M. K. (2022), Equation 2.36.
     """
+    isothermal_rate = mass_transfer_rate_wp(
+        pressure_delta,
+        first_order_mass_transport,
+        temperature,
+        molar_mass,
+        gas_constant,
+    )
     if latent_heat == wp.float64(0.0):
-        return mass_transfer_rate_wp(
-            pressure_delta,
-            first_order_mass_transport,
-            temperature,
-            molar_mass,
-            gas_constant,
-        )
+        return isothermal_rate
+    if (
+        latent_heat < wp.float64(0.0)
+        or not wp.isfinite(latent_heat)
+        or not wp.isfinite(isothermal_rate)
+    ):
+        return wp.float64(0.0)
     thermal_factor = _thermal_resistance_factor_wp(
         diffusion_coefficient,
         latent_heat,
@@ -205,17 +212,20 @@ def _mass_transfer_rate_latent_heat_wp(
         gas_constant,
     )
     r_specific = gas_constant / molar_mass
-    correction = thermal_factor / (r_specific * temperature)
-    return (
-        mass_transfer_rate_wp(
-            pressure_delta,
-            first_order_mass_transport,
-            temperature,
-            molar_mass,
-            gas_constant,
-        )
-        / correction
-    )
+    denominator = r_specific * temperature
+    correction = thermal_factor / denominator
+    if (
+        not wp.isfinite(thermal_factor)
+        or not wp.isfinite(denominator)
+        or denominator <= wp.float64(0.0)
+        or not wp.isfinite(correction)
+        or correction <= wp.float64(0.0)
+    ):
+        return isothermal_rate
+    corrected_rate = isothermal_rate / correction
+    if not wp.isfinite(corrected_rate):
+        return isothermal_rate
+    return corrected_rate
 
 
 @wp.func
