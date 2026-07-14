@@ -47,10 +47,13 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     `rtol=5e-2` and maximum-relative-error recorded bounds; required Warp CPU;
     one optional marked CUDA droplet-like slice; stable repeated sidecar reuse.
 
-- [ ] **E4-F3-P4:** Update development documentation for fixed-four integration
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document selected production behavior, scratch ownership, limitations,
-    and focused validation commands.
+- [x] **E4-F3-P4:** Update development documentation for fixed-four integration
+  - Issue: #1295 | Size: XS | Status: Shipped (2026-07-13)
+  - Delivered: Documented the package-level step import and the
+    concrete-module-only scratch sidecar; fixed-four refresh and transfer
+    semantics; caller ownership; particle-only scope; and bounded limitations.
   - Files: `docs/Features/Roadmap/condensation-stiffness-study.md`,
-    `docs/Features/Roadmap/data-oriented-gpu.md`, relevant feature docs
-  - Tests: Markdown links and documented command/reference verification.
+    `docs/Features/Roadmap/data-oriented-gpu.md`,
+    `docs/Features/condensation_strategy_system.md`
+  - Tests: verified Markdown links and focused discoverable condensation test
+    commands, including the guarded Warp/CUDA behavior.

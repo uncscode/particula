@@ -2,14 +2,14 @@
   "id": "E4-F3",
   "type": "feature",
   "title": "Fixed four-substep integration with reusable stable-shape buffers",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-07-14",
+  "completion_date": "2026-07-13",
+  "last_updated": "2026-07-13",
   "dependencies": [
     "E4-F1"
   ],
@@ -38,7 +38,7 @@
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": "2026-07-14",
+      "completion_date": "2026-07-13",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -51,7 +51,7 @@
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": "2026-07-14",
+      "completion_date": "2026-07-13",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -64,7 +64,7 @@
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": "2026-07-14",
+      "completion_date": "2026-07-13",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -73,11 +73,11 @@
     {
       "id": "E4-F3-P4",
       "title": "Update development documentation for fixed-four integration",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
-      "issue_number": null,
+      "issue_number": 1295,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-13",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -85,5 +85,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
