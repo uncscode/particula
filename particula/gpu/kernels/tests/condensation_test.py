@@ -139,10 +139,10 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
         in EXPORTED_CONDENSATION_TESTS
     )
     assert (
-        "test_finalize_inventory_limited_transfer_preflight_is_atomic"
+        "test_finalize_inventory_rejects_invalid_physical_inputs_atomically"
         in EXPORTED_CONDENSATION_TESTS
     )
     assert (
-        "test_finalize_inventory_limited_transfer_rejects_cuda_p2_sidecar"
+        "test_finalize_inventory_rejects_p2_sidecar_aliases_atomically"
         in EXPORTED_CONDENSATION_TESTS
     )

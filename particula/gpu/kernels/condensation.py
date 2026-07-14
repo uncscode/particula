@@ -1079,6 +1079,112 @@ def _validate_energy_transfer_ownership(
             )
 
 
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
+def _validate_p2_physical_values_kernel(
+    masses: Any,
+    concentration: Any,
+    gas_concentration: Any,
+    gated_mass_transfer: Any,
+    invalid: Any,
+) -> None:
+    """Record invalid direct-P2 physical values without changing input state."""
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
+    concentration_value = concentration[box_idx, particle_idx]
+    if not wp.isfinite(concentration_value) or concentration_value < 0.0:
+        wp.atomic_add(invalid, 0, 1)
+    for species_idx in range(masses.shape[2]):
+        mass = masses[box_idx, particle_idx, species_idx]
+        proposal = gated_mass_transfer[box_idx, particle_idx, species_idx]
+        if not wp.isfinite(mass) or mass < 0.0 or not wp.isfinite(proposal):
+            wp.atomic_add(invalid, 0, 1)
+        if particle_idx == 0:
+            gas_value = gas_concentration[box_idx, species_idx]
+            if not wp.isfinite(gas_value) or gas_value < 0.0:
+                wp.atomic_add(invalid, 0, 1)
+
+
+def _validate_p2_physical_inputs(
+    particles: Any,
+    gas: Any,
+    gated_mass_transfer: Any,
+    dimensions: tuple[int, int, int],
+    device: Any,
+) -> None:
+    """Validate direct-P2 values before resolving caller-owned sidecars."""
+    n_boxes, n_particles, _ = dimensions
+    if not getattr(device, "is_cuda", False):
+        values = (
+            ("particles.masses", particles.masses, True),
+            ("particles.concentration", particles.concentration, True),
+            ("gas.concentration", gas.concentration, True),
+            ("gated_mass_transfer", gated_mass_transfer, False),
+        )
+        for name, array, nonnegative in values:
+            numeric_values = _read_float64_array(array)
+            if not np.all(np.isfinite(numeric_values)) or (
+                nonnegative and np.any(numeric_values < 0.0)
+            ):
+                requirement = (
+                    "finite and non-negative" if nonnegative else "finite"
+                )
+                raise ValueError(f"{name} must be {requirement}")
+        return
+
+    invalid = wp.zeros(1, dtype=wp.int32, device=device)
+    wp.launch(
+        _validate_p2_physical_values_kernel,
+        dim=(n_boxes, n_particles),
+        inputs=[
+            particles.masses,
+            particles.concentration,
+            gas.concentration,
+            gated_mass_transfer,
+            invalid,
+        ],
+        device=device,
+    )
+    if invalid.numpy()[0] != 0:
+        raise ValueError(
+            "P2 particle masses, concentrations, and gas concentration must "
+            "be finite and non-negative; gated_mass_transfer must be finite"
+        )
+
+
+def _validate_p2_sidecar_ownership(
+    demand: Any | None,
+    release: Any | None,
+    scale: Any | None,
+    gas_concentration: Any,
+    energy_transfer: Any | None,
+) -> None:
+    """Reject P2 reduction sidecars overlapping protected or peer storage."""
+    sidecars = (
+        ("positive_mass_transfer_demand", demand),
+        ("negative_mass_transfer_release", release),
+        ("positive_mass_transfer_scale", scale),
+    )
+    protected: tuple[tuple[str, Any], ...] = (
+        ("gas.concentration", gas_concentration),
+    )
+    if energy_transfer is not None:
+        protected = protected + (("energy_transfer", energy_transfer),)
+    for index, (name, sidecar) in enumerate(sidecars):
+        if sidecar is None:
+            continue
+        sidecar_start, sidecar_end = _warp_array_memory_range(sidecar)
+        for other_name, other in (*sidecars[index + 1 :], *protected):
+            if other is None:
+                continue
+            other_start, other_end = _warp_array_memory_range(other)
+            if sidecar is other or (
+                sidecar_start < other_end and other_start < sidecar_end
+            ):
+                raise ValueError(
+                    f"{name} must not overlap {other_name} in direct P2 state"
+                )
+
+
 def _validate_particle_arrays(
     particles: Any,
     n_boxes: int,
@@ -1259,6 +1365,8 @@ def _finalize_inventory_limited_mass_transfer(
     gas: Any,
     gated_mass_transfer: Any,
     scratch_buffers: CondensationScratchBuffers | Any | None = None,
+    *,
+    energy_transfer: Any | None = None,
 ) -> Any:
     """Finalize a pre-gated proposal under particle and gas inventory limits.
 
@@ -1276,19 +1384,22 @@ def _finalize_inventory_limited_mass_transfer(
             proposal [kg] already P1-gated for partitioning and inactive slots.
         scratch_buffers: Optional validated scratch sidecar. Only its P2 demand,
             release, and scale fields are resolved or mutated.
+        energy_transfer: Optional public-step energy output to protect from P2
+            sidecar aliasing. It is never read or written by this helper.
 
     Returns:
         New float64 finalized applied-transfer array matching particle masses
         [kg].
 
     Raises:
-        ValueError: If masses, the proposal, particle or gas arrays, or supplied
-            scratch metadata have incompatible shape, dtype, or device.
+        ValueError: If physical inputs are invalid, buffers have incompatible
+            metadata, or P2 sidecars overlap protected or peer storage.
 
     Notes:
-        Metadata preflight finishes before this helper allocates output or
-        launches a mutating kernel. Invalid inputs therefore leave caller-owned
-        state unchanged; this does not promise rollback after a device failure.
+        Preflight validation finishes before this helper resolves fallback
+        state, allocates output, or launches a mutating kernel. Validation
+        failures leave caller-owned state unchanged; this does not promise
+        rollback after a post-launch device-runtime failure.
     """
     masses = particles.masses
     if not _is_warp_array_like(masses) or len(masses.shape) != 3:
@@ -1305,6 +1416,19 @@ def _finalize_inventory_limited_mass_transfer(
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
     _validate_gas_arrays(gas, n_boxes, n_species)
     _validate_device_arrays(particles, gas, device)
+    _validate_p2_physical_inputs(
+        particles,
+        gas,
+        gated_mass_transfer,
+        dimensions,
+        device,
+    )
+    if energy_transfer is not None:
+        _validate_energy_transfer_buffer(
+            energy_transfer,
+            (n_boxes, n_species),
+            device,
+        )
     if scratch_buffers is not None:
         validated_scratch = validate_condensation_scratch_buffers(
             scratch_buffers,
@@ -1315,6 +1439,13 @@ def _finalize_inventory_limited_mass_transfer(
     else:
         validated_scratch = CondensationScratchBuffers()
 
+    _validate_p2_sidecar_ownership(
+        validated_scratch.positive_mass_transfer_demand,
+        validated_scratch.negative_mass_transfer_release,
+        validated_scratch.positive_mass_transfer_scale,
+        gas.concentration,
+        energy_transfer,
+    )
     reduction_shape = (n_boxes, n_species)
     demand = validated_scratch.positive_mass_transfer_demand
     if demand is None:
