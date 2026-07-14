@@ -15259,8 +15259,8 @@ documentation conventions.</p>
 <tr>
 <td>4</td>
 <td><a href="#epic-d-gpu-condensation-physics-parity">Epic D: GPU Condensation Physics Parity</a></td>
-<td>Next up</td>
-<td>not scheduled</td>
+<td>In progress</td>
+<td>E4-F2</td>
 </tr>
 <tr>
 <td>5</td>
@@ -15410,10 +15410,10 @@ and <code>GasSpecies</code> remain available for compatibility.</p>
   <code>warp</code>, <code>cuda</code>, <code>gpu_parity</code>, and <code>stochastic</code>, and CPU-only or standard CI
   environments are expected to skip CUDA-specific coverage cleanly instead of
   treating it as a regression. Focused examples include
-  <code>pytest particula/gpu/kernels/tests/environment_test.py -q</code> for the Warp CPU
-  baseline path and
-  <code>pytest particula/gpu/kernels/tests/environment_test.py -q -m "warp and cuda"</code>
-  for optional CUDA-if-available validation. This documentation records the
+   <code>pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and gpu_parity and not cuda"</code>
+   for the required Warp CPU parity path and
+   <code>pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda"</code>
+   for optional CUDA-if-available evidence. This documentation records the
   explicit helper surface rather than implying automatic GPU runtime
   integration.</li>
 </ul>
@@ -15435,10 +15435,12 @@ high-level dynamics workflows.</p>
 <li>Wall loss, dilution, and other dynamics processes are CPU-only today. They
   need GPU implementations before a full simulation can remain GPU-resident for
   every timestep.</li>
-<li>GPU condensation ignores activity and surface strategies. The kernel uses a
-  hardcoded surface-tension default (0.072 N/m) with raw Kelvin and vapor
-  pressure terms, so composition-dependent water uptake, kappa-hygroscopicity,
-  and activity effects are not represented on the GPU.</li>
+<li>Direct GPU condensation supports ideal/kappa water activity and
+  static/composition-weighted surface tension through fixed-shape,
+  caller-owned <code>wp.float64</code> sidecars. This is direct-kernel support only, not
+  high-level GPU <code>Aerosol</code> or <code>Runnable</code> support. BAT and every other deferred
+  activity or surface strategy remain CPU-only and are rejected with
+  <code>ValueError</code>; they are never silently approximated or transferred.</li>
 <li>Gas vapor pressure is a GPU-only derived field:
   <code>WarpGasData.vapor_pressure</code> defaults to zeros when not supplied and is
   dropped when converting back to <code>GasData</code>. Every successful supported direct
@@ -16655,8 +16657,10 @@ pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_test.py<sp
   <a href="#measured-decision-record-for-the-current-one-thread-per-box-path">decision record</a>.
   A parallel-within-box variant requires a separate evidence-backed proposal.</p>
 <h2 id="epic-d-gpu-condensation-physics-parity">Epic D: GPU Condensation Physics Parity<a class="headerlink" href="#epic-d-gpu-condensation-physics-parity" title="Permanent link">&para;</a></h2>
-<p>Status: next up; not yet scheduled as an ADW plan. Epic C has no unfinished
-exit-bar deliverables to roll forward. Epic D inherits the supported
+<p>Status: in progress. E4-F2 ships limited direct-kernel activity and
+surface-tension support plus deterministic reference parity evidence. Epic C
+has no unfinished exit-bar deliverables to roll forward. Epic D inherits the
+supported
 <code>particula.gpu.kernels</code> entry points, explicit transfer boundary, and
 device-aware validation policy from E3, plus the E3-F7 CPU latent-heat
 integration baseline. The accepted mixed-scale coagulation and
@@ -16668,15 +16672,29 @@ or canonical Buck models. The
 <a href="../../data-containers-and-gpu-foundations/">data containers and GPU foundations guide</a>
 is the canonical source for its schema, units, ordering, device ownership, and
 refresh ordering. This narrow refresh baseline does not provide CPU-strategy
-parity, activity, surface tension, latent heat, gas coupling, substep
-orchestration, or a final support contract. Staggered (Gauss-Seidel)
-condensation stays CPU-only (see <a href="#non-goals">Non-Goals</a>).</p>
+parity beyond E4-F2's direct activity/surface sidecar, latent heat, gas
+coupling, substep orchestration, or a final support contract. E4-F2 supports
+ideal or kappa water activity and static or composition-weighted tension via
+fixed-shape, caller-owned <code>wp.float64</code> sidecars. Other activity and
+surface-tension strategies, including BAT, remain CPU-only and fail with
+<code>ValueError</code> before mutation; they are never silently approximated or moved
+across the CPU↔Warp boundary. Staggered (Gauss-Seidel) condensation stays
+CPU-only (see <a href="#non-goals">Non-Goals</a>).</p>
+<p>E4-F2 parity uses an independent deterministic NumPy <code>float64</code> reference for
+the four activity/surface combinations on one-box and multi-box fixtures. It
+checks raw transfer, clamp ownership, unchanged gas concentration, and the
+on-device vapor-pressure refresh with explicit parity tolerances and tighter
+invariants. Warp <code>cpu</code> coverage is required whenever Warp is installed; CUDA
+is separately marked optional evidence and skips when unavailable. The
+canonical focused commands are:</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and gpu_parity and not cuda&quot;</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+</code></pre></div>
 <p>The current executable CPU integration baseline remains
 <code>particula/integration_tests/condensation_latent_heat_conservation_test.py</code>.
-Temperature-feedback runtime support remains future work. GPU latent-heat parity remain future Epic D goals.</p>
+Temperature-feedback runtime support and latent-heat parity remain future Epic D goals.</p>
 <p>Remaining feature ownership:</p>
 <ol>
-<li>E4-F2: activity and effective surface-tension physics.</li>
 <li>E4-F3: fixed four-substep orchestration based on the
    <code>fixed_count_substeps_4</code> recommendation from the
    <a href="../condensation-stiffness-study/">condensation stiffness study</a>.</li>
@@ -16684,7 +16702,8 @@ Temperature-feedback runtime support remains future work. GPU latent-heat parity
    reference context in the <a href="../../../Theory/Technical/Dynamics/Condensation_Equations/#condensation-with-latent-heat">condensation
    equations</a>.</li>
 <li>E4-F5: gas-coupled inventory, partitioning, and conservation evidence.</li>
-<li>E4-F6: independent Warp/CUDA parity, conservation, and readiness evidence.</li>
+<li>E4-F6: broader independent Warp/CUDA parity, conservation, and readiness
+   evidence.</li>
 <li>E4-F7: the final support contract, examples, troubleshooting, and support
    matrix.</li>
 </ol>
@@ -17133,10 +17152,10 @@ the operators themselves must still be differentiable in state.</p>
   different composition merge. Decide the representation that is both
   physically adequate and differentiable, for example composition-resolved
   sectional bins (size by composition) versus particle-resolved with a
-  differentiable surrogate. Note that hygroscopicity targets also require the
-  GPU activity/kappa support planned in
-  <a href="#epic-d-gpu-condensation-physics-parity">Epic D</a>; a condensation operator
-  without water-activity modeling cannot fit hygroscopicity.</li>
+  differentiable surrogate. The limited direct-kernel ideal/kappa water-
+  activity support shipped in <a href="#epic-d-gpu-condensation-physics-parity">Epic D</a>
+  is not yet a differentiable or high-level runtime path; a suitable
+  differentiable hygroscopicity implementation remains required.</li>
 <li><strong>Autodiff, graph capture, and RNG state interact.</strong> Differentiable execution,
   graph-captured timestep loops, and per-box RNG streams must coexist for
   gradient-based fitting. Validate them together, not only in isolation.</li>
@@ -17232,9 +17251,9 @@ coagulation and state-representation decisions are recorded.</p>
 <td>Fixed shapes, inactive slots, documented re-capture triggers</td>
 </tr>
 <tr>
-<td>GPU condensation lacks activity/kappa physics</td>
-<td>Hygroscopicity and mixing-state targets unfittable</td>
-<td>Plan GPU activity/surface-tension support in Epic D before Epic I targets</td>
+<td>GPU condensation supports only limited activity/kappa physics</td>
+<td>Unsupported activity/surface strategies and the lack of a differentiable/high-level path still constrain hygroscopicity targets</td>
+<td>Retain E4-F2's direct ideal/kappa and static/weighted sidecars; add broader or differentiable support only through scoped, evidence-backed Epic D work</td>
 </tr>
 </tbody>
 </table>

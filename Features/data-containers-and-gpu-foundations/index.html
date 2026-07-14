@@ -11475,6 +11475,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#condensation-activity-and-surface-sidecars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condensation activity and surface sidecars
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -14538,6 +14549,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#condensation-activity-and-surface-sidecars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condensation activity and surface sidecars
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -15036,6 +15058,47 @@ temperature array into a device-local float64 buffer when needed, overwrites
 failed preflight leaves the vapor-pressure output buffer unchanged. Import the
 standalone <code>refresh_vapor_pressure_gpu</code> only from
 <code>particula.gpu.kernels.thermodynamics</code>, never <code>particula.gpu.kernels</code>.</p>
+<h3 id="condensation-activity-and-surface-sidecars">Condensation activity and surface sidecars<a class="headerlink" href="#condensation-activity-and-surface-sidecars" title="Permanent link">&para;</a></h3>
+<p>The optional <code>CondensationActivitySurfaceConfig</code> is a direct-kernel-only,
+caller-owned configuration sidecar for <code>condensation_step_gpu()</code>. Activity mode
+<code>0</code> is ideal and mode <code>1</code> is kappa; surface-tension mode <code>0</code> is static and mode
+<code>1</code> is composition-weighted. Activity applies only to <code>water_species_index</code>;
+all non-water species use unit activity. Static tension uses the current
+species' supplied value, while composition-weighted tension computes one
+particle-wide value from the per-species tensions.</p>
+<p><code>kappas</code> and <code>molar_mass_reference</code> must be same-device <code>wp.float64</code> arrays of
+shape <code>(n_species,)</code>. Kappas must be finite and nonnegative, and ordered molar
+masses must exactly match <code>gas.molar_mass</code>; this preserves the positional
+ordered-molar-mass compatibility contract. The frozen dataclass prevents field
+rebinding, not mutation of its arrays. Callers retain those arrays and must not
+mutate them concurrently with a launch.</p>
+<p>Successful direct calls mutate particle masses in place, overwrite the derived
+GPU-only vapor-pressure buffer, and return raw transfer before particle clamping.
+They do <strong>not</strong> couple or update gas concentration. Validation is atomic:
+unsupported sidecars fail with <code>ValueError</code> before mutation. Unsupported
+activity or surface strategies are not silently copied or approximated; passing
+<code>activity_surface=None</code> retains legacy unit activity and static tension.</p>
+<p>The direct condensation parity suite exercises all four activity/surface pairs
+(ideal/static, ideal/composition-weighted, kappa/static, and
+kappa/composition-weighted) against an independent NumPy <code>float64</code> reference.
+It uses deterministic one-box and multi-box inputs, including pure and mixed
+particle compositions, a clamp-to-zero evaporation case, and constant plus
+both Buck vapor-pressure branches. Parity checks cover raw transfer, final
+particle mass, refreshed vapor pressure, and unchanged gas concentration;
+tighter ownership invariants separately verify
+<code>final_mass == maximum(initial_mass + raw_transfer, 0)</code>. They do not claim
+particle-plus-gas conservation for this uncoupled direct step.</p>
+<p>Use <code>to_warp_*</code> and <code>from_warp_*</code> as the sole CPU↔Warp boundary. There is no
+hidden transfer and no high-level <code>Aerosol</code> or <code>Runnable</code> GPU path. Deterministic
+fp64 tests compare an independent NumPy reference with explicit parity
+<code>rtol</code>/<code>atol</code>, then apply tighter separate ownership invariants. Warp <code>cpu</code> is
+required whenever Warp is installed; CUDA is optional, availability-guarded,
+and separately marked. Warp-dependent test imports are lazy, so marker-
+deselected collection does not require Warp:</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>--collect-only<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not warp&quot;</span>
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and gpu_parity and not cuda&quot;</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+</code></pre></div>
 <h2 id="current-shipped-support-boundaries">Current shipped support boundaries<a class="headerlink" href="#current-shipped-support-boundaries" title="Permanent link">&para;</a></h2>
 <p>The containers are multi-box capable, but current execution support is narrower
 than storage support.</p>

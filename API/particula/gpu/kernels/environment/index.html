@@ -5383,6 +5383,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label=" environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.gpu.kernels.environment.validate_environment_inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;validate_environment_inputs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -14259,6 +14276,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label=" environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#particula.gpu.kernels.environment.validate_environment_inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;validate_environment_inputs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -14304,7 +14338,9 @@
 entry points and normalizes them into canonical Warp arrays with shape
 <code>(n_boxes,)</code> on the caller's device. Supported entry-point contracts accept
 scalars, device-local Warp arrays, or a <code>WarpEnvironmentData</code> container
-without performing hidden device transfers.</p>
+without hidden device transfers. <code>validate_environment_inputs</code> is the
+read-only preflight phase: it completes before scalar broadcasting and does
+not mutate caller-owned environment arrays.</p>
 
 
 
@@ -14325,6 +14361,225 @@ without performing hidden device transfers.</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="particula.gpu.kernels.environment.validate_environment_inputs" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">validate_environment_inputs</span>
+
+
+<a href="#particula.gpu.kernels.environment.validate_environment_inputs" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">validate_environment_inputs</span><span class="p">(</span><span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">caller_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Validate an environment source without broadcasting scalar inputs.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>temperature</code></b>
+              (<code><span title="float">float</span> | <span title="typing.Any">Any</span> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>Direct scalar or <code>(n_boxes,)</code> Warp temperature [K].</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>pressure</code></b>
+              (<code><span title="float">float</span> | <span title="typing.Any">Any</span> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>Direct scalar or <code>(n_boxes,)</code> Warp pressure [Pa].</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>environment</code></b>
+              (<code><span title="typing.Any">Any</span> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>Optional container providing both Warp arrays.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>n_boxes</code></b>
+              (<code><span title="int">int</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Expected number of spatial boxes.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>device</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Expected Warp device for direct or container arrays.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>caller_name</code></b>
+              (<code><span title="str">str</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Entry-point name used in validation errors.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If sources are mixed or missing, or if an input has an
+invalid scalar domain, Warp-array schema, device, or shape.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<details class="notes" open>
+  <summary>Notes</summary>
+  <p>This is the read-only preflight half of
+:func:<code>_ensure_environment_arrays</code>. It validates all input domains
+before scalar broadcasting and does not mutate or replace caller-owned
+arrays or environment fields.</p>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>particula/gpu/kernels/environment.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_environment_inputs</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_boxes</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">caller_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate an environment source without broadcasting scalar inputs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        temperature: Direct scalar or ``(n_boxes,)`` Warp temperature [K].</span>
+<span class="sd">        pressure: Direct scalar or ``(n_boxes,)`` Warp pressure [Pa].</span>
+<span class="sd">        environment: Optional container providing both Warp arrays.</span>
+<span class="sd">        n_boxes: Expected number of spatial boxes.</span>
+<span class="sd">        device: Expected Warp device for direct or container arrays.</span>
+<span class="sd">        caller_name: Entry-point name used in validation errors.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If sources are mixed or missing, or if an input has an</span>
+<span class="sd">            invalid scalar domain, Warp-array schema, device, or shape.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        This is the read-only preflight half of</span>
+<span class="sd">        :func:`_ensure_environment_arrays`. It validates all input domains</span>
+<span class="sd">        before scalar broadcasting and does not mutate or replace caller-owned</span>
+<span class="sd">        arrays or environment fields.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">environment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">pressure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot mix direct temperature/pressure inputs with &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;environment in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;pressure&quot;</span><span class="p">):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">_validate_box_array</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;environment.</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">_get_environment_array</span><span class="p">(</span><span class="n">environment</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">caller_name</span><span class="p">),</span>
+                <span class="n">n_boxes</span><span class="p">,</span>
+                <span class="n">device</span><span class="p">,</span>
+                <span class="n">caller_name</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">_validate_positive_finite_array</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;environment.</span><span class="si">{</span><span class="n">field_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">caller_name</span>
+            <span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">temperature</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">pressure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;temperature and pressure must both be provided when environment &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;is omitted in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;pressure&quot;</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">_is_warp_array_like</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">_validate_box_array</span><span class="p">(</span>
+                <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">caller_name</span>
+            <span class="p">)</span>
+            <span class="n">_validate_positive_finite_array</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">caller_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scalar</span> <span class="o">=</span> <span class="n">_coerce_direct_scalar</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">caller_name</span><span class="p">)</span>
+            <span class="n">_validate_positive_finite_scalar</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">scalar</span><span class="p">,</span> <span class="n">caller_name</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 
 
