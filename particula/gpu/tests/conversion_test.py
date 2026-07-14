@@ -1319,6 +1319,66 @@ class TestFromWarpGasData:
             sample_gas_data.partitioning,
         )
 
+    @pytest.mark.parametrize(
+        "partitioning",
+        [
+            np.empty((0, 3), dtype=np.int32),
+            np.ones((1, 3), dtype=np.int32),
+            np.ones((3, 3), dtype=np.int32),
+            np.ones((2, 2), dtype=np.int32),
+            np.ones(3, dtype=np.int32),
+        ],
+    )
+    def test_from_warp_gas_data_rejects_partitioning_shape_mismatch(
+        self,
+        sample_gas_data,
+        partitioning: np.ndarray,
+    ) -> None:
+        """Test partitioning must exactly match the concentration layout."""
+        gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
+        gpu_data.partitioning = wp.array(
+            partitioning,
+            dtype=wp.int32,
+            device="cpu",
+        )
+
+        with pytest.raises(ValueError, match="same .*shape as concentration"):
+            from_warp_gas_data(gpu_data, name=sample_gas_data.name)
+
+    def test_from_warp_gas_data_restores_valid_multi_box_enabled_mask(
+        self,
+        sample_gas_data,
+    ) -> None:
+        """Test an all-enabled multi-box mask restores like its CPU control."""
+        gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
+        gpu_data.partitioning = wp.ones(
+            sample_gas_data.concentration.shape,
+            dtype=wp.int32,
+            device="cpu",
+        )
+
+        result = from_warp_gas_data(gpu_data, name=sample_gas_data.name)
+
+        np.testing.assert_array_equal(
+            result.partitioning,
+            np.ones(sample_gas_data.n_species, dtype=bool),
+        )
+
+    def test_from_warp_gas_data_rejects_partitioning_that_differs_by_box(
+        self,
+        sample_gas_data,
+    ) -> None:
+        """Test binary per-box masks cannot restore to one CPU shared mask."""
+        gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
+        gpu_data.partitioning = wp.array(
+            np.array([[1, 1, 0], [1, 0, 0]], dtype=np.int32),
+            dtype=wp.int32,
+            device="cpu",
+        )
+
+        with pytest.raises(ValueError, match="identical binary"):
+            from_warp_gas_data(gpu_data, name=sample_gas_data.name)
+
     def test_from_warp_gas_data_rejects_non_binary_partitioning_values(
         self,
         sample_gas_data,

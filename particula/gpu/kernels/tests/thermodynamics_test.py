@@ -54,7 +54,9 @@ def _gas(
         dtype=wp.float64,
         device=device,
     )
-    gas.partitioning = wp.ones(n_species, dtype=wp.int32, device=device)
+    gas.partitioning = wp.ones(
+        (n_boxes, n_species), dtype=wp.int32, device=device
+    )
     return gas
 
 

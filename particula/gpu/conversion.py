@@ -505,14 +505,18 @@ def from_warp_gas_data(
     if sync:
         wp.synchronize()
 
-    # Collapse the GPU's per-box mask back to CPU's shared species mask.
+    # Validate the GPU's per-box mask before collapsing it to CPU's shared
+    # species mask. Exact shape matching prevents broadcasting and indexing
+    # failures for malformed device-side data.
     partitioning_values = gpu_data.partitioning.numpy()
+    concentration_shape = gpu_data.concentration.shape
+    if partitioning_values.shape != concentration_shape:
+        raise ValueError(
+            "GPU partitioning must have the same (n_boxes, n_species) shape "
+            "as concentration to restore CPU GasData."
+        )
     partitioning_bool_by_box = _restore_partitioning_bool(partitioning_values)
-    if (
-        partitioning_bool_by_box.ndim != 2
-        or partitioning_bool_by_box.shape[1] != n_species
-        or not np.all(partitioning_bool_by_box == partitioning_bool_by_box[0])
-    ):
+    if not np.all(partitioning_bool_by_box == partitioning_bool_by_box[0]):
         raise ValueError(
             "GPU partitioning must be an identical binary (n_boxes, n_species) "
             "mask to restore CPU GasData."

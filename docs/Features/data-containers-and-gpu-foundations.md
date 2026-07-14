@@ -324,8 +324,14 @@ mutate them concurrently with a launch.
 
 Successful direct calls mutate particle masses in place, overwrite the derived
 GPU-only vapor-pressure buffer, and return accumulated **applied, mass-clamped**
-transfer. Scratch work storage contains only the final raw proposal. They do
-**not** couple or update gas concentration. Validation is atomic:
+transfer. The caller-visible final work proposal is gated after proposal
+generation: disabled `(box, species)` entries in the per-box
+`(n_boxes, n_species)` partitioning mask and inactive particle slots are zeroed
+before application or reductions. CPU↔Warp conversion expands the CPU shared
+species mask to this per-box layout, and restore requires the exact layout.
+P1 reduction, scale, and accumulator sidecars are metadata-validated only:
+they are not read, written, cleared, or allocated. The direct step does **not**
+couple or update gas concentration. Validation is atomic:
 unsupported sidecars fail with `ValueError` before mutation. Unsupported
 activity or surface strategies are not silently copied or approximated; passing
 `activity_surface=None` retains legacy unit activity and static tension.
