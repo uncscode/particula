@@ -322,7 +322,7 @@ def validate_condensation_activity_surface_config(
     return activity_surface
 
 
-@wp.kernel
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
 def condensation_mass_transfer_kernel(  # noqa: C901
     masses: Any,
@@ -489,7 +489,7 @@ def condensation_mass_transfer_kernel(  # noqa: C901
         )
 
 
-@wp.kernel
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 def _effective_surface_tension_kernel(
     masses: Any,
     density: Any,
@@ -507,7 +507,7 @@ def _effective_surface_tension_kernel(
     )
 
 
-@wp.kernel
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
 def _copy_temperature_to_float64_kernel(
     temperature: Any,
@@ -526,7 +526,7 @@ def _copy_temperature_to_float64_kernel(
     output[box_idx] = wp.float64(temperature[box_idx])
 
 
-@wp.kernel
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
 def _copy_pressure_to_float64_kernel(
     pressure: Any,
@@ -542,7 +542,7 @@ def _copy_pressure_to_float64_kernel(
     output[box_idx] = wp.float64(pressure[box_idx])
 
 
-@wp.kernel
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
 def _prepare_environment_properties_kernel(
     temperature: Any,
@@ -578,7 +578,7 @@ def _prepare_environment_properties_kernel(
     )
 
 
-@wp.kernel
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
 def apply_mass_transfer_kernel(
     masses: Any,
@@ -602,7 +602,7 @@ def apply_mass_transfer_kernel(
         masses[box_idx, particle_idx, species_idx] = updated_mass
 
 
-@wp.kernel
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
 def _clear_mass_transfer_kernel(
     total_mass_transfer: Any,
@@ -615,7 +615,7 @@ def _clear_mass_transfer_kernel(
         )
 
 
-@wp.kernel
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
 def _apply_and_accumulate_mass_transfer_kernel(
     masses: Any,
