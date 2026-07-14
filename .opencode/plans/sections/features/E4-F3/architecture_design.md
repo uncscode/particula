@@ -3,21 +3,19 @@
 ## High-Level Design
 
 ```text
-condensation_step_gpu(..., reusable scratch)
+condensation_step_gpu(..., scratch_buffers=...)
   -> validate all inputs and scratch before mutation
-  -> clear total-transfer accumulator
-  -> repeat exactly 4 times (static host orchestration)
-       -> refresh E4-F1 thermodynamics for current substep
-       -> prepare dynamic viscosity / mean free path in reusable buffers
-       -> calculate transfer using dt / 4 and current particles
-       -> clamp and apply transfer in place
-       -> accumulate applied transfer into total-transfer buffer
-  -> return updated particles and caller-owned total transfer by identity
+  -> normalize environment and resolve omitted sidecars after the gate
+  -> prepare dynamic viscosity / mean free path in resolved buffers
+  -> calculate one raw transfer into work and total buffers when supplied
+  -> clamp and apply resolved work in place
+  -> return the resolved total buffer by identity
 ```
 
-The count is a fixed constant, not a user-selected or convergence-dependent
-loop. Each iteration observes the state produced by the prior iteration. The
-design remains compatible with E4-F2 physics when E4-F4 combines the tracks.
+This delivered P1 path deliberately remains one update. The fixed-four static
+loop, per-substep refresh, and accumulated applied-transfer semantics remain P2
+work. The design remains compatible with E4-F2 physics when E4-F4 combines the
+tracks.
 
 ## Data / API / Workflow Changes
 
@@ -28,17 +26,21 @@ design remains compatible with E4-F2 physics when E4-F4 combines the tracks.
   scratch through typed, keyword-only operation sidecars while preserving
   existing positional compatibility. Keep the lazy export in
   `particula.gpu.kernels` unchanged.
-- **Return semantics:** The transfer buffer records the sum of applied transfer
-  across the full call, not only the fourth substep.
+- **Return semantics:** In the scratch-transfer path, work and total buffers
+  receive the same raw pre-clamp transfer and the resolved total is returned by
+  identity. Without scratch transfer fields, legacy `mass_transfer` remains the
+  work/result buffer by identity.
 - **Workflow hooks:** E4-F1 is a hard gate. E4-F2 may proceed in parallel;
   E4-F4 consumes both tracks and must retain per-substep refresh placement.
 
 ## Validation and Mutation Ordering
 
-Resolve dimensions and validate all environment inputs, E4-F1 configuration,
-and supplied scratch arrays before clearing accumulators or launching a kernel.
-Reject mismatched shape, dtype, device, species order, or physical parameters
-with `ValueError`; particle and caller-owned state must remain unchanged.
+Once dimensions and active device are known, validate all environment inputs,
+E4-F1 configuration, and every supplied scratch field before environment
+normalization, fallback allocation, refresh, clear, launch, or mutation. Reject
+wrong sidecar type, shape, dtype, device, and overlap between `mass_transfer`
+and a supplied scratch transfer field with `ValueError`; particle and
+caller-owned state remain unchanged.
 
 ## Security & Compliance
 

@@ -2,13 +2,14 @@
 
 ## GPU Backend
 
-- [ ] Define fixed-four count and stable scratch shape contracts in
-  `particula/gpu/kernels/condensation.py`.
-- [ ] Generalize buffer validation for work, accumulator, viscosity, and mean
-  free path, with all checks completed before mutation.
-- [ ] Extend `condensation_step_gpu()` using optional keyword-only scratch inputs
-  without breaking current call forms.
-- [ ] Clear reusable output/work buffers only after validation succeeds.
+- [x] Define `CondensationScratchBuffers` and stable scratch shape contracts in
+  `particula/gpu/kernels/condensation.py` (issue #1292).
+- [x] Validate work, total-transfer, viscosity, and mean-free-path sidecars as
+  one pre-mutation metadata gate (issue #1292).
+- [x] Extend `condensation_step_gpu()` with keyword-only `scratch_buffers`
+  without breaking existing positional calls (issue #1292).
+- [x] Resolve partial sidecars only after validation; preserve legacy
+  `mass_transfer` identity and reject transfer-storage overlap (issue #1292).
 - [ ] Launch E4-F1 refresh and applicable environment preparation inside each
   of four equal substeps.
 - [ ] Calculate, clamp, apply, and accumulate transfer each iteration.
@@ -19,8 +20,10 @@
 
 ## Tooling / Tests
 
-- [ ] Add production scratch reuse and rejection tests to
-  `particula/gpu/kernels/tests/condensation_test.py`.
+- [x] Add co-located production scratch reuse, partial-sidecar, overlap, and
+  pre-mutation rejection coverage in
+  `particula/gpu/kernels/tests/_condensation_test_support.py`, exported by
+  `particula/gpu/kernels/tests/condensation_test.py` (issue #1292).
 - [ ] Promote fixed-four candidate cases through
   `condensation_stiffness_test.py` against the production entry point.
 - [ ] Assert exactly four equal iterations and per-substep E4-F1 refresh.
