@@ -78,6 +78,7 @@ if TYPE_CHECKING:
         condensation_step_gpu,
         particle_radius_from_volume_wp,
         validate_condensation_activity_surface_config,
+        validate_condensation_scratch_buffers,
     )
     from particula.gpu.tests.cuda_availability import (
         cuda_available,
@@ -127,12 +128,18 @@ def _load_warp_runtime() -> SimpleNamespace:
         CondensationActivitySurfaceConfig=(
             runtime.condensation_module.CondensationActivitySurfaceConfig
         ),
+        CondensationScratchBuffers=(
+            runtime.condensation_module.CondensationScratchBuffers
+        ),
         _validate_mass_transfer_buffer=(
             runtime.condensation_module._validate_mass_transfer_buffer
         ),
         _validate_species_array=runtime.condensation_module._validate_species_array,
         validate_condensation_activity_surface_config=(
             runtime.condensation_module.validate_condensation_activity_surface_config
+        ),
+        validate_condensation_scratch_buffers=(
+            runtime.condensation_module.validate_condensation_scratch_buffers
         ),
         _condensation_step_gpu=runtime.condensation_module.condensation_step_gpu,
         particle_radius_from_volume_wp=(
@@ -223,6 +230,33 @@ def _make_activity_surface_config(
             device=gpu_gas.molar_mass.device,
         ),
     )
+
+
+def _make_condensation_scratch_buffers(
+    shape: tuple[int, int, int],
+    device: str,
+    *,
+    fields: tuple[str, ...] = (
+        "work_mass_transfer",
+        "total_mass_transfer",
+        "dynamic_viscosity",
+        "mean_free_path",
+    ),
+) -> Any:
+    """Build selected caller-owned fp64 scratch fields for a fixed shape."""
+    n_boxes, _, _ = shape
+    values: dict[str, Any] = {
+        "work_mass_transfer": None,
+        "total_mass_transfer": None,
+        "dynamic_viscosity": None,
+        "mean_free_path": None,
+    }
+    for name in fields:
+        field_shape = shape if "mass_transfer" in name else (n_boxes,)
+        values[name] = wp.full(
+            field_shape, wp.float64(-1.0), dtype=wp.float64, device=device
+        )
+    return CondensationScratchBuffers(**values)
 
 
 def condensation_step_gpu(*args: Any, **kwargs: Any) -> tuple[Any, Any]:
@@ -1472,6 +1506,7 @@ def _run_gpu_step(
     environment: Any | None = None,
     thermodynamics: ThermodynamicsConfig | None = None,
     activity_surface: CondensationActivitySurfaceConfig | None = None,
+    scratch_buffers: Any | None = None,
     return_gas_state: Literal[False] = False,
 ) -> tuple[ParticleData, Any]: ...
 
@@ -1492,6 +1527,7 @@ def _run_gpu_step(
     environment: Any | None = None,
     thermodynamics: ThermodynamicsConfig | None = None,
     activity_surface: CondensationActivitySurfaceConfig | None = None,
+    scratch_buffers: Any | None = None,
     return_gas_state: Literal[True] = True,
 ) -> tuple[ParticleData, Any, GasData]: ...
 
@@ -1511,6 +1547,7 @@ def _run_gpu_step(
     environment: Any | None = None,
     thermodynamics: ThermodynamicsConfig | None = None,
     activity_surface: CondensationActivitySurfaceConfig | None = None,
+    scratch_buffers: Any | None = None,
     return_gas_state: bool = False,
 ) -> tuple[ParticleData, Any] | tuple[ParticleData, Any, GasData]:
     """Run GPU condensation step and return CPU particle data.
@@ -1556,12 +1593,274 @@ def _run_gpu_step(
         environment=environment,
         thermodynamics=thermodynamics,
         activity_surface=activity_surface,
+        scratch_buffers=scratch_buffers,
     )
     cpu_particles = from_warp_particle_data(gpu_particles, sync=True)
     if not return_gas_state:
         return cpu_particles, mass_transfer_buffer
     cpu_gas = from_warp_gas_data(gpu_gas, name=gas.name, sync=False)
     return cpu_particles, mass_transfer_buffer, cpu_gas
+
+
+def test_condensation_scratch_buffers_complete_sidecar_preserves_identity(
+    warp_cpu_device: str,
+) -> None:
+    """A complete scratch sidecar returns its total buffer by identity."""
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    scratch = _make_condensation_scratch_buffers(
+        particles.masses.shape, warp_cpu_device
+    )
+    initial_gas = gas.concentration.copy()
+    _, returned = _run_gpu_step(
+        particles,
+        gas,
+        _make_vapor_pressure(1, 2),
+        298.15,
+        101325.0,
+        0.1,
+        warp_cpu_device,
+        scratch_buffers=scratch,
+    )
+    assert returned is scratch.total_mass_transfer
+    assert scratch.work_mass_transfer.shape == particles.masses.shape
+    npt.assert_allclose(
+        scratch.work_mass_transfer.numpy(),
+        scratch.total_mass_transfer.numpy(),
+        rtol=1.0e-12,
+        atol=1.0e-30,
+    )
+    npt.assert_allclose(gas.concentration, initial_gas, rtol=0.0, atol=0.0)
+
+
+def test_validate_condensation_scratch_buffers_rejects_non_exact_sidecar_type(
+    warp_cpu_device: str,
+) -> None:
+    """Scratch validation rejects non-dataclass candidates before allocation."""
+    with pytest.raises(
+        ValueError,
+        match="scratch_buffers must be a CondensationScratchBuffers",
+    ):
+        validate_condensation_scratch_buffers(
+            SimpleNamespace(),
+            (1, 2, 2),
+            wp.get_device(warp_cpu_device),
+            "test_caller",
+        )
+
+
+@pytest.mark.parametrize(
+    "fields",
+    (
+        ("work_mass_transfer",),
+        ("total_mass_transfer",),
+        ("dynamic_viscosity",),
+        ("mean_free_path",),
+        ("work_mass_transfer", "dynamic_viscosity"),
+    ),
+)
+def test_condensation_scratch_buffers_partial_sidecars_match_legacy(
+    warp_cpu_device: str, fields: tuple[str, ...]
+) -> None:
+    """Partial sidecars preserve supplied identities and legacy results."""
+    shape = (1, 2, 2)
+    reference_particles = _make_particle_data(*shape)
+    reference_gas = _make_gas_data(1, 2)
+    reference_result, reference_transfer = _run_gpu_step(
+        reference_particles,
+        reference_gas,
+        _make_vapor_pressure(1, 2),
+        298.15,
+        101325.0,
+        0.1,
+        warp_cpu_device,
+    )
+    particles = _make_particle_data(*shape)
+    gas = _make_gas_data(1, 2)
+    scratch = _make_condensation_scratch_buffers(
+        shape, warp_cpu_device, fields=fields
+    )
+    result, returned = _run_gpu_step(
+        particles,
+        gas,
+        _make_vapor_pressure(1, 2),
+        298.15,
+        101325.0,
+        0.1,
+        warp_cpu_device,
+        scratch_buffers=scratch,
+    )
+
+    for field in fields:
+        assert getattr(scratch, field) is not None
+    expected_return = (
+        scratch.total_mass_transfer
+        if "total_mass_transfer" in fields
+        else returned
+    )
+    assert returned is expected_return
+    npt.assert_allclose(
+        result.masses, reference_result.masses, rtol=1.0e-12, atol=1.0e-30
+    )
+    npt.assert_allclose(
+        returned.numpy(), reference_transfer.numpy(), rtol=1.0e-12, atol=1.0e-30
+    )
+
+
+def test_condensation_scratch_property_sidecar_allows_legacy_transfer_buffer(
+    warp_cpu_device: str,
+) -> None:
+    """Property-only scratch does not conflict with legacy transfer output."""
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    transfer = wp.full(
+        particles.masses.shape,
+        wp.float64(-1.0),
+        dtype=wp.float64,
+        device=warp_cpu_device,
+    )
+    scratch = _make_condensation_scratch_buffers(
+        particles.masses.shape,
+        warp_cpu_device,
+        fields=("dynamic_viscosity", "mean_free_path"),
+    )
+    _, returned = _run_gpu_step(
+        particles,
+        gas,
+        _make_vapor_pressure(1, 2),
+        298.15,
+        101325.0,
+        0.1,
+        warp_cpu_device,
+        mass_transfer=transfer,
+        scratch_buffers=scratch,
+    )
+    assert returned is transfer
+    assert scratch.dynamic_viscosity is not None
+    assert scratch.mean_free_path is not None
+    assert np.all(scratch.dynamic_viscosity.numpy() > 0.0)
+    assert np.all(scratch.mean_free_path.numpy() > 0.0)
+
+
+@pytest.mark.parametrize("field", ("work_mass_transfer", "total_mass_transfer"))
+def test_condensation_scratch_transfer_overlap_is_atomic(
+    warp_cpu_device: str, field: str
+) -> None:
+    """Legacy transfer output rejects either overlapping scratch transfer."""
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    transfer = wp.full(
+        particles.masses.shape,
+        wp.float64(-1.0),
+        dtype=wp.float64,
+        device=warp_cpu_device,
+    )
+    scratch = _make_condensation_scratch_buffers(
+        particles.masses.shape, warp_cpu_device, fields=(field,)
+    )
+    initial_mass = gpu_particles.masses.numpy().copy()
+    initial_transfer = transfer.numpy().copy()
+    with pytest.raises(ValueError, match="conflicts with supplied scratch"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            298.15,
+            101325.0,
+            0.1,
+            mass_transfer=transfer,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            scratch_buffers=scratch,
+        )
+    npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
+    npt.assert_array_equal(transfer.numpy(), initial_transfer)
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "work_mass_transfer",
+        "total_mass_transfer",
+        "dynamic_viscosity",
+        "mean_free_path",
+    ),
+)
+def test_condensation_scratch_buffer_wrong_dtype_is_atomic(
+    warp_cpu_device: str, field: str
+) -> None:
+    """Non-float64 scratch fields fail before particle mutation."""
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    scratch = _make_condensation_scratch_buffers(
+        particles.masses.shape, warp_cpu_device, fields=(field,)
+    )
+    shape = getattr(scratch, field).shape
+    scratch = dataclasses.replace(
+        scratch,
+        **{
+            field: wp.zeros(shape, dtype=wp.float32, device=warp_cpu_device),
+        },
+    )
+    initial_mass = gpu_particles.masses.numpy().copy()
+    with pytest.raises(
+        ValueError,
+        match=f"scratch_buffers.{field} must use dtype",
+    ):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            298.15,
+            101325.0,
+            0.1,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            scratch_buffers=scratch,
+        )
+    npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "work_mass_transfer",
+        "total_mass_transfer",
+        "dynamic_viscosity",
+        "mean_free_path",
+    ),
+)
+def test_condensation_scratch_buffer_wrong_shape_is_atomic(
+    warp_cpu_device: str, field: str
+) -> None:
+    """Each malformed supplied scratch field fails before a Warp launch."""
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    scratch = _make_condensation_scratch_buffers(
+        particles.masses.shape, warp_cpu_device, fields=(field,)
+    )
+    malformed = wp.zeros((3,), dtype=wp.float64, device=warp_cpu_device)
+    scratch = dataclasses.replace(scratch, **{field: malformed})
+    initial_mass = gpu_particles.masses.numpy().copy()
+    with pytest.raises(ValueError, match=f"scratch_buffers.{field} shape"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            298.15,
+            101325.0,
+            0.1,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            scratch_buffers=scratch,
+        )
+    npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
 
 
 def _record_condensation_stiffness_trials(
@@ -1690,13 +1989,14 @@ def _record_condensation_stiffness_trials_uncached(
 
 
 def test_condensation_step_gpu_signature_keeps_keyword_only_inputs() -> None:
-    """The explicit environment and thermodynamics inputs stay keyword-only."""
+    """Optional sidecars stay keyword-only after scalar positional inputs."""
     parameters = inspect.signature(_condensation_step_gpu).parameters
     parameter = parameters["environment"]
 
     assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
     assert parameters["thermodynamics"].kind is inspect.Parameter.KEYWORD_ONLY
     assert parameters["activity_surface"].kind is inspect.Parameter.KEYWORD_ONLY
+    assert parameters["scratch_buffers"].kind is inspect.Parameter.KEYWORD_ONLY
 
 
 @pytest.mark.gpu_parity
