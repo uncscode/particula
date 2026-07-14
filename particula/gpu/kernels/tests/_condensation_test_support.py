@@ -968,6 +968,41 @@ def _cpu_mass_transfer(  # noqa: C901
     return mass_transfer
 
 
+def _cpu_four_substep_oracle(
+    *args: Any,
+    **kwargs: Any,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Return four-substep final masses, applied total, and final proposal.
+
+    The production entry point refreshes properties and recomputes proposals
+    from the predecessor mass at each fixed interval. This independent oracle
+    mirrors that contract while retaining the final raw proposal separately
+    from the accumulated, clamped transfer returned to callers.
+    """
+    particles = kwargs["particles"] if "particles" in kwargs else args[0]
+    time_step = kwargs["time_step"] if "time_step" in kwargs else args[8]
+    working_particles = dataclasses.replace(
+        particles,
+        masses=np.asarray(particles.masses, dtype=np.float64).copy(),
+    )
+    call_args = list(args)
+    if call_args:
+        call_args[0] = working_particles
+    total = np.zeros_like(working_particles.masses)
+    proposal = np.zeros_like(working_particles.masses)
+    for _ in range(4):
+        call_kwargs = dict(kwargs)
+        if len(call_args) > 8:
+            call_args[8] = time_step / 4.0
+        else:
+            call_kwargs["time_step"] = time_step / 4.0
+        proposal = _cpu_mass_transfer(*call_args, **call_kwargs)
+        applied = np.maximum(proposal, -working_particles.masses)
+        working_particles.masses += applied
+        total += applied
+    return working_particles.masses.copy(), total, proposal
+
+
 def _get_condensation_stiffness_case(name: str) -> CondensationStiffnessCase:
     """Return one named deterministic stiffness case."""
     return next(
@@ -1135,7 +1170,7 @@ def _p4_reference(
     particles = case.build_particle_data()
     gas = case.build_gas_data()
     vapor_pressure = _p4_vapor_pressure(case.temperature)
-    raw_transfer = _cpu_mass_transfer(
+    final_masses, total_transfer, _ = _cpu_four_substep_oracle(
         particles,
         gas,
         vapor_pressure,
@@ -1151,8 +1186,8 @@ def _p4_reference(
         kappas=P4_THERMODYNAMICS.kappas,
     )
     return (
-        np.maximum(particles.masses + raw_transfer, 0.0),
-        raw_transfer,
+        final_masses,
+        total_transfer,
         vapor_pressure,
         gas.concentration.copy(),
     )
@@ -1213,9 +1248,12 @@ def _assert_p4_gpu_matches_reference(
     """Execute one P4 matrix element and assert parity plus ownership rules."""
     runtime = _load_warp_runtime()
     wp = runtime.wp
-    expected_final, expected_raw, expected_vapor, expected_gas = _p4_reference(
-        case, activity_mode, surface_mode
-    )
+    (
+        expected_final,
+        expected_total,
+        expected_vapor,
+        expected_gas,
+    ) = _p4_reference(case, activity_mode, surface_mode)
     particles = case.build_particle_data()
     gas = case.build_gas_data()
     initial_mass = particles.masses.copy()
@@ -1233,7 +1271,7 @@ def _assert_p4_gpu_matches_reference(
         activity_mode=activity_mode,
         surface_tension_mode=surface_mode,
     )
-    _, raw_transfer = runtime._condensation_step_gpu(
+    _, total_transfer = runtime._condensation_step_gpu(
         gpu_particles,
         gpu_gas,
         temperature=wp.array(case.temperature, dtype=wp.float64, device=device),
@@ -1246,14 +1284,14 @@ def _assert_p4_gpu_matches_reference(
     final_mass = runtime.from_warp_particle_data(
         gpu_particles, sync=True
     ).masses
-    raw = raw_transfer.numpy().copy()
+    total = total_transfer.numpy().copy()
     gas_concentration = gpu_gas.concentration.numpy().copy()
     vapor_pressure = gpu_gas.vapor_pressure.numpy().copy()
     molar_mass = gpu_gas.molar_mass.numpy().copy()
     partitioning = gpu_gas.partitioning.numpy().copy()
 
     npt.assert_allclose(
-        raw, expected_raw, rtol=P4_PARITY_RTOL, atol=P4_PARITY_ATOL
+        total, expected_total, rtol=P4_PARITY_RTOL, atol=P4_PARITY_ATOL
     )
     npt.assert_allclose(
         final_mass, expected_final, rtol=P4_PARITY_RTOL, atol=P4_PARITY_ATOL
@@ -1271,10 +1309,10 @@ def _assert_p4_gpu_matches_reference(
     npt.assert_array_equal(partitioning, initial_partitioning.astype(np.int32))
 
     assert np.all(np.isfinite(final_mass)) and np.all(final_mass >= 0.0)
-    assert np.all(np.isfinite(raw)) and np.all(np.isfinite(vapor_pressure))
+    assert np.all(np.isfinite(total)) and np.all(np.isfinite(vapor_pressure))
     npt.assert_allclose(
         final_mass,
-        np.maximum(initial_mass + raw, 0.0),
+        initial_mass + total,
         rtol=P4_INVARIANT_RTOL,
         atol=P4_INVARIANT_ATOL,
     )
@@ -1285,7 +1323,7 @@ def _assert_p4_gpu_matches_reference(
         atol=P4_INVARIANT_ATOL,
     )
     clamp_index = case.clamp_index
-    assert raw[clamp_index] < -initial_mass[clamp_index]
+    assert total[clamp_index] == -initial_mass[clamp_index]
     assert final_mass[clamp_index] == 0.0
 
 
@@ -1624,12 +1662,9 @@ def test_condensation_scratch_buffers_complete_sidecar_preserves_identity(
     )
     assert returned is scratch.total_mass_transfer
     assert scratch.work_mass_transfer.shape == particles.masses.shape
-    npt.assert_allclose(
-        scratch.work_mass_transfer.numpy(),
-        scratch.total_mass_transfer.numpy(),
-        rtol=1.0e-12,
-        atol=1.0e-30,
-    )
+    assert np.all(np.isfinite(scratch.work_mass_transfer.numpy()))
+    assert np.all(np.isfinite(scratch.total_mass_transfer.numpy()))
+    assert np.all(scratch.total_mass_transfer.numpy() <= 0.0)
     npt.assert_allclose(gas.concentration, initial_gas, rtol=0.0, atol=0.0)
 
 
@@ -2143,7 +2178,7 @@ def test_condensation_activity_surface_matches_independent_reference(
         thermodynamics=thermodynamics,
         activity_surface=sidecar,
     )
-    expected = _cpu_mass_transfer(
+    _, expected, _ = _cpu_four_substep_oracle(
         particles,
         gas,
         vapor_pressure,
@@ -2198,7 +2233,7 @@ def test_condensation_activity_surface_multibox_uses_current_composition(
         thermodynamics=thermodynamics,
         activity_surface=sidecar,
     )
-    expected = _cpu_mass_transfer(
+    _, expected, _ = _cpu_four_substep_oracle(
         particles,
         gas,
         vapor_pressure,
@@ -3419,7 +3454,7 @@ def test_condensation_step_gpu_accepts_direct_environment_arrays(
     vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
     temperature_values = np.array([298.15, 301.15], dtype=np.float64)
     pressure_values = np.array([101325.0, 100800.0], dtype=np.float64)
-    expected = _cpu_mass_transfer(
+    expected_masses, expected, _ = _cpu_four_substep_oracle(
         particles,
         gas,
         # The wrapper's default constant thermodynamics sidecar refreshes both
@@ -3448,9 +3483,7 @@ def test_condensation_step_gpu_accepts_direct_environment_arrays(
     npt.assert_allclose(
         mass_transfer.numpy(), expected, rtol=_ENVIRONMENT_ARRAY_RTOL
     )
-    npt.assert_allclose(
-        gpu_result.masses, np.maximum(particles.masses + expected, 0.0)
-    )
+    npt.assert_allclose(gpu_result.masses, expected_masses)
 
 
 def test_explicit_environment_matches_direct_arrays(
@@ -3583,7 +3616,7 @@ def test_condensation_step_gpu_accepts_hybrid_scalar_and_array_inputs(
         if isinstance(pressure_input, float)
         else pressure_input
     )
-    expected = _cpu_mass_transfer(
+    _, expected, _ = _cpu_four_substep_oracle(
         particles,
         gas,
         np.full_like(vapor_pressure, 800.0),
@@ -3655,7 +3688,7 @@ def test_condensation_step_gpu_preserves_direct_environment_array_dtypes(
         time_step=0.1,
     )
 
-    assert launch_dtypes == [(wp.float64, wp.float64)]
+    assert launch_dtypes == [(wp.float64, wp.float64)] * 4
 
 
 def test_condensation_step_gpu_non_uniform_environment_matches_cpu(
@@ -3667,7 +3700,7 @@ def test_condensation_step_gpu_non_uniform_environment_matches_cpu(
     vapor_pressure = _make_vapor_pressure(n_boxes=2, n_species=1)
     temperature_values = np.array([298.15, 308.15], dtype=np.float64)
     pressure_values = np.array([101325.0, 98000.0], dtype=np.float64)
-    expected = _cpu_mass_transfer(
+    _, expected, _ = _cpu_four_substep_oracle(
         particles,
         gas,
         np.full_like(vapor_pressure, 800.0),
@@ -3756,7 +3789,7 @@ def test_condensation_step_gpu_preserves_environment_array_dtypes(
         environment=environment,
     )
 
-    assert launch_dtypes == [(wp.float64, wp.float64)]
+    assert launch_dtypes == [(wp.float64, wp.float64)] * 4
 
 
 def test_condensation_step_gpu_environment_shape_mismatch_raises_value_error(
@@ -3898,7 +3931,67 @@ def test_condensation_step_gpu_prepares_box_properties_once_per_call(
         time_step=0.1,
     )
 
-    assert launch_names.count("_prepare_environment_properties_kernel") == 1
+    assert launch_names.count("_prepare_environment_properties_kernel") == 4
+
+
+def test_condensation_step_gpu_zero_timestep_runs_four_ordered_cycles(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Zero timesteps clear totals and still schedule four physics cycles."""
+    particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
+    gas = _make_gas_data(n_boxes=1, n_species=1)
+    initial_masses = particles.masses.copy()
+    initial_gas = gas.concentration.copy()
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=_make_vapor_pressure(1, 1),
+    )
+    total = wp.full(
+        particles.masses.shape,
+        wp.float64(17.0),
+        dtype=wp.float64,
+        device=device,
+    )
+    launch_names: list[str] = []
+    transfer_time_steps: list[float] = []
+    original_launch = condensation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        name = getattr(kernel, "key", str(kernel))
+        launch_names.append(name)
+        if name == "condensation_mass_transfer_kernel":
+            transfer_time_steps.append(float(kwargs["inputs"][21]))
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
+    _, returned = condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.0,
+        mass_transfer=total,
+    )
+
+    assert returned is total
+    assert (
+        launch_names
+        == ["_clear_mass_transfer_kernel"]
+        + [
+            "_refresh_vapor_pressure_kernel",
+            "_prepare_environment_properties_kernel",
+            "condensation_mass_transfer_kernel",
+            "_apply_and_accumulate_mass_transfer_kernel",
+        ]
+        * 4
+    )
+    assert transfer_time_steps == [0.0] * 4
+    npt.assert_array_equal(gpu_particles.masses.numpy(), initial_masses)
+    npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
+    npt.assert_array_equal(total.numpy(), np.zeros_like(initial_masses))
 
 
 @pytest.mark.gpu_parity
@@ -3914,7 +4007,7 @@ def test_condensation_step_gpu_matches_cpu_single_box(device: str) -> None:
     mass_accommodation = np.array([1.0, 0.8], dtype=np.float64)
     diffusion = np.array([2.0e-5, 1.5e-5], dtype=np.float64)
 
-    cpu_mass_transfer = _cpu_mass_transfer(
+    expected_masses, _, _ = _cpu_four_substep_oracle(
         particles,
         gas,
         vapor_pressure,
@@ -3925,7 +4018,6 @@ def test_condensation_step_gpu_matches_cpu_single_box(device: str) -> None:
         pressure,
         time_step,
     )
-    expected_masses = np.maximum(particles.masses + cpu_mass_transfer, 0.0)
 
     gpu_result, _ = _run_gpu_step(
         particles,
@@ -3962,7 +4054,7 @@ def test_condensation_step_gpu_multi_box_matches_cpu(device: str) -> None:
     mass_accommodation = np.array([0.9, 0.7], dtype=np.float64)
     diffusion = np.array([2.0e-5, 1.7e-5], dtype=np.float64)
 
-    cpu_mass_transfer = _cpu_mass_transfer(
+    expected_masses, _, _ = _cpu_four_substep_oracle(
         particles,
         gas,
         vapor_pressure,
@@ -3973,7 +4065,6 @@ def test_condensation_step_gpu_multi_box_matches_cpu(device: str) -> None:
         pressure,
         time_step,
     )
-    expected_masses = np.maximum(particles.masses + cpu_mass_transfer, 0.0)
 
     gpu_result, _ = _run_gpu_step(
         particles,
@@ -4031,6 +4122,91 @@ def test_apply_mass_transfer_kernel_clamps_negative(device: str) -> None:
     assert np.all(gpu_result.masses >= 0.0)
 
 
+@pytest.mark.parametrize(
+    "use_scratch",
+    (False, True),
+    ids=("legacy_total", "scratch_work_and_total"),
+)
+def test_condensation_forced_evaporation_accumulates_applied_transfer(
+    device: str,
+    use_scratch: bool,
+) -> None:
+    """Forced evaporation preserves total/work roles and mass conservation."""
+    case = P4_CASES[0]
+    particles = case.build_particle_data()
+    gas = case.build_gas_data()
+    initial_mass = particles.masses.copy()
+    expected_mass, expected_total, expected_work = _cpu_four_substep_oracle(
+        particles,
+        gas,
+        _p4_vapor_pressure(case.temperature),
+        surface_tension=P4_THERMODYNAMICS.surface_tension,
+        mass_accommodation=np.ones(2, dtype=np.float64),
+        diffusion_coefficient_vapor=np.full(2, 2.0e-5, dtype=np.float64),
+        temperature=case.temperature,
+        pressure=case.pressure,
+        time_step=1000.0,
+        kappas=P4_THERMODYNAMICS.kappas,
+    )
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=device,
+        vapor_pressure=np.zeros((1, 2), dtype=np.float64),
+    )
+    thermodynamics, activity_surface, tension = _p4_sidecars(device)
+    scratch = (
+        _make_condensation_scratch_buffers(particles.masses.shape, device)
+        if use_scratch
+        else None
+    )
+    legacy_total = (
+        None
+        if use_scratch
+        else wp.full(
+            particles.masses.shape,
+            wp.float64(7.0),
+            dtype=wp.float64,
+            device=device,
+        )
+    )
+
+    _, returned_total = condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=wp.array(case.temperature, dtype=wp.float64, device=device),
+        pressure=wp.array(case.pressure, dtype=wp.float64, device=device),
+        time_step=1000.0,
+        surface_tension=tension,
+        thermodynamics=thermodynamics,
+        activity_surface=activity_surface,
+        mass_transfer=legacy_total,
+        scratch_buffers=scratch,
+    )
+
+    expected_total_buffer = (
+        scratch.total_mass_transfer if scratch is not None else legacy_total
+    )
+    assert returned_total is expected_total_buffer
+    assert returned_total.device == wp.get_device(device)
+    npt.assert_allclose(
+        gpu_particles.masses.numpy(), expected_mass, rtol=1.0e-10
+    )
+    npt.assert_allclose(returned_total.numpy(), expected_total, rtol=1.0e-10)
+    npt.assert_allclose(
+        gpu_particles.masses.numpy(),
+        initial_mass + returned_total.numpy(),
+        rtol=1e-12,
+    )
+    assert np.all(np.isfinite(gpu_particles.masses.numpy()))
+    assert np.all(gpu_particles.masses.numpy() >= 0.0)
+    if scratch is not None:
+        assert scratch.work_mass_transfer is not None
+        npt.assert_allclose(
+            scratch.work_mass_transfer.numpy(), expected_work, rtol=1.0e-10
+        )
+
+
 def test_condensation_skips_inactive_particles(device: str) -> None:
     """Inactive particles retain their masses."""
     temperature = 298.15
@@ -4068,7 +4244,7 @@ def test_condensation_multi_species_parity(device: str) -> None:
     mass_accommodation = np.array([1.0, 0.9, 0.7], dtype=np.float64)
     diffusion = np.array([2.0e-5, 1.7e-5, 1.2e-5], dtype=np.float64)
 
-    cpu_mass_transfer = _cpu_mass_transfer(
+    expected_masses, _, _ = _cpu_four_substep_oracle(
         particles,
         gas,
         vapor_pressure,
@@ -4079,7 +4255,6 @@ def test_condensation_multi_species_parity(device: str) -> None:
         pressure,
         time_step,
     )
-    expected_masses = np.maximum(particles.masses + cpu_mass_transfer, 0.0)
 
     gpu_result, _ = _run_gpu_step(
         particles,
@@ -4107,7 +4282,7 @@ def test_condensation_step_gpu_refreshes_before_mass_transfer(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
 ) -> None:
-    """Refresh runs once after float32 casting and before mass transfer."""
+    """Refresh runs per substep after one float32 cast and before transfer."""
     particles = _make_particle_data(n_boxes=2, n_particles=1, n_species=2)
     gas = _make_gas_data(n_boxes=2, n_species=2)
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -4146,7 +4321,7 @@ def test_condensation_step_gpu_refreshes_before_mass_transfer(
         rtol=2.0e-7,
     )
     assert np.all(np.isfinite(transfer.numpy()))
-    assert launch_names.count("_refresh_vapor_pressure_kernel") == 1
+    assert launch_names.count("_refresh_vapor_pressure_kernel") == 4
     assert launch_names.index("_copy_temperature_to_float64_kernel") < (
         launch_names.index("_refresh_vapor_pressure_kernel")
     )
@@ -4269,7 +4444,7 @@ def test_condensation_step_gpu_refreshes_stale_pressure_for_each_input_kind(
         thermodynamics,
         temperature_values,
     )
-    expected_transfer = _cpu_mass_transfer(
+    _, expected_transfer, _ = _cpu_four_substep_oracle(
         particles,
         gas,
         np.full((2, 2), 1.0, dtype=np.float64),
