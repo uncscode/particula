@@ -19,10 +19,11 @@
     `atol=max(1e-18, scale * eps)`. Physics parity starts at `rtol=1e-10` with
     its independently scale-derived `atol`.
 - [x] Where do invalid nonbinary `int32` partition values fail?
-  - Resolved 2026-07-13: validate binary values during CPU-to-Warp conversion
-    and validate dtype/shape/device during call preflight. Manually constructed
-    Warp structs document binary values as a precondition; do not add hidden
-    device-status synchronization solely for value inspection.
+  - Resolved 2026-07-14 by issue #1302: validate dtype/shape/device in call
+    preflight and inspect manually constructed Warp masks with a private
+    status-only device validation launch/readback. Nonbinary values raise
+    `ValueError` before mutable work; conversion restoration also rejects
+    nonbinary values.
 
 Diagnostics requested: none. These questions must not weaken the issue #1272
 production-hook and conservation gates.

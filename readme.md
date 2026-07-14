@@ -80,6 +80,14 @@ may be reused across calls. A failed preflight, including missing or
 device-incompatible thermodynamics, leaves caller-owned simulation and output
 buffers unchanged.
 
+Before a direct condensation call can mutate state, `gas.partitioning` must be
+an active-device, binary `wp.int32` mask shaped `(n_boxes, n_species)`.
+Disabled species and zero-concentration particle slots receive no transfer.
+Invalid masks, and invalid optional P2-only reduction/scale/accumulator scratch
+sidecars, raise `ValueError` without changing caller-owned state. The P2-only
+sidecars are validated but otherwise untouched, and this low-level
+particle-only path never updates `gas.concentration`.
+
 The direct condensation kernel also accepts optional keyword-only,
 active-device `wp.float64` sidecars: `latent_heat`, shaped `(n_species,)`, and
 the caller-owned write-only `energy_transfer`, shaped `(n_boxes, n_species)`.

@@ -1,12 +1,16 @@
 # Implementation Tasks
 
-1. In `particula/gpu/kernels/condensation.py`, extend the
-   `condensation_step_gpu()` preflight for partitioning shape/device/binary value
-   and every reduction, scale, and accumulator buffer; snapshot all mutable
-   buffers in `gpu/kernels/tests/condensation_test.py` to prove rejection is
-   pre-mutation.
-2. Add a private Warp launch in `condensation.py` that zeros raw transfer for a
-   disabled species or inactive particle before any reduction.
+1. [x] **Issue #1302:** In `particula/gpu/kernels/condensation.py`, extend the
+    `condensation_step_gpu()` preflight for partitioning shape/device/binary value
+    and every reduction, scale, and accumulator buffer; snapshot all mutable
+    buffers in `particula/gpu/kernels/tests/_condensation_test_support.py` to
+    prove rejection is pre-mutation. Conversion coverage in
+    `particula/gpu/tests/conversion_test.py` validates binary partitioning on
+    CPU↔Warp restoration.
+2. [x] **Issue #1302:** Add a private Warp launch in `condensation.py` that
+    zeros raw transfer for a disabled species or inactive particle before
+    application. Preserve `gas.concentration` and the existing enabled-entry
+    clamp/accumulator behavior.
 3. Add private fp64 launches for per-particle evaporation bounds and separate
    positive/negative `(n_boxes, n_species)` transfer reductions, using the
    caller-owned fixed-shape scratch established by E4-F3.

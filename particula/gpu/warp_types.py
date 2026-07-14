@@ -97,9 +97,11 @@ class WarpGasData:
           caller-owned ordered names or index mapping outside this struct;
           placeholder names are generated only by CPU restore helpers when
           names are omitted.
-        - The ``partitioning`` field uses int32 instead of bool for GPU
-          compatibility (1 = True, 0 = False) and is expected to remain
-          binary for CPU restore.
+        - The ``partitioning`` field is an active-device, per-box
+          ``(n_boxes, n_species)`` int32 mask rather than a CPU bool vector.
+          Its values must remain binary (1 = True, 0 = False) for condensation
+          and CPU restore. CPU restore additionally requires every box to have
+          the same mask because ``GasData`` owns one shared species mask.
         - ``vapor_pressure`` is GPU-only helper state for condensation-style
           kernels and is not part of CPU ``GasData`` ownership.
           ``to_warp_gas_data()`` accepts caller-supplied values with shape
@@ -118,7 +120,8 @@ class WarpGasData:
         vapor_pressure: Vapor pressures in Pa.
             Shape: (n_boxes, n_species)
             GPU-only helper state for condensation kernels.
-        partitioning: Whether each species can partition to particles per box.
+        partitioning: Binary mask of species allowed to partition to particles
+            in each box.
             Shape: (n_boxes, n_species)
             Uses int32 (1=True, 0=False) for GPU compatibility.
 

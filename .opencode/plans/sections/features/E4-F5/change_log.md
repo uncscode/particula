@@ -1,5 +1,12 @@
 # Change Log
 
+## 2026-07-14 — E4-F5-P1 shipped (issue #1302)
+- Validated active-device binary per-box `WarpGasData.partitioning` masks and
+  optional P2 sidecar metadata atomically before mutable condensation work.
+- Added a private raw-proposal gate for disabled species and inactive slots.
+- Preserved the particle-only `gas.concentration` contract and added focused
+  kernel atomicity/gating plus CPU↔Warp conversion regression coverage.
+
 ## 2026-07-12 — Initial draft
 - Created five issue-sized phases with co-located tests and final documentation.
 - Set E4-F3 and E4-F4 as required predecessors and E4-F6 as downstream gate.

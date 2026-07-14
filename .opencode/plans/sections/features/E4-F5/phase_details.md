@@ -3,11 +3,17 @@
 Phase issue creation is intentionally deferred until E4 implementation issues
 are generated and scheduled; `TBD` is not an unresolved design decision.
 
-- [ ] **E4-F5-P1:** Partitioning gates and gas-coupling validation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Validate gas coupling inputs before mutation and strictly zero disabled species.
-  - Files: `particula/gpu/kernels/condensation.py`, co-located kernel tests
-  - Tests: mask, shape, device, binary-value, inactive-slot, and fail-before-mutation cases
+- [x] **E4-F5-P1:** Partitioning gates and gas-coupling validation with unit tests
+  - Issue: #1302 | Size: S | Status: Shipped (2026-07-14)
+  - Delivered: atomically validate active-device binary `(n_boxes, n_species)`
+    `wp.int32` masks and supplied P2 sidecar metadata before mutable work;
+    strictly zero disabled-species and inactive-slot raw proposals before
+    application; preserve the particle-only no-gas-mutation contract.
+  - Files: `particula/gpu/kernels/condensation.py`,
+    `particula/gpu/kernels/tests/_condensation_test_support.py`, and
+    `particula/gpu/tests/conversion_test.py`
+  - Tests: mask shape/device/dtype/binary-value and P2-sidecar atomicity,
+    disabled/inactive gate behavior, and CPU↔Warp partitioning conversion
 
 - [ ] **E4-F5-P2:** Deterministic gas and particle inventory limits with unit tests
   - Issue: TBD | Size: S | Status: Not Started
