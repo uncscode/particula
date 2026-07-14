@@ -6,10 +6,15 @@ coverage.
 
 ## Per-Phase Coverage
 
-- **P1:** In `particula/gpu/kernels/tests/condensation_test.py`, verify supplied
-  buffers are returned/reused by identity, have stable shapes, and reject wrong
-  shape, fp64 dtype, or device before particles or any caller buffer changes.
-  Instrument the all-scratch path to detect required allocations.
+- **P1 (shipped, issue #1292):** Co-located executable coverage in
+  `particula/gpu/kernels/tests/_condensation_test_support.py`, exported through
+  `condensation_test.py`, verifies complete and partial `CondensationScratchBuffers`
+  sidecars. It covers identity, stable shapes, raw work/total agreement,
+  scalar/direct/hybrid/environment input forms, legacy positional compatibility,
+  property-only sidecars with `mass_transfer`, and no required stable-shape
+  allocations for a complete sidecar. Rejection coverage asserts wrong type,
+  shape, fp64 dtype, device, and transfer overlap fail before launch,
+  allocation/normalization/refresh instrumentation, or mutation.
 - **P2:** Verify four unconditional equal substeps, updated-state reads, E4-F1
   refresh on every iteration, per-step clamping, total transfer accumulation,
   deterministic repeatability, finite values, and nonnegative particle mass.

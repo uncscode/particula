@@ -3,14 +3,19 @@
 Phase issue creation is intentionally deferred until E4 implementation issues
 are generated and scheduled; `TBD` is not an unresolved design decision.
 
-- [ ] **E4-F3-P1:** Reusable stable-shape scratch buffers and pre-mutation validation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add optional caller-owned scratch inputs and validate shape, dtype,
-    and device before any buffer or particle mutation.
+- [x] **E4-F3-P1:** Reusable stable-shape scratch buffers and pre-mutation validation with unit tests
+  - Issue: #1292 | Size: S | Status: Shipped (2026-07-13)
+  - Delivered: Added the concrete-module-only frozen
+    `CondensationScratchBuffers` sidecar and keyword-only `scratch_buffers` to
+    the existing one-update entry point. All supplied fields validate atomically
+    for shape, fp64 dtype, and active device before any fallback allocation,
+    normalization, refresh, launch, clear, or mutation.
   - Files: `particula/gpu/kernels/condensation.py`,
     `particula/gpu/kernels/tests/condensation_test.py`
-  - Tests: identity reuse, wrong shape/device/dtype, unchanged buffers and
-    particles on rejection, and allocation-free supplied-scratch path.
+  - Tests: cover complete and partial sidecars, all supported environment input
+    forms, identity and stable shapes, transfer overlap rejection, wrong
+    type/shape/dtype/device, unchanged state after rejection, and the
+    allocation-free complete-sidecar path.
 
 - [ ] **E4-F3-P2:** Fixed four-substep integration and per-substep physics refresh with unit tests
   - Issue: TBD | Size: S | Status: Not Started

@@ -3,9 +3,12 @@
 - [ ] E4-F1 is shipped and its thermodynamic refresh executes before transfer
   calculation in each of exactly four substeps.
 - [ ] Every substep uses `time_step / 4` and reads current particle state.
-- [ ] All supported scratch supplied by the caller eliminates required
-  per-call temporary allocations and preserves object identity and shape.
-- [ ] All inputs and buffers validate before particle or caller-buffer mutation.
+- [x] Complete fp64 `CondensationScratchBuffers` sidecars eliminate required
+  allocation of the two transfer and two property stable shapes and preserve
+  caller identity and shape (P1, issue #1292).
+- [x] All supplied scratch fields validate before allocation, normalization,
+  refresh, launch, clear, particle mutation, or caller-buffer mutation (P1,
+  issue #1292).
 - [ ] Returned mass transfer is the accumulated applied transfer for the full
   call; particle mass remains finite and nonnegative.
 - [ ] Repeated identical runs are deterministic and gas concentration is
@@ -23,7 +26,7 @@
 | Metric | Baseline | Target | Source |
 |---|---:|---:|---|
 | Explicit substeps per call | 1 | Exactly 4 | Launch-count tests |
-| Required allocations with all scratch supplied | Environment buffers allocated | 0 | Allocation instrumentation |
+| Required stable-shape allocations with complete scratch | Environment buffers allocated | 0 | P1 allocation instrumentation |
 | Recorded-grid max relative error | Candidate <= `5e-2` | Production <= `5e-2` | Stiffness suite |
 | Negative or non-finite particle outputs | Candidate 0 | 0 | Production regressions |
 | Mutation on invalid input | Existing mass-transfer contract: 0 | 0 for all scratch | Rejection tests |

@@ -1,19 +1,23 @@
 # Scope
 
-E4-F3 promotes the selected fixed-count condensation integrator and reusable
-scratch ownership after E4-F1 establishes on-device thermodynamic refresh.
+E4-F3 promotes reusable scratch ownership first, then the selected fixed-count
+condensation integrator after E4-F1 establishes on-device thermodynamic refresh.
 
 ## In Scope
 
-- Execute exactly four unconditional substeps of `time_step / 4`.
-- Recompute transfer from current particle state and refresh applicable E4-F1
-  thermodynamic state during every substep.
-- Add reusable fixed-shape fp64 work, total-transfer, dynamic-viscosity, and
-  mean-free-path buffers where required by the production implementation.
-- Validate every caller-owned buffer before clearing buffers, launching kernels,
-  or mutating particle state.
-- Return total transfer accumulated over all four substeps while preserving
-  caller-buffer identity.
+- **Delivered in P1 / issue #1292:** Add concrete-module-only
+  `CondensationScratchBuffers` in `particula/gpu/kernels/condensation.py` with
+  optional fixed-shape fp64 work-transfer, total-transfer, dynamic-viscosity,
+  and mean-free-path fields.
+- **Delivered in P1 / issue #1292:** Validate the complete supplied sidecar and
+  reject `mass_transfer` overlap with supplied scratch transfer fields before
+  allocation, normalization, refresh, launch, clear, or particle mutation.
+- **Delivered in P1 / issue #1292:** Support partial sidecars; allocate only
+  omitted fields through the compatibility path. Complete sidecar reuse needs no
+  allocation of the four stable shapes.
+- **Remaining P2 scope:** Execute exactly four unconditional substeps of
+  `time_step / 4`, refresh E4-F1 state every substep, and return accumulated
+  applied transfer over those substeps.
 - Promote deterministic, nonnegative, finite, stiffness-bound, shape, device,
   mutation-order, and no-allocation regression coverage from issue #1272.
 - Preserve scalar, direct Warp-array, hybrid, and `WarpEnvironmentData` inputs.

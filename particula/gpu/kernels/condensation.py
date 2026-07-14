@@ -3,13 +3,14 @@
 This module composes condensation ``@wp.func`` building blocks into end-to-end
 kernels and provides the high-level ``condensation_step_gpu`` API. Entry-point
 validation accepts scalar direct inputs, explicit ``(n_boxes,)`` Warp arrays,
-or a ``WarpEnvironmentData`` container. Aggregate preflight completes before
-buffer allocation, Warp launch, vapor-pressure refresh, or mutation of any
-caller-owned buffer. A required keyword-only ``ThermodynamicsConfig`` then
-refreshes the caller-owned pure-vapor-pressure buffer from the current
-normalized temperature before mass transfer. Float32 temperatures are cast to
-a step-owned float64 device buffer for that refresh. Kernel launches operate
-on GPU-resident Warp arrays and update particle masses in-place.
+or a ``WarpEnvironmentData`` container. Aggregate preflight, including supplied
+``CondensationScratchBuffers`` metadata, completes before buffer allocation,
+Warp launch, vapor-pressure refresh, or mutation of caller-owned state. A
+required keyword-only ``ThermodynamicsConfig`` then refreshes the caller-owned
+pure-vapor-pressure buffer from the current normalized temperature before mass
+transfer. Float32 temperatures are cast to a step-owned float64 device buffer
+for that refresh. Kernel launches operate on GPU-resident Warp arrays and
+update particle masses in-place.
 """
 
 # pyright: basic
@@ -117,18 +118,31 @@ class CondensationActivitySurfaceConfig:
 class CondensationScratchBuffers:
     """Own reusable stable-shape buffers for one P1 condensation update.
 
-    This concrete-module-only sidecar is intentionally not exported.
-    Non-``None``
-    fields are caller-owned, active-device ``wp.float64`` arrays with stable
-    shapes: both transfer fields have shape
-    ``(n_boxes, n_particles, n_species)`` and both property fields have shape
-    ``(n_boxes,)``. Successful calls preserve each supplied object's identity.
-    P1 performs exactly one update: work and total transfers contain the same
-    raw pre-clamp transfer, and the supplied total buffer is returned by
-    identity. Callers must keep arrays alive and unmodified until launched work
-    completes; reuse them only after successful completion. Complete metadata
-    validation precedes allocation, normalization, refresh, launch, and
-    mutation, so validation failures leave caller-owned state unchanged.
+    This concrete-module-only sidecar is intentionally not exported. Every
+    non-``None`` field is a caller-owned, active-device ``wp.float64`` array
+    whose shape must remain stable: transfer fields have shape
+    ``(n_boxes, n_particles, n_species)`` and property fields have shape
+    ``(n_boxes,)``. Fields may be omitted independently; omitted fields are
+    step-local fallback allocations, while successful calls preserve every
+    supplied object's identity.
+
+    P1 performs exactly one update. Its work and total transfer buffers contain
+    identical raw pre-clamp transfers; a supplied ``total_mass_transfer`` is
+    returned by identity. Callers must keep supplied arrays alive and
+    unmodified until launched work completes, and may reuse them only after a
+    successful completion. Complete supplied-field metadata validation precedes
+    allocation, environment normalization, refresh, launch, and mutation, so a
+    validation failure leaves caller-owned state unchanged.
+
+    Attributes:
+        work_mass_transfer: Optional caller-owned P1 work-transfer array with
+            shape ``(n_boxes, n_particles, n_species)``.
+        total_mass_transfer: Optional caller-owned raw P1 total-transfer array
+            with shape ``(n_boxes, n_particles, n_species)``.
+        dynamic_viscosity: Optional caller-owned per-box dynamic-viscosity
+            array with shape ``(n_boxes,)`` [Pa·s].
+        mean_free_path: Optional caller-owned per-box mean-free-path array with
+            shape ``(n_boxes,)`` [m].
     """
 
     work_mass_transfer: Any | None = None
@@ -145,8 +159,24 @@ def validate_condensation_scratch_buffers(
 ) -> CondensationScratchBuffers:
     """Validate scratch metadata without allocation, reads, or mutation.
 
-    This is an atomic metadata-only gate. It neither reads nor writes supplied
-    arrays, allocates fallback buffers, launches Warp work, or synchronizes.
+    This atomic metadata-only gate requires the exact
+    ``CondensationScratchBuffers`` type and validates every supplied field's
+    stable shape, ``wp.float64`` dtype, and active device. It neither reads nor
+    writes supplied arrays, allocates fallback buffers, launches Warp work, or
+    synchronizes.
+
+    Args:
+        candidate: Scratch-buffer sidecar to validate.
+        dimensions: Expected ``(n_boxes, n_particles, n_species)`` dimensions.
+        device: Active Warp device required for supplied fields.
+        caller_name: Entry-point name included in validation errors.
+
+    Returns:
+        The original validated ``CondensationScratchBuffers`` object.
+
+    Raises:
+        ValueError: If ``candidate`` is not the exact sidecar type or a
+            supplied field has incompatible shape, dtype, or device.
     """
     if type(candidate) is not CondensationScratchBuffers:
         raise ValueError(
@@ -835,6 +865,10 @@ def condensation_step_gpu(  # noqa: C901
             species, active device, or required fixed schema.
         ValueError: If ``activity_surface`` violates its frozen-sidecar,
             selector, device-array, domain, or molar-mass ordering contract.
+        ValueError: If ``scratch_buffers`` is not the exact frozen sidecar type,
+            a supplied field lacks its stable active-device ``wp.float64``
+            metadata, or ``mass_transfer`` overlaps a supplied scratch transfer
+            field.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
@@ -863,6 +897,17 @@ def condensation_step_gpu(  # noqa: C901
         current temperature before preparing box-level properties and
         calculating mass transfer. Float32 temperature arrays are cast
         device-side to float64 for the refresh.
+
+        ``scratch_buffers`` is P1-only: it represents one condensation update,
+        not an accumulator or a multi-step integration state. A supplied work
+        and/or total transfer field conflicts with ``mass_transfer`` because
+        they overlap its legacy output role; a property-only sidecar can be
+        used with ``mass_transfer``. In scratch-transfer mode, work and total
+        record the same raw pre-clamp transfer and the resolved total buffer is
+        returned. Therefore, a supplied total field is returned by identity;
+        when omitted, the returned total is a step-local fallback buffer. With
+        no supplied scratch transfer field, legacy ``mass_transfer`` identity
+        behavior is retained.
 
         Thermodynamic validation may synchronously read caller-owned device
         arrays, including on CUDA, without allocating, replacing, or mutating

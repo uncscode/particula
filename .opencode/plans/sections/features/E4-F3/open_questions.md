@@ -7,12 +7,14 @@
 - [x] Which omitted scratch arrays may be allocated for compatibility?
   - Resolved 2026-07-13: omission of the entire scratch sidecar keeps the
     convenience allocation path. A complete validated sidecar provides the
-    zero-required-allocation path; reject partial sidecars rather than
-    allocating unpredictably.
+    zero-required-allocation path, and P1 also supports partial sidecars by
+    allocating only omitted fields after the atomic validation gate.
 - [x] Should `mass_transfer` be both work storage and the total accumulator?
-  - Resolved 2026-07-13: keep work and output separate. Zero `mass_transfer` as
-    the whole-call applied-transfer accumulator and use a distinct substep work
-    buffer.
+  - Resolved 2026-07-13: for P1, retain legacy `mass_transfer` as the single
+    work/result buffer by identity. Scratch work and total fields both receive
+    the one-update raw pre-clamp transfer; `mass_transfer` conflicts only with
+    a supplied scratch transfer field. P2 owns accumulated applied-transfer
+    semantics.
 - [x] Can E4-F1 refresh reuse the same `(n_boxes,)` environment-property
   buffers across all four substeps?
   - Resolved 2026-07-13: yes. Complete structural validation before the loop,
