@@ -343,7 +343,9 @@ def _inventory_reference(
             np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64),
             np.array(
                 [
-                    [[4.0, -4.0], [9.0, 8.0]],
+                    # The second particle is inactive and the first species in
+                    # its proposal is explicitly pre-gated to zero.
+                    [[4.0, -4.0], [0.0, 0.0]],
                     [[-20.0, 3.0], [6.0, -30.0]],
                 ],
                 dtype=np.float64,
@@ -514,6 +516,167 @@ def test_finalize_inventory_limited_transfer_preflight_is_atomic(
         npt.assert_array_equal(actual, values)
 
 
+@pytest.mark.parametrize(
+    ("invalid_kind", "invalid_value", "message"),
+    (
+        ("masses", -1.0, "particles.masses.*finite"),
+        ("concentration", np.nan, "particles.concentration.*finite"),
+        ("gas", -1.0, "gas.concentration.*finite"),
+        ("proposal", np.inf, "gated_mass_transfer must be finite"),
+    ),
+)
+def test_finalize_inventory_rejects_invalid_physical_inputs_atomically(
+    warp_cpu_device: str,
+    invalid_kind: str,
+    invalid_value: float,
+    message: str,
+) -> None:
+    """Invalid direct-P2 physical inputs fail before caller-state mutation."""
+    particles = _make_particle_data(1, 1, 1)
+    gas = _make_gas_data(1, 1)
+    gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=warp_cpu_device,
+        vapor_pressure=np.zeros((1, 1), dtype=np.float64),
+    )
+    proposal = wp.full(
+        (1, 1, 1), wp.float64(1.0), dtype=wp.float64, device=warp_cpu_device
+    )
+    scratch = _make_condensation_scratch_buffers(
+        (1, 1, 1),
+        warp_cpu_device,
+        fields=(
+            "positive_mass_transfer_demand",
+            "negative_mass_transfer_release",
+            "positive_mass_transfer_scale",
+        ),
+    )
+    if invalid_kind == "masses":
+        wp.copy(
+            gpu_particles.masses,
+            wp.array(
+                [[[invalid_value]]], dtype=wp.float64, device=warp_cpu_device
+            ),
+        )
+    elif invalid_kind == "concentration":
+        wp.copy(
+            gpu_particles.concentration,
+            wp.array(
+                [[invalid_value]], dtype=wp.float64, device=warp_cpu_device
+            ),
+        )
+    elif invalid_kind == "gas":
+        wp.copy(
+            gpu_gas.concentration,
+            wp.array(
+                [[invalid_value]], dtype=wp.float64, device=warp_cpu_device
+            ),
+        )
+    else:
+        proposal = wp.array(
+            [[[invalid_value]]], dtype=wp.float64, device=warp_cpu_device
+        )
+    initial = (
+        gpu_particles.masses.numpy().copy(),
+        gpu_gas.concentration.numpy().copy(),
+        proposal.numpy().copy(),
+        *(
+            getattr(scratch, name).numpy().copy()
+            for name in (
+                "positive_mass_transfer_demand",
+                "negative_mass_transfer_release",
+                "positive_mass_transfer_scale",
+            )
+        ),
+    )
+    with pytest.raises(ValueError, match=message):
+        _finalize_inventory_limited_mass_transfer(
+            gpu_particles, gpu_gas, proposal, scratch
+        )
+    actual = (
+        gpu_particles.masses.numpy(),
+        gpu_gas.concentration.numpy(),
+        proposal.numpy(),
+        *(
+            getattr(scratch, name).numpy()
+            for name in (
+                "positive_mass_transfer_demand",
+                "negative_mass_transfer_release",
+                "positive_mass_transfer_scale",
+            )
+        ),
+    )
+    for actual_values, initial_values in zip(actual, initial, strict=True):
+        npt.assert_array_equal(actual_values, initial_values)
+
+
+@pytest.mark.parametrize("alias_kind", ("peer", "gas", "energy"))
+def test_finalize_inventory_rejects_p2_sidecar_aliases_atomically(
+    warp_cpu_device: str, alias_kind: str
+) -> None:
+    """P2 reduction sidecars cannot alias peers or protected input/output."""
+    particles = _make_particle_data(1, 1, 1)
+    gas = _make_gas_data(1, 1)
+    gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gpu_gas = to_warp_gas_data(
+        gas,
+        device=warp_cpu_device,
+        vapor_pressure=np.zeros((1, 1), dtype=np.float64),
+    )
+    proposal = wp.full(
+        (1, 1, 1), wp.float64(1.0), dtype=wp.float64, device=warp_cpu_device
+    )
+    scratch = _make_condensation_scratch_buffers(
+        (1, 1, 1),
+        warp_cpu_device,
+        fields=(
+            "positive_mass_transfer_demand",
+            "negative_mass_transfer_release",
+            "positive_mass_transfer_scale",
+        ),
+    )
+    energy_transfer = None
+    if alias_kind == "peer":
+        scratch = dataclasses.replace(
+            scratch,
+            negative_mass_transfer_release=scratch.positive_mass_transfer_demand,
+        )
+    elif alias_kind == "gas":
+        scratch = dataclasses.replace(
+            scratch,
+            positive_mass_transfer_demand=gpu_gas.concentration,
+        )
+    else:
+        energy_transfer = wp.full(
+            (1, 1), wp.float64(-2.0), dtype=wp.float64, device=warp_cpu_device
+        )
+        scratch = dataclasses.replace(
+            scratch,
+            positive_mass_transfer_demand=energy_transfer,
+        )
+    initial_mass = gpu_particles.masses.numpy().copy()
+    initial_gas = gpu_gas.concentration.numpy().copy()
+    initial_proposal = proposal.numpy().copy()
+    initial_energy = (
+        None if energy_transfer is None else energy_transfer.numpy().copy()
+    )
+    with pytest.raises(ValueError, match="must not overlap"):
+        _finalize_inventory_limited_mass_transfer(
+            gpu_particles,
+            gpu_gas,
+            proposal,
+            scratch,
+            energy_transfer=energy_transfer,
+        )
+    npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
+    npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
+    npt.assert_array_equal(proposal.numpy(), initial_proposal)
+    if energy_transfer is not None:
+        assert initial_energy is not None
+        npt.assert_array_equal(energy_transfer.numpy(), initial_energy)
+
+
 @pytest.mark.cuda
 def test_finalize_inventory_limited_transfer_rejects_cuda_p2_sidecar(
     warp_cpu_device: str,
@@ -581,7 +744,9 @@ def test_finalize_inventory_limited_transfer_is_exactly_repeatable(
     gas_concentration = np.array([[2.0]], dtype=np.float64)
     proposal = np.array([[[2.0], [-6.0]]], dtype=np.float64)
 
-    def _run_once() -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def _run_once() -> tuple[
+        np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray
+    ]:
         particles = dataclasses.replace(
             _make_particle_data(1, 2, 1),
             masses=masses.copy(),
@@ -618,6 +783,7 @@ def test_finalize_inventory_limited_transfer_is_exactly_repeatable(
             finalized.numpy(),
             gpu_particles.masses.numpy(),
             scratch.positive_mass_transfer_demand.numpy(),
+            scratch.negative_mass_transfer_release.numpy(),
             scratch.positive_mass_transfer_scale.numpy(),
         )
 
@@ -3483,6 +3649,68 @@ def test_condensation_step_gpu_without_energy_transfer_skips_energy_kernels(
         condensation_module._accumulate_energy_transfer_kernel
         not in launched_kernels
     )
+
+
+def test_condensation_step_gpu_nonzero_execution_never_launches_p2_kernels(
+    device: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The active public P1 path neither resolves nor launches P2 state."""
+    particles = _make_particle_data(1, 1, 1)
+    gas = _make_gas_data(1, 1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=_make_vapor_pressure(1, 1)
+    )
+    scratch = _make_condensation_scratch_buffers(
+        (1, 1, 1),
+        device,
+        fields=(
+            "positive_mass_transfer_demand",
+            "negative_mass_transfer_release",
+            "positive_mass_transfer_scale",
+        ),
+    )
+    p2_sidecars = tuple(
+        getattr(scratch, name)
+        for name in (
+            "positive_mass_transfer_demand",
+            "negative_mass_transfer_release",
+            "positive_mass_transfer_scale",
+        )
+    )
+    initial_sidecars = tuple(sidecar.numpy().copy() for sidecar in p2_sidecars)
+    initial_gas = gpu_gas.concentration.numpy().copy()
+    launched_kernels: list[Any] = []
+    original_launch = condensation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        launched_kernels.append(kernel)
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
+    _condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=_make_thermodynamics_config(gpu_gas),
+        scratch_buffers=scratch,
+    )
+
+    p2_kernels = (
+        condensation_module._bound_evaporation_candidate_kernel,
+        condensation_module._reduce_inventory_candidates_kernel,
+        condensation_module._scale_inventory_uptake_kernel,
+        condensation_module._finalize_and_apply_inventory_transfer_kernel,
+    )
+    assert not any(kernel in launched_kernels for kernel in p2_kernels)
+    npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
+    for sidecar, initial_values in zip(
+        p2_sidecars, initial_sidecars, strict=True
+    ):
+        npt.assert_array_equal(sidecar.numpy(), initial_values)
 
 
 @pytest.mark.gpu_parity
