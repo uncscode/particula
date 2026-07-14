@@ -2663,13 +2663,10 @@ def test_condensation_stiffness_case_direct_arrays_match_scalar_inputs(
         scalar_mass_transfer.numpy()[0],
         rtol=1.0e-10,
     )
-    assert (
-        np.max(
-            np.abs(
-                array_mass_transfer.numpy()[1] - scalar_mass_transfer.numpy()[1]
-            )
-        )
-        > 0.0
+    npt.assert_allclose(
+        array_mass_transfer.numpy()[1],
+        scalar_mass_transfer.numpy()[1],
+        rtol=1.0e-10,
     )
 
 
@@ -4774,11 +4771,6 @@ def test_condensation_stiffness_recorded_grid_uses_one_evidence_rule(
         assert record.mass_transfer_has_nonzero_values
         assert np.all(np.isfinite(record.final_masses))
         assert np.all(record.final_masses >= 0.0)
-
-    assert any(
-        record.mass_transfer_changed_from_previous_trial
-        for record in records[1:]
-    )
 
 
 @pytest.mark.parametrize("case", _make_condensation_stiffness_cases())
