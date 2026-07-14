@@ -977,10 +977,13 @@ def condensation_step_gpu(  # noqa: C901
             device=device,
         )
 
-    scratch_transfer_mode = scratch_buffers is not None and (
-        scratch_buffers.work_mass_transfer is not None
-        or scratch_buffers.total_mass_transfer is not None
-    )
+    scratch_buffers_value = scratch_buffers
+    scratch_transfer_mode = False
+    if scratch_buffers_value is not None:
+        scratch_transfer_mode = (
+            scratch_buffers_value.work_mass_transfer is not None
+            or scratch_buffers_value.total_mass_transfer is not None
+        )
     if mass_transfer is None and not scratch_transfer_mode:
         mass_transfer = wp.zeros(
             expected_shape,
@@ -990,14 +993,16 @@ def condensation_step_gpu(  # noqa: C901
     work_mass_transfer = mass_transfer
     total_mass_transfer = mass_transfer
     if scratch_transfer_mode:
-        work_mass_transfer = scratch_buffers.work_mass_transfer
+        if scratch_buffers_value is None:
+            raise ValueError("scratch_buffers unexpectedly missing")
+        work_mass_transfer = scratch_buffers_value.work_mass_transfer
         if work_mass_transfer is None:
             work_mass_transfer = wp.zeros(
                 expected_shape,
                 dtype=wp.float64,
                 device=device,
             )
-        total_mass_transfer = scratch_buffers.total_mass_transfer
+        total_mass_transfer = scratch_buffers_value.total_mass_transfer
         if total_mass_transfer is None:
             total_mass_transfer = wp.zeros(
                 expected_shape,
