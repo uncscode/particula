@@ -201,10 +201,11 @@ GPU condensation updates gas concentrations in production.
 
 ### Downstream gates and dependency boundaries
 
-The following work remains downstream of E4-F3: E4-F4 latent heat, E4-F5 gas
-coupling and particle-plus-gas conservation, E4-F6 independent-device plus
-graph/autodiff evidence, and E4-F7 final support work. None is implied by the
-fixed-four production step.
+E4-F4 P2 ships a low-level, per-substep latent-heat rate correction with
+CPU-oracle/Warp parity. It does not imply the deferred P3/P4 temperature
+feedback or energy bookkeeping, E4-F5 gas coupling and particle-plus-gas
+conservation, E4-F6 independent-device plus graph/autodiff evidence, or E4-F7
+strategy/runnable and final support work.
 
 - **E2-F2 environment-shape dependency:** the recommendation assumes the shipped
   contract for scalar inputs and explicit direct Warp `(n_boxes,)` environment
@@ -222,7 +223,10 @@ This record does **not** publish:
 - generalized stable timestep limits
 - gas-coupled conservation claims that the current production path does not yet
   satisfy
-- latent-heat, independent-device, graph-capture/replay, or autodiff claims
+- P3/P4 temperature-feedback or energy-bookkeeping claims; E4-F5 gas coupling
+  or conservation claims; or E4-F6 independent-device, graph-capture/replay,
+  or autodiff claims
+- strategy/runnable-level latent-heat support
 
 Later phases can build on this measured baseline and recommendation without
 redefining case shapes, metric names, threshold meaning, or the current

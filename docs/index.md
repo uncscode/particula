@@ -33,9 +33,12 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
   latent-heat energy-density bookkeeping, and the
   `CondensationLatentHeat` strategy with latent-heat-corrected
   `mass_transfer_rate()`/`rate()` plus a `step()` that tracks per-step
-  latent heat diagnostics. The shipped support boundary is CPU-only and
-  does not claim GPU latent-heat parity or temperature-feedback runtime
-  support.
+   latent heat diagnostics. The bounded, low-level direct GPU condensation
+   path optionally applies a latent-rate correction during each of its four
+   equal substeps, with CPU-oracle/Warp parity coverage. Omitted latent heat,
+   or a zero per-species value, retains that species' isothermal rate path.
+   Broader temperature feedback, gas coupling/conservation, energy
+   bookkeeping, and strategy/runnable-level support remain deferred.
 - **Interrogating your experimental data** to validate and expand your impact.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
 

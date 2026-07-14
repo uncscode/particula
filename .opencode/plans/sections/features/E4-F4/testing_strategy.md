@@ -12,9 +12,15 @@ never lowered.
   multi-species sidecars, both sidecars together, finite/nonnegative/shape/
   dtype/device/non-Warp failures, and atomic no-allocation/no-launch/
   no-mutation preflight. CUDA device mismatch remains optional with clean skips.
-- **P2:** In `condensation_test.py`, compare corrected rates with CPU, verify
-  rate reduction, exact zero-latent fallback, four refreshes, determinism, and
-  scratch identity.
+- **P2 (shipped, issue #1298):**
+  `_condensation_test_support.py`, exercised by `condensation_test.py`, extends
+  the CPU four-substep oracle with the same shared surface pressure and latent
+  rate. Regression coverage verifies multi-species activity/Kelvin parity,
+  reduced condensing rate, all-zero and isolated zero-latent exact isothermal
+  behavior, coupled mixed-latent oracle parity, sidecar immutability, malformed
+  latent/thermal-work atomic rejection, four launch ordering, determinism, and
+  complete caller-owned scratch/returned-total identity reuse. Optional CUDA
+  remains cleanly skippable.
 - **P3:** In `condensation_test.py`, verify positive/negative/zero energy and
   whole-call per-box/species `Q = sum(bounded Δm * L)`, including clamped and
   isolated cases.

@@ -16,11 +16,16 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     `particula/gpu/kernels/tests/_condensation_test_support.py` covers valid
     sidecars, metadata/domain failures, and pre-mutation atomicity.
 
-- [ ] **E4-F4-P2:** Per-substep latent-heat correction with parity tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Correct the common E4-F2 surface-pressure rate in all four substeps.
-  - Files: `particula/gpu/kernels/condensation.py`
-  - Tests: Corrected-rate parity, deterministic substeps, fallback, scratch reuse.
+- [x] **E4-F4-P2:** Per-substep latent-heat correction with parity tests
+  - Issue: #1298 | Size: S | Status: Shipped (2026-07-14)
+  - Delivered: applies the correction in all four fixed substeps, sharing one
+    activity/Kelvin surface pressure with pressure-delta logic. Omitted/all-zero
+    latent heat preserves the isothermal path; `thermal_work` remains deferred.
+  - Files: `particula/gpu/kernels/condensation.py`;
+    `particula/gpu/kernels/tests/_condensation_test_support.py`.
+  - Tests: CPU four-substep oracle/Warp parity, mixed and isolated-zero latent
+    cases, rate reduction, validation atomicity, determinism, launch ordering,
+    and scratch reuse/identity.
 
 - [ ] **E4-F4-P3:** Signed whole-call energy bookkeeping with unit tests
   - Issue: TBD | Size: S | Status: Not Started
