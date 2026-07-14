@@ -3,17 +3,18 @@
 Phase issue creation is intentionally deferred until E4 implementation issues
 are generated and scheduled; `TBD` is not an unresolved design decision.
 
-- [ ] **E4-F4-P1:** Warp thermal-resistance helpers and validation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E4-F4-P1:** Warp thermal-resistance helpers and validation with unit tests
+  - Issue: #1297 | Size: S | Status: Shipped (2026-07-14)
   - Goal: Port the fp64 equations from `get_thermal_resistance_factor()` and
     `get_mass_transfer_rate_latent_heat()` before the E4-F3 calculate launch.
-  - Files: `particula/gpu/dynamics/condensation_funcs.py` (new private Warp
-    thermal-factor/rate helpers, roughly 60--100 production LOC) and
-    `particula/gpu/kernels/condensation.py` (keyword-only latent-sidecar
-    preflight, roughly 20--40 production LOC).
-  - Tests: `particula/gpu/dynamics/tests/condensation_funcs_test.py` CPU-formula
-    parity plus `particula/gpu/kernels/tests/condensation_test.py` value, shape,
-    dtype, device, and pre-mutation rejection coverage.
+  - Delivered: private fp64 conductivity, thermal-factor, and corrected-rate
+    helpers; atomic keyword-only `(n_species,)` `latent_heat` and
+    `thermal_work` preflight. P1 validates but neither consumes nor mutates the
+    sidecars, and does not change the production isothermal calculate launch.
+  - Tests: `particula/gpu/dynamics/tests/condensation_funcs_test.py` covers CPU
+    formula parity and exact zero-latent identity;
+    `particula/gpu/kernels/tests/_condensation_test_support.py` covers valid
+    sidecars, metadata/domain failures, and pre-mutation atomicity.
 
 - [ ] **E4-F4-P2:** Per-substep latent-heat correction with parity tests
   - Issue: TBD | Size: S | Status: Not Started

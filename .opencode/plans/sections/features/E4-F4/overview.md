@@ -9,6 +9,14 @@ Warp code makes each E4-F3 substep physically consistent. A whole-call
 diagnostic based on bounded applied mass gives a deterministic `Q = Δm L`
 audit trail without host transfers or container schema changes.
 
+**P1 Delivered (issue #1297):** Private fp64 Warp conductivity,
+thermal-resistance, and latent-corrected-rate helpers now reproduce the CPU
+formulas, including exact zero-latent isothermal helper behavior.
+`condensation_step_gpu()` now atomically validates optional caller-owned
+`latent_heat` and `thermal_work` fp64 `(n_species,)` sidecars before any work.
+They are validation-only and remain unused and unmodified; production rate
+correction and energy diagnostics remain future phases.
+
 **User Stories:**
 - As a simulation user, I want latent heat to reduce GPU condensation rates so
   Warp results agree with CPU reference physics.

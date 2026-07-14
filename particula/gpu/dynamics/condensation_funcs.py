@@ -2,7 +2,9 @@
 
 These functions mirror NumPy implementations in
 ``particula.particles.properties`` and
-``particula.dynamics.condensation.mass_transfer``.
+``particula.dynamics.condensation.mass_transfer``. Private thermal helpers
+use fp64 equations for the P1 latent-heat foundation; P1 does not integrate
+their latent correction into the condensation step.
 """
 
 import warp as wp
@@ -91,9 +93,17 @@ def mass_transfer_rate_wp(
 
 @wp.func
 def _thermal_conductivity_wp(temperature: wp.float64) -> wp.float64:
-    """Calculate air thermal conductivity [W/(m·K)].
+    """Calculate air thermal conductivity from temperature.
 
-    Port of Seinfeld and Pandis, Equation 17.54.
+    Args:
+        temperature: Air temperature [K].
+
+    Returns:
+        Air thermal conductivity [W/(m·K)].
+
+    References:
+        Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry
+        and Physics*, Equation 17.54.
     """
     return wp.float64(1e-3) * (
         wp.float64(4.39) + wp.float64(0.071) * temperature
@@ -110,9 +120,22 @@ def _thermal_resistance_factor_wp(
     molar_mass: wp.float64,
     gas_constant: wp.float64,
 ) -> wp.float64:
-    """Calculate the latent-heat thermal resistance factor [J/kg].
+    """Calculate the latent-heat thermal resistance factor.
 
-    Port of Topping and Bane (2022), Equation 2.36.
+    Args:
+        diffusion_coefficient: Vapor diffusion coefficient [m²/s].
+        latent_heat: Species latent heat [J/kg].
+        vapor_pressure_surface: Surface vapor pressure [Pa].
+        thermal_conductivity: Air thermal conductivity [W/(m·K)].
+        temperature: Gas temperature [K].
+        molar_mass: Species molar mass [kg/mol].
+        gas_constant: Universal gas constant [J/(mol·K)].
+
+    Returns:
+        Thermal resistance factor [J/kg].
+
+    References:
+        Topping, D. O., & Bane, M. K. (2022), Equation 2.36.
     """
     r_specific = gas_constant / molar_mass
     diffusion_term = (
@@ -138,10 +161,28 @@ def _mass_transfer_rate_latent_heat_wp(
     diffusion_coefficient: wp.float64,
     gas_constant: wp.float64,
 ) -> wp.float64:
-    """Calculate latent-corrected condensation mass transfer [kg/s].
+    """Calculate the latent-corrected condensation mass transfer rate.
 
-    Port of Topping and Bane (2022), Equation 2.36. Zero latent heat returns
-    the isothermal helper result exactly.
+    A zero latent heat returns ``mass_transfer_rate_wp`` exactly, preserving
+    the isothermal result.
+
+    Args:
+        pressure_delta: Gas-to-particle partial-pressure difference [Pa].
+        first_order_mass_transport: First-order mass transport coefficient
+            [m³/s].
+        temperature: Gas temperature [K].
+        molar_mass: Species molar mass [kg/mol].
+        latent_heat: Species latent heat [J/kg].
+        thermal_conductivity: Air thermal conductivity [W/(m·K)].
+        vapor_pressure_surface: Surface vapor pressure [Pa].
+        diffusion_coefficient: Vapor diffusion coefficient [m²/s].
+        gas_constant: Universal gas constant [J/(mol·K)].
+
+    Returns:
+        Latent-corrected mass transfer rate [kg/s].
+
+    References:
+        Topping, D. O., & Bane, M. K. (2022), Equation 2.36.
     """
     if latent_heat == wp.float64(0.0):
         return mass_transfer_rate_wp(
