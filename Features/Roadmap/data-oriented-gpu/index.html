@@ -16402,22 +16402,23 @@ not raw speed, is the main precision driver.</p>
 <h3 id="time-scale-stiffness">Time-Scale Stiffness<a class="headerlink" href="#time-scale-stiffness" title="Permanent link">&para;</a></h3>
 <p>The same NPF-to-droplet range that stresses mass precision also stresses time
 integration: nanometer particles equilibrate with vapor in microseconds while
-cloud droplets evolve over seconds. P2/P3 recorded the current particle-only
-explicit timestep grid and compared two deterministic fixed-shape candidates;
-P4 turns that evidence into a development recommendation without expanding the
-shipped runtime boundary.</p>
+cloud droplets evolve over seconds. E4-F3 ships the particle-only direct GPU
+step with exactly four equal substeps. P2/P3 candidate comparisons are retained
+only as historical evidence and do not expand the shipped runtime boundary.</p>
 <ul>
 <li>Detailed evidence lives in
   <a href="../condensation-stiffness-study/"><code>condensation-stiffness-study.md</code></a>,
   including the recorded explicit grid, the candidate comparison, and the
   particle-only gas-update caveat.</li>
-<li>Later GPU condensation work should build on fixed-count explicit
-  sub-stepping, specifically <code>fixed_count_substeps_4</code>, because it has the best
-  documented agreement with the current CPU/explicit reference while preserving
-  deterministic fixed-shape buffer reuse.</li>
-<li>Keep the implementation graph-capture-friendly and autodiff-compatible:
-  fixed iteration counts, stable allocation layouts, and no adaptive or
-  data-dependent loop bounds on the recommended path.</li>
+<li>Every successful <code>condensation_step_gpu(...)</code> call runs four <code>time_step / 4.0</code>
+  substeps. Each optionally refreshes composition-weighted surface tension,
+  refreshes vapor pressure and environment properties, produces a raw proposal,
+  then applies and accumulates mass-clamped transfer.</li>
+<li>The case-specific stiffness evidence and limitations are in the
+  <a href="../condensation-stiffness-study/">condensation stiffness study</a>; its recorded
+  thresholds are not general accuracy or stable-timestep limits.</li>
+<li>Adaptive stepping, graph capture/replay, and autodiff readiness are not
+  shipped claims.</li>
 <li>Do not claim gas-coupled GPU production support until the production hook and
   same-issue conservation regression in
   <code>particula/integration_tests/condensation_particle_resolved_test.py</code> land.</li>
@@ -16693,17 +16694,30 @@ pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<s
 <p>The current executable CPU integration baseline remains
 <code>particula/integration_tests/condensation_latent_heat_conservation_test.py</code>.
 Temperature-feedback runtime support and latent-heat parity remain future Epic D goals.</p>
+<p>E4-F3 is shipped. Import its only step entry point with
+<code>from particula.gpu.kernels import condensation_step_gpu</code>. When reusable scratch
+is needed, <code>CondensationScratchBuffers</code> is intentionally concrete-module-only
+at <code>particula.gpu.kernels.condensation.CondensationScratchBuffers</code>; it is not a
+second entry point. Supplied transfer fields have shape
+<code>(n_boxes, n_particles, n_species)</code> and property fields <code>(n_boxes,)</code>; each must
+be stable-shape, active-device <code>wp.float64</code>. Fields can be omitted
+independently, using fallback allocations. Supplied buffers preserve identity
+and remain caller-owned, alive, and unmodified through launch completion. The
+step executes four equal <code>time_step / 4.0</code> substeps: each optionally refreshes
+composition-weighted surface tension, overwrites <code>gas.vapor_pressure</code>, refreshes
+environment properties, produces a raw proposal, then applies and accumulates
+its mass-clamped transfer. It clears its total buffer once after preflight,
+accumulates applied clamped transfer, and retains only the final raw proposal in
+work storage. It mutates particle masses in place, leaves <code>gas.concentration</code>
+unchanged, and makes no hidden CPU↔Warp transfers. Validation may read device
+metadata or thermodynamic inputs but does not transfer or mutate caller state.</p>
 <p>Remaining feature ownership:</p>
 <ol>
-<li>E4-F3: fixed four-substep orchestration based on the
-   <code>fixed_count_substeps_4</code> recommendation from the
-   <a href="../condensation-stiffness-study/">condensation stiffness study</a>.</li>
 <li>E4-F4: latent-heat correction and energy diagnostics, including the CPU
    reference context in the <a href="../../../Theory/Technical/Dynamics/Condensation_Equations/#condensation-with-latent-heat">condensation
    equations</a>.</li>
 <li>E4-F5: gas-coupled inventory, partitioning, and conservation evidence.</li>
-<li>E4-F6: broader independent Warp/CUDA parity, conservation, and readiness
-   evidence.</li>
+<li>E4-F6: broader independent-device, graph-capture, and autodiff evidence.</li>
 <li>E4-F7: the final support contract, examples, troubleshooting, and support
    matrix.</li>
 </ol>
@@ -17198,7 +17212,7 @@ coagulation and state-representation decisions are recorded.</p>
 <tr>
 <td>Time-scale stiffness across NPF-to-droplet range</td>
 <td>Unstable or wastefully slow explicit stepping</td>
-<td>Build later GPU condensation integration from the shipped <code>fixed_count_substeps_4</code> recommendation while keeping gas-coupled production support gated</td>
+<td>Use the shipped four-substep particle-only direct condensation step; retain case-specific evidence in the stiffness study and keep gas coupling, latent heat, independent-device, graph, and autodiff work gated</td>
 </tr>
 <tr>
 <td>No fully integrated GPU-ready per-box thermodynamic runtime path</td>

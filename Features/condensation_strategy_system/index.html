@@ -11666,6 +11666,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#low-level-warp-gpu-condensation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Low-level Warp GPU condensation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -15012,6 +15029,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Best Practices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#low-level-warp-gpu-condensation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Low-level Warp GPU condensation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -15720,6 +15754,37 @@ condensing species.</p>
 <li><strong>Sub-step when composing processes</strong>: Increase <code>sub_steps</code> to reduce
    operator-splitting error when coupling with wall loss or coagulation.</li>
 </ol>
+<h3 id="low-level-warp-gpu-condensation">Low-level Warp GPU condensation<a class="headerlink" href="#low-level-warp-gpu-condensation" title="Permanent link">&para;</a></h3>
+<p>This is a direct low-level Warp path, separate from the CPU strategies and the
+<code>MassCondensation</code> runnable described above. Its canonical step import is:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">condensation_step_gpu</span>
+</code></pre></div>
+<p>When reusable scratch is needed, import <code>CondensationScratchBuffers</code> only from
+<code>particula.gpu.kernels.condensation</code>. That concrete-module-only sidecar is not
+a second step entry point. Its transfer fields have shape
+<code>(n_boxes, n_particles, n_species)</code> and its property fields have shape
+<code>(n_boxes,)</code>. Each supplied field must be active-device, stable-shape
+<code>wp.float64</code>; fields may be omitted independently and use fallback allocations.
+Supplied buffers preserve identity and callers must keep them alive and
+unmodified through launch completion.</p>
+<p>Every successful call executes exactly four <code>time_step / 4.0</code> substeps. Each
+substep optionally refreshes composition-weighted surface tension, overwrites
+<code>gas.vapor_pressure</code>, refreshes environment properties, produces a raw transfer
+proposal, and applies and accumulates its mass-clamped transfer. The resolved
+total transfer buffer is cleared once after preflight, accumulates applied
+clamped transfer, and is returned by identity when supplied. Work storage keeps
+only the final raw proposal. Particle masses are mutated in place, while
+<code>gas.concentration</code> remains unchanged. Production calculations make no hidden
+CPU↔Warp transfers; validation-only device reads do not transfer or mutate
+caller buffers.</p>
+<p>This direct step does not claim CPU-strategy parity, <code>Runnable</code> composition,
+adaptive stepping, gas coupling or conservation, latent heat, graph
+capture/replay, or autodiff readiness. For its focused coverage, run:</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/gpu/kernels/tests/condensation_stiffness_test.py<span class="w"> </span>-q
+</code></pre></div>
+<p>Warp-backed tests may skip when Warp is missing. CUDA evidence is optional when
+CUDA is unavailable; a skip is not GPU execution.</p>
 <h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Staggered solver is Gauss-Seidel only; other solvers are not exposed.</li>

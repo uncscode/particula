@@ -11613,10 +11613,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#recommended-implementation-foundation" class="md-nav__link">
+  <a href="#shipped-fixed-four-implementation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Recommended implementation foundation
+        Shipped fixed-four implementation
       
     </span>
   </a>
@@ -11646,10 +11646,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dependency-boundaries-that-still-limit-the-recommendation" class="md-nav__link">
+  <a href="#downstream-gates-and-dependency-boundaries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Dependency boundaries that still limit the recommendation
+        Downstream gates and dependency boundaries
       
     </span>
   </a>
@@ -14498,10 +14498,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#recommended-implementation-foundation" class="md-nav__link">
+  <a href="#shipped-fixed-four-implementation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Recommended implementation foundation
+        Shipped fixed-four implementation
       
     </span>
   </a>
@@ -14531,10 +14531,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#dependency-boundaries-that-still-limit-the-recommendation" class="md-nav__link">
+  <a href="#downstream-gates-and-dependency-boundaries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Dependency boundaries that still limit the recommendation
+        Downstream gates and dependency boundaries
       
     </span>
   </a>
@@ -14581,18 +14581,26 @@
 
 
 <h1 id="condensation-stiffness-study-and-recommendation-record">Condensation Stiffness Study and Recommendation Record<a class="headerlink" href="#condensation-stiffness-study-and-recommendation-record" title="Permanent link">&para;</a></h1>
-<p>This note is the canonical decision record for future GPU condensation
-integration work. It separates the current shipped runtime boundary, the
-measured P2/P3 evidence, and the final P4 recommendation derived from that
-evidence. The current production GPU path remains particle-only and <code>float64</code>
-bounded; this page does not claim that gas-coupled production condensation has
-shipped.</p>
+<p>This note is the canonical decision record for GPU condensation integration.
+The shipped production path uses four fixed equal substeps; P2/P3 candidate
+comparisons remain historical evidence only. The current production GPU path
+remains particle-only and <code>float64</code> bounded; this page does not claim that
+gas-coupled production condensation has shipped.</p>
 <h2 id="current-runtime-scope">Current Runtime Scope<a class="headerlink" href="#current-runtime-scope" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Production path: explicit fixed-step GPU condensation.</li>
+<li>Production path: explicit fixed-four GPU condensation. Every successful
+  <code>condensation_step_gpu(...)</code> call performs exactly four <code>time_step / 4.0</code>
+  substeps.</li>
 <li>Particle update: particle masses are clamped to remain non-negative.</li>
 <li>Gas update: the current Warp path is particle-only and does not yet update gas
   concentrations during production condensation.</li>
+<li>Per-substep order: optionally refresh composition-weighted surface tension,
+  overwrite <code>gas.vapor_pressure</code>, refresh environment properties, produce a raw
+  transfer proposal, then apply and accumulate its mass-clamped transfer.</li>
+<li>Transfer buffers: the resolved total transfer is cleared once after preflight
+  and accumulates applied clamped transfer over all four substeps. A supplied
+  total buffer is returned by identity; the separate work buffer retains only
+  the final raw proposal.</li>
 <li>Baseline backend for this phase: <code>np.float64</code> inputs and Warp CPU execution.</li>
 <li>Accepted study inputs: scalar <code>temperature</code> and <code>pressure</code>, direct Warp
   arrays with shape <code>(n_boxes,)</code>, and the tested hybrid mode where one direct
@@ -14766,7 +14774,7 @@ zero-mass growth, and non-finite values. This is recorded-grid evidence for the
 current fixed-shape particle-only path, not a gas-coupled conservation result
 and not a general stable-timestep limit for other cases.</p>
 <h2 id="candidate-evaluation-evidence">Candidate Evaluation Evidence<a class="headerlink" href="#candidate-evaluation-evidence" title="Permanent link">&para;</a></h2>
-<p>This phase adds two deterministic prototype candidates implemented in
+<p>P2/P3 recorded two deterministic prototype candidates implemented in
 <code>particula/gpu/kernels/tests/_condensation_test_support.py</code> and collected
 through <code>particula/gpu/kernels/tests/condensation_stiffness_test.py</code>. They
 remain test-local evidence only; the public <code>condensation_step_gpu(...)</code>
@@ -14788,13 +14796,13 @@ hook shipped, and no new private production helper was added.</p>
 <tbody>
 <tr>
 <td><code>fixed_count_substeps_4</code></td>
-<td>Fixed-count explicit sub-stepping</td>
+<td>Historical P2/P3 fixed-count explicit sub-stepping evidence; its fixed-four behavior is now shipped.</td>
 <td>Pass: one caller-owned <code>mass_transfer</code> array plus fixed-shape <code>work</code>/<code>accumulator</code> scratch reused across runs.</td>
 <td>Pass: repeated runs for named stiffness cases produce identical arrays.</td>
 <td>Pass: candidate tests require finite outputs and <code>&gt;= 0</code> particle masses.</td>
-<td>Pass within documented <code>rtol &lt;= 5e-2</code> at the baseline timestep and <code>max relative error &lt;= 5e-2</code> across the recorded grid. These recorded bounds are evidence, not a shipped production tolerance.</td>
-<td>Pass: fixed loop count (<code>4</code>) and fixed-shape scratch keep the prototype graph-capture-friendly.</td>
-<td>Clamp boundaries are still non-smooth, but there are no data-dependent loop counts.</td>
+<td>Pass within documented <code>rtol &lt;= 5e-2</code> at the baseline timestep and <code>max relative error &lt;= 5e-2</code> across the recorded grids for <code>nanometer</code>, <code>accumulation_mode</code>, and <code>droplet_like</code>. These bounds are case-specific evidence, not a general accuracy tolerance or stable-timestep limit.</td>
+<td>Not evaluated as production graph-capture evidence.</td>
+<td>Not evaluated as production autodiff evidence.</td>
 </tr>
 <tr>
 <td><code>asymptotic_relaxation</code></td>
@@ -14825,39 +14833,37 @@ hook shipped, and no new private production helper was added.</p>
   production helper was added to <code>particula/gpu/kernels/condensation.py</code>.</li>
 </ul>
 <h2 id="final-recommendation">Final Recommendation<a class="headerlink" href="#final-recommendation" title="Permanent link">&para;</a></h2>
-<h3 id="recommended-implementation-foundation">Recommended implementation foundation<a class="headerlink" href="#recommended-implementation-foundation" title="Permanent link">&para;</a></h3>
-<p>Later GPU condensation implementation phases should build on
-<code>fixed_count_substeps_4</code> as the preferred integration foundation.</p>
+<h3 id="shipped-fixed-four-implementation">Shipped fixed-four implementation<a class="headerlink" href="#shipped-fixed-four-implementation" title="Permanent link">&para;</a></h3>
+<p><code>fixed_count_substeps_4</code> is the shipped production integration behavior of
+<code>condensation_step_gpu(...)</code>, not a future prototype. Each valid call uses four
+equal substeps, updates particle masses in place, leaves
+<code>gas.concentration</code> unchanged, and keeps production calculations device
+resident.</p>
 <p>Why this is the recommended path:</p>
 <ul>
-<li>It has the strongest recorded agreement with the current CPU/explicit
-  reference, with documented <code>rtol &lt;= 5e-2</code> at the baseline timestep and
-  <code>max relative error &lt;= 5e-2</code> across the recorded grid.</li>
-<li>It preserves deterministic fixed-shape execution with caller-owned buffer
-  reuse and fixed scratch layouts across repeated runs.</li>
-<li>Its fixed loop count (<code>4</code>) is graph-capture-friendly in a way adaptive or
-  data-dependent loop counts are not.</li>
-<li>It fits Warp autodiff expectations better than dynamic-loop schemes because
-  the repeated work is statically bounded even though clamp boundaries remain
-  non-smooth.</li>
-<li>Its evidence quality is materially stronger than the asymptotic alternative,
-  so it provides the clearest foundation for later production work.</li>
+<li>The historical P2/P3 comparison recorded <code>rtol &lt;= 5e-2</code> at the baseline
+  timestep and maximum relative error <code>&lt;= 5e-2</code> only for the named
+  <code>nanometer</code>, <code>accumulation_mode</code>, and <code>droplet_like</code> grids.</li>
+<li>Successful calls preserve supplied total-buffer identity, clear that total
+  once after preflight, and accumulate applied mass-clamped transfer. A
+  separate work buffer retains the final raw proposal.</li>
+<li><code>CondensationScratchBuffers</code> remains a concrete-module-only sidecar. Its
+  supplied active-device, stable-shape <code>wp.float64</code> fields may be omitted
+  independently, in which case the step allocates fallback buffers.</li>
+<li>This shipped behavior does not establish graph capture/replay or autodiff
+  readiness.</li>
 </ul>
 <h3 id="alternatives-considered-but-not-selected">Alternatives considered but not selected<a class="headerlink" href="#alternatives-considered-but-not-selected" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Current single-step explicit update:</strong> keep as the shipped baseline only.
-  It is still useful as the production reference path, but it is not a strong
-  forward-looking foundation for broader stiffness handling across the recorded
-  particle-size range.</li>
+<li><strong>Historical single-step explicit update:</strong> retained only as a P2/P3
+  comparison baseline; it is not the shipped production path.</li>
 <li><strong><code>asymptotic_relaxation</code>:</strong> retain as evidence-only. It remains interesting
   for differentiability because the algebra is smooth away from clamp
   boundaries, but the measured CPU-reference agreement is materially looser
   (<code>rtol &lt;= 3.5e-1</code> / <code>max relative error &lt;= 3.5e-1</code>) than the fixed-count
   candidate.</li>
-<li><strong>Adaptive or dynamic-loop schemes:</strong> defer. They conflict with the fixed
-  iteration count and stable allocation layout preferred for Warp graph capture,
-  and they complicate autodiff replay because backward passes do not reliably
-  mirror data-dependent loop structure.</li>
+<li><strong>Adaptive or dynamic-loop schemes:</strong> deferred; no adaptive-stepping support
+  is documented by this record.</li>
 </ul>
 <h3 id="gas-coupled-follow-up-gate">Gas-coupled follow-up gate<a class="headerlink" href="#gas-coupled-follow-up-gate" title="Permanent link">&para;</a></h3>
 <p>The recommendation remains bounded to particle-only production condensation.
@@ -14866,7 +14872,11 @@ plus same-issue particle-plus-gas conservation regression coverage in
 <code>particula/integration_tests/condensation_particle_resolved_test.py</code>.
 Until that gate lands, roadmap and implementation guidance must not claim that
 GPU condensation updates gas concentrations in production.</p>
-<h3 id="dependency-boundaries-that-still-limit-the-recommendation">Dependency boundaries that still limit the recommendation<a class="headerlink" href="#dependency-boundaries-that-still-limit-the-recommendation" title="Permanent link">&para;</a></h3>
+<h3 id="downstream-gates-and-dependency-boundaries">Downstream gates and dependency boundaries<a class="headerlink" href="#downstream-gates-and-dependency-boundaries" title="Permanent link">&para;</a></h3>
+<p>The following work remains downstream of E4-F3: E4-F4 latent heat, E4-F5 gas
+coupling and particle-plus-gas conservation, E4-F6 independent-device plus
+graph/autodiff evidence, and E4-F7 final support work. None is implied by the
+fixed-four production step.</p>
 <ul>
 <li><strong>E2-F2 environment-shape dependency:</strong> the recommendation assumes the shipped
   contract for scalar inputs and explicit direct Warp <code>(n_boxes,)</code> environment
@@ -14883,6 +14893,7 @@ GPU condensation updates gas concentrations in production.</p>
 <li>generalized stable timestep limits</li>
 <li>gas-coupled conservation claims that the current production path does not yet
   satisfy</li>
+<li>latent-heat, independent-device, graph-capture/replay, or autodiff claims</li>
 </ul>
 <p>Later phases can build on this measured baseline and recommendation without
 redefining case shapes, metric names, threshold meaning, or the current
