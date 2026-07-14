@@ -823,6 +823,33 @@ def _validate_energy_transfer_buffer(
         raise ValueError(f"energy_transfer must use dtype {wp.float64}")
 
 
+def _warp_array_memory_range(array: Any) -> tuple[int, int]:
+    """Return the contiguous byte range owned by a Warp array."""
+    start = int(array.ptr)
+    item_count = int(np.prod(array.shape, dtype=np.int64))
+    return start, start + item_count * np.dtype(np.float64).itemsize
+
+
+def _validate_energy_transfer_ownership(
+    energy_transfer: Any,
+    mutable_arrays: tuple[Any, ...],
+) -> None:
+    """Reject energy output storage that overlaps mutable step state."""
+    output_start, output_end = _warp_array_memory_range(energy_transfer)
+    for array in mutable_arrays:
+        if array is None or not _is_warp_array_like(array):
+            continue
+        if energy_transfer is array:
+            raise ValueError(
+                "energy_transfer must not overlap mutable condensation state"
+            )
+        array_start, array_end = _warp_array_memory_range(array)
+        if output_start < array_end and array_start < output_end:
+            raise ValueError(
+                "energy_transfer must not overlap mutable condensation state"
+            )
+
+
 def _validate_particle_arrays(
     particles: Any,
     n_boxes: int,
@@ -1178,6 +1205,39 @@ def condensation_step_gpu(  # noqa: C901
                 "mass_transfer conflicts with supplied scratch transfer "
                 "buffers in condensation_step_gpu."
             )
+
+    if energy_transfer is not None:
+        _validate_energy_transfer_ownership(
+            energy_transfer,
+            (
+                particles.masses,
+                particles.concentration,
+                particles.density,
+                particles.charge,
+                particles.volume,
+                gas.molar_mass,
+                gas.concentration,
+                gas.vapor_pressure,
+                latent_heat,
+                thermal_work,
+                surface_tension,
+                mass_accommodation,
+                diffusion_coefficient_vapor,
+                mass_transfer,
+                scratch_buffers.work_mass_transfer
+                if scratch_buffers is not None
+                else None,
+                scratch_buffers.total_mass_transfer
+                if scratch_buffers is not None
+                else None,
+                scratch_buffers.dynamic_viscosity
+                if scratch_buffers is not None
+                else None,
+                scratch_buffers.mean_free_path
+                if scratch_buffers is not None
+                else None,
+            ),
+        )
 
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature=temperature,

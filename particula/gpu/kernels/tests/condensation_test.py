@@ -109,6 +109,9 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
     assert "test_condensation_energy_transfer_preflight_is_atomic" in (
         EXPORTED_CONDENSATION_TESTS
     )
+    assert "test_condensation_energy_transfer_alias_preflight_is_atomic" in (
+        EXPORTED_CONDENSATION_TESTS
+    )
     assert (
         "test_condensation_energy_transfer_cuda_matches_box_species_oracle"
         in EXPORTED_CONDENSATION_TESTS
