@@ -113,6 +113,67 @@ class CondensationActivitySurfaceConfig:
     molar_mass_reference: Any
 
 
+@dataclass(frozen=True)
+class CondensationScratchBuffers:
+    """Own reusable stable-shape buffers for one P1 condensation update.
+
+    This concrete-module-only sidecar is intentionally not exported.
+    Non-``None``
+    fields are caller-owned, active-device ``wp.float64`` arrays with stable
+    shapes: both transfer fields have shape
+    ``(n_boxes, n_particles, n_species)`` and both property fields have shape
+    ``(n_boxes,)``. Successful calls preserve each supplied object's identity.
+    P1 performs exactly one update: work and total transfers contain the same
+    raw pre-clamp transfer, and the supplied total buffer is returned by
+    identity. Callers must keep arrays alive and unmodified until launched work
+    completes; reuse them only after successful completion. Complete metadata
+    validation precedes allocation, normalization, refresh, launch, and
+    mutation, so validation failures leave caller-owned state unchanged.
+    """
+
+    work_mass_transfer: Any | None = None
+    total_mass_transfer: Any | None = None
+    dynamic_viscosity: Any | None = None
+    mean_free_path: Any | None = None
+
+
+def validate_condensation_scratch_buffers(
+    candidate: CondensationScratchBuffers | Any,
+    dimensions: tuple[int, int, int],
+    device: Any,
+    caller_name: str,
+) -> CondensationScratchBuffers:
+    """Validate scratch metadata without allocation, reads, or mutation.
+
+    This is an atomic metadata-only gate. It neither reads nor writes supplied
+    arrays, allocates fallback buffers, launches Warp work, or synchronizes.
+    """
+    if type(candidate) is not CondensationScratchBuffers:
+        raise ValueError(
+            "scratch_buffers must be a CondensationScratchBuffers "
+            f"in {caller_name}."
+        )
+    n_boxes, n_particles, n_species = dimensions
+    for name, shape in (
+        ("work_mass_transfer", (n_boxes, n_particles, n_species)),
+        ("total_mass_transfer", (n_boxes, n_particles, n_species)),
+        ("dynamic_viscosity", (n_boxes,)),
+        ("mean_free_path", (n_boxes,)),
+    ):
+        values = getattr(candidate, name)
+        if values is not None:
+            _validate_array_metadata(
+                name,
+                values,
+                shape,
+                wp.float64,
+                device,
+                caller_name,
+                "scratch_buffers",
+            )
+    return candidate
+
+
 def _validate_int32_selector(
     name: str, value: Any, allowed: tuple[int, ...]
 ) -> int:
@@ -510,6 +571,24 @@ def apply_mass_transfer_kernel(
         masses[box_idx, particle_idx, species_idx] = updated_mass
 
 
+@wp.kernel
+# type: ignore[misc]
+def apply_mass_transfer_with_total_kernel(
+    masses: Any,
+    work_mass_transfer: Any,
+    total_mass_transfer: Any,
+) -> None:
+    """Apply work transfer while storing the matching raw P1 total."""
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
+    for species_idx in range(masses.shape[2]):
+        transfer = work_mass_transfer[box_idx, particle_idx, species_idx]
+        total_mass_transfer[box_idx, particle_idx, species_idx] = transfer
+        updated_mass = masses[box_idx, particle_idx, species_idx] + transfer
+        if updated_mass < wp.float64(0.0):
+            updated_mass = wp.float64(0.0)
+        masses[box_idx, particle_idx, species_idx] = updated_mass
+
+
 def _validate_species_array(
     name: str,
     array: Any,
@@ -696,6 +775,7 @@ def condensation_step_gpu(  # noqa: C901
     environment: Any | None = None,
     thermodynamics: ThermodynamicsConfig | Any | None = None,
     activity_surface: CondensationActivitySurfaceConfig | Any | None = None,
+    scratch_buffers: CondensationScratchBuffers | Any | None = None,
 ) -> tuple[Any, Any]:
     """Execute one condensation timestep on the GPU.
 
@@ -726,6 +806,16 @@ def condensation_step_gpu(  # noqa: C901
             unit activity. Static tension uses the current condensing-species
             index, while weighted tension uses one particle-wide value. ``None``
             retains legacy unit activity and species-indexed static tension.
+        scratch_buffers: Optional frozen caller-owned P1 buffers. Supplied
+            transfer fields have shape ``(n_boxes, n_particles, n_species)``;
+            supplied property fields have shape ``(n_boxes,)``. Every supplied
+            field must be active-device ``wp.float64``. Fields may be omitted
+            independently and use step-local fallback allocation. A supplied
+            total transfer buffer is returned by identity; P1 work and total
+            contain the same raw pre-clamp transfer. Validation is performed
+            before allocation or mutation. Arrays must remain alive and
+            unmodified until launched work completes and may be reused only
+            after a successful completion.
 
     Returns:
         Tuple of the particle data with in-place updated masses and the raw,
@@ -838,6 +928,22 @@ def condensation_step_gpu(  # noqa: C901
     if mass_transfer is not None:
         _validate_mass_transfer_buffer(mass_transfer, expected_shape, device)
 
+    if scratch_buffers is not None:
+        scratch_buffers = validate_condensation_scratch_buffers(
+            scratch_buffers,
+            expected_shape,
+            device,
+            "condensation_step_gpu",
+        )
+        if mass_transfer is not None and (
+            scratch_buffers.work_mass_transfer is not None
+            or scratch_buffers.total_mass_transfer is not None
+        ):
+            raise ValueError(
+                "mass_transfer conflicts with supplied scratch transfer "
+                "buffers in condensation_step_gpu."
+            )
+
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature=temperature,
         pressure=pressure,
@@ -871,14 +977,45 @@ def condensation_step_gpu(  # noqa: C901
             device=device,
         )
 
-    if mass_transfer is None:
+    scratch_transfer_mode = scratch_buffers is not None and (
+        scratch_buffers.work_mass_transfer is not None
+        or scratch_buffers.total_mass_transfer is not None
+    )
+    if mass_transfer is None and not scratch_transfer_mode:
         mass_transfer = wp.zeros(
             expected_shape,
             dtype=wp.float64,
             device=device,
         )
-    dynamic_viscosity = wp.zeros((n_boxes,), dtype=wp.float64, device=device)
-    mean_free_path = wp.zeros((n_boxes,), dtype=wp.float64, device=device)
+    work_mass_transfer = mass_transfer
+    total_mass_transfer = mass_transfer
+    if scratch_transfer_mode:
+        work_mass_transfer = scratch_buffers.work_mass_transfer
+        if work_mass_transfer is None:
+            work_mass_transfer = wp.zeros(
+                expected_shape,
+                dtype=wp.float64,
+                device=device,
+            )
+        total_mass_transfer = scratch_buffers.total_mass_transfer
+        if total_mass_transfer is None:
+            total_mass_transfer = wp.zeros(
+                expected_shape,
+                dtype=wp.float64,
+                device=device,
+            )
+    dynamic_viscosity = (
+        scratch_buffers.dynamic_viscosity
+        if scratch_buffers is not None
+        and scratch_buffers.dynamic_viscosity is not None
+        else wp.zeros((n_boxes,), dtype=wp.float64, device=device)
+    )
+    mean_free_path = (
+        scratch_buffers.mean_free_path
+        if scratch_buffers is not None
+        and scratch_buffers.mean_free_path is not None
+        else wp.zeros((n_boxes,), dtype=wp.float64, device=device)
+    )
     kappas = wp.zeros(n_species, dtype=wp.float64, device=device)
     molar_mass_reference = gas.molar_mass
     activity_enabled = wp.int32(0)
@@ -976,16 +1113,24 @@ def condensation_step_gpu(  # noqa: C901
             wp.float64(constants.BOLTZMANN_CONSTANT),
             refresh_temperature,
             wp.float64(time_step),
-            mass_transfer,
+            work_mass_transfer,
         ],
         device=device,
     )
 
     wp.launch(
-        apply_mass_transfer_kernel,
+        (
+            apply_mass_transfer_with_total_kernel
+            if scratch_transfer_mode
+            else apply_mass_transfer_kernel
+        ),
         dim=(n_boxes, n_particles),
-        inputs=[particles.masses, mass_transfer],
+        inputs=(
+            [particles.masses, work_mass_transfer, total_mass_transfer]
+            if scratch_transfer_mode
+            else [particles.masses, mass_transfer]
+        ),
         device=device,
     )
 
-    return particles, mass_transfer
+    return particles, total_mass_transfer
