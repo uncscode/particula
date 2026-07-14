@@ -31,14 +31,21 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     applied-total and raw-work semantics, forced evaporation clamp behavior,
     determinism, finite nonnegative mass, and unchanged gas concentration.
 
-- [ ] **E4-F3-P3:** Promote issue 1272 stiffness and buffer-reuse validation coverage
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Move selected candidate evidence onto the production Warp path without
-    weakening recorded validation signals.
+- [x] **E4-F3-P3:** Promote issue 1272 stiffness and buffer-reuse validation coverage
+  - Issue: #1294 | Size: S | Status: Shipped (2026-07-13)
+  - Delivered: Moved the selected recorded stiffness matrix to discoverable
+    production `condensation_step_gpu()` tests without changing production code
+    or APIs. The wrapper exports only production-prefixed evidence, and the
+    cached Warp CPU matrix reuses one complete sidecar while rebuilding inputs
+    per execution. Records verify fixed-four reference bounds, exact repeated
+    output, stale-input vapor-pressure refresh, unchanged gas concentration,
+    complete scratch identity, finite/nonnegative and zero-mass state, and
+    nonzero accumulated transfer.
   - Files: `particula/gpu/kernels/tests/_condensation_test_support.py`,
     `particula/gpu/kernels/tests/condensation_stiffness_test.py`
-  - Tests: nanometer, accumulation-mode, and droplet-like grids; `rtol=5e-2`
-    recorded bounds; Warp CPU parity; optional CUDA; stable repeated reuse.
+  - Tests: nanometer, accumulation-mode, and droplet-like grids; case-specific
+    `rtol=5e-2` and maximum-relative-error recorded bounds; required Warp CPU;
+    one optional marked CUDA droplet-like slice; stable repeated sidecar reuse.
 
 - [ ] **E4-F3-P4:** Update development documentation for fixed-four integration
   - Issue: TBD | Size: XS | Status: Not Started

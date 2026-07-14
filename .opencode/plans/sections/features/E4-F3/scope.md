@@ -21,8 +21,13 @@ condensation integrator after E4-F1 establishes on-device thermodynamic refresh.
 - **Delivered in P2 / issue #1293:** Mass-clamp each proposal before applying
   it, accumulate applied transfer in the resolved total buffer, and retain the
   final raw proposal in work storage.
-- Promote deterministic, nonnegative, finite, stiffness-bound, shape, device,
-  mutation-order, and no-allocation regression coverage from issue #1272.
+- **Delivered in P3 / issue #1294:** Promote the selected issue #1272
+  deterministic fixed-four stiffness evidence onto the discoverable production
+  Warp CPU path. Coverage records the nanometer, accumulation-mode, and
+  two-box droplet-like grids; validates scratch identity/reuse, stale-input
+  vapor-pressure refresh, unchanged gas concentration, finite/nonnegative and
+  zero-mass state, nonzero transfer, and exact repeatability; and adds one
+  optional clean-skipping CUDA slice.
 - Preserve scalar, direct Warp-array, hybrid, and `WarpEnvironmentData` inputs.
 
 ## Out of Scope

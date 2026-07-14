@@ -22,11 +22,16 @@ coverage.
   proposals, forced evaporation, deterministic repeatability, finite
   nonnegative particle mass, unchanged gas concentration, and supported scalar,
   direct, hybrid, and explicit-environment inputs.
-- **P3:** In `condensation_stiffness_test.py`, run nanometer,
-  accumulation-mode, and two-box droplet-like recorded grids against production.
-  Preserve the candidate `rtol=5e-2` comparison and maximum relative-error
-  bound, unchanged gas, stable zero-mass handling, nonzero transfer, and scratch
-  identity. Warp CPU is required; CUDA is optional and skips cleanly.
+- **P3 (shipped, issue #1294):**
+  `particula/gpu/kernels/tests/condensation_stiffness_test.py` exports only
+  `test_condensation_production_stiffness_` support tests. The cached Warp CPU
+  recorded grid covers nanometer, accumulation-mode, and two-box droplet-like
+  cases against the independent fixed-four NumPy reference with the
+  case-specific `rtol=5e-2` and maximum-relative-error bound. It separately
+  checks unchanged gas concentration, stale-input vapor-pressure refresh,
+  complete scratch identity/reuse, finite/nonnegative and zero-mass behavior,
+  nonzero transfer, and exact repeatability. One `cuda`/`gpu_parity` droplet
+  slice is additive and cleanly skipped when CUDA is unavailable.
 - **P4:** Validate Markdown links, focused pytest commands, and consistency
   between roadmap claims and executable test names.
 
