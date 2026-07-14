@@ -751,9 +751,9 @@ def _validate_float64_species_array(
 ) -> None:
     """Validate metadata for a caller-owned float64 per-species Warp array.
 
-    CUDA sidecars remain device-resident at step entry.  CPU-side preflight
-    retains eager value-domain errors for the synchronous Warp CPU backend,
-    while guarded device arithmetic protects CUDA execution without a readback.
+    Numeric-domain validation runs before the step can clear or mutate any
+    caller-owned output. CUDA values are checked by a device-side preflight
+    kernel; only its one-element validation result is read back.
     """
     if not _is_warp_array_like(array):
         raise ValueError(f"{name} must be a Warp array")
@@ -766,6 +766,31 @@ def _validate_float64_species_array(
             nonnegative and np.any(values < 0.0)
         ):
             raise ValueError(f"{name} must be finite and non-negative")
+        return
+
+    invalid = wp.zeros(1, dtype=wp.int32, device=expected_device)
+    wp.launch(
+        _validate_species_values_kernel,
+        dim=n_species,
+        inputs=[array, wp.int32(nonnegative), invalid],
+        device=expected_device,
+    )
+    if invalid.numpy()[0] != 0:
+        raise ValueError(f"{name} must be finite and non-negative")
+
+
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
+def _validate_species_values_kernel(
+    values: Any,
+    require_nonnegative: wp.int32,
+    invalid: Any,
+) -> None:
+    """Record whether a species sidecar has an invalid numeric value."""
+    species_idx = wp.tid()
+    value = values[species_idx]
+    if not wp.isfinite(value) or (require_nonnegative != 0 and value < 0.0):
+        wp.atomic_add(invalid, 0, 1)
 
 
 def _validate_mass_transfer_buffer(
@@ -834,19 +859,21 @@ def _validate_energy_transfer_ownership(
     energy_transfer: Any,
     mutable_arrays: tuple[Any, ...],
 ) -> None:
-    """Reject energy output storage that overlaps mutable step state."""
+    """Reject energy output storage overlapping condensation state."""
     output_start, output_end = _warp_array_memory_range(energy_transfer)
     for array in mutable_arrays:
         if array is None or not _is_warp_array_like(array):
             continue
         if energy_transfer is array:
             raise ValueError(
-                "energy_transfer must not overlap mutable condensation state"
+                "energy_transfer must not overlap mutable or read-side "
+                "condensation state"
             )
         array_start, array_end = _warp_array_memory_range(array)
         if output_start < array_end and array_start < output_end:
             raise ValueError(
-                "energy_transfer must not overlap mutable condensation state"
+                "energy_transfer must not overlap mutable or read-side "
+                "condensation state"
             )
 
 
@@ -1206,6 +1233,15 @@ def condensation_step_gpu(  # noqa: C901
                 "buffers in condensation_step_gpu."
             )
 
+    temperature_array, pressure_array = _ensure_environment_arrays(
+        temperature=temperature,
+        pressure=pressure,
+        environment=environment,
+        n_boxes=n_boxes,
+        device=device,
+        caller_name="condensation_step_gpu",
+    )
+
     if energy_transfer is not None:
         _validate_energy_transfer_ownership(
             energy_transfer,
@@ -1218,8 +1254,21 @@ def condensation_step_gpu(  # noqa: C901
                 gas.molar_mass,
                 gas.concentration,
                 gas.vapor_pressure,
+                thermodynamics.modes,
+                thermodynamics.parameters,
+                thermodynamics.molar_mass_reference,
+                temperature_array,
+                pressure_array,
                 latent_heat,
                 thermal_work,
+                (
+                    activity_surface.kappas
+                    if activity_surface is not None
+                    else None
+                ),
+                activity_surface.molar_mass_reference
+                if activity_surface is not None
+                else None,
                 surface_tension,
                 mass_accommodation,
                 diffusion_coefficient_vapor,
@@ -1238,15 +1287,6 @@ def condensation_step_gpu(  # noqa: C901
                 else None,
             ),
         )
-
-    temperature_array, pressure_array = _ensure_environment_arrays(
-        temperature=temperature,
-        pressure=pressure,
-        environment=environment,
-        n_boxes=n_boxes,
-        device=device,
-        caller_name="condensation_step_gpu",
-    )
 
     if surface_tension is None:
         surface_tension = wp.full(

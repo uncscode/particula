@@ -205,10 +205,10 @@ E4-F4 P2 ships a low-level, per-substep latent-heat rate correction with
 CPU-oracle/Warp parity. Issue #1272 also ships its caller-owned, signed
 `energy_transfer` diagnostic: after successful preflight, its active-device
 `wp.float64` `(n_boxes, n_species)` output is overwritten with mass-clamped
-applied transfer times latent heat. It does not imply the deferred P3/P4
-temperature feedback, E4-F5 gas coupling and particle-plus-gas conservation,
-E4-F6 independent-device plus graph/autodiff evidence, or E4-F7
-strategy/runnable and final support work.
+applied transfer times latent heat. It does not add temperature-state feedback,
+E4-F5 gas coupling and particle-plus-gas conservation, E4-F6
+independent-device plus graph/autodiff evidence, or E4-F7 strategy/runnable
+and final support work.
 
 - **E2-F2 environment-shape dependency:** the recommendation assumes the shipped
   contract for scalar inputs and explicit direct Warp `(n_boxes,)` environment
