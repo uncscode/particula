@@ -6,11 +6,13 @@ validation accepts scalar direct inputs, explicit ``(n_boxes,)`` Warp arrays,
 or a ``WarpEnvironmentData`` container. Aggregate preflight, including supplied
 ``CondensationScratchBuffers`` metadata, completes before buffer allocation,
 Warp launch, vapor-pressure refresh, or mutation of caller-owned state. A
-required keyword-only ``ThermodynamicsConfig`` then refreshes the caller-owned
-pure-vapor-pressure buffer from the current normalized temperature before mass
-transfer. Float32 temperatures are cast to a step-owned float64 device buffer
-for that refresh. Kernel launches operate on GPU-resident Warp arrays and
-update particle masses in-place.
+required keyword-only ``ThermodynamicsConfig`` then executes exactly four
+equal substeps. Each substep refreshes the caller-owned pure-vapor-pressure
+buffer, updates box-level environment properties, proposes transfer from the
+current particle mass, and applies a mass-clamped transfer. Float32
+temperatures are cast to a step-owned float64 device buffer for refresh. Kernel
+launches operate on GPU-resident Warp arrays and update particle masses
+in-place.
 """
 
 # pyright: basic
@@ -116,7 +118,7 @@ class CondensationActivitySurfaceConfig:
 
 @dataclass(frozen=True)
 class CondensationScratchBuffers:
-    """Own reusable stable-shape buffers for one P1 condensation update.
+    """Own reusable stable-shape buffers for a condensation-step update.
 
     This concrete-module-only sidecar is intentionally not exported. Every
     non-``None`` field is a caller-owned, active-device ``wp.float64`` array
@@ -124,16 +126,18 @@ class CondensationScratchBuffers:
     ``(n_boxes, n_particles, n_species)`` and property fields have shape
     ``(n_boxes,)``. Fields may be omitted independently; omitted fields are
     step-local fallback allocations, while successful calls preserve every
-    supplied object's identity.
+    supplied object's identity. Transfer roles are deliberately separate: work
+    retains the raw proposal from the final substep, while total records the
+    applied transfer over the complete four-substep step.
 
-    Each call performs four fixed updates. Work holds the latest raw proposal,
-    while total holds the accumulated, mass-clamped applied transfer; a
-    supplied ``total_mass_transfer`` is returned by identity. Callers must keep
-    supplied arrays alive and
-    unmodified until launched work completes, and may reuse them only after a
-    successful completion. Complete supplied-field metadata validation precedes
-    allocation, environment normalization, refresh, launch, and mutation, so a
-    validation failure leaves caller-owned state unchanged.
+    Each call performs four fixed updates. The total buffer is cleared once
+    after preflight and accumulates the mass-clamped transfer applied in each
+    substep; a supplied ``total_mass_transfer`` is returned by identity.
+    Callers must keep supplied arrays alive and unmodified until launched work
+    completes, and may reuse them only after a successful completion. Complete
+    supplied-field metadata validation precedes allocation, environment
+    normalization, refresh, launch, and mutation, so a validation failure
+    leaves caller-owned state unchanged.
 
     Attributes:
         work_mass_transfer: Optional caller-owned work-transfer array with
@@ -349,7 +353,7 @@ def condensation_mass_transfer_kernel(  # noqa: C901
     time_step: Any,
     mass_transfer: Any,
 ) -> None:
-    """Compute condensation mass transfer for each particle species.
+    """Compute a raw condensation mass-transfer proposal per particle species.
 
     Water activity is applied only when enabled and the current species equals
     ``water_species_index``. In configured weighted-tension mode, the supplied
@@ -377,8 +381,8 @@ def condensation_mass_transfer_kernel(  # noqa: C901
         gas_constant: Universal gas constant [J/(mol·K)].
         boltzmann_constant: Boltzmann constant [J/K].
         temperature: Per-box gas temperature [K].
-        time_step: Condensation time step [s].
-        mass_transfer: Output mass transfer array.
+        time_step: Condensation substep duration [s].
+        mass_transfer: Output raw mass-transfer proposal array.
     """  # type: ignore
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     dynamic_viscosity_value = dynamic_viscosity[box_idx]
@@ -498,8 +502,9 @@ def _effective_surface_tension_kernel(
 ) -> None:
     """Compute one composition-weighted surface tension per particle.
 
-    The output is step-owned and subsequently reused for every condensing
-    species of that particle, avoiding a full composition reduction per species.
+    The output is recalculated from the current mass in each substep and reused
+    for every condensing species of that particle, avoiding a full composition
+    reduction per species.
     """
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     output[box_idx, particle_idx] = effective_surface_tension_wp(
@@ -550,7 +555,7 @@ def _prepare_environment_properties_kernel(
     dynamic_viscosity: Any,
     mean_free_path: Any,
 ) -> None:
-    """Precompute box-level gas properties once per entry-point call.
+    """Precompute box-level gas properties for one condensation substep.
 
     Args:
         temperature: Per-box gas temperatures ``(n_boxes,)`` [K].
@@ -607,7 +612,7 @@ def apply_mass_transfer_kernel(
 def _clear_mass_transfer_kernel(
     total_mass_transfer: Any,
 ) -> None:
-    """Clear the fixed-shape applied-transfer accumulator."""
+    """Clear the fixed-shape accumulator before the four-substep update."""
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     for species_idx in range(total_mass_transfer.shape[2]):
         total_mass_transfer[box_idx, particle_idx, species_idx] = wp.float64(
@@ -624,8 +629,14 @@ def _apply_and_accumulate_mass_transfer_kernel(
 ) -> None:
     """Apply a clamped proposal and accumulate its applied transfer.
 
-    ``work_mass_transfer`` remains the most recent raw proposal. The total
-    buffer is cleared once per step and records all four applied proposals.
+    ``work_mass_transfer`` remains the current raw proposal, so it retains the
+    final raw proposal after four substeps. The total buffer is cleared once per
+    successful step and records each mass-clamped applied transfer.
+
+    Args:
+        masses: Particle masses updated in place.
+        work_mass_transfer: Raw proposal from the current substep.
+        total_mass_transfer: Accumulator of applied transfers for all substeps.
     """
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     for species_idx in range(masses.shape[2]):
@@ -829,7 +840,7 @@ def condensation_step_gpu(  # noqa: C901
     activity_surface: CondensationActivitySurfaceConfig | Any | None = None,
     scratch_buffers: CondensationScratchBuffers | Any | None = None,
 ) -> tuple[Any, Any]:
-    """Execute one condensation timestep on the GPU.
+    """Execute a fixed four-substep condensation timestep on the GPU.
 
     Args:
         particles: GPU-resident particle data.
@@ -839,13 +850,14 @@ def condensation_step_gpu(  # noqa: C901
             ``environment=...``.
         pressure: Direct gas pressure as either a scalar or a Warp array with
             shape ``(n_boxes,)``. Use ``None`` only with ``environment=...``.
-        time_step: Condensation time step in seconds.
+        time_step: Total condensation time step [s], divided into four equal
+            substeps.
         surface_tension: Optional per-species surface tension [N/m].
         mass_accommodation: Optional per-species accommodation coefficient.
         diffusion_coefficient_vapor: Optional per-species vapor diffusion
             coefficient [m^2/s].
-        mass_transfer: Optional preallocated mass transfer buffer with shape
-            ``(n_boxes, n_particles, n_species)``.
+        mass_transfer: Optional preallocated accumulated applied-transfer buffer
+            with shape ``(n_boxes, n_particles, n_species)``.
         environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``
             temperature and pressure arrays on the same device as ``particles``
             and ``gas``. This mode is supported when both direct inputs are
@@ -858,15 +870,15 @@ def condensation_step_gpu(  # noqa: C901
             unit activity. Static tension uses the current condensing-species
             index, while weighted tension uses one particle-wide value. ``None``
             retains legacy unit activity and species-indexed static tension.
-        scratch_buffers: Optional frozen caller-owned P1 buffers. Supplied
+        scratch_buffers: Optional frozen caller-owned buffers. Supplied
             transfer fields have shape ``(n_boxes, n_particles, n_species)``;
             supplied property fields have shape ``(n_boxes,)``. Every supplied
             field must be active-device ``wp.float64``. Fields may be omitted
             independently and use step-local fallback allocation. A supplied
             total transfer buffer is returned by identity. Work retains the
-            final raw proposal and total accumulates clamped applied transfers.
-            Validation is performed
-            before allocation or mutation. Arrays must remain alive and
+             final raw proposal and total accumulates clamped applied transfers.
+             Validation is performed before allocation or mutation. Arrays must
+             remain alive and
             unmodified until launched work completes and may be reused only
             after a successful completion.
 
@@ -915,10 +927,11 @@ def condensation_step_gpu(  # noqa: C901
         allocation, launch, refresh, or mutation. Thus a validation failure
         leaves caller-owned particle, gas, environment, sidecar, and supplied
         output buffers unchanged and is retryable with corrected inputs.
-        Successful calls overwrite ``gas.vapor_pressure`` from the normalized
-        current temperature before preparing box-level properties and
-        calculating mass transfer. Float32 temperature arrays are cast
-        device-side to float64 for the refresh.
+        Each substep overwrites ``gas.vapor_pressure`` from the normalized
+        current temperature, prepares box-level properties, calculates a raw
+        proposal from current particle mass, then applies and accumulates the
+        mass-clamped transfer. Float32 temperature arrays are cast device-side
+        to float64 for refresh.
 
         A supplied work and/or total scratch transfer field conflicts with
         ``mass_transfer`` because they overlap its legacy output role; a

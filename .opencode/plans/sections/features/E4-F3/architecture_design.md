@@ -6,16 +6,18 @@
 condensation_step_gpu(..., scratch_buffers=...)
   -> validate all inputs and scratch before mutation
   -> normalize environment and resolve omitted sidecars after the gate
-  -> prepare dynamic viscosity / mean free path in resolved buffers
-  -> calculate one raw transfer into work and total buffers when supplied
-  -> clamp and apply resolved work in place
+  -> clear resolved total once
+  -> repeat exactly four times:
+       refresh vapor pressure and environment properties
+       calculate one raw transfer into work from current mass
+       clamp, apply, and accumulate into total
   -> return the resolved total buffer by identity
 ```
 
-This delivered P1 path deliberately remains one update. The fixed-four static
-loop, per-substep refresh, and accumulated applied-transfer semantics remain P2
-work. The design remains compatible with E4-F2 physics when E4-F4 combines the
-tracks.
+Issue #1293 delivered the fixed-four static loop. Each interval uses
+`time_step / 4.0`; thermodynamic and environment properties refresh in every
+iteration before transfer calculation. The design remains compatible with
+E4-F2 physics when E4-F4 combines the tracks.
 
 ## Data / API / Workflow Changes
 
@@ -26,10 +28,10 @@ tracks.
   scratch through typed, keyword-only operation sidecars while preserving
   existing positional compatibility. Keep the lazy export in
   `particula.gpu.kernels` unchanged.
-- **Return semantics:** In the scratch-transfer path, work and total buffers
-  receive the same raw pre-clamp transfer and the resolved total is returned by
-  identity. Without scratch transfer fields, legacy `mass_transfer` remains the
-  work/result buffer by identity.
+- **Return semantics:** Work retains the final raw, pre-clamp proposal. Total is
+  cleared once and accumulates only the mass-clamped applied transfers across
+  all four substeps; the resolved total is returned by identity. Legacy
+  `mass_transfer` remains that total when scratch transfer fields are omitted.
 - **Workflow hooks:** E4-F1 is a hard gate. E4-F2 may proceed in parallel;
   E4-F4 consumes both tracks and must retain per-substep refresh placement.
 

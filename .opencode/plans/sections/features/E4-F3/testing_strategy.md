@@ -15,9 +15,13 @@ coverage.
   allocations for a complete sidecar. Rejection coverage asserts wrong type,
   shape, fp64 dtype, device, and transfer overlap fail before launch,
   allocation/normalization/refresh instrumentation, or mutation.
-- **P2:** Verify four unconditional equal substeps, updated-state reads, E4-F1
-  refresh on every iteration, per-step clamping, total transfer accumulation,
-  deterministic repeatability, finite values, and nonnegative particle mass.
+- **P2 (shipped, issue #1293):** Co-located production tests verify four
+  unconditional equal substeps, ordered E4-F1 refresh and environment
+  preparation on every iteration, and transfer calculations from updated mass.
+  They cover per-step clamping, accumulated applied totals versus final raw work
+  proposals, forced evaporation, deterministic repeatability, finite
+  nonnegative particle mass, unchanged gas concentration, and supported scalar,
+  direct, hybrid, and explicit-environment inputs.
 - **P3:** In `condensation_stiffness_test.py`, run nanometer,
   accumulation-mode, and two-box droplet-like recorded grids against production.
   Preserve the candidate `rtol=5e-2` comparison and maximum relative-error

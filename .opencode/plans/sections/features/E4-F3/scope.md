@@ -15,9 +15,12 @@ condensation integrator after E4-F1 establishes on-device thermodynamic refresh.
 - **Delivered in P1 / issue #1292:** Support partial sidecars; allocate only
   omitted fields through the compatibility path. Complete sidecar reuse needs no
   allocation of the four stable shapes.
-- **Remaining P2 scope:** Execute exactly four unconditional substeps of
-  `time_step / 4`, refresh E4-F1 state every substep, and return accumulated
-  applied transfer over those substeps.
+- **Delivered in P2 / issue #1293:** Execute exactly four unconditional
+  substeps of `time_step / 4`, refreshing E4-F1 and environment state every
+  substep from current particle mass.
+- **Delivered in P2 / issue #1293:** Mass-clamp each proposal before applying
+  it, accumulate applied transfer in the resolved total buffer, and retain the
+  final raw proposal in work storage.
 - Promote deterministic, nonnegative, finite, stiffness-bound, shape, device,
   mutation-order, and no-allocation regression coverage from issue #1272.
 - Preserve scalar, direct Warp-array, hybrid, and `WarpEnvironmentData` inputs.

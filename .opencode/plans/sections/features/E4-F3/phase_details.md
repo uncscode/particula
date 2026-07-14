@@ -17,13 +17,19 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     type/shape/dtype/device, unchanged state after rejection, and the
     allocation-free complete-sidecar path.
 
-- [ ] **E4-F3-P2:** Fixed four-substep integration and per-substep physics refresh with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Run four equal calculate/apply iterations, refresh E4-F1 physics each
-    iteration, and return accumulated total transfer.
-  - Files: `particula/gpu/kernels/condensation.py`, production contract tests
-  - Tests: exactly four launches, equal durations, current-state refresh,
-    accumulation semantics, clamp behavior, determinism, and finite output.
+- [x] **E4-F3-P2:** Fixed four-substep integration and per-substep physics refresh with unit tests
+  - Issue: #1293 | Size: S | Status: Shipped (2026-07-13)
+  - Delivered: `condensation_step_gpu()` unconditionally schedules four
+    `time_step / 4.0` iterations. Each iteration refreshes thermodynamics and
+    environment properties, calculates from predecessor-updated mass, clamps
+    applied transfer to available mass, and accumulates it in total storage.
+    Work storage retains the final raw proposal.
+  - Files: `particula/gpu/kernels/condensation.py`,
+    `particula/gpu/kernels/tests/condensation_test.py`,
+    `particula/gpu/kernels/tests/_condensation_test_support.py`
+  - Tests: fixed integration launch/order behavior, current-state refresh,
+    applied-total and raw-work semantics, forced evaporation clamp behavior,
+    determinism, finite nonnegative mass, and unchanged gas concentration.
 
 - [ ] **E4-F3-P3:** Promote issue 1272 stiffness and buffer-reuse validation coverage
   - Issue: TBD | Size: S | Status: Not Started
