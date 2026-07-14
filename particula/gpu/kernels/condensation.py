@@ -839,6 +839,8 @@ def condensation_step_gpu(  # noqa: C901
     thermodynamics: ThermodynamicsConfig | Any | None = None,
     activity_surface: CondensationActivitySurfaceConfig | Any | None = None,
     scratch_buffers: CondensationScratchBuffers | Any | None = None,
+    latent_heat: Any | None = None,
+    thermal_work: Any | None = None,
 ) -> tuple[Any, Any]:
     """Execute a fixed four-substep condensation timestep on the GPU.
 
@@ -872,15 +874,21 @@ def condensation_step_gpu(  # noqa: C901
             retains legacy unit activity and species-indexed static tension.
         scratch_buffers: Optional frozen caller-owned buffers. Supplied
             transfer fields have shape ``(n_boxes, n_particles, n_species)``;
-            supplied property fields have shape ``(n_boxes,)``. Every supplied
-            field must be active-device ``wp.float64``. Fields may be omitted
-            independently and use step-local fallback allocation. A supplied
-            total transfer buffer is returned by identity. Work retains the
+             supplied property fields have shape ``(n_boxes,)``. Every supplied
+             field must be active-device ``wp.float64``. Fields may be omitted
+             independently and use step-local fallback allocation. A supplied
+             total transfer buffer is returned by identity. Work retains the
              final raw proposal and total accumulates clamped applied transfers.
              Validation is performed before allocation or mutation. Arrays must
-             remain alive and
-            unmodified until launched work completes and may be reused only
-            after a successful completion.
+             remain alive and unmodified until launched work completes and may
+             be reused only after a successful completion.
+        latent_heat: Optional caller-owned per-species latent heat [J/kg] as an
+            active-device ``wp.float64`` array shaped ``(n_species,)``. It is
+            validated but not consumed during this isothermal phase.
+        thermal_work: Optional caller-owned per-species thermal-work operation
+            sidecar [J/kg] as an active-device ``wp.float64`` array shaped
+            ``(n_species,)``. It is validated but not allocated, initialized,
+            modified, or consumed during this phase.
 
     Returns:
         Tuple of the particle data with in-place updated masses and accumulated,
@@ -904,6 +912,9 @@ def condensation_step_gpu(  # noqa: C901
             a supplied field lacks its stable active-device ``wp.float64``
             metadata, or ``mass_transfer`` overlaps a supplied scratch transfer
             field.
+        ValueError: If ``latent_heat`` or ``thermal_work`` is not a finite,
+            non-negative active-device ``wp.float64`` array shaped
+            ``(n_species,)``.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
@@ -945,6 +956,11 @@ def condensation_step_gpu(  # noqa: C901
         arrays, including on CUDA, without allocating, replacing, or mutating
         those buffers. Refresh evaluation and all production calculations stay
         device-resident.
+
+        Supplied latent sidecars are caller-owned. Their validation can read
+        device values but does not allocate, initialize, modify, or consume
+        either sidecar in this phase. Invalid metadata or values leave physical
+        state and all caller-owned work state unchanged.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)
@@ -967,6 +983,23 @@ def condensation_step_gpu(  # noqa: C901
         gas.molar_mass,
         "condensation_step_gpu",
     )
+
+    if latent_heat is not None:
+        _validate_float64_species_array(
+            "latent_heat",
+            latent_heat,
+            n_species,
+            device,
+            nonnegative=True,
+        )
+    if thermal_work is not None:
+        _validate_float64_species_array(
+            "thermal_work",
+            thermal_work,
+            n_species,
+            device,
+            nonnegative=True,
+        )
 
     if activity_surface is not None:
         activity_surface = validate_condensation_activity_surface_config(
