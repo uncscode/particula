@@ -168,8 +168,9 @@ high-level dynamics workflows.
 
 Known GPU physics gaps remain:
 
-- Latent-heat condensation is implemented on the CPU side, but there is no
-  Warp-backed latent-heat condensation kernel yet.
+- Bounded direct GPU condensation applies an optional Warp-backed latent-heat
+  rate correction during each fixed substep. It does not provide temperature
+  feedback, gas coupling or conservation, or energy bookkeeping.
 - Particle charge is present in the GPU data container, but charged particle
   coagulation kernels are not implemented yet.
 - The current GPU coagulation path is Brownian-focused; charged, turbulent,
@@ -968,7 +969,10 @@ pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -W
 
 The current executable CPU integration baseline remains
 `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
-Temperature-feedback runtime support and latent-heat parity remain future Epic D goals.
+The direct step applies an optional latent-heat rate correction in each of its
+four fixed substeps, with CPU-oracle/Warp parity coverage. Omitted latent heat
+or zero per-species entries retain exact isothermal behavior. Temperature
+feedback, gas coupling, and energy bookkeeping remain deferred.
 
 E4-F3 is shipped. Import its only step entry point with
 `from particula.gpu.kernels import condensation_step_gpu`. When reusable scratch
@@ -990,8 +994,8 @@ metadata or thermodynamic inputs but does not transfer or mutate caller state.
 
 Remaining feature ownership:
 
-1. E4-F4: latent-heat correction and energy diagnostics, including the CPU
-   reference context in the [condensation
+1. E4-F4: energy diagnostics and temperature-feedback integration, including
+   the CPU reference context in the [condensation
    equations](../../Theory/Technical/Dynamics/Condensation_Equations.md#condensation-with-latent-heat).
 2. E4-F5: gas-coupled inventory, partitioning, and conservation evidence.
 3. E4-F6: broader independent-device, graph-capture, and autodiff evidence.
@@ -1485,7 +1489,7 @@ coagulation and state-representation decisions are recorded.
 | fp64 throughput on consumer CUDA | Slower GPU, weaker speedups | Keep fp64 as the shipped reference and production baseline; evaluate mixed precision only through a future evidence-backed migration proposal |
 | NPF-to-droplet dynamic range near fp64 limits | Lost small-mass resolution | Use the shipped mass-precision report as the baseline; keep per-species absolute mass until a future proposal proves an alternative across the E2 cases |
 | fp64 memory doubling vs large multi-box | Fewer boxes fit in memory | Build a memory-budget model; treat precision and box count together |
-| Time-scale stiffness across NPF-to-droplet range | Unstable or wastefully slow explicit stepping | Use the shipped four-substep particle-only direct condensation step; retain case-specific evidence in the stiffness study and keep gas coupling, latent heat, independent-device, graph, and autodiff work gated |
+| Time-scale stiffness across NPF-to-droplet range | Unstable or wastefully slow explicit stepping | Use the shipped four-substep particle-only direct condensation step; retain case-specific evidence in the stiffness study and keep gas coupling, temperature feedback/energy bookkeeping, independent-device, graph, and autodiff work gated |
 | No fully integrated GPU-ready per-box thermodynamic runtime path | Blocks parcels, expansion, latent-heat feedback from running end to end on GPU | Keep shipped CPU `EnvironmentData` as the authoritative CPU owner, build on the shipped `WarpEnvironmentData` CPU↔GPU round-trip helpers, and add integration work |
 | Rejection-sampling acceptance collapse for wide size ranges | Coagulation trial counts explode in mixed NPF/droplet boxes | Evaluate binned majorant kernels or stratified pair sampling |
 | One-thread-per-box coagulation | Serializes large single-box workloads | Record as the current measured multi-box tradeoff for the shipped path; any parallel-within-box follow-up would require a new evidence-backed proposal |

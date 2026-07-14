@@ -361,7 +361,11 @@ def condensation_mass_transfer_kernel(  # noqa: C901
 
     Water activity is applied only when enabled and the current species equals
     ``water_species_index``. In configured weighted-tension mode, the supplied
-    per-particle tension is shared by all condensing species.
+    per-particle tension is shared by all condensing species. For each species,
+    the activity- and Kelvin-adjusted surface vapor pressure is used both for
+    the gas-to-surface pressure difference and, when enabled, the latent-heat
+    correction. Omitted latent heat and exactly zero per-species entries use
+    the original isothermal rate path.
 
     Args:
         masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
@@ -910,8 +914,8 @@ def condensation_step_gpu(  # noqa: C901
             active-device ``wp.float64`` array shaped ``(n_species,)``. When
             supplied, it is consumed in every fixed substep; zero entries use
             the exact isothermal rate path.
-        thermal_work: Optional caller-owned per-species thermal-work operation
-            sidecar [J/kg] as an active-device ``wp.float64`` array shaped
+        thermal_work: Optional caller-owned per-species thermal-work sidecar
+            [J/kg] as an active-device ``wp.float64`` array shaped
             ``(n_species,)``. It is validated but deferred and unused P3 state;
             this step does not allocate, initialize, modify, or consume it.
 
@@ -983,9 +987,10 @@ def condensation_step_gpu(  # noqa: C901
         device-resident.
 
         Supplied latent sidecars are caller-owned. Latent heat is consumed per
-        fixed substep without mutation; thermal work is validated but unused.
-        Invalid metadata or values leave physical state and all caller-owned
-        work state unchanged.
+        fixed substep without mutation; omitting it or supplying zero for a
+        species preserves that species' isothermal arithmetic. Thermal work is
+        validated but unused. Invalid metadata or values leave physical state
+        and all caller-owned work state unchanged.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)

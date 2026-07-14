@@ -34,19 +34,31 @@ INDEX_CPU_BASELINE_SNIPPET = "The executable CPU integration baseline remains"
 DOCS_INDEX_LATENT_HEAT_HEADING = (
     "**Supporting CPU latent-heat-corrected condensation diagnostics**"
 )
-DOCS_INDEX_LATENT_HEAT_CONTRACT_SNIPPET = (
-    "does not claim GPU latent-heat parity or temperature-feedback runtime"
+DOCS_INDEX_DIRECT_GPU_CONTRACT_SNIPPETS = (
+    "optionally applies a latent-rate correction during each of its four",
+    "CPU-oracle/Warp parity coverage.",
+    "Omitted latent heat,",
+    "or a zero per-species value, retains that species' isothermal rate path.",
+    "Broader temperature feedback, gas coupling/conservation, energy",
+    "bookkeeping, and strategy/runnable-level support remain deferred.",
 )
 FEATURE_CPU_BASELINE_SNIPPET = (
     "This baseline is CPU-only and diagnostic/reference only"
 )
-FEATURE_FUTURE_WORK_SNIPPET = (
-    "temperature-feedback runtime support and GPU latent-heat parity remain"
+FEATURE_DIRECT_GPU_CONTRACT_SNIPPETS = (
+    "optional per-species latent-rate correction in each of its four equal",
+    "substeps, with CPU-oracle/Warp parity coverage.",
+    "using a zero entry for a species, retains that species' isothermal rate",
+    "This does not provide broader temperature feedback, gas coupling or",
+    "conservation, energy bookkeeping, or strategy/runnable-level latent-heat",
+    "support; those remain deferred.",
 )
 ROADMAP_CPU_BASELINE_SNIPPET = "current executable CPU integration baseline"
-ROADMAP_FUTURE_WORK_SNIPPETS = (
-    "Temperature-feedback runtime support",
-    "latent-heat parity remain future Epic D goals",
+ROADMAP_DIRECT_GPU_CONTRACT_SNIPPETS = (
+    "Bounded direct GPU condensation applies an optional Warp-backed latent-heat",
+    "rate correction during each fixed substep.",
+    "It does not provide temperature",
+    "feedback, gas coupling or conservation, or energy bookkeeping.",
 )
 
 
@@ -118,27 +130,32 @@ def test_docs_index_latent_heat_summary_stays_diagnostic_only() -> None:
     content = DOCS_INDEX_PATH.read_text(encoding="utf-8")
 
     assert DOCS_INDEX_LATENT_HEAT_HEADING in content
-    assert DOCS_INDEX_LATENT_HEAT_CONTRACT_SNIPPET in content
+    for snippet in DOCS_INDEX_DIRECT_GPU_CONTRACT_SNIPPETS:
+        assert snippet in content
+    assert "thermal_work" not in content
     assert "**Supporting non-isothermal condensation**" not in content
 
 
-def test_condensation_feature_page_keeps_cpu_only_latent_heat_boundary() -> (
+def test_condensation_feature_page_keeps_direct_gpu_latent_heat_boundary() -> (
     None
 ):
-    """Feature page keeps the reviewed CPU-only latent-heat contract."""
+    """Feature page states the bounded direct GPU latent-heat contract."""
     content = CONDENSATION_FEATURE_PATH.read_text(encoding="utf-8")
 
     assert CPU_BASELINE_TEST_PATH in content
     assert FEATURE_CPU_BASELINE_SNIPPET in content
-    assert FEATURE_FUTURE_WORK_SNIPPET in content
+    for snippet in FEATURE_DIRECT_GPU_CONTRACT_SNIPPETS:
+        assert snippet in content
+    assert "thermal_work" not in content
 
 
-def test_roadmap_latent_heat_note_stays_future_facing() -> None:
-    """Roadmap page keeps GPU latent-heat support as future work."""
+def test_roadmap_records_bounded_direct_gpu_latent_heat_support() -> None:
+    """Roadmap distinguishes direct GPU support from deferred integration."""
     content = ROADMAP_PATH.read_text(encoding="utf-8")
 
     assert ROADMAP_CPU_BASELINE_SNIPPET in content
     assert CPU_BASELINE_TEST_PATH in content
-    for snippet in ROADMAP_FUTURE_WORK_SNIPPETS:
+    for snippet in ROADMAP_DIRECT_GPU_CONTRACT_SNIPPETS:
         assert snippet in content
+    assert "thermal_work" not in content
     assert "with per-box temperature feedback through the" not in content

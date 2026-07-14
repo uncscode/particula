@@ -314,9 +314,14 @@ restored = from_warp_environment_data(gpu_environment)
   stable-shape `wp.float64`: transfer fields use
   `(n_boxes, n_particles, n_species)` and property fields use `(n_boxes,)`.
   Fields may be omitted independently, which uses fallback allocations.
+- An optional active-device `wp.float64` `latent_heat` sidecar shaped
+  `(n_species,)` applies a per-substep rate correction. Omitting it, or using
+  a zero entry for a species, preserves that species' isothermal rate path.
+  `thermal_work` has the same validated sidecar shape but remains deferred,
+  unused P3 state.
 - This direct particle-only step does not establish CPU-strategy parity, a
-  `Runnable` API, adaptive stepping, latent heat, gas coupling/conservation,
-  graph capture/replay, autodiff, or general accuracy claims. See
+  `Runnable` API, adaptive stepping, gas coupling/conservation, energy
+  accumulation, graph capture/replay, autodiff, or general accuracy claims. See
   `docs/Features/condensation_strategy_system.md` and
   `docs/Features/Roadmap/condensation-stiffness-study.md` for its bounded
   contract and case-specific evidence.
@@ -570,6 +575,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2026-07-13  
+**Last Updated:** 2026-07-14  
 **For questions about ADW:** See `.opencode/guides/README.md`  
 **For questions about particula:** See main `readme.md`

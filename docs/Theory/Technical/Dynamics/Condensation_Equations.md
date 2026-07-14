@@ -61,9 +61,11 @@ This equation modifies the isothermal rate to include thermal effects due to lat
 - The CPU implementation is available through `CondensationLatentHeat`,
   `get_mass_transfer_rate_latent_heat`, and
   `get_latent_heat_energy_released`.
-- A Warp-backed GPU implementation of this latent-heat equation is still
-  planned. Track this work in the
-  [Data-Oriented Design and GPU Roadmap](../../../Features/Roadmap/data-oriented-gpu.md).
+- The direct Warp GPU condensation step applies an optional latent-heat rate
+  correction in each of its four fixed substeps, with CPU-oracle/Warp parity
+  coverage. Omitted latent heat or zero per-species entries retain exact
+  isothermal behavior. Temperature feedback, gas coupling, and energy
+  bookkeeping remain deferred.
 
 
 ## Additional Parameters
@@ -262,4 +264,3 @@ By reviewing the equations and expanding on the descriptions, we enhance the und
 1. **Topping, D., & Bane, M. (2022).** *Introduction to Aerosol Modelling*. Wiley. DOI: [10.1002/9781119625728](https://doi.org/10.1002/9781119625728)
 
 2. **Seinfeld, J. H., & Pandis, S. N. (2016).** *Atmospheric Chemistry and Physics: From Air Pollution to Climate Change* (3rd ed.). Wiley.
-

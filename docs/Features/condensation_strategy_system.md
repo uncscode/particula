@@ -197,9 +197,15 @@ integration baseline for future Epic D GPU parity work:
 It verifies only a finite nonzero condensation transfer, particle water
 gain, gas water loss, total water conservation, and final-step
 `last_latent_heat_energy` agreement with the constant-latent-heat
-bookkeeping path. This baseline is CPU-only and diagnostic/reference only;
-temperature-feedback runtime support and GPU latent-heat parity remain
-future work.
+bookkeeping path. This baseline is CPU-only and diagnostic/reference only.
+
+The bounded, low-level direct GPU condensation path separately supports an
+optional per-species latent-rate correction in each of its four equal
+substeps, with CPU-oracle/Warp parity coverage. Omitting `latent_heat`, or
+using a zero entry for a species, retains that species' isothermal rate path.
+This does not provide broader temperature feedback, gas coupling or
+conservation, energy bookkeeping, or strategy/runnable-level latent-heat
+support; those remain deferred.
 
 ### CondensationIsothermalStaggered (two-pass Gauss-Seidel)
 
@@ -652,8 +658,10 @@ only the final raw proposal. Particle masses are mutated in place, while
 CPU↔Warp transfers; validation-only device reads do not transfer or mutate
 caller buffers.
 
-This direct step does not claim CPU-strategy parity, `Runnable` composition,
-adaptive stepping, gas coupling or conservation, latent heat, graph
+This direct low-level GPU step uses an optional per-species latent-heat rate
+correction in its four fixed substeps, with CPU-oracle/Warp parity. It has no
+temperature feedback, gas coupling or conservation, energy bookkeeping, or
+strategy/`Runnable` integration; nor does it claim adaptive stepping, graph
 capture/replay, or autodiff readiness. For its focused coverage, run:
 
 ```bash
@@ -669,7 +677,9 @@ CUDA is unavailable; a skip is not GPU execution.
 - Staggered solver is Gauss-Seidel only; other solvers are not exposed.
 - Factory supports `"isothermal"`, `"isothermal_staggered"`, and
   `"latent_heat"` only.
-- No temperature feedback; latent heat is diagnostic only.
+- Direct low-level GPU latent heat is a per-species rate correction only; it
+  has no temperature feedback, gas coupling or conservation, energy
+  bookkeeping, or strategy/`Runnable` integration.
 - Minimum-radius clamp (1e-10 m) enforces continuum validity; sub-continuum
   physics is out of scope.
 

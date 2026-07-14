@@ -9,10 +9,10 @@
   `(n_species,)` latent-heat and thermal-work preflight; reject nonfinite or
   negative values and wrong shape, fp64 dtype, device, or non-Warp inputs
   before allocation or mutation. P1 does not add or validate an energy sidecar.
-- [ ] Feed the E4-F2 activity-adjusted Kelvin surface pressure into the new
+- [x] Feed the E4-F2 activity-adjusted Kelvin surface pressure into the new
   latent-rate helper from the existing `condensation_step_gpu()` calculate
   launch, so the isothermal and latent paths use one surface-pressure value.
-- [ ] Apply the latent correction during each of E4-F3's four substeps (roughly
+- [x] Apply the latent correction during each of E4-F3's four substeps (roughly
   30--50 orchestration LOC), retaining bitwise-compatible isothermal behavior
   when latent heat is omitted or zero.
 - [ ] Route only transfer that has passed the existing particle-mass bound to
@@ -32,13 +32,11 @@
 - [x] In `particula/gpu/kernels/tests/condensation_test.py`, snapshot all mutable
   buffers before nonfinite/negative latent and sidecar shape/dtype/device
   rejections, then assert pre-mutation failure.
-- [ ] Cover positive, negative, zero, clamped, and multi-box/species transfers
-  on Warp CPU; assert energy sign, per-slot aggregation, and unchanged
-  cross-box/species slots.
-- [ ] Parameterize optional CUDA parity with clean skips and separate explicit
-  physics and conservation tolerances.
-- [ ] Verify repeated caller-owned thermal/energy buffer identity and that a
-  fully supplied sidecar path requires no allocation or host synchronization.
-- [ ] Run the two focused test modules with `-Werror`, then Ruff and mypy on
-  `particula/gpu/dynamics/condensation_funcs.py` and
-  `particula/gpu/kernels/condensation.py`.
+- [x] Add CPU four-substep oracle parity for multi-species latent heat, including
+  shared activity/Kelvin pressure, exact isolated zero-latent fallback, and
+  coupled mixed-latent coverage.
+- [x] Verify validation atomicity, sidecar immutability, four latent-aware
+  launches, deterministic fresh-state results, returned-total/scratch identity,
+  scratch reuse, and no omitted-latent allocation.
+- [ ] Add energy-sign, aggregation, and clamp-accounting tests with P3 energy
+  bookkeeping.

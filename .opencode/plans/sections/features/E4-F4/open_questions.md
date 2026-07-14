@@ -25,4 +25,9 @@
 - [x] What E4-F3 scratch API does E4-F4 consume without duplication?
   - Resolved 2026-07-13: consume the typed sidecar's substep work and whole-call
     mass accumulator, adding only fixed-shape latent-property and
-    `(n_boxes, n_species)` energy buffers.
+     `(n_boxes, n_species)` energy buffers.
+- [x] Does P2 apply the correction at every fixed substep without changing the
+  isothermal contract?
+  - Resolved 2026-07-14: yes. All four launches receive the latent sidecar and
+    enabled flag; omitted latent heat and exact zero entries use the original
+    isothermal arithmetic. `thermal_work` remains validated and deferred.

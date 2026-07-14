@@ -3,8 +3,10 @@
 These functions mirror NumPy implementations in
 ``particula.particles.properties`` and
 ``particula.dynamics.condensation.mass_transfer``. Private thermal helpers
-use fp64 equations for the latent-heat correction integrated by the fixed
-substeps in ``particula.gpu.kernels.condensation``.
+use fp64 non-isothermal equations during each fixed substep in
+``particula.gpu.kernels.condensation``. The correction uses the same
+activity- and Kelvin-adjusted surface vapor pressure as the mass-transfer
+driving pressure; zero latent heat retains the isothermal rate.
 """
 
 import warp as wp
@@ -163,8 +165,9 @@ def _mass_transfer_rate_latent_heat_wp(
 ) -> wp.float64:
     """Calculate the latent-corrected condensation mass transfer rate.
 
-    A zero latent heat returns ``mass_transfer_rate_wp`` exactly, preserving
-    the isothermal result.
+    The non-isothermal correction uses the supplied activity- and
+    Kelvin-adjusted surface vapor pressure. A zero latent heat returns
+    ``mass_transfer_rate_wp`` exactly, preserving the isothermal result.
 
     Args:
         pressure_delta: Gas-to-particle partial-pressure difference [Pa].
