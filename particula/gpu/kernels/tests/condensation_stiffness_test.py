@@ -38,9 +38,8 @@ EXPORTED_STIFFNESS_TESTS = _export_stiffness_tests()
 
 def test_condensation_stiffness_wrapper_exports_support_evidence() -> None:
     """The stiffness wrapper stays discoverable and non-empty."""
-    assert len(EXPORTED_STIFFNESS_TESTS) >= 1
-    assert all(
-        name.startswith("test_condensation_production_stiffness_")
-        for name in EXPORTED_STIFFNESS_TESTS
+    assert EXPORTED_STIFFNESS_TESTS == (
+        "test_condensation_production_stiffness_cuda_slice",
+        "test_condensation_production_stiffness_recorded_contract",
     )
     assert not any("candidate" in name for name in EXPORTED_STIFFNESS_TESTS)
