@@ -10,10 +10,19 @@
 - Cover atomic failures and CPU↔Warp partitioning conversion with focused
   regression tests.
 
+## Delivered in P2 / issue #1303
+- Add a private direct-test-only fp64 finalization helper in
+  `particula/gpu/kernels/condensation.py` for already P1-gated proposals.
+- Bound negative proposals by per-particle mass, reduce positive demand and
+  negative release in fixed particle-index order, and scale positive uptake by
+  gas inventory plus permitted release for each `(box, species)`.
+- Apply and return the finalized direct-helper transfer while keeping
+  `gas.concentration` read-only; atomically reject invalid proposals or P2
+  sidecars before caller-owned state changes.
+- Add independent NumPy-oracle, atomic-preflight, and public-P1-isolation
+  coverage in `particula/gpu/kernels/tests/_condensation_test_support.py`.
+
 ## Remaining in scope
-- Bound evaporation by per-particle and aggregate particle inventory.
-- Bound condensation by current per-box/per-species gas inventory, accounting
-  for same-substep evaporation before scaling positive uptake.
 - Update particle masses and gas concentration from one finalized fp64 transfer
   over exactly four E4-F3 substeps.
 - Feed updated gas state into every subsequent thermodynamic refresh.
@@ -23,7 +32,8 @@
 - Land the production hook and issue #1272 conservation regression together.
 
 ## Out of scope
-- Gas inventory limiting, coupled gas mutation, and conservation claims in P1.
+- Public invocation of P2 finalization, gas mutation, and conservation claims
+  until P3--P4.
 - New gas/container fields, adaptive substepping, or CPU/GPU synchronization.
 - New activity, Kelvin, vapor-pressure, or latent-heat models (E4-F1/F2/F4).
 - Performance diagnostics or debug-only public API (diagnostics: none).

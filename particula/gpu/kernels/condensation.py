@@ -1,7 +1,11 @@
 """GPU condensation kernels and orchestration utilities.
 
 This module composes condensation ``@wp.func`` building blocks into end-to-end
-kernels and provides the high-level ``condensation_step_gpu`` API. Entry-point
+kernels and provides the high-level ``condensation_step_gpu`` API. The private
+P2 inventory finalizer is direct-test-only: it accepts an already gated
+proposal, mutates particle masses and P2 scratch sidecars, and deliberately
+leaves gas concentration unchanged while public gas coupling remains deferred.
+Entry-point
 validation accepts scalar direct inputs, explicit ``(n_boxes,)`` Warp arrays,
 or a ``WarpEnvironmentData`` container. Aggregate preflight, including supplied
 ``CondensationScratchBuffers`` metadata, completes before buffer allocation,
@@ -736,7 +740,14 @@ def _bound_evaporation_candidate_kernel(
     gated_transfer: Any,
     candidate: Any,
 ) -> None:
-    """Bound each evaporation proposal by the owned particle mass."""
+    """Copy a gated proposal while bounding evaporation by owned mass.
+
+    Args:
+        masses: Particle masses ``(n_boxes, n_particles, n_species)`` [kg].
+        gated_transfer: Already P1-gated transfer proposal matching ``masses``
+            [kg].
+        candidate: Output bounded proposal matching ``masses`` [kg].
+    """
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     for species_idx in range(masses.shape[2]):
         transfer = gated_transfer[box_idx, particle_idx, species_idx]
@@ -754,7 +765,20 @@ def _reduce_inventory_candidates_kernel(
     demand: Any,
     release: Any,
 ) -> None:
-    """Reduce positive demand and negative release in particle-index order."""
+    """Reduce concentration-weighted demand and release in index order.
+
+    Each ``(box, species)`` lane traverses particles in ascending index order,
+    avoiding atomic accumulation. Positive candidates contribute to demand;
+    negative candidates contribute their magnitude to release.
+
+    Args:
+        candidate: Bounded, already gated transfer proposal [kg].
+        concentration: Particle number concentrations ``(n_boxes, n_particles)``
+            [1/m^3].
+        demand: Output positive transfer demand ``(n_boxes, n_species)``
+            [kg/m^3].
+        release: Output evaporation release ``(n_boxes, n_species)`` [kg/m^3].
+    """
     box_idx, species_idx = wp.tid()  # type: ignore[misc]
     positive_demand = wp.float64(0.0)
     negative_release = wp.float64(0.0)
@@ -777,7 +801,19 @@ def _scale_inventory_uptake_kernel(
     release: Any,
     scale: Any,
 ) -> None:
-    """Compute the bounded positive-transfer fraction for each box species."""
+    """Compute each box-species uptake fraction from available inventory.
+
+    Available inventory is gas concentration plus the bounded evaporation
+    release. The output is one when demand is covered (including zero demand)
+    and otherwise the available-to-demand ratio clamped to ``[0, 1]``.
+
+    Args:
+        gas_concentration: Gas concentrations ``(n_boxes, n_species)``
+            [kg/m^3], read without mutation.
+        demand: Positive transfer demand ``(n_boxes, n_species)`` [kg/m^3].
+        release: Evaporation release ``(n_boxes, n_species)`` [kg/m^3].
+        scale: Output positive-transfer fractions ``(n_boxes, n_species)``.
+    """
     box_idx, species_idx = wp.tid()  # type: ignore[misc]
     demand_value = demand[box_idx, species_idx]
     available = (
@@ -801,7 +837,18 @@ def _finalize_and_apply_inventory_transfer_kernel(
     scale: Any,
     finalized: Any,
 ) -> None:
-    """Apply bounded evaporation and inventory-scaled uptake."""
+    """Apply bounded evaporation and inventory-scaled uptake to masses.
+
+    Negative candidates are retained and positive candidates are multiplied by
+    their box-species scale. This kernel has no gas-concentration argument and
+    therefore does not perform gas coupling.
+
+    Args:
+        masses: Particle masses updated in place [kg].
+        candidate: Bounded, already gated transfer proposal [kg].
+        scale: Positive-transfer fractions by box and species.
+        finalized: Output applied transfer matching ``masses`` [kg].
+    """
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     for species_idx in range(masses.shape[2]):
         transfer = candidate[box_idx, particle_idx, species_idx]
@@ -1147,7 +1194,19 @@ def _gate_mass_transfer_kernel(
     concentration: Any,
     work_mass_transfer: Any,
 ) -> None:
-    """Zero raw proposals for disabled species and inactive particle slots."""
+    """Zero proposals for disabled species and zero-concentration slots.
+
+    A partitioning value of one permits a proposal; zero disables it. This P1
+    gate is performed before the public step applies mass transfer. The P2
+    inventory finalizer accepts the resulting pre-gated proposal and does not
+    inspect this mask.
+
+    Args:
+        partitioning: Binary per-box, per-species mask where one permits
+            partitioning.
+        concentration: Particle number concentrations by box and particle.
+        work_mass_transfer: Raw proposal overwritten with zeros where disabled.
+    """
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     for species_idx in range(work_mass_transfer.shape[2]):
         if partitioning[box_idx, species_idx] != wp.int32(1) or concentration[
@@ -1201,11 +1260,35 @@ def _finalize_inventory_limited_mass_transfer(
     gated_mass_transfer: Any,
     scratch_buffers: CondensationScratchBuffers | Any | None = None,
 ) -> Any:
-    """Finalize an already gated proposal; public gas coupling is deferred.
+    """Finalize a pre-gated proposal under particle and gas inventory limits.
 
-    Validation completes before caller-owned state is changed. This direct
-    P2 primitive bounds particle evaporation and limits positive uptake by the
-    gas inventory plus the permitted evaporation release.
+    This private, direct-test-only P2 primitive first bounds evaporation by
+    owned particle mass. It then limits concentration-weighted positive uptake
+    for each box and species to gas inventory plus permitted evaporation
+    release. It mutates particle masses and any supplied P2 sidecars, but
+    deliberately does not mutate ``gas.concentration``; public orchestration
+    and gas coupling remain deferred.
+
+    Args:
+        particles: GPU particle data with float64 masses and concentrations.
+        gas: GPU gas data whose concentration supplies read-only inventory.
+        gated_mass_transfer: Float64 ``(n_boxes, n_particles, n_species)``
+            proposal [kg] already P1-gated for partitioning and inactive slots.
+        scratch_buffers: Optional validated scratch sidecar. Only its P2 demand,
+            release, and scale fields are resolved or mutated.
+
+    Returns:
+        New float64 finalized applied-transfer array matching particle masses
+        [kg].
+
+    Raises:
+        ValueError: If masses, the proposal, particle or gas arrays, or supplied
+            scratch metadata have incompatible shape, dtype, or device.
+
+    Notes:
+        Metadata preflight finishes before this helper allocates output or
+        launches a mutating kernel. Invalid inputs therefore leave caller-owned
+        state unchanged; this does not promise rollback after a device failure.
     """
     masses = particles.masses
     if not _is_warp_array_like(masses) or len(masses.shape) != 3:

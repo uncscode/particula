@@ -11,10 +11,19 @@ entries match an all-enabled control. `particula/gpu/tests/conversion_test.py`
 covers binary partitioning restoration at the CPU↔Warp boundary.
 
 Unit tests ship with every remaining phase. Use explicit fp64 fixtures and
-compare against CPU inventory-limit semantics. Required cases include condensation with ample
-and insufficient gas, evaporation, mixed positive/negative transfer, disabled
-species, inactive and zero-concentration slots, and independent multi-box and
-multi-species limits.
+compare against CPU inventory-limit semantics. Issue #1303 adds an independent
+NumPy oracle in `particula/gpu/kernels/tests/_condensation_test_support.py` for
+the direct helper: ample, insufficient, and zero gas; evaporation; mixed
+positive/negative transfer; disabled/pre-gated species; inactive
+zero-concentration slots; and independent multi-box/multi-species limits. It
+also verifies supplied P2 sidecar identity, unchanged gas, repeatability,
+finite/nonnegative particle mass, and atomic rejection of malformed proposals
+or P2 sidecars.
+
+Launch-spy coverage proves the successful public four-substep P1 path launches
+none of the P2 kernels and leaves sentinel P2 sidecars unchanged. P2 tests are
+Warp-CPU direct-helper tests; CUDA parity and public coupled conservation remain
+P3--P4 work.
 
 Conservation is asserted independently per box/species: concentration-weighted
 particle gain equals gas loss to tight bookkeeping tolerance; both inventories

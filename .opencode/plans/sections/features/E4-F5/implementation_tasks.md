@@ -11,21 +11,22 @@
     zeros raw transfer for a disabled species or inactive particle before
     application. Preserve `gas.concentration` and the existing enabled-entry
     clamp/accumulator behavior.
-3. Add private fp64 launches for per-particle evaporation bounds and separate
-   positive/negative `(n_boxes, n_species)` transfer reductions, using the
-   caller-owned fixed-shape scratch established by E4-F3.
-4. Add the gas-limited positive-scale launch using current gas inventory plus
-   permitted evaporation; keep launches 2--4 and their orchestration to roughly
-   100 production LOC before tests.
-5. Add the finalized-transfer apply launch so particle gain and gas loss are
-   opposite aggregates, then assert finite nonnegative postconditions in the
-   kernel tests.
+3. [x] **Issue #1303:** Add private fp64 evaporation-bound, ordered
+    positive/negative reduction, uptake-scale, and finalize/apply launches plus
+    a direct-test-only helper. It resolves only P2 sidecars, applies finalized
+    particle transfer, and leaves gas read-only.
+4. [x] **Issue #1303:** Add an independent NumPy oracle and direct-helper
+    atomic-preflight regressions, including multi-box/species isolation,
+    mixed-sign funding, supplied-sidecar identity, and unchanged gas.
+5. [x] **Issue #1303:** Prove `condensation_step_gpu()` remains P1-only: its
+    four-substep launch trace excludes every P2 kernel and sentinel P2
+    sidecars remain untouched.
 6. Call the limiting/apply launches from each of the four
    `condensation_step_gpu()` substeps and refresh E4-F1/F2/F4 dependent state
    from the newly updated gas.
 7. Route the finalized whole-call transfer, not the raw request, to the return
    accumulator and E4-F4 latent-energy accumulator.
-8. Add per-launch and end-to-end cases to
+8. Add public-production and end-to-end cases to
    `particula/gpu/kernels/tests/condensation_test.py` and the same-change
    conservation regression to
    `particula/integration_tests/condensation_particle_resolved_test.py`.

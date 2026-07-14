@@ -2,8 +2,10 @@
 
 - [x] Issue #1302: `partitioning == 0` leaves particle species strictly
   unchanged; `gas.concentration` remains unchanged for the particle-only path.
-- [ ] Finalized uptake never exceeds current gas plus same-substep evaporation.
-- [ ] Evaporation never exceeds per-particle or aggregate particle inventory.
+- [x] Issue #1303 direct helper: finalized uptake never exceeds current gas
+  plus same-box/species release from the already-gated proposal.
+- [x] Issue #1303 direct helper: evaporation never exceeds per-particle owned
+  mass.
 - [ ] Particle gain equals gas loss for every box/species at tight tolerance.
 - [ ] Gas and particle inventories remain finite and nonnegative; inactive slots are unchanged.
 - [ ] All four fixed substeps consume current, already-updated gas state.
@@ -12,6 +14,10 @@
   shape/device/dtype/value failures occur before observable state mutation.
 - [x] Issue #1302: binary-mask checking uses only a private status readback; no
   container/data transfer, schema change, or caller-scratch allocation occurs.
+- [x] Issue #1303: invalid direct-helper proposal/P2-sidecar inputs fail before
+  masses, gas, proposal, or supplied P2 sidecars change.
+- [x] Issue #1303: the public P1 path launches no P2 inventory kernels and
+  leaves supplied P2 sidecars untouched.
 - [ ] Production hook and issue #1272 conservation regression land together.
 - [ ] CPU reference and Warp CPU pass; CUDA parity passes when available.
 
