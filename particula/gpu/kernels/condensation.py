@@ -128,8 +128,10 @@ class CondensationScratchBuffers:
     This concrete-module-only sidecar is intentionally not exported. Every
     non-``None`` field is a caller-owned, active-device ``wp.float64`` array
     whose shape must remain stable: transfer fields have shape
-    ``(n_boxes, n_particles, n_species)`` and property fields have shape
-    ``(n_boxes,)``. Fields may be omitted independently; omitted fields are
+    ``(n_boxes, n_particles, n_species)``, property fields have shape
+    ``(n_boxes,)``, and P2-only limiting sidecars have shape
+    ``(n_boxes, n_species)``. Fields may be omitted independently; omitted
+    fields are
     step-local fallback allocations, while successful calls preserve every
     supplied object's identity. Transfer roles are deliberately separate: work
     retains the raw proposal from the final substep, while total records the
@@ -153,12 +155,21 @@ class CondensationScratchBuffers:
             array with shape ``(n_boxes,)`` [Pa·s].
         mean_free_path: Optional caller-owned per-box mean-free-path array with
             shape ``(n_boxes,)`` [m].
+        positive_mass_transfer_demand: Optional P2-only per-box, per-species
+            reduction storage. P1 validates but does not read or write it.
+        negative_mass_transfer_release: Optional P2-only per-box, per-species
+            reduction storage. P1 validates but does not read or write it.
+        positive_mass_transfer_scale: Optional P2-only per-box, per-species
+            scale storage. P1 validates but does not read or write it.
     """
 
     work_mass_transfer: Any | None = None
     total_mass_transfer: Any | None = None
     dynamic_viscosity: Any | None = None
     mean_free_path: Any | None = None
+    positive_mass_transfer_demand: Any | None = None
+    negative_mass_transfer_release: Any | None = None
+    positive_mass_transfer_scale: Any | None = None
 
 
 def _read_float64_array(array: Any) -> np.ndarray:
@@ -204,6 +215,9 @@ def validate_condensation_scratch_buffers(
         ("total_mass_transfer", (n_boxes, n_particles, n_species)),
         ("dynamic_viscosity", (n_boxes,)),
         ("mean_free_path", (n_boxes,)),
+        ("positive_mass_transfer_demand", (n_boxes, n_species)),
+        ("negative_mass_transfer_release", (n_boxes, n_species)),
+        ("positive_mass_transfer_scale", (n_boxes, n_species)),
     ):
         values = getattr(candidate, name)
         if values is not None:
@@ -989,6 +1003,78 @@ def _validate_gas_arrays(
         )
 
 
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
+def _validate_partitioning_values_kernel(
+    partitioning: Any, invalid: Any
+) -> None:
+    """Record non-binary entries in a per-box partitioning mask."""
+    box_idx, species_idx = wp.tid()  # type: ignore[misc]
+    value = partitioning[box_idx, species_idx]
+    if value != wp.int32(0) and value != wp.int32(1):
+        wp.atomic_add(invalid, 0, 1)
+
+
+def _validate_partitioning_metadata(
+    partitioning: Any,
+    n_boxes: int,
+    n_species: int,
+    device: Any,
+    caller_name: str,
+) -> None:
+    """Validate an active-device per-box partitioning mask's metadata."""
+    _validate_array_metadata(
+        "gas.partitioning",
+        partitioning,
+        (n_boxes, n_species),
+        wp.int32,
+        device,
+        caller_name,
+        "",
+    )
+
+
+def _validate_partitioning_values(
+    partitioning: Any,
+    n_boxes: int,
+    n_species: int,
+    device: Any,
+) -> None:
+    """Validate the binary values after all caller sidecars validate.
+
+    The one-element status buffer is private disposable preflight state. Its
+    readback is necessary to make arbitrary device-resident non-binary values
+    observable before any caller-owned state is changed.
+    """
+    invalid = wp.zeros(1, dtype=wp.int32, device=device)
+    wp.launch(
+        _validate_partitioning_values_kernel,
+        dim=(n_boxes, n_species),
+        inputs=[partitioning, invalid],
+        device=device,
+    )
+    if invalid.numpy()[0] != 0:
+        raise ValueError("gas.partitioning must contain only binary 0/1 values")
+
+
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
+def _gate_mass_transfer_kernel(
+    partitioning: Any,
+    concentration: Any,
+    work_mass_transfer: Any,
+) -> None:
+    """Zero raw proposals for disabled species and inactive particle slots."""
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
+    for species_idx in range(work_mass_transfer.shape[2]):
+        if partitioning[box_idx, species_idx] != wp.int32(1) or concentration[
+            box_idx, particle_idx
+        ] == wp.float64(0.0):
+            work_mass_transfer[box_idx, particle_idx, species_idx] = wp.float64(
+                0.0
+            )
+
+
 def _validate_device_match(name: str, array: Any, expected_device: Any) -> None:
     """Validate that a Warp array is on the expected device.
 
@@ -1023,6 +1109,7 @@ def _validate_device_arrays(particles: Any, gas: Any, device: Any) -> None:
     _validate_device_match("gas molar mass", gas.molar_mass, device)
     _validate_device_match("gas concentration", gas.concentration, device)
     _validate_device_match("gas vapor pressure", gas.vapor_pressure, device)
+    _validate_device_match("gas partitioning", gas.partitioning, device)
 
 
 def condensation_step_gpu(  # noqa: C901
@@ -1049,6 +1136,8 @@ def condensation_step_gpu(  # noqa: C901
     Args:
         particles: GPU-resident particle data.
         gas: GPU-resident gas data.
+            ``gas.partitioning`` must be an active-device binary ``wp.int32``
+            mask shaped ``(n_boxes, n_species)``.
         temperature: Direct gas temperature as either a scalar or a Warp array
             with shape ``(n_boxes,)``. Use ``None`` only with
             ``environment=...``.
@@ -1081,6 +1170,9 @@ def condensation_step_gpu(  # noqa: C901
             independently and use step-local fallback allocation. A supplied
             total transfer buffer is returned by identity. Work retains the
             final raw proposal and total accumulates clamped applied transfers.
+            P2 limiting sidecars have shape ``(n_boxes, n_species)`` and are
+            metadata-validated only; P1 does not allocate, read, clear, or
+            write them.
             Validation is performed before allocation or mutation. Arrays must
             remain alive and unmodified until launched work completes and may
             be reused only after a successful completion.
@@ -1110,6 +1202,8 @@ def condensation_step_gpu(  # noqa: C901
 
     Raises:
         ValueError: If species counts, array lengths, or devices mismatch.
+        ValueError: If ``gas.partitioning`` is not an active-device binary
+             ``wp.int32`` array shaped ``(n_boxes, n_species)``.
         ValueError: If direct ``temperature`` or ``pressure`` inputs are mixed
             with ``environment``.
         ValueError: If direct inputs are missing when ``environment`` is
@@ -1156,6 +1250,10 @@ def condensation_step_gpu(  # noqa: C901
         allocation, launch, refresh, or mutation. Thus a validation failure
         leaves caller-owned particle, gas, environment, sidecar, and supplied
         output buffers unchanged and is retryable with corrected inputs.
+        In particular, partitioning metadata and its status-only binary
+        validation complete before environment normalization, fallback
+        allocation, output clearing, vapor-pressure refresh, or physical
+        mutation.
         Each substep overwrites ``gas.vapor_pressure`` from the normalized
         current temperature, prepares box-level properties, calculates a raw
         proposal from current particle mass, then applies and accumulates the
@@ -1203,13 +1301,12 @@ def condensation_step_gpu(  # noqa: C901
 
     device = particles.masses.device
     _validate_device_arrays(particles, gas, device)
-    validate_environment_inputs(
-        temperature=temperature,
-        pressure=pressure,
-        environment=environment,
-        n_boxes=n_boxes,
-        device=device,
-        caller_name="condensation_step_gpu",
+    _validate_partitioning_metadata(
+        gas.partitioning,
+        n_boxes,
+        n_species,
+        device,
+        "condensation_step_gpu",
     )
     thermodynamics = validate_thermodynamics_config(
         thermodynamics,
@@ -1310,6 +1407,22 @@ def condensation_step_gpu(  # noqa: C901
                 scratch_buffers.mean_free_path,
             ),
         )
+
+    _validate_partitioning_values(
+        gas.partitioning,
+        n_boxes,
+        n_species,
+        device,
+    )
+
+    validate_environment_inputs(
+        temperature=temperature,
+        pressure=pressure,
+        environment=environment,
+        n_boxes=n_boxes,
+        device=device,
+        caller_name="condensation_step_gpu",
+    )
 
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature=temperature,
@@ -1540,6 +1653,16 @@ def condensation_step_gpu(  # noqa: C901
                 wp.float64(constants.BOLTZMANN_CONSTANT),
                 refresh_temperature,
                 substep_time_step,
+                work_mass_transfer,
+            ],
+            device=device,
+        )
+        wp.launch(
+            _gate_mass_transfer_kernel,
+            dim=(n_boxes, n_particles),
+            inputs=[
+                gas.partitioning,
+                particles.concentration,
                 work_mass_transfer,
             ],
             device=device,

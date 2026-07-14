@@ -175,7 +175,7 @@ class TestWarpGasDataCreation:
         gas.vapor_pressure = wp.array(
             np.ones((n_boxes, n_species)) * 1000.0, dtype=wp.float64
         )
-        gas.partitioning = wp.array([1, 1, 0], dtype=wp.int32)
+        gas.partitioning = wp.array([[1, 1, 0], [1, 1, 0]], dtype=wp.int32)
 
         # Verify struct is accessible
         assert gas.molar_mass is not None
@@ -193,13 +193,13 @@ class TestWarpGasDataCreation:
         )
         gas.concentration = wp.zeros((n_boxes, n_species), dtype=wp.float64)
         gas.vapor_pressure = wp.ones((n_boxes, n_species), dtype=wp.float64)
-        gas.partitioning = wp.array([1, 1, 0, 1], dtype=wp.int32)
+        gas.partitioning = wp.array([[1, 1, 0, 1]] * n_boxes, dtype=wp.int32)
 
         # Verify shapes
         assert gas.molar_mass.shape == (n_species,)
         assert gas.concentration.shape == (n_boxes, n_species)
         assert gas.vapor_pressure.shape == (n_boxes, n_species)
-        assert gas.partitioning.shape == (n_species,)
+        assert gas.partitioning.shape == (n_boxes, n_species)
 
     def test_single_box_gas_data(self) -> None:
         """Test WarpGasData with n_boxes = 1 (single box)."""
@@ -209,13 +209,13 @@ class TestWarpGasDataCreation:
         gas.molar_mass = wp.array([0.018, 0.044], dtype=wp.float64)
         gas.concentration = wp.zeros((n_boxes, n_species), dtype=wp.float64)
         gas.vapor_pressure = wp.ones((n_boxes, n_species), dtype=wp.float64)
-        gas.partitioning = wp.array([1, 0], dtype=wp.int32)
+        gas.partitioning = wp.array([[1, 0]], dtype=wp.int32)
 
         # Verify single-box shapes
         assert gas.molar_mass.shape == (2,)
         assert gas.concentration.shape == (1, 2)
         assert gas.vapor_pressure.shape == (1, 2)
-        assert gas.partitioning.shape == (2,)
+        assert gas.partitioning.shape == (n_boxes, n_species)
 
     def test_multi_box_gas_data(self) -> None:
         """Test WarpGasData with n_boxes > 1 (multi-box CFD scenario)."""
@@ -225,13 +225,13 @@ class TestWarpGasDataCreation:
         gas.molar_mass = wp.array([0.018, 0.150, 0.200], dtype=wp.float64)
         gas.concentration = wp.zeros((n_boxes, n_species), dtype=wp.float64)
         gas.vapor_pressure = wp.ones((n_boxes, n_species), dtype=wp.float64)
-        gas.partitioning = wp.array([1, 1, 0], dtype=wp.int32)
+        gas.partitioning = wp.array([[1, 1, 0]] * n_boxes, dtype=wp.int32)
 
         # Verify multi-box shapes
         assert gas.molar_mass.shape == (3,)
         assert gas.concentration.shape == (5, 3)
         assert gas.vapor_pressure.shape == (5, 3)
-        assert gas.partitioning.shape == (3,)
+        assert gas.partitioning.shape == (n_boxes, n_species)
 
     def test_gas_data_field_dtypes(self) -> None:
         """Verify array dtypes: float64 numerical, int32 partitioning."""
@@ -241,7 +241,7 @@ class TestWarpGasDataCreation:
         gas.molar_mass = wp.array([0.018, 0.150], dtype=wp.float64)
         gas.concentration = wp.zeros((n_boxes, n_species), dtype=wp.float64)
         gas.vapor_pressure = wp.ones((n_boxes, n_species), dtype=wp.float64)
-        gas.partitioning = wp.array([1, 0], dtype=wp.int32)
+        gas.partitioning = wp.array([[1, 0]] * n_boxes, dtype=wp.int32)
 
         # Verify dtypes
         assert gas.molar_mass.dtype == wp.float64
@@ -257,7 +257,7 @@ class TestWarpGasDataCreation:
         np_molar_mass = np.array([0.018, 0.029, 0.044, 0.150])
         np_concentration = np.random.rand(n_boxes, n_species) * 1e15
         np_vapor_pressure = np.random.rand(n_boxes, n_species) * 1000.0
-        np_partitioning = np.array([1, 0, 1, 1], dtype=np.int32)
+        np_partitioning = np.array([[1, 0, 1, 1]] * n_boxes, dtype=np.int32)
 
         # Create Warp struct with NumPy data
         gas = WarpGasData()
@@ -270,7 +270,7 @@ class TestWarpGasDataCreation:
         assert gas.molar_mass.shape == (n_species,)
         assert gas.concentration.shape == (n_boxes, n_species)
         assert gas.vapor_pressure.shape == (n_boxes, n_species)
-        assert gas.partitioning.shape == (n_species,)
+        assert gas.partitioning.shape == (n_boxes, n_species)
 
 
 class TestWarpEnvironmentDataCreation:
@@ -457,16 +457,16 @@ class TestWarpDataFieldAccess:
 
     def test_gas_data_partitioning_int32(self) -> None:
         """Test partitioning array uses int32 values correctly."""
-        n_species = 4
+        n_boxes, n_species = 2, 4
 
         # Create partitioning mask (1=True, 0=False)
-        np_partitioning = np.array([1, 0, 1, 0], dtype=np.int32)
+        np_partitioning = np.array([[1, 0, 1, 0]] * n_boxes, dtype=np.int32)
 
         gas = WarpGasData()
         gas.partitioning = wp.array(np_partitioning, dtype=wp.int32)
 
         # Verify shape and dtype
-        assert gas.partitioning.shape == (n_species,)
+        assert gas.partitioning.shape == (n_boxes, n_species)
         assert gas.partitioning.dtype == wp.int32
 
         # Convert back and verify values

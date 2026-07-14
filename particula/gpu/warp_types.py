@@ -118,8 +118,8 @@ class WarpGasData:
         vapor_pressure: Vapor pressures in Pa.
             Shape: (n_boxes, n_species)
             GPU-only helper state for condensation kernels.
-        partitioning: Whether each species can partition to particles.
-            Shape: (n_species,)
+        partitioning: Whether each species can partition to particles per box.
+            Shape: (n_boxes, n_species)
             Uses int32 (1=True, 0=False) for GPU compatibility.
 
     Example:
@@ -137,13 +137,13 @@ class WarpGasData:
         >>> gas.vapor_pressure = wp.ones(
         ...     (n_boxes, n_species), dtype=wp.float64
         ... ) * 1000.0
-        >>> gas.partitioning = wp.array([1, 1, 0], dtype=wp.int32)
+        >>> gas.partitioning = wp.array([[1, 1, 0], [1, 1, 0]], dtype=wp.int32)
     """
 
     molar_mass: wp.array(dtype=wp.float64)  # type: ignore[valid-type]
     concentration: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
     vapor_pressure: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
-    partitioning: wp.array(dtype=wp.int32)  # type: ignore[valid-type]
+    partitioning: wp.array2d(dtype=wp.int32)  # type: ignore[valid-type]
 
 
 @wp.struct

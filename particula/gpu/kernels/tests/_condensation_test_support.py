@@ -242,18 +242,30 @@ def _make_condensation_scratch_buffers(
         "total_mass_transfer",
         "dynamic_viscosity",
         "mean_free_path",
+        "positive_mass_transfer_demand",
+        "negative_mass_transfer_release",
+        "positive_mass_transfer_scale",
     ),
 ) -> Any:
     """Build selected caller-owned fp64 scratch fields for a fixed shape."""
-    n_boxes, _, _ = shape
+    n_boxes, _, n_species = shape
     values: dict[str, Any] = {
         "work_mass_transfer": None,
         "total_mass_transfer": None,
         "dynamic_viscosity": None,
         "mean_free_path": None,
+        "positive_mass_transfer_demand": None,
+        "negative_mass_transfer_release": None,
+        "positive_mass_transfer_scale": None,
     }
     for name in fields:
-        field_shape = shape if "mass_transfer" in name else (n_boxes,)
+        field_shape = (
+            shape
+            if name in {"work_mass_transfer", "total_mass_transfer"}
+            else (n_boxes, n_species)
+            if "mass_transfer" in name
+            else (n_boxes,)
+        )
         values[name] = wp.full(
             field_shape, wp.float64(-1.0), dtype=wp.float64, device=device
         )
@@ -1340,7 +1352,12 @@ def _assert_p4_gpu_matches_reference(
         atol=P4_PARITY_ATOL,
     )
     npt.assert_array_equal(molar_mass, initial_molar_mass)
-    npt.assert_array_equal(partitioning, initial_partitioning.astype(np.int32))
+    npt.assert_array_equal(
+        partitioning,
+        np.broadcast_to(
+            initial_partitioning.astype(np.int32), partitioning.shape
+        ),
+    )
 
     assert np.all(np.isfinite(final_mass)) and np.all(final_mass >= 0.0)
     assert np.all(np.isfinite(total)) and np.all(np.isfinite(vapor_pressure))
@@ -1727,6 +1744,12 @@ def test_condensation_scratch_buffers_complete_sidecar_preserves_identity(
     assert np.all(np.isfinite(scratch.work_mass_transfer.numpy()))
     assert np.all(np.isfinite(scratch.total_mass_transfer.numpy()))
     assert np.all(scratch.total_mass_transfer.numpy() <= 0.0)
+    for field in (
+        "positive_mass_transfer_demand",
+        "negative_mass_transfer_release",
+        "positive_mass_transfer_scale",
+    ):
+        npt.assert_array_equal(getattr(scratch, field).numpy(), -1.0)
     npt.assert_allclose(gas.concentration, initial_gas, rtol=0.0, atol=0.0)
 
 
@@ -1753,6 +1776,9 @@ def test_validate_condensation_scratch_buffers_rejects_non_exact_sidecar_type(
         ("total_mass_transfer",),
         ("dynamic_viscosity",),
         ("mean_free_path",),
+        ("positive_mass_transfer_demand",),
+        ("negative_mass_transfer_release",),
+        ("positive_mass_transfer_scale",),
         ("work_mass_transfer", "dynamic_viscosity"),
     ),
 )
@@ -1883,6 +1909,9 @@ def test_condensation_scratch_transfer_overlap_is_atomic(
         "total_mass_transfer",
         "dynamic_viscosity",
         "mean_free_path",
+        "positive_mass_transfer_demand",
+        "negative_mass_transfer_release",
+        "positive_mass_transfer_scale",
     ),
 )
 def test_condensation_scratch_buffer_wrong_dtype_is_atomic(
@@ -1929,6 +1958,9 @@ def test_condensation_scratch_buffer_wrong_dtype_is_atomic(
         "total_mass_transfer",
         "dynamic_viscosity",
         "mean_free_path",
+        "positive_mass_transfer_demand",
+        "negative_mass_transfer_release",
+        "positive_mass_transfer_scale",
     ),
 )
 def test_condensation_scratch_buffer_wrong_shape_is_atomic(
@@ -1958,6 +1990,323 @@ def test_condensation_scratch_buffer_wrong_shape_is_atomic(
             scratch_buffers=scratch,
         )
     npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "positive_mass_transfer_demand",
+        "negative_mass_transfer_release",
+        "positive_mass_transfer_scale",
+    ),
+)
+def test_condensation_p2_scratch_non_warp_value_is_atomic(
+    warp_cpu_device: str, field: str
+) -> None:
+    """P2 scratch fields reject non-Warp objects without changing state."""
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    scratch = _make_condensation_scratch_buffers(
+        particles.masses.shape, warp_cpu_device
+    )
+    scratch = dataclasses.replace(
+        scratch, **{field: np.full((1, 2), -1.0, dtype=np.float64)}
+    )
+    transfer = wp.full(
+        particles.masses.shape,
+        wp.float64(7.0),
+        dtype=wp.float64,
+        device=warp_cpu_device,
+    )
+    initial_mass = gpu_particles.masses.numpy().copy()
+    initial_gas = gpu_gas.concentration.numpy().copy()
+    initial_vapor = gpu_gas.vapor_pressure.numpy().copy()
+    initial_transfer = transfer.numpy().copy()
+    initial_scratch = {
+        field_info.name: (
+            value.copy()
+            if isinstance(value, np.ndarray)
+            else value.numpy().copy()
+        )
+        for field_info in dataclasses.fields(scratch)
+        if (value := getattr(scratch, field_info.name)) is not None
+    }
+
+    with pytest.raises(ValueError, match=f"scratch_buffers.{field}"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            298.15,
+            101325.0,
+            0.1,
+            mass_transfer=transfer,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            scratch_buffers=scratch,
+        )
+
+    npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
+    npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
+    npt.assert_array_equal(gpu_gas.vapor_pressure.numpy(), initial_vapor)
+    npt.assert_array_equal(transfer.numpy(), initial_transfer)
+    for name, initial_value in initial_scratch.items():
+        value = getattr(scratch, name)
+        actual = value if isinstance(value, np.ndarray) else value.numpy()
+        npt.assert_array_equal(actual, initial_value)
+
+
+@pytest.mark.parametrize(
+    "field",
+    (
+        "positive_mass_transfer_demand",
+        "negative_mass_transfer_release",
+        "positive_mass_transfer_scale",
+    ),
+)
+def test_condensation_p2_scratch_wrong_device_is_atomic(field: str) -> None:
+    """P2 scratch fields reject alternate-device storage before mutation."""
+    runtime = _load_warp_runtime()
+    if not runtime.cuda_available(runtime.wp):
+        pytest.skip(runtime.CUDA_SKIP_REASON)
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device="cpu")
+    gpu_gas = to_warp_gas_data(
+        gas, device="cpu", vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    scratch = _make_condensation_scratch_buffers(particles.masses.shape, "cpu")
+    scratch = dataclasses.replace(
+        scratch,
+        **{
+            field: wp.full(
+                (1, 2), wp.float64(-1.0), dtype=wp.float64, device="cuda"
+            )
+        },
+    )
+    initial_mass = gpu_particles.masses.numpy().copy()
+    initial_gas = gpu_gas.concentration.numpy().copy()
+    initial_vapor = gpu_gas.vapor_pressure.numpy().copy()
+
+    with pytest.raises(ValueError, match=f"scratch_buffers.{field} device"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            298.15,
+            101325.0,
+            0.1,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            scratch_buffers=scratch,
+        )
+
+    npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
+    npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
+    npt.assert_array_equal(gpu_gas.vapor_pressure.numpy(), initial_vapor)
+
+
+@pytest.mark.parametrize("invalid_value", (-1, 2))
+def test_condensation_partitioning_nonbinary_mask_is_atomic(
+    warp_cpu_device: str, invalid_value: int
+) -> None:
+    """A non-binary per-box mask fails before refreshing mutable state."""
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    gpu_gas.partitioning = wp.array(
+        [[1, invalid_value]], dtype=wp.int32, device=warp_cpu_device
+    )
+    initial_mass = gpu_particles.masses.numpy().copy()
+    initial_gas = gpu_gas.concentration.numpy().copy()
+    initial_vapor = gpu_gas.vapor_pressure.numpy().copy()
+    with pytest.raises(ValueError, match="gas.partitioning must contain"):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            298.15,
+            101325.0,
+            0.1,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+        )
+    npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
+    npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
+    npt.assert_array_equal(gpu_gas.vapor_pressure.numpy(), initial_vapor)
+
+
+@pytest.mark.parametrize(
+    ("mask", "message"),
+    (
+        (np.array([1, 0], dtype=np.int32), "gas.partitioning"),
+        (np.ones((1, 2), dtype=np.float64), "gas.partitioning"),
+        (np.ones((1, 3), dtype=np.int32), "gas.partitioning"),
+    ),
+)
+def test_condensation_partitioning_metadata_failure_is_atomic(
+    warp_cpu_device: str,
+    mask: np.ndarray,
+    message: str,
+) -> None:
+    """Malformed partitioning metadata leaves every caller buffer untouched."""
+    particles = _make_particle_data(1, 2, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    if mask.dtype == np.int32:
+        gpu_gas.partitioning = wp.array(
+            mask, dtype=wp.int32, device=warp_cpu_device
+        )
+        gas_for_step = gpu_gas
+    else:
+        # Warp structs reject a wrong field dtype at assignment, so use the
+        # entry point's duck-typed container contract to exercise preflight.
+        gas_for_step = SimpleNamespace(
+            molar_mass=gpu_gas.molar_mass,
+            concentration=gpu_gas.concentration,
+            vapor_pressure=gpu_gas.vapor_pressure,
+            partitioning=wp.array(
+                mask, dtype=wp.float64, device=warp_cpu_device
+            ),
+        )
+    scratch = _make_condensation_scratch_buffers(
+        particles.masses.shape, warp_cpu_device
+    )
+    transfer = wp.full(
+        particles.masses.shape,
+        wp.float64(7.0),
+        dtype=wp.float64,
+        device=warp_cpu_device,
+    )
+    initial_mass = gpu_particles.masses.numpy().copy()
+    initial_gas = gpu_gas.concentration.numpy().copy()
+    initial_vapor = gpu_gas.vapor_pressure.numpy().copy()
+    initial_transfer = transfer.numpy().copy()
+    initial_scratch = {
+        field.name: getattr(scratch, field.name).numpy().copy()
+        for field in dataclasses.fields(scratch)
+    }
+
+    with pytest.raises(ValueError, match=message):
+        condensation_step_gpu(
+            gpu_particles,
+            gas_for_step,
+            298.15,
+            101325.0,
+            0.1,
+            mass_transfer=transfer,
+            thermodynamics=_make_thermodynamics_config(gas_for_step),
+            scratch_buffers=scratch,
+        )
+
+    npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
+    npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
+    npt.assert_array_equal(gpu_gas.vapor_pressure.numpy(), initial_vapor)
+    npt.assert_array_equal(transfer.numpy(), initial_transfer)
+    for field in dataclasses.fields(scratch):
+        npt.assert_array_equal(
+            getattr(scratch, field.name).numpy(), initial_scratch[field.name]
+        )
+
+
+def test_condensation_partitioning_gates_disabled_species_and_inactive_slots(
+    warp_cpu_device: str,
+) -> None:
+    """The raw and accumulated transfers are zeroed before application gates."""
+    particles = _make_particle_data(2, 2, 2)
+    particles.concentration[1, 1] = 0.0
+    gas = _make_gas_data(2, 2)
+    gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(2, 2)
+    )
+    gpu_gas.partitioning = wp.array(
+        [[1, 0], [0, 1]], dtype=wp.int32, device=warp_cpu_device
+    )
+    scratch = _make_condensation_scratch_buffers(
+        particles.masses.shape,
+        warp_cpu_device,
+        fields=("work_mass_transfer", "total_mass_transfer"),
+    )
+    initial_mass = gpu_particles.masses.numpy().copy()
+    initial_gas = gpu_gas.concentration.numpy().copy()
+    _, total = condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        298.15,
+        101325.0,
+        0.1,
+        thermodynamics=_make_thermodynamics_config(gpu_gas),
+        scratch_buffers=scratch,
+    )
+    work = scratch.work_mass_transfer.numpy()
+    total_values = total.numpy()
+    final_mass = gpu_particles.masses.numpy()
+    for box_idx, species_idx in ((0, 1), (1, 0)):
+        npt.assert_array_equal(work[box_idx, :, species_idx], 0.0)
+        npt.assert_array_equal(total_values[box_idx, :, species_idx], 0.0)
+        npt.assert_array_equal(
+            final_mass[box_idx, :, species_idx],
+            initial_mass[box_idx, :, species_idx],
+        )
+    npt.assert_array_equal(work[1, 1, :], 0.0)
+    npt.assert_array_equal(total_values[1, 1, :], 0.0)
+    npt.assert_array_equal(final_mass[1, 1, :], initial_mass[1, 1, :])
+    npt.assert_array_equal(gpu_gas.concentration.numpy(), initial_gas)
+
+
+def test_condensation_partitioning_enabled_entry_matches_all_enabled_control(
+    warp_cpu_device: str,
+) -> None:
+    """A binary enabled entry preserves the all-enabled raw proposal."""
+    particles = _make_particle_data(1, 1, 1)
+    gas = _make_gas_data(1, 1)
+    gated_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    gated_gas = to_warp_gas_data(
+        gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(1, 1)
+    )
+    control_particles = to_warp_particle_data(particles, device=warp_cpu_device)
+    control_gas = to_warp_gas_data(
+        gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(1, 1)
+    )
+    gated_scratch = _make_condensation_scratch_buffers(
+        particles.masses.shape,
+        warp_cpu_device,
+        fields=("work_mass_transfer",),
+    )
+    control_scratch = _make_condensation_scratch_buffers(
+        particles.masses.shape,
+        warp_cpu_device,
+        fields=("work_mass_transfer",),
+    )
+    condensation_step_gpu(
+        gated_particles,
+        gated_gas,
+        298.15,
+        101325.0,
+        0.1,
+        thermodynamics=_make_thermodynamics_config(gated_gas),
+        scratch_buffers=gated_scratch,
+    )
+    condensation_step_gpu(
+        control_particles,
+        control_gas,
+        298.15,
+        101325.0,
+        0.1,
+        thermodynamics=_make_thermodynamics_config(control_gas),
+        scratch_buffers=control_scratch,
+    )
+    npt.assert_allclose(
+        gated_scratch.work_mass_transfer.numpy(),
+        control_scratch.work_mass_transfer.numpy(),
+        rtol=1.0e-12,
+        atol=1.0e-30,
+    )
 
 
 def _record_condensation_stiffness_trials(
@@ -3723,7 +4072,7 @@ def test_condensation_activity_surface_invalid_sidecar_is_atomic(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
 ) -> None:
-    """Invalid sidecars preserve caller buffers and never launch a kernel."""
+    """Invalid sidecars preserve caller buffers after mask-only preflight."""
     particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=2)
     gas = _make_gas_data(n_boxes=1, n_species=2)
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -3751,8 +4100,13 @@ def test_condensation_activity_surface_invalid_sidecar_is_atomic(
         )
     )
 
-    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
-        raise AssertionError("invalid sidecar launched a kernel")
+    original_launch = condensation_module.wp.launch
+
+    def _unexpected_launch(kernel: Any, *args: Any, **kwargs: Any) -> None:
+        if kernel is condensation_module._validate_partitioning_values_kernel:
+            original_launch(kernel, *args, **kwargs)
+            return
+        raise AssertionError("invalid sidecar launched a non-preflight kernel")
 
     monkeypatch.setattr(condensation_module.wp, "launch", _unexpected_launch)
     with pytest.raises(ValueError, match="kappas"):
@@ -4483,7 +4837,7 @@ def test_condensation_step_gpu_contract_errors_short_circuit_before_helpers(
     pressure: float | None,
     message: str,
 ) -> None:
-    """Contract errors fire before buffer preparation or Warp launch work."""
+    """Contract errors follow the mask-only preflight before normal work."""
     particles = _make_particle_data(n_boxes=1, n_particles=1, n_species=1)
     gas = _make_gas_data(n_boxes=1, n_species=1)
     vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
@@ -4499,7 +4853,13 @@ def test_condensation_step_gpu_contract_errors_short_circuit_before_helpers(
     )
     calls: list[str] = []
 
-    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+    original_launch = condensation_module.wp.launch
+
+    def _unexpected_launch(kernel: Any, *args: Any, **kwargs: Any) -> None:
+        if kernel is condensation_module._validate_partitioning_values_kernel:
+            calls.append("partitioning_validation")
+            original_launch(kernel, *args, **kwargs)
+            return
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
@@ -4515,7 +4875,7 @@ def test_condensation_step_gpu_contract_errors_short_circuit_before_helpers(
             environment=environment,
         )
 
-    assert calls == []
+    assert calls == ["partitioning_validation"]
 
 
 @pytest.mark.parametrize(
@@ -4544,7 +4904,13 @@ def test_missing_scalar_inputs_short_circuit_before_helpers(
     )
     calls: list[str] = []
 
-    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+    original_launch = condensation_module.wp.launch
+
+    def _unexpected_launch(kernel: Any, *args: Any, **kwargs: Any) -> None:
+        if kernel is condensation_module._validate_partitioning_values_kernel:
+            calls.append("partitioning_validation")
+            original_launch(kernel, *args, **kwargs)
+            return
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
@@ -4562,7 +4928,7 @@ def test_missing_scalar_inputs_short_circuit_before_helpers(
             time_step=0.1,
         )
 
-    assert calls == []
+    assert calls == ["partitioning_validation"]
 
 
 @pytest.mark.parametrize(
@@ -4592,7 +4958,13 @@ def test_invalid_scalar_domains_short_circuit_before_launch(
     )
     calls: list[str] = []
 
-    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+    original_launch = condensation_module.wp.launch
+
+    def _unexpected_launch(kernel: Any, *args: Any, **kwargs: Any) -> None:
+        if kernel is condensation_module._validate_partitioning_values_kernel:
+            calls.append("partitioning_validation")
+            original_launch(kernel, *args, **kwargs)
+            return
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
@@ -4607,7 +4979,7 @@ def test_invalid_scalar_domains_short_circuit_before_launch(
             time_step=0.1,
         )
 
-    assert calls == []
+    assert calls == ["partitioning_validation"]
 
 
 def test_invalid_environment_domains_short_circuit_before_launch(
@@ -4631,7 +5003,13 @@ def test_invalid_environment_domains_short_circuit_before_launch(
     )
     calls: list[str] = []
 
-    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+    original_launch = condensation_module.wp.launch
+
+    def _unexpected_launch(kernel: Any, *args: Any, **kwargs: Any) -> None:
+        if kernel is condensation_module._validate_partitioning_values_kernel:
+            calls.append("partitioning_validation")
+            original_launch(kernel, *args, **kwargs)
+            return
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
@@ -4650,7 +5028,7 @@ def test_invalid_environment_domains_short_circuit_before_launch(
             environment=environment,
         )
 
-    assert calls == []
+    assert calls == ["partitioning_validation"]
 
 
 @pytest.mark.parametrize("field_name", ["temperature", "pressure"])
@@ -4691,7 +5069,13 @@ def test_missing_environment_field_short_circuits_before_launch(
     delattr(environment, field_name)
     calls: list[str] = []
 
-    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+    original_launch = condensation_module.wp.launch
+
+    def _unexpected_launch(kernel: Any, *args: Any, **kwargs: Any) -> None:
+        if kernel is condensation_module._validate_partitioning_values_kernel:
+            calls.append("partitioning_validation")
+            original_launch(kernel, *args, **kwargs)
+            return
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
@@ -4712,7 +5096,7 @@ def test_missing_environment_field_short_circuits_before_launch(
             environment=environment,
         )
 
-    assert calls == []
+    assert calls == ["partitioning_validation"]
     npt.assert_allclose(gpu_particles.masses.numpy(), original_masses)
     npt.assert_allclose(mass_transfer.numpy(), original_mass_transfer)
 
@@ -4751,7 +5135,13 @@ def test_invalid_direct_array_domains_short_circuit_before_launch(
     )
     calls: list[str] = []
 
-    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+    original_launch = condensation_module.wp.launch
+
+    def _unexpected_launch(kernel: Any, *args: Any, **kwargs: Any) -> None:
+        if kernel is condensation_module._validate_partitioning_values_kernel:
+            calls.append("partitioning_validation")
+            original_launch(kernel, *args, **kwargs)
+            return
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
@@ -4774,7 +5164,7 @@ def test_invalid_direct_array_domains_short_circuit_before_launch(
             time_step=0.1,
         )
 
-    assert calls == []
+    assert calls == ["partitioning_validation"]
 
 
 @pytest.mark.parametrize(
@@ -4819,7 +5209,13 @@ def test_condensation_step_gpu_rejects_direct_non_warp_arrays_before_launch(
     original_mass_transfer = np.asarray(mass_transfer.numpy()).copy()
     calls: list[str] = []
 
-    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+    original_launch = condensation_module.wp.launch
+
+    def _unexpected_launch(kernel: Any, *args: Any, **kwargs: Any) -> None:
+        if kernel is condensation_module._validate_partitioning_values_kernel:
+            calls.append("partitioning_validation")
+            original_launch(kernel, *args, **kwargs)
+            return
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
@@ -4835,7 +5231,7 @@ def test_condensation_step_gpu_rejects_direct_non_warp_arrays_before_launch(
             mass_transfer=mass_transfer,
         )
 
-    assert calls == []
+    assert calls == ["partitioning_validation"]
     npt.assert_allclose(gpu_particles.masses.numpy(), original_masses)
     npt.assert_allclose(mass_transfer.numpy(), original_mass_transfer)
 
@@ -4883,7 +5279,13 @@ def test_invalid_environment_array_domains_short_circuit_before_launch(
     )
     calls: list[str] = []
 
-    def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+    original_launch = condensation_module.wp.launch
+
+    def _unexpected_launch(kernel: Any, *args: Any, **kwargs: Any) -> None:
+        if kernel is condensation_module._validate_partitioning_values_kernel:
+            calls.append("partitioning_validation")
+            original_launch(kernel, *args, **kwargs)
+            return
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
@@ -4899,7 +5301,7 @@ def test_invalid_environment_array_domains_short_circuit_before_launch(
             environment=environment,
         )
 
-    assert calls == []
+    assert calls == ["partitioning_validation"]
 
 
 def test_condensation_step_gpu_accepts_direct_environment_arrays(
@@ -5439,11 +5841,15 @@ def test_condensation_step_gpu_zero_timestep_runs_four_ordered_cycles(
     assert returned is total
     assert (
         launch_names
-        == ["_clear_mass_transfer_kernel"]
+        == [
+            "_validate_partitioning_values_kernel",
+            "_clear_mass_transfer_kernel",
+        ]
         + [
             "_refresh_vapor_pressure_kernel",
             "_prepare_environment_properties_kernel",
             "condensation_mass_transfer_kernel",
+            "_gate_mass_transfer_kernel",
             "_apply_and_accumulate_mass_transfer_kernel",
         ]
         * 4

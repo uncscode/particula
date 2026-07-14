@@ -95,7 +95,7 @@ def _assert_gas_gpu_mirror_matches(
     assert gpu_data.molar_mass.shape == source.molar_mass.shape
     assert gpu_data.concentration.shape == source.concentration.shape
     assert gpu_data.vapor_pressure.shape == vapor_pressure.shape
-    assert gpu_data.partitioning.shape == source.partitioning.shape
+    assert gpu_data.partitioning.shape == source.concentration.shape
 
     np.testing.assert_array_equal(
         gpu_data.molar_mass.numpy(), source.molar_mass
@@ -110,7 +110,9 @@ def _assert_gas_gpu_mirror_matches(
     )
     np.testing.assert_array_equal(
         gpu_data.partitioning.numpy(),
-        source.partitioning.astype(np.int32),
+        np.broadcast_to(
+            source.partitioning.astype(np.int32), source.concentration.shape
+        ),
     )
 
     assert gpu_data.molar_mass.dtype == wp.float64
@@ -335,7 +337,7 @@ class TestToWarpGasData:
         gpu_data = to_warp_gas_data(sample_gas_data, device="cpu")
 
         partitioning_np = gpu_data.partitioning.numpy()
-        expected = np.array([1, 1, 0], dtype=np.int32)
+        expected = np.array([[1, 1, 0], [1, 1, 0]], dtype=np.int32)
 
         np.testing.assert_array_equal(partitioning_np, expected)
         assert partitioning_np.dtype == np.int32
@@ -797,7 +799,7 @@ class TestMultiBoxScenarios:
         assert gpu_data.molar_mass.shape == (4,)
         assert gpu_data.concentration.shape == (5, 4)
         assert gpu_data.vapor_pressure.shape == (5, 4)
-        assert gpu_data.partitioning.shape == (4,)
+        assert gpu_data.partitioning.shape == (5, 4)
 
     def test_single_box_particle_data(self) -> None:
         """Test n_boxes = 1 edge case for ParticleData."""
@@ -839,7 +841,7 @@ class TestMultiBoxScenarios:
         assert gpu_data.molar_mass.shape == (2,)
         assert gpu_data.concentration.shape == (1, 2)
         assert gpu_data.vapor_pressure.shape == (1, 2)
-        assert gpu_data.partitioning.shape == (2,)
+        assert gpu_data.partitioning.shape == (1, 2)
 
     def test_multi_box_particle_data_round_trip(self) -> None:
         """Test n_boxes > 1 round-trip for ParticleData."""
@@ -1341,7 +1343,7 @@ class TestFromWarpGasData:
             device="cpu",
         )
         gpu_data.partitioning = wp.array(
-            np.array([1, 2, 0], dtype=np.int32),
+            np.array([[1, 2, 0], [1, 1, 0]], dtype=np.int32),
             dtype=wp.int32,
             device="cpu",
         )
@@ -1380,7 +1382,7 @@ class TestFromWarpGasData:
             device="cpu",
         )
         gpu_data.partitioning = wp.array(
-            np.array([1, 2, 0], dtype=np.int32),
+            np.array([[1, 2, 0], [1, 1, 0]], dtype=np.int32),
             dtype=wp.int32,
             device="cpu",
         )
@@ -1417,7 +1419,7 @@ class TestFromWarpGasData:
             device="cpu",
         )
         gpu_data.partitioning = wp.array(
-            np.array([1, 2, 0], dtype=np.int32),
+            np.array([[1, 2, 0], [1, 1, 0]], dtype=np.int32),
             dtype=wp.int32,
             device="cpu",
         )
@@ -1426,7 +1428,10 @@ class TestFromWarpGasData:
             from_warp_gas_data(gpu_data, name=sample_gas_data.name)
 
         gpu_data.partitioning = wp.array(
-            sample_gas_data.partitioning.astype(np.int32),
+            np.broadcast_to(
+                sample_gas_data.partitioning.astype(np.int32),
+                sample_gas_data.concentration.shape,
+            ),
             dtype=wp.int32,
             device="cpu",
         )

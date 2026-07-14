@@ -275,8 +275,9 @@ def to_warp_gas_data(
         The 'name' field from GasData is excluded (strings are not
         GPU-compatible). Use index mapping for species identification.
 
-        The 'partitioning' field is converted from bool to int32
-        (1 = True, 0 = False) for GPU compatibility.
+        The species-level CPU ``partitioning`` field is expanded across boxes
+        and converted from bool to int32 (1 = True, 0 = False) for GPU
+        compatibility.
 
         ``WarpGasData`` requires a ``vapor_pressure`` buffer even though CPU
         ``GasData`` does not own that field. Callers may supply the
@@ -339,8 +340,11 @@ def to_warp_gas_data(
         # GPU kernels always receive a valid (n_boxes, n_species) buffer.
         vp_array = np.zeros(expected_shape, dtype=np.float64)
 
-    # Convert partitioning from bool to int32 (1=True, 0=False)
-    partitioning_int = data.partitioning.astype(np.int32)
+    # The GPU contract owns an explicit per-box mask, while CPU GasData owns
+    # one shared species mask.
+    partitioning_int = np.broadcast_to(
+        data.partitioning.astype(np.int32), expected_shape
+    ).copy()
 
     gpu_data = WarpGasData()
 
@@ -446,8 +450,9 @@ def from_warp_gas_data(
         reconstructing ``GasData``. Placeholder names are generated only
         when ``name`` is omitted or explicitly set to ``None``.
 
-        Restored ``partitioning`` values must remain binary ``0``/``1`` on
-        the GPU side. Any non-binary values raise ``ValueError`` before a
+        Restored ``partitioning`` values must remain binary ``0``/``1`` and
+        identical in every box because CPU ``GasData`` owns one shared
+        species mask. Any incompatible mask raises ``ValueError`` before a
         ``GasData`` instance is returned.
 
     Args:
@@ -500,10 +505,19 @@ def from_warp_gas_data(
     if sync:
         wp.synchronize()
 
-    # Convert partitioning from int32 to bool after validating GPU flags.
-    partitioning_bool = _restore_partitioning_bool(
-        gpu_data.partitioning.numpy()
-    )
+    # Collapse the GPU's per-box mask back to CPU's shared species mask.
+    partitioning_values = gpu_data.partitioning.numpy()
+    partitioning_bool_by_box = _restore_partitioning_bool(partitioning_values)
+    if (
+        partitioning_bool_by_box.ndim != 2
+        or partitioning_bool_by_box.shape[1] != n_species
+        or not np.all(partitioning_bool_by_box == partitioning_bool_by_box[0])
+    ):
+        raise ValueError(
+            "GPU partitioning must be an identical binary (n_boxes, n_species) "
+            "mask to restore CPU GasData."
+        )
+    partitioning_bool = partitioning_bool_by_box[0]
 
     from particula.gas.gas_data import GasData
 
