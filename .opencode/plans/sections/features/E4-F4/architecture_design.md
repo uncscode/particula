@@ -26,6 +26,15 @@ transfer actually applied after clamping.
 
 ### Data / API / Workflow Changes
 
+**P3 implementation:** `energy_transfer` is an optional keyword-only,
+caller-owned `wp.float64` `(n_boxes, n_species)` output on the particle device.
+It requires valid latent heat and is metadata-validated before normalization,
+allocation, clear, launch, or mutation; its finite/NaN/Inf contents are not
+inputs. One clear launches after preflight and one post-four-substep kernel
+assigns each box/species output from the sum of `total_mass_transfer` over
+particles times latent heat. This avoids contended fp64 atomics, host readback,
+new device buffers, and any energy work when omitted.
+
 - **Data Model:** No container changes. P1/P2 accept caller-owned fp64,
   nonnegative, finite `(n_species,)` `latent_heat` (J/kg) and `thermal_work`
   sidecars on the active device; neither is allocated, attached to a WarpData

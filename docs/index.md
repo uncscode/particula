@@ -37,8 +37,8 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
    path optionally applies a latent-rate correction during each of its four
    equal substeps, with CPU-oracle/Warp parity coverage. Omitted latent heat,
    or a zero per-species value, retains that species' isothermal rate path.
-   Broader temperature feedback, gas coupling/conservation, energy
-   bookkeeping, and strategy/runnable-level support remain deferred.
+    Broader temperature feedback, gas coupling/conservation, and
+    strategy/runnable-level support remain deferred.
 - **Interrogating your experimental data** to validate and expand your impact.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
 

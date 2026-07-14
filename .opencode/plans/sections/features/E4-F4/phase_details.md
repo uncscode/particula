@@ -27,11 +27,19 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     cases, rate reduction, validation atomicity, determinism, launch ordering,
     and scratch reuse/identity.
 
-- [ ] **E4-F4-P3:** Signed whole-call energy bookkeeping with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Accumulate per-box/species energy from bounded applied transfer.
-  - Files: `particula/gpu/kernels/condensation.py`
-  - Tests: Sign, identity, clamp, aggregation, isolation, pre-mutation failure.
+- [x] **E4-F4-P3:** Signed whole-call energy bookkeeping with unit tests
+  - Issue: #1299 | Size: S | Status: Shipped (2026-07-14)
+  - Delivered: optional caller-owned device-only `energy_transfer` output with
+    atomic dependency/metadata validation, one post-preflight clear, and one
+    post-four-substep single-writer box/species reduction of bounded whole-call
+    mass transfer times latent heat. The two-item return and disabled path are
+    unchanged.
+  - Files: `particula/gpu/kernels/condensation.py`;
+    `particula/gpu/kernels/tests/_condensation_test_support.py`;
+    `particula/gpu/kernels/tests/condensation_test.py`.
+  - Tests: overwrite/reuse, NaN/Inf output storage, oracle/clamp parity,
+    box/species aggregation, atomic metadata failure, disabled behavior, and
+    cleanly skippable CUDA parity.
 
 - [ ] **E4-F4-P4:** Warp integration regressions and documentation updates
   - Issue: TBD | Size: S | Status: Not Started

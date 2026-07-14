@@ -15,13 +15,13 @@
 - [x] Apply the latent correction during each of E4-F3's four substeps (roughly
   30--50 orchestration LOC), retaining bitwise-compatible isothermal behavior
   when latent heat is omitted or zero.
-- [ ] Route only transfer that has passed the existing particle-mass bound to
+- [x] Route only transfer that has passed the existing particle-mass bound to
   particle mutation, whole-call transfer accumulation, and energy bookkeeping.
-- [ ] Add a private on-device accumulation launch in `condensation.py` that
-  writes signed `applied_transfer * latent_heat` into caller-owned fp64
-  `(n_boxes, n_species)` energy storage without changing the default two-item
-  `condensation_step_gpu()` return.
-- [ ] Preserve positional callers, lazy kernel exports, and physical `WarpData`
+- [x] Add private energy clear and post-four-substep single-writer reduction
+  kernels in `condensation.py`. They write signed whole-call bounded transfer
+  times latent heat to caller-owned fp64 `(n_boxes, n_species)` storage without
+  changing the default two-item `condensation_step_gpu()` return.
+- [x] Preserve positional callers, lazy kernel exports, and physical `WarpData`
   schemas; keep all new configuration and scratch as typed keyword-only
   operation sidecars.
 
@@ -38,5 +38,6 @@
 - [x] Verify validation atomicity, sidecar immutability, four latent-aware
   launches, deterministic fresh-state results, returned-total/scratch identity,
   scratch reuse, and no omitted-latent allocation.
-- [ ] Add energy-sign, aggregation, and clamp-accounting tests with P3 energy
-  bookkeeping.
+- [x] Add energy-output overwrite/reuse, NaN/Inf write-only storage,
+  oracle/clamp parity, aggregation, atomic preflight, disabled-path, and CUDA
+  parity tests.

@@ -12,8 +12,10 @@ buffer, updates box-level environment properties, proposes transfer from the
 current particle mass, and applies a mass-clamped transfer. Float32
 temperatures are cast to a step-owned float64 device buffer for refresh. Kernel
 launches operate on GPU-resident Warp arrays and update particle masses
-in-place. Latent heat, when supplied, corrects each fixed substep while
-thermal-work remains validated caller-owned state reserved for later work.
+ in-place. Latent heat, when supplied, corrects each fixed substep. An optional
+ caller-owned energy-transfer output records whole-call bounded-transfer energy
+ on the active device, while thermal-work remains validated caller-owned state
+ reserved for later work.
 """
 
 # pyright: basic
@@ -974,20 +976,25 @@ def condensation_step_gpu(  # noqa: C901
             active-device ``wp.float64`` array shaped ``(n_species,)``. When
             supplied, it is consumed in every fixed substep; zero entries use
             the exact isothermal rate path.
-        energy_transfer: Optional caller-owned write-only energy output [J]
-            shaped ``(n_boxes, n_species)``. After successful preflight it is
-            overwritten with the signed whole-call, bounded applied transfer
-            times ``latent_heat``. Its contents, including stale NaN/Inf, are
-            not validated because it is output storage. It is not returned as
-            a third tuple item.
+        energy_transfer: Optional caller-owned, active-device ``wp.float64``
+            write-only energy output [J] shaped ``(n_boxes, n_species)``. It
+            requires valid ``latent_heat``. After successful preflight, the
+            same buffer is cleared and overwritten with signed whole-call
+            bounded applied transfer times per-species ``latent_heat``; callers
+            may reuse it on a later successful call. Its existing contents,
+            including stale NaN/Inf, are deliberately not validated because it
+            is output-only diagnostic storage. It is not returned as a third
+            tuple item.
         thermal_work: Optional caller-owned per-species thermal-work sidecar
             [J/kg] as an active-device ``wp.float64`` array shaped
             ``(n_species,)``. It is validated but deferred and unused P3 state;
             this step does not allocate, initialize, modify, or consume it.
 
     Returns:
-        Tuple of the particle data with in-place updated masses and accumulated,
-        clamped mass transfer [kg]. Gas concentration is unchanged.
+        Two-item tuple of the particle data with in-place updated masses and
+        accumulated, clamped mass transfer [kg]. ``energy_transfer``, when
+        supplied, remains caller-owned output rather than a third tuple item.
+        Gas concentration is unchanged.
 
     Raises:
         ValueError: If species counts, array lengths, or devices mismatch.
@@ -1063,7 +1070,8 @@ def condensation_step_gpu(  # noqa: C901
         Energy transfer is caller-owned, allocation-stable diagnostic storage.
         It is cleared and overwritten only after successful preflight, is
         reconstructible on each successful whole call, and is deliberately not
-        content-validated because the step only writes it.
+        content-validated because the step only writes it. This write-only
+        contract permits stale finite values and NaN/Inf prior to a call.
     """
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_gas_arrays(gas, n_boxes, n_species)

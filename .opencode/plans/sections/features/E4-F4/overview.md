@@ -5,10 +5,10 @@ isothermal rate and lacked signed latent-energy bookkeeping. This blocked
 latent-rate CPU-oracle parity and verification of issue #1272's energy
 identity.
 
-**Value Proposition:** The shipped P2 fp64 latent-rate correction makes each
-of the four fixed GPU condensation substeps agree with the CPU reference while
-preserving the existing low-level, allocation-stable contract. Signed
-whole-call `Q = Δm L` diagnostics and totals are deferred P3 scope.
+**Value Proposition:** The shipped correction and opt-in P3 diagnostic make
+each of the four fixed GPU condensation substeps agree with the CPU reference
+while preserving the low-level, allocation-stable contract. Callers can record
+signed whole-call `Q = Δm L` diagnostics without a return or schema change.
 
 **P1 Delivered (issue #1297):** Private fp64 Warp conductivity,
 thermal-resistance, and latent-corrected-rate helpers now reproduce the CPU
@@ -22,14 +22,21 @@ per-species latent-heat correction in each of its four fixed substeps. The
 activity- and Kelvin-adjusted surface vapor pressure is computed once and is
 shared by the pressure-delta and thermal-rate paths. Omitted latent heat and
 exactly zero per-species entries retain the preexisting isothermal arithmetic.
-No public API, return shape, gas-state, or `thermal_work` behavior changed.
-P3 signed energy diagnostics and totals remain future scope.
+No return shape, gas-state, or `thermal_work` behavior changed.
+
+**P3 Delivered (issue #1299):** `condensation_step_gpu()` accepts optional,
+caller-owned, active-device `wp.float64` `energy_transfer` storage shaped
+`(n_boxes, n_species)`. After atomic metadata/dependency preflight it clears
+the output once, then after all four substeps each box/species has one writer
+that reduces bounded accumulated particle transfer times latent heat. The
+output is overwritten by identity, remains device-only, and is not a third
+return item. Omitted output adds no energy allocation or kernel work.
 
 **User Stories:**
 - As a simulation user, I want latent heat to reduce GPU condensation rates so
   Warp results agree with CPU reference physics.
 - As a model validator, I want deterministic CPU-oracle/Warp parity for the
-  corrected four-substep rate without claiming P3 energy totals.
+  corrected four-substep rate and signed bounded energy totals.
 - As a GPU integrator, I want fixed-shape caller-owned buffers so repeated and
   graph-oriented execution remains allocation-stable.
 
