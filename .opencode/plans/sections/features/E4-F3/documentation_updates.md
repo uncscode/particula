@@ -5,9 +5,10 @@
   sidecar API. The docstrings state ownership/lifetime, active-device fp64 and
   stable-shape requirements, identity semantics, fixed-four work-versus-total
   transfer behavior, and the pre-mutation failure guarantee.
-- Update `docs/Features/Roadmap/condensation-stiffness-study.md` to mark
-  fixed-count four-substep integration as production behavior, document total
-  transfer semantics, and retain recorded-grid evidence and caveats.
+- P3 / issue #1294 made no user or roadmap documentation changes: it is
+  test-only regression coverage. Test names and assertion messages label the
+  `5e-2` bound as recorded case-specific stiffness evidence, not a general
+  parity or conservation tolerance.
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` with E4-F3 completion,
   scratch ownership, E4-F1 refresh placement, and downstream gates.
 - Update `docs/Features/Roadmap/warp-autodiff-limitations.md` if validation
@@ -16,4 +17,5 @@
   P1; the sidecar is imported only from the concrete condensation module.
 - Add or update a focused usage example only if the public scratch API is
   intended for users; avoid introducing a second canonical entry point.
-- Mark this plan's phases and change log as shipped during final documentation.
+- The plan section status and change log record P3 as shipped; P4 remains the
+  planned development-documentation phase.

@@ -16,10 +16,12 @@
   unchanged (P2, issue #1293).
 - [x] Scalar, Warp-array, hybrid, and explicit environment input contracts pass
   fixed-four integration coverage (P2, issue #1293).
-- [ ] Recorded nanometer, accumulation-mode, and droplet-like stiffness grids
-  preserve issue #1272 validation signals on Warp CPU; optional CUDA skips or
-  passes cleanly.
-- [ ] No container-schema, fp64, direct-import, or hidden-transfer regression.
+- [x] Recorded nanometer, accumulation-mode, and droplet-like stiffness grids
+  preserve issue #1272 validation signals on Warp CPU; one optional marked CUDA
+  slice skips or passes cleanly (P3, issue #1294).
+- [x] P3 changed test-only support and discovery files; it introduced no
+  production container-schema, fp64, direct-import, or hidden-transfer change
+  (issue #1294).
 - [ ] Documentation states limits: fixed count, no adaptive integration, no gas
   coupling, and `5e-2` as recorded evidence rather than universal tolerance.
 

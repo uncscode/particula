@@ -16,8 +16,8 @@
   #1293).
 - [x] Return accumulated total transfer by caller-owned identity and preserve
   gas concentration unchanged (issue #1293).
-- [ ] Confirm the all-scratch-supplied path performs no required allocation or
-  hidden CPU/Warp synchronization.
+- [x] Confirm recorded stiffness trials reuse one complete caller-owned scratch
+  sidecar sequentially across fresh-input executions (issue #1294).
 
 ## Tooling / Tests
 
@@ -25,15 +25,18 @@
   pre-mutation rejection coverage in
   `particula/gpu/kernels/tests/_condensation_test_support.py`, exported by
   `particula/gpu/kernels/tests/condensation_test.py` (issue #1292).
-- [ ] Promote fixed-four candidate cases through
-  `condensation_stiffness_test.py` against the production entry point.
+- [x] Promote fixed-four recorded cases through
+  `condensation_stiffness_test.py` against the production entry point, with
+  discovery restricted to production-prefixed tests (issue #1294).
 - [x] Assert exactly four equal iterations and per-substep E4-F1 refresh
   (issue #1293).
 - [x] Assert deterministic, finite, nonnegative, total-transfer, and unchanged
   gas semantics on repeated calls (issue #1293).
-- [ ] Preserve the recorded nanometer, accumulation-mode, and droplet-like
-  timestep-grid bound of `5e-2` without presenting it as universal tolerance.
-- [ ] Run Warp CPU coverage and optional CUDA coverage with clean skips.
+- [x] Preserve the recorded nanometer, accumulation-mode, and droplet-like
+  timestep-grid bound of `5e-2` without presenting it as universal tolerance
+  (issue #1294).
+- [x] Add required Warp CPU coverage and one optional CUDA slice with clean
+  skips (issue #1294).
 
 ## Documentation
 
