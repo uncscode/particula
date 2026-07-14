@@ -3521,7 +3521,7 @@ def test_condensation_production_stiffness_recorded_contract(
     assert record.environment_input_mode == (
         "scalar_inputs" if case_name != "droplet_like" else "direct_warp_arrays"
     )
-    assert record.gas_unchanged
+    assert not record.gas_unchanged
     assert record.reuses_caller_mass_transfer_buffer
     assert record.reuses_work_mass_transfer_buffer
     assert record.reuses_total_mass_transfer_buffer
@@ -3534,10 +3534,23 @@ def test_condensation_production_stiffness_recorded_contract(
     assert np.all(record.final_masses >= 0.0)
     assert record.zero_mass_stable
     assert record.vapor_pressure_refreshed
-    npt.assert_array_equal(
-        record.final_gas_concentration,
-        record.initial_gas_concentration,
+    particle_concentration = (
+        _get_condensation_stiffness_case(case_name)
+        .build_particle_data()
+        .concentration
     )
+    expected_final_gas = record.initial_gas_concentration - np.sum(
+        record.mass_transfer_values * particle_concentration[:, :, None],
+        axis=1,
+    )
+    npt.assert_allclose(
+        record.final_gas_concentration,
+        expected_final_gas,
+        rtol=1.0e-12,
+        atol=1.0e-30,
+    )
+    assert np.all(np.isfinite(record.final_gas_concentration))
+    assert np.all(record.final_gas_concentration >= 0.0)
     npt.assert_array_equal(
         record.final_vapor_pressure,
         record.expected_vapor_pressure,
@@ -3568,7 +3581,7 @@ def test_condensation_production_stiffness_cuda_slice(cuda_device: str) -> None:
             "CUDA stiffness evidence uses the recorded case-specific bound."
         ),
     )
-    assert record.gas_unchanged
+    assert not record.gas_unchanged
     assert record.reuses_all_scratch_buffers
     assert record.reuses_work_mass_transfer_buffer
     assert record.reuses_total_mass_transfer_buffer
@@ -3579,6 +3592,19 @@ def test_condensation_production_stiffness_cuda_slice(cuda_device: str) -> None:
     assert record.values_finite
     assert np.all(record.final_masses >= 0.0)
     assert record.vapor_pressure_refreshed
+    particle_concentration = case.build_particle_data().concentration
+    expected_final_gas = record.initial_gas_concentration - np.sum(
+        record.mass_transfer_values * particle_concentration[:, :, None],
+        axis=1,
+    )
+    npt.assert_allclose(
+        record.final_gas_concentration,
+        expected_final_gas,
+        rtol=1.0e-12,
+        atol=1.0e-30,
+    )
+    assert np.all(np.isfinite(record.final_gas_concentration))
+    assert np.all(record.final_gas_concentration >= 0.0)
     npt.assert_array_equal(
         record.final_vapor_pressure,
         record.expected_vapor_pressure,
