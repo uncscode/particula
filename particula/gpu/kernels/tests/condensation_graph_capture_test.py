@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import suppress
 from typing import Any
 
 import numpy as np
@@ -153,28 +154,32 @@ def _reset_mutable_state(runtime: Any, state: dict[str, Any]) -> None:
     wp.copy(state["energy"], reset_sources["energy"])
 
 
-def _capture_support_error(error: Exception) -> bool:
-    """Return whether an exception describes unavailable capture support."""
-    if not isinstance(error, (RuntimeError, NotImplementedError)):
-        return False
+def _capture_support_error(error: BaseException) -> bool:
+    """Return whether an exception reports capture support limitations."""
     message = str(error).lower()
     return any(term in message for term in ("captur", "graph", "not supported"))
 
 
-def _end_capture_best_effort(wp: Any) -> bool:
-    """End an active capture, returning whether the cleanup succeeded."""
-    try:
-        wp.capture_end()
-    except Exception:
-        return False
-    return True
+def _capture_recording_support_error(error: BaseException) -> bool:
+    """Return whether capture-recording failed for a known support reason."""
+    message = str(error).lower()
+    return _capture_support_error(error) or (
+        isinstance(error, ValueError)
+        and "gas.partitioning must contain only binary 0/1 values" in message
+    )
 
 
 def _require_capture_apis(wp: Any, device: str) -> None:
-    """Skip when a device cannot provide the public graph-capture APIs."""
+    """Skip when the required public Warp capture APIs are unavailable."""
     for operation in ("capture_begin", "capture_end", "capture_launch"):
         if not callable(getattr(wp, operation, None)):
             pytest.skip(f"{device}: {operation} is unavailable")
+
+
+def _end_capture_best_effort(wp: Any) -> None:
+    """End an active capture and ignore cleanup failures."""
+    with suppress(Exception):
+        wp.capture_end()
 
 
 def _capture_graph_or_skip(
@@ -185,45 +190,39 @@ def _capture_graph_or_skip(
     """Record ``call`` or skip only when this device lacks graph capture."""
     wp = runtime.wp
     _require_capture_apis(wp, device)
-    began = False
-    result = None
     try:
         wp.capture_begin(device=device, force_module_load=True)
-        began = True
     except Exception as error:
         if _capture_support_error(error):
             pytest.skip(f"{device}: capture_begin unavailable: {error}")
         raise
+    capture_active = True
     try:
         result = call()
     except Exception as error:
-        if _capture_support_error(error):
-            began = not _end_capture_best_effort(wp)
-            pytest.skip(f"{device}: capture_recording unavailable: {error}")
-        if (
-            device == "cpu"
-            and isinstance(error, ValueError)
-            and "partitioning must contain only binary 0/1 values"
-            in str(error).lower()
-        ):
-            began = not _end_capture_best_effort(wp)
-            pytest.skip(f"{device}: capture_recording unavailable: {error}")
-        raise
-    try:
-        graph = wp.capture_end()
-        began = False
-    except Exception as error:
-        if _capture_support_error(error):
-            pytest.skip(f"{device}: capture_end unavailable: {error}")
-        raise
-    finally:
-        if began:
+        if _capture_recording_support_error(error):
             _end_capture_best_effort(wp)
-    return graph, result
+            capture_active = False
+            pytest.skip(f"{device}: capture_recording unavailable: {error}")
+        raise
+    else:
+        try:
+            graph = wp.capture_end()
+        except Exception as error:
+            if _capture_support_error(error):
+                _end_capture_best_effort(wp)
+                capture_active = False
+                pytest.skip(f"{device}: capture_end unavailable: {error}")
+            raise
+        capture_active = False
+        return graph, result
+    finally:
+        if capture_active:
+            _end_capture_best_effort(wp)
 
 
 def _launch_graph_or_skip(runtime: Any, device: str, graph: object) -> None:
-    """Launch a captured graph or skip only for launch capability failures."""
+    """Launch a captured graph and surface all launch failures."""
     try:
         runtime.wp.capture_launch(graph)
     except Exception as error:
