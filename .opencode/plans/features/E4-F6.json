@@ -2,7 +2,7 @@
   "id": "E4-F6",
   "type": "feature",
   "title": "Device-aware parity, conservation, and graph/autodiff-readiness evidence",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -90,11 +90,11 @@
     {
       "id": "E4-F6-P5",
       "title": "Update development documentation and evidence matrix",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-15",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -102,5 +102,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
