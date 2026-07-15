@@ -187,7 +187,7 @@ thresholds. They are distinct from current production-hook evidence:
 | --- | --- | --- |
 | P1 | `particula/gpu/kernels/tests/condensation_test.py` | Independent NumPy-oracle parity for final particle mass and gas concentration, including one/multi-box and multi-species fixtures. |
 | P2 | `particula/gpu/kernels/tests/condensation_test.py` | Separate strict concentration-weighted particle-plus-gas conservation at `rtol=1e-12`, plus mutation and output-buffer contracts. |
-| P3 | `particula/gpu/kernels/tests/condensation_graph_capture_test.py` | CPU capture is capability-skipped; CUDA public-step replay is strict-xfailed because host validation readbacks are not capture-safe. This is a limitation, not support. |
+| P3 | `particula/gpu/kernels/tests/condensation_graph_capture_test.py` | CPU capture is capability-skipped; on CUDA, only the public-step host-validation readback during capture is strict-xfailed. Setup and normal calls remain ordinary assertions. This is a limitation, not support. |
 | P4 | `particula/gpu/kernels/tests/condensation_autodiff_test.py` | Raw-rate-only, one-box fp64 interior Tape derivative evidence; P2 clamps and inventory limits remain outside the derivative claim. |
 
 Warp CPU is the standard backend for supported P1/P2 and P4 probes when Warp is

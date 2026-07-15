@@ -422,13 +422,119 @@ def condensation_mass_transfer_kernel(  # noqa: C901
     dynamic_viscosity_value = dynamic_viscosity[box_idx]
     mean_free_path_value = mean_free_path[box_idx]
     temperature_value = temperature[box_idx]
+    n_species = masses.shape[2]
 
     if concentration[box_idx, particle_idx] == wp.float64(0.0):
-        for species_idx in range(masses.shape[2]):
+        if n_species == 1:
+            mass_transfer[box_idx, particle_idx, 0] = wp.float64(0.0)
+            return
+        for species_idx in range(n_species):
             mass_transfer[box_idx, particle_idx, species_idx] = wp.float64(0.0)
         return
 
-    n_species = masses.shape[2]
+    # Warp does not replay dynamic loops in a backward pass.  Preserve the
+    # general multi-species path below, but keep the common one-species raw
+    # rate free of dynamic loops so its out-of-place Tape derivative remains
+    # available without changing P2 or the public step contract.
+    if n_species == 1:
+        species_mass = masses[box_idx, particle_idx, 0]
+        total_volume = species_mass / density[0]
+        if total_volume <= wp.float64(0.0):
+            mass_transfer[box_idx, particle_idx, 0] = wp.float64(0.0)
+            return
+
+        radius = particle_radius_from_volume_wp(total_volume)
+        effective_density = density[0]
+        knudsen_number = knudsen_number_wp(mean_free_path_value, radius)
+        slip_correction = cunningham_slip_correction_wp(knudsen_number)
+        mobility = aerodynamic_mobility_wp(
+            radius, slip_correction, dynamic_viscosity_value
+        )
+        diffusion_coefficient_particle = diffusion_coefficient_wp(
+            temperature_value,
+            mobility,
+            boltzmann_constant,
+        )
+        transition = vapor_transition_correction_wp(
+            knudsen_number,
+            mass_accommodation[0],
+        )
+        diffusion_value = diffusion_coefficient_vapor[0]
+        if diffusion_value <= wp.float64(0.0):
+            diffusion_value = diffusion_coefficient_particle
+        mass_transport = first_order_mass_transport_k_wp(
+            radius,
+            transition,
+            diffusion_value,
+        )
+        tension = surface_tension[0]
+        if surface_tension_mode == SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED:
+            tension = effective_surface_tension[box_idx, particle_idx]
+        kelvin_radius = kelvin_radius_wp(
+            tension,
+            effective_density,
+            molar_mass[0],
+            temperature_value,
+            gas_constant,
+        )
+        kelvin_term = kelvin_term_wp(radius, kelvin_radius)
+        partial_pressure_gas = partial_pressure_wp(
+            gas_concentration[box_idx, 0],
+            molar_mass[0],
+            temperature_value,
+            gas_constant,
+        )
+        activity_factor = wp.float64(1.0)
+        if activity_enabled == wp.int32(1) and water_species_index == 0:
+            if activity_mode == ACTIVITY_MODE_IDEAL:
+                activity_factor = water_activity_ideal_wp(
+                    masses,
+                    molar_mass_reference,
+                    box_idx,
+                    particle_idx,
+                    0,
+                )
+            else:
+                activity_factor = water_activity_kappa_wp(
+                    masses,
+                    density,
+                    kappas,
+                    box_idx,
+                    particle_idx,
+                    0,
+                )
+        surface_vapor_pressure = (
+            activity_factor * vapor_pressure[box_idx, 0] * kelvin_term
+        )
+        pressure_delta = partial_pressure_gas - surface_vapor_pressure
+        species_latent_heat = wp.float64(0.0)
+        thermal_conductivity = wp.float64(0.0)
+        if latent_heat_enabled == wp.int32(1):
+            species_latent_heat = latent_heat[0]
+            thermal_conductivity = _thermal_conductivity_wp(temperature_value)
+        if species_latent_heat == wp.float64(0.0):
+            mass_rate = mass_transfer_rate_wp(
+                pressure_delta,
+                mass_transport,
+                temperature_value,
+                molar_mass[0],
+                gas_constant,
+            )
+        else:
+            mass_rate = _mass_transfer_rate_latent_heat_wp(
+                pressure_delta,
+                mass_transport,
+                temperature_value,
+                molar_mass[0],
+                species_latent_heat,
+                thermal_conductivity,
+                surface_vapor_pressure,
+                diffusion_value,
+                gas_constant,
+            )
+        mass_transfer[box_idx, particle_idx, 0] = mass_rate * time_step
+        return
+
     total_volume = wp.float64(0.0)
     total_mass = wp.float64(0.0)
     for species_idx in range(n_species):

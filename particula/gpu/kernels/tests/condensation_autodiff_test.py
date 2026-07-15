@@ -18,7 +18,9 @@ pytestmark = pytest.mark.warp
 _INTERIOR_INVENTORY_MARGIN = 0.5
 _FINITE_DIFFERENCE_EPSILON = 1.0e-9
 _DERIVATIVE_RTOL = 2.0e-5
-_DERIVATIVE_ATOL = 5.0e-11
+# The expected interior derivative is about 1e-11, so this floor cannot
+# accept a missing (zero) Tape gradient.
+_DERIVATIVE_ATOL = 1.0e-18
 
 
 @pytest.fixture(autouse=True)

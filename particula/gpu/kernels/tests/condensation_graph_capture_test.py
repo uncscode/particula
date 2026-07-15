@@ -171,6 +171,18 @@ def _capture_support_error(error: BaseException) -> bool:
     )
 
 
+def _capture_host_readback_error(error: BaseException) -> bool:
+    """Return whether CUDA rejected the documented host readback in capture."""
+    message = str(error).strip().lower()
+    return isinstance(error, RuntimeError) and (
+        "stream is capturing" in message
+        or "stream capture" in message
+        and "not permitted" in message
+        or "wp_memcpy_d2h" in message
+        and "capturing" in message
+    )
+
+
 def _require_capture_apis(wp: Any, device: str) -> None:
     """Skip when the required public Warp capture APIs are unavailable."""
     if device == "cpu":
@@ -180,11 +192,11 @@ def _require_capture_apis(wp: Any, device: str) -> None:
             pytest.skip(f"{device}: {operation} is unavailable")
 
 
-def _end_capture_after_error(wp: Any, error: BaseException) -> None:
+def _end_capture_after_error(wp: Any, error: Exception) -> None:
     """End capture, retaining both operation and cleanup failures."""
     try:
         wp.capture_end()
-    except BaseException as cleanup_error:
+    except Exception as cleanup_error:
         raise ExceptionGroup(
             "Graph capture and its cleanup both failed",
             [error, cleanup_error],
@@ -242,14 +254,20 @@ def _launch_graph_or_skip(runtime: Any, device: str, graph: object) -> None:
 
 
 def _snapshot_state(state: dict[str, Any]) -> dict[str, np.ndarray]:
-    """Synchronize and snapshot mutable outputs outside a capture region."""
+    """Synchronize and snapshot mutable outputs and all scratch sidecars."""
     support.wp.synchronize()
-    return {
+    snapshot = {
         "masses": state["particles"].masses.numpy().copy(),
         "gas": state["gas"].concentration.numpy().copy(),
-        "transfer": state["scratch"].total_mass_transfer.numpy().copy(),
         "energy": state["energy"].numpy().copy(),
     }
+    snapshot.update(
+        {
+            f"scratch_{name}": getattr(state["scratch"], name).numpy().copy()
+            for name in _SCRATCH_FIELDS
+        }
+    )
+    return snapshot
 
 
 def test_capture_capability_errors_are_precise() -> None:
@@ -373,10 +391,10 @@ def _assert_graph_replay(device: str) -> None:
     _assert_sidecar_contract(captured)
 
     for replay in (replay_one, replay_two):
-        for name in ("masses", "gas", "transfer", "energy"):
+        for name, expected in normal_result.items():
             npt.assert_allclose(
                 replay[name],
-                normal_result[name],
+                expected,
                 rtol=support.PRODUCTION_PARITY_RTOL,
                 atol=support.PRODUCTION_PARITY_ATOL,
             )
@@ -389,7 +407,7 @@ def _assert_graph_replay(device: str) -> None:
         )
         support._assert_contract_allclose(
             replay["energy"],
-            replay["transfer"].sum(axis=1)
+            replay["scratch_total_mass_transfer"].sum(axis=1)
             * captured["latent_heat_values"][None, :],
         )
     support._assert_particle_gas_inventory_conserved(
@@ -401,7 +419,7 @@ def _assert_graph_replay(device: str) -> None:
     )
     support._assert_contract_allclose(
         normal_result["energy"],
-        normal_result["transfer"].sum(axis=1)
+        normal_result["scratch_total_mass_transfer"].sum(axis=1)
         * normal["latent_heat_values"][None, :],
     )
 
@@ -420,17 +438,33 @@ def test_condensation_graph_replay_warp_cpu() -> None:
 
 
 @pytest.mark.cuda
-@pytest.mark.gpu_parity
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "The public step performs host validation readbacks, which CUDA graph "
-        "capture forbids."
-    ),
-)
-def test_condensation_graph_replay_cuda() -> None:
-    """CUDA graph replay retains public condensation state contracts."""
+def test_condensation_capture_host_readback_is_unsupported_on_cuda() -> None:
+    """Strictly xfail only the documented public-step capture readback."""
     runtime = support._load_warp_runtime()
     if not runtime.cuda_available(runtime.wp):
         pytest.skip(runtime.CUDA_SKIP_REASON)
-    _assert_graph_replay("cuda")
+    normal = _make_graph_capture_state(runtime, "cuda")
+    _call_condensation(runtime, normal)
+
+    captured = _make_graph_capture_state(runtime, "cuda")
+    try:
+        _capture_graph_or_skip(
+            runtime,
+            "cuda",
+            lambda: _call_condensation(runtime, captured),
+        )
+    except ExceptionGroup as errors:
+        # The first exception is the in-capture D2H validation readback.  Warp
+        # then reports that same invalid capture when teardown consumes it.
+        assert len(errors.exceptions) == 2
+        assert _capture_host_readback_error(errors.exceptions[0])
+        assert "cuda graph capture failed" in str(errors.exceptions[1]).lower()
+    except RuntimeError as error:
+        assert _capture_host_readback_error(error)
+    else:
+        pytest.fail("CUDA capture unexpectedly supported public-step readback")
+
+    pytest.xfail(
+        "The public step performs host validation readbacks, which CUDA graph "
+        "capture forbids."
+    )
