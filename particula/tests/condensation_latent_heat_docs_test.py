@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -102,8 +103,19 @@ P3_ANCHOR_LINK = (
     "./docs/Features/data-containers-and-gpu-foundations.md"
     "#focused-reproduction-commands"
 )
-EPIC_D_SHIPPED_ROW = "Shipped | E4"
 EPIC_D_COMPLETED_PUBLICATION = "E4-F1--E4-F7 recorded evidence is complete"
+EPIC_D_DECISION_RECORD_LINK = (
+    "[fixed-four decision record](condensation-stiffness-study.md)"
+)
+EPIC_D_DEFERRED_BOUNDARIES = (
+    "Temperature feedback",
+    "high-level `Aerosol`/`Runnable` integration",
+    "adaptive stepping",
+    "unsupported physics",
+    "graph capture/replay",
+    "broad autodiff",
+    "general CPU-strategy parity remain future work outside the shipped scope",
+)
 FOUNDATIONS_CONFIGURATION_SNIPPETS = (
     "from particula.gpu.kernels import condensation_step_gpu",
     "constant `wp.int32(0)`",
@@ -199,6 +211,14 @@ def _normalized_section(content: str, heading: str) -> str:
             section = "\n".join(section.splitlines()[:line_index])
             break
     return " ".join(section.split())
+
+
+def _canonical_contract_destinations(content: str) -> list[str]:
+    """Return destinations for links bearing the canonical-contract label."""
+    return re.findall(
+        rf"\[{re.escape(CANONICAL_CONTRACT_LABEL)}\]\(([^)]+)\)",
+        content,
+    )
 
 
 def test_condensation_latent_heat_notebook_exists_at_published_path() -> None:
@@ -564,6 +584,9 @@ def test_example_index_links_canonical_low_level_condensation_contract() -> (
 
     assert content.count(EXAMPLES_CONTRACT_LINK) == 1
     assert content.count(EXAMPLES_CONTRACT_DESTINATION) == 1
+    assert _canonical_contract_destinations(content) == [
+        EXAMPLES_CONTRACT_DESTINATION
+    ]
     assert (
         EXAMPLES_INDEX_PATH.parent / EXAMPLES_CONTRACT_DESTINATION
     ).resolve() == FOUNDATIONS_PATH
@@ -578,17 +601,26 @@ def test_readme_links_canonical_low_level_condensation_contract() -> None:
     assert content.count(README_CONTRACT_LINK) == 1
     assert content.count(P3_ANCHOR_LINK) == 1
     assert README_CONTRACT_LINK != P3_ANCHOR_LINK
+    assert _canonical_contract_destinations(content) == [
+        README_CONTRACT_DESTINATION
+    ]
+    assert (README_PATH.parent / README_CONTRACT_DESTINATION).resolve() == (
+        FOUNDATIONS_PATH
+    )
 
 
 def test_roadmap_marks_e4_low_level_condensation_publication_shipped() -> None:
     """Epic D records the bounded completed low-level publication."""
     content = ROADMAP_PATH.read_text(encoding="utf-8")
-    roadmap = _normalized_section(
-        content,
-        "## Epic D: GPU Condensation Physics Parity",
-    )
+    epic_d_start = content.index("## Epic D: GPU Condensation Physics Parity")
+    epic_e_start = content.index("## Epic E: GPU Coagulation Physics Coverage")
+    roadmap = " ".join(content[epic_d_start:epic_e_start].split())
 
-    assert EPIC_D_SHIPPED_ROW in content
+    assert (
+        "| 4 | [Epic D: GPU Condensation Physics Parity]"
+        "(#epic-d-gpu-condensation-physics-parity) | Shipped | E4 |"
+    ) in content
+    assert "Status: shipped." in roadmap
     for snippet in (
         EPIC_D_COMPLETED_PUBLICATION,
         "particula.gpu.kernels",
@@ -599,6 +631,8 @@ def test_roadmap_marks_e4_low_level_condensation_publication_shipped() -> None:
         "Optional/local additive CUDA evidence",
         "skips cleanly when unavailable",
         "../data-containers-and-gpu-foundations.md",
+        EPIC_D_DECISION_RECORD_LINK,
+        *EPIC_D_DEFERRED_BOUNDARIES,
     ):
         assert " ".join(snippet.split()) in roadmap
     for stale_claim in (
@@ -615,7 +649,3 @@ def test_roadmap_marks_e4_low_level_condensation_publication_shipped() -> None:
         "adaptive stepping is shipped",
     ):
         assert unsupported_claim not in roadmap
-    assert (
-        "condensation-stiffness-study.md" in roadmap
-        or "fixed_count_substeps_4" in roadmap
-    )
