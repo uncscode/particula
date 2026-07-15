@@ -345,7 +345,8 @@ overwrite the derived GPU-only vapor-pressure buffer, and return the accumulated
 **P2-finalized, inventory-limited** transfer. A supplied total-transfer buffer
 holds that finalized accumulated output and is returned by identity; separate
 supplied work storage retains only the final gated raw proposal and is never the
-returned transfer. The two-item return is `(particles, mass_transfer)`;
+returned transfer. The two-item return assignment is
+`particles_out, mass_transfer = condensation_step_gpu(...)`;
 `energy_transfer` is caller-owned output, not a third return value. Disabled
 `(box, species)` entries in the
 per-box `(n_boxes, n_species)` partitioning mask and inactive particle slots
@@ -356,9 +357,10 @@ rejects masks that differ by box and rejects zero-box mirrors because no box can
 authoritatively supply the shared CPU mask.
 P2 demand, release, scale, and accumulator sidecars are validated and used for
 finalization; aggregate invalid state, metadata, or ownership fails with
-`ValueError` before launches or caller mutation. A later failure caused by a
-fresh raw proposal does not roll back completed substeps, although it occurs
-before P2 mutation in its failing substep. Unsupported activity or surface
+`ValueError` before mutable physics or caller-state mutation. Preflight may run
+read-only validation kernels. A later failure caused by a fresh raw proposal
+does not roll back completed substeps, although it occurs before P2 mutation in
+its failing substep. Unsupported activity or surface
 strategies are not silently copied or approximated; passing
 `activity_surface=None` retains legacy unit activity and static tension.
 
@@ -366,9 +368,10 @@ strategies are not silently copied or approximated; passing
 `particula.gpu.kernels.condensation`; it is not another step entry point.
 Particle mass, transfer, and scratch transfer arrays are active-device
 `wp.float64` with shape `(n_boxes, n_particles, n_species)`; gas concentration
-and energy arrays are `wp.float64` with shape `(n_boxes, n_species)`; scratch
-property arrays are `wp.float64` with shape `(n_boxes,)`; and latent heat and
-thermal work arrays are `wp.float64` with shape `(n_species,)`. Supplied
+and energy arrays are active-device `wp.float64` with shape
+`(n_boxes, n_species)`; scratch property arrays are active-device `wp.float64`
+with shape `(n_boxes,)`; and latent heat and thermal work arrays are
+active-device `wp.float64` with shape `(n_species,)`. Supplied
 transfer fields must be active-device, stable-shape `wp.float64` arrays with
 shape `(n_boxes, n_particles, n_species)`, and supplied property fields must be
 active-device, stable-shape `wp.float64` arrays with shape `(n_boxes,)`.
@@ -417,9 +420,8 @@ condensation is positive and evaporation is negative. The strict #1272
 energy-regression tolerance is `rtol=1e-12, atol=1e-18`.
 
 `thermal_work` has the same validated sidecar shape but remains deferred and
-unused. This diagnostic does not evolve temperature or add a `Runnable`,
-adaptive substeps, graph capture/replay, or autodiff. It uses the whole-call
-finalized transfer, including the direct step's coupled gas mutation.
+unused: the step neither reads nor writes it. It does not evolve temperature or
+add a `Runnable`, adaptive substeps, graph capture/replay, or autodiff.
 
 Use `to_warp_*` and `from_warp_*` as the sole data CPU↔Warp boundary. There is
 no high-level `Aerosol` or `Runnable` GPU path. CUDA preflight reads one-element
@@ -470,7 +472,10 @@ Additional shipped boundaries:
 - Coagulation `rng_states` are caller-owned Warp-resident sidecar state only;
   they are not fields on `ParticleData`, `GasData`, `EnvironmentData`, or any
   Warp container schema.
-- No hidden CPU↔GPU synchronization occurs inside kernels or runnables.
+- Kernels and runnables do not perform hidden simulation-state transfers or
+  caller-buffer mutation. Callers remain responsible for synchronization before
+  host observation or restoration; CUDA preflight validation-flag readbacks may
+  synchronize without transferring simulation state.
 - Direct condensation does not add a high-level `Aerosol`/`Runnable` path,
   automatic backend selection or fallback, implicit transfer or synchronization,
   adaptive stepping, new container fields, kernels, or physics, BAT, or
