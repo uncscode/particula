@@ -163,6 +163,10 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
         in EXPORTED_CONDENSATION_TESTS
     )
     assert (
+        "test_condensation_step_gpu_rejects_legacy_output_alias_atomically"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
         "test_condensation_scratch_ownership_aliases_are_atomic"
         in EXPORTED_CONDENSATION_TESTS
     )
