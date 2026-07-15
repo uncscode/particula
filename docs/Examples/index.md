@@ -160,9 +160,10 @@ Jump in by selecting any card below and follow along in your browser or local en
     - [Data containers and GPU foundations](Data_Containers/index.md) —
       `ParticleData` / `GasData` shapes plus explicit transfer helpers
     - [Direct GPU kernels quick-start source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
-      — the single canonical low-level Warp kernel example with explicit
-      CPU↔Warp transfers, lazy `particula.gpu.kernels` imports, one
-      condensation call, one coagulation call, and caller-owned `rng_states`
+      — a low-level explicit-transfer direct-condensation path with a Warp CPU
+      default when installed, lazy direct and concrete imports, caller-owned
+      fixed-shape fp64 scratch/latent/energy sidecars reused across explicit
+      calls, gas coupling, and explicit final checkpoint restoration
 
     [:octicons-arrow-right-24: Guide](Data_Containers/index.md)
 
