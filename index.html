@@ -14650,12 +14650,15 @@
   latent-heat energy-density bookkeeping, and the
   <code>CondensationLatentHeat</code> strategy with latent-heat-corrected
   <code>mass_transfer_rate()</code>/<code>rate()</code> plus a <code>step()</code> that tracks per-step
-   latent heat diagnostics. The bounded, low-level direct GPU condensation
-   path optionally applies a latent-rate correction during each of its four
-   equal substeps, with CPU-oracle/Warp parity coverage. Omitted latent heat,
+  latent heat diagnostics. The bounded, low-level direct GPU condensation
+  path optionally applies a latent-rate correction during each of its four
+  equal substeps, with CPU-oracle/Warp parity coverage. Omitted latent heat,
    or a zero per-species value, retains that species' isothermal rate path.
-    Broader temperature feedback, gas coupling/conservation, and
-    strategy/runnable-level support remain deferred.</li>
+   The direct hook couples each P2-finalized particle transfer to gas using
+   particle concentration and has deterministic fp64, two-box CPU-oracle
+   parity and per-box/per-species inventory-conservation regression coverage.
+   Broader temperature feedback, gas coupling/conservation, and
+   strategy/runnable-level support remain deferred.</li>
 <li><strong>Interrogating your experimental data</strong> to validate and expand your impact.</li>
 <li><strong>Fostering open-source collaboration</strong> to share ideas and build on each other’s work.</li>
 </ul>
@@ -14766,6 +14769,11 @@
   current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
   such as coagulation <code>rng_states</code> and condensation thermodynamics. GPU
   condensation requires keyword-only <code>thermodynamics=ThermodynamicsConfig</code>,
+  validates an active-device binary per-box/species <code>gas.partitioning</code> mask
+  before mutation, and runs exactly four equal substeps. Disabled species and
+  zero-concentration particle slots receive no transfer. Each finalized
+  transfer updates particle mass and applies the matching weighted delta to
+  <code>gas.concentration</code>, so later substeps read coupled gas inventory. It
   optionally accepts <code>latent_heat</code> rate correction and its write-only signed
   <code>energy_transfer</code> diagnostic, and refreshes caller-owned
   <code>WarpGasData.vapor_pressure</code> from the current device-resident temperature

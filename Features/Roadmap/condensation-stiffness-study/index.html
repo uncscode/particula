@@ -11585,10 +11585,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#phase-boundary-decision" class="md-nav__link">
+  <a href="#historical-phase-boundary-decision" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase Boundary Decision
+        Historical Phase Boundary Decision
       
     </span>
   </a>
@@ -11635,10 +11635,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gas-coupled-follow-up-gate" class="md-nav__link">
+  <a href="#current-gas-coupling-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gas-coupled follow-up gate
+        Current gas-coupling boundary
       
     </span>
   </a>
@@ -14470,10 +14470,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#phase-boundary-decision" class="md-nav__link">
+  <a href="#historical-phase-boundary-decision" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase Boundary Decision
+        Historical Phase Boundary Decision
       
     </span>
   </a>
@@ -14520,10 +14520,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gas-coupled-follow-up-gate" class="md-nav__link">
+  <a href="#current-gas-coupling-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gas-coupled follow-up gate
+        Current gas-coupling boundary
       
     </span>
   </a>
@@ -14583,24 +14583,30 @@
 <h1 id="condensation-stiffness-study-and-recommendation-record">Condensation Stiffness Study and Recommendation Record<a class="headerlink" href="#condensation-stiffness-study-and-recommendation-record" title="Permanent link">&para;</a></h1>
 <p>This note is the canonical decision record for GPU condensation integration.
 The shipped production path uses four fixed equal substeps; P2/P3 candidate
-comparisons remain historical evidence only. The current production GPU path
-remains particle-only and <code>float64</code> bounded; this page does not claim that
-gas-coupled production condensation has shipped.</p>
+comparisons remain historical evidence only. The current production GPU path is
+<code>float64</code> bounded and couples P2-finalized particle transfer to gas
+concentration; this remains a narrow direct-kernel contract rather than a
+general GPU production claim.</p>
 <h2 id="current-runtime-scope">Current Runtime Scope<a class="headerlink" href="#current-runtime-scope" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Production path: explicit fixed-four GPU condensation. Every successful
   <code>condensation_step_gpu(...)</code> call performs exactly four <code>time_step / 4.0</code>
   substeps.</li>
-<li>Particle update: particle masses are clamped to remain non-negative.</li>
-<li>Gas update: the current Warp path is particle-only and does not yet update gas
-  concentrations during production condensation.</li>
+<li>Particle and gas update: each raw proposal is P2-finalized against inventory,
+  then applied to particle mass and coupled to gas concentration by the matching
+  particle-concentration-weighted transfer.</li>
 <li>Per-substep order: optionally refresh composition-weighted surface tension,
   overwrite <code>gas.vapor_pressure</code>, refresh environment properties, produce a raw
-  transfer proposal, then apply and accumulate its mass-clamped transfer.</li>
+  transfer proposal, P2-finalize and apply it, accumulate the finalized
+  transfer, and couple gas concentration. Later proposals read coupled gas;
+  vapor-pressure refresh does not read gas concentration.</li>
 <li>Transfer buffers: the resolved total transfer is cleared once after preflight
-  and accumulates applied clamped transfer over all four substeps. A supplied
-  total buffer is returned by identity; the separate work buffer retains only
-  the final raw proposal.</li>
+  and accumulates P2-finalized transfer over all four substeps. A supplied total
+  buffer is returned by identity; the separate work buffer retains only the
+  final raw proposal.</li>
+<li>Failure boundary: invalid aggregate P2 state or sidecars fail before launches
+  or mutation. A later non-finite fresh proposal fails before P2 mutation in
+  that cycle but does not roll back earlier completed substeps.</li>
 <li>Baseline backend for this phase: <code>np.float64</code> inputs and Warp CPU execution.</li>
 <li>Accepted study inputs: scalar <code>temperature</code> and <code>pressure</code>, direct Warp
   arrays with shape <code>(n_boxes,)</code>, and the tested hybrid mode where one direct
@@ -14647,9 +14653,9 @@ explicit <code>(n_boxes, n_particles, n_species)</code> and <code>(n_boxes,)</co
   shapes.</li>
 <li><code>_validate_stiffness_case_metadata</code>: declared case metadata must match array
   shape and <code>np.float64</code> dtype expectations.</li>
-<li><code>_classify_particle_only_condensation_stiffness</code>: returns a stable/unstable
-  result for the current particle-only GPU path and marks the
-  <code>particle_only_update</code> caveat explicitly.</li>
+<li><code>_classify_particle_only_condensation_stiffness</code>: historical test helper name
+  retained for the recorded study; it is not the current gas-coupled runtime
+  contract.</li>
 </ul>
 <h3 id="boundary-semantics">Boundary Semantics<a class="headerlink" href="#boundary-semantics" title="Permanent link">&para;</a></h3>
 <ul>
@@ -14674,8 +14680,8 @@ case, the collected tests:</p>
 <li>execute the fixed timestep grid from <code>_RECORDED_TIMESTEP_GRID_BY_CASE</code></li>
 <li>reuse one caller-owned preallocated <code>mass_transfer</code> buffer per case/device</li>
 <li>rebuild particle, gas, and vapor-pressure inputs before every trial</li>
-<li>verify that the current Warp path updates particle masses only and leaves gas
-  concentration unchanged</li>
+<li>historical baseline: record the then-current particle-only behavior; these
+  rows do not describe the later P2-finalized gas-coupled runtime</li>
 <li>keep scalar <code>temperature</code> / <code>pressure</code> inputs for single-box cases and direct
   Warp <code>(n_boxes,)</code> arrays for the multi-box <code>droplet_like</code> case</li>
 </ul>
@@ -14697,7 +14703,7 @@ case, the collected tests:</p>
 <td style="text-align: right;"><code>0.00005</code></td>
 <td style="text-align: right;"><code>1.0</code></td>
 <td><code>stable</code></td>
-<td>Caller-owned buffer reused and overwritten; executed Warp gas state unchanged.</td>
+<td>Historical particle-only baseline; caller-owned buffer reused and overwritten.</td>
 </tr>
 <tr>
 <td><code>nanometer</code></td>
@@ -14705,7 +14711,7 @@ case, the collected tests:</p>
 <td style="text-align: right;"><code>0.05</code></td>
 <td style="text-align: right;"><code>1.0</code></td>
 <td><code>stable</code></td>
-<td>Same fixed-shape particle-only path; executed Warp gas state unchanged.</td>
+<td>Historical particle-only baseline.</td>
 </tr>
 <tr>
 <td><code>nanometer</code></td>
@@ -14713,7 +14719,7 @@ case, the collected tests:</p>
 <td style="text-align: right;"><code>50.0</code></td>
 <td style="text-align: right;"><code>1.0</code></td>
 <td><code>stable</code></td>
-<td>Same caller-owned buffer contract; executed Warp gas state unchanged.</td>
+<td>Historical particle-only baseline.</td>
 </tr>
 <tr>
 <td><code>accumulation_mode</code></td>
@@ -14721,7 +14727,7 @@ case, the collected tests:</p>
 <td style="text-align: right;"><code>0.004</code></td>
 <td style="text-align: right;"><code>1.0</code></td>
 <td><code>stable</code></td>
-<td>Caller-owned buffer reused and overwritten; executed Warp gas state unchanged.</td>
+<td>Historical particle-only baseline; caller-owned buffer reused and overwritten.</td>
 </tr>
 <tr>
 <td><code>accumulation_mode</code></td>
@@ -14729,7 +14735,7 @@ case, the collected tests:</p>
 <td style="text-align: right;"><code>0.4</code></td>
 <td style="text-align: right;"><code>1.0</code></td>
 <td><code>stable</code></td>
-<td>Same fixed-shape particle-only path; executed Warp gas state unchanged.</td>
+<td>Historical particle-only baseline.</td>
 </tr>
 <tr>
 <td><code>accumulation_mode</code></td>
@@ -14737,7 +14743,7 @@ case, the collected tests:</p>
 <td style="text-align: right;"><code>40.0</code></td>
 <td style="text-align: right;"><code>1.0</code></td>
 <td><code>stable</code></td>
-<td>Same caller-owned buffer contract; executed Warp gas state unchanged.</td>
+<td>Historical particle-only baseline.</td>
 </tr>
 <tr>
 <td><code>droplet_like</code></td>
@@ -14745,7 +14751,7 @@ case, the collected tests:</p>
 <td style="text-align: right;"><code>0.04</code></td>
 <td style="text-align: right;"><code>1.0</code></td>
 <td><code>stable</code></td>
-<td>Multi-box direct-array environment inputs stay supported; executed Warp gas state unchanged.</td>
+<td>Historical particle-only baseline; multi-box direct arrays supported.</td>
 </tr>
 <tr>
 <td><code>droplet_like</code></td>
@@ -14753,7 +14759,7 @@ case, the collected tests:</p>
 <td style="text-align: right;"><code>4.0</code></td>
 <td style="text-align: right;"><code>1.0</code></td>
 <td><code>stable</code></td>
-<td>Same fixed-shape particle-only path; executed Warp gas state unchanged.</td>
+<td>Historical particle-only baseline.</td>
 </tr>
 <tr>
 <td><code>droplet_like</code></td>
@@ -14761,25 +14767,25 @@ case, the collected tests:</p>
 <td style="text-align: right;"><code>400.0</code></td>
 <td style="text-align: right;"><code>1.0</code></td>
 <td><code>stable</code></td>
-<td>Same caller-owned buffer contract; executed Warp gas state unchanged.</td>
+<td>Historical particle-only baseline.</td>
 </tr>
 </tbody>
 </table>
 <p>Across the current recorded grid, the executable tests observe the same
-particle-only maximum fractional-mass-change magnitude (<code>1.0</code>) for every row.
+historical particle-only maximum fractional-mass-change magnitude (<code>1.0</code>) for every row.
 The baseline therefore applies one inclusive threshold (<code>1.0</code>) across the full
 grid and records every row as <code>stable</code> under that shared rule. Separate unit
 tests still cover the <code>unstable</code> branch for larger fractional changes,
 zero-mass growth, and non-finite values. This is recorded-grid evidence for the
-current fixed-shape particle-only path, not a gas-coupled conservation result
-and not a general stable-timestep limit for other cases.</p>
+historical fixed-shape particle-only path, not evidence for the current
+gas-coupled conservation contract or a general stable-timestep limit.</p>
 <h2 id="candidate-evaluation-evidence">Candidate Evaluation Evidence<a class="headerlink" href="#candidate-evaluation-evidence" title="Permanent link">&para;</a></h2>
 <p>P2/P3 recorded two deterministic prototype candidates implemented in
 <code>particula/gpu/kernels/tests/_condensation_test_support.py</code> and collected
 through <code>particula/gpu/kernels/tests/condensation_stiffness_test.py</code>. They
 remain test-local evidence only; the public <code>condensation_step_gpu(...)</code>
-runtime and package export surface are unchanged, no production gas-coupled
-hook shipped, and no new private production helper was added.</p>
+runtime and package export surface are unchanged. The later production path
+does ship gas coupling, but these candidates remain historical evidence only.</p>
 <table>
 <thead>
 <tr>
@@ -14816,16 +14822,11 @@ hook shipped, and no new private production helper was added.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="phase-boundary-decision">Phase Boundary Decision<a class="headerlink" href="#phase-boundary-decision" title="Permanent link">&para;</a></h3>
+<h3 id="historical-phase-boundary-decision">Historical Phase Boundary Decision<a class="headerlink" href="#historical-phase-boundary-decision" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Gas coupling is still deferred. No production gas-state update hook shipped in
-  this issue.</li>
-<li><code>condensation_step_gpu(...)</code> remains particle-only in production, so the new
-  candidate coverage should be read strictly as deterministic evaluation
-  evidence rather than a runtime capability change.</li>
-<li>The exact split boundary remains the same: any production gas-coupled path
-  must land with same-issue particle-plus-gas conservation regression coverage
-  in <code>particula/integration_tests/condensation_particle_resolved_test.py</code>.</li>
+<li>This decision preceded the shipped P2-finalized gas-coupled production path.
+  The candidate coverage remains deterministic evaluation evidence, not a
+  current runtime description.</li>
 <li>The asymptotic candidate remains evidence-only because the tolerance required
   to track the current CPU/explicit reference is materially looser than the
   fixed-count candidate.</li>
@@ -14836,16 +14837,15 @@ hook shipped, and no new private production helper was added.</p>
 <h3 id="shipped-fixed-four-implementation">Shipped fixed-four implementation<a class="headerlink" href="#shipped-fixed-four-implementation" title="Permanent link">&para;</a></h3>
 <p><code>fixed_count_substeps_4</code> is the shipped production integration behavior of
 <code>condensation_step_gpu(...)</code>, not a future prototype. Each valid call uses four
-equal substeps, updates particle masses in place, leaves
-<code>gas.concentration</code> unchanged, and keeps production calculations device
-resident.</p>
+equal substeps, updates particle mass and gas concentration using the same
+P2-finalized transfer, and keeps production calculations device resident.</p>
 <p>Why this is the recommended path:</p>
 <ul>
 <li>The historical P2/P3 comparison recorded <code>rtol &lt;= 5e-2</code> at the baseline
   timestep and maximum relative error <code>&lt;= 5e-2</code> only for the named
   <code>nanometer</code>, <code>accumulation_mode</code>, and <code>droplet_like</code> grids.</li>
 <li>Successful calls preserve supplied total-buffer identity, clear that total
-  once after preflight, and accumulate applied mass-clamped transfer. A
+  once after preflight, and accumulate P2-finalized transfer. A
   separate work buffer retains the final raw proposal.</li>
 <li><code>CondensationScratchBuffers</code> remains a concrete-module-only sidecar. Its
   supplied active-device, stable-shape <code>wp.float64</code> fields may be omitted
@@ -14865,20 +14865,20 @@ resident.</p>
 <li><strong>Adaptive or dynamic-loop schemes:</strong> deferred; no adaptive-stepping support
   is documented by this record.</li>
 </ul>
-<h3 id="gas-coupled-follow-up-gate">Gas-coupled follow-up gate<a class="headerlink" href="#gas-coupled-follow-up-gate" title="Permanent link">&para;</a></h3>
-<p>The recommendation remains bounded to particle-only production condensation.
-Any future production gas-coupled GPU path must land with the production hook
-plus same-issue particle-plus-gas conservation regression coverage in
-<code>particula/integration_tests/condensation_particle_resolved_test.py</code>.
-Until that gate lands, roadmap and implementation guidance must not claim that
-GPU condensation updates gas concentrations in production.</p>
+<h3 id="current-gas-coupling-boundary">Current gas-coupling boundary<a class="headerlink" href="#current-gas-coupling-boundary" title="Permanent link">&para;</a></h3>
+<p>The shipped direct kernel couples each finalized transfer to gas concentration;
+later mass-transfer proposals observe that updated gas state. This is not
+temperature feedback, a strategy or <code>Runnable</code> path, adaptive stepping, graph
+capture/replay, autodiff support, or general CPU-strategy parity. A failed
+aggregate P2 preflight is atomic, while a later raw-proposal failure retains
+completed earlier substeps rather than rolling back the whole call.</p>
 <h3 id="downstream-gates-and-dependency-boundaries">Downstream gates and dependency boundaries<a class="headerlink" href="#downstream-gates-and-dependency-boundaries" title="Permanent link">&para;</a></h3>
 <p>E4-F4 P2 ships a low-level, per-substep latent-heat rate correction with
 CPU-oracle/Warp parity. Issue #1272 also ships its caller-owned, signed
 <code>energy_transfer</code> diagnostic: after successful preflight, its active-device
-<code>wp.float64</code> <code>(n_boxes, n_species)</code> output is overwritten with mass-clamped
-applied transfer times latent heat. It does not add temperature-state feedback,
-E4-F5 gas coupling and particle-plus-gas conservation, E4-F6
+<code>wp.float64</code> <code>(n_boxes, n_species)</code> output is overwritten with P2-finalized
+transfer times latent heat. It does not add temperature-state
+feedback, E4-F6
 independent-device plus graph/autodiff evidence, or E4-F7 strategy/runnable
 and final support work.</p>
 <ul>
@@ -14895,17 +14895,16 @@ and final support work.</p>
 <ul>
 <li>adaptive or exhaustive timestep search results</li>
 <li>generalized stable timestep limits</li>
-<li>gas-coupled conservation claims that the current production path does not yet
-  satisfy</li>
-<li>P3/P4 temperature-feedback claims; E4-F5 gas coupling or conservation
-  claims; or E4-F6 independent-device, graph-capture/replay, or autodiff
+<li>general CPU-strategy parity or accuracy claims beyond the documented direct
+  kernel cases</li>
+<li>P3/P4 temperature-feedback claims; E4-F6 independent-device,
+  graph-capture/replay, or autodiff
   claims. Issue #1272's caller-owned signed <code>energy_transfer</code> diagnostic is
   shipped bookkeeping, not temperature feedback.</li>
 <li>strategy/runnable-level latent-heat support</li>
 </ul>
 <p>Later phases can build on this measured baseline and recommendation without
-redefining case shapes, metric names, threshold meaning, or the current
-particle-only production boundary.</p>
+redefining case shapes, metric names, or threshold meaning.</p>
 
 
 

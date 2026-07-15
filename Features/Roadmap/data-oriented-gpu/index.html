@@ -15260,7 +15260,7 @@ documentation conventions.</p>
 <td>4</td>
 <td><a href="#epic-d-gpu-condensation-physics-parity">Epic D: GPU Condensation Physics Parity</a></td>
 <td>In progress</td>
-<td>E4-F4</td>
+<td>E4-F5</td>
 </tr>
 <tr>
 <td>5</td>
@@ -15424,7 +15424,11 @@ high-level dynamics workflows.</p>
 <ul>
 <li>Bounded direct GPU condensation applies an optional Warp-backed latent-heat
   rate correction during each fixed substep and a signed energy diagnostic. It
-  does not provide temperature feedback, gas coupling, or conservation.</li>
+  couples P2-finalized transfer to authoritative active-device gas
+  concentration, but does not provide temperature feedback or high-level
+  <code>Runnable</code> integration. This is a verified direct-kernel contract, not
+  complete GPU-condensation or E4 production support; E4-F6 and E4-F7 remain
+  the gates for those broader claims.</li>
 <li>Particle charge is present in the GPU data container, but charged particle
   coagulation kernels are not implemented yet.</li>
 <li>The current GPU coagulation path is Brownian-focused; charged, turbulent,
@@ -15484,8 +15488,9 @@ must build on.</p>
   transfer boundary. Kernels and runnables still do not perform hidden
   CPU/GPU synchronization or movement.</li>
 <li>Gas CPU/GPU restore semantics are locked down: <code>GasData.name</code> is CPU-only
-  ordered metadata, <code>partitioning</code> converts <code>bool</code> on CPU to <code>int32</code> on GPU,
-  and <code>WarpGasData.vapor_pressure</code> is GPU helper state dropped on CPU restore.</li>
+  ordered metadata, shared CPU <code>partitioning</code> expands to an active-device,
+  binary <code>wp.int32</code> mask indexed by box and species on GPU, and
+  <code>WarpGasData.vapor_pressure</code> is GPU helper state dropped on CPU restore.</li>
 <li>The low-level GPU condensation and coagulation environment inputs now share
   a scalar-or-per-box normalization contract, including explicit
   <code>WarpEnvironmentData</code> inputs.</li>
@@ -15493,8 +15498,8 @@ must build on.</p>
   <code>wp.float64</code> particle mass storage as the production baseline and defers any
   dtype or schema migration until stronger evidence exists.</li>
 <li>The condensation-stiffness study recommends <code>fixed_count_substeps_4</code> as the
-  fixed-shape foundation for later GPU condensation integration, while keeping
-  gas-coupled production support deferred.</li>
+  fixed-shape foundation for direct GPU condensation, including its current
+  P2-finalized gas-coupling contract.</li>
 <li>The foundation guide, migration guide, data-container example, and support
   boundary docs now distinguish multi-box-capable storage from still-limited
   CPU process execution.</li>
@@ -15727,12 +15732,12 @@ implying broader test coverage.</p>
 <td><code>WarpGasData</code></td>
 <td><code>partitioning</code></td>
 <td><code>WarpGasData</code></td>
-<td><code>(n_species,)</code></td>
-<td><code>wp.int32</code></td>
-<td>Stored, mutable GPU mirror/helper mask; shared across boxes</td>
-<td>Declared as <code>wp.array(dtype=wp.int32)</code>; <code>to_warp_gas_data()</code> converts <code>GasData.partitioning</code> from <code>bool</code> to <code>int32</code></td>
-<td><code>from_warp_gas_data()</code> restores <code>int32 → bool</code> into <code>GasData.partitioning</code></td>
-<td>Source: <code>particula/gpu/warp_types.py:134</code>, <code>particula/gpu/conversion.py:159-160,208-209,223-239,347-356</code>; tests: <code>particula/gpu/tests/warp_types_test.py:178-184,218-232,322-338</code>, <code>particula/gpu/tests/conversion_test.py:189-199,609-619</code></td>
+<td><code>(n_boxes, n_species)</code></td>
+<td>Active-device binary <code>wp.int32</code></td>
+<td>Stored, mutable per-box/per-species GPU helper mask</td>
+<td>Declared as <code>wp.array2d(dtype=wp.int32)</code>; <code>to_warp_gas_data()</code> expands the shared CPU <code>bool</code> mask per box and converts it to binary <code>int32</code></td>
+<td>Kernels index <code>[box, species]</code>; CPU restore converts <code>int32 → bool</code> only when every box agrees</td>
+<td>Source: <code>particula/gpu/warp_types.py</code>; <code>particula/gpu/conversion.py</code>; tests: <code>particula/gpu/tests/warp_types_test.py</code>, <code>particula/gpu/tests/conversion_test.py</code></td>
 </tr>
 </tbody>
 </table>
@@ -15869,12 +15874,12 @@ future GPU environment state.</p>
 <td><code>GasData.partitioning</code></td>
 <td>Owned by <code>GasData</code> as authoritative shared-across-boxes partitioning eligibility state</td>
 <td><code>(n_species,)</code></td>
-<td><code>(n_species,)</code> via <code>WarpGasData.partitioning</code></td>
-<td><code>bool</code> on CPU / <code>wp.int32</code> on GPU</td>
+<td><code>(n_boxes, n_species)</code> via <code>WarpGasData.partitioning</code></td>
+<td><code>bool</code> on CPU / active-device binary <code>wp.int32</code> on GPU</td>
 <td>Mutable stored state on both containers</td>
-<td>Must round-trip with explicit <code>bool → int32 → bool</code> conversion</td>
+<td>CPU transfer expands <code>bool</code> per box; kernels index <code>[box, species]</code>; CPU restore converts back only when every box agrees</td>
 <td>Condensation partitioning decisions and GPU kernels that require a numeric mask</td>
-<td><code>particula/gas/gas_data.py:57-58,79-115</code>; <code>particula/gpu/warp_types.py:96-111,134</code>; <code>particula/gpu/conversion.py:159-160,208-209,223-239,347-356</code>; <code>particula/gas/tests/gas_data_test.py:77-97</code>; <code>particula/gpu/tests/conversion_test.py:189-199,609-619</code></td>
+<td><code>particula/gas/gas_data.py</code>; <code>particula/gpu/warp_types.py</code>; <code>particula/gpu/conversion.py</code>; <code>particula/gas/tests/gas_data_test.py</code>; <code>particula/gpu/tests/conversion_test.py</code></td>
 </tr>
 <tr>
 <td><code>WarpParticleData</code> numeric mirrors</td>
@@ -15890,13 +15895,13 @@ future GPU environment state.</p>
 <tr>
 <td><code>WarpGasData.molar_mass</code> / <code>concentration</code> / <code>partitioning</code></td>
 <td>Owned on GPU only as numeric mirrors/helpers of authoritative CPU <code>GasData</code> state</td>
-<td><code>(n_species,)</code>, <code>(n_boxes, n_species)</code>, <code>(n_species,)</code></td>
+<td><code>(n_species,)</code>, <code>(n_boxes, n_species)</code>, <code>(n_boxes, n_species)</code></td>
 <td>Same declared GPU shapes</td>
-<td><code>wp.float64</code> / <code>wp.float64</code> / <code>wp.int32</code></td>
+<td><code>wp.float64</code> / <code>wp.float64</code> / active-device binary <code>wp.int32</code></td>
 <td>Mutable GPU working state</td>
-<td>Must restore to <code>GasData</code> numeric state, with explicit <code>int32 → bool</code> recovery for <code>partitioning</code></td>
+<td>CPU partitioning expands per box; kernels index <code>[box, species]</code>; restore recovers <code>bool</code> only when every box agrees</td>
 <td>GPU condensation and other gas-kernel workflows</td>
-<td><code>particula/gpu/warp_types.py:82-99,100-111,131-134</code>; <code>particula/gpu/conversion.py:142-241,290-357</code>; <code>particula/gpu/tests/warp_types_test.py:168-184,218-232,322-338</code>; <code>particula/gpu/tests/conversion_test.py:189-229,583-619</code></td>
+<td><code>particula/gpu/warp_types.py</code>; <code>particula/gpu/conversion.py</code>; <code>particula/gpu/tests/warp_types_test.py</code>; <code>particula/gpu/tests/conversion_test.py</code></td>
 </tr>
 <tr>
 <td><code>WarpGasData.vapor_pressure</code></td>
@@ -15981,6 +15986,7 @@ shape and do not gain a box dimension just because the workflow is batched.</p>
 <li><code>ParticleData.concentration -&gt; (1, n_particles)</code></li>
 <li><code>GasData.concentration -&gt; (1, n_species)</code></li>
 <li><code>ParticleData.density -&gt; (n_species,)</code></li>
+<li><code>WarpGasData.partitioning -&gt; (n_boxes, n_species)</code></li>
 <li><code>WarpGasData.vapor_pressure -&gt; (n_boxes, n_species)</code></li>
 </ul>
 <p>Verification evidence for the shape claims in this subsection:</p>
@@ -16188,6 +16194,11 @@ shape and do not gain a box dimension just because the workflow is batched.</p>
 <td>GPU mirror of gas concentration.</td>
 </tr>
 <tr>
+<td><code>partitioning</code></td>
+<td><code>(n_boxes, n_species)</code></td>
+<td>Active-device binary <code>wp.int32</code> mask, indexed by box and species.</td>
+</tr>
+<tr>
 <td><code>vapor_pressure</code></td>
 <td><code>(n_boxes, n_species)</code></td>
 <td>GPU-only helper state; not restored to CPU <code>GasData</code>.</td>
@@ -16208,11 +16219,6 @@ shape and do not gain a box dimension just because the workflow is batched.</p>
 <td><code>molar_mass</code></td>
 <td><code>(n_species,)</code></td>
 <td>GPU mirror of shared gas molar mass.</td>
-</tr>
-<tr>
-<td><code>partitioning</code></td>
-<td><code>(n_species,)</code></td>
-<td>GPU mirror/helper mask; stored as <code>int32</code> on GPU.</td>
 </tr>
 </tbody>
 </table>
@@ -16285,12 +16291,14 @@ downstream implementers; it does not add new schema semantics.</p>
   <code>temperature -&gt; (n_boxes,)</code>, <code>pressure -&gt; (n_boxes,)</code>, and
   <code>saturation_ratio -&gt; (n_boxes, n_species)</code>; do not add an extra volume field
   or an implicit transfer path.</li>
-<li><code>E2-F4</code>: inherit that <code>GasData.name</code> remains CPU-only ordered metadata,
-  <code>GasData.partitioning</code> stays <code>bool</code> on CPU and <code>int32</code> on GPU, and
-  <code>WarpGasData.vapor_pressure -&gt; (n_boxes, n_species)</code> remains explicit
-  GPU-helper state dropped on CPU restore; callers must preserve ordered
-  species names outside <code>WarpGasData</code> and pass them back on restore because
-  GPU→CPU restore is intentionally lossy for gas metadata and helper state.</li>
+<li><code>E2-F4</code>: inherit that <code>GasData.name</code> remains CPU-only ordered metadata and
+  <code>GasData.partitioning</code> stays <code>bool</code> on CPU while <code>WarpGasData.partitioning</code>
+  is an active-device binary <code>wp.int32</code> <code>(n_boxes, n_species)</code> mask indexed by
+  box and species. <code>WarpGasData.vapor_pressure -&gt; (n_boxes, n_species)</code> remains
+  explicit GPU-helper state dropped on CPU restore; callers must preserve
+  ordered species names outside <code>WarpGasData</code> and pass them back on restore
+  because GPU→CPU restore is intentionally lossy for gas metadata and helper
+  state.</li>
 <li><code>E2-F5</code>: inherit the single-box leading-dimension contract for per-box arrays
   such as <code>ParticleData.masses -&gt; (1, n_particles, n_species)</code>,
   <code>ParticleData.concentration -&gt; (1, n_particles)</code>, and
@@ -16308,7 +16316,10 @@ downstream implementers; it does not add new schema semantics.</p>
   <a href="../condensation-stiffness-study/"><code>condensation-stiffness-study.md</code></a>:
   <code>fixed_count_substeps_4</code> as the preferred fixed-shape foundation, bounded by
   the E2-F2 environment-shape contract, the E2-F6 <code>float64</code> evidence envelope,
-  and the still-deferred gas-coupled production gate.</li>
+  and the shipped bounded direct-kernel gas-coupling hook. That hook applies
+  validated, P2-finalized particle-transfer deltas to active-device gas state
+  and has direct-kernel conservation evidence; broader CPU-strategy parity and
+  runnable support remain deferred to E4-F6 and E4-F7.</li>
 <li><code>E2-F8</code>: inherit that container schemas are already multi-box capable through
   leading <code>n_boxes</code> dimensions, while current CPU condensation runtime support
   remains single-box and current CPU coagulation paths are still documented as
@@ -16403,26 +16414,28 @@ not raw speed, is the main precision driver.</p>
 <h3 id="time-scale-stiffness">Time-Scale Stiffness<a class="headerlink" href="#time-scale-stiffness" title="Permanent link">&para;</a></h3>
 <p>The same NPF-to-droplet range that stresses mass precision also stresses time
 integration: nanometer particles equilibrate with vapor in microseconds while
-cloud droplets evolve over seconds. E4-F3 ships the particle-only direct GPU
-step with exactly four equal substeps. P2/P3 candidate comparisons are retained
-only as historical evidence and do not expand the shipped runtime boundary.</p>
+cloud droplets evolve over seconds. The shipped direct GPU step uses exactly
+four equal substeps and P2-finalized particle/gas coupling. P2/P3 candidate
+comparisons are retained only as historical evidence and do not expand the
+shipped runtime boundary.</p>
 <ul>
 <li>Detailed evidence lives in
   <a href="../condensation-stiffness-study/"><code>condensation-stiffness-study.md</code></a>,
-  including the recorded explicit grid, the candidate comparison, and the
-  particle-only gas-update caveat.</li>
+  including the recorded explicit grid, candidate comparison, and current
+  bounded direct-kernel contract.</li>
 <li>Every successful <code>condensation_step_gpu(...)</code> call runs four <code>time_step / 4.0</code>
   substeps. Each optionally refreshes composition-weighted surface tension,
   refreshes vapor pressure and environment properties, produces a raw proposal,
-  then applies and accumulates mass-clamped transfer.</li>
+  P2-finalizes and applies it, accumulates finalized transfer, and couples gas
+  concentration. Later proposals read coupled gas; refresh does not read gas.</li>
 <li>The case-specific stiffness evidence and limitations are in the
   <a href="../condensation-stiffness-study/">condensation stiffness study</a>; its recorded
   thresholds are not general accuracy or stable-timestep limits.</li>
 <li>Adaptive stepping, graph capture/replay, and autodiff readiness are not
   shipped claims.</li>
-<li>Do not claim gas-coupled GPU production support until the production hook and
-  same-issue conservation regression in
-  <code>particula/integration_tests/condensation_particle_resolved_test.py</code> land.</li>
+<li>Do not extend this bounded direct-kernel coupling to temperature feedback,
+  high-level strategies or <code>Runnable</code>s, general CPU parity, graph capture, or
+  autodiff support.</li>
 <li>Downstream implementers must stay inside the E2-F2 environment-shape
   contract and the E2-F6 <code>float64</code> evidence envelope when applying this
   recommendation.</li>
@@ -16684,10 +16697,10 @@ across the CPU↔Warp boundary. Staggered (Gauss-Seidel) condensation stays
 CPU-only (see <a href="#non-goals">Non-Goals</a>).</p>
 <p>E4-F2 parity uses an independent deterministic NumPy <code>float64</code> reference for
 the four activity/surface combinations on one-box and multi-box fixtures. It
-checks raw transfer, clamp ownership, unchanged gas concentration, and the
-on-device vapor-pressure refresh with explicit parity tolerances and tighter
-invariants. Warp <code>cpu</code> coverage is required whenever Warp is installed; CUDA
-is separately marked optional evidence and skips when unavailable. The
+checks raw transfer, finalized transfer ownership, coupled gas concentration,
+and the on-device vapor-pressure refresh with explicit parity tolerances and
+tighter invariants. Warp <code>cpu</code> coverage is required whenever Warp is installed;
+CUDA is separately marked optional evidence and skips when unavailable. The
 canonical focused commands are:</p>
 <div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and gpu_parity and not cuda&quot;</span><span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
@@ -16703,7 +16716,10 @@ rate is <code>dm_i/dt = isothermal_rate_i / correction_i</code>, where
 <code>thermal_factor_i = (D_i * L_i * p_surface_i / (T * k_thermal)) * (L_i / (T * R_specific_i) - 1) + R_specific_i * T</code>.
 <code>p_surface_i</code> is activity- and Kelvin-adjusted. Omitted latent heat or exactly
 zero per-species entries retain exact isothermal behavior.</p>
-<p>E4-F3 is shipped. Import its only step entry point with
+<p>E4-F3 and E4-F5 P1-P4 are shipped. The #1305 regression gate for #1272
+verifies the bounded direct-kernel gas-coupling contract and its production
+hook, not general GPU-condensation physics, CPU-strategy parity, or complete E4
+production support. Import its only step entry point with
 <code>from particula.gpu.kernels import condensation_step_gpu</code>. When reusable scratch
 is needed, <code>CondensationScratchBuffers</code> is intentionally concrete-module-only
 at <code>particula.gpu.kernels.condensation.CondensationScratchBuffers</code>; it is not a
@@ -16711,37 +16727,55 @@ second entry point. Supplied transfer fields have shape
 <code>(n_boxes, n_particles, n_species)</code> and property fields <code>(n_boxes,)</code>; each must
 be stable-shape, active-device <code>wp.float64</code>. Fields can be omitted
 independently, using fallback allocations. Supplied buffers preserve identity
-and remain caller-owned, alive, and unmodified through launch completion. The
-step executes four equal <code>time_step / 4.0</code> substeps: each optionally refreshes
-composition-weighted surface tension, overwrites <code>gas.vapor_pressure</code>, refreshes
-environment properties, produces a raw proposal, then applies and accumulates
-its mass-clamped transfer. It clears its total buffer once after preflight,
-accumulates applied clamped transfer, and retains only the final raw proposal in
-work storage. It mutates particle masses in place, leaves <code>gas.concentration</code>
-unchanged, and makes no hidden CPU↔Warp transfers. Validation may read device
-metadata or thermodynamic inputs but does not transfer or mutate caller state.</p>
+and remain caller-owned mutable work/output storage; a successful call may
+write their work or output fields. The step executes four equal
+<code>time_step / 4.0</code> substeps: each optionally refreshes composition-weighted
+surface tension, overwrites derived <code>gas.vapor_pressure</code>, refreshes environment
+properties, gates disabled per-box/species partitioning entries and inactive
+particle slots, produces a raw proposal, then P2-finalizes and applies its
+inventory-limited transfer. The active-device binary <code>wp.int32</code> partitioning
+mask has shape <code>(n_boxes, n_species)</code>. <code>WarpGasData.concentration</code> is the
+authoritative active-device <code>wp.float64</code> mass concentration in <code>kg/m^3</code> with
+that same shape; the step mutates it in place by the matching
+particle-concentration-weighted opposite delta. The caller-visible and
+accumulated transfer is the P2-finalized applied transfer, never the raw work
+proposal. The total buffer is cleared once after preflight, accumulates the
+finalized transfer, and work storage retains only the final raw proposal.
+Physical-state updates are device resident and do not perform hidden CPU↔Warp
+transfers; validation or status checks may intentionally read device values back
+to the host. Later proposals read coupled gas, while vapor-pressure refresh does
+not. Aggregate invalid P2 state or sidecars fail before launches or mutation; a
+later fresh raw-proposal failure preserves completed prior substeps and may write
+only raw work storage in the failed cycle.</p>
 <p>E4-F4's #1272 signed diagnostic is shipped: optional keyword-only caller-owned
 active-device <code>wp.float64</code> <code>latent_heat</code>, <code>(n_species,)</code>, and
 <code>energy_transfer</code>, <code>(n_boxes, n_species)</code>, record
-<code>Q[box, species] = sum_particles(Delta m_applied) * L[species]</code>. Here
+<code>Q[box, species] = sum_particles(Delta m_finalized) * L[species]</code>. Here
 <code>Delta m</code> is kg, <code>L</code> is J/kg, and <code>Q</code> is J; condensation is positive and
 evaporation negative. Energy output requires valid latent heat, is overwritten
 only after successful preflight, is not a third return item, and has strict
 issue #1272 tolerance <code>rtol=1e-12, atol=1e-18</code>. <code>thermal_work</code> remains
 validated but deferred/unused. This leaves temperature feedback, gas mutation
-and gas/full-system conservation, adaptive substeps, high-level <code>Runnable</code>,
-graph capture/replay, autodiff guarantees, and complete E4-F6 cross-device
-certification outside the supported scope.</p>
-<p>Required Warp-CPU and optional CUDA evidence commands are:</p>
+beyond the P2-finalized direct coupling, adaptive substeps, high-level
+<code>Runnable</code>, graph capture/replay, autodiff guarantees,
+general CPU-strategy parity, new-physics claims, and complete E4-F6
+cross-device certification outside the supported scope. E4-F7 remains the
+final support-contract, examples, troubleshooting, and support-matrix gate.</p>
+<p>Required Warp-CPU evidence and optional CUDA evidence commands are:</p>
 <div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/integration_tests/condensation_particle_resolved_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+<span class="c1"># Optional local CUDA evidence, when a CUDA-capable device is available:</span>
 pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
 </code></pre></div>
+<p>The first command uses Warp <code>cpu</code> as the baseline when Warp is installed;
+Warp- or CUDA-guarded cases skip cleanly when their optional runtime is absent.
+The CUDA-marked command is additive local evidence, not a default support or CI
+requirement.</p>
 <p>Remaining feature ownership:</p>
 <ol>
 <li>Unassigned future work: temperature-feedback integration, including the CPU
    reference context in the <a href="../../../Theory/Technical/Dynamics/Condensation_Equations/#condensation-with-latent-heat">condensation
    equations</a>.</li>
-<li>E4-F5: gas-coupled inventory, partitioning, and conservation evidence.</li>
 <li>E4-F6: broader independent-device, graph-capture, and autodiff evidence.</li>
 <li>E4-F7: the final support contract, examples, troubleshooting, and support
    matrix.</li>
@@ -17237,7 +17271,7 @@ coagulation and state-representation decisions are recorded.</p>
 <tr>
 <td>Time-scale stiffness across NPF-to-droplet range</td>
 <td>Unstable or wastefully slow explicit stepping</td>
-<td>Use the shipped four-substep particle-only direct condensation step; retain case-specific evidence in the stiffness study and keep gas coupling, temperature feedback, independent-device, graph, and autodiff work gated</td>
+<td>Use the shipped four-substep direct condensation step with P2-finalized particle/gas coupling; retain case-specific evidence in the stiffness study and keep temperature feedback, independent-device, graph, and autodiff work gated</td>
 </tr>
 <tr>
 <td>No fully integrated GPU-ready per-box thermodynamic runtime path</td>
@@ -17282,7 +17316,7 @@ coagulation and state-representation decisions are recorded.</p>
 <tr>
 <td>Caller drops ordered gas metadata or vapor-pressure sidecar across <code>WarpGasData</code> restore</td>
 <td>Placeholder names or missing GPU-helper state break name-keyed or condensation follow-up logic</td>
-<td>Preserve ordered names externally. The supported direct condensation path automatically refreshes derived vapor pressure on-device, but CPU restore remains intentionally lossy and this does not add latent-heat, gas-coupled, or broader runtime behavior.</td>
+<td>Preserve ordered names externally. The supported direct condensation path automatically refreshes derived vapor pressure on-device, but CPU restore remains intentionally lossy and this does not add latent-heat temperature feedback or broader runtime behavior.</td>
 </tr>
 <tr>
 <td>Graph capture fragility (shape/process changes)</td>

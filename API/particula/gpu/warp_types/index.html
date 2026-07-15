@@ -14532,17 +14532,29 @@ string fields (names) which are not GPU-compatible.</p>
   caller-owned ordered names or index mapping outside this struct;
   placeholder names are generated only by CPU restore helpers when
   names are omitted.</li>
-<li>The <code>partitioning</code> field uses int32 instead of bool for GPU
-  compatibility (1 = True, 0 = False) and is expected to remain
-  binary for CPU restore.</li>
+<li>The <code>partitioning</code> field is the version-2 active-device, per-box
+  <code>(n_boxes, n_species)</code> int32 mask rather than a CPU bool vector.
+  Its values must remain binary (1 = True, 0 = False). The public
+  condensation step gates raw proposals with this mask; its private P2
+  inventory finalizer instead requires an already gated proposal. The
+  public step applies finalized transfer to particle mass and couples
+  its concentration-weighted opposite to <code>concentration</code> after every
+  substep. CPU restore additionally requires every box to have the same
+  mask because <code>GasData</code> owns one shared species mask. Migrate legacy
+  one-dimensional masks with <code>to_per_box_partitioning()</code> before
+  assigning this public field.</li>
 <li><code>vapor_pressure</code> is GPU-only helper state for condensation-style
   kernels and is not part of CPU <code>GasData</code> ownership.
   <code>to_warp_gas_data()</code> accepts caller-supplied values with shape
   <code>(n_boxes, n_species)</code> or allocates zeros when omitted. Those
   zeros keep the Warp schema valid but do not provide physical
-  vapor-pressure inputs by themselves. CPU restore helpers drop this
-  field intentionally from restored <code>GasData</code>, while the retained GPU
-  container can still expose it until the caller discards that object.</li>
+  vapor-pressure inputs for kernels that consume the field directly.
+  <code>condensation_step_gpu()</code> refreshes the field from its thermodynamic
+  configuration before every transfer proposal; that refresh does not
+  consume gas concentration. CPU restore helpers drop this field
+  intentionally from restored <code>GasData</code>, while the
+  retained GPU container can still expose it until the caller discards
+  that object.</li>
 </ul>
 </details>
 
@@ -14564,7 +14576,9 @@ Shared across all boxes - not batched.</p>
           –
           <div class="doc-md-description">
             <p>Mass concentrations in kg/m^3.
-Shape: (n_boxes, n_species)</p>
+Shape: (n_boxes, n_species). The public condensation step updates
+this field after each P2-finalized substep transfer; it supplies
+inventory for subsequent transfer proposals.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -14579,11 +14593,12 @@ GPU-only helper state for condensation kernels.</p>
         </li>
         <li class="doc-section-item field-body">
           <b><code><span title="particula.gpu.warp_types.WarpGasData.partitioning">partitioning</span></code></b>
-              (<code><span title="warp.array">array</span>(dtype=<span title="warp.int32">int32</span>)</code>)
+              (<code><span title="warp.array2d">array2d</span>(dtype=<span title="warp.int32">int32</span>)</code>)
           –
           <div class="doc-md-description">
-            <p>Whether each species can partition to particles.
-Shape: (n_species,)
+            <p>Binary mask used by the public condensation step to allow
+species proposals to partition to particles in each box.
+Shape: (n_boxes, n_species)
 Uses int32 (1=True, 0=False) for GPU compatibility.</p>
           </div>
         </li>
@@ -14609,7 +14624,7 @@ gas.concentration = wp.zeros(
 gas.vapor_pressure = wp.ones(
 ...     (n_boxes, n_species), dtype=wp.float64
 ... ) * 1000.0
-gas.partitioning = wp.array([1, 1, 0], dtype=wp.int32)</p>
+gas.partitioning = wp.array([[1, 1, 0], [1, 1, 0]], dtype=wp.int32)</p>
 </blockquote>
 </blockquote>
 </blockquote>

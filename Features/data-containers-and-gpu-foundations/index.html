@@ -14986,15 +14986,15 @@ boundary:</p>
 </tr>
 <tr>
 <td><code>concentration</code></td>
-<td><code>(n_boxes, n_species)</code></td>
-<td><code>(n_boxes, n_species)</code></td>
-<td>Round-trips without shape drift.</td>
+<td>Mass concentration in <code>kg/m^3</code>, <code>(n_boxes, n_species)</code></td>
+<td>Authoritative active-device <code>wp.float64</code> mass concentration in <code>kg/m^3</code>, <code>(n_boxes, n_species)</code></td>
+<td>Round-trips without shape drift. Direct condensation mutates the GPU field in place.</td>
 </tr>
 <tr>
 <td><code>partitioning</code></td>
 <td><code>bool</code>, shape <code>(n_species,)</code></td>
-<td><code>int32</code>, shape <code>(n_species,)</code></td>
-<td>Converts <code>bool → int32 → bool</code>; restored GPU values must remain binary.</td>
+<td>Active-device binary <code>wp.int32</code>, shape <code>(n_boxes, n_species)</code></td>
+<td>CPU masks expand per box as <code>bool → int32</code>; kernels index <code>[box, species]</code>. CPU restore converts back to <code>bool</code> and requires every box to agree.</td>
 </tr>
 <tr>
 <td><code>vapor_pressure</code></td>
@@ -15005,7 +15005,11 @@ boundary:</p>
 </tbody>
 </table>
 <p>This makes GPU→CPU gas restore intentionally lossy unless the caller preserves
-ordered names and any vapor-pressure sidecar state outside <code>WarpGasData</code>.</p>
+ordered names and any vapor-pressure sidecar state outside <code>WarpGasData</code>.
+<code>concentration</code> remains the authoritative gas inventory while a direct kernel
+is running. In contrast, <code>vapor_pressure</code> is derived GPU-only helper state and
+is intentionally dropped by CPU restore; it is not an alternate concentration
+field or a source of hidden CPU↔Warp synchronization.</p>
 <p>Example explicit gas handoff:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -15073,11 +15077,20 @@ sources are a direct scalar, a direct same-device Warp array with shape
 <code>environment=</code> when both direct values are <code>None</code>. NumPy arrays and Python
 lists are not accepted as direct arrays, and the step does not perform hidden
 transfers.</p>
-<p>On every successful condensation call, the step validates all inputs and
-optional buffers first. It then casts a non-<code>wp.float64</code> direct or environment
-temperature array into a device-local float64 buffer when needed, overwrites
-<code>vapor_pressure</code>, prepares environment properties, and transfers mass. A
-failed preflight leaves the vapor-pressure output buffer unchanged. Import the
+<p>On every successful condensation call, the step validates aggregate caller
+state and optional sidecars first. It then casts a non-<code>wp.float64</code> direct or
+environment temperature array into a device-local float64 buffer when needed
+and performs exactly four equal <code>time_step / 4.0</code> substeps. Each substep
+overwrites <code>vapor_pressure</code>, prepares environment properties, gates disabled
+partitioning entries and inactive particle slots, and creates a raw proposal.
+P2 finalizes that proposal against particle and gas inventory limits. The step
+then applies the finalized transfer to particles and accumulates it in the
+returned total-transfer buffer, reduces the matching concentration-weighted
+opposite gas delta, validates that delta, and only then mutates
+<code>gas.concentration</code>. Raw proposal work storage is intermediate state, not
+returned transfer. Later proposals read the coupled gas concentration;
+vapor-pressure refresh does not. A failed aggregate preflight leaves the
+vapor-pressure output buffer unchanged. Import the
 standalone <code>refresh_vapor_pressure_gpu</code> only from
 <code>particula.gpu.kernels.thermodynamics</code>, never <code>particula.gpu.kernels</code>.</p>
 <h3 id="condensation-activity-and-surface-sidecars">Condensation activity and surface sidecars<a class="headerlink" href="#condensation-activity-and-surface-sidecars" title="Permanent link">&para;</a></h3>
@@ -15094,23 +15107,49 @@ masses must exactly match <code>gas.molar_mass</code>; this preserves the positi
 ordered-molar-mass compatibility contract. The frozen dataclass prevents field
 rebinding, not mutation of its arrays. Callers retain those arrays and must not
 mutate them concurrently with a launch.</p>
-<p>Successful direct calls mutate particle masses in place, overwrite the derived
-GPU-only vapor-pressure buffer, and return accumulated <strong>applied, mass-clamped</strong>
-transfer. Scratch work storage contains only the final raw proposal. They do
-<strong>not</strong> couple or update gas concentration. Validation is atomic:
-unsupported sidecars fail with <code>ValueError</code> before mutation. Unsupported
-activity or surface strategies are not silently copied or approximated; passing
+<p>Successful direct calls mutate particle masses and gas concentration in place,
+overwrite the derived GPU-only vapor-pressure buffer, and return the accumulated
+<strong>P2-finalized, inventory-limited</strong> transfer. A supplied total-transfer buffer
+holds that finalized accumulated output and is returned by identity; separate
+supplied work storage retains only the final gated raw proposal and is never the
+returned transfer. Disabled <code>(box, species)</code> entries in the
+per-box <code>(n_boxes, n_species)</code> partitioning mask and inactive particle slots
+are zeroed before P2 finalization or reductions. CPU↔Warp conversion expands
+the CPU shared species mask to this per-box layout. <code>to_per_box_partitioning()</code>
+is the public migration helper for legacy one-dimensional masks. CPU restoration
+rejects masks that differ by box and rejects zero-box mirrors because no box can
+authoritatively supply the shared CPU mask.
+P2 demand, release, scale, and accumulator sidecars are validated and used for
+finalization; aggregate invalid state, metadata, or ownership fails with
+<code>ValueError</code> before launches or caller mutation. A later failure caused by a
+fresh raw proposal does not roll back completed substeps, although it occurs
+before P2 mutation in its failing substep. Unsupported activity or surface
+strategies are not silently copied or approximated; passing
 <code>activity_surface=None</code> retains legacy unit activity and static tension.</p>
+<p><code>CondensationScratchBuffers</code> is a concrete-module-only optional sidecar at
+<code>particula.gpu.kernels.condensation</code>; it is not another step entry point.
+Supplied transfer fields must be active-device, stable-shape <code>wp.float64</code> arrays
+with shape <code>(n_boxes, n_particles, n_species)</code>, and supplied property fields
+must be active-device, stable-shape <code>wp.float64</code> arrays with shape <code>(n_boxes,)</code>.
+The P2 demand, release, and scale sidecars must likewise be caller-owned,
+active-device, stable-shape <code>wp.float64</code> arrays with shape
+<code>(n_boxes, n_species)</code>. Every supplied field is metadata-validated for its
+applicable shape, dtype, and active device before launch; each may be omitted
+independently, in which case the step allocates only that field's fallback
+storage. Supplied fields preserve identity and remain caller-owned, but
+successful calls intentionally write their mutable work/output storage. No new
+container field, sidecar API, host conversion, synchronization, or transfer is
+implied by this ownership contract.</p>
 <p>The direct condensation parity suite exercises all four activity/surface pairs
 (ideal/static, ideal/composition-weighted, kappa/static, and
 kappa/composition-weighted) against an independent NumPy <code>float64</code> reference.
 It uses deterministic one-box and multi-box inputs, including pure and mixed
 particle compositions, a clamp-to-zero evaporation case, and constant plus
 both Buck vapor-pressure branches. Parity checks cover raw transfer, final
-particle mass, refreshed vapor pressure, and unchanged gas concentration;
-tighter ownership invariants separately verify
-<code>final_mass == maximum(initial_mass + raw_transfer, 0)</code>. They do not claim
-particle-plus-gas conservation for this uncoupled direct step.</p>
+particle mass, refreshed vapor pressure, finalized totals, and coupled gas
+concentration. Tighter conservation checks separately verify the weighted
+particle transfer equals the opposing gas change. These checks remain a bounded
+direct-step contract, not a general CPU-strategy parity claim.</p>
 <h3 id="latent-rate-correction-and-energy-diagnostic">Latent-rate correction and energy diagnostic<a class="headerlink" href="#latent-rate-correction-and-energy-diagnostic" title="Permanent link">&para;</a></h3>
 <p>The direct step accepts optional keyword-only caller-owned active-device
 <code>wp.float64</code> <code>latent_heat</code> with shape <code>(n_species,)</code>. For species <code>i</code>, its
@@ -15132,20 +15171,26 @@ is applied transfer in kg, <code>L</code> is latent heat in J/kg, and <code>Q</c
 condensation is positive and evaporation is negative. The strict #1272
 energy-regression tolerance is <code>rtol=1e-12, atol=1e-18</code>.</p>
 <p><code>thermal_work</code> has the same validated sidecar shape but remains deferred and
-unused. This diagnostic does not evolve temperature, mutate gas concentration,
-establish gas/full-system conservation, or add a <code>Runnable</code>, adaptive
-substeps, graph capture/replay, autodiff, or E4-F6 cross-device certification.</p>
-<p>Use <code>to_warp_*</code> and <code>from_warp_*</code> as the sole CPU↔Warp boundary. There is no
-hidden transfer and no high-level <code>Aerosol</code> or <code>Runnable</code> GPU path. Deterministic
+unused. This diagnostic does not evolve temperature or add a <code>Runnable</code>,
+adaptive substeps, graph capture/replay, autodiff, or E4-F6 cross-device
+certification. It uses the whole-call finalized transfer, including the direct
+step's coupled gas mutation.</p>
+<p>Use <code>to_warp_*</code> and <code>from_warp_*</code> as the sole data CPU↔Warp boundary. There is
+no high-level <code>Aerosol</code> or <code>Runnable</code> GPU path. CUDA preflight reads one-element
+device validation flags with <code>.numpy()</code>; those status reads synchronize but do
+not transfer or mutate caller-owned simulation buffers. Deterministic
 fp64 tests compare an independent NumPy reference with explicit parity
 <code>rtol</code>/<code>atol</code>, then apply tighter separate ownership invariants. Warp <code>cpu</code> is
-required whenever Warp is installed; CUDA is optional, availability-guarded,
+the baseline whenever Warp is installed; CUDA is optional, availability-guarded,
 and separately marked. Warp-dependent test imports are lazy, so marker-
-deselected collection does not require Warp:</p>
+deselected collection does not require Warp. Focused direct-kernel and CPU
+integration smoke commands are:</p>
 <div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>--collect-only<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not warp&quot;</span>
 pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
-pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/integration_tests/condensation_particle_resolved_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 </code></pre></div>
+<p>Run CUDA-marked kernel cases separately only on CUDA-capable hosts; unavailable
+Warp or CUDA remains an expected guarded skip, not evidence of a fallback path.</p>
 <h2 id="current-shipped-support-boundaries">Current shipped support boundaries<a class="headerlink" href="#current-shipped-support-boundaries" title="Permanent link">&para;</a></h2>
 <p>The containers are multi-box capable, but current execution support is narrower
 than storage support.</p>
@@ -15184,6 +15229,11 @@ than storage support.</p>
 <td>Warp parity tests always cover Warp <code>cpu</code>; <code>cuda</code> runs only when available.</td>
 </tr>
 <tr>
+<td>Low-level GPU condensation direct-kernel path</td>
+<td>Bounded P1-P4 contract</td>
+<td>Executes four fixed coupled substeps with active-device gas coupling; #1305/#1272 is direct-kernel and production-hook regression evidence, not broad GPU-condensation or E4 production support. E4-F6 and E4-F7 remain required gates.</td>
+</tr>
+<tr>
 <td>Low-level GPU coagulation direct-kernel path</td>
 <td>Accepted with caveats</td>
 <td>Appropriate for many independent boxes, especially when CUDA can supply box-level parallel throughput, Warp-backed direct-kernel workflows, and CUDA benchmark/study runs tied to the roadmap's measured decision record; not a broad production recommendation for large single-box workloads and does not imply hidden transfer or synchronization behavior.</td>
@@ -15207,6 +15257,9 @@ than storage support.</p>
   they are not fields on <code>ParticleData</code>, <code>GasData</code>, <code>EnvironmentData</code>, or any
   Warp container schema.</li>
 <li>No hidden CPU↔GPU synchronization occurs inside kernels or runnables.</li>
+<li>Direct condensation does not add adaptive stepping, a high-level <code>Runnable</code>
+  path, general CPU-strategy parity, unproven physics, or automatic host/device
+  movement. E4-F6 and E4-F7 remain the broader evidence and final-support gates.</li>
 </ul>
 <h2 id="guidance-for-current-users">Guidance for current users<a class="headerlink" href="#guidance-for-current-users" title="Permanent link">&para;</a></h2>
 <ul>
@@ -15264,6 +15317,13 @@ path.</p>
     device as the particle/gas/environment inputs used by the kernel call.</li>
 <li>Treat device-mismatch <code>ValueError</code> failures as input validation, not as a
     signal that Particula will migrate arrays automatically.</li>
+<li><strong>Condensation scratch buffers</strong></li>
+<li>Keep supplied <code>CondensationScratchBuffers</code> fields on the active device with
+    their required stable <code>wp.float64</code> shapes. Omitted fields allocate fallback
+    storage independently.</li>
+<li>Supplied fields preserve caller ownership and identity but are mutable
+    work/output storage; do not expect a successful step to leave them
+    unmodified.</li>
 <li><strong>Mixed <code>environment=</code> plus scalar <code>temperature</code>/<code>pressure</code> inputs</strong></li>
 <li>Pass either <code>environment=</code> or direct temperature/pressure inputs.</li>
 <li>Do not mix scalar or Warp-array <code>temperature</code> / <code>pressure</code> values with

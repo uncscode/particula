@@ -15334,9 +15334,10 @@ bookkeeping path. This baseline is CPU-only and diagnostic/reference only.</p>
 optional per-species latent-rate correction in each of its four equal
 substeps, with CPU-oracle/Warp parity coverage. Omitting <code>latent_heat</code>, or
 using a zero entry for a species, retains that species' isothermal rate path.
-This does not provide broader temperature feedback, gas coupling or
-conservation, or strategy/runnable-level latent-heat support; the separate
-<code>energy_transfer</code> bookkeeping diagnostic is described below.</p>
+This is diagnostic bookkeeping, not temperature feedback, gas mutation or
+gas/full-system conservation. It does not provide strategy/runnable-level
+latent-heat support; the separate <code>energy_transfer</code> diagnostic is described
+below.</p>
 <h3 id="condensationisothermalstaggered-two-pass-gauss-seidel">CondensationIsothermalStaggered (two-pass Gauss-Seidel)<a class="headerlink" href="#condensationisothermalstaggered-two-pass-gauss-seidel" title="Permanent link">&para;</a></h3>
 <p><code>CondensationIsothermalStaggered</code> splits each timestep into two passes. Theta
 controls the first-pass fraction; batches are clipped to the particle count and
@@ -15775,13 +15776,25 @@ unmodified through launch completion.</p>
 <p>Every successful call executes exactly four <code>time_step / 4.0</code> substeps. Each
 substep optionally refreshes composition-weighted surface tension, overwrites
 <code>gas.vapor_pressure</code>, refreshes environment properties, produces a raw transfer
-proposal, and applies and accumulates its mass-clamped transfer. The resolved
-total transfer buffer is cleared once after preflight, accumulates applied
-clamped transfer, and is returned by identity when supplied. Work storage keeps
-only the final raw proposal. Particle masses are mutated in place, while
-<code>gas.concentration</code> remains unchanged. Production calculations make no hidden
-CPU↔Warp transfers; validation-only device reads do not transfer or mutate
-caller buffers.</p>
+proposal, finalizes that proposal against available inventory, applies the
+finalized transfer to particle mass, accumulates it, and mutates gas
+concentration by the matching particle-concentration-weighted amount. Later
+proposals therefore see gas concentration coupled by earlier substeps.
+Vapor-pressure refresh is temperature-driven and does not read gas
+concentration. The resolved total transfer buffer is cleared once after
+preflight, accumulates P2-finalized transfer, and is returned by identity when
+supplied. Work storage keeps only the final raw proposal. Production
+calculations make no hidden data CPU↔Warp transfers. CUDA validation reads small
+device status flags with <code>.numpy()</code>, which synchronizes execution but does not
+transfer or mutate caller-owned simulation buffers.</p>
+<p>Invalid primary P2 state or supplied P2 sidecars fail during aggregate
+preflight, before launches or caller-buffer mutation. A non-finite fresh raw
+proposal fails before P2 finalization for that substep; completed earlier
+substeps remain applied. The failed cycle may already have written raw work,
+<code>gas.vapor_pressure</code>, and supplied dynamic-viscosity, mean-free-path, or
+composition-weighted surface-tension workspaces, but not P2 inventories or
+energy output. Retain or restore caller-owned snapshots when a failed call must
+be retried from its original state.</p>
 <p>This direct low-level GPU step uses an optional keyword-only caller-owned
 active-device <code>wp.float64</code> <code>latent_heat</code> sidecar with shape <code>(n_species,)</code> in
 each fixed substep. Its shipped rate is
@@ -15798,15 +15811,16 @@ isothermal branch.</p>
 <code>wp.float64</code> <code>energy_transfer</code>, shape <code>(n_boxes, n_species)</code>, as write-only
 diagnostic output. It requires valid latent heat, is overwritten only after
 successful preflight, and is not a third return item. Its signed whole-call
-identity is <code>Q[box, species] = sum_particles(Delta m_applied) * L[species]</code>:
-applied <code>Delta m</code> is kg, <code>L</code> is J/kg, and <code>Q</code> is J, so condensation is positive
-and evaporation negative. The #1272 diagnostic uses strict
+identity is <code>Q[box, species] = sum_particles(Delta m_finalized) * L[species]</code>:
+finalized <code>Delta m</code> is kg, <code>L</code> is J/kg, and <code>Q</code> is J, so condensation is
+positive and evaporation negative. The #1272 diagnostic uses strict
 <code>rtol=1e-12, atol=1e-18</code> evidence. <code>thermal_work</code> is validated but remains
 deferred and unused.</p>
-<p>This is diagnostic bookkeeping, not temperature feedback, gas mutation or
-gas/full-system conservation. It adds no strategy/<code>Runnable</code> integration,
-adaptive stepping, graph capture/replay, autodiff guarantee, or complete E4-F6
-cross-device certification. For focused coverage, run:</p>
+<p>This is diagnostic bookkeeping, not temperature feedback. The direct step
+couples finalized particle and gas transfer, but does not add strategy/
+<code>Runnable</code> integration, adaptive stepping, graph capture/replay, autodiff
+guarantees, or complete E4-F6 cross-device certification. For focused coverage,
+run:</p>
 <div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
 </code></pre></div>
@@ -15818,9 +15832,8 @@ CUDA is unavailable; a skip is not GPU execution.</p>
 <li>Factory supports <code>"isothermal"</code>, <code>"isothermal_staggered"</code>, and
   <code>"latent_heat"</code> only.</li>
 <li>Direct low-level GPU latent heat is a per-species rate correction only; it
-  has no temperature feedback, gas coupling or conservation, or
-  strategy/<code>Runnable</code> integration. Its signed <code>energy_transfer</code> sidecar is
-  diagnostic bookkeeping only.</li>
+  has no temperature feedback or strategy/<code>Runnable</code> integration. Its signed
+  <code>energy_transfer</code> sidecar is finalized-transfer diagnostic bookkeeping only.</li>
 <li>Minimum-radius clamp (1e-10 m) enforces continuum validity; sub-continuum
   physics is out of scope.</li>
 </ul>
