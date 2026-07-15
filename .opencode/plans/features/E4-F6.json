@@ -77,11 +77,11 @@
     {
       "id": "E4-F6-P4",
       "title": "Add bounded autodiff-readiness experiments and limitation tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-15",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
