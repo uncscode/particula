@@ -10,11 +10,12 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`, `docs/Features/particle-data-migration.md`, `particula/tests/condensation_latent_heat_docs_test.py`
   - Tests: `pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror`.
 
-- [ ] **E4-F7-P2:** Extend the explicit-transfer condensation example with regression tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Demonstrate final E4 configuration, caller-owned stable buffers, Warp CPU execution, diagnostics, and explicit restore without hidden host work.
+- [x] **E4-F7-P2:** Extend the explicit-transfer condensation example with regression tests
+  - Issue: #1315 | Size: S | Status: Completed
+  - Completed: 2026-07-15
+  - Delivered: Reworked the quick-start into the supported gas-coupled condensation-only path with lazy Warp/direct/concrete imports, explicit CPU↔Warp conversion and final restore, and two calls reusing the same complete fp64 scratch, latent-heat, and energy sidecars. The gallery entry now describes those bounded guarantees.
   - Files: `docs/Examples/gpu_direct_kernels_quick_start.py`, `docs/Examples/index.md`, `particula/gpu/tests/gpu_direct_kernels_example_test.py`
-  - Tests: Example execution on Warp CPU, exact output, lazy imports, no-Warp behavior, explicit transfer calls, and optional CUDA skip behavior where applicable.
+  - Tests: Exact output and forced no-Warp import isolation; lazy public/concrete import contract; mocked explicit conversion, restore, sidecar identity, and failure behavior; plus guarded real Warp-CPU transfer/energy/gas-coupling checks. `pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q -Werror`.
 
 - [ ] **E4-F7-P3:** Publish troubleshooting and focused reproduction commands with documentation tests
   - Issue: TBD | Size: S | Status: Not Started

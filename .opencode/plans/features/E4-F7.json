@@ -52,11 +52,11 @@
     {
       "id": "E4-F7-P2",
       "title": "Extend the explicit-transfer condensation example with regression tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-15",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
