@@ -39,8 +39,8 @@ DOCS_INDEX_DIRECT_GPU_CONTRACT_SNIPPETS = (
     "CPU-oracle/Warp parity coverage.",
     "Omitted latent heat,",
     "or a zero per-species value, retains that species' isothermal rate path.",
-    "Broader temperature feedback, gas coupling/conservation, and",
-    "strategy/runnable-level support remain deferred.",
+    "The direct hook couples each P2-finalized particle transfer to gas",
+    "Broader temperature feedback and CPU-strategy/runnable-level support remain",
 )
 FEATURE_CPU_BASELINE_SNIPPET = (
     "This baseline is CPU-only and diagnostic/reference only"
