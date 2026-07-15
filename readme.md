@@ -38,8 +38,8 @@ aerosol = process.execute(aerosol, time_step=10, sub_steps=1000)
 
 ## Migration / What's New
 
-For the canonical container, shape, and CPU↔GPU transfer contract, see the
-[Data Containers and GPU Foundations guide](./docs/Features/data-containers-and-gpu-foundations.md).
+For the [Canonical low-level direct-condensation contract](./docs/Features/data-containers-and-gpu-foundations.md),
+see the container, shape, and CPU↔GPU transfer boundaries.
 For a runnable low-level walkthrough, run `python
 docs/Examples/gpu_direct_kernels_quick_start.py` to see explicit
 `to_warp_*` / `from_warp_*` boundaries, lazy kernel imports from
@@ -104,9 +104,8 @@ four fixed substeps; omitting it, or setting a species entry to zero, preserves
 that species' isothermal rate path. `energy_transfer` requires `latent_heat`
 and is overwritten after successful preflight with signed, whole-call
 P2-finalized transfer times latent heat. It remains caller-owned rather than
-becoming a third return item. See the
-[Data Containers and GPU Foundations guide](./docs/Features/data-containers-and-gpu-foundations.md)
-for ownership, units, and direct-step limits.
+becoming a third return item; the canonical contract defines its ownership,
+units, and direct-step limits.
 For focused troubleshooting and reproduction commands, see the [GPU condensation command matrix](./docs/Features/data-containers-and-gpu-foundations.md#focused-reproduction-commands).
 
 ## Code Structure

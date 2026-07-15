@@ -18,4 +18,10 @@
 
 ## Phase Ordering
 
-All E4-F1 through E4-F6 behavior and evidence must be stable before P1 freezes claims. P1 precedes P2 so the example targets the canonical contract. P2 and its tests precede P3 command publication. P4 is last and may mark the roadmap shipped only after P1-P3 and all upstream gates pass.
+All E4-F1 through E4-F6 behavior and evidence was verified stable before P4
+publication. P1 preceded P2 so the example targets the canonical contract, and
+P2 preceded P3 command publication. Issue #1317 completed P4 only after
+inspecting the E4-F1--E4-F6 `phase_details.md` records and P1--P3 entries above,
+then passing `pytest particula/tests/condensation_latent_heat_docs_test.py -q
+-Werror` (22 passed). Warp CPU remains the baseline and optional CUDA remains
+additive evidence with clean skips; high-level integration remains downstream.
