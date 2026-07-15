@@ -5,12 +5,14 @@ inventory-limited transfer consistently to particle mass, gas concentration,
 whole-call transfer accounting, and optional energy accounting across four
 fixed substeps, while rejecting invalid caller-owned state before mutable work.
 
-**Value Proposition:** Issue #1304 shipped E4-F5-P3's public orchestration.
-Each successful call performs four equal P1-gated proposal/P2-finalization
-cycles, applies the finalized transfer to particles, deterministically couples
-the concentration-weighted opposite transfer to gas, and returns/accounting
-uses the finalized whole-call total. The public API and export boundary remain
-unchanged.
+**Value Proposition:** Issues #1304 and #1305 ship public orchestration and its
+production-path conservation evidence. Each successful call performs four equal
+P1-gated proposal/P2-finalization cycles, applies the finalized transfer to
+particles, deterministically couples the concentration-weighted opposite
+transfer to gas, and uses the finalized whole-call total for return/accounting.
+Regression coverage separately proves CPU mapped-species conservation and
+per-box/per-species fp64 GPU inventory bookkeeping against a CPU oracle. The
+public API and export boundary remain unchanged.
 
 **User Stories:**
 - As a model author, I want binary per-box partitioning flags honored on GPU so

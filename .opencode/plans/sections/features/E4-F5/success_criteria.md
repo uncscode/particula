@@ -22,14 +22,18 @@
   masses, gas, proposal, or supplied P2 sidecars change.
 - [x] Issue #1303: the public P1 path launches no P2 inventory kernels and
   leaves supplied P2 sidecars untouched.
-- [ ] Production hook and issue #1272 integration conservation regression land together.
-- [ ] CPU reference and Warp CPU pass; CUDA parity passes when available.
+- [x] Issue #1305: production-hook and issue #1272 integration conservation
+  regressions land together, with H2O/NH4HSO4 accounting kept independent and
+  gas-only N2 exactly invariant.
+- [x] Issue #1305: deterministic fp64 public-hook bookkeeping is conserved per
+  box/species at `rtol=1e-12, atol=1e-30`, separately from CPU-oracle particle/
+  gas parity at `rtol=2e-10, atol=1e-30`; Warp CPU passes and CUDA is guarded.
 
 | Metric | Baseline | Target | Source |
 |---|---|---|---|
-| Per-box/species conservation residual | Not guaranteed | Within explicit tight fp64 bookkeeping tolerance | Integration regression |
+| Per-box/species conservation residual | Not guaranteed | `rtol=1e-12`, `atol=1e-30` | CPU integration and GPU public-hook regression |
 | Negative gas/particle inventories | Possible after independent clamps | 0 cases | GPU unit/integration tests |
 | Disabled-species mutations | Gate ignored | 0 | Partitioning tests |
 | Coupled substeps using current gas | 0 | 4 of 4 | Substep regression |
 | Hidden CPU/GPU transfers | Not permitted | 0 | Transfer-boundary tests |
-| Production hook paired with regression | Missing | Same issue/change | Issue #1272 gate |
+| Production hook paired with regression | Missing | Shipped in #1305 | Issue #1272 gate |

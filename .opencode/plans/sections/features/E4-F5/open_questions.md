@@ -33,7 +33,16 @@
   - Resolved 2026-07-14 by issue #1304: each successful cycle finalizes,
     applies, accumulates, and concentration-weights the same transfer into gas;
     later proposals read the updated gas. Aggregate preflight is atomic, but a
-    later fresh-proposal failure does not roll back earlier completed cycles.
+     later fresh-proposal failure does not roll back earlier completed cycles.
+- [x] Does the shipped public path conserve concentration-weighted inventory
+  separately from CPU-oracle physics parity?
+  - Resolved 2026-07-14 by issue #1305: yes. Regression-only CPU integration
+    coverage accounts for H2O and NH4HSO4 independently and requires exact N2
+    invariance. A deterministic fp64 two-box public-hook case checks per-box/
+    per-species particle-plus-gas inventory at `rtol=1e-12, atol=1e-30`
+    separately from CPU-oracle particle/gas parity at `rtol=2e-10, atol=1e-30`,
+    including uptake, evaporation, disabled partitioning, zero gas, and
+    zero-concentration slots.
 
-Diagnostics requested: none. These questions must not weaken the issue #1272
-production-hook and conservation gates.
+Diagnostics requested: none. Issue #1272's production-hook and conservation
+gate is satisfied; broader E4 production claims remain separately gated.

@@ -33,5 +33,13 @@
 9. [x] **Issue #1304:** Add focused Warp wrapper/support regressions for oracle
    coupling, sequence/order, atomic preflight, fresh-proposal failure, and
    scratch reuse.
-10. Run P4 production-hook/integration and backend-parity evidence.
-11. Update roadmap wording only after remaining production gates pass.
+10. [x] **Issue #1305:** Add regression-only CPU particle-resolved mapped-species
+    inventory coverage for H2O/NH4HSO4 and exact gas-only N2 invariance in
+    `particula/integration_tests/condensation_particle_resolved_test.py`.
+11. [x] **Issue #1305:** Add deterministic fp64 two-box public-hook regression
+    support in `particula/gpu/kernels/tests/_condensation_test_support.py` and
+    wrapper export checks in `particula/gpu/kernels/tests/condensation_test.py`.
+    Separately verify per-box/per-species inventory conservation, CPU-oracle
+    parity, disabled partitioning, zero gas, and inactive slots on Warp CPU and
+    guarded CUDA.
+12. Update roadmap wording only after remaining production gates pass.

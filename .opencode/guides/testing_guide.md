@@ -276,6 +276,15 @@ def test_total_mass_is_conserved():
     npt.assert_allclose(final_total, initial_total, rtol=1e-12, atol=0.0)
 ```
 
+The public GPU condensation hook has a separate deterministic fp64 regression
+pattern. For each box and partitioning species, compare the change in particle
+inventory (particle mass weighted by particle concentration) plus the gas
+change against zero. Keep that `rtol=1e-12, atol=1e-30` inventory assertion
+separate from CPU-oracle particle and gas parity
+(`rtol=2e-10, atol=1e-30`). The fixture must also retain disabled-partitioning,
+zero-gas, and zero-concentration-slot cases; this is scoped direct-kernel
+evidence, not CPU-strategy or runnable parity.
+
 For stochastic kernels, assert bounded aggregate behavior instead of replaying
 exact accepted-collision sequences or per-seed trajectories. A seeded range can
 be used to gather repeated evidence, but the pass condition should be a

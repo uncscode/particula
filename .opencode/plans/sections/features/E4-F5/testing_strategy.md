@@ -34,5 +34,13 @@ and overwritten; a nonfinite fresh proposal fails before P2, gas, total,
 particle, or energy mutation for that cycle. A later-cycle proposal failure is
 explicitly partial: earlier completed cycles are retained, not rolled back.
 
-Warp CPU is the required focused evidence; optional CUDA coverage skips cleanly
-when unavailable. P4 retains the integration production-hook/CPU-parity gate.
+Issue #1305 closes the production-hook/CPU-parity gate with regression-only
+coverage. The CPU particle-resolved integration test computes
+concentration-weighted inventories for H2O and NH4HSO4 independently and
+requires exact gas-only N2 invariance. The public GPU hook has a deterministic
+fp64 two-box fixture that covers uptake, evaporation, disabled partitioning,
+zero gas, and zero-concentration slots. It asserts per-box/per-species
+particle-plus-gas bookkeeping at `rtol=1e-12, atol=1e-30`, independently from
+CPU-oracle particle/gas parity at `rtol=2e-10, atol=1e-30`. Warp CPU is required
+focused evidence; the `cuda` plus `gpu_parity` case skips cleanly when CUDA is
+unavailable.

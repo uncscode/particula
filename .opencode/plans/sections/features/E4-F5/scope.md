@@ -37,9 +37,20 @@
   ordering, empty/single-particle limits, scratch identity, and atomic
   preflight/proposal failure boundaries.
 
+## Delivered in P4 / issue #1305
+- Add regression-only concentration-weighted particle-plus-gas inventory checks
+  to `particula/integration_tests/condensation_particle_resolved_test.py`:
+  H2O and NH4HSO4 are accounted independently and gas-only N2 is exactly
+  invariant.
+- Add deterministic fp64 two-box public `condensation_step_gpu()` coverage in
+  `particula/gpu/kernels/tests/_condensation_test_support.py`, with wrapper
+  export checks in `particula/gpu/kernels/tests/condensation_test.py`.
+- Verify per-box/per-species bookkeeping at `rtol=1e-12, atol=1e-30` separately
+  from CPU-oracle particle/gas parity at `rtol=2e-10, atol=1e-30`; exercise
+  uptake, evaporation, disabled partitioning, zero gas, and inactive slots on
+  Warp CPU plus guarded optional CUDA.
+
 ## Remaining in scope
-- Production-hook conservation regression, CPU reference evidence, and backend
-  parity are P4 work.
 - Development/user documentation is P5 work.
 
 ## Out of scope

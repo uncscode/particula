@@ -39,12 +39,20 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
    - Tests: four-cycle NumPy oracle/order, zero/empty/single-particle limits,
      atomic preflight/aliasing, fresh-proposal boundary, and scratch reuse
 
-- [ ] **E4-F5-P4:** Production-hook conservation regressions and backend parity
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Land the production hook with issue #1272's same-change regression gate.
+- [x] **E4-F5-P4:** Production-hook conservation regressions and backend parity
+   - Issue: #1305 | Size: S | Status: Shipped (2026-07-14)
+   - Delivered: regression-only concentration-weighted particle-plus-gas
+     inventory evidence without changing the public hook, APIs, or four-substep
+     behavior.
    - Files: `particula/integration_tests/condensation_particle_resolved_test.py`,
+     `particula/gpu/kernels/tests/_condensation_test_support.py`, and
      `particula/gpu/kernels/tests/condensation_test.py`
-  - Tests: per-box/species conservation, CPU parity, Warp CPU, optional CUDA
+   - Tests: CPU integration maps H2O and NH4HSO4 inventories independently and
+     requires exact N2 invariance. A deterministic fp64 two-box public-hook case
+     covers uptake, evaporation, disabled partitioning, zero gas, and
+     zero-concentration slots; it checks per-box/species inventory at
+     `rtol=1e-12, atol=1e-30` separately from CPU-oracle parity at
+     `rtol=2e-10, atol=1e-30` on Warp CPU and guarded CUDA.
 
 - [ ] **E4-F5-P5:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started
