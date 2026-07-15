@@ -107,6 +107,7 @@ P2-finalized transfer times latent heat. It remains caller-owned rather than
 becoming a third return item. See the
 [Data Containers and GPU Foundations guide](./docs/Features/data-containers-and-gpu-foundations.md)
 for ownership, units, and direct-step limits.
+For focused troubleshooting and reproduction commands, see the [GPU condensation command matrix](./docs/Features/data-containers-and-gpu-foundations.md#focused-reproduction-commands).
 
 ## Code Structure
 
