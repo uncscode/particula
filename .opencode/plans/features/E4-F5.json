@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-14",
+  "last_updated": "2026-07-15",
   "dependencies": [
     "E4-F3",
     "E4-F4"
@@ -61,11 +61,11 @@
     {
       "id": "E4-F5-P3",
       "title": "Four-substep coupled gas mutation and conserved transfer with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-15",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
