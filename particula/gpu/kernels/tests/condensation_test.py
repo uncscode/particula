@@ -194,3 +194,17 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
         "test_condensation_public_insufficient_inventory_scales_uptake_and_conserves"
         in EXPORTED_CONDENSATION_TESTS
     )
+    assert (
+        "test_condensation_p2_contract_conserves_per_box_species_and_energy"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_p2_contract_inventory_limited_uptake_is_consistent"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert "test_condensation_p2_contract_repeat_is_deterministic" in (
+        EXPORTED_CONDENSATION_TESTS
+    )
+    assert "test_condensation_p2_contract_invalid_buffers_are_atomic" in (
+        EXPORTED_CONDENSATION_TESTS
+    )
