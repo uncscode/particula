@@ -10,10 +10,10 @@
     conservation, and energy identity as separate categories, including any
     F6-approved device/case exceptions and a focused test reference for each.
 - [x] Which focused marker commands are stable?
-  - Resolved 2026-07-13: use registered `warp`, `gpu_parity`, and `cuda`
-    markers. Publish `-m "warp and gpu_parity"` for baseline parity and
-    `-m "warp and gpu_parity and cuda"` for optional CUDA, plus direct-file
-    commands where clearer.
+  - Resolved 2026-07-15 by Issue #1316: publish the direct-file Warp CPU
+    baseline commands and the optional/local CUDA command
+    `pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror`.
+    CUDA is additive and skips cleanly when unavailable.
 - [x] Where does the parity walkthrough live?
   - Resolved 2026-07-13: extend the canonical
     `docs/Examples/gpu_direct_kernels_quick_start.py`; add another artifact only
