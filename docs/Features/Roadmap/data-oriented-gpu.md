@@ -565,7 +565,10 @@ downstream implementers; it does not add new schema semantics.
   [`condensation-stiffness-study.md`](condensation-stiffness-study.md):
   `fixed_count_substeps_4` as the preferred fixed-shape foundation, bounded by
   the E2-F2 environment-shape contract, the E2-F6 `float64` evidence envelope,
-  and the still-deferred gas-coupled production gate.
+  and the shipped bounded direct-kernel gas-coupling hook. That hook applies
+  validated, P2-finalized particle-transfer deltas to active-device gas state
+  and has direct-kernel conservation evidence; broader CPU-strategy parity and
+  runnable support remain deferred to E4-F6 and E4-F7.
 - `E2-F8`: inherit that container schemas are already multi-box capable through
   leading `n_boxes` dimensions, while current CPU condensation runtime support
   remains single-box and current CPU coagulation paths are still documented as
@@ -1013,13 +1016,13 @@ that same shape; the step mutates it in place by the matching
 particle-concentration-weighted opposite delta. The caller-visible and
 accumulated transfer is the P2-finalized applied transfer, never the raw work
 proposal. The total buffer is cleared once after preflight, accumulates the
-finalized transfer, and work storage retains only the final raw proposal. No
-hidden CPU↔Warp transfer or synchronization occurs. Later proposals read
-coupled gas, while vapor-pressure refresh does not. Aggregate invalid P2 state
-or sidecars fail before launches or mutation; a later fresh raw-proposal failure
-preserves completed prior substeps and may write only raw work storage in the
-failed cycle. Validation may read device metadata or thermodynamic inputs but
-does not transfer caller state.
+finalized transfer, and work storage retains only the final raw proposal.
+Physical-state updates are device resident and do not perform hidden CPU↔Warp
+transfers; validation or status checks may intentionally read device values back
+to the host. Later proposals read coupled gas, while vapor-pressure refresh does
+not. Aggregate invalid P2 state or sidecars fail before launches or mutation; a
+later fresh raw-proposal failure preserves completed prior substeps and may write
+only raw work storage in the failed cycle.
 
 E4-F4's #1272 signed diagnostic is shipped: optional keyword-only caller-owned
 active-device `wp.float64` `latent_heat`, `(n_species,)`, and
@@ -1036,16 +1039,19 @@ general CPU-strategy parity, new-physics claims, and complete E4-F6
 cross-device certification outside the supported scope. E4-F7 remains the
 final support-contract, examples, troubleshooting, and support-matrix gate.
 
-Required Warp-CPU and optional CUDA evidence commands are:
+Required Warp-CPU evidence and optional CUDA evidence commands are:
 
 ```bash
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/integration_tests/condensation_particle_resolved_test.py -q -Werror
+# Optional local CUDA evidence, when a CUDA-capable device is available:
+pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
 ```
 
 The first command uses Warp `cpu` as the baseline when Warp is installed;
 Warp- or CUDA-guarded cases skip cleanly when their optional runtime is absent.
-Run the CUDA-marked kernel cases separately only when CUDA is available.
+The CUDA-marked command is additive local evidence, not a default support or CI
+requirement.
 
 Remaining feature ownership:
 

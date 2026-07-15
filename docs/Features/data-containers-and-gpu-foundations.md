@@ -307,13 +307,14 @@ environment temperature array into a device-local float64 buffer when needed
 and performs exactly four equal `time_step / 4.0` substeps. Each substep
 overwrites `vapor_pressure`, prepares environment properties, gates disabled
 partitioning entries and inactive particle slots, and creates a raw proposal.
-P2 finalizes that proposal against particle and gas inventory limits before the
-step applies the finalized transfer to particles and the matching
-concentration-weighted opposite delta to `gas.concentration`. Only then does it
-accumulate the P2-finalized applied transfer for return. Raw proposal work
-storage is intermediate state, not returned transfer. Later proposals read the
-coupled gas concentration; vapor-pressure refresh does not. A failed aggregate
-preflight leaves the vapor-pressure output buffer unchanged. Import the
+P2 finalizes that proposal against particle and gas inventory limits. The step
+then applies the finalized transfer to particles and accumulates it in the
+returned total-transfer buffer, reduces the matching concentration-weighted
+opposite gas delta, validates that delta, and only then mutates
+`gas.concentration`. Raw proposal work storage is intermediate state, not
+returned transfer. Later proposals read the coupled gas concentration;
+vapor-pressure refresh does not. A failed aggregate preflight leaves the
+vapor-pressure output buffer unchanged. Import the
 standalone `refresh_vapor_pressure_gpu` only from
 `particula.gpu.kernels.thermodynamics`, never `particula.gpu.kernels`.
 
@@ -335,9 +336,11 @@ rebinding, not mutation of its arrays. Callers retain those arrays and must not
 mutate them concurrently with a launch.
 
 Successful direct calls mutate particle masses and gas concentration in place,
-overwrite the derived GPU-only vapor-pressure buffer, and return accumulated
-**P2-finalized, inventory-limited** transfer. The caller-visible final work
-transfer is never the raw proposal. Disabled `(box, species)` entries in the
+overwrite the derived GPU-only vapor-pressure buffer, and return the accumulated
+**P2-finalized, inventory-limited** transfer. A supplied total-transfer buffer
+holds that finalized accumulated output and is returned by identity; separate
+supplied work storage retains only the final gated raw proposal and is never the
+returned transfer. Disabled `(box, species)` entries in the
 per-box `(n_boxes, n_species)` partitioning mask and inactive particle slots
 are zeroed before P2 finalization or reductions. CPU↔Warp conversion expands
 the CPU shared species mask to this per-box layout, and restore requires the
@@ -355,11 +358,15 @@ strategies are not silently copied or approximated; passing
 Supplied transfer fields must be active-device, stable-shape `wp.float64` arrays
 with shape `(n_boxes, n_particles, n_species)`, and supplied property fields
 must be active-device, stable-shape `wp.float64` arrays with shape `(n_boxes,)`.
-Each field may be omitted independently, in which case the step allocates only
-that field's fallback storage. Supplied fields remain caller-owned and preserve
-identity, but successful calls intentionally write mutable work/output storage.
-No new container field, sidecar API, host conversion, synchronization, or
-transfer is implied by this ownership contract.
+The P2 demand, release, and scale sidecars must likewise be caller-owned,
+active-device, stable-shape `wp.float64` arrays with shape
+`(n_boxes, n_species)`. Every supplied field is metadata-validated for its
+applicable shape, dtype, and active device before launch; each may be omitted
+independently, in which case the step allocates only that field's fallback
+storage. Supplied fields preserve identity and remain caller-owned, but
+successful calls intentionally write their mutable work/output storage. No new
+container field, sidecar API, host conversion, synchronization, or transfer is
+implied by this ownership contract.
 
 The direct condensation parity suite exercises all four activity/surface pairs
 (ideal/static, ideal/composition-weighted, kappa/static, and
