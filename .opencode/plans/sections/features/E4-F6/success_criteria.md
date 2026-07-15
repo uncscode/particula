@@ -15,7 +15,13 @@
   transfer/energy-output identities with complete caller-owned scratch.
 - [x] P2 representative invalid shape/dtype/device/configuration paths fail
   before state or caller-owned-buffer mutation.
-- [ ] Supported graph capture/replay matches normal launch parity and conservation.
+- [x] P3 supported graph capture/replay matches an independent normal public
+  launch for particle mass, gas concentration, total transfer, and energy at
+  production parity tolerance; normal and both replays separately pass strict
+  per-box/per-species conservation and the energy contract.
+- [x] P3 retains every supplied scratch and energy sidecar's identity, canonical
+  shape, fp64 dtype, and active device across capture and replay; unsupported
+  capture capability skips have device/operation context.
 - [ ] Bounded autodiff experiments report supported smooth-interior behavior and
   explicit clamp/in-place limitations without claiming full differentiability.
 - [ ] Focused commands and evidence/non-claims are documented.

@@ -31,3 +31,11 @@
 - This plan records the strict accounting, mutation-contract, and deterministic
   fresh-run regressions. P5 still owns user-facing evidence-matrix and roadmap
   updates.
+
+## Completed P3 Documentation Record
+
+- Issue #1310 added only
+  `particula/gpu/kernels/tests/condensation_graph_capture_test.py`; no
+  user-facing documentation was added or revised.
+- This plan records the graph-capture readiness evidence and its bounded
+  non-claims. P5 still owns user-facing evidence-matrix and roadmap updates.

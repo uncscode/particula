@@ -11,10 +11,10 @@
     all identities and shapes. Missing or partial complete-scratch fields fail
     before mutation.
 - [x] Which devices support graph capture and what skip policy applies?
-  - Resolved 2026-07-13: require capture/replay only on CUDA when the tested Warp
-    APIs and CUDA device are available. Warp CPU remains the required parity
-    baseline, not graph proof. Use the stable skip reason `Warp/CUDA not
-    available` elsewhere and record the tested Warp version with evidence.
+  - Resolved 2026-07-15: exercise capture/replay on Warp CPU and, when CUDA is
+    available, CUDA. Missing capture APIs or capture capability failures at
+    begin, recording, end, or launch skip only that device with operation
+    context; normal-launch and post-launch correctness failures remain failures.
 - [x] Which smooth-interior slice is differentiated?
   - Resolved 2026-07-13: use the out-of-place mass-transfer-rate kernel or one
     out-of-place substep with positive inventories and inactive clamps/gates.

@@ -22,10 +22,17 @@ unchanged and changed code must retain at least 80% coverage.
   zero-concentration entries; inventory-limited uptake; finite/nonnegative
   state; immutable inputs; deterministic fresh runs; caller-owned output
   identity; and atomic representative invalid-buffer/configuration paths.
-- **P3:** Add
-  `particula/gpu/kernels/tests/condensation_graph_capture_test.py`. Preallocate
-  all scratch, capture exactly four substeps, replay repeatedly, and compare
-  with a normal launch for state, transfer, conservation, identity, and shape.
+- **P3 (completed, #1310):**
+  `particula/gpu/kernels/tests/condensation_graph_capture_test.py` preallocates
+  all seven scratch fields, latent heat, energy, and device-resident mutable
+  reset sources. It captures only the already-created public four-substep call,
+  restores mutable inputs/outputs device-to-device, and compares two launches
+  of the same graph with an independent normal launch for mass, gas, transfer,
+  and energy at `rtol=2e-10`, `atol=1e-30`. Normal and replay states separately
+  pass strict per-box/per-species inventory and energy assertions; sidecar
+  identity/shape/dtype/device stability is checked throughout. Warp CPU is
+  covered and CUDA is optional. Capture support failures skip with the device
+  and failed capture operation; correctness failures do not skip.
 - **P4:** Add
   `particula/gpu/kernels/tests/condensation_autodiff_test.py` for a bounded
   out-of-place smooth-interior tape/gradcheck and access verification.

@@ -22,6 +22,11 @@ evidence documentation rather than new physics.
   `condensation_test.py`, cover those accounting and mutation contracts with
   no production source or public API changes.
 - Capture/replay evidence for the exactly-four-substep path where supported.
+- **Delivered in P3 (#1310):** test-only capture/replay coverage in
+  `particula/gpu/kernels/tests/condensation_graph_capture_test.py` uses all
+  seven supplied scratch fields plus energy sidecars, two device-reset replays,
+  and normal/replay state, invariant, and buffer-contract checks. It does not
+  claim allocation-free capture or alter production behavior.
 - Bounded tape/gradcheck or access-verification experiments, with clamps and
   in-place mutation limitations recorded explicitly.
 - An evidence matrix and focused reproduction commands.

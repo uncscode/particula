@@ -29,11 +29,21 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     and deterministic runs with fresh state and sidecars. No production API or
     physics changes were made.
 
-- [ ] **E4-F6-P3:** Prove fixed-loop reusable-buffer graph-capture readiness
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Capture and replay the exactly-four-substep path with stable caller-owned buffers.
-  - Files: condensation support and a discoverable graph-readiness test module.
-  - Tests: Stable identities/shapes, no required allocation with complete scratch, replay parity and conservation, supported-device skips.
+- [x] **E4-F6-P3:** Prove fixed-loop reusable-buffer graph-capture readiness
+  - Issue: #1310 | Size: S | Status: Completed
+  - Delivered: `condensation_graph_capture_test.py` captures the public
+    exactly-four-substep path with all seven caller-owned scratch fields, latent
+    heat, and caller-owned energy output already allocated. Device-to-device
+    reset sources permit two replays of one captured graph without recapture or
+    host transfers between launches.
+  - Files: `particula/gpu/kernels/tests/condensation_graph_capture_test.py`
+  - Tests: An independent normal call and each replay agree for mass, gas,
+    total transfer, and energy at the production parity tolerance; each state
+    separately passes per-box/per-species inventory conservation and the
+    established energy contract. Scratch and energy identity/shape/dtype/device
+    stability are checked around capture and replays. Warp CPU is exercised and
+    CUDA is optional; unavailable capture support skips with device/operation
+    context. No production API or behavior changed.
 
 - [ ] **E4-F6-P4:** Add bounded autodiff-readiness experiments and limitation tests
   - Issue: TBD | Size: S | Status: Not Started
