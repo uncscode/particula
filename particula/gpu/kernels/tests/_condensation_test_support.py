@@ -3442,9 +3442,19 @@ def _run_p2_contract_case(device: str) -> dict[str, Any]:
         scratch_buffers=scratch,
     )
     return {
+        "particles": particles,
+        "gas": gas,
+        "gpu_particles": gpu_particles,
+        "gpu_gas": gpu_gas,
         "initial_masses": initial_masses,
         "initial_gas": initial_gas,
         "concentration": particles.concentration.copy(),
+        "temperature": temperature,
+        "pressure": pressure,
+        "surface_tension": surface_tension,
+        "mass_accommodation": mass_accommodation,
+        "diffusion": diffusion,
+        "thermodynamics": thermodynamics,
         "final_masses": gpu_particles.masses.numpy().copy(),
         "final_gas": gpu_gas.concentration.numpy().copy(),
         "vapor_pressure": gpu_gas.vapor_pressure.numpy().copy(),
@@ -3611,11 +3621,11 @@ def test_condensation_p2_contract_repeat_is_deterministic(
         "final_gas",
         "vapor_pressure",
     ):
-        _assert_contract_allclose(first[name], second[name])
-    _assert_contract_allclose(
+        npt.assert_array_equal(first[name], second[name])
+    npt.assert_array_equal(
         first["total_transfer"].numpy(), second["total_transfer"].numpy()
     )
-    _assert_contract_allclose(
+    npt.assert_array_equal(
         first["energy_transfer"].numpy(), second["energy_transfer"].numpy()
     )
     for field in dataclasses.fields(first["scratch"]):
@@ -3623,7 +3633,7 @@ def test_condensation_p2_contract_repeat_is_deterministic(
         second_array = getattr(second["scratch"], field.name)
         if first_array is not None:
             assert first_array is not second_array
-            _assert_contract_allclose(first_array.numpy(), second_array.numpy())
+            npt.assert_array_equal(first_array.numpy(), second_array.numpy())
     for result in (first, second):
         _assert_warp_arrays_unchanged(
             result["snapshots"], result["immutable_arrays"]
@@ -3639,10 +3649,13 @@ def test_condensation_p2_contract_repeat_is_deterministic(
         "energy_shape",
         "missing_latent_heat",
         "partitioning",
+        "device_mismatch",
     ),
 )
 def test_condensation_p2_contract_invalid_buffers_are_atomic(
-    warp_cpu_device: str, invalid_kind: str
+    warp_cpu_device: str,
+    invalid_kind: str,
+    request: pytest.FixtureRequest,
 ) -> None:
     """Representative invalid P2 metadata leaves all caller arrays untouched."""
     runtime = _load_warp_runtime()
@@ -3668,6 +3681,11 @@ def test_condensation_p2_contract_invalid_buffers_are_atomic(
     )
     scratch = _make_condensation_scratch_buffers((1, 1, 2), warp_cpu_device)
     thermodynamics = _make_thermodynamics_config(gpu_gas)
+    if invalid_kind == "device_mismatch":
+        energy_device = request.getfixturevalue("cuda_device")
+        energy = runtime.wp.full(
+            (1, 2), 19.0, dtype=runtime.wp.float64, device=energy_device
+        )
     if invalid_kind == "scratch_shape":
         scratch = dataclasses.replace(
             scratch,
@@ -3688,11 +3706,15 @@ def test_condensation_p2_contract_invalid_buffers_are_atomic(
         )
     elif invalid_kind == "partitioning":
         gpu_gas.partitioning = runtime.wp.array(
-            [1, 2], dtype=runtime.wp.int32, device=warp_cpu_device
+            [[1, 2]], dtype=runtime.wp.int32, device=warp_cpu_device
         )
     arrays = {
         "masses": gpu_particles.masses,
+        "particle_density": gpu_particles.density,
+        "particle_charge": gpu_particles.charge,
+        "particle_volume": gpu_particles.volume,
         "gas_concentration": gpu_gas.concentration,
+        "gas_molar_mass": gpu_gas.molar_mass,
         "vapor_pressure": gpu_gas.vapor_pressure,
         "particle_concentration": gpu_particles.concentration,
         "partitioning": gpu_gas.partitioning,
@@ -3712,7 +3734,12 @@ def test_condensation_p2_contract_invalid_buffers_are_atomic(
         }
     )
     snapshots = _snapshot_warp_arrays(*arrays.items())
-    with pytest.raises(ValueError):
+    expected_error = (
+        "gas.partitioning must contain only binary 0/1 values"
+        if invalid_kind == "partitioning"
+        else None
+    )
+    with pytest.raises(ValueError, match=expected_error):
         condensation_step_gpu(
             gpu_particles,
             gpu_gas,
