@@ -98,11 +98,11 @@ meets its exit bar, the next pending epic in the sequence becomes active.
       — runnable bookkeeping reference for future GPU parity
     - [Measured coagulation decision record](data-oriented-gpu.md#measured-decision-record-for-the-current-one-thread-per-box-path)
       — accepted many-box baseline and large single-box caution band
-
-### Next Up
-
 - [Epic D: GPU Condensation Physics Parity](data-oriented-gpu.md#epic-d-gpu-condensation-physics-parity)
-  — the next epic in the sequence; not yet scheduled as an ADW plan.
+  (ADW plan E4) — bounded low-level direct-condensation publication with
+  fixed-four P2 inventory finalization, gas coupling, thermodynamics refresh,
+  caller-owned fp64 sidecars, and direct-kernel evidence. It does not provide
+  high-level runnable integration or general CPU-strategy parity.
 
 ### Pending
 

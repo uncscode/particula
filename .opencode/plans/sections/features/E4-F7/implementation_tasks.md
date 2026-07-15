@@ -8,7 +8,10 @@
 - [x] Document gas partitioning, inventory limiting, conservation, latent-energy sign/units, and whole-call diagnostic aggregation.
 - [x] Extend `docs/Features/particle-data-migration.md` with final call signatures and targeted validation failures.
 - [x] Extend `docs/Examples/gpu_direct_kernels_quick_start.py` using lazy kernel imports, Warp CPU default, ordered species configuration, reusable buffers, and explicit restore. Completed by Issue #1315 with two sequential direct calls and caller-owned scratch, latent-heat, and energy sidecars.
-- [ ] Add a parity walkthrough that constructs independent CPU and Warp inputs and separates physics, conservation, and energy tolerances. Deferred to a later phase; Issue #1315 provides bounded direct-kernel regression evidence, not a general parity walkthrough.
+- [ ] Add the **CPU/Warp parity-walkthrough follow-up** that constructs
+  independent CPU and Warp inputs and separates physics, conservation, and
+  energy tolerances. Deferred outside E4-F7; Issue #1315 provides bounded
+  direct-kernel regression evidence, not a general parity walkthrough.
 - [x] Publish focused commands in the canonical page and concise discovery links in `readme.md` and the migration guide. Completed by Issue #1316; the migration guide links once to the canonical matrix and does not duplicate commands.
 - [x] Update `docs/Features/Roadmap/data-oriented-gpu.md` after verifying all
   E4-F1 through E4-F6 and E4-F7-P1 through P3 completion records; Issue #1317

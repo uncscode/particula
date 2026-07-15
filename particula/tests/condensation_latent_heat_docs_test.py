@@ -16,6 +16,7 @@ CONDENSATION_FEATURE_PATH = (
 )
 DOCS_INDEX_PATH = ROOT / "docs/index.md"
 ROADMAP_PATH = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
+ROADMAP_INDEX_PATH = ROOT / "docs/Features/Roadmap/index.md"
 FOUNDATIONS_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
 MIGRATION_PATH = ROOT / "docs/Features/particle-data-migration.md"
 README_PATH = ROOT / "readme.md"
@@ -118,6 +119,7 @@ EPIC_D_DEFERRED_BOUNDARIES = (
 )
 FOUNDATIONS_CONFIGURATION_SNIPPETS = (
     "from particula.gpu.kernels import condensation_step_gpu",
+    "from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig",
     "constant `wp.int32(0)`",
     "canonical Buck `wp.int32(1)`",
     "Activity mode `0` is ideal and mode `1` is kappa",
@@ -139,6 +141,7 @@ FOUNDATIONS_SCHEMA_INPUT_SNIPPETS = (
 FOUNDATIONS_LIFECYCLE_SNIPPETS = (
     "exactly four equal `time_step / 4.0` substeps",
     "P2 finalizes that proposal against particle and gas inventory limits",
+    "validates that delta and all pending commit values before mutating particle",
     "Later proposals read the coupled gas concentration",
     "mutate particle masses and gas concentration in place",
     "**P2-finalized, inventory-limited** transfer",
@@ -649,3 +652,14 @@ def test_roadmap_marks_e4_low_level_condensation_publication_shipped() -> None:
         "adaptive stepping is shipped",
     ):
         assert unsupported_claim not in roadmap
+
+
+def test_roadmap_index_labels_e4_as_bounded_low_level_support() -> None:
+    """Roadmap index links shipped E4 without expanding its support claim."""
+    content = " ".join(ROADMAP_INDEX_PATH.read_text(encoding="utf-8").split())
+
+    assert "(ADW plan E4)" in content
+    assert "bounded low-level direct-condensation publication" in content
+    assert "fixed-four P2 inventory finalization" in content
+    assert "It does not provide high-level runnable integration" in content
+    assert "general CPU-strategy parity" in content

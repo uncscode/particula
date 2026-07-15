@@ -274,6 +274,12 @@ restored_gas = from_warp_gas_data(gpu_gas, name=gas_data.name)
 
 Import the supported direct step only with
 `from particula.gpu.kernels import condensation_step_gpu`.
+Import its required `ThermodynamicsConfig` from the concrete module only:
+
+```python
+from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
+```
+
 `ThermodynamicsConfig` is caller-owned, device-local process configuration.
 Its Warp arrays have no species names: species identity is positional, and
 `molar_mass_reference` must exactly equal ordered `gas.molar_mass` on the
@@ -312,14 +318,14 @@ environment temperature array into a device-local float64 buffer when needed
 and performs exactly four equal `time_step / 4.0` substeps. Each substep
 overwrites `vapor_pressure`, prepares environment properties, gates disabled
 partitioning entries and inactive particle slots, and creates a raw proposal.
-P2 finalizes that proposal against particle and gas inventory limits. The step
-then applies the finalized transfer to particles and accumulates it in the
-returned total-transfer buffer, reduces the matching concentration-weighted
-opposite gas delta, validates that delta, and only then mutates
-`gas.concentration`. Raw proposal work storage is intermediate state, not
-returned transfer. Later proposals read the coupled gas concentration;
-vapor-pressure refresh does not. A failed aggregate preflight leaves the
-vapor-pressure output buffer unchanged. Import the
+P2 finalizes that proposal against particle and gas inventory limits, then
+derives the matching concentration-weighted opposite gas delta. The step
+validates that delta and all pending commit values before mutating particle
+masses, accumulating the finalized transfer in the returned total-transfer
+buffer, and mutating `gas.concentration`. Raw proposal work storage is
+intermediate state, not returned transfer. Later proposals read the coupled gas
+concentration; vapor-pressure refresh does not. A failed aggregate preflight
+leaves the vapor-pressure output buffer unchanged. Import the
 standalone `refresh_vapor_pressure_gpu` only from
 `particula.gpu.kernels.thermodynamics`, never `particula.gpu.kernels`.
 
