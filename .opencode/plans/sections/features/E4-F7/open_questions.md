@@ -14,10 +14,12 @@
     baseline commands and the optional/local CUDA command
     `pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror`.
     CUDA is additive and skips cleanly when unavailable.
-- [x] Where does the parity walkthrough live?
-  - Resolved 2026-07-13: extend the canonical
-    `docs/Examples/gpu_direct_kernels_quick_start.py`; add another artifact only
-    if measured runtime or clarity makes the canonical example unsuitable.
+- [x] Is an independent CPU/Warp parity walkthrough delivered?
+  - Resolved 2026-07-15: No. The canonical direct-kernel quick-start documents
+    explicit conversion and execution only; it is not an independent CPU/Warp
+    parity comparison. The **CPU/Warp parity-walkthrough follow-up** remains
+    deferred and must separately establish physics, conservation, and energy
+    tolerances before it can be published.
 - [x] How does on-device refresh affect `WarpGasData.vapor_pressure` guidance?
   - Resolved 2026-07-13: retain it as derived mutable GPU helper/scratch state.
     Supported E4 models refresh it on device; explicit caller values are only

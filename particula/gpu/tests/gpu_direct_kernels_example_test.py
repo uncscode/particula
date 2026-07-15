@@ -150,17 +150,32 @@ def test_forced_no_warp_import_run_main_and_subprocess_defer_kernels(
     """Test every forced no-Warp route avoids direct and concrete modules."""
     monkeypatch.syspath_prepend(str(EXAMPLES_ROOT))
     monkeypatch.setenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", "1")
-    sys.modules.pop("gpu_direct_kernels_quick_start", None)
-    for module_name in KERNEL_MODULES:
-        sys.modules.pop(module_name, None)
+    preexisting_modules = {
+        module_name: importlib.import_module(module_name)
+        for module_name in KERNEL_MODULES
+    }
+    monkeypatch.delitem(
+        sys.modules, "gpu_direct_kernels_quick_start", raising=False
+    )
 
-    module = importlib.import_module("gpu_direct_kernels_quick_start")
-    result = module.run_example()
-    module.main()
+    with monkeypatch.context() as kernel_module_cleanup:
+        for module_name in KERNEL_MODULES:
+            kernel_module_cleanup.delitem(sys.modules, module_name)
 
-    assert result.output == CPU_ONLY_OUTPUT
-    assert capsys.readouterr().out.splitlines() == CPU_ONLY_OUTPUT
-    assert all(module_name not in sys.modules for module_name in KERNEL_MODULES)
+        module = importlib.import_module("gpu_direct_kernels_quick_start")
+        result = module.run_example()
+        module.main()
+
+        assert result.output == CPU_ONLY_OUTPUT
+        assert capsys.readouterr().out.splitlines() == CPU_ONLY_OUTPUT
+        assert all(
+            module_name not in sys.modules for module_name in KERNEL_MODULES
+        )
+
+    assert all(
+        sys.modules[module_name] is preexisting_modules[module_name]
+        for module_name in KERNEL_MODULES
+    )
     process = _run_example(force_no_warp=True)
     assert process.stdout.splitlines() == CPU_ONLY_OUTPUT
 

@@ -564,10 +564,10 @@ downstream implementers; it does not add new schema semantics.
   [`condensation-stiffness-study.md`](condensation-stiffness-study.md):
   `fixed_count_substeps_4` as the preferred fixed-shape foundation, bounded by
   the E2-F2 environment-shape contract, the E2-F6 `float64` evidence envelope,
-  and the shipped bounded direct-kernel gas-coupling hook. That hook applies
-  validated, P2-finalized particle-transfer deltas to active-device gas state
-  and has direct-kernel conservation evidence; broader CPU-strategy parity and
-  runnable support remain deferred to E4-F6 and E4-F7.
+   and the shipped bounded direct-kernel gas-coupling hook. That hook applies
+   validated, P2-finalized particle-transfer deltas to active-device gas state
+   and has direct-kernel conservation evidence; broader CPU-strategy parity and
+   runnable support remain future work outside the shipped Epic D scope.
 - `E2-F8`: inherit that container schemas are already multi-box capable through
   leading `n_boxes` dimensions, while current CPU condensation runtime support
   remains single-box and current CPU coagulation paths are still documented as
@@ -960,8 +960,9 @@ substep refreshes derived vapor pressure and environment properties, produces a
 raw proposal, and applies a P2-finalized, inventory-limited transfer. Particle
 masses and the matching particle-concentration-weighted gas-concentration delta
 mutate in place. The total-transfer buffer accumulates P2-finalized transfers,
-while work storage retains the final raw proposal. Physical updates are device
-resident; transfers and synchronization remain explicit caller responsibilities.
+while work storage retains the final raw proposal. Explicit simulation-state
+transfers remain caller responsibilities; entry-point validation may still
+perform synchronous device-to-host readbacks.
 
 The current executable CPU integration baseline remains
 `particula/integration_tests/condensation_latent_heat_conservation_test.py`.
