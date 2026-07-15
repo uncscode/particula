@@ -22,7 +22,7 @@ documentation conventions.
 | 1 | [Epic A: Data-Model and Numerical Foundations](#epic-a-data-model-and-numerical-foundations) | Shipped | E2 |
 | 2 | [Epic B: Non-Isothermal Condensation Public API (CPU)](#epic-b-non-isothermal-condensation-public-api-cpu) | Shipped | E1 |
 | 3 | [Epic C: GPU Kernel Correctness and Low-Level API Hardening](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening) | Shipped | E3 |
-| 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | In progress | E4-F4 |
+| 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | In progress | E4-F5 |
 | 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Pending | not scheduled |
 | 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Pending | not scheduled |
 | 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Pending | not scheduled |
@@ -1040,8 +1040,12 @@ Required Warp-CPU and optional CUDA evidence commands are:
 
 ```bash
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
-pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
+pytest particula/integration_tests/condensation_particle_resolved_test.py -q -Werror
 ```
+
+The first command uses Warp `cpu` as the baseline when Warp is installed;
+Warp- or CUDA-guarded cases skip cleanly when their optional runtime is absent.
+Run the CUDA-marked kernel cases separately only when CUDA is available.
 
 Remaining feature ownership:
 

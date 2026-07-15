@@ -26,8 +26,11 @@
   regressions land together, with H2O/NH4HSO4 accounting kept independent and
   gas-only N2 exactly invariant.
 - [x] Issue #1305: deterministic fp64 public-hook bookkeeping is conserved per
-  box/species at `rtol=1e-12, atol=1e-30`, separately from CPU-oracle particle/
-  gas parity at `rtol=2e-10, atol=1e-30`; Warp CPU passes and CUDA is guarded.
+   box/species at `rtol=1e-12, atol=1e-30`, separately from CPU-oracle particle/
+   gas parity at `rtol=2e-10, atol=1e-30`; Warp CPU passes and CUDA is guarded.
+- [x] Issue #1306: the roadmap and foundation guide describe only the verified
+   P1-P4 bounded direct-kernel contract and retain E4-F6/E4-F7 as gates for
+   broader GPU-condensation and E4 production support.
 
 | Metric | Baseline | Target | Source |
 |---|---|---|---|
@@ -37,3 +40,4 @@
 | Coupled substeps using current gas | 0 | 4 of 4 | Substep regression |
 | Hidden CPU/GPU transfers | Not permitted | 0 | Transfer-boundary tests |
 | Production hook paired with regression | Missing | Shipped in #1305 | Issue #1272 gate |
+| Bounded support documentation | Deferred | Shipped in #1306 | Roadmap and foundation guide |

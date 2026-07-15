@@ -54,9 +54,15 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
      `rtol=1e-12, atol=1e-30` separately from CPU-oracle parity at
      `rtol=2e-10, atol=1e-30` on Warp CPU and guarded CUDA.
 
-- [ ] **E4-F5-P5:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-   - Goal: Document gas ownership, limits, partitioning, and production-gate status.
-   - Files: GPU roadmap and feature documentation
-   - Tests: Documentation link and command/reference checks only; this is a
-     docs-only exception to production-code test coverage.
+- [x] **E4-F5-P5:** Update development documentation
+  - Issue: #1306 | Size: XS | Status: Shipped (2026-07-14)
+  - Delivered: documented the verified bounded P1-P4 direct-kernel contract:
+    active-device `WarpGasData.concentration` ownership in `kg/m^3`, binary
+    partitioning, P2-finalized inventory limits and transfer accounting,
+    four-substep concentration-weighted gas coupling, mutable caller-owned
+    scratch storage, and no hidden CPU↔Warp movement.
+  - Files: `docs/Features/Roadmap/data-oriented-gpu.md` and
+    `docs/Features/data-containers-and-gpu-foundations.md`
+  - Validation: documented focused Warp-CPU `-Werror` command and optional
+    guarded CUDA command were verified; documentation retains E4-F6/E4-F7 as
+    the gates for broader support claims.
