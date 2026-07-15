@@ -154,3 +154,19 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
         "test_condensation_step_gpu_rejects_p2_vapor_pressure_alias_atomically"
         in EXPORTED_CONDENSATION_TESTS
     )
+    assert (
+        "test_condensation_scratch_ownership_aliases_are_atomic"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_energy_retains_committed_substeps_after_proposal_failure"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_rejects_nonfinite_extreme_gas_delta_before_coupling"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_public_insufficient_inventory_scales_uptake_and_conserves"
+        in EXPORTED_CONDENSATION_TESTS
+    )

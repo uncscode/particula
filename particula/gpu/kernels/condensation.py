@@ -723,25 +723,41 @@ def _accumulate_finalized_mass_transfer_kernel(
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 # type: ignore[misc]
 def _couple_finalized_transfer_to_gas_kernel(
-    finalized: Any,
-    concentration: Any,
+    gas_delta: Any,
     gas_concentration: Any,
 ) -> None:
-    """Couple one finalized P2 transfer to gas concentration conservatively.
+    """Couple a prevalidated finalized-transfer reduction to gas.
 
-    Each box-species lane sums finalized particle transfer weighted by particle
-    concentration in ascending particle-index order, then subtracts that mass
-    concentration delta from gas. Negative finalized transfer therefore adds
+    Each box-species lane subtracts a finite, concentration-weighted particle
+    transfer delta from gas. Negative finalized transfer therefore adds
     evaporated inventory to gas.
     """
     box_idx, species_idx = wp.tid()  # type: ignore[misc]
-    gas_delta = wp.float64(0.0)
+    updated_concentration = (
+        gas_concentration[box_idx, species_idx]
+        - (gas_delta[box_idx, species_idx])
+    )
+    if updated_concentration < wp.float64(0.0):
+        updated_concentration = wp.float64(0.0)
+    gas_concentration[box_idx, species_idx] = updated_concentration
+
+
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
+def _reduce_finalized_transfer_to_gas_kernel(
+    finalized: Any,
+    concentration: Any,
+    gas_delta: Any,
+) -> None:
+    """Reduce finalized particle transfer into a gas concentration delta."""
+    box_idx, species_idx = wp.tid()  # type: ignore[misc]
+    delta = wp.float64(0.0)
     for particle_idx in range(finalized.shape[1]):
-        gas_delta += (
+        delta += (
             finalized[box_idx, particle_idx, species_idx]
             * concentration[box_idx, particle_idx]
         )
-    gas_concentration[box_idx, species_idx] -= gas_delta
+    gas_delta[box_idx, species_idx] = delta
 
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
@@ -1122,6 +1138,15 @@ def _validate_p2_proposal_values_kernel(proposal: Any, invalid: Any) -> None:
             wp.atomic_add(invalid, 0, 1)
 
 
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+# type: ignore[misc]
+def _validate_gas_delta_values_kernel(gas_delta: Any, invalid: Any) -> None:
+    """Record a non-finite finalized-transfer gas reduction."""
+    box_idx, species_idx = wp.tid()  # type: ignore[misc]
+    if not wp.isfinite(gas_delta[box_idx, species_idx]):
+        wp.atomic_add(invalid, 0, 1)
+
+
 def _validate_p2_primary_state(
     particles: Any,
     gas: Any,
@@ -1185,6 +1210,23 @@ def _validate_p2_proposal_finiteness(
         raise ValueError("gated_mass_transfer must be finite")
 
 
+def _validate_finite_gas_delta(gas_delta: Any, device: Any) -> None:
+    """Reject non-finite finalized-transfer reductions before gas mutation."""
+    if not getattr(device, "is_cuda", False):
+        if not np.all(np.isfinite(_read_float64_array(gas_delta))):
+            raise ValueError("finalized transfer gas coupling must be finite")
+        return
+    invalid = wp.zeros(1, dtype=wp.int32, device=device)
+    wp.launch(
+        _validate_gas_delta_values_kernel,
+        dim=gas_delta.shape,
+        inputs=[gas_delta, invalid],
+        device=device,
+    )
+    if invalid.numpy()[0] != 0:
+        raise ValueError("finalized transfer gas coupling must be finite")
+
+
 def _validate_p2_sidecar_ownership(
     demand: Any | None,
     release: Any | None,
@@ -1210,6 +1252,43 @@ def _validate_p2_sidecar_ownership(
             ):
                 raise ValueError(
                     f"{name} must not overlap {other_name} in direct P2 state"
+                )
+
+
+def _validate_scratch_ownership(
+    scratch_buffers: CondensationScratchBuffers,
+    protected_arrays: tuple[tuple[str, Any | None], ...],
+) -> None:
+    """Reject all supplied scratch buffers overlapping peers or public state."""
+    scratch_arrays = tuple(
+        (name, getattr(scratch_buffers, name))
+        for name in (
+            "work_mass_transfer",
+            "total_mass_transfer",
+            "dynamic_viscosity",
+            "mean_free_path",
+            "positive_mass_transfer_demand",
+            "negative_mass_transfer_release",
+            "positive_mass_transfer_scale",
+        )
+    )
+    for index, (name, array) in enumerate(scratch_arrays):
+        if array is None:
+            continue
+        array_start, array_end = _warp_array_memory_range(array)
+        for other_name, other in (
+            *scratch_arrays[index + 1 :],
+            *protected_arrays,
+        ):
+            if other is None:
+                continue
+            other_start, other_end = _warp_array_memory_range(other)
+            if array is other or (
+                array_start < other_end and other_start < array_end
+            ):
+                raise ValueError(
+                    f"{name} must not overlap {other_name} "
+                    "in condensation state"
                 )
 
 
@@ -1699,9 +1778,11 @@ def condensation_step_gpu(  # noqa: C901
         before launch, finite latent heat is limited to ``1e9`` J/kg.
 
         Energy transfer is caller-owned, allocation-stable diagnostic storage.
-        It is cleared once after successful preflight and, after all four
-        substeps, records the signed finalized whole-call transfer multiplied by
-        latent heat. It is deliberately not content-validated because the step
+        It is cleared once after successful preflight and records each signed
+        finalized substep transfer multiplied by latent heat immediately after
+        that substep commits. It therefore remains consistent with committed
+        work if a later fresh proposal fails. It is deliberately not
+        content-validated because the step
         only writes it. This write-only contract permits stale finite values and
         NaN/Inf before a call.
     """
@@ -1847,21 +1928,63 @@ def condensation_step_gpu(  # noqa: C901
     # normalization or fallback allocation, so invalid state is fully atomic.
     _validate_p2_primary_state(particles, gas, expected_shape, device)
     if scratch_buffers is not None:
-        _validate_p2_sidecar_ownership(
-            scratch_buffers.positive_mass_transfer_demand,
-            scratch_buffers.negative_mass_transfer_release,
-            scratch_buffers.positive_mass_transfer_scale,
+        direct_temperature = (
+            temperature if _is_warp_array_like(temperature) else None
+        )
+        direct_pressure = pressure if _is_warp_array_like(pressure) else None
+        environment_temperature = getattr(environment, "temperature", None)
+        environment_pressure = getattr(environment, "pressure", None)
+        _validate_scratch_ownership(
+            scratch_buffers,
             (
                 ("particles.masses", particles.masses),
                 ("particles.concentration", particles.concentration),
+                ("particles.density", particles.density),
+                ("particles.charge", particles.charge),
+                ("particles.volume", particles.volume),
+                ("gas.molar_mass", gas.molar_mass),
                 ("gas.concentration", gas.concentration),
                 ("gas.vapor_pressure", gas.vapor_pressure),
+                ("gas.partitioning", gas.partitioning),
+                ("thermodynamics.modes", thermodynamics.modes),
+                ("thermodynamics.parameters", thermodynamics.parameters),
+                (
+                    "thermodynamics.molar_mass_reference",
+                    thermodynamics.molar_mass_reference,
+                ),
+                ("latent_heat", latent_heat),
+                ("thermal_work", thermal_work),
+                ("surface_tension", surface_tension),
+                ("mass_accommodation", mass_accommodation),
+                ("diffusion_coefficient_vapor", diffusion_coefficient_vapor),
                 ("mass_transfer", mass_transfer),
-                ("work_mass_transfer", scratch_buffers.work_mass_transfer),
-                ("total_mass_transfer", scratch_buffers.total_mass_transfer),
                 ("energy_transfer", energy_transfer),
-                ("dynamic_viscosity", scratch_buffers.dynamic_viscosity),
-                ("mean_free_path", scratch_buffers.mean_free_path),
+                ("temperature", direct_temperature),
+                ("pressure", direct_pressure),
+                (
+                    "environment.temperature",
+                    environment_temperature
+                    if _is_warp_array_like(environment_temperature)
+                    else None,
+                ),
+                (
+                    "environment.pressure",
+                    environment_pressure
+                    if _is_warp_array_like(environment_pressure)
+                    else None,
+                ),
+                (
+                    "activity_surface.kappas",
+                    activity_surface.kappas
+                    if activity_surface is not None
+                    else None,
+                ),
+                (
+                    "activity_surface.molar_mass_reference",
+                    activity_surface.molar_mass_reference
+                    if activity_surface is not None
+                    else None,
+                ),
             ),
         )
 
@@ -1999,6 +2122,7 @@ def condensation_step_gpu(  # noqa: C901
     )
     candidate = wp.zeros(expected_shape, dtype=wp.float64, device=device)
     finalized = wp.zeros(expected_shape, dtype=wp.float64, device=device)
+    gas_delta = wp.zeros((n_boxes, n_species), dtype=wp.float64, device=device)
     dynamic_viscosity = (
         scratch_buffers.dynamic_viscosity
         if scratch_buffers is not None
@@ -2174,18 +2298,24 @@ def condensation_step_gpu(  # noqa: C901
             device=device,
         )
         wp.launch(
+            _reduce_finalized_transfer_to_gas_kernel,
+            dim=(n_boxes, n_species),
+            inputs=[finalized, particles.concentration, gas_delta],
+            device=device,
+        )
+        _validate_finite_gas_delta(gas_delta, device)
+        wp.launch(
             _couple_finalized_transfer_to_gas_kernel,
             dim=(n_boxes, n_species),
-            inputs=[finalized, particles.concentration, gas.concentration],
+            inputs=[gas_delta, gas.concentration],
             device=device,
         )
-
-    if energy_transfer is not None:
-        wp.launch(
-            _accumulate_energy_transfer_kernel,
-            dim=(n_boxes, n_particles),
-            inputs=[total_mass_transfer, latent_heat, energy_transfer],
-            device=device,
-        )
+        if energy_transfer is not None:
+            wp.launch(
+                _accumulate_energy_transfer_kernel,
+                dim=(n_boxes, n_particles),
+                inputs=[finalized, latent_heat, energy_transfer],
+                device=device,
+            )
 
     return particles, total_mass_transfer
