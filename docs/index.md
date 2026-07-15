@@ -35,14 +35,11 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
   `mass_transfer_rate()`/`rate()` plus a `step()` that tracks per-step
   latent heat diagnostics. The bounded, low-level direct GPU condensation
    path optionally applies a latent-rate correction during each of its four
-   equal substeps, with deterministic fp64 CPU-oracle parity coverage for
-   one-box and multi-box/multi-species direct-kernel cases. Omitted latent
-   heat, or a zero per-species value, retains that species' isothermal rate
-   path. The direct hook couples each P2-finalized particle transfer to gas
+   equal substeps, with deterministic fp64 CPU-oracle/Warp parity coverage.
+   Omitted latent heat, or a zero per-species value, retains that species' isothermal rate path. The direct hook couples each P2-finalized particle transfer to gas
    using particle concentration and has separate particle-mass, gas-
    concentration, and per-box/per-species inventory-conservation regressions.
-   Broader temperature feedback and strategy/runnable-level support remain
-   deferred.
+   Broader temperature feedback, gas coupling/conservation, and strategy/runnable-level support remain deferred.
 - **Interrogating your experimental data** to validate and expand your impact.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
 
