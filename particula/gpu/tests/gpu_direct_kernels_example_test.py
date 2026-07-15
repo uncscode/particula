@@ -471,6 +471,8 @@ def test_run_example_uses_scalar_condensation_inputs_and_caller_owned_rng(
     assert coagulation_kwargs["rng_states"].shape == (1,)
 
 
+@pytest.mark.slow
+@pytest.mark.warp
 @pytest.mark.skipif(not WARP_AVAILABLE, reason="Warp is not available")
 def test_run_example_warp_cpu_path_reports_kernel_and_transfer_output() -> None:
     """Test the real Warp CPU path exercises both direct kernels."""
