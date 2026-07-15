@@ -3418,6 +3418,18 @@ def _run_p2_contract_case(device: str) -> dict[str, Any]:
     scratch = _make_condensation_scratch_buffers(
         (n_boxes, n_particles, n_species), device
     )
+    supplied_scratch_fields = {
+        name: getattr(scratch, name)
+        for name in (
+            "work_mass_transfer",
+            "total_mass_transfer",
+            "dynamic_viscosity",
+            "mean_free_path",
+            "positive_mass_transfer_demand",
+            "negative_mass_transfer_release",
+            "positive_mass_transfer_scale",
+        )
+    }
     energy_transfer = runtime.wp.full(
         (n_boxes, n_species), 17.0, dtype=runtime.wp.float64, device=device
     )
@@ -3472,6 +3484,7 @@ def _run_p2_contract_case(device: str) -> dict[str, Any]:
         "energy_transfer": energy_transfer,
         "latent_heat": latent_heat.numpy().copy(),
         "scratch": scratch,
+        "supplied_scratch_fields": supplied_scratch_fields,
         "snapshots": snapshots,
         "immutable_arrays": immutable_arrays,
     }
@@ -3520,6 +3533,27 @@ def test_condensation_p2_contract_conserves_per_box_species_and_energy(
         result["snapshots"], result["immutable_arrays"]
     )
     assert result["scratch"].total_mass_transfer is result["total_transfer"]
+    for name, supplied in result["supplied_scratch_fields"].items():
+        assert getattr(result["scratch"], name) is supplied
+
+    work_transfer = result["scratch"].work_mass_transfer.numpy()
+    npt.assert_array_equal(work_transfer[inactive], 0.0)
+    npt.assert_array_equal(work_transfer[:, :, 2], 0.0)
+    assert np.all(np.isfinite(work_transfer))
+    assert np.all(np.isfinite(result["scratch"].dynamic_viscosity.numpy()))
+    assert np.all(result["scratch"].dynamic_viscosity.numpy() > 0.0)
+    assert np.all(np.isfinite(result["scratch"].mean_free_path.numpy()))
+    assert np.all(result["scratch"].mean_free_path.numpy() > 0.0)
+    for name in (
+        "positive_mass_transfer_demand",
+        "negative_mass_transfer_release",
+    ):
+        values = getattr(result["scratch"], name).numpy()
+        assert np.all(np.isfinite(values))
+        assert np.all(values >= 0.0)
+    scale = result["scratch"].positive_mass_transfer_scale.numpy()
+    assert np.all(np.isfinite(scale))
+    assert np.all((scale >= 0.0) & (scale <= 1.0))
 
 
 def test_condensation_p2_contract_inventory_limited_uptake_is_consistent(

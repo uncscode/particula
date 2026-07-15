@@ -299,8 +299,9 @@ For direct-condensation P1--P4 coverage, keep parity, conservation, capture,
 and derivative assertions separate. Warp CPU is the baseline for supported P1
 parity/P2 conservation and bounded P4 raw-rate autodiff probes when Warp is
 installed; CUDA is optional local/manual evidence. P3 is the exception: CPU
-graph capture is capability-skipped, and CUDA public-step replay is a strict
-expected failure because host validation readbacks are not capture-safe. These
+graph capture is capability-skipped, and only the CUDA public-step host
+validation readback within capture is a strict expected failure because it is
+not capture-safe. Setup and normal calls remain ordinary assertions. These
 precise guarded skips/xfails document an unsupported capture capability, not a
 CPU-baseline or replay-support claim. The P4 wrapper covers only an interior,
 out-of-place raw-rate Tape derivative; it does not relax P2 boundary or
