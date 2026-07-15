@@ -472,10 +472,14 @@ Additional shipped boundaries:
 - Coagulation `rng_states` are caller-owned Warp-resident sidecar state only;
   they are not fields on `ParticleData`, `GasData`, `EnvironmentData`, or any
   Warp container schema.
-- Kernels and runnables do not perform hidden simulation-state transfers or
-  caller-buffer mutation. Callers remain responsible for synchronization before
-  host observation or restoration; CUDA preflight validation-flag readbacks may
-  synchronize without transferring simulation state.
+- Kernels and runnables do not perform hidden simulation-state transfers.
+  Explicitly supplied step and output buffers do mutate in place: particle
+  masses, gas concentration, scratch transfer fields, total transfer, and
+  energy output retain their documented write semantics. Callers remain
+  responsible for synchronization before host observation or restoration.
+  Validation `.numpy()` readbacks at their documented preflight and per-substep
+  boundaries, including CUDA validation-flag readbacks, may synchronize without
+  transferring simulation state.
 - Direct condensation does not add a high-level `Aerosol`/`Runnable` path,
   automatic backend selection or fallback, implicit transfer or synchronization,
   adaptive stepping, new container fields, kernels, or physics, BAT, or

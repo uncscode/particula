@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import io
 import os
 import runpy
 import subprocess
@@ -36,10 +37,11 @@ WARP_OUTPUT = [
     "ParticleData constructed: masses=(1, 2, 1), concentration=(1, 2), charge=(1, 2), density=(1,), volume=(1,)",
     "GasData constructed: concentration=(1, 1), molar_mass=(1,), partitioning=(1,), names=['Water']",
     "Explicit helpers: CPU→Warp conversion -> direct condensation -> CPU checkpoints",
-    "Direct condensation complete: device=cpu, calls=2, total_transfer_shape=(1, 2, 1)",
+    "Direct condensation complete: device=cpu, calls=2, final_call_transfer_shape=(1, 2, 1)",
     "Final checkpoints restored: particle_masses=(1, 2, 1), gas_concentration=(1, 1), names=['Water']",
     "Two-item kernel return; energy remains a caller-owned sidecar.",
-    "Fixed-shape fp64 scratch, latent heat, and energy sidecars reused.",
+    "Fixed-shape fp64 scratch, physical-property, latent-heat, and energy sidecars reused.",
+    "Transfer and energy diagnostics are reset per call and report the final call.",
 ]
 EXAMPLE_TIMEOUT_SECONDS = 10
 KERNEL_MODULES = (
@@ -64,14 +66,18 @@ def _run_example(*, force_no_warp: bool) -> subprocess.CompletedProcess[str]:
         env["PARTICULA_EXAMPLE_FORCE_NO_WARP"] = "1"
     else:
         env.pop("PARTICULA_EXAMPLE_FORCE_NO_WARP", None)
-    return subprocess.run(  # noqa: S603
-        [sys.executable, str(EXAMPLE_PATH)],
-        check=True,
-        capture_output=True,
-        text=True,
-        env=env,
-        timeout=EXAMPLE_TIMEOUT_SECONDS,
-    )
+    stdout, stderr = sys.stdout, sys.stderr
+    try:
+        return subprocess.run(  # noqa: S603
+            [sys.executable, str(EXAMPLE_PATH)],
+            check=True,
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=EXAMPLE_TIMEOUT_SECONDS,
+        )
+    finally:
+        sys.stdout, sys.stderr = stdout, stderr
 
 
 def test_cpu_builders_preserve_documented_dtype_and_species_order(
@@ -159,6 +165,73 @@ def test_forced_no_warp_import_run_main_and_subprocess_defer_kernels(
     assert process.stdout.splitlines() == CPU_ONLY_OUTPUT
 
 
+def test_unavailable_warp_skips_loader_and_conversions(
+    monkeypatch: pytest.MonkeyPatch,
+    example_module: types.ModuleType,
+) -> None:
+    """Test unavailable Warp leaves optional results empty without runtime work."""
+    monkeypatch.setattr(example_module, "WARP_AVAILABLE", False)
+    monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
+    monkeypatch.setattr(
+        example_module,
+        "_load_gpu_runtime",
+        lambda: pytest.fail("runtime loader must not run"),
+    )
+    monkeypatch.setattr(
+        example_module,
+        "to_warp_particle_data",
+        lambda *args, **kwargs: pytest.fail("particle conversion must not run"),
+    )
+    monkeypatch.setattr(
+        example_module,
+        "to_warp_gas_data",
+        lambda *args, **kwargs: pytest.fail("gas conversion must not run"),
+    )
+
+    result = example_module.run_example()
+
+    assert result.output == CPU_ONLY_OUTPUT
+    assert result.particle_data is None
+    assert result.gas_data is None
+    assert result.total_mass_transfer is None
+    assert result.scratch_buffers is None
+    assert result.latent_heat is None
+    assert result.energy_transfer is None
+
+
+@pytest.mark.parametrize(
+    "failure",
+    [
+        None,
+        subprocess.CalledProcessError(1, "example"),
+        subprocess.TimeoutExpired("example", EXAMPLE_TIMEOUT_SECONDS),
+    ],
+)
+def test_subprocess_helper_restores_captured_streams(
+    monkeypatch: pytest.MonkeyPatch,
+    failure: Exception | None,
+) -> None:
+    """Test subprocess capture restores streams on success, failure, and timeout."""
+    captured_stdout, captured_stderr = sys.stdout, sys.stderr
+
+    def fake_run(*args: Any, **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        sys.stdout = io.StringIO()
+        sys.stderr = io.StringIO()
+        if failure is not None:
+            raise failure
+        return subprocess.CompletedProcess(args[0], 0, stdout="", stderr="")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    if failure is None:
+        _run_example(force_no_warp=True)
+    else:
+        with pytest.raises(type(failure)):
+            _run_example(force_no_warp=True)
+    assert sys.stdout is captured_stdout
+    assert sys.stderr is captured_stderr
+
+
 def test_main_entrypoint_prints_result_output(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -233,6 +306,8 @@ def test_enabled_path_reuses_complete_caller_owned_sidecars(
     def fake_step(*args: Any, **kwargs: Any) -> tuple[Any, Any]:
         events.append("step")
         calls.append(kwargs)
+        kwargs["scratch_buffers"].total_mass_transfer.values.fill(len(calls))
+        kwargs["energy_transfer"].values.fill(10 * len(calls))
         return args[0], kwargs["scratch_buffers"].total_mass_transfer
 
     def fake_to_particles(*args: Any, **kwargs: Any) -> object:
@@ -304,6 +379,12 @@ def test_enabled_path_reuses_complete_caller_owned_sidecars(
     assert calls[0]["scratch_buffers"] is calls[1]["scratch_buffers"]
     assert calls[0]["latent_heat"] is calls[1]["latent_heat"]
     assert calls[0]["energy_transfer"] is calls[1]["energy_transfer"]
+    assert calls[0]["surface_tension"] is calls[1]["surface_tension"]
+    assert calls[0]["mass_accommodation"] is calls[1]["mass_accommodation"]
+    assert (
+        calls[0]["diffusion_coefficient_vapor"]
+        is calls[1]["diffusion_coefficient_vapor"]
+    )
     assert (
         result.total_mass_transfer is result.scratch_buffers.total_mass_transfer
     )
@@ -311,11 +392,16 @@ def test_enabled_path_reuses_complete_caller_owned_sidecars(
         result.total_mass_transfer
         is calls[1]["scratch_buffers"].total_mass_transfer
     )
+    np.testing.assert_allclose(result.total_mass_transfer.numpy(), 2.0)
+    np.testing.assert_allclose(result.energy_transfer.numpy(), 20.0)
     for call in calls:
         assert set(call) == {
             "temperature",
             "pressure",
             "time_step",
+            "surface_tension",
+            "mass_accommodation",
+            "diffusion_coefficient_vapor",
             "thermodynamics",
             "scratch_buffers",
             "latent_heat",
@@ -343,6 +429,15 @@ def test_enabled_path_reuses_complete_caller_owned_sidecars(
     assert result.energy_transfer.shape == (1, 1)
     assert result.latent_heat.dtype is _FakeWP.float64
     assert result.energy_transfer.dtype is _FakeWP.float64
+    for name in (
+        "surface_tension",
+        "mass_accommodation",
+        "diffusion_coefficient_vapor",
+    ):
+        value = calls[0][name]
+        assert value.shape == (1,)
+        assert value.dtype is _FakeWP.float64
+        assert value.device == "cpu"
     thermodynamics = calls[0]["thermodynamics"]
     assert thermodynamics.modes.shape == (1,)
     assert thermodynamics.modes.dtype is _FakeWP.int32
@@ -432,6 +527,12 @@ def test_real_warp_cpu_path_reuses_sidecars_and_couples_gas(
     assert calls[0]["scratch_buffers"] is calls[1]["scratch_buffers"]
     assert calls[0]["latent_heat"] is calls[1]["latent_heat"]
     assert calls[0]["energy_transfer"] is calls[1]["energy_transfer"]
+    assert calls[0]["surface_tension"] is calls[1]["surface_tension"]
+    assert calls[0]["mass_accommodation"] is calls[1]["mass_accommodation"]
+    assert (
+        calls[0]["diffusion_coefficient_vapor"]
+        is calls[1]["diffusion_coefficient_vapor"]
+    )
     assert (
         result.total_mass_transfer is result.scratch_buffers.total_mass_transfer
     )

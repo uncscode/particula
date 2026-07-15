@@ -91,7 +91,9 @@ meets its exit bar, the next pending epic in the sequence becomes active.
   kernel entry points, device-aware test policy, and the completed Epic B
   latent-heat example and integration baseline. Shipped artifacts:
     - [Direct GPU kernels quick-start](../../Examples/gpu_direct_kernels_quick_start.py)
-      — explicit transfer and low-level condensation/coagulation kernel path
+      — explicit-transfer, two-call low-level condensation path with reused
+      caller-owned fp64 sidecars; it does not invoke coagulation or configure
+      RNG state
     - [CPU latent-heat condensation example](../../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb)
       — runnable bookkeeping reference for future GPU parity
     - [Measured coagulation decision record](data-oriented-gpu.md#measured-decision-record-for-the-current-one-thread-per-box-path)

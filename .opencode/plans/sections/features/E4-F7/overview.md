@@ -2,11 +2,11 @@
 
 ## Problem Statement
 
-Issue #1314 completed the first publication phase: the canonical foundations page now states the shipped bounded low-level GPU direct-condensation contract, and migration guidance no longer shows the obsolete return signature. The published contract prevents users from inferring unsupported high-level integration, hidden host transfers, or behavior beyond the fixed four-substep direct-kernel path.
+Issues #1314 and #1315 completed the first two publication phases. The canonical foundations page states the bounded low-level GPU direct-condensation contract, while the revised quick-start now demonstrates its explicit-transfer workflow. The published material prevents users from inferring unsupported high-level integration, hidden host transfers, or behavior beyond the fixed four-substep direct-kernel path.
 
 ## Value Proposition
 
-The completed phase preserves explicit CPU-to-Warp transfer ownership, direct imports from `particula.gpu.kernels`, fixed-shape fp64 state, and the distinction between bounded low-level support and future high-level backend integration. Text-only publication regression coverage now protects the canonical contract and the concise migration guidance.
+The completed phases preserve explicit CPU-to-Warp transfer ownership, lazy direct/concrete imports, fixed-shape fp64 caller-owned sidecars, gas coupling, and explicit final checkpoint restoration. The quick-start performs two sequential calls reusing the same scratch, latent-heat, and energy sidecars; regression coverage protects that behavior as well as the no-Warp path and the canonical documentation.
 
 ## User Stories
 

@@ -1,8 +1,10 @@
-"""Direct condensation kernel quick-start with explicit CPU↔Warp transfers.
+"""Run direct condensation with explicit CPU↔Warp transfers.
 
-The example uses the supported low-level, gas-coupled condensation path only.
-It keeps CPU fixtures and transfers explicit, lazily imports Warp-only APIs,
-and demonstrates fixed-shape caller-owned sidecars reused across two calls.
+This example demonstrates only the supported low-level, gas-coupled
+condensation path. It lazily imports Warp-only APIs, reuses fixed-shape,
+caller-owned sidecars across two direct calls, and explicitly restores final
+particle and gas checkpoints. Without Warp, or when the force-no-Warp flag is
+set, it constructs CPU fixtures and reports that no kernel ran.
 """
 
 from __future__ import annotations
@@ -30,8 +32,8 @@ _FORCE_NO_WARP_ENV = "PARTICULA_EXAMPLE_FORCE_NO_WARP"
 class ExampleRun:
     """Store output and optional Warp-path checkpoints from the example.
 
-    Warp-backed fields remain ``None`` when Warp is unavailable or disabled, so
-    importing and running the CPU-only branch does not require Warp.
+    Warp-backed fields are ``None`` when Warp is unavailable or disabled. This
+    keeps importing and executing the CPU-only branch independent of Warp.
 
     Attributes:
         output: Deterministic, human-readable execution metadata.
@@ -57,6 +59,10 @@ def _build_particle_data() -> ParticleData:
 
     The sole mass column corresponds to the ``Water`` species in
     :func:`_build_gas_data`.
+
+    Returns:
+        Particle data with ``float64`` state arrays and masses shaped
+        ``(1, 2, 1)``.
     """
     return ParticleData(
         masses=np.array([[[1.0e-18], [1.2e-18]]], dtype=np.float64),
@@ -68,7 +74,12 @@ def _build_particle_data() -> ParticleData:
 
 
 def _build_gas_data() -> GasData:
-    """Create one-box gas data ordered to match the particle mass column."""
+    """Create one-box gas data ordered to match the particle mass column.
+
+    Returns:
+        Gas data for ``Water`` with ``float64`` molar mass and concentration,
+        plus a Boolean partitioning mask.
+    """
     return GasData(
         name=["Water"],
         molar_mass=np.array([0.018], dtype=np.float64),
@@ -82,21 +93,37 @@ def _build_vapor_pressure() -> np.ndarray:
 
     Condensation overwrites this GPU helper storage from the thermodynamic
     sidecar before transfer, so it is not a caller-supplied physics source.
+
+    Returns:
+        Initial ``float64`` storage shaped ``(1, 1)`` with pressure in Pa.
     """
     return np.array([[2330.0]], dtype=np.float64)
 
 
 def _warp_enabled() -> bool:
-    """Return whether optional Warp execution is available and enabled."""
+    """Return whether optional Warp execution is available and enabled.
+
+    The ``PARTICULA_EXAMPLE_FORCE_NO_WARP=1`` environment variable disables
+    the direct path even when Warp is installed.
+
+    Returns:
+        ``True`` only when Warp is available and the force-no-Warp flag is not
+        set.
+    """
     return WARP_AVAILABLE and os.getenv(_FORCE_NO_WARP_ENV) != "1"
 
 
 def _load_gpu_runtime() -> tuple[Any, Any, Any, Any]:
     """Lazily load Warp and the direct condensation runtime contract.
 
+    This helper runs only after the Warp guard succeeds. It deliberately loads
+    the public step entry point and the concrete sidecar classes rather than a
+    high-level runnable API.
+
     Returns:
-        Warp, public ``condensation_step_gpu``, concrete
-        ``CondensationScratchBuffers``, and concrete ``ThermodynamicsConfig``.
+        A tuple containing Warp, public ``condensation_step_gpu``, concrete
+        ``CondensationScratchBuffers``, and concrete
+        ``ThermodynamicsConfig``.
     """
     wp = importlib.import_module("warp")
     kernels = importlib.import_module("particula.gpu.kernels")
@@ -113,7 +140,15 @@ def _load_gpu_runtime() -> tuple[Any, Any, Any, Any]:
 
 
 def _output_prefix(particle_data: ParticleData, gas_data: GasData) -> list[str]:
-    """Return deterministic CPU-fixture metadata lines."""
+    """Build deterministic metadata describing the CPU fixtures.
+
+    Args:
+        particle_data: CPU particle fixture to describe.
+        gas_data: CPU gas fixture to describe.
+
+    Returns:
+        Human-readable fixture metadata in its printed order.
+    """
     return [
         "Canonical path: docs/Examples/gpu_direct_kernels_quick_start.py",
         (
@@ -135,17 +170,28 @@ def _output_prefix(particle_data: ParticleData, gas_data: GasData) -> list[str]:
 
 
 def run_example(device: str = "cpu") -> ExampleRun:
-    """Run two explicit direct-condensation calls with reused sidecars.
+    """Run two direct-condensation calls with reused caller-owned sidecars.
+
+    The enabled path explicitly converts CPU fixtures to Warp data, executes
+    two sequential low-level calls with the same scratch and physical-property
+    sidecars, then restores final particle and gas checkpoints. The transfer
+    and energy outputs are cleared per successful call, so returned diagnostics
+    describe the final call only. It does not provide a fallback kernel path:
+    when Warp is unavailable or disabled, it returns CPU-fixture metadata
+    stating that no kernel ran.
 
     Args:
         device: Warp device for the optional kernel path. Defaults to Warp CPU.
 
     Returns:
-        CPU-only metadata with no Warp fields when unavailable, otherwise final
-        restored checkpoints and the exact caller-owned sidecar objects.
+        An :class:`ExampleRun` containing CPU-only metadata and ``None``
+        Warp fields when disabled, or restored final checkpoints and the exact
+        caller-owned sidecars after both direct calls.
 
     Raises:
-        RuntimeError: Propagated from conversion, allocation, or kernel calls.
+        Exception: Propagates conversion, allocation, and direct-kernel errors
+            without claiming a successful checkpoint or rolling back device
+            state.
     """
     particle_data = _build_particle_data()
     gas_data = _build_gas_data()
@@ -195,6 +241,15 @@ def run_example(device: str = "cpu") -> ExampleRun:
         np.array([2.26e6], dtype=np.float64), dtype=wp.float64, device=device
     )
     energy_transfer = wp.zeros(species_shape, dtype=wp.float64, device=device)
+    surface_tension = wp.array(
+        np.array([0.072], dtype=np.float64), dtype=wp.float64, device=device
+    )
+    mass_accommodation = wp.array(
+        np.array([1.0], dtype=np.float64), dtype=wp.float64, device=device
+    )
+    diffusion_coefficient_vapor = wp.array(
+        np.array([2.0e-5], dtype=np.float64), dtype=wp.float64, device=device
+    )
     thermodynamics = thermodynamics_config(
         modes=wp.array(
             np.array([0], dtype=np.int32), dtype=wp.int32, device=device
@@ -215,6 +270,9 @@ def run_example(device: str = "cpu") -> ExampleRun:
         temperature=298.15,
         pressure=101325.0,
         time_step=0.1,
+        surface_tension=surface_tension,
+        mass_accommodation=mass_accommodation,
+        diffusion_coefficient_vapor=diffusion_coefficient_vapor,
         thermodynamics=thermodynamics,
         scratch_buffers=scratch_buffers,
         latent_heat=latent_heat,
@@ -226,6 +284,9 @@ def run_example(device: str = "cpu") -> ExampleRun:
         temperature=298.15,
         pressure=101325.0,
         time_step=0.1,
+        surface_tension=surface_tension,
+        mass_accommodation=mass_accommodation,
+        diffusion_coefficient_vapor=diffusion_coefficient_vapor,
         thermodynamics=thermodynamics,
         scratch_buffers=scratch_buffers,
         latent_heat=latent_heat,
@@ -238,7 +299,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
             "Explicit helpers: CPU→Warp conversion -> direct condensation -> CPU checkpoints",
             (
                 "Direct condensation complete: "
-                f"device={device}, calls=2, total_transfer_shape="
+                f"device={device}, calls=2, final_call_transfer_shape="
                 f"{total_mass_transfer.shape}"
             ),
             (
@@ -248,7 +309,11 @@ def run_example(device: str = "cpu") -> ExampleRun:
                 f"names={restored_gas_data.name}"
             ),
             "Two-item kernel return; energy remains a caller-owned sidecar.",
-            "Fixed-shape fp64 scratch, latent heat, and energy sidecars reused.",
+            (
+                "Fixed-shape fp64 scratch, physical-property, latent-heat, "
+                "and energy sidecars reused."
+            ),
+            "Transfer and energy diagnostics are reset per call and report the final call.",
         ]
     )
     return ExampleRun(
@@ -263,7 +328,11 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 def main() -> None:
-    """Print deterministic metadata from :func:`run_example`."""
+    """Run the example and print its deterministic execution metadata.
+
+    The metadata identifies the no-Warp outcome or the explicit conversion,
+    direct-call, sidecar-reuse, and final-checkpoint restoration route.
+    """
     for line in run_example().output:
         print(line)
 
