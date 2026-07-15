@@ -1,7 +1,7 @@
 # Testing Guide
 
 **Project:** particula  
-**Last Updated:** 2026-07-10
+**Last Updated:** 2026-07-14
 
 particula uses pytest as its primary testing framework. Tests should be close to
 the code they validate and should exercise scientific correctness, edge cases,
@@ -276,14 +276,22 @@ def test_total_mass_is_conserved():
     npt.assert_allclose(final_total, initial_total, rtol=1e-12, atol=0.0)
 ```
 
-The public GPU condensation hook has a separate deterministic fp64 regression
-pattern. For each box and partitioning species, compare the change in particle
+The direct GPU condensation hook has deterministic fp64 parity-matrix coverage
+in `particula/gpu/kernels/tests/condensation_test.py`. It runs one-box and
+multi-box/multi-species fixtures against an independent NumPy fixed-four-
+substep, P2 inventory-finalized, gas-coupled oracle. Compare final particle
+masses and gas concentrations independently, with explicit tolerance bounds;
+do not replace these checks with an aggregate inventory assertion. The matrix
+covers uptake, evaporation, disabled partitioning, latent heat, zero gas, and
+inactive particle slots. Warp CPU is required whenever Warp is installed;
+the matching CUDA matrix is optional and must skip cleanly when unavailable.
+This is scoped direct-kernel evidence, not CPU-strategy or runnable parity.
+
+The public GPU condensation hook also has separate deterministic per-box,
+per-species inventory regression coverage. Compare the change in particle
 inventory (particle mass weighted by particle concentration) plus the gas
-change against zero. Keep that `rtol=1e-12, atol=1e-30` inventory assertion
-separate from CPU-oracle particle and gas parity
-(`rtol=2e-10, atol=1e-30`). The fixture must also retain disabled-partitioning,
-zero-gas, and zero-concentration-slot cases; this is scoped direct-kernel
-evidence, not CPU-strategy or runnable parity.
+change against zero at `rtol=1e-12, atol=1e-30`. Keep this conservation
+assertion separate from CPU-oracle particle and gas parity.
 
 For stochastic kernels, assert bounded aggregate behavior instead of replaying
 exact accepted-collision sequences or per-seed trajectories. A seeded range can

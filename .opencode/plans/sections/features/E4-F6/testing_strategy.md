@@ -5,10 +5,14 @@ unchanged and changed code must retain at least 80% coverage.
 
 ## Per-Phase Approach
 
-- **P1:** In `_condensation_test_support.py` plus `condensation_test.py`, compare
-  deterministic fp64 production outputs to independent one-box CPU equations.
-  Run one/multi-box and multi-species cases on Warp CPU and optional CUDA with
-  parity `rtol=1e-10` and a scale-derived `atol`.
+- **P1 (completed, #1308):** `_condensation_test_support.py` defines two shared
+  deterministic fp64 cases and a NumPy fixed-four-substep/P2/gas-coupled
+  expected-output builder; `condensation_test.py` exports the Warp-CPU and CUDA
+  matrix tests. The cases independently compare final particle masses and gas
+  concentrations at `rtol=1e-10`, with
+  `atol=max(max(abs(expected)) * 1e-12, 1e-30)` per output. Warp CPU is required
+  when Warp is installed; CUDA uses the same matrix and skips cleanly when
+  unavailable.
 - **P2:** Add separate strict per-box/per-species inventory and latent-energy
   assertions with `rtol=1e-12` and
   `atol=max(1e-18, scale * eps)`. Cover inactive entries, clamp bounds,

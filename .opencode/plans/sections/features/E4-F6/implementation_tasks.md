@@ -2,16 +2,20 @@
 
 ## GPU Test Infrastructure
 
-- [ ] Extend `_condensation_test_support.py` with independent per-box CPU
-  reference assembly for all E4-F1 through E4-F5 physics.
-- [ ] Build explicit fp64 fixtures covering one/multiple boxes and species,
-  condensation/evaporation, partitioning gates, thermal coupling, and clamps.
-- [ ] Reuse `warp_devices(wp)` so CPU always runs and CUDA is optional.
-- [ ] Keep support cases discoverable through focused `*_test.py` wrappers.
+- [x] Extend `_condensation_test_support.py` with the independent NumPy
+  four-substep/P2/gas-coupled expected-output builder used by P1.
+- [x] Build two explicit fp64 fixtures covering one/multiple boxes and species,
+  uptake, evaporation, partitioning gates, latent heat, gas-limited uptake,
+  zero gas, and inactive particle slots.
+- [x] Reuse `warp_devices(wp)` at execution time so Warp CPU runs and CUDA is
+  optional.
+- [x] Export the support cases through `condensation_test.py` as discoverable
+  Warp-CPU and CUDA parity tests.
 
 ## Correctness Evidence
 
-- [ ] Add explicit CPU/Warp parity assertions with reviewed `rtol` and `atol`.
+- [x] Add explicit CPU/Warp particle-mass and gas-concentration parity
+  assertions with `rtol=1e-10` and a separate scale-derived finite `atol`.
 - [ ] Add separate per-box/per-species particle-plus-gas conservation checks.
 - [ ] Verify transfer, gas loss, particle gain, and E4-F4 latent energy all use
   the same finalized bounded transfer.

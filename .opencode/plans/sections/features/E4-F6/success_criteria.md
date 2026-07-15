@@ -1,9 +1,10 @@
 # Success Criteria
 
-- [ ] Independent fp64 CPU references pass for every one-box case and each box
-  in multi-box production cases.
-- [ ] Warp CPU executes all required parity, conservation, buffer, and fixed-loop
-  cases; CUDA runs the same eligible matrix when available and skips cleanly otherwise.
+- [x] P1 provides independent fp64 NumPy-oracle parity for the shared one-box
+  and multi-box/multi-species cases, with particle mass and gas concentration
+  compared separately.
+- [x] P1 executes the required parity matrix on Warp CPU and runs the identical
+  matrix on CUDA when available, with a clean CUDA skip otherwise.
 - [ ] Per-box/per-species particle gain, gas loss, returned transfer, and latent
   energy agree with the same bounded transfer.
 - [ ] Particle-plus-gas inventory passes a separately stated strict tolerance;

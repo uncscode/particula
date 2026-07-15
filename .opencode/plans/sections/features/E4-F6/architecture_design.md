@@ -19,9 +19,11 @@ E4-F1..F5 production condensation step
 documented evidence matrix and limitations
 ```
 
-Tests must observe the public production entry point and derive expected values
-independently. Multi-box expectations are assembled by running a one-box CPU
-reference for each box, avoiding circular validation of vectorized indexing.
+Tests observe the direct production entry point and derive expected values with
+the independent NumPy fixed-four-substep/P2/gas-coupled oracle. The delivered
+P1 matrix uses two NumPy-owned descriptors and separately asserts particle mass
+and gas concentration, avoiding circular validation through GPU buffers or
+aggregate-only comparisons.
 
 ## Data / API / Workflow Changes
 
