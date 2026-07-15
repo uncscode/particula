@@ -203,10 +203,10 @@ The bounded, low-level direct GPU condensation path separately supports an
 optional per-species latent-rate correction in each of its four equal
 substeps, with CPU-oracle/Warp parity coverage. Omitting `latent_heat`, or
 using a zero entry for a species, retains that species' isothermal rate path.
-This does not provide temperature feedback or strategy/runnable-level
-latent-heat support. It does couple its finalized particle transfer to gas
-concentration; the separate `energy_transfer` bookkeeping diagnostic is
-described below.
+This is diagnostic bookkeeping, not temperature feedback, gas mutation or
+gas/full-system conservation. It does not provide strategy/runnable-level
+latent-heat support; the separate `energy_transfer` diagnostic is described
+below.
 
 ### CondensationIsothermalStaggered (two-pass Gauss-Seidel)
 
