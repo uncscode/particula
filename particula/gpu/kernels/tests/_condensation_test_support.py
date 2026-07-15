@@ -3015,6 +3015,7 @@ def _run_production_inventory_case(device: str) -> None:
     initial_masses = particles.masses.copy()
     initial_gas = gas.concentration.copy()
     particle_concentration = particles.concentration.copy()
+    npt.assert_array_equal(initial_gas[:, 2], 0.0)
     expected_masses, _, _, expected_gas = _cpu_four_substep_oracle(
         particles,
         gas,
@@ -3081,13 +3082,19 @@ def _run_production_inventory_case(device: str) -> None:
         rtol=PRODUCTION_PARITY_RTOL,
         atol=PRODUCTION_PARITY_ATOL,
     )
+    npt.assert_allclose(
+        total,
+        final_masses - initial_masses,
+        rtol=PRODUCTION_PARITY_RTOL,
+        atol=PRODUCTION_PARITY_ATOL,
+    )
     npt.assert_array_equal(total[:, :, 1], 0.0)
     npt.assert_array_equal(final_masses[:, :, 1], initial_masses[:, :, 1])
     npt.assert_array_equal(final_gas_concentration[:, 1], initial_gas[:, 1])
-    enabled_transfer = total[:, :, (0, 2)]
-    assert np.any(enabled_transfer > 0.0)
-    assert np.any(enabled_transfer < 0.0)
     inactive = particle_concentration == 0.0
+    assert np.any(total[:, :, 0][~inactive] > 0.0)
+    assert np.any(total[:, :, 2][~inactive] < 0.0)
+    assert np.any(final_gas_concentration[:, 2] > 0.0)
     npt.assert_array_equal(total[inactive], 0.0)
     npt.assert_array_equal(final_masses[inactive], initial_masses[inactive])
 
