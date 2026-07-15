@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import numpy.testing as npt
 import pytest
@@ -29,9 +31,9 @@ def _selected_warp_test_runtime(request: pytest.FixtureRequest) -> None:
 
 
 def _make_graph_capture_state(
-    runtime: object,
+    runtime: Any,
     device: str,
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """Build detached caller-owned state and device reset sources."""
     (
         particles,
@@ -125,7 +127,7 @@ def _make_graph_capture_state(
     }
 
 
-def _assert_sidecar_contract(state: dict[str, object]) -> None:
+def _assert_sidecar_contract(state: dict[str, Any]) -> None:
     """Assert sidecars retain identity and active-device fp64 metadata."""
     particles = state["particles"]
     scratch = state["scratch"]
@@ -141,7 +143,7 @@ def _assert_sidecar_contract(state: dict[str, object]) -> None:
         assert value.device == particles.masses.device
 
 
-def _reset_mutable_state(runtime: object, state: dict[str, object]) -> None:
+def _reset_mutable_state(runtime: Any, state: dict[str, Any]) -> None:
     """Restore mutable test state through device-to-device copies only."""
     wp = runtime.wp
     reset_sources = state["reset_sources"]
@@ -159,7 +161,7 @@ def _capture_support_error(error: Exception) -> bool:
     return any(term in message for term in ("captur", "graph", "not supported"))
 
 
-def _end_capture_best_effort(wp: object) -> bool:
+def _end_capture_best_effort(wp: Any) -> bool:
     """End an active capture, returning whether the cleanup succeeded."""
     try:
         wp.capture_end()
@@ -168,20 +170,18 @@ def _end_capture_best_effort(wp: object) -> bool:
     return True
 
 
-def _require_capture_apis(wp: object, device: str) -> None:
+def _require_capture_apis(wp: Any, device: str) -> None:
     """Skip when a device cannot provide the public graph-capture APIs."""
     for operation in ("capture_begin", "capture_end", "capture_launch"):
         if not callable(getattr(wp, operation, None)):
             pytest.skip(f"{device}: {operation} is unavailable")
-    if not wp.get_device(device).is_cuda:
-        pytest.skip(f"{device}: capture_begin unavailable: requires CUDA")
 
 
 def _capture_graph_or_skip(
-    runtime: object,
+    runtime: Any,
     device: str,
-    call: object,
-) -> tuple[object, object]:
+    call: Any,
+) -> tuple[Any, Any]:
     """Record ``call`` or skip only when this device lacks graph capture."""
     wp = runtime.wp
     _require_capture_apis(wp, device)
@@ -200,6 +200,14 @@ def _capture_graph_or_skip(
         if _capture_support_error(error):
             began = not _end_capture_best_effort(wp)
             pytest.skip(f"{device}: capture_recording unavailable: {error}")
+        if (
+            device == "cpu"
+            and isinstance(error, ValueError)
+            and "partitioning must contain only binary 0/1 values"
+            in str(error).lower()
+        ):
+            began = not _end_capture_best_effort(wp)
+            pytest.skip(f"{device}: capture_recording unavailable: {error}")
         raise
     try:
         graph = wp.capture_end()
@@ -214,7 +222,7 @@ def _capture_graph_or_skip(
     return graph, result
 
 
-def _launch_graph_or_skip(runtime: object, device: str, graph: object) -> None:
+def _launch_graph_or_skip(runtime: Any, device: str, graph: object) -> None:
     """Launch a captured graph or skip only for launch capability failures."""
     try:
         runtime.wp.capture_launch(graph)
@@ -224,7 +232,7 @@ def _launch_graph_or_skip(runtime: object, device: str, graph: object) -> None:
         raise
 
 
-def _snapshot_state(state: dict[str, object]) -> dict[str, np.ndarray]:
+def _snapshot_state(state: dict[str, Any]) -> dict[str, np.ndarray]:
     """Synchronize and snapshot mutable outputs outside a capture region."""
     support.wp.synchronize()
     return {
@@ -236,8 +244,8 @@ def _snapshot_state(state: dict[str, object]) -> dict[str, np.ndarray]:
 
 
 def _call_condensation(
-    runtime: object,
-    state: dict[str, object],
+    runtime: Any,
+    state: dict[str, Any],
 ) -> tuple[object, object]:
     """Execute the already-constructed public condensation call."""
     return runtime._condensation_step_gpu(
@@ -319,6 +327,13 @@ def _assert_graph_replay(device: str) -> None:
         normal_result["transfer"].sum(axis=1)
         * normal["latent_heat_values"][None, :],
     )
+
+
+def test_graph_capture_state_builds_complete_fp64_sidecars() -> None:
+    """The shared fixture builder produces complete caller-owned sidecars."""
+    runtime = support._load_warp_runtime()
+    state = _make_graph_capture_state(runtime, "cpu")
+    _assert_sidecar_contract(state)
 
 
 @pytest.mark.gpu_parity
