@@ -11846,6 +11846,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#bounded-p4-condensation-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bounded P4 condensation evidence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#non-differentiable-points-in-coagulation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14785,6 +14796,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#bounded-p4-condensation-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bounded P4 condensation evidence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#non-differentiable-points-in-coagulation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -15199,7 +15221,7 @@ parameters are fixed.</p>
 <tbody>
 <tr>
 <td>Condensation (deterministic)</td>
-<td>Direct autodiff, no change needed</td>
+<td>Bounded raw-rate autodiff evidence only; public-step differentiation unsupported</td>
 </tr>
 <tr>
 <td>Gas partitioning / rates</td>
@@ -15239,6 +15261,23 @@ are already gradient-friendly; the stochastic control flow is not.</p>
   because fixed iteration counts fit Warp autodiff and graph-capture
   expectations better than adaptive loop structures.</li>
 </ul>
+<h3 id="bounded-p4-condensation-evidence">Bounded P4 condensation evidence<a class="headerlink" href="#bounded-p4-condensation-evidence" title="Permanent link">&para;</a></h3>
+<p><code>particula/gpu/kernels/tests/condensation_autodiff_test.py</code> records a narrow
+P4 result, rather than support for differentiating the public condensation
+step. On Warp CPU, its one-box fp64, out-of-place raw-rate
+<code>condensation_mass_transfer_kernel</code> Tape derivative with respect to gas
+concentration agrees with a centered finite-difference reference only when
+positivity and inventory margins keep P2 boundaries inactive. CUDA runs are
+optional additive evidence and skip cleanly when unavailable; this work neither
+requires CUDA nor promises <code>wp.autograd.gradcheck</code> support.</p>
+<p>The test scopes <code>verify_autograd_array_access</code> and restores its prior value even
+when an exception occurs. A missing Tape, backward, or access-verification
+capability is a precise skip, not evidence for a gradient path.</p>
+<p>P2 remains forward-only evidence at its boundaries: the evaporation clamp is
+non-smooth, uptake inventory limiting is a boundary, and finalized transfer
+mutates particle and gas state in place. Therefore, P4 does not establish a
+derivative for the complete public step, a multi-step loop, or a production
+optimization API.</p>
 <h3 id="non-differentiable-points-in-coagulation">Non-differentiable points in coagulation<a class="headerlink" href="#non-differentiable-points-in-coagulation" title="Permanent link">&para;</a></h3>
 <p>All three are in <code>particula/gpu/kernels/coagulation.py</code>:</p>
 <ol>
@@ -15256,9 +15295,10 @@ backward pass, so even the smooth arithmetic inside that loop would not
 differentiate correctly as written.</p>
 <h3 id="recommended-direction">Recommended direction<a class="headerlink" href="#recommended-direction" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Prove the autodiff loop on deterministic condensation first: allocate
-  <code>requires_grad=True</code> inputs, record a multi-step condensation loop on a tape,
-  and validate with <code>wp.autograd.gradcheck</code>.</li>
+<li>Treat the bounded raw-rate P4 Tape check as a starting point, not a complete
+  public-step or multi-step gradient claim. Any future broader path requires
+  independent boundary-aware validation; it is not currently promised through
+  <code>wp.autograd.gradcheck</code>.</li>
 <li>For condensation implementation work, prefer the documented
   <code>fixed_count_substeps_4</code> foundation over adaptive or per-case dynamic-loop
   schemes. The fixed loop count is easier to replay, keeps buffer layouts

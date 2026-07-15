@@ -14796,28 +14796,28 @@ scale storage. P1 validates but does not read or write it.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/condensation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">638</span>
-<span class="normal">639</span>
-<span class="normal">640</span>
-<span class="normal">641</span>
-<span class="normal">642</span>
-<span class="normal">643</span>
-<span class="normal">644</span>
-<span class="normal">645</span>
-<span class="normal">646</span>
-<span class="normal">647</span>
-<span class="normal">648</span>
-<span class="normal">649</span>
-<span class="normal">650</span>
-<span class="normal">651</span>
-<span class="normal">652</span>
-<span class="normal">653</span>
-<span class="normal">654</span>
-<span class="normal">655</span>
-<span class="normal">656</span>
-<span class="normal">657</span>
-<span class="normal">658</span>
-<span class="normal">659</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>  <span class="c1"># pragma: no cover - device kernels execute outside Python coverage</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span>
+<span class="normal">759</span>
+<span class="normal">760</span>
+<span class="normal">761</span>
+<span class="normal">762</span>
+<span class="normal">763</span>
+<span class="normal">764</span>
+<span class="normal">765</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>  <span class="c1"># pragma: no cover - device kernels execute outside Python coverage</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_mass_transfer_kernel</span><span class="p">(</span>
     <span class="n">masses</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -15265,7 +15265,113 @@ the original isothermal rate path.</p>
 <span class="normal">542</span>
 <span class="normal">543</span>
 <span class="normal">544</span>
-<span class="normal">545</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>  <span class="c1"># pragma: no cover - device kernels execute outside Python coverage</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span>
+<span class="normal">633</span>
+<span class="normal">634</span>
+<span class="normal">635</span>
+<span class="normal">636</span>
+<span class="normal">637</span>
+<span class="normal">638</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>  <span class="c1"># pragma: no cover - device kernels execute outside Python coverage</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">condensation_mass_transfer_kernel</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">masses</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -15335,13 +15441,119 @@ the original isothermal rate path.</p>
     <span class="n">dynamic_viscosity_value</span> <span class="o">=</span> <span class="n">dynamic_viscosity</span><span class="p">[</span><span class="n">box_idx</span><span class="p">]</span>
     <span class="n">mean_free_path_value</span> <span class="o">=</span> <span class="n">mean_free_path</span><span class="p">[</span><span class="n">box_idx</span><span class="p">]</span>
     <span class="n">temperature_value</span> <span class="o">=</span> <span class="n">temperature</span><span class="p">[</span><span class="n">box_idx</span><span class="p">]</span>
+    <span class="n">n_species</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">concentration</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">particle_idx</span><span class="p">]</span> <span class="o">==</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">species_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">n_species</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">mass_transfer</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">particle_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">species_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_species</span><span class="p">):</span>
             <span class="n">mass_transfer</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">particle_idx</span><span class="p">,</span> <span class="n">species_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="k">return</span>
 
-    <span class="n">n_species</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="c1"># Warp does not replay dynamic loops in a backward pass.  Preserve the</span>
+    <span class="c1"># general multi-species path below, but keep the common one-species raw</span>
+    <span class="c1"># rate free of dynamic loops so its out-of-place Tape derivative remains</span>
+    <span class="c1"># available without changing P2 or the public step contract.</span>
+    <span class="k">if</span> <span class="n">n_species</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">species_mass</span> <span class="o">=</span> <span class="n">masses</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">particle_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">total_volume</span> <span class="o">=</span> <span class="n">species_mass</span> <span class="o">/</span> <span class="n">density</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">total_volume</span> <span class="o">&lt;=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">):</span>
+            <span class="n">mass_transfer</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">particle_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">radius</span> <span class="o">=</span> <span class="n">particle_radius_from_volume_wp</span><span class="p">(</span><span class="n">total_volume</span><span class="p">)</span>
+        <span class="n">effective_density</span> <span class="o">=</span> <span class="n">density</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">knudsen_number</span> <span class="o">=</span> <span class="n">knudsen_number_wp</span><span class="p">(</span><span class="n">mean_free_path_value</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span>
+        <span class="n">slip_correction</span> <span class="o">=</span> <span class="n">cunningham_slip_correction_wp</span><span class="p">(</span><span class="n">knudsen_number</span><span class="p">)</span>
+        <span class="n">mobility</span> <span class="o">=</span> <span class="n">aerodynamic_mobility_wp</span><span class="p">(</span>
+            <span class="n">radius</span><span class="p">,</span> <span class="n">slip_correction</span><span class="p">,</span> <span class="n">dynamic_viscosity_value</span>
+        <span class="p">)</span>
+        <span class="n">diffusion_coefficient_particle</span> <span class="o">=</span> <span class="n">diffusion_coefficient_wp</span><span class="p">(</span>
+            <span class="n">temperature_value</span><span class="p">,</span>
+            <span class="n">mobility</span><span class="p">,</span>
+            <span class="n">boltzmann_constant</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">transition</span> <span class="o">=</span> <span class="n">vapor_transition_correction_wp</span><span class="p">(</span>
+            <span class="n">knudsen_number</span><span class="p">,</span>
+            <span class="n">mass_accommodation</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">diffusion_value</span> <span class="o">=</span> <span class="n">diffusion_coefficient_vapor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">diffusion_value</span> <span class="o">&lt;=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">):</span>
+            <span class="n">diffusion_value</span> <span class="o">=</span> <span class="n">diffusion_coefficient_particle</span>
+        <span class="n">mass_transport</span> <span class="o">=</span> <span class="n">first_order_mass_transport_k_wp</span><span class="p">(</span>
+            <span class="n">radius</span><span class="p">,</span>
+            <span class="n">transition</span><span class="p">,</span>
+            <span class="n">diffusion_value</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">tension</span> <span class="o">=</span> <span class="n">surface_tension</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">surface_tension_mode</span> <span class="o">==</span> <span class="n">SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED</span><span class="p">:</span>
+            <span class="n">tension</span> <span class="o">=</span> <span class="n">effective_surface_tension</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">particle_idx</span><span class="p">]</span>
+        <span class="n">kelvin_radius</span> <span class="o">=</span> <span class="n">kelvin_radius_wp</span><span class="p">(</span>
+            <span class="n">tension</span><span class="p">,</span>
+            <span class="n">effective_density</span><span class="p">,</span>
+            <span class="n">molar_mass</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">temperature_value</span><span class="p">,</span>
+            <span class="n">gas_constant</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">kelvin_term</span> <span class="o">=</span> <span class="n">kelvin_term_wp</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">kelvin_radius</span><span class="p">)</span>
+        <span class="n">partial_pressure_gas</span> <span class="o">=</span> <span class="n">partial_pressure_wp</span><span class="p">(</span>
+            <span class="n">gas_concentration</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">molar_mass</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">temperature_value</span><span class="p">,</span>
+            <span class="n">gas_constant</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">activity_factor</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">activity_enabled</span> <span class="o">==</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">water_species_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">activity_mode</span> <span class="o">==</span> <span class="n">ACTIVITY_MODE_IDEAL</span><span class="p">:</span>
+                <span class="n">activity_factor</span> <span class="o">=</span> <span class="n">water_activity_ideal_wp</span><span class="p">(</span>
+                    <span class="n">masses</span><span class="p">,</span>
+                    <span class="n">molar_mass_reference</span><span class="p">,</span>
+                    <span class="n">box_idx</span><span class="p">,</span>
+                    <span class="n">particle_idx</span><span class="p">,</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">activity_factor</span> <span class="o">=</span> <span class="n">water_activity_kappa_wp</span><span class="p">(</span>
+                    <span class="n">masses</span><span class="p">,</span>
+                    <span class="n">density</span><span class="p">,</span>
+                    <span class="n">kappas</span><span class="p">,</span>
+                    <span class="n">box_idx</span><span class="p">,</span>
+                    <span class="n">particle_idx</span><span class="p">,</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="n">surface_vapor_pressure</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">activity_factor</span> <span class="o">*</span> <span class="n">vapor_pressure</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">kelvin_term</span>
+        <span class="p">)</span>
+        <span class="n">pressure_delta</span> <span class="o">=</span> <span class="n">partial_pressure_gas</span> <span class="o">-</span> <span class="n">surface_vapor_pressure</span>
+        <span class="n">species_latent_heat</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">thermal_conductivity</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">latent_heat_enabled</span> <span class="o">==</span> <span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">species_latent_heat</span> <span class="o">=</span> <span class="n">latent_heat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">thermal_conductivity</span> <span class="o">=</span> <span class="n">_thermal_conductivity_wp</span><span class="p">(</span><span class="n">temperature_value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">species_latent_heat</span> <span class="o">==</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">):</span>
+            <span class="n">mass_rate</span> <span class="o">=</span> <span class="n">mass_transfer_rate_wp</span><span class="p">(</span>
+                <span class="n">pressure_delta</span><span class="p">,</span>
+                <span class="n">mass_transport</span><span class="p">,</span>
+                <span class="n">temperature_value</span><span class="p">,</span>
+                <span class="n">molar_mass</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">gas_constant</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mass_rate</span> <span class="o">=</span> <span class="n">_mass_transfer_rate_latent_heat_wp</span><span class="p">(</span>
+                <span class="n">pressure_delta</span><span class="p">,</span>
+                <span class="n">mass_transport</span><span class="p">,</span>
+                <span class="n">temperature_value</span><span class="p">,</span>
+                <span class="n">molar_mass</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">species_latent_heat</span><span class="p">,</span>
+                <span class="n">thermal_conductivity</span><span class="p">,</span>
+                <span class="n">surface_vapor_pressure</span><span class="p">,</span>
+                <span class="n">diffusion_value</span><span class="p">,</span>
+                <span class="n">gas_constant</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">mass_transfer</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">particle_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mass_rate</span> <span class="o">*</span> <span class="n">time_step</span>
+        <span class="k">return</span>
+
     <span class="n">total_volume</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="n">total_mass</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">species_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_species</span><span class="p">):</span>
@@ -15900,113 +16112,7 @@ NaN/Inf before a call.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/condensation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1708</span>
-<span class="normal">1709</span>
-<span class="normal">1710</span>
-<span class="normal">1711</span>
-<span class="normal">1712</span>
-<span class="normal">1713</span>
-<span class="normal">1714</span>
-<span class="normal">1715</span>
-<span class="normal">1716</span>
-<span class="normal">1717</span>
-<span class="normal">1718</span>
-<span class="normal">1719</span>
-<span class="normal">1720</span>
-<span class="normal">1721</span>
-<span class="normal">1722</span>
-<span class="normal">1723</span>
-<span class="normal">1724</span>
-<span class="normal">1725</span>
-<span class="normal">1726</span>
-<span class="normal">1727</span>
-<span class="normal">1728</span>
-<span class="normal">1729</span>
-<span class="normal">1730</span>
-<span class="normal">1731</span>
-<span class="normal">1732</span>
-<span class="normal">1733</span>
-<span class="normal">1734</span>
-<span class="normal">1735</span>
-<span class="normal">1736</span>
-<span class="normal">1737</span>
-<span class="normal">1738</span>
-<span class="normal">1739</span>
-<span class="normal">1740</span>
-<span class="normal">1741</span>
-<span class="normal">1742</span>
-<span class="normal">1743</span>
-<span class="normal">1744</span>
-<span class="normal">1745</span>
-<span class="normal">1746</span>
-<span class="normal">1747</span>
-<span class="normal">1748</span>
-<span class="normal">1749</span>
-<span class="normal">1750</span>
-<span class="normal">1751</span>
-<span class="normal">1752</span>
-<span class="normal">1753</span>
-<span class="normal">1754</span>
-<span class="normal">1755</span>
-<span class="normal">1756</span>
-<span class="normal">1757</span>
-<span class="normal">1758</span>
-<span class="normal">1759</span>
-<span class="normal">1760</span>
-<span class="normal">1761</span>
-<span class="normal">1762</span>
-<span class="normal">1763</span>
-<span class="normal">1764</span>
-<span class="normal">1765</span>
-<span class="normal">1766</span>
-<span class="normal">1767</span>
-<span class="normal">1768</span>
-<span class="normal">1769</span>
-<span class="normal">1770</span>
-<span class="normal">1771</span>
-<span class="normal">1772</span>
-<span class="normal">1773</span>
-<span class="normal">1774</span>
-<span class="normal">1775</span>
-<span class="normal">1776</span>
-<span class="normal">1777</span>
-<span class="normal">1778</span>
-<span class="normal">1779</span>
-<span class="normal">1780</span>
-<span class="normal">1781</span>
-<span class="normal">1782</span>
-<span class="normal">1783</span>
-<span class="normal">1784</span>
-<span class="normal">1785</span>
-<span class="normal">1786</span>
-<span class="normal">1787</span>
-<span class="normal">1788</span>
-<span class="normal">1789</span>
-<span class="normal">1790</span>
-<span class="normal">1791</span>
-<span class="normal">1792</span>
-<span class="normal">1793</span>
-<span class="normal">1794</span>
-<span class="normal">1795</span>
-<span class="normal">1796</span>
-<span class="normal">1797</span>
-<span class="normal">1798</span>
-<span class="normal">1799</span>
-<span class="normal">1800</span>
-<span class="normal">1801</span>
-<span class="normal">1802</span>
-<span class="normal">1803</span>
-<span class="normal">1804</span>
-<span class="normal">1805</span>
-<span class="normal">1806</span>
-<span class="normal">1807</span>
-<span class="normal">1808</span>
-<span class="normal">1809</span>
-<span class="normal">1810</span>
-<span class="normal">1811</span>
-<span class="normal">1812</span>
-<span class="normal">1813</span>
-<span class="normal">1814</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1814</span>
 <span class="normal">1815</span>
 <span class="normal">1816</span>
 <span class="normal">1817</span>
@@ -16662,7 +16768,122 @@ NaN/Inf before a call.</p>
 <span class="normal">2467</span>
 <span class="normal">2468</span>
 <span class="normal">2469</span>
-<span class="normal">2470</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">condensation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">2470</span>
+<span class="normal">2471</span>
+<span class="normal">2472</span>
+<span class="normal">2473</span>
+<span class="normal">2474</span>
+<span class="normal">2475</span>
+<span class="normal">2476</span>
+<span class="normal">2477</span>
+<span class="normal">2478</span>
+<span class="normal">2479</span>
+<span class="normal">2480</span>
+<span class="normal">2481</span>
+<span class="normal">2482</span>
+<span class="normal">2483</span>
+<span class="normal">2484</span>
+<span class="normal">2485</span>
+<span class="normal">2486</span>
+<span class="normal">2487</span>
+<span class="normal">2488</span>
+<span class="normal">2489</span>
+<span class="normal">2490</span>
+<span class="normal">2491</span>
+<span class="normal">2492</span>
+<span class="normal">2493</span>
+<span class="normal">2494</span>
+<span class="normal">2495</span>
+<span class="normal">2496</span>
+<span class="normal">2497</span>
+<span class="normal">2498</span>
+<span class="normal">2499</span>
+<span class="normal">2500</span>
+<span class="normal">2501</span>
+<span class="normal">2502</span>
+<span class="normal">2503</span>
+<span class="normal">2504</span>
+<span class="normal">2505</span>
+<span class="normal">2506</span>
+<span class="normal">2507</span>
+<span class="normal">2508</span>
+<span class="normal">2509</span>
+<span class="normal">2510</span>
+<span class="normal">2511</span>
+<span class="normal">2512</span>
+<span class="normal">2513</span>
+<span class="normal">2514</span>
+<span class="normal">2515</span>
+<span class="normal">2516</span>
+<span class="normal">2517</span>
+<span class="normal">2518</span>
+<span class="normal">2519</span>
+<span class="normal">2520</span>
+<span class="normal">2521</span>
+<span class="normal">2522</span>
+<span class="normal">2523</span>
+<span class="normal">2524</span>
+<span class="normal">2525</span>
+<span class="normal">2526</span>
+<span class="normal">2527</span>
+<span class="normal">2528</span>
+<span class="normal">2529</span>
+<span class="normal">2530</span>
+<span class="normal">2531</span>
+<span class="normal">2532</span>
+<span class="normal">2533</span>
+<span class="normal">2534</span>
+<span class="normal">2535</span>
+<span class="normal">2536</span>
+<span class="normal">2537</span>
+<span class="normal">2538</span>
+<span class="normal">2539</span>
+<span class="normal">2540</span>
+<span class="normal">2541</span>
+<span class="normal">2542</span>
+<span class="normal">2543</span>
+<span class="normal">2544</span>
+<span class="normal">2545</span>
+<span class="normal">2546</span>
+<span class="normal">2547</span>
+<span class="normal">2548</span>
+<span class="normal">2549</span>
+<span class="normal">2550</span>
+<span class="normal">2551</span>
+<span class="normal">2552</span>
+<span class="normal">2553</span>
+<span class="normal">2554</span>
+<span class="normal">2555</span>
+<span class="normal">2556</span>
+<span class="normal">2557</span>
+<span class="normal">2558</span>
+<span class="normal">2559</span>
+<span class="normal">2560</span>
+<span class="normal">2561</span>
+<span class="normal">2562</span>
+<span class="normal">2563</span>
+<span class="normal">2564</span>
+<span class="normal">2565</span>
+<span class="normal">2566</span>
+<span class="normal">2567</span>
+<span class="normal">2568</span>
+<span class="normal">2569</span>
+<span class="normal">2570</span>
+<span class="normal">2571</span>
+<span class="normal">2572</span>
+<span class="normal">2573</span>
+<span class="normal">2574</span>
+<span class="normal">2575</span>
+<span class="normal">2576</span>
+<span class="normal">2577</span>
+<span class="normal">2578</span>
+<span class="normal">2579</span>
+<span class="normal">2580</span>
+<span class="normal">2581</span>
+<span class="normal">2582</span>
+<span class="normal">2583</span>
+<span class="normal">2584</span>
+<span class="normal">2585</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">condensation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -17001,21 +17222,30 @@ NaN/Inf before a call.</p>
             <span class="p">),</span>
         <span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">environment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">validate_environment_inputs</span><span class="p">(</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span>
+            <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
+            <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="n">_validate_partitioning_values</span><span class="p">(</span>
         <span class="n">gas</span><span class="o">.</span><span class="n">partitioning</span><span class="p">,</span>
         <span class="n">n_boxes</span><span class="p">,</span>
         <span class="n">n_species</span><span class="p">,</span>
         <span class="n">device</span><span class="p">,</span>
     <span class="p">)</span>
-
-    <span class="n">validate_environment_inputs</span><span class="p">(</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-        <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span>
-        <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
-        <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-        <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">environment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">validate_environment_inputs</span><span class="p">(</span>
+            <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+            <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span>
+            <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
+            <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">caller_name</span><span class="o">=</span><span class="s2">&quot;condensation_step_gpu&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="c1"># P2 primary state and caller-owned sidecars validate before environment</span>
     <span class="c1"># normalization or fallback allocation, so invalid state is fully atomic.</span>
     <span class="n">_validate_p2_primary_state</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">gas</span><span class="p">,</span> <span class="n">expected_shape</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>

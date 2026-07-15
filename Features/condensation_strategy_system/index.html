@@ -11678,6 +11678,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Low-level Warp GPU condensation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#p1-p4-direct-condensation-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1--P4 direct-condensation evidence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -15041,6 +15058,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Low-level Warp GPU condensation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#p1-p4-direct-condensation-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1--P4 direct-condensation evidence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -15334,10 +15368,11 @@ bookkeeping path. This baseline is CPU-only and diagnostic/reference only.</p>
 optional per-species latent-rate correction in each of its four equal
 substeps, with CPU-oracle/Warp parity coverage. Omitting <code>latent_heat</code>, or
 using a zero entry for a species, retains that species' isothermal rate path.
-This is diagnostic bookkeeping, not temperature feedback, gas mutation or
-gas/full-system conservation. It does not provide strategy/runnable-level
-latent-heat support; the separate <code>energy_transfer</code> diagnostic is described
-below.</p>
+This is diagnostic bookkeeping, not temperature feedback or strategy/runnable
+thermal coupling. The direct path mutates gas concentration and its P2
+finalization conserves particle-plus-gas inventory per box and species. It does
+not provide strategy/runnable-level latent-heat support; the separate
+<code>energy_transfer</code> diagnostic is described below.</p>
 <h3 id="condensationisothermalstaggered-two-pass-gauss-seidel">CondensationIsothermalStaggered (two-pass Gauss-Seidel)<a class="headerlink" href="#condensationisothermalstaggered-two-pass-gauss-seidel" title="Permanent link">&para;</a></h3>
 <p><code>CondensationIsothermalStaggered</code> splits each timestep into two passes. Theta
 controls the first-pass fraction; batches are clipped to the particle count and
@@ -15816,16 +15851,61 @@ finalized <code>Delta m</code> is kg, <code>L</code> is J/kg, and <code>Q</code>
 positive and evaporation negative. The #1272 diagnostic uses strict
 <code>rtol=1e-12, atol=1e-18</code> evidence. <code>thermal_work</code> is validated but remains
 deferred and unused.</p>
-<p>This is diagnostic bookkeeping, not temperature feedback. The direct step
-couples finalized particle and gas transfer, but does not add strategy/
+<p>This is diagnostic bookkeeping, not temperature feedback, gas mutation or
+gas/full-system conservation. The direct step couples finalized particle and
+gas transfer through its stated P2-finalized direct coupling, but does not add strategy/
 <code>Runnable</code> integration, adaptive stepping, graph capture/replay, autodiff
-guarantees, or complete E4-F6 cross-device certification. For focused coverage,
-run:</p>
+guarantees, or complete E4-F6 cross-device certification.</p>
+<h4 id="p1-p4-direct-condensation-evidence">P1--P4 direct-condensation evidence<a class="headerlink" href="#p1-p4-direct-condensation-evidence" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Discoverable wrapper</th>
+<th>Bounded result and backend</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1 parity</td>
+<td><code>particula/gpu/kernels/tests/condensation_test.py</code></td>
+<td>An independent NumPy fixed-four-substep oracle separately compares final particle masses and gas concentrations for one/multi-box and multi-species cases. Warp CPU is the normal backend when Warp is installed; CUDA is optional additive evidence.</td>
+</tr>
+<tr>
+<td>P2 conservation and contracts</td>
+<td><code>particula/gpu/kernels/tests/condensation_test.py</code></td>
+<td>Separate concentration-weighted particle-plus-gas inventory checks use <code>rtol=1e-12</code>, distinct from P1 parity. The wrapper also covers in-place mutation and caller-owned output contracts.</td>
+</tr>
+<tr>
+<td>P3 capture limit</td>
+<td><code>particula/gpu/kernels/tests/condensation_graph_capture_test.py</code></td>
+<td>Warp CPU capture is capability-skipped because Warp capture requires CUDA. On CUDA, only the public-step host-validation readback inside capture is strict-xfailed; setup and normal calls must still pass. This records an unsupported capability, not replay support.</td>
+</tr>
+<tr>
+<td>P4 raw-rate autodiff</td>
+<td><code>particula/gpu/kernels/tests/condensation_autodiff_test.py</code></td>
+<td>A one-box fp64 out-of-place <code>condensation_mass_transfer_kernel</code> Tape derivative is compared with centered finite differences only in the interior, where P2 positivity and inventory boundaries are inactive. Warp CPU is the normal backend; CUDA is optional.</td>
+</tr>
+</tbody>
+</table>
+<p>This matrix is evidence for <code>condensation_step_gpu</code> (P1--P3) or the raw
+<code>condensation_mass_transfer_kernel</code> (P4) only. It establishes no CPU strategy
+or <code>Runnable</code> equivalence, performance target, adaptive stepping, new API,
+general graph replay, or general differentiability claim. For focused,
+warning-clean coverage, run:</p>
 <div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_graph_capture_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_autodiff_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+
+<span class="c1"># Optional CUDA selections; unavailable CUDA must skip cleanly.</span>
 pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_graph_capture_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_autodiff_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
 </code></pre></div>
 <p>Warp-backed tests may skip when Warp is missing. CUDA evidence is optional when
-CUDA is unavailable; a skip is not GPU execution.</p>
+CUDA is unavailable; a skip is not GPU execution. P3's CPU skip and narrowly
+scoped CUDA strict expected failure document the public-step host-readback
+limitation rather than a successful capture replay.</p>
 <h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Staggered solver is Gauss-Seidel only; other solvers are not exposed.</li>

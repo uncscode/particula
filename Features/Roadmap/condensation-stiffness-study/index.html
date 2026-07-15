@@ -11624,6 +11624,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#p1-p4-production-hook-evidence-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1--P4 production-hook evidence boundary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#alternatives-considered-but-not-selected" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14509,6 +14520,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#p1-p4-production-hook-evidence-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1--P4 production-hook evidence boundary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#alternatives-considered-but-not-selected" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14853,6 +14875,57 @@ P2-finalized transfer, and keeps production calculations device resident.</p>
 <li>This shipped behavior does not establish graph capture/replay or autodiff
   readiness.</li>
 </ul>
+<h3 id="p1-p4-production-hook-evidence-boundary">P1--P4 production-hook evidence boundary<a class="headerlink" href="#p1-p4-production-hook-evidence-boundary" title="Permanent link">&para;</a></h3>
+<p>The historical candidate comparisons above used case-specific <code>5e-2</code> agreement
+thresholds. They are distinct from current production-hook evidence:</p>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Wrapper</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1</td>
+<td><code>particula/gpu/kernels/tests/condensation_test.py</code></td>
+<td>Independent NumPy-oracle parity for final particle mass and gas concentration, including one/multi-box and multi-species fixtures.</td>
+</tr>
+<tr>
+<td>P2</td>
+<td><code>particula/gpu/kernels/tests/condensation_test.py</code></td>
+<td>Separate strict concentration-weighted particle-plus-gas conservation at <code>rtol=1e-12</code>, plus mutation and output-buffer contracts.</td>
+</tr>
+<tr>
+<td>P3</td>
+<td><code>particula/gpu/kernels/tests/condensation_graph_capture_test.py</code></td>
+<td>CPU capture is capability-skipped; on CUDA, only the public-step host-validation readback during capture is strict-xfailed. Setup and normal calls remain ordinary assertions. This is a limitation, not support.</td>
+</tr>
+<tr>
+<td>P4</td>
+<td><code>particula/gpu/kernels/tests/condensation_autodiff_test.py</code></td>
+<td>Raw-rate-only, one-box fp64 interior Tape derivative evidence; P2 clamps and inventory limits remain outside the derivative claim.</td>
+</tr>
+</tbody>
+</table>
+<p>Warp CPU is the standard backend for supported P1/P2 and P4 probes when Warp is
+installed. CUDA is optional local/manual evidence. Fixed-four looping and stable
+caller-owned buffers enable deterministic evaluation, but neither supplies a
+graph-replay or general autodiff guarantee. The scope remains fp64,
+fixed-four-substep, no-temperature-feedback, no-adaptive-step direct-kernel
+behavior: it is not strategy/<code>Runnable</code> support or general CPU parity.</p>
+<p>Focused commands are:</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_stiffness_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_graph_capture_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_autodiff_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+
+<span class="c1"># Optional CUDA selections.</span>
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_graph_capture_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_autodiff_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+</code></pre></div>
 <h3 id="alternatives-considered-but-not-selected">Alternatives considered but not selected<a class="headerlink" href="#alternatives-considered-but-not-selected" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Historical single-step explicit update:</strong> retained only as a P2/P3
@@ -14897,10 +14970,10 @@ and final support work.</p>
 <li>generalized stable timestep limits</li>
 <li>general CPU-strategy parity or accuracy claims beyond the documented direct
   kernel cases</li>
-<li>P3/P4 temperature-feedback claims; E4-F6 independent-device,
-  graph-capture/replay, or autodiff
-  claims. Issue #1272's caller-owned signed <code>energy_transfer</code> diagnostic is
-  shipped bookkeeping, not temperature feedback.</li>
+<li>temperature-feedback, general graph-capture/replay, or general autodiff
+  claims. P3 records an unsupported public-step capture constraint, and P4 is
+  raw-rate-only interior evidence. Issue #1272's caller-owned signed
+  <code>energy_transfer</code> diagnostic is shipped bookkeeping, not temperature feedback.</li>
 <li>strategy/runnable-level latent-heat support</li>
 </ul>
 <p>Later phases can build on this measured baseline and recommendation without

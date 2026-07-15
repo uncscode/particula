@@ -14651,14 +14651,14 @@
   <code>CondensationLatentHeat</code> strategy with latent-heat-corrected
   <code>mass_transfer_rate()</code>/<code>rate()</code> plus a <code>step()</code> that tracks per-step
   latent heat diagnostics. The bounded, low-level direct GPU condensation
-  path optionally applies a latent-rate correction during each of its four
-  equal substeps, with CPU-oracle/Warp parity coverage. Omitted latent heat,
-   or a zero per-species value, retains that species' isothermal rate path.
-   The direct hook couples each P2-finalized particle transfer to gas using
-   particle concentration and has deterministic fp64, two-box CPU-oracle
-   parity and per-box/per-species inventory-conservation regression coverage.
-   Broader temperature feedback, gas coupling/conservation, and
-   strategy/runnable-level support remain deferred.</li>
+   path optionally applies a latent-rate correction during each of its four
+   equal substeps, with deterministic fp64 CPU-oracle/Warp parity coverage.
+   Omitted latent heat, or a zero per-species value, retains that species' isothermal rate path. The direct hook couples each P2-finalized particle transfer to gas
+   using particle concentration and has separate particle-mass, gas-
+   concentration, and per-box/per-species inventory-conservation regressions.
+    Broader temperature feedback and CPU-strategy/runnable-level support remain
+    deferred; this bounded direct-kernel behavior does not establish those
+    broader contracts.</li>
 <li><strong>Interrogating your experimental data</strong> to validate and expand your impact.</li>
 <li><strong>Fostering open-source collaboration</strong> to share ideas and build on each other’s work.</li>
 </ul>
