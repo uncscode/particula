@@ -29,6 +29,11 @@
     direct-test-only, require an already P1-gated proposal, and leave
     `condensation_step_gpu()`, `gas.concentration`, public return semantics,
     and energy handling unchanged. P3--P4 own public orchestration.
+- [x] How does the public path handle four-substep gas coupling and failure?
+  - Resolved 2026-07-14 by issue #1304: each successful cycle finalizes,
+    applies, accumulates, and concentration-weights the same transfer into gas;
+    later proposals read the updated gas. Aggregate preflight is atomic, but a
+    later fresh-proposal failure does not roll back earlier completed cycles.
 
 Diagnostics requested: none. These questions must not weaken the issue #1272
 production-hook and conservation gates.

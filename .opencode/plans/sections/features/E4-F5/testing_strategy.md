@@ -20,21 +20,19 @@ also verifies supplied P2 sidecar identity, unchanged gas, repeatability,
 finite/nonnegative particle mass, and atomic rejection of malformed proposals
 or P2 sidecars.
 
-Launch-spy coverage proves the successful public four-substep P1 path launches
-none of the P2 kernels and leaves sentinel P2 sidecars unchanged. P2 tests are
-Warp-CPU direct-helper tests; CUDA parity and public coupled conservation remain
-P3--P4 work.
+Issue #1304 adds Warp-CPU wrapper-exported regressions for the public path:
+small independent NumPy four-substep oracles, inventory-limited uptake and
+mixed-sign transfer, exactly four P1/P2/total/gas sequences (including zero
+time or proposal), coupled-next-proposal tracing, and empty/single-particle
+boundaries. They separately assert finalized total, particle delta, weighted
+gas delta, finite/nonnegative gas, optional energy, and supplied scratch
+identity/reuse.
 
-Conservation is asserted independently per box/species: concentration-weighted
-particle gain equals gas loss to tight bookkeeping tolerance; both inventories
-remain finite and nonnegative. Global sums are supplemental only. Exactly four
-substeps must use updated gas, and caller-owned buffers must retain identity and
-validate before mutation. Returned transfer and E4-F4 energy must use the exact
-applied transfer.
+Atomic-preflight cases cover invalid primary state, sidecar metadata, and
+ownership aliases before launch or mutation. Stale nonfinite work is accepted
+and overwritten; a nonfinite fresh proposal fails before P2, gas, total,
+particle, or energy mutation for that cycle. A later-cycle proposal failure is
+explicitly partial: earlier completed cycles are retained, not rolled back.
 
-The issue #1272 production hook and regression in
-`particula/integration_tests/condensation_particle_resolved_test.py` land in the
-same phase. Warp CPU is required when Warp is installed; CUDA runs the same
-checks when available and otherwise skips cleanly. Physics parity tolerances are
-reported separately from stricter conservation tolerances. Tests must detect
-hidden host conversion/synchronization and preserve the public API contract.
+Warp CPU is the required focused evidence; optional CUDA coverage skips cleanly
+when unavailable. P4 retains the integration production-hook/CPU-parity gate.

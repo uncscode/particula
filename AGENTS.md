@@ -302,14 +302,15 @@ restored = from_warp_environment_data(gpu_environment)
   `thermodynamics=ThermodynamicsConfig`. Each successful call executes exactly
   four equal `time_step / 4.0` substeps. In each substep, it optionally refreshes
   composition-weighted surface tension, overwrites caller-owned
-  `WarpGasData.vapor_pressure` from normalized current per-box temperature,
-  refreshes environment properties, produces a raw proposal, then applies its
-  mass-clamped transfer. Vapor pressure is derived step state, not a
-  caller-supplied physics source.
+   `WarpGasData.vapor_pressure` from normalized current per-box temperature,
+   refreshes environment properties, produces a raw proposal, then applies its
+   P2-finalized, inventory-limited transfer. Vapor pressure is derived step
+   state, not a caller-supplied physics source.
 - The total-transfer buffer is cleared once after preflight, accumulates applied
-  clamped transfers, and is returned by identity when supplied. Work storage
-  retains only the final raw proposal. Particle masses mutate in place while
-  `gas.concentration` remains unchanged.
+  P2-finalized transfers, and is returned by identity when supplied. Work
+  storage retains only the final raw proposal. Particle masses mutate in place,
+  and each finalized transfer applies the matching particle-concentration-
+  weighted delta to `gas.concentration`.
 - Supplied `CondensationScratchBuffers` fields must be active-device,
   stable-shape `wp.float64`: transfer fields use
   `(n_boxes, n_particles, n_species)` and property fields use `(n_boxes,)`.
@@ -317,14 +318,17 @@ restored = from_warp_environment_data(gpu_environment)
 - An optional active-device `wp.float64` `latent_heat` sidecar shaped
   `(n_species,)` applies a per-substep rate correction. Omitting it, or using
   a zero entry for a species, preserves that species' isothermal rate path. An
-  optional caller-owned active-device `wp.float64` `energy_transfer` output
-  shaped `(n_boxes, n_species)` requires `latent_heat`; after successful
-  preflight it records signed whole-call, mass-clamped transfer times latent
-  heat and is not returned as a third tuple item. `thermal_work` has validated
-  per-species shape `(n_species,)` but remains deferred, unused state.
-- This direct particle-only step does not establish CPU-strategy parity, a
-  `Runnable` API, adaptive stepping, gas coupling/conservation, graph
-  capture/replay, autodiff, or general accuracy claims. See
+   optional caller-owned active-device `wp.float64` `energy_transfer` output
+   shaped `(n_boxes, n_species)` requires `latent_heat`; after successful
+   preflight it records signed whole-call P2-finalized transfer times latent
+   heat and is not returned as a third tuple item. `thermal_work` has
+   validated per-species shape `(n_species,)` but remains deferred, unused
+   state.
+- This direct kernel step does not establish CPU-strategy parity, a `Runnable`
+  API, adaptive stepping, graph capture/replay, autodiff, or general accuracy
+  claims. It executes exactly four equal substeps; vapor-pressure refresh does
+  not read gas concentration, while each later mass-transfer proposal reads
+  gas concentration coupled by its predecessors. See
   `docs/Features/condensation_strategy_system.md` and
   `docs/Features/Roadmap/condensation-stiffness-study.md` for its bounded
   contract and case-specific evidence.

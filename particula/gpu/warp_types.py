@@ -101,18 +101,21 @@ class WarpGasData:
           ``(n_boxes, n_species)`` int32 mask rather than a CPU bool vector.
           Its values must remain binary (1 = True, 0 = False). The public
           condensation step gates raw proposals with this mask; its private P2
-          inventory finalizer instead requires an already gated proposal. CPU
-          restore additionally requires every box to have the same mask because
-          ``GasData`` owns one shared species mask.
+          inventory finalizer instead requires an already gated proposal. The
+          public step applies finalized transfer to particle mass and couples
+          its concentration-weighted opposite to ``concentration`` after every
+          substep. CPU restore additionally requires every box to have the same
+          mask because ``GasData`` owns one shared species mask.
         - ``vapor_pressure`` is GPU-only helper state for condensation-style
           kernels and is not part of CPU ``GasData`` ownership.
           ``to_warp_gas_data()`` accepts caller-supplied values with shape
           ``(n_boxes, n_species)`` or allocates zeros when omitted. Those
           zeros keep the Warp schema valid but do not provide physical
           vapor-pressure inputs for kernels that consume the field directly.
-          ``condensation_step_gpu()`` refreshes the field from its
-          thermodynamic configuration before transfer. CPU restore helpers drop
-          this field intentionally from restored ``GasData``, while the
+          ``condensation_step_gpu()`` refreshes the field from its thermodynamic
+          configuration before every transfer proposal; that refresh does not
+          consume gas concentration. CPU restore helpers drop this field
+          intentionally from restored ``GasData``, while the
           retained GPU container can still expose it until the caller discards
           that object.
 
@@ -121,7 +124,9 @@ class WarpGasData:
             Shape: (n_species,)
             Shared across all boxes - not batched.
         concentration: Mass concentrations in kg/m^3.
-            Shape: (n_boxes, n_species)
+            Shape: (n_boxes, n_species). The public condensation step updates
+            this field after each P2-finalized substep transfer; it supplies
+            inventory for subsequent transfer proposals.
         vapor_pressure: Vapor pressures in Pa.
             Shape: (n_boxes, n_species)
             GPU-only helper state for condensation kernels.

@@ -85,8 +85,16 @@ an active-device, binary `wp.int32` mask shaped `(n_boxes, n_species)`.
 Disabled species and zero-concentration particle slots receive no transfer.
 Invalid masks, and invalid optional P2-only reduction/scale/accumulator scratch
 sidecars, raise `ValueError` without changing caller-owned state. The P2-only
-sidecars are validated but otherwise untouched, and this low-level
-particle-only path never updates `gas.concentration`.
+sidecars finalize inventory-limited transfers during each substep. The direct
+kernel updates particle masses and applies the matching particle-concentration-
+weighted delta to `gas.concentration` after each finalized transfer.
+
+Each successful direct condensation call executes exactly four equal
+`time_step / 4.0` substeps. A supplied scratch work buffer retains the final
+raw P1 proposal, while the returned total (and optional energy diagnostic) use
+the P2-finalized transfers accumulated over the whole call. Vapor-pressure
+refresh depends on temperature, not gas concentration; subsequent
+mass-transfer proposals read the gas concentration coupled by prior substeps.
 
 The direct condensation kernel also accepts optional keyword-only,
 active-device `wp.float64` sidecars: `latent_heat`, shaped `(n_species,)`, and
@@ -94,9 +102,9 @@ the caller-owned write-only `energy_transfer`, shaped `(n_boxes, n_species)`.
 Nonzero latent heat applies the per-species rate correction during each of the
 four fixed substeps; omitting it, or setting a species entry to zero, preserves
 that species' isothermal rate path. `energy_transfer` requires `latent_heat`
-and is overwritten after successful preflight with signed, mass-clamped applied
-transfer times latent heat. It remains caller-owned rather than becoming a
-third return item. See the
+and is overwritten after successful preflight with signed, whole-call
+P2-finalized transfer times latent heat. It remains caller-owned rather than
+becoming a third return item. See the
 [Data Containers and GPU Foundations guide](./docs/Features/data-containers-and-gpu-foundations.md)
 for ownership, units, and direct-step limits.
 

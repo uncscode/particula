@@ -1,5 +1,17 @@
 # Change Log
 
+## 2026-07-14 — E4-F5-P3 shipped (issue #1304)
+- Completed public four-fixed-substep P1/P2 orchestration in
+  `particula/gpu/kernels/condensation.py`: finalized transfer is applied once,
+  accumulated into the returned total, and coupled deterministically to gas.
+- Added aggregate atomic preflight and one-per-call scratch resolution, plus
+  finalized energy accounting while retaining API, exports, return arity, and
+  caller-buffer identity.
+- Added focused Warp wrapper/support regression coverage for oracle coupling,
+  sequence/order, boundaries, ownership/metadata atomicity, fresh-proposal
+  failures, and scratch reuse. Later-cycle fresh-proposal failure intentionally
+  retains already completed substeps; it is not whole-call rollback.
+
 ## 2026-07-14 — E4-F5-P2 shipped (issue #1303)
 - Added private, direct-test-only fp64 inventory finalization for already
   P1-gated transfer proposals: owned-mass evaporation bounds, deterministic

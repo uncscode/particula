@@ -33,12 +33,12 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
   latent-heat energy-density bookkeeping, and the
   `CondensationLatentHeat` strategy with latent-heat-corrected
   `mass_transfer_rate()`/`rate()` plus a `step()` that tracks per-step
-   latent heat diagnostics. The bounded, low-level direct GPU condensation
-   path optionally applies a latent-rate correction during each of its four
-   equal substeps, with CPU-oracle/Warp parity coverage. Omitted latent heat,
-   or a zero per-species value, retains that species' isothermal rate path.
-    Broader temperature feedback, gas coupling/conservation, and
-    strategy/runnable-level support remain deferred.
+  latent heat diagnostics. The bounded, low-level direct GPU condensation
+  path optionally applies a latent-rate correction during each of its four
+  equal substeps, with CPU-oracle/Warp parity coverage. Omitted latent heat,
+  or a zero per-species value, retains that species' isothermal rate path.
+  Broader temperature feedback and strategy/runnable-level support remain
+  deferred.
 - **Interrogating your experimental data** to validate and expand your impact.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
 
@@ -168,15 +168,16 @@ print(result)
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
   explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
-   current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
-   such as coagulation `rng_states` and condensation thermodynamics. GPU
-   condensation requires keyword-only `thermodynamics=ThermodynamicsConfig`,
-   validates an active-device binary per-box/species `gas.partitioning` mask
-   before mutation, and retains its bounded particle-only contract: disabled
-   species and zero-concentration particle slots receive no transfer, while
-   `gas.concentration` remains unchanged. It optionally accepts `latent_heat`
-   rate correction and its write-only signed
-   `energy_transfer` diagnostic, and refreshes caller-owned
+  current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
+  such as coagulation `rng_states` and condensation thermodynamics. GPU
+  condensation requires keyword-only `thermodynamics=ThermodynamicsConfig`,
+  validates an active-device binary per-box/species `gas.partitioning` mask
+  before mutation, and runs exactly four equal substeps. Disabled species and
+  zero-concentration particle slots receive no transfer. Each finalized
+  transfer updates particle mass and applies the matching weighted delta to
+  `gas.concentration`, so later substeps read coupled gas inventory. It
+  optionally accepts `latent_heat` rate correction and its write-only signed
+  `energy_transfer` diagnostic, and refreshes caller-owned
   `WarpGasData.vapor_pressure` from the current device-resident temperature
   before mass transfer. For a runnable direct-kernel walkthrough, use
   `python docs/Examples/gpu_direct_kernels_quick_start.py`.

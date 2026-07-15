@@ -299,10 +299,14 @@ transfers.
 
 On every successful condensation call, the step validates all inputs and
 optional buffers first. It then casts a non-`wp.float64` direct or environment
-temperature array into a device-local float64 buffer when needed, overwrites
-`vapor_pressure`, prepares environment properties, and transfers mass. A
-failed preflight leaves the vapor-pressure output buffer unchanged. Import the
-standalone `refresh_vapor_pressure_gpu` only from
+temperature array into a device-local float64 buffer when needed and performs
+exactly four equal `time_step / 4.0` substeps. Each substep overwrites
+`vapor_pressure`, prepares environment properties, makes a raw proposal,
+finalizes it against inventory, applies it to particles, accumulates it, and
+couples the matching concentration-weighted transfer to gas. Later proposals
+read that coupled gas concentration; vapor-pressure refresh does not. A failed
+aggregate preflight leaves the vapor-pressure output buffer unchanged. Import
+the standalone `refresh_vapor_pressure_gpu` only from
 `particula.gpu.kernels.thermodynamics`, never `particula.gpu.kernels`.
 
 ### Condensation activity and surface sidecars
@@ -322,18 +326,19 @@ ordered-molar-mass compatibility contract. The frozen dataclass prevents field
 rebinding, not mutation of its arrays. Callers retain those arrays and must not
 mutate them concurrently with a launch.
 
-Successful direct calls mutate particle masses in place, overwrite the derived
-GPU-only vapor-pressure buffer, and return accumulated **applied, mass-clamped**
-transfer. The caller-visible final work proposal is gated after proposal
-generation: disabled `(box, species)` entries in the per-box
+Successful direct calls mutate particle masses and gas concentration in place,
+overwrite the derived GPU-only vapor-pressure buffer, and return accumulated
+**P2-finalized, inventory-limited** transfer. The caller-visible final work
+proposal is gated after proposal generation: disabled `(box, species)` entries in the per-box
 `(n_boxes, n_species)` partitioning mask and inactive particle slots are zeroed
-before application or reductions. CPU↔Warp conversion expands the CPU shared
+before P2 finalization or reductions. CPU↔Warp conversion expands the CPU shared
 species mask to this per-box layout, and restore requires the exact layout.
-P1 reduction, scale, and accumulator sidecars are metadata-validated only:
-they are not read, written, cleared, or allocated. The direct step does **not**
-couple or update gas concentration. Validation is atomic:
-unsupported sidecars fail with `ValueError` before mutation. Unsupported
-activity or surface strategies are not silently copied or approximated; passing
+P2 demand, release, scale, and accumulator sidecars are validated and used for
+finalization; aggregate invalid state, metadata, or ownership fails with
+`ValueError` before launches or caller mutation. A later failure caused by a
+fresh raw proposal does not roll back completed substeps, although it occurs
+before P2 mutation in its failing substep. Unsupported activity or surface
+strategies are not silently copied or approximated; passing
 `activity_surface=None` retains legacy unit activity and static tension.
 
 The direct condensation parity suite exercises all four activity/surface pairs
@@ -342,10 +347,10 @@ kappa/composition-weighted) against an independent NumPy `float64` reference.
 It uses deterministic one-box and multi-box inputs, including pure and mixed
 particle compositions, a clamp-to-zero evaporation case, and constant plus
 both Buck vapor-pressure branches. Parity checks cover raw transfer, final
-particle mass, refreshed vapor pressure, and unchanged gas concentration;
-tighter ownership invariants separately verify
-`final_mass == maximum(initial_mass + raw_transfer, 0)`. They do not claim
-particle-plus-gas conservation for this uncoupled direct step.
+particle mass, refreshed vapor pressure, finalized totals, and coupled gas
+concentration. Tighter conservation checks separately verify the weighted
+particle transfer equals the opposing gas change. These checks remain a bounded
+direct-step contract, not a general CPU-strategy parity claim.
 
 ### Latent-rate correction and energy diagnostic
 
@@ -371,9 +376,10 @@ condensation is positive and evaporation is negative. The strict #1272
 energy-regression tolerance is `rtol=1e-12, atol=1e-18`.
 
 `thermal_work` has the same validated sidecar shape but remains deferred and
-unused. This diagnostic does not evolve temperature, mutate gas concentration,
-establish gas/full-system conservation, or add a `Runnable`, adaptive
-substeps, graph capture/replay, autodiff, or E4-F6 cross-device certification.
+unused. This diagnostic does not evolve temperature or add a `Runnable`,
+adaptive substeps, graph capture/replay, autodiff, or E4-F6 cross-device
+certification. It uses the whole-call finalized transfer, including the direct
+step's coupled gas mutation.
 
 Use `to_warp_*` and `from_warp_*` as the sole CPU↔Warp boundary. There is no
 hidden transfer and no high-level `Aerosol` or `Runnable` GPU path. Deterministic
