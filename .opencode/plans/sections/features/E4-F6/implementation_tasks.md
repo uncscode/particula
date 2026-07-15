@@ -29,15 +29,20 @@
 
 ## Graph and Autodiff Readiness
 
-- [ ] In `particula/gpu/kernels/tests/condensation_test.py` or a new discoverable
-  `condensation_graph_test.py`, construct complete E4-F3 caller-owned scratch
-  and fixed fp64 inputs before entering capture; do not allocate or transfer
-  inside the captured region.
-- [ ] Capture and replay the public `condensation_step_gpu()` four-substep path,
-  then compare normal-launch and replay particle, gas, transfer, and energy
-  outputs with separate parity and conservation assertions.
-- [ ] Assert stable identity, shape, dtype, and active-device placement for every
-  supplied scratch sidecar across repeated normal and replay calls.
+- [x] In the discoverable
+  `particula/gpu/kernels/tests/condensation_graph_capture_test.py`, construct
+  complete E4-F3 caller-owned scratch and fp64 inputs before capture; the
+  captured callable contains only the already-created public step call.
+- [x] Capture and replay the public `condensation_step_gpu()` four-substep path
+  twice with device-to-device resets, then compare each replay to an independent
+  normal launch for particle, gas, transfer, and energy with separate parity
+  and conservation assertions.
+- [x] Assert stable identity, canonical shape, `wp.float64` dtype, and active
+  device placement for every supplied scratch sidecar and energy output before
+  and after capture and replays.
+- [x] Exercise capture readiness on Warp CPU and optional CUDA; unsupported
+  capture APIs/capabilities skip with device and operation context, while
+  normal-launch and post-launch correctness failures propagate.
 - [ ] Add a deterministic, out-of-place smooth-interior tape/gradcheck probe in
   a focused `*_test.py` module only where Warp supports it; cap the test helper
   at a small one-box/one-species fixture rather than expanding production code.
