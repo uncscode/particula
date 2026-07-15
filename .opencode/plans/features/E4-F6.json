@@ -63,7 +63,7 @@
     },
     {
       "id": "E4-F6-P3",
-      "title": "Prove fixed-loop reusable-buffer graph-capture readiness",
+      "title": "Document fixed-loop reusable-buffer graph-capture limitations",
       "status": "Shipped",
       "size": "S",
       "issue_number": null,

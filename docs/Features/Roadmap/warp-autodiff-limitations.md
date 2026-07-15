@@ -335,7 +335,7 @@ parameters are fixed.
 
 | Process | Recommended state-gradient path |
 | --- | --- |
-| Condensation (deterministic) | Direct autodiff, no change needed |
+| Condensation (deterministic) | Bounded raw-rate autodiff evidence only; public-step differentiation unsupported |
 | Gas partitioning / rates | Direct autodiff or reparameterization |
 | Coagulation, size distribution target | Deterministic sectional Smoluchowski surrogate |
 | Coagulation, mixing-state/hygroscopicity target | Composition-resolved sectional surrogate |
