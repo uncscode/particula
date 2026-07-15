@@ -404,9 +404,11 @@ The step executes four fixed equal substeps, uses caller-owned reusable scratch
 and diagnostic buffers, P2 inventory finalization, and gas coupling for later
 proposals. Its transfer is a whole-call total; optional caller-owned energy
 output is not a third return value. This is not a high-level `Aerosol` or
-`Runnable` API, automatic fallback, hidden transfer/synchronization, adaptive
-stepping, new physics or container support, BAT, or staggered/Gauss-Seidel
-support.
+`Runnable` API, automatic fallback, or hidden simulation-state transfer.
+Callers synchronize before host observation or restoration; CUDA preflight
+validation-flag readbacks may synchronize without transferring simulation
+state. It also does not add adaptive stepping, new physics or container
+support, BAT, or staggered/Gauss-Seidel support.
 
 ## Conversion helpers
 

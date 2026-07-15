@@ -45,7 +45,8 @@ FOUNDATIONS_LIFECYCLE_SNIPPETS = (
     "**P2-finalized, inventory-limited** transfer",
     "returned by identity",
     "supplied work storage retains only the final gated raw proposal",
-    "The two-item return is `(particles, mass_transfer)`",
+    "The two-item return assignment is\n"
+    "`particles_out, mass_transfer = condensation_step_gpu(...)`",
     "overwrite the derived GPU-only vapor-pressure buffer",
     "`energy_transfer` is a caller-owned active-device\n"
     "`wp.float64`, `(n_boxes, n_species)`, write-only output",
@@ -228,15 +229,38 @@ def test_foundations_page_publishes_gpu_condensation_lifecycle_contract() -> (
 def test_foundations_page_publishes_validation_and_shipped_boundaries() -> None:
     """Foundations page preserves bounded support and rollback guardrails."""
     content = FOUNDATIONS_PATH.read_text(encoding="utf-8")
-    normalized = " ".join(content.split())
+    condensation_section = content.split(
+        "### GPU thermodynamics and condensation refresh", 1
+    )[1].split("### Condensation activity and surface sidecars", 1)[0]
+    sidecar_section = content.split(
+        "### Condensation activity and surface sidecars", 1
+    )[1].split("### Latent-rate correction and energy diagnostic", 1)[0]
+    lifecycle_section = content.split(
+        "### Latent-rate correction and energy diagnostic", 1
+    )[1].split("## Current shipped support boundaries", 1)[0]
     boundaries = content.split("## Current shipped support boundaries", 1)[
         1
     ].split("## Guidance for current users", 1)[0]
 
     for snippet in (
-        "aggregate invalid state, metadata, or ownership fails with\n`ValueError` before launches or caller mutation",
+        "aggregate invalid state, metadata, or ownership fails with\n`ValueError` before mutable physics or caller-state mutation",
+        "Preflight may run\nread-only validation kernels",
         "A later failure caused by a\nfresh raw proposal does not roll back completed substeps",
+    ):
+        assert " ".join(snippet.split()) in " ".join(sidecar_section.split())
+    for snippet in (
         "snapshot and restore particle masses, gas concentration,\nderived vapor pressure, and caller-owned output/work buffers",
+    ):
+        assert " ".join(snippet.split()) in " ".join(lifecycle_section.split())
+    for snippet in (
+        "Particle mass, transfer, and scratch transfer arrays are active-device\n`wp.float64`",
+        "gas concentration\nand energy arrays are active-device `wp.float64`",
+        "scratch property arrays are active-device `wp.float64`",
+        "latent heat and thermal work arrays are\nactive-device `wp.float64`",
+        "P2 demand, release, and scale sidecars must likewise be caller-owned,\nactive-device, stable-shape `wp.float64` arrays",
+    ):
+        assert " ".join(snippet.split()) in " ".join(sidecar_section.split())
+    for snippet in (
         'Warp `device="cpu"` is the baseline',
         "CUDA is additive local evidence",
         "unavailable devices skip cleanly",
@@ -247,7 +271,18 @@ def test_foundations_page_publishes_validation_and_shipped_boundaries() -> None:
         "BAT",
         "staggered/Gauss-Seidel support",
     ):
-        assert " ".join(snippet.split()) in normalized
+        assert " ".join(snippet.split()) in " ".join(boundaries.split())
+    assert "before launches or caller mutation" not in sidecar_section
+    assert "No hidden CPU↔GPU synchronization occurs" not in boundaries
+    assert (
+        "Callers remain responsible for synchronization before\n  host observation or restoration"
+        in boundaries
+    )
+    assert (
+        "CUDA preflight validation-flag readbacks may\n  synchronize"
+        in boundaries
+    )
+    assert "does not perform hidden\ntransfers" in condensation_section
     assert "E4-F6" not in boundaries
     assert "E4-F7" not in boundaries
     for prohibited_claim in (
@@ -273,6 +308,7 @@ def test_migration_page_links_to_canonical_gpu_condensation_contract() -> None:
         "[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md)",
         "from particula.gpu.kernels import condensation_step_gpu",
         "thermodynamics=thermodynamics",
+        "particles_out, mass_transfer = condensation_step_gpu(...,",
         "mass_transfer",
         "`to_warp_*`",
         "`from_warp_*`",
