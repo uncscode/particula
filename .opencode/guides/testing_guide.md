@@ -250,6 +250,8 @@ points are:
 
 - `particula/gpu/kernels/tests/condensation_test.py`
 - `particula/gpu/kernels/tests/condensation_stiffness_test.py`
+- `particula/gpu/kernels/tests/condensation_graph_capture_test.py`
+- `particula/gpu/kernels/tests/condensation_autodiff_test.py`
 
 ```python
 import numpy as np
@@ -292,6 +294,17 @@ per-species inventory regression coverage. Compare the change in particle
 inventory (particle mass weighted by particle concentration) plus the gas
 change against zero at `rtol=1e-12, atol=1e-30`. Keep this conservation
 assertion separate from CPU-oracle particle and gas parity.
+
+For direct-condensation P1--P4 coverage, keep parity, conservation, capture,
+and derivative assertions separate. Warp CPU is the baseline for supported P1
+parity/P2 conservation and bounded P4 raw-rate autodiff probes when Warp is
+installed; CUDA is optional local/manual evidence. P3 is the exception: CPU
+graph capture is capability-skipped, and CUDA public-step replay is a strict
+expected failure because host validation readbacks are not capture-safe. These
+precise guarded skips/xfails document an unsupported capture capability, not a
+CPU-baseline or replay-support claim. The P4 wrapper covers only an interior,
+out-of-place raw-rate Tape derivative; it does not relax P2 boundary or
+in-place-mutation limits.
 
 For stochastic kernels, assert bounded aggregate behavior instead of replaying
 exact accepted-collision sequences or per-seed trajectories. A seeded range can
