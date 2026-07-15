@@ -15,6 +15,44 @@ CONDENSATION_FEATURE_PATH = (
 )
 DOCS_INDEX_PATH = ROOT / "docs/index.md"
 ROADMAP_PATH = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
+FOUNDATIONS_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
+MIGRATION_PATH = ROOT / "docs/Features/particle-data-migration.md"
+FOUNDATIONS_CONFIGURATION_SNIPPETS = (
+    "from particula.gpu.kernels import condensation_step_gpu",
+    "constant `wp.int32(0)`",
+    "canonical Buck `wp.int32(1)`",
+    "Activity mode `0` is ideal and mode `1` is kappa",
+    "surface-tension mode `0` is static and mode `1` is composition-weighted",
+    "ordered-molar-mass compatibility contract",
+)
+FOUNDATIONS_SCHEMA_INPUT_SNIPPETS = (
+    "`(n_boxes, n_particles, n_species)`",
+    "`(n_boxes, n_species)`",
+    "`(n_boxes,)`",
+    "`(n_species,)`",
+    "each may be omitted independently",
+    "direct scalar",
+    "direct same-device Warp array",
+    "hybrid direct scalar/Warp-array inputs",
+    "`environment=`",
+    "non-`wp.float64` temperature arrays are normalized",
+)
+FOUNDATIONS_LIFECYCLE_SNIPPETS = (
+    "exactly four equal `time_step / 4.0` substeps",
+    "P2 finalizes that proposal against particle and gas inventory limits",
+    "Later proposals read the coupled gas concentration",
+    "mutate particle masses and gas concentration in place",
+    "**P2-finalized, inventory-limited** transfer",
+    "returned by identity",
+    "supplied work storage retains only the final gated raw proposal",
+    "The two-item return is `(particles, mass_transfer)`",
+    "overwrite the derived GPU-only vapor-pressure buffer",
+    "`energy_transfer` is a caller-owned active-device\n"
+    "`wp.float64`, `(n_boxes, n_species)`, write-only output",
+    "not a third return value",
+    "`thermal_work` has the same validated sidecar shape but remains deferred "
+    "and\nunused",
+)
 PUBLISHED_NOTEBOOK_RELATIVE_PATH = "Condensation/Condensation_Latent_Heat.ipynb"
 FEATURE_NOTEBOOK_RELATIVE_PATH = (
     "../Examples/Dynamics/Condensation/Condensation_Latent_Heat.ipynb"
@@ -160,3 +198,97 @@ def test_roadmap_records_bounded_direct_gpu_latent_heat_support() -> None:
         assert snippet in content
     assert "`thermal_work` remains" in content
     assert "with per-box temperature feedback through the" not in content
+
+
+def test_foundations_page_publishes_gpu_condensation_configuration_contract() -> (
+    None
+):
+    """Foundations page defines the canonical direct-step configuration contract."""
+    content = FOUNDATIONS_PATH.read_text(encoding="utf-8")
+    normalized = " ".join(content.split())
+
+    for snippet in (
+        *FOUNDATIONS_CONFIGURATION_SNIPPETS,
+        *FOUNDATIONS_SCHEMA_INPUT_SNIPPETS,
+    ):
+        assert " ".join(snippet.split()) in normalized
+
+
+def test_foundations_page_publishes_gpu_condensation_lifecycle_contract() -> (
+    None
+):
+    """Foundations page distinguishes finalized output from mutable work state."""
+    content = FOUNDATIONS_PATH.read_text(encoding="utf-8")
+    normalized = " ".join(content.split())
+
+    for snippet in FOUNDATIONS_LIFECYCLE_SNIPPETS:
+        assert " ".join(snippet.split()) in normalized
+
+
+def test_foundations_page_publishes_validation_and_shipped_boundaries() -> None:
+    """Foundations page preserves bounded support and rollback guardrails."""
+    content = FOUNDATIONS_PATH.read_text(encoding="utf-8")
+    normalized = " ".join(content.split())
+    boundaries = content.split("## Current shipped support boundaries", 1)[
+        1
+    ].split("## Guidance for current users", 1)[0]
+
+    for snippet in (
+        "aggregate invalid state, metadata, or ownership fails with\n`ValueError` before launches or caller mutation",
+        "A later failure caused by a\nfresh raw proposal does not roll back completed substeps",
+        "snapshot and restore particle masses, gas concentration,\nderived vapor pressure, and caller-owned output/work buffers",
+        'Warp `device="cpu"` is the baseline',
+        "CUDA is additive local evidence",
+        "unavailable devices skip cleanly",
+        "high-level `Aerosol`/`Runnable` path",
+        "automatic backend selection or fallback",
+        "implicit transfer or synchronization",
+        "adaptive stepping",
+        "BAT",
+        "staggered/Gauss-Seidel support",
+    ):
+        assert " ".join(snippet.split()) in normalized
+    assert "E4-F6" not in boundaries
+    assert "E4-F7" not in boundaries
+    for prohibited_claim in (
+        "supports a high-level `Aerosol`/`Runnable` path",
+        "automatic backend selection or fallback is supported",
+        "implicit CPU↔GPU transfer or synchronization is supported",
+        "adaptive stepping is supported",
+        "BAT support is shipped",
+        "staggered/Gauss-Seidel support is shipped",
+    ):
+        assert prohibited_claim not in boundaries
+
+
+def test_migration_page_links_to_canonical_gpu_condensation_contract() -> None:
+    """Migration guidance summarizes, rather than forks, the GPU contract."""
+    content = MIGRATION_PATH.read_text(encoding="utf-8")
+    section = content.split(
+        "### `condensation_step_gpu` environment inputs", 1
+    )[1].split("## Conversion helpers", 1)[0]
+    normalized = " ".join(section.split())
+
+    for snippet in (
+        "[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md)",
+        "from particula.gpu.kernels import condensation_step_gpu",
+        "thermodynamics=thermodynamics",
+        "mass_transfer",
+        "`to_warp_*`",
+        "`from_warp_*`",
+        "ordered species names",
+        "synchronization and checkpoint/snapshot responsibility",
+        "`gas.concentration` mutate\nin place",
+        "positive-finite scalars",
+        "same-device Warp arrays with shape `(n_boxes,)`",
+        "hybrid scalar/Warp-array",
+        "`environment=WarpEnvironmentData`",
+        "derived, non-authoritative state",
+        "rather than duplicating that matrix here",
+    ):
+        assert " ".join(snippet.split()) in normalized
+    assert "particle_out, gas_out = condensation_step_gpu(" not in section
+    signature = section.split("The non-executable signature is", 1)[1].split(
+        "Direct temperature", 1
+    )[0]
+    assert "gas_out" not in signature

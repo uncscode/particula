@@ -377,43 +377,36 @@ do not expect kernels or runnables to move environment state for you.
 
 ### `condensation_step_gpu` environment inputs
 
-`particula.gpu.kernels.condensation_step_gpu(...)` supports the shared
-environment normalization contract used by the low-level GPU kernels.
+The bounded direct GPU condensation path is imported with
+`from particula.gpu.kernels import condensation_step_gpu`. Explicitly convert
+with `to_warp_*` before the call and restore with `from_warp_*` afterward;
+preserve ordered species names outside GPU containers. Callers also own required
+synchronization and checkpoint/snapshot responsibility. See the authoritative
+[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md)
+page for its modes and schema matrix rather than duplicating that matrix here.
 
-- Keep using scalar `temperature` and `pressure` for legacy one-box calls.
-- For multi-box or GPU-resident workflows, you may instead pass direct Warp
-  arrays with shape `(n_boxes,)`.
-- Hybrid direct calls are also accepted: one of `temperature` or `pressure`
-  may be a scalar while the other is a Warp array.
-- You may also pass `environment=WarpEnvironmentData(...)` instead of direct
-  temperature/pressure inputs.
-- `temperature` and `pressure` remain environment-owned state. Do not move them
-  into `GasData`.
+The non-executable signature is
+`particles_out, mass_transfer = condensation_step_gpu(...,
+thermodynamics=thermodynamics)`. `thermodynamics=` is required and is
+caller-owned device-local configuration. Particle masses and
+`gas.concentration` mutate in place; there is no second gas return value.
+Caller-supplied GPU vapor pressure is derived, non-authoritative state that the
+step overwrites.
 
-```python
-from particula.gpu import to_warp_environment_data
-from particula.gpu.kernels import condensation_step_gpu
+Direct temperature and pressure inputs may be positive-finite scalars,
+same-device Warp arrays with shape `(n_boxes,)`, or hybrid scalar/Warp-array
+inputs. Alternatively, pass `environment=WarpEnvironmentData` with both direct
+inputs omitted; its `(n_boxes,)` values must be positive finite and on the same
+device. Temperature and pressure remain environment-owned state, not `GasData`
+fields.
 
-# Legacy-compatible scalar call
-particle_out, gas_out = condensation_step_gpu(
-    particles=warp_particle,
-    gas=warp_gas,
-    temperature=298.15,
-    pressure=101325.0,
-    time_step=1.0,
-)
-
-# Explicit environment-owned thermodynamic state
-warp_environment = to_warp_environment_data(environment, device="cpu")
-particle_out, gas_out = condensation_step_gpu(
-    particles=warp_particle,
-    gas=warp_gas,
-    temperature=None,
-    pressure=None,
-    environment=warp_environment,
-    time_step=1.0,
-)
-```
+The step executes four fixed equal substeps, uses caller-owned reusable scratch
+and diagnostic buffers, P2 inventory finalization, and gas coupling for later
+proposals. Its transfer is a whole-call total; optional caller-owned energy
+output is not a third return value. This is not a high-level `Aerosol` or
+`Runnable` API, automatic fallback, hidden transfer/synchronization, adaptive
+stepping, new physics or container support, BAT, or staggered/Gauss-Seidel
+support.
 
 ## Conversion helpers
 
