@@ -25,13 +25,15 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
   - Tests: Scoped text-only command/path, heading, link, constraints, and evidence-separation assertions run without Warp/CUDA imports; published focused suites retain `-Werror` where advertised.
 
 - [x] **E4-F7-P4:** Update development documentation and roadmap status
-  - Issue: #1317 | Size: XS | Status: Completed
+  - Issue: #1317 | Size: XS | Status: Completed | Commit: `52a5b35d5`
   - Completed: 2026-07-15
   - Delivered: Added distinct canonical-contract discovery links in the gallery
     and README, published `Shipped | E4` after evidence verification, and added
     text-only link, boundary, and roadmap-status guards.
-  - Prerequisites verified: E4-F1 through E4-F6 `phase_details.md` records;
-    E4-F7-P1 #1314, P2 #1315, and P3 #1316 records in this section.
+  - Prerequisites verified: completed records in
+    `.opencode/plans/sections/features/E4-F1/phase_details.md` through
+    `.opencode/plans/sections/features/E4-F6/phase_details.md`, plus the
+    E4-F7-P1 #1314, P2 #1315, and P3 #1316 entries in this section.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Examples/index.md`, `readme.md`,
     `particula/tests/condensation_latent_heat_docs_test.py`, and E4-F7 plan
