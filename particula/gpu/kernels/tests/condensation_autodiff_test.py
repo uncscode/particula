@@ -36,6 +36,11 @@ def _require_autodiff_capabilities(runtime: Any, device: str) -> None:
             f"{device}: wp.Tape is unavailable for the bounded out-of-place "
             "raw-rate probe"
         )
+    if hasattr(wp.config, "enable_backward") and not wp.config.enable_backward:
+        pytest.skip(
+            f"{device}: Warp backward autograd is disabled for the bounded "
+            "out-of-place raw-rate probe"
+        )
     if not hasattr(wp.config, "verify_autograd_array_access"):
         pytest.skip(
             f"{device}: verify_autograd_array_access is unavailable for the "
@@ -69,9 +74,24 @@ def _make_smooth_rate_case(
         """Allocate an active-device fp64 fixture array."""
         return wp.array(values, dtype=wp.float64, device=device, **kwargs)
 
+    mass_transfer_kwargs: dict[str, Any] = {
+        "dtype": wp.float64,
+        "device": device,
+    }
+    if requires_grad:
+        mass_transfer_kwargs["requires_grad"] = True
+        mass_transfer_kwargs["retain_grad"] = True
+    loss_kwargs: dict[str, Any] = {
+        "dtype": wp.float64,
+        "device": device,
+    }
+    if requires_grad:
+        loss_kwargs["requires_grad"] = True
+        loss_kwargs["retain_grad"] = True
+
     return {
         "masses": array([[[1.0e-15]]]),
-        "concentration": array([[1.0e6]]),
+        "concentration": array([[1.0e2]]),
         "density": array([1000.0]),
         "gas_concentration": array(
             [[gas_concentration]], requires_grad=requires_grad
@@ -90,10 +110,9 @@ def _make_smooth_rate_case(
         "temperature": array([298.15]),
         "mass_transfer": wp.zeros(
             (1, 1, 1),
-            dtype=wp.float64,
-            device=device,
-            requires_grad=requires_grad,
+            **mass_transfer_kwargs,
         ),
+        "loss": wp.zeros((1,), **loss_kwargs),
     }
 
 
@@ -155,7 +174,7 @@ def _assert_interior_margins(
 def _assert_tape_matches_centered_difference(runtime: Any, device: str) -> None:
     """Check the bounded raw-rate adjoint against a centered fp64 reference."""
     _require_autodiff_capabilities(runtime, device)
-    gas_concentration = 1.0e-6
+    gas_concentration = 1.0e-2
     base_case = _make_smooth_rate_case(runtime, device, gas_concentration)
     _assert_interior_margins(
         _launch_raw_rate(runtime, device, base_case), gas_concentration
@@ -180,18 +199,17 @@ def _assert_tape_matches_centered_difference(runtime: Any, device: str) -> None:
     with _verify_autograd_array_access(runtime):
         with runtime.wp.Tape() as tape:
             forward = _launch_raw_rate(runtime, device, tape_case)
+            runtime.wp.copy(tape_case["loss"], tape_case["mass_transfer"])
         tape.backward(
             grads={
-                tape_case["mass_transfer"]: runtime.wp.ones(
-                    (1, 1, 1),
+                tape_case["loss"]: runtime.wp.ones(
+                    (1,),
                     dtype=runtime.wp.float64,
                     device=device,
                 )
             }
         )
-    derivative = float(
-        tape.gradients[tape_case["gas_concentration"]].numpy()[0, 0]
-    )
+    derivative = float(tape_case["gas_concentration"].grad.numpy()[0, 0])
     centered_derivative = (forward_plus - forward_minus) / (
         2.0 * _FINITE_DIFFERENCE_EPSILON
     )
@@ -245,7 +263,7 @@ def test_autograd_array_access_guard_restores_previous_value_after_exception() -
         with pytest.raises(RuntimeError, match="sentinel"):
             with _verify_autograd_array_access(runtime):
                 raise RuntimeError("sentinel")
-        assert config.verify_autograd_array_access is not previous_value
+        assert config.verify_autograd_array_access is previous_value
     finally:
         config.verify_autograd_array_access = previous_value
 
