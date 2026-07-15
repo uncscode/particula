@@ -357,7 +357,7 @@ def _call_condensation(
 
 
 def _assert_graph_replay(device: str) -> None:
-    """Compare independent normal and twice-replayed captured public calls."""
+    """Retain a future replay harness without treating it as evidence today."""
     runtime = support._load_warp_runtime()
     normal = _make_graph_capture_state(runtime, device)
     captured = _make_graph_capture_state(runtime, device)
@@ -432,8 +432,8 @@ def test_graph_capture_state_builds_complete_fp64_sidecars() -> None:
 
 
 @pytest.mark.gpu_parity
-def test_condensation_graph_replay_warp_cpu() -> None:
-    """Warp CPU graph replay retains public condensation state contracts."""
+def test_condensation_graph_capture_is_unsupported_on_warp_cpu() -> None:
+    """Warp CPU explicitly skips unsupported graph capture for this public step."""
     _assert_graph_replay("cpu")
 
 

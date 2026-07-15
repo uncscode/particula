@@ -2150,21 +2150,30 @@ def condensation_step_gpu(  # noqa: C901
             ),
         )
 
+    if environment is None:
+        validate_environment_inputs(
+            temperature=temperature,
+            pressure=pressure,
+            environment=environment,
+            n_boxes=n_boxes,
+            device=device,
+            caller_name="condensation_step_gpu",
+        )
     _validate_partitioning_values(
         gas.partitioning,
         n_boxes,
         n_species,
         device,
     )
-
-    validate_environment_inputs(
-        temperature=temperature,
-        pressure=pressure,
-        environment=environment,
-        n_boxes=n_boxes,
-        device=device,
-        caller_name="condensation_step_gpu",
-    )
+    if environment is not None:
+        validate_environment_inputs(
+            temperature=temperature,
+            pressure=pressure,
+            environment=environment,
+            n_boxes=n_boxes,
+            device=device,
+            caller_name="condensation_step_gpu",
+        )
     # P2 primary state and caller-owned sidecars validate before environment
     # normalization or fallback allocation, so invalid state is fully atomic.
     _validate_p2_primary_state(particles, gas, expected_shape, device)
