@@ -154,6 +154,7 @@ def _load_warp_runtime() -> SimpleNamespace:
         ThermodynamicsConfig=thermodynamics.ThermodynamicsConfig,
         cuda_available=cuda.cuda_available,
         CUDA_SKIP_REASON=cuda.CUDA_SKIP_REASON,
+        warp_devices=cuda.warp_devices,
     )
     globals().update(runtime.__dict__)
     return runtime
@@ -1607,6 +1608,145 @@ def _make_environment_data(
 
 
 @dataclass(frozen=True)
+class CondensationParityCase:
+    """Describe immutable NumPy inputs for one condensation parity case."""
+
+    name: str
+    particles: ParticleData
+    gas: GasData
+    vapor_pressure: np.ndarray
+    temperature: np.ndarray
+    pressure: np.ndarray
+    surface_tension: np.ndarray
+    mass_accommodation: np.ndarray
+    diffusion_coefficient_vapor: np.ndarray
+    latent_heat: np.ndarray
+    time_step: float
+
+    def build_inputs(self) -> tuple[ParticleData, GasData]:
+        """Return detached CPU inputs for an independent execution."""
+        return (
+            ParticleData(
+                masses=self.particles.masses.copy(),
+                concentration=self.particles.concentration.copy(),
+                charge=self.particles.charge.copy(),
+                density=self.particles.density.copy(),
+                volume=self.particles.volume.copy(),
+            ),
+            GasData(
+                name=list(self.gas.name),
+                molar_mass=self.gas.molar_mass.copy(),
+                concentration=self.gas.concentration.copy(),
+                partitioning=self.gas.partitioning.copy(),
+            ),
+        )
+
+    def vapor_pressure_matrix(self) -> np.ndarray:
+        """Return constant per-species vapor pressure for every box."""
+        return np.broadcast_to(
+            self.vapor_pressure,
+            (self.particles.n_boxes, self.gas.n_species),
+        ).copy()
+
+
+def _make_condensation_parity_cases() -> tuple[CondensationParityCase, ...]:
+    """Build deterministic fp64 cases for device-aware parity coverage."""
+    one_box_particles = ParticleData(
+        masses=np.array(
+            [[[1.0e-18, 2.0e-18], [1.3e-18, 1.6e-18]]],
+            dtype=np.float64,
+        ),
+        concentration=np.array([[1.0, 2.0]], dtype=np.float64),
+        charge=np.zeros((1, 2), dtype=np.float64),
+        density=np.array([1000.0, 1200.0], dtype=np.float64),
+        volume=np.array([1.0e-6], dtype=np.float64),
+    )
+    one_box_gas = GasData(
+        name=["uptake", "companion"],
+        molar_mass=np.array([0.018, 0.05], dtype=np.float64),
+        concentration=np.array([[1.0e-17, 4.0e-7]], dtype=np.float64),
+        partitioning=np.array([True, True]),
+    )
+    multi_box_particles = ParticleData(
+        masses=np.array(
+            [
+                [[1.0e-18, 2.0e-18, 3.0e-18], [1.4e-18, 2.2e-18, 3.2e-18]],
+                [[1.2e-18, 2.4e-18, 3.4e-18], [1.6e-18, 2.6e-18, 3.6e-18]],
+            ],
+            dtype=np.float64,
+        ),
+        concentration=np.array([[1.0, 2.0], [1.5, 0.0]], dtype=np.float64),
+        charge=np.zeros((2, 2), dtype=np.float64),
+        density=np.array([1000.0, 1100.0, 1200.0], dtype=np.float64),
+        volume=np.array([1.0e-6, 1.1e-6], dtype=np.float64),
+    )
+    multi_box_gas = GasData(
+        name=["uptake", "evaporation", "disabled"],
+        molar_mass=np.array([0.018, 0.04, 0.06], dtype=np.float64),
+        concentration=np.array(
+            [[3.0e-17, 0.0, 9.0e-8], [4.0e-17, 0.0, 1.1e-7]],
+            dtype=np.float64,
+        ),
+        partitioning=np.array([True, True, False]),
+    )
+    return (
+        CondensationParityCase(
+            name="one_box_uptake_latent_inventory_limited",
+            particles=one_box_particles,
+            gas=one_box_gas,
+            vapor_pressure=np.array([1.0e-15, 3000.0], dtype=np.float64),
+            temperature=np.array([298.15], dtype=np.float64),
+            pressure=np.array([101325.0], dtype=np.float64),
+            surface_tension=np.array([0.072, 0.080], dtype=np.float64),
+            mass_accommodation=np.array([1.0, 0.8], dtype=np.float64),
+            diffusion_coefficient_vapor=np.array(
+                [2.0e-5, 1.6e-5], dtype=np.float64
+            ),
+            latent_heat=np.array([2.2e6, 0.0], dtype=np.float64),
+            time_step=1.0,
+        ),
+        CondensationParityCase(
+            name="multi_box_mixed_phase_gated",
+            particles=multi_box_particles,
+            gas=multi_box_gas,
+            vapor_pressure=np.array([1.0e-15, 3000.0, 0.1], dtype=np.float64),
+            temperature=np.array([294.15, 304.15], dtype=np.float64),
+            pressure=np.array([101325.0, 95000.0], dtype=np.float64),
+            surface_tension=np.array([0.072, 0.078, 0.085], dtype=np.float64),
+            mass_accommodation=np.array([0.9, 0.7, 0.8], dtype=np.float64),
+            diffusion_coefficient_vapor=np.array(
+                [2.0e-5, 1.7e-5, 1.5e-5], dtype=np.float64
+            ),
+            latent_heat=np.array([1.8e6, 0.0, 0.0], dtype=np.float64),
+            time_step=0.75,
+        ),
+    )
+
+
+def _condensation_parity_expected(
+    case: CondensationParityCase,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return independent four-substep mass and gas outputs for a case."""
+    particles, gas = case.build_inputs()
+    expected_masses, _, _, expected_gas = _cpu_four_substep_oracle(
+        particles=particles,
+        gas=gas,
+        vapor_pressure=case.vapor_pressure_matrix(),
+        surface_tension=case.surface_tension.copy(),
+        mass_accommodation=case.mass_accommodation.copy(),
+        diffusion_coefficient_vapor=case.diffusion_coefficient_vapor.copy(),
+        temperature=case.temperature.copy(),
+        pressure=case.pressure.copy(),
+        time_step=case.time_step,
+        thermodynamics=None,
+        partitioning=gas.partitioning,
+        latent_heat=case.latent_heat.copy(),
+        return_gas=True,
+    )
+    return expected_masses, expected_gas
+
+
+@dataclass(frozen=True)
 class CondensationStiffnessCase:
     """Define a deterministic fixed-shape condensation stress case.
 
@@ -2846,6 +2986,7 @@ def _run_gpu_step(
     thermodynamics: ThermodynamicsConfig | None = None,
     activity_surface: CondensationActivitySurfaceConfig | None = None,
     scratch_buffers: Any | None = None,
+    latent_heat: Any | None = None,
     return_gas_state: Literal[False] = False,
 ) -> tuple[ParticleData, Any]: ...
 
@@ -2867,6 +3008,7 @@ def _run_gpu_step(
     thermodynamics: ThermodynamicsConfig | None = None,
     activity_surface: CondensationActivitySurfaceConfig | None = None,
     scratch_buffers: Any | None = None,
+    latent_heat: Any | None = None,
     return_gas_state: Literal[True] = True,
 ) -> tuple[ParticleData, Any, GasData]: ...
 
@@ -2887,6 +3029,7 @@ def _run_gpu_step(
     thermodynamics: ThermodynamicsConfig | None = None,
     activity_surface: CondensationActivitySurfaceConfig | None = None,
     scratch_buffers: Any | None = None,
+    latent_heat: Any | None = None,
     return_gas_state: bool = False,
 ) -> tuple[ParticleData, Any] | tuple[ParticleData, Any, GasData]:
     """Run GPU condensation step and return CPU particle data.
@@ -2905,6 +3048,7 @@ def _run_gpu_step(
         mass_transfer: Optional caller-owned Warp mass-transfer buffer.
         environment: Optional explicit Warp environment container.
         thermodynamics: Optional supplied config; defaults to constant models.
+        latent_heat: Already-active-device fp64 per-species sidecar.
         return_gas_state: If True, also round-trip the executed Warp gas state.
 
     Returns:
@@ -2933,12 +3077,140 @@ def _run_gpu_step(
         thermodynamics=thermodynamics,
         activity_surface=activity_surface,
         scratch_buffers=scratch_buffers,
+        latent_heat=latent_heat,
     )
     cpu_particles = from_warp_particle_data(gpu_particles, sync=True)
     if not return_gas_state:
         return cpu_particles, mass_transfer_buffer
     cpu_gas = from_warp_gas_data(gpu_gas, name=gas.name, sync=False)
     return cpu_particles, mass_transfer_buffer, cpu_gas
+
+
+def _parity_atol(expected: np.ndarray) -> float:
+    """Return a finite, scale-derived absolute tolerance for parity outputs."""
+    # The relative scale allows fp64 device arithmetic while 1e-30 keeps
+    # zero and near-zero comparisons finite and meaningful.
+    return max(float(np.max(np.abs(expected))) * 1.0e-12, 1.0e-30)
+
+
+def _assert_condensation_parity_case(
+    case: CondensationParityCase,
+    device: str,
+) -> None:
+    """Assert one direct-device condensation run matches its NumPy oracle."""
+    runtime = _load_warp_runtime()
+    expected_masses, expected_gas = _condensation_parity_expected(case)
+    particles, gas = case.build_inputs()
+    expected_transfer = expected_masses - particles.masses
+    assert expected_masses.shape == (
+        particles.n_boxes,
+        particles.n_particles,
+        gas.n_species,
+    )
+    assert expected_gas.shape == (particles.n_boxes, gas.n_species)
+    if case.name == "one_box_uptake_latent_inventory_limited":
+        assert np.any(expected_transfer[:, :, 0] > 0.0)
+        assert expected_gas[0, 0] < gas.concentration[0, 0]
+    elif case.name == "multi_box_mixed_phase_gated":
+        active_slots = particles.concentration > 0.0
+        assert np.any(expected_transfer[:, :, 0][active_slots] > 0.0)
+        assert np.any(expected_transfer[:, :, 1][active_slots] < 0.0)
+        npt.assert_array_equal(expected_transfer[:, :, 2], 0.0)
+        npt.assert_array_equal(expected_gas[:, 2], gas.concentration[:, 2])
+    vapor_pressure = case.vapor_pressure_matrix()
+    n_species = gas.n_species
+    thermodynamics = runtime.ThermodynamicsConfig(
+        modes=runtime.wp.array(
+            np.full(n_species, THERMODYNAMICS_MODE_CONSTANT, dtype=np.int32),
+            dtype=runtime.wp.int32,
+            device=device,
+        ),
+        parameters=runtime.wp.array(
+            np.column_stack(
+                (
+                    case.vapor_pressure.copy(),
+                    np.zeros((n_species, 3), dtype=np.float64),
+                )
+            ),
+            dtype=runtime.wp.float64,
+            device=device,
+        ),
+        molar_mass_reference=runtime.wp.array(
+            gas.molar_mass.copy(),
+            dtype=runtime.wp.float64,
+            device=device,
+        ),
+    )
+    gpu_result, _, gpu_gas = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        runtime.wp.array(
+            case.temperature.copy(), dtype=runtime.wp.float64, device=device
+        ),
+        runtime.wp.array(
+            case.pressure.copy(), dtype=runtime.wp.float64, device=device
+        ),
+        case.time_step,
+        device,
+        surface_tension=runtime.wp.array(
+            case.surface_tension.copy(),
+            dtype=runtime.wp.float64,
+            device=device,
+        ),
+        mass_accommodation=runtime.wp.array(
+            case.mass_accommodation.copy(),
+            dtype=runtime.wp.float64,
+            device=device,
+        ),
+        diffusion_coefficient_vapor=runtime.wp.array(
+            case.diffusion_coefficient_vapor.copy(),
+            dtype=runtime.wp.float64,
+            device=device,
+        ),
+        thermodynamics=thermodynamics,
+        latent_heat=runtime.wp.array(
+            case.latent_heat.copy(), dtype=runtime.wp.float64, device=device
+        ),
+        return_gas_state=True,
+    )
+    assert gpu_result.masses.shape == expected_masses.shape
+    assert gpu_gas.concentration.shape == expected_gas.shape
+    npt.assert_allclose(
+        gpu_result.masses,
+        expected_masses,
+        rtol=1.0e-10,
+        atol=_parity_atol(expected_masses),
+    )
+    npt.assert_allclose(
+        gpu_gas.concentration,
+        expected_gas,
+        rtol=1.0e-10,
+        atol=_parity_atol(expected_gas),
+    )
+
+
+@pytest.mark.gpu_parity
+def test_condensation_parity_matrix_warp_cpu_matches_numpy_oracle(
+    warp_cpu_device: str,
+) -> None:
+    """Warp CPU matches the NumPy oracle for all shared parity cases."""
+    runtime = _load_warp_runtime()
+    assert warp_cpu_device in runtime.warp_devices(runtime.wp)
+    for case in _make_condensation_parity_cases():
+        _assert_condensation_parity_case(case, warp_cpu_device)
+
+
+@pytest.mark.cuda
+@pytest.mark.gpu_parity
+def test_condensation_parity_matrix_cuda_matches_numpy_oracle(
+    cuda_device: str,
+) -> None:
+    """CUDA matches the NumPy oracle for all shared parity cases."""
+    runtime = _load_warp_runtime()
+    assert cuda_device in runtime.warp_devices(runtime.wp)
+    for case in _make_condensation_parity_cases():
+        _assert_condensation_parity_case(case, cuda_device)
 
 
 PRODUCTION_PARITY_RTOL = 2.0e-10

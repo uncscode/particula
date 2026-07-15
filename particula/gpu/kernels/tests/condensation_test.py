@@ -103,6 +103,14 @@ def test_condensation_wrapper_exports_support_contract_tests() -> None:
         in EXPORTED_CONDENSATION_TESTS
     )
     assert (
+        "test_condensation_parity_matrix_warp_cpu_matches_numpy_oracle"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
+        "test_condensation_parity_matrix_cuda_matches_numpy_oracle"
+        in EXPORTED_CONDENSATION_TESTS
+    )
+    assert (
         "test_condensation_step_gpu_energy_transfer_reuses_and_overwrites_output"
         in EXPORTED_CONDENSATION_TESTS
     )
