@@ -24,8 +24,17 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`, `docs/Features/particle-data-migration.md`, `readme.md`, `particula/tests/condensation_latent_heat_docs_test.py`
   - Tests: Scoped text-only command/path, heading, link, constraints, and evidence-separation assertions run without Warp/CUDA imports; published focused suites retain `-Werror` where advertised.
 
-- [ ] **E4-F7-P4:** Update development documentation and roadmap status
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Link the canonical contract from discovery surfaces and update E4 status only after every dependency exit criterion is evidenced.
-  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, `docs/Examples/index.md`, `readme.md`, relevant plan sections
-  - Tests: Markdown link validation, roadmap wording guardrails, and final focused documentation suite.
+- [x] **E4-F7-P4:** Update development documentation and roadmap status
+  - Issue: #1317 | Size: XS | Status: Completed
+  - Completed: 2026-07-15
+  - Delivered: Added distinct canonical-contract discovery links in the gallery
+    and README, published `Shipped | E4` after evidence verification, and added
+    text-only link, boundary, and roadmap-status guards.
+  - Prerequisites verified: E4-F1 through E4-F6 `phase_details.md` records;
+    E4-F7-P1 #1314, P2 #1315, and P3 #1316 records in this section.
+  - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
+    `docs/Examples/index.md`, `readme.md`,
+    `particula/tests/condensation_latent_heat_docs_test.py`, and E4-F7 plan
+    sections.
+  - Tests: `pytest particula/tests/condensation_latent_heat_docs_test.py -q
+    -Werror` (22 passed, 2026-07-15; no Warp/CUDA imports).

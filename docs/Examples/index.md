@@ -164,6 +164,8 @@ Jump in by selecting any card below and follow along in your browser or local en
       default when installed, lazy direct and concrete imports, caller-owned
       fixed-shape fp64 scratch/latent/energy sidecars reused across explicit
       calls, gas coupling, and explicit final checkpoint restoration
+    - [Canonical low-level direct-condensation contract](../Features/data-containers-and-gpu-foundations.md)
+      — supported low-level scope and boundaries
 
     [:octicons-arrow-right-24: Guide](Data_Containers/index.md)
 

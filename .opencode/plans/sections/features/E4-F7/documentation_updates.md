@@ -18,3 +18,19 @@ Issue #1315 intentionally left the README, roadmap, canonical feature pages, run
 - `particula/tests/condensation_latent_heat_docs_test.py` — added isolated text-only regressions for scoped troubleshooting language, command paths and flags, evidence-class separation, and migration/README link constraints; they do not import Warp or CUDA.
 
 Issue #1316 changed documentation and text-only regression coverage only; no runtime APIs, kernels, containers, examples, or roadmap status changed.
+
+- `docs/Examples/index.md` and `readme.md` — Issue #1317 added one distinct
+  canonical low-level direct-condensation-contract discovery link per surface
+  while retaining the P2 quick-start source and the single P3 command-matrix
+  anchor.
+- `docs/Features/Roadmap/data-oriented-gpu.md` — published `Shipped | E4` and
+  a completed bounded direct-kernel summary: explicit transfers, caller-owned
+  fp64 sidecars, four equal substeps, P2 coupling, Warp CPU baseline, and
+  optional/local CUDA evidence. High-level integration remains future work.
+- `particula/tests/condensation_latent_heat_docs_test.py` — added isolated
+  text-only discovery-link and Epic D shipped-boundary regressions.
+
+Issue #1317 completed E4-F7-P4 after inspecting the E4-F1 through E4-F6 and
+E4-F7-P1 through P3 records and passing `pytest
+particula/tests/condensation_latent_heat_docs_test.py -q -Werror` (22 passed).
+No production kernel, container, or API changed.

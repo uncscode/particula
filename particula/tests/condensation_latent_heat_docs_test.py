@@ -18,6 +18,26 @@ ROADMAP_PATH = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
 FOUNDATIONS_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
 MIGRATION_PATH = ROOT / "docs/Features/particle-data-migration.md"
 README_PATH = ROOT / "readme.md"
+EXAMPLES_INDEX_PATH = ROOT / "docs/Examples/index.md"
+CANONICAL_CONTRACT_LABEL = "Canonical low-level direct-condensation contract"
+EXAMPLES_CONTRACT_DESTINATION = (
+    "../Features/data-containers-and-gpu-foundations.md"
+)
+README_CONTRACT_DESTINATION = (
+    "./docs/Features/data-containers-and-gpu-foundations.md"
+)
+EXAMPLES_CONTRACT_LINK = (
+    f"[{CANONICAL_CONTRACT_LABEL}]({EXAMPLES_CONTRACT_DESTINATION})"
+)
+README_CONTRACT_LINK = (
+    f"[{CANONICAL_CONTRACT_LABEL}]({README_CONTRACT_DESTINATION})"
+)
+P2_QUICK_START_SOURCE = "Direct GPU kernels quick-start source"
+P2_QUICK_START_SOURCE_LINK = (
+    "[Direct GPU kernels quick-start source]"
+    "(https://github.com/Gorkowski/particula/blob/main/docs/Examples/"
+    "gpu_direct_kernels_quick_start.py)"
+)
 FOUNDATIONS_P3_HEADING = "### Focused reproduction commands"
 MIGRATION_P3_HEADING = (
     "### Direct-condensation troubleshooting and reproduction"
@@ -82,6 +102,8 @@ P3_ANCHOR_LINK = (
     "./docs/Features/data-containers-and-gpu-foundations.md"
     "#focused-reproduction-commands"
 )
+EPIC_D_SHIPPED_ROW = "Shipped | E4"
+EPIC_D_COMPLETED_PUBLICATION = "E4-F1--E4-F7 recorded evidence is complete"
 FOUNDATIONS_CONFIGURATION_SNIPPETS = (
     "from particula.gpu.kernels import condensation_step_gpu",
     "constant `wp.int32(0)`",
@@ -532,3 +554,68 @@ def test_migration_page_groups_sidecars_by_their_required_shapes() -> None:
         "water-species index, remain scalar",
     ):
         assert snippet in migration
+
+
+def test_example_index_links_canonical_low_level_condensation_contract() -> (
+    None
+):
+    """Examples index has one resolving canonical contract discovery link."""
+    content = EXAMPLES_INDEX_PATH.read_text(encoding="utf-8")
+
+    assert content.count(EXAMPLES_CONTRACT_LINK) == 1
+    assert content.count(EXAMPLES_CONTRACT_DESTINATION) == 1
+    assert (
+        EXAMPLES_INDEX_PATH.parent / EXAMPLES_CONTRACT_DESTINATION
+    ).resolve() == FOUNDATIONS_PATH
+    assert P2_QUICK_START_SOURCE_LINK in content
+    assert P2_QUICK_START_SOURCE != CANONICAL_CONTRACT_LABEL
+
+
+def test_readme_links_canonical_low_level_condensation_contract() -> None:
+    """README keeps distinct canonical-contract and P3 troubleshooting links."""
+    content = README_PATH.read_text(encoding="utf-8")
+
+    assert content.count(README_CONTRACT_LINK) == 1
+    assert content.count(P3_ANCHOR_LINK) == 1
+    assert README_CONTRACT_LINK != P3_ANCHOR_LINK
+
+
+def test_roadmap_marks_e4_low_level_condensation_publication_shipped() -> None:
+    """Epic D records the bounded completed low-level publication."""
+    content = ROADMAP_PATH.read_text(encoding="utf-8")
+    roadmap = _normalized_section(
+        content,
+        "## Epic D: GPU Condensation Physics Parity",
+    )
+
+    assert EPIC_D_SHIPPED_ROW in content
+    for snippet in (
+        EPIC_D_COMPLETED_PUBLICATION,
+        "particula.gpu.kernels",
+        "exactly four `time_step / 4.0` substeps",
+        "P2-finalized",
+        "fp64",
+        "Warp `cpu` baseline",
+        "Optional/local additive CUDA evidence",
+        "skips cleanly when unavailable",
+        "../data-containers-and-gpu-foundations.md",
+    ):
+        assert " ".join(snippet.split()) in roadmap
+    for stale_claim in (
+        "In progress | E4-F5",
+        "E4-F6 remains",
+        "E4-F7 remains",
+        "final support-contract",
+        "Status: in progress",
+    ):
+        assert stale_claim not in roadmap
+    for unsupported_claim in (
+        "high-level backends are shipped",
+        "automatic transfers are shipped",
+        "adaptive stepping is shipped",
+    ):
+        assert unsupported_claim not in roadmap
+    assert (
+        "condensation-stiffness-study.md" in roadmap
+        or "fixed_count_substeps_4" in roadmap
+    )

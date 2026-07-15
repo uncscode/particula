@@ -7,7 +7,12 @@ Every phase ships with its documentation regression coverage. Existing coverage 
 - **P1 (completed, Issue #1314):** `particula/tests/condensation_latent_heat_docs_test.py` now provides text-only assertions for the canonical foundations configuration, schemas/input variants, lifecycle/ownership semantics, validation and shipped boundaries, and migration guidance. It retains the CPU notebook/publication checks and requires no Warp or CUDA device.
 - **P2 (completed, Issue #1315):** `particula/gpu/tests/gpu_direct_kernels_example_test.py` covers exact deterministic output, forced no-Warp import isolation, the lazy public-step/concrete-sidecar loader, mocked explicit conversion/restore and same-object sidecar reuse, and failure propagation without restore. Its guarded real Warp-CPU test checks restored shapes/names, two-call sidecar identity, nonzero finalized transfer/energy, the unweighted energy identity, and concentration-weighted particle/gas conservation. CUDA is not required.
 - **P3 (completed, Issue #1316):** `particula/tests/condensation_latent_heat_docs_test.py` provides scoped text-only checks for the foundations troubleshooting and command H3, migration pointer, exact command targets/flags, README anchor discovery, prohibited claims, and distinct parity/inventory/energy evidence. The published baseline is Warp `device="cpu"`; CUDA is optional/local and its marker command skips cleanly when unavailable.
-- **P4:** Validate markdown links, roadmap language, example-index discovery, and the complete focused documentation suite.
+- **P4 (completed, Issue #1317):** Text-only assertions validate the single
+  resolving gallery and README canonical-contract links, preserve the distinct
+  P3 anchor, and scope Epic D to the shipped direct-kernel/fixed-four/P2/fp64
+  contract with Warp CPU baseline and optional/local CUDA evidence. Validation:
+  `pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror`
+  (22 passed, 2026-07-15; no Warp/CUDA imports).
 
 ## Published Reproduction Baseline
 
