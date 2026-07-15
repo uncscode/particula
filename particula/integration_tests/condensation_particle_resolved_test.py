@@ -3,6 +3,7 @@
 import unittest
 
 import numpy as np
+import numpy.testing as npt
 import particula as par
 
 
@@ -120,28 +121,55 @@ class TestCondensationParticleResolved(unittest.TestCase):
 
     def test_condensation_transfers_mass(self):
         """Particle mass should increase while gas-phase water decreases."""
-        initial_particle_mass = self.aerosol.particles.get_mass_concentration()
-        initial_gas_water = (
-            self.aerosol.atmosphere.partitioning_species.get_concentration()[
-                0
-            ].item()
+        initial_species_mass = self.aerosol.particles.get_species_mass(
+            clone=True
         )
+        particle_concentration = self.aerosol.particles.get_concentration(
+            clone=True
+        )
+        initial_particle_inventory = np.sum(
+            initial_species_mass * particle_concentration[:, None], axis=0
+        )
+        initial_partitioning_gas = self.aerosol.atmosphere.partitioning_species.get_concentration().copy()
+        initial_nitrogen = (
+            self.aerosol.atmosphere.gas_only_species.get_concentration()
+        )
+        initial_gas_water = initial_partitioning_gas[0]
 
         aerosol = self.aerosol
         for _ in range(5):
             aerosol = self.condensation.execute(aerosol, 0.1, 1)
 
-        final_particle_mass = aerosol.particles.get_mass_concentration()
-        final_gas_water = (
-            aerosol.atmosphere.partitioning_species.get_concentration()[
-                0
-            ].item()
+        final_species_mass = aerosol.particles.get_species_mass(clone=True)
+        final_particle_inventory = np.sum(
+            final_species_mass * particle_concentration[:, None], axis=0
         )
+        final_partitioning_gas = (
+            aerosol.atmosphere.partitioning_species.get_concentration()
+        )
+        final_nitrogen = aerosol.atmosphere.gas_only_species.get_concentration()
+        final_gas_water = final_partitioning_gas[0]
 
-        # assertions
-        self.assertGreater(final_particle_mass, initial_particle_mass)
+        self.assertGreater(
+            final_particle_inventory[0], initial_particle_inventory[0]
+        )
         self.assertLess(final_gas_water, initial_gas_water)
-        # mass conservation (water + core species)
-        total_initial = initial_particle_mass + initial_gas_water
-        total_final = final_particle_mass + final_gas_water
-        self.assertAlmostEqual(total_initial, total_final, delta=1e-9)
+        assert np.all(np.isfinite(initial_particle_inventory))
+        assert np.all(np.isfinite(final_particle_inventory))
+        assert np.all(np.isfinite(initial_partitioning_gas))
+        assert np.all(np.isfinite(final_partitioning_gas))
+        assert np.all(initial_particle_inventory >= 0.0)
+        assert np.all(final_particle_inventory >= 0.0)
+        assert np.all(initial_partitioning_gas >= 0.0)
+        assert np.all(final_partitioning_gas >= 0.0)
+        npt.assert_allclose(
+            final_particle_inventory + final_partitioning_gas,
+            initial_particle_inventory + initial_partitioning_gas,
+            rtol=1e-12,
+            atol=1e-30,
+        )
+        assert np.isfinite(final_nitrogen)
+        assert final_nitrogen >= 0.0
+        npt.assert_allclose(
+            final_nitrogen, initial_nitrogen, rtol=0.0, atol=0.0
+        )

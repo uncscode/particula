@@ -2189,6 +2189,7 @@ def _cpu_four_substep_oracle(
     """
     particles = kwargs["particles"] if "particles" in kwargs else args[0]
     return_gas = kwargs.pop("return_gas", False)
+    partitioning = kwargs.pop("partitioning", None)
     time_step = kwargs["time_step"] if "time_step" in kwargs else args[8]
     gas = kwargs["gas"] if "gas" in kwargs else args[1]
     working_particles = dataclasses.replace(
@@ -2214,6 +2215,8 @@ def _cpu_four_substep_oracle(
         if "gas" in call_kwargs:
             call_kwargs["gas"] = working_gas
         proposal = _cpu_mass_transfer(*call_args, **call_kwargs)
+        if partitioning is not None:
+            proposal[:, :, ~np.asarray(partitioning, dtype=bool)] = 0.0
         _, _, _, _, applied = _inventory_reference(
             working_particles.masses,
             working_particles.concentration,
@@ -2900,6 +2903,210 @@ def _run_gpu_step(
         return cpu_particles, mass_transfer_buffer
     cpu_gas = from_warp_gas_data(gpu_gas, name=gas.name, sync=False)
     return cpu_particles, mass_transfer_buffer, cpu_gas
+
+
+PRODUCTION_PARITY_RTOL = 2.0e-10
+PRODUCTION_PARITY_ATOL = 1.0e-30
+PRODUCTION_INVENTORY_RTOL = 1.0e-12
+PRODUCTION_INVENTORY_ATOL = 1.0e-30
+
+
+def _assert_particle_gas_inventory_conserved(
+    initial_masses: np.ndarray,
+    particle_concentration: np.ndarray,
+    initial_gas: np.ndarray,
+    final_masses: np.ndarray,
+    final_gas: np.ndarray,
+) -> None:
+    """Assert per-box, per-species particle-plus-gas conservation."""
+    residual = np.sum(
+        (final_masses - initial_masses) * particle_concentration[:, :, None],
+        axis=1,
+    ) + (final_gas - initial_gas)
+    npt.assert_allclose(
+        residual,
+        np.zeros_like(residual),
+        rtol=PRODUCTION_INVENTORY_RTOL,
+        atol=PRODUCTION_INVENTORY_ATOL,
+    )
+    for values in (initial_masses, initial_gas, final_masses, final_gas):
+        assert np.all(np.isfinite(values))
+    assert np.all(final_masses >= 0.0)
+    assert np.all(final_gas >= 0.0)
+
+
+def _make_production_inventory_case() -> tuple[
+    ParticleData,
+    GasData,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+]:
+    """Build detached fp64 inputs for public multi-box inventory coverage."""
+    particles = ParticleData(
+        masses=np.array(
+            [
+                [
+                    [2.0e-18, 4.0e-18, 6.0e-18],
+                    [3.0e-18, 5.0e-18, 7.0e-18],
+                    [4.0e-18, 6.0e-18, 8.0e-18],
+                ],
+                [
+                    [5.0e-18, 7.0e-18, 9.0e-18],
+                    [6.0e-18, 8.0e-18, 1.0e-17],
+                    [7.0e-18, 9.0e-18, 1.1e-17],
+                ],
+            ],
+            dtype=np.float64,
+        ),
+        concentration=np.array(
+            [[1.0, 0.0, 2.0], [1.5, 0.0, 0.5]], dtype=np.float64
+        ),
+        charge=np.zeros((2, 3), dtype=np.float64),
+        density=np.array([1000.0, 1200.0, 1400.0], dtype=np.float64),
+        volume=np.full(2, 1.0e-6, dtype=np.float64),
+    )
+    gas = GasData(
+        name=["uptake", "disabled", "evaporation"],
+        molar_mass=np.array([0.018, 0.058, 0.098], dtype=np.float64),
+        concentration=np.array(
+            [[1.0e-17, 2.0e-17, 0.0], [2.0e-17, 3.0e-17, 0.0]],
+            dtype=np.float64,
+        ),
+        partitioning=np.array([True, False, True]),
+    )
+    vapor_pressure = np.array(
+        [[1.0e-15, 500.0, 2.0e3], [1.0e-15, 500.0, 2.0e3]],
+        dtype=np.float64,
+    )
+    temperature = np.array([298.15, 303.15], dtype=np.float64)
+    pressure = np.array([101325.0, 99000.0], dtype=np.float64)
+    surface_tension = np.full(3, 0.072, dtype=np.float64)
+    mass_accommodation = np.ones(3, dtype=np.float64)
+    diffusion = np.full(3, 2.0e-5, dtype=np.float64)
+    return (
+        particles,
+        gas,
+        vapor_pressure,
+        temperature,
+        pressure,
+        surface_tension,
+        mass_accommodation,
+        diffusion,
+    )
+
+
+def _run_production_inventory_case(device: str) -> None:
+    """Run public-hook inventory and CPU-oracle parity regression coverage."""
+    runtime = _load_warp_runtime()
+    (
+        particles,
+        gas,
+        vapor_pressure,
+        temperature,
+        pressure,
+        surface_tension,
+        mass_accommodation,
+        diffusion,
+    ) = _make_production_inventory_case()
+    initial_masses = particles.masses.copy()
+    initial_gas = gas.concentration.copy()
+    particle_concentration = particles.concentration.copy()
+    expected_masses, _, _, expected_gas = _cpu_four_substep_oracle(
+        particles,
+        gas,
+        vapor_pressure,
+        surface_tension,
+        mass_accommodation,
+        diffusion,
+        temperature,
+        pressure,
+        0.1,
+        partitioning=gas.partitioning,
+        return_gas=True,
+    )
+    thermodynamics = runtime.ThermodynamicsConfig(
+        modes=runtime.wp.zeros(3, dtype=runtime.wp.int32, device=device),
+        parameters=runtime.wp.array(
+            np.column_stack((vapor_pressure[0], np.zeros((3, 3)))),
+            dtype=runtime.wp.float64,
+            device=device,
+        ),
+        molar_mass_reference=runtime.wp.array(
+            gas.molar_mass, dtype=runtime.wp.float64, device=device
+        ),
+    )
+    final_particles, total_transfer, final_gas = _run_gpu_step(
+        particles,
+        gas,
+        vapor_pressure,
+        runtime.wp.array(temperature, dtype=runtime.wp.float64, device=device),
+        runtime.wp.array(pressure, dtype=runtime.wp.float64, device=device),
+        0.1,
+        device,
+        surface_tension=runtime.wp.array(
+            surface_tension, dtype=runtime.wp.float64, device=device
+        ),
+        mass_accommodation=runtime.wp.array(
+            mass_accommodation, dtype=runtime.wp.float64, device=device
+        ),
+        diffusion_coefficient_vapor=runtime.wp.array(
+            diffusion, dtype=runtime.wp.float64, device=device
+        ),
+        thermodynamics=thermodynamics,
+        return_gas_state=True,
+    )
+    final_masses = final_particles.masses
+    final_gas_concentration = final_gas.concentration
+    total = total_transfer.numpy().copy()
+    _assert_particle_gas_inventory_conserved(
+        initial_masses,
+        particle_concentration,
+        initial_gas,
+        final_masses,
+        final_gas_concentration,
+    )
+    npt.assert_allclose(
+        final_masses,
+        expected_masses,
+        rtol=PRODUCTION_PARITY_RTOL,
+        atol=PRODUCTION_PARITY_ATOL,
+    )
+    npt.assert_allclose(
+        final_gas_concentration,
+        expected_gas,
+        rtol=PRODUCTION_PARITY_RTOL,
+        atol=PRODUCTION_PARITY_ATOL,
+    )
+    npt.assert_array_equal(total[:, :, 1], 0.0)
+    npt.assert_array_equal(final_masses[:, :, 1], initial_masses[:, :, 1])
+    npt.assert_array_equal(final_gas_concentration[:, 1], initial_gas[:, 1])
+    enabled_transfer = total[:, :, (0, 2)]
+    assert np.any(enabled_transfer > 0.0)
+    assert np.any(enabled_transfer < 0.0)
+    inactive = particle_concentration == 0.0
+    npt.assert_array_equal(total[inactive], 0.0)
+    npt.assert_array_equal(final_masses[inactive], initial_masses[inactive])
+
+
+@pytest.mark.gpu_parity
+def test_condensation_public_inventory_warp_cpu_matches_oracle(
+    warp_cpu_device: str,
+) -> None:
+    """Public Warp CPU hook conserves inventory and matches its oracle."""
+    _run_production_inventory_case(warp_cpu_device)
+
+
+@pytest.mark.cuda
+@pytest.mark.gpu_parity
+def test_condensation_public_inventory_cuda_matches_oracle(
+    cuda_device: str,
+) -> None:
+    """Public CUDA hook conserves inventory and matches its oracle."""
+    _run_production_inventory_case(cuda_device)
 
 
 def test_condensation_scratch_buffers_complete_sidecar_preserves_identity(
