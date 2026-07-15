@@ -3318,6 +3318,417 @@ def _assert_particle_gas_inventory_conserved(
     assert np.all(final_gas >= 0.0)
 
 
+def _contract_atol(*values: np.ndarray) -> float:
+    """Return an fp64-scale absolute tolerance for P2 contract checks."""
+    scale = max((float(np.max(np.abs(value))) for value in values), default=0.0)
+    return max(1.0e-18, scale * np.finfo(np.float64).eps)
+
+
+def _assert_contract_allclose(actual: np.ndarray, expected: np.ndarray) -> None:
+    """Assert a strict, comparison-local P2 accounting equality."""
+    npt.assert_allclose(
+        actual,
+        expected,
+        rtol=1.0e-12,
+        atol=_contract_atol(actual, expected),
+    )
+
+
+def _snapshot_warp_arrays(
+    *named_arrays: tuple[str, Any],
+) -> dict[str, np.ndarray]:
+    """Copy named Warp arrays so immutable caller inputs can be checked."""
+    return {
+        name: array.numpy().copy()
+        for name, array in named_arrays
+        if array is not None
+    }
+
+
+def _assert_warp_arrays_unchanged(
+    snapshots: dict[str, np.ndarray], arrays: dict[str, Any]
+) -> None:
+    """Assert that each snapshotted caller-owned Warp array is unchanged."""
+    for name, expected in snapshots.items():
+        npt.assert_array_equal(arrays[name].numpy(), expected)
+
+
+def _run_p2_contract_case(device: str) -> dict[str, Any]:
+    """Execute the mixed P2 case with fresh caller-owned output sidecars."""
+    runtime = _load_warp_runtime()
+    case = next(
+        item
+        for item in _make_condensation_parity_cases()
+        if item.name == "multi_box_mixed_phase_gated"
+    )
+    particles, gas = case.build_inputs()
+    gpu_particles = runtime.to_warp_particle_data(particles, device=device)
+    gpu_gas = runtime.to_warp_gas_data(
+        gas, device=device, vapor_pressure=case.vapor_pressure_matrix()
+    )
+    n_boxes, n_particles, n_species = particles.masses.shape
+    temperature = runtime.wp.array(
+        case.temperature, dtype=runtime.wp.float64, device=device
+    )
+    pressure = runtime.wp.array(
+        case.pressure, dtype=runtime.wp.float64, device=device
+    )
+    surface_tension = runtime.wp.array(
+        case.surface_tension, dtype=runtime.wp.float64, device=device
+    )
+    mass_accommodation = runtime.wp.array(
+        case.mass_accommodation, dtype=runtime.wp.float64, device=device
+    )
+    diffusion = runtime.wp.array(
+        case.diffusion_coefficient_vapor,
+        dtype=runtime.wp.float64,
+        device=device,
+    )
+    latent_heat = runtime.wp.array(
+        case.latent_heat, dtype=runtime.wp.float64, device=device
+    )
+    thermodynamics = runtime.ThermodynamicsConfig(
+        modes=runtime.wp.zeros(
+            n_species, dtype=runtime.wp.int32, device=device
+        ),
+        parameters=runtime.wp.array(
+            np.column_stack(
+                (
+                    case.vapor_pressure,
+                    np.zeros((n_species, 3), dtype=np.float64),
+                )
+            ),
+            dtype=runtime.wp.float64,
+            device=device,
+        ),
+        molar_mass_reference=runtime.wp.array(
+            gas.molar_mass, dtype=runtime.wp.float64, device=device
+        ),
+    )
+    scratch = _make_condensation_scratch_buffers(
+        (n_boxes, n_particles, n_species), device
+    )
+    energy_transfer = runtime.wp.full(
+        (n_boxes, n_species), 17.0, dtype=runtime.wp.float64, device=device
+    )
+    immutable_arrays = {
+        "concentration": gpu_particles.concentration,
+        "temperature": temperature,
+        "pressure": pressure,
+        "partitioning": gpu_gas.partitioning,
+        "latent_heat": latent_heat,
+        "surface_tension": surface_tension,
+        "mass_accommodation": mass_accommodation,
+        "diffusion": diffusion,
+        "thermodynamics_modes": thermodynamics.modes,
+        "thermodynamics_parameters": thermodynamics.parameters,
+        "molar_mass_reference": thermodynamics.molar_mass_reference,
+    }
+    snapshots = _snapshot_warp_arrays(*immutable_arrays.items())
+    initial_masses = particles.masses.copy()
+    initial_gas = gas.concentration.copy()
+    _, total_transfer = condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=case.time_step,
+        surface_tension=surface_tension,
+        mass_accommodation=mass_accommodation,
+        diffusion_coefficient_vapor=diffusion,
+        thermodynamics=thermodynamics,
+        latent_heat=latent_heat,
+        energy_transfer=energy_transfer,
+        scratch_buffers=scratch,
+    )
+    return {
+        "initial_masses": initial_masses,
+        "initial_gas": initial_gas,
+        "concentration": particles.concentration.copy(),
+        "final_masses": gpu_particles.masses.numpy().copy(),
+        "final_gas": gpu_gas.concentration.numpy().copy(),
+        "vapor_pressure": gpu_gas.vapor_pressure.numpy().copy(),
+        "total_transfer": total_transfer,
+        "energy_transfer": energy_transfer,
+        "latent_heat": latent_heat.numpy().copy(),
+        "scratch": scratch,
+        "snapshots": snapshots,
+        "immutable_arrays": immutable_arrays,
+    }
+
+
+def test_condensation_p2_contract_conserves_per_box_species_and_energy(
+    warp_cpu_device: str,
+) -> None:
+    """P2 transfers conserve every box/species and retain caller ownership."""
+    result = _run_p2_contract_case(warp_cpu_device)
+    transfer = result["total_transfer"].numpy()
+    mass_delta = result["final_masses"] - result["initial_masses"]
+    weighted_delta = np.sum(
+        mass_delta * result["concentration"][:, :, None], axis=1
+    )
+    gas_delta = result["final_gas"] - result["initial_gas"]
+    _assert_contract_allclose(
+        weighted_delta + gas_delta, np.zeros_like(gas_delta)
+    )
+    _assert_contract_allclose(transfer, mass_delta)
+    _assert_contract_allclose(
+        result["initial_gas"] - result["final_gas"],
+        np.sum(transfer * result["concentration"][:, :, None], axis=1),
+    )
+    energy = result["energy_transfer"].numpy()
+    expected_energy = transfer.sum(axis=1) * result["latent_heat"][None, :]
+    _assert_contract_allclose(energy, expected_energy)
+    npt.assert_array_equal(energy[:, 1:], 0.0)
+    inactive = result["concentration"] == 0.0
+    npt.assert_array_equal(transfer[inactive], 0.0)
+    npt.assert_array_equal(
+        result["final_masses"][inactive], result["initial_masses"][inactive]
+    )
+    npt.assert_array_equal(transfer[:, :, 2], 0.0)
+    npt.assert_array_equal(
+        result["final_masses"][:, :, 2], result["initial_masses"][:, :, 2]
+    )
+    npt.assert_array_equal(
+        result["final_gas"][:, 2], result["initial_gas"][:, 2]
+    )
+    assert np.all(np.isfinite(result["final_masses"]))
+    assert np.all(np.isfinite(result["final_gas"]))
+    assert np.all(result["final_masses"] >= 0.0)
+    assert np.all(result["final_gas"] >= 0.0)
+    _assert_warp_arrays_unchanged(
+        result["snapshots"], result["immutable_arrays"]
+    )
+    assert result["scratch"].total_mass_transfer is result["total_transfer"]
+
+
+def test_condensation_p2_contract_inventory_limited_uptake_is_consistent(
+    warp_cpu_device: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Check finalized-transfer accounting for inventory-limited P2 uptake."""
+    runtime = _load_warp_runtime()
+    particles = dataclasses.replace(
+        _make_particle_data(1, 1, 1),
+        masses=np.array([[[1.0e-18]]]),
+        concentration=np.array([[1.0e9]]),
+    )
+    gas = dataclasses.replace(
+        _make_gas_data(1, 1), concentration=np.array([[1.0e-12]])
+    )
+    gpu_particles = runtime.to_warp_particle_data(
+        particles, device=warp_cpu_device
+    )
+    gpu_gas = runtime.to_warp_gas_data(
+        gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(1, 1)
+    )
+    latent_heat = runtime.wp.array(
+        [2.0e6], dtype=runtime.wp.float64, device=warp_cpu_device
+    )
+    energy = runtime.wp.full(
+        (1, 1), 3.0, dtype=runtime.wp.float64, device=warp_cpu_device
+    )
+    scratch = _make_condensation_scratch_buffers((1, 1, 1), warp_cpu_device)
+    thermodynamics = _make_thermodynamics_config(gpu_gas)
+    immutable = {
+        "concentration": gpu_particles.concentration,
+        "partitioning": gpu_gas.partitioning,
+        "latent_heat": latent_heat,
+        "thermodynamics_modes": thermodynamics.modes,
+        "thermodynamics_parameters": thermodynamics.parameters,
+        "molar_mass_reference": thermodynamics.molar_mass_reference,
+    }
+    snapshots = _snapshot_warp_arrays(*immutable.items())
+    initial_masses = particles.masses.copy()
+    initial_gas = gas.concentration.copy()
+    original_launch = runtime.condensation_module.wp.launch
+
+    def _inject_insufficient_uptake(
+        kernel: Any, *args: Any, **kwargs: Any
+    ) -> Any:
+        result = original_launch(kernel, *args, **kwargs)
+        if kernel is runtime.condensation_module._gate_mass_transfer_kernel:
+            runtime.wp.copy(
+                kwargs["inputs"][2],
+                runtime.wp.array(
+                    [[[1.0e-18]]],
+                    dtype=runtime.wp.float64,
+                    device=warp_cpu_device,
+                ),
+            )
+        return result
+
+    monkeypatch.setattr(
+        runtime.condensation_module.wp, "launch", _inject_insufficient_uptake
+    )
+    _, transfer_buffer = condensation_step_gpu(
+        gpu_particles,
+        gpu_gas,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        thermodynamics=thermodynamics,
+        latent_heat=latent_heat,
+        energy_transfer=energy,
+        scratch_buffers=scratch,
+    )
+    transfer = transfer_buffer.numpy()
+    final_masses = gpu_particles.masses.numpy()
+    final_gas = gpu_gas.concentration.numpy()
+    assert scratch.positive_mass_transfer_scale is not None
+    assert np.all(scratch.positive_mass_transfer_scale.numpy() < 1.0)
+    assert np.all(np.isfinite(final_masses))
+    assert np.all(np.isfinite(final_gas))
+    assert np.all(final_masses >= 0.0)
+    assert np.all(final_gas >= 0.0)
+    _assert_contract_allclose(transfer, final_masses - initial_masses)
+    _assert_contract_allclose(
+        np.sum(
+            (final_masses - initial_masses)
+            * particles.concentration[:, :, None],
+            axis=1,
+        )
+        + final_gas
+        - initial_gas,
+        np.zeros_like(initial_gas),
+    )
+    _assert_contract_allclose(
+        energy.numpy(), transfer.sum(axis=1) * latent_heat.numpy()[None, :]
+    )
+    _assert_warp_arrays_unchanged(snapshots, immutable)
+    assert scratch.total_mass_transfer is transfer_buffer
+
+
+def test_condensation_p2_contract_repeat_is_deterministic(
+    warp_cpu_device: str,
+) -> None:
+    """Fresh P2 executions reproduce outputs and populated scratch fields."""
+    first = _run_p2_contract_case(warp_cpu_device)
+    second = _run_p2_contract_case(warp_cpu_device)
+    assert first["total_transfer"] is not second["total_transfer"]
+    assert first["energy_transfer"] is not second["energy_transfer"]
+    for name in (
+        "final_masses",
+        "final_gas",
+        "vapor_pressure",
+    ):
+        _assert_contract_allclose(first[name], second[name])
+    _assert_contract_allclose(
+        first["total_transfer"].numpy(), second["total_transfer"].numpy()
+    )
+    _assert_contract_allclose(
+        first["energy_transfer"].numpy(), second["energy_transfer"].numpy()
+    )
+    for field in dataclasses.fields(first["scratch"]):
+        first_array = getattr(first["scratch"], field.name)
+        second_array = getattr(second["scratch"], field.name)
+        if first_array is not None:
+            assert first_array is not second_array
+            _assert_contract_allclose(first_array.numpy(), second_array.numpy())
+    for result in (first, second):
+        _assert_warp_arrays_unchanged(
+            result["snapshots"], result["immutable_arrays"]
+        )
+        assert result["scratch"].total_mass_transfer is result["total_transfer"]
+
+
+@pytest.mark.parametrize(
+    "invalid_kind",
+    (
+        "scratch_shape",
+        "scratch_dtype",
+        "energy_shape",
+        "missing_latent_heat",
+        "partitioning",
+    ),
+)
+def test_condensation_p2_contract_invalid_buffers_are_atomic(
+    warp_cpu_device: str, invalid_kind: str
+) -> None:
+    """Representative invalid P2 metadata leaves all caller arrays untouched."""
+    runtime = _load_warp_runtime()
+    particles = _make_particle_data(1, 1, 2)
+    gas = _make_gas_data(1, 2)
+    gpu_particles = runtime.to_warp_particle_data(
+        particles, device=warp_cpu_device
+    )
+    gpu_gas = runtime.to_warp_gas_data(
+        gas, device=warp_cpu_device, vapor_pressure=_make_vapor_pressure(1, 2)
+    )
+    temperature = runtime.wp.array(
+        [298.15], dtype=runtime.wp.float64, device=warp_cpu_device
+    )
+    pressure = runtime.wp.array(
+        [101325.0], dtype=runtime.wp.float64, device=warp_cpu_device
+    )
+    latent_heat = runtime.wp.ones(
+        2, dtype=runtime.wp.float64, device=warp_cpu_device
+    )
+    energy = runtime.wp.full(
+        (1, 2), 19.0, dtype=runtime.wp.float64, device=warp_cpu_device
+    )
+    scratch = _make_condensation_scratch_buffers((1, 1, 2), warp_cpu_device)
+    thermodynamics = _make_thermodynamics_config(gpu_gas)
+    if invalid_kind == "scratch_shape":
+        scratch = dataclasses.replace(
+            scratch,
+            positive_mass_transfer_demand=runtime.wp.zeros(
+                (1, 3), dtype=runtime.wp.float64, device=warp_cpu_device
+            ),
+        )
+    elif invalid_kind == "scratch_dtype":
+        scratch = dataclasses.replace(
+            scratch,
+            work_mass_transfer=runtime.wp.zeros(
+                (1, 1, 2), dtype=runtime.wp.float32, device=warp_cpu_device
+            ),
+        )
+    elif invalid_kind == "energy_shape":
+        energy = runtime.wp.full(
+            (1, 3), 19.0, dtype=runtime.wp.float64, device=warp_cpu_device
+        )
+    elif invalid_kind == "partitioning":
+        gpu_gas.partitioning = runtime.wp.array(
+            [1, 2], dtype=runtime.wp.int32, device=warp_cpu_device
+        )
+    arrays = {
+        "masses": gpu_particles.masses,
+        "gas_concentration": gpu_gas.concentration,
+        "vapor_pressure": gpu_gas.vapor_pressure,
+        "particle_concentration": gpu_particles.concentration,
+        "partitioning": gpu_gas.partitioning,
+        "temperature": temperature,
+        "pressure": pressure,
+        "latent_heat": latent_heat,
+        "energy": energy,
+        "thermodynamics_modes": thermodynamics.modes,
+        "thermodynamics_parameters": thermodynamics.parameters,
+        "molar_mass_reference": thermodynamics.molar_mass_reference,
+    }
+    arrays.update(
+        {
+            field.name: getattr(scratch, field.name)
+            for field in dataclasses.fields(scratch)
+            if getattr(scratch, field.name) is not None
+        }
+    )
+    snapshots = _snapshot_warp_arrays(*arrays.items())
+    with pytest.raises(ValueError):
+        condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+            thermodynamics=thermodynamics,
+            latent_heat=None
+            if invalid_kind == "missing_latent_heat"
+            else latent_heat,
+            energy_transfer=energy,
+            scratch_buffers=scratch,
+        )
+    _assert_warp_arrays_unchanged(snapshots, arrays)
+
+
 def _make_production_inventory_case() -> tuple[
     ParticleData,
     GasData,
@@ -5343,7 +5754,7 @@ def test_condensation_energy_transfer_device_mismatch_is_atomic(
     warp_cpu_device: str,
     cuda_device: str,
 ) -> None:
-    """A cross-device energy output fails before caller state is changed."""
+    """A cross-device energy output leaves all caller sidecars unchanged."""
     particles = _make_particle_data(1, 1, 2)
     gas = _make_gas_data(1, 2)
     gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
@@ -5353,15 +5764,31 @@ def test_condensation_energy_transfer_device_mismatch_is_atomic(
         vapor_pressure=_make_vapor_pressure(1, 2),
     )
     latent_heat = wp.ones(2, dtype=wp.float64, device=warp_cpu_device)
+    scratch = _make_condensation_scratch_buffers((1, 1, 2), warp_cpu_device)
+    thermodynamics = _make_thermodynamics_config(gpu_gas)
     energy_transfer = wp.full(
         (1, 2), wp.float64(19.0), dtype=wp.float64, device=cuda_device
     )
-    state_arrays = (
-        gpu_particles.masses,
-        gpu_gas.vapor_pressure,
-        energy_transfer,
+    state_arrays = {
+        "masses": gpu_particles.masses,
+        "particle_concentration": gpu_particles.concentration,
+        "gas_concentration": gpu_gas.concentration,
+        "vapor_pressure": gpu_gas.vapor_pressure,
+        "partitioning": gpu_gas.partitioning,
+        "latent_heat": latent_heat,
+        "energy_transfer": energy_transfer,
+        "thermodynamics_modes": thermodynamics.modes,
+        "thermodynamics_parameters": thermodynamics.parameters,
+        "molar_mass_reference": thermodynamics.molar_mass_reference,
+    }
+    state_arrays.update(
+        {
+            field.name: getattr(scratch, field.name)
+            for field in dataclasses.fields(scratch)
+            if getattr(scratch, field.name) is not None
+        }
     )
-    snapshots = tuple(array.numpy().copy() for array in state_arrays)
+    snapshots = _snapshot_warp_arrays(*state_arrays.items())
 
     with pytest.raises(ValueError, match="energy_transfer device"):
         _condensation_step_gpu(
@@ -5370,13 +5797,13 @@ def test_condensation_energy_transfer_device_mismatch_is_atomic(
             temperature=298.15,
             pressure=101325.0,
             time_step=0.1,
-            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            thermodynamics=thermodynamics,
             latent_heat=latent_heat,
             energy_transfer=energy_transfer,
+            scratch_buffers=scratch,
         )
 
-    for array, expected in zip(state_arrays, snapshots, strict=True):
-        npt.assert_array_equal(array.numpy(), expected)
+    _assert_warp_arrays_unchanged(snapshots, state_arrays)
 
 
 @pytest.mark.cuda
