@@ -1656,7 +1656,7 @@ def _make_condensation_parity_cases() -> tuple[CondensationParityCase, ...]:
             [[[1.0e-18, 2.0e-18], [1.3e-18, 1.6e-18]]],
             dtype=np.float64,
         ),
-        concentration=np.array([[1.0, 2.0]], dtype=np.float64),
+        concentration=np.array([[1.0e12, 2.0e12]], dtype=np.float64),
         charge=np.zeros((1, 2), dtype=np.float64),
         density=np.array([1000.0, 1200.0], dtype=np.float64),
         volume=np.array([1.0e-6], dtype=np.float64),
@@ -3010,7 +3010,31 @@ def _run_gpu_step(
     scratch_buffers: Any | None = None,
     latent_heat: Any | None = None,
     return_gas_state: Literal[True] = True,
+    return_vapor_pressure: Literal[False] = False,
 ) -> tuple[ParticleData, Any, GasData]: ...
+
+
+@overload
+def _run_gpu_step(
+    particles: ParticleData,
+    gas: GasData,
+    vapor_pressure: np.ndarray,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    time_step: float,
+    device: str,
+    surface_tension: np.ndarray | None = None,
+    mass_accommodation: np.ndarray | None = None,
+    diffusion_coefficient_vapor: np.ndarray | None = None,
+    mass_transfer: Any | None = None,
+    environment: Any | None = None,
+    thermodynamics: ThermodynamicsConfig | None = None,
+    activity_surface: CondensationActivitySurfaceConfig | None = None,
+    scratch_buffers: Any | None = None,
+    latent_heat: Any | None = None,
+    return_gas_state: Literal[True] = True,
+    return_vapor_pressure: Literal[True] = True,
+) -> tuple[ParticleData, Any, GasData, np.ndarray]: ...
 
 
 def _run_gpu_step(
@@ -3031,7 +3055,12 @@ def _run_gpu_step(
     scratch_buffers: Any | None = None,
     latent_heat: Any | None = None,
     return_gas_state: bool = False,
-) -> tuple[ParticleData, Any] | tuple[ParticleData, Any, GasData]:
+    return_vapor_pressure: bool = False,
+) -> (
+    tuple[ParticleData, Any]
+    | tuple[ParticleData, Any, GasData]
+    | tuple[ParticleData, Any, GasData, np.ndarray]
+):
     """Run GPU condensation step and return CPU particle data.
 
     Args:
@@ -3048,12 +3077,18 @@ def _run_gpu_step(
         mass_transfer: Optional caller-owned Warp mass-transfer buffer.
         environment: Optional explicit Warp environment container.
         thermodynamics: Optional supplied config; defaults to constant models.
-        latent_heat: Already-active-device fp64 per-species sidecar.
-        return_gas_state: If True, also round-trip the executed Warp gas state.
+        latent_heat: Already-active-device fp64 per-species sidecar stored
+            on the execution device.
+        return_gas_state: If True, also round-trip the executed Warp gas
+            state.
+        return_vapor_pressure: If True, also return refreshed GPU vapor
+            pressure.
 
     Returns:
         CPU particle data plus the Warp mass-transfer buffer. When
         ``return_gas_state`` is True, also returns the executed CPU gas state.
+        When ``return_vapor_pressure`` is True, the final item is a CPU copy of
+        the refreshed GPU vapor-pressure buffer.
     """
     gpu_particles = to_warp_particle_data(particles, device=device)
     gpu_gas = to_warp_gas_data(
@@ -3083,6 +3118,13 @@ def _run_gpu_step(
     if not return_gas_state:
         return cpu_particles, mass_transfer_buffer
     cpu_gas = from_warp_gas_data(gpu_gas, name=gas.name, sync=False)
+    if return_vapor_pressure:
+        return (
+            cpu_particles,
+            mass_transfer_buffer,
+            cpu_gas,
+            gpu_gas.vapor_pressure.numpy().copy(),
+        )
     return cpu_particles, mass_transfer_buffer, cpu_gas
 
 
@@ -3109,6 +3151,32 @@ def _assert_condensation_parity_case(
     )
     assert expected_gas.shape == (particles.n_boxes, gas.n_species)
     if case.name == "one_box_uptake_latent_inventory_limited":
+        raw_proposal = _cpu_mass_transfer(
+            particles=particles,
+            gas=gas,
+            vapor_pressure=case.vapor_pressure_matrix(),
+            surface_tension=case.surface_tension,
+            mass_accommodation=case.mass_accommodation,
+            diffusion_coefficient_vapor=case.diffusion_coefficient_vapor,
+            temperature=case.temperature,
+            pressure=case.pressure,
+            time_step=case.time_step / 4.0,
+            latent_heat=case.latent_heat,
+        )
+        _, demand, _, scale, finalized = _inventory_reference(
+            particles.masses,
+            particles.concentration,
+            gas.concentration,
+            raw_proposal,
+        )
+        assert demand[0, 0] > gas.concentration[0, 0]
+        assert 0.0 < scale[0, 0] < 1.0
+        npt.assert_allclose(
+            np.sum(finalized[:, :, 0] * particles.concentration),
+            gas.concentration[0, 0],
+            rtol=1.0e-12,
+            atol=1.0e-30,
+        )
         assert np.any(expected_transfer[:, :, 0] > 0.0)
         assert expected_gas[0, 0] < gas.concentration[0, 0]
     elif case.name == "multi_box_mixed_phase_gated":
@@ -3141,7 +3209,7 @@ def _assert_condensation_parity_case(
             device=device,
         ),
     )
-    gpu_result, _, gpu_gas = _run_gpu_step(
+    gpu_result, _, gpu_gas, refreshed_vapor_pressure = _run_gpu_step(
         particles,
         gas,
         vapor_pressure,
@@ -3173,9 +3241,16 @@ def _assert_condensation_parity_case(
             case.latent_heat.copy(), dtype=runtime.wp.float64, device=device
         ),
         return_gas_state=True,
+        return_vapor_pressure=True,
     )
     assert gpu_result.masses.shape == expected_masses.shape
     assert gpu_gas.concentration.shape == expected_gas.shape
+    npt.assert_allclose(
+        refreshed_vapor_pressure,
+        case.vapor_pressure_matrix(),
+        rtol=0.0,
+        atol=0.0,
+    )
     npt.assert_allclose(
         gpu_result.masses,
         expected_masses,
@@ -5338,36 +5413,42 @@ def test_condensation_mixed_latent_heat_with_activity_matches_oracle(
         gas, device=device, vapor_pressure=vapor_pressure
     )
     thermodynamics = _make_thermodynamics_config(gpu_gas)
-    expected_masses, expected_total, expected_work = _cpu_four_substep_oracle(
-        particles,
-        gas,
-        vapor_pressure,
-        surface_tension,
-        mass_accommodation,
-        diffusion,
-        temperature,
-        pressure,
-        time_step,
-        thermodynamics=thermodynamics,
-        activity_mode=int(ACTIVITY_MODE_KAPPA),
-        surface_tension_mode=int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
-        kappas=kappas,
-        latent_heat=latent_values,
+    expected_masses, expected_total, expected_work, expected_gas = (
+        _cpu_four_substep_oracle(
+            particles,
+            gas,
+            vapor_pressure,
+            surface_tension,
+            mass_accommodation,
+            diffusion,
+            temperature,
+            pressure,
+            time_step,
+            thermodynamics=thermodynamics,
+            activity_mode=int(ACTIVITY_MODE_KAPPA),
+            surface_tension_mode=int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+            kappas=kappas,
+            latent_heat=latent_values,
+            return_gas=True,
+        )
     )
-    _, _, isothermal_work = _cpu_four_substep_oracle(
-        particles,
-        gas,
-        vapor_pressure,
-        surface_tension,
-        mass_accommodation,
-        diffusion,
-        temperature,
-        pressure,
-        time_step,
-        thermodynamics=thermodynamics,
-        activity_mode=int(ACTIVITY_MODE_KAPPA),
-        surface_tension_mode=int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
-        kappas=kappas,
+    isothermal_masses, _, isothermal_work, isothermal_gas = (
+        _cpu_four_substep_oracle(
+            particles,
+            gas,
+            vapor_pressure,
+            surface_tension,
+            mass_accommodation,
+            diffusion,
+            temperature,
+            pressure,
+            time_step,
+            thermodynamics=thermodynamics,
+            activity_mode=int(ACTIVITY_MODE_KAPPA),
+            surface_tension_mode=int(SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED),
+            kappas=kappas,
+            return_gas=True,
+        )
     )
     activity_surface = CondensationActivitySurfaceConfig(
         activity_mode=int(ACTIVITY_MODE_KAPPA),
@@ -5408,12 +5489,17 @@ def test_condensation_mixed_latent_heat_with_activity_matches_oracle(
     npt.assert_allclose(
         scratch.work_mass_transfer.numpy(), expected_work, rtol=1e-12, atol=0.0
     )
+    npt.assert_allclose(
+        gpu_gas.concentration.numpy(), expected_gas, rtol=1e-12, atol=0.0
+    )
     assert np.all(gpu_particles.masses.numpy() >= 0.0)
     assert np.all(np.isfinite(gpu_particles.masses.numpy()))
     assert np.all(expected_work[:, :, 1] < isothermal_work[:, :, 1])
     assert np.all(
         scratch.work_mass_transfer.numpy()[:, :, 1] < isothermal_work[:, :, 1]
     )
+    assert np.max(np.abs(expected_masses - isothermal_masses)) > 1.0e-25
+    assert np.max(np.abs(expected_gas - isothermal_gas)) > 1.0e-25
 
 
 def test_condensation_isolated_zero_latent_species_matches_baseline(
