@@ -482,3 +482,53 @@ def test_p3_command_evidence_and_scope_remain_bounded() -> None:
     ):
         assert prohibited_claim not in foundations
         assert prohibited_claim not in migration
+
+
+def test_readme_describes_the_two_call_direct_condensation_quick_start() -> (
+    None
+):
+    """README describes current quick-start sidecars without stale RNG claims."""
+    quick_start = " ".join(README_PATH.read_text(encoding="utf-8").split())
+
+    assert (
+        "two direct condensation calls with reused scratch buffers,"
+        in quick_start
+    )
+    assert "latent-heat, and energy sidecars" in quick_start
+    assert "one condensation step, one coagulation step" not in quick_start
+    assert "caller-owned `rng_states`" not in quick_start
+
+
+def test_p3_matrix_labels_cpu_integration_commands_as_cpu_evidence() -> None:
+    """CPU integration commands remain distinct from direct-GPU evidence."""
+    commands = _normalized_section(
+        FOUNDATIONS_PATH.read_text(encoding="utf-8"),
+        FOUNDATIONS_P3_HEADING,
+    )
+
+    assert (
+        "CPU integration/inventory-conservation evidence (separate" in commands
+    )
+    assert (
+        "inventory conservation checks); not direct-GPU validation" in commands
+    )
+    assert (
+        "CPU integration evidence for particle-resolved condensation; not"
+        in commands
+    )
+
+
+def test_migration_page_groups_sidecars_by_their_required_shapes() -> None:
+    """Migration troubleshooting avoids a universal per-box sidecar claim."""
+    migration = _normalized_section(
+        MIGRATION_PATH.read_text(encoding="utf-8"),
+        MIGRATION_P3_HEADING,
+    )
+
+    for snippet in (
+        "species configuration uses `(n_species,)`",
+        "scratch property fields use `(n_boxes,)`",
+        "per-particle or per-species transfer shapes",
+        "water-species index, remain scalar",
+    ):
+        assert snippet in migration

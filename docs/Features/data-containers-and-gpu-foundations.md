@@ -591,8 +591,8 @@ the other evidence classes.
 | `pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q` | Quick-start regression. |
 | `pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror` | Primary direct CPU-oracle particle-mass/gas-concentration parity matrix. |
 | `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror` | Bounded direct-step stiffness coverage. |
-| `pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q` | Separate particle-plus-gas inventory conservation checks. |
-| `pytest particula/integration_tests/condensation_particle_resolved_test.py -q` | Particle-resolved condensation integration. |
+| `pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q` | CPU integration/inventory-conservation evidence (separate particle-plus-gas inventory conservation checks); not direct-GPU validation. |
+| `pytest particula/integration_tests/condensation_particle_resolved_test.py -q` | CPU integration evidence for particle-resolved condensation; not direct-GPU validation. |
 | `pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror` | Latent-heat energy/bookkeeping documentation checks. |
 
 The required baseline is Warp `device="cpu"` when Warp is installed. The

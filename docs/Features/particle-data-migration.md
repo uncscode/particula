@@ -488,9 +488,13 @@ convert it at the explicit `to_warp_environment_data()` boundary.
 ### Direct-condensation troubleshooting and reproduction
 
 Keep restored ordered gas names and thermodynamics-sidecar species order aligned
-with `gas.molar_mass`, including a valid water-species index. Particle, gas,
-and sidecar layouts retain their leading `(n_boxes, ...)` dimension; supplied
-scratch, latent-heat, and energy sidecars must be active-device `wp.float64`.
+with `gas.molar_mass`, including a valid water-species index. Particle and gas
+layouts retain their leading `(n_boxes, ...)` dimension, but sidecars have
+field-appropriate shapes: species configuration uses `(n_species,)`, scratch
+property fields use `(n_boxes,)`, and transfer fields use their required
+per-particle or per-species transfer shapes. Scalar indices, including the
+water-species index, remain scalar. Supplied scratch, latent-heat, and energy
+sidecars must be active-device `wp.float64`.
 Use either `environment=` or both direct positive finite temperature/pressure
 inputs, with direct arrays on the active device. P2 inventory limiting bounds
 applied transfers rather than proving parity. Synchronize explicitly before host
