@@ -975,8 +975,9 @@ active-device
 Warp `cpu` baseline evidence is required whenever Warp is installed.
 Optional/local additive CUDA evidence skips cleanly when unavailable; it is
 additional local evidence rather than a default CI requirement. The focused
-direct-kernel evidence is summarized in the [fixed-four decision record]
-(condensation-stiffness-study.md) and the canonical foundations guide.
+direct-kernel evidence is summarized in the
+[fixed-four decision record](condensation-stiffness-study.md) and the
+canonical foundations guide.
 
 Temperature feedback, high-level `Aerosol`/`Runnable` integration, adaptive
 stepping, unsupported physics, graph capture/replay, broad autodiff, and
