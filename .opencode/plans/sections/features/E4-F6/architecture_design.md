@@ -12,7 +12,7 @@ E4-F1..F5 production condensation step
   -> parity assertions (physics tolerance)
   -> conservation assertions (strict, separate)
   -> mutation and reusable-buffer assertions
-  -> fixed-four-loop capture/replay evidence
+  -> fixed-four-loop capture limitation evidence
   -> bounded out-of-place smooth-interior autodiff experiment
              |
              v
@@ -37,10 +37,11 @@ aggregate-only comparisons.
   CUDA only when available. Cases remain discoverable in `*_test.py` modules
   with `warp`, `gpu_parity`, and other established markers.
 
-Exactly four substeps are retained. Capture setup occurs outside capture;
-replay performs no hidden host transfer or adaptive allocation. Autodiff
-evidence is limited to an out-of-place smooth-interior slice and explicitly
-excludes clamps, inventory gates, and in-place mutation.
+Exactly four substeps are retained. P3 records that the public step is not
+capture-safe: CPU capture is capability-skipped and CUDA replay is
+strict-xfailed because of host validation readbacks. Autodiff evidence is
+limited to an out-of-place smooth-interior slice and explicitly excludes clamps,
+inventory gates, and in-place mutation.
 
 ## Security & Compliance
 

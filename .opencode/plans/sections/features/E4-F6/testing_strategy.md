@@ -23,16 +23,11 @@ unchanged and changed code must retain at least 80% coverage.
   state; immutable inputs; deterministic fresh runs; caller-owned output
   identity; and atomic representative invalid-buffer/configuration paths.
 - **P3 (completed, #1310):**
-  `particula/gpu/kernels/tests/condensation_graph_capture_test.py` preallocates
-  all seven scratch fields, latent heat, energy, and device-resident mutable
-  reset sources. It captures only the already-created public four-substep call,
-  restores mutable inputs/outputs device-to-device, and compares two launches
-  of the same graph with an independent normal launch for mass, gas, transfer,
-  and energy at `rtol=2e-10`, `atol=1e-30`. Normal and replay states separately
-  pass strict per-box/per-species inventory and energy assertions; sidecar
-  identity/shape/dtype/device stability is checked throughout. Warp CPU is
-  covered and CUDA is optional. Capture support failures skip with the device
-  and failed capture operation; correctness failures do not skip.
+  `particula/gpu/kernels/tests/condensation_graph_capture_test.py` records a
+  capability boundary: Warp CPU capture is skipped because Warp capture requires
+  CUDA, while CUDA public-step replay is strict-xfailed because host validation
+  readbacks are not capture-safe. These precise outcomes are unsupported-capture
+  evidence, not correctness or replay support.
 - **P4 (completed, #1311):**
   `particula/gpu/kernels/tests/condensation_autodiff_test.py` differentiates a
   one-box, out-of-place raw `condensation_mass_transfer_kernel` proposal with
@@ -44,7 +39,9 @@ unchanged and changed code must retain at least 80% coverage.
   capability skips with precise bounded-probe/device context. Separate
   forward-only tests cover P2 evaporation clamp, inventory scaling, and
   in-place mutation without asserting backend-specific gradients or warnings.
-- **P5:** Validate documentation links and execute focused reproduction commands.
+- **P5 (completed, #1312):** The published feature, roadmap, and testing-guide
+  matrix maps P1--P4 to their wrappers and keeps parity, conservation,
+  unsupported capture, and raw-rate derivative assertions distinct.
 
 Parity and conservation are always distinct assertions. Warp absence and CUDA
 absence skip cleanly according to repository policy, but when Warp is installed

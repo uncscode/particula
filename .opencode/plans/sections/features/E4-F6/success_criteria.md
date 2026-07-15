@@ -15,20 +15,17 @@
   transfer/energy-output identities with complete caller-owned scratch.
 - [x] P2 representative invalid shape/dtype/device/configuration paths fail
   before state or caller-owned-buffer mutation.
-- [x] P3 supported graph capture/replay matches an independent normal public
-  launch for particle mass, gas concentration, total transfer, and energy at
-  production parity tolerance; normal and both replays separately pass strict
-  per-box/per-species conservation and the energy contract.
-- [x] P3 retains every supplied scratch and energy sidecar's identity, canonical
-  shape, fp64 dtype, and active device across capture and replay; unsupported
-  capture capability skips have device/operation context.
+- [x] P3 documents CPU capture as a capability skip and CUDA public-step replay
+  as a strict expected failure caused by host validation readbacks; neither
+  guarded outcome is presented as graph-capture support.
 - [x] P4 compares the bounded out-of-place raw-rate Warp Tape derivative with a
   centered fp64 reference on Warp CPU and optionally CUDA, with executable
   smooth-interior margins and access-verification state restoration.
 - [x] P4 covers P2 evaporation clamping, uptake inventory scaling, and in-place
   mass mutation as forward-only limitations without claiming full
   differentiability.
-- [ ] Focused commands and evidence/non-claims are documented.
+- [x] P5 documents focused commands and P1--P4 evidence/non-claims in the
+  feature, roadmap, and testing-guide records.
 
 ## Metrics
 
@@ -40,5 +37,5 @@
 | Conservation granularity | Global CPU precedents | Per box and species | Conservation tests |
 | Conservation tolerance | Mixed | Explicit strict target, nominally `rtol=1e-12` | Invariant assertions |
 | Integrator loop count | Candidate evidence | Exactly 4 | Fixed-loop tests |
-| Capture readiness | No condensation regression | Deterministic capture/replay where supported | Graph tests |
+| Capture support | No condensation regression | Document CPU skip/CUDA strict-xfail limitation | Graph tests/docs |
 | Autodiff claim | Documentation only | Bounded evidence plus explicit limitations | Autodiff tests/docs |

@@ -29,21 +29,15 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     and deterministic runs with fresh state and sidecars. No production API or
     physics changes were made.
 
-- [x] **E4-F6-P3:** Prove fixed-loop reusable-buffer graph-capture readiness
+- [x] **E4-F6-P3:** Record fixed-loop graph-capture capability boundary
   - Issue: #1310 | Size: S | Status: Completed
-  - Delivered: `condensation_graph_capture_test.py` captures the public
-    exactly-four-substep path with all seven caller-owned scratch fields, latent
-    heat, and caller-owned energy output already allocated. Device-to-device
-    reset sources permit two replays of one captured graph without recapture or
-    host transfers between launches.
+  - Delivered: `condensation_graph_capture_test.py` establishes the public
+    step's capture limitation, rather than capture readiness.
   - Files: `particula/gpu/kernels/tests/condensation_graph_capture_test.py`
-  - Tests: An independent normal call and each replay agree for mass, gas,
-    total transfer, and energy at the production parity tolerance; each state
-    separately passes per-box/per-species inventory conservation and the
-    established energy contract. Scratch and energy identity/shape/dtype/device
-    stability are checked around capture and replays. Warp CPU is exercised and
-    CUDA is optional; unavailable capture support skips with device/operation
-    context. No production API or behavior changed.
+  - Tests: Warp CPU is capability-skipped because Warp capture requires CUDA.
+    CUDA public-step replay is strict-xfailed because host validation readbacks
+    are not capture-safe. These guarded outcomes document unsupported capture,
+    not successful replay. No production API or behavior changed.
 
 - [x] **E4-F6-P4:** Add bounded autodiff-readiness experiments and limitation tests
   - Issue: #1311 | Size: S | Status: Completed
@@ -60,8 +54,14 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     skips with bounded-probe/device context. No production API, behavior, or
     published documentation changed.
 
-- [ ] **E4-F6-P5:** Update development documentation and evidence matrix
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Publish backend, invariant, graph, and autodiff evidence with focused commands.
-  - Files: issue 1272 roadmap/feature documentation and testing guidance.
-  - Tests: Markdown links, command/reference verification.
+- [x] **E4-F6-P5:** Update development documentation and evidence matrix
+  - Issue: #1312 | Size: XS | Status: Completed
+  - Delivered: Published the P1--P4 matrix, supported-backend convention, and
+    focused commands while documenting P3 CPU capability skip/CUDA strict-xfail
+    as unsupported public-step capture, not replay support.
+  - Files: `docs/Features/condensation_strategy_system.md`,
+    `docs/Features/Roadmap/warp-autodiff-limitations.md`,
+    `docs/Features/Roadmap/condensation-stiffness-study.md`, and
+    `.opencode/guides/testing_guide.md`.
+  - Validation: Documentation points to discoverable `*_test.py` wrappers and
+    retains P1/P2/P3/P4 evidence and non-claim boundaries.

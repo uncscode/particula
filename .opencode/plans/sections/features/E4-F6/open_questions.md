@@ -6,15 +6,14 @@
     relaxation; the stiffness-study `5e-2` bound is not accepted for production
     qualification.
 - [x] How is complete scratch for graph capture validated?
-  - Resolved 2026-07-13: enumerate every sidecar buffer, warm compilation, then
-    assert subsequent calls allocate and synchronize zero times while retaining
-    all identities and shapes. Missing or partial complete-scratch fields fail
-    before mutation.
+  - Superseded 2026-07-15: public-step capture is not supported. P3 therefore
+    records the CPU capability skip and CUDA strict-xfail rather than validating
+    scratch behavior across successful capture/replay.
 - [x] Which devices support graph capture and what skip policy applies?
-  - Resolved 2026-07-15: exercise capture/replay on Warp CPU and, when CUDA is
-    available, CUDA. Missing capture APIs or capture capability failures at
-    begin, recording, end, or launch skip only that device with operation
-    context; normal-launch and post-launch correctness failures remain failures.
+  - Resolved 2026-07-15: Warp CPU capture is capability-skipped because capture
+    requires CUDA. CUDA public-step replay is strict-xfailed because host
+    validation readbacks are not capture-safe. Both outcomes document an
+    unsupported capability, not capture/replay support.
 - [x] Which smooth-interior slice is differentiated?
   - Resolved 2026-07-15 by #1311: the test differentiates only the
     out-of-place `condensation_mass_transfer_kernel` raw-rate proposal with
@@ -26,9 +25,10 @@
   - Resolved 2026-07-13: yes. Use `rtol=1e-12` with
     `atol=max(1e-18, scale * eps)` so near-zero inventories remain meaningful.
 - [x] Which issue #1272 document is canonical for the final evidence matrix?
-  - Resolved 2026-07-13: `docs/Features/Roadmap/data-oriented-gpu.md` owns the
-    final support/evidence matrix. `condensation-stiffness-study.md` remains the
-    historical integration decision record.
+  - Resolved 2026-07-15 by #1312:
+    `docs/Features/condensation_strategy_system.md` owns the direct-condensation
+    P1--P4 evidence matrix; the stiffness study reconciles it with historical
+    candidate evidence.
 
 Diagnostics are intentionally **none**; questions must not introduce a public
 diagnostics surface merely to make tests convenient.
