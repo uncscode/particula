@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-13",
+  "last_updated": "2026-07-15",
   "dependencies": [
     "E4-F1",
     "E4-F2",
@@ -38,11 +38,11 @@
     {
       "id": "E4-F6-P1",
       "title": "Add device-aware condensation parity matrix with independent CPU references",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-15",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
