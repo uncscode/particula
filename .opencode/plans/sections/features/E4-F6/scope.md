@@ -21,12 +21,11 @@ evidence documentation rather than new physics.
   `particula/gpu/kernels/tests/_condensation_test_support.py`, exported by
   `condensation_test.py`, cover those accounting and mutation contracts with
   no production source or public API changes.
-- Capture/replay evidence for the exactly-four-substep path where supported.
-- **Delivered in P3 (#1310):** test-only capture/replay coverage in
-  `particula/gpu/kernels/tests/condensation_graph_capture_test.py` uses all
-  seven supplied scratch fields plus energy sidecars, two device-reset replays,
-  and normal/replay state, invariant, and buffer-contract checks. It does not
-  claim allocation-free capture or alter production behavior.
+- Capture limitation evidence for the exactly-four-substep public path.
+- **Delivered in P3 (#1310):**
+  `particula/gpu/kernels/tests/condensation_graph_capture_test.py` records a
+  Warp CPU capability skip and a CUDA public-step strict-xfail caused by
+  host-validation readbacks. It documents unsupported capture, not replay.
 - Bounded tape/gradcheck or access-verification experiments, with clamps and
   in-place mutation limitations recorded explicitly.
 - **Delivered in P4 (#1311):**
@@ -36,6 +35,8 @@ evidence documentation rather than new physics.
   clamp, inventory, and in-place-mutation cases are explicitly forward-only
   non-claims; production APIs and published docs are unchanged.
 - An evidence matrix and focused reproduction commands.
+- **Delivered in P5 (#1312):** feature, roadmap, and testing-guide documentation
+  publishes the P1--P4 matrix, commands, backend convention, and non-claims.
 
 ## Out of Scope
 
