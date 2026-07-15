@@ -15,7 +15,7 @@ representation.
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, Generator
 
 import numpy as np
 from numpy.typing import NDArray
@@ -370,6 +370,48 @@ def to_warp_gas_data(
     return gpu_data
 
 
+def to_per_box_partitioning(
+    partitioning: np.ndarray,
+    n_boxes: int,
+    *,
+    device: str = "cpu",
+) -> Any:
+    """Migrate a legacy shared mask to the Warp per-box mask schema.
+
+    ``WarpGasData.partitioning`` is version-2 public state: its active-device
+    representation is always binary ``int32`` with shape
+    ``(n_boxes, n_species)``.  This explicit helper is the compatibility path
+    for callers that previously kept a one-dimensional shared mask.
+
+    Args:
+        partitioning: Legacy ``(n_species,)`` or current
+            ``(n_boxes, n_species)`` binary mask.
+        n_boxes: Number of simulation boxes.
+        device: Warp device for the returned mask.
+
+    Returns:
+        Active-device binary ``int32`` mask with per-box shape.
+
+    Raises:
+        ValueError: If shape or binary values are invalid.
+    """
+    wp = _ensure_warp_available()
+    values = np.asarray(partitioning)
+    if values.ndim == 1:
+        values = np.broadcast_to(values, (n_boxes, values.shape[0]))
+    elif values.ndim != 2 or values.shape[0] != n_boxes:
+        raise ValueError(
+            "partitioning must have shape (n_species,) or (n_boxes, n_species)"
+        )
+    if not np.all((values == 0) | (values == 1)):
+        raise ValueError("partitioning must contain only binary 0/1 values")
+    return wp.array(
+        values.astype(np.int32, copy=False),
+        dtype=wp.int32,
+        device=device,
+    )
+
+
 def from_warp_particle_data(
     gpu_data: "WarpParticleData",
     sync: bool = True,
@@ -507,6 +549,11 @@ def from_warp_gas_data(
         raise ValueError(
             "GPU partitioning must have the same (n_boxes, n_species) shape "
             "as concentration to restore CPU GasData."
+        )
+    if concentration_shape[0] == 0:
+        raise ValueError(
+            "cannot restore zero-box WarpGasData to GasData because its shared "
+            "partitioning mask has no authoritative box"
         )
     partitioning_bool_by_box = _restore_partitioning_bool(partitioning_values)
     if not np.all(partitioning_bool_by_box == partitioning_bool_by_box[0]):

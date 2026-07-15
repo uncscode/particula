@@ -72,6 +72,7 @@ from particula.gpu.conversion import (
     from_warp_gas_data,
     from_warp_particle_data,
     gpu_context,
+    to_per_box_partitioning,
     to_warp_environment_data,
     to_warp_gas_data,
     to_warp_particle_data,
@@ -86,6 +87,7 @@ __all__ = [
     "from_warp_gas_data",
     "from_warp_environment_data",
     "gpu_context",
+    "to_per_box_partitioning",
 ]
 
 if WARP_AVAILABLE:

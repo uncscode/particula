@@ -34,6 +34,7 @@ if wp is not None:
         from_warp_gas_data,
         from_warp_particle_data,
         gpu_context,
+        to_per_box_partitioning,
         to_warp_environment_data,
         to_warp_gas_data,
         to_warp_particle_data,
@@ -141,6 +142,23 @@ def _assert_gas_round_trip_matches(source, restored) -> None:
     assert restored.molar_mass.dtype == np.float64
     assert restored.concentration.dtype == np.float64
     assert restored.partitioning.dtype == np.bool_
+
+
+def test_to_per_box_partitioning_migrates_legacy_shared_mask() -> None:
+    """The public migration helper expands legacy masks deterministically."""
+    partitioning = to_per_box_partitioning(
+        np.array([1, 0], dtype=np.int32), 2, device="cpu"
+    )
+    np.testing.assert_array_equal(
+        partitioning.numpy(), np.array([[1, 0], [1, 0]], dtype=np.int32)
+    )
+
+
+def test_to_per_box_partitioning_preserves_current_per_box_mask() -> None:
+    """The public migration helper accepts the version-2 representation."""
+    values = np.array([[1, 0], [0, 1]], dtype=np.int32)
+    partitioning = to_per_box_partitioning(values, 2, device="cpu")
+    np.testing.assert_array_equal(partitioning.numpy(), values)
 
 
 @pytest.fixture

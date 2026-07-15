@@ -659,15 +659,18 @@ Vapor-pressure refresh is temperature-driven and does not read gas
 concentration. The resolved total transfer buffer is cleared once after
 preflight, accumulates P2-finalized transfer, and is returned by identity when
 supplied. Work storage keeps only the final raw proposal. Production
-calculations make no hidden CPU↔Warp transfers; validation-only device reads do
-not transfer or mutate caller buffers.
+calculations make no hidden data CPU↔Warp transfers. CUDA validation reads small
+device status flags with `.numpy()`, which synchronizes execution but does not
+transfer or mutate caller-owned simulation buffers.
 
 Invalid primary P2 state or supplied P2 sidecars fail during aggregate
 preflight, before launches or caller-buffer mutation. A non-finite fresh raw
 proposal fails before P2 finalization for that substep; completed earlier
-substeps remain applied, and only raw work storage may have been written for
-the failed cycle. Retain or restore caller-owned snapshots when a failed call
-must be retried from its original state.
+substeps remain applied. The failed cycle may already have written raw work,
+`gas.vapor_pressure`, and supplied dynamic-viscosity, mean-free-path, or
+composition-weighted surface-tension workspaces, but not P2 inventories or
+energy output. Retain or restore caller-owned snapshots when a failed call must
+be retried from its original state.
 
 This direct low-level GPU step uses an optional keyword-only caller-owned
 active-device `wp.float64` `latent_heat` sidecar with shape `(n_species,)` in

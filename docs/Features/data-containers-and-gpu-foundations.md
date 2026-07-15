@@ -343,8 +343,10 @@ supplied work storage retains only the final gated raw proposal and is never the
 returned transfer. Disabled `(box, species)` entries in the
 per-box `(n_boxes, n_species)` partitioning mask and inactive particle slots
 are zeroed before P2 finalization or reductions. CPU↔Warp conversion expands
-the CPU shared species mask to this per-box layout, and restore requires the
-exact layout.
+the CPU shared species mask to this per-box layout. `to_per_box_partitioning()`
+is the public migration helper for legacy one-dimensional masks. CPU restoration
+rejects masks that differ by box and rejects zero-box mirrors because no box can
+authoritatively supply the shared CPU mask.
 P2 demand, release, scale, and accumulator sidecars are validated and used for
 finalization; aggregate invalid state, metadata, or ownership fails with
 `ValueError` before launches or caller mutation. A later failure caused by a
@@ -408,8 +410,10 @@ adaptive substeps, graph capture/replay, autodiff, or E4-F6 cross-device
 certification. It uses the whole-call finalized transfer, including the direct
 step's coupled gas mutation.
 
-Use `to_warp_*` and `from_warp_*` as the sole CPU↔Warp boundary. There is no
-hidden transfer and no high-level `Aerosol` or `Runnable` GPU path. Deterministic
+Use `to_warp_*` and `from_warp_*` as the sole data CPU↔Warp boundary. There is
+no high-level `Aerosol` or `Runnable` GPU path. CUDA preflight reads one-element
+device validation flags with `.numpy()`; those status reads synchronize but do
+not transfer or mutate caller-owned simulation buffers. Deterministic
 fp64 tests compare an independent NumPy reference with explicit parity
 `rtol`/`atol`, then apply tighter separate ownership invariants. Warp `cpu` is
 the baseline whenever Warp is installed; CUDA is optional, availability-guarded,

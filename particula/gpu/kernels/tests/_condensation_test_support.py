@@ -1059,6 +1059,42 @@ def test_condensation_step_gpu_rejects_p2_vapor_pressure_alias_atomically(
     )
 
 
+def test_condensation_step_gpu_rejects_legacy_output_alias_atomically(
+    device: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Legacy mass-transfer output cannot clear particle-owned mass storage."""
+    particles = _make_particle_data(1, 1, 1)
+    gas = _make_gas_data(1, 1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_gas = to_warp_gas_data(
+        gas, device=device, vapor_pressure=_make_vapor_pressure(1, 1)
+    )
+    initial_mass = gpu_particles.masses.numpy().copy()
+    launched_kernels: list[Any] = []
+    original_launch = condensation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        launched_kernels.append(kernel)
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(condensation_module.wp, "launch", _tracking_launch)
+    with pytest.raises(ValueError, match="mass_transfer must not overlap"):
+        _condensation_step_gpu(
+            gpu_particles,
+            gpu_gas,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            thermodynamics=_make_thermodynamics_config(gpu_gas),
+            mass_transfer=gpu_particles.masses,
+        )
+    npt.assert_array_equal(gpu_particles.masses.numpy(), initial_mass)
+    assert (
+        condensation_module._clear_mass_transfer_kernel not in launched_kernels
+    )
+
+
 @pytest.mark.parametrize(
     "alias_kind",
     (
@@ -7379,8 +7415,9 @@ def test_condensation_step_gpu_zero_timestep_runs_four_ordered_cycles(
             "_reduce_inventory_candidates_kernel",
             "_scale_inventory_uptake_kernel",
             "_finalize_and_apply_inventory_transfer_kernel",
-            "_accumulate_finalized_mass_transfer_kernel",
             "_reduce_finalized_transfer_to_gas_kernel",
+            "apply_mass_transfer_kernel",
+            "_accumulate_finalized_mass_transfer_kernel",
             "_couple_finalized_transfer_to_gas_kernel",
         ]
         * 4

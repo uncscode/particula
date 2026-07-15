@@ -97,7 +97,7 @@ class WarpGasData:
           caller-owned ordered names or index mapping outside this struct;
           placeholder names are generated only by CPU restore helpers when
           names are omitted.
-        - The ``partitioning`` field is an active-device, per-box
+        - The ``partitioning`` field is the version-2 active-device, per-box
           ``(n_boxes, n_species)`` int32 mask rather than a CPU bool vector.
           Its values must remain binary (1 = True, 0 = False). The public
           condensation step gates raw proposals with this mask; its private P2
@@ -105,7 +105,9 @@ class WarpGasData:
           public step applies finalized transfer to particle mass and couples
           its concentration-weighted opposite to ``concentration`` after every
           substep. CPU restore additionally requires every box to have the same
-          mask because ``GasData`` owns one shared species mask.
+          mask because ``GasData`` owns one shared species mask. Migrate legacy
+          one-dimensional masks with ``to_per_box_partitioning()`` before
+          assigning this public field.
         - ``vapor_pressure`` is GPU-only helper state for condensation-style
           kernels and is not part of CPU ``GasData`` ownership.
           ``to_warp_gas_data()`` accepts caller-supplied values with shape
