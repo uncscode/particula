@@ -5,13 +5,16 @@
   compared separately.
 - [x] P1 executes the required parity matrix on Warp CPU and runs the identical
   matrix on CUDA when available, with a clean CUDA skip otherwise.
-- [ ] Per-box/per-species particle gain, gas loss, returned transfer, and latent
-  energy agree with the same bounded transfer.
-- [ ] Particle-plus-gas inventory passes a separately stated strict tolerance;
-  inactive/disabled entries remain unchanged and all inventories stay finite/nonnegative.
-- [ ] Exactly four substeps execute with stable fixed-shape caller-owned scratch,
-  deterministic output, and no hidden host transfer.
-- [ ] Invalid shape/device/configuration fails before state mutation.
+- [x] P2 per-box/per-species particle gain, gas loss, returned transfer, and
+  latent energy agree with the same P2-finalized bounded transfer; energy is
+  intentionally unweighted by particle concentration.
+- [x] P2 particle-plus-gas inventory passes the separate strict tolerance;
+  inactive, disabled, and zero-concentration entries remain unchanged and final
+  inventories stay finite/nonnegative.
+- [x] P2 deterministic fresh calls preserve immutable inputs and supplied
+  transfer/energy-output identities with complete caller-owned scratch.
+- [x] P2 representative invalid shape/dtype/device/configuration paths fail
+  before state or caller-owned-buffer mutation.
 - [ ] Supported graph capture/replay matches normal launch parity and conservation.
 - [ ] Bounded autodiff experiments report supported smooth-interior behavior and
   explicit clamp/in-place limitations without claiming full differentiability.

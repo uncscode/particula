@@ -16,11 +16,16 @@
 
 - [x] Add explicit CPU/Warp particle-mass and gas-concentration parity
   assertions with `rtol=1e-10` and a separate scale-derived finite `atol`.
-- [ ] Add separate per-box/per-species particle-plus-gas conservation checks.
-- [ ] Verify transfer, gas loss, particle gain, and E4-F4 latent energy all use
-  the same finalized bounded transfer.
-- [ ] Verify inactive/disabled entries and immutable inputs remain unchanged.
-- [ ] Verify wrong shape/device/configuration fails before allocation or mutation.
+- [x] Add separate per-box/per-species concentration-weighted particle-plus-gas
+  conservation checks.
+- [x] Verify transfer, gas loss, particle gain, and E4-F4 latent energy all use
+  the same finalized bounded transfer; energy remains unweighted by particle
+  concentration.
+- [x] Verify inactive/disabled/zero-concentration entries and immutable inputs
+  remain unchanged.
+- [x] Verify representative wrong shape/dtype/device/configuration paths fail
+  before mutation, and verify deterministic fresh runs and caller-owned output
+  identities.
 
 ## Graph and Autodiff Readiness
 

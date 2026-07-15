@@ -13,10 +13,15 @@ unchanged and changed code must retain at least 80% coverage.
   `atol=max(max(abs(expected)) * 1e-12, 1e-30)` per output. Warp CPU is required
   when Warp is installed; CUDA uses the same matrix and skips cleanly when
   unavailable.
-- **P2:** Add separate strict per-box/per-species inventory and latent-energy
-  assertions with `rtol=1e-12` and
-  `atol=max(1e-18, scale * eps)`. Cover inactive entries, clamp bounds,
-  deterministic replay, immutable inputs, and fail-before-mutation paths.
+- **P2 (completed, #1309):** `_condensation_test_support.py` adds Warp-CPU
+  public-step contract regressions, re-exported by `condensation_test.py`.
+  They assert per-box/per-species concentration-weighted particle-plus-gas
+  conservation, returned total-transfer accounting, and unweighted latent
+  energy from finalized transfer at `rtol=1e-12` and
+  `atol=max(1e-18, scale * eps)`. Coverage includes inactive, disabled, and
+  zero-concentration entries; inventory-limited uptake; finite/nonnegative
+  state; immutable inputs; deterministic fresh runs; caller-owned output
+  identity; and atomic representative invalid-buffer/configuration paths.
 - **P3:** Add
   `particula/gpu/kernels/tests/condensation_graph_capture_test.py`. Preallocate
   all scratch, capture exactly four substeps, replay repeatedly, and compare

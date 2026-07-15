@@ -17,6 +17,10 @@ evidence documentation rather than new physics.
   latent-energy bookkeeping assertions.
 - Validation-before-mutation, unchanged-input, deterministic-repeat, and
   caller-owned stable scratch-buffer checks.
+- **Delivered in P2 (#1309):** Warp-CPU public-step regressions in
+  `particula/gpu/kernels/tests/_condensation_test_support.py`, exported by
+  `condensation_test.py`, cover those accounting and mutation contracts with
+  no production source or public API changes.
 - Capture/replay evidence for the exactly-four-substep path where supported.
 - Bounded tape/gradcheck or access-verification experiments, with clamps and
   in-place mutation limitations recorded explicitly.
