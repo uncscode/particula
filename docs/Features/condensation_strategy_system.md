@@ -696,8 +696,9 @@ positive and evaporation negative. The #1272 diagnostic uses strict
 `rtol=1e-12, atol=1e-18` evidence. `thermal_work` is validated but remains
 deferred and unused.
 
-This is diagnostic bookkeeping, not temperature feedback. The direct step
-couples finalized particle and gas transfer, but does not add strategy/
+This is diagnostic bookkeeping, not temperature feedback, gas mutation or
+gas/full-system conservation. The direct step couples finalized particle and
+gas transfer through its stated P2-finalized direct coupling, but does not add strategy/
 `Runnable` integration, adaptive stepping, graph capture/replay, autodiff
 guarantees, or complete E4-F6 cross-device certification.
 
