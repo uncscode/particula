@@ -2,11 +2,11 @@
 
 ## Problem Statement
 
-E4-F1 through E4-F6 establish GPU condensation physics, integration, and parity evidence, but users still need one accurate, discoverable contract for the supported low-level path. Existing documentation describes the pre-E4 API and intentionally says that GPU latent-heat feedback is future work. Without a coordinated publication pass, users could infer unsupported high-level integration, perform hidden or repeated host transfers, or miss the fixed-shape and four-substep constraints from issue 1272.
+Issue #1314 completed the first publication phase: the canonical foundations page now states the shipped bounded low-level GPU direct-condensation contract, and migration guidance no longer shows the obsolete return signature. The published contract prevents users from inferring unsupported high-level integration, hidden host transfers, or behavior beyond the fixed four-substep direct-kernel path.
 
 ## Value Proposition
 
-E4-F7 turns the verified implementation into an evidence-backed support matrix, runnable Warp CPU example, parity walkthrough, troubleshooting guide, and focused reproduction commands. It preserves explicit CPU-to-Warp transfer ownership, direct imports from `particula.gpu.kernels`, fixed-shape fp64 state, and the distinction between low-level support and future high-level backend integration.
+The completed phase preserves explicit CPU-to-Warp transfer ownership, direct imports from `particula.gpu.kernels`, fixed-shape fp64 state, and the distinction between bounded low-level support and future high-level backend integration. Text-only publication regression coverage now protects the canonical contract and the concise migration guidance.
 
 ## User Stories
 
