@@ -21,15 +21,17 @@
 5. [x] **Issue #1303:** Prove `condensation_step_gpu()` remains P1-only: its
     four-substep launch trace excludes every P2 kernel and sentinel P2
     sidecars remain untouched.
-6. Call the limiting/apply launches from each of the four
-   `condensation_step_gpu()` substeps and refresh E4-F1/F2/F4 dependent state
-   from the newly updated gas.
-7. Route the finalized whole-call transfer, not the raw request, to the return
-   accumulator and E4-F4 latent-energy accumulator.
-8. Add public-production and end-to-end cases to
-   `particula/gpu/kernels/tests/condensation_test.py` and the same-change
-   conservation regression to
-   `particula/integration_tests/condensation_particle_resolved_test.py`.
-9. Run focused NumPy-reference and Warp CPU suites, plus CUDA parity when
-   available with a clean skip otherwise.
-10. Update roadmap wording only after the production and conservation gates pass.
+6. [x] **Issue #1304:** Run P2 finalization/application, finalized-total
+   accumulation, and deterministic weighted gas coupling in every fixed public
+   substep; later transfer proposals, not vapor-pressure refresh, read coupled
+   gas.
+7. [x] **Issue #1304:** Perform aggregate primary-state/metadata/ownership
+   preflight and resolve scratch once per successful call; preserve raw-work and
+   later-substep partial-failure semantics.
+8. [x] **Issue #1304:** Route only finalized whole-call transfer to the returned
+   total and E4-F4 energy output, retaining caller-buffer identity.
+9. [x] **Issue #1304:** Add focused Warp wrapper/support regressions for oracle
+   coupling, sequence/order, atomic preflight, fresh-proposal failure, and
+   scratch reuse.
+10. Run P4 production-hook/integration and backend-parity evidence.
+11. Update roadmap wording only after remaining production gates pass.

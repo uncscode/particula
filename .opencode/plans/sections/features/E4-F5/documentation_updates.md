@@ -5,10 +5,13 @@
   P1-only sidecar validation, atomic `ValueError` behavior, and the unchanged
   particle-only/no-gas-mutation contract.
 - Issue #1303 adds only a short private-helper docstring stating that input is
-  already gated and public gas coupling is deferred; it makes no user-facing
-  documentation change.
-- Do not update user-facing roadmap text yet: in-place gas mutation, finalized
-  public coupled transfer, and conservation remain P3--P4 work.
+  already gated.
+- Issue #1304 updates implementation docstrings/comments to distinguish raw
+  work proposal, P2-finalized applied transfer, gas coupling, finalized total,
+  and energy output. They also record aggregate-preflight atomicity and the
+  intentional no-rollback boundary for later fresh-proposal failures.
+- User-facing roadmap text remains deferred to P5; P4 production/integration
+  evidence is still required before broader support claims.
 - P5 remains responsible for recording scratch ownership, no-hidden-transfer
   rules, Warp CPU support, and optional CUDA behavior in the GPU feature guide.
 - Preserve issue #1272 wording: do not claim gas-coupled production support

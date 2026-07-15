@@ -2,25 +2,26 @@
 
 This module composes condensation ``@wp.func`` building blocks into end-to-end
 kernels and provides the high-level ``condensation_step_gpu`` API. The private
-P2 inventory finalizer is direct-test-only: it accepts an already gated
-proposal, mutates particle masses and P2 scratch sidecars, and deliberately
-leaves gas concentration unchanged while public gas coupling remains deferred.
-Entry-point
-validation accepts scalar direct inputs, explicit ``(n_boxes,)`` Warp arrays,
-or a ``WarpEnvironmentData`` container. Aggregate preflight, including supplied
-``CondensationScratchBuffers`` metadata, completes before buffer allocation,
-Warp launch, vapor-pressure refresh, or mutation of caller-owned state. A
-required keyword-only ``ThermodynamicsConfig`` then executes exactly four
-equal substeps. Each substep refreshes the caller-owned pure-vapor-pressure
-buffer, updates box-level environment properties, proposes transfer from the
-current particle mass, gates disabled species and zero-concentration slots,
-and applies a mass-clamped transfer. Float32
-temperatures are cast to a step-owned float64 device buffer for refresh. Kernel
-launches operate on GPU-resident Warp arrays and update particle masses
- in-place. Latent heat, when supplied, corrects each fixed substep. An optional
- caller-owned energy-transfer output records whole-call bounded-transfer energy
- on the active device, while thermal-work remains validated caller-owned state
- reserved for later work.
+P2 inventory finalizer is direct-test-only: it accepts an already P1-gated raw
+proposal, bounds and finalizes it, and mutates particle masses and P2 scratch
+sidecars without coupling gas. The public step performs that coupling after
+each finalized P2 transfer.
+
+Entry-point validation accepts scalar direct inputs, explicit ``(n_boxes,)``
+Warp arrays, or a ``WarpEnvironmentData`` container. Aggregate preflight,
+including supplied ``CondensationScratchBuffers`` metadata, completes before
+buffer allocation, Warp launch, vapor-pressure refresh, or mutation of
+caller-owned state. A required keyword-only ``ThermodynamicsConfig`` then
+executes exactly four equal substeps. Each substep refreshes the caller-owned
+pure-vapor-pressure buffer, updates box-level environment properties, proposes
+transfer from current particle and gas state, P1-gates disabled species and
+zero-concentration slots, P2-finalizes the inventory-limited applied transfer,
+updates particle mass and gas concentration, and accumulates the finalized
+whole-call total. Float32 temperatures are cast to a step-owned float64 device
+buffer for refresh. Latent heat, when supplied, corrects each fixed substep.
+An optional caller-owned energy-transfer output records signed whole-call
+finalized-transfer energy on the active device, while thermal-work remains
+validated caller-owned state reserved for later work.
 """
 
 # pyright: basic
@@ -143,8 +144,9 @@ class CondensationScratchBuffers:
     the applied transfer over the complete four-substep step.
 
     Each call performs four fixed updates. The total buffer is cleared once
-    after preflight and accumulates the mass-clamped transfer applied in each
-    substep; a supplied ``total_mass_transfer`` is returned by identity.
+        after preflight and accumulates the P2-finalized, inventory-limited
+        transfer applied in each substep; a supplied ``total_mass_transfer`` is
+        returned by identity.
     Callers must keep supplied arrays alive and unmodified until launched work
     completes, and may reuse them only after a successful completion. Complete
     supplied-field metadata validation precedes allocation, environment
@@ -688,7 +690,11 @@ def _accumulate_energy_transfer_kernel(
     latent_heat: Any,
     energy_transfer: Any,
 ) -> None:
-    """Accumulate one particle's signed energy using parallel particle lanes."""
+    """Accumulate signed energy from the finalized whole-call transfer.
+
+    Parallel particle lanes add each finalized whole-call particle transfer
+    multiplied by its species latent heat to the per-box, per-species output.
+    """
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     for species_idx in range(total_mass_transfer.shape[2]):
         wp.atomic_add(
@@ -721,7 +727,13 @@ def _couple_finalized_transfer_to_gas_kernel(
     concentration: Any,
     gas_concentration: Any,
 ) -> None:
-    """Conservatively subtract finalized particle transfer from gas."""
+    """Couple one finalized P2 transfer to gas concentration conservatively.
+
+    Each box-species lane sums finalized particle transfer weighted by particle
+    concentration in ascending particle-index order, then subtracts that mass
+    concentration delta from gas. Negative finalized transfer therefore adds
+    evaporated inventory to gas.
+    """
     box_idx, species_idx = wp.tid()  # type: ignore[misc]
     gas_delta = wp.float64(0.0)
     for particle_idx in range(finalized.shape[1]):
@@ -1541,8 +1553,10 @@ def condensation_step_gpu(  # noqa: C901
         mass_accommodation: Optional per-species accommodation coefficient.
         diffusion_coefficient_vapor: Optional per-species vapor diffusion
             coefficient [m^2/s].
-        mass_transfer: Optional preallocated accumulated applied-transfer buffer
-            with shape ``(n_boxes, n_particles, n_species)``.
+        mass_transfer: Optional preallocated whole-call accumulator for the
+            P2-finalized applied transfer [kg], with shape
+            ``(n_boxes, n_particles, n_species)``. It is not raw proposal
+            workspace.
         environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``
             temperature and pressure arrays on the same device as ``particles``
             and ``gas``. This mode is supported when both direct inputs are
@@ -1561,11 +1575,10 @@ def condensation_step_gpu(  # noqa: C901
             field must be active-device ``wp.float64``. Fields may be omitted
             independently and use step-local fallback allocation. A supplied
             total transfer buffer is returned by identity. Work retains the
-            final gated raw proposal and total accumulates P2-finalized applied
-             transfers.
-             P2 limiting sidecars have shape ``(n_boxes, n_species)`` and are
-             validated before launch and are reused by all four P2 finalization
-             cycles.
+            final P1-gated raw proposal; total accumulates P2-finalized applied
+            transfers. P2 limiting sidecars have shape
+            ``(n_boxes, n_species)``, validate before launch, and are reused by
+            all four P2 finalization cycles.
             Validation is performed before allocation or mutation. Arrays must
             remain alive and unmodified until launched work completes and may
             be reused only after a successful completion.
@@ -1577,21 +1590,22 @@ def condensation_step_gpu(  # noqa: C901
             write-only energy output [J] shaped ``(n_boxes, n_species)``. It
             requires valid ``latent_heat``. After successful preflight, the
             same buffer is cleared and overwritten with signed whole-call
-            bounded applied transfer times per-species ``latent_heat``; callers
-            may reuse it on a later successful call. Its existing contents,
-            including stale NaN/Inf, are deliberately not validated because it
-            is output-only diagnostic storage. It is not returned as a third
-            tuple item.
+            finalized applied transfer times per-species ``latent_heat``;
+            callers may reuse it on a later successful call. Its existing
+            contents, including stale NaN/Inf, are deliberately not validated
+            because it is output-only diagnostic storage. It is not returned as
+            a third tuple item.
         thermal_work: Optional caller-owned per-species thermal-work sidecar
             [J/kg] as an active-device ``wp.float64`` array shaped
             ``(n_species,)``. It is validated but deferred and unused P3 state;
             this step does not allocate, initialize, modify, or consume it.
 
     Returns:
-        Two-item tuple of the particle data with in-place updated masses and
-        accumulated, P2-finalized mass transfer [kg]. ``energy_transfer``, when
-        supplied, remains caller-owned output rather than a third tuple item.
-        Gas concentration is coupled after each finalized substep transfer.
+        Two-item tuple of the particle data with in-place updated masses and the
+        whole-call accumulated P2-finalized mass transfer [kg].
+        ``energy_transfer``, when supplied, remains caller-owned output rather
+        than a third tuple item. Gas concentration is coupled after each
+        finalized substep transfer.
 
     Raises:
         ValueError: If species counts, array lengths, or devices mismatch.
@@ -1627,8 +1641,9 @@ def condensation_step_gpu(  # noqa: C901
         inputs, or keyword-only ``environment=...`` execution. NumPy arrays,
         Python lists, and other non-Warp direct array-likes are rejected.
 
-        Particle masses are updated in-place on the GPU. Callers that require
-        rollback should copy masses before invoking this function.
+        Particle masses and gas concentration are updated in-place on the GPU.
+        Callers requiring rollback must retain or restore pre-call snapshots of
+        both fields and of caller-owned output buffers.
 
         Exactly four equal substeps run for every valid timestep. The returned
         transfer buffer accumulates the P2-finalized applied transfer from all
@@ -1655,10 +1670,11 @@ def condensation_step_gpu(  # noqa: C901
         current temperature, prepares box-level properties, calculates and
         gates a raw proposal from current particle mass, validates that fresh
         proposal, then P2-finalizes, applies, couples, and accumulates it.
-        A later-substep fresh-proposal validation failure does not roll back
-        earlier completed substeps: it may leave only that substep's raw work
-        proposal written, while its P2, particle, gas, total, and energy state
-        remains unchanged.
+        A fresh-proposal validation failure is the partial-failure boundary.
+        Earlier completed substeps are not rolled back. The failing substep may
+        write only its raw work proposal; it does not mutate P2 sidecars,
+        particle mass, gas concentration, the finalized total, or energy
+        output. Callers that need retry semantics must restore their snapshots.
         Float32 temperature arrays are
         cast device-side to float64 for refresh.
 
@@ -1683,10 +1699,11 @@ def condensation_step_gpu(  # noqa: C901
         before launch, finite latent heat is limited to ``1e9`` J/kg.
 
         Energy transfer is caller-owned, allocation-stable diagnostic storage.
-        It is cleared and overwritten only after successful preflight, is
-        reconstructible on each successful whole call, and is deliberately not
-        content-validated because the step only writes it. This write-only
-        contract permits stale finite values and NaN/Inf prior to a call.
+        It is cleared once after successful preflight and, after all four
+        substeps, records the signed finalized whole-call transfer multiplied by
+        latent heat. It is deliberately not content-validated because the step
+        only writes it. This write-only contract permits stale finite values and
+        NaN/Inf before a call.
     """
     if (
         isinstance(time_step, bool)

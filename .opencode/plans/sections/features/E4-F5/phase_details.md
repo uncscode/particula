@@ -27,12 +27,17 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
      evaporation, mixed signs, inactive and pre-gated entries, and multi-box/
      species isolation; atomic preflight and P1 public-isolation regressions.
 
-- [ ] **E4-F5-P3:** Four-substep coupled gas mutation and conserved transfer with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Mutate gas and particles from one transfer and refresh current gas each substep.
-   - Files: `particula/gpu/kernels/condensation.py` (`condensation_step_gpu()`
-     four-substep orchestration) and `particula/gpu/kernels/tests/condensation_test.py`
-  - Tests: exactly four steps, scratch reuse, finalized return, latent-energy coupling
+- [x] **E4-F5-P3:** Four-substep coupled gas mutation and conserved transfer with unit tests
+   - Issue: #1304 | Size: S | Status: Shipped (2026-07-14)
+   - Delivered: four fixed P1→P2 cycles apply finalized transfer to particles,
+     deterministically couple its weighted opposite to gas, and use finalized
+     total/energy accounting. Aggregate preflight and scratch ownership are
+     atomic; later fresh-proposal failures retain earlier completed cycles.
+   - Files: `particula/gpu/kernels/condensation.py`,
+     `particula/gpu/kernels/tests/_condensation_test_support.py`, and
+     `particula/gpu/kernels/tests/condensation_test.py`
+   - Tests: four-cycle NumPy oracle/order, zero/empty/single-particle limits,
+     atomic preflight/aliasing, fresh-proposal boundary, and scratch reuse
 
 - [ ] **E4-F5-P4:** Production-hook conservation regressions and backend parity
   - Issue: TBD | Size: S | Status: Not Started

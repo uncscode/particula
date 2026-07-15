@@ -267,14 +267,18 @@ def to_warp_gas_data(
         ``GasData`` does not own that field. Callers may supply an initial
         ``(n_boxes, n_species)`` vapor-pressure array for kernels that consume
         it directly. ``condensation_step_gpu()`` instead refreshes this buffer
-        from its thermodynamic configuration on every substep.
+        from its thermodynamic configuration on every substep. That step also
+        updates this mirror's ``concentration`` from each P2-finalized particle
+        transfer. The updated concentration informs the next mass-transfer
+        proposal, not vapor-pressure refresh.
 
         If ``vapor_pressure`` is omitted, this helper allocates a zero-filled
         ``(n_boxes, n_species)`` GPU buffer on the selected device. That
         default keeps the transfer schema valid. It is suitable for
         ``condensation_step_gpu()``, which overwrites vapor pressure before
-        calculating transfer, but not for kernels that consume the field
-        without refreshing it.
+        calculating transfer and couples finalized transfer to gas
+        concentration, but not for kernels that consume the field without
+        refreshing it.
 
     Args:
         data: CPU-side GasData container.
@@ -424,8 +428,10 @@ def from_warp_gas_data(
     checkpointing, analysis, or continuing with CPU-based operations.
 
     Note:
-        The restored CPU ``GasData`` omits ``vapor_pressure`` because that
-        field is not part of the CPU schema. The ``WarpGasData`` container may
+        The restored CPU ``GasData`` includes the current GPU concentration,
+        including in-place condensation coupling. It omits ``vapor_pressure``
+        because that field is not part of the CPU schema. The ``WarpGasData``
+        container may
         still retain ``gpu_data.vapor_pressure`` after this helper returns, so
         callers can keep reading that GPU-side field while they retain the GPU
         container, or preserve a sidecar copy if they need a detached CPU copy.

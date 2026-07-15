@@ -6,10 +6,14 @@
   plus same-box/species release from the already-gated proposal.
 - [x] Issue #1303 direct helper: evaporation never exceeds per-particle owned
   mass.
-- [ ] Particle gain equals gas loss for every box/species at tight tolerance.
-- [ ] Gas and particle inventories remain finite and nonnegative; inactive slots are unchanged.
-- [ ] All four fixed substeps consume current, already-updated gas state.
-- [ ] Returned transfer and E4-F4 heat use the exact finalized applied transfer.
+- [x] Issue #1304: particle gain equals gas loss for every tested box/species at
+  tight deterministic bookkeeping tolerance.
+- [x] Issue #1304: gas and particle inventories remain finite/nonnegative and
+  inactive slots remain unchanged in focused Warp regressions.
+- [x] Issue #1304: all four fixed substeps use current, already-coupled gas for
+  subsequent mass-transfer proposals.
+- [x] Issue #1304: returned transfer and E4-F4 heat use exact finalized applied
+  transfer.
 - [x] Issue #1302: partitioning and supplied P2-sidecar
   shape/device/dtype/value failures occur before observable state mutation.
 - [x] Issue #1302: binary-mask checking uses only a private status readback; no
@@ -18,7 +22,7 @@
   masses, gas, proposal, or supplied P2 sidecars change.
 - [x] Issue #1303: the public P1 path launches no P2 inventory kernels and
   leaves supplied P2 sidecars untouched.
-- [ ] Production hook and issue #1272 conservation regression land together.
+- [ ] Production hook and issue #1272 integration conservation regression land together.
 - [ ] CPU reference and Warp CPU pass; CUDA parity passes when available.
 
 | Metric | Baseline | Target | Source |

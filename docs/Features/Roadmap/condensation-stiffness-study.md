@@ -2,25 +2,31 @@
 
 This note is the canonical decision record for GPU condensation integration.
 The shipped production path uses four fixed equal substeps; P2/P3 candidate
-comparisons remain historical evidence only. The current production GPU path
-remains particle-only and `float64` bounded; this page does not claim that
-gas-coupled production condensation has shipped.
+comparisons remain historical evidence only. The current production GPU path is
+`float64` bounded and couples P2-finalized particle transfer to gas
+concentration; this remains a narrow direct-kernel contract rather than a
+general GPU production claim.
 
 ## Current Runtime Scope
 
 - Production path: explicit fixed-four GPU condensation. Every successful
   `condensation_step_gpu(...)` call performs exactly four `time_step / 4.0`
   substeps.
-- Particle update: particle masses are clamped to remain non-negative.
-- Gas update: the current Warp path is particle-only and does not yet update gas
-  concentrations during production condensation.
+- Particle and gas update: each raw proposal is P2-finalized against inventory,
+  then applied to particle mass and coupled to gas concentration by the matching
+  particle-concentration-weighted transfer.
 - Per-substep order: optionally refresh composition-weighted surface tension,
   overwrite `gas.vapor_pressure`, refresh environment properties, produce a raw
-  transfer proposal, then apply and accumulate its mass-clamped transfer.
+  transfer proposal, P2-finalize and apply it, accumulate the finalized
+  transfer, and couple gas concentration. Later proposals read coupled gas;
+  vapor-pressure refresh does not read gas concentration.
 - Transfer buffers: the resolved total transfer is cleared once after preflight
-  and accumulates applied clamped transfer over all four substeps. A supplied
-  total buffer is returned by identity; the separate work buffer retains only
-  the final raw proposal.
+  and accumulates P2-finalized transfer over all four substeps. A supplied total
+  buffer is returned by identity; the separate work buffer retains only the
+  final raw proposal.
+- Failure boundary: invalid aggregate P2 state or sidecars fail before launches
+  or mutation. A later non-finite fresh proposal fails before P2 mutation in
+  that cycle but does not roll back earlier completed substeps.
 - Baseline backend for this phase: `np.float64` inputs and Warp CPU execution.
 - Accepted study inputs: scalar `temperature` and `pressure`, direct Warp
   arrays with shape `(n_boxes,)`, and the tested hybrid mode where one direct
@@ -70,9 +76,9 @@ The baseline tests use the following helper concepts:
   shapes.
 - `_validate_stiffness_case_metadata`: declared case metadata must match array
   shape and `np.float64` dtype expectations.
-- `_classify_particle_only_condensation_stiffness`: returns a stable/unstable
-  result for the current particle-only GPU path and marks the
-  `particle_only_update` caveat explicitly.
+- `_classify_particle_only_condensation_stiffness`: historical test helper name
+  retained for the recorded study; it is not the current gas-coupled runtime
+  contract.
 
 ### Boundary Semantics
 
@@ -98,31 +104,31 @@ case, the collected tests:
 - execute the fixed timestep grid from `_RECORDED_TIMESTEP_GRID_BY_CASE`
 - reuse one caller-owned preallocated `mass_transfer` buffer per case/device
 - rebuild particle, gas, and vapor-pressure inputs before every trial
-- verify that the current Warp path updates particle masses only and leaves gas
-  concentration unchanged
+- historical baseline: record the then-current particle-only behavior; these
+  rows do not describe the later P2-finalized gas-coupled runtime
 - keep scalar `temperature` / `pressure` inputs for single-box cases and direct
   Warp `(n_boxes,)` arrays for the multi-box `droplet_like` case
 
 | Case | Environment input mode | Timestep | Threshold | Classification | Notes |
 | --- | --- | ---: | ---: | --- | --- |
-| `nanometer` | scalar `temperature` / `pressure` | `0.00005` | `1.0` | `stable` | Caller-owned buffer reused and overwritten; executed Warp gas state unchanged. |
-| `nanometer` | scalar `temperature` / `pressure` | `0.05` | `1.0` | `stable` | Same fixed-shape particle-only path; executed Warp gas state unchanged. |
-| `nanometer` | scalar `temperature` / `pressure` | `50.0` | `1.0` | `stable` | Same caller-owned buffer contract; executed Warp gas state unchanged. |
-| `accumulation_mode` | scalar `temperature` / `pressure` | `0.004` | `1.0` | `stable` | Caller-owned buffer reused and overwritten; executed Warp gas state unchanged. |
-| `accumulation_mode` | scalar `temperature` / `pressure` | `0.4` | `1.0` | `stable` | Same fixed-shape particle-only path; executed Warp gas state unchanged. |
-| `accumulation_mode` | scalar `temperature` / `pressure` | `40.0` | `1.0` | `stable` | Same caller-owned buffer contract; executed Warp gas state unchanged. |
-| `droplet_like` | direct Warp `(n_boxes,)` arrays | `0.04` | `1.0` | `stable` | Multi-box direct-array environment inputs stay supported; executed Warp gas state unchanged. |
-| `droplet_like` | direct Warp `(n_boxes,)` arrays | `4.0` | `1.0` | `stable` | Same fixed-shape particle-only path; executed Warp gas state unchanged. |
-| `droplet_like` | direct Warp `(n_boxes,)` arrays | `400.0` | `1.0` | `stable` | Same caller-owned buffer contract; executed Warp gas state unchanged. |
+| `nanometer` | scalar `temperature` / `pressure` | `0.00005` | `1.0` | `stable` | Historical particle-only baseline; caller-owned buffer reused and overwritten. |
+| `nanometer` | scalar `temperature` / `pressure` | `0.05` | `1.0` | `stable` | Historical particle-only baseline. |
+| `nanometer` | scalar `temperature` / `pressure` | `50.0` | `1.0` | `stable` | Historical particle-only baseline. |
+| `accumulation_mode` | scalar `temperature` / `pressure` | `0.004` | `1.0` | `stable` | Historical particle-only baseline; caller-owned buffer reused and overwritten. |
+| `accumulation_mode` | scalar `temperature` / `pressure` | `0.4` | `1.0` | `stable` | Historical particle-only baseline. |
+| `accumulation_mode` | scalar `temperature` / `pressure` | `40.0` | `1.0` | `stable` | Historical particle-only baseline. |
+| `droplet_like` | direct Warp `(n_boxes,)` arrays | `0.04` | `1.0` | `stable` | Historical particle-only baseline; multi-box direct arrays supported. |
+| `droplet_like` | direct Warp `(n_boxes,)` arrays | `4.0` | `1.0` | `stable` | Historical particle-only baseline. |
+| `droplet_like` | direct Warp `(n_boxes,)` arrays | `400.0` | `1.0` | `stable` | Historical particle-only baseline. |
 
 Across the current recorded grid, the executable tests observe the same
-particle-only maximum fractional-mass-change magnitude (`1.0`) for every row.
+historical particle-only maximum fractional-mass-change magnitude (`1.0`) for every row.
 The baseline therefore applies one inclusive threshold (`1.0`) across the full
 grid and records every row as `stable` under that shared rule. Separate unit
 tests still cover the `unstable` branch for larger fractional changes,
 zero-mass growth, and non-finite values. This is recorded-grid evidence for the
-current fixed-shape particle-only path, not a gas-coupled conservation result
-and not a general stable-timestep limit for other cases.
+historical fixed-shape particle-only path, not evidence for the current
+gas-coupled conservation contract or a general stable-timestep limit.
 
 ## Candidate Evaluation Evidence
 
@@ -130,24 +136,19 @@ P2/P3 recorded two deterministic prototype candidates implemented in
 `particula/gpu/kernels/tests/_condensation_test_support.py` and collected
 through `particula/gpu/kernels/tests/condensation_stiffness_test.py`. They
 remain test-local evidence only; the public `condensation_step_gpu(...)`
-runtime and package export surface are unchanged, no production gas-coupled
-hook shipped, and no new private production helper was added.
+runtime and package export surface are unchanged. The later production path
+does ship gas coupling, but these candidates remain historical evidence only.
 
 | Candidate | Family | Buffer reuse | Determinism | Finite/non-negative masses | CPU-reference agreement | Graph capture | Autodiff note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `fixed_count_substeps_4` | Historical P2/P3 fixed-count explicit sub-stepping evidence; its fixed-four behavior is now shipped. | Pass: one caller-owned `mass_transfer` array plus fixed-shape `work`/`accumulator` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 5e-2` at the baseline timestep and `max relative error <= 5e-2` across the recorded grids for `nanometer`, `accumulation_mode`, and `droplet_like`. These bounds are case-specific evidence, not a general accuracy tolerance or stable-timestep limit. | Not evaluated as production graph-capture evidence. | Not evaluated as production autodiff evidence. |
 | `asymptotic_relaxation` | Asymptotic first-order bounded relaxation | Pass: one caller-owned `mass_transfer` array plus one fixed-shape `work` scratch reused across runs. | Pass: repeated runs for named stiffness cases produce identical arrays. | Pass: candidate tests require finite outputs and `>= 0` particle masses. | Pass within documented `rtol <= 3.5e-1` at the baseline timestep and `max relative error <= 3.5e-1` across the recorded grid. This looser bound is recorded as prototype evidence only and is not suitable for a production recommendation by itself. | Pass: fixed-shape algebra with no adaptive search or variable-length loops. | `exp(...)` relaxation remains differentiable away from the same clamp boundary, so it is a plausible autodiff target but not yet production-qualified. |
 
-### Phase Boundary Decision
+### Historical Phase Boundary Decision
 
-- Gas coupling is still deferred. No production gas-state update hook shipped in
-  this issue.
-- `condensation_step_gpu(...)` remains particle-only in production, so the new
-  candidate coverage should be read strictly as deterministic evaluation
-  evidence rather than a runtime capability change.
-- The exact split boundary remains the same: any production gas-coupled path
-  must land with same-issue particle-plus-gas conservation regression coverage
-  in `particula/integration_tests/condensation_particle_resolved_test.py`.
+- This decision preceded the shipped P2-finalized gas-coupled production path.
+  The candidate coverage remains deterministic evaluation evidence, not a
+  current runtime description.
 - The asymptotic candidate remains evidence-only because the tolerance required
   to track the current CPU/explicit reference is materially looser than the
   fixed-count candidate.
@@ -160,9 +161,8 @@ hook shipped, and no new private production helper was added.
 
 `fixed_count_substeps_4` is the shipped production integration behavior of
 `condensation_step_gpu(...)`, not a future prototype. Each valid call uses four
-equal substeps, updates particle masses in place, leaves
-`gas.concentration` unchanged, and keeps production calculations device
-resident.
+equal substeps, updates particle mass and gas concentration using the same
+P2-finalized transfer, and keeps production calculations device resident.
 
 Why this is the recommended path:
 
@@ -170,7 +170,7 @@ Why this is the recommended path:
   timestep and maximum relative error `<= 5e-2` only for the named
   `nanometer`, `accumulation_mode`, and `droplet_like` grids.
 - Successful calls preserve supplied total-buffer identity, clear that total
-  once after preflight, and accumulate applied mass-clamped transfer. A
+  once after preflight, and accumulate P2-finalized transfer. A
   separate work buffer retains the final raw proposal.
 - `CondensationScratchBuffers` remains a concrete-module-only sidecar. Its
   supplied active-device, stable-shape `wp.float64` fields may be omitted
@@ -190,23 +190,23 @@ Why this is the recommended path:
 - **Adaptive or dynamic-loop schemes:** deferred; no adaptive-stepping support
   is documented by this record.
 
-### Gas-coupled follow-up gate
+### Current gas-coupling boundary
 
-The recommendation remains bounded to particle-only production condensation.
-Any future production gas-coupled GPU path must land with the production hook
-plus same-issue particle-plus-gas conservation regression coverage in
-`particula/integration_tests/condensation_particle_resolved_test.py`.
-Until that gate lands, roadmap and implementation guidance must not claim that
-GPU condensation updates gas concentrations in production.
+The shipped direct kernel couples each finalized transfer to gas concentration;
+later mass-transfer proposals observe that updated gas state. This is not
+temperature feedback, a strategy or `Runnable` path, adaptive stepping, graph
+capture/replay, autodiff support, or general CPU-strategy parity. A failed
+aggregate P2 preflight is atomic, while a later raw-proposal failure retains
+completed earlier substeps rather than rolling back the whole call.
 
 ### Downstream gates and dependency boundaries
 
 E4-F4 P2 ships a low-level, per-substep latent-heat rate correction with
 CPU-oracle/Warp parity. Issue #1272 also ships its caller-owned, signed
 `energy_transfer` diagnostic: after successful preflight, its active-device
-`wp.float64` `(n_boxes, n_species)` output is overwritten with mass-clamped
-applied transfer times latent heat. It does not add temperature-state feedback,
-E4-F5 gas coupling and particle-plus-gas conservation, E4-F6
+`wp.float64` `(n_boxes, n_species)` output is overwritten with P2-finalized
+transfer times latent heat. It does not add temperature-state
+feedback, E4-F6
 independent-device plus graph/autodiff evidence, or E4-F7 strategy/runnable
 and final support work.
 
@@ -224,14 +224,13 @@ This record does **not** publish:
 
 - adaptive or exhaustive timestep search results
 - generalized stable timestep limits
-- gas-coupled conservation claims that the current production path does not yet
-  satisfy
-- P3/P4 temperature-feedback claims; E4-F5 gas coupling or conservation
-  claims; or E4-F6 independent-device, graph-capture/replay, or autodiff
+- general CPU-strategy parity or accuracy claims beyond the documented direct
+  kernel cases
+- P3/P4 temperature-feedback claims; E4-F6 independent-device,
+  graph-capture/replay, or autodiff
   claims. Issue #1272's caller-owned signed `energy_transfer` diagnostic is
   shipped bookkeeping, not temperature feedback.
 - strategy/runnable-level latent-heat support
 
 Later phases can build on this measured baseline and recommendation without
-redefining case shapes, metric names, threshold meaning, or the current
-particle-only production boundary.
+redefining case shapes, metric names, or threshold meaning.

@@ -80,8 +80,8 @@ meets its exit bar, the next pending epic in the sequence becomes active.
     - [Mass Precision Recommendation Report](mass-precision-study.md) —
       canonical reference for downstream dtype/schema decisions
     - [Condensation stiffness study baseline](condensation-stiffness-study.md)
-      — recorded timestep grid, particle-only GPU contract, inclusive
-      threshold semantics, and accepted `(n_boxes,)` environment inputs
+      — recorded timestep grid, fixed-four P2-finalized direct GPU contract,
+      inclusive threshold semantics, and accepted `(n_boxes,)` environment inputs
 - [Epic B: Non-Isothermal Condensation Public API (CPU)](data-oriented-gpu.md#epic-b-non-isothermal-condensation-public-api-cpu)
   (ADW plan E1) — public builder/factory access, validation, and
   documentation for latent-heat condensation on the CPU reference path.
