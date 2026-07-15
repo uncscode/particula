@@ -16,10 +16,12 @@
     begin, recording, end, or launch skip only that device with operation
     context; normal-launch and post-launch correctness failures remain failures.
 - [x] Which smooth-interior slice is differentiated?
-  - Resolved 2026-07-13: use the out-of-place mass-transfer-rate kernel or one
-    out-of-place substep with positive inventories and inactive clamps/gates.
-    Verify `wp.Tape`/gradcheck access; do not claim gradients through final
-    in-place state updates.
+  - Resolved 2026-07-15 by #1311: the test differentiates only the
+    out-of-place `condensation_mass_transfer_kernel` raw-rate proposal with
+    positive inventory and executable interior-margin checks. Warp Tape is
+    compared with a centered fp64 derivative with
+    `rtol=2e-5`, `atol=1e-18`; P2 clamps, inventory scaling, and in-place mass
+    updates remain forward-only non-claims.
 - [x] Does strict conservation require an absolute tolerance?
   - Resolved 2026-07-13: yes. Use `rtol=1e-12` with
     `atol=max(1e-18, scale * eps)` so near-zero inventories remain meaningful.

@@ -1,7 +1,7 @@
 # Infrastructure Reuse
 
 - `condensation_step_gpu` and its validation/buffer setup in
-  `particula/gpu/kernels/condensation.py:387-570` are the production surface
+  `particula/gpu/kernels/condensation.py:1708-2470` are the production surface
   under qualification; extend behavior delivered by E4-F1 through E4-F5.
 - Shape/device validators in `particula/gpu/kernels/condensation.py:270-384`
   provide the fail-before-mutation contract.

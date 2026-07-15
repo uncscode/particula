@@ -29,6 +29,12 @@ evidence documentation rather than new physics.
   claim allocation-free capture or alter production behavior.
 - Bounded tape/gradcheck or access-verification experiments, with clamps and
   in-place mutation limitations recorded explicitly.
+- **Delivered in P4 (#1311):**
+  `particula/gpu/kernels/tests/condensation_autodiff_test.py` checks a bounded
+  out-of-place raw-rate Warp Tape derivative against a centered fp64 reference,
+  verifies access-configuration cleanup, and adds optional CUDA evidence. P2
+  clamp, inventory, and in-place-mutation cases are explicitly forward-only
+  non-claims; production APIs and published docs are unchanged.
 - An evidence matrix and focused reproduction commands.
 
 ## Out of Scope

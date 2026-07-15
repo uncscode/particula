@@ -34,6 +34,14 @@ device/operation skips when unavailable. This is readiness evidence, not an
 allocation-free or general graph-support claim; no production API or behavior
 changed.
 
+P4 is complete for issue #1311. Its dedicated autodiff test records a bounded
+one-box out-of-place raw-rate Warp Tape derivative against a centered-fp64
+reference, enables and restores Warp array-access verification, and adds
+optional CUDA evidence. Separate P2 tests prove evaporation clamping,
+inventory-limited uptake, and in-place mass mutation only as forward semantics;
+they make no backward claim. The change is test-only: no production API or
+published documentation changed.
+
 ## User Stories
 
 - As a scientist, I want each box and species compared with an independent CPU

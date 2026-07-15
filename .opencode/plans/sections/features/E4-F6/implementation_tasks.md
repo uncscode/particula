@@ -43,12 +43,14 @@
 - [x] Exercise capture readiness on Warp CPU and optional CUDA; unsupported
   capture APIs/capabilities skip with device and operation context, while
   normal-launch and post-launch correctness failures propagate.
-- [ ] Add a deterministic, out-of-place smooth-interior tape/gradcheck probe in
-  a focused `*_test.py` module only where Warp supports it; cap the test helper
-  at a small one-box/one-species fixture rather than expanding production code.
-- [ ] Enable array-access verification in that isolated probe and assert explicit
-  expected limitations for clamps, inventory gates, and in-place mutation rather
-  than weakening the supported-interior assertions.
+- [x] Add `particula/gpu/kernels/tests/condensation_autodiff_test.py` with a
+  deterministic one-box/one-particle/one-species, out-of-place smooth-interior
+  raw-rate Tape probe. It compares the gas-concentration derivative to a
+  centered fp64 finite difference on Warp CPU and optionally CUDA.
+- [x] Enable `verify_autograd_array_access` only within the isolated probe and
+  restore its exact prior value, including after a sentinel exception. Cover P2
+  evaporation clamp, uptake inventory scaling, and in-place mutation as
+  forward-only limitation semantics rather than gradient claims.
 
 ## Documentation / Validation
 
