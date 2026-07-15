@@ -1,5 +1,17 @@
 # Change Log
 
+## 2026-07-14 — E4-F5-P4 shipped (issue #1305)
+- Added regression-only concentration-weighted particle-plus-gas inventory
+  conservation coverage; production APIs, container schemas, and the fixed
+  four-substep behavior are unchanged.
+- Updated the CPU particle-resolved integration regression to account for H2O
+  and NH4HSO4 independently and to require exact invariance of gas-only N2.
+- Added a deterministic fp64 two-box public `condensation_step_gpu()` case with
+  uptake, evaporation, disabled partitioning, zero gas, and zero-concentration
+  slots. It checks per-box/per-species inventory at `rtol=1e-12, atol=1e-30`
+  separately from CPU-oracle parity at `rtol=2e-10, atol=1e-30`, on Warp CPU
+  and guarded CUDA.
+
 ## 2026-07-14 — E4-F5-P3 shipped (issue #1304)
 - Completed public four-fixed-substep P1/P2 orchestration in
   `particula/gpu/kernels/condensation.py`: finalized transfer is applied once,
