@@ -3321,7 +3321,7 @@ def _assert_particle_gas_inventory_conserved(
 def _contract_atol(*values: np.ndarray) -> float:
     """Return an fp64-scale absolute tolerance for P2 contract checks."""
     scale = max((float(np.max(np.abs(value))) for value in values), default=0.0)
-    return max(1.0e-18, scale * np.finfo(np.float64).eps)
+    return max(1.0e-25, scale * np.finfo(np.float64).eps)
 
 
 def _assert_contract_allclose(actual: np.ndarray, expected: np.ndarray) -> None:
@@ -3332,6 +3332,16 @@ def _assert_contract_allclose(actual: np.ndarray, expected: np.ndarray) -> None:
         rtol=1.0e-12,
         atol=_contract_atol(actual, expected),
     )
+
+
+def test_contract_atol_does_not_mask_tiny_mass_discrepancies() -> None:
+    """A discrepancy comparable to a tiny asserted mass must fail."""
+    actual = np.array([0.0], dtype=np.float64)
+    expected = np.array([1.0e-18], dtype=np.float64)
+
+    assert _contract_atol(actual, expected) == 1.0e-25
+    with pytest.raises(AssertionError):
+        _assert_contract_allclose(actual, expected)
 
 
 def _snapshot_warp_arrays(

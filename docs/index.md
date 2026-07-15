@@ -39,7 +39,9 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
    Omitted latent heat, or a zero per-species value, retains that species' isothermal rate path. The direct hook couples each P2-finalized particle transfer to gas
    using particle concentration and has separate particle-mass, gas-
    concentration, and per-box/per-species inventory-conservation regressions.
-   Broader temperature feedback, gas coupling/conservation, and strategy/runnable-level support remain deferred.
+    Broader temperature feedback and CPU-strategy/runnable-level support remain
+    deferred; this bounded direct-kernel behavior does not establish those
+    broader contracts.
 - **Interrogating your experimental data** to validate and expand your impact.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
 

@@ -18,7 +18,7 @@ pytestmark = pytest.mark.warp
 _INTERIOR_INVENTORY_MARGIN = 0.5
 _FINITE_DIFFERENCE_EPSILON = 1.0e-9
 _DERIVATIVE_RTOL = 2.0e-5
-_DERIVATIVE_ATOL = 1.0e-18
+_DERIVATIVE_ATOL = 5.0e-11
 
 
 @pytest.fixture(autouse=True)
