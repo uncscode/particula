@@ -17,11 +17,12 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
   - Files: `docs/Examples/gpu_direct_kernels_quick_start.py`, `docs/Examples/index.md`, `particula/gpu/tests/gpu_direct_kernels_example_test.py`
   - Tests: Exact output and forced no-Warp import isolation; lazy public/concrete import contract; mocked explicit conversion, restore, sidecar identity, and failure behavior; plus guarded real Warp-CPU transfer/energy/gas-coupling checks. `pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q -Werror`.
 
-- [ ] **E4-F7-P3:** Publish troubleshooting and focused reproduction commands with documentation tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Give users deterministic failure guidance and commands for the example, contract, stiffness, CPU reference, conservation, and docs suites.
-  - Files: `docs/Features/data-containers-and-gpu-foundations.md`, `docs/Features/particle-data-migration.md`, `readme.md`, documentation tests
-  - Tests: Command/path existence, troubleshooting keyword/constraint assertions, focused suites on Warp CPU, and warning-clean execution.
+- [x] **E4-F7-P3:** Publish troubleshooting and focused reproduction commands with documentation tests
+  - Issue: #1316 | Size: S | Status: Completed
+  - Completed: 2026-07-15 | Commit: `cb05def58`
+  - Delivered: Added deterministic direct-condensation troubleshooting and the canonical focused reproduction matrix to the foundations guide; added one migration pointer and one README discovery link. The matrix uses Warp `device="cpu"` as the required baseline and labels CUDA as optional/local additive evidence.
+  - Files: `docs/Features/data-containers-and-gpu-foundations.md`, `docs/Features/particle-data-migration.md`, `readme.md`, `particula/tests/condensation_latent_heat_docs_test.py`
+  - Tests: Scoped text-only command/path, heading, link, constraints, and evidence-separation assertions run without Warp/CUDA imports; published focused suites retain `-Werror` where advertised.
 
 - [ ] **E4-F7-P4:** Update development documentation and roadmap status
   - Issue: TBD | Size: XS | Status: Not Started

@@ -9,7 +9,7 @@
 - [x] Extend `docs/Features/particle-data-migration.md` with final call signatures and targeted validation failures.
 - [x] Extend `docs/Examples/gpu_direct_kernels_quick_start.py` using lazy kernel imports, Warp CPU default, ordered species configuration, reusable buffers, and explicit restore. Completed by Issue #1315 with two sequential direct calls and caller-owned scratch, latent-heat, and energy sidecars.
 - [ ] Add a parity walkthrough that constructs independent CPU and Warp inputs and separates physics, conservation, and energy tolerances. Deferred to a later phase; Issue #1315 provides bounded direct-kernel regression evidence, not a general parity walkthrough.
-- [ ] Publish focused commands in the canonical page and concise discovery links in `readme.md` and `docs/Examples/index.md`.
+- [x] Publish focused commands in the canonical page and concise discovery links in `readme.md` and the migration guide. Completed by Issue #1316; the migration guide links once to the canonical matrix and does not duplicate commands.
 - [ ] Update `docs/Features/Roadmap/data-oriented-gpu.md` only after all E4 evidence gates pass.
 
 ## Tooling / Tests
@@ -18,4 +18,5 @@
 - [x] Revise `particula/tests/condensation_latent_heat_docs_test.py` to recognize shipped low-level GPU support while retaining CPU-notebook and no-high-level-backend guardrails.
 - [x] Add documentation assertions for direct kernel imports, no hidden transfer/fallback, four substeps, Warp CPU baseline, optional CUDA, fixed-shape fp64, and unsupported modes.
 - [x] Validate the revised example's published path and focused command against its final test layout: `pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q -Werror`. Completed by Issue #1315.
+- [x] Add scoped text-only documentation assertions for troubleshooting remedies, exact baseline/CUDA commands and flags, target paths, migration/README canonical-anchor links, evidence separation, and prohibited claims. Completed by Issue #1316 without Warp/CUDA imports.
 - [ ] Run the complete cross-phase example, GPU contract, stiffness, CPU reference, documentation, and warning-clean suite set; record optional CUDA skips separately.

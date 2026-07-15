@@ -2,11 +2,11 @@
 
 ## Problem Statement
 
-Issues #1314 and #1315 completed the first two publication phases. The canonical foundations page states the bounded low-level GPU direct-condensation contract, while the revised quick-start now demonstrates its explicit-transfer workflow. The published material prevents users from inferring unsupported high-level integration, hidden host transfers, or behavior beyond the fixed four-substep direct-kernel path.
+Issues #1314 through #1316 completed the first three publication phases. The canonical foundations page states the bounded low-level GPU direct-condensation contract, the quick-start demonstrates its explicit-transfer workflow, and the troubleshooting section supplies reproducible failure guidance and focused commands. The published material prevents users from inferring unsupported high-level integration, hidden host transfers, or behavior beyond the fixed four-substep direct-kernel path.
 
 ## Value Proposition
 
-The completed phases preserve explicit CPU-to-Warp transfer ownership, lazy direct/concrete imports, fixed-shape fp64 caller-owned sidecars, gas coupling, and explicit final checkpoint restoration. The quick-start performs two sequential calls reusing the same scratch, latent-heat, and energy sidecars; regression coverage protects that behavior as well as the no-Warp path and the canonical documentation.
+The completed phases preserve explicit CPU-to-Warp transfer ownership, lazy direct/concrete imports, fixed-shape fp64 caller-owned sidecars, gas coupling, and explicit final checkpoint restoration. The published command matrix makes Warp `device="cpu"` the required baseline, treats CUDA as optional/local additive evidence, and keeps parity, inventory conservation, and energy bookkeeping as separate evidence classes. Text-only regressions protect the troubleshooting, command, migration-link, and README-discovery contracts without importing Warp or CUDA.
 
 ## User Stories
 

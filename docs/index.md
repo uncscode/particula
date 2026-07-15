@@ -181,9 +181,14 @@ print(result)
   `gas.concentration`, so later substeps read coupled gas inventory. It
   optionally accepts `latent_heat` rate correction and its write-only signed
   `energy_transfer` diagnostic, and refreshes caller-owned
-  `WarpGasData.vapor_pressure` from the current device-resident temperature
-  before mass transfer. For a runnable direct-kernel walkthrough, use
-  `python docs/Examples/gpu_direct_kernels_quick_start.py`.
+   `WarpGasData.vapor_pressure` from the current device-resident temperature
+   before mass transfer. For the supported low-level, direct-kernel-only
+   walkthrough, use `python docs/Examples/gpu_direct_kernels_quick_start.py`.
+   This path does not add high-level `Aerosol`/`Runnable` support, implicit
+   transfers or synchronization, automatic fallback or migration, or
+   CPU-strategy/runnable parity. See the [GPU condensation command
+   matrix](Features/data-containers-and-gpu-foundations.md#focused-reproduction-commands)
+   for focused troubleshooting and reproduction commands.
 - [ParticleData and GasData migration guide](Features/particle-data-migration.md)
   — migration workflow and before/after examples for moving from legacy facades
   to the canonical data-container contract documented in the foundation guide.
