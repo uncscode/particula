@@ -45,11 +45,20 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     CUDA is optional; unavailable capture support skips with device/operation
     context. No production API or behavior changed.
 
-- [ ] **E4-F6-P4:** Add bounded autodiff-readiness experiments and limitation tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Exercise supported smooth interiors and record clamp/in-place limitations without promising production gradients.
-  - Files: condensation support, autodiff-readiness tests.
-  - Tests: Deterministic tape/gradcheck where supported, array-access verification, explicit expected skip/limitation cases.
+- [x] **E4-F6-P4:** Add bounded autodiff-readiness experiments and limitation tests
+  - Issue: #1311 | Size: S | Status: Completed
+  - Delivered: `condensation_autodiff_test.py` records the derivative of the
+    out-of-place raw `condensation_mass_transfer_kernel` proposal with respect
+    to gas concentration. A one-box fp64 Warp Tape result is compared with a
+    centered finite difference while executable positivity/inventory margins
+    keep P2 boundaries inactive.
+  - Files: `particula/gpu/kernels/tests/condensation_autodiff_test.py`
+  - Tests: Warp CPU and optional CUDA Tape/reference checks; scoped
+    `verify_autograd_array_access` restoration after a sentinel failure; and
+    forward-only P2 evaporation clamp, uptake inventory scaling, and in-place
+    mutation tests. Missing Tape, backward, or access-verification capability
+    skips with bounded-probe/device context. No production API, behavior, or
+    published documentation changed.
 
 - [ ] **E4-F6-P5:** Update development documentation and evidence matrix
   - Issue: TBD | Size: XS | Status: Not Started

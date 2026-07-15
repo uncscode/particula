@@ -22,8 +22,12 @@
 - [x] P3 retains every supplied scratch and energy sidecar's identity, canonical
   shape, fp64 dtype, and active device across capture and replay; unsupported
   capture capability skips have device/operation context.
-- [ ] Bounded autodiff experiments report supported smooth-interior behavior and
-  explicit clamp/in-place limitations without claiming full differentiability.
+- [x] P4 compares the bounded out-of-place raw-rate Warp Tape derivative with a
+  centered fp64 reference on Warp CPU and optionally CUDA, with executable
+  smooth-interior margins and access-verification state restoration.
+- [x] P4 covers P2 evaporation clamping, uptake inventory scaling, and in-place
+  mass mutation as forward-only limitations without claiming full
+  differentiability.
 - [ ] Focused commands and evidence/non-claims are documented.
 
 ## Metrics

@@ -33,12 +33,17 @@ unchanged and changed code must retain at least 80% coverage.
   identity/shape/dtype/device stability is checked throughout. Warp CPU is
   covered and CUDA is optional. Capture support failures skip with the device
   and failed capture operation; correctness failures do not skip.
-- **P4:** Add
-  `particula/gpu/kernels/tests/condensation_autodiff_test.py` for a bounded
-  out-of-place smooth-interior tape/gradcheck and access verification.
-  Unsupported backends skip with precise reasons; clamps, inventory gates, and
-  in-place mutation are documented as unsupported rather than assigned
-  permissive gradient tolerances.
+- **P4 (completed, #1311):**
+  `particula/gpu/kernels/tests/condensation_autodiff_test.py` differentiates a
+  one-box, out-of-place raw `condensation_mass_transfer_kernel` proposal with
+  respect to gas concentration. It compares Warp Tape with a centered fp64
+  reference at `rtol=2e-5`, `atol=1e-18`, with executable positive/inventory
+  margins. The probe scopes `verify_autograd_array_access` and verifies exact
+  restoration after an exception. Warp CPU is required when available and CUDA
+  adds the same optional evidence; absent Tape, backward, or access-verification
+  capability skips with precise bounded-probe/device context. Separate
+  forward-only tests cover P2 evaporation clamp, inventory scaling, and
+  in-place mutation without asserting backend-specific gradients or warnings.
 - **P5:** Validate documentation links and execute focused reproduction commands.
 
 Parity and conservation are always distinct assertions. Warp absence and CUDA

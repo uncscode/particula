@@ -39,3 +39,13 @@
   user-facing documentation was added or revised.
 - This plan records the graph-capture readiness evidence and its bounded
   non-claims. P5 still owns user-facing evidence-matrix and roadmap updates.
+
+## Completed P4 Documentation Record
+
+- Issue #1311 added only
+  `particula/gpu/kernels/tests/condensation_autodiff_test.py`; no production
+  code, published documentation, or public API was revised.
+- This plan records the bounded out-of-place raw-rate Tape evidence,
+  centered-fp64 reference, access-verification cleanup, optional CUDA behavior,
+  and forward-only P2 clamp/inventory/in-place-mutation non-claims. P5 still
+  owns user-facing evidence-matrix and roadmap updates.
