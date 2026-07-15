@@ -178,6 +178,39 @@ Why this is the recommended path:
 - This shipped behavior does not establish graph capture/replay or autodiff
   readiness.
 
+### P1--P4 production-hook evidence boundary
+
+The historical candidate comparisons above used case-specific `5e-2` agreement
+thresholds. They are distinct from current production-hook evidence:
+
+| Evidence | Wrapper | Scope |
+| --- | --- | --- |
+| P1 | `particula/gpu/kernels/tests/condensation_test.py` | Independent NumPy-oracle parity for final particle mass and gas concentration, including one/multi-box and multi-species fixtures. |
+| P2 | `particula/gpu/kernels/tests/condensation_test.py` | Separate strict concentration-weighted particle-plus-gas conservation at `rtol=1e-12`, plus mutation and output-buffer contracts. |
+| P3 | `particula/gpu/kernels/tests/condensation_graph_capture_test.py` | CPU capture is capability-skipped; CUDA public-step replay is strict-xfailed because host validation readbacks are not capture-safe. This is a limitation, not support. |
+| P4 | `particula/gpu/kernels/tests/condensation_autodiff_test.py` | Raw-rate-only, one-box fp64 interior Tape derivative evidence; P2 clamps and inventory limits remain outside the derivative claim. |
+
+Warp CPU is the standard backend for supported P1/P2 and P4 probes when Warp is
+installed. CUDA is optional local/manual evidence. Fixed-four looping and stable
+caller-owned buffers enable deterministic evaluation, but neither supplies a
+graph-replay or general autodiff guarantee. The scope remains fp64,
+fixed-four-substep, no-temperature-feedback, no-adaptive-step direct-kernel
+behavior: it is not strategy/`Runnable` support or general CPU parity.
+
+Focused commands are:
+
+```bash
+pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
+pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror
+pytest particula/gpu/kernels/tests/condensation_graph_capture_test.py -q -Werror
+pytest particula/gpu/kernels/tests/condensation_autodiff_test.py -q -Werror
+
+# Optional CUDA selections.
+pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
+pytest particula/gpu/kernels/tests/condensation_graph_capture_test.py -q -m "warp and cuda" -Werror
+pytest particula/gpu/kernels/tests/condensation_autodiff_test.py -q -m "warp and cuda" -Werror
+```
+
 ### Alternatives considered but not selected
 
 - **Historical single-step explicit update:** retained only as a P2/P3
@@ -226,10 +259,10 @@ This record does **not** publish:
 - generalized stable timestep limits
 - general CPU-strategy parity or accuracy claims beyond the documented direct
   kernel cases
-- P3/P4 temperature-feedback claims; E4-F6 independent-device,
-  graph-capture/replay, or autodiff
-  claims. Issue #1272's caller-owned signed `energy_transfer` diagnostic is
-  shipped bookkeeping, not temperature feedback.
+- temperature-feedback, general graph-capture/replay, or general autodiff
+  claims. P3 records an unsupported public-step capture constraint, and P4 is
+  raw-rate-only interior evidence. Issue #1272's caller-owned signed
+  `energy_transfer` diagnostic is shipped bookkeeping, not temperature feedback.
 - strategy/runnable-level latent-heat support
 
 Later phases can build on this measured baseline and recommendation without

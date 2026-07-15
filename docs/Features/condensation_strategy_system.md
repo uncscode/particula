@@ -698,16 +698,38 @@ deferred and unused.
 This is diagnostic bookkeeping, not temperature feedback. The direct step
 couples finalized particle and gas transfer, but does not add strategy/
 `Runnable` integration, adaptive stepping, graph capture/replay, autodiff
-guarantees, or complete E4-F6 cross-device certification. For focused coverage,
-run:
+guarantees, or complete E4-F6 cross-device certification.
+
+#### P1--P4 direct-condensation evidence
+
+| Evidence | Discoverable wrapper | Bounded result and backend |
+| --- | --- | --- |
+| P1 parity | `particula/gpu/kernels/tests/condensation_test.py` | An independent NumPy fixed-four-substep oracle separately compares final particle masses and gas concentrations for one/multi-box and multi-species cases. Warp CPU is the normal backend when Warp is installed; CUDA is optional additive evidence. |
+| P2 conservation and contracts | `particula/gpu/kernels/tests/condensation_test.py` | Separate concentration-weighted particle-plus-gas inventory checks use `rtol=1e-12`, distinct from P1 parity. The wrapper also covers in-place mutation and caller-owned output contracts. |
+| P3 capture limit | `particula/gpu/kernels/tests/condensation_graph_capture_test.py` | Warp CPU capture is capability-skipped because Warp capture requires CUDA. CUDA public-step replay is a strict expected failure because host validation readbacks are not capture-safe. This records an unsupported capability, not replay support. |
+| P4 raw-rate autodiff | `particula/gpu/kernels/tests/condensation_autodiff_test.py` | A one-box fp64 out-of-place `condensation_mass_transfer_kernel` Tape derivative is compared with centered finite differences only in the interior, where P2 positivity and inventory boundaries are inactive. Warp CPU is the normal backend; CUDA is optional. |
+
+This matrix is evidence for `condensation_step_gpu` (P1--P3) or the raw
+`condensation_mass_transfer_kernel` (P4) only. It establishes no CPU strategy
+or `Runnable` equivalence, performance target, adaptive stepping, new API,
+general graph replay, or general differentiability claim. For focused,
+warning-clean coverage, run:
 
 ```bash
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
+pytest particula/gpu/kernels/tests/condensation_graph_capture_test.py -q -Werror
+pytest particula/gpu/kernels/tests/condensation_autodiff_test.py -q -Werror
+
+# Optional CUDA selections; unavailable CUDA must skip cleanly.
 pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
+pytest particula/gpu/kernels/tests/condensation_graph_capture_test.py -q -m "warp and cuda" -Werror
+pytest particula/gpu/kernels/tests/condensation_autodiff_test.py -q -m "warp and cuda" -Werror
 ```
 
 Warp-backed tests may skip when Warp is missing. CUDA evidence is optional when
-CUDA is unavailable; a skip is not GPU execution.
+CUDA is unavailable; a skip is not GPU execution. P3's CPU skip and CUDA strict
+expected failure document the public-step capture limitation rather than a
+successful capture replay.
 
 ## Limitations
 
