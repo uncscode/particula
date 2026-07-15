@@ -14,7 +14,9 @@ from typing import Any
 import numpy as np
 import pytest
 
+from particula.gas import GasData
 from particula.gpu import WARP_AVAILABLE
+from particula.particles import ParticleData
 
 EXAMPLE_PATH = (
     Path(__file__).resolve().parents[3]
@@ -233,6 +235,25 @@ def test_enabled_path_reuses_complete_caller_owned_sidecars(
         calls.append(kwargs)
         return args[0], kwargs["scratch_buffers"].total_mass_transfer
 
+    def fake_to_particles(*args: Any, **kwargs: Any) -> object:
+        conversion_calls["particles"] = (args, kwargs)
+        events.append("to_particles")
+        return gpu_particles
+
+    def fake_to_gas(*args: Any, **kwargs: Any) -> object:
+        conversion_calls["gas"] = (args, kwargs)
+        events.append("to_gas")
+        return gpu_gas
+
+    def fake_from_particles(value: Any) -> ParticleData:
+        events.append("from_particles")
+        return particle_data
+
+    def fake_from_gas(value: Any, name: list[str]) -> GasData:
+        restored_names.append(name)
+        events.append("from_gas")
+        return gas_data
+
     monkeypatch.setattr(example_module, "WARP_AVAILABLE", True)
     monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
     monkeypatch.setattr(
@@ -243,34 +264,22 @@ def test_enabled_path_reuses_complete_caller_owned_sidecars(
     monkeypatch.setattr(
         example_module,
         "to_warp_particle_data",
-        lambda *args, **kwargs: (
-            conversion_calls.setdefault("particles", (args, kwargs)),
-            events.append("to_particles"),
-            gpu_particles,
-        )[2],
+        fake_to_particles,
     )
     monkeypatch.setattr(
         example_module,
         "to_warp_gas_data",
-        lambda *args, **kwargs: (
-            conversion_calls.setdefault("gas", (args, kwargs)),
-            events.append("to_gas"),
-            gpu_gas,
-        )[2],
+        fake_to_gas,
     )
     monkeypatch.setattr(
         example_module,
         "from_warp_particle_data",
-        lambda value: (events.append("from_particles"), particle_data)[1],
+        fake_from_particles,
     )
     monkeypatch.setattr(
         example_module,
         "from_warp_gas_data",
-        lambda value, name: (
-            restored_names.append(name),
-            events.append("from_gas"),
-            gas_data,
-        )[2],
+        fake_from_gas,
     )
 
     result = example_module.run_example(device="cpu")
