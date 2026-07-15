@@ -475,11 +475,13 @@ Additional shipped boundaries:
 - Kernels and runnables do not perform hidden simulation-state transfers.
   Explicitly supplied step and output buffers do mutate in place: particle
   masses, gas concentration, scratch transfer fields, total transfer, and
-  energy output retain their documented write semantics. Callers remain
-  responsible for synchronization before host observation or restoration.
+  energy output retain their documented write semantics.
+  Callers remain responsible for synchronization before
+  host observation or restoration.
   Validation `.numpy()` readbacks at their documented preflight and per-substep
-  boundaries, including CUDA validation-flag readbacks, may synchronize without
-  transferring simulation state.
+  boundaries may synchronize without transferring simulation state.
+  CUDA preflight validation-flag readbacks may
+  synchronize without transferring simulation state.
 - Direct condensation does not add a high-level `Aerosol`/`Runnable` path,
   automatic backend selection or fallback, implicit transfer or synchronization,
   adaptive stepping, new container fields, kernels, or physics, BAT, or
@@ -544,9 +546,11 @@ path.
   - Treat device-mismatch `ValueError` failures as input validation, not as a
     signal that Particula will migrate arrays automatically.
 - **Condensation scratch buffers**
-  - Keep supplied `CondensationScratchBuffers` fields on the active device with
-    their required stable `wp.float64` shapes. Omitted fields allocate fallback
-    storage independently.
+  - Preserve leading `(n_boxes, ...)` layouts. Keep supplied
+    `CondensationScratchBuffers` fields on the active device with their
+    required stable `wp.float64` shapes: transfer fields use
+    `(n_boxes, n_particles, n_species)` and property fields use `(n_boxes,)`.
+    Only omitted fields allocate fallback storage independently.
   - Supplied fields preserve caller ownership and identity but are mutable
     work/output storage; do not expect a successful step to leave them
     unmodified.
@@ -554,6 +558,18 @@ path.
   - Pass either `environment=` or direct temperature/pressure inputs.
   - Do not mix scalar or Warp-array `temperature` / `pressure` values with
     `environment=`; current kernels reject that combination explicitly.
+  - When `environment=` is absent, provide both direct inputs. They must be
+    positive finite physical values and any direct Warp arrays must be
+    compatible with the active device.
+- **Species metadata and thermodynamics sidecars**
+  - Preserve ordered CPU gas-name metadata when restoring `GasData`, and keep
+    thermodynamics-sidecar species order aligned with `gas.molar_mass`.
+  - Confirm the configured water-species index addresses a valid species.
+- **P2 transfer and energy diagnostics**
+  - P2 inventory-limited applied transfers are expected bounded behavior, not
+    CPU-strategy or runnable parity evidence.
+  - `energy_transfer` is caller-owned whole-call P2-finalized output. Explicitly
+    synchronize before observing it on the host.
 - **Gas/environment restore expectations**
   - `from_warp_gas_data()` is intentionally lossy across the helper boundary:
     it restores ordered species names only when you supply them; otherwise it
@@ -563,6 +579,34 @@ path.
   - `from_warp_environment_data(..., sync=False)` is an explicit expert path;
     manual synchronization remains the caller's responsibility before NumPy
     access.
+
+### Focused reproduction commands
+
+These focused commands provide distinct evidence; none establishes either of
+the other evidence classes.
+
+| Command | Evidence |
+| --- | --- |
+| `python docs/Examples/gpu_direct_kernels_quick_start.py` | Canonical explicit-transfer walkthrough. |
+| `pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q` | Quick-start regression. |
+| `pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror` | Primary direct CPU-oracle particle-mass/gas-concentration parity matrix. |
+| `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror` | Bounded direct-step stiffness coverage. |
+| `pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q` | Separate particle-plus-gas inventory conservation checks. |
+| `pytest particula/integration_tests/condensation_particle_resolved_test.py -q` | Particle-resolved condensation integration. |
+| `pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror` | Latent-heat energy/bookkeeping documentation checks. |
+
+The required baseline is Warp `device="cpu"` when Warp is installed. The
+parity matrix, inventory conservation checks, and latent-heat energy/bookkeeping
+checks are separate: no one class proves either of the others.
+
+**Optional/local CUDA evidence:**
+
+```bash
+pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
+```
+
+This is additive to the required Warp `device="cpu"` baseline and skips
+cleanly when CUDA is unavailable.
 
 ## Related references
 

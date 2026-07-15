@@ -17,6 +17,71 @@ DOCS_INDEX_PATH = ROOT / "docs/index.md"
 ROADMAP_PATH = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
 FOUNDATIONS_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
 MIGRATION_PATH = ROOT / "docs/Features/particle-data-migration.md"
+README_PATH = ROOT / "readme.md"
+FOUNDATIONS_P3_HEADING = "### Focused reproduction commands"
+MIGRATION_P3_HEADING = (
+    "### Direct-condensation troubleshooting and reproduction"
+)
+P3_BASELINE_COMMANDS = (
+    "python docs/Examples/gpu_direct_kernels_quick_start.py",
+    "pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q",
+    "pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror",
+    "pytest particula/gpu/kernels/tests/condensation_stiffness_test.py "
+    "-q -Werror",
+    "pytest particula/integration_tests/"
+    "condensation_latent_heat_conservation_test.py -q",
+    "pytest particula/integration_tests/"
+    "condensation_particle_resolved_test.py -q",
+    "pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror",
+)
+P3_COMMAND_TARGETS = (
+    ROOT / "docs/Examples/gpu_direct_kernels_quick_start.py",
+    ROOT / "particula/gpu/tests/gpu_direct_kernels_example_test.py",
+    ROOT / "particula/gpu/kernels/tests/condensation_test.py",
+    ROOT / "particula/gpu/kernels/tests/condensation_stiffness_test.py",
+    ROOT
+    / "particula/integration_tests/condensation_latent_heat_conservation_test.py",
+    ROOT / "particula/integration_tests/condensation_particle_resolved_test.py",
+    ROOT / "particula/tests/condensation_latent_heat_docs_test.py",
+)
+P3_CUDA_COMMAND = (
+    "pytest particula/gpu/kernels/tests/condensation_test.py -q "
+    '-m "warp and cuda" -Werror'
+)
+P3_FOUNDATIONS_SNIPPETS = (
+    'Warp `device="cpu"`',
+    "**Optional/local CUDA evidence:**",
+    "skips cleanly when CUDA is unavailable",
+    "ordered CPU gas-name metadata",
+    "thermodynamics-sidecar species order",
+    "`(n_boxes, ...)`",
+    "`wp.float64`",
+    "`environment=`",
+    "positive finite physical values",
+    "P2 inventory-limited applied transfers",
+    "Explicitly synchronize before observing it on the host",
+    "particle-mass/gas-concentration parity matrix",
+    "particle-plus-gas inventory conservation checks",
+    "latent-heat energy/bookkeeping",
+)
+P3_MIGRATION_SNIPPETS = (
+    "ordered gas names",
+    "`(n_boxes, ...)`",
+    "`wp.float64`",
+    "`environment=`",
+    "positive finite temperature/pressure",
+    "P2 inventory limiting",
+    "Synchronize explicitly",
+    'Warp `device="cpu"`',
+    "CUDA is optional/local",
+    "skips cleanly when CUDA is unavailable",
+    "valid water-species index",
+    "caller-owned energy output",
+)
+P3_ANCHOR_LINK = (
+    "./docs/Features/data-containers-and-gpu-foundations.md"
+    "#focused-reproduction-commands"
+)
 FOUNDATIONS_CONFIGURATION_SNIPPETS = (
     "from particula.gpu.kernels import condensation_step_gpu",
     "constant `wp.int32(0)`",
@@ -100,6 +165,18 @@ ROADMAP_DIRECT_GPU_CONTRACT_SNIPPETS = (
     "E4-F4's #1272 signed diagnostic is shipped: optional keyword-only caller-owned",
     "This leaves temperature feedback, gas mutation",
 )
+
+
+def _normalized_section(content: str, heading: str) -> str:
+    """Return a heading section through the next same-or-higher heading."""
+    start = content.index(heading)
+    section = content[start:]
+    level = len(heading) - len(heading.lstrip("#"))
+    for line_index, line in enumerate(section.splitlines()[1:], start=1):
+        if line.startswith("#") and len(line) - len(line.lstrip("#")) <= level:
+            section = "\n".join(section.splitlines()[:line_index])
+            break
+    return " ".join(section.split())
 
 
 def test_condensation_latent_heat_notebook_exists_at_published_path() -> None:
@@ -328,3 +405,80 @@ def test_migration_page_links_to_canonical_gpu_condensation_contract() -> None:
         "Direct temperature", 1
     )[0]
     assert "gas_out" not in signature
+
+
+def test_p3_scoped_sections_publish_required_remedies() -> None:
+    """P3 troubleshooting sections retain their bounded remediation text."""
+    foundations = _normalized_section(
+        FOUNDATIONS_PATH.read_text(encoding="utf-8"),
+        "## Direct-kernel troubleshooting",
+    )
+    migration = _normalized_section(
+        MIGRATION_PATH.read_text(encoding="utf-8"),
+        MIGRATION_P3_HEADING,
+    )
+
+    for snippet in P3_FOUNDATIONS_SNIPPETS:
+        assert " ".join(snippet.split()) in foundations
+    for snippet in P3_MIGRATION_SNIPPETS:
+        assert " ".join(snippet.split()) in migration
+
+
+def test_p3_command_matrix_has_exact_commands_and_existing_targets() -> None:
+    """Published command matrix uses delivered paths and warning flags."""
+    content = FOUNDATIONS_PATH.read_text(encoding="utf-8")
+    commands = _normalized_section(content, FOUNDATIONS_P3_HEADING)
+
+    assert FOUNDATIONS_P3_HEADING in content
+    assert content.count(FOUNDATIONS_P3_HEADING) == 1
+    for command in P3_BASELINE_COMMANDS:
+        assert command in commands
+    assert P3_CUDA_COMMAND in commands
+    assert '-m "warp and cuda"' in commands
+    assert all("-q" in command for command in P3_BASELINE_COMMANDS[1:])
+    assert commands.count("-Werror") == 4
+    for target in P3_COMMAND_TARGETS:
+        assert target.exists()
+
+
+def test_p3_cross_links_keep_one_canonical_command_matrix() -> None:
+    """README and migration page discover the one canonical command matrix."""
+    readme = README_PATH.read_text(encoding="utf-8")
+    migration = _normalized_section(
+        MIGRATION_PATH.read_text(encoding="utf-8"),
+        MIGRATION_P3_HEADING,
+    )
+
+    assert readme.count(P3_ANCHOR_LINK) == 1
+    assert migration.count("#focused-reproduction-commands") == 1
+    assert "pytest " not in migration
+    assert (
+        "python docs/Examples/gpu_direct_kernels_quick_start.py"
+        not in migration
+    )
+
+
+def test_p3_command_evidence_and_scope_remain_bounded() -> None:
+    """P3 separates evidence classes without expanding runtime support."""
+    foundations = _normalized_section(
+        FOUNDATIONS_PATH.read_text(encoding="utf-8"),
+        "## Direct-kernel troubleshooting",
+    )
+    migration = _normalized_section(
+        MIGRATION_PATH.read_text(encoding="utf-8"),
+        MIGRATION_P3_HEADING,
+    )
+
+    assert (
+        "none establishes either of the other evidence classes" in foundations
+    )
+    assert "no one class proves either of the others" in foundations
+    for prohibited_claim in (
+        "automatic migration is supported",
+        "high-level `Aerosol`/`Runnable` support",
+        "mandatory CUDA",
+        "implicit transfer/synchronization",
+        "general CPU-strategy/runnable parity",
+    ):
+        assert prohibited_claim not in foundations
+        assert prohibited_claim not in migration
