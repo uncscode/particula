@@ -243,12 +243,16 @@ Across this boundary, shapes stay fixed:
 | --- | --- | --- | --- |
 | `name` | Ordered species names | Not stored | Restore requires caller-supplied ordered names, or placeholder names such as `species_0`. |
 | `molar_mass` | `(n_species,)` | `(n_species,)` | Round-trips without shape drift. |
-| `concentration` | `(n_boxes, n_species)` | `(n_boxes, n_species)` | Round-trips without shape drift. |
+| `concentration` | Mass concentration in `kg/m^3`, `(n_boxes, n_species)` | Authoritative active-device `wp.float64` mass concentration in `kg/m^3`, `(n_boxes, n_species)` | Round-trips without shape drift. Direct condensation mutates the GPU field in place. |
 | `partitioning` | `bool`, shape `(n_species,)` | Active-device binary `wp.int32`, shape `(n_boxes, n_species)` | CPU masks expand per box as `bool → int32`; kernels index `[box, species]`. CPU restore converts back to `bool` and requires every box to agree. |
 | `vapor_pressure` | Not owned by `GasData` | `(n_boxes, n_species)` | GPU-only helper state. Pass it explicitly when needed; CPU restore always drops it. |
 
 This makes GPU→CPU gas restore intentionally lossy unless the caller preserves
 ordered names and any vapor-pressure sidecar state outside `WarpGasData`.
+`concentration` remains the authoritative gas inventory while a direct kernel
+is running. In contrast, `vapor_pressure` is derived GPU-only helper state and
+is intentionally dropped by CPU restore; it is not an alternate concentration
+field or a source of hidden CPU↔Warp synchronization.
 
 Example explicit gas handoff:
 
@@ -297,16 +301,20 @@ sources are a direct scalar, a direct same-device Warp array with shape
 lists are not accepted as direct arrays, and the step does not perform hidden
 transfers.
 
-On every successful condensation call, the step validates all inputs and
-optional buffers first. It then casts a non-`wp.float64` direct or environment
-temperature array into a device-local float64 buffer when needed and performs
-exactly four equal `time_step / 4.0` substeps. Each substep overwrites
-`vapor_pressure`, prepares environment properties, makes a raw proposal,
-finalizes it against inventory, applies it to particles, accumulates it, and
-couples the matching concentration-weighted transfer to gas. Later proposals
-read that coupled gas concentration; vapor-pressure refresh does not. A failed
-aggregate preflight leaves the vapor-pressure output buffer unchanged. Import
-the standalone `refresh_vapor_pressure_gpu` only from
+On every successful condensation call, the step validates aggregate caller
+state and optional sidecars first. It then casts a non-`wp.float64` direct or
+environment temperature array into a device-local float64 buffer when needed
+and performs exactly four equal `time_step / 4.0` substeps. Each substep
+overwrites `vapor_pressure`, prepares environment properties, gates disabled
+partitioning entries and inactive particle slots, and creates a raw proposal.
+P2 finalizes that proposal against particle and gas inventory limits before the
+step applies the finalized transfer to particles and the matching
+concentration-weighted opposite delta to `gas.concentration`. Only then does it
+accumulate the P2-finalized applied transfer for return. Raw proposal work
+storage is intermediate state, not returned transfer. Later proposals read the
+coupled gas concentration; vapor-pressure refresh does not. A failed aggregate
+preflight leaves the vapor-pressure output buffer unchanged. Import the
+standalone `refresh_vapor_pressure_gpu` only from
 `particula.gpu.kernels.thermodynamics`, never `particula.gpu.kernels`.
 
 ### Condensation activity and surface sidecars
@@ -340,6 +348,17 @@ fresh raw proposal does not roll back completed substeps, although it occurs
 before P2 mutation in its failing substep. Unsupported activity or surface
 strategies are not silently copied or approximated; passing
 `activity_surface=None` retains legacy unit activity and static tension.
+
+`CondensationScratchBuffers` is a concrete-module-only optional sidecar at
+`particula.gpu.kernels.condensation`; it is not another step entry point.
+Supplied transfer fields must be active-device, stable-shape `wp.float64` arrays
+with shape `(n_boxes, n_particles, n_species)`, and supplied property fields
+must be active-device, stable-shape `wp.float64` arrays with shape `(n_boxes,)`.
+Each field may be omitted independently, in which case the step allocates only
+that field's fallback storage. Supplied fields remain caller-owned and preserve
+identity, but successful calls intentionally write mutable work/output storage.
+No new container field, sidecar API, host conversion, synchronization, or
+transfer is implied by this ownership contract.
 
 The direct condensation parity suite exercises all four activity/surface pairs
 (ideal/static, ideal/composition-weighted, kappa/static, and
@@ -407,6 +426,7 @@ than storage support.
 | CPU coagulation with data containers | `n_boxes == 1` only | Multi-box CPU execution is not yet a built-in runtime path. |
 | CPU↔GPU transfer | Explicit helper calls only | No hidden container movement or hidden environment synchronization. |
 | Warp/CUDA support | Optional | Warp parity tests always cover Warp `cpu`; `cuda` runs only when available. |
+| Low-level GPU condensation direct-kernel path | Bounded P1-P4 contract | Executes four fixed coupled substeps with active-device gas coupling; #1305/#1272 is direct-kernel and production-hook regression evidence, not broad GPU-condensation or E4 production support. E4-F6 and E4-F7 remain required gates. |
 | Low-level GPU coagulation direct-kernel path | Accepted with caveats | Appropriate for many independent boxes, especially when CUDA can supply box-level parallel throughput, Warp-backed direct-kernel workflows, and CUDA benchmark/study runs tied to the roadmap's measured decision record; not a broad production recommendation for large single-box workloads and does not imply hidden transfer or synchronization behavior. |
 | Fixed-shape GPU/runtime roadmap work | Not current runtime behavior | Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior. |
 
@@ -422,6 +442,9 @@ Additional shipped boundaries:
   they are not fields on `ParticleData`, `GasData`, `EnvironmentData`, or any
   Warp container schema.
 - No hidden CPU↔GPU synchronization occurs inside kernels or runnables.
+- Direct condensation does not add adaptive stepping, a high-level `Runnable`
+  path, general CPU-strategy parity, unproven physics, or automatic host/device
+  movement. E4-F6 and E4-F7 remain the broader evidence and final-support gates.
 
 ## Guidance for current users
 
@@ -480,6 +503,13 @@ path.
     device as the particle/gas/environment inputs used by the kernel call.
   - Treat device-mismatch `ValueError` failures as input validation, not as a
     signal that Particula will migrate arrays automatically.
+- **Condensation scratch buffers**
+  - Keep supplied `CondensationScratchBuffers` fields on the active device with
+    their required stable `wp.float64` shapes. Omitted fields allocate fallback
+    storage independently.
+  - Supplied fields preserve caller ownership and identity but are mutable
+    work/output storage; do not expect a successful step to leave them
+    unmodified.
 - **Mixed `environment=` plus scalar `temperature`/`pressure` inputs**
   - Pass either `environment=` or direct temperature/pressure inputs.
   - Do not mix scalar or Warp-array `temperature` / `pressure` values with

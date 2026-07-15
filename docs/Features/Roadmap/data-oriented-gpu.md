@@ -170,8 +170,11 @@ Known GPU physics gaps remain:
 
 - Bounded direct GPU condensation applies an optional Warp-backed latent-heat
   rate correction during each fixed substep and a signed energy diagnostic. It
-  couples P2-finalized transfer to gas concentration but does not provide
-  temperature feedback or high-level `Runnable` integration.
+  couples P2-finalized transfer to authoritative active-device gas
+  concentration, but does not provide temperature feedback or high-level
+  `Runnable` integration. This is a verified direct-kernel contract, not
+  complete GPU-condensation or E4 production support; E4-F6 and E4-F7 remain
+  the gates for those broader claims.
 - Particle charge is present in the GPU data container, but charged particle
   coagulation kernels are not implemented yet.
 - The current GPU coagulation path is Brownian-focused; charged, turbulent,
@@ -986,7 +989,10 @@ rate is `dm_i/dt = isothermal_rate_i / correction_i`, where
 `p_surface_i` is activity- and Kelvin-adjusted. Omitted latent heat or exactly
 zero per-species entries retain exact isothermal behavior.
 
-E4-F3 is shipped. Import its only step entry point with
+E4-F3 and E4-F5 P1-P4 are shipped. The #1305 regression gate for #1272
+verifies the bounded direct-kernel gas-coupling contract and its production
+hook, not general GPU-condensation physics, CPU-strategy parity, or complete E4
+production support. Import its only step entry point with
 `from particula.gpu.kernels import condensation_step_gpu`. When reusable scratch
 is needed, `CondensationScratchBuffers` is intentionally concrete-module-only
 at `particula.gpu.kernels.condensation.CondensationScratchBuffers`; it is not a
@@ -994,20 +1000,26 @@ second entry point. Supplied transfer fields have shape
 `(n_boxes, n_particles, n_species)` and property fields `(n_boxes,)`; each must
 be stable-shape, active-device `wp.float64`. Fields can be omitted
 independently, using fallback allocations. Supplied buffers preserve identity
-and remain caller-owned, alive, and unmodified through launch completion. The
-step executes four equal `time_step / 4.0` substeps: each optionally refreshes
-composition-weighted surface tension, overwrites `gas.vapor_pressure`, refreshes
-environment properties, produces a raw proposal, then applies and accumulates
-its P2-finalized inventory-limited transfer, accumulates it, and couples gas
-concentration by the matching particle-concentration-weighted amount. It clears
-its total buffer once after preflight, accumulates finalized transfer, and
-retains only the final raw proposal in work storage. It mutates particle masses
-and `gas.concentration` in place, and makes no hidden CPU↔Warp transfers. Later
-proposals read coupled gas, while vapor-pressure refresh does not. Aggregate
-invalid P2 state or sidecars fail before launches or mutation; a later fresh
-raw-proposal failure preserves completed prior substeps and may write only raw
-work storage in the failed cycle. Validation may read device metadata or
-thermodynamic inputs but does not transfer caller state.
+and remain caller-owned mutable work/output storage; a successful call may
+write their work or output fields. The step executes four equal
+`time_step / 4.0` substeps: each optionally refreshes composition-weighted
+surface tension, overwrites derived `gas.vapor_pressure`, refreshes environment
+properties, gates disabled per-box/species partitioning entries and inactive
+particle slots, produces a raw proposal, then P2-finalizes and applies its
+inventory-limited transfer. The active-device binary `wp.int32` partitioning
+mask has shape `(n_boxes, n_species)`. `WarpGasData.concentration` is the
+authoritative active-device `wp.float64` mass concentration in `kg/m^3` with
+that same shape; the step mutates it in place by the matching
+particle-concentration-weighted opposite delta. The caller-visible and
+accumulated transfer is the P2-finalized applied transfer, never the raw work
+proposal. The total buffer is cleared once after preflight, accumulates the
+finalized transfer, and work storage retains only the final raw proposal. No
+hidden CPU↔Warp transfer or synchronization occurs. Later proposals read
+coupled gas, while vapor-pressure refresh does not. Aggregate invalid P2 state
+or sidecars fail before launches or mutation; a later fresh raw-proposal failure
+preserves completed prior substeps and may write only raw work storage in the
+failed cycle. Validation may read device metadata or thermodynamic inputs but
+does not transfer caller state.
 
 E4-F4's #1272 signed diagnostic is shipped: optional keyword-only caller-owned
 active-device `wp.float64` `latent_heat`, `(n_species,)`, and
@@ -1017,10 +1029,11 @@ active-device `wp.float64` `latent_heat`, `(n_species,)`, and
 evaporation negative. Energy output requires valid latent heat, is overwritten
 only after successful preflight, is not a third return item, and has strict
 issue #1272 tolerance `rtol=1e-12, atol=1e-18`. `thermal_work` remains
-validated but deferred/unused. This leaves temperature feedback, gas mutation,
-adaptive substeps, high-level `Runnable`, graph capture/replay, autodiff
-guarantees, and complete E4-F6 cross-device certification outside the
-supported scope.
+validated but deferred/unused. This leaves temperature feedback, adaptive
+substeps, high-level `Runnable`, graph capture/replay, autodiff guarantees,
+general CPU-strategy parity, new-physics claims, and complete E4-F6
+cross-device certification outside the supported scope. E4-F7 remains the
+final support-contract, examples, troubleshooting, and support-matrix gate.
 
 Required Warp-CPU and optional CUDA evidence commands are:
 
