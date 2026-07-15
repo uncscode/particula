@@ -1,12 +1,12 @@
 # Success Criteria
 
-- [ ] Canonical documentation enumerates every supported vapor-pressure, activity, surface-tension, latent-heat, gas-coupling, diagnostic, scratch, shape, precision, and device contract delivered by E4-F1 through E4-F6.
-- [ ] Unsupported BAT/staggered modes, high-level integration, automatic backend selection, implicit fallback, and hidden transfer are explicit.
+- [x] Canonical documentation enumerates the shipped bounded direct-condensation vapor-pressure, activity, surface-tension, latent-heat, gas-coupling, diagnostic, scratch, shape, precision, and device contract.
+- [x] Unsupported BAT/staggered modes, high-level integration, automatic backend selection, implicit fallback, and hidden transfer are explicit.
 - [ ] The example runs on Warp CPU from a clean supported environment and visibly performs CPU-to-Warp conversion, low-level execution, and explicit checkpoint restore.
 - [ ] The example preserves ordered species metadata, uses reusable fixed-shape fp64 buffers, performs no per-substep host refresh, and matches documented conservation/energy semantics.
 - [ ] Troubleshooting covers configuration, order, shape, device, environment exclusivity, physical validation, scratch, inventory limiting, diagnostics, and missing Warp/CUDA.
 - [ ] Every published command resolves to a real post-E4 file/marker and passes on its required backend; optional CUDA skips cleanly when unavailable.
-- [ ] Issue 1272 documentation tests are revised deliberately and continue to reject unsupported high-level or hidden-transfer claims.
+- [x] Text-only publication tests deliberately cover the canonical foundations and migration wording and continue to reject unsupported high-level or hidden-transfer claims.
 - [ ] Roadmap shipped status is withheld until E4-F1 through E4-F6 evidence and E4-F7 publication checks all pass.
 
 ## Metrics
