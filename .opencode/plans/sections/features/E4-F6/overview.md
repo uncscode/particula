@@ -19,6 +19,12 @@ P1 is complete for issue #1308. Its deterministic fp64 matrix compares final
 particle mass and coupled gas concentration independently against a NumPy
 four-substep, P2-finalized, gas-coupled oracle on Warp CPU and optional CUDA.
 
+P2 is complete for issue #1309. It adds Warp-CPU contract regressions for
+per-box/per-species concentration-weighted particle-plus-gas conservation,
+P2-finalized transfer and unweighted latent-energy accounting, immutable
+caller inputs, atomic invalid-buffer rejection, and deterministic fresh runs.
+The delivered work is test-only and does not change production APIs or physics.
+
 ## User Stories
 
 - As a scientist, I want each box and species compared with an independent CPU

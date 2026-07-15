@@ -15,11 +15,19 @@ are generated and scheduled; `TBD` is not an unresolved design decision.
     includes uptake, evaporation, disabled partitioning, zero gas, and inactive
     particle slots; CUDA skips cleanly when unavailable.
 
-- [ ] **E4-F6-P2:** Add per-box per-species conservation and mutation-contract regressions
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Prove strict inventory/energy bookkeeping and validation-before-mutation.
-  - Files: condensation support and discoverable contract tests.
-  - Tests: Tight separate conservation assertions, inactive-entry checks, invalid-buffer non-mutation, deterministic repeats.
+- [x] **E4-F6-P2:** Add per-box per-species conservation and mutation-contract regressions
+  - Issue: #1309 | Size: S | Status: Completed
+  - Delivered: Warp-CPU contract regressions separately prove
+    concentration-weighted particle-plus-gas conservation for each box/species,
+    P2-finalized total-transfer accounting, and unweighted latent-energy
+    accounting.
+  - Files: `particula/gpu/kernels/tests/_condensation_test_support.py`,
+    `particula/gpu/kernels/tests/condensation_test.py`
+  - Tests: Inactive, disabled, and zero-concentration entries; inventory-limited
+    uptake; finite/nonnegative final state; immutable caller inputs;
+    caller-owned output identity; atomic representative invalid-buffer paths;
+    and deterministic runs with fresh state and sidecars. No production API or
+    physics changes were made.
 
 - [ ] **E4-F6-P3:** Prove fixed-loop reusable-buffer graph-capture readiness
   - Issue: TBD | Size: S | Status: Not Started

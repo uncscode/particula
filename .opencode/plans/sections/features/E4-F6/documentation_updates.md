@@ -22,3 +22,12 @@
 - This plan records the delivered P1 matrix, its independent NumPy oracle,
   Warp-CPU requirement, optional-CUDA behavior, and focused coverage. P5 still
   owns user-facing evidence-matrix and roadmap updates.
+
+## Completed P2 Documentation Record
+
+- Issue #1309 changed only `particula/gpu/kernels/tests/`
+  `_condensation_test_support.py` and `condensation_test.py`; no user-facing
+  documentation was added or revised.
+- This plan records the strict accounting, mutation-contract, and deterministic
+  fresh-run regressions. P5 still owns user-facing evidence-matrix and roadmap
+  updates.
