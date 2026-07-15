@@ -43,8 +43,8 @@ For the canonical container, shape, and CPU↔GPU transfer contract, see the
 For a runnable low-level walkthrough, run `python
 docs/Examples/gpu_direct_kernels_quick_start.py` to see explicit
 `to_warp_*` / `from_warp_*` boundaries, lazy kernel imports from
-`particula.gpu.kernels`, one condensation step, one coagulation step, and
-caller-owned `rng_states` on Warp's CPU backend by default.
+`particula.gpu.kernels`, two direct condensation calls with reused scratch
+buffers, latent-heat, and energy sidecars on Warp's CPU backend by default.
 For migration details and updated API mappings, see the
 [ParticleData and GasData Migration Guide](./docs/Features/particle-data-migration.md).
 Legacy facades remain available, with deprecation planned for v0.3.0.
