@@ -1029,8 +1029,9 @@ active-device `wp.float64` `latent_heat`, `(n_species,)`, and
 evaporation negative. Energy output requires valid latent heat, is overwritten
 only after successful preflight, is not a third return item, and has strict
 issue #1272 tolerance `rtol=1e-12, atol=1e-18`. `thermal_work` remains
-validated but deferred/unused. This leaves temperature feedback, adaptive
-substeps, high-level `Runnable`, graph capture/replay, autodiff guarantees,
+validated but deferred/unused. This leaves temperature feedback, gas mutation
+beyond the P2-finalized direct coupling, adaptive substeps, high-level
+`Runnable`, graph capture/replay, autodiff guarantees,
 general CPU-strategy parity, new-physics claims, and complete E4-F6
 cross-device certification outside the supported scope. E4-F7 remains the
 final support-contract, examples, troubleshooting, and support-matrix gate.
