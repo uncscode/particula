@@ -64,11 +64,11 @@
     {
       "id": "E4-F6-P3",
       "title": "Prove fixed-loop reusable-buffer graph-capture readiness",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-15",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
