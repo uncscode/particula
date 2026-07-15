@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from contextlib import suppress
 from typing import Any
 
 import numpy as np
@@ -21,6 +20,16 @@ _SCRATCH_FIELDS = (
     "positive_mass_transfer_demand",
     "negative_mass_transfer_release",
     "positive_mass_transfer_scale",
+)
+
+_CAPTURE_UNAVAILABLE_MESSAGES = frozenset(
+    {
+        "cuda graph capture is not supported on this device",
+        "cuda graph capture is not supported on cpu devices",
+        "graph capture is not supported on this device",
+        "graph capture is not supported on cpu devices",
+        "warp graph capture is only supported on cuda devices",
+    }
 )
 
 
@@ -156,30 +165,30 @@ def _reset_mutable_state(runtime: Any, state: dict[str, Any]) -> None:
 
 def _capture_support_error(error: BaseException) -> bool:
     """Return whether an exception reports capture support limitations."""
-    message = str(error).lower()
-    return any(term in message for term in ("captur", "graph", "not supported"))
-
-
-def _capture_recording_support_error(error: BaseException) -> bool:
-    """Return whether capture-recording failed for a known support reason."""
-    message = str(error).lower()
-    return _capture_support_error(error) or (
-        isinstance(error, ValueError)
-        and "gas.partitioning must contain only binary 0/1 values" in message
+    return (
+        isinstance(error, RuntimeError)
+        and str(error).strip().lower() in _CAPTURE_UNAVAILABLE_MESSAGES
     )
 
 
 def _require_capture_apis(wp: Any, device: str) -> None:
     """Skip when the required public Warp capture APIs are unavailable."""
+    if device == "cpu":
+        pytest.skip("cpu: Warp graph capture requires a CUDA device")
     for operation in ("capture_begin", "capture_end", "capture_launch"):
         if not callable(getattr(wp, operation, None)):
             pytest.skip(f"{device}: {operation} is unavailable")
 
 
-def _end_capture_best_effort(wp: Any) -> None:
-    """End an active capture and ignore cleanup failures."""
-    with suppress(Exception):
+def _end_capture_after_error(wp: Any, error: BaseException) -> None:
+    """End capture, retaining both operation and cleanup failures."""
+    try:
         wp.capture_end()
+    except BaseException as cleanup_error:
+        raise ExceptionGroup(
+            "Graph capture and its cleanup both failed",
+            [error, cleanup_error],
+        ) from None
 
 
 def _capture_graph_or_skip(
@@ -200,25 +209,26 @@ def _capture_graph_or_skip(
     try:
         result = call()
     except Exception as error:
-        if _capture_recording_support_error(error):
-            _end_capture_best_effort(wp)
-            capture_active = False
-            pytest.skip(f"{device}: capture_recording unavailable: {error}")
+        # ``capture_end`` consumes the capture even when it reports a cleanup
+        # failure, so the finalizer must not attempt a second teardown.
+        capture_active = False
+        _end_capture_after_error(wp, error)
         raise
     else:
         try:
             graph = wp.capture_end()
         except Exception as error:
+            # ``capture_end`` consumes the active capture even when it reports
+            # an unsupported graph operation; do not attempt a second teardown.
+            capture_active = False
             if _capture_support_error(error):
-                _end_capture_best_effort(wp)
-                capture_active = False
                 pytest.skip(f"{device}: capture_end unavailable: {error}")
             raise
         capture_active = False
         return graph, result
     finally:
         if capture_active:
-            _end_capture_best_effort(wp)
+            wp.capture_end()
 
 
 def _launch_graph_or_skip(runtime: Any, device: str, graph: object) -> None:
@@ -240,6 +250,74 @@ def _snapshot_state(state: dict[str, Any]) -> dict[str, np.ndarray]:
         "transfer": state["scratch"].total_mass_transfer.numpy().copy(),
         "energy": state["energy"].numpy().copy(),
     }
+
+
+def test_capture_capability_errors_are_precise() -> None:
+    """Only known Warp capability errors qualify for a capture skip."""
+    assert _capture_support_error(
+        RuntimeError("graph capture is not supported on this device")
+    )
+    assert not _capture_support_error(
+        ValueError("gas.partitioning must contain only binary 0/1 values")
+    )
+    assert not _capture_support_error(RuntimeError("graph allocation failed"))
+
+
+def test_capture_cleanup_propagates_failure_and_clears_normal_state() -> None:
+    """Capture cleanup clears state normally and exposes cleanup failures."""
+
+    class FakeWarp:
+        """Minimal capture-end fake for teardown regression coverage."""
+
+        def __init__(self, failure: BaseException | None = None) -> None:
+            self.active = True
+            self.failure = failure
+
+        def capture_end(self) -> None:
+            self.active = False
+            if self.failure is not None:
+                raise self.failure
+
+    normal = FakeWarp()
+    _end_capture_after_error(normal, ValueError("call failed"))
+    assert not normal.active
+
+    failing = FakeWarp(RuntimeError("cleanup failed"))
+    with pytest.raises(ExceptionGroup, match="cleanup") as captured:
+        _end_capture_after_error(failing, ValueError("call failed"))
+    assert not failing.active
+    assert len(captured.value.exceptions) == 2
+
+
+def test_capture_call_cleanup_is_not_repeated_after_failure() -> None:
+    """A capture-call failure attempts teardown exactly once."""
+
+    class FakeWarp:
+        """Minimal capture fake that records teardown attempts."""
+
+        def __init__(self) -> None:
+            self.capture_end_calls = 0
+
+        def capture_begin(self, **_: Any) -> None:
+            """Start the fake capture."""
+
+        def capture_end(self) -> None:
+            """Fail while consuming the active fake capture."""
+            self.capture_end_calls += 1
+            raise RuntimeError("cleanup failed")
+
+        def capture_launch(self, _: object) -> None:
+            """Expose the required unused capture API."""
+
+    fake_wp = FakeWarp()
+    runtime = type("Runtime", (), {"wp": fake_wp})()
+    with pytest.raises(ExceptionGroup, match="cleanup"):
+        _capture_graph_or_skip(
+            runtime,
+            "cuda",
+            lambda: (_ for _ in ()).throw(ValueError("call failed")),
+        )
+    assert fake_wp.capture_end_calls == 1
 
 
 def _call_condensation(
@@ -343,6 +421,13 @@ def test_condensation_graph_replay_warp_cpu() -> None:
 
 @pytest.mark.cuda
 @pytest.mark.gpu_parity
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "The public step performs host validation readbacks, which CUDA graph "
+        "capture forbids."
+    ),
+)
 def test_condensation_graph_replay_cuda() -> None:
     """CUDA graph replay retains public condensation state contracts."""
     runtime = support._load_warp_runtime()
