@@ -14,3 +14,11 @@
 - Add focused pytest commands for Warp CPU and optional CUDA evidence.
 - Update these plan sections with final phase status and measured results after
   implementation.
+
+## Completed P1 Documentation Record
+
+- Issue #1308 changed only the two GPU condensation test/support files; no
+  user-facing documentation was added or revised.
+- This plan records the delivered P1 matrix, its independent NumPy oracle,
+  Warp-CPU requirement, optional-CUDA behavior, and focused coverage. P5 still
+  owns user-facing evidence-matrix and roadmap updates.

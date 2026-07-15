@@ -332,11 +332,15 @@ restored = from_warp_environment_data(gpu_environment)
   `docs/Features/condensation_strategy_system.md` and
   `docs/Features/Roadmap/condensation-stiffness-study.md` for its bounded
   contract and case-specific evidence.
-- The public-hook regression includes a deterministic fp64 two-box case with
-  uptake, evaporation, disabled partitioning, zero gas, and zero-concentration
-  slots. It checks per-box/per-species particle-plus-gas inventory at
-  `rtol=1e-12, atol=1e-30` separately from CPU-oracle particle/gas parity at
-  `rtol=2e-10, atol=1e-30`; this is direct-kernel evidence only.
+- The deterministic fp64 direct-kernel parity matrix runs one-box and
+  multi-box/multi-species fixtures against an independent NumPy fixed-four-
+  substep, P2 inventory-finalized, gas-coupled oracle. It separately compares
+  particle masses and gas concentrations, and covers uptake, evaporation,
+  disabled partitioning, latent heat, zero gas, and inactive particle slots.
+  Warp CPU is required when Warp is installed; CUDA is optional and skips
+  cleanly when unavailable. Separate per-box/per-species particle-plus-gas
+  inventory coverage uses `rtol=1e-12, atol=1e-30`. This is direct-kernel
+  evidence only.
 - Scalar temperatures, direct Warp temperature arrays, and
   `WarpEnvironmentData` all drive this refresh. Non-`wp.float64` temperature
   arrays are cast into a device-local float64 buffer; no host vapor-pressure

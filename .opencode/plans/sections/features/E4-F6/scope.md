@@ -9,6 +9,10 @@ evidence documentation rather than new physics.
 - Deterministic fp64 one-box and multi-box parity against independent CPU
   equations for the combined E4-F1 through E4-F5 behavior.
 - Mandatory Warp CPU and cleanly optional CUDA parameterization.
+- **Delivered in P1 (#1308):** two shared one-/multi-box, multi-species cases
+  in `particula/gpu/kernels/tests/_condensation_test_support.py`, re-exported
+  by `condensation_test.py`; they compare particle mass and gas concentration
+  independently to the NumPy four-substep/P2/gas-coupled oracle.
 - Separate, strict per-box/per-species particle-plus-gas conservation and
   latent-energy bookkeeping assertions.
 - Validation-before-mutation, unchanged-input, deterministic-repeat, and

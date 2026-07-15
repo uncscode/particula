@@ -3,11 +3,17 @@
 Phase issue creation is intentionally deferred until E4 implementation issues
 are generated and scheduled; `TBD` is not an unresolved design decision.
 
-- [ ] **E4-F6-P1:** Add device-aware condensation parity matrix with independent CPU references
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Compare combined E4 physics per box and species on Warp CPU and optional CUDA.
+- [x] **E4-F6-P1:** Add device-aware condensation parity matrix with independent CPU references
+  - Issue: #1308 | Size: S | Status: Completed
+  - Delivered: Two shared deterministic fp64 cases compare the direct GPU step
+    with an independent NumPy fixed-four-substep/P2/gas-coupled oracle on Warp
+    CPU and, when available, CUDA.
   - Files: `particula/gpu/kernels/tests/_condensation_test_support.py`, `condensation_test.py`
-  - Tests: One/multi-box fp64 cases, independent one-box references, explicit tolerances, clean backend skips.
+  - Tests: One-box uptake/latent-heat/inventory-limited and multi-box,
+    multi-species mixed-phase/gated cases; mass and gas are asserted separately
+    at `rtol=1e-10` with per-output scale-derived finite `atol`. Coverage
+    includes uptake, evaporation, disabled partitioning, zero gas, and inactive
+    particle slots; CUDA skips cleanly when unavailable.
 
 - [ ] **E4-F6-P2:** Add per-box per-species conservation and mutation-contract regressions
   - Issue: TBD | Size: S | Status: Not Started

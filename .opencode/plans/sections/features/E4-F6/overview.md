@@ -15,6 +15,10 @@ mandatory, CUDA runs when available, parity and strict conservation are tested
 separately, and fixed-loop/buffer behavior is evaluated for graph capture and
 autodiff readiness without claiming unsupported differentiability.
 
+P1 is complete for issue #1308. Its deterministic fp64 matrix compares final
+particle mass and coupled gas concentration independently against a NumPy
+four-substep, P2-finalized, gas-coupled oracle on Warp CPU and optional CUDA.
+
 ## User Stories
 
 - As a scientist, I want each box and species compared with an independent CPU
