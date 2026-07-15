@@ -337,10 +337,11 @@ mutate them concurrently with a launch.
 Successful direct calls mutate particle masses and gas concentration in place,
 overwrite the derived GPU-only vapor-pressure buffer, and return accumulated
 **P2-finalized, inventory-limited** transfer. The caller-visible final work
-proposal is gated after proposal generation: disabled `(box, species)` entries in the per-box
-`(n_boxes, n_species)` partitioning mask and inactive particle slots are zeroed
-before P2 finalization or reductions. CPU↔Warp conversion expands the CPU shared
-species mask to this per-box layout, and restore requires the exact layout.
+transfer is never the raw proposal. Disabled `(box, species)` entries in the
+per-box `(n_boxes, n_species)` partitioning mask and inactive particle slots
+are zeroed before P2 finalization or reductions. CPU↔Warp conversion expands
+the CPU shared species mask to this per-box layout, and restore requires the
+exact layout.
 P2 demand, release, scale, and accumulator sidecars are validated and used for
 finalization; aggregate invalid state, metadata, or ownership fails with
 `ValueError` before launches or caller mutation. A later failure caused by a
@@ -404,15 +405,19 @@ Use `to_warp_*` and `from_warp_*` as the sole CPU↔Warp boundary. There is no
 hidden transfer and no high-level `Aerosol` or `Runnable` GPU path. Deterministic
 fp64 tests compare an independent NumPy reference with explicit parity
 `rtol`/`atol`, then apply tighter separate ownership invariants. Warp `cpu` is
-required whenever Warp is installed; CUDA is optional, availability-guarded,
+the baseline whenever Warp is installed; CUDA is optional, availability-guarded,
 and separately marked. Warp-dependent test imports are lazy, so marker-
-deselected collection does not require Warp:
+deselected collection does not require Warp. Focused direct-kernel and CPU
+integration smoke commands are:
 
 ```bash
 pytest particula/gpu/kernels/tests/condensation_test.py --collect-only -q -m "not warp"
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
-pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
+pytest particula/integration_tests/condensation_particle_resolved_test.py -q -Werror
 ```
+
+Run CUDA-marked kernel cases separately only on CUDA-capable hosts; unavailable
+Warp or CUDA remains an expected guarded skip, not evidence of a fallback path.
 
 ## Current shipped support boundaries
 

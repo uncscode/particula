@@ -12,11 +12,18 @@
   intentional no-rollback boundary for later fresh-proposal failures.
 - Issue #1305 adds regression evidence only; it does not change user-facing API
   documentation. The CPU and public-hook conservation gate is now satisfied.
-- User-facing roadmap text remains deferred to P5; broader support claims still
-  require the remaining E4-F6/E4-F7 gates.
-- P5 remains responsible for recording scratch ownership, no-hidden-transfer
-  rules, Warp CPU support, and optional CUDA behavior in the GPU feature guide.
+- Issue #1306 completed P5 in
+  `docs/Features/Roadmap/data-oriented-gpu.md` and
+  `docs/Features/data-containers-and-gpu-foundations.md`. The documents now
+  describe authoritative active-device `wp.float64` gas concentration in
+  `kg/m^3`, binary per-box/species `wp.int32` partitioning, inventory-limited
+  P2-finalized applied transfer, four fixed coupled substeps, and mutable
+  caller-owned scratch work/output storage.
+- The P5 documents explicitly preserve the CPU↔Warp helper boundary, Warp CPU
+  as the installed-Warp evidence path, optional guarded CUDA evidence, and the
+  absence of hidden transfers or synchronization.
 - Issue #1272's production-hook and same-change conservation-regression gate
   passed in issue #1305; do not expand support claims beyond its test evidence.
-- Cross-reference E4-F3/E4-F4 and note that broader production claims remain
-  gated by E4-F6/E4-F7.
+- Cross-references distinguish the P1-P4/#1272 direct-kernel and production-hook
+  regression evidence from broader E4 production claims, which remain gated by
+  E4-F6/E4-F7.

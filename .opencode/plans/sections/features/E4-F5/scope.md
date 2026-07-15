@@ -50,8 +50,15 @@
   uptake, evaporation, disabled partitioning, zero gas, and inactive slots on
   Warp CPU plus guarded optional CUDA.
 
-## Remaining in scope
-- Development/user documentation is P5 work.
+## Delivered in P5 / issue #1306
+- Update `docs/Features/Roadmap/data-oriented-gpu.md` and
+  `docs/Features/data-containers-and-gpu-foundations.md` with the verified
+  bounded P1-P4 direct-kernel contract, including active-device gas ownership,
+  binary partitioning, P2-finalized inventory-limited accounting, fixed
+  four-substep coupling, scratch mutability/identity, and no hidden transfers.
+- Qualify #1305/#1272 evidence as direct-kernel and production-hook regression
+  only; retain E4-F6/E4-F7 as gates for broader cross-device and final support
+  claims.
 
 ## Out of scope
 - Exporting P2 internals or adding a public entry point.

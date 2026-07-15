@@ -44,3 +44,10 @@ particle-plus-gas bookkeeping at `rtol=1e-12, atol=1e-30`, independently from
 CPU-oracle particle/gas parity at `rtol=2e-10, atol=1e-30`. Warp CPU is required
 focused evidence; the `cuda` plus `gpu_parity` case skips cleanly when CUDA is
 unavailable.
+
+Issue #1306 performed documentation smoke validation against the two canonical
+GPU feature guides. The focused command
+`pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror` documents
+the Warp-CPU baseline, while its CUDA-marked variant remains optional and
+guarded. Edited links, units, API names, scratch shapes, and test paths were
+reviewed; P5 added no production code or pytest coverage.

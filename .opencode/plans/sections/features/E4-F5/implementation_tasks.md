@@ -42,4 +42,7 @@
     Separately verify per-box/per-species inventory conservation, CPU-oracle
     parity, disabled partitioning, zero gas, and inactive slots on Warp CPU and
     guarded CUDA.
-12. Update roadmap wording only after remaining production gates pass.
+12. [x] **Issue #1306:** Update the GPU roadmap and foundation guide with the
+    verified P1-P4 direct-kernel gas-coupling contract, caller-owned mutable
+    scratch semantics, explicit CPU↔Warp boundary, and focused evidence paths.
+    Retain E4-F6/E4-F7 as the broader-support gates.

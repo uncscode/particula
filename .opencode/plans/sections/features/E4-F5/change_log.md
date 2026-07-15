@@ -1,5 +1,15 @@
 # Change Log
 
+## 2026-07-14 — E4-F5-P5 shipped (issue #1306)
+- Updated the GPU roadmap and data-container foundation guide to document the
+  verified P1-P4 bounded direct-kernel gas-coupling contract: active-device gas
+  concentration, binary partitioning, P2-finalized inventory limits/accounting,
+  four fixed coupled substeps, mutable caller-owned scratch storage, and no
+  hidden CPU↔Warp movement.
+- Qualified #1305/#1272 as direct-kernel and production-hook regression evidence
+  only. E4-F6 and E4-F7 remain explicit gates for broader cross-device evidence
+  and the final support contract.
+
 ## 2026-07-14 — E4-F5-P4 shipped (issue #1305)
 - Added regression-only concentration-weighted particle-plus-gas inventory
   conservation coverage; production APIs, container schemas, and the fixed
