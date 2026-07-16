@@ -1,0 +1,34 @@
+# Scope
+
+E5-F2 ports the scalar Coulomb, reduced-property, and approved charged
+pair-kernel calculations needed by the E5 mechanism dispatcher; validates the
+existing fp64 charge field; and extends accepted-pair application to add donor
+charge into the recipient before clearing the donor. It does not make charged
+physics executable through the public sampler; that integration belongs to
+E5-F3.
+
+## In Scope
+
+- Add focused `@wp.func` helpers in
+  `particula/gpu/dynamics/coagulation_funcs.py` for approved charged pair
+  physics, including stable neutral, attractive, and repulsive limits.
+- Use CPU formulas as independent references while keeping device execution
+  free of hidden host calculations or transfers.
+- Validate `WarpParticleData.charge` shape, dtype, device, and finite values
+  before particle mutation or RNG advancement.
+- Pass charge into `apply_coagulation_kernel`, add donor charge to the accepted
+  recipient, and clear donor charge with donor mass and concentration.
+- Add co-located deterministic pair parity, validation, merge, multi-box,
+  inactive-slot, and separate mass/charge conservation tests.
+- Preserve Brownian behavior for all-zero charge and existing callers.
+
+## Out of Scope
+
+- Candidate selection, charged majorant proofs, stochastic charged execution,
+  or Brownian-plus-charged execution (E5-F3).
+- Sedimentation, turbulent shear, and additive multi-mechanism execution
+  (E5-F4 through E5-F6).
+- Cross-mechanism release matrix and user-facing support closeout (E5-F7/F9).
+- Binned or continuous-PDF GPU coagulation, high-level `Aerosol`/`Runnable`
+  APIs, hidden CPU fallback/transfers, dynamic slots, graph capture, autodiff,
+  adaptive stepping, DNS turbulence, or general performance redesign.
