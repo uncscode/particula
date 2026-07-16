@@ -250,6 +250,81 @@ def _bound_scheduled_trials(expected_trials: Any) -> Any:
 
 @no_type_check
 @wp.func
+def _sanitize_positive_finite(value: Any) -> Any:
+    """Return finite, strictly positive terms or zero for safe accumulation."""
+    if wp.isfinite(value) and value > wp.float64(0.0):
+        return value
+    return wp.float64(0.0)
+
+
+@no_type_check
+@wp.func
+def _total_pair_rate(  # noqa: PLR0913
+    mechanism_mask: Any,
+    radius_i: Any,
+    radius_j: Any,
+    diffusivity_i: Any,
+    diffusivity_j: Any,
+    g_term_i: Any,
+    g_term_j: Any,
+    speed_i: Any,
+    speed_j: Any,
+) -> Any:
+    """Sum enabled finite pair-rate terms using fixed mechanism branches."""
+    total_rate = wp.float64(0.0)
+    if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
+        total_rate += _sanitize_positive_finite(
+            brownian_kernel_pair_wp(
+                radius_i,
+                radius_j,
+                diffusivity_i,
+                diffusivity_j,
+                g_term_i,
+                g_term_j,
+                speed_i,
+                speed_j,
+                wp.float64(1.0),
+            )
+        )
+    # Reserved mechanism bits deliberately contribute no executable term.
+    return total_rate
+
+
+@no_type_check
+@wp.func
+def _total_majorant(  # noqa: PLR0913
+    mechanism_mask: Any,
+    radius_min: Any,
+    radius_max: Any,
+    diffusivity_min: Any,
+    diffusivity_max: Any,
+    g_term_min: Any,
+    g_term_max: Any,
+    speed_min: Any,
+    speed_max: Any,
+) -> Any:
+    """Sum enabled finite majorant terms using fixed mechanism branches."""
+    total_majorant = wp.float64(0.0)
+    if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
+        total_majorant += _sanitize_positive_finite(
+            brownian_kernel_pair_wp(
+                radius_min,
+                radius_max,
+                diffusivity_min,
+                diffusivity_max,
+                g_term_min,
+                g_term_max,
+                speed_min,
+                speed_max,
+                wp.float64(1.0),
+            )
+        )
+    # Reserved mechanism bits deliberately contribute no executable term.
+    return total_majorant
+
+
+@no_type_check
+@wp.func
 def _select_active_pair_by_rank(
     active_indices: Any,
     box_idx: Any,
@@ -360,6 +435,7 @@ def brownian_coagulation_kernel(  # noqa: C901
     collision_pairs: Any,
     n_collisions: Any,
     rng_states: Any,
+    mechanism_mask: Any,
     collision_capacity: Any,
 ) -> None:
     """Select stochastic coagulation pairs for each box.
@@ -394,6 +470,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         rng_states: Per-box RNG states ``(n_boxes,)`` mutated in place during
             pair selection. Reusing this buffer across calls preserves
             caller-owned persistent state unless it is reset before launch.
+        mechanism_mask: Fixed internal mechanism-dispatch mask.
         collision_capacity: Maximum accepted collisions per box for this call.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]
@@ -469,7 +546,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         n_collisions[box_idx] = wp.int32(0)
         return
 
-    # Find particles with min/max radius to compute a k_max upper bound.
+    # Find particles with min/max radius for the one total-rate majorant.
     # The Brownian kernel is maximized at the greatest size disparity
     # (small particle has high diffusivity, large particle has large
     # cross-section), so K(r_min, r_max) bounds all pairwise values.
@@ -488,7 +565,7 @@ def brownian_coagulation_kernel(  # noqa: C901
             r_max = r_p
             idx_max = wp.int32(p_idx)
 
-    k_max = wp.float64(0.0)
+    majorant_total = wp.float64(0.0)
     if idx_min >= wp.int32(0) and idx_max >= wp.int32(0):
         if idx_min == idx_max:
             # All active particles have the same radius; use self-pair
@@ -498,7 +575,8 @@ def brownian_coagulation_kernel(  # noqa: C901
                 if candidate_idx != idx_min:
                     idx_max = candidate_idx
                     break
-        k_max = brownian_kernel_pair_wp(
+        majorant_total = _total_majorant(
+            mechanism_mask,
             radii[box_idx, idx_min],
             radii[box_idx, idx_max],
             diffusivities[box_idx, idx_min],
@@ -507,10 +585,9 @@ def brownian_coagulation_kernel(  # noqa: C901
             g_terms[box_idx, idx_max],
             speeds[box_idx, idx_min],
             speeds[box_idx, idx_max],
-            wp.float64(1.0),
         )
 
-    if k_max <= wp.float64(0.0):
+    if not (wp.isfinite(majorant_total) and majorant_total > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
         return
 
@@ -519,8 +596,10 @@ def brownian_coagulation_kernel(  # noqa: C901
         * wp.float64(active_count - 1)
         / (wp.float64(2.0))
     )
-    expected_trials = k_max * possible_pairs * time_step / volume[box_idx]
-    if not (expected_trials > wp.float64(0.0)):
+    expected_trials = (
+        majorant_total * possible_pairs * time_step / volume[box_idx]
+    )
+    if not (wp.isfinite(expected_trials) and expected_trials > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
         return
 
@@ -569,7 +648,8 @@ def brownian_coagulation_kernel(  # noqa: C901
             selected_i = selected_j
             selected_j = temp_idx
 
-        kernel_value = brownian_kernel_pair_wp(
+        total_rate = _total_pair_rate(
+            mechanism_mask,
             radii[box_idx, selected_i],
             radii[box_idx, selected_j],
             diffusivities[box_idx, selected_i],
@@ -578,12 +658,14 @@ def brownian_coagulation_kernel(  # noqa: C901
             g_terms[box_idx, selected_j],
             speeds[box_idx, selected_i],
             speeds[box_idx, selected_j],
-            wp.float64(1.0),
         )
-        if kernel_value <= wp.float64(0.0):
+        if not (wp.isfinite(total_rate) and total_rate > wp.float64(0.0)):
+            continue
+        if total_rate > majorant_total:
             continue
 
-        if wp.randf(state) < kernel_value / k_max:
+        # Every valid candidate gets exactly one acceptance draw.
+        if wp.randf(state) < total_rate / majorant_total:
             collision_pairs[box_idx, collision_count, 0] = selected_i
             collision_pairs[box_idx, collision_count, 1] = selected_j
             collision_count += wp.int32(1)
@@ -1174,6 +1256,7 @@ def coagulation_step_gpu(  # noqa: C901
             collision_pairs,
             n_collisions,
             rng_states,
+            wp.int32(BROWNIAN_MECHANISM_FLAG),
             wp.int32(max_collisions_value),
         ],
         device=device,

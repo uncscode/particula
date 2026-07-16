@@ -79,7 +79,10 @@ if wp is not None:
         _remove_active_pair_by_rank_swap_pop,
         _resolve_active_pair_by_rank,
         _resolve_collision_capacity,
+        _sanitize_positive_finite,
         _select_active_pair_by_rank,
+        _total_majorant,
+        _total_pair_rate,
         _validate_collision_counts,
         _validate_collision_pairs,
         _validate_device_arrays,
@@ -371,6 +374,76 @@ def _bound_scheduled_trials_probe_kernel(
 
 
 @_warp_kernel
+def _additive_helper_probe_kernel(
+    mechanism_mask: Any,
+    values: Any,
+    pair_rate: Any,
+    majorant: Any,
+    sanitized: Any,
+) -> None:
+    """Probe fixed-mask additive helpers and finite-term sanitization."""
+    pair_rate[0] = _total_pair_rate(
+        mechanism_mask,
+        values[0],
+        values[1],
+        values[2],
+        values[3],
+        values[4],
+        values[5],
+        values[6],
+        values[7],
+    )
+    majorant[0] = _total_majorant(
+        mechanism_mask,
+        values[0],
+        values[1],
+        values[2],
+        values[3],
+        values[4],
+        values[5],
+        values[6],
+        values[7],
+    )
+    sanitized[0] = _sanitize_positive_finite(values[8])
+
+
+@_warp_kernel
+def _synthetic_total_sampling_probe_kernel(
+    rate_terms: Any,
+    majorant_terms: Any,
+    pair_sentinel: Any,
+    totals: Any,
+    candidate_count: Any,
+    acceptance_draw_count: Any,
+    accepted_count: Any,
+) -> None:
+    """Exercise total-rate sampling guards with test-only synthetic terms."""
+    total_rate = _sanitize_positive_finite(rate_terms[0])
+    total_rate += _sanitize_positive_finite(rate_terms[1])
+    total_majorant = _sanitize_positive_finite(majorant_terms[0])
+    total_majorant += _sanitize_positive_finite(majorant_terms[1])
+    totals[0] = total_rate
+    totals[1] = total_majorant
+
+    if not (wp.isfinite(total_majorant) and total_majorant > wp.float64(0.0)):
+        return
+
+    candidate_count[0] = wp.int32(1)
+    if not (wp.isfinite(total_rate) and total_rate > wp.float64(0.0)):
+        return
+    if total_rate > total_majorant:
+        return
+
+    # Exactly one acceptance draw occurs for each otherwise valid candidate.
+    acceptance_draw_count[0] = wp.int32(1)
+    state = wp.rand_init(wp.int32(17))
+    if wp.randf(state) < total_rate / total_majorant:
+        pair_sentinel[0] = wp.int32(0)
+        pair_sentinel[1] = wp.int32(1)
+        accepted_count[0] = wp.int32(1)
+
+
+@_warp_kernel
 def _resolve_active_pair_probe_kernel(
     active_flags: Any,
     resolved_pairs: Any,
@@ -436,6 +509,213 @@ def _remove_active_pair_probe_kernel(
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param
+
+
+@pytest.mark.parametrize(
+    "mechanism_mask",
+    [
+        0,
+        CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+        SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+        BROWNIAN_MECHANISM_FLAG,
+        BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+        BROWNIAN_MECHANISM_FLAG | SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        BROWNIAN_MECHANISM_FLAG | TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+    ],
+)
+def test_additive_helpers_ignore_reserved_bits(
+    device: str,
+    mechanism_mask: int,
+) -> None:
+    """Only the Brownian bit contributes to pair-rate and majorant totals."""
+    values = np.array(
+        [1.0e-8, 5.0e-8, 1.0e-9, 2.0e-10, 2.0e-8, 4.0e-8, 0.2, 0.1, 3.0],
+        dtype=np.float64,
+    )
+    values_wp = wp.array(values, dtype=wp.float64, device=device)
+    pair_rate = wp.zeros((1,), dtype=wp.float64, device=device)
+    majorant = wp.zeros((1,), dtype=wp.float64, device=device)
+    sanitized = wp.zeros((1,), dtype=wp.float64, device=device)
+
+    wp.launch(
+        _additive_helper_probe_kernel,
+        dim=1,
+        inputs=[
+            wp.int32(mechanism_mask),
+            values_wp,
+            pair_rate,
+            majorant,
+            sanitized,
+        ],
+        device=device,
+    )
+    wp.synchronize()
+
+    pair_value = float(np.asarray(pair_rate.numpy()).item())
+    majorant_value = float(np.asarray(majorant.numpy()).item())
+    if mechanism_mask & BROWNIAN_MECHANISM_FLAG:
+        sum_radius = values[0] + values[1]
+        sum_diffusivity = values[2] + values[3]
+        g_sqrt = np.sqrt(values[4] ** 2 + values[5] ** 2)
+        speed_sqrt = np.sqrt(values[6] ** 2 + values[7] ** 2)
+        expected = (
+            4.0
+            * np.pi
+            * sum_diffusivity
+            * sum_radius
+            / (
+                sum_radius / (sum_radius + g_sqrt)
+                + 4.0 * sum_diffusivity / (sum_radius * speed_sqrt)
+            )
+        )
+        npt.assert_allclose(pair_value, expected, rtol=1.0e-12, atol=0.0)
+        npt.assert_allclose(
+            majorant_value,
+            expected,
+            rtol=1.0e-12,
+            atol=0.0,
+        )
+        assert pair_value > 0.0
+    else:
+        assert pair_value == 0.0
+        assert majorant_value == 0.0
+    assert float(np.asarray(sanitized.numpy()).item()) == 3.0
+
+
+@pytest.mark.parametrize(
+    "invalid_value",
+    [0.0, -1.0, float("nan"), float("inf"), float("-inf")],
+)
+def test_additive_sanitizer_rejects_invalid_terms(
+    device: str,
+    invalid_value: float,
+) -> None:
+    """Nonpositive and nonfinite terms make no additive contribution."""
+    values = np.array(
+        [
+            1.0e-8,
+            5.0e-8,
+            1.0e-9,
+            2.0e-10,
+            2.0e-8,
+            4.0e-8,
+            0.2,
+            0.1,
+            invalid_value,
+        ],
+        dtype=np.float64,
+    )
+    values_wp = wp.array(values, dtype=wp.float64, device=device)
+    pair_rate = wp.zeros((1,), dtype=wp.float64, device=device)
+    majorant = wp.zeros((1,), dtype=wp.float64, device=device)
+    sanitized = wp.zeros((1,), dtype=wp.float64, device=device)
+    wp.launch(
+        _additive_helper_probe_kernel,
+        dim=1,
+        inputs=[wp.int32(0), values_wp, pair_rate, majorant, sanitized],
+        device=device,
+    )
+    wp.synchronize()
+
+    assert float(np.asarray(sanitized.numpy()).item()) == 0.0
+
+
+def _run_synthetic_total_sampling_probe(
+    device: str,
+    rate_terms: tuple[float, float],
+    majorant_terms: tuple[float, float],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Run the test-only total-sampling probe with sentinel output state."""
+    rates = wp.array(
+        np.array(rate_terms, dtype=np.float64), dtype=wp.float64, device=device
+    )
+    majorants = wp.array(
+        np.array(majorant_terms, dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
+    pair_sentinel = wp.array(
+        np.array([-7, -7], dtype=np.int32), dtype=wp.int32, device=device
+    )
+    totals = wp.zeros((2,), dtype=wp.float64, device=device)
+    candidate_count = wp.zeros((1,), dtype=wp.int32, device=device)
+    acceptance_draw_count = wp.zeros((1,), dtype=wp.int32, device=device)
+    accepted_count = wp.zeros((1,), dtype=wp.int32, device=device)
+    wp.launch(
+        _synthetic_total_sampling_probe_kernel,
+        dim=1,
+        inputs=[
+            rates,
+            majorants,
+            pair_sentinel,
+            totals,
+            candidate_count,
+            acceptance_draw_count,
+            accepted_count,
+        ],
+        device=device,
+    )
+    wp.synchronize()
+    return (
+        np.asarray(pair_sentinel.numpy()),
+        np.asarray(totals.numpy()),
+        np.asarray(candidate_count.numpy()),
+        np.asarray(acceptance_draw_count.numpy()),
+        np.asarray(accepted_count.numpy()),
+    )
+
+
+def test_synthetic_additive_terms_use_one_total_and_acceptance_draw(
+    device: str,
+) -> None:
+    """Two finite synthetic terms sum once and make one accepted draw."""
+    pair, totals, candidates, draws, accepted = (
+        _run_synthetic_total_sampling_probe(
+            device,
+            rate_terms=(2.0, 3.0),
+            majorant_terms=(4.0, 1.0),
+        )
+    )
+
+    npt.assert_allclose(totals, np.array([5.0, 5.0], dtype=np.float64))
+    npt.assert_array_equal(candidates, np.array([1], dtype=np.int32))
+    npt.assert_array_equal(draws, np.array([1], dtype=np.int32))
+    npt.assert_array_equal(accepted, np.array([1], dtype=np.int32))
+    npt.assert_array_equal(pair, np.array([0, 1], dtype=np.int32))
+
+
+@pytest.mark.parametrize(
+    ("rate_terms", "majorant_terms", "expected_candidates"),
+    [
+        ((1.0, 1.0), (0.0, 0.0), 0),
+        ((1.0, 1.0), (-1.0, 0.0), 0),
+        ((1.0, 1.0), (float("nan"), 0.0), 0),
+        ((1.0, 1.0), (float("inf"), 0.0), 0),
+        ((3.0, 0.0), (2.0, 0.0), 1),
+        ((0.0, 0.0), (2.0, 0.0), 1),
+        ((float("nan"), 0.0), (2.0, 0.0), 1),
+    ],
+)
+def test_synthetic_invalid_totals_preserve_sampling_output_state(
+    device: str,
+    rate_terms: tuple[float, float],
+    majorant_terms: tuple[float, float],
+    expected_candidates: int,
+) -> None:
+    """Invalid, zero, and underestimated terms cannot mutate pair output."""
+    pair, _, candidates, draws, accepted = _run_synthetic_total_sampling_probe(
+        device,
+        rate_terms=rate_terms,
+        majorant_terms=majorant_terms,
+    )
+
+    npt.assert_array_equal(
+        candidates, np.array([expected_candidates], dtype=np.int32)
+    )
+    npt.assert_array_equal(draws, np.array([0], dtype=np.int32))
+    npt.assert_array_equal(accepted, np.array([0], dtype=np.int32))
+    npt.assert_array_equal(pair, np.array([-7, -7], dtype=np.int32))
 
 
 def _make_particle_data(
@@ -854,7 +1134,7 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
             r_max = r_p
             idx_max = wp.int32(p_idx)
 
-    k_max = wp.float64(0.0)
+    majorant_total = wp.float64(0.0)
     if idx_min >= wp.int32(0) and idx_max >= wp.int32(0):
         if idx_min == idx_max:
             for active_rank in range(active_count):
@@ -862,7 +1142,8 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
                 if candidate_idx != idx_min:
                     idx_max = candidate_idx
                     break
-        k_max = brownian_kernel_pair_wp(
+        majorant_total = _total_majorant(
+            wp.int32(BROWNIAN_MECHANISM_FLAG),
             radii[box_idx, idx_min],
             radii[box_idx, idx_max],
             diffusivities[box_idx, idx_min],
@@ -871,10 +1152,9 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
             g_terms[box_idx, idx_max],
             speeds[box_idx, idx_min],
             speeds[box_idx, idx_max],
-            wp.float64(1.0),
         )
 
-    if k_max <= wp.float64(0.0):
+    if not (wp.isfinite(majorant_total) and majorant_total > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
         return
 
@@ -883,8 +1163,10 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
         * wp.float64(active_count - 1)
         / wp.float64(2.0)
     )
-    expected_trials = k_max * possible_pairs * time_step / volume[box_idx]
-    if not (expected_trials > wp.float64(0.0)):
+    expected_trials = (
+        majorant_total * possible_pairs * time_step / volume[box_idx]
+    )
+    if not (wp.isfinite(expected_trials) and expected_trials > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
         return
 
@@ -933,7 +1215,8 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
             selected_i = selected_j
             selected_j = temp_idx
 
-        kernel_value = brownian_kernel_pair_wp(
+        total_rate = _total_pair_rate(
+            wp.int32(BROWNIAN_MECHANISM_FLAG),
             radii[box_idx, selected_i],
             radii[box_idx, selected_j],
             diffusivities[box_idx, selected_i],
@@ -942,12 +1225,13 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
             g_terms[box_idx, selected_j],
             speeds[box_idx, selected_i],
             speeds[box_idx, selected_j],
-            wp.float64(1.0),
         )
-        if kernel_value <= wp.float64(0.0):
+        if not (wp.isfinite(total_rate) and total_rate > wp.float64(0.0)):
+            continue
+        if total_rate > majorant_total:
             continue
 
-        if wp.randf(state) < kernel_value / k_max:
+        if wp.randf(state) < total_rate / majorant_total:
             collision_pairs[box_idx, collision_count, 0] = selected_i
             collision_pairs[box_idx, collision_count, 1] = selected_j
             collision_count += wp.int32(1)
@@ -3457,6 +3741,7 @@ def test_brownian_coagulation_kernel_inactive_particles(
             collision_pairs,
             n_collisions,
             rng_states,
+            wp.int32(BROWNIAN_MECHANISM_FLAG),
             wp.int32(4),
         ],
         device=device,
