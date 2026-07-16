@@ -10,6 +10,12 @@ Those sources are normalized into per-box Warp arrays before volume setup,
 RNG initialization, or any Warp launch. The kernels operate on GPU-resident
 particle data and produce collision pairs that are applied to merge particle
 masses in-place.
+
+``CoagulationMechanismConfig`` and its resolver are concrete-module APIs:
+import them from ``particula.gpu.kernels.coagulation``, not
+``particula.gpu.kernels``. The public step defaults to Brownian,
+particle-resolved execution and rejects unsupported configurations before
+accessing runtime state.
 """
 
 # pyright: basic
@@ -99,8 +105,9 @@ class CoagulationMechanismConfig:
     """Configure P1 host-side coagulation mechanism validation.
 
     The default selects Brownian, particle-resolved coagulation. This frozen
-    configuration is concrete-module-only and is not an argument of the public
-    ``coagulation_step_gpu`` API in P1.
+    configuration is concrete-module-only: import it from
+    ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
+    ``coagulation_step_gpu`` accepts it as a keyword-only argument.
 
     Attributes:
         mechanisms: Requested canonical mechanism identifiers, or ``None`` to
@@ -1079,6 +1086,7 @@ def coagulation_step_gpu(  # noqa: C901
     n_collisions: Any | None = None,
     rng_states: Any | None = None,
     *,
+    mechanism_config: CoagulationMechanismConfig | None = None,
     initialize_rng: bool = False,
     environment: Any | None = None,
 ) -> tuple[Any, Any, Any]:
@@ -1111,7 +1119,14 @@ def coagulation_step_gpu(  # noqa: C901
             provided, the caller owns the persistent GPU-resident sidecar
             buffer and it is reused as-is across repeated calls unless
             ``initialize_rng=True`` explicitly requests a reset from
-            ``rng_seed``.
+             ``rng_seed``.
+        mechanism_config: Optional concrete-module configuration. Omission
+            selects Brownian particle-resolved execution. Malformed
+            configurations, unsupported distributions, and reserved mechanisms
+            fail before runtime inputs are accessed. A wrong type raises exactly
+            ``ValueError`` with message
+            ``"mechanism_config must be a CoagulationMechanismConfig."``;
+            other errors are delegated to the resolver and capability gate.
         initialize_rng: Explicit reset flag for caller-provided
             ``rng_states``. The default ``False`` path validates the buffer and
             reuses its existing state without reseeding, even if ``rng_seed``
@@ -1137,14 +1152,19 @@ def coagulation_step_gpu(  # noqa: C901
             omitted.
         ValueError: If environment arrays do not match ``(n_boxes,)`` or the
             caller device.
+        ValueError: If mechanism_config has the wrong type, is malformed, or
+            requests an unsupported distribution or reserved mechanism.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
         ``(n_boxes,)`` Warp arrays, hybrid scalar-plus-Warp-array direct
         inputs, or keyword-only ``environment=...`` execution.
 
-        ``initialize_rng`` and ``environment`` remain keyword-only so existing
-        positional scalar callers stay source-compatible.
+        ``mechanism_config``, ``initialize_rng``, and ``environment`` remain
+        keyword-only so existing positional scalar callers stay
+        source-compatible. Configuration preflight occurs before all runtime
+        input access, allocation, normalization, RNG work, and launches. It
+        does not make unrelated later validation failures atomic.
 
         Validation runs before volume normalization, RNG setup, and kernel
         launches so invalid ``time_step``, shape, dtype, or device
@@ -1169,6 +1189,17 @@ def coagulation_step_gpu(  # noqa: C901
         capture setup, initialize caller-owned buffers once before the loop or
         before capture, then reuse them without hidden per-step resets.
     """
+    if mechanism_config is None:
+        mechanism_config = CoagulationMechanismConfig()
+    if not isinstance(mechanism_config, CoagulationMechanismConfig):
+        raise ValueError(
+            "mechanism_config must be a CoagulationMechanismConfig."
+        )
+    resolved_mechanism_config = resolve_coagulation_mechanism_config(
+        mechanism_config
+    )
+    validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
+
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
 
@@ -1280,7 +1311,7 @@ def coagulation_step_gpu(  # noqa: C901
             collision_pairs,
             n_collisions,
             rng_states,
-            wp.int32(BROWNIAN_MECHANISM_FLAG),
+            wp.int32(resolved_mechanism_config.mask),
             wp.int32(max_collisions_value),
         ],
         device=device,
