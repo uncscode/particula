@@ -15,6 +15,7 @@ GPU API.
 from __future__ import annotations
 
 import inspect
+import re
 from dataclasses import dataclass
 
 # pyright: reportArgumentType=false
@@ -61,7 +62,17 @@ if wp is not None:
         particle_radius_from_volume_wp,
     )
     from particula.gpu.kernels.coagulation import (  # noqa: E402
+        BROWNIAN_MECHANISM,
+        BROWNIAN_MECHANISM_FLAG,
+        CANONICAL_COAGULATION_MECHANISMS,
+        CHARGED_HARD_SPHERE_MECHANISM,
+        CHARGED_HARD_SPHERE_MECHANISM_FLAG,
         MAX_SCHEDULED_TRIALS_PER_BOX,
+        SEDIMENTATION_SP2016_MECHANISM,
+        SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        TURBULENT_SHEAR_ST1956_MECHANISM,
+        TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+        CoagulationMechanismConfig,
         _bound_scheduled_trials,
         _ensure_volume_array,
         _initialize_rng_states,
@@ -81,6 +92,8 @@ if wp is not None:
         brownian_coagulation_kernel,
         coagulation_step_gpu,
         initialize_coagulation_rng_states,
+        resolve_coagulation_mechanism_config,
+        validate_coagulation_mechanism_capabilities,
     )
     from particula.gpu.properties.gas_properties import (  # noqa: E402
         dynamic_viscosity_wp,
@@ -103,6 +116,136 @@ if wp is not None:
     # pyright: reportAssignmentType=false
     from particula.particles.particle_data import ParticleData  # noqa: E402
     from particula.util import constants  # noqa: E402
+
+
+def test_mechanism_default_matches_explicit_brownian() -> None:
+    """Default mechanism configuration matches explicit Brownian selection."""
+    default = resolve_coagulation_mechanism_config(CoagulationMechanismConfig())
+    explicit = resolve_coagulation_mechanism_config(
+        CoagulationMechanismConfig(mechanisms=(BROWNIAN_MECHANISM,))
+    )
+
+    assert default == explicit
+    assert default.mechanisms == (BROWNIAN_MECHANISM,)
+    assert default.distribution_type == "particle_resolved"
+    assert default.mask == BROWNIAN_MECHANISM_FLAG
+
+
+def test_mechanism_canonicalizes_order_and_mask() -> None:
+    """Mechanism resolution uses canonical order and fixed flags."""
+    resolved = resolve_coagulation_mechanism_config(
+        CoagulationMechanismConfig(
+            mechanisms=(
+                TURBULENT_SHEAR_ST1956_MECHANISM,
+                BROWNIAN_MECHANISM,
+                SEDIMENTATION_SP2016_MECHANISM,
+                CHARGED_HARD_SPHERE_MECHANISM,
+            )
+        )
+    )
+
+    assert resolved.mechanisms == CANONICAL_COAGULATION_MECHANISMS
+    assert resolved.mask == 15
+
+
+@pytest.mark.parametrize(
+    ("mechanisms", "message"),
+    [
+        ((), "mechanisms"),
+        ("brownian", "mechanisms"),
+        (["brownian"], "mechanisms"),
+        ((BROWNIAN_MECHANISM, BROWNIAN_MECHANISM), BROWNIAN_MECHANISM),
+        (("unknown",), "unknown"),
+        ((BROWNIAN_MECHANISM, 1), "mechanisms"),
+    ],
+)
+def test_mechanism_rejects_structural_failures(
+    mechanisms: object,
+    message: str,
+) -> None:
+    """Malformed mechanism selections fail structural validation."""
+    config = CoagulationMechanismConfig(mechanisms=mechanisms)  # type: ignore[arg-type]
+
+    with pytest.raises(ValueError, match=message):
+        resolve_coagulation_mechanism_config(config)
+
+
+@pytest.mark.parametrize(
+    "distribution_type",
+    ["discrete", "continuous_pdf", None, "Particle_resolved"],
+)
+def test_mechanism_rejects_invalid_distribution_type(
+    distribution_type: object,
+) -> None:
+    """Only exact particle-resolved distribution type is structurally valid."""
+    config = CoagulationMechanismConfig(  # type: ignore[arg-type]
+        distribution_type=distribution_type
+    )
+
+    with pytest.raises(ValueError, match="distribution_type"):
+        resolve_coagulation_mechanism_config(config)
+
+
+@pytest.mark.parametrize(
+    ("mechanism", "flag", "message"),
+    [
+        (
+            CHARGED_HARD_SPHERE_MECHANISM,
+            CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+            "Coagulation mechanism 'charged_hard_sphere' is reserved for E5-F3.",
+        ),
+        (
+            SEDIMENTATION_SP2016_MECHANISM,
+            SEDIMENTATION_SP2016_MECHANISM_FLAG,
+            "Coagulation mechanism 'sedimentation_sp2016' is reserved for E5-F4.",
+        ),
+        (
+            TURBULENT_SHEAR_ST1956_MECHANISM,
+            TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+            "Coagulation mechanism 'turbulent_shear_st1956' is reserved for E5-F5.",
+        ),
+    ],
+)
+def test_mechanism_support_rejects_reserved_terms(
+    mechanism: str,
+    flag: int,
+    message: str,
+) -> None:
+    """Reserved terms resolve structurally before P1 capability rejection."""
+    resolved = resolve_coagulation_mechanism_config(
+        CoagulationMechanismConfig(mechanisms=(mechanism,))
+    )
+
+    assert resolved.mechanisms == (mechanism,)
+    assert resolved.mask == flag
+    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
+        validate_coagulation_mechanism_capabilities(resolved)
+
+
+def test_mechanism_support_accepts_brownian() -> None:
+    """Brownian remains the sole P1 executable mechanism."""
+    resolved = resolve_coagulation_mechanism_config(
+        CoagulationMechanismConfig(mechanisms=(BROWNIAN_MECHANISM,))
+    )
+
+    assert validate_coagulation_mechanism_capabilities(resolved) is None
+
+
+def test_mechanism_support_rejects_combined_brownian_and_reserved_term() -> (
+    None
+):
+    """Mixed structurally valid mechanisms cannot bypass the P1 gate."""
+    resolved = resolve_coagulation_mechanism_config(
+        CoagulationMechanismConfig(
+            mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
+        )
+    )
+
+    message = (
+        "Coagulation mechanism 'charged_hard_sphere' is reserved for E5-F3."
+    )
+    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
+        validate_coagulation_mechanism_capabilities(resolved)
 
 
 def _warp_kernel(function):
