@@ -229,8 +229,10 @@ not transferred, synchronized, or stored in a container schema. In contrast,
 supplied `rng_states` are caller-owned, same-device Warp resources. Omitted
 collision outputs and RNG state use call-local convenience allocation. A
 supplied RNG sidecar is reused and changes in place; it resets only with
-`initialize_rng=True`. Kernels do not perform hidden CPU↔GPU transfer or
-synchronization for configuration or these sidecars.
+`initialize_rng=True`. Configuration and caller-owned sidecars have no implicit
+CPU↔GPU transfer. Reuse of a supplied persistent `rng_states` buffer is
+unsynchronized, while omitted RNG state and `initialize_rng=True` use the
+initialization path, which synchronizes after initializing or resetting state.
 
 Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 `"continuous_pdf"` raise `ValueError`; they do not fall back or convert.
@@ -513,7 +515,7 @@ than storage support.
 | CPU↔GPU transfer | Explicit helper calls only | No hidden container movement or hidden environment synchronization. |
 | Warp/CUDA support | Optional | Warp `device="cpu"` is the baseline when Warp is installed; CUDA is additive local evidence and unavailable devices skip cleanly. |
 | Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
-| Low-level GPU coagulation direct-kernel path | Brownian-only, particle-resolved direct-kernel contract | `brownian` is the sole executable mechanism. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources; this path does not imply hidden transfer or synchronization. |
+| Low-level GPU coagulation direct-kernel path | Brownian-only, particle-resolved direct-kernel contract | `brownian` is the sole executable mechanism. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state and explicit resets synchronize during initialization. |
 | Fixed-shape GPU/runtime roadmap work | Not current runtime behavior | Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior. |
 
 Additional shipped boundaries:

@@ -40,9 +40,9 @@
 
 ## Documentation
 
-- [ ] Document the extension checklist: identifier, required inputs, property
+- [x] Document the extension checklist: identifier, required inputs, property
   preparation, pair term, safe majorant, capability row, and co-located tests.
-- [ ] Publish the initial supported/reserved matrix and explicitly state that
+- [x] Publish the initial supported/reserved matrix and explicitly state that
   binned and continuous-PDF GPU coagulation are rejected.
-- [ ] Record additive single-pass semantics for E5-F3 through E5-F7 and update
+- [x] Record additive single-pass semantics for E5-F3 through E5-F7 and update
   plan phase statuses as work ships.
