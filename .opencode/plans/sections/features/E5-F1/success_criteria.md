@@ -17,7 +17,8 @@
   reserved E5 terms and names the downstream owner of each reserved term.
 - [x] `WarpParticleData` and CPU/Warp conversion schemas remain unchanged.
 - [ ] Required Warp CPU tests pass, CUDA tests skip cleanly when unavailable,
-  and Ruff/mypy checks pass without reducing coverage requirements.
+  and Ruff/mypy checks pass without reducing coverage requirements. These
+  validations were not run or claimed by the #1334 documentation-only closeout.
 - [x] Documentation explicitly states the particle-resolved-only boundary and
   does not claim downstream mechanisms are already executable.
 

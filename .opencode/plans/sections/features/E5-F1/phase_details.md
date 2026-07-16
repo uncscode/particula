@@ -48,9 +48,9 @@
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`, relevant docstrings, and E5
     plan sections.
-  - Completed: Published the host-configuration and Warp-sidecar ownership
-    contract, the Brownian-only executable/reserved-ID matrix, and the shared
-    one-pass dispatcher rule in both developer documents. Focused mechanism
-    tests and changed-document link/anchor validation confirm the contract
-    without changing container schemas or runtime behavior. The full end-user
-    example and final support matrix remain deferred to E5-F9.
+  - Completed: Documentation-only issue #1334 published the host-configuration
+    and Warp-sidecar ownership contract, the Brownian-only executable/reserved-ID
+    matrix, and the shared one-pass dispatcher rule in both developer documents.
+    Container schemas and runtime behavior are unchanged. No validation run is
+    recorded for this documentation-only closeout. The full end-user example and
+    final support matrix remain deferred to E5-F9.
