@@ -1794,7 +1794,16 @@ def test_coagulation_config_rejection_bypasses_runtime_helpers(
         )
 
 
-@pytest.mark.parametrize("source", ["scalar", "direct_arrays", "environment"])
+@pytest.mark.parametrize(
+    "source",
+    [
+        "scalar",
+        "direct_arrays",
+        "scalar_temperature_array_pressure",
+        "array_temperature_scalar_pressure",
+        "environment",
+    ],
+)
 def test_coagulation_step_gpu_explicit_brownian_matches_default_and_dispatches_mask(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
@@ -1828,6 +1837,18 @@ def test_coagulation_step_gpu_explicit_brownian_matches_default_and_dispatches_m
             pressure = wp.array(
                 [101325.0, 100800.0], dtype=wp.float64, device=device
             )
+            environment = None
+        elif source == "scalar_temperature_array_pressure":
+            temperature = 298.15
+            pressure = wp.array(
+                [101325.0, 100800.0], dtype=wp.float64, device=device
+            )
+            environment = None
+        elif source == "array_temperature_scalar_pressure":
+            temperature = wp.array(
+                [298.15, 299.15], dtype=wp.float64, device=device
+            )
+            pressure = 101325.0
             environment = None
         else:
             temperature, pressure = None, None
