@@ -1,17 +1,16 @@
 # Infrastructure Reuse
 
-- `coagulation_step_gpu()` in
-  `particula/gpu/kernels/coagulation.py:792-1022` is the public low-level
-  orchestration boundary. Extend it with a keyword-only configuration so all
-  existing positional Brownian callers remain source-compatible.
-- Validation ordering in `particula/gpu/kernels/coagulation.py:894-978` already
-  checks particle arrays, device, timestep, environment, volume, caller-owned
-  buffers, and RNG state before allocation and launch. Insert mechanism
-  preflight before normalization/allocation and retain this ordering.
-- `brownian_coagulation_kernel` and its acceptance logic at
-  `particula/gpu/kernels/coagulation.py:400-427` provide the bounded active-pair
-  selection, acceptance, swap-pop removal, and persistent RNG patterns. Factor
-  pair-rate/majorant dispatch around this one loop rather than cloning it.
+- `coagulation_step_gpu()` in `particula/gpu/kernels/coagulation.py` is the
+  public low-level orchestration boundary. P3 will extend it with a keyword-only
+  configuration while preserving positional Brownian compatibility.
+- Its validation ordering checks particle arrays, device, timestep, environment,
+  volume, caller-owned buffers, and RNG state before allocation and launch. P3
+  must insert mechanism preflight before normalization/allocation and retain this
+  ordering.
+- `brownian_coagulation_kernel` in `particula/gpu/kernels/coagulation.py`
+  provides bounded active-pair selection, additive pair-rate/majorant dispatch,
+  one acceptance draw per valid candidate, swap-pop removal, and persistent RNG
+  patterns. Downstream terms must extend this loop rather than clone it.
 - `brownian_kernel_pair_wp()` in
   `particula/gpu/dynamics/coagulation_funcs.py:92-139` is the first term behind
   the additive pair-rate interface and remains the independent Brownian

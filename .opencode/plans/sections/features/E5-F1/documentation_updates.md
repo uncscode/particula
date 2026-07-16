@@ -7,8 +7,9 @@
 - [x] Added module/class/function docstrings for the P1 configuration, resolver,
   and capability validator. They state the concrete-module-only boundary, the
   Brownian default, canonicalization, and absence of public-step integration.
-- Add module/class docstrings for the future pair-rate dispatcher and majorant
-  interface, including the downstream extension checklist.
+- [x] Updated private helper and sampler comments/docstrings in
+  `particula/gpu/kernels/coagulation.py` for P2's additive total-rate/majorant,
+  one-acceptance-draw, and invalid-term skip behavior.
 - Update `docs/Features/data-containers-and-gpu-foundations.md` with ownership:
   mechanism configuration is caller-owned host metadata; particle state,
   buffers, and RNG remain caller-owned Warp data.
@@ -23,3 +24,6 @@
 
 No user-facing documentation changed in Issue #1331 because the public API and
 GPU runtime behavior did not change.
+
+No user-facing documentation changed in Issue #1332: the refactor is private to
+the Brownian kernel and leaves the public API unchanged.

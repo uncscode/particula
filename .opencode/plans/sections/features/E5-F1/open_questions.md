@@ -23,9 +23,9 @@
     either as excess input when ST1956 is disabled.
 - [x] Should invalid device-computed rate/majorant values set a diagnostic
   buffer or simply suppress acceptance after host preflight?
-  - Resolved 2026-07-16: use an internal per-box `wp.int32` status buffer and a
-    documented validation readback before RNG initialization or mutable
-    launches. Raise on non-finite, negative, or material bound violations. Do
-    not expose debug buffers or silently suppress invalid physics.
+  - Resolved 2026-07-16 (Issue #1332): sanitize invalid terms to zero and skip
+    zero, invalid, or underestimated candidates before acceptance or mutation.
+    Do not add a diagnostic buffer, readback, or public API; whole-call
+    preflight atomicity remains P3 scope.
 
 Classifier diagnostics: none.

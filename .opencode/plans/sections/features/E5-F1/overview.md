@@ -12,13 +12,14 @@ opportunities, and validation after state or RNG mutation.
 
 ## Value Proposition
 
-Issue #1331 completed the P1 host-side foundation: a concrete-module-only,
-frozen configuration; canonical, unique mechanism resolution; fixed masks; and
-a separate executable-capability gate. The remaining E5-F1 work will add
-additive pair rates, one bounded sampling pass, and public pre-mutation
-validation without changing the existing Brownian runtime until those phases.
-The contract preserves caller-owned buffers, persistent RNG state, fixed-shape
-fp64 execution, and explicit device ownership.
+Issues #1331 and #1332 completed the P1/P2 foundation: a concrete-module-only,
+frozen configuration; canonical fixed masks; Brownian-only capability gating;
+and private additive mask dispatch in the Brownian sampler. P2 uses one
+sanitized `K_total`, one safe `M_total`, and one acceptance draw per valid
+candidate while reserved bits contribute nothing. P3 remains responsible for
+public pre-mutation configuration validation. The contract preserves
+caller-owned buffers, persistent RNG state, fixed-shape fp64 execution, and
+explicit device ownership.
 
 ## User Stories
 

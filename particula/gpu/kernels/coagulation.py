@@ -1,7 +1,10 @@
 """GPU Brownian coagulation kernels and orchestration utilities.
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
-coagulation pipeline. Entry-point validation accepts scalar direct inputs,
+Brownian coagulation pipeline. Its fixed-mask sampler accumulates finite,
+positive executable rate terms and a single safe majorant before making one
+acceptance draw for each valid candidate. Entry-point validation accepts
+scalar direct inputs,
 explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
 Those sources are normalized into per-box Warp arrays before volume setup,
 RNG initialization, or any Warp launch. The kernels operate on GPU-resident
@@ -251,7 +254,11 @@ def _bound_scheduled_trials(expected_trials: Any) -> Any:
 @no_type_check
 @wp.func
 def _sanitize_positive_finite(value: Any) -> Any:
-    """Return finite, strictly positive terms or zero for safe accumulation."""
+    """Return a finite, strictly positive term or zero for safe accumulation.
+
+    Invalid, zero, and negative terms make no contribution to an additive
+    pair-rate or majorant total.
+    """
     if wp.isfinite(value) and value > wp.float64(0.0):
         return value
     return wp.float64(0.0)
@@ -270,7 +277,11 @@ def _total_pair_rate(  # noqa: PLR0913
     speed_i: Any,
     speed_j: Any,
 ) -> Any:
-    """Sum enabled finite pair-rate terms using fixed mechanism branches."""
+    """Accumulate enabled finite, positive pair-rate terms.
+
+    The fixed mask dispatches Brownian physics without dynamic mechanism
+    iteration. Reserved bits deliberately contribute no executable term.
+    """
     total_rate = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
         total_rate += _sanitize_positive_finite(
@@ -303,7 +314,12 @@ def _total_majorant(  # noqa: PLR0913
     speed_min: Any,
     speed_max: Any,
 ) -> Any:
-    """Sum enabled finite majorant terms using fixed mechanism branches."""
+    """Accumulate enabled finite, positive pair-rate-majorant terms.
+
+    The result is the single safe majorant used to schedule and accept
+    candidates. The fixed mask currently executes Brownian only; reserved bits
+    deliberately contribute no term.
+    """
     total_majorant = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
         total_majorant += _sanitize_positive_finite(
@@ -442,7 +458,11 @@ def brownian_coagulation_kernel(  # noqa: C901
 
     Candidate pairs are drawn by rank within the current active set so each
     scheduled trial proposes two distinct active particles without retrying on
-    inactive slots.
+    inactive slots. The sampler computes one finite positive total majorant per
+    box and one finite positive total pair rate per candidate. A valid candidate
+    receives exactly one acceptance draw; invalid rates, invalid majorants, and
+    rates above the majorant are skipped without collision-buffer or active-set
+    mutation.
 
     Args:
         masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
@@ -470,7 +490,8 @@ def brownian_coagulation_kernel(  # noqa: C901
         rng_states: Per-box RNG states ``(n_boxes,)`` mutated in place during
             pair selection. Reusing this buffer across calls preserves
             caller-owned persistent state unless it is reset before launch.
-        mechanism_mask: Fixed internal mechanism-dispatch mask.
+        mechanism_mask: Fixed internal mask for additive executable rate terms.
+            Brownian is currently executable; reserved bits contribute nothing.
         collision_capacity: Maximum accepted collisions per box for this call.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]

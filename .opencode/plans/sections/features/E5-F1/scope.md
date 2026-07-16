@@ -30,6 +30,16 @@ particle-resolved support boundary executable rather than implicit.
 - Add co-located unit and integration tests for compatibility, additive
   dispatch semantics, and state-preserving failures.
 
+## P2 Boundary Recorded by Issue #1332
+
+P2 adds private `@wp.func` additive rate and majorant helpers and passes an
+internal `mechanism_mask` to `brownian_coagulation_kernel`; it does not expose
+configuration on `coagulation_step_gpu`. Brownian is the only executable term.
+For every valid selected candidate, the kernel calculates one sanitized total
+rate and, only when it is positive, finite, and no greater than the one safe
+total majorant, makes one acceptance draw. Zero, non-finite, negative, and
+underestimated inputs are skipped before collision or active-set mutation.
+
 ## Out of Scope
 
 - Charged formulas, charge-conserving merge implementation, or charged
