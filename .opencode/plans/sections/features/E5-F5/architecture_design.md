@@ -15,7 +15,7 @@ coagulation_step_gpu(..., mechanisms=("turbulent_shear",),
        derive active particle radii from species mass/density
        ST1956(i,j) = sqrt(pi*epsilon[box]/(120*nu))
                        * (2*r_i + 2*r_j)^3
-       majorant = proven maximum across active unordered pairs
+       majorant = ST1956 rate for the two largest active radii
   -> E5-F1 bounded active-pair loop
        accept once using ST1956(i,j) / majorant
        remove accepted pair once; advance one per-box RNG stream
@@ -24,11 +24,9 @@ coagulation_step_gpu(..., mechanisms=("turbulent_shear",),
 ```
 
 Because the ST1956 prefactor is constant within a box and the rate is monotone
-in the radius sum, the two largest active radii provide a tight majorant. An
-exhaustive active-pair maximum is also correct and may be preferred initially
-for uniformity with sibling mechanisms. The implementation decision must be
-covered by an independent all-pairs assertion; no unproved extrema heuristic is
-acceptable.
+in the radius sum, the two largest active radii provide the required tight
+majorant. Tests must exhaustively compare every active unordered pair against
+this proved bound; no alternate unproved extrema heuristic is acceptable.
 
 ## Data / API / Workflow Changes
 

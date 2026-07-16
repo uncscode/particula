@@ -2,17 +2,18 @@
 
 ## GPU Physics
 
-- [ ] Freeze the E5-F2 approved charged-model subset with E5-F1 before adding
-  executable identifiers; require the hard-sphere charged baseline and record
-  any deferred Dyachkov/Gatti/Gopalakrishnan/Chahl variants explicitly.
+- [ ] Implement `charged_hard_sphere` as the sole initial GPU charged model.
+  Keep Dyachkov, Gatti, Gopalakrishnan, and Chahl variants unavailable until a
+  separately approved parity contract exists for each one.
 - [ ] Add scalar fp64 Coulomb potential and stable enhancement-limit helpers in
   `particula/gpu/dynamics/coagulation_funcs.py`.
 - [ ] Add scalar reduced mass and reduced friction helpers with explicit
   zero/positive-domain guards in the same module.
 - [ ] Port diffusive Knudsen and dimensional conversion calculations from the
   published CPU formula chain without calling NumPy code at runtime.
-- [ ] Add one scalar pair helper per approved charged model, returning a finite
-  non-negative rate in cubic meters per second.
+- [ ] Add the scalar `charged_hard_sphere` pair helper, returning a finite
+  non-negative rate in cubic meters per second; do not add generic or deferred
+  charged-model dispatch.
 
 ## Kernel and Validation
 

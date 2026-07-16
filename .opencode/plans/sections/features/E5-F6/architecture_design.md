@@ -25,8 +25,10 @@ The total bound is the sum of valid component bounds. For non-negative rates,
 if `K_m(i,j) <= M_m` for every enabled mechanism `m`, then
 `sum_m K_m(i,j) <= sum_m M_m`. This bound may be conservative because component
 maxima can occur at different pairs, but it is safe and avoids an unproved
-cross-mechanism extrema heuristic. A tighter bound is future work unless it
-comes with a proof and all-pairs evidence.
+cross-mechanism extrema heuristic. Approved fixtures must not bind the bounded
+trial cap. If the cap binds, replace the summed-component scheduling bound with
+the exhaustive maximum of the summed total pair rate for every active unordered
+pair; do not substitute an unproved heuristic.
 
 The combination matrix is data-driven on the host and explicit in device mask
 branches. Canonical ordering means equivalent mechanism sets resolve to the

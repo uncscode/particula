@@ -3,8 +3,10 @@
 ## Upstream
 
 - E5-F1, Mechanism Configuration and Sampling Contract, must freeze stable
-  mechanism identifiers, the approved charged-model subset, particle-resolved
-  support, and the pair-rate extension contract before E5-F2-P2 is finalized.
+  mechanism identifiers, `charged_hard_sphere` as the sole approved charged
+  model, particle-resolved support, and the pair-rate extension contract before
+  E5-F2-P2 is finalized. Dyachkov, Gatti, Gopalakrishnan, and Chahl variants
+  remain deferred and are not executable E5 dependencies.
 - Shipped E2 foundations provide `WarpParticleData.charge`, fp64 fixed-shape
   arrays, and explicit CPU/Warp conversion boundaries.
 - Shipped E3 coagulation hardening provides disjoint bounded pair selection,

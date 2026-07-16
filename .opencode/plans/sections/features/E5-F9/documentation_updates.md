@@ -10,7 +10,8 @@
   completed scope, artifact links, E5 exit evidence, and Epic F transition.
 - Update `docs/Features/Roadmap/index.md` with the same status and canonical
   shipped artifact list.
-- Link E5-F7's validation artifact and E5-F8's
+- Link E5-F7's canonical validation artifact at
+  `docs/Features/Roadmap/coagulation-validation.md` and E5-F8's
   `docs/Features/Roadmap/condensation-parity-walkthrough.md` plus
   `docs/Examples/gpu_condensation_parity_walkthrough.py` without duplicating
   their content.

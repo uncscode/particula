@@ -35,4 +35,9 @@ to implement and prove summed rates/majorants. P3 validates end-to-end one-pass
 execution only after P2's deterministic bound proof. P4 documents only shipped,
 verified rows. E5-F7 starts after P3; E5-F9 consumes P4 and E5-F7 results.
 
+The frozen matrix contains the four singleton rows, all six unordered two-way
+rows, and the full four-way row. Three-way masks are unsupported and must fail
+preflight before allocation, mutation, or RNG advancement; they are not an
+implicit intermediate on the path to the four-way row.
+
 Parent: E5. Classifier diagnostics: none.
