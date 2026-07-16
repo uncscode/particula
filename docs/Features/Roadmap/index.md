@@ -99,16 +99,27 @@ meets its exit bar, the next pending epic in the sequence becomes active.
     - [Measured coagulation decision record](data-oriented-gpu.md#measured-decision-record-for-the-current-one-thread-per-box-path)
       — accepted many-box baseline and large single-box caution band
 - [Epic D: GPU Condensation Physics Parity](data-oriented-gpu.md#epic-d-gpu-condensation-physics-parity)
-  (ADW plan E4) — bounded low-level direct-condensation publication with
-  fixed-four P2 inventory finalization, gas coupling, thermodynamics refresh,
-  caller-owned fp64 sidecars, and direct-kernel evidence. It does not provide
-  high-level runnable integration or general CPU-strategy parity.
+  (ADW plan E4) is the shipped bounded low-level direct-condensation
+  publication. It includes constant and Buck vapor-pressure refresh, ideal and
+  kappa activity, static and composition-weighted surface tension, fixed-four
+  P2 inventory finalization, gas coupling and conservation, latent-heat rate
+  correction and signed energy diagnostics, reusable caller-owned fp64
+  sidecars, device-aware parity evidence, and the published direct-kernel
+  support contract and example. It does not provide high-level runnable
+  integration or general CPU-strategy parity.
+
+### Active
+
+- [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
+  extends the Brownian baseline across charged, sedimentation, turbulent-shear,
+  and combined coagulation mechanisms. Its closeout also owns the Epic D
+  carry-forward record: an independent CPU/Warp condensation parity walkthrough
+  and explicit downstream ownership for deferred condensation capabilities.
 
 ### Pending
 
 Listed in execution order; each becomes active when the previous epic ships.
 
-- [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
 - [Epic F: GPU Process Completeness](data-oriented-gpu.md#epic-f-gpu-process-completeness)
 - [Epic G: Backend Selection and GPU-Resident Simulation](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
 - [Epic H: Graph Capture and Performance](data-oriented-gpu.md#epic-h-graph-capture-and-performance)
