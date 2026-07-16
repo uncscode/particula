@@ -3755,6 +3755,117 @@ def test_brownian_coagulation_kernel_inactive_particles(
     npt.assert_allclose(np.asarray(speeds.numpy()), 0.0)
 
 
+def test_brownian_kernel_zero_mask_rejects_work_and_caps_overflow_schedule(
+    device: str,
+) -> None:
+    """Private dispatch preserves safety and schedules positive overflow."""
+    n_boxes = 1
+    n_particles = 2
+    masses = wp.array(
+        np.full((n_boxes, n_particles, 1), 1.0e-18, dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
+    concentration = wp.array(
+        np.ones((n_boxes, n_particles), dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
+    density = wp.array([1000.0], dtype=wp.float64, device=device)
+    volume = wp.array([1.0], dtype=wp.float64, device=device)
+    temperature = wp.array([298.15], dtype=wp.float64, device=device)
+    pressure = wp.array([101325.0], dtype=wp.float64, device=device)
+    radii = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
+    diffusivities = wp.zeros_like(radii)
+    g_terms = wp.zeros_like(radii)
+    speeds = wp.zeros_like(radii)
+    active_indices = wp.zeros(
+        (n_boxes, n_particles), dtype=wp.int32, device=device
+    )
+    collision_pairs = wp.array([[[91, 92]]], dtype=wp.int32, device=device)
+    n_collisions = wp.array([9], dtype=wp.int32, device=device)
+    rng_states = wp.array([123], dtype=wp.uint32, device=device)
+
+    def launch(mechanism_mask: int, time_step: float) -> None:
+        """Launch the private sampler with its production dispatch inputs."""
+        wp.launch(
+            brownian_coagulation_kernel,
+            dim=n_boxes,
+            inputs=[
+                masses,
+                concentration,
+                density,
+                volume,
+                temperature,
+                pressure,
+                wp.float64(constants.GAS_CONSTANT),
+                wp.float64(constants.BOLTZMANN_CONSTANT),
+                wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+                wp.float64(constants.REF_VISCOSITY_AIR_STP),
+                wp.float64(constants.REF_TEMPERATURE_STP),
+                wp.float64(constants.SUTHERLAND_CONSTANT),
+                wp.float64(time_step),
+                radii,
+                diffusivities,
+                g_terms,
+                speeds,
+                active_indices,
+                collision_pairs,
+                n_collisions,
+                rng_states,
+                wp.int32(mechanism_mask),
+                wp.int32(1),
+            ],
+            device=device,
+        )
+        wp.synchronize()
+
+    initial_rng_state = np.asarray(rng_states.numpy()).copy()
+    launch(0, 1.0)
+
+    assert np.asarray(n_collisions.numpy()).item() == 0
+    npt.assert_array_equal(
+        np.asarray(collision_pairs.numpy()),
+        np.array([[[91, 92]]], dtype=np.int32),
+    )
+    npt.assert_array_equal(np.asarray(active_indices.numpy()), [[0, 1]])
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng_state)
+
+    masses = wp.array(
+        np.full((n_boxes, n_particles, 1), np.nan, dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
+    launch(BROWNIAN_MECHANISM_FLAG, 1.0)
+
+    assert np.asarray(n_collisions.numpy()).item() == 0
+    npt.assert_array_equal(
+        np.asarray(collision_pairs.numpy()),
+        np.array([[[91, 92]]], dtype=np.int32),
+    )
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng_state)
+
+    masses = wp.array(
+        np.full((n_boxes, n_particles, 1), 1.0e-18, dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
+    collision_pairs = wp.array([[[91, 92]]], dtype=wp.int32, device=device)
+    n_collisions = wp.array([9], dtype=wp.int32, device=device)
+    rng_states = wp.array([123], dtype=wp.uint32, device=device)
+    active_indices = wp.zeros(
+        (n_boxes, n_particles), dtype=wp.int32, device=device
+    )
+    launch(BROWNIAN_MECHANISM_FLAG, 1.0e308)
+
+    assert np.asarray(n_collisions.numpy()).item() == 1
+    npt.assert_array_equal(
+        np.asarray(collision_pairs.numpy()),
+        np.array([[[0, 1]]], dtype=np.int32),
+    )
+    assert not np.array_equal(np.asarray(rng_states.numpy()), initial_rng_state)
+
+
 def test_apply_coagulation_kernel_merges_particles(device: str) -> None:
     """Apply kernel merges masses and zeroes merged particle concentration."""
     masses = np.array([[[1.0e-18], [2.0e-18]]], dtype=np.float64)

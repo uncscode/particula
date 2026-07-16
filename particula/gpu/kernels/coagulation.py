@@ -620,7 +620,10 @@ def brownian_coagulation_kernel(  # noqa: C901
     expected_trials = (
         majorant_total * possible_pairs * time_step / volume[box_idx]
     )
-    if not (wp.isfinite(expected_trials) and expected_trials > wp.float64(0.0)):
+    # A finite-positive calculation can overflow to positive infinity. Let the
+    # bounded scheduler cap that case rather than silently dropping all work.
+    # This comparison also rejects NaN, zero, and negative schedules.
+    if not (expected_trials > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
         return
 
