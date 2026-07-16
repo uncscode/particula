@@ -22,7 +22,7 @@ from dataclasses import dataclass
 # pyright: reportAssignmentType=false
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import numpy.testing as npt
@@ -178,8 +178,8 @@ def test_mechanism_rejects_invalid_distribution_type(
     distribution_type: object,
 ) -> None:
     """Only exact particle-resolved distribution type is structurally valid."""
-    config = CoagulationMechanismConfig(  # type: ignore[arg-type]
-        distribution_type=distribution_type
+    config = CoagulationMechanismConfig(
+        distribution_type=cast(str, distribution_type)
     )
 
     with pytest.raises(ValueError, match="distribution_type"):
@@ -228,7 +228,7 @@ def test_mechanism_support_accepts_brownian() -> None:
         CoagulationMechanismConfig(mechanisms=(BROWNIAN_MECHANISM,))
     )
 
-    assert validate_coagulation_mechanism_capabilities(resolved) is None
+    validate_coagulation_mechanism_capabilities(resolved)
 
 
 def test_mechanism_support_rejects_combined_brownian_and_reserved_term() -> (
