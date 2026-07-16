@@ -22,13 +22,15 @@ coverage. Test files use the repository's `*_test.py` convention.
   conservation preserve Brownian evidence; marked stochastic tests use
   aggregate independent-seed bounds. Invalid, zero, and underestimated inputs
   assert no accepted output or mutation.
-- **P3 — Public integration/regression tests:** Under identical seeds, compare
-  omitted configuration with explicit Brownian for collision counts, pairs,
-  masses, concentration, and RNG state. For every rejected configuration,
-  snapshot particle fields, caller collision buffers, count buffers, and
-  persistent RNG and prove no value or object identity changes. Include
-  one-box, multi-box, direct scalar, direct Warp-array, and environment-sidecar
-  cases where relevant.
+- **P3 — Public integration/regression tests (completed in Issue #1333):**
+  `particula/gpu/kernels/tests/coagulation_test.py` covers the keyword-only
+  signature, wrong-type and all rejected resolver/capability categories, and
+  configuration-error ordering ahead of runtime access. Warp CPU one-box and
+  multi-box snapshots prove values and identities of particle state,
+  caller-owned collision buffers, and persistent RNG remain unchanged. Equal
+  seed omitted-versus-explicit Brownian coverage compares scalar, direct
+  Warp-array/hybrid, and environment-sidecar inputs, including launch-mask,
+  collision/RNG exactness, floating state tolerances, and conservation.
 - **P4 — Documentation validation:** Check internal links, import paths, support
   table consistency, and executable snippets. Do not advertise reserved terms
   as available.

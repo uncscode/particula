@@ -8,7 +8,7 @@
   mechanisms and `distribution_type="particle_resolved"`.
 - [x] Implement an explicit executable-capability table that initially enables
   only Brownian and reports the owning E5 track for reserved terms.
-- [ ] Add keyword-only configuration to `coagulation_step_gpu`; resolve and
+- [x] Add keyword-only configuration to `coagulation_step_gpu`; resolve and
   validate it before particle/environment normalization, allocations, RNG
   initialization, or launch.
 - [x] Add private mask-dispatch helpers in
@@ -29,9 +29,9 @@
   order, duplicate/empty/unknown terms, reserved terms, and unsupported modes.
 - [x] Add test-only synthetic additive probes proving two terms are summed
   before one acceptance comparison rather than sampled separately.
-- [ ] Compare omitted configuration and explicit Brownian calls under equal
+- [x] Compare omitted configuration and explicit Brownian calls under equal
   seeds, buffers, scalar environment inputs, and per-box environment arrays.
-- [ ] Snapshot masses, concentration, charge, collision pairs/counts, and
+- [x] Snapshot masses, concentration, charge, collision pairs/counts, and
   persistent RNG before every public preflight failure and assert identity and
   values remain unchanged.
 - [x] Add focused unit, fixed-seed deterministic, and marked stochastic Warp

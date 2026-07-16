@@ -27,16 +27,19 @@
     parity, synthetic addition, one-draw behavior, guards, selector validity,
     and mass conservation.
 
-- [ ] **E5-F1-P3:** Enforce pre-mutation particle-resolved support boundaries with integration tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E5-F1-P3:** Enforce pre-mutation particle-resolved support boundaries with integration tests
+  - Issue: #1333 | Size: S | Status: Completed
   - Goal: Integrate keyword-only mechanism configuration into
     `coagulation_step_gpu` and prove every unsupported request fails before
     state, output buffers, allocations, or RNG launches are changed.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: legacy-vs-explicit Brownian equivalence; snapshots of masses,
-    concentration, charge, collision buffers, collision counts, and persistent
-    RNG for each failing configuration; multi-box Warp CPU coverage.
+  - Completed: Added host-only configuration preflight as the first runtime
+    action, with `None` selecting Brownian and the resolved mask passed to the
+    existing launch. Rejected wrong-type, structural, distribution, and reserved
+    configurations fail before runtime access or mutation. Co-located Warp CPU
+    integration tests cover failure atomicity, ordering sentinels, and equal-seed
+    omitted-versus-explicit Brownian equivalence across environment source forms.
 
 - [ ] **E5-F1-P4:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

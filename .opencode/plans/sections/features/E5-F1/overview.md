@@ -16,8 +16,10 @@ Issues #1331 and #1332 completed the P1/P2 foundation: a concrete-module-only,
 frozen configuration; canonical fixed masks; Brownian-only capability gating;
 and private additive mask dispatch in the Brownian sampler. P2 uses one
 sanitized `K_total`, one safe `M_total`, and one acceptance draw per valid
-candidate while reserved bits contribute nothing. P3 remains responsible for
-public pre-mutation configuration validation. The contract preserves
+candidate while reserved bits contribute nothing. Issue #1333 completed P3:
+`coagulation_step_gpu` now accepts keyword-only `mechanism_config`, preflights
+it before any runtime-state access, and dispatches the resolved mask at the
+existing kernel boundary. The contract preserves
 caller-owned buffers, persistent RNG state, fixed-shape fp64 execution, and
 explicit device ownership.
 
