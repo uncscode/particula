@@ -13,11 +13,12 @@ masses in-place.
 
 ``CoagulationMechanismConfig`` and its resolver are concrete-module APIs:
 import them from ``particula.gpu.kernels.coagulation``, not
-``particula.gpu.kernels``. The frozen configuration is host-side metadata, not
-device-resident simulation state. The public step defaults to Brownian,
-particle-resolved execution and rejects unsupported configurations before
-accessing runtime state. Supplied particle data, collision outputs, and RNG
-sidecars are caller-owned same-device Warp resources.
+``particula.gpu.kernels``. The immutable, keyword-only configuration is
+host-side metadata, not device-resident simulation state. The public step
+defaults to Brownian, particle-resolved execution and rejects reserved or
+otherwise unsupported configurations during preflight, before runtime state is
+accessed or mutated. Supplied particles, collision outputs, and RNG sidecars
+are caller-owned same-device Warp resources.
 """
 
 # pyright: basic
@@ -106,12 +107,15 @@ _COAGULATION_MECHANISM_FLAGS = MappingProxyType(
 class CoagulationMechanismConfig:
     """Configure host-side coagulation mechanism selection.
 
-    The default selects Brownian, particle-resolved coagulation. This frozen,
+    The default selects Brownian, particle-resolved coagulation. This immutable,
     concrete-module-only API must be imported from
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
-    ``coagulation_step_gpu`` accepts the configuration as a keyword-only
-    argument. Only the Brownian ``"particle_resolved"`` combination is
-    executable; the resolver and capability validator reject other requests.
+    ``coagulation_step_gpu`` accepts it only through its keyword-only
+    ``mechanism_config`` argument. The configuration is host metadata and does
+    not own, transfer, or synchronize Warp resources. Only the Brownian
+    ``"particle_resolved"`` combination is executable; reserved mechanisms and
+    other distribution types are rejected during host-side preflight before any
+    runtime state access or mutation.
 
     Attributes:
         mechanisms: Requested canonical mechanism identifiers, or ``None`` to
@@ -1097,15 +1101,21 @@ def coagulation_step_gpu(  # noqa: C901
 ) -> tuple[Any, Any, Any]:
     """Execute one particle-resolved Brownian coagulation timestep on the GPU.
 
-    ``mechanism_config`` is preflighted before any runtime input access,
-    allocation, normalization, RNG work, or launch. Omission selects Brownian
-    particle-resolved execution; all other mechanisms and distributions are
-    outside this executable boundary. Direct temperature and pressure inputs are
-    then validated and normalized before volume setup or launches. Caller-owned
-    RNG buffers are reset only when ``initialize_rng=True`` explicitly opts in.
+    ``mechanism_config`` is immutable, keyword-only host metadata and is
+    preflighted before any runtime input access, allocation, normalization, RNG
+    work, or launch. Omission selects the only executable combination:
+    Brownian ``"particle_resolved"``. Reserved mechanisms and all other
+    distribution types reject during preflight without runtime mutation. Direct
+    temperature and pressure inputs are then validated and normalized before
+    volume setup or launches. ``particles`` and supplied ``collision_pairs``,
+    ``n_collisions``, and ``rng_states`` are caller-owned same-device Warp
+    resources; the step mutates them in place as applicable. Caller-owned RNG
+    buffers are reset only when ``initialize_rng=True`` explicitly opts in.
 
     Args:
-        particles: GPU-resident particle data.
+        particles: Caller-owned, GPU-resident particle data. All required Warp
+            arrays must be on the same device; particle mass and concentration
+            state is mutated in place by accepted collisions.
         temperature: Direct gas temperature as either a scalar or a Warp array
             with shape ``(n_boxes,)``. Use ``None`` only with
             ``environment=...``.
@@ -1119,26 +1129,29 @@ def coagulation_step_gpu(  # noqa: C901
             For caller-owned persistent buffers, the seed is only consumed when
             ``initialize_rng=True`` explicitly requests a reset.
         collision_pairs: Optional caller-owned, same-device Warp collision
-            output buffer. When omitted, the function allocates a call-local
-            convenience buffer for this call.
+            output buffer. The buffer is written in place. When omitted, the
+            function allocates a call-local convenience buffer for this call.
         n_collisions: Optional caller-owned, same-device Warp per-box collision
-            count output buffer. When omitted, the function allocates a
-            call-local convenience buffer for this call.
-        rng_states: Optional preallocated RNG state buffer. When omitted, this
-            function allocates a call-local same-device ``(n_boxes,)`` buffer,
-            seeds it from ``rng_seed``, and uses it only for the current call.
-            When provided, the caller owns the persistent same-device
-            GPU-resident sidecar buffer and it is reused as-is across repeated
-            calls unless
+            count output buffer. The buffer is written in place. When omitted,
+            the function allocates a call-local convenience buffer for this
+            call.
+        rng_states: Optional caller-owned, same-device Warp RNG state buffer.
+            The buffer is mutated in place. When omitted, this function
+            allocates a call-local same-device ``(n_boxes,)`` buffer, seeds it
+            from ``rng_seed``, and uses it only for the current call. When
+            provided, the caller owns the persistent GPU-resident sidecar
+            buffer and it is reused as-is across repeated calls unless
             ``initialize_rng=True`` explicitly requests a reset from
              ``rng_seed``.
-        mechanism_config: Optional ``CoagulationMechanismConfig`` imported from
+        mechanism_config: Optional immutable host-side
+            ``CoagulationMechanismConfig`` imported from
             ``particula.gpu.kernels.coagulation``; it is not re-exported by
-            ``particula.gpu.kernels``. Omission selects Brownian,
-            particle-resolved execution. Malformed configurations, unsupported
-            distributions, and reserved mechanisms fail before runtime inputs
-            are accessed. A wrong type raises exactly ``ValueError`` with the
-            message
+            ``particula.gpu.kernels``. This keyword-only configuration does not
+            transfer, synchronize, or own Warp state. Omission selects
+            Brownian, particle-resolved execution. Malformed configurations,
+            unsupported distributions, and reserved mechanisms fail before
+            runtime inputs are accessed or mutable runtime state is changed. A
+            wrong type raises exactly ``ValueError`` with the message
             ``"mechanism_config must be a CoagulationMechanismConfig."``;
             other errors are delegated to the resolver and capability gate.
         initialize_rng: Explicit reset flag for caller-provided

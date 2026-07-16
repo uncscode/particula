@@ -20,7 +20,9 @@
 - Keep `docs/Features/condensation_strategy_system.md` unchanged unless a shared
   low-level configuration convention is explicitly cross-referenced.
 - [x] Issue #1334 updated the P4 phase status and success criteria without
-  changing container schemas or GPU runtime behavior.
+   changing container schemas or GPU runtime behavior.
+- No focused test, import-smoke, or documentation-build validation is recorded
+  for this documentation-only closeout.
 - [x] The complete direct GPU coagulation example and final support matrix remain
   deferred to E5-F9 so documentation does not imply unavailable physics.
 
