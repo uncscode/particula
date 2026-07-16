@@ -20,9 +20,10 @@
 
 - **E5-F9:** Uses the walkthrough, separate criteria, and owner table as the T8
   closeout artifact and links them in final E5 support/roadmap documentation.
-- **Epic F (GPU Process Completeness):** Owns thermal-state/temperature-feedback
-  and adaptive process-completeness work once explicit numerical contracts are
-  approved.
+- **Future condensation numerical-method plan:** Owns `thermal_work`
+  consumption, temperature feedback, and adaptive stepping after a concrete
+  plan ID and numerical contract are approved. These remain outside E5 and are
+  not assigned to Epic F by implication.
 - **Epic G (Backend Selection and GPU-Resident Simulation):** Owns high-level
   `Aerosol`/`Runnable` integration, backend selection, resident-loop coupling,
   and broader CPU workflow parity.
