@@ -1007,7 +1007,7 @@ autodiff. Those runtime capabilities remain assigned to later roadmap epics or
 a separately approved physics expansion; recording them here does not claim
 that Epic E's coagulation implementation delivers them.
 
-The current direct-kernel configuration and ownership boundary is:
+Import the supported direct step and its host-side configuration separately:
 
 ```python
 from particula.gpu.kernels import coagulation_step_gpu
@@ -1022,9 +1022,7 @@ supplied `rng_states` are caller-owned, same-device Warp resources. Omitted
 collision outputs and RNG state use call-local convenience allocation. A
 supplied RNG sidecar is reused and changes in place; it resets only with
 `initialize_rng=True`. Kernels do not perform hidden CPU↔GPU transfer or
-synchronization for configuration or these sidecars. See the [data containers
-and GPU foundations guide](../data-containers-and-gpu-foundations.md#gpu-coagulation-configuration-and-sidecar-ownership)
-for the broader container boundary.
+synchronization for configuration or these sidecars.
 
 Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 `"continuous_pdf"` raise `ValueError`; they do not fall back or convert.
@@ -1047,13 +1045,13 @@ candidate, one collision-pair output buffer, and one per-box RNG-state
 progression. Invalid, nonfinite, or nonpositive terms do not add to totals;
 invalid candidates do not mutate the active set or collision output.
 
-Each future mechanism must add a stable identifier; required host and device
+Future mechanisms must provide a stable identifier; required host and device
 inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
 additive majorant; a capability-table row; shared-dispatcher integration; and
-co-located `*_test.py` coverage. It must not add an independent sampling loop,
-acceptance pass, collision buffer, or RNG stream. This work does not add
+co-located `*_test.py` coverage. They must not add an independent sampling
+loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
-integration, graph-capture claims, or executable charged, sedimentation, or
+integration, graph-capture claims, and executable charged, sedimentation, or
 turbulent-shear physics.
 
 Planned features:
