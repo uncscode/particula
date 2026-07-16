@@ -11642,6 +11642,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#direct-condensation-troubleshooting-and-reproduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct-condensation troubleshooting and reproduction
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -14783,6 +14794,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#direct-condensation-troubleshooting-and-reproduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct-condensation troubleshooting and reproduction
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -15311,42 +15333,35 @@ round trip is needed, use the explicit helper boundary documented in
 <a href="../data-containers-and-gpu-foundations/">Data Containers and GPU Foundations</a>;
 do not expect kernels or runnables to move environment state for you.</p>
 <h3 id="condensation_step_gpu-environment-inputs"><code>condensation_step_gpu</code> environment inputs<a class="headerlink" href="#condensation_step_gpu-environment-inputs" title="Permanent link">&para;</a></h3>
-<p><code>particula.gpu.kernels.condensation_step_gpu(...)</code> supports the shared
-environment normalization contract used by the low-level GPU kernels.</p>
-<ul>
-<li>Keep using scalar <code>temperature</code> and <code>pressure</code> for legacy one-box calls.</li>
-<li>For multi-box or GPU-resident workflows, you may instead pass direct Warp
-  arrays with shape <code>(n_boxes,)</code>.</li>
-<li>Hybrid direct calls are also accepted: one of <code>temperature</code> or <code>pressure</code>
-  may be a scalar while the other is a Warp array.</li>
-<li>You may also pass <code>environment=WarpEnvironmentData(...)</code> instead of direct
-  temperature/pressure inputs.</li>
-<li><code>temperature</code> and <code>pressure</code> remain environment-owned state. Do not move them
-  into <code>GasData</code>.</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_warp_environment_data</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">condensation_step_gpu</span>
-
-<span class="c1"># Legacy-compatible scalar call</span>
-<span class="n">particle_out</span><span class="p">,</span> <span class="n">gas_out</span> <span class="o">=</span> <span class="n">condensation_step_gpu</span><span class="p">(</span>
-    <span class="n">particles</span><span class="o">=</span><span class="n">warp_particle</span><span class="p">,</span>
-    <span class="n">gas</span><span class="o">=</span><span class="n">warp_gas</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>
-    <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>
-    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Explicit environment-owned thermodynamic state</span>
-<span class="n">warp_environment</span> <span class="o">=</span> <span class="n">to_warp_environment_data</span><span class="p">(</span><span class="n">environment</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-<span class="n">particle_out</span><span class="p">,</span> <span class="n">gas_out</span> <span class="o">=</span> <span class="n">condensation_step_gpu</span><span class="p">(</span>
-    <span class="n">particles</span><span class="o">=</span><span class="n">warp_particle</span><span class="p">,</span>
-    <span class="n">gas</span><span class="o">=</span><span class="n">warp_gas</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">pressure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">environment</span><span class="o">=</span><span class="n">warp_environment</span><span class="p">,</span>
-    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div>
+<p>The bounded direct GPU condensation path is imported with
+<code>from particula.gpu.kernels import condensation_step_gpu</code>. Explicitly convert
+with <code>to_warp_*</code> before the call and restore with <code>from_warp_*</code> afterward;
+preserve ordered species names outside GPU containers. Callers also own required
+synchronization and checkpoint/snapshot responsibility. See the authoritative
+<a href="../data-containers-and-gpu-foundations/">Data Containers and GPU Foundations</a>
+page for its modes and schema matrix rather than duplicating that matrix here.</p>
+<p>The non-executable signature is
+<code>particles_out, mass_transfer = condensation_step_gpu(...,
+thermodynamics=thermodynamics)</code>. <code>thermodynamics=</code> is required and is
+caller-owned device-local configuration. Particle masses and
+<code>gas.concentration</code> mutate in place; there is no second gas return value.
+Caller-supplied GPU vapor pressure is derived, non-authoritative state that the
+step overwrites.</p>
+<p>Direct temperature and pressure inputs may be positive-finite scalars,
+same-device Warp arrays with shape <code>(n_boxes,)</code>, or hybrid scalar/Warp-array
+inputs. Alternatively, pass <code>environment=WarpEnvironmentData</code> with both direct
+inputs omitted; its <code>(n_boxes,)</code> values must be positive finite and on the same
+device. Temperature and pressure remain environment-owned state, not <code>GasData</code>
+fields.</p>
+<p>The step executes four fixed equal substeps, uses caller-owned reusable scratch
+and diagnostic buffers, P2 inventory finalization, and gas coupling for later
+proposals. Its transfer is a whole-call total; optional caller-owned energy
+output is not a third return value. This is not a high-level <code>Aerosol</code> or
+<code>Runnable</code> API, automatic fallback, or hidden simulation-state transfer.
+Callers synchronize before host observation or restoration; CUDA preflight
+validation-flag readbacks may synchronize without transferring simulation
+state. It also does not add adaptive stepping, new physics or container
+support, BAT, or staggered/Gauss-Seidel support.</p>
 <h2 id="conversion-helpers">Conversion helpers<a class="headerlink" href="#conversion-helpers" title="Permanent link">&para;</a></h2>
 <p>Use the conversion helpers when you need to bridge old and new APIs:</p>
 <ul>
@@ -15407,6 +15422,22 @@ launch. Check the following first:</p>
 </ul>
 <p>If you need a CPU-owned source of truth, keep using <code>EnvironmentData</code> and only
 convert it at the explicit <code>to_warp_environment_data()</code> boundary.</p>
+<h3 id="direct-condensation-troubleshooting-and-reproduction">Direct-condensation troubleshooting and reproduction<a class="headerlink" href="#direct-condensation-troubleshooting-and-reproduction" title="Permanent link">&para;</a></h3>
+<p>Keep restored ordered gas names and thermodynamics-sidecar species order aligned
+with <code>gas.molar_mass</code>, including a valid water-species index. Particle and gas
+layouts retain their leading <code>(n_boxes, ...)</code> dimension, but sidecars have
+field-appropriate shapes: species configuration uses <code>(n_species,)</code>, scratch
+property fields use <code>(n_boxes,)</code>, and transfer fields use their required
+per-particle or per-species transfer shapes. Scalar indices, including the
+water-species index, remain scalar. Supplied scratch, latent-heat, and energy
+sidecars must be active-device <code>wp.float64</code>.
+Use either <code>environment=</code> or both direct positive finite temperature/pressure
+inputs, with direct arrays on the active device. P2 inventory limiting bounds
+applied transfers rather than proving parity. Synchronize explicitly before host
+observation of caller-owned energy output. Warp <code>device="cpu"</code> is the baseline
+when installed; CUDA is optional/local and skips cleanly when CUDA is
+unavailable.</p>
+<p>For the single canonical command matrix, see <a href="../data-containers-and-gpu-foundations/#focused-reproduction-commands">GPU condensation command matrix</a>.</p>
 <h2 id="related-references">Related references<a class="headerlink" href="#related-references" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>ParticleData</code> implementation: <code>particula/particles/particle_data.py</code></li>

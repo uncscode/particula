@@ -11533,6 +11533,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Direct-kernel troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#focused-reproduction-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Focused reproduction commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -14618,6 +14635,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Direct-kernel troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#focused-reproduction-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Focused reproduction commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -15024,6 +15058,11 @@ field or a source of hidden CPU↔Warp synchronization.</p>
 <span class="n">restored_gas</span> <span class="o">=</span> <span class="n">from_warp_gas_data</span><span class="p">(</span><span class="n">gpu_gas</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">gas_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="gpu-thermodynamics-and-condensation-refresh">GPU thermodynamics and condensation refresh<a class="headerlink" href="#gpu-thermodynamics-and-condensation-refresh" title="Permanent link">&para;</a></h3>
+<p>Import the supported direct step only with
+<code>from particula.gpu.kernels import condensation_step_gpu</code>.
+Import its required <code>ThermodynamicsConfig</code> from the concrete module only:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.thermodynamics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThermodynamicsConfig</span>
+</code></pre></div>
 <p><code>ThermodynamicsConfig</code> is caller-owned, device-local process configuration.
 Its Warp arrays have no species names: species identity is positional, and
 <code>molar_mass_reference</code> must exactly equal ordered <code>gas.molar_mass</code> on the
@@ -15067,7 +15106,7 @@ omitted by <code>from_warp_gas_data()</code>.</p>
 </tr>
 </tbody>
 </table>
-<p>Only two model codes are shipped: constant <code>wp.int32(0)</code>, which reads
+<p>Only two vapor-pressure model codes are shipped: constant <code>wp.int32(0)</code>, which reads
 <code>parameters[:, 0]</code> in Pa, and canonical Buck <code>wp.int32(1)</code>, which evaluates
 the water/ice equations and ignores all four reserved parameter slots.</p>
 <p><code>condensation_step_gpu()</code> requires keyword-only <code>thermodynamics=</code> while
@@ -15076,21 +15115,24 @@ sources are a direct scalar, a direct same-device Warp array with shape
 <code>(n_boxes,)</code>, hybrid direct scalar/Warp-array inputs, or keyword-only
 <code>environment=</code> when both direct values are <code>None</code>. NumPy arrays and Python
 lists are not accepted as direct arrays, and the step does not perform hidden
-transfers.</p>
+transfers. Temperature and pressure must be positive finite values. Direct and
+environment temperature/pressure arrays are active-device <code>(n_boxes,)</code> inputs;
+non-<code>wp.float64</code> temperature arrays are normalized into a device-local fp64
+buffer. This normalization does not make every environment input fp64-only.</p>
 <p>On every successful condensation call, the step validates aggregate caller
 state and optional sidecars first. It then casts a non-<code>wp.float64</code> direct or
 environment temperature array into a device-local float64 buffer when needed
 and performs exactly four equal <code>time_step / 4.0</code> substeps. Each substep
 overwrites <code>vapor_pressure</code>, prepares environment properties, gates disabled
 partitioning entries and inactive particle slots, and creates a raw proposal.
-P2 finalizes that proposal against particle and gas inventory limits. The step
-then applies the finalized transfer to particles and accumulates it in the
-returned total-transfer buffer, reduces the matching concentration-weighted
-opposite gas delta, validates that delta, and only then mutates
-<code>gas.concentration</code>. Raw proposal work storage is intermediate state, not
-returned transfer. Later proposals read the coupled gas concentration;
-vapor-pressure refresh does not. A failed aggregate preflight leaves the
-vapor-pressure output buffer unchanged. Import the
+P2 finalizes that proposal against particle and gas inventory limits, then
+derives the matching concentration-weighted opposite gas delta. The step
+validates that delta and all pending commit values before mutating particle
+masses, accumulating the finalized transfer in the returned total-transfer
+buffer, and mutating <code>gas.concentration</code>. Raw proposal work storage is
+intermediate state, not returned transfer. Later proposals read the coupled gas
+concentration; vapor-pressure refresh does not. A failed aggregate preflight
+leaves the vapor-pressure output buffer unchanged. Import the
 standalone <code>refresh_vapor_pressure_gpu</code> only from
 <code>particula.gpu.kernels.thermodynamics</code>, never <code>particula.gpu.kernels</code>.</p>
 <h3 id="condensation-activity-and-surface-sidecars">Condensation activity and surface sidecars<a class="headerlink" href="#condensation-activity-and-surface-sidecars" title="Permanent link">&para;</a></h3>
@@ -15112,7 +15154,10 @@ overwrite the derived GPU-only vapor-pressure buffer, and return the accumulated
 <strong>P2-finalized, inventory-limited</strong> transfer. A supplied total-transfer buffer
 holds that finalized accumulated output and is returned by identity; separate
 supplied work storage retains only the final gated raw proposal and is never the
-returned transfer. Disabled <code>(box, species)</code> entries in the
+returned transfer. The two-item return assignment is
+<code>particles_out, mass_transfer = condensation_step_gpu(...)</code>;
+<code>energy_transfer</code> is caller-owned output, not a third return value. Disabled
+<code>(box, species)</code> entries in the
 per-box <code>(n_boxes, n_species)</code> partitioning mask and inactive particle slots
 are zeroed before P2 finalization or reductions. CPU↔Warp conversion expands
 the CPU shared species mask to this per-box layout. <code>to_per_box_partitioning()</code>
@@ -15121,16 +15166,23 @@ rejects masks that differ by box and rejects zero-box mirrors because no box can
 authoritatively supply the shared CPU mask.
 P2 demand, release, scale, and accumulator sidecars are validated and used for
 finalization; aggregate invalid state, metadata, or ownership fails with
-<code>ValueError</code> before launches or caller mutation. A later failure caused by a
-fresh raw proposal does not roll back completed substeps, although it occurs
-before P2 mutation in its failing substep. Unsupported activity or surface
+<code>ValueError</code> before mutable physics or caller-state mutation. Preflight may run
+read-only validation kernels. A later failure caused by a fresh raw proposal
+does not roll back completed substeps, although it occurs before P2 mutation in
+its failing substep. Unsupported activity or surface
 strategies are not silently copied or approximated; passing
 <code>activity_surface=None</code> retains legacy unit activity and static tension.</p>
 <p><code>CondensationScratchBuffers</code> is a concrete-module-only optional sidecar at
 <code>particula.gpu.kernels.condensation</code>; it is not another step entry point.
-Supplied transfer fields must be active-device, stable-shape <code>wp.float64</code> arrays
-with shape <code>(n_boxes, n_particles, n_species)</code>, and supplied property fields
-must be active-device, stable-shape <code>wp.float64</code> arrays with shape <code>(n_boxes,)</code>.
+Particle mass, transfer, and scratch transfer arrays are active-device
+<code>wp.float64</code> with shape <code>(n_boxes, n_particles, n_species)</code>; gas concentration
+and energy arrays are active-device <code>wp.float64</code> with shape
+<code>(n_boxes, n_species)</code>; scratch property arrays are active-device <code>wp.float64</code>
+with shape <code>(n_boxes,)</code>; and latent heat and thermal work arrays are
+active-device <code>wp.float64</code> with shape <code>(n_species,)</code>. Supplied
+transfer fields must be active-device, stable-shape <code>wp.float64</code> arrays with
+shape <code>(n_boxes, n_particles, n_species)</code>, and supplied property fields must be
+active-device, stable-shape <code>wp.float64</code> arrays with shape <code>(n_boxes,)</code>.
 The P2 demand, release, and scale sidecars must likewise be caller-owned,
 active-device, stable-shape <code>wp.float64</code> arrays with shape
 <code>(n_boxes, n_species)</code>. Every supplied field is metadata-validated for its
@@ -15171,14 +15223,14 @@ is applied transfer in kg, <code>L</code> is latent heat in J/kg, and <code>Q</c
 condensation is positive and evaporation is negative. The strict #1272
 energy-regression tolerance is <code>rtol=1e-12, atol=1e-18</code>.</p>
 <p><code>thermal_work</code> has the same validated sidecar shape but remains deferred and
-unused. This diagnostic does not evolve temperature or add a <code>Runnable</code>,
-adaptive substeps, graph capture/replay, autodiff, or E4-F6 cross-device
-certification. It uses the whole-call finalized transfer, including the direct
-step's coupled gas mutation.</p>
+unused: the step neither reads nor writes it. It does not evolve temperature or
+add a <code>Runnable</code>, adaptive substeps, graph capture/replay, or autodiff.</p>
 <p>Use <code>to_warp_*</code> and <code>from_warp_*</code> as the sole data CPU↔Warp boundary. There is
 no high-level <code>Aerosol</code> or <code>Runnable</code> GPU path. CUDA preflight reads one-element
 device validation flags with <code>.numpy()</code>; those status reads synchronize but do
-not transfer or mutate caller-owned simulation buffers. Deterministic
+not transfer or mutate caller-owned simulation buffers. Callers requiring retry
+or rollback must snapshot and restore particle masses, gas concentration,
+derived vapor pressure, and caller-owned output/work buffers. Deterministic
 fp64 tests compare an independent NumPy reference with explicit parity
 <code>rtol</code>/<code>atol</code>, then apply tighter separate ownership invariants. Warp <code>cpu</code> is
 the baseline whenever Warp is installed; CUDA is optional, availability-guarded,
@@ -15226,12 +15278,12 @@ than storage support.</p>
 <tr>
 <td>Warp/CUDA support</td>
 <td>Optional</td>
-<td>Warp parity tests always cover Warp <code>cpu</code>; <code>cuda</code> runs only when available.</td>
+<td>Warp <code>device="cpu"</code> is the baseline when Warp is installed; CUDA is additive local evidence and unavailable devices skip cleanly.</td>
 </tr>
 <tr>
 <td>Low-level GPU condensation direct-kernel path</td>
-<td>Bounded P1-P4 contract</td>
-<td>Executes four fixed coupled substeps with active-device gas coupling; #1305/#1272 is direct-kernel and production-hook regression evidence, not broad GPU-condensation or E4 production support. E4-F6 and E4-F7 remain required gates.</td>
+<td>Shipped bounded direct-kernel contract</td>
+<td>Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support.</td>
 </tr>
 <tr>
 <td>Low-level GPU coagulation direct-kernel path</td>
@@ -15256,10 +15308,21 @@ than storage support.</p>
 <li>Coagulation <code>rng_states</code> are caller-owned Warp-resident sidecar state only;
   they are not fields on <code>ParticleData</code>, <code>GasData</code>, <code>EnvironmentData</code>, or any
   Warp container schema.</li>
-<li>No hidden CPU↔GPU synchronization occurs inside kernels or runnables.</li>
-<li>Direct condensation does not add adaptive stepping, a high-level <code>Runnable</code>
-  path, general CPU-strategy parity, unproven physics, or automatic host/device
-  movement. E4-F6 and E4-F7 remain the broader evidence and final-support gates.</li>
+<li>Kernels and runnables do not perform hidden simulation-state transfers.
+  Explicitly supplied step and output buffers do mutate in place: particle
+  masses, gas concentration, scratch transfer fields, total transfer, and
+  energy output retain their documented write semantics.
+  Callers remain responsible for synchronization before
+  host observation or restoration.
+  Validation <code>.numpy()</code> readbacks at their documented preflight and per-substep
+  boundaries may synchronize without transferring simulation state.
+  CUDA preflight validation-flag readbacks may
+  synchronize without transferring simulation state.</li>
+<li>Direct condensation does not add a high-level <code>Aerosol</code>/<code>Runnable</code> path,
+  automatic backend selection or fallback, implicit transfer or synchronization,
+  adaptive stepping, new container fields, kernels, or physics, BAT, or
+  staggered/Gauss-Seidel support. It also does not claim general CPU-strategy
+  parity or broader unproven physics support.</li>
 </ul>
 <h2 id="guidance-for-current-users">Guidance for current users<a class="headerlink" href="#guidance-for-current-users" title="Permanent link">&para;</a></h2>
 <ul>
@@ -15318,9 +15381,11 @@ path.</p>
 <li>Treat device-mismatch <code>ValueError</code> failures as input validation, not as a
     signal that Particula will migrate arrays automatically.</li>
 <li><strong>Condensation scratch buffers</strong></li>
-<li>Keep supplied <code>CondensationScratchBuffers</code> fields on the active device with
-    their required stable <code>wp.float64</code> shapes. Omitted fields allocate fallback
-    storage independently.</li>
+<li>Preserve leading <code>(n_boxes, ...)</code> layouts. Keep supplied
+    <code>CondensationScratchBuffers</code> fields on the active device with their
+    required stable <code>wp.float64</code> shapes: transfer fields use
+    <code>(n_boxes, n_particles, n_species)</code> and property fields use <code>(n_boxes,)</code>.
+    Only omitted fields allocate fallback storage independently.</li>
 <li>Supplied fields preserve caller ownership and identity but are mutable
     work/output storage; do not expect a successful step to leave them
     unmodified.</li>
@@ -15328,6 +15393,18 @@ path.</p>
 <li>Pass either <code>environment=</code> or direct temperature/pressure inputs.</li>
 <li>Do not mix scalar or Warp-array <code>temperature</code> / <code>pressure</code> values with
     <code>environment=</code>; current kernels reject that combination explicitly.</li>
+<li>When <code>environment=</code> is absent, provide both direct inputs. They must be
+    positive finite physical values and any direct Warp arrays must be
+    compatible with the active device.</li>
+<li><strong>Species metadata and thermodynamics sidecars</strong></li>
+<li>Preserve ordered CPU gas-name metadata when restoring <code>GasData</code>, and keep
+    thermodynamics-sidecar species order aligned with <code>gas.molar_mass</code>.</li>
+<li>Confirm the configured water-species index addresses a valid species.</li>
+<li><strong>P2 transfer and energy diagnostics</strong></li>
+<li>P2 inventory-limited applied transfers are expected bounded behavior, not
+    CPU-strategy or runnable parity evidence.</li>
+<li><code>energy_transfer</code> is caller-owned whole-call P2-finalized output. Explicitly
+    synchronize before observing it on the host.</li>
 <li><strong>Gas/environment restore expectations</strong></li>
 <li><code>from_warp_gas_data()</code> is intentionally lossy across the helper boundary:
     it restores ordered species names only when you supply them; otherwise it
@@ -15338,6 +15415,55 @@ path.</p>
     manual synchronization remains the caller's responsibility before NumPy
     access.</li>
 </ul>
+<h3 id="focused-reproduction-commands">Focused reproduction commands<a class="headerlink" href="#focused-reproduction-commands" title="Permanent link">&para;</a></h3>
+<p>These focused commands provide distinct evidence; none establishes either of
+the other evidence classes.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>python docs/Examples/gpu_direct_kernels_quick_start.py</code></td>
+<td>Canonical explicit-transfer walkthrough.</td>
+</tr>
+<tr>
+<td><code>pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q</code></td>
+<td>Quick-start regression.</td>
+</tr>
+<tr>
+<td><code>pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror</code></td>
+<td>Primary direct CPU-oracle particle-mass/gas-concentration parity matrix.</td>
+</tr>
+<tr>
+<td><code>pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror</code></td>
+<td>Bounded direct-step stiffness coverage.</td>
+</tr>
+<tr>
+<td><code>pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q</code></td>
+<td>CPU integration/inventory-conservation evidence (separate particle-plus-gas inventory conservation checks); not direct-GPU validation.</td>
+</tr>
+<tr>
+<td><code>pytest particula/integration_tests/condensation_particle_resolved_test.py -q</code></td>
+<td>CPU integration evidence for particle-resolved condensation; not direct-GPU validation.</td>
+</tr>
+<tr>
+<td><code>pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror</code></td>
+<td>Latent-heat energy/bookkeeping documentation checks.</td>
+</tr>
+</tbody>
+</table>
+<p>The required baseline is Warp <code>device="cpu"</code> when Warp is installed. The
+parity matrix, inventory conservation checks, and latent-heat energy/bookkeeping
+checks are separate: no one class proves either of the others.</p>
+<p><strong>Optional/local CUDA evidence:</strong></p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+</code></pre></div>
+<p>This is additive to the required Warp <code>device="cpu"</code> baseline and skips
+cleanly when CUDA is unavailable.</p>
 <h2 id="related-references">Related references<a class="headerlink" href="#related-references" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../../Examples/Data_Containers/">Data Containers example</a></li>

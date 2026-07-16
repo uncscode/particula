@@ -15259,8 +15259,8 @@ documentation conventions.</p>
 <tr>
 <td>4</td>
 <td><a href="#epic-d-gpu-condensation-physics-parity">Epic D: GPU Condensation Physics Parity</a></td>
-<td>In progress</td>
-<td>E4-F5</td>
+<td>Shipped</td>
+<td>E4</td>
 </tr>
 <tr>
 <td>5</td>
@@ -15422,13 +15422,12 @@ integrated as an automatic backend in the main <code>Aerosol</code>, <code>Runna
 high-level dynamics workflows.</p>
 <p>Known GPU physics gaps remain:</p>
 <ul>
-<li>Bounded direct GPU condensation applies an optional Warp-backed latent-heat
-  rate correction during each fixed substep and a signed energy diagnostic. It
+<li>Bounded direct GPU condensation is a shipped, verified direct-kernel
+  contract. It applies an optional Warp-backed latent-heat rate correction,
   couples P2-finalized transfer to authoritative active-device gas
-  concentration, but does not provide temperature feedback or high-level
-  <code>Runnable</code> integration. This is a verified direct-kernel contract, not
-  complete GPU-condensation or E4 production support; E4-F6 and E4-F7 remain
-  the gates for those broader claims.</li>
+  concentration, and records a signed energy diagnostic. Temperature feedback
+  and high-level <code>Runnable</code> integration remain future work outside this
+  low-level publication.</li>
 <li>Particle charge is present in the GPU data container, but charged particle
   coagulation kernels are not implemented yet.</li>
 <li>The current GPU coagulation path is Brownian-focused; charged, turbulent,
@@ -16316,10 +16315,10 @@ downstream implementers; it does not add new schema semantics.</p>
   <a href="../condensation-stiffness-study/"><code>condensation-stiffness-study.md</code></a>:
   <code>fixed_count_substeps_4</code> as the preferred fixed-shape foundation, bounded by
   the E2-F2 environment-shape contract, the E2-F6 <code>float64</code> evidence envelope,
-  and the shipped bounded direct-kernel gas-coupling hook. That hook applies
-  validated, P2-finalized particle-transfer deltas to active-device gas state
-  and has direct-kernel conservation evidence; broader CPU-strategy parity and
-  runnable support remain deferred to E4-F6 and E4-F7.</li>
+   and the shipped bounded direct-kernel gas-coupling hook. That hook applies
+   validated, P2-finalized particle-transfer deltas to active-device gas state
+   and has direct-kernel conservation evidence; broader CPU-strategy parity and
+   runnable support remain future work outside the shipped Epic D scope.</li>
 <li><code>E2-F8</code>: inherit that container schemas are already multi-box capable through
   leading <code>n_boxes</code> dimensions, while current CPU condensation runtime support
   remains single-box and current CPU coagulation paths are still documented as
@@ -16672,117 +16671,45 @@ pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_test.py<sp
   <a href="#measured-decision-record-for-the-current-one-thread-per-box-path">decision record</a>.
   A parallel-within-box variant requires a separate evidence-backed proposal.</p>
 <h2 id="epic-d-gpu-condensation-physics-parity">Epic D: GPU Condensation Physics Parity<a class="headerlink" href="#epic-d-gpu-condensation-physics-parity" title="Permanent link">&para;</a></h2>
-<p>Status: in progress. E4-F2 ships limited direct-kernel activity and
-surface-tension support plus deterministic reference parity evidence. Epic C
-has no unfinished exit-bar deliverables to roll forward. Epic D inherits the
-supported
-<code>particula.gpu.kernels</code> entry points, explicit transfer boundary, and
-device-aware validation policy from E3, plus the E3-F7 CPU latent-heat
-integration baseline. The accepted mixed-scale coagulation and
-parallel-within-box limitations are not condensation parity work; they remain
-documented constraints for Epic E or a separate evidence-backed proposal.</p>
-<p>Epic D's shipped E4-F1 baseline refreshes the derived GPU vapor-pressure
-matrix on-device during every successful direct condensation call with constant
-or canonical Buck models. The
-<a href="../../data-containers-and-gpu-foundations/">data containers and GPU foundations guide</a>
-is the canonical source for its schema, units, ordering, device ownership, and
-refresh ordering. This narrow refresh baseline does not provide CPU-strategy
-parity beyond E4-F2's direct activity/surface sidecar, latent heat, gas
-coupling, substep orchestration, or a final support contract. E4-F2 supports
-ideal or kappa water activity and static or composition-weighted tension via
-fixed-shape, caller-owned <code>wp.float64</code> sidecars. Other activity and
-surface-tension strategies, including BAT, remain CPU-only and fail with
-<code>ValueError</code> before mutation; they are never silently approximated or moved
-across the CPU↔Warp boundary. Staggered (Gauss-Seidel) condensation stays
-CPU-only (see <a href="#non-goals">Non-Goals</a>).</p>
-<p>E4-F2 parity uses an independent deterministic NumPy <code>float64</code> reference for
-the four activity/surface combinations on one-box and multi-box fixtures. It
-checks raw transfer, finalized transfer ownership, coupled gas concentration,
-and the on-device vapor-pressure refresh with explicit parity tolerances and
-tighter invariants. Warp <code>cpu</code> coverage is required whenever Warp is installed;
-CUDA is separately marked optional evidence and skips when unavailable. The
-canonical focused commands are:</p>
-<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and gpu_parity and not cuda&quot;</span><span class="w"> </span>-Werror
-pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
-</code></pre></div>
+<p>Status: shipped. E4-F1--E4-F7 recorded evidence is complete for the bounded
+low-level direct-condensation publication; it does not enable new production
+functionality beyond the verified direct kernel. Epic D inherits the supported
+<code>particula.gpu.kernels</code> entry point, explicit transfer boundary, and
+device-aware validation policy from Epic C.</p>
+<p>Import the direct step with <code>from particula.gpu.kernels import
+condensation_step_gpu</code>. The canonical <a href="../../data-containers-and-gpu-foundations/">data containers and GPU foundations
+guide</a> defines the supported schema,
+units, ordering, device ownership, and explicit-transfer boundary. The step
+uses caller-owned stable-shape fp64 (<code>wp.float64</code>) sidecars: transfer fields use
+<code>(n_boxes, n_particles, n_species)</code> and property fields use <code>(n_boxes,)</code>.
+Supplied buffers preserve identity; omitted fields use fallback allocations.</p>
+<p>Each successful call executes exactly four <code>time_step / 4.0</code> substeps. Every
+substep refreshes derived vapor pressure and environment properties, produces a
+raw proposal, and applies a P2-finalized, inventory-limited transfer. Particle
+masses and the matching particle-concentration-weighted gas-concentration delta
+mutate in place. The total-transfer buffer accumulates P2-finalized transfers,
+while work storage retains the final raw proposal. Explicit simulation-state
+transfers remain caller responsibilities; entry-point validation may still
+perform synchronous device-to-host readbacks.</p>
 <p>The current executable CPU integration baseline remains
 <code>particula/integration_tests/condensation_latent_heat_conservation_test.py</code>.
 The direct step applies an optional latent-heat rate correction in each of its
-four fixed substeps, with CPU-oracle/Warp parity coverage. The shipped source
-rate is <code>dm_i/dt = isothermal_rate_i / correction_i</code>, where
-<code>isothermal_rate_i = k_i * Delta_p_i * M_i / (R * T)</code>,
-<code>R_specific_i = R / M_i</code>,
-<code>correction_i = thermal_factor_i / (R_specific_i * T)</code>, and
-<code>thermal_factor_i = (D_i * L_i * p_surface_i / (T * k_thermal)) * (L_i / (T * R_specific_i) - 1) + R_specific_i * T</code>.
-<code>p_surface_i</code> is activity- and Kelvin-adjusted. Omitted latent heat or exactly
-zero per-species entries retain exact isothermal behavior.</p>
-<p>E4-F3 and E4-F5 P1-P4 are shipped. The #1305 regression gate for #1272
-verifies the bounded direct-kernel gas-coupling contract and its production
-hook, not general GPU-condensation physics, CPU-strategy parity, or complete E4
-production support. Import its only step entry point with
-<code>from particula.gpu.kernels import condensation_step_gpu</code>. When reusable scratch
-is needed, <code>CondensationScratchBuffers</code> is intentionally concrete-module-only
-at <code>particula.gpu.kernels.condensation.CondensationScratchBuffers</code>; it is not a
-second entry point. Supplied transfer fields have shape
-<code>(n_boxes, n_particles, n_species)</code> and property fields <code>(n_boxes,)</code>; each must
-be stable-shape, active-device <code>wp.float64</code>. Fields can be omitted
-independently, using fallback allocations. Supplied buffers preserve identity
-and remain caller-owned mutable work/output storage; a successful call may
-write their work or output fields. The step executes four equal
-<code>time_step / 4.0</code> substeps: each optionally refreshes composition-weighted
-surface tension, overwrites derived <code>gas.vapor_pressure</code>, refreshes environment
-properties, gates disabled per-box/species partitioning entries and inactive
-particle slots, produces a raw proposal, then P2-finalizes and applies its
-inventory-limited transfer. The active-device binary <code>wp.int32</code> partitioning
-mask has shape <code>(n_boxes, n_species)</code>. <code>WarpGasData.concentration</code> is the
-authoritative active-device <code>wp.float64</code> mass concentration in <code>kg/m^3</code> with
-that same shape; the step mutates it in place by the matching
-particle-concentration-weighted opposite delta. The caller-visible and
-accumulated transfer is the P2-finalized applied transfer, never the raw work
-proposal. The total buffer is cleared once after preflight, accumulates the
-finalized transfer, and work storage retains only the final raw proposal.
-Physical-state updates are device resident and do not perform hidden CPU↔Warp
-transfers; validation or status checks may intentionally read device values back
-to the host. Later proposals read coupled gas, while vapor-pressure refresh does
-not. Aggregate invalid P2 state or sidecars fail before launches or mutation; a
-later fresh raw-proposal failure preserves completed prior substeps and may write
-only raw work storage in the failed cycle.</p>
-<p>E4-F4's #1272 signed diagnostic is shipped: optional keyword-only caller-owned
-active-device <code>wp.float64</code> <code>latent_heat</code>, <code>(n_species,)</code>, and
-<code>energy_transfer</code>, <code>(n_boxes, n_species)</code>, record
-<code>Q[box, species] = sum_particles(Delta m_finalized) * L[species]</code>. Here
-<code>Delta m</code> is kg, <code>L</code> is J/kg, and <code>Q</code> is J; condensation is positive and
-evaporation negative. Energy output requires valid latent heat, is overwritten
-only after successful preflight, is not a third return item, and has strict
-issue #1272 tolerance <code>rtol=1e-12, atol=1e-18</code>. <code>thermal_work</code> remains
-validated but deferred/unused. This leaves temperature feedback, gas mutation
-beyond the P2-finalized direct coupling, adaptive substeps, high-level
-<code>Runnable</code>, graph capture/replay, autodiff guarantees,
-general CPU-strategy parity, new-physics claims, and complete E4-F6
-cross-device certification outside the supported scope. E4-F7 remains the
-final support-contract, examples, troubleshooting, and support-matrix gate.</p>
-<p>Required Warp-CPU evidence and optional CUDA evidence commands are:</p>
-<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
-pytest<span class="w"> </span>particula/integration_tests/condensation_particle_resolved_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
-<span class="c1"># Optional local CUDA evidence, when a CUDA-capable device is available:</span>
-pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
-</code></pre></div>
-<p>The first command uses Warp <code>cpu</code> as the baseline when Warp is installed;
-Warp- or CUDA-guarded cases skip cleanly when their optional runtime is absent.
-The CUDA-marked command is additive local evidence, not a default support or CI
-requirement.</p>
-<p>Remaining feature ownership:</p>
-<ol>
-<li>Unassigned future work: temperature-feedback integration, including the CPU
-   reference context in the <a href="../../../Theory/Technical/Dynamics/Condensation_Equations/#condensation-with-latent-heat">condensation
-   equations</a>.</li>
-<li>E4-F6: broader independent-device, graph-capture, and autodiff evidence.</li>
-<li>E4-F7: the final support contract, examples, troubleshooting, and support
-   matrix.</li>
-</ol>
-<p>Each deferred feature requires its own scoped validation under the Epic C
-device-aware test policy. The automatic E4-F1 refresh alone does not satisfy
-any deferred feature's exit bar.</p>
+four fixed substeps, with CPU-oracle/Warp parity coverage. E4-F4's #1272 signed diagnostic is shipped: optional keyword-only caller-owned
+active-device
+<code>wp.float64</code> <code>latent_heat</code>, <code>(n_species,)</code>, and <code>energy_transfer</code>,
+<code>(n_boxes, n_species)</code>, record finalized transfer times latent heat.
+<code>thermal_work</code> remains validated but deferred/unused.</p>
+<p>Warp <code>cpu</code> baseline evidence is required whenever Warp is installed.
+Optional/local additive CUDA evidence skips cleanly when unavailable; it is
+additional local evidence rather than a default CI requirement. The focused
+direct-kernel evidence is summarized in the
+<a href="../condensation-stiffness-study/">fixed-four decision record</a> and the
+canonical foundations guide.</p>
+<p>Temperature feedback, high-level <code>Aerosol</code>/<code>Runnable</code> integration, adaptive
+stepping, unsupported physics, graph capture/replay, broad autodiff, and
+general CPU-strategy parity remain future work outside the shipped scope.
+This leaves temperature feedback, gas mutation beyond the P2-finalized direct
+coupling, and all higher-level process integration outside this milestone.</p>
 <h2 id="epic-e-gpu-coagulation-physics-coverage">Epic E: GPU Coagulation Physics Coverage<a class="headerlink" href="#epic-e-gpu-coagulation-physics-coverage" title="Permanent link">&para;</a></h2>
 <p>Extend GPU coagulation beyond the Brownian kernel to the collision
 mechanisms already available on CPU. DNS turbulence remains deferred (see

@@ -14278,17 +14278,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#next-up" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Next Up
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#pending" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14450,18 +14439,20 @@ meets its exit bar, the next pending epic in the sequence becomes active.</p>
   kernel entry points, device-aware test policy, and the completed Epic B
   latent-heat example and integration baseline. Shipped artifacts:<ul>
 <li><a href="../../Examples/gpu_direct_kernels_quick_start/">Direct GPU kernels quick-start</a>
-  — explicit transfer and low-level condensation/coagulation kernel path</li>
+  — explicit-transfer, two-call low-level condensation path with reused
+  caller-owned fp64 sidecars; it does not invoke coagulation or configure
+  RNG state</li>
 <li><a href="../../Examples/Dynamics/Condensation/Condensation_Latent_Heat/">CPU latent-heat condensation example</a>
   — runnable bookkeeping reference for future GPU parity</li>
 <li><a href="data-oriented-gpu/#measured-decision-record-for-the-current-one-thread-per-box-path">Measured coagulation decision record</a>
   — accepted many-box baseline and large single-box caution band</li>
 </ul>
 </li>
-</ul>
-<h3 id="next-up">Next Up<a class="headerlink" href="#next-up" title="Permanent link">&para;</a></h3>
-<ul>
 <li><a href="data-oriented-gpu/#epic-d-gpu-condensation-physics-parity">Epic D: GPU Condensation Physics Parity</a>
-  — the next epic in the sequence; not yet scheduled as an ADW plan.</li>
+  (ADW plan E4) — bounded low-level direct-condensation publication with
+  fixed-four P2 inventory finalization, gas coupling, thermodynamics refresh,
+  caller-owned fp64 sidecars, and direct-kernel evidence. It does not provide
+  high-level runnable integration or general CPU-strategy parity.</li>
 </ul>
 <h3 id="pending">Pending<a class="headerlink" href="#pending" title="Permanent link">&para;</a></h3>
 <p>Listed in execution order; each becomes active when the previous epic ships.</p>

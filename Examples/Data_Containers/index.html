@@ -14238,10 +14238,12 @@ not required.</p>
 <p>For the low-level direct kernel path, use the separate canonical quick-start:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/gpu_direct_kernels_quick_start.py
 </code></pre></div>
-<p>That runnable script is the single direct GPU kernel example. It demonstrates
-explicit <code>to_warp_*</code> / <code>from_warp_*</code> transfers, lazy imports from
-<code>particula.gpu.kernels</code>, one condensation kernel call, one coagulation kernel
-call, caller-owned <code>rng_states</code>, and Warp <code>device="cpu"</code> by default.</p>
+<p>That runnable script is the single direct GPU condensation example. It
+demonstrates explicit <code>to_warp_*</code> / <code>from_warp_*</code> transfers, lazy imports from
+<code>particula.gpu.kernels</code>, two fixed-four-substep condensation calls, and
+caller-owned fp64 scratch, physical-property, latent-heat, and energy sidecars
+reused on Warp <code>device="cpu"</code> by default. It does not invoke coagulation or
+configure RNG state.</p>
 <ul>
 <li><a href="../../Features/data-containers-and-gpu-foundations/">Feature guide: Data Containers and GPU Foundations</a></li>
 <li><a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/data_containers_and_gpu_foundations.py">Runnable entrypoint source on GitHub</a></li>
