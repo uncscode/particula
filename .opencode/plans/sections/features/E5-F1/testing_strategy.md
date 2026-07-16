@@ -10,7 +10,9 @@ coverage. Test files use the repository's `*_test.py` convention.
   `particula/gpu/kernels/tests/coagulation_test.py`, test omitted and explicit
   Brownian configurations; canonical ordering; empty, duplicate, unknown, and
   reserved terms; invalid distribution modes; stable error messages; and pure
-  resolver behavior without requiring a launch.
+  resolver behavior without requiring a launch. **Completed in Issue #1331:**
+  the co-located host-only tests cover these resolver and capability cases;
+  reserved-term failures name E5-F3, E5-F4, or E5-F5.
 - **P2 — Dispatch and sampling unit tests:** Test Brownian rate/majorant parity
   against current behavior and independent CPU formulas. Use test-only fixed
   terms to assert `K_total = sum(K_i)`, `M_total = sum(M_i)`, one acceptance
@@ -41,7 +43,8 @@ coverage. Test files use the repository's `*_test.py` convention.
 ## Verification Commands
 
 ```bash
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mechanism or additive or support"
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mechanism or support" -Werror
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
 ruff check particula/gpu/ --fix
 ruff format particula/gpu/
 ruff check particula/gpu/

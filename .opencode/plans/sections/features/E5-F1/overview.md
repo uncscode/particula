@@ -12,12 +12,13 @@ opportunities, and validation after state or RNG mutation.
 
 ## Value Proposition
 
-E5-F1 establishes the contract that the remaining E5 mechanism tracks can
-extend safely: a backward-compatible Brownian default, canonical and unique
-mechanism selection, additive pair rates, one bounded sampling pass, and
-fail-before-mutation particle-resolved validation. The contract preserves
-caller-owned buffers, persistent RNG state, fixed-shape fp64 execution, and
-explicit device ownership.
+Issue #1331 completed the P1 host-side foundation: a concrete-module-only,
+frozen configuration; canonical, unique mechanism resolution; fixed masks; and
+a separate executable-capability gate. The remaining E5-F1 work will add
+additive pair rates, one bounded sampling pass, and public pre-mutation
+validation without changing the existing Brownian runtime until those phases.
+The contract preserves caller-owned buffers, persistent RNG state, fixed-shape
+fp64 execution, and explicit device ownership.
 
 ## User Stories
 

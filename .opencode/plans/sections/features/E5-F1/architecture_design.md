@@ -3,21 +3,15 @@
 ## High-Level Design
 
 ```text
-coagulation_step_gpu(..., mechanisms=None)
-  -> resolve None as Brownian + particle_resolved (legacy behavior)
-  -> validate structural configuration
-       non-empty, known, unique, particle_resolved
-  -> normalize any unique user ordering to canonical mechanism order
-  -> validate current executable capability matrix
-  -> validate particles/environment/output buffers/persistent RNG
-  -> normalize configuration to a compact mechanism bit mask
-  -> prepare properties required by enabled terms
-  -> compute safe total majorant = sum(term majorants)
-  -> bounded active-pair loop
-       total pair rate = sum(enabled pair-rate terms)
-       accept once using total pair rate / total majorant
-       remove accepted pair once and update RNG state once
-  -> apply accepted collision buffer once
+P1 concrete-module helpers (completed in Issue #1331)
+  CoagulationMechanismConfig
+    -> structural resolver: default Brownian, validate, canonicalize, mask
+    -> capability validator: accept Brownian; identify reserved-term owner
+
+Future P2/P3 integration
+  coagulation_step_gpu(..., mechanism configuration)
+    -> resolve and capability-check before existing runtime preflight
+    -> additive rate/majorant dispatch and one bounded sampling pass
 ```
 
 The host-side configuration is a frozen dataclass in the concrete coagulation
@@ -27,11 +21,13 @@ launch. `distribution_type` defaults to `"particle_resolved"` and currently
 accepts no other value. An omitted configuration resolves to Brownian and
 therefore does not break existing calls.
 
-Structural support and executable support are intentionally distinct. The
-schema can reserve E5 mechanism identifiers, while the public step rejects a
-reserved term until its owning child feature registers pair-rate, property,
-majorant, and tests. Duplicate terms are errors rather than accidental weights.
-Canonical ordering makes equivalent sets resolve identically.
+Structural support and executable support are intentionally distinct. Issue
+#1331 implemented this distinction as pure host-side helpers, not public-step
+preflight: the schema recognizes canonical terms and produces fixed bits `1`,
+`2`, `4`, and `8`, while the capability validator accepts Brownian only.
+Reserved terms identify E5-F3, E5-F4, or E5-F5 as their owner. Duplicate terms
+are errors rather than accidental weights, and canonical ordering makes
+equivalent sets resolve identically.
 
 Warp cannot dispatch Python callbacks inside a kernel, so the sampling
 interface uses a compact mask and explicit term branches. Each term contributes
@@ -48,10 +44,9 @@ loop.
   resolved configuration/mask. Keep the configuration concrete-module-only at
   `particula.gpu.kernels.coagulation`; do not modify `WarpParticleData` or
   transfer schemas.
-- **API Surface:** Add a keyword-only optional mechanism configuration to
-  `coagulation_step_gpu`. Do not add a higher-level export for
-  `CoagulationMechanismConfig`; only `coagulation_step_gpu` remains exported
-  through `particula.gpu.kernels`.
+- **API Surface:** P1 deliberately leaves `coagulation_step_gpu` unchanged and
+  does not package-export `CoagulationMechanismConfig`. P3 will add the
+  keyword-only public-step configuration after P2 establishes dispatch.
 - **Combination Matrix:** P1 recognizes Brownian plus reserved E5 term names,
   but the executable matrix initially contains Brownian only. E5-F3, E5-F4,
   E5-F5, and E5-F6 expand executable rows only with their required inputs,

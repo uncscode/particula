@@ -1,15 +1,16 @@
 # Phase Details
 
-- [ ] **E5-F1-P1:** Define mechanism configuration and support validation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E5-F1-P1:** Define mechanism configuration and support validation with unit tests
+  - Issue: #1331 | Size: S | Status: Completed
   - Goal: Add canonical mechanism identifiers, a frozen configuration, a
     resolved execution mask, and structural/capability validators while
     preserving the omitted-configuration Brownian default.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: default compatibility, canonical ordering, empty/duplicate/unknown
-    mechanisms, reserved-but-unimplemented mechanisms, and distribution-mode
-    rejection.
+  - Completed: Added host-only configuration, resolver, capability validator,
+    and co-located resolver/capability tests. Fixed masks are Brownian `1`,
+    charged hard-sphere `2`, SP2016 `4`, and ST1956 `8`; only Brownian is
+    executable. `coagulation_step_gpu` signature and GPU runtime are unchanged.
 
 - [ ] **E5-F1-P2:** Introduce additive pair-rate and single-pass sampling interfaces with unit tests
   - Issue: TBD | Size: S | Status: Not Started
