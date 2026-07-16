@@ -9,16 +9,16 @@
 - [x] All caller-controlled configuration validation completes before
   allocation, Warp launch, particle mutation, output-buffer mutation, or RNG
   advancement.
-- [ ] Pair rates and safe term majorants have one documented extension
+- [x] Pair rates and safe term majorants have one documented extension
   interface; enabled terms are summed before one acceptance pass.
-- [ ] No mechanism can add a separate candidate stream, acceptance pass,
+- [x] No mechanism can add a separate candidate stream, acceptance pass,
   collision buffer, or RNG update through the E5-F1 interface.
-- [ ] The initial capability matrix distinguishes Brownian support from
+- [x] The initial capability matrix distinguishes Brownian support from
   reserved E5 terms and names the downstream owner of each reserved term.
-- [ ] `WarpParticleData` and CPU/Warp conversion schemas remain unchanged.
+- [x] `WarpParticleData` and CPU/Warp conversion schemas remain unchanged.
 - [ ] Required Warp CPU tests pass, CUDA tests skip cleanly when unavailable,
   and Ruff/mypy checks pass without reducing coverage requirements.
-- [ ] Documentation explicitly states the particle-resolved-only boundary and
+- [x] Documentation explicitly states the particle-resolved-only boundary and
   does not claim downstream mechanisms are already executable.
 
 ## Metrics

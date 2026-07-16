@@ -213,6 +213,55 @@ As with the gas and environment helpers, kernels and runnables do not perform
 hidden CPU↔GPU synchronization or implicit container transfers for particle
 state.
 
+### GPU coagulation configuration and sidecar ownership
+
+Import the supported direct step and its host-side configuration separately:
+
+```python
+from particula.gpu.kernels import coagulation_step_gpu
+from particula.gpu.kernels.coagulation import CoagulationMechanismConfig
+```
+
+Pass `mechanism_config=CoagulationMechanismConfig(...)` as keyword-only host
+metadata. The frozen dataclass is not device-resident simulation state and is
+not transferred, synchronized, or stored in a container schema. In contrast,
+`WarpParticleData`, supplied `collision_pairs`, supplied `n_collisions`, and
+supplied `rng_states` are caller-owned, same-device Warp resources. Omitted
+collision outputs and RNG state use call-local convenience allocation. A
+supplied RNG sidecar is reused and changes in place; it resets only with
+`initialize_rng=True`. Kernels do not perform hidden CPU↔GPU transfer or
+synchronization for configuration or these sidecars.
+
+Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
+`"continuous_pdf"` raise `ValueError`; they do not fall back or convert.
+
+| Identifier | Status | Owner |
+| --- | --- | --- |
+| `brownian` | Executable with `particle_resolved` only | Shipped E5-F1 baseline |
+| `charged_hard_sphere` | Reserved; rejected in capability preflight | E5-F3 |
+| `sedimentation_sp2016` | Reserved; rejected in capability preflight | E5-F4 |
+| `turbulent_shear_st1956` | Reserved; rejected in capability preflight | E5-F5 |
+
+Structural recognition is not executability. Any reserved ID, including a
+Brownian-plus-reserved combination, raises `ValueError` in host capability
+preflight before runtime input access, allocation, launch, or mutable state
+changes.
+
+The fixed sampler has one normalized active set, one total safe majorant, one
+candidate stream, one total pair-rate acceptance decision for each valid
+candidate, one collision-pair output buffer, and one per-box RNG-state
+progression. Invalid, nonfinite, or nonpositive terms do not add to totals;
+invalid candidates do not mutate the active set or collision output.
+
+Future mechanisms must provide a stable identifier; required host and device
+inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
+additive majorant; a capability-table row; shared-dispatcher integration; and
+co-located `*_test.py` coverage. They must not add an independent sampling
+loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
+binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
+integration, graph-capture claims, and executable charged, sedimentation, or
+turbulent-shear physics.
+
 ### Environment transfer boundary
 
 Use the environment helpers when thermodynamic state must cross the CPU↔GPU
@@ -464,7 +513,7 @@ than storage support.
 | CPU↔GPU transfer | Explicit helper calls only | No hidden container movement or hidden environment synchronization. |
 | Warp/CUDA support | Optional | Warp `device="cpu"` is the baseline when Warp is installed; CUDA is additive local evidence and unavailable devices skip cleanly. |
 | Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
-| Low-level GPU coagulation direct-kernel path | Accepted with caveats | Appropriate for many independent boxes, especially when CUDA can supply box-level parallel throughput, Warp-backed direct-kernel workflows, and CUDA benchmark/study runs tied to the roadmap's measured decision record; not a broad production recommendation for large single-box workloads and does not imply hidden transfer or synchronization behavior. |
+| Low-level GPU coagulation direct-kernel path | Brownian-only, particle-resolved direct-kernel contract | `brownian` is the sole executable mechanism. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources; this path does not imply hidden transfer or synchronization. |
 | Fixed-shape GPU/runtime roadmap work | Not current runtime behavior | Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior. |
 
 Additional shipped boundaries:
@@ -475,9 +524,13 @@ Additional shipped boundaries:
   `pressure`, and `saturation_ratio`.
 - `WarpGasData.vapor_pressure` is helper state only and has no CPU `GasData`
   field.
-- Coagulation `rng_states` are caller-owned Warp-resident sidecar state only;
-  they are not fields on `ParticleData`, `GasData`, `EnvironmentData`, or any
-  Warp container schema.
+- Coagulation `mechanism_config` is host metadata, while supplied
+  `collision_pairs`, `n_collisions`, and `rng_states` are caller-owned
+  same-device Warp sidecars. None are fields on `ParticleData`, `GasData`,
+  `EnvironmentData`, or any Warp container schema.
+- Omitted coagulation collision outputs and RNG state are call-local convenience
+  allocations. Supplied RNG state advances in place and resets only with
+  `initialize_rng=True`.
 - Kernels and runnables do not perform hidden simulation-state transfers.
   Explicitly supplied step and output buffers do mutate in place: particle
   masses, gas concentration, scratch transfer fields, total transfer, and

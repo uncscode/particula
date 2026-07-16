@@ -41,12 +41,16 @@
     integration tests cover failure atomicity, ordering sentinels, and equal-seed
     omitted-versus-explicit Brownian equivalence across environment source forms.
 
-- [ ] **E5-F1-P4:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document extension rules, supported/reserved mechanism matrix,
-    additive sampling semantics, and the particle-resolved-only boundary.
+- [x] **E5-F1-P4:** Update development documentation
+  - Issue: #1334 | Size: XS | Status: Completed
+  - Goal: Published the developer extension rules, supported/reserved mechanism
+    matrix, additive sampling semantics, and particle-resolved-only boundary.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`, relevant docstrings, and E5
     plan sections.
-  - Tests: markdown link/reference validation and doctest/import checks where
-    configuration examples are executable.
+  - Completed: Published the host-configuration and Warp-sidecar ownership
+    contract, the Brownian-only executable/reserved-ID matrix, and the shared
+    one-pass dispatcher rule in both developer documents. Focused mechanism
+    tests and changed-document link/anchor validation confirm the contract
+    without changing container schemas or runtime behavior. The full end-user
+    example and final support matrix remain deferred to E5-F9.
