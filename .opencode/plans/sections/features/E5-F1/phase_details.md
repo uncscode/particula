@@ -1,0 +1,43 @@
+# Phase Details
+
+- [ ] **E5-F1-P1:** Define mechanism configuration and support validation with unit tests
+  - Issue: TBD | Size: S | Status: Not Started
+  - Goal: Add canonical mechanism identifiers, a frozen configuration, a
+    resolved execution mask, and structural/capability validators while
+    preserving the omitted-configuration Brownian default.
+  - Files: `particula/gpu/kernels/coagulation.py`,
+    `particula/gpu/kernels/tests/coagulation_test.py`
+  - Tests: default compatibility, canonical ordering, empty/duplicate/unknown
+    mechanisms, reserved-but-unimplemented mechanisms, and distribution-mode
+    rejection.
+
+- [ ] **E5-F1-P2:** Introduce additive pair-rate and single-pass sampling interfaces with unit tests
+  - Issue: TBD | Size: S | Status: Not Started
+  - Goal: Route Brownian through shared pair-rate and majorant dispatch whose
+    contract sums enabled non-negative terms before one acceptance decision.
+  - Files: `particula/gpu/kernels/coagulation.py`,
+    `particula/gpu/dynamics/coagulation_funcs.py`,
+    `particula/gpu/kernels/tests/coagulation_test.py`
+  - Tests: Brownian pair/majorant parity, test-only additive terms, one-pass RNG
+    advancement, zero-term handling, and invalid-majorant rejection/guards.
+
+- [ ] **E5-F1-P3:** Enforce pre-mutation particle-resolved support boundaries with integration tests
+  - Issue: TBD | Size: S | Status: Not Started
+  - Goal: Integrate keyword-only mechanism configuration into
+    `coagulation_step_gpu` and prove every unsupported request fails before
+    state, output buffers, allocations, or RNG launches are changed.
+  - Files: `particula/gpu/kernels/coagulation.py`,
+    `particula/gpu/kernels/tests/coagulation_test.py`
+  - Tests: legacy-vs-explicit Brownian equivalence; snapshots of masses,
+    concentration, charge, collision buffers, collision counts, and persistent
+    RNG for each failing configuration; multi-box Warp CPU coverage.
+
+- [ ] **E5-F1-P4:** Update development documentation
+  - Issue: TBD | Size: XS | Status: Not Started
+  - Goal: Document extension rules, supported/reserved mechanism matrix,
+    additive sampling semantics, and the particle-resolved-only boundary.
+  - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`, relevant docstrings, and E5
+    plan sections.
+  - Tests: markdown link/reference validation and doctest/import checks where
+    configuration examples are executable.
