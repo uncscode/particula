@@ -65,7 +65,10 @@ Downstream tracks extend this dispatch rather than the sampling loop.
 
 There is no network or authorization surface. Robustness requirements are the
 security boundary: reject malformed mode names, duplicates, unsupported
-distributions, unavailable terms, invalid required inputs, and unsafe
-majorants before mutation or RNG advancement. Do not perform hidden host reads,
+distributions, unavailable terms, and invalid required inputs before mutation
+or RNG advancement; P3 owns that pre-RNG validation. Candidate pair selection
+can advance RNG before its per-candidate rate-to-majorant guard. Unsafe
+candidates then receive no acceptance draw and cause no collision write/count
+increment or active-set swap-pop mutation. Do not perform hidden host reads,
 CPU fallback, synchronization, or device transfer. Error messages should name
 the unsupported term or distribution without exposing device memory contents.
