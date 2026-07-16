@@ -90,10 +90,17 @@ COAGULATION_MECHANISM_FLAGS = {
 
 @dataclass(frozen=True)
 class CoagulationMechanismConfig:
-    """Concrete-module mechanism configuration for P1 host validation.
+    """Configure P1 host-side coagulation mechanism validation.
 
-    The default selects Brownian particle-resolved coagulation. This
-    configuration is not yet an argument of the public GPU step.
+    The default selects Brownian, particle-resolved coagulation. This frozen
+    configuration is concrete-module-only and is not an argument of the public
+    ``coagulation_step_gpu`` API in P1.
+
+    Attributes:
+        mechanisms: Requested canonical mechanism identifiers, or ``None`` to
+            select Brownian.
+        distribution_type: Required distribution representation; only
+            ``"particle_resolved"`` is structurally supported in P1.
     """
 
     mechanisms: tuple[str, ...] | None = None
@@ -102,7 +109,17 @@ class CoagulationMechanismConfig:
 
 @dataclass(frozen=True)
 class _ResolvedCoagulationMechanismConfig:
-    """Normalized concrete-module P1 validation result, not a public API."""
+    """Store the normalized result of concrete-module P1 validation.
+
+    This private result is not a public API or a ``coagulation_step_gpu``
+    argument. Structural resolution retains recognized reserved mechanisms for
+    later capability validation.
+
+    Attributes:
+        mechanisms: Structurally valid mechanism identifiers in canonical order.
+        distribution_type: Validated particle distribution representation.
+        mask: Bitwise OR of the fixed flags for ``mechanisms``.
+    """
 
     mechanisms: tuple[str, ...]
     distribution_type: str
@@ -112,16 +129,20 @@ class _ResolvedCoagulationMechanismConfig:
 def resolve_coagulation_mechanism_config(
     config: CoagulationMechanismConfig,
 ) -> _ResolvedCoagulationMechanismConfig:
-    """Normalize and structurally validate coagulation mechanisms.
+    """Resolve a configuration through concrete-module P1 structural validation.
 
-    This concrete-module P1 helper defaults ``mechanisms`` to Brownian and
-    returns canonical mechanism order, distribution type, and fixed-bit mask.
+    ``None`` defaults to Brownian. Valid identifiers are normalized to canonical
+    order and retained in the returned fixed-bit mask, including reserved terms
+    that the separate P1 capability gate rejects. This pure host-side helper
+    neither allocates device storage nor mutates its input or runtime state; it
+    is not part of the public ``coagulation_step_gpu`` API.
 
     Args:
         config: Immutable host-side coagulation mechanism configuration.
 
     Returns:
-        The normalized mechanisms, distribution type, and combined bit mask.
+        Private resolved configuration with canonical mechanisms, validated
+        distribution type, and the combined fixed-bit mask.
 
     Raises:
         ValueError: If mechanisms are malformed, duplicate, or unknown, or if
@@ -178,17 +199,20 @@ def resolve_coagulation_mechanism_config(
 def validate_coagulation_mechanism_capabilities(
     resolved: _ResolvedCoagulationMechanismConfig,
 ) -> None:
-    """Validate the P1 executable capability of resolved mechanisms.
+    """Enforce the concrete-module P1 executable-mechanism boundary.
 
-    This concrete-module gate accepts Brownian execution only. Reserved terms
-    remain structurally valid and retain their flags for future owning tracks.
+    This pure host-side, concrete-module-only gate accepts Brownian execution
+    only. It rejects structurally valid reserved terms while preserving their
+    resolved flags for their owning implementation tracks. It neither mutates
+    state nor integrates with the public ``coagulation_step_gpu`` API in P1.
 
     Args:
         resolved: Structurally validated, normalized mechanism configuration.
 
     Raises:
-        ValueError: If a reserved mechanism is requested before its owning
-            implementation track is available.
+        ValueError: If ``charged_hard_sphere``, ``sedimentation_sp2016``, or
+            ``turbulent_shear_st1956`` is requested before its owning track
+            E5-F3, E5-F4, or E5-F5, respectively, is available.
     """
     reserved_messages = {
         CHARGED_HARD_SPHERE_MECHANISM: (

@@ -2,11 +2,11 @@
 
 ## GPU Backend
 
-- [ ] Define canonical mechanism names, bit flags, ordering, and the frozen
+- [x] Define canonical mechanism names, bit flags, ordering, and the frozen
   mechanism configuration in `particula/gpu/kernels/coagulation.py`.
-- [ ] Implement a pure host validator/resolver for non-empty, known, unique
+- [x] Implement a pure host validator/resolver for non-empty, known, unique
   mechanisms and `distribution_type="particle_resolved"`.
-- [ ] Implement an explicit executable-capability table that initially enables
+- [x] Implement an explicit executable-capability table that initially enables
   only Brownian and reports the owning E5 track for reserved terms.
 - [ ] Add keyword-only configuration to `coagulation_step_gpu`; resolve and
   validate it before particle/environment normalization, allocations, RNG
@@ -24,7 +24,7 @@
 
 ## Tooling / Tests
 
-- [ ] Add resolver table tests to
+- [x] Add resolver table tests to
   `particula/gpu/kernels/tests/coagulation_test.py` for defaults, canonical
   order, duplicate/empty/unknown terms, reserved terms, and unsupported modes.
 - [ ] Add a test-only dispatcher fixture proving two enabled synthetic terms

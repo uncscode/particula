@@ -4,9 +4,11 @@
   `particula/gpu/kernels/coagulation.py` with the keyword-only configuration,
   Brownian default, additive semantics, validation order, and
   particle-resolved-only support.
-- Add module/class docstrings for the configuration, resolver, pair-rate
-  dispatcher, and majorant interface, including the downstream extension
-  checklist.
+- [x] Added module/class/function docstrings for the P1 configuration, resolver,
+  and capability validator. They state the concrete-module-only boundary, the
+  Brownian default, canonicalization, and absence of public-step integration.
+- Add module/class docstrings for the future pair-rate dispatcher and majorant
+  interface, including the downstream extension checklist.
 - Update `docs/Features/data-containers-and-gpu-foundations.md` with ownership:
   mechanism configuration is caller-owned host metadata; particle state,
   buffers, and RNG remain caller-owned Warp data.
@@ -18,3 +20,6 @@
   when implementation resolves naming/export questions.
 - Defer the complete direct GPU coagulation example and final support matrix to
   E5-F9 so documentation does not imply unavailable physics.
+
+No user-facing documentation changed in Issue #1331 because the public API and
+GPU runtime behavior did not change.
