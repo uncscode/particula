@@ -152,9 +152,10 @@ def resolve_coagulation_mechanism_config(
 ) -> _ResolvedCoagulationMechanismConfig:
     """Resolve a configuration through structural validation.
 
-    ``None`` defaults to Brownian. Valid identifiers are normalized to canonical
-    order and retained in the returned fixed-bit mask, including reserved terms
-    that the separate capability validator rejects. This pure host-side,
+    ``config.mechanisms=None`` defaults to Brownian; ``config`` itself remains
+    required. Valid identifiers are normalized to canonical order and retained
+    in the returned fixed-bit mask, including reserved terms that the separate
+    capability validator rejects. This pure host-side,
     concrete-module-only helper neither allocates device storage nor mutates its
     input or runtime state. Import it from
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
@@ -583,46 +584,29 @@ def brownian_coagulation_kernel(  # noqa: C901
         n_collisions[box_idx] = wp.int32(0)
         return
 
-    # Find particles with min/max radius for the one total-rate majorant.
-    # The Brownian kernel is maximized at the greatest size disparity
-    # (small particle has high diffusivity, large particle has large
-    # cross-section), so K(r_min, r_max) bounds all pairwise values.
-    # This replaces the previous O(n^2) all-pairs scan with O(n).
-    r_min = wp.float64(1.0e30)
-    r_max = wp.float64(0.0)
-    idx_min = wp.int32(-1)
-    idx_max = wp.int32(-1)
-    for active_rank in range(active_count):
-        p_idx = wp.int32(active_indices[box_idx, active_rank])
-        r_p = radii[box_idx, p_idx]
-        if r_p < r_min:
-            r_min = r_p
-            idx_min = wp.int32(p_idx)
-        if r_p > r_max:
-            r_max = r_p
-            idx_max = wp.int32(p_idx)
-
+    # Use the exact active-pair maximum as the rejection-sampling majorant.
+    # Radius extrema alone are insufficient because Brownian rates also depend
+    # on mass-derived speed, diffusivity, and composition through the prepared
+    # terms. Scanning every active pair proves this bound covers the supported
+    # particle-resolved Brownian contract.
     majorant_total = wp.float64(0.0)
-    if idx_min >= wp.int32(0) and idx_max >= wp.int32(0):
-        if idx_min == idx_max:
-            # All active particles have the same radius; use self-pair
-            # kernel which is symmetric, so pick any two active indices.
-            for active_rank in range(active_count):
-                candidate_idx = wp.int32(active_indices[box_idx, active_rank])
-                if candidate_idx != idx_min:
-                    idx_max = candidate_idx
-                    break
-        majorant_total = _total_majorant(
-            mechanism_mask,
-            radii[box_idx, idx_min],
-            radii[box_idx, idx_max],
-            diffusivities[box_idx, idx_min],
-            diffusivities[box_idx, idx_max],
-            g_terms[box_idx, idx_min],
-            g_terms[box_idx, idx_max],
-            speeds[box_idx, idx_min],
-            speeds[box_idx, idx_max],
-        )
+    for first_rank in range(active_count - wp.int32(1)):
+        first_idx = wp.int32(active_indices[box_idx, first_rank])
+        for second_rank in range(first_rank + wp.int32(1), active_count):
+            second_idx = wp.int32(active_indices[box_idx, second_rank])
+            pair_rate = _total_pair_rate(
+                mechanism_mask,
+                radii[box_idx, first_idx],
+                radii[box_idx, second_idx],
+                diffusivities[box_idx, first_idx],
+                diffusivities[box_idx, second_idx],
+                g_terms[box_idx, first_idx],
+                g_terms[box_idx, second_idx],
+                speeds[box_idx, first_idx],
+                speeds[box_idx, second_idx],
+            )
+            if pair_rate > majorant_total:
+                majorant_total = pair_rate
 
     if not (wp.isfinite(majorant_total) and majorant_total > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
@@ -701,9 +685,6 @@ def brownian_coagulation_kernel(  # noqa: C901
         )
         if not (wp.isfinite(total_rate) and total_rate > wp.float64(0.0)):
             continue
-        if total_rate > majorant_total:
-            continue
-
         # Every valid candidate gets exactly one acceptance draw.
         if wp.randf(state) < total_rate / majorant_total:
             collision_pairs[box_idx, collision_count, 0] = selected_i

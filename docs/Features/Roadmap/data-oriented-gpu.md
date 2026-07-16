@@ -1070,8 +1070,8 @@ Planned features:
    when multiple mechanisms are active.
 6. Parity and statistical validation: CPU/GPU parity or statistically
    bounded tests for each new kernel, with recorded tolerances.
-7. Distribution-support decision record: the current GPU path implicitly
-   assumes particle-resolved semantics (per-slot merges, concentration
+7. Distribution-support decision record: the current GPU path explicitly
+   enforces particle-resolved semantics (per-slot merges, concentration
    zeroing); document which binned/moving-bin strategies remain CPU-only.
 8. Epic D carry-forward closure: publish an independent CPU/Warp condensation
    parity walkthrough that separates physics, conservation, and energy

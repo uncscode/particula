@@ -28,17 +28,8 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-wp: Any = None
-try:
-    import warp as wp
-except ImportError:
-    pass
-
-pytestmark = (
-    [pytest.mark.warp, pytest.mark.skip(reason="Warp not installed")]
-    if wp is None
-    else pytest.mark.warp
-)
+wp = pytest.importorskip("warp", reason="Warp not installed")
+pytestmark = pytest.mark.warp
 
 if wp is not None:
     import particula.gpu.kernels.coagulation as coagulation_module  # noqa: E402
@@ -1123,39 +1114,24 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
         n_collisions[box_idx] = wp.int32(0)
         return
 
-    r_min = wp.float64(1.0e30)
-    r_max = wp.float64(0.0)
-    idx_min = wp.int32(-1)
-    idx_max = wp.int32(-1)
-    for active_rank in range(active_count):
-        p_idx = wp.int32(active_indices[box_idx, active_rank])
-        r_p = radii[box_idx, p_idx]
-        if r_p < r_min:
-            r_min = r_p
-            idx_min = wp.int32(p_idx)
-        if r_p > r_max:
-            r_max = r_p
-            idx_max = wp.int32(p_idx)
-
     majorant_total = wp.float64(0.0)
-    if idx_min >= wp.int32(0) and idx_max >= wp.int32(0):
-        if idx_min == idx_max:
-            for active_rank in range(active_count):
-                candidate_idx = wp.int32(active_indices[box_idx, active_rank])
-                if candidate_idx != idx_min:
-                    idx_max = candidate_idx
-                    break
-        majorant_total = _total_majorant(
-            wp.int32(BROWNIAN_MECHANISM_FLAG),
-            radii[box_idx, idx_min],
-            radii[box_idx, idx_max],
-            diffusivities[box_idx, idx_min],
-            diffusivities[box_idx, idx_max],
-            g_terms[box_idx, idx_min],
-            g_terms[box_idx, idx_max],
-            speeds[box_idx, idx_min],
-            speeds[box_idx, idx_max],
-        )
+    for first_rank in range(active_count - wp.int32(1)):
+        first_idx = wp.int32(active_indices[box_idx, first_rank])
+        for second_rank in range(first_rank + wp.int32(1), active_count):
+            second_idx = wp.int32(active_indices[box_idx, second_rank])
+            pair_rate = _total_pair_rate(
+                wp.int32(BROWNIAN_MECHANISM_FLAG),
+                radii[box_idx, first_idx],
+                radii[box_idx, second_idx],
+                diffusivities[box_idx, first_idx],
+                diffusivities[box_idx, second_idx],
+                g_terms[box_idx, first_idx],
+                g_terms[box_idx, second_idx],
+                speeds[box_idx, first_idx],
+                speeds[box_idx, second_idx],
+            )
+            if pair_rate > majorant_total:
+                majorant_total = pair_rate
 
     if not (wp.isfinite(majorant_total) and majorant_total > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
@@ -1231,9 +1207,6 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
         )
         if not (wp.isfinite(total_rate) and total_rate > wp.float64(0.0)):
             continue
-        if total_rate > majorant_total:
-            continue
-
         if wp.randf(state) < total_rate / majorant_total:
             collision_pairs[box_idx, collision_count, 0] = selected_i
             collision_pairs[box_idx, collision_count, 1] = selected_j
@@ -1811,6 +1784,9 @@ def test_coagulation_step_gpu_explicit_brownian_matches_default_and_dispatches_m
 ) -> None:
     """Explicit Brownian config preserves default seeded dispatch behavior."""
     particles = _make_particle_data(n_boxes=2, n_particles=4, n_species=1)
+    particles.volume[:] = 1.0e-18
+    initial_masses = particles.masses.copy()
+    initial_concentration = particles.concentration.copy()
     config = CoagulationMechanismConfig(mechanisms=(BROWNIAN_MECHANISM,))
     masks: list[Any] = []
     original_launch = coagulation_module.wp.launch
@@ -1881,12 +1857,15 @@ def test_coagulation_step_gpu_explicit_brownian_matches_default_and_dispatches_m
         )
 
     default, explicit = results
+    assert int(default[1].sum()) > 0
     npt.assert_array_equal(default[0], explicit[0])
     npt.assert_array_equal(default[1], explicit[1])
     npt.assert_array_equal(default[2], explicit[2])
     npt.assert_allclose(default[3].masses, explicit[3].masses)
     npt.assert_allclose(default[3].concentration, explicit[3].concentration)
     npt.assert_allclose(default[3].charge, explicit[3].charge)
+    assert not np.array_equal(default[3].masses, initial_masses)
+    assert not np.array_equal(default[3].concentration, initial_concentration)
     assert masks == [wp.int32(BROWNIAN_MECHANISM_FLAG)] * 2
 
 
@@ -2953,6 +2932,71 @@ def test_coagulation_step_gpu_nonuniform_arrays_keep_single_active_box_idle(
 
     assert result.shape == (2,)
     assert result[1] == 0
+
+
+def test_heterogeneous_majorant_retains_non_radius_extrema_collision(
+    device: str,
+) -> None:
+    """All-pair majorant retains a faster equal-radius composition pair."""
+    density = np.array([1000.0, 3000.0], dtype=np.float64)
+    masses = np.array(
+        [
+            [0.00e-18, 3.00e-18],
+            [0.45e-18, 1.65e-18],
+            [0.50e-18, 1.50e-18],
+        ],
+        dtype=np.float64,
+    )
+    particles = ParticleData(
+        masses=masses[np.newaxis, :, :],
+        concentration=np.ones((1, 3), dtype=np.float64),
+        charge=np.zeros((1, 3), dtype=np.float64),
+        density=density,
+        volume=np.array([1.0e-18], dtype=np.float64),
+    )
+    total_volume = np.sum(masses / density, axis=1)
+    radii = np.cbrt(3.0 * total_volume / (4.0 * np.pi))
+    pair_rates = np.asarray(
+        get_brownian_kernel_via_system_state(
+            particle_radius=radii,
+            particle_mass=np.sum(masses, axis=1),
+            temperature=298.15,
+            pressure=101325.0,
+        ),
+        dtype=np.float64,
+    )
+
+    # The former equal-radius tie handling selected (0, 1), although the
+    # mass/composition-dependent (1, 2) rate is larger.
+    assert pair_rates[1, 2] > pair_rates[0, 1]
+    initial_mass = float(np.sum(particles.masses))
+    retained_high_rate_pair = False
+    for seed in range(1, 101):
+        gpu_particles = to_warp_particle_data(particles, device=device)
+        pairs = wp.zeros((1, 1, 2), dtype=wp.int32, device=device)
+        counts = wp.zeros((1,), dtype=wp.int32, device=device)
+        rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.5,
+            max_collisions=1,
+            rng_seed=seed,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=rng_states,
+            initialize_rng=True,
+        )
+        result = from_warp_particle_data(gpu_particles, sync=True)
+        npt.assert_allclose(np.sum(result.masses), initial_mass, rtol=1.0e-12)
+        if int(np.asarray(counts.numpy())[0]) == 1:
+            selected_pair = np.asarray(pairs.numpy())[0, 0]
+            if np.array_equal(selected_pair, np.array([1, 2], dtype=np.int32)):
+                retained_high_rate_pair = True
+                break
+
+    assert retained_high_rate_pair
 
 
 def test_mixed_scale_diagnostic_reports_attempted_and_accepted_counts(
