@@ -13,9 +13,11 @@ masses in-place.
 
 ``CoagulationMechanismConfig`` and its resolver are concrete-module APIs:
 import them from ``particula.gpu.kernels.coagulation``, not
-``particula.gpu.kernels``. The public step defaults to Brownian,
+``particula.gpu.kernels``. The frozen configuration is host-side metadata, not
+device-resident simulation state. The public step defaults to Brownian,
 particle-resolved execution and rejects unsupported configurations before
-accessing runtime state.
+accessing runtime state. Supplied particle data, collision outputs, and RNG
+sidecars are caller-owned same-device Warp resources.
 """
 
 # pyright: basic
@@ -1116,13 +1118,18 @@ def coagulation_step_gpu(  # noqa: C901
             This always applies to the omitted-``rng_states`` convenience path.
             For caller-owned persistent buffers, the seed is only consumed when
             ``initialize_rng=True`` explicitly requests a reset.
-        collision_pairs: Optional preallocated collision buffer.
-        n_collisions: Optional preallocated collision count buffer.
+        collision_pairs: Optional caller-owned, same-device Warp collision
+            output buffer. When omitted, the function allocates a call-local
+            convenience buffer for this call.
+        n_collisions: Optional caller-owned, same-device Warp per-box collision
+            count output buffer. When omitted, the function allocates a
+            call-local convenience buffer for this call.
         rng_states: Optional preallocated RNG state buffer. When omitted, this
-            function allocates a call-local ``(n_boxes,)`` buffer, seeds it
-            from ``rng_seed``, and uses it only for the current call. When
-            provided, the caller owns the persistent GPU-resident sidecar
-            buffer and it is reused as-is across repeated calls unless
+            function allocates a call-local same-device ``(n_boxes,)`` buffer,
+            seeds it from ``rng_seed``, and uses it only for the current call.
+            When provided, the caller owns the persistent same-device
+            GPU-resident sidecar buffer and it is reused as-is across repeated
+            calls unless
             ``initialize_rng=True`` explicitly requests a reset from
              ``rng_seed``.
         mechanism_config: Optional ``CoagulationMechanismConfig`` imported from

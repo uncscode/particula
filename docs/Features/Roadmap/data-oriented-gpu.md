@@ -176,9 +176,10 @@ Known GPU physics gaps remain:
   low-level publication.
 - Particle charge is present in the GPU data container, but charged particle
   coagulation kernels are not implemented yet.
-- The current GPU coagulation path is Brownian-focused; charged, turbulent,
-  sedimentation, and combined particle-resolved coagulation workflows still
-  need GPU coverage decisions and implementations.
+- The current GPU coagulation path executes Brownian with
+  `particle_resolved` inputs only. Charged, turbulent, sedimentation, and
+  combined particle-resolved workflows are reserved and rejected during host
+  capability preflight until their assigned Epic E features implement them.
 - CPU sedimentation coagulation and simple turbulent shear coagulation exist,
   but neither has a GPU kernel yet. DNS turbulence is intentionally deferred
   from the near-term GPU scope.
@@ -1005,6 +1006,55 @@ high-level `Aerosol`/`Runnable` integration, graph capture/replay, and broad
 autodiff. Those runtime capabilities remain assigned to later roadmap epics or
 a separately approved physics expansion; recording them here does not claim
 that Epic E's coagulation implementation delivers them.
+
+The current direct-kernel configuration and ownership boundary is:
+
+```python
+from particula.gpu.kernels import coagulation_step_gpu
+from particula.gpu.kernels.coagulation import CoagulationMechanismConfig
+```
+
+Pass `mechanism_config=CoagulationMechanismConfig(...)` as keyword-only host
+metadata. The frozen dataclass is not device-resident simulation state and is
+not transferred, synchronized, or stored in a container schema. In contrast,
+`WarpParticleData`, supplied `collision_pairs`, supplied `n_collisions`, and
+supplied `rng_states` are caller-owned, same-device Warp resources. Omitted
+collision outputs and RNG state use call-local convenience allocation. A
+supplied RNG sidecar is reused and changes in place; it resets only with
+`initialize_rng=True`. Kernels do not perform hidden CPU↔GPU transfer or
+synchronization for configuration or these sidecars. See the [data containers
+and GPU foundations guide](../data-containers-and-gpu-foundations.md#gpu-coagulation-configuration-and-sidecar-ownership)
+for the broader container boundary.
+
+Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
+`"continuous_pdf"` raise `ValueError`; they do not fall back or convert.
+
+| Identifier | Status | Owner |
+| --- | --- | --- |
+| `brownian` | Executable with `particle_resolved` only | Shipped E5-F1 baseline |
+| `charged_hard_sphere` | Reserved; rejected in capability preflight | E5-F3 |
+| `sedimentation_sp2016` | Reserved; rejected in capability preflight | E5-F4 |
+| `turbulent_shear_st1956` | Reserved; rejected in capability preflight | E5-F5 |
+
+Structural recognition is not executability. Any reserved ID, including a
+Brownian-plus-reserved combination, raises `ValueError` in host capability
+preflight before runtime input access, allocation, launch, or mutable state
+changes.
+
+The fixed sampler has one normalized active set, one total safe majorant, one
+candidate stream, one total pair-rate acceptance decision for each valid
+candidate, one collision-pair output buffer, and one per-box RNG-state
+progression. Invalid, nonfinite, or nonpositive terms do not add to totals;
+invalid candidates do not mutate the active set or collision output.
+
+Each future mechanism must add a stable identifier; required host and device
+inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
+additive majorant; a capability-table row; shared-dispatcher integration; and
+co-located `*_test.py` coverage. It must not add an independent sampling loop,
+acceptance pass, collision buffer, or RNG stream. This work does not add
+binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
+integration, graph-capture claims, or executable charged, sedimentation, or
+turbulent-shear physics.
 
 Planned features:
 
