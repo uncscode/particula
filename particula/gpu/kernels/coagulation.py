@@ -15,6 +15,7 @@ masses in-place.
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast, no_type_check
 
 import numpy as np
@@ -61,6 +62,150 @@ from particula.gpu.properties.particle_properties import (
 
 MAX_COLLISION_PAIR_BUFFER_BYTES = 256 * 1024 * 1024
 MAX_SCHEDULED_TRIALS_PER_BOX = 65_536
+
+BROWNIAN_MECHANISM = "brownian"
+CHARGED_HARD_SPHERE_MECHANISM = "charged_hard_sphere"
+SEDIMENTATION_SP2016_MECHANISM = "sedimentation_sp2016"
+TURBULENT_SHEAR_ST1956_MECHANISM = "turbulent_shear_st1956"
+
+CANONICAL_COAGULATION_MECHANISMS = (
+    BROWNIAN_MECHANISM,
+    CHARGED_HARD_SPHERE_MECHANISM,
+    SEDIMENTATION_SP2016_MECHANISM,
+    TURBULENT_SHEAR_ST1956_MECHANISM,
+)
+
+BROWNIAN_MECHANISM_FLAG = 1
+CHARGED_HARD_SPHERE_MECHANISM_FLAG = 2
+SEDIMENTATION_SP2016_MECHANISM_FLAG = 4
+TURBULENT_SHEAR_ST1956_MECHANISM_FLAG = 8
+
+COAGULATION_MECHANISM_FLAGS = {
+    BROWNIAN_MECHANISM: BROWNIAN_MECHANISM_FLAG,
+    CHARGED_HARD_SPHERE_MECHANISM: CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+    SEDIMENTATION_SP2016_MECHANISM: SEDIMENTATION_SP2016_MECHANISM_FLAG,
+    TURBULENT_SHEAR_ST1956_MECHANISM: TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+}
+
+
+@dataclass(frozen=True)
+class CoagulationMechanismConfig:
+    """Concrete-module mechanism configuration for P1 host validation.
+
+    The default selects Brownian particle-resolved coagulation. This
+    configuration is not yet an argument of the public GPU step.
+    """
+
+    mechanisms: tuple[str, ...] | None = None
+    distribution_type: str = "particle_resolved"
+
+
+@dataclass(frozen=True)
+class _ResolvedCoagulationMechanismConfig:
+    """Normalized concrete-module P1 validation result, not a public API."""
+
+    mechanisms: tuple[str, ...]
+    distribution_type: str
+    mask: int
+
+
+def resolve_coagulation_mechanism_config(
+    config: CoagulationMechanismConfig,
+) -> _ResolvedCoagulationMechanismConfig:
+    """Normalize and structurally validate coagulation mechanisms.
+
+    This concrete-module P1 helper defaults ``mechanisms`` to Brownian and
+    returns canonical mechanism order, distribution type, and fixed-bit mask.
+
+    Args:
+        config: Immutable host-side coagulation mechanism configuration.
+
+    Returns:
+        The normalized mechanisms, distribution type, and combined bit mask.
+
+    Raises:
+        ValueError: If mechanisms are malformed, duplicate, or unknown, or if
+            distribution_type is not exactly ``"particle_resolved"``.
+    """
+    if config.distribution_type != "particle_resolved":
+        raise ValueError(
+            "distribution_type must be exactly 'particle_resolved'."
+        )
+
+    mechanisms = config.mechanisms
+    if mechanisms is None:
+        mechanisms = (BROWNIAN_MECHANISM,)
+    if not isinstance(mechanisms, tuple) or not mechanisms:
+        raise ValueError("mechanisms must be a non-empty tuple of strings.")
+
+    for mechanism in mechanisms:
+        if not isinstance(mechanism, str):
+            raise ValueError("mechanisms must contain only string identifiers.")
+
+    seen_mechanisms: set[str] = set()
+    for mechanism in mechanisms:
+        if mechanism in seen_mechanisms:
+            raise ValueError(f"Duplicate coagulation mechanism '{mechanism}'.")
+        seen_mechanisms.add(mechanism)
+
+    unknown = next(
+        (
+            mechanism
+            for mechanism in mechanisms
+            if mechanism not in COAGULATION_MECHANISM_FLAGS
+        ),
+        None,
+    )
+    if unknown is not None:
+        raise ValueError(f"Unknown coagulation mechanism '{unknown}'.")
+
+    normalized_mechanisms = tuple(
+        mechanism
+        for mechanism in CANONICAL_COAGULATION_MECHANISMS
+        if mechanism in mechanisms
+    )
+    mask = 0
+    for mechanism in normalized_mechanisms:
+        mask |= COAGULATION_MECHANISM_FLAGS[mechanism]
+
+    return _ResolvedCoagulationMechanismConfig(
+        mechanisms=normalized_mechanisms,
+        distribution_type=config.distribution_type,
+        mask=mask,
+    )
+
+
+def validate_coagulation_mechanism_capabilities(
+    resolved: _ResolvedCoagulationMechanismConfig,
+) -> None:
+    """Validate the P1 executable capability of resolved mechanisms.
+
+    This concrete-module gate accepts Brownian execution only. Reserved terms
+    remain structurally valid and retain their flags for future owning tracks.
+
+    Args:
+        resolved: Structurally validated, normalized mechanism configuration.
+
+    Raises:
+        ValueError: If a reserved mechanism is requested before its owning
+            implementation track is available.
+    """
+    reserved_messages = {
+        CHARGED_HARD_SPHERE_MECHANISM: (
+            "Coagulation mechanism 'charged_hard_sphere' is reserved for E5-F3."
+        ),
+        SEDIMENTATION_SP2016_MECHANISM: (
+            "Coagulation mechanism 'sedimentation_sp2016' is reserved for "
+            "E5-F4."
+        ),
+        TURBULENT_SHEAR_ST1956_MECHANISM: (
+            "Coagulation mechanism 'turbulent_shear_st1956' is reserved for "
+            "E5-F5."
+        ),
+    }
+    for mechanism in resolved.mechanisms:
+        if mechanism in reserved_messages:
+            raise ValueError(reserved_messages[mechanism])
 
 
 @no_type_check
