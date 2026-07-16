@@ -1021,8 +1021,10 @@ not transferred, synchronized, or stored in a container schema. In contrast,
 supplied `rng_states` are caller-owned, same-device Warp resources. Omitted
 collision outputs and RNG state use call-local convenience allocation. A
 supplied RNG sidecar is reused and changes in place; it resets only with
-`initialize_rng=True`. Kernels do not perform hidden CPU↔GPU transfer or
-synchronization for configuration or these sidecars.
+`initialize_rng=True`. Configuration and caller-owned sidecars have no implicit
+CPU↔GPU transfer. Reuse of a supplied persistent `rng_states` buffer is
+unsynchronized, while omitted RNG state and `initialize_rng=True` use the
+initialization path, which synchronizes after initializing or resetting state.
 
 Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 `"continuous_pdf"` raise `ValueError`; they do not fall back or convert.
