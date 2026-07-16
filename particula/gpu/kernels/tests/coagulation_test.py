@@ -131,6 +131,35 @@ def test_mechanism_default_matches_explicit_brownian() -> None:
     assert default.mask == BROWNIAN_MECHANISM_FLAG
 
 
+def test_mechanism_flags_have_documented_numeric_values() -> None:
+    """Mechanism flags retain their fixed dispatch bit assignments."""
+    assert BROWNIAN_MECHANISM_FLAG == 1
+    assert CHARGED_HARD_SPHERE_MECHANISM_FLAG == 2
+    assert SEDIMENTATION_SP2016_MECHANISM_FLAG == 4
+    assert TURBULENT_SHEAR_ST1956_MECHANISM_FLAG == 8
+
+
+def test_mechanism_flag_mapping_is_immutable() -> None:
+    """Mechanism flag mapping cannot be changed after module initialization."""
+    flag_mapping = coagulation_module._COAGULATION_MECHANISM_FLAGS
+
+    assert dict(flag_mapping) == {
+        BROWNIAN_MECHANISM: 1,
+        CHARGED_HARD_SPHERE_MECHANISM: 2,
+        SEDIMENTATION_SP2016_MECHANISM: 4,
+        TURBULENT_SHEAR_ST1956_MECHANISM: 8,
+    }
+    mutable_flag_mapping = cast(Any, flag_mapping)
+    with pytest.raises(TypeError):
+        mutable_flag_mapping[BROWNIAN_MECHANISM] = 16
+
+    resolved = resolve_coagulation_mechanism_config(
+        CoagulationMechanismConfig(mechanisms=(BROWNIAN_MECHANISM,))
+    )
+
+    assert resolved.mask == 1
+
+
 def test_mechanism_canonicalizes_order_and_mask() -> None:
     """Mechanism resolution uses canonical order and fixed flags."""
     resolved = resolve_coagulation_mechanism_config(

@@ -16,6 +16,7 @@ masses in-place.
 # pyright: reportOperatorIssue=false
 
 from dataclasses import dataclass
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, cast, no_type_check
 
 import numpy as np
@@ -80,12 +81,14 @@ CHARGED_HARD_SPHERE_MECHANISM_FLAG = 2
 SEDIMENTATION_SP2016_MECHANISM_FLAG = 4
 TURBULENT_SHEAR_ST1956_MECHANISM_FLAG = 8
 
-COAGULATION_MECHANISM_FLAGS = {
-    BROWNIAN_MECHANISM: BROWNIAN_MECHANISM_FLAG,
-    CHARGED_HARD_SPHERE_MECHANISM: CHARGED_HARD_SPHERE_MECHANISM_FLAG,
-    SEDIMENTATION_SP2016_MECHANISM: SEDIMENTATION_SP2016_MECHANISM_FLAG,
-    TURBULENT_SHEAR_ST1956_MECHANISM: TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
-}
+_COAGULATION_MECHANISM_FLAGS = MappingProxyType(
+    {
+        BROWNIAN_MECHANISM: BROWNIAN_MECHANISM_FLAG,
+        CHARGED_HARD_SPHERE_MECHANISM: CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+        SEDIMENTATION_SP2016_MECHANISM: SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        TURBULENT_SHEAR_ST1956_MECHANISM: TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -173,7 +176,7 @@ def resolve_coagulation_mechanism_config(
         (
             mechanism
             for mechanism in mechanisms
-            if mechanism not in COAGULATION_MECHANISM_FLAGS
+            if mechanism not in _COAGULATION_MECHANISM_FLAGS
         ),
         None,
     )
@@ -187,7 +190,7 @@ def resolve_coagulation_mechanism_config(
     )
     mask = 0
     for mechanism in normalized_mechanisms:
-        mask |= COAGULATION_MECHANISM_FLAGS[mechanism]
+        mask |= _COAGULATION_MECHANISM_FLAGS[mechanism]
 
     return _ResolvedCoagulationMechanismConfig(
         mechanisms=normalized_mechanisms,
