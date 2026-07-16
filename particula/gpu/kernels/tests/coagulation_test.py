@@ -224,17 +224,20 @@ def test_mechanism_rejects_invalid_distribution_type(
         (
             CHARGED_HARD_SPHERE_MECHANISM,
             CHARGED_HARD_SPHERE_MECHANISM_FLAG,
-            "Coagulation mechanism 'charged_hard_sphere' is reserved for E5-F3.",
+            "Coagulation mechanism 'charged_hard_sphere' is reserved for "
+            "E5-F3.",
         ),
         (
             SEDIMENTATION_SP2016_MECHANISM,
             SEDIMENTATION_SP2016_MECHANISM_FLAG,
-            "Coagulation mechanism 'sedimentation_sp2016' is reserved for E5-F4.",
+            "Coagulation mechanism 'sedimentation_sp2016' is reserved for "
+            "E5-F4.",
         ),
         (
             TURBULENT_SHEAR_ST1956_MECHANISM,
             TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
-            "Coagulation mechanism 'turbulent_shear_st1956' is reserved for E5-F5.",
+            "Coagulation mechanism 'turbulent_shear_st1956' is reserved for "
+            "E5-F5.",
         ),
     ],
 )
@@ -1483,15 +1486,387 @@ def _draw_single_random_kernel(rng_states: Any, draws: Any) -> None:
     draws[box_idx] = wp.float64(wp.randf(state))
 
 
-def test_coagulation_step_gpu_signature_keeps_environment_keyword_only() -> (
+def test_coagulation_step_gpu_signature_keeps_runtime_options_keyword_only() -> (
     None
 ):
-    """The RNG reset and environment inputs stay keyword-only."""
+    """Configuration, RNG reset, and environment inputs stay keyword-only."""
     parameters = inspect.signature(coagulation_step_gpu).parameters
 
+    assert parameters["mechanism_config"].default is None
+    assert parameters["mechanism_config"].kind is inspect.Parameter.KEYWORD_ONLY
     assert parameters["initialize_rng"].default is False
     assert parameters["initialize_rng"].kind is inspect.Parameter.KEYWORD_ONLY
     assert parameters["environment"].kind is inspect.Parameter.KEYWORD_ONLY
+
+
+class _ParticlesAccessSentinel:
+    """Raise if configuration preflight touches particle runtime state."""
+
+    @property
+    def masses(self) -> Any:
+        """Reject any runtime particle access."""
+        raise AssertionError(
+            "configuration validation accessed particles.masses"
+        )
+
+
+@pytest.mark.parametrize(
+    ("config", "message"),
+    [
+        (object(), "mechanism_config must be a CoagulationMechanismConfig."),
+        (
+            CoagulationMechanismConfig(mechanisms=()),
+            "mechanisms must be a non-empty tuple of strings.",
+        ),
+        (
+            CoagulationMechanismConfig(mechanisms=[BROWNIAN_MECHANISM]),  # type: ignore[arg-type]
+            "mechanisms must be a non-empty tuple of strings.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=(BROWNIAN_MECHANISM, BROWNIAN_MECHANISM)
+            ),
+            "Duplicate coagulation mechanism 'brownian'.",
+        ),
+        (
+            CoagulationMechanismConfig(mechanisms=("unknown",)),
+            "Unknown coagulation mechanism 'unknown'.",
+        ),
+        (
+            CoagulationMechanismConfig(distribution_type="discrete"),
+            "distribution_type must be exactly 'particle_resolved'.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+            ),
+            "Coagulation mechanism 'charged_hard_sphere' is reserved for "
+            "E5-F3.",
+        ),
+    ],
+)
+def test_coagulation_step_gpu_rejects_config_before_runtime_access(
+    config: object,
+    message: str,
+) -> None:
+    """Rejected configuration never accesses runtime particle state."""
+    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
+        coagulation_step_gpu(
+            _ParticlesAccessSentinel(),
+            temperature=None,
+            pressure=None,
+            time_step=object(),
+            mechanism_config=config,  # type: ignore[arg-type]
+        )
+
+
+@pytest.mark.parametrize("n_boxes", [1, 2])
+@pytest.mark.parametrize(
+    ("config", "message"),
+    [
+        (object(), "mechanism_config must be a CoagulationMechanismConfig."),
+        (
+            CoagulationMechanismConfig(mechanisms=()),
+            "mechanisms must be a non-empty tuple of strings.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms="brownian"  # type: ignore[arg-type]
+            ),
+            "mechanisms must be a non-empty tuple of strings.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=[BROWNIAN_MECHANISM]  # type: ignore[arg-type]
+            ),
+            "mechanisms must be a non-empty tuple of strings.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=(BROWNIAN_MECHANISM, 1)  # type: ignore[arg-type]
+            ),
+            "mechanisms must contain only string identifiers.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=(BROWNIAN_MECHANISM, BROWNIAN_MECHANISM)
+            ),
+            "Duplicate coagulation mechanism 'brownian'.",
+        ),
+        (
+            CoagulationMechanismConfig(mechanisms=("unknown",)),
+            "Unknown coagulation mechanism 'unknown'.",
+        ),
+        (
+            CoagulationMechanismConfig(distribution_type="continuous_pdf"),
+            "distribution_type must be exactly 'particle_resolved'.",
+        ),
+        (
+            CoagulationMechanismConfig(distribution_type="discrete"),
+            "distribution_type must be exactly 'particle_resolved'.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+            ),
+            "Coagulation mechanism 'charged_hard_sphere' is reserved for E5-F3.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
+            ),
+            "Coagulation mechanism 'sedimentation_sp2016' is reserved for E5-F4.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+            ),
+            "Coagulation mechanism 'turbulent_shear_st1956' is reserved for E5-F5.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
+            ),
+            "Coagulation mechanism 'charged_hard_sphere' is reserved for E5-F3.",
+        ),
+    ],
+)
+def test_coagulation_step_gpu_rejected_config_preserves_caller_state(
+    device: str,
+    n_boxes: int,
+    config: object,
+    message: str,
+) -> None:
+    """Rejected configuration leaves every supplied mutable input unchanged."""
+    particles = _make_particle_data(n_boxes=n_boxes, n_particles=4, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    collision_pairs = wp.array(
+        np.full((n_boxes, 2, 2), -7, dtype=np.int32),
+        dtype=wp.int32,
+        device=device,
+    )
+    collision_counts = wp.array(
+        np.arange(1, n_boxes + 1, dtype=np.int32),
+        dtype=wp.int32,
+        device=device,
+    )
+    rng_states = wp.array(
+        np.arange(11, 11 + n_boxes, dtype=np.uint32),
+        dtype=wp.uint32,
+        device=device,
+    )
+    caller_buffers = (collision_pairs, collision_counts, rng_states)
+    particle_arrays = (
+        gpu_particles.masses,
+        gpu_particles.concentration,
+        gpu_particles.charge,
+    )
+    initial_particles = from_warp_particle_data(gpu_particles, sync=True)
+    initial_pairs = np.asarray(collision_pairs.numpy()).copy()
+    initial_counts = np.asarray(collision_counts.numpy()).copy()
+    initial_rng_states = np.asarray(rng_states.numpy()).copy()
+
+    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            max_collisions=4,
+            collision_pairs=collision_pairs,
+            n_collisions=collision_counts,
+            rng_states=rng_states,
+            initialize_rng=True,
+            mechanism_config=config,  # type: ignore[arg-type]
+        )
+
+    assert particle_arrays[0] is gpu_particles.masses
+    assert particle_arrays[1] is gpu_particles.concentration
+    assert particle_arrays[2] is gpu_particles.charge
+    assert collision_pairs is caller_buffers[0]
+    assert collision_counts is caller_buffers[1]
+    assert rng_states is caller_buffers[2]
+    npt.assert_array_equal(np.asarray(collision_pairs.numpy()), initial_pairs)
+    npt.assert_array_equal(np.asarray(collision_counts.numpy()), initial_counts)
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng_states)
+    restored = from_warp_particle_data(gpu_particles, sync=True)
+    npt.assert_allclose(restored.masses, initial_particles.masses)
+    npt.assert_allclose(restored.concentration, initial_particles.concentration)
+    npt.assert_allclose(restored.charge, initial_particles.charge)
+
+
+@pytest.mark.parametrize("source", ["direct_arrays", "environment"])
+def test_coagulation_config_error_precedes_environment_normalization(
+    device: str,
+    source: str,
+) -> None:
+    """Configuration rejection wins over invalid direct and sidecar sources."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    invalid_config = CoagulationMechanismConfig(mechanisms=())
+
+    if source == "direct_arrays":
+        temperature = wp.array([0.0, 0.0], dtype=wp.float64, device=device)
+        pressure = wp.array([0.0, 0.0], dtype=wp.float64, device=device)
+        environment = None
+    else:
+        environment = to_warp_environment_data(
+            _make_environment_data(n_boxes=2, n_species=1), device=device
+        )
+        environment.pressure = wp.array(
+            [0.0, 0.0], dtype=wp.float64, device=device
+        )
+        temperature = 298.15
+        pressure = 101325.0
+
+    with pytest.raises(
+        ValueError,
+        match="^mechanisms must be a non-empty tuple of strings\\.$",
+    ):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+            environment=environment,
+            mechanism_config=invalid_config,
+        )
+
+
+@pytest.mark.parametrize(
+    ("config", "message"),
+    [
+        (object(), "mechanism_config must be a CoagulationMechanismConfig."),
+        (
+            CoagulationMechanismConfig(mechanisms=()),
+            "mechanisms must be a non-empty tuple of strings.",
+        ),
+        (
+            CoagulationMechanismConfig(distribution_type="discrete"),
+            "distribution_type must be exactly 'particle_resolved'.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+            ),
+            "Coagulation mechanism 'charged_hard_sphere' is reserved for "
+            "E5-F3.",
+        ),
+    ],
+)
+def test_coagulation_config_rejection_bypasses_runtime_helpers(
+    monkeypatch: pytest.MonkeyPatch,
+    config: object,
+    message: str,
+) -> None:
+    """Configuration errors occur before validation, allocation, or launch."""
+
+    def _unexpected_runtime_access(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("configuration rejection accessed runtime state")
+
+    for helper_name in (
+        "_validate_particle_arrays",
+        "_validate_device_arrays",
+        "_validate_time_step",
+        "_ensure_environment_arrays",
+        "_ensure_volume_array",
+        "_resolve_collision_capacity",
+        "_validate_rng_states",
+        "initialize_coagulation_rng_states",
+    ):
+        monkeypatch.setattr(
+            coagulation_module, helper_name, _unexpected_runtime_access
+        )
+    monkeypatch.setattr(
+        coagulation_module.wp, "zeros", _unexpected_runtime_access
+    )
+    monkeypatch.setattr(
+        coagulation_module.wp, "launch", _unexpected_runtime_access
+    )
+
+    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
+        coagulation_step_gpu(
+            _ParticlesAccessSentinel(),
+            temperature=None,
+            pressure=None,
+            time_step=object(),
+            mechanism_config=config,  # type: ignore[arg-type]
+        )
+
+
+@pytest.mark.parametrize("source", ["scalar", "direct_arrays", "environment"])
+def test_coagulation_step_gpu_explicit_brownian_matches_default_and_dispatches_mask(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    source: str,
+) -> None:
+    """Explicit Brownian config preserves default seeded dispatch behavior."""
+    particles = _make_particle_data(n_boxes=2, n_particles=4, n_species=1)
+    config = CoagulationMechanismConfig(mechanisms=(BROWNIAN_MECHANISM,))
+    masks: list[Any] = []
+    original_launch = coagulation_module.wp.launch
+
+    def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        if getattr(kernel, "key", "") == "brownian_coagulation_kernel":
+            masks.append(kwargs["inputs"][21])
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(coagulation_module.wp, "launch", _tracking_launch)
+
+    results = []
+    for mechanism_config in (None, config):
+        gpu_particles = to_warp_particle_data(particles, device=device)
+        pairs = wp.zeros((2, 2, 2), dtype=wp.int32, device=device)
+        counts = wp.zeros((2,), dtype=wp.int32, device=device)
+        rng_states = wp.zeros((2,), dtype=wp.uint32, device=device)
+        if source == "scalar":
+            temperature, pressure, environment = 298.15, 101325.0, None
+        elif source == "direct_arrays":
+            temperature = wp.array(
+                [298.15, 299.15], dtype=wp.float64, device=device
+            )
+            pressure = wp.array(
+                [101325.0, 100800.0], dtype=wp.float64, device=device
+            )
+            environment = None
+        else:
+            temperature, pressure = None, None
+            environment = to_warp_environment_data(
+                _make_environment_data(n_boxes=2, n_species=1), device=device
+            )
+
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=0.1,
+            max_collisions=4,
+            rng_seed=37,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=rng_states,
+            initialize_rng=True,
+            environment=environment,
+            mechanism_config=mechanism_config,
+        )
+        wp.synchronize()
+        results.append(
+            (
+                np.asarray(pairs.numpy()).copy(),
+                np.asarray(counts.numpy()).copy(),
+                np.asarray(rng_states.numpy()).copy(),
+                from_warp_particle_data(gpu_particles, sync=True),
+            )
+        )
+
+    default, explicit = results
+    npt.assert_array_equal(default[0], explicit[0])
+    npt.assert_array_equal(default[1], explicit[1])
+    npt.assert_array_equal(default[2], explicit[2])
+    npt.assert_allclose(default[3].masses, explicit[3].masses)
+    npt.assert_allclose(default[3].concentration, explicit[3].concentration)
+    npt.assert_allclose(default[3].charge, explicit[3].charge)
+    assert masks == [wp.int32(BROWNIAN_MECHANISM_FLAG)] * 2
 
 
 def test_coagulation_step_gpu_scalar_positional_call_remains_valid(
