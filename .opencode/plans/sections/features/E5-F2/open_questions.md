@@ -1,28 +1,32 @@
 # Open Questions
 
-- [ ] Which CPU charged variants are approved for the first GPU support matrix?
-  - Owner: E5-F1/E5-F2-P2.
-  - Decision gate: freeze identifiers and require the hard-sphere charged
-    baseline before P2 implementation; explicitly defer or include Dyachkov
-    2007, Gatti 2008, Gopalakrishnan 2012, and Chahl 2019 individually.
-- [ ] What exact `rtol`/`atol` applies to each approved pair model and extreme
+- [x] Which CPU charged variants are approved for the first GPU support matrix?
+  - Resolved 2026-07-16: approve only the complete hard-sphere system-state
+    model as `charged_hard_sphere`. It consumes existing radius, mass, signed
+    finite elementary-charge counts, temperature, and pressure, with the CPU
+    repulsive-potential floor of `-200`. The other four CPU variants are deferred.
+- [x] What exact `rtol`/`atol` applies to each approved pair model and extreme
   repulsive fixture?
-  - Owner: E5-F2-P1/P2, with E5-F7 consuming the recorded fixture tolerances.
-  - Constraint: tolerances must be justified per formula and cannot be replaced
-    by exact stochastic pair replay.
-- [ ] Should invalid duplicate recipient indices in a caller-supplied collision
+  - Resolved 2026-07-16: positive finite hard-sphere pair rates use
+    `rtol=1e-6, atol=0`. Neutral-limit exact zeros are asserted exactly. The
+    extreme repulsive fixture uses `rtol=1e-6, atol=1e-30` so its physical floor
+    is tested without NumPy's broad default absolute tolerance.
+- [x] Should invalid duplicate recipient indices in a caller-supplied collision
   buffer be defensively ignored, rejected, or remain a documented private-kernel
   precondition?
-  - Owner: E5-F2-P4.
-  - Constraint: the production selector emits disjoint pairs; do not add an
-    O(n²) validation or serialize the normal path without evidence.
-- [ ] Should charge finite-value validation reuse a shared active-device helper
+  - Resolved 2026-07-16: disjoint recipients remain a documented private apply-
+    kernel precondition. The production selector overwrites the work buffer and
+    emits disjoint pairs, so no O(n²) normal-path scan is added. A future public
+    prepopulated-pair boundary must reject duplicates before launch.
+- [x] Should charge finite-value validation reuse a shared active-device helper
   or add a coagulation-local helper with non-positive values allowed?
-  - Owner: E5-F2-P3.
-  - Constraint: validation must not copy charge to the host and must finish
-    before RNG initialization or particle mutation.
-- [ ] Does the final model decision require concrete-module exports for pair
+  - Resolved 2026-07-16: add a coagulation-local active-device finite validator
+    because signed and zero charges are valid. Validate shape, fp64 dtype,
+    device, and finite contents through a compact status readback before RNG or
+    mutation, without copying the full charge array to the host.
+- [x] Does the final model decision require concrete-module exports for pair
   helpers, or should they remain internal until E5-F3 integrates execution?
-  - Owner: E5-F2-P2/E5-F3. Default is internal helpers to avoid premature API.
+  - Resolved 2026-07-16: keep charged and reduced-property helpers internal to
+    `particula.gpu.dynamics.coagulation_funcs`; add no package export in E5.
 
 Classifier diagnostics: none.

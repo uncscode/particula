@@ -1,24 +1,32 @@
 # Open Questions
 
-- [ ] What is the exact final list of approved two-way masks emitted by E5-F6?
-  - Resolve before P1 implementation by reading the shipped configuration; the
-    matrix must fail closed for any executable row without evidence.
-- [ ] Should the cross-mechanism cases remain in
+- [x] What is the exact final list of approved two-way masks emitted by E5-F6?
+  - Resolved 2026-07-16: validate masks `3`, `5`, `9`, `6`, `10`, and `12`, plus
+    singleton masks `1`, `2`, `4`, `8` and full mask `15`. Assert exact equality
+    between the test case table and the executable capability table. Three-way
+    masks remain unsupported.
+- [x] Should the cross-mechanism cases remain in
   `coagulation_validation_test.py` or be split into deterministic and stochastic
   modules?
-  - Decide in P1 based on collection clarity; preserve one canonical case table
-    either way.
-- [ ] What sample count and confidence/sigma threshold gives useful power for
+  - Resolved 2026-07-16: use `coagulation_validation_test.py` for deterministic,
+    majorant, conservation, and edge cases; use
+    `coagulation_stochastic_validation_test.py` for repeated-seed checks; keep
+    one canonical case table in `_coagulation_validation_support.py`.
+- [x] What sample count and confidence/sigma threshold gives useful power for
   every mechanism while keeping the required suite fast?
-  - Resolve in P3 before observing pass/fail outcomes; document derivation and
-    measured runtime.
-- [ ] Which existing mechanism-specific fixtures can be imported safely without
+  - Resolved 2026-07-16: use 100 fresh independent seeds and a predeclared
+    `3 * sqrt(expected_mean)` aggregate bound. Author uncapped fixtures with an
+    expected aggregate count of at least 100; test zero-rate rows deterministically.
+- [x] Which existing mechanism-specific fixtures can be imported safely without
   coupling expected values to implementation internals?
-  - Prefer neutral test-support records; copy small explicit fixtures when
-    importing would create circular or private dependencies.
-- [ ] Where should E5-F9 publish the final user-facing evidence table?
-  - Coordinate during P4 with the roadmap document selected by E5-F9; E5-F7
-    must still retain focused commands and evidence references.
+  - Resolved 2026-07-16: reuse public CPU formulas and shared device helpers, but
+    do not import private fixtures from another `*_test.py` or use Warp helpers
+    as the oracle. Copy compact explicit fp64 physical records into the neutral
+    support module and calculate additive expectations independently.
+- [x] Where should E5-F9 publish the final user-facing evidence table?
+  - Resolved 2026-07-16: publish the canonical detailed report at
+    `docs/Features/Roadmap/coagulation-validation.md`. E5-F9 links it from both
+    roadmap files, the coagulation/foundations guides, and the direct example.
 
 Resolved constraints: parent is E5; classifier diagnostics are none; Warp CPU is
 required when Warp is installed; CUDA is optional; exact CPU/Warp pair replay

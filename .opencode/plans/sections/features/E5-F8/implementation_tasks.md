@@ -22,9 +22,10 @@
   and explicit E5-F8 non-claim for every carry-forward item.
 - [ ] Assign phase-aware surface tension and BAT activity to a separately
   approved condensation-physics expansion rather than implying current support.
-- [ ] Assign thermal feedback/adaptive process work to Epic F, high-level
-  backend/`Runnable` work and general workflow parity to Epic G, capture and
-  performance work to Epic H, and broad autodiff to Epic I.
+- [ ] Assign thermal feedback/adaptive stepping to a future approved
+  condensation numerical-method plan; assign high-level backend/`Runnable`
+  work and general workflow parity to Epic G, capture and performance work to
+  Epic H, and broad autodiff to Epic I.
 - [ ] Link the artifact from canonical condensation, foundations, examples, and
   both roadmap files without duplicating conflicting support language.
 

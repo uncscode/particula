@@ -4,8 +4,8 @@
   cross-mechanism fixture matrix, deterministic/stochastic separation, marker
   commands, and conservation assertion policy if existing guidance is not
   sufficient to reproduce the suite.
-- Update the relevant `docs/Features/Roadmap/` GPU roadmap document with a table
-  for Brownian, charged, Brownian-plus-charged, SP2016, ST1956, approved two-way
+- Publish `docs/Features/Roadmap/coagulation-validation.md` with a table for
+  Brownian, charged, Brownian-plus-charged, SP2016, ST1956, approved two-way
   combinations, and the full four-way row. Record deterministic parity,
   stochastic bounds, mass/charge, multi-box/inactive, Warp CPU, and optional
   CUDA status separately.

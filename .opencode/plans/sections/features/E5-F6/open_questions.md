@@ -1,23 +1,28 @@
 # Open Questions
 
-- [ ] Which exact two-way masks are part of the first executable support matrix?
-  - Proposed decision: register every pairwise combination whose two owning
-    mechanism tracks have shipped, retain Brownian-plus-charged, and verify each
-    row table-wise. Confirm against the implementation issue before P1 closes.
-- [ ] Are three-way masks deliberately unsupported in E5-F6 or should the
+- [x] Which exact two-way masks are part of the first executable support matrix?
+  - Resolved 2026-07-16: register all six pairs after their owning tracks ship:
+    masks `3`, `5`, `9`, `6`, `10`, and `12`, using canonical bits Brownian `1`,
+    charged hard-sphere `2`, SP2016 `4`, and ST1956 `8`. Also retain all four
+    singleton rows and register the full four-way mask `15`.
+- [x] Are three-way masks deliberately unsupported in E5-F6 or should the
   capability matrix include all non-empty subsets?
-  - Proposed decision: fail closed unless issue #1320 explicitly requires them;
-    E5's done signal requires supported two-way and full four-way evidence, not
-    an implicit three-way claim. Document the final choice.
-- [ ] Should an unused turbulent dissipation/fluid-density argument be rejected
+  - Resolved 2026-07-16: masks `7`, `11`, `13`, and `14` are deliberately
+    unsupported. E5 validates all two-way rows and the full four-way row without
+    claiming unrequested three-way coverage.
+- [x] Should an unused turbulent dissipation/fluid-density argument be rejected
   for a mask without turbulent shear?
-  - Resolve in P1 by applying E5-F1/E5-F5's established excess-input policy
-    consistently; do not silently diverge only for combined calls.
-- [ ] Is `sum(component_majorants)` too conservative for the bounded trial cap
+  - Resolved 2026-07-16: yes. Reject excess or partial ST1956 inputs before any
+    allocation, RNG work, output clearing, or particle mutation.
+- [x] Is `sum(component_majorants)` too conservative for the bounded trial cap
   in realistic four-way fixtures?
-  - Measure in P2/P3. Correctness does not depend on tightness; any optimization
-    requires a proof and all-pairs regression evidence and may be deferred.
-- [ ] How should device code surface a material `total_rate > total_majorant`
+  - Resolved 2026-07-16: use the sum as the initial proved bound and require
+    approved fixtures not to hit the trial cap. If measurement shows cap binding,
+    replace it with the exhaustive maximum of the summed total pair rate, not an
+    unproved heuristic.
+- [x] How should device code surface a material `total_rate > total_majorant`
   violation without host synchronization?
-  - Reuse E5-F1's device guard/diagnostic contract. A tiny roundoff clamp may be
-    allowed, but invalid physics must never become acceptance probability > 1.
+  - Resolved 2026-07-16: a preflight device scan writes an internal per-box
+    status buffer that is read before RNG/merge launches. Permit a ratio clamp
+    only within `8 * eps * max(abs(rate), abs(majorant), tiny)`; raise on larger
+    exceedance. The status buffer is not public API.
