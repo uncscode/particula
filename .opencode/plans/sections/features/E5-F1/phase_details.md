@@ -12,15 +12,20 @@
     charged hard-sphere `2`, SP2016 `4`, and ST1956 `8`; only Brownian is
     executable. `coagulation_step_gpu` signature and GPU runtime are unchanged.
 
-- [ ] **E5-F1-P2:** Introduce additive pair-rate and single-pass sampling interfaces with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E5-F1-P2:** Introduce additive pair-rate and single-pass sampling interfaces with unit tests
+  - Issue: #1332 | Size: S | Status: Completed
   - Goal: Route Brownian through shared pair-rate and majorant dispatch whose
     contract sums enabled non-negative terms before one acceptance decision.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/dynamics/coagulation_funcs.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: Brownian pair/majorant parity, test-only additive terms, one-pass RNG
-    advancement, zero-term handling, and invalid-majorant rejection/guards.
+  - Completed: Added private additive mask-dispatch helpers for sanitized,
+    finite-positive Brownian pair rates and majorants. The kernel computes one
+    total rate/majorant and uses one acceptance draw for each valid candidate;
+    reserved flags are no-ops and unsafe inputs skip before mutation. Co-located
+    unit, fixed-seed deterministic, and marked stochastic tests cover helper
+    parity, synthetic addition, one-draw behavior, guards, selector validity,
+    and mass conservation.
 
 - [ ] **E5-F1-P3:** Enforce pre-mutation particle-resolved support boundaries with integration tests
   - Issue: TBD | Size: S | Status: Not Started

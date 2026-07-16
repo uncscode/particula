@@ -5,3 +5,4 @@
 | 2026-07-15 | Initial E5-F1 plan drafted from T1, parent E5 context, and authoritative issue #1320 code references; classifier diagnostics preserved as none | plan-feature-drafter |
 | 2026-07-15 | Added four issue-sized phases with co-located tests and a final development-documentation phase | plan-feature-drafter |
 | 2026-07-16 | Issue #1331 completed E5-F1-P1: added concrete-module-only host configuration, canonical fixed-mask resolution, Brownian-only capability validation, and co-located host tests; public-step signature and GPU runtime remain unchanged | plan-update-full |
+| 2026-07-16 | Issue #1332 completed E5-F1-P2: added private Brownian additive rate/majorant mask dispatch, one-total/one-acceptance-draw sampling guards, and co-located focused deterministic and stochastic Warp tests; reserved flags remain no-ops and the public step signature remains unchanged | plan-update-full |

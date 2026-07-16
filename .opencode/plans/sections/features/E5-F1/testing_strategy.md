@@ -13,11 +13,15 @@ coverage. Test files use the repository's `*_test.py` convention.
   resolver behavior without requiring a launch. **Completed in Issue #1331:**
   the co-located host-only tests cover these resolver and capability cases;
   reserved-term failures name E5-F3, E5-F4, or E5-F5.
-- **P2 — Dispatch and sampling unit tests:** Test Brownian rate/majorant parity
-  against current behavior and independent CPU formulas. Use test-only fixed
-  terms to assert `K_total = sum(K_i)`, `M_total = sum(M_i)`, one acceptance
-  comparison, one accepted pair, and one RNG update. Cover zero rates and
-  defensive handling of non-finite, negative, or underestimated bounds.
+- **P2 — Dispatch and sampling tests (completed in Issue #1332):**
+  `particula/gpu/kernels/tests/coagulation_test.py` covers private Brownian
+  pair-rate/majorant helper parity against independent CPU formulas, sanitizer
+  inputs, and reserved-mask no-op behavior. Test-only synthetic probes assert
+  `K_total = sum(K_i)`, `M_total = sum(M_i)`, one candidate, and one acceptance
+  draw. Fixed-seed same-backend regression, selector validity, and tight mass
+  conservation preserve Brownian evidence; marked stochastic tests use
+  aggregate independent-seed bounds. Invalid, zero, and underestimated inputs
+  assert no accepted output or mutation.
 - **P3 — Public integration/regression tests:** Under identical seeds, compare
   omitted configuration with explicit Brownian for collision counts, pairs,
   masses, concentration, and RNG state. For every rejected configuration,

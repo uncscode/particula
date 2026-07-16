@@ -8,10 +8,10 @@ P1 concrete-module helpers (completed in Issue #1331)
     -> structural resolver: default Brownian, validate, canonicalize, mask
     -> capability validator: accept Brownian; identify reserved-term owner
 
-Future P2/P3 integration
-  coagulation_step_gpu(..., mechanism configuration)
-    -> resolve and capability-check before existing runtime preflight
-    -> additive rate/majorant dispatch and one bounded sampling pass
+P2 sampler integration (completed in Issue #1332)
+  brownian_coagulation_kernel(..., mechanism_mask)
+    -> private additive rate/majorant dispatch
+    -> one bounded sampling pass
 ```
 
 The host-side configuration is a frozen dataclass in the concrete coagulation
@@ -30,13 +30,15 @@ are errors rather than accidental weights, and canonical ordering makes
 equivalent sets resolve identically.
 
 Warp cannot dispatch Python callbacks inside a kernel, so the sampling
-interface uses a compact mask and explicit term branches. Each term contributes
-a finite, non-negative pair rate and a proven finite, non-negative majorant.
-The dispatcher sums all enabled pair rates and term majorants. It must maintain
-`0 <= total_pair_rate <= total_majorant`; a defensive guard rejects/skips
-invalid device values, while host preflight handles all caller-controlled
-invalidity before launch. Downstream tracks extend dispatch, not the sampling
-loop.
+interface uses a compact mask and explicit fixed-mask branches. Issue #1332
+implemented private additive helpers in `particula.gpu.kernels.coagulation`:
+they sanitize each Brownian term to finite, strictly positive `wp.float64`
+values and accumulate one `K_total` and one `M_total`. Reserved bits are
+deliberate no-ops. The sampler computes `M_total` once per box and `K_total`
+once per valid selected candidate; it performs one acceptance draw only when
+both totals are safe and `K_total <= M_total`. Invalid, zero, and underestimated
+terms are skipped before acceptance, collision output, or swap-pop mutation.
+Downstream tracks extend this dispatch rather than the sampling loop.
 
 ## Data / API / Workflow Changes
 
@@ -51,9 +53,11 @@ loop.
   but the executable matrix initially contains Brownian only. E5-F3, E5-F4,
   E5-F5, and E5-F6 expand executable rows only with their required inputs,
   majorant proof, and tests.
-- **Sampling Interface:** One normalized mask, one safe total majorant, one
-  active-pair candidate stream, one acceptance decision per trial, one output
-  pair buffer, and one persistent RNG stream per box.
+- **Sampling Interface:** The private kernel receives `mechanism_mask`
+  immediately before `collision_capacity`; production launches pass the Brownian
+  flag. It has one total majorant, one active-pair candidate stream, one
+  acceptance draw per otherwise-valid trial, one output pair buffer, and one
+  persistent RNG stream per box. The public step signature is unchanged.
 - **Workflow Hooks:** No high-level `Aerosol` or `Runnable` integration. This
   remains the direct low-level import from `particula.gpu.kernels`.
 
