@@ -6,8 +6,9 @@
   canonical identifiers, resolved mechanism masks, executable-capability
   validation, additive pair-rate/majorant dispatch, and one-pass sampling.
 - E5-F2, Charged Pair Physics and Charge-Conserving Merges, must provide the
-  approved scalar charged pair helper, charge preflight, and recipient/donor
-  charge transfer and clearing.
+  `charged_hard_sphere` scalar pair helper, charge preflight, and recipient/
+  donor charge transfer and clearing. Other charged variants remain deferred
+  and cannot be registered by this execution track.
 - Shipped E2/E3 GPU foundations provide `WarpParticleData.charge`, fixed-shape
   fp64 arrays, bounded disjoint pair sampling, caller buffers, and persistent RNG.
 - CPU charged and combined coagulation modules provide independent formula and

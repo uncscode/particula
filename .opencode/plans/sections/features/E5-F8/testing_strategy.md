@@ -12,7 +12,9 @@ test modules use the `*_test.py` suffix.
   before Warp mutation, the no-Warp outcome is explicit, Warp CPU runs whenever
   installed, and unavailable CUDA skips cleanly.
 - **P2 — Separate criteria:** In the same test module, verify final particle
-  mass and gas concentration physics parity, concentration-weighted
+  mass, gas concentration, and total transfer physics parity at
+  `rtol=2e-10, atol=1e-30`, with constant vapor pressure checked exactly. Verify
+  concentration-weighted
   per-box/per-species inventory conservation at `rtol=1e-12, atol=1e-30`, and
   signed energy identity at `rtol=1e-12, atol=1e-18`. Perturb each category in
   isolation so a physics pass cannot satisfy conservation or energy, and vice
@@ -21,8 +23,11 @@ test modules use the `*_test.py` suffix.
 - **P3 — Ownership record:** Add
   `particula/tests/condensation_parity_walkthrough_docs_test.py`. Parse the
   record and assert every required deferred capability has exactly one non-empty
-  owner, entry gate, and explicit non-claim. Validate Epic F-I and approved
-  physics-expansion links/labels.
+  future plan family, entry gate, and explicit non-claim. Thermal feedback and
+  adaptive stepping require a future approved condensation numerical-method
+  plan; phase-aware surface tension and BAT require a future approved
+  condensation-physics plan. Assign no speculative plan IDs and do not broaden
+  Epic F.
 - **P4 — Documentation integration:** Extend documentation checks for all
   canonical inbound/outbound links, exact focused commands, Warp CPU/CUDA
   policy, two-item return wording, and separate evidence labels.

@@ -12,7 +12,10 @@
 - **P4:** run E5-F7's focused parity/stochastic/conservation matrix, both new
   test modules, the example, docs validation, fast tests, and lint. Assert that
   failed prerequisites preserve E5 active/Epic F pending before testing the
-  successful status transition.
+  successful status transition. Gate closeout on authoritative feature and
+  phase status, issue and commit references, resolving artifact paths, focused
+  command results, and required Warp CPU evidence; issue closure alone is never
+  sufficient.
 
 Tests ship in the same phase as changes and use `*_test.py`. Coverage thresholds
 must not be lowered; changed executable code must maintain at least 80% coverage.
@@ -44,6 +47,7 @@ aggregate behavior, never exact CPU/GPU pair replay.
 pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror
 pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -Werror
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
 ```
 

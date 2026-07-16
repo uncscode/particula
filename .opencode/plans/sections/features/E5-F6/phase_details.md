@@ -2,8 +2,9 @@
 
 - [ ] **E5-F6-P1:** Define additive combination matrix and preflight validation with unit tests
   - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Register approved two-way and full four-way canonical masks and reject
-    unsupported or under-specified combinations before any launch or mutation.
+  - Goal: Register four singleton rows, all six two-way rows, and the full
+    four-way canonical mask; reject three-way, unsupported, or under-specified
+    combinations before any launch or mutation.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
   - Tests: canonical order equivalence, duplicate/unknown terms, explicit matrix

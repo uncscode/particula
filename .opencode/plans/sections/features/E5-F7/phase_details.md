@@ -25,10 +25,11 @@
   - Goal: Establish documented aggregate stochastic bounds for each executable
     row and execute the same correctness cases on required Warp CPU and optional
     CUDA.
-  - Files: `particula/gpu/kernels/tests/coagulation_validation_test.py`,
-    `particula/gpu/tests/cuda_availability.py` only if shared device support needs
-    a compatible extension
-  - Tests: Repeated fresh seeded runs, expected collision aggregates, declared
+  - Files: `particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py`,
+    `_coagulation_validation_support.py`, and `particula/gpu/tests/cuda_availability.py`
+    only if shared device support needs a compatible extension
+  - Tests: Repeated fresh seeded runs using the neutral support table shared with
+    `coagulation_validation_test.py`, expected collision aggregates, declared
     sigma/confidence windows, deterministic invariants on every run, Warp CPU
     enforcement, and clean CUDA skips/parity when available.
 

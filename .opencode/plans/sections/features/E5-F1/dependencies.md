@@ -33,3 +33,7 @@ mask. P2 establishes additive dispatch before P3 wires the public entry point
 and state-preserving failure tests. P4 documents only the verified contract.
 E5-F2/F4/F5 should branch from the completed P1/P2 interface rather than
 creating mechanism-specific sampling loops.
+
+The initial charged identifier is `charged_hard_sphere` only. Configuration
+validation must reject or retain as reserved the deferred Dyachkov, Gatti,
+Gopalakrishnan, and Chahl variants before any GPU state or RNG mutation.

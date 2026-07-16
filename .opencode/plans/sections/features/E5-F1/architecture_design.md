@@ -6,7 +6,8 @@
 coagulation_step_gpu(..., mechanisms=None)
   -> resolve None as Brownian + particle_resolved (legacy behavior)
   -> validate structural configuration
-       non-empty, known, unique, canonical, particle_resolved
+       non-empty, known, unique, particle_resolved
+  -> normalize any unique user ordering to canonical mechanism order
   -> validate current executable capability matrix
   -> validate particles/environment/output buffers/persistent RNG
   -> normalize configuration to a compact mechanism bit mask
@@ -43,12 +44,14 @@ loop.
 
 ## Data / API / Workflow Changes
 
-- **Data Model:** Add a frozen `CoagulationMechanismConfig` (name to be
-  finalized in P1) and internal resolved configuration/mask. Do not modify
-  `WarpParticleData` or transfer schemas.
+- **Data Model:** Add a frozen `CoagulationMechanismConfig` and internal
+  resolved configuration/mask. Keep the configuration concrete-module-only at
+  `particula.gpu.kernels.coagulation`; do not modify `WarpParticleData` or
+  transfer schemas.
 - **API Surface:** Add a keyword-only optional mechanism configuration to
-  `coagulation_step_gpu`. Keep it a concrete-module API initially, matching
-  other low-level sidecars; decide re-export only after the name is stable.
+  `coagulation_step_gpu`. Do not add a higher-level export for
+  `CoagulationMechanismConfig`; only `coagulation_step_gpu` remains exported
+  through `particula.gpu.kernels`.
 - **Combination Matrix:** P1 recognizes Brownian plus reserved E5 term names,
   but the executable matrix initially contains Brownian only. E5-F3, E5-F4,
   E5-F5, and E5-F6 expand executable rows only with their required inputs,
