@@ -102,12 +102,14 @@ _COAGULATION_MECHANISM_FLAGS = MappingProxyType(
 
 @dataclass(frozen=True)
 class CoagulationMechanismConfig:
-    """Configure P1 host-side coagulation mechanism validation.
+    """Configure host-side coagulation mechanism selection.
 
-    The default selects Brownian, particle-resolved coagulation. This frozen
-    configuration is concrete-module-only: import it from
+    The default selects Brownian, particle-resolved coagulation. This frozen,
+    concrete-module-only API must be imported from
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
-    ``coagulation_step_gpu`` accepts it as a keyword-only argument.
+    ``coagulation_step_gpu`` accepts the configuration as a keyword-only
+    argument. Only the Brownian ``"particle_resolved"`` combination is
+    executable; the resolver and capability validator reject other requests.
 
     Attributes:
         mechanisms: Requested canonical mechanism identifiers, or ``None`` to
@@ -142,13 +144,14 @@ class _ResolvedCoagulationMechanismConfig:
 def resolve_coagulation_mechanism_config(
     config: CoagulationMechanismConfig,
 ) -> _ResolvedCoagulationMechanismConfig:
-    """Resolve a configuration through concrete-module P1 structural validation.
+    """Resolve a configuration through structural validation.
 
     ``None`` defaults to Brownian. Valid identifiers are normalized to canonical
     order and retained in the returned fixed-bit mask, including reserved terms
-    that the separate P1 capability gate rejects. This pure host-side helper
-    neither allocates device storage nor mutates its input or runtime state; it
-    is not part of the public ``coagulation_step_gpu`` API.
+    that the separate capability validator rejects. This pure host-side,
+    concrete-module-only helper neither allocates device storage nor mutates its
+    input or runtime state. Import it from
+    ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
 
     Args:
         config: Immutable host-side coagulation mechanism configuration.
@@ -212,20 +215,20 @@ def resolve_coagulation_mechanism_config(
 def validate_coagulation_mechanism_capabilities(
     resolved: _ResolvedCoagulationMechanismConfig,
 ) -> None:
-    """Enforce the concrete-module P1 executable-mechanism boundary.
+    """Enforce the executable coagulation-mechanism boundary.
 
-    This pure host-side, concrete-module-only gate accepts Brownian execution
-    only. It rejects structurally valid reserved terms while preserving their
-    resolved flags for their owning implementation tracks. It neither mutates
-    state nor integrates with the public ``coagulation_step_gpu`` API in P1.
+    This pure host-side, concrete-module-only validator accepts only Brownian
+    ``"particle_resolved"`` execution. It rejects structurally valid reserved
+    terms while preserving their resolved flags for their owning implementation
+    tracks. ``coagulation_step_gpu`` calls it during configuration preflight,
+    before accessing or mutating runtime state. Import it from
+    ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
 
     Args:
         resolved: Structurally validated, normalized mechanism configuration.
 
     Raises:
-        ValueError: If ``charged_hard_sphere``, ``sedimentation_sp2016``, or
-            ``turbulent_shear_st1956`` is requested before its owning track
-            E5-F3, E5-F4, or E5-F5, respectively, is available.
+        ValueError: If any reserved mechanism is requested.
     """
     reserved_messages = {
         CHARGED_HARD_SPHERE_MECHANISM: (
@@ -1090,12 +1093,14 @@ def coagulation_step_gpu(  # noqa: C901
     initialize_rng: bool = False,
     environment: Any | None = None,
 ) -> tuple[Any, Any, Any]:
-    """Execute one Brownian coagulation timestep on the GPU.
+    """Execute one particle-resolved Brownian coagulation timestep on the GPU.
 
-    Direct temperature and pressure inputs are validated and normalized before
-    volume setup, RNG initialization, or any Warp kernel launch. Caller-owned
-    RNG buffers are only reset when ``initialize_rng=True`` explicitly opts in
-    to reinitialization.
+    ``mechanism_config`` is preflighted before any runtime input access,
+    allocation, normalization, RNG work, or launch. Omission selects Brownian
+    particle-resolved execution; all other mechanisms and distributions are
+    outside this executable boundary. Direct temperature and pressure inputs are
+    then validated and normalized before volume setup or launches. Caller-owned
+    RNG buffers are reset only when ``initialize_rng=True`` explicitly opts in.
 
     Args:
         particles: GPU-resident particle data.
@@ -1120,11 +1125,13 @@ def coagulation_step_gpu(  # noqa: C901
             buffer and it is reused as-is across repeated calls unless
             ``initialize_rng=True`` explicitly requests a reset from
              ``rng_seed``.
-        mechanism_config: Optional concrete-module configuration. Omission
-            selects Brownian particle-resolved execution. Malformed
-            configurations, unsupported distributions, and reserved mechanisms
-            fail before runtime inputs are accessed. A wrong type raises exactly
-            ``ValueError`` with message
+        mechanism_config: Optional ``CoagulationMechanismConfig`` imported from
+            ``particula.gpu.kernels.coagulation``; it is not re-exported by
+            ``particula.gpu.kernels``. Omission selects Brownian,
+            particle-resolved execution. Malformed configurations, unsupported
+            distributions, and reserved mechanisms fail before runtime inputs
+            are accessed. A wrong type raises exactly ``ValueError`` with the
+            message
             ``"mechanism_config must be a CoagulationMechanismConfig."``;
             other errors are delegated to the resolver and capability gate.
         initialize_rng: Explicit reset flag for caller-provided

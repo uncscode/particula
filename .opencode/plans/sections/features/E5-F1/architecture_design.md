@@ -12,6 +12,11 @@ P2 sampler integration (completed in Issue #1332)
   brownian_coagulation_kernel(..., mechanism_mask)
     -> private additive rate/majorant dispatch
     -> one bounded sampling pass
+
+P3 public-step integration (completed in Issue #1333)
+  coagulation_step_gpu(..., *, mechanism_config=None)
+    -> resolve and capability-validate before runtime access
+    -> launch existing kernel with resolved mask
 ```
 
 The host-side configuration is a frozen dataclass in the concrete coagulation
@@ -21,8 +26,8 @@ launch. `distribution_type` defaults to `"particle_resolved"` and currently
 accepts no other value. An omitted configuration resolves to Brownian and
 therefore does not break existing calls.
 
-Structural support and executable support are intentionally distinct. Issue
-#1331 implemented this distinction as pure host-side helpers, not public-step
+Structural support and executable support are intentionally distinct. Issue #1331
+implemented this distinction as pure host-side helpers, not public-step
 preflight: the schema recognizes canonical terms and produces fixed bits `1`,
 `2`, `4`, and `8`, while the capability validator accepts Brownian only.
 Reserved terms identify E5-F3, E5-F4, or E5-F5 as their owner. Duplicate terms
@@ -46,18 +51,21 @@ Downstream tracks extend this dispatch rather than the sampling loop.
   resolved configuration/mask. Keep the configuration concrete-module-only at
   `particula.gpu.kernels.coagulation`; do not modify `WarpParticleData` or
   transfer schemas.
-- **API Surface:** P1 deliberately leaves `coagulation_step_gpu` unchanged and
-  does not package-export `CoagulationMechanismConfig`. P3 will add the
-  keyword-only public-step configuration after P2 establishes dispatch.
+- **API Surface:** `coagulation_step_gpu` accepts keyword-only
+  `mechanism_config: CoagulationMechanismConfig | None = None`. `None` selects
+  Brownian particle-resolved execution. `CoagulationMechanismConfig` remains
+  concrete-module-only and is not package-exported through
+  `particula.gpu.kernels`.
 - **Combination Matrix:** P1 recognizes Brownian plus reserved E5 term names,
   but the executable matrix initially contains Brownian only. E5-F3, E5-F4,
   E5-F5, and E5-F6 expand executable rows only with their required inputs,
   majorant proof, and tests.
 - **Sampling Interface:** The private kernel receives `mechanism_mask`
-  immediately before `collision_capacity`; production launches pass the Brownian
-  flag. It has one total majorant, one active-pair candidate stream, one
+  immediately before `collision_capacity`; the public step passes the
+  preflight-resolved mask at this existing boundary. It has one total majorant,
+  one active-pair candidate stream, one
   acceptance draw per otherwise-valid trial, one output pair buffer, and one
-  persistent RNG stream per box. The public step signature is unchanged.
+  persistent RNG stream per box.
 - **Workflow Hooks:** No high-level `Aerosol` or `Runnable` integration. This
   remains the direct low-level import from `particula.gpu.kernels`.
 
@@ -66,8 +74,8 @@ Downstream tracks extend this dispatch rather than the sampling loop.
 There is no network or authorization surface. Robustness requirements are the
 security boundary: reject malformed mode names, duplicates, unsupported
 distributions, unavailable terms, and invalid required inputs before mutation
-or RNG advancement; P3 owns that pre-RNG validation. Candidate pair selection
-can advance RNG before its per-candidate rate-to-majorant guard. Unsafe
+or RNG advancement; Issue #1333 implements that pre-RNG validation. Candidate
+pair selection can advance RNG before its per-candidate rate-to-majorant guard. Unsafe
 candidates then receive no acceptance draw and cause no collision write/count
 increment or active-set swap-pop mutation. Do not perform hidden host reads,
 CPU fallback, synchronization, or device transfer. Error messages should name

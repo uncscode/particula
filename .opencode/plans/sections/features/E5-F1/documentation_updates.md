@@ -1,9 +1,9 @@
 # Documentation Updates
 
-- Update the `coagulation_step_gpu` docstring in
+- [x] Updated the `coagulation_step_gpu` docstring in
   `particula/gpu/kernels/coagulation.py` with the keyword-only configuration,
-  Brownian default, additive semantics, validation order, and
-  particle-resolved-only support.
+  Brownian default, resolved-mask dispatch, validation order, exact wrong-type
+  error, and particle-resolved-only support.
 - [x] Added module/class/function docstrings for the P1 configuration, resolver,
   and capability validator. They state the concrete-module-only boundary, the
   Brownian default, canonicalization, and absence of public-step integration.
@@ -27,3 +27,7 @@ GPU runtime behavior did not change.
 
 No user-facing documentation changed in Issue #1332: the refactor is private to
 the Brownian kernel and leaves the public API unchanged.
+
+Issue #1333 updated the low-level public-step docstring plus `readme.md` and
+`AGENTS.md`; broader developer documentation and support-matrix publication
+remain P4/E5-F9 work.

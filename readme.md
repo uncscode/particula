@@ -65,6 +65,14 @@ temperature and pressure arrays. All accepted temperature, pressure, and
 coagulation volume inputs are validated as positive finite physical values
 before launch.
 
+`coagulation_step_gpu` accepts an optional keyword-only `mechanism_config`
+from `particula.gpu.kernels.coagulation`; this configuration API is not
+re-exported from `particula.gpu.kernels`. Omitting it preserves the Brownian,
+particle-resolved path. That is the only executable mechanism/distribution
+combination: malformed configurations, unsupported distributions, and reserved
+mechanisms fail during host-side preflight before runtime state is accessed,
+allocated, mutated, reseeded, or launched.
+
 `condensation_step_gpu` additionally requires a keyword-only
 `ThermodynamicsConfig` through `thermodynamics=`. After all inputs and optional
 buffers validate, each successful call refreshes the caller-owned,

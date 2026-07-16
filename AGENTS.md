@@ -419,6 +419,15 @@ for _ in range(n_steps):
 
 **Key points:**
 
+- `coagulation_step_gpu(..., mechanism_config=...)` accepts a keyword-only
+  `CoagulationMechanismConfig` imported from
+  `particula.gpu.kernels.coagulation`; configuration APIs are deliberately not
+  re-exported through `particula.gpu.kernels`.
+- Omitting `mechanism_config` preserves Brownian, particle-resolved execution.
+  This is the only executable mechanism/distribution combination. Malformed
+  configuration, unsupported distributions, and reserved mechanisms fail during
+  host-side preflight before runtime state access, allocation, mutation, RNG
+  initialization, or kernel launch.
 - Shipped baseline: caller-owned persistent `rng_states` are seeded once and
   then reused across repeated calls.
 - Omitting `rng_states` keeps the convenience allocate-and-seed-per-call path.

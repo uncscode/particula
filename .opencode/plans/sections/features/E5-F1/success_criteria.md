@@ -1,12 +1,12 @@
 # Success Criteria
 
-- [ ] Existing calls that omit mechanism configuration execute the same
+- [x] Existing calls that omit mechanism configuration execute the same
   Brownian particle-resolved path and preserve positional compatibility.
-- [ ] Explicit Brownian configuration is seed-for-seed equivalent to the
+- [x] Explicit Brownian configuration is seed-for-seed equivalent to the
   omitted-configuration path for accepted pairs, particle updates, and RNG.
-- [ ] Configuration rejects empty, duplicate, unknown, unavailable, and
+- [x] Configuration rejects empty, duplicate, unknown, unavailable, and
   non-particle-resolved requests with actionable errors.
-- [ ] All caller-controlled configuration validation completes before
+- [x] All caller-controlled configuration validation completes before
   allocation, Warp launch, particle mutation, output-buffer mutation, or RNG
   advancement.
 - [ ] Pair rates and safe term majorants have one documented extension

@@ -40,6 +40,18 @@ rate and, only when it is positive, finite, and no greater than the one safe
 total majorant, makes one acceptance draw. Zero, non-finite, negative, and
 underestimated inputs are skipped before collision or active-set mutation.
 
+## P3 Outcome Recorded by Issue #1333
+
+`coagulation_step_gpu` now exposes keyword-only
+`mechanism_config: CoagulationMechanismConfig | None = None`. Omission resolves
+to Brownian particle-resolved execution; an explicit Brownian configuration
+uses the same resolved mask (`1`) at the existing launch boundary. Wrong-type,
+malformed, unsupported-distribution, and reserved-mechanism configurations are
+rejected by host-only preflight before runtime input access, normalization,
+allocation, output-buffer clearing, RNG initialization, or kernel launch.
+Warp CPU integration coverage verifies rejected-call identity/value preservation
+and omitted-versus-explicit Brownian equivalence.
+
 ## Out of Scope
 
 - Charged formulas, charge-conserving merge implementation, or charged
@@ -56,7 +68,7 @@ underestimated inputs are skipped before collision or active-set mutation.
 
 ## P1 Boundary Recorded by Issue #1331
 
-P1 does not add a `coagulation_step_gpu` argument, package export, Warp launch,
+P1 did not add a `coagulation_step_gpu` argument, package export, Warp launch,
 device allocation, or runtime dispatch. Recognized reserved identifiers resolve
 structurally and retain their bits, then fail the pure capability gate with
 their owners: `charged_hard_sphere` (E5-F3), `sedimentation_sp2016` (E5-F4),
