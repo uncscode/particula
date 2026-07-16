@@ -2,14 +2,14 @@
   "id": "E4-F1",
   "type": "feature",
   "title": "GPU thermodynamic configuration and on-device vapor-pressure refresh",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-07-13",
+  "completion_date": "2026-07-13",
+  "last_updated": "2026-07-16",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E4-F1/architecture_design.md",
@@ -45,11 +45,11 @@
     {
       "id": "E4-F1-P2",
       "title": "Implement constant and Buck Warp vapor-pressure refresh with parity tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-13",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -96,5 +96,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

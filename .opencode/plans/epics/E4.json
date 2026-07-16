@@ -2,14 +2,14 @@
   "id": "E4",
   "type": "epic",
   "title": "GPU Condensation Physics Parity",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-07-13",
+  "completion_date": "2026-07-15",
+  "last_updated": "2026-07-16",
   "dependencies": [
     "E1",
     "E2",
@@ -64,5 +64,5 @@
   "milestones": [],
   "governance_log": [],
   "risk_register": [],
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

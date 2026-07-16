@@ -197,7 +197,7 @@ def _mass_transfer_rate_latent_heat_wp(
     if latent_heat == wp.float64(0.0):
         return isothermal_rate
     if (
-        latent_heat < wp.float64(0.0)
+        latent_heat < wp.float64(0.0)  # type: ignore[operator]
         or not wp.isfinite(latent_heat)
         or not wp.isfinite(isothermal_rate)
     ):
@@ -246,7 +246,7 @@ def particle_radius_from_volume_wp(total_volume: wp.float64) -> wp.float64:
 
 @wp.func
 def effective_surface_tension_wp(
-    masses: wp.array3d[wp.float64],
+    masses: wp.array3d[wp.float64],  # type: ignore[valid-type]
     densities: wp.array[wp.float64],
     surface_tensions: wp.array[wp.float64],
     box_idx: int,
@@ -302,7 +302,7 @@ def effective_surface_tension_wp(
 
 @wp.func
 def water_activity_ideal_wp(
-    masses: wp.array3d[wp.float64],
+    masses: wp.array3d[wp.float64],  # type: ignore[valid-type]
     molar_masses: wp.array[wp.float64],
     box_idx: int,
     particle_idx: int,
@@ -344,7 +344,7 @@ def water_activity_ideal_wp(
 
 @wp.func
 def water_activity_kappa_wp(
-    masses: wp.array3d[wp.float64],
+    masses: wp.array3d[wp.float64],  # type: ignore[valid-type]
     densities: wp.array[wp.float64],
     kappas: wp.array[wp.float64],
     box_idx: int,

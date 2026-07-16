@@ -23,7 +23,7 @@ documentation conventions.
 | 2 | [Epic B: Non-Isothermal Condensation Public API (CPU)](#epic-b-non-isothermal-condensation-public-api-cpu) | Shipped | E1 |
 | 3 | [Epic C: GPU Kernel Correctness and Low-Level API Hardening](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening) | Shipped | E3 |
 | 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | Shipped | E4 |
-| 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Pending | not scheduled |
+| 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Active | not scheduled |
 | 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Pending | not scheduled |
 | 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Pending | not scheduled |
 | 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Pending | not scheduled |
@@ -988,11 +988,23 @@ coupling, and all higher-level process integration outside this milestone.
 
 ## Epic E: GPU Coagulation Physics Coverage
 
+Status: active. Epic E is the next ordered epic after the shipped E4 plan.
+
 Extend GPU coagulation beyond the Brownian kernel to the collision
 mechanisms already available on CPU. DNS turbulence remains deferred (see
 [Non-Goals](#non-goals)). Every kernel in this epic ships with CPU/GPU
 parity or statistically bounded tests under the Epic C device-aware test
 policy.
+
+Epic E also owns the closeout disposition for Epic D carry-forward work. The
+independent CPU/Warp condensation parity walkthrough is in scope as an evidence
+and documentation feature. The closeout record must retain explicit downstream
+owners for phase-aware surface tension and BAT activity, consumption of the
+validated `thermal_work` sidecar and temperature feedback, adaptive stepping,
+high-level `Aerosol`/`Runnable` integration, graph capture/replay, and broad
+autodiff. Those runtime capabilities remain assigned to later roadmap epics or
+a separately approved physics expansion; recording them here does not claim
+that Epic E's coagulation implementation delivers them.
 
 Planned features:
 
@@ -1011,10 +1023,15 @@ Planned features:
 7. Distribution-support decision record: the current GPU path implicitly
    assumes particle-resolved semantics (per-slot merges, concentration
    zeroing); document which binned/moving-bin strategies remain CPU-only.
+8. Epic D carry-forward closure: publish an independent CPU/Warp condensation
+   parity walkthrough that separates physics, conservation, and energy
+   tolerances, and maintain the downstream ownership record for every deferred
+   condensation capability listed above.
 
 **Exit bar:** Each in-scope CPU coagulation mechanism has a GPU kernel with
 parity or statistically bounded tests, combined-mechanism kernels are
-validated, and unsupported distribution types are documented as CPU-only.
+validated, unsupported distribution types are documented as CPU-only, and the
+Epic D carry-forward walkthrough and ownership record are published.
 
 ## Epic F: GPU Process Completeness
 
