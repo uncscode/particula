@@ -14752,7 +14752,7 @@ otherwise selects static mode.</p>
 <span class="normal">299</span>
 <span class="normal">300</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">effective_surface_tension_wp</span><span class="p">(</span>
-    <span class="n">masses</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array3d</span><span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">masses</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array3d</span><span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>  <span class="c1"># type: ignore[valid-type]</span>
     <span class="n">densities</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">surface_tensions</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">box_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -15266,7 +15266,7 @@ It returns zero when the selected particle has zero total moles.</p>
 <span class="normal">341</span>
 <span class="normal">342</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">water_activity_ideal_wp</span><span class="p">(</span>
-    <span class="n">masses</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array3d</span><span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">masses</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array3d</span><span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>  <span class="c1"># type: ignore[valid-type]</span>
     <span class="n">molar_masses</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">box_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">particle_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -15462,7 +15462,7 @@ https://doi.org/10.5194/acp-7-1961-2007</p>
 <span class="normal">398</span>
 <span class="normal">399</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">water_activity_kappa_wp</span><span class="p">(</span>
-    <span class="n">masses</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array3d</span><span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+    <span class="n">masses</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array3d</span><span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>  <span class="c1"># type: ignore[valid-type]</span>
     <span class="n">densities</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">kappas</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
     <span class="n">box_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
