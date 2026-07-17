@@ -413,11 +413,12 @@ def charged_hard_sphere_wp(  # noqa: C901
 ) -> wp.float64:
     """Calculate an internal charged hard-sphere pair rate in SI units.
 
-    This device-only, unexported helper ports the charged CPU pair calculation
+    This device-only, concrete-module-only helper is the pair-rate primitive for
+    charged-only low-level GPU coagulation. It ports the charged CPU calculation
     from ``particula.dynamics.coagulation.charged_dimensional_kernel`` and the
     hard-sphere fit from
-    ``particula.dynamics.coagulation.charged_dimensionless_kernel``. It is
-    not integrated with charged execution and does not change public exports.
+    ``particula.dynamics.coagulation.charged_dimensionless_kernel``. It does
+    not change public exports.
 
     Non-finite or non-positive radii, masses, thermodynamic state, or physical
     constants return exact safe zero. Charges must be finite but may be signed

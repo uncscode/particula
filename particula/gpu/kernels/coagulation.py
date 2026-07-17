@@ -1,27 +1,29 @@
-"""GPU Brownian coagulation kernels and orchestration utilities.
+"""GPU Brownian and charged hard-sphere coagulation utilities.
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
-Brownian coagulation pipeline. Its fixed-mask sampler accumulates finite,
-positive executable rate terms and a single safe majorant before making one
-acceptance draw for each valid candidate. Entry-point validation accepts
+coagulation pipeline. Its fixed-mask sampler executes either Brownian or
+charged hard-sphere particle-resolved physics, accumulates a finite positive
+rate and a safe majorant, then makes one acceptance draw for each valid
+candidate. Entry-point validation accepts
 scalar direct inputs,
 explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
 Particle metadata and device checks run before normalizing environment inputs,
 setting up volume, initializing RNG state, or executing Brownian work. An
-explicit opt-in finite-charge validation scan is available for callers that
-require host-visible validation. The kernels operate on GPU-resident particle
-data and produce
- collision pairs that are applied in place: recipient particles receive donor
- mass and charge, while donor mass, concentration, and charge are cleared.
+explicit opt-in finite-charge validation scan is available for Brownian
+callers; charged-only execution always validates finite charge before resource
+allocation or mutation. The kernels operate on GPU-resident particle data and
+produce collision pairs that are applied in place: recipient particles receive
+donor mass and charge, while donor mass, concentration, and charge are cleared.
 
 ``CoagulationMechanismConfig`` and its resolver are concrete-module APIs:
 import them from ``particula.gpu.kernels.coagulation``, not
 ``particula.gpu.kernels``. The immutable, keyword-only configuration is
 host-side metadata, not device-resident simulation state. The public step
-defaults to Brownian, particle-resolved execution and rejects reserved or
-otherwise unsupported configurations during preflight, before runtime state is
-accessed or mutated. Supplied particles, collision outputs, and RNG sidecars
-are caller-owned same-device Warp resources.
+defaults to Brownian, particle-resolved execution and also accepts exact
+charged-only particle-resolved execution. It rejects combined and otherwise
+unsupported configurations during preflight, before runtime state is accessed
+or mutated. Supplied particles, collision outputs, and RNG sidecars are
+caller-owned same-device Warp resources.
 """
 
 # pyright: basic
@@ -116,16 +118,16 @@ class CoagulationMechanismConfig:
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
     ``coagulation_step_gpu`` accepts it only through its keyword-only
     ``mechanism_config`` argument. The configuration is host metadata and does
-    not own, transfer, or synchronize Warp resources. Only the Brownian
-    ``"particle_resolved"`` combination is executable; reserved mechanisms and
-    other distribution types are rejected during host-side preflight before any
-    runtime state access or mutation.
+    not own, transfer, or synchronize Warp resources. Brownian and exact
+    charged hard-sphere ``"particle_resolved"`` configurations are executable;
+    combined and deferred mechanisms and other distribution types are rejected
+    during host-side preflight before any runtime state access or mutation.
 
     Attributes:
         mechanisms: Requested canonical mechanism identifiers, or ``None`` to
             select Brownian.
         distribution_type: Required distribution representation; only
-            ``"particle_resolved"`` is structurally supported in P1.
+            ``"particle_resolved"`` is structurally supported.
     """
 
     mechanisms: tuple[str, ...] | None = None
@@ -228,10 +230,9 @@ def validate_coagulation_mechanism_capabilities(
 ) -> None:
     """Enforce the executable coagulation-mechanism boundary.
 
-    This pure host-side, concrete-module-only validator accepts only Brownian
-    ``"particle_resolved"`` execution. It rejects structurally valid reserved
-    terms while preserving their resolved flags for their owning implementation
-    tracks. ``coagulation_step_gpu`` calls it during configuration preflight,
+    This pure host-side, concrete-module-only validator accepts Brownian or
+    charged hard-sphere ``"particle_resolved"`` execution. Combined execution
+    and deferred mechanisms are rejected during configuration preflight,
     before accessing or mutating runtime state. Import it from
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
 
@@ -239,12 +240,21 @@ def validate_coagulation_mechanism_capabilities(
         resolved: Structurally validated, normalized mechanism configuration.
 
     Raises:
-        ValueError: If any reserved mechanism is requested.
+        ValueError: If a combined or deferred mechanism is requested.
     """
+    if resolved.mask in (
+        BROWNIAN_MECHANISM_FLAG,
+        CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+    ):
+        return
+    if resolved.mask == (
+        BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG
+    ):
+        raise ValueError(
+            "Combined Brownian and charged_hard_sphere coagulation is deferred "
+            "to E5-F3-P3."
+        )
     reserved_messages = {
-        CHARGED_HARD_SPHERE_MECHANISM: (
-            "Coagulation mechanism 'charged_hard_sphere' is reserved for E5-F3."
-        ),
         SEDIMENTATION_SP2016_MECHANISM: (
             "Coagulation mechanism 'sedimentation_sp2016' is reserved for "
             "E5-F4."
@@ -297,11 +307,25 @@ def _total_pair_rate(  # noqa: PLR0913
     g_term_j: Any,
     speed_i: Any,
     speed_j: Any,
+    total_mass_i: Any,
+    total_mass_j: Any,
+    charge_i: Any,
+    charge_j: Any,
+    temperature: Any,
+    pressure: Any,
+    boltzmann_constant: Any,
+    elementary_charge_value: Any,
+    electric_permittivity: Any,
+    gas_constant: Any,
+    molecular_weight_air: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
 ) -> Any:
     """Accumulate enabled finite, positive pair-rate terms.
 
-    The fixed mask dispatches Brownian physics without dynamic mechanism
-    iteration. Reserved bits deliberately contribute no executable term.
+    The fixed mask dispatches Brownian or charged hard-sphere physics without
+    dynamic mechanism iteration. Capability validation prevents additive use.
     """
     total_rate = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
@@ -318,7 +342,27 @@ def _total_pair_rate(  # noqa: PLR0913
                 wp.float64(1.0),
             )
         )
-    # Reserved mechanism bits deliberately contribute no executable term.
+    if mechanism_mask & wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG):
+        total_rate += _sanitize_positive_finite(
+            charged_hard_sphere_wp(
+                radius_i,
+                radius_j,
+                total_mass_i,
+                total_mass_j,
+                charge_i,
+                charge_j,
+                temperature,
+                pressure,
+                boltzmann_constant,
+                elementary_charge_value,
+                electric_permittivity,
+                gas_constant,
+                molecular_weight_air,
+                ref_viscosity,
+                ref_temperature,
+                sutherland_constant,
+            )
+        )
     return total_rate
 
 
@@ -439,10 +483,10 @@ def _total_majorant(  # noqa: PLR0913
 ) -> Any:
     """Accumulate enabled finite, positive terms for private staged tests.
 
-    This private dispatcher is a staged majorant/test foundation, not the
-    production scheduling path. Public candidate selection and acceptance
-    remain Brownian-only. Brownian retains its extrema-derived term; the
-    approved charged term uses an exhaustive compact-active scan. Other
+    The production selector uses this dispatcher for charged-only execution,
+    whose charge and mass dependence requires an exhaustive compact-active
+    scan. Brownian production selection uses its own exact active-pair scan.
+    Capability validation prevents additive production execution; other
     reserved bits contribute no term.
     """
     total_majorant = wp.float64(0.0)
@@ -605,11 +649,15 @@ def brownian_coagulation_kernel(  # noqa: C901
     ref_viscosity: Any,
     ref_temperature: Any,
     sutherland_constant: Any,
+    elementary_charge_value: Any,
+    electric_permittivity: Any,
     time_step: Any,
     radii: Any,
     diffusivities: Any,
     g_terms: Any,
     speeds: Any,
+    total_masses: Any,
+    charge: Any,
     active_indices: Any,
     collision_pairs: Any,
     n_collisions: Any,
@@ -640,6 +688,8 @@ def brownian_coagulation_kernel(  # noqa: C901
         ref_viscosity: Reference viscosity at STP [Pa·s].
         ref_temperature: Reference temperature [K].
         sutherland_constant: Sutherland constant [K].
+        elementary_charge_value: Elementary-charge magnitude [C].
+        electric_permittivity: Vacuum electric permittivity [F/m].
         time_step: Coagulation time step [s].
         radii: Output particle radii ``(n_boxes, n_particles)``.
         diffusivities: Output diffusivities ``(n_boxes, n_particles)``.
@@ -653,8 +703,9 @@ def brownian_coagulation_kernel(  # noqa: C901
         rng_states: Per-box RNG states ``(n_boxes,)`` mutated in place during
             pair selection. Reusing this buffer across calls preserves
             caller-owned persistent state unless it is reset before launch.
-        mechanism_mask: Fixed internal mask for additive executable rate terms.
-            Brownian is currently executable; reserved bits contribute nothing.
+        total_masses: Private fp64 per-particle total-mass scratch.
+        charge: Caller-owned signed elementary-charge counts.
+        mechanism_mask: Fixed internal mask for one executable rate term.
         collision_capacity: Maximum accepted collisions per box for this call.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]
@@ -683,6 +734,7 @@ def brownian_coagulation_kernel(  # noqa: C901
 
     active_count = wp.int32(0)
     for particle_idx in range(n_particles):
+        total_masses[box_idx, particle_idx] = wp.float64(0.0)
         if concentration[box_idx, particle_idx] <= wp.float64(0.0):
             active_indices[box_idx, particle_idx] = wp.int32(-1)
             radii[box_idx, particle_idx] = wp.float64(0.0)
@@ -721,6 +773,7 @@ def brownian_coagulation_kernel(  # noqa: C901
 
         active_indices[box_idx, active_count] = wp.int32(particle_idx)
         radii[box_idx, particle_idx] = radius
+        total_masses[box_idx, particle_idx] = total_mass
         diffusivities[box_idx, particle_idx] = diffusivity
         g_terms[box_idx, particle_idx] = g_term
         speeds[box_idx, particle_idx] = speed
@@ -730,29 +783,71 @@ def brownian_coagulation_kernel(  # noqa: C901
         n_collisions[box_idx] = wp.int32(0)
         return
 
-    # Use the exact active-pair maximum as the rejection-sampling majorant.
-    # Radius extrema alone are insufficient because Brownian rates also depend
-    # on mass-derived speed, diffusivity, and composition through the prepared
-    # terms. Scanning every active pair proves this bound covers the supported
-    # particle-resolved Brownian contract.
+    # Charged hard-sphere rates require the exact compact active-pair maximum.
     majorant_total = wp.float64(0.0)
-    for first_rank in range(active_count - wp.int32(1)):
-        first_idx = wp.int32(active_indices[box_idx, first_rank])
-        for second_rank in range(first_rank + wp.int32(1), active_count):
-            second_idx = wp.int32(active_indices[box_idx, second_rank])
-            pair_rate = _total_pair_rate(
-                mechanism_mask,
-                radii[box_idx, first_idx],
-                radii[box_idx, second_idx],
-                diffusivities[box_idx, first_idx],
-                diffusivities[box_idx, second_idx],
-                g_terms[box_idx, first_idx],
-                g_terms[box_idx, second_idx],
-                speeds[box_idx, first_idx],
-                speeds[box_idx, second_idx],
-            )
-            if pair_rate > majorant_total:
-                majorant_total = pair_rate
+    if mechanism_mask & wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG):
+        majorant_total = _total_majorant(
+            mechanism_mask,
+            wp.float64(0.0),
+            wp.float64(0.0),
+            wp.float64(0.0),
+            wp.float64(0.0),
+            wp.float64(0.0),
+            wp.float64(0.0),
+            wp.float64(0.0),
+            wp.float64(0.0),
+            active_indices,
+            box_idx,
+            active_count,
+            radii,
+            total_masses,
+            charge,
+            temperature,
+            pressure,
+            boltzmann_constant,
+            elementary_charge_value,
+            electric_permittivity,
+            gas_constant,
+            molecular_weight_air,
+            ref_viscosity,
+            ref_temperature,
+            sutherland_constant,
+        )
+    # Brownian rates also depend on mass-derived prepared terms, so their
+    # exact active-pair scan remains separate from the charged-only dispatcher.
+    if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
+        majorant_total = wp.float64(0.0)
+        for first_rank in range(active_count - wp.int32(1)):
+            first_idx = wp.int32(active_indices[box_idx, first_rank])
+            for second_rank in range(first_rank + wp.int32(1), active_count):
+                second_idx = wp.int32(active_indices[box_idx, second_rank])
+                pair_rate = _total_pair_rate(
+                    mechanism_mask,
+                    radii[box_idx, first_idx],
+                    radii[box_idx, second_idx],
+                    diffusivities[box_idx, first_idx],
+                    diffusivities[box_idx, second_idx],
+                    g_terms[box_idx, first_idx],
+                    g_terms[box_idx, second_idx],
+                    speeds[box_idx, first_idx],
+                    speeds[box_idx, second_idx],
+                    total_masses[box_idx, first_idx],
+                    total_masses[box_idx, second_idx],
+                    charge[box_idx, first_idx],
+                    charge[box_idx, second_idx],
+                    temperature_value,
+                    pressure_value,
+                    boltzmann_constant,
+                    elementary_charge_value,
+                    electric_permittivity,
+                    gas_constant,
+                    molecular_weight_air,
+                    ref_viscosity,
+                    ref_temperature,
+                    sutherland_constant,
+                )
+                if pair_rate > majorant_total:
+                    majorant_total = pair_rate
 
     if not (wp.isfinite(majorant_total) and majorant_total > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
@@ -828,6 +923,20 @@ def brownian_coagulation_kernel(  # noqa: C901
             g_terms[box_idx, selected_j],
             speeds[box_idx, selected_i],
             speeds[box_idx, selected_j],
+            total_masses[box_idx, selected_i],
+            total_masses[box_idx, selected_j],
+            charge[box_idx, selected_i],
+            charge[box_idx, selected_j],
+            temperature_value,
+            pressure_value,
+            boltzmann_constant,
+            elementary_charge_value,
+            electric_permittivity,
+            gas_constant,
+            molecular_weight_air,
+            ref_viscosity,
+            ref_temperature,
+            sutherland_constant,
         )
         if not (wp.isfinite(total_rate) and total_rate > wp.float64(0.0)):
             continue
@@ -1282,15 +1391,16 @@ def coagulation_step_gpu(  # noqa: C901
     environment: Any | None = None,
     validate_charge_finite: bool = False,
 ) -> tuple[Any, Any, Any]:
-    """Execute one particle-resolved Brownian coagulation timestep on the GPU.
+    """Execute one particle-resolved coagulation timestep on the GPU.
 
     ``mechanism_config`` is immutable, keyword-only host metadata and is
     preflighted before any runtime input access, allocation, normalization, RNG
-    work, or launch. Omission selects the only executable combination:
-    Brownian ``"particle_resolved"``. Reserved mechanisms and all other
-    distribution types reject during preflight without runtime mutation. After
-    particle metadata and device checks, direct temperature and pressure inputs
-    are validated and normalized before volume setup or Brownian launches.
+    work, or launch. Omission selects Brownian ``"particle_resolved"``;
+    exact charged-only ``"particle_resolved"`` execution is also supported.
+    Combined, reserved, and other distribution requests reject during preflight
+    without runtime mutation. After particle metadata and device checks, direct
+    temperature and pressure inputs are validated and normalized before volume
+    setup or selector launches.
     ``particles`` and supplied ``collision_pairs``, ``n_collisions``,
     and ``rng_states`` are caller-owned same-device Warp resources; the step
     mutates them in place as applicable. Caller-owned RNG buffers are reset only
@@ -1335,9 +1445,11 @@ def coagulation_step_gpu(  # noqa: C901
             ``particula.gpu.kernels.coagulation``; it is not re-exported by
             ``particula.gpu.kernels``. This keyword-only configuration does not
             transfer, synchronize, or own Warp state. Omission selects
-            Brownian, particle-resolved execution. Malformed configurations,
-            unsupported distributions, and reserved mechanisms fail before
-            runtime inputs are accessed or mutable runtime state is changed. A
+            Brownian, particle-resolved execution. Exact charged-only
+            particle-resolved execution is also supported. Malformed
+            configurations, unsupported distributions, combined mechanisms,
+            and reserved mechanisms fail before runtime inputs are accessed or
+            mutable runtime state is changed. A
             wrong type raises exactly ``ValueError`` with the message
             ``"mechanism_config must be a CoagulationMechanismConfig."``;
             other errors are delegated to the resolver and capability gate.
@@ -1355,7 +1467,8 @@ def coagulation_step_gpu(  # noqa: C901
         validate_charge_finite: When True, explicitly scan charge on device and
             synchronize for host-visible rejection of NaN or infinity. The
             default False avoids per-step allocation, synchronization, and host
-            readback, supporting persistent-state loops and graph capture.
+            readback for Brownian execution. Charged-only execution always
+            performs this scan before caller output or RNG mutation.
 
     Returns:
         Tuple containing ``particles`` after in-place coagulation, the
@@ -1374,8 +1487,8 @@ def coagulation_step_gpu(  # noqa: C901
             requests an unsupported distribution or reserved mechanism.
         ValueError: If particle charge does not have shape
             ``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle
-            device. With ``validate_charge_finite=True``, also raises for NaN or
-            infinity.
+            device. Charged-only execution, and Brownian with
+            ``validate_charge_finite=True``, also raise for NaN or infinity.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
@@ -1395,12 +1508,12 @@ def coagulation_step_gpu(  # noqa: C901
         downstream work. The normalized environment arrays are forwarded
         directly into the launch path.
 
-        With ``validate_charge_finite=True``, charge validation runs after
+        Charged-only execution always validates finite charge; Brownian does so
+        only with ``validate_charge_finite=True``. The validation runs after
         particle metadata and device validation but before time-step and
         environment normalization. It uses one read-only O(``n_boxes *
         n_particles``) launch and a private one-element status-scalar
-        allocation/readback to reject non-finite charge. This explicit debugging
-        validation does not enable charged-coagulation physics. The default
+        allocation/readback to reject non-finite charge. Brownian's default
         avoids the scan, allocation, synchronization, and host readback.
 
         Supported RNG setup cases are:
@@ -1436,7 +1549,10 @@ def coagulation_step_gpu(  # noqa: C901
 
     device = particles.masses.device
     _validate_device_arrays(particles, device)
-    if validate_charge_finite:
+    if (
+        validate_charge_finite
+        or resolved_mechanism_config.mask == CHARGED_HARD_SPHERE_MECHANISM_FLAG
+    ):
         _validate_charge_finite(
             particles.charge,
             n_boxes,
@@ -1513,6 +1629,9 @@ def coagulation_step_gpu(  # noqa: C901
     )
     g_terms = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     speeds = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
+    total_masses = wp.zeros(
+        (n_boxes, n_particles), dtype=wp.float64, device=device
+    )
     active_indices = wp.zeros(
         (n_boxes, n_particles), dtype=wp.int32, device=device
     )
@@ -1540,11 +1659,15 @@ def coagulation_step_gpu(  # noqa: C901
             wp.float64(constants.REF_VISCOSITY_AIR_STP),
             wp.float64(constants.REF_TEMPERATURE_STP),
             wp.float64(constants.SUTHERLAND_CONSTANT),
+            wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+            wp.float64(constants.ELECTRIC_PERMITTIVITY),
             wp.float64(time_step_value),
             radii,
             diffusivities,
             g_terms,
             speeds,
+            total_masses,
+            particles.charge,
             active_indices,
             collision_pairs,
             n_collisions,

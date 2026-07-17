@@ -217,12 +217,6 @@ def test_mechanism_rejects_invalid_distribution_type(
     ("mechanism", "flag", "message"),
     [
         (
-            CHARGED_HARD_SPHERE_MECHANISM,
-            CHARGED_HARD_SPHERE_MECHANISM_FLAG,
-            "Coagulation mechanism 'charged_hard_sphere' is reserved for "
-            "E5-F3.",
-        ),
-        (
             SEDIMENTATION_SP2016_MECHANISM,
             SEDIMENTATION_SP2016_MECHANISM_FLAG,
             "Coagulation mechanism 'sedimentation_sp2016' is reserved for "
@@ -253,7 +247,7 @@ def test_mechanism_support_rejects_reserved_terms(
 
 
 def test_mechanism_support_accepts_brownian() -> None:
-    """Brownian remains the sole P1 executable mechanism."""
+    """Brownian remains an executable particle-resolved mechanism."""
     resolved = resolve_coagulation_mechanism_config(
         CoagulationMechanismConfig(mechanisms=(BROWNIAN_MECHANISM,))
     )
@@ -261,19 +255,61 @@ def test_mechanism_support_accepts_brownian() -> None:
     validate_coagulation_mechanism_capabilities(resolved)
 
 
+def test_mechanism_support_accepts_charged_only() -> None:
+    """Charged hard-sphere is executable only as its own resolved mask."""
+    resolved = resolve_coagulation_mechanism_config(
+        CoagulationMechanismConfig(mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,))
+    )
+
+    validate_coagulation_mechanism_capabilities(resolved)
+
+
+def test_charged_only_step_runs_and_preserves_output_identity(
+    device: str,
+) -> None:
+    """Charged-only selection uses caller charge and supplied output buffers."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=2)
+    particles.volume[:] = 1.0e-18
+    particles.masses[0, :, 0] = [1.0e-21, 2.0e-21, 3.0e-21]
+    particles.masses[0, :, 1] = [4.0e-21, 5.0e-21, 6.0e-21]
+    particles.charge = np.array([[1.0, -1.0, 0.0]], dtype=np.float64)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.zeros((1, 1, 2), dtype=wp.int32, device=device)
+    counts = wp.zeros((1,), dtype=wp.int32, device=device)
+    states = wp.zeros((1,), dtype=wp.uint32, device=device)
+
+    result_particles, result_pairs, result_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+        max_collisions=1,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        rng_states=states,
+        initialize_rng=True,
+        mechanism_config=CoagulationMechanismConfig(
+            mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+        ),
+    )
+
+    assert result_particles is gpu_particles
+    assert result_pairs is pairs
+    assert result_counts is counts
+    assert 0 <= int(counts.numpy()[0]) <= 1
+
+
 def test_mechanism_support_rejects_combined_brownian_and_reserved_term() -> (
     None
 ):
-    """Mixed structurally valid mechanisms cannot bypass the P1 gate."""
+    """Combined structurally valid mechanisms cannot bypass the capability gate."""
     resolved = resolve_coagulation_mechanism_config(
         CoagulationMechanismConfig(
             mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
         )
     )
 
-    message = (
-        "Coagulation mechanism 'charged_hard_sphere' is reserved for E5-F3."
-    )
+    message = "Combined Brownian and charged_hard_sphere coagulation is deferred to E5-F3-P3."
     with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
         validate_coagulation_mechanism_capabilities(resolved)
 
@@ -556,6 +592,20 @@ def _additive_helper_probe_kernel(
         values[5],
         values[6],
         values[7],
+        total_masses[0, 0],
+        total_masses[0, 1],
+        charges[0, 0],
+        charges[0, 1],
+        temperature[0],
+        pressure[0],
+        wp.float64(constants.BOLTZMANN_CONSTANT),
+        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+        wp.float64(constants.ELECTRIC_PERMITTIVITY),
+        wp.float64(constants.GAS_CONSTANT),
+        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+        wp.float64(constants.REF_VISCOSITY_AIR_STP),
+        wp.float64(constants.REF_TEMPERATURE_STP),
+        wp.float64(constants.SUTHERLAND_CONSTANT),
     )
     majorant[0] = _total_majorant(
         mechanism_mask,
@@ -1206,7 +1256,7 @@ def test_charged_majorant_scans_each_unique_sparse_active_pair(
 
 @pytest.mark.gpu_parity
 def test_charged_majorant_dispatcher_adds_brownian_term(device: str) -> None:
-    """The approved combined mask adds independent Brownian and charged bounds."""
+    """Private dispatcher adds independent terms for its direct unit probe."""
     compact = np.array([[0, 1]], dtype=np.int32)
     radii = np.array([[2.0e-9, 8.0e-9]], dtype=np.float64)
     masses = np.array([[1.0e-23, 3.0e-22]], dtype=np.float64)
@@ -1780,6 +1830,20 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
                 g_terms[box_idx, second_idx],
                 speeds[box_idx, first_idx],
                 speeds[box_idx, second_idx],
+                wp.float64(1.0),
+                wp.float64(1.0),
+                wp.float64(0.0),
+                wp.float64(0.0),
+                temperature_value,
+                pressure_value,
+                boltzmann_constant,
+                wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+                wp.float64(constants.ELECTRIC_PERMITTIVITY),
+                gas_constant,
+                molecular_weight_air,
+                ref_viscosity,
+                ref_temperature,
+                sutherland_constant,
             )
             if pair_rate > majorant_total:
                 majorant_total = pair_rate
@@ -1855,6 +1919,20 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
             g_terms[box_idx, selected_j],
             speeds[box_idx, selected_i],
             speeds[box_idx, selected_j],
+            wp.float64(1.0),
+            wp.float64(1.0),
+            wp.float64(0.0),
+            wp.float64(0.0),
+            temperature_value,
+            pressure_value,
+            boltzmann_constant,
+            wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+            wp.float64(constants.ELECTRIC_PERMITTIVITY),
+            gas_constant,
+            molecular_weight_air,
+            ref_viscosity,
+            ref_temperature,
+            sutherland_constant,
         )
         if not (wp.isfinite(total_rate) and total_rate > wp.float64(0.0)):
             continue
@@ -2163,10 +2241,10 @@ class _ParticlesAccessSentinel:
         ),
         (
             CoagulationMechanismConfig(
-                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+                mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
             ),
-            "Coagulation mechanism 'charged_hard_sphere' is reserved for "
-            "E5-F3.",
+            "Combined Brownian and charged_hard_sphere coagulation is deferred "
+            "to E5-F3-P3.",
         ),
     ],
 )
@@ -2232,12 +2310,6 @@ def test_coagulation_step_gpu_rejects_config_before_runtime_access(
         ),
         (
             CoagulationMechanismConfig(
-                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
-            ),
-            "Coagulation mechanism 'charged_hard_sphere' is reserved for E5-F3.",
-        ),
-        (
-            CoagulationMechanismConfig(
                 mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
             ),
             "Coagulation mechanism 'sedimentation_sp2016' is reserved for E5-F4.",
@@ -2252,7 +2324,8 @@ def test_coagulation_step_gpu_rejects_config_before_runtime_access(
             CoagulationMechanismConfig(
                 mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
             ),
-            "Coagulation mechanism 'charged_hard_sphere' is reserved for E5-F3.",
+            "Combined Brownian and charged_hard_sphere coagulation is deferred "
+            "to E5-F3-P3.",
         ),
     ],
 )
@@ -2372,10 +2445,10 @@ def test_coagulation_config_error_precedes_environment_normalization(
         ),
         (
             CoagulationMechanismConfig(
-                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+                mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
             ),
-            "Coagulation mechanism 'charged_hard_sphere' is reserved for "
-            "E5-F3.",
+            "Combined Brownian and charged_hard_sphere coagulation is deferred "
+            "to E5-F3-P3.",
         ),
     ],
 )
@@ -2445,7 +2518,7 @@ def test_coagulation_step_gpu_explicit_brownian_matches_default_and_dispatches_m
 
     def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
         if getattr(kernel, "key", "") == "brownian_coagulation_kernel":
-            masks.append(kwargs["inputs"][21])
+            masks.append(kwargs["inputs"][25])
         return original_launch(kernel, *args, **kwargs)
 
     monkeypatch.setattr(coagulation_module.wp, "launch", _tracking_launch)
@@ -4826,6 +4899,8 @@ def test_brownian_coagulation_kernel_inactive_particles(
     )
     g_terms = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     speeds = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
+    total_masses = wp.zeros_like(speeds)
+    charge = wp.zeros_like(speeds)
     active_flags = wp.zeros(
         (n_boxes, n_particles), dtype=wp.int32, device=device
     )
@@ -4849,11 +4924,15 @@ def test_brownian_coagulation_kernel_inactive_particles(
             wp.float64(constants.REF_VISCOSITY_AIR_STP),
             wp.float64(constants.REF_TEMPERATURE_STP),
             wp.float64(constants.SUTHERLAND_CONSTANT),
+            wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+            wp.float64(constants.ELECTRIC_PERMITTIVITY),
             wp.float64(1.0),
             radii,
             diffusivities,
             g_terms,
             speeds,
+            total_masses,
+            charge,
             active_flags,
             collision_pairs,
             n_collisions,
@@ -4896,6 +4975,8 @@ def test_brownian_kernel_zero_mask_rejects_work_and_caps_overflow_schedule(
     diffusivities = wp.zeros_like(radii)
     g_terms = wp.zeros_like(radii)
     speeds = wp.zeros_like(radii)
+    total_masses = wp.zeros_like(radii)
+    charge = wp.zeros_like(radii)
     active_indices = wp.zeros(
         (n_boxes, n_particles), dtype=wp.int32, device=device
     )
@@ -4921,11 +5002,15 @@ def test_brownian_kernel_zero_mask_rejects_work_and_caps_overflow_schedule(
                 wp.float64(constants.REF_VISCOSITY_AIR_STP),
                 wp.float64(constants.REF_TEMPERATURE_STP),
                 wp.float64(constants.SUTHERLAND_CONSTANT),
+                wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+                wp.float64(constants.ELECTRIC_PERMITTIVITY),
                 wp.float64(time_step),
                 radii,
                 diffusivities,
                 g_terms,
                 speeds,
+                total_masses,
+                charge,
                 active_indices,
                 collision_pairs,
                 n_collisions,
@@ -5507,7 +5592,7 @@ def test_coagulation_step_gpu_rejects_nonfinite_charge_before_downstream_work(
     device: str,
     nonfinite_charge: float,
 ) -> None:
-    """Non-finite charge performs only the private validation launch."""
+    """Charged-only execution rejects non-finite charge before downstream work."""
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
     particles.charge[0, 1] = nonfinite_charge
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -5561,7 +5646,9 @@ def test_coagulation_step_gpu_rejects_nonfinite_charge_before_downstream_work(
             n_collisions=n_collisions,
             rng_states=rng_states,
             initialize_rng=True,
-            validate_charge_finite=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+            ),
         )
 
     assert kernels == [_validate_charge_finite_kernel]
@@ -5672,7 +5759,7 @@ def test_coagulation_step_gpu_forced_collision_transfers_charge_exactly(
             return launch(
                 _force_pair,
                 dim=(1,),
-                inputs=[inputs[18], inputs[19]],
+                inputs=[inputs[22], inputs[23]],
                 device=kwargs["device"],
             )
         return launch(kernel, *args, **kwargs)
