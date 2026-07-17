@@ -1147,12 +1147,14 @@ def coagulation_step_gpu(  # noqa: C901
     preflighted before any runtime input access, allocation, normalization, RNG
     work, or launch. Omission selects the only executable combination:
     Brownian ``"particle_resolved"``. Reserved mechanisms and all other
-    distribution types reject during preflight without runtime mutation. Direct
-    temperature and pressure inputs are then validated and normalized before
-    volume setup or launches. ``particles`` and supplied ``collision_pairs``,
-    ``n_collisions``, and ``rng_states`` are caller-owned same-device Warp
-    resources; the step mutates them in place as applicable. Caller-owned RNG
-    buffers are reset only when ``initialize_rng=True`` explicitly opts in.
+    distribution types reject during preflight without runtime mutation. After
+    particle metadata and device checks, finite-charge validation runs before
+    time-step and environment normalization. Direct temperature and pressure
+    inputs are then validated and normalized before volume setup or Brownian
+    launches. ``particles`` and supplied ``collision_pairs``, ``n_collisions``,
+    and ``rng_states`` are caller-owned same-device Warp resources; the step
+    mutates them in place as applicable. Caller-owned RNG buffers are reset only
+    when ``initialize_rng=True`` explicitly opts in.
 
     Args:
         particles: Caller-owned, GPU-resident particle data. All required Warp
@@ -1240,18 +1242,21 @@ def coagulation_step_gpu(  # noqa: C901
         input access, allocation, normalization, RNG work, and launches. It
         does not make unrelated later validation failures atomic.
 
-        Validation runs before volume normalization, RNG setup, and kernel
-        launches so invalid ``time_step``, shape, dtype, or device
+        Validation runs before volume normalization, RNG setup, and Brownian or
+        apply launches so invalid ``time_step``, shape, dtype, or device
         combinations fail without mutating particle state or allocating
-        downstream launch work. The normalized environment arrays are
-        forwarded directly into the launch path.
+        downstream work. The normalized environment arrays are forwarded
+        directly into the launch path.
 
         Charge validation runs after particle metadata and device validation,
-        but before time-step validation and all downstream work. It uses one
-        read-only O(``n_boxes * n_particles``) launch and a private status
-        readback to reject non-finite charge. A charge failure cannot proceed
-        to normalization, caller-output validation, allocation, RNG setup, or
-        Brownian/apply execution.
+        but before time-step and environment normalization or all downstream
+        work. It uses one read-only O(``n_boxes * n_particles``) launch and a
+        private one-element status-scalar allocation/readback to reject
+        non-finite charge. This is schema and finiteness validation only; it
+        does not enable charged-coagulation physics. A charge failure cannot
+        proceed to normalization, caller-output validation or allocation, RNG
+        setup, or Brownian/apply execution; the private status scalar is the
+        sole allowed allocation during the finite-charge check.
 
         Supported RNG setup cases are:
 
