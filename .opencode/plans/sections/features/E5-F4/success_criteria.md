@@ -6,10 +6,13 @@
 - [x] The device pair equation is
   `pi * (r_i + r_j)^2 * abs(v_i - v_j)` and exposes no way to request collision
   efficiency other than 1.
-- [ ] Every finite active-pair sedimentation rate is non-negative and no greater
-  than the computed majorant in deterministic exhaustive fixtures.
-- [ ] Sedimentation-only execution uses E5-F1's bounded single candidate/
-  acceptance pass and does not add an independent RNG stream or selector.
+- [x] Every finite active-pair sedimentation rate is non-negative and bounded by
+  the exhaustive compact active-pair majorant in private-dispatch coverage.
+- [x] Exact private sedimentation-only execution uses the existing bounded
+  single candidate/acceptance pass and does not add an RNG stream or selector.
+- [x] Private settling-velocity scratch is cleared each launch; public
+  sedimentation remains rejected and mixed sedimentation masks do no work or
+  advance RNG.
 - [ ] One-box and multi-box/multi-species tests cover differing environments,
   inactive slots, zero/one/two active particles, and equal settling velocity.
 - [ ] Accepted merges preserve total species mass per box, clear donor mass and

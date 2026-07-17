@@ -16,11 +16,11 @@ Warp is absent.
   `rtol=1e-12, atol=0.0`; safe-zero branches use exact equality. An AST check
   verifies that the pair helper has exactly its four physics arguments and no
   collision-efficiency argument.
-- **P2 -- majorant and dispatch:** Enumerate all active unordered fixture pairs
-  on the test side and prove each rate is finite, non-negative, and no greater
-  than the device majorant. Cover zero/one/two active slots, equal velocities,
-  inactive gaps, bounded trial scheduling, sorted/in-range/disjoint accepted
-  pairs, one acceptance draw, and persistent RNG advancement.
+- **P2 -- majorant and private dispatch (complete):** Co-located direct-kernel
+  tests cover the exhaustive compact active-pair majorant, the existing bounded
+  scheduler/RNG path, cleared private settling-velocity scratch, and mixed
+  sedimentation-mask no-op behavior. Public preflight rejection remains a
+  separate preserved boundary.
 - **P3 -- end-to-end execution:** Run sedimentation-only one-box and multi-box/
   multi-species cases with differing temperature and pressure. Check particle
   and species-mass conservation, donor mass/concentration clearing, inactive

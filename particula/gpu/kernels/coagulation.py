@@ -27,10 +27,11 @@ otherwise unsupported configurations during preflight, before runtime state is
 accessed or mutated. Supplied particles, collision outputs, and RNG sidecars
 are caller-owned same-device Warp resources.
 
-The exact private ``SEDIMENTATION_SP2016_MECHANISM_FLAG`` is additionally
-available to direct kernel tests. It shares the bounded sampler and persistent
-RNG path, but is not accepted by public configuration validation; mixed masks
-containing sedimentation remain non-executable.
+The exact private ``SEDIMENTATION_SP2016_MECHANISM_FLAG`` is available only to
+direct kernel launches and tests. It shares the bounded sampler and persistent
+RNG path, but public configuration validation rejects it before allocation or
+mutation. Mixed masks containing sedimentation are non-executable, including
+for direct kernel launches.
 """
 
 # pyright: basic
@@ -338,11 +339,11 @@ def _total_pair_rate(  # noqa: PLR0913
 ) -> Any:
     """Return the enabled finite, positive pair rate.
 
-    The fixed mask dispatches private helper physics without dynamic mechanism
-    iteration. Each enabled term is independently sanitized before their
-    additive combined rate is returned. The sampler only executes the exact
-    sedimentation-only mask; mixed sedimentation masks remain non-executable.
-    Invalid rate terms contribute zero.
+    This helper dispatches fixed flag bits without dynamic mechanism iteration.
+    Each enabled term is independently sanitized before its additive combined
+    rate is returned. This helper's bit dispatch does not grant sampler
+    support: the sampler executes sedimentation only for its exact private
+    sedimentation-only mask. Invalid rate terms contribute zero.
     """
     total_rate = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
@@ -492,6 +493,18 @@ def _sedimentation_majorant_from_active_pairs(
     This private helper exhaustively resolves compact active ranks, so sparse
     source slots cannot affect the exact sedimentation-only sampler majorant.
     Invalid, zero, and nonpositive P1 rates contribute zero.
+
+    Args:
+        active_indices: Compact particle indices ``(n_boxes, n_particles)``.
+        box_idx: Index of the simulation box to scan.
+        active_count: Number of compact active ranks in ``box_idx``.
+        radii: Particle radii ``(n_boxes, n_particles)`` [m].
+        settling_velocities: Private particle settling velocities
+            ``(n_boxes, n_particles)`` [m/s].
+
+    Returns:
+        Finite, nonnegative maximum sedimentation rate for the selected box,
+        or zero when no positive finite selected-pair rate exists.
     """
     majorant = wp.float64(0.0)
     if active_count < wp.int32(2):
@@ -546,10 +559,12 @@ def _total_majorant(  # noqa: PLR0913
 ) -> Any:
     """Accumulate enabled finite, positive terms for private staged tests.
 
-    The production selector uses this dispatcher for exact charged-only and
-    private sedimentation-only execution. Brownian-containing production
-    selection uses one exact active-pair scan through ``_total_pair_rate``.
-    Other reserved bits contribute no term.
+    This helper dispatches fixed flag bits for internal tests and for exact
+    charged-only or private sedimentation-only sampler execution. The sampler
+    separately enforces its executable-mask boundary; a helper contribution
+    does not make a mixed sedimentation mask executable. Brownian-containing
+    production selection uses one exact active-pair scan through
+    ``_total_pair_rate``. Other reserved bits contribute no term.
     """
     total_majorant = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
@@ -792,7 +807,9 @@ def brownian_coagulation_kernel(  # noqa: C901
     box and one finite positive total pair rate per candidate. A valid candidate
     receives exactly one acceptance draw; invalid rates, invalid majorants, and
     rates above the majorant are skipped without collision-buffer or active-set
-    mutation.
+    mutation. Only the exact private sedimentation-only mask joins the public
+    Brownian and charged masks; unsupported masks return before scheduling or
+    accessing the RNG state.
 
     Args:
         masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
@@ -1686,10 +1703,11 @@ def coagulation_step_gpu(  # noqa: C901
     set, RNG stream, and apply pass. Its active-pair work is O(A²), while
     collision and selector buffers are O(A), for active count A; this is bounded
     implementation scope, not a throughput or scaling claim.
-    Reserved mechanisms, other charged variants, and non-particle-resolved
-    distributions reject during preflight without runtime mutation. After
-    particle metadata and device checks, direct temperature and pressure inputs
-    are validated and normalized before volume setup or selector launches.
+    Reserved mechanisms, including sedimentation, other charged variants, and
+    non-particle-resolved distributions reject during preflight without runtime
+    mutation. After particle metadata and device checks, direct temperature and
+    pressure inputs are validated and normalized before volume setup or selector
+    launches.
     ``particles`` and supplied ``collision_pairs``, ``n_collisions``,
     and ``rng_states`` are caller-owned same-device Warp resources; the step
     mutates them in place as applicable. The three-item return tuple contains
@@ -1815,11 +1833,13 @@ def coagulation_step_gpu(  # noqa: C901
         allocation, synchronization, and host readback.
 
         A successful call allocates private, call-local selector scratch,
-        including a ``wp.float64`` ``(n_boxes, n_particles)`` total-mass array.
-        The selector clears every scratch slot and sums each active particle's
-        species masses once for charged pair rates and their compact-active
-        majorant. This scratch is not a caller-owned output, is not returned,
-        and is allocated only after caller-resource preflight succeeds.
+        including ``wp.float64`` ``(n_boxes, n_particles)`` total-mass and
+        settling-velocity arrays. The selector clears every scratch slot and
+        sums each active particle's species masses once for charged pair rates
+        and their compact-active majorant. It populates settling velocities only
+        for valid active slots of the exact private sedimentation-only mask.
+        This scratch is not a caller-owned output, is not returned, and is
+        allocated only after caller-resource preflight succeeds.
 
         Supported RNG setup cases are:
 

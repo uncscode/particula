@@ -11,14 +11,14 @@ not represented in the GPU API.
 
 ## Value Proposition
 
-E5-F4 begins with a reviewable fp64 Warp implementation of mixture density,
-Stokes settling with Cunningham slip correction, and the SP2016 pair kernel.
-P1 is complete: the three internal helpers and independent direct Warp probes
-are implemented without registering an executable sedimentation mechanism.
-Later phases retain ownership of E5-F1 sampler dispatch, state safety, and
-sedimentation-only execution. This gives E5-F6 a validated sedimentation term
-to integrate for additive mechanisms and E5-F7 deterministic and stochastic
-release fixtures.
+E5-F4 now has the P1 helpers and a private P2 execution slice. The direct
+kernel can execute only the exact sedimentation-only mask through the existing
+bounded active-pair scheduler and RNG path. It uses an exhaustive compact
+active-pair majorant and private, cleared settling-velocity scratch. Public
+capability validation continues to reject sedimentation before allocation or
+mutation, and mixed sedimentation masks remain no-ops in private dispatch.
+This preserves a validated term for later additive-mechanism and public-support
+work without expanding the public API.
 
 ## User Stories
 
