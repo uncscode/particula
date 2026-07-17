@@ -29,8 +29,13 @@ if wp is not None:
     from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
         brownian_diffusivity_wp,
         brownian_kernel_pair_wp,
+        coulomb_continuum_limit_wp,
+        coulomb_kinetic_limit_wp,
+        coulomb_potential_ratio_wp,
+        diffusive_knudsen_number_wp,
         g_collection_term_wp,
         particle_mean_free_path_wp,
+        reduced_value_wp,
     )
     from particula.gpu.properties.gas_properties import (  # noqa: E402
         dynamic_viscosity_wp,
@@ -45,6 +50,8 @@ if wp is not None:
     from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
     from particula.util.constants import (  # noqa: E402
         BOLTZMANN_CONSTANT,
+        ELECTRIC_PERMITTIVITY,
+        ELEMENTARY_CHARGE_VALUE,
         GAS_CONSTANT,
         MOLECULAR_WEIGHT_AIR,
         REF_TEMPERATURE_STP,
@@ -271,10 +278,447 @@ def _brownian_chain_kernel(
     )
 
 
+@_warp_kernel
+def _coulomb_potential_ratio_kernel(
+    radii_i: Any,
+    radii_j: Any,
+    charges_i: Any,
+    charges_j: Any,
+    temperatures: Any,
+    boltzmann_constant: Any,
+    elementary_charge_value: Any,
+    electric_permittivity: Any,
+    result: Any,
+) -> None:
+    """Compute the Coulomb potential ratio for each scalar pair."""
+    tid = wp.tid()
+    result[tid] = coulomb_potential_ratio_wp(
+        radii_i[tid],
+        radii_j[tid],
+        charges_i[tid],
+        charges_j[tid],
+        temperatures[tid],
+        boltzmann_constant,
+        elementary_charge_value,
+        electric_permittivity,
+    )
+
+
+@_warp_kernel
+def _reduced_value_kernel(left: Any, right: Any, result: Any) -> None:
+    """Compute reduced scalar values."""
+    tid = wp.tid()
+    result[tid] = reduced_value_wp(left[tid], right[tid])
+
+
+@_warp_kernel
+def _coulomb_kinetic_limit_kernel(potential: Any, result: Any) -> None:
+    """Compute kinetic Coulomb enhancement factors."""
+    tid = wp.tid()
+    result[tid] = coulomb_kinetic_limit_wp(potential[tid])
+
+
+@_warp_kernel
+def _coulomb_continuum_limit_kernel(potential: Any, result: Any) -> None:
+    """Compute continuum Coulomb enhancement factors."""
+    tid = wp.tid()
+    result[tid] = coulomb_continuum_limit_wp(potential[tid])
+
+
+@_warp_kernel
+def _diffusive_knudsen_number_kernel(
+    radii_i: Any,
+    radii_j: Any,
+    masses_i: Any,
+    masses_j: Any,
+    frictions_i: Any,
+    frictions_j: Any,
+    potentials: Any,
+    temperatures: Any,
+    boltzmann_constant: Any,
+    result: Any,
+) -> None:
+    """Compute pair diffusive Knudsen numbers."""
+    tid = wp.tid()
+    result[tid] = diffusive_knudsen_number_wp(
+        radii_i[tid],
+        radii_j[tid],
+        masses_i[tid],
+        masses_j[tid],
+        frictions_i[tid],
+        frictions_j[tid],
+        potentials[tid],
+        temperatures[tid],
+        boltzmann_constant,
+    )
+
+
 @pytest.fixture(params=_available_warp_devices())
 def device(request) -> str:
     """Provide available Warp devices for testing."""
     return request.param
+
+
+def _coulomb_potential_ratio_oracle(
+    radius_i: float,
+    radius_j: float,
+    charge_i: float,
+    charge_j: float,
+    temperature: float,
+) -> float:
+    """Model the scalar GPU Coulomb-potential contract independently."""
+    sum_radius = radius_i + radius_j
+    if sum_radius <= 0.0 or temperature <= 0.0:
+        return 0.0
+    value = -(charge_i * charge_j * ELEMENTARY_CHARGE_VALUE**2) / (
+        4.0
+        * np.pi
+        * ELECTRIC_PERMITTIVITY
+        * sum_radius
+        * BOLTZMANN_CONSTANT
+        * temperature
+    )
+    return max(value, -200.0)
+
+
+def _reduced_value_oracle(left: float, right: float) -> float:
+    """Model the scalar GPU reduced-value contract independently."""
+    if left + right <= 0.0:
+        return 0.0
+    return left * right / (left + right)
+
+
+def _kinetic_limit_oracle(potential: float) -> float:
+    """Model the scalar GPU kinetic-limit equation independently."""
+    return 1.0 + potential if potential >= 0.0 else float(np.exp(potential))
+
+
+def _continuum_limit_oracle(potential: float) -> float:
+    """Model the scalar GPU continuum-limit equation independently."""
+    if potential == 0.0:
+        return 1.0
+    return potential / (1.0 - float(np.exp(-potential)))
+
+
+def _diffusive_knudsen_number_oracle(
+    radius_i: float,
+    radius_j: float,
+    mass_i: float,
+    mass_j: float,
+    friction_i: float,
+    friction_j: float,
+    potential: float,
+    temperature: float,
+) -> float:
+    """Model the scalar GPU diffusive-Knudsen contract independently."""
+    sum_radius = radius_i + radius_j
+    if sum_radius <= 0.0 or temperature <= 0.0:
+        return 0.0
+    reduced_mass = _reduced_value_oracle(mass_i, mass_j)
+    reduced_friction = _reduced_value_oracle(friction_i, friction_j)
+    if reduced_mass <= 0.0 or reduced_friction <= 0.0:
+        return 0.0
+    kinetic_limit = _kinetic_limit_oracle(potential)
+    if kinetic_limit < 1.0e-80:
+        return 0.0
+    continuum_limit = _continuum_limit_oracle(potential)
+    numerator = np.sqrt(BOLTZMANN_CONSTANT * temperature * reduced_mass)
+    denominator = (
+        reduced_friction * sum_radius * continuum_limit / kinetic_limit
+    )
+    return float(numerator / denominator)
+
+
+def _warp_array(values: np.ndarray, device: str) -> Any:
+    """Create a float64 Warp array for a scalar parity probe."""
+    return wp.array(values, dtype=wp.float64, device=device)
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "case_index",
+    [
+        pytest.param(0, id="neutral"),
+        pytest.param(1, id="opposite_sign_attraction"),
+        pytest.param(2, id="same_sign_repulsion"),
+        pytest.param(3, id="repulsion_lower_clipped"),
+        pytest.param(4, id="zero_radius_sum"),
+        pytest.param(5, id="negative_radius_sum"),
+        pytest.param(6, id="negative_temperature"),
+        pytest.param(7, id="zero_temperature"),
+    ],
+)
+def test_coulomb_potential_ratio_wp_matches_independent_oracle(
+    device: str, case_index: int
+) -> None:
+    """Validate neutral, attractive, repulsive, and safe Coulomb branches."""
+    radii_i = np.array(
+        [1e-8, 1e-8, 1e-8, 1e-12, 0.0, -1e-8, 1e-8, 1e-8],
+        dtype=np.float64,
+    )
+    radii_j = np.array(
+        [2e-8, 2e-8, 2e-8, 1e-12, 0.0, 0.0, 2e-8, 2e-8],
+        dtype=np.float64,
+    )
+    charges_i = np.array(
+        [0.0, 1.0, 1.0, 1e5, 1.0, 1.0, 1.0, 1.0], dtype=np.float64
+    )
+    charges_j = np.array(
+        [0.0, -1.0, 1.0, 1e5, 1.0, 1.0, 1.0, 1.0], dtype=np.float64
+    )
+    temperatures = np.array(
+        [298.15, 298.15, 298.15, 298.15, 298.15, 298.15, -1.0, 0.0]
+    )
+    expected = np.array(
+        [
+            _coulomb_potential_ratio_oracle(*values)
+            for values in zip(
+                radii_i,
+                radii_j,
+                charges_i,
+                charges_j,
+                temperatures,
+                strict=True,
+            )
+        ],
+        dtype=np.float64,
+    )
+    result = wp.zeros(len(expected), dtype=wp.float64, device=device)
+    wp.launch(
+        _coulomb_potential_ratio_kernel,
+        dim=len(expected),
+        inputs=[
+            _warp_array(radii_i, device),
+            _warp_array(radii_j, device),
+            _warp_array(charges_i, device),
+            _warp_array(charges_j, device),
+            _warp_array(temperatures, device),
+            wp.float64(BOLTZMANN_CONSTANT),
+            wp.float64(ELEMENTARY_CHARGE_VALUE),
+            wp.float64(ELECTRIC_PERMITTIVITY),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    observed = result.numpy()
+    assert observed.dtype == np.float64
+    npt.assert_allclose(
+        observed[case_index], expected[case_index], rtol=1e-12, atol=0.0
+    )
+    assert observed[0] == 0.0
+    assert observed[1] > 0.0
+    assert observed[2] < 0.0
+    assert observed[3] == -200.0
+    assert observed[4] == 0.0
+    assert observed[5] == 0.0
+    assert observed[6] == 0.0
+    assert observed[7] == 0.0
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "case_index",
+    [
+        pytest.param(0, id="equal_values"),
+        pytest.param(1, id="zero_denominator"),
+        pytest.param(2, id="zero_inputs"),
+        pytest.param(3, id="negative_denominator"),
+    ],
+)
+def test_reduced_value_wp_matches_independent_oracle(
+    device: str, case_index: int
+) -> None:
+    """Validate equal and invalid-denominator reduced values."""
+    left = np.array([2.0, 1.0, 0.0, -1.0], dtype=np.float64)
+    right = np.array([2.0, -1.0, 0.0, -2.0], dtype=np.float64)
+    expected = np.array(
+        [
+            _reduced_value_oracle(*values)
+            for values in zip(left, right, strict=True)
+        ],
+        dtype=np.float64,
+    )
+    result = wp.zeros(len(expected), dtype=wp.float64, device=device)
+    wp.launch(
+        _reduced_value_kernel,
+        dim=len(expected),
+        inputs=[_warp_array(left, device), _warp_array(right, device)],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    observed = result.numpy()
+    assert observed.dtype == np.float64
+    npt.assert_allclose(
+        observed[case_index], expected[case_index], rtol=1e-12, atol=0.0
+    )
+    assert np.all(np.isfinite(observed))
+    assert np.all(observed >= 0.0)
+    npt.assert_array_equal(observed[1:], np.zeros(3, dtype=np.float64))
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "case_index",
+    [
+        pytest.param(0, id="neutral"),
+        pytest.param(1, id="attraction"),
+        pytest.param(2, id="repulsion"),
+        pytest.param(3, id="extreme_repulsion"),
+    ],
+)
+def test_coulomb_limit_helpers_wp_match_independent_oracle(
+    device: str, case_index: int
+) -> None:
+    """Validate neutral, attractive, and repulsive Coulomb enhancements."""
+    potential = np.array([0.0, 2.0, -2.0, -200.0], dtype=np.float64)
+    kinetic_expected = np.array(
+        [_kinetic_limit_oracle(value) for value in potential], dtype=np.float64
+    )
+    continuum_expected = np.array(
+        [_continuum_limit_oracle(value) for value in potential],
+        dtype=np.float64,
+    )
+    kinetic = wp.zeros(len(potential), dtype=wp.float64, device=device)
+    continuum = wp.zeros(len(potential), dtype=wp.float64, device=device)
+    potential_wp = _warp_array(potential, device)
+    wp.launch(
+        _coulomb_kinetic_limit_kernel,
+        dim=len(potential),
+        inputs=[potential_wp],
+        outputs=[kinetic],
+        device=device,
+    )
+    wp.launch(
+        _coulomb_continuum_limit_kernel,
+        dim=len(potential),
+        inputs=[potential_wp],
+        outputs=[continuum],
+        device=device,
+    )
+    wp.synchronize()
+    kinetic_observed = kinetic.numpy()
+    continuum_observed = continuum.numpy()
+    assert kinetic_observed.dtype == np.float64
+    assert continuum_observed.dtype == np.float64
+    npt.assert_allclose(
+        kinetic_observed[case_index],
+        kinetic_expected[case_index],
+        rtol=1e-12,
+        atol=0.0,
+    )
+    npt.assert_allclose(
+        continuum_observed[case_index],
+        continuum_expected[case_index],
+        rtol=1e-12,
+        atol=1e-100,
+    )
+    assert kinetic_observed[0] == 1.0
+    assert continuum_observed[0] == 1.0
+    assert np.all(np.isfinite(kinetic_observed))
+    assert np.all(np.isfinite(continuum_observed))
+    assert np.all(kinetic_observed >= 0.0)
+    assert np.all(continuum_observed >= 0.0)
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "case_index",
+    [
+        pytest.param(0, id="equal_particle_values"),
+        pytest.param(1, id="mixed_radius_mass_friction_scales"),
+        pytest.param(2, id="zero_radius_sum"),
+        pytest.param(3, id="negative_radius_sum"),
+        pytest.param(4, id="negative_temperature"),
+        pytest.param(5, id="negative_reduced_mass"),
+        pytest.param(6, id="zero_reduced_friction"),
+        pytest.param(7, id="kinetic_threshold"),
+        pytest.param(8, id="negative_reduced_friction"),
+        pytest.param(9, id="zero_temperature"),
+    ],
+)
+def test_diffusive_knudsen_number_wp_matches_independent_oracle(
+    device: str, case_index: int
+) -> None:
+    """Validate equal, mixed, safe, and kinetic-threshold pair branches."""
+    radii_i = np.array(
+        [1e-8, 1e-9, 0.0, -1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8]
+    )
+    radii_j = np.array(
+        [1e-8, 1e-6, 0.0, 0.0, 2e-8, 2e-8, 2e-8, 2e-8, 2e-8, 2e-8]
+    )
+    masses_i = np.array(
+        [1e-20, 1e-24, 1e-20, 1e-20, 0.0, -1.0, 1e-20, 1e-20, 1e-20, 1e-20]
+    )
+    masses_j = np.array(
+        [1e-20, 1e-18, 1e-20, 1e-20, 1e-20, -2.0, 1e-20, 1e-20, 1e-20, 1e-20]
+    )
+    frictions_i = np.array(
+        [1e-12, 1e-14, 1e-12, 1e-12, 1e-12, 1e-12, 0.0, 1e-12, -1.0, 1e-12]
+    )
+    frictions_j = np.array(
+        [1e-12, 1e-10, 1e-12, 1e-12, 1e-12, 1e-12, 1e-12, 1e-12, -2.0, 1e-12]
+    )
+    potentials = np.array([0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, -200.0, 0.0, 0.0])
+    temperatures = np.array(
+        [
+            298.15,
+            320.0,
+            298.15,
+            298.15,
+            -1.0,
+            298.15,
+            298.15,
+            298.15,
+            298.15,
+            0.0,
+        ]
+    )
+    values = zip(
+        radii_i,
+        radii_j,
+        masses_i,
+        masses_j,
+        frictions_i,
+        frictions_j,
+        potentials,
+        temperatures,
+        strict=True,
+    )
+    expected = np.array(
+        [_diffusive_knudsen_number_oracle(*value) for value in values],
+        dtype=np.float64,
+    )
+    result = wp.zeros(len(expected), dtype=wp.float64, device=device)
+    wp.launch(
+        _diffusive_knudsen_number_kernel,
+        dim=len(expected),
+        inputs=[
+            _warp_array(radii_i, device),
+            _warp_array(radii_j, device),
+            _warp_array(masses_i, device),
+            _warp_array(masses_j, device),
+            _warp_array(frictions_i, device),
+            _warp_array(frictions_j, device),
+            _warp_array(potentials, device),
+            _warp_array(temperatures, device),
+            wp.float64(BOLTZMANN_CONSTANT),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    observed = result.numpy()
+    assert observed.dtype == np.float64
+    npt.assert_allclose(
+        observed[case_index], expected[case_index], rtol=1e-12, atol=1e-100
+    )
+    assert np.all(np.isfinite(observed))
+    assert np.all(observed >= 0.0)
+    assert observed[0] > 0.0
+    assert observed[1] > 0.0
+    npt.assert_array_equal(observed[2:], np.zeros(8, dtype=np.float64))
 
 
 def test_brownian_diffusivity_wp_matches_numpy(device: str) -> None:
