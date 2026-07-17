@@ -300,10 +300,74 @@ def test_charged_only_step_runs_and_preserves_output_identity(
     assert 0 <= int(counts.numpy()[0]) <= 1
 
 
-def test_charged_only_step_merges_and_conserves_mass_and_charge(
+@pytest.mark.parametrize(
+    "mechanisms",
+    [
+        (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
+        (CHARGED_HARD_SPHERE_MECHANISM, BROWNIAN_MECHANISM),
+    ],
+)
+def test_combined_step_normalizes_order_and_preserves_output_identity(
+    monkeypatch: pytest.MonkeyPatch,
     device: str,
+    mechanisms: tuple[str, str],
 ) -> None:
-    """The public charged path applies a selected merge without inventory drift."""
+    """Combined execution uses one selector/apply path and caller buffers."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=2)
+    particles.volume[:] = 1.0e-18
+    particles.masses[0, :, 0] = [1.0e-21, 2.0e-21, 3.0e-21]
+    particles.masses[0, :, 1] = [4.0e-21, 5.0e-21, 6.0e-21]
+    particles.charge = np.array([[1.0, -1.0, 0.0]], dtype=np.float64)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.zeros((1, 1, 2), dtype=wp.int32, device=device)
+    counts = wp.zeros((1,), dtype=wp.int32, device=device)
+    states = wp.zeros((1,), dtype=wp.uint32, device=device)
+    launches: list[str] = []
+    original_launch = coagulation_module.wp.launch
+
+    def _track_combined_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        key = getattr(kernel, "key", "")
+        if key in {"brownian_coagulation_kernel", "apply_coagulation_kernel"}:
+            launches.append(key)
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(coagulation_module.wp, "launch", _track_combined_launch)
+
+    result_particles, result_pairs, result_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+        max_collisions=1,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        rng_states=states,
+        initialize_rng=True,
+        mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
+    )
+
+    assert result_particles is gpu_particles
+    assert result_pairs is pairs
+    assert result_counts is counts
+    assert 0 <= int(counts.numpy()[0]) <= 1
+    assert launches == [
+        "brownian_coagulation_kernel",
+        "apply_coagulation_kernel",
+    ]
+
+
+@pytest.mark.parametrize(
+    "mechanisms",
+    [
+        (CHARGED_HARD_SPHERE_MECHANISM,),
+        (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
+    ],
+)
+def test_charged_modes_merge_and_conserve_mass_and_charge(
+    device: str,
+    mechanisms: tuple[str, ...],
+) -> None:
+    """Charged-containing paths apply a merge without inventory drift."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
     particles.volume[:] = 1.0e-18
     particles.masses[0] = [[1.0e-21, 2.0e-21], [3.0e-21, 4.0e-21]]
@@ -323,9 +387,7 @@ def test_charged_only_step_merges_and_conserves_mass_and_charge(
         rng_seed=41,
         collision_pairs=pairs,
         n_collisions=counts,
-        mechanism_config=CoagulationMechanismConfig(
-            mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
-        ),
+        mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
     )
     result = from_warp_particle_data(result_particles, sync=True)
 
@@ -554,12 +616,20 @@ def test_charged_only_fresh_seed_counts_match_pair_rate_oracle(
         ("concentration", -1.0),
     ],
 )
-def test_charged_only_rejects_invalid_particle_physics_before_mutation(
+@pytest.mark.parametrize(
+    "mechanisms",
+    [
+        (CHARGED_HARD_SPHERE_MECHANISM,),
+        (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
+    ],
+)
+def test_charged_modes_reject_invalid_particle_physics_before_mutation(
     device: str,
     field: str,
     invalid_value: float,
+    mechanisms: tuple[str, ...],
 ) -> None:
-    """Charged validation rejects hostile particle inputs before side effects."""
+    """Charged-containing modes reject hostile inputs before side effects."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
     if field == "density":
         particles.density[0] = invalid_value
@@ -582,9 +652,7 @@ def test_charged_only_rejects_invalid_particle_physics_before_mutation(
             n_collisions=counts,
             rng_states=states,
             initialize_rng=True,
-            mechanism_config=CoagulationMechanismConfig(
-                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
-            ),
+            mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
         )
 
     _assert_particles_unchanged(gpu_particles, initial_particles)
@@ -593,10 +661,18 @@ def test_charged_only_rejects_invalid_particle_physics_before_mutation(
     npt.assert_array_equal(states.numpy(), np.array([17], dtype=np.uint32))
 
 
-def test_charged_only_rejects_over_limit_active_particles_before_mutation(
+@pytest.mark.parametrize(
+    "mechanisms",
+    [
+        (CHARGED_HARD_SPHERE_MECHANISM,),
+        (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
+    ],
+)
+def test_charged_modes_reject_over_limit_active_particles_before_mutation(
     device: str,
+    mechanisms: tuple[str, ...],
 ) -> None:
-    """Charged exact-majorant work is bounded before output or RNG mutation."""
+    """Charged modes bound exact-majorant work before output or RNG mutation."""
     particles = _make_particle_data(
         n_boxes=1,
         n_particles=MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX + 1,
@@ -621,9 +697,7 @@ def test_charged_only_rejects_over_limit_active_particles_before_mutation(
             n_collisions=counts,
             rng_states=states,
             initialize_rng=True,
-            mechanism_config=CoagulationMechanismConfig(
-                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
-            ),
+            mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
         )
 
     _assert_particles_unchanged(gpu_particles, initial_particles)
@@ -632,19 +706,15 @@ def test_charged_only_rejects_over_limit_active_particles_before_mutation(
     npt.assert_array_equal(states.numpy(), np.array([17], dtype=np.uint32))
 
 
-def test_mechanism_support_rejects_combined_brownian_and_reserved_term() -> (
-    None
-):
-    """Combined structurally valid mechanisms cannot bypass the capability gate."""
+def test_mechanism_support_accepts_combined_brownian_and_charged() -> None:
+    """Canonical Brownian-plus-charged configuration is executable."""
     resolved = resolve_coagulation_mechanism_config(
         CoagulationMechanismConfig(
             mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
         )
     )
 
-    message = "Combined Brownian and charged_hard_sphere coagulation is deferred to E5-F3-P3."
-    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
-        validate_coagulation_mechanism_capabilities(resolved)
+    validate_coagulation_mechanism_capabilities(resolved)
 
 
 def _warp_kernel(function):
@@ -1155,7 +1225,7 @@ def test_additive_helpers_ignore_reserved_bits(
     device: str,
     mechanism_mask: int,
 ) -> None:
-    """Only the Brownian bit contributes to pair-rate and majorant totals."""
+    """Enabled Brownian and charged terms sum while reserved bits contribute zero."""
     values = np.array(
         [1.0e-8, 5.0e-8, 1.0e-9, 2.0e-10, 2.0e-8, 4.0e-8, 0.2, 0.1, 3.0],
         dtype=np.float64,
@@ -1168,8 +1238,16 @@ def test_additive_helpers_ignore_reserved_bits(
         np.array([[-1]], dtype=np.int32), dtype=wp.int32, device=device
     )
     radii = wp.zeros((1, 1), dtype=wp.float64, device=device)
-    total_masses = wp.zeros((1, 1), dtype=wp.float64, device=device)
-    charges = wp.zeros((1, 1), dtype=wp.float64, device=device)
+    total_masses = wp.array(
+        np.array([[1.0e-23, 3.0e-22]], dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
+    charges = wp.array(
+        np.array([[1.0, -2.0]], dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
     temperature = wp.array(
         np.array([298.15], dtype=np.float64), dtype=wp.float64, device=device
     )
@@ -1199,12 +1277,13 @@ def test_additive_helpers_ignore_reserved_bits(
 
     pair_value = float(np.asarray(pair_rate.numpy()).item())
     majorant_value = float(np.asarray(majorant.numpy()).item())
+    expected_brownian = 0.0
     if mechanism_mask & BROWNIAN_MECHANISM_FLAG:
         sum_radius = values[0] + values[1]
         sum_diffusivity = values[2] + values[3]
         g_sqrt = np.sqrt(values[4] ** 2 + values[5] ** 2)
         speed_sqrt = np.sqrt(values[6] ** 2 + values[7] ** 2)
-        expected = (
+        expected_brownian = (
             4.0
             * np.pi
             * sum_diffusivity
@@ -1214,17 +1293,33 @@ def test_additive_helpers_ignore_reserved_bits(
                 + 4.0 * sum_diffusivity / (sum_radius * speed_sqrt)
             )
         )
-        npt.assert_allclose(pair_value, expected, rtol=1.0e-12, atol=0.0)
+    expected_charged = 0.0
+    if mechanism_mask & CHARGED_HARD_SPHERE_MECHANISM_FLAG:
+        expected_charged = _charged_hard_sphere_oracle(
+            values[0],
+            values[1],
+            1.0e-23,
+            3.0e-22,
+            1.0,
+            -2.0,
+            298.15,
+            101325.0,
+        )
+    expected = expected_brownian + expected_charged
+    npt.assert_allclose(pair_value, expected, rtol=1.0e-11, atol=0.0)
+    if mechanism_mask & BROWNIAN_MECHANISM_FLAG:
         npt.assert_allclose(
             majorant_value,
-            expected,
+            expected_brownian,
             rtol=1.0e-12,
             atol=0.0,
         )
-        assert pair_value > 0.0
     else:
-        assert pair_value == 0.0
         assert majorant_value == 0.0
+    if mechanism_mask & (
+        BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG
+    ):
+        assert pair_value > 0.0
     assert float(np.asarray(sanitized.numpy()).item()) == 3.0
 
 
@@ -2580,13 +2675,6 @@ class _ParticlesAccessSentinel:
             CoagulationMechanismConfig(distribution_type="discrete"),
             "distribution_type must be exactly 'particle_resolved'.",
         ),
-        (
-            CoagulationMechanismConfig(
-                mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
-            ),
-            "Combined Brownian and charged_hard_sphere coagulation is deferred "
-            "to E5-F3-P3.",
-        ),
     ],
 )
 def test_coagulation_step_gpu_rejects_config_before_runtime_access(
@@ -2660,13 +2748,6 @@ def test_coagulation_step_gpu_rejects_config_before_runtime_access(
                 mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
             ),
             "Coagulation mechanism 'turbulent_shear_st1956' is reserved for E5-F5.",
-        ),
-        (
-            CoagulationMechanismConfig(
-                mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
-            ),
-            "Combined Brownian and charged_hard_sphere coagulation is deferred "
-            "to E5-F3-P3.",
         ),
     ],
 )
@@ -2783,13 +2864,6 @@ def test_coagulation_config_error_precedes_environment_normalization(
         (
             CoagulationMechanismConfig(distribution_type="discrete"),
             "distribution_type must be exactly 'particle_resolved'.",
-        ),
-        (
-            CoagulationMechanismConfig(
-                mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
-            ),
-            "Combined Brownian and charged_hard_sphere coagulation is deferred "
-            "to E5-F3-P3.",
         ),
     ],
 )
@@ -5928,12 +6002,20 @@ def test_coagulation_step_gpu_rejects_charge_device_before_downstream_work(
 
 
 @pytest.mark.parametrize("nonfinite_charge", [np.nan, np.inf, -np.inf])
-def test_coagulation_step_gpu_rejects_nonfinite_charge_before_downstream_work(
+@pytest.mark.parametrize(
+    "mechanisms",
+    [
+        (CHARGED_HARD_SPHERE_MECHANISM,),
+        (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
+    ],
+)
+def test_charged_modes_reject_nonfinite_charge_before_downstream_work(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
     nonfinite_charge: float,
+    mechanisms: tuple[str, ...],
 ) -> None:
-    """Charged-only execution rejects non-finite charge before downstream work."""
+    """Charged-containing modes reject non-finite charge before downstream work."""
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
     particles.charge[0, 1] = nonfinite_charge
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -5987,9 +6069,7 @@ def test_coagulation_step_gpu_rejects_nonfinite_charge_before_downstream_work(
             n_collisions=n_collisions,
             rng_states=rng_states,
             initialize_rng=True,
-            mechanism_config=CoagulationMechanismConfig(
-                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
-            ),
+            mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
         )
 
     assert kernels == [_validate_charge_finite_kernel]
