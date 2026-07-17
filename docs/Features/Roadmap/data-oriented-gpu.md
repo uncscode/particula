@@ -1053,9 +1053,9 @@ clear the donor.
 Combined execution independently sanitizes and sums Brownian and charged pair
 rates, then uses one active set, exhaustive additive majorant,
 candidate/acceptance pass, collision-buffer set, per-box RNG stream, and apply
-pass. For active count A, pair work is O(A²), while collision and selector
-buffers are O(A); this is bounded implementation scope, not a performance
-claim. The return tuple is exactly
+pass. For active count A, pair work is O(A²), preparation is O(N), and
+selector/collision storage is O(N), where N is total particle capacity. This is
+bounded implementation scope, not a performance claim. The return tuple is exactly
 `(particles, collision_pairs, n_collisions)`: supplied collision buffers return
 by identity, while supplied `rng_states` mutates in place and is not returned.
 Warp CPU is the baseline when installed; CUDA is optional additive evidence and

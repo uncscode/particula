@@ -1000,6 +1000,23 @@ def brownian_coagulation_kernel(  # noqa: C901
             continue
         # Every valid candidate gets exactly one acceptance draw.
         if wp.randf(state) < total_rate / majorant_total:
+            merged_charge = (
+                charge[box_idx, selected_i] + charge[box_idx, selected_j]
+            )
+            merge_is_representable = wp.isfinite(merged_charge)
+            for species_idx in range(n_species):
+                merged_mass = (
+                    masses[box_idx, selected_i, species_idx]
+                    + masses[box_idx, selected_j, species_idx]
+                )
+                if not (
+                    wp.isfinite(merged_mass) and merged_mass >= wp.float64(0.0)
+                ):
+                    merge_is_representable = False
+            if not merge_is_representable:
+                # Preserve both particles for later representable proposals.
+                # The apply kernel retains this check as defense in depth.
+                continue
             collision_pairs[box_idx, collision_count, 0] = selected_i
             collision_pairs[box_idx, collision_count, 1] = selected_j
             collision_count += wp.int32(1)
@@ -1093,13 +1110,14 @@ def _compact_applied_collision_pairs_kernel(
     original_count = n_collisions[box_idx]
     applied_count = wp.int32(0)
     for collision_idx in range(collision_pairs.shape[1]):
-        if collision_idx < original_count:
-            idx_i = collision_pairs[box_idx, collision_idx, 0]
-            idx_j = collision_pairs[box_idx, collision_idx, 1]
-            if idx_i >= wp.int32(0) and idx_j >= wp.int32(0):
-                collision_pairs[box_idx, applied_count, 0] = idx_i
-                collision_pairs[box_idx, applied_count, 1] = idx_j
-                applied_count += wp.int32(1)
+        if collision_idx >= original_count:
+            break
+        idx_i = collision_pairs[box_idx, collision_idx, 0]
+        idx_j = collision_pairs[box_idx, collision_idx, 1]
+        if idx_i >= wp.int32(0) and idx_j >= wp.int32(0):
+            collision_pairs[box_idx, applied_count, 0] = idx_i
+            collision_pairs[box_idx, applied_count, 1] = idx_j
+            applied_count += wp.int32(1)
     n_collisions[box_idx] = applied_count
 
 
@@ -1514,10 +1532,11 @@ def _ensure_volume_array(
         )
         return volume_array
 
-    if hasattr(volume, "shape"):
-        raise ValueError("volume must be a Warp array with shape (n_boxes,)")
-
     if isinstance(volume, bool) or not isinstance(volume, (float, np.floating)):
+        if hasattr(volume, "shape"):
+            raise ValueError(
+                "volume must be a Warp array with shape (n_boxes,)"
+            )
         raise ValueError("volume must be a floating scalar or Warp array")
 
     volume_scalar = float(volume)
