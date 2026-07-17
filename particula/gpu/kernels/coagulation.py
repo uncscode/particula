@@ -6,10 +6,11 @@ positive executable rate terms and a single safe majorant before making one
 acceptance draw for each valid candidate. Entry-point validation accepts
 scalar direct inputs,
 explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
-Those sources are normalized into per-box Warp arrays before volume setup,
-RNG initialization, or any Warp launch. The kernels operate on GPU-resident
-particle data and produce collision pairs that are applied to merge particle
-masses in-place.
+After particle metadata and device checks, the public entry point performs one
+read-only device scan of particle charge for finite values before normalizing
+environment inputs, setting up volume, initializing RNG state, or executing
+Brownian work. The kernels operate on GPU-resident particle data and produce
+collision pairs that are applied to merge particle masses in-place.
 
 ``CoagulationMechanismConfig`` and its resolver are concrete-module APIs:
 import them from ``particula.gpu.kernels.coagulation``, not
@@ -447,7 +448,14 @@ def _initialize_rng_states(seed: Any, rng_states: Any) -> None:
 @wp.kernel
 # type: ignore[misc]
 def _validate_charge_finite_kernel(charge: Any, invalid: Any) -> None:
-    """Record whether any particle charge value is non-finite."""  # type: ignore
+    """Record non-finite charge in a private status buffer without mutation.
+
+    Args:
+        charge: Caller-owned particle charge array ``(n_boxes, n_particles)``
+            read without modification.
+        invalid: Private one-element ``wp.int32`` status buffer set to one
+            when any charge value is non-finite.
+    """  # type: ignore
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     if not wp.isfinite(charge[box_idx, particle_idx]):
         wp.atomic_max(invalid, 0, 1)
@@ -756,7 +764,7 @@ def _validate_particle_arrays(
     n_particles: int,
     n_species: int,
 ) -> None:
-    """Validate particle array shapes and lengths.
+    """Validate particle array shapes, including the charge schema.
 
     Args:
         particles: GPU particle data container.
@@ -765,7 +773,8 @@ def _validate_particle_arrays(
         n_species: Expected number of species.
 
     Raises:
-        ValueError: If particle arrays do not match expected shapes.
+        ValueError: If particle arrays do not match expected shapes, or charge
+            is not ``wp.float64``.
     """
     if particles.masses.shape != (n_boxes, n_particles, n_species):
         raise ValueError("particle masses shape does not match expected")
@@ -802,7 +811,7 @@ def _validate_device_match(name: str, array: Any, expected_device: Any) -> None:
 
 
 def _validate_device_arrays(particles: Any, device: Any) -> None:
-    """Validate particle arrays share the same Warp device.
+    """Validate particle arrays, including charge, share one Warp device.
 
     Args:
         particles: GPU particle data container.
@@ -826,7 +835,23 @@ def _validate_charge_finite(
     n_particles: int,
     device: Any,
 ) -> None:
-    """Validate that every caller-owned particle charge is finite."""
+    """Reject non-finite caller-owned charge through a read-only device scan.
+
+    This helper runs only after the public entry point validates the charge
+    shape, dtype, and device. It allocates a private status scalar, launches
+    one ``O(n_boxes * n_particles)`` read-only scan, and reads back only that
+    scalar. It neither copies nor mutates the caller-owned charge array.
+
+    Args:
+        charge: Caller-owned ``wp.float64`` charge array with shape
+            ``(n_boxes, n_particles)``.
+        n_boxes: Number of simulation boxes.
+        n_particles: Number of particles per box.
+        device: Warp device that owns ``charge`` and the private status buffer.
+
+    Raises:
+        ValueError: If any charge value is NaN or infinite.
+    """
     invalid = wp.zeros((1,), dtype=wp.int32, device=device)
     wp.launch(
         _validate_charge_finite_kernel,
@@ -1131,10 +1156,10 @@ def coagulation_step_gpu(  # noqa: C901
 
     Args:
         particles: Caller-owned, GPU-resident particle data. All required Warp
-            arrays must be on the same device. ``charge`` must be finite
-            ``wp.float64`` with shape ``(n_boxes, n_particles)``. Particle
-            mass and concentration state is mutated in place by accepted
-            collisions.
+            arrays, including ``charge``, must be on the same device. ``charge``
+            must be finite ``wp.float64`` with shape ``(n_boxes, n_particles)``.
+            Particle mass and concentration state is mutated in place by
+            accepted collisions.
         temperature: Direct gas temperature as either a scalar or a Warp array
             with shape ``(n_boxes,)``. Use ``None`` only with
             ``environment=...``.
@@ -1200,8 +1225,9 @@ def coagulation_step_gpu(  # noqa: C901
             caller device.
         ValueError: If mechanism_config has the wrong type, is malformed, or
             requests an unsupported distribution or reserved mechanism.
-        ValueError: If particle charge has an invalid shape, dtype, device, or
-            non-finite value.
+        ValueError: If particle charge does not have shape
+            ``(n_boxes, n_particles)``, dtype ``wp.float64``, the particle
+            device, or only finite values.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
