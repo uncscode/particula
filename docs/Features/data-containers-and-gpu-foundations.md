@@ -216,14 +216,20 @@ state.
 For direct GPU coagulation, `WarpParticleData.charge` is caller-owned,
 device-resident particle state, not a sidecar or hidden transfer result. It
 must be a same-device `wp.float64` array matching shape
-`(n_boxes, n_particles)`, and every value must be finite. Before
-downstream runtime work or mutation, coagulation performs a read-only
-device-side finite-value scan. A failing scan rejects the call without copying
-or mutating the caller-owned charge array.
+`(n_boxes, n_particles)`. Shape, dtype, and device are validated without a
+device-to-host readback. Callers that require host-visible rejection of NaN or
+infinite values must pass `validate_charge_finite=True`; that explicit debug
+validation allocates a private status scalar, runs a read-only device scan, and
+synchronizes before reading the result. The default step path performs no such
+scan, synchronization, or host readback, so persistent-state loops and graph
+capture remain caller-controlled.
 
 When a collision is accepted, the recipient receives the donor charge and the
 donor charge is cleared together with donor mass and concentration. Supported
 evidence conserves charge independently in each box. This merge bookkeeping
+skips a collision whose finite charge sum cannot be represented as finite
+`float64`, leaving both particles unchanged rather than producing infinity.
+This merge bookkeeping
 does not make charged selection, charged majorants, Brownian-plus-charged
 execution, or public charged stochastic execution available.
 
