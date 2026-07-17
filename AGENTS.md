@@ -428,6 +428,12 @@ for _ in range(n_steps):
   configuration, unsupported distributions, and reserved mechanisms fail during
   host-side preflight before runtime state access, allocation, mutation, RNG
   initialization, or kernel launch.
+- Before Brownian execution, `particles.charge` must be a finite `wp.float64`
+  Warp array with shape `(n_boxes, n_particles)` on the particle-data device.
+  Non-finite charge is detected by one read-only device scan and private-status
+  readback; failure occurs before environment or volume normalization,
+  caller-output validation or allocation, RNG setup, and Brownian/apply work.
+  This validation does not enable charged coagulation physics.
 - Shipped baseline: caller-owned persistent `rng_states` are seeded once and
   then reused across repeated calls.
 - Omitting `rng_states` keeps the convenience allocate-and-seed-per-call path.
