@@ -1507,13 +1507,15 @@ def coagulation_step_gpu(  # noqa: C901
     environment: Any | None = None,
     validate_charge_finite: bool = False,
 ) -> tuple[Any, Any, Any]:
-    """Execute one particle-resolved coagulation timestep on the GPU.
+    """Execute one direct, particle-resolved Warp coagulation timestep.
 
-    ``mechanism_config`` is immutable, keyword-only host metadata and is
-    preflighted before any runtime input access, allocation, normalization, RNG
-    work, or launch. Omission selects Brownian ``"particle_resolved"``;
-    charged-only and Brownian-plus-charged ``"particle_resolved"`` execution
-    are also supported. The combined mode accepts
+    This low-level API is not a CPU strategy-composition or ``Runnable`` API.
+    It supports only ``"particle_resolved"`` execution: omission selects
+    Brownian, and the only executable charged model is
+    ``"charged_hard_sphere"``. ``mechanism_config`` is immutable, keyword-only
+    host metadata and is preflighted before any runtime input access,
+    allocation, normalization, RNG work, or launch. The supported charged-only
+    configuration is ``("charged_hard_sphere",)``; the combined mode accepts
     ``("brownian", "charged_hard_sphere")`` in either requested order and
     normalizes it to one fixed mask, one shared selector, and one additive
     majorant. Independently sanitized Brownian and charged pair-rate terms are
@@ -1521,10 +1523,10 @@ def coagulation_step_gpu(  # noqa: C901
     set, RNG stream, and apply pass. Its active-pair work and storage are O(A²)
     for active count A; this is bounded implementation scope, not a throughput
     or scaling claim.
-    Reserved, unsupported-combination, and other distribution requests reject
-    during preflight without runtime mutation. After particle metadata and
-    device checks, direct temperature and pressure inputs are validated and
-    normalized before volume setup or selector launches.
+    Reserved mechanisms, other charged variants, and non-particle-resolved
+    distributions reject during preflight without runtime mutation. After
+    particle metadata and device checks, direct temperature and pressure inputs
+    are validated and normalized before volume setup or selector launches.
     ``particles`` and supplied ``collision_pairs``, ``n_collisions``,
     and ``rng_states`` are caller-owned same-device Warp resources; the step
     mutates them in place as applicable. The three-item return tuple contains
@@ -1533,7 +1535,7 @@ def coagulation_step_gpu(  # noqa: C901
     when ``initialize_rng=True`` explicitly opts in.
 
     Args:
-        particles: Caller-owned, GPU-resident particle data. All required Warp
+        particles: Caller-owned, Warp-resident particle data. All required Warp
             arrays, including ``charge``, must be on the same device. ``charge``
             must be ``wp.float64`` with shape ``(n_boxes, n_particles)``.
             Charged-containing calls scan it for finite values before output

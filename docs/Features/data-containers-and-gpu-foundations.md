@@ -537,7 +537,7 @@ than storage support.
 | CPU↔GPU transfer | Explicit helper calls only | No hidden container movement or hidden environment synchronization. |
 | Warp/CUDA support | Optional | Warp `device="cpu"` is the baseline when Warp is installed; CUDA is additive local evidence and unavailable devices skip cleanly. |
 | Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
-| Low-level GPU coagulation direct-kernel path | Brownian-only, particle-resolved direct-kernel contract | `brownian` is the sole executable mechanism. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state and explicit resets synchronize during initialization. |
+| Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Executable configurations are `('brownian',)`, `('charged_hard_sphere',)`, and Brownian-plus-charged in either requested order; combined requests normalize to canonical order. This low-level path does not establish Runnable support, CPU parity, or performance claims. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state and explicit resets synchronize during initialization. |
 | Fixed-shape GPU/runtime roadmap work | Not current runtime behavior | Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior. |
 
 Additional shipped boundaries:
@@ -580,24 +580,17 @@ Additional shipped boundaries:
   gas round trip.
 - Preserve or recompute vapor pressure separately on the CPU side after GPU
   restore.
-- Use the current low-level GPU coagulation path when you want throughput from
-  many independent boxes, especially on CUDA where box-level parallelism can
-  stay busy, a documented direct-kernel workflow on a Warp-supported device,
-  or a CUDA-backed benchmark/study run tied to the measured evidence in the
-  roadmap.
-- Do not treat the current one-thread-per-box coagulation path as the
-  recommended production path for large single-box workloads; the shipped
-  caution band is documented in the roadmap's measured decision record.
-- Do not read the current low-level GPU coagulation support row as a general
-  claim that Particula has broad GPU production support beyond the explicit
-  helper boundary, optional Warp/CUDA availability, and measured many-box use
-  cases documented here and in the roadmap.
+- Use the current low-level GPU coagulation path only within its documented
+  direct-kernel workflow on a Warp-supported device.
+- The current low-level GPU coagulation path remains bounded direct-kernel
+  implementation scope; it does not establish a general production-support
+  claim beyond its documented helper boundary and supported inputs.
 - Do not expect kernels or runnables to perform hidden CPU↔GPU transfers or
   hidden synchronization for particle, gas, or environment state; use the
   explicit helper calls when state must cross the device boundary.
 - Treat Warp and CUDA as optional runtime capabilities: without Warp, this
-  low-level GPU path is unavailable, and CUDA benchmark conclusions should not
-  be assumed to apply unchanged to Warp `cpu` or other hardware.
+  low-level GPU path is unavailable. Warp `device="cpu"` is the baseline;
+  CUDA support is optional and tests skip cleanly when CUDA is unavailable.
 - Treat roadmap pages as future-work references, not as evidence that broader
   runtime support has already shipped.
 
