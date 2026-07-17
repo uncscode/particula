@@ -9,11 +9,13 @@ under test as the oracle.
 
 ## Per-Phase Approach
 
-- **P1 — Majorant unit tests:** Build deterministic active-pair matrices for
-  neutral-limit, same-sign, opposite-sign, equal-size, mixed-size/mass/charge,
-  inactive-slot, and multi-box fixtures. Assert a finite non-negative majorant
-  and `rate(i,j) <= majorant` for every unique active pair, including zero-rate
-  and fewer-than-two-active cases. Probe total-majorant addition independently.
+- **P1 — Majorant unit tests (completed, issue #1342):** Co-located independent
+  deterministic tests cover neutral, same-sign, opposite-sign, equal-size, and
+  mixed nanometer/droplet physics fixtures; zero and invalid candidates; sparse
+  compact active lists; and nonuniform per-box inputs. Direct-helper and
+  dispatcher probes are compared with a local NumPy pair enumeration, including
+  charged-dispatch addition and Brownian-only regression. These tests do not
+  invoke public charged execution.
 - **P2 — Charged-only unit/integration tests:** Validate capability resolution
   and pre-mutation failures. Across fixed seeds, assert accepted pair invariants,
   bounded collision-count statistics against an independent expected sum, one

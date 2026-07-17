@@ -2,8 +2,8 @@
 
 ## GPU Kernel and API
 
-- [ ] In `particula/gpu/kernels/coagulation.py`, add the charged-term majorant
-  branch to the E5-F1 majorant dispatcher using all unique active pairs.
+- [x] In `particula/gpu/kernels/coagulation.py`, add the charged-term majorant
+  branch to the E5-F1 majorant dispatcher using all unique compact active pairs.
 - [ ] Pass E5-F2's charge array and charged pair properties into the shared
   selector without allocating a mechanism-specific collision buffer.
 - [ ] Register charged-only capability only after the charged helper, majorant,
@@ -21,9 +21,10 @@
 
 ## Tooling / Tests
 
-- [ ] Add deterministic charged-majorant probes to
+- [x] Add deterministic charged-majorant probes to
   `particula/gpu/kernels/tests/coagulation_test.py` and compare every active pair
-  against independently calculated expected rates.
+  against independently calculated expected rates, including invalid/zero,
+  sparse-list, and per-box cases.
 - [ ] Add charged-only seeded fresh-run statistics for same-sign, opposite-sign,
   neutral-limit, and mixed-scale fixtures with declared sigma bounds.
 - [ ] Assert accepted pairs are sorted, distinct, in bounds, initially active,

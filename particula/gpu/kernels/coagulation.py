@@ -342,7 +342,37 @@ def _charged_majorant_from_active_pairs(  # noqa: PLR0913
     ref_temperature: Any,
     sutherland_constant: Any,
 ) -> Any:
-    """Return the exact finite charged-rate maximum for compact active ranks."""
+    """Return the finite charged-rate maximum over unique compact active pairs.
+
+    This read-only helper resolves compact ranks through ``active_indices`` and
+    sanitizes every charged hard-sphere candidate. Charge and mass dependence
+    prevents a proved extrema-only bound, so the intentional O(n²) scan favors
+    a correctness-first majorant. Fewer than two active ranks and invalid,
+    nonpositive candidates contribute zero.
+
+    Args:
+        active_indices: Compact particle indices ``(n_boxes, n_particles)``.
+        box_idx: Index of the simulation box to scan.
+        active_count: Number of compact active ranks in ``box_idx``.
+        radii: Particle radii ``(n_boxes, n_particles)`` [m].
+        total_masses: Total particle masses ``(n_boxes, n_particles)`` [kg].
+        charges: Particle charges ``(n_boxes, n_particles)`` in elementary
+            charge counts.
+        temperature: Per-box gas temperatures ``(n_boxes,)`` [K].
+        pressure: Per-box gas pressures ``(n_boxes,)`` [Pa].
+        boltzmann_constant: Boltzmann constant [J/K].
+        elementary_charge_value: Elementary charge [C].
+        electric_permittivity: Vacuum permittivity [F/m].
+        gas_constant: Universal gas constant [J/(mol·K)].
+        molecular_weight_air: Molecular weight of air [kg/mol].
+        ref_viscosity: Reference gas viscosity [Pa·s].
+        ref_temperature: Reference viscosity temperature [K].
+        sutherland_constant: Sutherland viscosity constant [K].
+
+    Returns:
+        Finite, nonnegative maximum charged hard-sphere rate for the selected
+        box, or zero when no positive finite selected-pair rate exists.
+    """
     majorant = wp.float64(0.0)
     if active_count < wp.int32(2):
         return majorant
