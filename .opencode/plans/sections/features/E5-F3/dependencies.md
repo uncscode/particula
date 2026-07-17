@@ -29,8 +29,9 @@
 
 ## Phase Ordering
 
-P1 must prove and expose the charged majorant before P2 can register charged-only
-execution. P2 establishes executable charged behavior and charge-conservation
-evidence before P3 combines it with Brownian. P4 documents only behavior proven
-by P1-P3 and remains final. Every implementation phase includes co-located tests;
-there is no standalone testing phase. Classifier diagnostics: none.
+P1 proved and exposed the charged majorant before P2 registered charged-only
+execution. P2 established executable charged behavior and charge-conservation
+evidence before P3 shipped combined Brownian-plus-charged execution. P4 documents
+only behavior proven by P1-P3 and remains final. Every implementation phase
+includes co-located tests; there is no standalone testing phase. Classifier
+diagnostics: none.

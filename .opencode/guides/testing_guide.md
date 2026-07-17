@@ -238,11 +238,11 @@ imply exact replay requirements.
 Document the chosen tolerances in the test body or nearby comments when they
 are not already obvious from the physics or baseline study.
 
-For GPU coagulation acceptance work, including exact charged-only hard-sphere
-coverage, keep attempted-vs-accepted collision instrumentation private to
-`particula/gpu/kernels/tests/coagulation_test.py`. The shipped
-`coagulation_step_gpu(...)` API and production synchronization behavior should
-stay unchanged when the work is diagnostic-only.
+For GPU coagulation acceptance work, including charged-hard-sphere-only and
+canonical Brownian-plus-charged coverage, keep attempted-vs-accepted collision
+instrumentation private to `particula/gpu/kernels/tests/coagulation_test.py`.
+The shipped `coagulation_step_gpu(...)` API and production synchronization
+behavior should stay unchanged when the work is diagnostic-only.
 
 For the GPU condensation suite, keep shared helpers in support modules only when
 discoverable `*_test.py` wrappers expose the runnable cases. The current entry

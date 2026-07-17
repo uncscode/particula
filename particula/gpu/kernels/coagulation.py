@@ -1,12 +1,12 @@
 """GPU Brownian and charged hard-sphere coagulation utilities.
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
-coagulation pipeline. Its fixed-mask sampler executes Brownian, charged
-hard-sphere, or their canonical particle-resolved combination, accumulates a
-finite positive
-rate and a safe majorant, then makes one acceptance draw for each valid
-candidate. Entry-point validation accepts
-scalar direct inputs,
+coagulation pipeline. Its fixed-mask sampler executes particle-resolved
+Brownian, charged hard-sphere, or their combined configuration in either
+requested mechanism order. It normalizes that combined configuration to one
+mask, accumulates a finite positive additive rate and safe majorant, then
+makes one acceptance draw for each valid candidate. Entry-point validation
+accepts scalar direct inputs,
 explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
 Particle metadata and device checks run before normalizing environment inputs,
 setting up volume, initializing RNG state, or executing Brownian work. An
@@ -24,8 +24,8 @@ host-side metadata, not device-resident simulation state. The public step
 defaults to Brownian, particle-resolved execution and also accepts charged-only
 and canonical Brownian-plus-charged particle-resolved execution. It rejects
 otherwise unsupported configurations during preflight, before runtime state is
-accessed or mutated. Supplied particles, collision outputs, and RNG sidecars are
-caller-owned same-device Warp resources.
+accessed or mutated. Supplied particles, collision outputs, and RNG sidecars
+are caller-owned same-device Warp resources.
 """
 
 # pyright: basic
@@ -124,15 +124,17 @@ class CoagulationMechanismConfig:
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
     ``coagulation_step_gpu`` accepts it only through its keyword-only
     ``mechanism_config`` argument. The configuration is host metadata and does
-    not own, transfer, or synchronize Warp resources. Brownian and exact
-    charged hard-sphere ``"particle_resolved"`` configurations, including their
-    canonical combination, are executable; deferred mechanisms and other
-    distribution types are rejected during host-side preflight before any
-    runtime state access or mutation.
+    not own, transfer, or synchronize Warp resources. Executable
+    ``"particle_resolved"`` modes are Brownian-only, charged-hard-sphere-only,
+    and Brownian plus charged hard sphere. The resolver normalizes either
+    requested order of the combined mode to the canonical fixed mask. Deferred
+    mechanisms and other distribution types are rejected during host-side
+    preflight before any runtime state access or mutation.
 
     Attributes:
-        mechanisms: Requested canonical mechanism identifiers, or ``None`` to
-            select Brownian.
+        mechanisms: Requested mechanism identifiers, or ``None`` to select
+            Brownian. The resolver normalizes supported identifiers to canonical
+            order.
         distribution_type: Required distribution representation; only
             ``"particle_resolved"`` is structurally supported.
     """
@@ -1495,8 +1497,9 @@ def coagulation_step_gpu(  # noqa: C901
     ``mechanism_config`` is immutable, keyword-only host metadata and is
     preflighted before any runtime input access, allocation, normalization, RNG
     work, or launch. Omission selects Brownian ``"particle_resolved"``;
-    charged-only and canonical Brownian-plus-charged
-    ``"particle_resolved"`` execution are also supported.
+    charged-only and Brownian-plus-charged ``"particle_resolved"`` execution
+    are also supported. The combined mode accepts either requested mechanism
+    order and normalizes it to one fixed mask, shared selector, and majorant.
     Reserved, unsupported-combination, and other distribution requests reject
     during preflight without runtime mutation. After particle metadata and
     device checks, direct temperature and pressure inputs are validated and
@@ -1545,11 +1548,12 @@ def coagulation_step_gpu(  # noqa: C901
             ``particula.gpu.kernels.coagulation``; it is not re-exported by
             ``particula.gpu.kernels``. This keyword-only configuration does not
             transfer, synchronize, or own Warp state. Omission selects
-            Brownian, particle-resolved execution. Charged-only and canonical
+            Brownian, particle-resolved execution. Charged-only and
             Brownian-plus-charged particle-resolved execution are also
-            supported. Malformed configurations, unsupported distributions,
-            and reserved mechanisms fail before runtime inputs are accessed or
-            mutable runtime state is changed. A
+            supported; either requested combined-mechanism order normalizes to
+            the same execution. Malformed configurations, unsupported
+            distributions, and reserved mechanisms fail before runtime inputs
+            are accessed or mutable runtime state is changed. A
             wrong type raises exactly ``ValueError`` with the message
             ``"mechanism_config must be a CoagulationMechanismConfig."``;
             other errors are delegated to the resolver and capability gate.
@@ -1567,7 +1571,7 @@ def coagulation_step_gpu(  # noqa: C901
         validate_charge_finite: When True, explicitly scan charge on device and
             synchronize for host-visible rejection of NaN or infinity. The
             default False avoids per-step allocation, synchronization, and host
-            readback for Brownian execution. Charged-only execution always
+            readback for Brownian execution. Every charged-containing mode
             performs this scan before caller output or RNG mutation.
 
     Returns:

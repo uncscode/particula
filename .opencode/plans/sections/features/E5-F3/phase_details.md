@@ -25,15 +25,19 @@
     ownership/capacity, invariants, mass/charge conservation, and aggregate
     stochastic charged-only coverage.
 
-- [ ] **E5-F3-P3:** Enable Brownian-plus-charged execution with integration tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Sum Brownian and charged rates and majorants before one acceptance
-    decision without launching mechanism-specific stochastic passes.
+- [x] **E5-F3-P3:** Enable Brownian-plus-charged execution with integration tests
+  - Issue: #1344 | Size: S | Status: Completed
+  - Goal: Sum Brownian and charged rates before one acceptance decision, using a
+    single exhaustive additive-rate majorant scan and no mechanism-specific pass.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: Additive rate/majorant probes, one-pass RNG and merge evidence,
-    bounded repeated-seed statistics, canonical-order equivalence, legacy
-    Brownian regression, caller buffers, mixed-scale and multi-box conservation.
+  - Delivered: Both canonical combined orders normalize to one executable mask.
+    The shared selector sums independently sanitized terms and uses one RNG
+    stream, pair/count buffer set, and charge-conserving apply launch.
+  - Tests: Additive rate/majorant probes, one-pass launch/RNG/merge evidence,
+    bounded fresh-seed statistics, canonical-order equivalence, Brownian
+    compatibility, preflight state preservation, caller buffers, mixed-scale,
+    multi-box, multi-species, and mass/charge conservation.
 
 - [ ] **E5-F3-P4:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started
