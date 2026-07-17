@@ -15,6 +15,7 @@ GPU API.
 from __future__ import annotations
 
 import inspect
+import itertools
 import re
 from dataclasses import dataclass
 from types import SimpleNamespace
@@ -66,6 +67,7 @@ if wp is not None:
         TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
         CoagulationMechanismConfig,
         _bound_scheduled_trials,
+        _charged_majorant_from_active_pairs,
         _ensure_volume_array,
         _initialize_rng_states,
         _remove_active_pair_by_rank_swap_pop,
@@ -290,6 +292,166 @@ def _available_warp_devices() -> list[str]:
     return warp_devices(wp)
 
 
+def _charged_hard_sphere_oracle(
+    radius_i: float,
+    radius_j: float,
+    mass_i: float,
+    mass_j: float,
+    charge_i: float,
+    charge_j: float,
+    temperature: float,
+    pressure: float,
+) -> float:
+    """Independently reproduce the guarded charged hard-sphere pair rate."""
+    values = np.array(
+        [
+            radius_i,
+            radius_j,
+            mass_i,
+            mass_j,
+            charge_i,
+            charge_j,
+            temperature,
+            pressure,
+            constants.BOLTZMANN_CONSTANT,
+            constants.ELEMENTARY_CHARGE_VALUE,
+            constants.ELECTRIC_PERMITTIVITY,
+            constants.GAS_CONSTANT,
+            constants.MOLECULAR_WEIGHT_AIR,
+            constants.REF_VISCOSITY_AIR_STP,
+            constants.REF_TEMPERATURE_STP,
+            constants.SUTHERLAND_CONSTANT,
+        ],
+        dtype=np.float64,
+    )
+    if not np.all(np.isfinite(values)) or np.any(
+        values[[0, 1, 2, 3, 6, 7]] <= 0
+    ):
+        return 0.0
+    pi_value = np.pi
+    with np.errstate(all="ignore"):
+        viscosity = (
+            constants.REF_VISCOSITY_AIR_STP
+            * (temperature / constants.REF_TEMPERATURE_STP) ** 1.5
+            * (constants.REF_TEMPERATURE_STP + constants.SUTHERLAND_CONSTANT)
+            / (temperature + constants.SUTHERLAND_CONSTANT)
+        )
+        mean_free_path = (2.0 * viscosity / pressure) / np.sqrt(
+            8.0
+            * constants.MOLECULAR_WEIGHT_AIR
+            / (pi_value * constants.GAS_CONSTANT * temperature)
+        )
+        kn_i, kn_j = mean_free_path / radius_i, mean_free_path / radius_j
+        slip_i = 1.0 + kn_i * (1.257 + 0.4 * np.exp(-1.1 / kn_i))
+        slip_j = 1.0 + kn_j * (1.257 + 0.4 * np.exp(-1.1 / kn_j))
+        friction_i = 6.0 * pi_value * viscosity * radius_i / slip_i
+        friction_j = 6.0 * pi_value * viscosity * radius_j / slip_j
+        radius_sum = radius_i + radius_j
+        potential = -(
+            charge_i * charge_j * constants.ELEMENTARY_CHARGE_VALUE**2
+        ) / (
+            4.0
+            * pi_value
+            * constants.ELECTRIC_PERMITTIVITY
+            * radius_sum
+            * constants.BOLTZMANN_CONSTANT
+            * temperature
+        )
+        potential = np.clip(potential, -200.0, 200.0)
+        kinetic = 1.0 + potential if potential >= 0.0 else np.exp(potential)
+        continuum = (
+            1.0 if potential == 0.0 else potential / (1.0 - np.exp(-potential))
+        )
+        if abs(potential) < 1.0e-5 and potential != 0.0:
+            continuum = 1.0 + potential / 2.0 + potential**2 / 12.0
+        reduced_mass = mass_i * mass_j / (mass_i + mass_j)
+        reduced_friction = friction_i * friction_j / (friction_i + friction_j)
+        knudsen = (
+            np.sqrt(constants.BOLTZMANN_CONSTANT * temperature * reduced_mass)
+            / reduced_friction
+        ) / (radius_sum * continuum / kinetic)
+        numerator = (
+            4.0 * pi_value * knudsen**2
+            + 25.836 * knudsen**3
+            + np.sqrt(8.0 * pi_value) * 11.211 * knudsen**4
+        )
+        denominator = (
+            1.0 + 3.502 * knudsen + 7.211 * knudsen**2 + 11.211 * knudsen**3
+        )
+        result = (
+            numerator
+            / denominator
+            * reduced_friction
+            * radius_sum**3
+            * kinetic**2
+            / (reduced_mass * continuum)
+        )
+    return float(result) if np.isfinite(result) and result > 0.0 else 0.0
+
+
+def _charged_majorant_oracle(
+    active_indices: np.ndarray,
+    active_count: int,
+    radii: np.ndarray,
+    masses: np.ndarray,
+    charges: np.ndarray,
+    temperature: float,
+    pressure: float,
+) -> float:
+    """Return the independent exhaustive compact-active charged maximum."""
+    candidates = (
+        _charged_hard_sphere_oracle(
+            radii[first],
+            radii[second],
+            masses[first],
+            masses[second],
+            charges[first],
+            charges[second],
+            temperature,
+            pressure,
+        )
+        for first, second in itertools.combinations(
+            active_indices[:active_count], 2
+        )
+    )
+    return max(candidates, default=0.0)
+
+
+def _run_charged_majorant_probes(
+    device: str,
+    compact: np.ndarray,
+    active_counts: np.ndarray,
+    radii: np.ndarray,
+    masses: np.ndarray,
+    charges: np.ndarray,
+    temperature: np.ndarray,
+    pressure: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Upload explicit fp64 fixtures and return synchronized probe results."""
+    n_boxes = compact.shape[0]
+    direct = wp.zeros((n_boxes,), dtype=wp.float64, device=device)
+    dispatched = wp.zeros((n_boxes,), dtype=wp.float64, device=device)
+    wp.launch(
+        _charged_majorant_probe_kernel,
+        dim=n_boxes,
+        inputs=[
+            wp.array(compact, dtype=wp.int32, device=device),
+            wp.array(active_counts, dtype=wp.int32, device=device),
+            wp.array(radii, dtype=wp.float64, device=device),
+            wp.array(masses, dtype=wp.float64, device=device),
+            wp.array(charges, dtype=wp.float64, device=device),
+            wp.array(temperature, dtype=wp.float64, device=device),
+            wp.array(pressure, dtype=wp.float64, device=device),
+            wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG),
+            direct,
+            dispatched,
+        ],
+        device=device,
+    )
+    wp.synchronize_device(device)
+    return np.asarray(direct.numpy()), np.asarray(dispatched.numpy())
+
+
 _INT32_MAX = np.iinfo(np.int32).max
 
 
@@ -376,6 +538,12 @@ def _additive_helper_probe_kernel(
     pair_rate: Any,
     majorant: Any,
     sanitized: Any,
+    active_indices: Any,
+    radii: Any,
+    total_masses: Any,
+    charges: Any,
+    temperature: Any,
+    pressure: Any,
 ) -> None:
     """Probe fixed-mask additive helpers and finite-term sanitization."""
     pair_rate[0] = _total_pair_rate(
@@ -399,8 +567,88 @@ def _additive_helper_probe_kernel(
         values[5],
         values[6],
         values[7],
+        active_indices,
+        wp.int32(0),
+        wp.int32(0),
+        radii,
+        total_masses,
+        charges,
+        temperature,
+        pressure,
+        wp.float64(constants.BOLTZMANN_CONSTANT),
+        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+        wp.float64(constants.ELECTRIC_PERMITTIVITY),
+        wp.float64(constants.GAS_CONSTANT),
+        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+        wp.float64(constants.REF_VISCOSITY_AIR_STP),
+        wp.float64(constants.REF_TEMPERATURE_STP),
+        wp.float64(constants.SUTHERLAND_CONSTANT),
     )
     sanitized[0] = _sanitize_positive_finite(values[8])
+
+
+@_warp_kernel
+def _charged_majorant_probe_kernel(
+    active_indices: Any,
+    active_counts: Any,
+    radii: Any,
+    total_masses: Any,
+    charges: Any,
+    temperature: Any,
+    pressure: Any,
+    mechanism_mask: Any,
+    majorants: Any,
+    dispatched_majorants: Any,
+) -> None:
+    """Probe direct and dispatched charged majorants one box per thread."""
+    box_idx = wp.tid()
+    active_count = active_counts[box_idx]
+    direct = _charged_majorant_from_active_pairs(
+        active_indices,
+        box_idx,
+        active_count,
+        radii,
+        total_masses,
+        charges,
+        temperature,
+        pressure,
+        wp.float64(constants.BOLTZMANN_CONSTANT),
+        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+        wp.float64(constants.ELECTRIC_PERMITTIVITY),
+        wp.float64(constants.GAS_CONSTANT),
+        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+        wp.float64(constants.REF_VISCOSITY_AIR_STP),
+        wp.float64(constants.REF_TEMPERATURE_STP),
+        wp.float64(constants.SUTHERLAND_CONSTANT),
+    )
+    majorants[box_idx] = direct
+    dispatched_majorants[box_idx] = _total_majorant(
+        mechanism_mask,
+        wp.float64(1.0e-8),
+        wp.float64(5.0e-8),
+        wp.float64(1.0e-9),
+        wp.float64(2.0e-10),
+        wp.float64(2.0e-8),
+        wp.float64(4.0e-8),
+        wp.float64(0.2),
+        wp.float64(0.1),
+        active_indices,
+        box_idx,
+        active_count,
+        radii,
+        total_masses,
+        charges,
+        temperature,
+        pressure,
+        wp.float64(constants.BOLTZMANN_CONSTANT),
+        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+        wp.float64(constants.ELECTRIC_PERMITTIVITY),
+        wp.float64(constants.GAS_CONSTANT),
+        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+        wp.float64(constants.REF_VISCOSITY_AIR_STP),
+        wp.float64(constants.REF_TEMPERATURE_STP),
+        wp.float64(constants.SUTHERLAND_CONSTANT),
+    )
 
 
 @_warp_kernel
@@ -533,6 +781,18 @@ def test_additive_helpers_ignore_reserved_bits(
     pair_rate = wp.zeros((1,), dtype=wp.float64, device=device)
     majorant = wp.zeros((1,), dtype=wp.float64, device=device)
     sanitized = wp.zeros((1,), dtype=wp.float64, device=device)
+    active_indices = wp.array(
+        np.array([[-1]], dtype=np.int32), dtype=wp.int32, device=device
+    )
+    radii = wp.zeros((1, 1), dtype=wp.float64, device=device)
+    total_masses = wp.zeros((1, 1), dtype=wp.float64, device=device)
+    charges = wp.zeros((1, 1), dtype=wp.float64, device=device)
+    temperature = wp.array(
+        np.array([298.15], dtype=np.float64), dtype=wp.float64, device=device
+    )
+    pressure = wp.array(
+        np.array([101325.0], dtype=np.float64), dtype=wp.float64, device=device
+    )
 
     wp.launch(
         _additive_helper_probe_kernel,
@@ -543,6 +803,12 @@ def test_additive_helpers_ignore_reserved_bits(
             pair_rate,
             majorant,
             sanitized,
+            active_indices,
+            radii,
+            total_masses,
+            charges,
+            temperature,
+            pressure,
         ],
         device=device,
     )
@@ -606,15 +872,353 @@ def test_additive_sanitizer_rejects_invalid_terms(
     pair_rate = wp.zeros((1,), dtype=wp.float64, device=device)
     majorant = wp.zeros((1,), dtype=wp.float64, device=device)
     sanitized = wp.zeros((1,), dtype=wp.float64, device=device)
+    active_indices = wp.array(
+        np.array([[-1]], dtype=np.int32), dtype=wp.int32, device=device
+    )
+    radii = wp.zeros((1, 1), dtype=wp.float64, device=device)
+    total_masses = wp.zeros((1, 1), dtype=wp.float64, device=device)
+    charges = wp.zeros((1, 1), dtype=wp.float64, device=device)
+    temperature = wp.array(
+        np.array([298.15], dtype=np.float64), dtype=wp.float64, device=device
+    )
+    pressure = wp.array(
+        np.array([101325.0], dtype=np.float64), dtype=wp.float64, device=device
+    )
     wp.launch(
         _additive_helper_probe_kernel,
         dim=1,
-        inputs=[wp.int32(0), values_wp, pair_rate, majorant, sanitized],
+        inputs=[
+            wp.int32(0),
+            values_wp,
+            pair_rate,
+            majorant,
+            sanitized,
+            active_indices,
+            radii,
+            total_masses,
+            charges,
+            temperature,
+            pressure,
+        ],
         device=device,
     )
     wp.synchronize()
 
     assert float(np.asarray(sanitized.numpy()).item()) == 0.0
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("charges", "temperature", "pressure"),
+    [
+        (np.array([0.0, 0.0, 0.0, 0.0]), 298.15, 101325.0),
+        (np.array([1.0, 2.0, 3.0, 4.0]), 280.0, 90000.0),
+        (np.array([-1.0, 2.0, -3.0, 4.0]), 310.0, 110000.0),
+    ],
+)
+def test_charged_majorant_matches_independent_pair_maximum(
+    device: str,
+    charges: np.ndarray,
+    temperature: float,
+    pressure: float,
+) -> None:
+    """Direct and dispatched bounds equal the independent pair maximum."""
+    radii = np.array([[2.0e-9, 9.0e-9, 2.0e-7, 1.0e-5]], dtype=np.float64)
+    masses = np.array([[1.0e-23, 4.0e-22, 3.0e-17, 4.0e-10]], dtype=np.float64)
+    compact = np.array([[2, 0, 3, 1]], dtype=np.int32)
+    expected = _charged_majorant_oracle(
+        compact[0], 4, radii[0], masses[0], charges, temperature, pressure
+    )
+    direct, dispatched = _run_charged_majorant_probes(
+        device,
+        compact,
+        np.array([4], dtype=np.int32),
+        radii,
+        masses,
+        charges[np.newaxis, :],
+        np.array([temperature]),
+        np.array([pressure]),
+    )
+    # fp64 Warp arithmetic follows the independent scalar oracle to roundoff.
+    npt.assert_allclose(direct, [expected], rtol=1.0e-11, atol=0.0)
+    npt.assert_allclose(dispatched, [expected], rtol=1.0e-11, atol=0.0)
+    for first, second in itertools.combinations(compact[0], 2):
+        rate = _charged_hard_sphere_oracle(
+            radii[0, first],
+            radii[0, second],
+            masses[0, first],
+            masses[0, second],
+            charges[first],
+            charges[second],
+            temperature,
+            pressure,
+        )
+        assert np.isfinite(rate) and rate >= 0.0
+        assert rate <= direct[0]
+        assert rate <= dispatched[0]
+
+
+@pytest.mark.gpu_parity
+def test_charged_majorant_ignores_slots_outside_compact_active_list(
+    device: str,
+) -> None:
+    """Only compact ranks contribute, even when excluded slots have high rates."""
+    radii = np.array([[2.0e-9, 1.0e-4, 8.0e-9, 2.0e-4]], dtype=np.float64)
+    masses = np.array([[1.0e-23, 1.0e-7, 3.0e-22, 2.0e-7]], dtype=np.float64)
+    charges = np.array([[1.0, -100.0, -2.0, 100.0]], dtype=np.float64)
+    compact = np.array([[2, 0, -1, -1]], dtype=np.int32)
+    expected = _charged_majorant_oracle(
+        compact[0], 2, radii[0], masses[0], charges[0], 298.15, 101325.0
+    )
+    direct, dispatched = _run_charged_majorant_probes(
+        device,
+        compact,
+        np.array([2], dtype=np.int32),
+        radii,
+        masses,
+        charges,
+        np.array([298.15]),
+        np.array([101325.0]),
+    )
+    npt.assert_allclose(direct, [expected], rtol=1.0e-11, atol=0.0)
+    npt.assert_allclose(dispatched, [expected], rtol=1.0e-11, atol=0.0)
+
+
+@pytest.mark.parametrize("active_count", [0, 1])
+def test_charged_majorant_returns_zero_for_fewer_than_two_active_particles(
+    device: str, active_count: int
+) -> None:
+    """The helper returns exact safe zero before compact-list indexing."""
+    direct, dispatched = _run_charged_majorant_probes(
+        device,
+        np.array([[0, 1]], dtype=np.int32),
+        np.array([active_count], dtype=np.int32),
+        np.array([[2.0e-9, 3.0e-9]], dtype=np.float64),
+        np.array([[1.0e-22, 2.0e-22]], dtype=np.float64),
+        np.zeros((1, 2), dtype=np.float64),
+        np.array([298.15]),
+        np.array([101325.0]),
+    )
+    npt.assert_array_equal(direct, np.zeros(1, dtype=np.float64))
+    npt.assert_array_equal(dispatched, np.zeros(1, dtype=np.float64))
+
+
+@pytest.mark.parametrize("invalid_value", [np.nan, np.inf, -np.inf, 0.0, -1.0])
+@pytest.mark.parametrize(
+    "invalid_field", ["radius", "mass", "temperature", "pressure"]
+)
+def test_charged_majorant_sanitizes_invalid_selected_pair_candidates(
+    device: str, invalid_field: str, invalid_value: float
+) -> None:
+    """Invalid selected charged inputs make the exact two-particle bound zero."""
+    radii = np.array([[2.0e-9, 3.0e-9]], dtype=np.float64)
+    masses = np.array([[1.0e-22, 2.0e-22]], dtype=np.float64)
+    charges = np.array([[1.0, -1.0]], dtype=np.float64)
+    temperature = np.array([298.15], dtype=np.float64)
+    pressure = np.array([101325.0], dtype=np.float64)
+    if invalid_field == "radius":
+        radii[0, 1] = invalid_value
+    elif invalid_field == "mass":
+        masses[0, 1] = invalid_value
+    elif invalid_field == "temperature":
+        temperature[0] = invalid_value
+    else:
+        pressure[0] = invalid_value
+    direct, dispatched = _run_charged_majorant_probes(
+        device,
+        np.array([[0, 1]], dtype=np.int32),
+        np.array([2], dtype=np.int32),
+        radii,
+        masses,
+        charges,
+        temperature,
+        pressure,
+    )
+    npt.assert_array_equal(direct, np.zeros(1, dtype=np.float64))
+    npt.assert_array_equal(dispatched, np.zeros(1, dtype=np.float64))
+
+
+def test_charged_majorant_returns_zero_when_all_selected_rates_are_zero(
+    device: str,
+) -> None:
+    """All zero-radius selected pairs make no charged majorant contribution."""
+    direct, dispatched = _run_charged_majorant_probes(
+        device,
+        np.array([[2, 0, 1]], dtype=np.int32),
+        np.array([3], dtype=np.int32),
+        np.zeros((1, 3), dtype=np.float64),
+        np.array([[1.0e-22, 2.0e-22, 3.0e-22]], dtype=np.float64),
+        np.array([[1.0, -1.0, 2.0]], dtype=np.float64),
+        np.array([298.15], dtype=np.float64),
+        np.array([101325.0], dtype=np.float64),
+    )
+
+    npt.assert_array_equal(direct, np.zeros(1, dtype=np.float64))
+    npt.assert_array_equal(dispatched, np.zeros(1, dtype=np.float64))
+
+
+@pytest.mark.gpu_parity
+def test_charged_majorant_matches_each_box_of_nonuniform_fixture(
+    device: str,
+) -> None:
+    """Each box uses its own compact set and thermodynamic state."""
+    compact = np.array([[2, 0, 1], [1, 2, 0]], dtype=np.int32)
+    active_counts = np.array([3, 2], dtype=np.int32)
+    radii = np.array(
+        [[2.0e-9, 8.0e-9, 3.0e-7], [4.0e-8, 2.0e-6, 8.0e-6]],
+        dtype=np.float64,
+    )
+    masses = np.array(
+        [[1.0e-23, 2.0e-22, 5.0e-18], [3.0e-19, 7.0e-14, 2.0e-12]],
+        dtype=np.float64,
+    )
+    charges = np.array([[1.0, -2.0, 3.0], [-3.0, 1.0, 2.0]], dtype=np.float64)
+    temperature = np.array([280.0, 315.0], dtype=np.float64)
+    pressure = np.array([85000.0, 110000.0], dtype=np.float64)
+    expected = np.array(
+        [
+            _charged_majorant_oracle(
+                compact[box],
+                active_counts[box],
+                radii[box],
+                masses[box],
+                charges[box],
+                temperature[box],
+                pressure[box],
+            )
+            for box in range(2)
+        ],
+        dtype=np.float64,
+    )
+
+    direct, dispatched = _run_charged_majorant_probes(
+        device,
+        compact,
+        active_counts,
+        radii,
+        masses,
+        charges,
+        temperature,
+        pressure,
+    )
+
+    npt.assert_allclose(direct, expected, rtol=1.0e-11, atol=0.0)
+    npt.assert_allclose(dispatched, expected, rtol=1.0e-11, atol=0.0)
+
+
+@pytest.mark.gpu_parity
+def test_charged_majorant_scans_each_unique_sparse_active_pair(
+    device: str,
+) -> None:
+    """Sparse, non-sorted compact ranks enumerate all and only six pairs."""
+    compact = np.array([[5, 1, 4, 2, -1, -1]], dtype=np.int32)
+    radii = np.array(
+        [[1.0e-4, 2.0e-9, 8.0e-8, 5.0e-4, 3.0e-7, 2.0e-6]],
+        dtype=np.float64,
+    )
+    masses = np.array(
+        [[1.0e-8, 1.0e-23, 2.0e-18, 1.0e-6, 7.0e-17, 3.0e-13]],
+        dtype=np.float64,
+    )
+    charges = np.array(
+        [[100.0, 100.0, 1.0, -2.0, -100.0, 100.0]],
+        dtype=np.float64,
+    )
+    selected_pairs = list(itertools.combinations(compact[0, :4], 2))
+    rates = np.array(
+        [
+            _charged_hard_sphere_oracle(
+                radii[0, first],
+                radii[0, second],
+                masses[0, first],
+                masses[0, second],
+                charges[0, first],
+                charges[0, second],
+                298.15,
+                101325.0,
+            )
+            for first, second in selected_pairs
+        ],
+        dtype=np.float64,
+    )
+    expected = float(np.max(rates))
+    assert len(selected_pairs) == 6
+    assert int(np.argmax(rates)) not in (0, len(rates) - 1)
+
+    direct, dispatched = _run_charged_majorant_probes(
+        device,
+        compact,
+        np.array([4], dtype=np.int32),
+        radii,
+        masses,
+        charges,
+        np.array([298.15], dtype=np.float64),
+        np.array([101325.0], dtype=np.float64),
+    )
+
+    npt.assert_allclose(direct, [expected], rtol=1.0e-11, atol=0.0)
+    npt.assert_allclose(dispatched, [expected], rtol=1.0e-11, atol=0.0)
+
+
+@pytest.mark.gpu_parity
+def test_charged_majorant_dispatcher_adds_brownian_term(device: str) -> None:
+    """The approved combined mask adds independent Brownian and charged bounds."""
+    compact = np.array([[0, 1]], dtype=np.int32)
+    radii = np.array([[2.0e-9, 8.0e-9]], dtype=np.float64)
+    masses = np.array([[1.0e-23, 3.0e-22]], dtype=np.float64)
+    charges = np.array([[1.0, -2.0]], dtype=np.float64)
+    temperature = np.array([298.15], dtype=np.float64)
+    pressure = np.array([101325.0], dtype=np.float64)
+    direct, _ = _run_charged_majorant_probes(
+        device,
+        compact,
+        np.array([2], dtype=np.int32),
+        radii,
+        masses,
+        charges,
+        temperature,
+        pressure,
+    )
+    brownian = (
+        4.0
+        * np.pi
+        * (1.0e-9 + 2.0e-10)
+        * (1.0e-8 + 5.0e-8)
+        / (
+            (1.0e-8 + 5.0e-8) / ((1.0e-8 + 5.0e-8) + np.hypot(2.0e-8, 4.0e-8))
+            + 4.0
+            * (1.0e-9 + 2.0e-10)
+            / ((1.0e-8 + 5.0e-8) * np.hypot(0.2, 0.1))
+        )
+    )
+    active = wp.array(compact, dtype=wp.int32, device=device)
+    counts = wp.array(
+        np.array([2], dtype=np.int32), dtype=wp.int32, device=device
+    )
+    output = wp.zeros((1,), dtype=wp.float64, device=device)
+    wp.launch(
+        _charged_majorant_probe_kernel,
+        dim=1,
+        inputs=[
+            active,
+            counts,
+            wp.array(radii, dtype=wp.float64, device=device),
+            wp.array(masses, dtype=wp.float64, device=device),
+            wp.array(charges, dtype=wp.float64, device=device),
+            wp.array(temperature, dtype=wp.float64, device=device),
+            wp.array(pressure, dtype=wp.float64, device=device),
+            wp.int32(
+                BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG
+            ),
+            wp.zeros((1,), dtype=wp.float64, device=device),
+            output,
+        ],
+        device=device,
+    )
+    wp.synchronize_device(device)
+    npt.assert_allclose(
+        output.numpy(), direct + brownian, rtol=1.0e-11, atol=0.0
+    )
 
 
 def _run_synthetic_total_sampling_probe(
