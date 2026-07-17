@@ -52,6 +52,7 @@ else:  # pragma: no cover - runtime import with helpful error
 from particula.gpu.dynamics.coagulation_funcs import (
     brownian_diffusivity_wp,
     brownian_kernel_pair_wp,
+    charged_hard_sphere_wp,
     g_collection_term_wp,
     particle_mean_free_path_wp,
 )
@@ -323,6 +324,62 @@ def _total_pair_rate(  # noqa: PLR0913
 
 @no_type_check
 @wp.func
+def _charged_majorant_from_active_pairs(  # noqa: PLR0913
+    active_indices: Any,
+    box_idx: Any,
+    active_count: Any,
+    radii: Any,
+    total_masses: Any,
+    charges: Any,
+    temperature: Any,
+    pressure: Any,
+    boltzmann_constant: Any,
+    elementary_charge_value: Any,
+    electric_permittivity: Any,
+    gas_constant: Any,
+    molecular_weight_air: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
+) -> Any:
+    """Return the exact finite charged-rate maximum for compact active ranks."""
+    majorant = wp.float64(0.0)
+    if active_count < wp.int32(2):
+        return majorant
+
+    # Charge and mass dependence prevents a proved extrema-only bound, so this
+    # compact-active O(n²) scan intentionally prioritizes correctness.
+    for first_rank in range(active_count - wp.int32(1)):
+        first_idx = wp.int32(active_indices[box_idx, first_rank])
+        for second_rank in range(first_rank + wp.int32(1), active_count):
+            second_idx = wp.int32(active_indices[box_idx, second_rank])
+            candidate = _sanitize_positive_finite(
+                charged_hard_sphere_wp(
+                    radii[box_idx, first_idx],
+                    radii[box_idx, second_idx],
+                    total_masses[box_idx, first_idx],
+                    total_masses[box_idx, second_idx],
+                    charges[box_idx, first_idx],
+                    charges[box_idx, second_idx],
+                    temperature[box_idx],
+                    pressure[box_idx],
+                    boltzmann_constant,
+                    elementary_charge_value,
+                    electric_permittivity,
+                    gas_constant,
+                    molecular_weight_air,
+                    ref_viscosity,
+                    ref_temperature,
+                    sutherland_constant,
+                )
+            )
+            if candidate > majorant:
+                majorant = candidate
+    return majorant
+
+
+@no_type_check
+@wp.func
 def _total_majorant(  # noqa: PLR0913
     mechanism_mask: Any,
     radius_min: Any,
@@ -333,12 +390,29 @@ def _total_majorant(  # noqa: PLR0913
     g_term_max: Any,
     speed_min: Any,
     speed_max: Any,
+    active_indices: Any,
+    box_idx: Any,
+    active_count: Any,
+    radii: Any,
+    total_masses: Any,
+    charges: Any,
+    temperature: Any,
+    pressure: Any,
+    boltzmann_constant: Any,
+    elementary_charge_value: Any,
+    electric_permittivity: Any,
+    gas_constant: Any,
+    molecular_weight_air: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
 ) -> Any:
     """Accumulate enabled finite, positive pair-rate-majorant terms.
 
     The result is the single safe majorant used to schedule and accept
-    candidates. The fixed mask currently executes Brownian only; reserved bits
-    deliberately contribute no term.
+    candidates. Brownian retains its extrema-derived term; the approved charged
+    term uses an exhaustive compact-active scan. Other reserved bits contribute
+    no term.
     """
     total_majorant = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
@@ -355,7 +429,28 @@ def _total_majorant(  # noqa: PLR0913
                 wp.float64(1.0),
             )
         )
-    # Reserved mechanism bits deliberately contribute no executable term.
+    if mechanism_mask & wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG):
+        total_majorant += _sanitize_positive_finite(
+            _charged_majorant_from_active_pairs(
+                active_indices,
+                box_idx,
+                active_count,
+                radii,
+                total_masses,
+                charges,
+                temperature,
+                pressure,
+                boltzmann_constant,
+                elementary_charge_value,
+                electric_permittivity,
+                gas_constant,
+                molecular_weight_air,
+                ref_viscosity,
+                ref_temperature,
+                sutherland_constant,
+            )
+        )
+    # Other reserved mechanism bits deliberately contribute no term.
     return total_majorant
 
 
