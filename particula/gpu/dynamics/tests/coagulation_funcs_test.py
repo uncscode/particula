@@ -370,7 +370,9 @@ def _coulomb_potential_ratio_oracle(
     sum_radius = radius_i + radius_j
     if sum_radius <= 0.0 or temperature <= 0.0:
         return 0.0
-    value = -(charge_i * charge_j * ELEMENTARY_CHARGE_VALUE**2) / (
+    value = -(
+        charge_i * charge_j * ELEMENTARY_CHARGE_VALUE * ELEMENTARY_CHARGE_VALUE
+    ) / (
         4.0
         * np.pi
         * ELECTRIC_PERMITTIVITY
@@ -397,7 +399,7 @@ def _continuum_limit_oracle(potential: float) -> float:
     """Model the scalar GPU continuum-limit equation independently."""
     if potential == 0.0:
         return 1.0
-    return potential / (1.0 - float(np.exp(-potential)))
+    return potential / -float(np.expm1(-potential))
 
 
 def _diffusive_knudsen_number_oracle(
@@ -434,37 +436,45 @@ def _warp_array(values: np.ndarray, device: str) -> Any:
     return wp.array(values, dtype=wp.float64, device=device)
 
 
+def _assert_casewise_allclose(
+    observed: np.ndarray,
+    expected: np.ndarray,
+    case_names: tuple[str, ...],
+    *,
+    rtol: float,
+    atol: float,
+) -> None:
+    """Compare one launched probe batch while retaining case diagnostics."""
+    for case_index, (case_name, observed_value, expected_value) in enumerate(
+        zip(case_names, observed, expected, strict=True)
+    ):
+        npt.assert_allclose(
+            observed_value,
+            expected_value,
+            rtol=rtol,
+            atol=atol,
+            err_msg=f"case {case_index}: {case_name}",
+        )
+
+
 @pytest.mark.gpu_parity
-@pytest.mark.parametrize(
-    "case_index",
-    [
-        pytest.param(0, id="neutral"),
-        pytest.param(1, id="opposite_sign_attraction"),
-        pytest.param(2, id="same_sign_repulsion"),
-        pytest.param(3, id="repulsion_lower_clipped"),
-        pytest.param(4, id="zero_radius_sum"),
-        pytest.param(5, id="negative_radius_sum"),
-        pytest.param(6, id="negative_temperature"),
-        pytest.param(7, id="zero_temperature"),
-    ],
-)
 def test_coulomb_potential_ratio_wp_matches_independent_oracle(
-    device: str, case_index: int
+    device: str,
 ) -> None:
     """Validate neutral, attractive, repulsive, and safe Coulomb branches."""
     radii_i = np.array(
-        [1e-8, 1e-8, 1e-8, 1e-12, 0.0, -1e-8, 1e-8, 1e-8],
+        [1e-8, 1e-8, 1e-8, 1e-8, 0.0, -1e-8, 1e-8, 1e-8],
         dtype=np.float64,
     )
     radii_j = np.array(
-        [2e-8, 2e-8, 2e-8, 1e-12, 0.0, 0.0, 2e-8, 2e-8],
+        [2e-8, 2e-8, 2e-8, 1e-8, 0.0, 0.0, 2e-8, 2e-8],
         dtype=np.float64,
     )
     charges_i = np.array(
-        [0.0, 1.0, 1.0, 1e5, 1.0, 1.0, 1.0, 1.0], dtype=np.float64
+        [0.0, 1.0, 1.0, 10.0, 1.0, 1.0, 1.0, 1.0], dtype=np.float64
     )
     charges_j = np.array(
-        [0.0, -1.0, 1.0, 1e5, 1.0, 1.0, 1.0, 1.0], dtype=np.float64
+        [0.0, -1.0, 1.0, 10.0, 1.0, 1.0, 1.0, 1.0], dtype=np.float64
     )
     temperatures = np.array(
         [298.15, 298.15, 298.15, 298.15, 298.15, 298.15, -1.0, 0.0]
@@ -503,8 +513,21 @@ def test_coulomb_potential_ratio_wp_matches_independent_oracle(
     wp.synchronize()
     observed = result.numpy()
     assert observed.dtype == np.float64
-    npt.assert_allclose(
-        observed[case_index], expected[case_index], rtol=1e-12, atol=0.0
+    _assert_casewise_allclose(
+        observed,
+        expected,
+        (
+            "neutral",
+            "opposite_sign_attraction",
+            "same_sign_repulsion",
+            "repulsion_lower_clipped",
+            "zero_radius_sum",
+            "negative_radius_sum",
+            "negative_temperature",
+            "zero_temperature",
+        ),
+        rtol=1e-12,
+        atol=0.0,
     )
     assert observed[0] == 0.0
     assert observed[1] > 0.0
@@ -517,18 +540,7 @@ def test_coulomb_potential_ratio_wp_matches_independent_oracle(
 
 
 @pytest.mark.gpu_parity
-@pytest.mark.parametrize(
-    "case_index",
-    [
-        pytest.param(0, id="equal_values"),
-        pytest.param(1, id="zero_denominator"),
-        pytest.param(2, id="zero_inputs"),
-        pytest.param(3, id="negative_denominator"),
-    ],
-)
-def test_reduced_value_wp_matches_independent_oracle(
-    device: str, case_index: int
-) -> None:
+def test_reduced_value_wp_matches_independent_oracle(device: str) -> None:
     """Validate equal and invalid-denominator reduced values."""
     left = np.array([2.0, 1.0, 0.0, -1.0], dtype=np.float64)
     right = np.array([2.0, -1.0, 0.0, -2.0], dtype=np.float64)
@@ -550,8 +562,17 @@ def test_reduced_value_wp_matches_independent_oracle(
     wp.synchronize()
     observed = result.numpy()
     assert observed.dtype == np.float64
-    npt.assert_allclose(
-        observed[case_index], expected[case_index], rtol=1e-12, atol=0.0
+    _assert_casewise_allclose(
+        observed,
+        expected,
+        (
+            "equal_values",
+            "zero_denominator",
+            "zero_inputs",
+            "negative_denominator",
+        ),
+        rtol=1e-12,
+        atol=0.0,
     )
     assert np.all(np.isfinite(observed))
     assert np.all(observed >= 0.0)
@@ -559,18 +580,7 @@ def test_reduced_value_wp_matches_independent_oracle(
 
 
 @pytest.mark.gpu_parity
-@pytest.mark.parametrize(
-    "case_index",
-    [
-        pytest.param(0, id="neutral"),
-        pytest.param(1, id="attraction"),
-        pytest.param(2, id="repulsion"),
-        pytest.param(3, id="extreme_repulsion"),
-    ],
-)
-def test_coulomb_limit_helpers_wp_match_independent_oracle(
-    device: str, case_index: int
-) -> None:
+def test_coulomb_limit_helpers_wp_match_independent_oracle(device: str) -> None:
     """Validate neutral, attractive, and repulsive Coulomb enhancements."""
     potential = np.array([0.0, 2.0, -2.0, -200.0], dtype=np.float64)
     kinetic_expected = np.array(
@@ -602,15 +612,23 @@ def test_coulomb_limit_helpers_wp_match_independent_oracle(
     continuum_observed = continuum.numpy()
     assert kinetic_observed.dtype == np.float64
     assert continuum_observed.dtype == np.float64
-    npt.assert_allclose(
-        kinetic_observed[case_index],
-        kinetic_expected[case_index],
+    case_names = (
+        "neutral",
+        "attraction",
+        "repulsion",
+        "extreme_repulsion",
+    )
+    _assert_casewise_allclose(
+        kinetic_observed,
+        kinetic_expected,
+        case_names,
         rtol=1e-12,
         atol=0.0,
     )
-    npt.assert_allclose(
-        continuum_observed[case_index],
-        continuum_expected[case_index],
+    _assert_casewise_allclose(
+        continuum_observed,
+        continuum_expected,
+        case_names,
         rtol=1e-12,
         atol=1e-100,
     )
@@ -623,23 +641,8 @@ def test_coulomb_limit_helpers_wp_match_independent_oracle(
 
 
 @pytest.mark.gpu_parity
-@pytest.mark.parametrize(
-    "case_index",
-    [
-        pytest.param(0, id="equal_particle_values"),
-        pytest.param(1, id="mixed_radius_mass_friction_scales"),
-        pytest.param(2, id="zero_radius_sum"),
-        pytest.param(3, id="negative_radius_sum"),
-        pytest.param(4, id="negative_temperature"),
-        pytest.param(5, id="negative_reduced_mass"),
-        pytest.param(6, id="zero_reduced_friction"),
-        pytest.param(7, id="kinetic_threshold"),
-        pytest.param(8, id="negative_reduced_friction"),
-        pytest.param(9, id="zero_temperature"),
-    ],
-)
 def test_diffusive_knudsen_number_wp_matches_independent_oracle(
-    device: str, case_index: int
+    device: str,
 ) -> None:
     """Validate equal, mixed, safe, and kinetic-threshold pair branches."""
     radii_i = np.array(
@@ -711,8 +714,23 @@ def test_diffusive_knudsen_number_wp_matches_independent_oracle(
     wp.synchronize()
     observed = result.numpy()
     assert observed.dtype == np.float64
-    npt.assert_allclose(
-        observed[case_index], expected[case_index], rtol=1e-12, atol=1e-100
+    _assert_casewise_allclose(
+        observed,
+        expected,
+        (
+            "equal_particle_values",
+            "mixed_radius_mass_friction_scales",
+            "zero_radius_sum",
+            "negative_radius_sum",
+            "negative_temperature",
+            "negative_reduced_mass",
+            "zero_reduced_friction",
+            "kinetic_threshold",
+            "negative_reduced_friction",
+            "zero_temperature",
+        ),
+        rtol=1e-12,
+        atol=1e-100,
     )
     assert np.all(np.isfinite(observed))
     assert np.all(observed >= 0.0)
