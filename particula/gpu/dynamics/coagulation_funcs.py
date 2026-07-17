@@ -1,7 +1,8 @@
-"""Warp GPU coagulation composite functions.
+"""Warp GPU Brownian and internal charged-coagulation functions.
 
-These functions mirror the NumPy implementations in
-``particula.dynamics.coagulation.brownian_kernel``.
+The Brownian helpers mirror ``particula.dynamics.coagulation.brownian_kernel``.
+The internal charged hard-sphere helper ports the charged CPU dimensional and
+dimensionless kernels without adding charged execution or public exports.
 """
 
 import warp as wp
@@ -163,8 +164,9 @@ def coulomb_potential_ratio_wp(
     """Calculate the dimensionless pair Coulomb potential ratio.
 
     Computes ``-(q_i * q_j * e**2) / (4 * pi * epsilon_0 * (r_i + r_j)
-    * k_B * T)``. A non-positive radius sum or temperature safely returns
-    ``0.0``. Repulsion is lower-clipped at ``-200.0``.
+    * k_B * T)``. A non-positive radius sum or temperature, or a non-finite
+    intermediate from finite extreme inputs, safely returns ``0.0``. Repulsion
+    is lower-clipped at ``-200.0``.
 
     Args:
         radius_i: Particle i radius in meters.
@@ -179,7 +181,7 @@ def coulomb_potential_ratio_wp(
 
     Returns:
         Dimensionless Coulomb potential ratio, or ``0.0`` for an invalid
-        radius sum or temperature.
+        radius sum, temperature, or non-finite intermediate.
 
     References:
         Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced
@@ -191,16 +193,24 @@ def coulomb_potential_ratio_wp(
         return wp.float64(0.0)
 
     pi_value = wp.float64(3.141592653589793)
-    potential_ratio = -(
-        charge_i * charge_j * elementary_charge_value * elementary_charge_value
-    ) / (
-        wp.float64(4.0)
-        * pi_value
-        * electric_permittivity
-        * sum_radius
-        * boltzmann_constant
-        * temperature
-    )
+    charge_product = charge_i * charge_j
+    charge_scale = elementary_charge_value * elementary_charge_value
+    numerator = -charge_product * charge_scale
+    denominator = wp.float64(4.0) * pi_value * electric_permittivity
+    denominator = denominator * sum_radius
+    denominator = denominator * boltzmann_constant
+    denominator = denominator * temperature
+    if (
+        not wp.isfinite(numerator)
+        or not wp.isfinite(denominator)
+        or denominator <= wp.float64(0.0)
+    ):
+        return wp.float64(0.0)
+    potential_ratio = numerator / denominator
+    if not wp.isfinite(potential_ratio) or (
+        potential_ratio == wp.float64(0.0) and numerator != wp.float64(0.0)
+    ):
+        return wp.float64(0.0)
     return wp.max(potential_ratio, wp.float64(-200.0))
 
 
@@ -280,6 +290,15 @@ def coulomb_continuum_limit_wp(
     """
     if coulomb_potential_ratio == wp.float64(0.0):
         return wp.float64(1.0)
+    if coulomb_potential_ratio > wp.float64(
+        -1.0e-5
+    ) and coulomb_potential_ratio < wp.float64(1.0e-5):
+        potential_squared = coulomb_potential_ratio * coulomb_potential_ratio
+        return (
+            wp.float64(1.0)
+            + coulomb_potential_ratio / wp.float64(2.0)
+            + potential_squared / wp.float64(12.0)
+        )
     return coulomb_potential_ratio / (
         wp.float64(1.0) - wp.exp(-coulomb_potential_ratio)
     )
@@ -371,16 +390,19 @@ def charged_hard_sphere_wp(  # noqa: C901
 ) -> wp.float64:
     """Calculate an internal charged hard-sphere pair rate in SI units.
 
-    This device-only, unexported helper ports the pair calculation from
-    ``particula.dynamics.coagulation.charged_dimensional_kernel`` and the
+    This device-only, unexported helper ports the charged CPU pair calculation
+    from ``particula.dynamics.coagulation.charged_dimensional_kernel`` and the
     hard-sphere fit from
     ``particula.dynamics.coagulation.charged_dimensionless_kernel``. It is
     not integrated with charged execution and does not change public exports.
 
     Non-finite or non-positive radii, masses, thermodynamic state, or physical
     constants return exact safe zero. Charges must be finite but may be signed
-    or zero. Any invalid intermediate, overflow, or underflow also returns
-    exact safe zero rather than a non-finite or negative rate.
+    or zero. Invalid intermediates, finite-input intermediate overflow,
+    overflow-derived signed zero, and underflow return exact safe zero rather
+    than a non-finite or negative rate. Finite extreme repulsion is clipped at
+    a potential ratio of ``-200.0`` and returns safe zero through the kinetic
+    cutoff when its enhancement is below ``1e-80``.
 
     Args:
         radius_i: Radius of particle i [m]. Must be finite and positive.
@@ -410,7 +432,8 @@ def charged_hard_sphere_wp(  # noqa: C901
 
     Returns:
         Finite, non-negative charged hard-sphere pair rate [m³/s], or exact
-        ``0.0`` when an input or intermediate is outside its safe domain.
+        ``0.0`` for invalid inputs, invalid or overflowed intermediates,
+        finite extreme-repulsion clipping, or the kinetic cutoff.
 
     References:
         Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007).
@@ -502,6 +525,33 @@ def charged_hard_sphere_wp(  # noqa: C901
     ):
         return zero
 
+    sum_radius = radius_i + radius_j
+    if not wp.isfinite(sum_radius) or sum_radius <= zero:
+        return zero
+    coulomb_numerator = -(
+        charge_i * charge_j * elementary_charge_value * elementary_charge_value
+    )
+    coulomb_denominator = (
+        wp.float64(4.0)
+        * wp.float64(3.141592653589793)
+        * electric_permittivity
+        * sum_radius
+        * boltzmann_constant
+        * temperature
+    )
+    if (
+        not wp.isfinite(coulomb_numerator)
+        or not wp.isfinite(coulomb_denominator)
+        or coulomb_denominator <= zero
+        or (coulomb_numerator == zero and charge_i != zero and charge_j != zero)
+    ):
+        return zero
+    coulomb_quotient = coulomb_numerator / coulomb_denominator
+    if not wp.isfinite(coulomb_quotient) or (
+        coulomb_quotient == zero and coulomb_numerator != zero
+    ):
+        return zero
+
     potential_ratio = coulomb_potential_ratio_wp(
         radius_i,
         radius_j,
@@ -533,9 +583,6 @@ def charged_hard_sphere_wp(  # noqa: C901
         return zero
     continuum_limit = coulomb_continuum_limit_wp(potential_ratio)
     if not wp.isfinite(continuum_limit) or continuum_limit <= zero:
-        return zero
-    sum_radius = radius_i + radius_j
-    if not wp.isfinite(sum_radius) or sum_radius <= zero:
         return zero
     diffusive_denominator = sum_radius * continuum_limit / kinetic_limit
     if not wp.isfinite(diffusive_denominator) or diffusive_denominator <= zero:
