@@ -431,7 +431,8 @@ for _ in range(n_steps):
 - `WarpParticleData.charge` is caller-owned, device-resident state containing
   dimensionless elementary-charge counts with shape `(n_boxes, n_particles)`.
   It is not a sidecar or a hidden transfer result. Before Brownian execution,
-  it must be a finite `wp.float64` Warp array on the particle-data device.
+  it must be a finite, same-device `wp.float64` Warp array with that matching
+  shape on the particle-data device.
   Non-finite charge is detected by one read-only device scan and private-status
   readback; failure occurs before environment or volume normalization,
   caller-output validation or allocation, RNG setup, and Brownian/apply work.
