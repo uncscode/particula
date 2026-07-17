@@ -81,6 +81,10 @@ from particula.gpu.properties.particle_properties import (
 
 MAX_COLLISION_PAIR_BUFFER_BYTES = 256 * 1024 * 1024
 MAX_SCHEDULED_TRIALS_PER_BOX = 65_536
+# Charged selection obtains an exact majorant by visiting every compact active
+# pair in one thread. This limit caps that O(A²) pre-launch work at 32,640
+# pairs per box and deliberately applies only to charged-only execution.
+MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX = 256
 
 BROWNIAN_MECHANISM = "brownian"
 CHARGED_HARD_SPHERE_MECHANISM = "charged_hard_sphere"
@@ -638,6 +642,47 @@ def _validate_charge_finite_kernel(charge: Any, invalid: Any) -> None:
 @no_type_check
 @wp.kernel
 # type: ignore[misc]
+def _validate_charged_particle_physics_kernel(
+    masses: Any,
+    concentration: Any,
+    invalid: Any,
+    active_counts: Any,
+) -> None:
+    """Validate charged particle inputs and count active slots read-only.
+
+    Masses and concentrations may be zero for inactive slots, but all particle
+    state must be finite and nonnegative; species density must be finite and
+    strictly positive.
+    """  # type: ignore
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
+    concentration_value = concentration[box_idx, particle_idx]
+    if not wp.isfinite(concentration_value) or concentration_value < wp.float64(
+        0.0
+    ):
+        wp.atomic_max(invalid, 0, 1)
+    elif concentration_value > wp.float64(0.0):
+        wp.atomic_add(active_counts, box_idx, 1)
+
+    for species_idx in range(masses.shape[2]):
+        mass = masses[box_idx, particle_idx, species_idx]
+        if not wp.isfinite(mass) or mass < wp.float64(0.0):
+            wp.atomic_max(invalid, 0, 1)
+
+
+@no_type_check
+@wp.kernel
+# type: ignore[misc]
+def _validate_charged_density_kernel(density: Any, invalid: Any) -> None:
+    """Record invalid charged species densities without mutation."""  # type: ignore
+    species_idx = wp.tid()  # type: ignore[misc]
+    density_value = density[species_idx]
+    if not wp.isfinite(density_value) or density_value <= wp.float64(0.0):
+        wp.atomic_max(invalid, 0, 1)
+
+
+@no_type_check
+@wp.kernel
+# type: ignore[misc]
 def brownian_coagulation_kernel(  # noqa: C901
     masses: Any,
     concentration: Any,
@@ -1119,6 +1164,55 @@ def _validate_charge_finite(
         raise ValueError("particle charge must contain only finite values")
 
 
+def _validate_charged_particle_physics(
+    particles: Any,
+    n_boxes: int,
+    n_particles: int,
+    device: Any,
+) -> None:
+    """Reject invalid charged particle inputs and excessive active work.
+
+    The exact charged majorant enumerates all unique active pairs in a single
+    selector thread. This read-only preflight therefore bounds each box to
+    ``MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX`` active particles before any output
+    allocation, RNG initialization, selector launch, or caller-state mutation.
+
+    Raises:
+        ValueError: If mass or concentration is non-finite/negative, density is
+            non-finite/nonpositive, or a box exceeds the charged active limit.
+    """
+    invalid = wp.zeros((1,), dtype=wp.int32, device=device)
+    active_counts = wp.zeros((n_boxes,), dtype=wp.int32, device=device)
+    wp.launch(
+        _validate_charged_particle_physics_kernel,
+        dim=(n_boxes, n_particles),
+        inputs=[
+            particles.masses,
+            particles.concentration,
+            invalid,
+            active_counts,
+        ],
+        device=device,
+    )
+    wp.launch(
+        _validate_charged_density_kernel,
+        dim=particles.density.shape[0],
+        inputs=[particles.density, invalid],
+        device=device,
+    )
+    wp.synchronize_device(device)
+    if invalid.numpy()[0] != 0:
+        raise ValueError(
+            "charged particle masses and concentrations must be finite and "
+            "nonnegative, and density must be finite and > 0"
+        )
+    if np.any(active_counts.numpy() > MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX):
+        raise ValueError(
+            "charged active particle count exceeds "
+            "MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX"
+        )
+
+
 def _validate_collision_pairs(
     collision_pairs: Any,
     expected_shape: tuple[int, int, int],
@@ -1495,6 +1589,9 @@ def coagulation_step_gpu(  # noqa: C901
             ``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle
             device. Charged-only execution, and Brownian with
             ``validate_charge_finite=True``, also raise for NaN or infinity.
+        ValueError: If charged-only masses or concentrations are non-finite or
+            negative, species density is non-finite or nonpositive, or a box
+            exceeds ``MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX`` active particles.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
@@ -1514,13 +1611,13 @@ def coagulation_step_gpu(  # noqa: C901
         downstream work. The normalized environment arrays are forwarded
         directly into the launch path.
 
-        Charged-only execution always validates finite charge; Brownian does so
-        only with ``validate_charge_finite=True``. The validation runs after
-        particle metadata and device validation but before time-step and
-        environment normalization. It uses one read-only O(``n_boxes *
-        n_particles``) launch and a private one-element status-scalar
-        allocation/readback to reject non-finite charge. Brownian's default
-        avoids the scan, allocation, synchronization, and host readback.
+        Charged-only execution read-only-validates finite/nonnegative masses
+        and concentrations, finite/positive density, its bounded active count,
+        and finite charge before time-step or environment normalization. The
+        active bound caps its exact compact-active O(A²) majorant at 32,640
+        pairs per box. Brownian validates charge only with
+        ``validate_charge_finite=True`` and otherwise avoids this scan,
+        allocation, synchronization, and host readback.
 
         A successful call allocates private, call-local selector scratch,
         including a ``wp.float64`` ``(n_boxes, n_particles)`` total-mass array.
@@ -1562,12 +1659,19 @@ def coagulation_step_gpu(  # noqa: C901
 
     device = particles.masses.device
     _validate_device_arrays(particles, device)
-    if (
-        validate_charge_finite
-        or resolved_mechanism_config.mask == CHARGED_HARD_SPHERE_MECHANISM_FLAG
-    ):
+    charged_only = (
+        resolved_mechanism_config.mask == CHARGED_HARD_SPHERE_MECHANISM_FLAG
+    )
+    if validate_charge_finite or charged_only:
         _validate_charge_finite(
             particles.charge,
+            n_boxes,
+            n_particles,
+            device,
+        )
+    if charged_only:
+        _validate_charged_particle_physics(
+            particles,
             n_boxes,
             n_particles,
             device,

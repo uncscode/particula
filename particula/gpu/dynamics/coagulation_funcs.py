@@ -1,8 +1,9 @@
 """Warp GPU Brownian and internal charged-coagulation functions.
 
 The Brownian helpers mirror ``particula.dynamics.coagulation.brownian_kernel``.
-The internal charged hard-sphere helper ports the charged CPU dimensional and
-dimensionless kernels without adding charged execution or public exports.
+The concrete-module-only charged hard-sphere helper supports the low-level,
+charged-only particle-resolved GPU execution path. It does not add public
+exports, combined mechanisms, or higher-level charged coagulation APIs.
 """
 
 import warp as wp

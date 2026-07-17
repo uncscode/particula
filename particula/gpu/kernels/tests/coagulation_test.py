@@ -60,6 +60,7 @@ if wp is not None:
         CANONICAL_COAGULATION_MECHANISMS,
         CHARGED_HARD_SPHERE_MECHANISM,
         CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+        MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX,
         MAX_SCHEDULED_TRIALS_PER_BOX,
         SEDIMENTATION_SP2016_MECHANISM,
         SEDIMENTATION_SP2016_MECHANISM_FLAG,
@@ -297,6 +298,338 @@ def test_charged_only_step_runs_and_preserves_output_identity(
     assert result_pairs is pairs
     assert result_counts is counts
     assert 0 <= int(counts.numpy()[0]) <= 1
+
+
+def test_charged_only_step_merges_and_conserves_mass_and_charge(
+    device: str,
+) -> None:
+    """The public charged path applies a selected merge without inventory drift."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    particles.volume[:] = 1.0e-18
+    particles.masses[0] = [[1.0e-21, 2.0e-21], [3.0e-21, 4.0e-21]]
+    particles.charge[:] = [[2.0, -5.0]]
+    initial_mass = np.sum(particles.masses, axis=1)
+    initial_charge = np.sum(particles.charge, axis=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.zeros((1, 1, 2), dtype=wp.int32, device=device)
+    counts = wp.zeros((1,), dtype=wp.int32, device=device)
+
+    result_particles, result_pairs, result_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+        max_collisions=1,
+        rng_seed=41,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        mechanism_config=CoagulationMechanismConfig(
+            mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+        ),
+    )
+    result = from_warp_particle_data(result_particles, sync=True)
+
+    assert result_pairs is pairs
+    assert result_counts is counts
+    npt.assert_array_equal(counts.numpy(), np.array([1], dtype=np.int32))
+    npt.assert_array_equal(pairs.numpy(), np.array([[[0, 1]]], dtype=np.int32))
+    npt.assert_allclose(np.sum(result.masses, axis=1), initial_mass, rtol=1e-12)
+    npt.assert_allclose(
+        np.sum(result.charge, axis=1), initial_charge, rtol=1e-12
+    )
+    npt.assert_allclose(result.masses[0, 0], [4.0e-21, 6.0e-21], rtol=1e-12)
+    npt.assert_array_equal(result.masses[0, 1], np.zeros(2))
+    assert result.charge[0, 0] == -3.0
+    assert result.charge[0, 1] == 0.0
+    assert result.concentration[0, 1] == 0.0
+
+
+def test_charged_only_multispecies_total_mass_regression(
+    device: str,
+) -> None:
+    """Charged-only selection uses summed species mass, not a component."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=2)
+    particles.volume[:] = 1.0e-18
+    particles.masses[0] = [
+        [1.0e-21, 9.0e-21],
+        [4.0e-21, 6.0e-21],
+        [2.0e-21, 1.0e-20],
+    ]
+    particles.charge[:] = [[1.0, -1.0, 2.0]]
+    total_masses = np.sum(particles.masses[0], axis=1)
+    radii = np.cbrt(3.0 * total_masses / (4.0 * np.pi * particles.density[0]))
+
+    expected_rate = _charged_hard_sphere_oracle(
+        radii[0],
+        radii[1],
+        total_masses[0],
+        total_masses[1],
+        particles.charge[0, 0],
+        particles.charge[0, 1],
+        298.15,
+        101325.0,
+    )
+    assert expected_rate > 0.0
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    collision_pairs = wp.array(
+        np.full((1, 1, 2), -7, dtype=np.int32),
+        dtype=wp.int32,
+        device=device,
+    )
+    collision_counts = wp.array(
+        np.array([-7], dtype=np.int32), dtype=wp.int32, device=device
+    )
+    rng_states = wp.array(
+        np.array([17], dtype=np.uint32), dtype=wp.uint32, device=device
+    )
+    total_masses_buffer = wp.zeros((1, 3), dtype=wp.float64, device=device)
+    radii_buffer = wp.zeros((1, 3), dtype=wp.float64, device=device)
+    diffusivities_buffer = wp.zeros((1, 3), dtype=wp.float64, device=device)
+    g_terms_buffer = wp.zeros((1, 3), dtype=wp.float64, device=device)
+    speeds_buffer = wp.zeros((1, 3), dtype=wp.float64, device=device)
+    active_indices = wp.zeros((1, 3), dtype=wp.int32, device=device)
+
+    wp.launch(
+        brownian_coagulation_kernel,
+        dim=(1,),
+        inputs=[
+            gpu_particles.masses,
+            gpu_particles.concentration,
+            gpu_particles.density,
+            gpu_particles.volume,
+            wp.array([298.15], dtype=wp.float64, device=device),
+            wp.array([101325.0], dtype=wp.float64, device=device),
+            wp.float64(constants.GAS_CONSTANT),
+            wp.float64(constants.BOLTZMANN_CONSTANT),
+            wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+            wp.float64(constants.REF_VISCOSITY_AIR_STP),
+            wp.float64(constants.REF_TEMPERATURE_STP),
+            wp.float64(constants.SUTHERLAND_CONSTANT),
+            wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+            wp.float64(constants.ELECTRIC_PERMITTIVITY),
+            wp.float64(0.0),
+            radii_buffer,
+            diffusivities_buffer,
+            g_terms_buffer,
+            speeds_buffer,
+            total_masses_buffer,
+            gpu_particles.charge,
+            active_indices,
+            collision_pairs,
+            collision_counts,
+            rng_states,
+            wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG),
+            wp.int32(1),
+        ],
+        device=device,
+    )
+    wp.synchronize()
+
+    npt.assert_allclose(
+        np.asarray(total_masses_buffer.numpy())[0],
+        total_masses,
+        rtol=1.0e-12,
+        atol=0.0,
+    )
+
+    compact = np.array([[0, 1, 2]], dtype=np.int32)
+    direct, dispatched = _run_charged_majorant_probes(
+        device,
+        compact,
+        np.array([3], dtype=np.int32),
+        np.asarray(radii_buffer.numpy()),
+        np.asarray(total_masses_buffer.numpy()),
+        np.asarray(gpu_particles.charge.numpy()),
+        np.array([298.15], dtype=np.float64),
+        np.array([101325.0], dtype=np.float64),
+    )
+    expected_majorant = _charged_majorant_oracle(
+        compact[0],
+        3,
+        np.asarray(radii_buffer.numpy())[0],
+        np.asarray(total_masses_buffer.numpy())[0],
+        np.asarray(gpu_particles.charge.numpy())[0],
+        298.15,
+        101325.0,
+    )
+    npt.assert_allclose(direct, [expected_majorant], rtol=1.0e-11, atol=0.0)
+    npt.assert_allclose(dispatched, [expected_majorant], rtol=1.0e-11, atol=0.0)
+
+    initial_collision_pairs = np.asarray(collision_pairs.numpy()).copy()
+    initial_collision_counts = np.asarray(collision_counts.numpy()).copy()
+
+    result_particles, result_pairs, result_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.0,
+        max_collisions=1,
+        collision_pairs=collision_pairs,
+        n_collisions=collision_counts,
+        rng_states=rng_states,
+        initialize_rng=True,
+        mechanism_config=CoagulationMechanismConfig(
+            mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+        ),
+    )
+
+    assert result_particles is gpu_particles
+    assert result_pairs is collision_pairs
+    assert result_counts is collision_counts
+    npt.assert_array_equal(np.asarray(collision_counts.numpy()), np.array([0]))
+    npt.assert_array_equal(
+        np.asarray(collision_pairs.numpy()), initial_collision_pairs
+    )
+    npt.assert_array_equal(
+        np.asarray(collision_counts.numpy()), initial_collision_counts
+    )
+
+
+@pytest.mark.stochastic
+@pytest.mark.parametrize("charges", [(0.0, 0.0), (3.0, 3.0), (3.0, -3.0)])
+def test_charged_only_fresh_seed_counts_match_pair_rate_oracle(
+    device: str,
+    charges: tuple[float, float],
+) -> None:
+    """Fresh-seed charged counts stay within a four-sigma oracle bound.
+
+    The two-active-particle fixture makes the exhaustive majorant equal the
+    independent pair rate. Volume selects a 0.2 scheduled-trial probability,
+    so each fresh seed is an independent Bernoulli observation rather than an
+    exact stochastic replay assertion.
+    """
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    particles.masses[:] = 1.0e-21
+    particles.charge[:] = [charges]
+    radius = (3.0 * 1.0e-21 / (4.0 * np.pi * particles.density[0])) ** (
+        1.0 / 3.0
+    )
+    rate = _charged_hard_sphere_oracle(
+        radius,
+        radius,
+        1.0e-21,
+        1.0e-21,
+        charges[0],
+        charges[1],
+        298.15,
+        101325.0,
+    )
+    assert rate > 0.0
+    trial_probability = 0.2
+    volume = rate / trial_probability
+    observations = 64
+    accepted = 0
+    for seed in range(observations):
+        gpu_particles = to_warp_particle_data(particles, device=device)
+        _, _, counts = coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            volume=volume,
+            max_collisions=1,
+            rng_seed=seed,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+            ),
+        )
+        accepted += int(counts.numpy()[0])
+
+    expected = observations * trial_probability
+    sigma = np.sqrt(
+        observations * trial_probability * (1.0 - trial_probability)
+    )
+    assert abs(accepted - expected) <= 4.0 * sigma + 1.0
+
+
+@pytest.mark.parametrize(
+    ("field", "invalid_value"),
+    [
+        ("masses", np.nan),
+        ("masses", -1.0e-21),
+        ("density", np.nan),
+        ("density", 0.0),
+        ("concentration", np.nan),
+        ("concentration", -1.0),
+    ],
+)
+def test_charged_only_rejects_invalid_particle_physics_before_mutation(
+    device: str,
+    field: str,
+    invalid_value: float,
+) -> None:
+    """Charged validation rejects hostile particle inputs before side effects."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    if field == "density":
+        particles.density[0] = invalid_value
+    else:
+        getattr(particles, field)[0, 0] = invalid_value
+    initial_particles = particles.copy()
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array(np.full((1, 1, 2), -7), dtype=wp.int32, device=device)
+    counts = wp.array(np.array([-7]), dtype=wp.int32, device=device)
+    states = wp.array(np.array([17]), dtype=wp.uint32, device=device)
+
+    with pytest.raises(ValueError, match="charged particle"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            max_collisions=1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+            ),
+        )
+
+    _assert_particles_unchanged(gpu_particles, initial_particles)
+    npt.assert_array_equal(pairs.numpy(), np.full((1, 1, 2), -7))
+    npt.assert_array_equal(counts.numpy(), np.array([-7], dtype=np.int32))
+    npt.assert_array_equal(states.numpy(), np.array([17], dtype=np.uint32))
+
+
+def test_charged_only_rejects_over_limit_active_particles_before_mutation(
+    device: str,
+) -> None:
+    """Charged exact-majorant work is bounded before output or RNG mutation."""
+    particles = _make_particle_data(
+        n_boxes=1,
+        n_particles=MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX + 1,
+        n_species=1,
+    )
+    initial_particles = particles.copy()
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array(np.full((1, 1, 2), -7), dtype=wp.int32, device=device)
+    counts = wp.array(np.array([-7]), dtype=wp.int32, device=device)
+    states = wp.array(np.array([17]), dtype=wp.uint32, device=device)
+
+    with pytest.raises(
+        ValueError, match="MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX"
+    ):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            max_collisions=1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(CHARGED_HARD_SPHERE_MECHANISM,)
+            ),
+        )
+
+    _assert_particles_unchanged(gpu_particles, initial_particles)
+    npt.assert_array_equal(pairs.numpy(), np.full((1, 1, 2), -7))
+    npt.assert_array_equal(counts.numpy(), np.array([-7], dtype=np.int32))
+    npt.assert_array_equal(states.numpy(), np.array([17], dtype=np.uint32))
 
 
 def test_mechanism_support_rejects_combined_brownian_and_reserved_term() -> (
@@ -1495,6 +1828,7 @@ def _accumulate_collision_counts(
     pressure: float | Any | None,
     environment: Any | None = None,
     volume: float | Any | None = None,
+    mechanism_config: CoagulationMechanismConfig | None = None,
 ) -> np.ndarray:
     """Accumulate per-box collision counts across a fixed seed set.
 
@@ -1510,6 +1844,8 @@ def _accumulate_collision_counts(
             ``coagulation_step_gpu``.
         environment: Optional explicit environment input for the launches.
         volume: Optional scalar or device volume override in m^3.
+        mechanism_config: Optional coagulation configuration forwarded to each
+            entry-point call.
 
     Returns:
         Per-box summed collision counts accumulated across all requested seeds.
@@ -1527,6 +1863,7 @@ def _accumulate_collision_counts(
             max_collisions=max_collisions,
             rng_seed=seed,
             environment=environment,
+            mechanism_config=mechanism_config,
         )
         wp.synchronize()
         total_counts += np.asarray(collision_counts.numpy(), dtype=np.int64)
@@ -1546,6 +1883,7 @@ def _run_seeded_coagulation_step(
     volume: float | np.ndarray | None = None,
     rng_states: Any | None = None,
     initialize_rng: bool = False,
+    mechanism_config: CoagulationMechanismConfig | None = None,
 ) -> _CoagulationStepResult:
     """Run one seeded coagulation step from a fresh particle fixture.
 
@@ -1560,6 +1898,8 @@ def _run_seeded_coagulation_step(
         volume: Optional scalar or array box volume override in m^3.
         rng_states: Optional caller-owned RNG state buffer to reuse or reset.
         initialize_rng: Whether to reseed a provided ``rng_states`` buffer.
+        mechanism_config: Optional coagulation configuration forwarded to the
+            public entry point.
 
     Returns:
         Collision counts, accepted pairs, restored particle state, and an
@@ -1589,6 +1929,7 @@ def _run_seeded_coagulation_step(
         n_collisions=collision_counts,
         rng_states=rng_states,
         initialize_rng=initialize_rng,
+        mechanism_config=mechanism_config,
     )
     wp.synchronize()
 
