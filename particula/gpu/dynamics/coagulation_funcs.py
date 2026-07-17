@@ -137,3 +137,129 @@ def brownian_kernel_pair_wp(
             / (sum_radius * speed_sqrt * alpha)
         )
     )
+
+
+@wp.func
+def coulomb_potential_ratio_wp(
+    radius_i: wp.float64,
+    radius_j: wp.float64,
+    charge_i: wp.float64,
+    charge_j: wp.float64,
+    temperature: wp.float64,
+    boltzmann_constant: wp.float64,
+    elementary_charge_value: wp.float64,
+    electric_permittivity: wp.float64,
+) -> wp.float64:
+    """Calculate the dimensionless pair Coulomb potential ratio.
+
+    Radii are in meters, temperature is in kelvin, and charges are elementary
+    charge counts. A non-positive radius sum or temperature safely returns
+    ``0.0``. The result is lower-clipped at ``-200.0`` following
+    Gopalakrishnan and Hogan (2012).
+    """
+    sum_radius = radius_i + radius_j
+    if sum_radius <= wp.float64(0.0) or temperature <= wp.float64(0.0):
+        return wp.float64(0.0)
+
+    pi_value = wp.float64(3.141592653589793)
+    potential_ratio = (
+        -charge_i
+        * charge_j
+        * elementary_charge_value
+        * elementary_charge_value
+        / (
+            wp.float64(4.0)
+            * pi_value
+            * electric_permittivity
+            * sum_radius
+            * boltzmann_constant
+            * temperature
+        )
+    )
+    return wp.max(potential_ratio, wp.float64(-200.0))
+
+
+@wp.func
+def reduced_value_wp(left: wp.float64, right: wp.float64) -> wp.float64:
+    """Calculate a scalar reduced value for mass or friction inputs.
+
+    Inputs use the units of the supplied quantity. A non-positive summed input
+    safely returns ``0.0``. This is the reduced-property form used by
+    Chahl and Gopalakrishnan (2019).
+    """
+    denominator = left + right
+    if denominator <= wp.float64(0.0):
+        return wp.float64(0.0)
+    return left * right / denominator
+
+
+@wp.func
+def coulomb_kinetic_limit_wp(
+    coulomb_potential_ratio: wp.float64,
+) -> wp.float64:
+    """Calculate the dimensionless kinetic Coulomb enhancement factor.
+
+    Uses the Gopalakrishnan and Hogan (2012) kinetic-limit expression. The
+    finite scalar input has no fallback condition.
+    """
+    if coulomb_potential_ratio >= wp.float64(0.0):
+        return wp.float64(1.0) + coulomb_potential_ratio
+    return wp.exp(coulomb_potential_ratio)
+
+
+@wp.func
+def coulomb_continuum_limit_wp(
+    coulomb_potential_ratio: wp.float64,
+) -> wp.float64:
+    """Calculate the dimensionless continuum Coulomb enhancement factor.
+
+    Uses the Gopalakrishnan and Hogan (2012) continuum-limit expression. A
+    neutral potential safely returns the limiting value ``1.0``.
+    """
+    if coulomb_potential_ratio == wp.float64(0.0):
+        return wp.float64(1.0)
+    return coulomb_potential_ratio / (
+        wp.float64(1.0) - wp.exp(-coulomb_potential_ratio)
+    )
+
+
+@wp.func
+def diffusive_knudsen_number_wp(
+    radius_i: wp.float64,
+    radius_j: wp.float64,
+    mass_i: wp.float64,
+    mass_j: wp.float64,
+    friction_i: wp.float64,
+    friction_j: wp.float64,
+    coulomb_potential_ratio: wp.float64,
+    temperature: wp.float64,
+    boltzmann_constant: wp.float64,
+) -> wp.float64:
+    """Calculate the dimensionless pair diffusive Knudsen number.
+
+    Radii are in meters, masses in kilograms, and temperature in kelvin. A
+    non-positive radius sum, temperature, reduced mass, or reduced friction
+    safely returns ``0.0``. A kinetic enhancement below ``1e-80`` also returns
+    ``0.0``, matching the extreme-repulsion treatment of
+    Chahl and Gopalakrishnan (2019).
+    """
+    sum_radius = radius_i + radius_j
+    if sum_radius <= wp.float64(0.0) or temperature <= wp.float64(0.0):
+        return wp.float64(0.0)
+
+    reduced_mass = reduced_value_wp(mass_i, mass_j)
+    reduced_friction = reduced_value_wp(friction_i, friction_j)
+    if reduced_mass <= wp.float64(0.0) or reduced_friction <= wp.float64(0.0):
+        return wp.float64(0.0)
+
+    kinetic_limit = coulomb_kinetic_limit_wp(coulomb_potential_ratio)
+    if kinetic_limit < wp.float64(1.0e-80):
+        return wp.float64(0.0)
+
+    continuum_limit = coulomb_continuum_limit_wp(coulomb_potential_ratio)
+    numerator = (
+        wp.sqrt(boltzmann_constant * temperature * reduced_mass)
+        / reduced_friction
+    )
+    denominator = sum_radius * continuum_limit / kinetic_limit
+    return numerator / denominator
