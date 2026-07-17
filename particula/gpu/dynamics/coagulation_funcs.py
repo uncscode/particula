@@ -6,6 +6,16 @@ These functions mirror the NumPy implementations in
 
 import warp as wp
 
+from particula.gpu.properties.gas_properties import (
+    dynamic_viscosity_wp,
+    molecule_mean_free_path_wp,
+)
+from particula.gpu.properties.particle_properties import (
+    cunningham_slip_correction_wp,
+    friction_factor_wp,
+    knudsen_number_wp,
+)
+
 
 @wp.func
 def brownian_diffusivity_wp(
@@ -338,3 +348,211 @@ def diffusive_knudsen_number_wp(
     )
     denominator = sum_radius * continuum_limit / kinetic_limit
     return numerator / denominator
+
+
+@wp.func
+def charged_hard_sphere_wp(  # noqa: C901
+    radius_i: wp.float64,
+    radius_j: wp.float64,
+    mass_i: wp.float64,
+    mass_j: wp.float64,
+    charge_i: wp.float64,
+    charge_j: wp.float64,
+    temperature: wp.float64,
+    pressure: wp.float64,
+    boltzmann_constant: wp.float64,
+    elementary_charge_value: wp.float64,
+    electric_permittivity: wp.float64,
+    gas_constant: wp.float64,
+    molecular_weight_air: wp.float64,
+    ref_viscosity: wp.float64,
+    ref_temperature: wp.float64,
+    sutherland_constant: wp.float64,
+) -> wp.float64:
+    """Calculate an internal charged hard-sphere pair rate in SI units.
+
+    This device-side helper ports
+    ``charged_dimensional_kernel.get_hard_sphere_kernel_via_system_state``
+    and ``charged_dimensionless_kernel.get_hard_sphere_kernel``. It accepts
+    radii [m], masses [kg], signed elementary-charge counts, temperature [K],
+    pressure [Pa], and physical constants in their SI units, and returns a
+    finite, non-negative rate [m³/s]. Non-finite or invalid positive-domain
+    state and constants return safe zero; charges may be finite, negative, or
+    zero. This internal helper does not enable charged execution.
+    """
+    zero = wp.float64(0.0)
+    if (
+        not wp.isfinite(radius_i)
+        or radius_i <= zero
+        or not wp.isfinite(radius_j)
+        or radius_j <= zero
+        or not wp.isfinite(mass_i)
+        or mass_i <= zero
+        or not wp.isfinite(mass_j)
+        or mass_j <= zero
+        or not wp.isfinite(charge_i)
+        or not wp.isfinite(charge_j)
+        or not wp.isfinite(temperature)
+        or temperature <= zero
+        or not wp.isfinite(pressure)
+        or pressure <= zero
+        or not wp.isfinite(boltzmann_constant)
+        or boltzmann_constant <= zero
+        or not wp.isfinite(elementary_charge_value)
+        or elementary_charge_value <= zero
+        or not wp.isfinite(electric_permittivity)
+        or electric_permittivity <= zero
+        or not wp.isfinite(gas_constant)
+        or gas_constant <= zero
+        or not wp.isfinite(molecular_weight_air)
+        or molecular_weight_air <= zero
+        or not wp.isfinite(ref_viscosity)
+        or ref_viscosity <= zero
+        or not wp.isfinite(ref_temperature)
+        or ref_temperature <= zero
+        or not wp.isfinite(sutherland_constant)
+        or sutherland_constant <= zero
+    ):
+        return zero
+
+    dynamic_viscosity = dynamic_viscosity_wp(
+        temperature,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+    )
+    if not wp.isfinite(dynamic_viscosity) or dynamic_viscosity <= zero:
+        return zero
+
+    mean_free_path = molecule_mean_free_path_wp(
+        molecular_weight_air,
+        temperature,
+        pressure,
+        dynamic_viscosity,
+        gas_constant,
+    )
+    if not wp.isfinite(mean_free_path) or mean_free_path <= zero:
+        return zero
+
+    knudsen_i = knudsen_number_wp(mean_free_path, radius_i)
+    knudsen_j = knudsen_number_wp(mean_free_path, radius_j)
+    if (
+        not wp.isfinite(knudsen_i)
+        or knudsen_i <= zero
+        or not wp.isfinite(knudsen_j)
+        or knudsen_j <= zero
+    ):
+        return zero
+
+    slip_i = cunningham_slip_correction_wp(knudsen_i)
+    slip_j = cunningham_slip_correction_wp(knudsen_j)
+    if (
+        not wp.isfinite(slip_i)
+        or slip_i <= zero
+        or not wp.isfinite(slip_j)
+        or slip_j <= zero
+    ):
+        return zero
+
+    friction_i = friction_factor_wp(radius_i, dynamic_viscosity, slip_i)
+    friction_j = friction_factor_wp(radius_j, dynamic_viscosity, slip_j)
+    if (
+        not wp.isfinite(friction_i)
+        or friction_i <= zero
+        or not wp.isfinite(friction_j)
+        or friction_j <= zero
+    ):
+        return zero
+
+    potential_ratio = coulomb_potential_ratio_wp(
+        radius_i,
+        radius_j,
+        charge_i,
+        charge_j,
+        temperature,
+        boltzmann_constant,
+        elementary_charge_value,
+        electric_permittivity,
+    )
+    if not wp.isfinite(potential_ratio):
+        return zero
+
+    reduced_mass = reduced_value_wp(mass_i, mass_j)
+    reduced_friction = reduced_value_wp(friction_i, friction_j)
+    if (
+        not wp.isfinite(reduced_mass)
+        or reduced_mass <= zero
+        or not wp.isfinite(reduced_friction)
+        or reduced_friction <= zero
+    ):
+        return zero
+    thermal_mass_product = boltzmann_constant * temperature * reduced_mass
+    if not wp.isfinite(thermal_mass_product) or thermal_mass_product <= zero:
+        return zero
+
+    kinetic_limit = coulomb_kinetic_limit_wp(potential_ratio)
+    if not wp.isfinite(kinetic_limit) or kinetic_limit < wp.float64(1.0e-80):
+        return zero
+    continuum_limit = coulomb_continuum_limit_wp(potential_ratio)
+    if not wp.isfinite(continuum_limit) or continuum_limit <= zero:
+        return zero
+    sum_radius = radius_i + radius_j
+    if not wp.isfinite(sum_radius) or sum_radius <= zero:
+        return zero
+    diffusive_denominator = sum_radius * continuum_limit / kinetic_limit
+    if not wp.isfinite(diffusive_denominator) or diffusive_denominator <= zero:
+        return zero
+
+    diffusive_knudsen = diffusive_knudsen_number_wp(
+        radius_i,
+        radius_j,
+        mass_i,
+        mass_j,
+        friction_i,
+        friction_j,
+        potential_ratio,
+        temperature,
+        boltzmann_constant,
+    )
+    if not wp.isfinite(diffusive_knudsen) or diffusive_knudsen < zero:
+        return zero
+
+    pi_value = wp.float64(3.141592653589793)
+    continuum = (
+        wp.float64(4.0) * pi_value * diffusive_knudsen * diffusive_knudsen
+    )
+    numerator = (
+        continuum
+        + wp.float64(25.836) * wp.pow(diffusive_knudsen, wp.float64(3.0))
+        + wp.sqrt(wp.float64(8.0) * pi_value)
+        * wp.float64(11.211)
+        * wp.pow(diffusive_knudsen, wp.float64(4.0))
+    )
+    denominator = (
+        wp.float64(1.0)
+        + wp.float64(3.502) * diffusive_knudsen
+        + wp.float64(7.211) * diffusive_knudsen * diffusive_knudsen
+        + wp.float64(11.211) * wp.pow(diffusive_knudsen, wp.float64(3.0))
+    )
+    if (
+        not wp.isfinite(numerator)
+        or numerator < zero
+        or not wp.isfinite(denominator)
+        or denominator <= zero
+    ):
+        return zero
+    dimensionless_kernel = numerator / denominator
+    if not wp.isfinite(dimensionless_kernel) or dimensionless_kernel < zero:
+        return zero
+
+    result = (
+        dimensionless_kernel
+        * reduced_friction
+        * wp.pow(sum_radius, wp.float64(3.0))
+        * kinetic_limit
+        * kinetic_limit
+        / (reduced_mass * continuum_limit)
+    )
+    if not wp.isfinite(result) or result <= zero:
+        return zero
+    return result
