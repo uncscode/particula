@@ -644,6 +644,7 @@ def _validate_charge_finite_kernel(charge: Any, invalid: Any) -> None:
 def _validate_charged_particle_physics_kernel(
     masses: Any,
     concentration: Any,
+    density: Any,
     invalid: Any,
     active_counts: Any,
 ) -> None:
@@ -659,16 +660,16 @@ def _validate_charged_particle_physics_kernel(
         0.0
     ):
         wp.atomic_max(invalid, 0, 1)
-    total_mass = wp.float64(0.0)
+    total_volume = wp.float64(0.0)
     for species_idx in range(masses.shape[2]):
         mass = masses[box_idx, particle_idx, species_idx]
         if not wp.isfinite(mass) or mass < wp.float64(0.0):
             wp.atomic_max(invalid, 0, 1)
-        total_mass += mass
+        total_volume += mass / density[species_idx]
 
-    # After density preflight, positive total mass is equivalent to the
-    # selector's positive total-volume requirement.
-    if concentration_value > wp.float64(0.0) and total_mass > wp.float64(0.0):
+    # Match the selector eligibility condition exactly so the charged-work cap
+    # covers precisely the slots that can enter its compact active set.
+    if concentration_value > wp.float64(0.0) and total_volume > wp.float64(0.0):
         wp.atomic_add(active_counts, box_idx, 1)
 
 
@@ -1043,12 +1044,16 @@ def apply_coagulation_kernel(
     idx_i = collision_pairs[box_idx, collision_idx, 0]
     idx_j = collision_pairs[box_idx, collision_idx, 1]
     if idx_i == idx_j:
+        collision_pairs[box_idx, collision_idx, 0] = wp.int32(-1)
+        collision_pairs[box_idx, collision_idx, 1] = wp.int32(-1)
         return
 
     merged_charge = charge[box_idx, idx_i] + charge[box_idx, idx_j]
     # An unrepresentable charge merge must not partially apply mass state or
     # turn finite caller state into infinity. Skipping preserves inventories.
     if not wp.isfinite(merged_charge):
+        collision_pairs[box_idx, collision_idx, 0] = wp.int32(-1)
+        collision_pairs[box_idx, collision_idx, 1] = wp.int32(-1)
         return
 
     n_species = masses.shape[2]
@@ -1060,6 +1065,8 @@ def apply_coagulation_kernel(
         # Validate every component before changing any state. A skipped pair
         # preserves caller-owned inventories and avoids partial merges.
         if not wp.isfinite(merged_mass) or merged_mass < wp.float64(0.0):
+            collision_pairs[box_idx, collision_idx, 0] = wp.int32(-1)
+            collision_pairs[box_idx, collision_idx, 1] = wp.int32(-1)
             return
 
     for species_idx in range(n_species):
@@ -1072,6 +1079,28 @@ def apply_coagulation_kernel(
     charge[box_idx, idx_i] = merged_charge
     charge[box_idx, idx_j] = wp.float64(0.0)
     concentration[box_idx, idx_j] = wp.float64(0.0)
+
+
+@no_type_check
+@wp.kernel
+# type: ignore[misc]
+def _compact_applied_collision_pairs_kernel(
+    collision_pairs: Any,
+    n_collisions: Any,
+) -> None:
+    """Remove rejected collision entries after the apply pass."""  # type: ignore
+    box_idx = wp.tid()  # type: ignore[misc]
+    original_count = n_collisions[box_idx]
+    applied_count = wp.int32(0)
+    for collision_idx in range(collision_pairs.shape[1]):
+        if collision_idx < original_count:
+            idx_i = collision_pairs[box_idx, collision_idx, 0]
+            idx_j = collision_pairs[box_idx, collision_idx, 1]
+            if idx_i >= wp.int32(0) and idx_j >= wp.int32(0):
+                collision_pairs[box_idx, applied_count, 0] = idx_i
+                collision_pairs[box_idx, applied_count, 1] = idx_j
+                applied_count += wp.int32(1)
+    n_collisions[box_idx] = applied_count
 
 
 def _validate_particle_arrays(
@@ -1198,6 +1227,19 @@ def _validate_charged_particle_physics(
             non-finite/nonpositive, or a box exceeds the charged active limit.
     """
     invalid = wp.zeros((1,), dtype=wp.int32, device=device)
+    wp.launch(
+        _validate_charged_density_kernel,
+        dim=(particles.density.shape[0],),
+        inputs=[particles.density, invalid],
+        device=device,
+    )
+    wp.synchronize_device(device)
+    if invalid.numpy()[0] != 0:
+        raise ValueError(
+            "charged particle masses and concentrations must be finite and "
+            "nonnegative, and density must be finite and > 0"
+        )
+
     active_counts = wp.zeros((n_boxes,), dtype=wp.int32, device=device)
     wp.launch(
         _validate_charged_particle_physics_kernel,
@@ -1205,15 +1247,10 @@ def _validate_charged_particle_physics(
         inputs=[
             particles.masses,
             particles.concentration,
+            particles.density,
             invalid,
             active_counts,
         ],
-        device=device,
-    )
-    wp.launch(
-        _validate_charged_density_kernel,
-        dim=particles.density.shape[0],
-        inputs=[particles.density, invalid],
         device=device,
     )
     wp.synchronize_device(device)
@@ -1520,9 +1557,9 @@ def coagulation_step_gpu(  # noqa: C901
     normalizes it to one fixed mask, one shared selector, and one additive
     majorant. Independently sanitized Brownian and charged pair-rate terms are
     summed before one candidate stream, acceptance stream, collision-buffer
-    set, RNG stream, and apply pass. Its active-pair work and storage are O(A²)
-    for active count A; this is bounded implementation scope, not a throughput
-    or scaling claim.
+    set, RNG stream, and apply pass. Its active-pair work is O(A²), while
+    collision and selector buffers are O(A), for active count A; this is bounded
+    implementation scope, not a throughput or scaling claim.
     Reserved mechanisms, other charged variants, and non-particle-resolved
     distributions reject during preflight without runtime mutation. After
     particle metadata and device checks, direct temperature and pressure inputs
@@ -1837,6 +1874,12 @@ def coagulation_step_gpu(  # noqa: C901
             collision_pairs,
             n_collisions,
         ],
+        device=device,
+    )
+    wp.launch(
+        _compact_applied_collision_pairs_kernel,
+        dim=(n_boxes,),
+        inputs=[collision_pairs, n_collisions],
         device=device,
     )
 

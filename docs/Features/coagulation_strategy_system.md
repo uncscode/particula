@@ -467,8 +467,9 @@ strategy API, CPU/GPU stochastic parity, or high-level `Runnable` support.
 Charged-only execution uses its bounded compact active-pair majorant. Combined
 execution sums independently sanitized Brownian and charged rates and uses one
 exhaustive additive majorant, selector/acceptance path, collision-buffer set,
-RNG stream, and apply pass. For A active particles, pair work and storage are
-O(A²); this is bounded implementation scope, not performance evidence.
+RNG stream, and apply pass. For A active particles, pair work is O(A²), while
+collision and selector buffers are O(A); this is bounded implementation scope,
+not performance evidence.
 
 ## Related Documentation
 

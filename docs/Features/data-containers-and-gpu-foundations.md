@@ -268,8 +268,9 @@ Charged-only execution uses a bounded compact active-pair majorant. Combined
 execution independently sanitizes and sums Brownian and charged terms, then
 uses one active set, exhaustive additive majorant, candidate/acceptance pass,
 collision-buffer set, per-box RNG stream, and apply pass. For active count A,
-the pair work and storage are O(A²); this documents bounded implementation
-scope, not throughput or scaling evidence. Invalid, nonfinite, or nonpositive
+the pair work is O(A²), while collision and selector buffers are O(A); this
+documents bounded implementation scope, not throughput or scaling evidence.
+Invalid, nonfinite, or nonpositive
 terms do not add to totals; invalid candidates do not mutate state or output.
 
 The return tuple is exactly `(particles, collision_pairs, n_collisions)`.
