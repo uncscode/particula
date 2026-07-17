@@ -31,7 +31,7 @@
 
 P1 proved and exposed the charged majorant before P2 registered charged-only
 execution. P2 established executable charged behavior and charge-conservation
-evidence before P3 shipped combined Brownian-plus-charged execution. P4 documents
-only behavior proven by P1-P3 and remains final. Every implementation phase
-includes co-located tests; there is no standalone testing phase. Classifier
-diagnostics: none.
+evidence before P3 shipped combined Brownian-plus-charged execution. P4 / #1345
+completed the final documentation of P1-P3-only behavior without runtime scope.
+Every implementation phase includes co-located tests; there is no standalone
+testing phase. Classifier diagnostics: none.

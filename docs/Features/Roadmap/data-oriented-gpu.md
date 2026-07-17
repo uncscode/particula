@@ -1033,20 +1033,32 @@ Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 | Identifier | Status | Owner |
 | --- | --- | --- |
 | `brownian` | Executable with `particle_resolved` only | Shipped E5-F1 baseline |
-| `charged_hard_sphere` | Reserved; rejected in capability preflight | E5-F3 |
+| `charged_hard_sphere` | Executable alone or with Brownian, particle-resolved only | Shipped E5-F3 |
 | `sedimentation_sp2016` | Reserved; rejected in capability preflight | E5-F4 |
 | `turbulent_shear_st1956` | Reserved; rejected in capability preflight | E5-F5 |
 
-Structural recognition is not executability. Any reserved ID, including a
-Brownian-plus-reserved combination, raises `ValueError` in host capability
+The charged-only tuple is `("charged_hard_sphere",)`. The combined tuple
+`("brownian", "charged_hard_sphere")` is accepted in either requested order
+and normalizes to one executable mask. Reserved IDs, including
+Brownian-plus-reserved combinations, raise `ValueError` in host capability
 preflight before runtime input access, allocation, launch, or mutable state
 changes.
 
-The fixed sampler has one normalized active set, one total safe majorant, one
-candidate stream, one total pair-rate acceptance decision for each valid
-candidate, one collision-pair output buffer, and one per-box RNG-state
-progression. Invalid, nonfinite, or nonpositive terms do not add to totals;
-invalid candidates do not mutate the active set or collision output.
+`WarpParticleData.charge` is caller-owned same-device `wp.float64` state with
+shape `(n_boxes, n_particles)`, not a sidecar or transfer result. Charged calls
+preflight finite charge before caller-output validation/allocation, RNG setup,
+or selector/apply work. Accepted merges add donor charge to the recipient and
+clear the donor.
+
+Combined execution independently sanitizes and sums Brownian and charged pair
+rates, then uses one active set, exhaustive additive majorant,
+candidate/acceptance pass, collision-buffer set, per-box RNG stream, and apply
+pass. For active count A, pair work and storage are O(A²); this is bounded
+implementation scope, not a performance claim. The return tuple is exactly
+`(particles, collision_pairs, n_collisions)`: supplied collision buffers return
+by identity, while supplied `rng_states` mutates in place and is not returned.
+Warp CPU is the baseline when installed; CUDA is optional additive evidence and
+skips cleanly when unavailable.
 
 Future mechanisms must provide a stable identifier; required host and device
 inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
@@ -1054,27 +1066,24 @@ additive majorant; a capability-table row; shared-dispatcher integration; and
 co-located `*_test.py` coverage. They must not add an independent sampling
 loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
-integration, graph-capture claims, and executable charged, sedimentation, or
-turbulent-shear physics.
+integration, graph-capture claims, sedimentation, or turbulent-shear physics.
+Alternate charged variants and broader combinations remain deferred; E5-F9 owns
+the canonical example and final support table.
 
 Planned features:
 
-1. Charged particle-resolved coagulation using `WarpParticleData.charge`
-   rather than treating charge as stored but inactive metadata.
-2. Combined Brownian plus charged coagulation when both mechanisms are
-   active.
-3. Sedimentation coagulation matching the CPU Seinfeld-Pandis 2016
+1. Sedimentation coagulation matching the CPU Seinfeld-Pandis 2016
    sedimentation kernel.
-4. Simple turbulent shear coagulation matching the CPU Saffman-Turner 1956
+2. Simple turbulent shear coagulation matching the CPU Saffman-Turner 1956
    kernel.
-5. Combined Brownian, charged, sedimentation, and turbulent shear kernels
+3. Combined Brownian, charged, sedimentation, and turbulent shear kernels
    when multiple mechanisms are active.
-6. Parity and statistical validation: CPU/GPU parity or statistically
+4. Parity and statistical validation: CPU/GPU parity or statistically
    bounded tests for each new kernel, with recorded tolerances.
-7. Distribution-support decision record: the current GPU path explicitly
+5. Distribution-support decision record: the current GPU path explicitly
    enforces particle-resolved semantics (per-slot merges, concentration
    zeroing); document which binned/moving-bin strategies remain CPU-only.
-8. Epic D carry-forward closure: publish an independent CPU/Warp condensation
+6. Epic D carry-forward closure: publish an independent CPU/Warp condensation
    parity walkthrough that separates physics, conservation, and energy
    tolerances, and maintain the downstream ownership record for every deferred
    condensation capability listed above.

@@ -10,7 +10,9 @@ not reuse of a Brownian size-extrema bound.
 
 ## Current Delivery
 
-E5-F3-P1 and P2 completed issues #1342 and #1343; P3 completed issue #1344.
+E5-F3-P1 and P2 completed issues #1342 and #1343; P3 completed issue #1344;
+P4 / issue #1345 completed the development documentation closeout without
+adding runtime behavior.
 The low-level `coagulation_step_gpu` accepts Brownian-only,
 `("charged_hard_sphere",)`, and either canonical ordering of
 `("brownian", "charged_hard_sphere")` for

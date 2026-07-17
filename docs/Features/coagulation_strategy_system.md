@@ -439,9 +439,10 @@ aerosol.particles = particle_resolved.step(
 ### GPU direct-kernel foundations and limitations
 
 This section is separate from the CPU `particula.dynamics` strategy API above.
-The direct GPU coagulation path executes Brownian particle-resolved coagulation
-only; it is not a GPU runnable for `ChargedCoagulationStrategy` or the other
-CPU strategies.
+The direct GPU path supports particle-resolved Brownian,
+`("charged_hard_sphere",)`, and `("brownian", "charged_hard_sphere")` in
+either requested combined order. It is not a GPU runnable for
+`ChargedCoagulationStrategy` or another CPU strategy.
 
 The approved internal E5-F2 helper subset is
 `coulomb_potential_ratio_wp`, `coulomb_kinetic_limit_wp`,
@@ -452,20 +453,22 @@ and strategy reference sources are
 `charged_dimensionless_kernel.py`, and `charged_kernel_strategy.py`; they are
 not a public GPU runnable.
 
-Current bounded evidence covers deterministic helper parity; neutral,
-attractive, repulsive, and safe-zero cases; charge-buffer validation; and
-recipient-add/donor-clear merge behavior. Warp CPU is the baseline when Warp
-is installed; CUDA evidence is optional and skips cleanly when unavailable.
+Current bounded evidence covers deterministic and stochastic execution;
+neutral, attractive, repulsive, and safe-zero cases; charge-buffer validation;
+and recipient-add/donor-clear merge behavior. Warp CPU is the baseline when
+Warp is installed; CUDA evidence is optional and skips cleanly when unavailable.
 The published
 [GPU container and direct-kernel contract](./data-containers-and-gpu-foundations.md)
 defines the associated ownership boundary, including caller-owned `wp.float64`
 charge state, read-only finite-value preflight, and recipient-add/donor-clear
-merge bookkeeping. These foundations do not expose a charged GPU strategy API.
+merge bookkeeping. These direct configurations do not expose a charged GPU
+strategy API, CPU/GPU stochastic parity, or high-level `Runnable` support.
 
-E5-F3 remains the downstream implementation track for safe majorants,
-candidate selection, and executable charged sampling. No charged candidate
-selection, majorants, Brownian-plus-charged execution, or public charged
-stochastic execution is available from these foundations.
+Charged-only execution uses its bounded compact active-pair majorant. Combined
+execution sums independently sanitized Brownian and charged rates and uses one
+exhaustive additive majorant, selector/acceptance path, collision-buffer set,
+RNG stream, and apply pass. For A active particles, pair work and storage are
+O(A²); this is bounded implementation scope, not performance evidence.
 
 ## Related Documentation
 

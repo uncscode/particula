@@ -39,13 +39,16 @@
     compatibility, preflight state preservation, caller buffers, mixed-scale,
     multi-box, multi-species, and mass/charge conservation.
 
-- [ ] **E5-F3-P4:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E5-F3-P4:** Update development documentation
+  - Issue: #1345 | Size: XS | Status: Completed
   - Goal: Document charged-only and Brownian-plus-charged direct execution,
     required inputs, tested devices, ownership guarantees, and limitations.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Features/coagulation_strategy_system.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`, docstrings, and E5
     plan sections
-  - Tests: Markdown link/reference validation plus focused import/signature
-    checks for any executable snippets.
+  - Delivered: Documented P1-P3 evidence only: approved direct configurations,
+    caller ownership, one-pass majorants, device evidence, and deferred scope.
+    No runtime behavior or executable example was added.
+  - Tests: Markdown/link and import/signature checks plus the focused
+    warning-clean coagulation regression.
