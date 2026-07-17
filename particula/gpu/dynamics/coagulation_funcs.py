@@ -148,6 +148,44 @@ def settling_velocity_stokes_wp(
     )
     if not wp.isfinite(mean_free_path) or mean_free_path <= zero:
         return zero
+    return settling_velocity_stokes_from_transport_wp(
+        particle_radius,
+        effective_density,
+        dynamic_viscosity,
+        mean_free_path,
+    )
+
+
+@wp.func
+def settling_velocity_stokes_from_transport_wp(
+    particle_radius: wp.float64,
+    effective_density: wp.float64,
+    dynamic_viscosity: wp.float64,
+    mean_free_path: wp.float64,
+) -> wp.float64:
+    """Calculate Stokes settling velocity from precomputed gas transport data.
+
+    Args:
+        particle_radius: Particle radius [m].
+        effective_density: Effective particle density [kg/m³].
+        dynamic_viscosity: Dynamic gas viscosity [Pa s].
+        mean_free_path: Molecular mean free path [m].
+
+    Returns:
+        Settling velocity [m/s], or exact ``0.0`` for invalid inputs.
+    """
+    zero = wp.float64(0.0)
+    if (
+        not wp.isfinite(particle_radius)
+        or particle_radius <= zero
+        or not wp.isfinite(effective_density)
+        or effective_density <= zero
+        or not wp.isfinite(dynamic_viscosity)
+        or dynamic_viscosity <= zero
+        or not wp.isfinite(mean_free_path)
+        or mean_free_path <= zero
+    ):
+        return zero
     knudsen_number = knudsen_number_wp(mean_free_path, particle_radius)
     if not wp.isfinite(knudsen_number) or knudsen_number <= zero:
         return zero
