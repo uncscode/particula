@@ -456,8 +456,11 @@ Current bounded evidence covers deterministic helper parity; neutral,
 attractive, repulsive, and safe-zero cases; charge-buffer validation; and
 recipient-add/donor-clear merge behavior. Warp CPU is the baseline when Warp
 is installed; CUDA evidence is optional and skips cleanly when unavailable.
-The published [GPU container and direct-kernel contract](./data-containers-and-gpu-foundations.md)
-defines the associated ownership boundary.
+The published
+[GPU container and direct-kernel contract](./data-containers-and-gpu-foundations.md)
+defines the associated ownership boundary, including caller-owned `wp.float64`
+charge state, read-only finite-value preflight, and recipient-add/donor-clear
+merge bookkeeping. These foundations do not expose a charged GPU strategy API.
 
 E5-F3 remains the downstream implementation track for safe majorants,
 candidate selection, and executable charged sampling. No charged candidate

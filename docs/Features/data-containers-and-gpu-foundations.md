@@ -215,8 +215,8 @@ state.
 
 For direct GPU coagulation, `WarpParticleData.charge` is caller-owned,
 device-resident particle state, not a sidecar or hidden transfer result. It
-must be a `wp.float64` array with shape `(n_boxes, n_particles)` on the same
-device as the other particle arrays, and every value must be finite. Before
+must be a same-device `wp.float64` array matching shape
+`(n_boxes, n_particles)`, and every value must be finite. Before
 downstream runtime work or mutation, coagulation performs a read-only
 device-side finite-value scan. A failing scan rejects the call without copying
 or mutating the caller-owned charge array.
@@ -671,6 +671,8 @@ the other evidence classes.
 | `pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q` | Quick-start regression. |
 | `pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror` | Primary direct CPU-oracle particle-mass/gas-concentration parity matrix. |
 | `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror` | Bounded direct-step stiffness coverage. |
+| `pytest particula/gpu/dynamics/tests/coagulation_funcs_test.py -q -Werror` | Deterministic GPU coagulation pair-helper parity. |
+| `pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror` | Charge-buffer preflight and recipient-add/donor-clear merge coverage. |
 | `pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q` | CPU integration/inventory-conservation evidence (separate particle-plus-gas inventory conservation checks); not direct-GPU validation. |
 | `pytest particula/integration_tests/condensation_particle_resolved_test.py -q` | CPU integration evidence for particle-resolved condensation; not direct-GPU validation. |
 | `pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror` | Latent-heat energy/bookkeeping documentation checks. |
