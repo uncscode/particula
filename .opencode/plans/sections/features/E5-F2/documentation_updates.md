@@ -12,6 +12,9 @@
 - Update `.opencode/plans/sections/epics/E5/` and this feature's sections with
   resolved model decisions, phase issue numbers/statuses, evidence links, and
   any deferred variant owner.
+- Completed for P1: this feature's structured plan sections record issue #1336,
+  the internal-helper/parity-test delivery, and its intentionally unchanged
+  public and execution boundaries. No user-facing documentation changed in P1.
 - Defer user-facing direct charged execution examples and final support/import
   matrix changes to E5-F9 after E5-F3 and E5-F7 establish execution evidence.
   Do not update README quick-start claims in this foundational feature.

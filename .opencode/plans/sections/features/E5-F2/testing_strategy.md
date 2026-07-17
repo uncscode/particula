@@ -7,12 +7,14 @@ parameterize optional CUDA with a clean skip when unavailable.
 
 ## Per-Phase Approach
 
-- **P1 — Pair-property unit tests:** Add probe kernels to
-  `particula/gpu/dynamics/tests/coagulation_funcs_test.py`. Compare Warp outputs
-  with independently evaluated CPU formulas for reduced quantities, Coulomb
-  potential, kinetic/continuum limits, and diffusive properties. Include zero
-  charge, equal particles, opposite/same signs, the `-200` repulsive clip,
-  extreme-but-supported scales, and finite non-negative outputs.
+- **P1 — Pair-property unit tests (completed, #1336):** Co-located probe
+  kernels in `particula/gpu/dynamics/tests/coagulation_funcs_test.py` compare
+  Warp outputs to independent local oracles for reduced values, Coulomb
+  potential, kinetic/continuum limits, and diffusive Knudsen number. Coverage
+  includes neutral charge, equal particles, opposite/same signs, the `-200`
+  repulsive clip, mixed scales, zero/negative guarded inputs, and the
+  sub-`1e-80` kinetic-limit branch. Tests are marked `gpu_parity`, retain the
+  module Warp marker, and use shared Warp-CPU/optional-CUDA device discovery.
 - **P2 — Model parity tests:** For each approved model, construct radius, mass,
   charge, temperature, and pressure fixtures independently on CPU and Warp.
   Compare scalar pair rates with explicit per-fixture `rtol`/`atol`; include

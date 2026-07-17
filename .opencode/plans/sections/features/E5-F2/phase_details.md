@@ -1,13 +1,19 @@
 # Phase Details
 
-- [ ] **E5-F2-P1:** Port scalar Coulomb and reduced-property helpers with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Implement stable fp64 pair primitives for Coulomb potential,
-    reduced mass/friction, enhancement limits, and diffusive properties.
+- [x] **E5-F2-P1:** Port scalar Coulomb and reduced-property helpers with unit tests
+  - Issue: #1336 | Size: S | Status: Completed
+  - Delivered: Internal scalar fp64 `@wp.func` primitives for Coulomb potential,
+    reduced values, kinetic/continuum limits, and diffusive Knudsen number.
+    The helpers retain local invalid-domain fallbacks, the `-200.0` Coulomb
+    lower clip, and the `< 1e-80` kinetic-limit zero result.
   - Files: `particula/gpu/dynamics/coagulation_funcs.py`,
     `particula/gpu/dynamics/tests/coagulation_funcs_test.py`
-  - Tests: Neutral, attractive, repulsive/clipped, equal-particle, mixed-scale,
-    and finite-limit comparisons against independently evaluated CPU formulas.
+  - Tests: Independent co-located Warp probe/oracle parity coverage for neutral,
+    attractive, repulsive/clipped, equal-particle, mixed-scale, invalid-domain,
+    and extreme kinetic-threshold cases. Tests are deterministic `gpu_parity`
+    coverage on Warp CPU with optional CUDA discovery.
+  - Boundary: No public exports, data-container changes, Brownian dispatch,
+    charged execution wiring, or module-boundary changes.
 
 - [ ] **E5-F2-P2:** Port approved charged pair models with CPU parity tests
   - Issue: TBD | Size: S | Status: Not Started

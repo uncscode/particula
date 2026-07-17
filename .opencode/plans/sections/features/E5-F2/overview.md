@@ -15,6 +15,12 @@
   - As a simulation user, I want recipient charge to equal the sum of both
     colliders and donor charge to clear so inactive slots cannot retain state.
   - As a maintainer, I want invalid charge arrays rejected before launch so
-    particle state and caller-owned RNG remain unchanged on failure.
+   particle state and caller-owned RNG remain unchanged on failure.
+
+**Delivered increment:** E5-F2-P1 (#1336) supplies only the internal scalar
+fp64 pair-property foundation and independent co-located parity tests. Charge
+preflight, charge-conserving merges, model-rate composition, and charged
+sampling remain later phases; P1 leaves public exports, data containers,
+Brownian dispatch, charged execution wiring, and module boundaries unchanged.
 
 This is epic-linked track T2 under E5. Classifier diagnostics: none.

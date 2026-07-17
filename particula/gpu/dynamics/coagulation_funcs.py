@@ -152,10 +152,29 @@ def coulomb_potential_ratio_wp(
 ) -> wp.float64:
     """Calculate the dimensionless pair Coulomb potential ratio.
 
-    Radii are in meters, temperature is in kelvin, and charges are elementary
-    charge counts. A non-positive radius sum or temperature safely returns
-    ``0.0``. The result is lower-clipped at ``-200.0`` following
-    Gopalakrishnan and Hogan (2012).
+    Computes ``-(q_i * q_j * e**2) / (4 * pi * epsilon_0 * (r_i + r_j)
+    * k_B * T)``. A non-positive radius sum or temperature safely returns
+    ``0.0``. Otherwise, the result is lower-clipped at ``-200.0``.
+
+    Args:
+        radius_i: Particle i radius in meters.
+        radius_j: Particle j radius in meters.
+        charge_i: Particle i charge as an elementary-charge count.
+        charge_j: Particle j charge as an elementary-charge count.
+        temperature: Gas temperature in kelvin.
+        boltzmann_constant: Boltzmann constant in joules per kelvin.
+        elementary_charge_value: Elementary charge magnitude in coulombs.
+        electric_permittivity: Vacuum electric permittivity in farads per
+            meter.
+
+    Returns:
+        Dimensionless Coulomb potential ratio, or ``0.0`` for an invalid
+        radius sum or temperature.
+
+    References:
+        Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced
+        collisions in aerosols and dusty plasmas. *Physical Review E*, 85(2).
+        https://doi.org/10.1103/PhysRevE.85.026410
     """
     sum_radius = radius_i + radius_j
     if sum_radius <= wp.float64(0.0) or temperature <= wp.float64(0.0):
@@ -183,9 +202,24 @@ def coulomb_potential_ratio_wp(
 def reduced_value_wp(left: wp.float64, right: wp.float64) -> wp.float64:
     """Calculate a scalar reduced value for mass or friction inputs.
 
-    Inputs use the units of the supplied quantity. A non-positive summed input
-    safely returns ``0.0``. This is the reduced-property form used by
-    Chahl and Gopalakrishnan (2019).
+    Computes ``(left * right) / (left + right)``. Inputs retain their supplied
+    units. A non-positive input sum safely returns ``0.0``.
+
+    Args:
+        left: First mass in kilograms or friction coefficient in kilograms per
+            second.
+        right: Second mass in kilograms or friction coefficient in kilograms
+            per second.
+
+    Returns:
+        Reduced value in the input units, or ``0.0`` when the input sum is
+        non-positive.
+
+    References:
+        Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
+        molecular regime Coulombic collisions in aerosols and dusty plasmas.
+        *Aerosol Science and Technology*, 53(8), 933-957.
+        https://doi.org/10.1080/02786826.2019.1614522
     """
     denominator = left + right
     if denominator <= wp.float64(0.0):
@@ -199,8 +233,19 @@ def coulomb_kinetic_limit_wp(
 ) -> wp.float64:
     """Calculate the dimensionless kinetic Coulomb enhancement factor.
 
-    Uses the Gopalakrishnan and Hogan (2012) kinetic-limit expression. The
-    finite scalar input has no fallback condition.
+    Computes ``1 + phi`` for ``phi >= 0`` and ``exp(phi)`` otherwise. Finite
+    scalar inputs have no fallback condition.
+
+    Args:
+        coulomb_potential_ratio: Dimensionless Coulomb potential ratio.
+
+    Returns:
+        Dimensionless kinetic-limit Coulomb enhancement factor.
+
+    References:
+        Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced
+        collisions in aerosols and dusty plasmas. *Physical Review E*, 85(2).
+        https://doi.org/10.1103/PhysRevE.85.026410
     """
     if coulomb_potential_ratio >= wp.float64(0.0):
         return wp.float64(1.0) + coulomb_potential_ratio
@@ -213,8 +258,19 @@ def coulomb_continuum_limit_wp(
 ) -> wp.float64:
     """Calculate the dimensionless continuum Coulomb enhancement factor.
 
-    Uses the Gopalakrishnan and Hogan (2012) continuum-limit expression. A
-    neutral potential safely returns the limiting value ``1.0``.
+    Computes ``phi / (1 - exp(-phi))``. A neutral potential safely returns the
+    limiting value ``1.0``.
+
+    Args:
+        coulomb_potential_ratio: Dimensionless Coulomb potential ratio.
+
+    Returns:
+        Dimensionless continuum-limit Coulomb enhancement factor.
+
+    References:
+        Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced
+        collisions in aerosols and dusty plasmas. *Physical Review E*, 85(2).
+        https://doi.org/10.1103/PhysRevE.85.026410
     """
     if coulomb_potential_ratio == wp.float64(0.0):
         return wp.float64(1.0)
@@ -237,11 +293,34 @@ def diffusive_knudsen_number_wp(
 ) -> wp.float64:
     """Calculate the dimensionless pair diffusive Knudsen number.
 
-    Radii are in meters, masses in kilograms, and temperature in kelvin. A
-    non-positive radius sum, temperature, reduced mass, or reduced friction
-    safely returns ``0.0``. A kinetic enhancement below ``1e-80`` also returns
-    ``0.0``, matching the extreme-repulsion treatment of
-    Chahl and Gopalakrishnan (2019).
+    Computes ``[sqrt(k_B * T * m_red) / f_red] / [(r_i + r_j) * Gamma_c /
+    Gamma_k]``. A non-positive radius sum, temperature, reduced mass, or
+    reduced friction safely returns ``0.0``. A kinetic enhancement below
+    ``1e-80`` also returns ``0.0`` for extreme repulsion.
+
+    Args:
+        radius_i: Particle i radius in meters.
+        radius_j: Particle j radius in meters.
+        mass_i: Particle i mass in kilograms.
+        mass_j: Particle j mass in kilograms.
+        friction_i: Particle i friction coefficient in kilograms per second.
+        friction_j: Particle j friction coefficient in kilograms per second.
+        coulomb_potential_ratio: Dimensionless Coulomb potential ratio.
+        temperature: Gas temperature in kelvin.
+        boltzmann_constant: Boltzmann constant in joules per kelvin.
+
+    Returns:
+        Dimensionless diffusive Knudsen number, or ``0.0`` for an invalid
+        scalar domain or a kinetic enhancement below ``1e-80``.
+
+    References:
+        Chahl, H. S., & Gopalakrishnan, R. (2019). High potential, near free
+        molecular regime Coulombic collisions in aerosols and dusty plasmas.
+        *Aerosol Science and Technology*, 53(8), 933-957.
+        https://doi.org/10.1080/02786826.2019.1614522
+        Gopalakrishnan, R., & Hogan, C. J. (2012). Coulomb-influenced
+        collisions in aerosols and dusty plasmas. *Physical Review E*, 85(2).
+        https://doi.org/10.1103/PhysRevE.85.026410
     """
     sum_radius = radius_i + radius_j
     if sum_radius <= wp.float64(0.0) or temperature <= wp.float64(0.0):
