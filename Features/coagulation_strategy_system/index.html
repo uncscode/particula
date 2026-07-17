@@ -11665,6 +11665,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Limitations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpu-direct-kernel-foundations-and-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU direct-kernel foundations and limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -15055,6 +15072,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Limitations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gpu-direct-kernel-foundations-and-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU direct-kernel foundations and limitations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -15558,6 +15592,32 @@
 <li>No built-in high-level orchestrator; you control the time loop and pipeline ordering.</li>
 <li>DNS parameterization assumes applicability of Ayala et al. (2008) fits; verify for extreme regimes.</li>
 </ul>
+<h3 id="gpu-direct-kernel-foundations-and-limitations">GPU direct-kernel foundations and limitations<a class="headerlink" href="#gpu-direct-kernel-foundations-and-limitations" title="Permanent link">&para;</a></h3>
+<p>This section is separate from the CPU <code>particula.dynamics</code> strategy API above.
+The direct GPU coagulation path executes Brownian particle-resolved coagulation
+only; it is not a GPU runnable for <code>ChargedCoagulationStrategy</code> or the other
+CPU strategies.</p>
+<p>The approved internal E5-F2 helper subset is
+<code>coulomb_potential_ratio_wp</code>, <code>coulomb_kinetic_limit_wp</code>,
+<code>coulomb_continuum_limit_wp</code>, <code>reduced_value_wp</code>,
+<code>diffusive_knudsen_number_wp</code>, and <code>charged_hard_sphere_wp</code>. The CPU formula
+and strategy reference sources are
+<code>particula/dynamics/coagulation/charged_dimensional_kernel.py</code>,
+<code>charged_dimensionless_kernel.py</code>, and <code>charged_kernel_strategy.py</code>; they are
+not a public GPU runnable.</p>
+<p>Current bounded evidence covers deterministic helper parity; neutral,
+attractive, repulsive, and safe-zero cases; charge-buffer validation; and
+recipient-add/donor-clear merge behavior. Warp CPU is the baseline when Warp
+is installed; CUDA evidence is optional and skips cleanly when unavailable.
+The published
+<a href="../data-containers-and-gpu-foundations/">GPU container and direct-kernel contract</a>
+defines the associated ownership boundary, including caller-owned <code>wp.float64</code>
+charge state, read-only finite-value preflight, and recipient-add/donor-clear
+merge bookkeeping. These foundations do not expose a charged GPU strategy API.</p>
+<p>E5-F3 remains the downstream implementation track for safe majorants,
+candidate selection, and executable charged sampling. No charged candidate
+selection, majorants, Brownian-plus-charged execution, or public charged
+stochastic execution is available from these foundations.</p>
 <h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Wall loss strategies</strong>: <a href="../wall_loss_strategy_system/">wall_loss_strategy_system.md</a></li>

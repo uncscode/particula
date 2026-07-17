@@ -14472,10 +14472,13 @@ positive executable rate terms and a single safe majorant before making one
 acceptance draw for each valid candidate. Entry-point validation accepts
 scalar direct inputs,
 explicit <code>(n_boxes,)</code> Warp arrays, or a <code>WarpEnvironmentData</code> container.
-Those sources are normalized into per-box Warp arrays before volume setup,
-RNG initialization, or any Warp launch. The kernels operate on GPU-resident
-particle data and produce collision pairs that are applied to merge particle
-masses in-place.</p>
+Particle metadata and device checks run before normalizing environment inputs,
+setting up volume, initializing RNG state, or executing Brownian work. An
+explicit opt-in finite-charge validation scan is available for callers that
+require host-visible validation. The kernels operate on GPU-resident particle
+data and produce
+ collision pairs that are applied in place: recipient particles receive donor
+ mass and charge, while donor mass, concentration, and charge are cleared.</p>
 <p><code>CoagulationMechanismConfig</code> and its resolver are concrete-module APIs:
 import them from <code>particula.gpu.kernels.coagulation</code>, not
 <code>particula.gpu.kernels</code>. The immutable, keyword-only configuration is
@@ -14596,12 +14599,12 @@ select Brownian.</p>
 
 
 <a href="#particula.gpu.kernels.coagulation.apply_coagulation_kernel" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">apply_coagulation_kernel</span><span class="p">(</span><span class="n">masses</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">collision_pairs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">n_collisions</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">apply_coagulation_kernel</span><span class="p">(</span><span class="n">masses</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">concentration</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">charge</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">collision_pairs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">n_collisions</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Apply coagulation collisions by merging particle masses.</p>
+        <p>Apply coagulation collisions by merging particle state in place.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -14620,6 +14623,16 @@ select Brownian.</p>
           –
           <div class="doc-md-description">
             <p>Particle concentrations <code>(n_boxes, n_particles)</code>.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>charge</code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Particle charges with <code>wp.float64</code> dtype and shape
+<code>(n_boxes, n_particles)</code>. Donor charge is added to its recipient
+and then cleared.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -14644,27 +14657,7 @@ select Brownian.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">705</span>
-<span class="normal">706</span>
-<span class="normal">707</span>
-<span class="normal">708</span>
-<span class="normal">709</span>
-<span class="normal">710</span>
-<span class="normal">711</span>
-<span class="normal">712</span>
-<span class="normal">713</span>
-<span class="normal">714</span>
-<span class="normal">715</span>
-<span class="normal">716</span>
-<span class="normal">717</span>
-<span class="normal">718</span>
-<span class="normal">719</span>
-<span class="normal">720</span>
-<span class="normal">721</span>
-<span class="normal">722</span>
-<span class="normal">723</span>
-<span class="normal">724</span>
-<span class="normal">725</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">725</span>
 <span class="normal">726</span>
 <span class="normal">727</span>
 <span class="normal">728</span>
@@ -14679,20 +14672,56 @@ select Brownian.</p>
 <span class="normal">737</span>
 <span class="normal">738</span>
 <span class="normal">739</span>
-<span class="normal">740</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
+<span class="normal">740</span>
+<span class="normal">741</span>
+<span class="normal">742</span>
+<span class="normal">743</span>
+<span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span>
+<span class="normal">759</span>
+<span class="normal">760</span>
+<span class="normal">761</span>
+<span class="normal">762</span>
+<span class="normal">763</span>
+<span class="normal">764</span>
+<span class="normal">765</span>
+<span class="normal">766</span>
+<span class="normal">767</span>
+<span class="normal">768</span>
+<span class="normal">769</span>
+<span class="normal">770</span>
+<span class="normal">771</span>
+<span class="normal">772</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
 <span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_coagulation_kernel</span><span class="p">(</span>
     <span class="n">masses</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">concentration</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">charge</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">collision_pairs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">n_collisions</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply coagulation collisions by merging particle masses.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply coagulation collisions by merging particle state in place.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        masses: Particle masses array ``(n_boxes, n_particles, n_species)``.</span>
 <span class="sd">        concentration: Particle concentrations ``(n_boxes, n_particles)``.</span>
+<span class="sd">        charge: Particle charges with ``wp.float64`` dtype and shape</span>
+<span class="sd">            ``(n_boxes, n_particles)``. Donor charge is added to its recipient</span>
+<span class="sd">            and then cleared.</span>
 <span class="sd">        collision_pairs: Collision index buffer</span>
 <span class="sd">            ``(n_boxes, max_collisions, 2)``.</span>
 <span class="sd">        n_collisions: Collision counts ``(n_boxes,)``.</span>
@@ -14706,6 +14735,12 @@ select Brownian.</p>
     <span class="k">if</span> <span class="n">idx_i</span> <span class="o">==</span> <span class="n">idx_j</span><span class="p">:</span>
         <span class="k">return</span>
 
+    <span class="n">merged_charge</span> <span class="o">=</span> <span class="n">charge</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">idx_i</span><span class="p">]</span> <span class="o">+</span> <span class="n">charge</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">idx_j</span><span class="p">]</span>
+    <span class="c1"># An unrepresentable charge merge must not partially apply mass state or</span>
+    <span class="c1"># turn finite caller state into infinity. Skipping preserves inventories.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">wp</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">merged_charge</span><span class="p">):</span>
+        <span class="k">return</span>
+
     <span class="n">n_species</span> <span class="o">=</span> <span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">species_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_species</span><span class="p">):</span>
         <span class="n">masses</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">idx_i</span><span class="p">,</span> <span class="n">species_idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -14714,6 +14749,8 @@ select Brownian.</p>
         <span class="p">)</span>
         <span class="n">masses</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">idx_j</span><span class="p">,</span> <span class="n">species_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
 
+    <span class="n">charge</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">idx_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged_charge</span>
+    <span class="n">charge</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">idx_j</span><span class="p">]</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="n">concentration</span><span class="p">[</span><span class="n">box_idx</span><span class="p">,</span> <span class="n">idx_j</span><span class="p">]</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -14940,27 +14977,7 @@ Brownian is currently executable; reserved bits contribute nothing.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">446</span>
-<span class="normal">447</span>
-<span class="normal">448</span>
-<span class="normal">449</span>
-<span class="normal">450</span>
-<span class="normal">451</span>
-<span class="normal">452</span>
-<span class="normal">453</span>
-<span class="normal">454</span>
-<span class="normal">455</span>
-<span class="normal">456</span>
-<span class="normal">457</span>
-<span class="normal">458</span>
-<span class="normal">459</span>
-<span class="normal">460</span>
-<span class="normal">461</span>
-<span class="normal">462</span>
-<span class="normal">463</span>
-<span class="normal">464</span>
-<span class="normal">465</span>
-<span class="normal">466</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">466</span>
 <span class="normal">467</span>
 <span class="normal">468</span>
 <span class="normal">469</span>
@@ -15196,7 +15213,27 @@ Brownian is currently executable; reserved bits contribute nothing.</p>
 <span class="normal">699</span>
 <span class="normal">700</span>
 <span class="normal">701</span>
-<span class="normal">702</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
+<span class="normal">702</span>
+<span class="normal">703</span>
+<span class="normal">704</span>
+<span class="normal">705</span>
+<span class="normal">706</span>
+<span class="normal">707</span>
+<span class="normal">708</span>
+<span class="normal">709</span>
+<span class="normal">710</span>
+<span class="normal">711</span>
+<span class="normal">712</span>
+<span class="normal">713</span>
+<span class="normal">714</span>
+<span class="normal">715</span>
+<span class="normal">716</span>
+<span class="normal">717</span>
+<span class="normal">718</span>
+<span class="normal">719</span>
+<span class="normal">720</span>
+<span class="normal">721</span>
+<span class="normal">722</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
 <span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">brownian_coagulation_kernel</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
@@ -15467,7 +15504,7 @@ Brownian is currently executable; reserved bits contribute nothing.</p>
 
 
 <a href="#particula.gpu.kernels.coagulation.coagulation_step_gpu" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">coagulation_step_gpu</span><span class="p">(</span><span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_collisions</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">collision_pairs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_collisions</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng_states</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mechanism_config</span><span class="p">:</span> <span class="n">CoagulationMechanismConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">initialize_rng</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">coagulation_step_gpu</span><span class="p">(</span><span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">time_step</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">volume</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_collisions</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span> <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">collision_pairs</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_collisions</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rng_states</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mechanism_config</span><span class="p">:</span> <span class="n">CoagulationMechanismConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">initialize_rng</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">validate_charge_finite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -15477,12 +15514,13 @@ Brownian is currently executable; reserved bits contribute nothing.</p>
 preflighted before any runtime input access, allocation, normalization, RNG
 work, or launch. Omission selects the only executable combination:
 Brownian <code>"particle_resolved"</code>. Reserved mechanisms and all other
-distribution types reject during preflight without runtime mutation. Direct
-temperature and pressure inputs are then validated and normalized before
-volume setup or launches. <code>particles</code> and supplied <code>collision_pairs</code>,
-<code>n_collisions</code>, and <code>rng_states</code> are caller-owned same-device Warp
-resources; the step mutates them in place as applicable. Caller-owned RNG
-buffers are reset only when <code>initialize_rng=True</code> explicitly opts in.</p>
+distribution types reject during preflight without runtime mutation. After
+particle metadata and device checks, direct temperature and pressure inputs
+are validated and normalized before volume setup or Brownian launches.
+<code>particles</code> and supplied <code>collision_pairs</code>, <code>n_collisions</code>,
+and <code>rng_states</code> are caller-owned same-device Warp resources; the step
+mutates them in place as applicable. Caller-owned RNG buffers are reset only
+when <code>initialize_rng=True</code> explicitly opts in.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -15493,8 +15531,11 @@ buffers are reset only when <code>initialize_rng=True</code> explicitly opts in.
           –
           <div class="doc-md-description">
             <p>Caller-owned, GPU-resident particle data. All required Warp
-arrays must be on the same device; particle mass and concentration
-state is mutated in place by accepted collisions.</p>
+arrays, including <code>charge</code>, must be on the same device. <code>charge</code>
+must be <code>wp.float64</code> with shape <code>(n_boxes, n_particles)</code>.
+Accepted collisions mutate mass, concentration, and charge in place:
+recipient particles receive donor mass and charge, and donor mass,
+concentration, and charge are cleared.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -15653,6 +15694,19 @@ temperature and pressure arrays on the same device as <code>particles</code>.
 This mode is supported when both direct inputs are <code>None</code>.</p>
           </div>
         </li>
+        <li class="doc-section-item field-body">
+            <b><code>validate_charge_finite</code></b>
+              (<code><span title="bool">bool</span></code>, default:
+                  <code>False</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>When True, explicitly scan charge on device and
+synchronize for host-visible rejection of NaN or infinity. The
+default False avoids per-step allocation, synchronization, and host
+readback, supporting persistent-state loops and graph capture.</p>
+          </div>
+        </li>
     </ul>
 
 
@@ -15723,6 +15777,16 @@ caller device.</p>
 requests an unsupported distribution or reserved mechanism.</p>
           </div>
         </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If particle charge does not have shape
+<code>(n_boxes, n_particles)</code>, dtype <code>wp.float64</code>, or the particle
+device. With <code>validate_charge_finite=True</code>, also raises for NaN or
+infinity.</p>
+          </div>
+        </li>
     </ul>
 
 
@@ -15731,16 +15795,24 @@ requests an unsupported distribution or reserved mechanism.</p>
   <p>Accepted environment sources are scalar direct inputs, direct
 <code>(n_boxes,)</code> Warp arrays, hybrid scalar-plus-Warp-array direct
 inputs, or keyword-only <code>environment=...</code> execution.</p>
-<p><code>mechanism_config</code>, <code>initialize_rng</code>, and <code>environment</code> remain
+<p><code>mechanism_config</code>, <code>initialize_rng</code>, <code>environment</code>, and
+<code>validate_charge_finite</code> remain
 keyword-only so existing positional scalar callers stay
 source-compatible. Configuration preflight occurs before all runtime
 input access, allocation, normalization, RNG work, and launches. It
 does not make unrelated later validation failures atomic.</p>
-<p>Validation runs before volume normalization, RNG setup, and kernel
-launches so invalid <code>time_step</code>, shape, dtype, or device
+<p>Validation runs before volume normalization, RNG setup, and Brownian or
+apply launches so invalid <code>time_step</code>, shape, dtype, or device
 combinations fail without mutating particle state or allocating
-downstream launch work. The normalized environment arrays are
-forwarded directly into the launch path.</p>
+downstream work. The normalized environment arrays are forwarded
+directly into the launch path.</p>
+<p>With <code>validate_charge_finite=True</code>, charge validation runs after
+particle metadata and device validation but before time-step and
+environment normalization. It uses one read-only O(<code>n_boxes *
+n_particles</code>) launch and a private one-element status-scalar
+allocation/readback to reject non-finite charge. This explicit debugging
+validation does not enable charged-coagulation physics. The default
+avoids the scan, allocation, synchronization, and host readback.</p>
 <p>Supported RNG setup cases are:</p>
 <ul>
 <li>Omitted <code>rng_states</code>: allocate a call-local internal buffer and
@@ -15761,82 +15833,7 @@ before capture, then reuse them without hidden per-step resets.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1067</span>
-<span class="normal">1068</span>
-<span class="normal">1069</span>
-<span class="normal">1070</span>
-<span class="normal">1071</span>
-<span class="normal">1072</span>
-<span class="normal">1073</span>
-<span class="normal">1074</span>
-<span class="normal">1075</span>
-<span class="normal">1076</span>
-<span class="normal">1077</span>
-<span class="normal">1078</span>
-<span class="normal">1079</span>
-<span class="normal">1080</span>
-<span class="normal">1081</span>
-<span class="normal">1082</span>
-<span class="normal">1083</span>
-<span class="normal">1084</span>
-<span class="normal">1085</span>
-<span class="normal">1086</span>
-<span class="normal">1087</span>
-<span class="normal">1088</span>
-<span class="normal">1089</span>
-<span class="normal">1090</span>
-<span class="normal">1091</span>
-<span class="normal">1092</span>
-<span class="normal">1093</span>
-<span class="normal">1094</span>
-<span class="normal">1095</span>
-<span class="normal">1096</span>
-<span class="normal">1097</span>
-<span class="normal">1098</span>
-<span class="normal">1099</span>
-<span class="normal">1100</span>
-<span class="normal">1101</span>
-<span class="normal">1102</span>
-<span class="normal">1103</span>
-<span class="normal">1104</span>
-<span class="normal">1105</span>
-<span class="normal">1106</span>
-<span class="normal">1107</span>
-<span class="normal">1108</span>
-<span class="normal">1109</span>
-<span class="normal">1110</span>
-<span class="normal">1111</span>
-<span class="normal">1112</span>
-<span class="normal">1113</span>
-<span class="normal">1114</span>
-<span class="normal">1115</span>
-<span class="normal">1116</span>
-<span class="normal">1117</span>
-<span class="normal">1118</span>
-<span class="normal">1119</span>
-<span class="normal">1120</span>
-<span class="normal">1121</span>
-<span class="normal">1122</span>
-<span class="normal">1123</span>
-<span class="normal">1124</span>
-<span class="normal">1125</span>
-<span class="normal">1126</span>
-<span class="normal">1127</span>
-<span class="normal">1128</span>
-<span class="normal">1129</span>
-<span class="normal">1130</span>
-<span class="normal">1131</span>
-<span class="normal">1132</span>
-<span class="normal">1133</span>
-<span class="normal">1134</span>
-<span class="normal">1135</span>
-<span class="normal">1136</span>
-<span class="normal">1137</span>
-<span class="normal">1138</span>
-<span class="normal">1139</span>
-<span class="normal">1140</span>
-<span class="normal">1141</span>
-<span class="normal">1142</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1142</span>
 <span class="normal">1143</span>
 <span class="normal">1144</span>
 <span class="normal">1145</span>
@@ -16034,7 +16031,112 @@ before capture, then reuse them without hidden per-step resets.</p>
 <span class="normal">1337</span>
 <span class="normal">1338</span>
 <span class="normal">1339</span>
-<span class="normal">1340</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coagulation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">1340</span>
+<span class="normal">1341</span>
+<span class="normal">1342</span>
+<span class="normal">1343</span>
+<span class="normal">1344</span>
+<span class="normal">1345</span>
+<span class="normal">1346</span>
+<span class="normal">1347</span>
+<span class="normal">1348</span>
+<span class="normal">1349</span>
+<span class="normal">1350</span>
+<span class="normal">1351</span>
+<span class="normal">1352</span>
+<span class="normal">1353</span>
+<span class="normal">1354</span>
+<span class="normal">1355</span>
+<span class="normal">1356</span>
+<span class="normal">1357</span>
+<span class="normal">1358</span>
+<span class="normal">1359</span>
+<span class="normal">1360</span>
+<span class="normal">1361</span>
+<span class="normal">1362</span>
+<span class="normal">1363</span>
+<span class="normal">1364</span>
+<span class="normal">1365</span>
+<span class="normal">1366</span>
+<span class="normal">1367</span>
+<span class="normal">1368</span>
+<span class="normal">1369</span>
+<span class="normal">1370</span>
+<span class="normal">1371</span>
+<span class="normal">1372</span>
+<span class="normal">1373</span>
+<span class="normal">1374</span>
+<span class="normal">1375</span>
+<span class="normal">1376</span>
+<span class="normal">1377</span>
+<span class="normal">1378</span>
+<span class="normal">1379</span>
+<span class="normal">1380</span>
+<span class="normal">1381</span>
+<span class="normal">1382</span>
+<span class="normal">1383</span>
+<span class="normal">1384</span>
+<span class="normal">1385</span>
+<span class="normal">1386</span>
+<span class="normal">1387</span>
+<span class="normal">1388</span>
+<span class="normal">1389</span>
+<span class="normal">1390</span>
+<span class="normal">1391</span>
+<span class="normal">1392</span>
+<span class="normal">1393</span>
+<span class="normal">1394</span>
+<span class="normal">1395</span>
+<span class="normal">1396</span>
+<span class="normal">1397</span>
+<span class="normal">1398</span>
+<span class="normal">1399</span>
+<span class="normal">1400</span>
+<span class="normal">1401</span>
+<span class="normal">1402</span>
+<span class="normal">1403</span>
+<span class="normal">1404</span>
+<span class="normal">1405</span>
+<span class="normal">1406</span>
+<span class="normal">1407</span>
+<span class="normal">1408</span>
+<span class="normal">1409</span>
+<span class="normal">1410</span>
+<span class="normal">1411</span>
+<span class="normal">1412</span>
+<span class="normal">1413</span>
+<span class="normal">1414</span>
+<span class="normal">1415</span>
+<span class="normal">1416</span>
+<span class="normal">1417</span>
+<span class="normal">1418</span>
+<span class="normal">1419</span>
+<span class="normal">1420</span>
+<span class="normal">1421</span>
+<span class="normal">1422</span>
+<span class="normal">1423</span>
+<span class="normal">1424</span>
+<span class="normal">1425</span>
+<span class="normal">1426</span>
+<span class="normal">1427</span>
+<span class="normal">1428</span>
+<span class="normal">1429</span>
+<span class="normal">1430</span>
+<span class="normal">1431</span>
+<span class="normal">1432</span>
+<span class="normal">1433</span>
+<span class="normal">1434</span>
+<span class="normal">1435</span>
+<span class="normal">1436</span>
+<span class="normal">1437</span>
+<span class="normal">1438</span>
+<span class="normal">1439</span>
+<span class="normal">1440</span>
+<span class="normal">1441</span>
+<span class="normal">1442</span>
+<span class="normal">1443</span>
+<span class="normal">1444</span>
+<span class="normal">1445</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coagulation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -16049,6 +16151,7 @@ before capture, then reuse them without hidden per-step resets.</p>
     <span class="n">mechanism_config</span><span class="p">:</span> <span class="n">CoagulationMechanismConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">initialize_rng</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">validate_charge_finite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute one particle-resolved Brownian coagulation timestep on the GPU.</span>
 
@@ -16056,17 +16159,21 @@ before capture, then reuse them without hidden per-step resets.</p>
 <span class="sd">    preflighted before any runtime input access, allocation, normalization, RNG</span>
 <span class="sd">    work, or launch. Omission selects the only executable combination:</span>
 <span class="sd">    Brownian ``&quot;particle_resolved&quot;``. Reserved mechanisms and all other</span>
-<span class="sd">    distribution types reject during preflight without runtime mutation. Direct</span>
-<span class="sd">    temperature and pressure inputs are then validated and normalized before</span>
-<span class="sd">    volume setup or launches. ``particles`` and supplied ``collision_pairs``,</span>
-<span class="sd">    ``n_collisions``, and ``rng_states`` are caller-owned same-device Warp</span>
-<span class="sd">    resources; the step mutates them in place as applicable. Caller-owned RNG</span>
-<span class="sd">    buffers are reset only when ``initialize_rng=True`` explicitly opts in.</span>
+<span class="sd">    distribution types reject during preflight without runtime mutation. After</span>
+<span class="sd">    particle metadata and device checks, direct temperature and pressure inputs</span>
+<span class="sd">    are validated and normalized before volume setup or Brownian launches.</span>
+<span class="sd">    ``particles`` and supplied ``collision_pairs``, ``n_collisions``,</span>
+<span class="sd">    and ``rng_states`` are caller-owned same-device Warp resources; the step</span>
+<span class="sd">    mutates them in place as applicable. Caller-owned RNG buffers are reset only</span>
+<span class="sd">    when ``initialize_rng=True`` explicitly opts in.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        particles: Caller-owned, GPU-resident particle data. All required Warp</span>
-<span class="sd">            arrays must be on the same device; particle mass and concentration</span>
-<span class="sd">            state is mutated in place by accepted collisions.</span>
+<span class="sd">            arrays, including ``charge``, must be on the same device. ``charge``</span>
+<span class="sd">            must be ``wp.float64`` with shape ``(n_boxes, n_particles)``.</span>
+<span class="sd">            Accepted collisions mutate mass, concentration, and charge in place:</span>
+<span class="sd">            recipient particles receive donor mass and charge, and donor mass,</span>
+<span class="sd">            concentration, and charge are cleared.</span>
 <span class="sd">        temperature: Direct gas temperature as either a scalar or a Warp array</span>
 <span class="sd">            with shape ``(n_boxes,)``. Use ``None`` only with</span>
 <span class="sd">            ``environment=...``.</span>
@@ -16116,6 +16223,10 @@ before capture, then reuse them without hidden per-step resets.</p>
 <span class="sd">        environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``</span>
 <span class="sd">            temperature and pressure arrays on the same device as ``particles``.</span>
 <span class="sd">            This mode is supported when both direct inputs are ``None``.</span>
+<span class="sd">        validate_charge_finite: When True, explicitly scan charge on device and</span>
+<span class="sd">            synchronize for host-visible rejection of NaN or infinity. The</span>
+<span class="sd">            default False avoids per-step allocation, synchronization, and host</span>
+<span class="sd">            readback, supporting persistent-state loops and graph capture.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple containing ``particles`` after in-place coagulation, the</span>
@@ -16132,23 +16243,36 @@ before capture, then reuse them without hidden per-step resets.</p>
 <span class="sd">            caller device.</span>
 <span class="sd">        ValueError: If mechanism_config has the wrong type, is malformed, or</span>
 <span class="sd">            requests an unsupported distribution or reserved mechanism.</span>
+<span class="sd">        ValueError: If particle charge does not have shape</span>
+<span class="sd">            ``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle</span>
+<span class="sd">            device. With ``validate_charge_finite=True``, also raises for NaN or</span>
+<span class="sd">            infinity.</span>
 
 <span class="sd">    Notes:</span>
 <span class="sd">        Accepted environment sources are scalar direct inputs, direct</span>
 <span class="sd">        ``(n_boxes,)`` Warp arrays, hybrid scalar-plus-Warp-array direct</span>
 <span class="sd">        inputs, or keyword-only ``environment=...`` execution.</span>
 
-<span class="sd">        ``mechanism_config``, ``initialize_rng``, and ``environment`` remain</span>
+<span class="sd">        ``mechanism_config``, ``initialize_rng``, ``environment``, and</span>
+<span class="sd">        ``validate_charge_finite`` remain</span>
 <span class="sd">        keyword-only so existing positional scalar callers stay</span>
 <span class="sd">        source-compatible. Configuration preflight occurs before all runtime</span>
 <span class="sd">        input access, allocation, normalization, RNG work, and launches. It</span>
 <span class="sd">        does not make unrelated later validation failures atomic.</span>
 
-<span class="sd">        Validation runs before volume normalization, RNG setup, and kernel</span>
-<span class="sd">        launches so invalid ``time_step``, shape, dtype, or device</span>
+<span class="sd">        Validation runs before volume normalization, RNG setup, and Brownian or</span>
+<span class="sd">        apply launches so invalid ``time_step``, shape, dtype, or device</span>
 <span class="sd">        combinations fail without mutating particle state or allocating</span>
-<span class="sd">        downstream launch work. The normalized environment arrays are</span>
-<span class="sd">        forwarded directly into the launch path.</span>
+<span class="sd">        downstream work. The normalized environment arrays are forwarded</span>
+<span class="sd">        directly into the launch path.</span>
+
+<span class="sd">        With ``validate_charge_finite=True``, charge validation runs after</span>
+<span class="sd">        particle metadata and device validation but before time-step and</span>
+<span class="sd">        environment normalization. It uses one read-only O(``n_boxes *</span>
+<span class="sd">        n_particles``) launch and a private one-element status-scalar</span>
+<span class="sd">        allocation/readback to reject non-finite charge. This explicit debugging</span>
+<span class="sd">        validation does not enable charged-coagulation physics. The default</span>
+<span class="sd">        avoids the scan, allocation, synchronization, and host readback.</span>
 
 <span class="sd">        Supported RNG setup cases are:</span>
 
@@ -16183,6 +16307,13 @@ before capture, then reuse them without hidden per-step resets.</p>
 
     <span class="n">device</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">device</span>
     <span class="n">_validate_device_arrays</span><span class="p">(</span><span class="n">particles</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">validate_charge_finite</span><span class="p">:</span>
+        <span class="n">_validate_charge_finite</span><span class="p">(</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+            <span class="n">n_boxes</span><span class="p">,</span>
+            <span class="n">n_particles</span><span class="p">,</span>
+            <span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="n">time_step_value</span> <span class="o">=</span> <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span>
     <span class="n">temperature_array</span><span class="p">,</span> <span class="n">pressure_array</span> <span class="o">=</span> <span class="n">_ensure_environment_arrays</span><span class="p">(</span>
         <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
@@ -16301,6 +16432,7 @@ before capture, then reuse them without hidden per-step resets.</p>
         <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
             <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
             <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+            <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
             <span class="n">collision_pairs</span><span class="p">,</span>
             <span class="n">n_collisions</span><span class="p">,</span>
         <span class="p">],</span>
@@ -16389,47 +16521,47 @@ buffer or if the provided device mismatches the buffer device.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 977</span>
-<span class="normal"> 978</span>
-<span class="normal"> 979</span>
-<span class="normal"> 980</span>
-<span class="normal"> 981</span>
-<span class="normal"> 982</span>
-<span class="normal"> 983</span>
-<span class="normal"> 984</span>
-<span class="normal"> 985</span>
-<span class="normal"> 986</span>
-<span class="normal"> 987</span>
-<span class="normal"> 988</span>
-<span class="normal"> 989</span>
-<span class="normal"> 990</span>
-<span class="normal"> 991</span>
-<span class="normal"> 992</span>
-<span class="normal"> 993</span>
-<span class="normal"> 994</span>
-<span class="normal"> 995</span>
-<span class="normal"> 996</span>
-<span class="normal"> 997</span>
-<span class="normal"> 998</span>
-<span class="normal"> 999</span>
-<span class="normal">1000</span>
-<span class="normal">1001</span>
-<span class="normal">1002</span>
-<span class="normal">1003</span>
-<span class="normal">1004</span>
-<span class="normal">1005</span>
-<span class="normal">1006</span>
-<span class="normal">1007</span>
-<span class="normal">1008</span>
-<span class="normal">1009</span>
-<span class="normal">1010</span>
-<span class="normal">1011</span>
-<span class="normal">1012</span>
-<span class="normal">1013</span>
-<span class="normal">1014</span>
-<span class="normal">1015</span>
-<span class="normal">1016</span>
-<span class="normal">1017</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize_coagulation_rng_states</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1052</span>
+<span class="normal">1053</span>
+<span class="normal">1054</span>
+<span class="normal">1055</span>
+<span class="normal">1056</span>
+<span class="normal">1057</span>
+<span class="normal">1058</span>
+<span class="normal">1059</span>
+<span class="normal">1060</span>
+<span class="normal">1061</span>
+<span class="normal">1062</span>
+<span class="normal">1063</span>
+<span class="normal">1064</span>
+<span class="normal">1065</span>
+<span class="normal">1066</span>
+<span class="normal">1067</span>
+<span class="normal">1068</span>
+<span class="normal">1069</span>
+<span class="normal">1070</span>
+<span class="normal">1071</span>
+<span class="normal">1072</span>
+<span class="normal">1073</span>
+<span class="normal">1074</span>
+<span class="normal">1075</span>
+<span class="normal">1076</span>
+<span class="normal">1077</span>
+<span class="normal">1078</span>
+<span class="normal">1079</span>
+<span class="normal">1080</span>
+<span class="normal">1081</span>
+<span class="normal">1082</span>
+<span class="normal">1083</span>
+<span class="normal">1084</span>
+<span class="normal">1085</span>
+<span class="normal">1086</span>
+<span class="normal">1087</span>
+<span class="normal">1088</span>
+<span class="normal">1089</span>
+<span class="normal">1090</span>
+<span class="normal">1091</span>
+<span class="normal">1092</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize_coagulation_rng_states</span><span class="p">(</span>
     <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">rng_states</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -16551,10 +16683,7 @@ distribution_type is not exactly <code>"particle_resolved"</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
@@ -16620,7 +16749,10 @@ distribution_type is not exactly <code>"particle_resolved"</code>.</p>
 <span class="normal">216</span>
 <span class="normal">217</span>
 <span class="normal">218</span>
-<span class="normal">219</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resolve_coagulation_mechanism_config</span><span class="p">(</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resolve_coagulation_mechanism_config</span><span class="p">(</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">CoagulationMechanismConfig</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ResolvedCoagulationMechanismConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a configuration through structural validation.</span>
@@ -16745,10 +16877,7 @@ before accessing or mutating runtime state. Import it from
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">225</span>
 <span class="normal">226</span>
 <span class="normal">227</span>
 <span class="normal">228</span>
@@ -16778,7 +16907,10 @@ before accessing or mutating runtime state. Import it from
 <span class="normal">252</span>
 <span class="normal">253</span>
 <span class="normal">254</span>
-<span class="normal">255</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_coagulation_mechanism_capabilities</span><span class="p">(</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_coagulation_mechanism_capabilities</span><span class="p">(</span>
     <span class="n">resolved</span><span class="p">:</span> <span class="n">_ResolvedCoagulationMechanismConfig</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enforce the executable coagulation-mechanism boundary.</span>
