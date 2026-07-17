@@ -1,5 +1,7 @@
 """Parity tests for GPU coagulation composite functions."""
 
+import ast
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -34,9 +36,12 @@ if wp is not None:
         coulomb_kinetic_limit_wp,
         coulomb_potential_ratio_wp,
         diffusive_knudsen_number_wp,
+        effective_density_wp,
         g_collection_term_wp,
         particle_mean_free_path_wp,
         reduced_value_wp,
+        sedimentation_sp2016_pair_rate_wp,
+        settling_velocity_stokes_wp,
     )
     from particula.gpu.properties.gas_properties import (  # noqa: E402
         dynamic_viscosity_wp,
@@ -57,6 +62,7 @@ if wp is not None:
         MOLECULAR_WEIGHT_AIR,
         REF_TEMPERATURE_STP,
         REF_VISCOSITY_AIR_STP,
+        STANDARD_GRAVITY,
         SUTHERLAND_CONSTANT,
     )
 
@@ -72,7 +78,12 @@ def _available_warp_devices() -> list[str]:
     """Return collection-safe Warp device params."""
     if wp is None:
         return ["cpu"]
-    return warp_devices(wp)
+    return [
+        pytest.param(device, marks=pytest.mark.cuda)
+        if device == "cuda"
+        else device
+        for device in warp_devices(wp)
+    ]
 
 
 @_warp_kernel
@@ -396,6 +407,63 @@ def _charged_hard_sphere_kernel(
     )
 
 
+@_warp_kernel
+def _effective_density_kernel(
+    total_masses: Any,
+    total_volumes: Any,
+    result: Any,
+) -> None:
+    """Compute effective densities for lane-indexed scalar totals."""
+    tid = wp.tid()
+    result[tid] = effective_density_wp(total_masses[tid], total_volumes[tid])
+
+
+@_warp_kernel
+def _settling_velocity_stokes_kernel(
+    radii: Any,
+    densities: Any,
+    temperatures: Any,
+    pressures: Any,
+    gas_constant: Any,
+    molecular_weight_air: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
+    result: Any,
+) -> None:
+    """Compute Stokes/Cunningham settling velocities for scalar lanes."""
+    tid = wp.tid()
+    result[tid] = settling_velocity_stokes_wp(
+        radii[tid],
+        densities[tid],
+        temperatures[tid],
+        pressures[tid],
+        gas_constant[tid],
+        molecular_weight_air[tid],
+        ref_viscosity[tid],
+        ref_temperature[tid],
+        sutherland_constant[tid],
+    )
+
+
+@_warp_kernel
+def _sedimentation_sp2016_pair_rate_kernel(
+    radii_i: Any,
+    radii_j: Any,
+    velocities_i: Any,
+    velocities_j: Any,
+    result: Any,
+) -> None:
+    """Compute SP2016 unit-efficiency pair rates for scalar lanes."""
+    tid = wp.tid()
+    result[tid] = sedimentation_sp2016_pair_rate_wp(
+        radii_i[tid],
+        radii_j[tid],
+        velocities_i[tid],
+        velocities_j[tid],
+    )
+
+
 @pytest.fixture(params=_available_warp_devices())
 def device(request) -> str:
     """Provide available Warp devices for testing."""
@@ -616,6 +684,111 @@ def _charged_hard_sphere_oracle(  # noqa: C901
     if not np.isfinite(result) or result <= 0.0:
         return 0.0
     return float(result)
+
+
+def _effective_density_oracle(
+    masses: np.ndarray,
+    species_densities: np.ndarray,
+) -> float:
+    """Independently calculate mixture density with the safe-zero contract."""
+    with np.errstate(all="ignore"):
+        total_mass = np.sum(masses)
+        total_volume = np.sum(masses / species_densities)
+        density = total_mass / total_volume
+    if (
+        not np.isfinite(total_mass)
+        or total_mass <= 0.0
+        or not np.isfinite(total_volume)
+        or total_volume <= 0.0
+        or not np.isfinite(density)
+        or density <= 0.0
+    ):
+        return 0.0
+    return float(density)
+
+
+def _settling_velocity_stokes_oracle(
+    radius: float,
+    density: float,
+    temperature: float,
+    pressure: float,
+    gas_constant: float = GAS_CONSTANT,
+    molecular_weight_air: float = MOLECULAR_WEIGHT_AIR,
+    ref_viscosity: float = REF_VISCOSITY_AIR_STP,
+    ref_temperature: float = REF_TEMPERATURE_STP,
+    sutherland_constant: float = SUTHERLAND_CONSTANT,
+) -> float:
+    """Independently model Stokes/Cunningham settling safe-zero behavior."""
+    values = (
+        radius,
+        density,
+        temperature,
+        pressure,
+        gas_constant,
+        molecular_weight_air,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+    )
+    if not all(np.isfinite(value) and value > 0.0 for value in values):
+        return 0.0
+    with np.errstate(all="ignore"):
+        viscosity = (
+            ref_viscosity
+            * (temperature / ref_temperature) ** 1.5
+            * (ref_temperature + sutherland_constant)
+            / (temperature + sutherland_constant)
+        )
+        mean_free_path = (2.0 * viscosity / pressure) / np.sqrt(
+            8.0 * molecular_weight_air / (np.pi * gas_constant * temperature)
+        )
+        knudsen = mean_free_path / radius
+        slip = 1.0 + knudsen * (1.257 + 0.4 * np.exp(-1.1 / knudsen))
+        result = (
+            2.0
+            * radius**2
+            * density
+            * slip
+            * STANDARD_GRAVITY
+            / (9.0 * viscosity)
+        )
+    if (
+        not np.isfinite(viscosity)
+        or viscosity <= 0.0
+        or not np.isfinite(mean_free_path)
+        or mean_free_path <= 0.0
+        or not np.isfinite(knudsen)
+        or knudsen <= 0.0
+        or not np.isfinite(slip)
+        or slip <= 0.0
+        or not np.isfinite(result)
+        or result <= 0.0
+    ):
+        return 0.0
+    return float(result)
+
+
+def _sedimentation_sp2016_pair_rate_oracle(
+    radius_i: float,
+    radius_j: float,
+    velocity_i: float,
+    velocity_j: float,
+) -> float:
+    """Independently model the SP2016 Eq. 13A.4 safe-zero contract."""
+    values = (radius_i, radius_j, velocity_i, velocity_j)
+    if (
+        not all(np.isfinite(value) for value in values)
+        or radius_i <= 0.0
+        or radius_j <= 0.0
+        or velocity_i < 0.0
+        or velocity_j < 0.0
+    ):
+        return 0.0
+    with np.errstate(all="ignore"):
+        rate = np.pi * (radius_i + radius_j) ** 2 * abs(velocity_i - velocity_j)
+    if not np.isfinite(rate) or rate <= 0.0:
+        return 0.0
+    return float(rate)
 
 
 def _warp_array(values: np.ndarray, device: str) -> Any:
@@ -1530,3 +1703,329 @@ def test_brownian_kernel_chain_matches_numpy(device: str) -> None:
     npt.assert_allclose(
         result_wp.numpy()[0], expected_value, rtol=1e-10, atol=1e-20
     )
+
+
+def _launch_effective_density(
+    device: str,
+    total_masses: np.ndarray,
+    total_volumes: np.ndarray,
+) -> np.ndarray:
+    """Launch a lane-indexed effective-density probe."""
+    result = wp.zeros(len(total_masses), dtype=wp.float64, device=device)
+    wp.launch(
+        _effective_density_kernel,
+        dim=len(total_masses),
+        inputs=[
+            _warp_array(total_masses, device),
+            _warp_array(total_volumes, device),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    return result.numpy()
+
+
+def _launch_settling_velocity_stokes(
+    device: str,
+    radii: np.ndarray,
+    densities: np.ndarray,
+    temperatures: np.ndarray,
+    pressures: np.ndarray,
+    constants: tuple[float, ...] | np.ndarray,
+) -> np.ndarray:
+    """Launch a lane-indexed Stokes/Cunningham settling probe."""
+    result = wp.zeros(len(radii), dtype=wp.float64, device=device)
+    constant_values = np.broadcast_to(
+        np.asarray(constants, dtype=np.float64), (len(radii), 5)
+    )
+    wp.launch(
+        _settling_velocity_stokes_kernel,
+        dim=len(radii),
+        inputs=[
+            _warp_array(radii, device),
+            _warp_array(densities, device),
+            _warp_array(temperatures, device),
+            _warp_array(pressures, device),
+            *(
+                _warp_array(constant_values[:, index], device)
+                for index in range(5)
+            ),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    return result.numpy()
+
+
+def _launch_sedimentation_pair_rate(
+    device: str,
+    radii_i: np.ndarray,
+    radii_j: np.ndarray,
+    velocities_i: np.ndarray,
+    velocities_j: np.ndarray,
+) -> np.ndarray:
+    """Launch a lane-indexed SP2016 sedimentation-rate probe."""
+    result = wp.zeros(len(radii_i), dtype=wp.float64, device=device)
+    wp.launch(
+        _sedimentation_sp2016_pair_rate_kernel,
+        dim=len(radii_i),
+        inputs=[
+            _warp_array(radii_i, device),
+            _warp_array(radii_j, device),
+            _warp_array(velocities_i, device),
+            _warp_array(velocities_j, device),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    return result.numpy()
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_effective_density_wp_matches_mixture_oracle(device: str) -> None:
+    """Match one- and multi-species mixture-density calculations."""
+    compositions = (
+        (
+            np.array([2.0e-18], dtype=np.float64),
+            np.array([1000.0], dtype=np.float64),
+        ),
+        (
+            np.array([1.0e-18, 3.0e-18], dtype=np.float64),
+            np.array([800.0, 1600.0], dtype=np.float64),
+        ),
+        (
+            np.array([4.0e-19, 2.0e-18, 1.0e-18], dtype=np.float64),
+            np.array([900.0, 1200.0, 1800.0], dtype=np.float64),
+        ),
+    )
+    total_masses = np.array(
+        [np.sum(masses) for masses, _ in compositions], dtype=np.float64
+    )
+    total_volumes = np.array(
+        [np.sum(masses / densities) for masses, densities in compositions],
+        dtype=np.float64,
+    )
+    expected = np.array(
+        [
+            _effective_density_oracle(masses, densities)
+            for masses, densities in compositions
+        ],
+        dtype=np.float64,
+    )
+    observed = _launch_effective_density(device, total_masses, total_volumes)
+    # fp64 operation ordering differs between NumPy and Warp.
+    npt.assert_allclose(observed, expected, rtol=1e-12, atol=0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_effective_density_wp_invalid_or_overflow_returns_exact_zero(
+    device: str,
+) -> None:
+    """Return finite exact zero for invalid or extreme density totals."""
+    total_masses = np.array(
+        [
+            0.0,
+            -1.0,
+            np.nan,
+            np.inf,
+            -np.inf,
+            np.finfo(float).max,
+            np.nextafter(0.0, 1.0),
+        ],
+        dtype=np.float64,
+    )
+    total_volumes = np.array(
+        [1.0, 1.0, 1.0, 1.0, 1.0, np.nextafter(0.0, 1.0), np.finfo(float).max],
+        dtype=np.float64,
+    )
+    observed = _launch_effective_density(device, total_masses, total_volumes)
+    assert np.all(np.isfinite(observed))
+    assert np.all(observed == 0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_settling_velocity_stokes_wp_matches_numpy_oracle(device: str) -> None:
+    """Match independent Stokes/Cunningham values from nano to droplet scale."""
+    radii = np.array([2.0e-9, 5.0e-8, 1.0e-6, 5.0e-5], dtype=np.float64)
+    densities = np.array([800.0, 1200.0, 1600.0, 1000.0], dtype=np.float64)
+    temperatures = np.array([260.0, 298.15, 320.0, 285.0], dtype=np.float64)
+    pressures = np.array(
+        [80000.0, 101325.0, 95000.0, 110000.0], dtype=np.float64
+    )
+    constants = (
+        GAS_CONSTANT,
+        MOLECULAR_WEIGHT_AIR,
+        REF_VISCOSITY_AIR_STP,
+        REF_TEMPERATURE_STP,
+        SUTHERLAND_CONSTANT,
+    )
+    expected = np.array(
+        [
+            _settling_velocity_stokes_oracle(
+                radius, density, temperature, pressure
+            )
+            for radius, density, temperature, pressure in zip(
+                radii, densities, temperatures, pressures, strict=True
+            )
+        ],
+        dtype=np.float64,
+    )
+    observed = _launch_settling_velocity_stokes(
+        device, radii, densities, temperatures, pressures, constants
+    )
+    npt.assert_allclose(observed, expected, rtol=1e-12, atol=0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_settling_velocity_stokes_wp_invalid_overflow_or_underflow_returns_exact_zero(
+    device: str,
+) -> None:
+    """Return finite exact zero for every invalid Stokes input category."""
+    base = (1.0e-6, 1000.0, 298.15, 101325.0)
+    constants = np.array(
+        [
+            GAS_CONSTANT,
+            MOLECULAR_WEIGHT_AIR,
+            REF_VISCOSITY_AIR_STP,
+            REF_TEMPERATURE_STP,
+            SUTHERLAND_CONSTANT,
+        ],
+        dtype=np.float64,
+    )
+    cases = []
+    for value in (0.0, -1.0, np.nan, np.inf, -np.inf):
+        for index in range(4):
+            case = list(base)
+            case[index] = value
+            cases.append((*case, *constants))
+        for index in range(5):
+            case_constants = constants.copy()
+            case_constants[index] = value
+            cases.append((*base, *case_constants))
+    cases.extend(
+        [
+            (1.0e200, *base[1:], *constants),
+            (base[0], np.nextafter(0.0, 1.0), *base[2:], *constants),
+        ]
+    )
+    values = np.asarray(cases, dtype=np.float64)
+    observed = _launch_settling_velocity_stokes(
+        device,
+        values[:, 0],
+        values[:, 1],
+        values[:, 2],
+        values[:, 3],
+        values[:, 4:],
+    )
+    assert np.all(np.isfinite(observed))
+    assert np.all(observed == 0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_sedimentation_sp2016_pair_rate_wp_matches_oracle_and_is_symmetric(
+    device: str,
+) -> None:
+    """Match SP2016 pair physics and its reversal symmetry."""
+    radii_i = np.array([1.0e-8, 1.0e-6, 5.0e-5], dtype=np.float64)
+    radii_j = np.array([2.0e-8, 3.0e-6, 1.0e-5], dtype=np.float64)
+    velocities_i = np.array([1.0e-6, 2.0e-4, 1.0e-2], dtype=np.float64)
+    velocities_j = np.array([3.0e-6, 5.0e-5, 1.0e-3], dtype=np.float64)
+    expected = np.array(
+        [
+            _sedimentation_sp2016_pair_rate_oracle(*values)
+            for values in zip(
+                radii_i, radii_j, velocities_i, velocities_j, strict=True
+            )
+        ],
+        dtype=np.float64,
+    )
+    observed = _launch_sedimentation_pair_rate(
+        device, radii_i, radii_j, velocities_i, velocities_j
+    )
+    reversed_observed = _launch_sedimentation_pair_rate(
+        device, radii_j, radii_i, velocities_j, velocities_i
+    )
+    npt.assert_allclose(observed, expected, rtol=1e-12, atol=0.0)
+    npt.assert_allclose(reversed_observed, expected, rtol=1e-12, atol=0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_sedimentation_sp2016_pair_rate_wp_equal_velocity_returns_exact_zero(
+    device: str,
+) -> None:
+    """Return exact zero for valid pairs with equal settling velocities."""
+    observed = _launch_sedimentation_pair_rate(
+        device,
+        np.array([1.0e-8, 1.0e-6], dtype=np.float64),
+        np.array([2.0e-8, 3.0e-6], dtype=np.float64),
+        np.array([1.0e-5, 0.0], dtype=np.float64),
+        np.array([1.0e-5, 0.0], dtype=np.float64),
+    )
+    assert np.all(observed == 0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_sedimentation_sp2016_pair_rate_wp_invalid_overflow_or_underflow_returns_exact_zero(
+    device: str,
+) -> None:
+    """Return finite exact zero for invalid and extreme SP2016 lanes."""
+    invalid = (0.0, -1.0, np.nan, np.inf, -np.inf)
+    cases = []
+    for value in invalid:
+        cases.extend(
+            [(value, 1.0e-6, 1.0e-4, 2.0e-4), (1.0e-6, value, 1.0e-4, 2.0e-4)]
+        )
+        paired_velocity = 0.0 if value == 0.0 else 2.0e-4
+        cases.extend(
+            [
+                (1.0e-6, 2.0e-6, value, paired_velocity),
+                (1.0e-6, 2.0e-6, 0.0 if value == 0.0 else 1.0e-4, value),
+            ]
+        )
+    cases.extend(
+        [
+            (np.finfo(float).max, np.finfo(float).max, 1.0e-4, 2.0e-4),
+            (1.0e154, 1.0e154, np.finfo(float).max, 0.0),
+            (1.0e-200, 1.0e-200, 1.0, 0.0),
+        ]
+    )
+    values = np.asarray(cases, dtype=np.float64)
+    observed = _launch_sedimentation_pair_rate(
+        device, values[:, 0], values[:, 1], values[:, 2], values[:, 3]
+    )
+    assert np.all(np.isfinite(observed))
+    assert np.all(observed == 0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_sedimentation_sp2016_pair_rate_wp_has_no_efficiency_argument() -> None:
+    """Keep the internal SP2016 primitive limited to its four physics inputs."""
+    source_path = Path(__file__).parents[1] / "coagulation_funcs.py"
+    tree = ast.parse(source_path.read_text(encoding="utf-8"))
+    function = next(
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "sedimentation_sp2016_pair_rate_wp"
+    )
+    assert tuple(argument.arg for argument in function.args.posonlyargs) == ()
+    assert tuple(argument.arg for argument in function.args.args) == (
+        "radius_i",
+        "radius_j",
+        "velocity_i",
+        "velocity_j",
+    )
+    assert function.args.vararg is None
+    assert function.args.kwarg is None
+    assert function.args.kwonlyargs == []
