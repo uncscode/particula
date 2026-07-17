@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../images/icon_dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -15001,21 +15001,20 @@ state.</p>
 <p>For direct GPU coagulation, <code>WarpParticleData.charge</code> is caller-owned,
 device-resident particle state, not a sidecar or hidden transfer result. It
 must be a same-device <code>wp.float64</code> array matching shape
-<code>(n_boxes, n_particles)</code>. Shape, dtype, and device are validated without a
-device-to-host readback. Callers that require host-visible rejection of NaN or
-infinite values must pass <code>validate_charge_finite=True</code>; that explicit debug
-validation allocates a private status scalar, runs a read-only device scan, and
-synchronizes before reading the result. The default step path performs no such
-scan, synchronization, or host readback, so persistent-state loops and graph
-capture remain caller-controlled.</p>
+<code>(n_boxes, n_particles)</code>. Charged-containing execution scans charge for finite
+values before caller-output validation/allocation, RNG setup, or selector/apply
+work. Brownian-only execution scans it only with <code>validate_charge_finite=True</code>.</p>
 <p>When a collision is accepted, the recipient receives the donor charge and the
 donor charge is cleared together with donor mass and concentration. Supported
 evidence conserves charge independently in each box. This merge bookkeeping
 skips a collision whose finite charge sum cannot be represented as finite
 <code>float64</code>, leaving both particles unchanged rather than producing infinity.
-This merge bookkeeping
-does not make charged selection, charged majorants, Brownian-plus-charged
-execution, or public charged stochastic execution available.</p>
+Before recording a selected collision or removing its candidates from the
+active set, selection also verifies that every merged species-mass component
+and the merged charge remain finite and nonnegative where applicable. The
+apply pass repeats those checks defensively; rejected entries are compacted
+using only the populated collision count, so unused capacity in an oversized
+caller buffer is never interpreted as a collision.</p>
 <h3 id="gpu-coagulation-configuration-and-sidecar-ownership">GPU coagulation configuration and sidecar ownership<a class="headerlink" href="#gpu-coagulation-configuration-and-sidecar-ownership" title="Permanent link">&para;</a></h3>
 <p>Import the supported direct step and its host-side configuration separately:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">coagulation_step_gpu</span>
@@ -15050,8 +15049,8 @@ initialization path, which synchronizes after initializing or resetting state.</
 </tr>
 <tr>
 <td><code>charged_hard_sphere</code></td>
-<td>Reserved; rejected in capability preflight</td>
-<td>E5-F3</td>
+<td>Executable alone or with Brownian, particle-resolved only</td>
+<td>Shipped E5-F3</td>
 </tr>
 <tr>
 <td><code>sedimentation_sp2016</code></td>
@@ -15065,27 +15064,33 @@ initialization path, which synchronizes after initializing or resetting state.</
 </tr>
 </tbody>
 </table>
-<p>Structural recognition is not executability. Any reserved ID, including a
-Brownian-plus-reserved combination, raises <code>ValueError</code> in host capability
+<p>The charged-only tuple is <code>("charged_hard_sphere",)</code>. The combined tuple
+<code>("brownian", "charged_hard_sphere")</code> is accepted in either requested order
+and normalizes to one executable mask. Reserved IDs, including
+Brownian-plus-reserved combinations, raise <code>ValueError</code> in host capability
 preflight before runtime input access, allocation, launch, or mutable state
 changes.</p>
-<p>The charge foundations above do not change this capability table:
-<code>charged_hard_sphere</code> remains reserved. They do not provide charged selection,
-charged majorants, Brownian-plus-charged execution, or public charged
-stochastic execution.</p>
-<p>The fixed sampler has one normalized active set, one total safe majorant, one
-candidate stream, one total pair-rate acceptance decision for each valid
-candidate, one collision-pair output buffer, and one per-box RNG-state
-progression. Invalid, nonfinite, or nonpositive terms do not add to totals;
-invalid candidates do not mutate the active set or collision output.</p>
+<p>Charged-only execution uses a bounded compact active-pair majorant. Combined
+execution independently sanitizes and sums Brownian and charged terms, then
+uses one active set, exhaustive additive majorant, candidate/acceptance pass,
+collision-buffer set, per-box RNG stream, and apply pass. For active count A,
+pair work is O(A²), preparation is O(N), and selector/collision storage is
+O(N), where N is total particle capacity. This documents bounded implementation
+scope, not throughput or scaling evidence.
+Invalid, nonfinite, or nonpositive
+terms do not add to totals; invalid candidates do not mutate state or output.</p>
+<p>The return tuple is exactly <code>(particles, collision_pairs, n_collisions)</code>.
+Supplied collision buffers are returned by identity. Supplied <code>rng_states</code>
+mutates in place but is never returned; omitted buffers are call-local
+conveniences. Warp CPU is the baseline when Warp is installed. CUDA is optional
+additive evidence and skips cleanly when unavailable.</p>
 <p>Future mechanisms must provide a stable identifier; required host and device
 inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
 additive majorant; a capability-table row; shared-dispatcher integration; and
 co-located <code>*_test.py</code> coverage. They must not add an independent sampling
 loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level <code>Runnable</code>
-integration, graph-capture claims, and executable charged, sedimentation, or
-turbulent-shear physics.</p>
+integration, graph-capture claims, sedimentation, or turbulent-shear physics.</p>
 <h3 id="environment-transfer-boundary">Environment transfer boundary<a class="headerlink" href="#environment-transfer-boundary" title="Permanent link">&para;</a></h3>
 <p>Use the environment helpers when thermodynamic state must cross the CPU↔GPU
 boundary:</p>
@@ -15397,8 +15402,8 @@ than storage support.</p>
 </tr>
 <tr>
 <td>Low-level GPU coagulation direct-kernel path</td>
-<td>Brownian-only, particle-resolved direct-kernel contract</td>
-<td><code>brownian</code> is the sole executable mechanism. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state and explicit resets synchronize during initialization.</td>
+<td>Direct, particle-resolved direct-kernel contract</td>
+<td>Executable configurations are <code>('brownian',)</code>, <code>('charged_hard_sphere',)</code>, and Brownian-plus-charged in either requested order; combined requests normalize to canonical order. This low-level path does not establish Runnable support, CPU parity, or performance claims. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state and explicit resets synchronize during initialization.</td>
 </tr>
 <tr>
 <td>Fixed-shape GPU/runtime roadmap work</td>
@@ -15447,24 +15452,17 @@ than storage support.</p>
   gas round trip.</li>
 <li>Preserve or recompute vapor pressure separately on the CPU side after GPU
   restore.</li>
-<li>Use the current low-level GPU coagulation path when you want throughput from
-  many independent boxes, especially on CUDA where box-level parallelism can
-  stay busy, a documented direct-kernel workflow on a Warp-supported device,
-  or a CUDA-backed benchmark/study run tied to the measured evidence in the
-  roadmap.</li>
-<li>Do not treat the current one-thread-per-box coagulation path as the
-  recommended production path for large single-box workloads; the shipped
-  caution band is documented in the roadmap's measured decision record.</li>
-<li>Do not read the current low-level GPU coagulation support row as a general
-  claim that Particula has broad GPU production support beyond the explicit
-  helper boundary, optional Warp/CUDA availability, and measured many-box use
-  cases documented here and in the roadmap.</li>
+<li>Use the current low-level GPU coagulation path only within its documented
+  direct-kernel workflow on a Warp-supported device.</li>
+<li>The current low-level GPU coagulation path remains bounded direct-kernel
+  implementation scope; it does not establish a general production-support
+  claim beyond its documented helper boundary and supported inputs.</li>
 <li>Do not expect kernels or runnables to perform hidden CPU↔GPU transfers or
   hidden synchronization for particle, gas, or environment state; use the
   explicit helper calls when state must cross the device boundary.</li>
 <li>Treat Warp and CUDA as optional runtime capabilities: without Warp, this
-  low-level GPU path is unavailable, and CUDA benchmark conclusions should not
-  be assumed to apply unchanged to Warp <code>cpu</code> or other hardware.</li>
+  low-level GPU path is unavailable. Warp <code>device="cpu"</code> is the baseline;
+  CUDA support is optional and tests skip cleanly when CUDA is unavailable.</li>
 <li>Treat roadmap pages as future-work references, not as evidence that broader
   runtime support has already shipped.</li>
 </ul>
@@ -15663,7 +15661,7 @@ cleanly when CUDA is unavailable.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.tracking", "navigation.top", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "header.autohide", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

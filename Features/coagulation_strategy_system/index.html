@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../images/icon_dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -15594,9 +15594,10 @@
 </ul>
 <h3 id="gpu-direct-kernel-foundations-and-limitations">GPU direct-kernel foundations and limitations<a class="headerlink" href="#gpu-direct-kernel-foundations-and-limitations" title="Permanent link">&para;</a></h3>
 <p>This section is separate from the CPU <code>particula.dynamics</code> strategy API above.
-The direct GPU coagulation path executes Brownian particle-resolved coagulation
-only; it is not a GPU runnable for <code>ChargedCoagulationStrategy</code> or the other
-CPU strategies.</p>
+The direct GPU path supports particle-resolved Brownian,
+<code>("charged_hard_sphere",)</code>, and <code>("brownian", "charged_hard_sphere")</code> in
+either requested combined order. It is not a GPU runnable for
+<code>ChargedCoagulationStrategy</code> or another CPU strategy.</p>
 <p>The approved internal E5-F2 helper subset is
 <code>coulomb_potential_ratio_wp</code>, <code>coulomb_kinetic_limit_wp</code>,
 <code>coulomb_continuum_limit_wp</code>, <code>reduced_value_wp</code>,
@@ -15605,19 +15606,23 @@ and strategy reference sources are
 <code>particula/dynamics/coagulation/charged_dimensional_kernel.py</code>,
 <code>charged_dimensionless_kernel.py</code>, and <code>charged_kernel_strategy.py</code>; they are
 not a public GPU runnable.</p>
-<p>Current bounded evidence covers deterministic helper parity; neutral,
-attractive, repulsive, and safe-zero cases; charge-buffer validation; and
-recipient-add/donor-clear merge behavior. Warp CPU is the baseline when Warp
-is installed; CUDA evidence is optional and skips cleanly when unavailable.
+<p>Current bounded evidence covers deterministic and stochastic execution;
+neutral, attractive, repulsive, and safe-zero cases; charge-buffer validation;
+and recipient-add/donor-clear merge behavior. Warp CPU is the baseline when
+Warp is installed; CUDA evidence is optional and skips cleanly when unavailable.
 The published
 <a href="../data-containers-and-gpu-foundations/">GPU container and direct-kernel contract</a>
 defines the associated ownership boundary, including caller-owned <code>wp.float64</code>
 charge state, read-only finite-value preflight, and recipient-add/donor-clear
-merge bookkeeping. These foundations do not expose a charged GPU strategy API.</p>
-<p>E5-F3 remains the downstream implementation track for safe majorants,
-candidate selection, and executable charged sampling. No charged candidate
-selection, majorants, Brownian-plus-charged execution, or public charged
-stochastic execution is available from these foundations.</p>
+merge bookkeeping. These direct configurations do not expose a charged GPU
+strategy API, CPU/GPU stochastic parity, or high-level <code>Runnable</code> support.</p>
+<p>Charged-only execution uses its bounded compact active-pair majorant. Combined
+execution sums independently sanitized Brownian and charged rates and uses one
+exhaustive additive majorant, selector/acceptance path, collision-buffer set,
+RNG stream, and apply pass. For A active particles, pair work is O(A²),
+preparation is O(N), and selector/collision storage is O(N), where N is total
+particle capacity. This is bounded implementation scope, not performance
+evidence.</p>
 <h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Wall loss strategies</strong>: <a href="../wall_loss_strategy_system/">wall_loss_strategy_system.md</a></li>
@@ -15703,7 +15708,7 @@ stochastic execution is available from these foundations.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.tracking", "navigation.top", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "header.autohide", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

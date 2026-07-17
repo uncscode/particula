@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../../../images/icon_dark.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -15428,12 +15428,13 @@ high-level dynamics workflows.</p>
   concentration, and records a signed energy diagnostic. Temperature feedback
   and high-level <code>Runnable</code> integration remain future work outside this
   low-level publication.</li>
-<li>Particle charge is present in the GPU data container, but charged particle
-  coagulation kernels are not implemented yet.</li>
-<li>The current GPU coagulation path executes Brownian with
-  <code>particle_resolved</code> inputs only. Charged, turbulent, sedimentation, and
-  combined particle-resolved workflows are reserved and rejected during host
-  capability preflight until their assigned Epic E features implement them.</li>
+<li>Particle charge supports direct low-level particle-resolved charged hard-sphere
+  coagulation, including the canonical Brownian-plus-charged combination.</li>
+<li>The current GPU coagulation path supports Brownian-only, charged-hard-sphere-
+  only, and canonical Brownian-plus-charged <code>particle_resolved</code> inputs.
+  Turbulent, sedimentation, alternate charged models, other mechanism
+  combinations, and broader distributions remain reserved and rejected during
+  host capability preflight.</li>
 <li>CPU sedimentation coagulation and simple turbulent shear coagulation exist,
   but neither has a GPU kernel yet. DNS turbulence is intentionally deferred
   from the near-term GPU scope.</li>
@@ -16760,8 +16761,8 @@ initialization path, which synchronizes after initializing or resetting state.</
 </tr>
 <tr>
 <td><code>charged_hard_sphere</code></td>
-<td>Reserved; rejected in capability preflight</td>
-<td>E5-F3</td>
+<td>Executable alone or with Brownian, particle-resolved only</td>
+<td>Shipped E5-F3</td>
 </tr>
 <tr>
 <td><code>sedimentation_sp2016</code></td>
@@ -16775,29 +16776,38 @@ initialization path, which synchronizes after initializing or resetting state.</
 </tr>
 </tbody>
 </table>
-<p>Structural recognition is not executability. Any reserved ID, including a
-Brownian-plus-reserved combination, raises <code>ValueError</code> in host capability
+<p>The charged-only tuple is <code>("charged_hard_sphere",)</code>. The combined tuple
+<code>("brownian", "charged_hard_sphere")</code> is accepted in either requested order
+and normalizes to one executable mask. Reserved IDs, including
+Brownian-plus-reserved combinations, raise <code>ValueError</code> in host capability
 preflight before runtime input access, allocation, launch, or mutable state
 changes.</p>
-<p>The fixed sampler has one normalized active set, one total safe majorant, one
-candidate stream, one total pair-rate acceptance decision for each valid
-candidate, one collision-pair output buffer, and one per-box RNG-state
-progression. Invalid, nonfinite, or nonpositive terms do not add to totals;
-invalid candidates do not mutate the active set or collision output.</p>
+<p><code>WarpParticleData.charge</code> is caller-owned same-device <code>wp.float64</code> state with
+shape <code>(n_boxes, n_particles)</code>, not a sidecar or transfer result. Charged calls
+preflight finite charge before caller-output validation/allocation, RNG setup,
+or selector/apply work. Accepted merges add donor charge to the recipient and
+clear the donor.</p>
+<p>Combined execution independently sanitizes and sums Brownian and charged pair
+rates, then uses one active set, exhaustive additive majorant,
+candidate/acceptance pass, collision-buffer set, per-box RNG stream, and apply
+pass. For active count A, pair work is O(A²), preparation is O(N), and
+selector/collision storage is O(N), where N is total particle capacity. This is
+bounded implementation scope, not a performance claim. The return tuple is exactly
+<code>(particles, collision_pairs, n_collisions)</code>: supplied collision buffers return
+by identity, while supplied <code>rng_states</code> mutates in place and is not returned.
+Warp CPU is the baseline when installed; CUDA is optional additive evidence and
+skips cleanly when unavailable.</p>
 <p>Future mechanisms must provide a stable identifier; required host and device
 inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
 additive majorant; a capability-table row; shared-dispatcher integration; and
 co-located <code>*_test.py</code> coverage. They must not add an independent sampling
 loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level <code>Runnable</code>
-integration, graph-capture claims, and executable charged, sedimentation, or
-turbulent-shear physics.</p>
+integration, graph-capture claims, sedimentation, or turbulent-shear physics.
+Alternate charged variants and broader combinations remain deferred; E5-F9 owns
+the canonical example and final support table.</p>
 <p>Planned features:</p>
 <ol>
-<li>Charged particle-resolved coagulation using <code>WarpParticleData.charge</code>
-   rather than treating charge as stored but inactive metadata.</li>
-<li>Combined Brownian plus charged coagulation when both mechanisms are
-   active.</li>
 <li>Sedimentation coagulation matching the CPU Seinfeld-Pandis 2016
    sedimentation kernel.</li>
 <li>Simple turbulent shear coagulation matching the CPU Saffman-Turner 1956
@@ -17405,7 +17415,7 @@ coagulation and state-representation decisions are recorded.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.tracking", "navigation.top", "navigation.indexes", "navigation.instant", "navigation.instant.progress", "header.autohide", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="../../../javascripts/mathjax.js"></script>
       
