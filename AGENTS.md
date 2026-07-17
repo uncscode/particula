@@ -463,8 +463,9 @@ for _ in range(n_steps):
   exactly-two-active inputs must collapse to the sole valid pair; and accepted
   collisions must conserve total mass.
 - Warp CPU is the baseline when installed; CUDA evidence is optional and must
-  skip cleanly when unavailable. Combined mechanisms, alternate charged
-  models, broader mechanisms, and performance claims remain deferred.
+  skip cleanly when unavailable. The canonical Brownian-plus-charged mechanism
+  is supported; other combined mechanisms, alternate charged models, broader
+  distributions, and performance claims remain deferred.
 - See `docs/Features/data-containers-and-gpu-foundations.md` and
   `docs/Features/Roadmap/data-oriented-gpu.md` for the user-facing ownership
   and graph-capture guidance.

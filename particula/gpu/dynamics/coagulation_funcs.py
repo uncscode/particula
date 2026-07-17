@@ -2,8 +2,8 @@
 
 The Brownian helpers mirror ``particula.dynamics.coagulation.brownian_kernel``.
 The concrete-module-only charged hard-sphere helper supports the low-level,
-charged-only particle-resolved GPU execution path. It does not add public
-exports, combined mechanisms, or higher-level charged coagulation APIs.
+charged-only and canonical Brownian-plus-charged particle-resolved GPU paths.
+It does not add public exports or higher-level charged coagulation APIs.
 """
 
 import warp as wp
@@ -415,9 +415,10 @@ def charged_hard_sphere_wp(  # noqa: C901
     """Calculate an internal charged hard-sphere pair rate in SI units.
 
     This device-only, concrete-module-only helper is the pair-rate primitive for
-    charged-only, particle-resolved low-level GPU coagulation. It receives each
-    particle's total mass across species and is used for candidate rates and
-    compact-active majorants. It ports the charged CPU calculation from
+    charged-only and canonical Brownian-plus-charged particle-resolved low-level
+    GPU coagulation. It receives each particle's total mass across species and
+    is used for candidate rates and compact-active majorants. It ports the
+    charged CPU calculation from
     ``particula.dynamics.coagulation.charged_dimensional_kernel`` and the
     hard-sphere fit from
     ``particula.dynamics.coagulation.charged_dimensionless_kernel``. It does

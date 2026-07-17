@@ -174,12 +174,13 @@ Known GPU physics gaps remain:
   concentration, and records a signed energy diagnostic. Temperature feedback
   and high-level `Runnable` integration remain future work outside this
   low-level publication.
-- Particle charge is present in the GPU data container, but charged particle
-  coagulation kernels are not implemented yet.
-- The current GPU coagulation path executes Brownian with
-  `particle_resolved` inputs only. Charged, turbulent, sedimentation, and
-  combined particle-resolved workflows are reserved and rejected during host
-  capability preflight until their assigned Epic E features implement them.
+- Particle charge supports direct low-level particle-resolved charged hard-sphere
+  coagulation, including the canonical Brownian-plus-charged combination.
+- The current GPU coagulation path supports Brownian-only, charged-hard-sphere-
+  only, and canonical Brownian-plus-charged `particle_resolved` inputs.
+  Turbulent, sedimentation, alternate charged models, other mechanism
+  combinations, and broader distributions remain reserved and rejected during
+  host capability preflight.
 - CPU sedimentation coagulation and simple turbulent shear coagulation exist,
   but neither has a GPU kernel yet. DNS turbulence is intentionally deferred
   from the near-term GPU scope.

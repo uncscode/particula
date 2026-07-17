@@ -646,7 +646,7 @@ def _validate_charged_particle_physics_kernel(
     invalid: Any,
     active_counts: Any,
 ) -> None:
-    """Validate charged particle inputs and count active slots read-only.
+    """Validate charged particle inputs and count selector-eligible slots.
 
     Masses and concentrations may be zero for inactive slots, but all particle
     state must be finite and nonnegative; species density must be finite and
@@ -658,13 +658,17 @@ def _validate_charged_particle_physics_kernel(
         0.0
     ):
         wp.atomic_max(invalid, 0, 1)
-    elif concentration_value > wp.float64(0.0):
-        wp.atomic_add(active_counts, box_idx, 1)
-
+    total_mass = wp.float64(0.0)
     for species_idx in range(masses.shape[2]):
         mass = masses[box_idx, particle_idx, species_idx]
         if not wp.isfinite(mass) or mass < wp.float64(0.0):
             wp.atomic_max(invalid, 0, 1)
+        total_mass += mass
+
+    # After density preflight, positive total mass is equivalent to the
+    # selector's positive total-volume requirement.
+    if concentration_value > wp.float64(0.0) and total_mass > wp.float64(0.0):
+        wp.atomic_add(active_counts, box_idx, 1)
 
 
 @no_type_check
@@ -1047,6 +1051,16 @@ def apply_coagulation_kernel(
         return
 
     n_species = masses.shape[2]
+    for species_idx in range(n_species):
+        merged_mass = (
+            masses[box_idx, idx_i, species_idx]
+            + masses[box_idx, idx_j, species_idx]
+        )
+        # Validate every component before changing any state. A skipped pair
+        # preserves caller-owned inventories and avoids partial merges.
+        if not wp.isfinite(merged_mass) or merged_mass < wp.float64(0.0):
+            return
+
     for species_idx in range(n_species):
         masses[box_idx, idx_i, species_idx] = (
             masses[box_idx, idx_i, species_idx]
