@@ -1,4 +1,4 @@
-"""GPU Brownian and charged hard-sphere coagulation utilities.
+"""GPU Brownian, charged, and private sedimentation coagulation utilities.
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
 coagulation pipeline. Its fixed-mask sampler executes particle-resolved
@@ -26,6 +26,11 @@ and canonical Brownian-plus-charged particle-resolved execution. It rejects
 otherwise unsupported configurations during preflight, before runtime state is
 accessed or mutated. Supplied particles, collision outputs, and RNG sidecars
 are caller-owned same-device Warp resources.
+
+The exact private ``SEDIMENTATION_SP2016_MECHANISM_FLAG`` is additionally
+available to direct kernel tests. It shares the bounded sampler and persistent
+RNG path, but is not accepted by public configuration validation; mixed masks
+containing sedimentation remain non-executable.
 """
 
 # pyright: basic
@@ -57,8 +62,11 @@ from particula.gpu.dynamics.coagulation_funcs import (
     brownian_diffusivity_wp,
     brownian_kernel_pair_wp,
     charged_hard_sphere_wp,
+    effective_density_wp,
     g_collection_term_wp,
     particle_mean_free_path_wp,
+    sedimentation_sp2016_pair_rate_wp,
+    settling_velocity_stokes_wp,
 )
 from particula.gpu.dynamics.condensation_funcs import (
     particle_radius_from_volume_wp,
@@ -311,6 +319,8 @@ def _total_pair_rate(  # noqa: PLR0913
     g_term_j: Any,
     speed_i: Any,
     speed_j: Any,
+    settling_velocity_i: Any,
+    settling_velocity_j: Any,
     total_mass_i: Any,
     total_mass_j: Any,
     charge_i: Any,
@@ -328,10 +338,11 @@ def _total_pair_rate(  # noqa: PLR0913
 ) -> Any:
     """Return the enabled finite, positive pair rate.
 
-    The fixed mask dispatches Brownian and charged hard-sphere physics without
-    dynamic mechanism iteration. Each enabled term is independently sanitized
-    before their additive combined rate is returned. Invalid rate terms
-    contribute zero.
+    The fixed mask dispatches private helper physics without dynamic mechanism
+    iteration. Each enabled term is independently sanitized before their
+    additive combined rate is returned. The sampler only executes the exact
+    sedimentation-only mask; mixed sedimentation masks remain non-executable.
+    Invalid rate terms contribute zero.
     """
     total_rate = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
@@ -367,6 +378,15 @@ def _total_pair_rate(  # noqa: PLR0913
                 ref_viscosity,
                 ref_temperature,
                 sutherland_constant,
+            )
+        )
+    if mechanism_mask & wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG):
+        total_rate += _sanitize_positive_finite(
+            sedimentation_sp2016_pair_rate_wp(
+                radius_i,
+                radius_j,
+                settling_velocity_i,
+                settling_velocity_j,
             )
         )
     return total_rate
@@ -460,6 +480,42 @@ def _charged_majorant_from_active_pairs(  # noqa: PLR0913
 
 @no_type_check
 @wp.func
+def _sedimentation_majorant_from_active_pairs(
+    active_indices: Any,
+    box_idx: Any,
+    active_count: Any,
+    radii: Any,
+    settling_velocities: Any,
+) -> Any:
+    """Return the finite sedimentation-rate maximum over active pairs.
+
+    This private helper exhaustively resolves compact active ranks, so sparse
+    source slots cannot affect the exact sedimentation-only sampler majorant.
+    Invalid, zero, and nonpositive P1 rates contribute zero.
+    """
+    majorant = wp.float64(0.0)
+    if active_count < wp.int32(2):
+        return majorant
+
+    for first_rank in range(active_count - wp.int32(1)):
+        first_idx = wp.int32(active_indices[box_idx, first_rank])
+        for second_rank in range(first_rank + wp.int32(1), active_count):
+            second_idx = wp.int32(active_indices[box_idx, second_rank])
+            candidate = _sanitize_positive_finite(
+                sedimentation_sp2016_pair_rate_wp(
+                    radii[box_idx, first_idx],
+                    radii[box_idx, second_idx],
+                    settling_velocities[box_idx, first_idx],
+                    settling_velocities[box_idx, second_idx],
+                )
+            )
+            if candidate > majorant:
+                majorant = candidate
+    return majorant
+
+
+@no_type_check
+@wp.func
 def _total_majorant(  # noqa: PLR0913
     mechanism_mask: Any,
     radius_min: Any,
@@ -474,6 +530,7 @@ def _total_majorant(  # noqa: PLR0913
     box_idx: Any,
     active_count: Any,
     radii: Any,
+    settling_velocities: Any,
     total_masses: Any,
     charges: Any,
     temperature: Any,
@@ -489,10 +546,10 @@ def _total_majorant(  # noqa: PLR0913
 ) -> Any:
     """Accumulate enabled finite, positive terms for private staged tests.
 
-    The production selector uses this dispatcher for charged-only execution,
-    whose charge and mass dependence requires an exhaustive compact-active
-    scan. Brownian-containing production selection uses one exact active-pair
-    scan through ``_total_pair_rate``. Other reserved bits contribute no term.
+    The production selector uses this dispatcher for exact charged-only and
+    private sedimentation-only execution. Brownian-containing production
+    selection uses one exact active-pair scan through ``_total_pair_rate``.
+    Other reserved bits contribute no term.
     """
     total_majorant = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
@@ -528,6 +585,16 @@ def _total_majorant(  # noqa: PLR0913
                 ref_viscosity,
                 ref_temperature,
                 sutherland_constant,
+            )
+        )
+    if mechanism_mask & wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG):
+        total_majorant += _sanitize_positive_finite(
+            _sedimentation_majorant_from_active_pairs(
+                active_indices,
+                box_idx,
+                active_count,
+                radii,
+                settling_velocities,
             )
         )
     # Other reserved mechanism bits deliberately contribute no term.
@@ -707,6 +774,7 @@ def brownian_coagulation_kernel(  # noqa: C901
     diffusivities: Any,
     g_terms: Any,
     speeds: Any,
+    settling_velocities: Any,
     total_masses: Any,
     charge: Any,
     active_indices: Any,
@@ -746,6 +814,10 @@ def brownian_coagulation_kernel(  # noqa: C901
         diffusivities: Output diffusivities ``(n_boxes, n_particles)``.
         g_terms: Output collection terms ``(n_boxes, n_particles)``.
         speeds: Output mean thermal speeds ``(n_boxes, n_particles)``.
+        settling_velocities: Private fp64 settling-velocity scratch
+            ``(n_boxes, n_particles)``. Every slot is cleared before active
+            eligibility checks; only exact private sedimentation-only launches
+            populate valid active values.
         active_indices: Output compact active indices
             ``(n_boxes, n_particles)``.
         collision_pairs: Output collision indices
@@ -759,8 +831,9 @@ def brownian_coagulation_kernel(  # noqa: C901
             the sum over species only for active particles.
         charge: Caller-owned signed elementary-charge counts
             ``(n_boxes, n_particles)``.
-        mechanism_mask: Fixed internal mask for Brownian, charged-only, or
-            canonical Brownian-plus-charged particle-resolved execution.
+        mechanism_mask: Fixed internal sampler mask. In addition to public
+            Brownian and charged masks, only the exact private
+            sedimentation-only mask is executable.
         collision_capacity: Maximum accepted collisions per box for this call.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]
@@ -790,6 +863,7 @@ def brownian_coagulation_kernel(  # noqa: C901
     active_count = wp.int32(0)
     for particle_idx in range(n_particles):
         total_masses[box_idx, particle_idx] = wp.float64(0.0)
+        settling_velocities[box_idx, particle_idx] = wp.float64(0.0)
         if concentration[box_idx, particle_idx] <= wp.float64(0.0):
             active_indices[box_idx, particle_idx] = wp.int32(-1)
             radii[box_idx, particle_idx] = wp.float64(0.0)
@@ -825,6 +899,19 @@ def brownian_coagulation_kernel(  # noqa: C901
         )
         particle_mean_free_path = particle_mean_free_path_wp(diffusivity, speed)
         g_term = g_collection_term_wp(particle_mean_free_path, radius)
+        settling_velocity = wp.float64(0.0)
+        if mechanism_mask == wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG):
+            settling_velocity = settling_velocity_stokes_wp(
+                radius,
+                effective_density_wp(total_mass, total_volume),
+                temperature_value,
+                pressure_value,
+                gas_constant,
+                molecular_weight_air,
+                ref_viscosity,
+                ref_temperature,
+                sutherland_constant,
+            )
 
         active_indices[box_idx, active_count] = wp.int32(particle_idx)
         radii[box_idx, particle_idx] = radius
@@ -832,17 +919,32 @@ def brownian_coagulation_kernel(  # noqa: C901
         diffusivities[box_idx, particle_idx] = diffusivity
         g_terms[box_idx, particle_idx] = g_term
         speeds[box_idx, particle_idx] = speed
+        settling_velocities[box_idx, particle_idx] = settling_velocity
         active_count += wp.int32(1)
 
     if active_count < wp.int32(2):
         n_collisions[box_idx] = wp.int32(0)
         return
 
-    # Charged-only rates require the exact compact active-pair maximum. Any mask
-    # containing Brownian uses the exhaustive scan below, which already obtains
-    # the additive Brownian-plus-charged maximum in one pass.
+    executable_brownian_mask = mechanism_mask == wp.int32(
+        BROWNIAN_MECHANISM_FLAG
+    ) or mechanism_mask == wp.int32(
+        BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG
+    )
+    if not (
+        executable_brownian_mask
+        or mechanism_mask == wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG)
+        or mechanism_mask == wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG)
+    ):
+        n_collisions[box_idx] = wp.int32(0)
+        return
+
+    # Charged-only and exact private sedimentation-only rates require exact
+    # compact active-pair maxima. Brownian masks use the shared scan below.
     majorant_total = wp.float64(0.0)
-    if mechanism_mask == wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG):
+    if mechanism_mask == wp.int32(
+        CHARGED_HARD_SPHERE_MECHANISM_FLAG
+    ) or mechanism_mask == wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG):
         majorant_total = _total_majorant(
             mechanism_mask,
             wp.float64(0.0),
@@ -857,6 +959,7 @@ def brownian_coagulation_kernel(  # noqa: C901
             box_idx,
             active_count,
             radii,
+            settling_velocities,
             total_masses,
             charge,
             temperature,
@@ -873,7 +976,7 @@ def brownian_coagulation_kernel(  # noqa: C901
     # Brownian-containing masks use one compact active-pair scan. For the
     # combined mask _total_pair_rate includes the charged term, so do not add a
     # separate charged-only maximum that would double-count the majorant.
-    if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
+    if executable_brownian_mask:
         majorant_total = wp.float64(0.0)
         for first_rank in range(active_count - wp.int32(1)):
             first_idx = wp.int32(active_indices[box_idx, first_rank])
@@ -889,6 +992,8 @@ def brownian_coagulation_kernel(  # noqa: C901
                     g_terms[box_idx, second_idx],
                     speeds[box_idx, first_idx],
                     speeds[box_idx, second_idx],
+                    settling_velocities[box_idx, first_idx],
+                    settling_velocities[box_idx, second_idx],
                     total_masses[box_idx, first_idx],
                     total_masses[box_idx, second_idx],
                     charge[box_idx, first_idx],
@@ -981,6 +1086,8 @@ def brownian_coagulation_kernel(  # noqa: C901
             g_terms[box_idx, selected_j],
             speeds[box_idx, selected_i],
             speeds[box_idx, selected_j],
+            settling_velocities[box_idx, selected_i],
+            settling_velocities[box_idx, selected_j],
             total_masses[box_idx, selected_i],
             total_masses[box_idx, selected_j],
             charge[box_idx, selected_i],
@@ -1834,6 +1941,9 @@ def coagulation_step_gpu(  # noqa: C901
     )
     g_terms = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     speeds = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
+    settling_velocities = wp.zeros(
+        (n_boxes, n_particles), dtype=wp.float64, device=device
+    )
     total_masses = wp.zeros(
         (n_boxes, n_particles), dtype=wp.float64, device=device
     )
@@ -1871,6 +1981,7 @@ def coagulation_step_gpu(  # noqa: C901
             diffusivities,
             g_terms,
             speeds,
+            settling_velocities,
             total_masses,
             particles.charge,
             active_indices,
