@@ -11443,6 +11443,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#gpu-coagulation-configuration-and-sidecar-ownership" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU coagulation configuration and sidecar ownership
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#environment-transfer-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14545,6 +14556,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#gpu-coagulation-configuration-and-sidecar-ownership" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU coagulation configuration and sidecar ownership
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#environment-transfer-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14976,6 +14998,72 @@ containers and Warp-owned storage:</p>
 <p>As with the gas and environment helpers, kernels and runnables do not perform
 hidden CPU↔GPU synchronization or implicit container transfers for particle
 state.</p>
+<h3 id="gpu-coagulation-configuration-and-sidecar-ownership">GPU coagulation configuration and sidecar ownership<a class="headerlink" href="#gpu-coagulation-configuration-and-sidecar-ownership" title="Permanent link">&para;</a></h3>
+<p>Import the supported direct step and its host-side configuration separately:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">coagulation_step_gpu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoagulationMechanismConfig</span>
+</code></pre></div>
+<p>Pass <code>mechanism_config=CoagulationMechanismConfig(...)</code> as keyword-only host
+metadata. The frozen dataclass is not device-resident simulation state and is
+not transferred, synchronized, or stored in a container schema. In contrast,
+<code>WarpParticleData</code>, supplied <code>collision_pairs</code>, supplied <code>n_collisions</code>, and
+supplied <code>rng_states</code> are caller-owned, same-device Warp resources. Omitted
+collision outputs and RNG state use call-local convenience allocation. A
+supplied RNG sidecar is reused and changes in place; it resets only with
+<code>initialize_rng=True</code>. Configuration and caller-owned sidecars have no implicit
+CPU↔GPU transfer. Reuse of a supplied persistent <code>rng_states</code> buffer is
+unsynchronized, while omitted RNG state and <code>initialize_rng=True</code> use the
+initialization path, which synchronizes after initializing or resetting state.</p>
+<p>Only <code>distribution_type="particle_resolved"</code> is accepted. <code>"discrete"</code> and
+<code>"continuous_pdf"</code> raise <code>ValueError</code>; they do not fall back or convert.</p>
+<table>
+<thead>
+<tr>
+<th>Identifier</th>
+<th>Status</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>brownian</code></td>
+<td>Executable with <code>particle_resolved</code> only</td>
+<td>Shipped E5-F1 baseline</td>
+</tr>
+<tr>
+<td><code>charged_hard_sphere</code></td>
+<td>Reserved; rejected in capability preflight</td>
+<td>E5-F3</td>
+</tr>
+<tr>
+<td><code>sedimentation_sp2016</code></td>
+<td>Reserved; rejected in capability preflight</td>
+<td>E5-F4</td>
+</tr>
+<tr>
+<td><code>turbulent_shear_st1956</code></td>
+<td>Reserved; rejected in capability preflight</td>
+<td>E5-F5</td>
+</tr>
+</tbody>
+</table>
+<p>Structural recognition is not executability. Any reserved ID, including a
+Brownian-plus-reserved combination, raises <code>ValueError</code> in host capability
+preflight before runtime input access, allocation, launch, or mutable state
+changes.</p>
+<p>The fixed sampler has one normalized active set, one total safe majorant, one
+candidate stream, one total pair-rate acceptance decision for each valid
+candidate, one collision-pair output buffer, and one per-box RNG-state
+progression. Invalid, nonfinite, or nonpositive terms do not add to totals;
+invalid candidates do not mutate the active set or collision output.</p>
+<p>Future mechanisms must provide a stable identifier; required host and device
+inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
+additive majorant; a capability-table row; shared-dispatcher integration; and
+co-located <code>*_test.py</code> coverage. They must not add an independent sampling
+loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
+binned/discrete/continuous-PDF GPU coagulation, high-level <code>Runnable</code>
+integration, graph-capture claims, and executable charged, sedimentation, or
+turbulent-shear physics.</p>
 <h3 id="environment-transfer-boundary">Environment transfer boundary<a class="headerlink" href="#environment-transfer-boundary" title="Permanent link">&para;</a></h3>
 <p>Use the environment helpers when thermodynamic state must cross the CPU↔GPU
 boundary:</p>
@@ -15287,8 +15375,8 @@ than storage support.</p>
 </tr>
 <tr>
 <td>Low-level GPU coagulation direct-kernel path</td>
-<td>Accepted with caveats</td>
-<td>Appropriate for many independent boxes, especially when CUDA can supply box-level parallel throughput, Warp-backed direct-kernel workflows, and CUDA benchmark/study runs tied to the roadmap's measured decision record; not a broad production recommendation for large single-box workloads and does not imply hidden transfer or synchronization behavior.</td>
+<td>Brownian-only, particle-resolved direct-kernel contract</td>
+<td><code>brownian</code> is the sole executable mechanism. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state and explicit resets synchronize during initialization.</td>
 </tr>
 <tr>
 <td>Fixed-shape GPU/runtime roadmap work</td>
@@ -15305,9 +15393,13 @@ than storage support.</p>
   <code>pressure</code>, and <code>saturation_ratio</code>.</li>
 <li><code>WarpGasData.vapor_pressure</code> is helper state only and has no CPU <code>GasData</code>
   field.</li>
-<li>Coagulation <code>rng_states</code> are caller-owned Warp-resident sidecar state only;
-  they are not fields on <code>ParticleData</code>, <code>GasData</code>, <code>EnvironmentData</code>, or any
-  Warp container schema.</li>
+<li>Coagulation <code>mechanism_config</code> is host metadata, while supplied
+  <code>collision_pairs</code>, <code>n_collisions</code>, and <code>rng_states</code> are caller-owned
+  same-device Warp sidecars. None are fields on <code>ParticleData</code>, <code>GasData</code>,
+  <code>EnvironmentData</code>, or any Warp container schema.</li>
+<li>Omitted coagulation collision outputs and RNG state are call-local convenience
+  allocations. Supplied RNG state advances in place and resets only with
+  <code>initialize_rng=True</code>.</li>
 <li>Kernels and runnables do not perform hidden simulation-state transfers.
   Explicitly supplied step and output buffers do mutate in place: particle
   masses, gas concentration, scratch transfer fields, total transfer, and

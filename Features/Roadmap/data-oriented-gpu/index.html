@@ -15430,9 +15430,10 @@ high-level dynamics workflows.</p>
   low-level publication.</li>
 <li>Particle charge is present in the GPU data container, but charged particle
   coagulation kernels are not implemented yet.</li>
-<li>The current GPU coagulation path is Brownian-focused; charged, turbulent,
-  sedimentation, and combined particle-resolved coagulation workflows still
-  need GPU coverage decisions and implementations.</li>
+<li>The current GPU coagulation path executes Brownian with
+  <code>particle_resolved</code> inputs only. Charged, turbulent, sedimentation, and
+  combined particle-resolved workflows are reserved and rejected during host
+  capability preflight until their assigned Epic E features implement them.</li>
 <li>CPU sedimentation coagulation and simple turbulent shear coagulation exist,
   but neither has a GPU kernel yet. DNS turbulence is intentionally deferred
   from the near-term GPU scope.</li>
@@ -16726,6 +16727,71 @@ high-level <code>Aerosol</code>/<code>Runnable</code> integration, graph capture
 autodiff. Those runtime capabilities remain assigned to later roadmap epics or
 a separately approved physics expansion; recording them here does not claim
 that Epic E's coagulation implementation delivers them.</p>
+<p>Import the supported direct step and its host-side configuration separately:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">coagulation_step_gpu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoagulationMechanismConfig</span>
+</code></pre></div>
+<p>Pass <code>mechanism_config=CoagulationMechanismConfig(...)</code> as keyword-only host
+metadata. The frozen dataclass is not device-resident simulation state and is
+not transferred, synchronized, or stored in a container schema. In contrast,
+<code>WarpParticleData</code>, supplied <code>collision_pairs</code>, supplied <code>n_collisions</code>, and
+supplied <code>rng_states</code> are caller-owned, same-device Warp resources. Omitted
+collision outputs and RNG state use call-local convenience allocation. A
+supplied RNG sidecar is reused and changes in place; it resets only with
+<code>initialize_rng=True</code>. Configuration and caller-owned sidecars have no implicit
+CPU↔GPU transfer. Reuse of a supplied persistent <code>rng_states</code> buffer is
+unsynchronized, while omitted RNG state and <code>initialize_rng=True</code> use the
+initialization path, which synchronizes after initializing or resetting state.</p>
+<p>Only <code>distribution_type="particle_resolved"</code> is accepted. <code>"discrete"</code> and
+<code>"continuous_pdf"</code> raise <code>ValueError</code>; they do not fall back or convert.</p>
+<table>
+<thead>
+<tr>
+<th>Identifier</th>
+<th>Status</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>brownian</code></td>
+<td>Executable with <code>particle_resolved</code> only</td>
+<td>Shipped E5-F1 baseline</td>
+</tr>
+<tr>
+<td><code>charged_hard_sphere</code></td>
+<td>Reserved; rejected in capability preflight</td>
+<td>E5-F3</td>
+</tr>
+<tr>
+<td><code>sedimentation_sp2016</code></td>
+<td>Reserved; rejected in capability preflight</td>
+<td>E5-F4</td>
+</tr>
+<tr>
+<td><code>turbulent_shear_st1956</code></td>
+<td>Reserved; rejected in capability preflight</td>
+<td>E5-F5</td>
+</tr>
+</tbody>
+</table>
+<p>Structural recognition is not executability. Any reserved ID, including a
+Brownian-plus-reserved combination, raises <code>ValueError</code> in host capability
+preflight before runtime input access, allocation, launch, or mutable state
+changes.</p>
+<p>The fixed sampler has one normalized active set, one total safe majorant, one
+candidate stream, one total pair-rate acceptance decision for each valid
+candidate, one collision-pair output buffer, and one per-box RNG-state
+progression. Invalid, nonfinite, or nonpositive terms do not add to totals;
+invalid candidates do not mutate the active set or collision output.</p>
+<p>Future mechanisms must provide a stable identifier; required host and device
+inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
+additive majorant; a capability-table row; shared-dispatcher integration; and
+co-located <code>*_test.py</code> coverage. They must not add an independent sampling
+loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
+binned/discrete/continuous-PDF GPU coagulation, high-level <code>Runnable</code>
+integration, graph-capture claims, and executable charged, sedimentation, or
+turbulent-shear physics.</p>
 <p>Planned features:</p>
 <ol>
 <li>Charged particle-resolved coagulation using <code>WarpParticleData.charge</code>
@@ -16740,8 +16806,8 @@ that Epic E's coagulation implementation delivers them.</p>
    when multiple mechanisms are active.</li>
 <li>Parity and statistical validation: CPU/GPU parity or statistically
    bounded tests for each new kernel, with recorded tolerances.</li>
-<li>Distribution-support decision record: the current GPU path implicitly
-   assumes particle-resolved semantics (per-slot merges, concentration
+<li>Distribution-support decision record: the current GPU path explicitly
+   enforces particle-resolved semantics (per-slot merges, concentration
    zeroing); document which binned/moving-bin strategies remain CPU-only.</li>
 <li>Epic D carry-forward closure: publish an independent CPU/Warp condensation
    parity walkthrough that separates physics, conservation, and energy
