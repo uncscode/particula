@@ -20,6 +20,15 @@ oracle/probe coverage. It composes the existing property and Coulomb helpers,
 returns exact safe zero for invalid, non-finite, or non-positive physical
 inputs, and has no execution or dispatch integration.
 
+**Completed increment (E5-F2-P4, issue #1339):**
+`particula/gpu/kernels/coagulation.py` now passes `particles.charge` into its
+private apply kernel, which transfers signed fp64 donor charge to the recipient
+and clears the donor alongside existing mass and concentration updates.
+`particula/gpu/kernels/tests/coagulation_test.py` updates every direct launch
+and adds deterministic multi-box/multi-species expected-state and inventory
+coverage. Brownian selection, public step/return contracts, sidecars, and
+persistent RNG ownership did not change.
+
 ## In Scope
 
 - Add focused `@wp.func` helpers in

@@ -29,11 +29,16 @@ parameterize optional CUDA with a clean skip when unavailable.
   wrong device, NaN, and infinity cases. Snapshot masses, concentration, charge,
   collision buffers, counts, and persistent RNG to prove validation fails before
   mutation or RNG advancement. Retain existing Brownian API tests.
-- **P4 — Merge/conservation tests:** Launch `apply_coagulation_kernel` with
-  deterministic disjoint pair buffers. Assert recipient mass by species and
-  charge sums, donor fields are all zero, untouched/inactive slots are stable,
-  and no-collision input is a no-op. Add one- and multi-box step cases and assert
-  species mass and total charge separately per box with tight fp64 tolerances.
+- **P4 — Merge/conservation tests (completed, #1339):**
+  `particula/gpu/kernels/tests/coagulation_test.py` launches
+  `apply_coagulation_kernel` with deterministic disjoint signed-charge pairs.
+  A multi-box/multi-species test compares complete mass, concentration, and
+  charge results to an independent NumPy expected state, then separately checks
+  per-box species-mass and total-charge inventory with `rtol=1e-12,
+  atol=1e-30`. Merge, zero-count, self-pair, and empty-pair cases cover donor
+  clearing and no-op paths. Step-level zero-charge and signed-charge tests retain
+  return and supplied-sidecar identity assertions; signed charge is conserved
+  per box rather than incorrectly required to remain slotwise unchanged.
 - **P5 — Documentation validation:** Check links, imports, support wording, and
   focused reproduction commands. Documentation must say pair physics and merges
   are foundational, not claim E5-F3 execution before it ships.

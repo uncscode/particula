@@ -14,7 +14,11 @@
   any deferred variant owner.
 - Completed for P1: this feature's structured plan sections record issue #1336,
   the internal-helper/parity-test delivery, and its intentionally unchanged
-  public and execution boundaries. No user-facing documentation changed in P1.
+   public and execution boundaries. No user-facing documentation changed in P1.
+- Completed for P4 (#1339): this feature's structured plan sections record the
+  private charge-transfer/clear merge semantics and deterministic conservation
+  evidence. No README, API reference, or user-facing guide changed because the
+  public coagulation API and charged-execution support boundary are unchanged.
 - Defer user-facing direct charged execution examples and final support/import
   matrix changes to E5-F9 after E5-F3 and E5-F7 establish execution evidence.
   Do not update README quick-start claims in this foundational feature.

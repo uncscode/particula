@@ -9,11 +9,11 @@
   and preserve the neutral limit without divide-by-zero or overflow.
 - [ ] Charge shape, dtype, device, NaN, and infinity failures occur before any
   particle/output-buffer mutation or persistent RNG advancement.
-- [ ] Every accepted merge adds donor charge to recipient charge and clears
+- [x] Every accepted merge adds donor charge to recipient charge and clears
   donor mass, concentration, and charge; zero-collision calls are no-ops.
-- [ ] Per-box species mass and total charge are separately conserved in
+- [x] Per-box species mass and total charge are separately conserved in
   one-box, multi-box, multi-species, zero-charge, and mixed-sign fixtures.
-- [ ] Existing Brownian behavior, return tuple, output-buffer identity, and
+- [x] Existing Brownian behavior, return tuple, output-buffer identity, and
   persistent RNG tests remain compatible.
 - [ ] Warp CPU evidence passes when Warp is installed; optional CUDA either
   passes the same deterministic checks or skips cleanly.

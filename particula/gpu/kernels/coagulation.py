@@ -9,8 +9,9 @@ explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
 After particle metadata and device checks, the public entry point performs one
 read-only device scan of particle charge for finite values before normalizing
 environment inputs, setting up volume, initializing RNG state, or executing
-Brownian work. The kernels operate on GPU-resident particle data and produce
-collision pairs that are applied to merge particle masses in-place.
+ Brownian work. The kernels operate on GPU-resident particle data and produce
+ collision pairs that are applied in place: recipient particles receive donor
+ mass and charge, while donor mass, concentration, and charge are cleared.
 
 ``CoagulationMechanismConfig`` and its resolver are concrete-module APIs:
 import them from ``particula.gpu.kernels.coagulation``, not
@@ -1166,8 +1167,9 @@ def coagulation_step_gpu(  # noqa: C901
         particles: Caller-owned, GPU-resident particle data. All required Warp
             arrays, including ``charge``, must be on the same device. ``charge``
             must be finite ``wp.float64`` with shape ``(n_boxes, n_particles)``.
-            Particle mass and concentration state is mutated in place by
-            accepted collisions.
+            Accepted collisions mutate mass, concentration, and charge in place:
+            recipient particles receive donor mass and charge, and donor mass,
+            concentration, and charge are cleared.
         temperature: Direct gas temperature as either a scalar or a Warp array
             with shape ``(n_boxes,)``. Use ``None`` only with
             ``environment=...``.

@@ -20,9 +20,12 @@
 **Delivered increments:** E5-F2-P1 (#1336) supplies the internal scalar fp64
 pair-property foundation and independent co-located parity tests. E5-F2-P2
 (#1337) adds the internal scalar `charged_hard_sphere_wp` composite rate helper
-and independent deterministic parity evidence. Charge preflight,
-charge-conserving merges, public/model dispatch, and charged sampling remain
-later phases; these increments leave public exports, data containers, Brownian
-dispatch, charged execution wiring, and module boundaries unchanged.
+and independent deterministic parity evidence. E5-F2-P4 (#1339) updates the
+private merge kernel so each accepted pair transfers signed fp64 donor charge
+to its recipient and clears the donor with mass and concentration. Direct
+kernel and step-level conservation coverage now prove that state transition;
+public exports, data containers, Brownian selection, the public step API,
+return tuple, sidecars, and RNG ownership remain unchanged. Charge preflight,
+public/model dispatch, and charged sampling remain separate phases.
 
 This is epic-linked track T2 under E5. Classifier diagnostics: none.
