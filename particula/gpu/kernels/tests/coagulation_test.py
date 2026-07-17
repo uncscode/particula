@@ -1388,6 +1388,7 @@ def _collect_test_local_attempt_diagnostics(
         inputs=[
             diagnostic_particles.masses,
             diagnostic_particles.concentration,
+            diagnostic_particles.charge,
             collision_pairs,
             n_collisions,
         ],
@@ -3473,15 +3474,22 @@ def test_mixed_scale_diagnostic_rejects_invalid_physical_inputs(
         )
 
 
-def test_coagulation_mass_conservation(device: str) -> None:
-    """Coagulation conserves total mass in each box."""
+def test_coagulation_conserves_mass_and_signed_charge_per_box(
+    device: str,
+) -> None:
+    """Coagulation conserves per-box mass and signed charge inventories."""
     temperature = 298.15
     pressure = 101325.0
     time_step = 1.0
-    particles = _make_particle_data(n_boxes=1, n_particles=4, n_species=2)
+    particles = _make_particle_data(n_boxes=2, n_particles=4, n_species=2)
+    particles.charge = np.array(
+        [[-1.5, 2.5, -3.5, 4.5], [5.5, -6.5, 7.5, -8.5]],
+        dtype=np.float64,
+    )
     gpu_particles = to_warp_particle_data(particles, device=device)
 
-    initial_mass = np.sum(particles.masses)
+    initial_mass = np.sum(particles.masses, axis=1)
+    initial_charge = np.sum(particles.charge, axis=1)
     coagulation_step_gpu(
         gpu_particles,
         temperature=temperature,
@@ -3492,8 +3500,10 @@ def test_coagulation_mass_conservation(device: str) -> None:
     )
     result = from_warp_particle_data(gpu_particles, sync=True)
 
-    final_mass = np.sum(result.masses)
-    npt.assert_allclose(final_mass, initial_mass, rtol=1.0e-12)
+    final_mass = np.sum(result.masses, axis=1)
+    final_charge = np.sum(result.charge, axis=1)
+    npt.assert_allclose(final_mass, initial_mass, rtol=1e-12, atol=1e-30)
+    npt.assert_allclose(final_charge, initial_charge, rtol=1e-12, atol=1e-30)
 
 
 def test_mixed_scale_coagulation_conserves_total_mass(device: str) -> None:
@@ -4325,14 +4335,16 @@ def test_brownian_kernel_zero_mask_rejects_work_and_caps_overflow_schedule(
 
 
 def test_apply_coagulation_kernel_merges_particles(device: str) -> None:
-    """Apply kernel merges masses and zeroes merged particle concentration."""
+    """Apply kernel merges mass and charge and clears donor state."""
     masses = np.array([[[1.0e-18], [2.0e-18]]], dtype=np.float64)
     concentration = np.array([[1.0, 1.0]], dtype=np.float64)
+    charge = np.array([[1.5, -0.5]], dtype=np.float64)
     collision_pairs = np.array([[[0, 1]]], dtype=np.int32)
     n_collisions = np.array([1], dtype=np.int32)
 
     masses_wp = wp.array(masses, dtype=wp.float64, device=device)
     concentration_wp = wp.array(concentration, dtype=wp.float64, device=device)
+    charge_wp = wp.array(charge, dtype=wp.float64, device=device)
     collision_pairs_wp = wp.array(
         collision_pairs, dtype=wp.int32, device=device
     )
@@ -4344,6 +4356,7 @@ def test_apply_coagulation_kernel_merges_particles(device: str) -> None:
         inputs=[
             masses_wp,
             concentration_wp,
+            charge_wp,
             collision_pairs_wp,
             n_collisions_wp,
         ],
@@ -4353,10 +4366,13 @@ def test_apply_coagulation_kernel_merges_particles(device: str) -> None:
 
     result_masses = np.asarray(masses_wp.numpy())
     result_concentration = np.asarray(concentration_wp.numpy())
+    result_charge = np.asarray(charge_wp.numpy())
 
     npt.assert_allclose(result_masses[0, 0, 0], 3.0e-18)
     npt.assert_allclose(result_masses[0, 1, 0], 0.0)
     npt.assert_allclose(result_concentration[0, 1], 0.0)
+    npt.assert_allclose(result_charge[0, 0], 1.0)
+    npt.assert_allclose(result_charge[0, 1], 0.0)
 
     n_collisions_zero = wp.zeros((1,), dtype=wp.int32, device=device)
     wp.launch(
@@ -4365,6 +4381,7 @@ def test_apply_coagulation_kernel_merges_particles(device: str) -> None:
         inputs=[
             masses_wp,
             concentration_wp,
+            charge_wp,
             collision_pairs_wp,
             n_collisions_zero,
         ],
@@ -4372,21 +4389,24 @@ def test_apply_coagulation_kernel_merges_particles(device: str) -> None:
     )
     wp.synchronize()
 
-    npt.assert_allclose(np.asarray(masses_wp.numpy()), result_masses)
-    npt.assert_allclose(
+    npt.assert_array_equal(np.asarray(masses_wp.numpy()), result_masses)
+    npt.assert_array_equal(
         np.asarray(concentration_wp.numpy()), result_concentration
     )
+    npt.assert_array_equal(np.asarray(charge_wp.numpy()), result_charge)
 
 
 def test_apply_coagulation_kernel_skips_self_pair(device: str) -> None:
     """Apply kernel ignores self-collisions without mutating arrays."""
     masses = np.array([[[1.0e-18], [2.0e-18]]], dtype=np.float64)
     concentration = np.array([[1.0, 1.0]], dtype=np.float64)
+    charge = np.array([[1.5, -0.5]], dtype=np.float64)
     collision_pairs = np.array([[[0, 0]]], dtype=np.int32)
     n_collisions = np.array([1], dtype=np.int32)
 
     masses_wp = wp.array(masses, dtype=wp.float64, device=device)
     concentration_wp = wp.array(concentration, dtype=wp.float64, device=device)
+    charge_wp = wp.array(charge, dtype=wp.float64, device=device)
     collision_pairs_wp = wp.array(
         collision_pairs, dtype=wp.int32, device=device
     )
@@ -4398,6 +4418,7 @@ def test_apply_coagulation_kernel_skips_self_pair(device: str) -> None:
         inputs=[
             masses_wp,
             concentration_wp,
+            charge_wp,
             collision_pairs_wp,
             n_collisions_wp,
         ],
@@ -4407,20 +4428,24 @@ def test_apply_coagulation_kernel_skips_self_pair(device: str) -> None:
 
     result_masses = np.asarray(masses_wp.numpy())
     result_concentration = np.asarray(concentration_wp.numpy())
+    result_charge = np.asarray(charge_wp.numpy())
 
-    npt.assert_allclose(result_masses, masses)
-    npt.assert_allclose(result_concentration, concentration)
+    npt.assert_array_equal(result_masses, masses)
+    npt.assert_array_equal(result_concentration, concentration)
+    npt.assert_array_equal(result_charge, charge)
 
 
 def test_apply_coagulation_kernel_skips_empty_pair(device: str) -> None:
     """Apply kernel ignores entries when collision index is out of range."""
     masses = np.array([[[1.0e-18], [2.0e-18]]], dtype=np.float64)
     concentration = np.array([[1.0, 1.0]], dtype=np.float64)
+    charge = np.array([[1.5, -0.5]], dtype=np.float64)
     collision_pairs = np.array([[[0, 1]]], dtype=np.int32)
     n_collisions = np.array([0], dtype=np.int32)
 
     masses_wp = wp.array(masses, dtype=wp.float64, device=device)
     concentration_wp = wp.array(concentration, dtype=wp.float64, device=device)
+    charge_wp = wp.array(charge, dtype=wp.float64, device=device)
     collision_pairs_wp = wp.array(
         collision_pairs, dtype=wp.int32, device=device
     )
@@ -4432,6 +4457,7 @@ def test_apply_coagulation_kernel_skips_empty_pair(device: str) -> None:
         inputs=[
             masses_wp,
             concentration_wp,
+            charge_wp,
             collision_pairs_wp,
             n_collisions_wp,
         ],
@@ -4441,9 +4467,90 @@ def test_apply_coagulation_kernel_skips_empty_pair(device: str) -> None:
 
     result_masses = np.asarray(masses_wp.numpy())
     result_concentration = np.asarray(concentration_wp.numpy())
+    result_charge = np.asarray(charge_wp.numpy())
 
-    npt.assert_allclose(result_masses, masses)
-    npt.assert_allclose(result_concentration, concentration)
+    npt.assert_array_equal(result_masses, masses)
+    npt.assert_array_equal(result_concentration, concentration)
+    npt.assert_array_equal(result_charge, charge)
+
+
+@pytest.mark.gpu_parity
+def test_apply_coagulation_kernel_transfers_signed_charge_and_conserves_inventories(
+    device: str,
+) -> None:
+    """Accepted pairs transfer signed charge while conserving inventories."""
+    masses = np.array(
+        [
+            [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0], [7.0, 8.0]],
+            [[9.0, 10.0], [11.0, 12.0], [13.0, 14.0], [15.0, 16.0]],
+        ],
+        dtype=np.float64,
+    )
+    concentration = np.array(
+        [[2.0, 3.0, 0.0, 5.0], [7.0, 11.0, 0.0, 13.0]],
+        dtype=np.float64,
+    )
+    charge = np.array(
+        [[-1.5, 2.5, -3.5, 4.5], [5.5, -6.5, 7.5, -8.5]],
+        dtype=np.float64,
+    )
+    collision_pairs = np.array([[[0, 1]], [[3, 0]]], dtype=np.int32)
+    n_collisions = np.ones(2, dtype=np.int32)
+
+    expected_masses = masses.copy()
+    expected_concentration = concentration.copy()
+    expected_charge = charge.copy()
+    for box_idx, (recipient, donor) in enumerate(collision_pairs[:, 0]):
+        expected_masses[box_idx, recipient] += expected_masses[box_idx, donor]
+        expected_masses[box_idx, donor] = 0.0
+        expected_concentration[box_idx, donor] = 0.0
+        expected_charge[box_idx, recipient] += expected_charge[box_idx, donor]
+        expected_charge[box_idx, donor] = 0.0
+
+    initial_mass_inventory = np.sum(masses, axis=1)
+    initial_charge_inventory = np.sum(charge, axis=1)
+    masses_wp = wp.array(masses, dtype=wp.float64, device=device)
+    concentration_wp = wp.array(concentration, dtype=wp.float64, device=device)
+    charge_wp = wp.array(charge, dtype=wp.float64, device=device)
+    collision_pairs_wp = wp.array(
+        collision_pairs, dtype=wp.int32, device=device
+    )
+    n_collisions_wp = wp.array(n_collisions, dtype=wp.int32, device=device)
+
+    wp.launch(
+        apply_coagulation_kernel,
+        dim=(2, 1),
+        inputs=[
+            masses_wp,
+            concentration_wp,
+            charge_wp,
+            collision_pairs_wp,
+            n_collisions_wp,
+        ],
+        device=device,
+    )
+    wp.synchronize()
+
+    final_masses = np.asarray(masses_wp.numpy())
+    final_concentration = np.asarray(concentration_wp.numpy())
+    final_charge = np.asarray(charge_wp.numpy())
+    npt.assert_allclose(final_masses, expected_masses, rtol=1e-12, atol=1e-30)
+    npt.assert_allclose(
+        final_concentration, expected_concentration, rtol=1e-12, atol=1e-30
+    )
+    npt.assert_allclose(final_charge, expected_charge, rtol=1e-12, atol=1e-30)
+    npt.assert_allclose(
+        np.sum(final_masses, axis=1),
+        initial_mass_inventory,
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    npt.assert_allclose(
+        np.sum(final_charge, axis=1),
+        initial_charge_inventory,
+        rtol=1e-12,
+        atol=1e-30,
+    )
 
 
 def test_coagulation_validation_rejects_bad_shapes(device: str) -> None:
@@ -4791,18 +4898,11 @@ def test_coagulation_step_gpu_rejects_nonfinite_charge_before_downstream_work(
     _assert_particles_unchanged(gpu_particles, initial_particles)
 
 
-@pytest.mark.parametrize(
-    "charge",
-    [
-        np.zeros((1, 3), dtype=np.float64),
-        np.array([[-1.0, 0.0, 2.0]], dtype=np.float64),
-    ],
-)
-def test_coagulation_step_gpu_accepts_finite_signed_charge(
+def test_coagulation_step_gpu_zero_charge_preserves_charge_and_sidecars(
     device: str,
-    charge: np.ndarray,
 ) -> None:
-    """Finite signed charge preserves ownership and Brownian behavior."""
+    """Zero charge preserves charge and caller-owned result sidecars."""
+    charge = np.zeros((1, 3), dtype=np.float64)
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
     particles.charge = charge
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -4829,6 +4929,44 @@ def test_coagulation_step_gpu_accepts_finite_signed_charge(
     assert result[2] is n_collisions
     assert gpu_particles.charge is charge_buffer
     npt.assert_array_equal(np.asarray(gpu_particles.charge.numpy()), charge)
+
+
+def test_coagulation_step_gpu_signed_charge_conserves_charge_and_sidecars(
+    device: str,
+) -> None:
+    """Signed charge conserves per-box inventory and supplied sidecars."""
+    charge = np.array([[-1.0, 0.0, 2.0]], dtype=np.float64)
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    particles.charge = charge
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    charge_buffer = gpu_particles.charge
+    collision_pairs = wp.zeros((1, 4, 2), dtype=wp.int32, device=device)
+    n_collisions = wp.zeros((1,), dtype=wp.int32, device=device)
+    rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
+
+    result = coagulation_step_gpu(
+        gpu_particles,
+        298.15,
+        101325.0,
+        0.1,
+        max_collisions=4,
+        collision_pairs=collision_pairs,
+        n_collisions=n_collisions,
+        rng_states=rng_states,
+        initialize_rng=True,
+    )
+
+    assert len(result) == 3
+    assert result[0] is gpu_particles
+    assert result[1] is collision_pairs
+    assert result[2] is n_collisions
+    assert gpu_particles.charge is charge_buffer
+    npt.assert_allclose(
+        np.sum(np.asarray(gpu_particles.charge.numpy()), axis=1),
+        np.sum(charge, axis=1),
+        rtol=1e-12,
+        atol=1e-30,
+    )
 
 
 def test_coagulation_step_gpu_validates_caller_rng_state_before_allocation(

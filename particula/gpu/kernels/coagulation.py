@@ -726,14 +726,18 @@ def brownian_coagulation_kernel(  # noqa: C901
 def apply_coagulation_kernel(
     masses: Any,
     concentration: Any,
+    charge: Any,
     collision_pairs: Any,
     n_collisions: Any,
 ) -> None:
-    """Apply coagulation collisions by merging particle masses.
+    """Apply coagulation collisions by merging particle state in place.
 
     Args:
         masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
         concentration: Particle concentrations ``(n_boxes, n_particles)``.
+        charge: Particle charges with ``wp.float64`` dtype and shape
+            ``(n_boxes, n_particles)``. Donor charge is added to its recipient
+            and then cleared.
         collision_pairs: Collision index buffer
             ``(n_boxes, max_collisions, 2)``.
         n_collisions: Collision counts ``(n_boxes,)``.
@@ -755,6 +759,8 @@ def apply_coagulation_kernel(
         )
         masses[box_idx, idx_j, species_idx] = wp.float64(0.0)
 
+    charge[box_idx, idx_i] = charge[box_idx, idx_i] + charge[box_idx, idx_j]
+    charge[box_idx, idx_j] = wp.float64(0.0)
     concentration[box_idx, idx_j] = wp.float64(0.0)
 
 
@@ -1415,6 +1421,7 @@ def coagulation_step_gpu(  # noqa: C901
         inputs=[
             particles.masses,
             particles.concentration,
+            particles.charge,
             collision_pairs,
             n_collisions,
         ],
