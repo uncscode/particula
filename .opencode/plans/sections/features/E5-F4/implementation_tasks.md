@@ -29,8 +29,8 @@
 - [x] Add probe-kernel tests for effective density, settling velocity, and
   SP2016 pair rate in
   `particula/gpu/dynamics/tests/coagulation_funcs_test.py`.
-- [x] Build expected values independently with NumPy and CPU public formulas;
-  do not call the new Warp helper to produce expected results.
+- [x] Build expected values with independent NumPy equations; do not call the
+  new Warp helper to produce expected results.
 - [ ] Add deterministic one-box and multi-box/multi-species parity fixtures,
   including equal settling velocities and composition-dependent densities.
 - [ ] Add bounded repeated-run stochastic checks rather than exact CPU/Warp pair
