@@ -446,6 +446,16 @@ def _initialize_rng_states(seed: Any, rng_states: Any) -> None:
 @no_type_check
 @wp.kernel
 # type: ignore[misc]
+def _validate_charge_finite_kernel(charge: Any, invalid: Any) -> None:
+    """Record whether any particle charge value is non-finite."""  # type: ignore
+    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
+    if not wp.isfinite(charge[box_idx, particle_idx]):
+        wp.atomic_max(invalid, 0, 1)
+
+
+@no_type_check
+@wp.kernel
+# type: ignore[misc]
 def brownian_coagulation_kernel(  # noqa: C901
     masses: Any,
     concentration: Any,
@@ -765,6 +775,12 @@ def _validate_particle_arrays(
         raise ValueError(
             "particle concentration shape does not match (n_boxes, n_particles)"
         )
+    if particles.charge.shape != (n_boxes, n_particles):
+        raise ValueError(
+            "particle charge shape does not match (n_boxes, n_particles)"
+        )
+    if particles.charge.dtype != wp.float64:
+        raise ValueError("particle charge must use dtype float64")
     if particles.volume.shape != (n_boxes,):
         raise ValueError("particle volume shape does not match (n_boxes,)")
 
@@ -799,8 +815,28 @@ def _validate_device_arrays(particles: Any, device: Any) -> None:
     _validate_device_match(
         "particle concentration", particles.concentration, device
     )
+    _validate_device_match("particle charge", particles.charge, device)
     _validate_device_match("particle density", particles.density, device)
     _validate_device_match("particle volume", particles.volume, device)
+
+
+def _validate_charge_finite(
+    charge: Any,
+    n_boxes: int,
+    n_particles: int,
+    device: Any,
+) -> None:
+    """Validate that every caller-owned particle charge is finite."""
+    invalid = wp.zeros((1,), dtype=wp.int32, device=device)
+    wp.launch(
+        _validate_charge_finite_kernel,
+        dim=(n_boxes, n_particles),
+        inputs=[charge, invalid],
+        device=device,
+    )
+    wp.synchronize_device(device)
+    if invalid.numpy()[0] != 0:
+        raise ValueError("particle charge must contain only finite values")
 
 
 def _validate_collision_pairs(
@@ -1095,8 +1131,10 @@ def coagulation_step_gpu(  # noqa: C901
 
     Args:
         particles: Caller-owned, GPU-resident particle data. All required Warp
-            arrays must be on the same device; particle mass and concentration
-            state is mutated in place by accepted collisions.
+            arrays must be on the same device. ``charge`` must be finite
+            ``wp.float64`` with shape ``(n_boxes, n_particles)``. Particle
+            mass and concentration state is mutated in place by accepted
+            collisions.
         temperature: Direct gas temperature as either a scalar or a Warp array
             with shape ``(n_boxes,)``. Use ``None`` only with
             ``environment=...``.
@@ -1162,6 +1200,8 @@ def coagulation_step_gpu(  # noqa: C901
             caller device.
         ValueError: If mechanism_config has the wrong type, is malformed, or
             requests an unsupported distribution or reserved mechanism.
+        ValueError: If particle charge has an invalid shape, dtype, device, or
+            non-finite value.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
@@ -1179,6 +1219,13 @@ def coagulation_step_gpu(  # noqa: C901
         combinations fail without mutating particle state or allocating
         downstream launch work. The normalized environment arrays are
         forwarded directly into the launch path.
+
+        Charge validation runs after particle metadata and device validation,
+        but before time-step validation and all downstream work. It uses one
+        read-only O(``n_boxes * n_particles``) launch and a private status
+        readback to reject non-finite charge. A charge failure cannot proceed
+        to normalization, caller-output validation, allocation, RNG setup, or
+        Brownian/apply execution.
 
         Supported RNG setup cases are:
 
@@ -1213,6 +1260,12 @@ def coagulation_step_gpu(  # noqa: C901
 
     device = particles.masses.device
     _validate_device_arrays(particles, device)
+    _validate_charge_finite(
+        particles.charge,
+        n_boxes,
+        n_particles,
+        device,
+    )
     time_step_value = _validate_time_step(time_step)
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature=temperature,

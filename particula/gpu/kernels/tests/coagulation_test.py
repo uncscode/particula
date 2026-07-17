@@ -17,6 +17,7 @@ from __future__ import annotations
 import inspect
 import re
 from dataclasses import dataclass
+from types import SimpleNamespace
 
 # pyright: reportArgumentType=false
 # pyright: reportAssignmentType=false
@@ -74,6 +75,7 @@ if wp is not None:
         _select_active_pair_by_rank,
         _total_majorant,
         _total_pair_rate,
+        _validate_charge_finite_kernel,
         _validate_collision_counts,
         _validate_collision_pairs,
         _validate_device_arrays,
@@ -781,6 +783,7 @@ def _assert_particles_unchanged(
         result_particles.concentration,
         initial_particles.concentration,
     )
+    npt.assert_allclose(result_particles.charge, initial_particles.charge)
 
 
 def _accumulate_collision_counts(
@@ -2098,6 +2101,9 @@ def test_coagulation_step_gpu_contract_errors_short_circuit_before_launch(
         "_ensure_volume_array",
         _unexpected_ensure_volume_array,
     )
+    monkeypatch.setattr(
+        coagulation_module, "_validate_charge_finite", lambda *_: None
+    )
     monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
 
     with pytest.raises(ValueError, match=message):
@@ -2145,6 +2151,9 @@ def test_coagulation_step_gpu_invalid_scalar_domains_short_circuit_before_launch
         "_ensure_volume_array",
         _unexpected_ensure_volume_array,
     )
+    monkeypatch.setattr(
+        coagulation_module, "_validate_charge_finite", lambda *_: None
+    )
     monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
 
     with pytest.raises(ValueError, match=message):
@@ -2185,6 +2194,9 @@ def test_coagulation_step_gpu_invalid_environment_domains_short_circuit_before_l
         coagulation_module,
         "_ensure_volume_array",
         _unexpected_ensure_volume_array,
+    )
+    monkeypatch.setattr(
+        coagulation_module, "_validate_charge_finite", lambda *_: None
     )
     monkeypatch.setattr(coagulation_module.wp, "launch", _tracking_launch)
 
@@ -2251,6 +2263,9 @@ def test_coagulation_step_gpu_invalid_environment_preserves_buffers_and_particle
         coagulation_module,
         "_ensure_volume_array",
         _unexpected_ensure_volume_array,
+    )
+    monkeypatch.setattr(
+        coagulation_module, "_validate_charge_finite", lambda *_: None
     )
     monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
 
@@ -2605,6 +2620,9 @@ def test_coagulation_step_gpu_missing_scalar_inputs_short_circuit_before_mutatio
         coagulation_module,
         "_ensure_volume_array",
         _unexpected_ensure_volume_array,
+    )
+    monkeypatch.setattr(
+        coagulation_module, "_validate_charge_finite", lambda *_: None
     )
     monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
 
@@ -4451,6 +4469,27 @@ def test_coagulation_validation_rejects_bad_shapes(device: str) -> None:
         _validate_particle_arrays(gpu_particles, 1, 2, 2)
 
     gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_particles.charge = wp.zeros((1, 3), dtype=wp.float64, device=device)
+    with pytest.raises(
+        ValueError,
+        match="particle charge shape does not match \\(n_boxes, n_particles\\)",
+    ):
+        _validate_particle_arrays(gpu_particles, 1, 2, 2)
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    invalid_charge_particles = SimpleNamespace(
+        masses=gpu_particles.masses,
+        concentration=gpu_particles.concentration,
+        charge=wp.zeros((1, 2), dtype=wp.float32, device=device),
+        density=gpu_particles.density,
+        volume=gpu_particles.volume,
+    )
+    with pytest.raises(
+        ValueError, match="particle charge must use dtype float64"
+    ):
+        _validate_particle_arrays(invalid_charge_particles, 1, 2, 2)
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
     gpu_particles.volume = wp.zeros(
         (2,),
         dtype=wp.float64,
@@ -4519,6 +4558,275 @@ def test_coagulation_step_gpu_rejects_rng_state_shape_before_mutation(
     npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng_states)
 
 
+@pytest.mark.parametrize(
+    ("charge", "message"),
+    [
+        (
+            np.zeros((1, 4), dtype=np.float64),
+            "particle charge shape does not match",
+        ),
+        (
+            np.zeros((1, 3), dtype=np.float32),
+            "particle charge must use dtype float64",
+        ),
+    ],
+)
+def test_coagulation_step_gpu_rejects_charge_metadata_before_downstream_work(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    charge: np.ndarray,
+    message: str,
+) -> None:
+    """Invalid charge metadata fails before inspection or downstream work."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    charge_buffer = wp.array(
+        charge,
+        dtype=wp.float32 if charge.dtype == np.float32 else wp.float64,
+        device=device,
+    )
+    if charge.dtype == np.float32:
+        particle_input = SimpleNamespace(
+            masses=gpu_particles.masses,
+            concentration=gpu_particles.concentration,
+            charge=charge_buffer,
+            density=gpu_particles.density,
+            volume=gpu_particles.volume,
+        )
+    else:
+        gpu_particles.charge = charge_buffer
+        particle_input = gpu_particles
+    masses_buffer = particle_input.masses
+    concentration_buffer = particle_input.concentration
+    initial_masses = np.asarray(masses_buffer.numpy()).copy()
+    initial_concentration = np.asarray(concentration_buffer.numpy()).copy()
+    initial_charge = np.asarray(charge_buffer.numpy()).copy()
+    collision_pairs = wp.array(
+        np.arange(8, dtype=np.int32).reshape(1, 4, 2),
+        dtype=wp.int32,
+        device=device,
+    )
+    n_collisions = wp.array([3], dtype=wp.int32, device=device)
+    rng_states = wp.array([17], dtype=wp.uint32, device=device)
+    initial_pairs = np.asarray(collision_pairs.numpy()).copy()
+    initial_counts = np.asarray(n_collisions.numpy()).copy()
+    initial_rng = np.asarray(rng_states.numpy()).copy()
+
+    def _unexpected(*args: Any, **kwargs: Any) -> Any:
+        raise AssertionError("downstream validation must not run")
+
+    monkeypatch.setattr(
+        coagulation_module, "_validate_charge_finite", _unexpected
+    )
+    monkeypatch.setattr(coagulation_module, "_ensure_volume_array", _unexpected)
+    monkeypatch.setattr(
+        coagulation_module, "initialize_coagulation_rng_states", _unexpected
+    )
+    monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected)
+
+    with pytest.raises(ValueError, match=message):
+        coagulation_step_gpu(
+            particle_input,
+            298.15,
+            101325.0,
+            0.1,
+            max_collisions=4,
+            collision_pairs=collision_pairs,
+            n_collisions=n_collisions,
+            rng_states=rng_states,
+            initialize_rng=True,
+        )
+
+    assert particle_input.masses is masses_buffer
+    assert particle_input.concentration is concentration_buffer
+    assert particle_input.charge is charge_buffer
+    npt.assert_array_equal(np.asarray(collision_pairs.numpy()), initial_pairs)
+    npt.assert_array_equal(np.asarray(n_collisions.numpy()), initial_counts)
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng)
+    npt.assert_array_equal(np.asarray(masses_buffer.numpy()), initial_masses)
+    npt.assert_array_equal(
+        np.asarray(concentration_buffer.numpy()), initial_concentration
+    )
+    npt.assert_array_equal(np.asarray(charge_buffer.numpy()), initial_charge)
+
+
+def test_coagulation_step_gpu_rejects_charge_device_before_downstream_work(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """Wrong-device charge fails before finite inspection or downstream work."""
+    wrong_device = "cuda" if device == "cpu" else "cpu"
+    if wrong_device == "cuda" and not cuda_available(wp):
+        pytest.skip("CUDA not available for mismatch test")
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_particles.charge = wp.zeros(
+        (1, 3), dtype=wp.float64, device=wrong_device
+    )
+    masses_buffer = gpu_particles.masses
+    concentration_buffer = gpu_particles.concentration
+    charge_buffer = gpu_particles.charge
+    initial_masses = np.asarray(masses_buffer.numpy()).copy()
+    initial_concentration = np.asarray(concentration_buffer.numpy()).copy()
+    initial_charge = np.asarray(charge_buffer.numpy()).copy()
+    collision_pairs = wp.array(
+        np.arange(8, dtype=np.int32).reshape(1, 4, 2),
+        dtype=wp.int32,
+        device=device,
+    )
+    n_collisions = wp.array([3], dtype=wp.int32, device=device)
+    rng_states = wp.array([17], dtype=wp.uint32, device=device)
+    initial_pairs = np.asarray(collision_pairs.numpy()).copy()
+    initial_counts = np.asarray(n_collisions.numpy()).copy()
+    initial_rng = np.asarray(rng_states.numpy()).copy()
+
+    def _unexpected(*args: Any, **kwargs: Any) -> Any:
+        raise AssertionError("downstream validation must not run")
+
+    monkeypatch.setattr(
+        coagulation_module, "_validate_charge_finite", _unexpected
+    )
+    monkeypatch.setattr(coagulation_module, "_ensure_volume_array", _unexpected)
+    monkeypatch.setattr(
+        coagulation_module, "initialize_coagulation_rng_states", _unexpected
+    )
+    monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected)
+
+    with pytest.raises(ValueError, match="particle charge device mismatch"):
+        coagulation_step_gpu(
+            gpu_particles,
+            298.15,
+            101325.0,
+            0.1,
+            max_collisions=4,
+            collision_pairs=collision_pairs,
+            n_collisions=n_collisions,
+            rng_states=rng_states,
+            initialize_rng=True,
+        )
+
+    assert gpu_particles.masses is masses_buffer
+    assert gpu_particles.concentration is concentration_buffer
+    assert gpu_particles.charge is charge_buffer
+    npt.assert_array_equal(np.asarray(collision_pairs.numpy()), initial_pairs)
+    npt.assert_array_equal(np.asarray(n_collisions.numpy()), initial_counts)
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng)
+    npt.assert_array_equal(np.asarray(masses_buffer.numpy()), initial_masses)
+    npt.assert_array_equal(
+        np.asarray(concentration_buffer.numpy()), initial_concentration
+    )
+    npt.assert_array_equal(np.asarray(charge_buffer.numpy()), initial_charge)
+
+
+@pytest.mark.parametrize("nonfinite_charge", [np.nan, np.inf, -np.inf])
+def test_coagulation_step_gpu_rejects_nonfinite_charge_before_downstream_work(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    nonfinite_charge: float,
+) -> None:
+    """Non-finite charge performs only the private validation launch."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    particles.charge[0, 1] = nonfinite_charge
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    masses_buffer = gpu_particles.masses
+    concentration_buffer = gpu_particles.concentration
+    charge_buffer = gpu_particles.charge
+    initial_particles = from_warp_particle_data(gpu_particles, sync=True)
+    collision_pairs = wp.array(
+        np.arange(8, dtype=np.int32).reshape(1, 4, 2),
+        dtype=wp.int32,
+        device=device,
+    )
+    n_collisions = wp.array([3], dtype=wp.int32, device=device)
+    rng_states = wp.array([17], dtype=wp.uint32, device=device)
+    initial_pairs = np.asarray(collision_pairs.numpy()).copy()
+    initial_counts = np.asarray(n_collisions.numpy()).copy()
+    initial_rng = np.asarray(rng_states.numpy()).copy()
+    launch = coagulation_module.wp.launch
+    kernels: list[Any] = []
+
+    def _only_charge_validation(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        kernels.append(kernel)
+        if kernel is not _validate_charge_finite_kernel:
+            raise AssertionError("only finite-charge validation may launch")
+        return launch(kernel, *args, **kwargs)
+
+    def _unexpected(*args: Any, **kwargs: Any) -> Any:
+        raise AssertionError("downstream work must not run")
+
+    monkeypatch.setattr(coagulation_module, "_ensure_volume_array", _unexpected)
+    monkeypatch.setattr(
+        coagulation_module, "initialize_coagulation_rng_states", _unexpected
+    )
+    monkeypatch.setattr(
+        coagulation_module.wp, "launch", _only_charge_validation
+    )
+
+    with pytest.raises(
+        ValueError, match="particle charge must contain only finite values"
+    ):
+        coagulation_step_gpu(
+            gpu_particles,
+            298.15,
+            101325.0,
+            0.1,
+            max_collisions=4,
+            collision_pairs=collision_pairs,
+            n_collisions=n_collisions,
+            rng_states=rng_states,
+            initialize_rng=True,
+        )
+
+    assert kernels == [_validate_charge_finite_kernel]
+    assert gpu_particles.masses is masses_buffer
+    assert gpu_particles.concentration is concentration_buffer
+    assert gpu_particles.charge is charge_buffer
+    npt.assert_array_equal(np.asarray(collision_pairs.numpy()), initial_pairs)
+    npt.assert_array_equal(np.asarray(n_collisions.numpy()), initial_counts)
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng)
+    _assert_particles_unchanged(gpu_particles, initial_particles)
+
+
+@pytest.mark.parametrize(
+    "charge",
+    [
+        np.zeros((1, 3), dtype=np.float64),
+        np.array([[-1.0, 0.0, 2.0]], dtype=np.float64),
+    ],
+)
+def test_coagulation_step_gpu_accepts_finite_signed_charge(
+    device: str,
+    charge: np.ndarray,
+) -> None:
+    """Finite signed charge preserves ownership and Brownian behavior."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    particles.charge = charge
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    charge_buffer = gpu_particles.charge
+    collision_pairs = wp.zeros((1, 4, 2), dtype=wp.int32, device=device)
+    n_collisions = wp.zeros((1,), dtype=wp.int32, device=device)
+    rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
+
+    result = coagulation_step_gpu(
+        gpu_particles,
+        298.15,
+        101325.0,
+        0.1,
+        max_collisions=4,
+        collision_pairs=collision_pairs,
+        n_collisions=n_collisions,
+        rng_states=rng_states,
+        initialize_rng=True,
+    )
+
+    assert len(result) == 3
+    assert result[0] is gpu_particles
+    assert result[1] is collision_pairs
+    assert result[2] is n_collisions
+    assert gpu_particles.charge is charge_buffer
+    npt.assert_array_equal(np.asarray(gpu_particles.charge.numpy()), charge)
+
+
 def test_coagulation_step_gpu_validates_caller_rng_state_before_allocation(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
@@ -4531,6 +4839,9 @@ def test_coagulation_step_gpu_validates_caller_rng_state_before_allocation(
     def _unexpected_zeros(*args: Any, **kwargs: Any) -> Any:
         raise AssertionError("wp.zeros should not run before rng validation")
 
+    monkeypatch.setattr(
+        coagulation_module, "_validate_charge_finite", lambda *_: None
+    )
     monkeypatch.setattr(coagulation_module.wp, "zeros", _unexpected_zeros)
 
     with pytest.raises(ValueError, match="rng_states shape"):
@@ -4671,6 +4982,9 @@ def test_coagulation_step_gpu_invalid_time_step_fails_before_mutation(
         "_ensure_volume_array",
         _unexpected_ensure_volume_array,
     )
+    monkeypatch.setattr(
+        coagulation_module, "_validate_charge_finite", lambda *_: None
+    )
     monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
 
     with pytest.raises(
@@ -4733,6 +5047,9 @@ def test_coagulation_step_gpu_invalid_volume_fails_before_mutation(
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
+    monkeypatch.setattr(
+        coagulation_module, "_validate_charge_finite", lambda *_: None
+    )
     monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
 
     with pytest.raises(ValueError, match="volume must be finite and > 0"):
@@ -4798,6 +5115,9 @@ def test_coagulation_step_gpu_invalid_max_collisions_fails_before_mutation(
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
+    monkeypatch.setattr(
+        coagulation_module, "_validate_charge_finite", lambda *_: None
+    )
     monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
 
     with pytest.raises(
@@ -5034,6 +5354,13 @@ def test_coagulation_validate_device_arrays(device: str) -> None:
 
     gpu_particles.volume = wp.zeros((1,), dtype=wp.float64, device=wrong_device)
     with pytest.raises(ValueError, match="particle volume device mismatch"):
+        _validate_device_arrays(gpu_particles, gpu_particles.masses.device)
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    gpu_particles.charge = wp.zeros(
+        (1, 2), dtype=wp.float64, device=wrong_device
+    )
+    with pytest.raises(ValueError, match="particle charge device mismatch"):
         _validate_device_arrays(gpu_particles, gpu_particles.masses.device)
 
 
