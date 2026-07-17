@@ -5,11 +5,11 @@
 - [ ] Implement `charged_hard_sphere` as the sole initial GPU charged model.
   Keep Dyachkov, Gatti, Gopalakrishnan, and Chahl variants unavailable until a
   separately approved parity contract exists for each one.
-- [ ] Add scalar fp64 Coulomb potential and stable enhancement-limit helpers in
+- [x] Add scalar fp64 Coulomb potential and stable enhancement-limit helpers in
   `particula/gpu/dynamics/coagulation_funcs.py`.
-- [ ] Add scalar reduced mass and reduced friction helpers with explicit
+- [x] Add scalar reduced mass and reduced friction helpers with explicit
   zero/positive-domain guards in the same module.
-- [ ] Port diffusive Knudsen and dimensional conversion calculations from the
+- [x] Port the scalar diffusive Knudsen calculation from the
   published CPU formula chain without calling NumPy code at runtime.
 - [ ] Add the scalar `charged_hard_sphere` pair helper, returning a finite
   non-negative rate in cubic meters per second; do not add generic or deferred
@@ -30,10 +30,11 @@
 
 ## Tooling / Tests
 
-- [ ] Add scalar helper probe kernels and CPU/Warp parity tables to
+- [x] Add scalar helper probe kernels and independent CPU/Warp parity tables to
   `particula/gpu/dynamics/tests/coagulation_funcs_test.py`.
-- [ ] Test neutral, same-sign, opposite-sign, clipped repulsion, mixed scale,
-  and finite boundary behavior for every approved model.
+- [x] Test neutral, same-sign, opposite-sign, clipped repulsion, equal and
+  mixed scales, zero/negative safe branches, and the extreme kinetic threshold
+  for the P1 primitives.
 - [ ] Add malformed shape/dtype/device/non-finite charge cases to
   `particula/gpu/kernels/tests/coagulation_test.py` with complete before/after
   state and persistent-RNG snapshots.

@@ -4,8 +4,15 @@ E5-F2 ports the scalar Coulomb, reduced-property, and approved charged
 pair-kernel calculations needed by the E5 mechanism dispatcher; validates the
 existing fp64 charge field; and extends accepted-pair application to add donor
 charge into the recipient before clearing the donor. It does not make charged
-physics executable through the public sampler; that integration belongs to
+ physics executable through the public sampler; that integration belongs to
 E5-F3.
+
+**Completed increment (E5-F2-P1, issue #1336):** internal scalar fp64 Warp
+Coulomb/reduced-property helpers and independent co-located parity tests are
+implemented only in `particula/gpu/dynamics/coagulation_funcs.py` and
+`particula/gpu/dynamics/tests/coagulation_funcs_test.py`. This increment does
+not change public exports, data containers, Brownian dispatch, charged
+execution wiring, or module boundaries.
 
 ## In Scope
 
