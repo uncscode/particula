@@ -6,6 +6,11 @@ These functions mirror the NumPy implementations in
 
 import warp as wp
 
+_PI = wp.constant(wp.float64(3.141592653589793))
+_CUNNINGHAM_CONSTANT = wp.constant(wp.float64(1.257))
+_CUNNINGHAM_EXPONENTIAL_SCALE = wp.constant(wp.float64(0.4))
+_CUNNINGHAM_EXPONENTIAL_RATE = wp.constant(wp.float64(1.1))
+
 
 @wp.func
 def knudsen_number_wp(
@@ -42,8 +47,11 @@ def cunningham_slip_correction_wp(
         Cunningham slip correction factor (dimensionless).
     """
     return wp.float64(1.0) + knudsen_number * (
-        wp.float64(1.257)
-        + wp.float64(0.4) * wp.exp(-wp.float64(1.1) / knudsen_number)
+        _CUNNINGHAM_CONSTANT
+        + _CUNNINGHAM_EXPONENTIAL_SCALE
+        * wp.exp(
+            wp.float64(-1.0) * _CUNNINGHAM_EXPONENTIAL_RATE / knudsen_number
+        )
     )
 
 
@@ -66,7 +74,7 @@ def aerodynamic_mobility_wp(
     Returns:
         Aerodynamic mobility [m²/s].
     """
-    pi_value = wp.float64(3.141592653589793)
+    pi_value = _PI
     return slip_correction_factor / (
         wp.float64(6.0) * pi_value * dynamic_viscosity * particle_radius
     )
@@ -91,7 +99,7 @@ def mean_thermal_speed_wp(
     Returns:
         Mean thermal speed [m/s].
     """
-    pi_value = wp.float64(3.141592653589793)
+    pi_value = _PI
     return wp.sqrt(
         (wp.float64(8.0) * boltzmann_constant * temperature)
         / (pi_value * particle_mass)
@@ -117,7 +125,7 @@ def friction_factor_wp(
     Returns:
         Friction factor [N·s/m].
     """
-    pi_value = wp.float64(3.141592653589793)
+    pi_value = _PI
     return (
         wp.float64(6.0) * pi_value * dynamic_viscosity * particle_radius
     ) / slip_correction

@@ -998,7 +998,24 @@ def test_charged_hard_sphere_wp_matches_independent_oracle_and_symmetry(
     )
     expected = np.array(
         [
-            _charged_hard_sphere_oracle(*values, *constants)
+            _charged_hard_sphere_oracle(
+                values[0],
+                values[1],
+                values[2],
+                values[3],
+                values[4],
+                values[5],
+                values[6],
+                values[7],
+                boltzmann_constant=constants[0],
+                elementary_charge_value=constants[1],
+                electric_permittivity=constants[2],
+                gas_constant=constants[3],
+                molecular_weight_air=constants[4],
+                ref_viscosity=constants[5],
+                ref_temperature=constants[6],
+                sutherland_constant=constants[7],
+            )
             for values in zip(
                 radii_i,
                 radii_j,
@@ -1086,7 +1103,24 @@ def test_charged_hard_sphere_wp_handles_extreme_charge_lanes(
     )
     expected = np.array(
         [
-            _charged_hard_sphere_oracle(*values, *constants)
+            _charged_hard_sphere_oracle(
+                values[0],
+                values[1],
+                values[2],
+                values[3],
+                values[4],
+                values[5],
+                values[6],
+                values[7],
+                boltzmann_constant=constants[0],
+                elementary_charge_value=constants[1],
+                electric_permittivity=constants[2],
+                gas_constant=constants[3],
+                molecular_weight_air=constants[4],
+                ref_viscosity=constants[5],
+                ref_temperature=constants[6],
+                sutherland_constant=constants[7],
+            )
             for values in zip(
                 radii_i,
                 radii_j,
@@ -1227,8 +1261,22 @@ def test_charged_hard_sphere_wp_returns_safe_zero_for_invalid_inputs(
         constant_values,
     )
     expected = _charged_hard_sphere_oracle(
-        *state.values(),
-        *constant_values,
+        state["radius_i"],
+        state["radius_j"],
+        state["mass_i"],
+        state["mass_j"],
+        state["charge_i"],
+        state["charge_j"],
+        state["temperature"],
+        state["pressure"],
+        boltzmann_constant=constant_values[0],
+        elementary_charge_value=constant_values[1],
+        electric_permittivity=constant_values[2],
+        gas_constant=constant_values[3],
+        molecular_weight_air=constant_values[4],
+        ref_viscosity=constant_values[5],
+        ref_temperature=constant_values[6],
+        sutherland_constant=constant_values[7],
     )
     assert observed[0] == 0.0
     assert expected == 0.0

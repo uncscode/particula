@@ -11,6 +11,10 @@ driving pressure; zero latent heat retains the isothermal rate.
 
 import warp as wp
 
+_THERMAL_CONDUCTIVITY_SCALE = wp.constant(wp.float64(1.0e-3))
+_THERMAL_CONDUCTIVITY_INTERCEPT = wp.constant(wp.float64(4.39))
+_THERMAL_CONDUCTIVITY_GRADIENT = wp.constant(wp.float64(0.071))
+
 
 @wp.func
 def diffusion_coefficient_wp(
@@ -107,8 +111,9 @@ def _thermal_conductivity_wp(temperature: wp.float64) -> wp.float64:
         Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry
         and Physics*, Equation 17.54.
     """
-    return wp.float64(1e-3) * (
-        wp.float64(4.39) + wp.float64(0.071) * temperature
+    return _THERMAL_CONDUCTIVITY_SCALE * (
+        _THERMAL_CONDUCTIVITY_INTERCEPT
+        + _THERMAL_CONDUCTIVITY_GRADIENT * temperature
     )
 
 
@@ -246,9 +251,9 @@ def particle_radius_from_volume_wp(total_volume: wp.float64) -> wp.float64:
 
 @wp.func
 def effective_surface_tension_wp(
-    masses: wp.array3d[wp.float64],  # type: ignore[valid-type]
-    densities: wp.array[wp.float64],
-    surface_tensions: wp.array[wp.float64],
+    masses: wp.array(dtype=wp.float64, ndim=3),  # type: ignore[valid-type]
+    densities: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+    surface_tensions: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
     box_idx: int,
     particle_idx: int,
     requested_species_idx: int,
@@ -302,8 +307,8 @@ def effective_surface_tension_wp(
 
 @wp.func
 def water_activity_ideal_wp(
-    masses: wp.array3d[wp.float64],  # type: ignore[valid-type]
-    molar_masses: wp.array[wp.float64],
+    masses: wp.array(dtype=wp.float64, ndim=3),  # type: ignore[valid-type]
+    molar_masses: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
     box_idx: int,
     particle_idx: int,
     water_index: int,
@@ -344,9 +349,9 @@ def water_activity_ideal_wp(
 
 @wp.func
 def water_activity_kappa_wp(
-    masses: wp.array3d[wp.float64],  # type: ignore[valid-type]
-    densities: wp.array[wp.float64],
-    kappas: wp.array[wp.float64],
+    masses: wp.array(dtype=wp.float64, ndim=3),  # type: ignore[valid-type]
+    densities: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+    kappas: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
     box_idx: int,
     particle_idx: int,
     water_index: int,
