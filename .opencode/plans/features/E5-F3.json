@@ -60,7 +60,7 @@
       "title": "Enable Brownian-plus-charged execution with integration tests",
       "status": "Shipped",
       "size": "S",
-      "issue_number": null,
+      "issue_number": 1344,
       "start_date": null,
       "completion_date": "2026-07-17",
       "estimates": null,
