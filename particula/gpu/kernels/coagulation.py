@@ -67,7 +67,7 @@ from particula.gpu.dynamics.coagulation_funcs import (
     g_collection_term_wp,
     particle_mean_free_path_wp,
     sedimentation_sp2016_pair_rate_wp,
-    settling_velocity_stokes_wp,
+    settling_velocity_stokes_from_transport_wp,
 )
 from particula.gpu.dynamics.condensation_funcs import (
     particle_radius_from_volume_wp,
@@ -832,9 +832,9 @@ def brownian_coagulation_kernel(  # noqa: C901
         g_terms: Output collection terms ``(n_boxes, n_particles)``.
         speeds: Output mean thermal speeds ``(n_boxes, n_particles)``.
         settling_velocities: Private fp64 settling-velocity scratch
-            ``(n_boxes, n_particles)``. Every slot is cleared before active
-            eligibility checks; only exact private sedimentation-only launches
-            populate valid active values.
+            ``(n_boxes, n_particles)``. The kernel clears every slot on entry
+            and populates this call-local scratch only for valid active slots
+            of the exact private sedimentation-only mask.
         active_indices: Output compact active indices
             ``(n_boxes, n_particles)``.
         collision_pairs: Output collision indices
@@ -854,10 +854,30 @@ def brownian_coagulation_kernel(  # noqa: C901
         collision_capacity: Maximum accepted collisions per box for this call.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]
+    n_particles = masses.shape[1]
+
+    # Clear private settling scratch before any eligibility filtering so stale
+    # values cannot leak through unsupported or retrying launches.
+    for particle_idx in range(n_particles):
+        settling_velocities[box_idx, particle_idx] = wp.float64(0.0)
+
+    executable_brownian_mask = mechanism_mask == wp.int32(
+        BROWNIAN_MECHANISM_FLAG
+    ) or mechanism_mask == wp.int32(
+        BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG
+    )
+    executable_sedimentation_mask = mechanism_mask == wp.int32(
+        SEDIMENTATION_SP2016_MECHANISM_FLAG
+    )
+    if not (
+        executable_brownian_mask
+        or mechanism_mask == wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG)
+        or executable_sedimentation_mask
+    ):
+        return
 
     # One thread per box keeps the pair selection sequential and avoids
     # cross-thread races when writing collision pairs.
-    n_particles = masses.shape[1]
     n_species = masses.shape[2]
 
     temperature_value = temperature[box_idx]
@@ -880,7 +900,6 @@ def brownian_coagulation_kernel(  # noqa: C901
     active_count = wp.int32(0)
     for particle_idx in range(n_particles):
         total_masses[box_idx, particle_idx] = wp.float64(0.0)
-        settling_velocities[box_idx, particle_idx] = wp.float64(0.0)
         if concentration[box_idx, particle_idx] <= wp.float64(0.0):
             active_indices[box_idx, particle_idx] = wp.int32(-1)
             radii[box_idx, particle_idx] = wp.float64(0.0)
@@ -917,17 +936,12 @@ def brownian_coagulation_kernel(  # noqa: C901
         particle_mean_free_path = particle_mean_free_path_wp(diffusivity, speed)
         g_term = g_collection_term_wp(particle_mean_free_path, radius)
         settling_velocity = wp.float64(0.0)
-        if mechanism_mask == wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG):
-            settling_velocity = settling_velocity_stokes_wp(
+        if executable_sedimentation_mask:
+            settling_velocity = settling_velocity_stokes_from_transport_wp(
                 radius,
                 effective_density_wp(total_mass, total_volume),
-                temperature_value,
-                pressure_value,
-                gas_constant,
-                molecular_weight_air,
-                ref_viscosity,
-                ref_temperature,
-                sutherland_constant,
+                dynamic_viscosity,
+                mean_free_path,
             )
 
         active_indices[box_idx, active_count] = wp.int32(particle_idx)
@@ -936,23 +950,11 @@ def brownian_coagulation_kernel(  # noqa: C901
         diffusivities[box_idx, particle_idx] = diffusivity
         g_terms[box_idx, particle_idx] = g_term
         speeds[box_idx, particle_idx] = speed
-        settling_velocities[box_idx, particle_idx] = settling_velocity
+        if executable_sedimentation_mask:
+            settling_velocities[box_idx, particle_idx] = settling_velocity
         active_count += wp.int32(1)
 
     if active_count < wp.int32(2):
-        n_collisions[box_idx] = wp.int32(0)
-        return
-
-    executable_brownian_mask = mechanism_mask == wp.int32(
-        BROWNIAN_MECHANISM_FLAG
-    ) or mechanism_mask == wp.int32(
-        BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG
-    )
-    if not (
-        executable_brownian_mask
-        or mechanism_mask == wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG)
-        or mechanism_mask == wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG)
-    ):
         n_collisions[box_idx] = wp.int32(0)
         return
 

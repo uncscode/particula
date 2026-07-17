@@ -5809,6 +5809,7 @@ def _launch_private_coagulation_sampler(
     time_step: float,
     volume: float = 1.0,
     rng_state: int = 17,
+    states: Any | None = None,
 ) -> dict[str, Any]:
     """Launch the private selector with caller-visible scratch for regression tests."""
     n_boxes, n_particles, _ = masses.shape
@@ -5831,7 +5832,8 @@ def _launch_private_coagulation_sampler(
         (n_boxes, n_particles, 2), -7, dtype=wp.int32, device=device
     )
     counts = wp.full((n_boxes,), -7, dtype=wp.int32, device=device)
-    states = wp.full((n_boxes,), rng_state, dtype=wp.uint32, device=device)
+    if states is None:
+        states = wp.full((n_boxes,), rng_state, dtype=wp.uint32, device=device)
     wp.launch(
         brownian_coagulation_kernel,
         dim=n_boxes,
@@ -5894,12 +5896,14 @@ def test_private_sedimentation_sampler_bounds_pairs_and_advances_rng(
         SEDIMENTATION_SP2016_MECHANISM_FLAG,
         time_step=1.0e308,
     )
+    initial_states = np.asarray(first["states"].numpy()).copy()
     second = _launch_private_coagulation_sampler(
         device,
         masses,
         concentration,
         SEDIMENTATION_SP2016_MECHANISM_FLAG,
         time_step=1.0e308,
+        states=first["states"],
     )
     count = int(first["counts"].numpy()[0])
     pairs = np.asarray(first["pairs"].numpy())[0, :count]
@@ -5908,10 +5912,40 @@ def test_private_sedimentation_sampler_bounds_pairs_and_advances_rng(
     assert np.all(pairs[:, 0] < pairs[:, 1])
     assert set(pairs.ravel()).issubset({0, 1, 2, 3})
     assert len(np.unique(pairs)) == 2 * count
-    assert int(first["states"].numpy()[0]) != 17
-    npt.assert_array_equal(first["pairs"].numpy(), second["pairs"].numpy())
-    npt.assert_array_equal(first["counts"].numpy(), second["counts"].numpy())
-    npt.assert_array_equal(first["states"].numpy(), second["states"].numpy())
+    assert int(initial_states[0]) != 17
+    assert int(second["states"].numpy()[0]) != int(initial_states[0])
+
+
+@pytest.mark.parametrize(
+    ("concentration", "expected_count", "active_slots"),
+    [
+        (np.zeros((1, 4), dtype=np.float64), 0, set()),
+        (np.array([[0.0, 1.0, 0.0, 0.0]]), 0, {1}),
+        (np.array([[1.0, 0.0, 0.0, 1.0]]), 1, {0, 3}),
+    ],
+)
+def test_private_sedimentation_sampler_sparse_active_slots(
+    device: str,
+    concentration: np.ndarray,
+    expected_count: int,
+    active_slots: set[int],
+) -> None:
+    """Sparse exact-private launches only select initially active slots."""
+    result = _launch_private_coagulation_sampler(
+        device,
+        np.array([[[1.0e-15], [8.0e-15], [2.7e-14], [6.4e-14]]]),
+        concentration,
+        SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        time_step=1.0e308,
+    )
+    count = int(result["counts"].numpy()[0])
+    pairs = np.asarray(result["pairs"].numpy())[0, :count]
+
+    assert count == expected_count
+    assert count <= MAX_SCHEDULED_TRIALS_PER_BOX
+    assert set(pairs.ravel()).issubset(active_slots)
+    if count:
+        assert np.all(pairs[:, 0] < pairs[:, 1])
 
 
 def test_private_mixed_sedimentation_mask_rejects_without_rng_or_pair_work(
@@ -5927,16 +5961,19 @@ def test_private_mixed_sedimentation_mask_rejects_without_rng_or_pair_work(
         time_step=1.0e308,
     )
 
-    npt.assert_array_equal(result["counts"].numpy(), [0])
+    npt.assert_array_equal(result["counts"].numpy(), [-7])
     npt.assert_array_equal(result["pairs"].numpy(), [[[-7, -7], [-7, -7]]])
     npt.assert_array_equal(result["states"].numpy(), [17])
     npt.assert_array_equal(result["masses"].numpy(), masses)
+    npt.assert_array_equal(result["concentration"].numpy(), [[1.0, 1.0]])
+    npt.assert_array_equal(result["radii"].numpy(), [[9.0, 9.0]])
+    npt.assert_array_equal(result["settling_velocities"].numpy(), [[0.0, 0.0]])
 
 
 def test_private_sampler_clears_and_populates_sedimentation_velocity_scratch(
     device: str,
 ) -> None:
-    """Settling scratch clears on every launch and only valid SP2016 slots fill."""
+    """Settling scratch is private to exact SP2016 launches and valid slots."""
     masses = np.array([[[1.0e-15], [8.0e-15], [0.0]]])
     concentration = np.array([[1.0, 1.0, 1.0]], dtype=np.float64)
     brownian = _launch_private_coagulation_sampler(
@@ -6083,7 +6120,7 @@ def test_brownian_coagulation_kernel_inactive_particles(
 def test_brownian_kernel_zero_mask_rejects_work_and_caps_overflow_schedule(
     device: str,
 ) -> None:
-    """Private dispatch preserves safety and schedules positive overflow."""
+    """Private dispatch preserves no-mutation rejection and capped scheduling."""
     n_boxes = 1
     n_particles = 2
     masses = wp.array(
@@ -6156,12 +6193,12 @@ def test_brownian_kernel_zero_mask_rejects_work_and_caps_overflow_schedule(
     initial_rng_state = np.asarray(rng_states.numpy()).copy()
     launch(0, 1.0)
 
-    assert np.asarray(n_collisions.numpy()).item() == 0
+    assert np.asarray(n_collisions.numpy()).item() == 9
     npt.assert_array_equal(
         np.asarray(collision_pairs.numpy()),
         np.array([[[91, 92]]], dtype=np.int32),
     )
-    npt.assert_array_equal(np.asarray(active_indices.numpy()), [[0, 1]])
+    npt.assert_array_equal(np.asarray(active_indices.numpy()), [[0, 0]])
     npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng_state)
 
     masses = wp.array(
