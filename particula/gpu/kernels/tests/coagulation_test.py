@@ -406,6 +406,41 @@ def test_charged_modes_merge_and_conserve_mass_and_charge(
     assert result.concentration[0, 1] == 0.0
 
 
+def test_combined_multibox_multispecies_conserves_mass_and_charge(
+    device: str,
+) -> None:
+    """Combined mode conserves per-box species mass and signed charge."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=2)
+    particles.volume[:] = 1.0e-18
+    particles.masses[:] = [
+        [[1.0e-21, 2.0e-21], [3.0e-21, 4.0e-21], [0.0, 0.0]],
+        [[5.0e-21, 6.0e-21], [7.0e-21, 8.0e-21], [0.0, 0.0]],
+    ]
+    particles.concentration[:, -1] = 1.0
+    particles.charge[:] = [[2.0, -5.0, 7.0], [-3.0, 4.0, -8.0]]
+    initial_mass = np.sum(particles.masses, axis=1)
+    initial_charge = np.sum(particles.charge, axis=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+
+    result_particles, _, _ = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+        max_collisions=1,
+        rng_seed=41,
+        mechanism_config=CoagulationMechanismConfig(
+            mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
+        ),
+    )
+    result = from_warp_particle_data(result_particles, sync=True)
+
+    npt.assert_allclose(np.sum(result.masses, axis=1), initial_mass, rtol=1e-12)
+    npt.assert_allclose(
+        np.sum(result.charge, axis=1), initial_charge, rtol=1e-12
+    )
+
+
 def test_charged_only_multispecies_total_mass_regression(
     device: str,
 ) -> None:
@@ -704,6 +739,47 @@ def test_charged_modes_reject_over_limit_active_particles_before_mutation(
     npt.assert_array_equal(pairs.numpy(), np.full((1, 1, 2), -7))
     npt.assert_array_equal(counts.numpy(), np.array([-7], dtype=np.int32))
     npt.assert_array_equal(states.numpy(), np.array([17], dtype=np.uint32))
+
+
+@pytest.mark.parametrize(
+    "mechanisms",
+    [
+        (CHARGED_HARD_SPHERE_MECHANISM,),
+        (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
+    ],
+)
+def test_charged_cap_ignores_positive_concentration_ineligible_slots(
+    device: str,
+    mechanisms: tuple[str, ...],
+) -> None:
+    """The charged cap counts only particles the selector can choose."""
+    particles = _make_particle_data(
+        n_boxes=1,
+        n_particles=MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX + 1,
+        n_species=1,
+    )
+    particles.masses[0, -1, :] = 0.0
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array(np.full((1, 1, 2), -7), dtype=wp.int32, device=device)
+    counts = wp.array(np.array([-7]), dtype=wp.int32, device=device)
+    states = wp.array(np.array([17]), dtype=wp.uint32, device=device)
+
+    _, result_pairs, result_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.0,
+        max_collisions=1,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        rng_states=states,
+        initialize_rng=True,
+        mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
+    )
+
+    assert result_pairs is pairs
+    assert result_counts is counts
+    npt.assert_array_equal(counts.numpy(), np.array([0], dtype=np.int32))
 
 
 def test_mechanism_support_accepts_combined_brownian_and_charged() -> None:
@@ -5569,6 +5645,37 @@ def test_apply_coagulation_kernel_skips_unrepresentable_charge_merge(
     result_charge = np.asarray(charge.numpy())
     npt.assert_array_equal(result_charge, [[maximum, maximum]])
     assert np.all(np.isfinite(result_charge))
+
+
+def test_apply_coagulation_kernel_skips_overflowing_mass_merge(
+    device: str,
+) -> None:
+    """Finite masses cannot overflow into a partially merged particle state."""
+    maximum = np.finfo(np.float64).max
+    masses = wp.array(
+        [[[maximum, 1.0], [maximum, 2.0]]],
+        dtype=wp.float64,
+        device=device,
+    )
+    concentration = wp.array([[1.0, 1.0]], dtype=wp.float64, device=device)
+    charge = wp.array([[1.0, -1.0]], dtype=wp.float64, device=device)
+    pairs = wp.array([[[0, 1]]], dtype=wp.int32, device=device)
+    counts = wp.array([1], dtype=wp.int32, device=device)
+
+    wp.launch(
+        apply_coagulation_kernel,
+        dim=(1, 1),
+        inputs=[masses, concentration, charge, pairs, counts],
+        device=device,
+    )
+    wp.synchronize()
+
+    result_masses = np.asarray(masses.numpy())
+    npt.assert_array_equal(result_masses, [[[maximum, 1.0], [maximum, 2.0]]])
+    assert np.all(np.isfinite(result_masses))
+    npt.assert_array_equal(np.asarray(concentration.numpy()), [[1.0, 1.0]])
+    npt.assert_array_equal(np.asarray(charge.numpy()), [[1.0, -1.0]])
+    npt.assert_array_equal(np.asarray(counts.numpy()), [1])
 
 
 def test_apply_coagulation_kernel_skips_self_pair(device: str) -> None:
