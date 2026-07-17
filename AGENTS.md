@@ -446,9 +446,9 @@ for _ in range(n_steps):
 - Combined execution independently sanitizes and sums Brownian and charged
   pair rates, then uses one active set, exhaustive additive majorant,
   candidate/acceptance pass, collision-buffer set, RNG stream, and apply pass.
-  For A active particles, pair work is O(A²), while collision and selector
-  buffers are O(A); this is bounded implementation scope, not performance
-  evidence. The return tuple is exactly
+  For A active particles, pair work is O(A²), preparation is O(N), and
+  selector/collision storage is O(N), where N is total particle capacity. This
+  is bounded implementation scope, not performance evidence. The return tuple is exactly
   `(particles, collision_pairs, n_collisions)`; supplied collision buffers are
   returned by identity, while `rng_states` mutates in place and is not returned.
 - Shipped baseline: caller-owned persistent `rng_states` are seeded once and

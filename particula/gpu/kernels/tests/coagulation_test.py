@@ -685,6 +685,68 @@ def test_charged_only_fresh_seed_counts_match_pair_rate_oracle(
     assert abs(accepted - expected) <= 4.0 * sigma + 1.0
 
 
+@pytest.mark.stochastic
+def test_combined_fresh_seed_counts_match_independent_rate_oracle(
+    device: str,
+) -> None:
+    """Combined counts stay within a four-sigma independent-rate bound.
+
+    With two active particles, the production majorant equals the sum of the
+    independently calculated Brownian and charged pair rates. The chosen volume
+    yields a 0.2 scheduled-trial probability, making fresh seeds independent
+    Bernoulli observations rather than exact stochastic replay assertions.
+    """
+    temperature = 298.15
+    pressure = 101325.0
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    particles.masses[:] = 1.0e-21
+    particles.charge[:] = [[0.0, 0.0]]
+    radius = (3.0 * 1.0e-21 / (4.0 * np.pi * particles.density[0])) ** (
+        1.0 / 3.0
+    )
+    brownian_rate_matrix = np.asarray(
+        get_brownian_kernel_via_system_state(
+            particle_radius=np.array([radius, radius]),
+            particle_mass=np.array([1.0e-21, 1.0e-21]),
+            temperature=temperature,
+            pressure=pressure,
+        ),
+        dtype=np.float64,
+    )
+    brownian_rate = float(brownian_rate_matrix[0, 1])
+    charged_rate = _charged_hard_sphere_oracle(
+        radius, radius, 1.0e-21, 1.0e-21, 0.0, 0.0, temperature, pressure
+    )
+    combined_rate = brownian_rate + charged_rate
+    assert combined_rate > 0.0
+    trial_probability = 0.2
+    observations = 64
+    accepted = 0
+    for seed in range(observations):
+        gpu_particles = to_warp_particle_data(particles, device=device)
+        _, _, counts = coagulation_step_gpu(
+            gpu_particles,
+            temperature=temperature,
+            pressure=pressure,
+            time_step=1.0,
+            volume=combined_rate / trial_probability,
+            max_collisions=1,
+            rng_seed=seed,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM)
+            ),
+        )
+        accepted += int(counts.numpy()[0])
+
+    expected = observations * trial_probability
+    sigma = np.sqrt(
+        observations * trial_probability * (1.0 - trial_probability)
+    )
+    assert abs(accepted - expected) <= 4.0 * sigma + 1.0, (
+        f"accepted={accepted}, expected={expected}, sigma={sigma}"
+    )
+
+
 @pytest.mark.parametrize(
     ("field", "invalid_value"),
     [
@@ -5774,6 +5836,29 @@ def test_apply_coagulation_kernel_skips_overflowing_mass_merge(
     npt.assert_array_equal(np.asarray(charge.numpy()), [[1.0, -1.0]])
     npt.assert_array_equal(np.asarray(pairs.numpy()), [[[-1, -1]]])
     npt.assert_array_equal(np.asarray(counts.numpy()), [0])
+
+
+def test_compaction_uses_only_populated_oversized_buffer_entries(
+    device: str,
+) -> None:
+    """Compaction retains valid populated entries in an oversized buffer."""
+    pairs = np.full((1, 64, 2), -7, dtype=np.int32)
+    pairs[0, 0] = [0, 1]
+    pairs[0, 1] = [-1, -1]
+    pairs_wp = wp.array(pairs, dtype=wp.int32, device=device)
+    counts_wp = wp.array([2], dtype=wp.int32, device=device)
+
+    wp.launch(
+        _compact_applied_collision_pairs_kernel,
+        dim=1,
+        inputs=[pairs_wp, counts_wp],
+        device=device,
+    )
+    wp.synchronize()
+
+    npt.assert_array_equal(np.asarray(counts_wp.numpy()), [1])
+    npt.assert_array_equal(np.asarray(pairs_wp.numpy())[0, 0], [0, 1])
+    npt.assert_array_equal(np.asarray(pairs_wp.numpy())[0, 2:], pairs[0, 2:])
 
 
 def test_apply_coagulation_kernel_skips_self_pair(device: str) -> None:

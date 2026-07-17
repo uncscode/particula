@@ -225,6 +225,12 @@ donor charge is cleared together with donor mass and concentration. Supported
 evidence conserves charge independently in each box. This merge bookkeeping
 skips a collision whose finite charge sum cannot be represented as finite
 `float64`, leaving both particles unchanged rather than producing infinity.
+Before recording a selected collision or removing its candidates from the
+active set, selection also verifies that every merged species-mass component
+and the merged charge remain finite and nonnegative where applicable. The
+apply pass repeats those checks defensively; rejected entries are compacted
+using only the populated collision count, so unused capacity in an oversized
+caller buffer is never interpreted as a collision.
 
 ### GPU coagulation configuration and sidecar ownership
 
@@ -268,8 +274,9 @@ Charged-only execution uses a bounded compact active-pair majorant. Combined
 execution independently sanitizes and sums Brownian and charged terms, then
 uses one active set, exhaustive additive majorant, candidate/acceptance pass,
 collision-buffer set, per-box RNG stream, and apply pass. For active count A,
-the pair work is O(A²), while collision and selector buffers are O(A); this
-documents bounded implementation scope, not throughput or scaling evidence.
+pair work is O(A²), preparation is O(N), and selector/collision storage is
+O(N), where N is total particle capacity. This documents bounded implementation
+scope, not throughput or scaling evidence.
 Invalid, nonfinite, or nonpositive
 terms do not add to totals; invalid candidates do not mutate state or output.
 
