@@ -202,6 +202,18 @@ def coulomb_potential_ratio_wp(
 
     pi_value = _PI
     charge_product = charge_i * charge_j
+    if (
+        not wp.isfinite(charge_i)
+        or not wp.isfinite(charge_j)
+        or not wp.isfinite(charge_product)
+    ):
+        # The hard-sphere limits only need the bounded potential ratio. Preserve
+        # the finite-input sign when the intermediate product overflows.
+        if wp.isfinite(charge_i) and wp.isfinite(charge_j):
+            if charge_i * charge_j < wp.float64(0.0):
+                return wp.float64(200.0)
+            return wp.float64(-200.0)
+        return wp.float64(0.0)
     charge_scale = elementary_charge_value * elementary_charge_value
     numerator = -charge_product * charge_scale
     denominator = wp.float64(4.0) * pi_value * electric_permittivity
@@ -215,11 +227,13 @@ def coulomb_potential_ratio_wp(
     ):
         return wp.float64(0.0)
     potential_ratio = numerator / denominator
-    if not wp.isfinite(potential_ratio) or (
-        potential_ratio == wp.float64(0.0) and numerator != wp.float64(0.0)
-    ):
-        return wp.float64(0.0)
-    return wp.max(potential_ratio, wp.float64(-200.0))
+    if not wp.isfinite(potential_ratio):
+        if charge_product < wp.float64(0.0):
+            return wp.float64(200.0)
+        return wp.float64(-200.0)
+    return wp.max(
+        wp.min(potential_ratio, wp.float64(200.0)), wp.float64(-200.0)
+    )
 
 
 @wp.func
@@ -537,30 +551,6 @@ def charged_hard_sphere_wp(  # noqa: C901
     sum_radius = radius_i + radius_j
     if not wp.isfinite(sum_radius) or sum_radius <= zero:
         return zero
-    coulomb_numerator = -(
-        charge_i * charge_j * elementary_charge_value * elementary_charge_value
-    )
-    coulomb_denominator = (
-        wp.float64(4.0)
-        * _PI
-        * electric_permittivity
-        * sum_radius
-        * boltzmann_constant
-        * temperature
-    )
-    if (
-        not wp.isfinite(coulomb_numerator)
-        or not wp.isfinite(coulomb_denominator)
-        or coulomb_denominator <= zero
-        or (coulomb_numerator == zero and charge_i != zero and charge_j != zero)
-    ):
-        return zero
-    coulomb_quotient = coulomb_numerator / coulomb_denominator
-    if not wp.isfinite(coulomb_quotient) or (
-        coulomb_quotient == zero and coulomb_numerator != zero
-    ):
-        return zero
-
     potential_ratio = coulomb_potential_ratio_wp(
         radius_i,
         radius_j,

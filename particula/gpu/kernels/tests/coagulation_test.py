@@ -3006,6 +3006,7 @@ def test_heterogeneous_majorant_retains_non_radius_extrema_collision(
             n_collisions=counts,
             rng_states=rng_states,
             initialize_rng=True,
+            validate_charge_finite=True,
         )
         result = from_warp_particle_data(gpu_particles, sync=True)
         npt.assert_allclose(np.sum(result.masses), initial_mass, rtol=1.0e-12)
@@ -4396,6 +4397,32 @@ def test_apply_coagulation_kernel_merges_particles(device: str) -> None:
     npt.assert_array_equal(np.asarray(charge_wp.numpy()), result_charge)
 
 
+def test_apply_coagulation_kernel_skips_unrepresentable_charge_merge(
+    device: str,
+) -> None:
+    """Finite same-sign charges cannot overflow into mutated particle state."""
+    maximum = np.finfo(np.float64).max
+    masses = wp.array([[[1.0], [2.0]]], dtype=wp.float64, device=device)
+    concentration = wp.array([[1.0, 1.0]], dtype=wp.float64, device=device)
+    charge = wp.array([[maximum, maximum]], dtype=wp.float64, device=device)
+    pairs = wp.array([[[0, 1]]], dtype=wp.int32, device=device)
+    counts = wp.array([1], dtype=wp.int32, device=device)
+
+    wp.launch(
+        apply_coagulation_kernel,
+        dim=(1, 1),
+        inputs=[masses, concentration, charge, pairs, counts],
+        device=device,
+    )
+    wp.synchronize()
+
+    npt.assert_array_equal(np.asarray(masses.numpy()), [[[1.0], [2.0]]])
+    npt.assert_array_equal(np.asarray(concentration.numpy()), [[1.0, 1.0]])
+    result_charge = np.asarray(charge.numpy())
+    npt.assert_array_equal(result_charge, [[maximum, maximum]])
+    assert np.all(np.isfinite(result_charge))
+
+
 def test_apply_coagulation_kernel_skips_self_pair(device: str) -> None:
     """Apply kernel ignores self-collisions without mutating arrays."""
     masses = np.array([[[1.0e-18], [2.0e-18]]], dtype=np.float64)
@@ -4886,6 +4913,7 @@ def test_coagulation_step_gpu_rejects_nonfinite_charge_before_downstream_work(
             n_collisions=n_collisions,
             rng_states=rng_states,
             initialize_rng=True,
+            validate_charge_finite=True,
         )
 
     assert kernels == [_validate_charge_finite_kernel]
@@ -4967,6 +4995,59 @@ def test_coagulation_step_gpu_signed_charge_conserves_charge_and_sidecars(
         rtol=1e-12,
         atol=1e-30,
     )
+
+
+def test_coagulation_step_gpu_forced_collision_transfers_charge_exactly(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """A forced accepted pair clears its donor and transfers its charge."""
+
+    @_warp_kernel
+    def _force_pair(pairs: Any, counts: Any) -> None:
+        box_idx = wp.tid()
+        pairs[box_idx, 0, 0] = wp.int32(0)
+        pairs[box_idx, 0, 1] = wp.int32(2)
+        counts[box_idx] = wp.int32(1)
+
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    particles.charge = np.array([[-1.0, 0.0, 2.0]], dtype=np.float64)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.zeros((1, 1, 2), dtype=wp.int32, device=device)
+    counts = wp.zeros((1,), dtype=wp.int32, device=device)
+    rng_states = wp.zeros((1,), dtype=wp.uint32, device=device)
+    launch = coagulation_module.wp.launch
+
+    def _force_brownian(kernel: Any, *args: Any, **kwargs: Any) -> Any:
+        if kernel is coagulation_module.brownian_coagulation_kernel:
+            inputs = kwargs["inputs"]
+            return launch(
+                _force_pair,
+                dim=(1,),
+                inputs=[inputs[18], inputs[19]],
+                device=kwargs["device"],
+            )
+        return launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(coagulation_module.wp, "launch", _force_brownian)
+    coagulation_step_gpu(
+        gpu_particles,
+        298.15,
+        101325.0,
+        0.1,
+        max_collisions=1,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        rng_states=rng_states,
+        initialize_rng=True,
+    )
+    wp.synchronize()
+
+    final_charge = np.asarray(gpu_particles.charge.numpy())
+    assert counts.numpy()[0] == 1
+    assert final_charge[0, 0] == 1.0
+    assert final_charge[0, 2] == 0.0
+    npt.assert_allclose(final_charge.sum(), particles.charge.sum(), atol=0.0)
 
 
 def test_coagulation_step_gpu_validates_caller_rng_state_before_allocation(

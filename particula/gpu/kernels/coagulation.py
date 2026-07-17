@@ -6,10 +6,11 @@ positive executable rate terms and a single safe majorant before making one
 acceptance draw for each valid candidate. Entry-point validation accepts
 scalar direct inputs,
 explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
-After particle metadata and device checks, the public entry point performs one
-read-only device scan of particle charge for finite values before normalizing
-environment inputs, setting up volume, initializing RNG state, or executing
- Brownian work. The kernels operate on GPU-resident particle data and produce
+Particle metadata and device checks run before normalizing environment inputs,
+setting up volume, initializing RNG state, or executing Brownian work. An
+explicit opt-in finite-charge validation scan is available for callers that
+require host-visible validation. The kernels operate on GPU-resident particle
+data and produce
  collision pairs that are applied in place: recipient particles receive donor
  mass and charge, while donor mass, concentration, and charge are cleared.
 
@@ -752,6 +753,12 @@ def apply_coagulation_kernel(
     if idx_i == idx_j:
         return
 
+    merged_charge = charge[box_idx, idx_i] + charge[box_idx, idx_j]
+    # An unrepresentable charge merge must not partially apply mass state or
+    # turn finite caller state into infinity. Skipping preserves inventories.
+    if not wp.isfinite(merged_charge):
+        return
+
     n_species = masses.shape[2]
     for species_idx in range(n_species):
         masses[box_idx, idx_i, species_idx] = (
@@ -760,7 +767,7 @@ def apply_coagulation_kernel(
         )
         masses[box_idx, idx_j, species_idx] = wp.float64(0.0)
 
-    charge[box_idx, idx_i] = charge[box_idx, idx_i] + charge[box_idx, idx_j]
+    charge[box_idx, idx_i] = merged_charge
     charge[box_idx, idx_j] = wp.float64(0.0)
     concentration[box_idx, idx_j] = wp.float64(0.0)
 
@@ -1147,6 +1154,7 @@ def coagulation_step_gpu(  # noqa: C901
     mechanism_config: CoagulationMechanismConfig | None = None,
     initialize_rng: bool = False,
     environment: Any | None = None,
+    validate_charge_finite: bool = False,
 ) -> tuple[Any, Any, Any]:
     """Execute one particle-resolved Brownian coagulation timestep on the GPU.
 
@@ -1155,10 +1163,9 @@ def coagulation_step_gpu(  # noqa: C901
     work, or launch. Omission selects the only executable combination:
     Brownian ``"particle_resolved"``. Reserved mechanisms and all other
     distribution types reject during preflight without runtime mutation. After
-    particle metadata and device checks, finite-charge validation runs before
-    time-step and environment normalization. Direct temperature and pressure
-    inputs are then validated and normalized before volume setup or Brownian
-    launches. ``particles`` and supplied ``collision_pairs``, ``n_collisions``,
+    particle metadata and device checks, direct temperature and pressure inputs
+    are validated and normalized before volume setup or Brownian launches.
+    ``particles`` and supplied ``collision_pairs``, ``n_collisions``,
     and ``rng_states`` are caller-owned same-device Warp resources; the step
     mutates them in place as applicable. Caller-owned RNG buffers are reset only
     when ``initialize_rng=True`` explicitly opts in.
@@ -1166,7 +1173,7 @@ def coagulation_step_gpu(  # noqa: C901
     Args:
         particles: Caller-owned, GPU-resident particle data. All required Warp
             arrays, including ``charge``, must be on the same device. ``charge``
-            must be finite ``wp.float64`` with shape ``(n_boxes, n_particles)``.
+            must be ``wp.float64`` with shape ``(n_boxes, n_particles)``.
             Accepted collisions mutate mass, concentration, and charge in place:
             recipient particles receive donor mass and charge, and donor mass,
             concentration, and charge are cleared.
@@ -1219,6 +1226,10 @@ def coagulation_step_gpu(  # noqa: C901
         environment: Optional ``WarpEnvironmentData`` with ``(n_boxes,)``
             temperature and pressure arrays on the same device as ``particles``.
             This mode is supported when both direct inputs are ``None``.
+        validate_charge_finite: When True, explicitly scan charge on device and
+            synchronize for host-visible rejection of NaN or infinity. The
+            default False avoids per-step allocation, synchronization, and host
+            readback, supporting persistent-state loops and graph capture.
 
     Returns:
         Tuple containing ``particles`` after in-place coagulation, the
@@ -1236,15 +1247,17 @@ def coagulation_step_gpu(  # noqa: C901
         ValueError: If mechanism_config has the wrong type, is malformed, or
             requests an unsupported distribution or reserved mechanism.
         ValueError: If particle charge does not have shape
-            ``(n_boxes, n_particles)``, dtype ``wp.float64``, the particle
-            device, or only finite values.
+            ``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle
+            device. With ``validate_charge_finite=True``, also raises for NaN or
+            infinity.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
         ``(n_boxes,)`` Warp arrays, hybrid scalar-plus-Warp-array direct
         inputs, or keyword-only ``environment=...`` execution.
 
-        ``mechanism_config``, ``initialize_rng``, and ``environment`` remain
+        ``mechanism_config``, ``initialize_rng``, ``environment``, and
+        ``validate_charge_finite`` remain
         keyword-only so existing positional scalar callers stay
         source-compatible. Configuration preflight occurs before all runtime
         input access, allocation, normalization, RNG work, and launches. It
@@ -1256,15 +1269,13 @@ def coagulation_step_gpu(  # noqa: C901
         downstream work. The normalized environment arrays are forwarded
         directly into the launch path.
 
-        Charge validation runs after particle metadata and device validation,
-        but before time-step and environment normalization or all downstream
-        work. It uses one read-only O(``n_boxes * n_particles``) launch and a
-        private one-element status-scalar allocation/readback to reject
-        non-finite charge. This is schema and finiteness validation only; it
-        does not enable charged-coagulation physics. A charge failure cannot
-        proceed to normalization, caller-output validation or allocation, RNG
-        setup, or Brownian/apply execution; the private status scalar is the
-        sole allowed allocation during the finite-charge check.
+        With ``validate_charge_finite=True``, charge validation runs after
+        particle metadata and device validation but before time-step and
+        environment normalization. It uses one read-only O(``n_boxes *
+        n_particles``) launch and a private one-element status-scalar
+        allocation/readback to reject non-finite charge. This explicit debugging
+        validation does not enable charged-coagulation physics. The default
+        avoids the scan, allocation, synchronization, and host readback.
 
         Supported RNG setup cases are:
 
@@ -1299,12 +1310,13 @@ def coagulation_step_gpu(  # noqa: C901
 
     device = particles.masses.device
     _validate_device_arrays(particles, device)
-    _validate_charge_finite(
-        particles.charge,
-        n_boxes,
-        n_particles,
-        device,
-    )
+    if validate_charge_finite:
+        _validate_charge_finite(
+            particles.charge,
+            n_boxes,
+            n_particles,
+            device,
+        )
     time_step_value = _validate_time_step(time_step)
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature=temperature,
