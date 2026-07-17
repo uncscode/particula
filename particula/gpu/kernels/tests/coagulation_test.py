@@ -4755,6 +4755,9 @@ def test_coagulation_step_gpu_rejects_nonfinite_charge_before_downstream_work(
     def _unexpected(*args: Any, **kwargs: Any) -> Any:
         raise AssertionError("downstream work must not run")
 
+    monkeypatch.setattr(
+        coagulation_module, "_ensure_environment_arrays", _unexpected
+    )
     monkeypatch.setattr(coagulation_module, "_ensure_volume_array", _unexpected)
     monkeypatch.setattr(
         coagulation_module, "initialize_coagulation_rng_states", _unexpected
