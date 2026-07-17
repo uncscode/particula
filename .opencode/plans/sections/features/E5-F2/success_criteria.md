@@ -1,10 +1,11 @@
 # Success Criteria
 
-- [ ] E5-F1/F2 records an explicit approved charged-model subset; every approved
-  model has a scalar fp64 Warp pair helper and every excluded model has an owner.
-- [ ] Approved charged pair rates meet documented deterministic CPU/Warp
+- [x] E5-F1/F2 records an explicit approved charged-model subset; the approved
+  hard-sphere model has an internal scalar fp64 Warp pair helper and excluded
+  models remain deferred.
+- [x] Approved charged pair rates meet documented deterministic CPU/Warp
   tolerances for neutral, same-sign, opposite-sign, and mixed-scale fixtures.
-- [ ] Supported pair-helper inputs produce finite, symmetric, non-negative rates
+- [x] Supported pair-helper inputs produce finite, symmetric, non-negative rates
   and preserve the neutral limit without divide-by-zero or overflow.
 - [ ] Charge shape, dtype, device, NaN, and infinity failures occur before any
   particle/output-buffer mutation or persistent RNG advancement.

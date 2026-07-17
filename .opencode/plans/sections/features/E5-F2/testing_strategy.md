@@ -15,11 +15,15 @@ parameterize optional CUDA with a clean skip when unavailable.
   repulsive clip, mixed scales, zero/negative guarded inputs, and the
   sub-`1e-80` kinetic-limit branch. Tests are marked `gpu_parity`, retain the
   module Warp marker, and use shared Warp-CPU/optional-CUDA device discovery.
-- **P2 — Model parity tests:** For each approved model, construct radius, mass,
-  charge, temperature, and pressure fixtures independently on CPU and Warp.
-  Compare scalar pair rates with explicit per-fixture `rtol`/`atol`; include
-  symmetry and neutral-limit checks. Do not import the Warp implementation into
-  the expected-value calculation.
+- **P2 — Model parity tests (completed, #1337):**
+  `particula/gpu/dynamics/tests/coagulation_funcs_test.py` uses an independent
+  NumPy hard-sphere oracle and fp64 Warp probe to cover valid neutral,
+  same-sign, opposite-sign, mixed-scale, temperature, and pressure lanes.
+  Deterministic Warp-CPU/optional-CUDA evidence checks oracle parity,
+  pair-order symmetry, neutral behavior, the exact extreme-repulsion zero, and
+  exhaustive non-finite/zero/negative safe-zero inputs for pair state, charge,
+  and all eight scalar constants. Valid positive rates use `rtol=1e-6,
+  atol=0`; invalid and extreme-repulsion results are exact zero.
 - **P3 — Validation/regression tests:** Extend
   `particula/gpu/kernels/tests/coagulation_test.py` with wrong shape, wrong dtype,
   wrong device, NaN, and infinity cases. Snapshot masses, concentration, charge,

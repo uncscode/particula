@@ -28,6 +28,15 @@ branches must explicitly handle a zero Coulomb potential, clip the repulsive
 potential consistently with the approved CPU reference, use safe exponentials,
 and return finite non-negative rates for the supported domain.
 
+**Implemented P2 design:** `charged_hard_sphere_wp` is an internal scalar
+composition of the existing gas/particle-property, Coulomb, reduced-value, and
+diffusive-Knudsen helpers. It accepts explicit fp64 pair state, environment,
+and physical constants; validates finite positive physical inputs and finite
+signed charges; preserves the `phi == -200` and sub-`1e-80` kinetic-limit
+safe-zero paths; and returns only finite non-negative m³/s rates. It neither
+exports nor invokes a sampler, dispatcher, kernel entry point, or charged
+workflow.
+
 Accepted pairs are already disjoint within one call because the selector
 removes both active ranks. The merge kernel therefore keeps its current
 parallel `(box, collision)` launch and extends the same recipient/donor update

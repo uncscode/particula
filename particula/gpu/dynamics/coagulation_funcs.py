@@ -371,14 +371,52 @@ def charged_hard_sphere_wp(  # noqa: C901
 ) -> wp.float64:
     """Calculate an internal charged hard-sphere pair rate in SI units.
 
-    This device-side helper ports
-    ``charged_dimensional_kernel.get_hard_sphere_kernel_via_system_state``
-    and ``charged_dimensionless_kernel.get_hard_sphere_kernel``. It accepts
-    radii [m], masses [kg], signed elementary-charge counts, temperature [K],
-    pressure [Pa], and physical constants in their SI units, and returns a
-    finite, non-negative rate [m³/s]. Non-finite or invalid positive-domain
-    state and constants return safe zero; charges may be finite, negative, or
-    zero. This internal helper does not enable charged execution.
+    This device-only, unexported helper ports the pair calculation from
+    ``particula.dynamics.coagulation.charged_dimensional_kernel`` and the
+    hard-sphere fit from
+    ``particula.dynamics.coagulation.charged_dimensionless_kernel``. It is
+    not integrated with charged execution and does not change public exports.
+
+    Non-finite or non-positive radii, masses, thermodynamic state, or physical
+    constants return exact safe zero. Charges must be finite but may be signed
+    or zero. Any invalid intermediate, overflow, or underflow also returns
+    exact safe zero rather than a non-finite or negative rate.
+
+    Args:
+        radius_i: Radius of particle i [m]. Must be finite and positive.
+        radius_j: Radius of particle j [m]. Must be finite and positive.
+        mass_i: Mass of particle i [kg]. Must be finite and positive.
+        mass_j: Mass of particle j [kg]. Must be finite and positive.
+        charge_i: Signed charge of particle i in elementary-charge counts.
+        charge_j: Signed charge of particle j in elementary-charge counts.
+        temperature: Gas temperature [K]. Must be finite and positive.
+        pressure: Gas pressure [Pa]. Must be finite and positive.
+        boltzmann_constant: Boltzmann constant [J/K]. Must be finite and
+            positive.
+        elementary_charge_value: Elementary-charge magnitude [C]. Must be
+            finite and positive.
+        electric_permittivity: Vacuum electric permittivity [F/m]. Must be
+            finite and positive.
+        gas_constant: Universal gas constant [J/(mol K)]. Must be finite and
+            positive.
+        molecular_weight_air: Molar mass of air [kg/mol]. Must be finite and
+            positive.
+        ref_viscosity: Reference gas dynamic viscosity [Pa s]. Must be finite
+            and positive.
+        ref_temperature: Reference temperature for Sutherland viscosity [K].
+            Must be finite and positive.
+        sutherland_constant: Sutherland temperature constant [K]. Must be
+            finite and positive.
+
+    Returns:
+        Finite, non-negative charged hard-sphere pair rate [m³/s], or exact
+        ``0.0`` when an input or intermediate is outside its safe domain.
+
+    References:
+        Dyachkov, S. A., Kustova, E. V., & Kustov, A. V. (2007).
+        Coagulation of particles in the transition regime: The effect of the
+        Coulomb potential. *Journal of Chemical Physics*, 126(12).
+        https://doi.org/10.1063/1.2713719
     """
     zero = wp.float64(0.0)
     if (
