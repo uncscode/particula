@@ -12,7 +12,7 @@ does not modify `particula/gpu/kernels/coagulation.py`: there is no public
 dispatch, mechanism registration, majorant, selector, or runnable API yet.
 
 ```text
-coagulation_step_gpu(..., mechanisms=("sedimentation",))
+coagulation_step_gpu(..., mechanisms=("sedimentation_sp2016",))
   -> E5-F1 canonicalizes the mechanism mask and validates capability
   -> validate particle-resolved fp64 state, environment, volume, buffers, RNG
   -> derive each active particle on device

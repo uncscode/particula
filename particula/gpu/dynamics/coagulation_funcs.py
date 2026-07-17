@@ -24,6 +24,7 @@ from particula.util.constants import STANDARD_GRAVITY
 
 _PI = wp.constant(wp.float64(3.141592653589793))
 _STANDARD_GRAVITY = wp.constant(wp.float64(STANDARD_GRAVITY))
+_MIN_NORMAL_FLOAT64 = wp.constant(wp.float64(2.2250738585072014e-308))
 _COULOMB_SERIES_THRESHOLD = wp.constant(wp.float64(1.0e-5))
 _KINETIC_LIMIT_CUTOFF = wp.constant(wp.float64(1.0e-80))
 _HARD_SPHERE_LINEAR = wp.constant(wp.float64(25.836))
@@ -60,7 +61,11 @@ def effective_density_wp(
     ):
         return zero
     density = total_mass / total_volume
-    if not wp.isfinite(density) or density <= zero:
+    if (
+        not wp.isfinite(density)
+        or density <= zero
+        or density < _MIN_NORMAL_FLOAT64
+    ):
         return zero
     return density
 
@@ -165,7 +170,11 @@ def settling_velocity_stokes_wp(
     if not wp.isfinite(denominator) or denominator <= zero:
         return zero
     velocity = numerator / denominator
-    if not wp.isfinite(velocity) or velocity <= zero:
+    if (
+        not wp.isfinite(velocity)
+        or velocity <= zero
+        or velocity < _MIN_NORMAL_FLOAT64
+    ):
         return zero
     return velocity
 
@@ -220,7 +229,7 @@ def sedimentation_sp2016_pair_rate_wp(
     if not wp.isfinite(relative_velocity):
         return zero
     rate = area * relative_velocity
-    if not wp.isfinite(rate) or rate <= zero:
+    if not wp.isfinite(rate) or rate <= zero or rate < _MIN_NORMAL_FLOAT64:
         return zero
     return rate
 

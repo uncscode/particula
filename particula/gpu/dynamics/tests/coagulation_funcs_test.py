@@ -438,11 +438,11 @@ def _settling_velocity_stokes_kernel(
         densities[tid],
         temperatures[tid],
         pressures[tid],
-        gas_constant[tid],
-        molecular_weight_air[tid],
-        ref_viscosity[tid],
-        ref_temperature[tid],
-        sutherland_constant[tid],
+        gas_constant,
+        molecular_weight_air,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
     )
 
 
@@ -1732,13 +1732,10 @@ def _launch_settling_velocity_stokes(
     densities: np.ndarray,
     temperatures: np.ndarray,
     pressures: np.ndarray,
-    constants: tuple[float, ...] | np.ndarray,
+    constants: tuple[float, float, float, float, float],
 ) -> np.ndarray:
     """Launch a lane-indexed Stokes/Cunningham settling probe."""
     result = wp.zeros(len(radii), dtype=wp.float64, device=device)
-    constant_values = np.broadcast_to(
-        np.asarray(constants, dtype=np.float64), (len(radii), 5)
-    )
     wp.launch(
         _settling_velocity_stokes_kernel,
         dim=len(radii),
@@ -1747,10 +1744,7 @@ def _launch_settling_velocity_stokes(
             _warp_array(densities, device),
             _warp_array(temperatures, device),
             _warp_array(pressures, device),
-            *(
-                _warp_array(constant_values[:, index], device)
-                for index in range(5)
-            ),
+            *(wp.float64(value) for value in constants),
         ],
         outputs=[result],
         device=device,
@@ -1836,14 +1830,47 @@ def test_effective_density_wp_invalid_or_overflow_returns_exact_zero(
             -np.inf,
             np.finfo(float).max,
             np.nextafter(0.0, 1.0),
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
         ],
         dtype=np.float64,
     )
     total_volumes = np.array(
-        [1.0, 1.0, 1.0, 1.0, 1.0, np.nextafter(0.0, 1.0), np.finfo(float).max],
+        [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            np.nextafter(0.0, 1.0),
+            np.finfo(float).max,
+            0.0,
+            -1.0,
+            np.nan,
+            np.inf,
+            -np.inf,
+        ],
         dtype=np.float64,
     )
     observed = _launch_effective_density(device, total_masses, total_volumes)
+    assert np.all(np.isfinite(observed))
+    assert np.all(observed == 0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_effective_density_wp_subnormal_result_returns_exact_zero(
+    device: str,
+) -> None:
+    """Return exact zero when a positive density result is subnormal."""
+    observed = _launch_effective_density(
+        device,
+        np.array([1.0e-320], dtype=np.float64),
+        np.array([1.0], dtype=np.float64),
+    )
     assert np.all(np.isfinite(observed))
     assert np.all(observed == 0.0)
 
@@ -1905,10 +1932,6 @@ def test_settling_velocity_stokes_wp_invalid_overflow_or_underflow_returns_exact
             case = list(base)
             case[index] = value
             cases.append((*case, *constants))
-        for index in range(5):
-            case_constants = constants.copy()
-            case_constants[index] = value
-            cases.append((*base, *case_constants))
     cases.extend(
         [
             (1.0e200, *base[1:], *constants),
@@ -1922,7 +1945,99 @@ def test_settling_velocity_stokes_wp_invalid_overflow_or_underflow_returns_exact
         values[:, 1],
         values[:, 2],
         values[:, 3],
-        values[:, 4:],
+        constants,
+    )
+    assert np.all(np.isfinite(observed))
+    assert np.all(observed == 0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("invalid_constant", "constant_name"),
+    [
+        (0.0, "gas_constant"),
+        (-1.0, "gas_constant"),
+        (np.nan, "gas_constant"),
+        (np.inf, "gas_constant"),
+        (-np.inf, "gas_constant"),
+        (0.0, "molecular_weight_air"),
+        (-1.0, "molecular_weight_air"),
+        (np.nan, "molecular_weight_air"),
+        (np.inf, "molecular_weight_air"),
+        (-np.inf, "molecular_weight_air"),
+        (0.0, "ref_viscosity"),
+        (-1.0, "ref_viscosity"),
+        (np.nan, "ref_viscosity"),
+        (np.inf, "ref_viscosity"),
+        (-np.inf, "ref_viscosity"),
+        (0.0, "ref_temperature"),
+        (-1.0, "ref_temperature"),
+        (np.nan, "ref_temperature"),
+        (np.inf, "ref_temperature"),
+        (-np.inf, "ref_temperature"),
+        (0.0, "sutherland_constant"),
+        (-1.0, "sutherland_constant"),
+        (np.nan, "sutherland_constant"),
+        (np.inf, "sutherland_constant"),
+        (-np.inf, "sutherland_constant"),
+    ],
+)
+def test_settling_velocity_stokes_wp_invalid_constants_return_exact_zero(
+    device: str,
+    invalid_constant: float,
+    constant_name: str,
+) -> None:
+    """Return exact zero when any scalar gas-property constant is invalid."""
+    constants = {
+        "gas_constant": GAS_CONSTANT,
+        "molecular_weight_air": MOLECULAR_WEIGHT_AIR,
+        "ref_viscosity": REF_VISCOSITY_AIR_STP,
+        "ref_temperature": REF_TEMPERATURE_STP,
+        "sutherland_constant": SUTHERLAND_CONSTANT,
+    }
+    constants[constant_name] = invalid_constant
+    observed = _launch_settling_velocity_stokes(
+        device,
+        np.array([1.0e-6], dtype=np.float64),
+        np.array([1000.0], dtype=np.float64),
+        np.array([298.15], dtype=np.float64),
+        np.array([101325.0], dtype=np.float64),
+        (
+            constants["gas_constant"],
+            constants["molecular_weight_air"],
+            constants["ref_viscosity"],
+            constants["ref_temperature"],
+            constants["sutherland_constant"],
+        ),
+    )
+    assert np.all(np.isfinite(observed))
+    assert np.all(observed == 0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_settling_velocity_stokes_wp_subnormal_result_returns_exact_zero(
+    device: str,
+) -> None:
+    """Return exact zero when a positive Stokes result is subnormal."""
+    constants = np.array(
+        [
+            GAS_CONSTANT,
+            MOLECULAR_WEIGHT_AIR,
+            REF_VISCOSITY_AIR_STP,
+            REF_TEMPERATURE_STP,
+            SUTHERLAND_CONSTANT,
+        ],
+        dtype=np.float64,
+    )
+    observed = _launch_settling_velocity_stokes(
+        device,
+        np.array([1.0e-6], dtype=np.float64),
+        np.array([1.0e-310], dtype=np.float64),
+        np.array([298.15], dtype=np.float64),
+        np.array([101325.0], dtype=np.float64),
+        tuple(constants.tolist()),
     )
     assert np.all(np.isfinite(observed))
     assert np.all(observed == 0.0)
@@ -1970,6 +2085,23 @@ def test_sedimentation_sp2016_pair_rate_wp_equal_velocity_returns_exact_zero(
         np.array([1.0e-5, 0.0], dtype=np.float64),
         np.array([1.0e-5, 0.0], dtype=np.float64),
     )
+    assert np.all(observed == 0.0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_sedimentation_sp2016_pair_rate_wp_subnormal_result_returns_exact_zero(
+    device: str,
+) -> None:
+    """Return exact zero when a positive SP2016 result is subnormal."""
+    observed = _launch_sedimentation_pair_rate(
+        device,
+        np.array([1.0e-154], dtype=np.float64),
+        np.array([1.0e-154], dtype=np.float64),
+        np.array([1.0e-10], dtype=np.float64),
+        np.array([0.0], dtype=np.float64),
+    )
+    assert np.all(np.isfinite(observed))
     assert np.all(observed == 0.0)
 
 
