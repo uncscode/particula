@@ -69,6 +69,7 @@ if wp is not None:
         CoagulationMechanismConfig,
         _bound_scheduled_trials,
         _charged_majorant_from_active_pairs,
+        _compact_applied_collision_pairs_kernel,
         _ensure_volume_array,
         _initialize_rng_states,
         _remove_active_pair_by_rank_swap_pop,
@@ -441,6 +442,52 @@ def test_combined_multibox_multispecies_conserves_mass_and_charge(
     )
 
 
+def test_combined_requested_orders_produce_equivalent_outcomes(
+    device: str,
+) -> None:
+    """Reversed combined configurations produce the same seeded outcome."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    particles.volume[:] = 1.0e-18
+    particles.masses[0] = [[1.0e-21, 2.0e-21], [3.0e-21, 4.0e-21]]
+    particles.charge[:] = [[2.0, -5.0]]
+    initial_mass = np.sum(particles.masses, axis=1)
+    initial_charge = np.sum(particles.charge, axis=1)
+    outcomes = []
+
+    for mechanisms in (
+        (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
+        (CHARGED_HARD_SPHERE_MECHANISM, BROWNIAN_MECHANISM),
+    ):
+        gpu_particles = to_warp_particle_data(particles.copy(), device=device)
+        pairs = wp.full((1, 1, 2), -7, dtype=wp.int32, device=device)
+        counts = wp.full((1,), -7, dtype=wp.int32, device=device)
+        states = wp.zeros((1,), dtype=wp.uint32, device=device)
+        result, _, _ = coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            max_collisions=1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
+        )
+        outcomes.append(
+            (pairs.numpy(), counts.numpy(), from_warp_particle_data(result))
+        )
+
+    first_pairs, first_counts, first_particles = outcomes[0]
+    second_pairs, second_counts, second_particles = outcomes[1]
+    npt.assert_array_equal(first_pairs, second_pairs)
+    npt.assert_array_equal(first_counts, second_counts)
+    npt.assert_array_equal(first_particles.masses, second_particles.masses)
+    npt.assert_array_equal(first_particles.charge, second_particles.charge)
+    npt.assert_allclose(np.sum(first_particles.masses, axis=1), initial_mass)
+    npt.assert_allclose(np.sum(first_particles.charge, axis=1), initial_charge)
+
+
 def test_charged_only_multispecies_total_mass_regression(
     device: str,
 ) -> None:
@@ -554,7 +601,6 @@ def test_charged_only_multispecies_total_mass_regression(
     npt.assert_allclose(dispatched, [expected_majorant], rtol=1.0e-11, atol=0.0)
 
     initial_collision_pairs = np.asarray(collision_pairs.numpy()).copy()
-    initial_collision_counts = np.asarray(collision_counts.numpy()).copy()
 
     result_particles, result_pairs, result_counts = coagulation_step_gpu(
         gpu_particles,
@@ -575,11 +621,10 @@ def test_charged_only_multispecies_total_mass_regression(
     assert result_pairs is collision_pairs
     assert result_counts is collision_counts
     npt.assert_array_equal(np.asarray(collision_counts.numpy()), np.array([0]))
+    # A successful no-op call writes the count but leaves unused pair slots
+    # caller-owned and unchanged.
     npt.assert_array_equal(
         np.asarray(collision_pairs.numpy()), initial_collision_pairs
-    )
-    npt.assert_array_equal(
-        np.asarray(collision_counts.numpy()), initial_collision_counts
     )
 
 
@@ -694,6 +739,38 @@ def test_charged_modes_reject_invalid_particle_physics_before_mutation(
     npt.assert_array_equal(pairs.numpy(), np.full((1, 1, 2), -7))
     npt.assert_array_equal(counts.numpy(), np.array([-7], dtype=np.int32))
     npt.assert_array_equal(states.numpy(), np.array([17], dtype=np.uint32))
+
+
+@pytest.mark.parametrize(
+    "mechanisms",
+    [
+        (CHARGED_HARD_SPHERE_MECHANISM,),
+        (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
+    ],
+)
+def test_charged_preflight_excludes_volume_underflow_slots(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    mechanisms: tuple[str, ...],
+) -> None:
+    """Selector-ineligible subnormal slots do not consume the charged cap."""
+    monkeypatch.setattr(
+        coagulation_module, "MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX", 2
+    )
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    particles.masses[0, :, 0] = [1.0e-21, 1.0e-21, np.nextafter(0.0, 1.0)]
+    gpu_particles = to_warp_particle_data(particles, device=device)
+
+    _, _, counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.0,
+        max_collisions=1,
+        mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
+    )
+
+    npt.assert_array_equal(counts.numpy(), np.array([0], dtype=np.int32))
 
 
 @pytest.mark.parametrize(
@@ -2630,6 +2707,12 @@ def _collect_test_local_attempt_diagnostics(
             collision_pairs,
             n_collisions,
         ],
+        device=device,
+    )
+    wp.launch(
+        _compact_applied_collision_pairs_kernel,
+        dim=1,
+        inputs=[collision_pairs, n_collisions],
         device=device,
     )
     wp.synchronize()
@@ -5638,6 +5721,12 @@ def test_apply_coagulation_kernel_skips_unrepresentable_charge_merge(
         inputs=[masses, concentration, charge, pairs, counts],
         device=device,
     )
+    wp.launch(
+        _compact_applied_collision_pairs_kernel,
+        dim=1,
+        inputs=[pairs, counts],
+        device=device,
+    )
     wp.synchronize()
 
     npt.assert_array_equal(np.asarray(masses.numpy()), [[[1.0], [2.0]]])
@@ -5645,6 +5734,8 @@ def test_apply_coagulation_kernel_skips_unrepresentable_charge_merge(
     result_charge = np.asarray(charge.numpy())
     npt.assert_array_equal(result_charge, [[maximum, maximum]])
     assert np.all(np.isfinite(result_charge))
+    npt.assert_array_equal(np.asarray(pairs.numpy()), [[[-1, -1]]])
+    npt.assert_array_equal(np.asarray(counts.numpy()), [0])
 
 
 def test_apply_coagulation_kernel_skips_overflowing_mass_merge(
@@ -5668,6 +5759,12 @@ def test_apply_coagulation_kernel_skips_overflowing_mass_merge(
         inputs=[masses, concentration, charge, pairs, counts],
         device=device,
     )
+    wp.launch(
+        _compact_applied_collision_pairs_kernel,
+        dim=1,
+        inputs=[pairs, counts],
+        device=device,
+    )
     wp.synchronize()
 
     result_masses = np.asarray(masses.numpy())
@@ -5675,7 +5772,8 @@ def test_apply_coagulation_kernel_skips_overflowing_mass_merge(
     assert np.all(np.isfinite(result_masses))
     npt.assert_array_equal(np.asarray(concentration.numpy()), [[1.0, 1.0]])
     npt.assert_array_equal(np.asarray(charge.numpy()), [[1.0, -1.0]])
-    npt.assert_array_equal(np.asarray(counts.numpy()), [1])
+    npt.assert_array_equal(np.asarray(pairs.numpy()), [[[-1, -1]]])
+    npt.assert_array_equal(np.asarray(counts.numpy()), [0])
 
 
 def test_apply_coagulation_kernel_skips_self_pair(device: str) -> None:
