@@ -437,12 +437,13 @@ def _total_majorant(  # noqa: PLR0913
     ref_temperature: Any,
     sutherland_constant: Any,
 ) -> Any:
-    """Accumulate enabled finite, positive pair-rate-majorant terms.
+    """Accumulate enabled finite, positive terms for private staged tests.
 
-    The result is the single safe majorant used to schedule and accept
-    candidates. Brownian retains its extrema-derived term; the approved charged
-    term uses an exhaustive compact-active scan. Other reserved bits contribute
-    no term.
+    This private dispatcher is a staged majorant/test foundation, not the
+    production scheduling path. Public candidate selection and acceptance
+    remain Brownian-only. Brownian retains its extrema-derived term; the
+    approved charged term uses an exhaustive compact-active scan. Other
+    reserved bits contribute no term.
     """
     total_majorant = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
