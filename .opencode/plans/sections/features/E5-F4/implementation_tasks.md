@@ -10,16 +10,16 @@
 - [x] Add a scalar SP2016 pair helper implementing
   `pi * (radius_i + radius_j)^2 * abs(velocity_i - velocity_j)` with no public
   collision-efficiency argument.
-- [ ] Extend E5-F1's particle-property preparation to calculate radius,
-  effective density, and settling velocity only when sedimentation is enabled.
-- [ ] Implement a safe active-pair sedimentation majorant as the exhaustive
-  maximum over `i < j`, including zero-rate and non-finite device guards.
-- [ ] Add sedimentation to E5-F1's shared mechanism mask, pair-rate dispatch,
-  total-majorant scheduling, and one-pass acceptance path.
-- [ ] Register only sedimentation-only execution in the capability matrix;
-  leave additive combinations reserved for E5-F6.
-- [ ] Preserve collision-pair/count buffer identity, persistent RNG semantics,
-  inactive slots, existing apply behavior, and the return tuple.
+- [x] Add private cleared settling-velocity scratch and calculate guarded
+  properties only for the exact private sedimentation-only mask.
+- [x] Implement a safe compact active-pair sedimentation majorant as the
+  exhaustive maximum over `i < j`, including zero-rate and non-finite guards.
+- [x] Add internal sedimentation pair-rate/majorant dispatch to the shared
+  bounded scheduler and one-pass acceptance/RNG path.
+- [x] Retain public capability-matrix rejection; private mixed sedimentation
+  masks return without scheduling or mutable-state access.
+- [x] Preserve collision-pair/count buffer identity, persistent RNG semantics,
+  inactive slots, and existing apply behavior in the private exact-mask path.
 - [ ] Ensure unsupported configuration or invalid density/environment/buffer
   requests fail before allocation, RNG initialization/advancement, output
   mutation, or particle mutation.
@@ -31,12 +31,10 @@
   `particula/gpu/dynamics/tests/coagulation_funcs_test.py`.
 - [x] Build expected values with independent NumPy equations; do not call the
   new Warp helper to produce expected results.
-- [ ] Add deterministic one-box and multi-box/multi-species parity fixtures,
-  including equal settling velocities and composition-dependent densities.
-- [ ] Add bounded repeated-run stochastic checks rather than exact CPU/Warp pair
-  replay.
-- [ ] Add species-mass conservation, donor clearing, inactive-slot, zero/one/
-  two-active, caller-buffer, persistent-RNG, and scheduled-trial-cap regressions.
+- [x] Add co-located private-dispatch coverage for the exhaustive majorant,
+  bounded scheduling/RNG behavior, scratch clearing, and mixed-mask no-op.
+- [ ] Add end-to-end multi-box conservation and broader state-safety evidence
+  required before any public capability expansion.
 - [ ] Snapshot all caller-owned state around invalid non-unit-efficiency,
   unsupported combination/distribution, shape, dtype, device, and domain cases.
 - [ ] Run focused Warp CPU tests when Warp is installed and optional CUDA tests
@@ -44,7 +42,7 @@
 
 ## Documentation
 
-- [ ] Update API docstrings and feature/roadmap documentation with the exact
-  equation, efficiency-1 rule, direct import, supported inputs/devices, and
-  exclusions.
+- [x] Update internal module/dispatcher/sampler documentation for the private
+  exact-mask boundary and scratch ownership; no user-facing documentation is
+  needed while public sedimentation remains rejected.
 - [ ] Mark E5-F4 phases and parent E5 dependencies accurately as work ships.

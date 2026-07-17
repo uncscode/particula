@@ -4,17 +4,18 @@
 
 ### Implemented P1 boundary
 
-`particula/gpu/dynamics/coagulation_funcs.py` now contains internal fp64 Warp
+`particula/gpu/dynamics/coagulation_funcs.py` contains internal fp64 Warp
 helpers for scalar effective mixture density, Stokes/Cunningham settling
 velocity, and the unit-efficiency SP2016 pair rate. They safely return zero for
-invalid, non-finite, overflowed, or underflowed scalar stages. P1 deliberately
-does not modify `particula/gpu/kernels/coagulation.py`: there is no public
-dispatch, mechanism registration, majorant, selector, or runnable API yet.
+invalid, non-finite, overflowed, or underflowed scalar stages. P2 imports those
+helpers into `particula/gpu/kernels/coagulation.py` for an internal exact-mask
+branch; it does not register public support, change capability validation, or
+add a runnable API.
 
 ```text
-coagulation_step_gpu(..., mechanisms=("sedimentation_sp2016",))
-  -> E5-F1 canonicalizes the mechanism mask and validates capability
-  -> validate particle-resolved fp64 state, environment, volume, buffers, RNG
+private direct sampler launch (exact sedimentation-only mask)
+  -> public `coagulation_step_gpu` still rejects sedimentation in preflight
+  -> private branch validates/prepares its existing fp64 sampler state
   -> derive each active particle on device
        total_mass = sum(species_mass)
        total_volume = sum(species_mass / species_density)
@@ -24,11 +25,10 @@ coagulation_step_gpu(..., mechanisms=("sedimentation_sp2016",))
        settling_velocity = 2*r^2*rho*g*C_c / (9*mu)
   -> sedimentation majorant = max(pair_rate(i, j)) for active i < j
        pair_rate = pi*(r_i+r_j)^2*abs(v_i-v_j)  # efficiency = 1
-  -> E5-F1 bounded active-pair loop
+   -> shared bounded active-pair loop
        accept once with pair_rate / majorant
        remove accepted active pair once; advance one RNG state
-  -> existing coagulation apply path mutates masses/concentration once
-  -> return existing particles/pairs/counts tuple
+   -> existing coagulation apply path mutates masses/concentration once
 ```
 
 The initial majorant deliberately scans every active unordered pair. The
@@ -40,10 +40,12 @@ by E5-F4.
 
 Sedimentation properties are derived in device code from caller-owned species
 masses and species densities. No per-particle density sidecar is added to
-`WarpParticleData`. Zero-concentration or non-positive-mass/volume slots remain
-inactive and contribute neither a property nor a pair. All caller-controlled
-invalidity is rejected in host preflight before allocations or launches that
-could mutate particles, output buffers, or RNG state.
+`WarpParticleData`; settling velocities are private call-local fp64 scratch and
+are cleared before eligibility work. Zero-concentration or non-positive-mass/
+volume slots remain inactive and contribute neither a property nor a pair. The
+public path rejects sedimentation in host preflight before allocation or
+mutation; private mixed sedimentation masks return without scheduling,
+collisions, mutation, or RNG advancement.
 
 ## Data / API / Workflow Changes
 
@@ -52,11 +54,11 @@ could mutate particles, output buffers, or RNG state.
   and pressure. Temporary radius, effective-density, settling-velocity, and
   active-index arrays remain step-local unless E5-F1 already defines reusable
   work storage.
-- **API Surface:** Expand E5-F1's concrete mechanism configuration capability
-  matrix to accept the canonical sedimentation-only configuration. Do not add a
-  separate public sedimentation step or collision-efficiency parameter.
-- **Kernel Interface:** P1 added focused scalar Warp helpers only. P2 will add
-  the sedimentation branch to the shared pair-rate/majorant dispatcher. The
+- **API Surface:** No public capability-matrix change. Public sedimentation
+  remains rejected; no separate public step or collision-efficiency parameter is
+  added.
+- **Kernel Interface:** P2 adds an internal sedimentation branch to the shared
+  pair-rate/majorant dispatcher and uses the existing scheduler/RNG path. The
   constant efficiency is encoded as 1, not accepted from caller input.
 - **Workflow Hooks:** E5-F4 depends on E5-F1, supplies its term and majorant to
   E5-F6, supplies fixtures to E5-F7, and supplies final support facts to E5-F9.
@@ -74,8 +76,9 @@ could mutate particles, output buffers, or RNG state.
   settling; binned/continuous-PDF distributions; high-level strategies or
   runnables; CPU fallback; hidden transfers/synchronization; dynamic slots;
   graph capture guarantees; adaptive stepping; exact CPU/Warp RNG replay.
-- Brownian-plus-sedimentation and larger combinations remain unavailable until
-  E5-F6 registers and validates them.
+- Brownian-plus-sedimentation and larger combinations remain unavailable.
+  Private mixed sedimentation masks intentionally do no work; E5-F6 owns any
+  future combination registration and validation.
 
 ## Security & Compliance
 

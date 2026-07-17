@@ -13,17 +13,19 @@
     radius/settling properties, symmetry, zero equal-velocity rate, batched
     invalid/overflow/underflow safe-zero behavior, Warp CPU, and optional CUDA.
 
-- [ ] **E5-F4-P2:** Add a safe sedimentation majorant and bounded mechanism dispatch with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E5-F4-P2:** Add a safe sedimentation majorant and bounded internal dispatch with unit tests
+  - Issue: #1348 | Size: S | Status: Complete
   - Goal: Compute the maximum sedimentation rate across all active unordered
     pairs and route the term through E5-F1's shared rate/majorant dispatcher
     without adding a second candidate or RNG pass.
   - Files: `particula/gpu/kernels/coagulation.py`,
-    `particula/gpu/dynamics/coagulation_funcs.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: exhaustive-majorant dominance, zero/one/two-active behavior,
-    equal-settling zero majorant, inactive slots, candidate acceptance bounds,
-    scheduled-trial cap, and deterministic RNG advancement.
+  - Delivered: exact sedimentation-only private dispatch through the shared
+    scheduler/RNG path, exhaustive compact active-pair majorant, and private
+    cleared settling-velocity scratch. Public preflight still rejects
+    sedimentation; mixed sedimentation masks are no-ops.
+  - Tests: co-located majorant, scheduler/RNG, scratch, and mixed-mask
+    state-preservation regressions.
 
 - [ ] **E5-F4-P3:** Integrate sedimentation execution with multi-box conservation and state-safety tests
   - Issue: TBD | Size: S | Status: Not Started

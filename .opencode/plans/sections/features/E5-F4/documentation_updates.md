@@ -1,9 +1,11 @@
 # Documentation Updates
 
-- Update `coagulation_step_gpu` and mechanism-configuration docstrings in
-  `particula/gpu/kernels/coagulation.py` with sedimentation-only configuration,
-  unit collision efficiency, environment inputs, return/ownership behavior,
-  and fail-before-mutation errors.
+- [x] Update internal module, dispatcher, and sampler documentation in
+  `particula/gpu/kernels/coagulation.py` with the private exact-mask boundary,
+  shared scheduler/RNG path, and cleared settling-velocity scratch ownership.
+- User-facing sedimentation documentation remains deferred to P4: P2
+  sedimentation execution is private and test-only, and public
+  `coagulation_step_gpu` configuration still rejects it.
 - Document the new scalar helpers in
   `particula/gpu/dynamics/coagulation_funcs.py` with the SP2016 and Stokes/slip
   equations, units, and citations.
