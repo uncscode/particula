@@ -1,9 +1,9 @@
 # Success Criteria
 
-- [ ] Independent fp64 fixtures show effective density, Stokes/slip settling
+- [x] Independent fp64 fixtures show effective density, Stokes/slip settling
   velocity, and SP2016 pair-rate agreement on Warp CPU within declared
   tolerances.
-- [ ] The device pair equation is
+- [x] The device pair equation is
   `pi * (r_i + r_j)^2 * abs(v_i - v_j)` and exposes no way to request collision
   efficiency other than 1.
 - [ ] Every finite active-pair sedimentation rate is non-negative and no greater

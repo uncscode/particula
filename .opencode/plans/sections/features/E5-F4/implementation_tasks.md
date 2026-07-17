@@ -2,12 +2,12 @@
 
 ## GPU Physics and Orchestration
 
-- [ ] Add an effective-density helper to
+- [x] Add an effective-density helper to
   `particula/gpu/dynamics/coagulation_funcs.py` using total mass divided by
   composition volume; define guards for non-positive inputs.
-- [ ] Add a Stokes settling helper using the existing fp64 viscosity, mean-free-
+- [x] Add a Stokes settling helper using the existing fp64 viscosity, mean-free-
   path, Knudsen, and Cunningham-slip helpers plus `STANDARD_GRAVITY`.
-- [ ] Add a scalar SP2016 pair helper implementing
+- [x] Add a scalar SP2016 pair helper implementing
   `pi * (radius_i + radius_j)^2 * abs(velocity_i - velocity_j)` with no public
   collision-efficiency argument.
 - [ ] Extend E5-F1's particle-property preparation to calculate radius,
@@ -26,10 +26,10 @@
 
 ## Tooling / Tests
 
-- [ ] Add probe-kernel tests for effective density, settling velocity, SP2016
-  pair rate, and majorant in
-  `particula/gpu/kernels/tests/coagulation_test.py`.
-- [ ] Build expected values independently with NumPy and CPU public formulas;
+- [x] Add probe-kernel tests for effective density, settling velocity, and
+  SP2016 pair rate in
+  `particula/gpu/dynamics/tests/coagulation_funcs_test.py`.
+- [x] Build expected values independently with NumPy and CPU public formulas;
   do not call the new Warp helper to produce expected results.
 - [ ] Add deterministic one-box and multi-box/multi-species parity fixtures,
   including equal settling velocities and composition-dependent densities.

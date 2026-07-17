@@ -1,6 +1,9 @@
-"""Warp GPU Brownian and internal charged-coagulation functions.
+"""Warp device functions for Brownian, sedimentation, and charged coagulation.
 
 The Brownian helpers mirror ``particula.dynamics.coagulation.brownian_kernel``.
+The internal sedimentation helpers calculate mixture effective density, Stokes
+settling velocity with Cunningham slip, and the unit-efficiency SP2016 pair
+rate using fp64 scalar device inputs.
 The concrete-module-only charged hard-sphere helper supports the low-level,
 charged-only and canonical Brownian-plus-charged particle-resolved GPU paths.
 It does not add public exports or higher-level charged coagulation APIs.
@@ -34,17 +37,19 @@ def effective_density_wp(
     total_mass: wp.float64,
     total_volume: wp.float64,
 ) -> wp.float64:
-    """Calculate an effective mixture density from scalar SI totals.
+    """Calculate an fp64 effective mixture density from scalar SI totals.
 
-    Callers provide total mass [kg] and total component volume [m³]. Invalid,
-    non-positive, or overflowed values return exact safe zero.
+    This device-only final stage expects callers to sum component mass [kg] and
+    volume [m³] before invocation. It returns exact ``0.0`` when an input or
+    the quotient is non-finite, non-positive, or underflowed.
 
     Args:
         total_mass: Total particle mass [kg].
         total_volume: Total particle volume [m³].
 
     Returns:
-        Effective density [kg/m³], or exact ``0.0`` for invalid inputs.
+        Effective mixture density [kg/m³], or exact safe zero for an invalid
+        calculation.
     """
     zero = wp.float64(0.0)
     if (
@@ -72,11 +77,14 @@ def settling_velocity_stokes_wp(
     ref_temperature: wp.float64,
     sutherland_constant: wp.float64,
 ) -> wp.float64:
-    """Calculate Stokes settling velocity with Cunningham slip in SI units.
+    """Calculate fp64 Stokes settling velocity with Cunningham slip.
 
-    Gas viscosity, molecular mean free path, Knudsen number, and Cunningham
-    slip are derived once from the supplied gas state. Invalid, non-positive,
-    underflowed, or overflowed inputs and intermediates return exact safe zero.
+    This device-only helper derives gas viscosity, molecular mean free path,
+    Knudsen number, and Cunningham slip once from the supplied SI gas state.
+    It applies ``v = 2 r² ρ C_c g / (9 μ)`` with standard gravity and no
+    fluid-density or non-Stokes drag correction. Non-finite, non-positive,
+    underflowed, or overflowed inputs, intermediates, and results return exact
+    ``0.0``.
 
     Args:
         particle_radius: Particle radius [m].
@@ -91,6 +99,10 @@ def settling_velocity_stokes_wp(
 
     Returns:
         Settling velocity [m/s], or exact ``0.0`` for an invalid calculation.
+
+    References:
+        Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry and
+        Physics* (3rd ed.). John Wiley & Sons.
     """
     zero = wp.float64(0.0)
     if (
@@ -165,10 +177,12 @@ def sedimentation_sp2016_pair_rate_wp(
     velocity_i: wp.float64,
     velocity_j: wp.float64,
 ) -> wp.float64:
-    """Calculate the SP2016 Eq. 13A.4 sedimentation pair rate in SI units.
+    """Calculate the fp64 SP2016 Eq. 13A.4 sedimentation pair rate.
 
-    This unit-efficiency rate is ``pi * (r_i + r_j)² * abs(v_i - v_j)``.
-    Invalid, negative, underflowed, or overflowed values return exact safe zero.
+    This device-only helper applies unit collision efficiency to
+    ``K = π (r_i + r_j)² |v_i - v_j|``. Non-finite or negative inputs and
+    non-finite, overflowed, or underflowed intermediates and results return
+    exact ``0.0``. Equal finite velocities also return exact ``0.0``.
 
     Args:
         radius_i: Particle i radius [m].
@@ -177,7 +191,8 @@ def sedimentation_sp2016_pair_rate_wp(
         velocity_j: Particle j settling velocity [m/s].
 
     Returns:
-        Sedimentation pair rate [m³/s], or exact ``0.0`` for invalid inputs.
+        Sedimentation pair rate [m³/s], or exact safe zero for an invalid or
+        zero-rate calculation.
 
     References:
         Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry and

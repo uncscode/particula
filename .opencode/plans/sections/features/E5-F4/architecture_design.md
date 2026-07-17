@@ -2,6 +2,15 @@
 
 ## High-Level Design
 
+### Implemented P1 boundary
+
+`particula/gpu/dynamics/coagulation_funcs.py` now contains internal fp64 Warp
+helpers for scalar effective mixture density, Stokes/Cunningham settling
+velocity, and the unit-efficiency SP2016 pair rate. They safely return zero for
+invalid, non-finite, overflowed, or underflowed scalar stages. P1 deliberately
+does not modify `particula/gpu/kernels/coagulation.py`: there is no public
+dispatch, mechanism registration, majorant, selector, or runnable API yet.
+
 ```text
 coagulation_step_gpu(..., mechanisms=("sedimentation",))
   -> E5-F1 canonicalizes the mechanism mask and validates capability
@@ -46,9 +55,9 @@ could mutate particles, output buffers, or RNG state.
 - **API Surface:** Expand E5-F1's concrete mechanism configuration capability
   matrix to accept the canonical sedimentation-only configuration. Do not add a
   separate public sedimentation step or collision-efficiency parameter.
-- **Kernel Interface:** Add focused scalar Warp helpers and a sedimentation
-  branch to the shared pair-rate/majorant dispatcher. The constant efficiency
-  is encoded as 1, not accepted from caller input.
+- **Kernel Interface:** P1 added focused scalar Warp helpers only. P2 will add
+  the sedimentation branch to the shared pair-rate/majorant dispatcher. The
+  constant efficiency is encoded as 1, not accepted from caller input.
 - **Workflow Hooks:** E5-F4 depends on E5-F1, supplies its term and majorant to
   E5-F6, supplies fixtures to E5-F7, and supplies final support facts to E5-F9.
 - **Compatibility:** Omitted mechanism configuration retains E5-F1's legacy
