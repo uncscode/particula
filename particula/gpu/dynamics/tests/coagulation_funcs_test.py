@@ -29,6 +29,7 @@ if wp is not None:
     from particula.gpu.dynamics.coagulation_funcs import (  # noqa: E402
         brownian_diffusivity_wp,
         brownian_kernel_pair_wp,
+        charged_hard_sphere_wp,
         coulomb_continuum_limit_wp,
         coulomb_kinetic_limit_wp,
         coulomb_potential_ratio_wp,
@@ -353,6 +354,48 @@ def _diffusive_knudsen_number_kernel(
     )
 
 
+@_warp_kernel
+def _charged_hard_sphere_kernel(
+    radii_i: Any,
+    radii_j: Any,
+    masses_i: Any,
+    masses_j: Any,
+    charges_i: Any,
+    charges_j: Any,
+    temperatures: Any,
+    pressures: Any,
+    boltzmann_constant: Any,
+    elementary_charge_value: Any,
+    electric_permittivity: Any,
+    gas_constant: Any,
+    molecular_weight_air: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
+    result: Any,
+) -> None:
+    """Compute charged hard-sphere pair rates for a scalar probe batch."""
+    tid = wp.tid()
+    result[tid] = charged_hard_sphere_wp(
+        radii_i[tid],
+        radii_j[tid],
+        masses_i[tid],
+        masses_j[tid],
+        charges_i[tid],
+        charges_j[tid],
+        temperatures[tid],
+        pressures[tid],
+        boltzmann_constant,
+        elementary_charge_value,
+        electric_permittivity,
+        gas_constant,
+        molecular_weight_air,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+    )
+
+
 @pytest.fixture(params=_available_warp_devices())
 def device(request) -> str:
     """Provide available Warp devices for testing."""
@@ -431,6 +474,150 @@ def _diffusive_knudsen_number_oracle(
     return float(numerator / denominator)
 
 
+def _charged_hard_sphere_oracle(  # noqa: C901
+    radius_i: float,
+    radius_j: float,
+    mass_i: float,
+    mass_j: float,
+    charge_i: float,
+    charge_j: float,
+    temperature: float,
+    pressure: float,
+    boltzmann_constant: float = BOLTZMANN_CONSTANT,
+    elementary_charge_value: float = ELEMENTARY_CHARGE_VALUE,
+    electric_permittivity: float = ELECTRIC_PERMITTIVITY,
+    gas_constant: float = GAS_CONSTANT,
+    molecular_weight_air: float = MOLECULAR_WEIGHT_AIR,
+    ref_viscosity: float = REF_VISCOSITY_AIR_STP,
+    ref_temperature: float = REF_TEMPERATURE_STP,
+    sutherland_constant: float = SUTHERLAND_CONSTANT,
+) -> float:
+    """Independently compute the charged hard-sphere safe-zero contract."""
+    positive_values = (
+        radius_i,
+        radius_j,
+        mass_i,
+        mass_j,
+        temperature,
+        pressure,
+        boltzmann_constant,
+        elementary_charge_value,
+        electric_permittivity,
+        gas_constant,
+        molecular_weight_air,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+    )
+    if (
+        not all(np.isfinite(value) and value > 0.0 for value in positive_values)
+        or not np.isfinite(charge_i)
+        or not np.isfinite(charge_j)
+    ):
+        return 0.0
+    with np.errstate(all="ignore"):
+        viscosity = (
+            ref_viscosity
+            * (temperature / ref_temperature) ** 1.5
+            * (ref_temperature + sutherland_constant)
+            / (temperature + sutherland_constant)
+        )
+        mean_free_path = (2.0 * viscosity / pressure) / np.sqrt(
+            8.0 * molecular_weight_air / (np.pi * gas_constant * temperature)
+        )
+        if not np.isfinite(viscosity) or viscosity <= 0.0:
+            return 0.0
+        if not np.isfinite(mean_free_path) or mean_free_path <= 0.0:
+            return 0.0
+        knudsen_i = mean_free_path / radius_i
+        knudsen_j = mean_free_path / radius_j
+        if (
+            not np.isfinite(knudsen_i)
+            or knudsen_i <= 0.0
+            or not np.isfinite(knudsen_j)
+            or knudsen_j <= 0.0
+        ):
+            return 0.0
+        slip_i = 1.0 + knudsen_i * (1.257 + 0.4 * np.exp(-1.1 / knudsen_i))
+        slip_j = 1.0 + knudsen_j * (1.257 + 0.4 * np.exp(-1.1 / knudsen_j))
+        friction_i = 6.0 * np.pi * viscosity * radius_i / slip_i
+        friction_j = 6.0 * np.pi * viscosity * radius_j / slip_j
+        if (
+            not np.isfinite(slip_i)
+            or slip_i <= 0.0
+            or not np.isfinite(slip_j)
+            or slip_j <= 0.0
+            or not np.isfinite(friction_i)
+            or friction_i <= 0.0
+            or not np.isfinite(friction_j)
+            or friction_j <= 0.0
+        ):
+            return 0.0
+        sum_radius = radius_i + radius_j
+        potential = -(
+            charge_i
+            * charge_j
+            * elementary_charge_value**2
+            / (
+                4.0
+                * np.pi
+                * electric_permittivity
+                * sum_radius
+                * boltzmann_constant
+                * temperature
+            )
+        )
+        potential = max(potential, -200.0)
+        if not np.isfinite(potential):
+            return 0.0
+        reduced_mass = mass_i * mass_j / (mass_i + mass_j)
+        reduced_friction = friction_i * friction_j / (friction_i + friction_j)
+        if (
+            not np.isfinite(reduced_mass)
+            or reduced_mass <= 0.0
+            or not np.isfinite(reduced_friction)
+            or reduced_friction <= 0.0
+        ):
+            return 0.0
+        kinetic = 1.0 + potential if potential >= 0.0 else np.exp(potential)
+        if not np.isfinite(kinetic) or kinetic < 1.0e-80:
+            return 0.0
+        continuum = (
+            1.0 if potential == 0.0 else potential / -np.expm1(-potential)
+        )
+        if not np.isfinite(continuum) or continuum <= 0.0:
+            return 0.0
+        diffusive_knudsen = (
+            np.sqrt(boltzmann_constant * temperature * reduced_mass)
+            / reduced_friction
+            / (sum_radius * continuum / kinetic)
+        )
+        if not np.isfinite(diffusive_knudsen) or diffusive_knudsen < 0.0:
+            return 0.0
+        numerator = (
+            4.0 * np.pi * diffusive_knudsen**2
+            + 25.836 * diffusive_knudsen**3
+            + np.sqrt(8.0 * np.pi) * 11.211 * diffusive_knudsen**4
+        )
+        denominator = (
+            1.0
+            + 3.502 * diffusive_knudsen
+            + 7.211 * diffusive_knudsen**2
+            + 11.211 * diffusive_knudsen**3
+        )
+        dimensionless = numerator / denominator
+        result = (
+            dimensionless
+            * reduced_friction
+            * sum_radius**3
+            * kinetic**2
+            / (reduced_mass * continuum)
+        )
+    if not np.isfinite(result) or result <= 0.0:
+        return 0.0
+    return float(result)
+
+
 def _warp_array(values: np.ndarray, device: str) -> Any:
     """Create a float64 Warp array for a scalar parity probe."""
     return wp.array(values, dtype=wp.float64, device=device)
@@ -455,6 +642,41 @@ def _assert_casewise_allclose(
             atol=atol,
             err_msg=f"case {case_index}: {case_name}",
         )
+
+
+def _launch_charged_hard_sphere(
+    device: str,
+    radii_i: np.ndarray,
+    radii_j: np.ndarray,
+    masses_i: np.ndarray,
+    masses_j: np.ndarray,
+    charges_i: np.ndarray,
+    charges_j: np.ndarray,
+    temperatures: np.ndarray,
+    pressures: np.ndarray,
+    constants: tuple[float, float, float, float, float, float, float, float],
+) -> np.ndarray:
+    """Launch the charged scalar probe and return its fp64 host result."""
+    result = wp.zeros(len(radii_i), dtype=wp.float64, device=device)
+    wp.launch(
+        _charged_hard_sphere_kernel,
+        dim=len(radii_i),
+        inputs=[
+            _warp_array(radii_i, device),
+            _warp_array(radii_j, device),
+            _warp_array(masses_i, device),
+            _warp_array(masses_j, device),
+            _warp_array(charges_i, device),
+            _warp_array(charges_j, device),
+            _warp_array(temperatures, device),
+            _warp_array(pressures, device),
+            *(wp.float64(value) for value in constants),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    return result.numpy()
 
 
 @pytest.mark.gpu_parity
@@ -737,6 +959,196 @@ def test_diffusive_knudsen_number_wp_matches_independent_oracle(
     assert observed[0] > 0.0
     assert observed[1] > 0.0
     npt.assert_array_equal(observed[2:], np.zeros(8, dtype=np.float64))
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.warp
+def test_charged_hard_sphere_wp_matches_independent_oracle_and_symmetry(
+    device: str,
+) -> None:
+    """Validate charged fp64 parity, neutral behavior, and pair symmetry."""
+    radii_i = np.array([1e-9, 8e-9, 3e-8, 2e-7, 1e-8], dtype=np.float64)
+    radii_j = np.array([2e-9, 2e-8, 8e-9, 8e-7, 2e-8], dtype=np.float64)
+    masses_i = np.array([1e-24, 3e-21, 2e-19, 8e-15, 1e-20], dtype=np.float64)
+    masses_j = np.array([8e-24, 2e-20, 7e-21, 3e-13, 2e-20], dtype=np.float64)
+    charges_i = np.array([0.0, 1.0, 2.0, -3.0, 100.0], dtype=np.float64)
+    charges_j = np.array([0.0, 1.0, -1.0, 4.0, 100.0], dtype=np.float64)
+    temperatures = np.array(
+        [250.0, 298.15, 320.0, 285.0, 298.15], dtype=np.float64
+    )
+    pressures = np.array(
+        [80000.0, 101325.0, 95000.0, 110000.0, 101325.0], dtype=np.float64
+    )
+    constants = (
+        np.float64(BOLTZMANN_CONSTANT),
+        np.float64(ELEMENTARY_CHARGE_VALUE),
+        np.float64(ELECTRIC_PERMITTIVITY),
+        np.float64(GAS_CONSTANT),
+        np.float64(MOLECULAR_WEIGHT_AIR),
+        np.float64(REF_VISCOSITY_AIR_STP),
+        np.float64(REF_TEMPERATURE_STP),
+        np.float64(SUTHERLAND_CONSTANT),
+    )
+    expected = np.array(
+        [
+            _charged_hard_sphere_oracle(*values, *constants)
+            for values in zip(
+                radii_i,
+                radii_j,
+                masses_i,
+                masses_j,
+                charges_i,
+                charges_j,
+                temperatures,
+                pressures,
+                strict=True,
+            )
+        ],
+        dtype=np.float64,
+    )
+    observed = _launch_charged_hard_sphere(
+        device,
+        radii_i,
+        radii_j,
+        masses_i,
+        masses_j,
+        charges_i,
+        charges_j,
+        temperatures,
+        pressures,
+        constants,
+    )
+    assert observed.dtype == np.float64
+    _assert_casewise_allclose(
+        observed,
+        expected,
+        (
+            "neutral_nanometer",
+            "same_sign_repulsion",
+            "opposite_sign_attraction",
+            "mixed_scale_attraction",
+            "repulsion_floor",
+        ),
+        rtol=1e-6,
+        atol=0.0,
+    )
+    assert np.all(np.isfinite(observed))
+    assert np.all(observed >= 0.0)
+    assert observed[4] == 0.0
+    assert expected[4] == 0.0
+    assert observed[0] > 0.0
+
+    swapped = _launch_charged_hard_sphere(
+        device,
+        radii_j,
+        radii_i,
+        masses_j,
+        masses_i,
+        charges_j,
+        charges_i,
+        temperatures,
+        pressures,
+        constants,
+    )
+    npt.assert_allclose(swapped, observed, rtol=1e-6, atol=0.0)
+
+
+_SAFE_ZERO_CASES = (
+    *(
+        (field, value)
+        for field in (
+            "radius_i",
+            "radius_j",
+            "mass_i",
+            "mass_j",
+            "temperature",
+            "pressure",
+        )
+        for value in (0.0, -1.0)
+    ),
+    *(
+        (field, value)
+        for field in (
+            "radius_i",
+            "radius_j",
+            "mass_i",
+            "mass_j",
+            "charge_i",
+            "charge_j",
+            "temperature",
+            "pressure",
+        )
+        for value in (np.nan, np.inf, -np.inf)
+    ),
+    *(
+        (field, value)
+        for field in (
+            "boltzmann_constant",
+            "elementary_charge_value",
+            "electric_permittivity",
+            "gas_constant",
+            "molecular_weight_air",
+            "ref_viscosity",
+            "ref_temperature",
+            "sutherland_constant",
+        )
+        for value in (np.nan, np.inf, -np.inf, 0.0, -1.0)
+    ),
+)
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.warp
+@pytest.mark.parametrize(("invalid_field", "invalid_value"), _SAFE_ZERO_CASES)
+def test_charged_hard_sphere_wp_returns_safe_zero_for_invalid_inputs(
+    device: str,
+    invalid_field: str,
+    invalid_value: float,
+) -> None:
+    """Verify every documented invalid scalar domain returns exact zero."""
+    state = {
+        "radius_i": np.float64(1e-8),
+        "radius_j": np.float64(2e-8),
+        "mass_i": np.float64(1e-20),
+        "mass_j": np.float64(2e-20),
+        "charge_i": np.float64(1.0),
+        "charge_j": np.float64(-1.0),
+        "temperature": np.float64(298.15),
+        "pressure": np.float64(101325.0),
+    }
+    constants = {
+        "boltzmann_constant": np.float64(BOLTZMANN_CONSTANT),
+        "elementary_charge_value": np.float64(ELEMENTARY_CHARGE_VALUE),
+        "electric_permittivity": np.float64(ELECTRIC_PERMITTIVITY),
+        "gas_constant": np.float64(GAS_CONSTANT),
+        "molecular_weight_air": np.float64(MOLECULAR_WEIGHT_AIR),
+        "ref_viscosity": np.float64(REF_VISCOSITY_AIR_STP),
+        "ref_temperature": np.float64(REF_TEMPERATURE_STP),
+        "sutherland_constant": np.float64(SUTHERLAND_CONSTANT),
+    }
+    if invalid_field in state:
+        state[invalid_field] = np.float64(invalid_value)
+    else:
+        constants[invalid_field] = np.float64(invalid_value)
+    constant_values = tuple(constants.values())
+    observed = _launch_charged_hard_sphere(
+        device,
+        np.array([state["radius_i"]], dtype=np.float64),
+        np.array([state["radius_j"]], dtype=np.float64),
+        np.array([state["mass_i"]], dtype=np.float64),
+        np.array([state["mass_j"]], dtype=np.float64),
+        np.array([state["charge_i"]], dtype=np.float64),
+        np.array([state["charge_j"]], dtype=np.float64),
+        np.array([state["temperature"]], dtype=np.float64),
+        np.array([state["pressure"]], dtype=np.float64),
+        constant_values,
+    )
+    expected = _charged_hard_sphere_oracle(
+        *state.values(),
+        *constant_values,
+    )
+    assert observed[0] == 0.0
+    assert expected == 0.0
 
 
 def test_brownian_diffusivity_wp_matches_numpy(device: str) -> None:
