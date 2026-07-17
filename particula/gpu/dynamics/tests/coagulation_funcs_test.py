@@ -654,7 +654,7 @@ def _launch_charged_hard_sphere(
     charges_j: np.ndarray,
     temperatures: np.ndarray,
     pressures: np.ndarray,
-    constants: tuple[float, float, float, float, float, float, float, float],
+    constants: tuple[float, ...],
 ) -> np.ndarray:
     """Launch the charged scalar probe and return its fp64 host result."""
     result = wp.zeros(len(radii_i), dtype=wp.float64, device=device)
@@ -804,7 +804,10 @@ def test_reduced_value_wp_matches_independent_oracle(device: str) -> None:
 @pytest.mark.gpu_parity
 def test_coulomb_limit_helpers_wp_match_independent_oracle(device: str) -> None:
     """Validate neutral, attractive, and repulsive Coulomb enhancements."""
-    potential = np.array([0.0, 2.0, -2.0, -200.0], dtype=np.float64)
+    potential = np.array(
+        [0.0, 1.0e-8, -1.0e-8, 2.0, -2.0, -200.0],
+        dtype=np.float64,
+    )
     kinetic_expected = np.array(
         [_kinetic_limit_oracle(value) for value in potential], dtype=np.float64
     )
@@ -836,6 +839,8 @@ def test_coulomb_limit_helpers_wp_match_independent_oracle(device: str) -> None:
     assert continuum_observed.dtype == np.float64
     case_names = (
         "neutral",
+        "near_neutral_attraction",
+        "near_neutral_repulsion",
         "attraction",
         "repulsion",
         "extreme_repulsion",
@@ -860,6 +865,8 @@ def test_coulomb_limit_helpers_wp_match_independent_oracle(device: str) -> None:
     assert np.all(np.isfinite(continuum_observed))
     assert np.all(kinetic_observed >= 0.0)
     assert np.all(continuum_observed >= 0.0)
+    assert continuum_observed[1] > 1.0
+    assert continuum_observed[2] < 1.0
 
 
 @pytest.mark.gpu_parity
@@ -979,7 +986,7 @@ def test_charged_hard_sphere_wp_matches_independent_oracle_and_symmetry(
     pressures = np.array(
         [80000.0, 101325.0, 95000.0, 110000.0, 101325.0], dtype=np.float64
     )
-    constants = (
+    constants: tuple[float, float, float, float, float, float, float, float] = (
         np.float64(BOLTZMANN_CONSTANT),
         np.float64(ELEMENTARY_CHARGE_VALUE),
         np.float64(ELECTRIC_PERMITTIVITY),
@@ -1051,6 +1058,71 @@ def test_charged_hard_sphere_wp_matches_independent_oracle_and_symmetry(
         constants,
     )
     npt.assert_allclose(swapped, observed, rtol=1e-6, atol=0.0)
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.warp
+def test_charged_hard_sphere_wp_handles_extreme_charge_lanes(
+    device: str,
+) -> None:
+    """Keep finite overflow-prone charge lanes at exact safe zero."""
+    radii_i = np.full(3, 1e-8, dtype=np.float64)
+    radii_j = np.full(3, 2e-8, dtype=np.float64)
+    masses_i = np.full(3, 1e-20, dtype=np.float64)
+    masses_j = np.full(3, 2e-20, dtype=np.float64)
+    charges_i = np.array([1.0, 1e200, -1e200], dtype=np.float64)
+    charges_j = np.array([-1.0, 1e200, 1e200], dtype=np.float64)
+    temperatures = np.full(3, 298.15, dtype=np.float64)
+    pressures = np.full(3, 101325.0, dtype=np.float64)
+    constants: tuple[float, float, float, float, float, float, float, float] = (
+        np.float64(BOLTZMANN_CONSTANT),
+        np.float64(ELEMENTARY_CHARGE_VALUE),
+        np.float64(ELECTRIC_PERMITTIVITY),
+        np.float64(GAS_CONSTANT),
+        np.float64(MOLECULAR_WEIGHT_AIR),
+        np.float64(REF_VISCOSITY_AIR_STP),
+        np.float64(REF_TEMPERATURE_STP),
+        np.float64(SUTHERLAND_CONSTANT),
+    )
+    expected = np.array(
+        [
+            _charged_hard_sphere_oracle(*values, *constants)
+            for values in zip(
+                radii_i,
+                radii_j,
+                masses_i,
+                masses_j,
+                charges_i,
+                charges_j,
+                temperatures,
+                pressures,
+                strict=True,
+            )
+        ],
+        dtype=np.float64,
+    )
+    observed = _launch_charged_hard_sphere(
+        device,
+        radii_i,
+        radii_j,
+        masses_i,
+        masses_j,
+        charges_i,
+        charges_j,
+        temperatures,
+        pressures,
+        constants,
+    )
+    _assert_casewise_allclose(
+        observed,
+        expected,
+        ("valid", "overflowing_repulsion", "overflowing_attraction"),
+        rtol=1e-12,
+        atol=0.0,
+    )
+    assert observed[0] > 0.0
+    npt.assert_array_equal(observed[1:], np.zeros(2, dtype=np.float64))
+    npt.assert_array_equal(expected[1:], np.zeros(2, dtype=np.float64))
 
 
 _SAFE_ZERO_CASES = (
@@ -1130,7 +1202,18 @@ def test_charged_hard_sphere_wp_returns_safe_zero_for_invalid_inputs(
         state[invalid_field] = np.float64(invalid_value)
     else:
         constants[invalid_field] = np.float64(invalid_value)
-    constant_values = tuple(constants.values())
+    constant_values: tuple[
+        float, float, float, float, float, float, float, float
+    ] = (
+        constants["boltzmann_constant"],
+        constants["elementary_charge_value"],
+        constants["electric_permittivity"],
+        constants["gas_constant"],
+        constants["molecular_weight_air"],
+        constants["ref_viscosity"],
+        constants["ref_temperature"],
+        constants["sutherland_constant"],
+    )
     observed = _launch_charged_hard_sphere(
         device,
         np.array([state["radius_i"]], dtype=np.float64),
