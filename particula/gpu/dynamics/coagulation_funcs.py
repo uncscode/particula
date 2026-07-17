@@ -154,7 +154,7 @@ def coulomb_potential_ratio_wp(
 
     Computes ``-(q_i * q_j * e**2) / (4 * pi * epsilon_0 * (r_i + r_j)
     * k_B * T)``. A non-positive radius sum or temperature safely returns
-    ``0.0``. Otherwise, the result is lower-clipped at ``-200.0``.
+    ``0.0``. Repulsion is lower-clipped at ``-200.0``.
 
     Args:
         radius_i: Particle i radius in meters.
@@ -181,19 +181,15 @@ def coulomb_potential_ratio_wp(
         return wp.float64(0.0)
 
     pi_value = wp.float64(3.141592653589793)
-    potential_ratio = (
-        -charge_i
-        * charge_j
-        * elementary_charge_value
-        * elementary_charge_value
-        / (
-            wp.float64(4.0)
-            * pi_value
-            * electric_permittivity
-            * sum_radius
-            * boltzmann_constant
-            * temperature
-        )
+    potential_ratio = -(
+        charge_i * charge_j * elementary_charge_value * elementary_charge_value
+    ) / (
+        wp.float64(4.0)
+        * pi_value
+        * electric_permittivity
+        * sum_radius
+        * boltzmann_constant
+        * temperature
     )
     return wp.max(potential_ratio, wp.float64(-200.0))
 
