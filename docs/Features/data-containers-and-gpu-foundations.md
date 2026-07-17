@@ -216,22 +216,15 @@ state.
 For direct GPU coagulation, `WarpParticleData.charge` is caller-owned,
 device-resident particle state, not a sidecar or hidden transfer result. It
 must be a same-device `wp.float64` array matching shape
-`(n_boxes, n_particles)`. Shape, dtype, and device are validated without a
-device-to-host readback. Callers that require host-visible rejection of NaN or
-infinite values must pass `validate_charge_finite=True`; that explicit debug
-validation allocates a private status scalar, runs a read-only device scan, and
-synchronizes before reading the result. The default step path performs no such
-scan, synchronization, or host readback, so persistent-state loops and graph
-capture remain caller-controlled.
+`(n_boxes, n_particles)`. Charged-containing execution scans charge for finite
+values before caller-output validation/allocation, RNG setup, or selector/apply
+work. Brownian-only execution scans it only with `validate_charge_finite=True`.
 
 When a collision is accepted, the recipient receives the donor charge and the
 donor charge is cleared together with donor mass and concentration. Supported
 evidence conserves charge independently in each box. This merge bookkeeping
 skips a collision whose finite charge sum cannot be represented as finite
 `float64`, leaving both particles unchanged rather than producing infinity.
-This merge bookkeeping
-does not make charged selection, charged majorants, Brownian-plus-charged
-execution, or public charged stochastic execution available.
 
 ### GPU coagulation configuration and sidecar ownership
 
@@ -260,25 +253,30 @@ Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 | Identifier | Status | Owner |
 | --- | --- | --- |
 | `brownian` | Executable with `particle_resolved` only | Shipped E5-F1 baseline |
-| `charged_hard_sphere` | Reserved; rejected in capability preflight | E5-F3 |
+| `charged_hard_sphere` | Executable alone or with Brownian, particle-resolved only | Shipped E5-F3 |
 | `sedimentation_sp2016` | Reserved; rejected in capability preflight | E5-F4 |
 | `turbulent_shear_st1956` | Reserved; rejected in capability preflight | E5-F5 |
 
-Structural recognition is not executability. Any reserved ID, including a
-Brownian-plus-reserved combination, raises `ValueError` in host capability
+The charged-only tuple is `("charged_hard_sphere",)`. The combined tuple
+`("brownian", "charged_hard_sphere")` is accepted in either requested order
+and normalizes to one executable mask. Reserved IDs, including
+Brownian-plus-reserved combinations, raise `ValueError` in host capability
 preflight before runtime input access, allocation, launch, or mutable state
 changes.
 
-The charge foundations above do not change this capability table:
-`charged_hard_sphere` remains reserved. They do not provide charged selection,
-charged majorants, Brownian-plus-charged execution, or public charged
-stochastic execution.
+Charged-only execution uses a bounded compact active-pair majorant. Combined
+execution independently sanitizes and sums Brownian and charged terms, then
+uses one active set, exhaustive additive majorant, candidate/acceptance pass,
+collision-buffer set, per-box RNG stream, and apply pass. For active count A,
+the pair work and storage are O(A²); this documents bounded implementation
+scope, not throughput or scaling evidence. Invalid, nonfinite, or nonpositive
+terms do not add to totals; invalid candidates do not mutate state or output.
 
-The fixed sampler has one normalized active set, one total safe majorant, one
-candidate stream, one total pair-rate acceptance decision for each valid
-candidate, one collision-pair output buffer, and one per-box RNG-state
-progression. Invalid, nonfinite, or nonpositive terms do not add to totals;
-invalid candidates do not mutate the active set or collision output.
+The return tuple is exactly `(particles, collision_pairs, n_collisions)`.
+Supplied collision buffers are returned by identity. Supplied `rng_states`
+mutates in place but is never returned; omitted buffers are call-local
+conveniences. Warp CPU is the baseline when Warp is installed. CUDA is optional
+additive evidence and skips cleanly when unavailable.
 
 Future mechanisms must provide a stable identifier; required host and device
 inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
@@ -286,8 +284,7 @@ additive majorant; a capability-table row; shared-dispatcher integration; and
 co-located `*_test.py` coverage. They must not add an independent sampling
 loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
-integration, graph-capture claims, and executable charged, sedimentation, or
-turbulent-shear physics.
+integration, graph-capture claims, sedimentation, or turbulent-shear physics.
 
 ### Environment transfer boundary
 

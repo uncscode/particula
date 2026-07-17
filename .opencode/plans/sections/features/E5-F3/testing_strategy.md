@@ -32,8 +32,9 @@ under test as the oracle.
   persistent RNG reuse/reset behavior, Brownian compatibility, preflight state
   preservation, and tight per-box/per-species mass plus signed-charge
   conservation.
-- **P4 — Documentation validation:** Check Markdown links, import paths,
-  signature references, mechanism names, and any executable snippets.
+- **P4 — Documentation validation:** Completed #1345 with Markdown/link,
+  import-path, signature-reference, and mechanism-name checks plus the focused
+  warning-clean coagulation regression; no executable snippet was added.
 
 ## Device and Edge Coverage
 

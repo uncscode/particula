@@ -441,16 +441,23 @@ for _ in range(n_steps):
   validation or allocation, RNG setup, and selector/apply work. Brownian
   finite-charge validation remains opt-in.
   Accepted merge application adds donor charge to the recipient and clears the
-  donor. This bookkeeping conserves charge; charge affects charged-hard-sphere
-  rates and selection but not Brownian rates or selection.
+   donor. This bookkeeping conserves charge; charge affects charged-hard-sphere
+   rates and selection but not Brownian rates or selection.
+- Combined execution independently sanitizes and sums Brownian and charged
+  pair rates, then uses one active set, exhaustive additive majorant,
+  candidate/acceptance pass, collision-buffer set, RNG stream, and apply pass.
+  For A active particles, pair work and storage are O(A²); this is bounded
+  implementation scope, not performance evidence. The return tuple is exactly
+  `(particles, collision_pairs, n_collisions)`; supplied collision buffers are
+  returned by identity, while `rng_states` mutates in place and is not returned.
 - Shipped baseline: caller-owned persistent `rng_states` are seeded once and
   then reused across repeated calls.
 - Omitting `rng_states` keeps the convenience allocate-and-seed-per-call path.
 - Reusing a fixed `rng_seed` with a persistent `rng_states` buffer does not
   trigger hidden reseeding; call with `initialize_rng=True` only when you
   intentionally want to reset the stream.
-- For graph capture or repeated-step loops, initialize or reset persistent
-  `rng_states` before capture or before entering the loop.
+- For repeated-step loops, initialize or reset persistent `rng_states` before
+  entering the loop.
 - Coagulation `rng_states` are Warp-resident sidecar state, not fields on
   `ParticleData`, `GasData`, `EnvironmentData`, or their Warp mirrors.
 - Mixed NPF/droplet coagulation acceptance diagnostics live only in
@@ -467,8 +474,8 @@ for _ in range(n_steps):
   is supported; other combined mechanisms, alternate charged models, broader
   distributions, and performance claims remain deferred.
 - See `docs/Features/data-containers-and-gpu-foundations.md` and
-  `docs/Features/Roadmap/data-oriented-gpu.md` for the user-facing ownership
-  and graph-capture guidance.
+  `docs/Features/Roadmap/data-oriented-gpu.md` for user-facing ownership
+  guidance.
 
 Focused diagnostic runs:
 

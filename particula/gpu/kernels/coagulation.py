@@ -125,11 +125,12 @@ class CoagulationMechanismConfig:
     ``coagulation_step_gpu`` accepts it only through its keyword-only
     ``mechanism_config`` argument. The configuration is host metadata and does
     not own, transfer, or synchronize Warp resources. Executable
-    ``"particle_resolved"`` modes are Brownian-only, charged-hard-sphere-only,
-    and Brownian plus charged hard sphere. The resolver normalizes either
-    requested order of the combined mode to the canonical fixed mask. Deferred
-    mechanisms and other distribution types are rejected during host-side
-    preflight before any runtime state access or mutation.
+    ``"particle_resolved"`` modes are Brownian-only,
+    ``("charged_hard_sphere",)``, and either requested order of
+    ``("brownian", "charged_hard_sphere")``. The resolver normalizes the
+    combined mode to the canonical fixed mask. Deferred mechanisms and other
+    distribution types are rejected during host-side preflight before any
+    runtime state access or mutation.
 
     Attributes:
         mechanisms: Requested mechanism identifiers, or ``None`` to select
@@ -240,7 +241,7 @@ def validate_coagulation_mechanism_capabilities(
     """Enforce the executable coagulation-mechanism boundary.
 
     This pure host-side, concrete-module-only validator accepts Brownian,
-    charged hard-sphere, or their canonical combined ``"particle_resolved"``
+    ``"charged_hard_sphere"``, or their combined ``"particle_resolved"``
     execution. Deferred mechanisms are rejected during configuration preflight,
     before accessing or mutating runtime state. Import it from
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
@@ -1512,21 +1513,31 @@ def coagulation_step_gpu(  # noqa: C901
     preflighted before any runtime input access, allocation, normalization, RNG
     work, or launch. Omission selects Brownian ``"particle_resolved"``;
     charged-only and Brownian-plus-charged ``"particle_resolved"`` execution
-    are also supported. The combined mode accepts either requested mechanism
-    order and normalizes it to one fixed mask, shared selector, and majorant.
+    are also supported. The combined mode accepts
+    ``("brownian", "charged_hard_sphere")`` in either requested order and
+    normalizes it to one fixed mask, one shared selector, and one additive
+    majorant. Independently sanitized Brownian and charged pair-rate terms are
+    summed before one candidate stream, acceptance stream, collision-buffer
+    set, RNG stream, and apply pass. Its active-pair work and storage are O(A²)
+    for active count A; this is bounded implementation scope, not a throughput
+    or scaling claim.
     Reserved, unsupported-combination, and other distribution requests reject
     during preflight without runtime mutation. After particle metadata and
     device checks, direct temperature and pressure inputs are validated and
     normalized before volume setup or selector launches.
     ``particles`` and supplied ``collision_pairs``, ``n_collisions``,
     and ``rng_states`` are caller-owned same-device Warp resources; the step
-    mutates them in place as applicable. Caller-owned RNG buffers are reset only
+    mutates them in place as applicable. The three-item return tuple contains
+    no RNG state: supplied collision buffers are returned by identity, while
+    ``rng_states`` remains caller-owned. Caller-owned RNG buffers are reset only
     when ``initialize_rng=True`` explicitly opts in.
 
     Args:
         particles: Caller-owned, GPU-resident particle data. All required Warp
             arrays, including ``charge``, must be on the same device. ``charge``
             must be ``wp.float64`` with shape ``(n_boxes, n_particles)``.
+            Charged-containing calls scan it for finite values before output
+            validation or allocation, RNG setup, or selector/apply work.
             Accepted collisions mutate mass, concentration, and charge in place:
             recipient particles receive donor mass and charge, and donor mass,
             concentration, and charge are cleared.
@@ -1658,9 +1669,9 @@ def coagulation_step_gpu(  # noqa: C901
 
         Reusing the same ``rng_seed`` alongside a persistent ``rng_states``
         buffer does not reseed that buffer on later calls unless
-        ``initialize_rng=True`` is passed. For repeated timesteps or graph
-        capture setup, initialize caller-owned buffers once before the loop or
-        before capture, then reuse them without hidden per-step resets.
+        ``initialize_rng=True`` is passed. Initialize caller-owned buffers once
+        before repeated timesteps, then reuse them without hidden per-step
+        resets. Graph-capture support remains deferred.
     """
     if mechanism_config is None:
         mechanism_config = CoagulationMechanismConfig()
