@@ -17,6 +17,14 @@ from particula.gpu.properties.particle_properties import (
     knudsen_number_wp,
 )
 
+_PI = wp.constant(wp.float64(3.141592653589793))
+_COULOMB_SERIES_THRESHOLD = wp.constant(wp.float64(1.0e-5))
+_KINETIC_LIMIT_CUTOFF = wp.constant(wp.float64(1.0e-80))
+_HARD_SPHERE_LINEAR = wp.constant(wp.float64(25.836))
+_HARD_SPHERE_QUARTIC = wp.constant(wp.float64(11.211))
+_HARD_SPHERE_DENOMINATOR_LINEAR = wp.constant(wp.float64(3.502))
+_HARD_SPHERE_DENOMINATOR_QUADRATIC = wp.constant(wp.float64(7.211))
+
 
 @wp.func
 def brownian_diffusivity_wp(
@@ -60,7 +68,7 @@ def particle_mean_free_path_wp(
     Returns:
         Particle mean free path in meters.
     """
-    pi_value = wp.float64(3.141592653589793)
+    pi_value = _PI
     return (
         wp.float64(8.0)
         * diffusivity_particle
@@ -131,7 +139,7 @@ def brownian_kernel_pair_wp(
     Returns:
         Brownian coagulation kernel for the pair in cubic meters per second.
     """
-    pi_value = wp.float64(3.141592653589793)
+    pi_value = _PI
     sum_radius = radius_i + radius_j
     sum_diffusivity = diff_i + diff_j
     g_term_sqrt = wp.sqrt(g_i * g_i + g_j * g_j)
@@ -192,7 +200,7 @@ def coulomb_potential_ratio_wp(
     if sum_radius <= wp.float64(0.0) or temperature <= wp.float64(0.0):
         return wp.float64(0.0)
 
-    pi_value = wp.float64(3.141592653589793)
+    pi_value = _PI
     charge_product = charge_i * charge_j
     charge_scale = elementary_charge_value * elementary_charge_value
     numerator = -charge_product * charge_scale
@@ -290,9 +298,10 @@ def coulomb_continuum_limit_wp(
     """
     if coulomb_potential_ratio == wp.float64(0.0):
         return wp.float64(1.0)
-    if coulomb_potential_ratio > wp.float64(
-        -1.0e-5
-    ) and coulomb_potential_ratio < wp.float64(1.0e-5):
+    if (
+        coulomb_potential_ratio > -_COULOMB_SERIES_THRESHOLD
+        and coulomb_potential_ratio < _COULOMB_SERIES_THRESHOLD
+    ):
         potential_squared = coulomb_potential_ratio * coulomb_potential_ratio
         return (
             wp.float64(1.0)
@@ -357,7 +366,7 @@ def diffusive_knudsen_number_wp(
         return wp.float64(0.0)
 
     kinetic_limit = coulomb_kinetic_limit_wp(coulomb_potential_ratio)
-    if kinetic_limit < wp.float64(1.0e-80):
+    if kinetic_limit < _KINETIC_LIMIT_CUTOFF:
         return wp.float64(0.0)
 
     continuum_limit = coulomb_continuum_limit_wp(coulomb_potential_ratio)
@@ -533,7 +542,7 @@ def charged_hard_sphere_wp(  # noqa: C901
     )
     coulomb_denominator = (
         wp.float64(4.0)
-        * wp.float64(3.141592653589793)
+        * _PI
         * electric_permittivity
         * sum_radius
         * boltzmann_constant
@@ -579,7 +588,7 @@ def charged_hard_sphere_wp(  # noqa: C901
         return zero
 
     kinetic_limit = coulomb_kinetic_limit_wp(potential_ratio)
-    if not wp.isfinite(kinetic_limit) or kinetic_limit < wp.float64(1.0e-80):
+    if not wp.isfinite(kinetic_limit) or kinetic_limit < _KINETIC_LIMIT_CUTOFF:
         return zero
     continuum_limit = coulomb_continuum_limit_wp(potential_ratio)
     if not wp.isfinite(continuum_limit) or continuum_limit <= zero:
@@ -602,22 +611,24 @@ def charged_hard_sphere_wp(  # noqa: C901
     if not wp.isfinite(diffusive_knudsen) or diffusive_knudsen < zero:
         return zero
 
-    pi_value = wp.float64(3.141592653589793)
+    pi_value = _PI
     continuum = (
         wp.float64(4.0) * pi_value * diffusive_knudsen * diffusive_knudsen
     )
     numerator = (
         continuum
-        + wp.float64(25.836) * wp.pow(diffusive_knudsen, wp.float64(3.0))
+        + _HARD_SPHERE_LINEAR * wp.pow(diffusive_knudsen, wp.float64(3.0))
         + wp.sqrt(wp.float64(8.0) * pi_value)
-        * wp.float64(11.211)
+        * _HARD_SPHERE_QUARTIC
         * wp.pow(diffusive_knudsen, wp.float64(4.0))
     )
     denominator = (
         wp.float64(1.0)
-        + wp.float64(3.502) * diffusive_knudsen
-        + wp.float64(7.211) * diffusive_knudsen * diffusive_knudsen
-        + wp.float64(11.211) * wp.pow(diffusive_knudsen, wp.float64(3.0))
+        + _HARD_SPHERE_DENOMINATOR_LINEAR * diffusive_knudsen
+        + _HARD_SPHERE_DENOMINATOR_QUADRATIC
+        * diffusive_knudsen
+        * diffusive_knudsen
+        + _HARD_SPHERE_QUARTIC * wp.pow(diffusive_knudsen, wp.float64(3.0))
     )
     if (
         not wp.isfinite(numerator)

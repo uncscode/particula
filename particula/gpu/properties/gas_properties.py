@@ -6,6 +6,8 @@ These functions mirror the NumPy implementations in
 
 import warp as wp
 
+_PI = wp.constant(wp.float64(3.141592653589793))
+
 
 @wp.func
 def dynamic_viscosity_wp(
@@ -59,7 +61,7 @@ def molecule_mean_free_path_wp(
     Returns:
         Mean free path of a gas molecule [m].
     """
-    pi_value = wp.float64(3.141592653589793)
+    pi_value = _PI
     numerator = wp.float64(8.0) * molar_mass
     denominator = wp.sqrt(numerator / (pi_value * gas_constant * temperature))
     return (wp.float64(2.0) * dynamic_viscosity / pressure) / denominator
