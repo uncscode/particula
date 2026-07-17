@@ -12,15 +12,18 @@
   - Tests: Independent deterministic physics, invalid/zero candidate, sparse
     active-list, per-box, dispatcher-addition, and Brownian-regression coverage.
 
-- [ ] **E5-F3-P2:** Enable charged-only one-pass execution with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Register charged capability and route charged-only configuration
+- [x] **E5-F3-P2:** Enable charged-only one-pass execution with unit tests
+  - Issue: #1343 | Size: S | Status: Completed
+  - Goal: Register exact charged-only particle-resolved capability and route it
     through the existing bounded sampler and charge-safe merge exactly once.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: Capability validation, accepted-pair validity, bounded stochastic
-    charged-only counts, inactive slots, state-preserving failures, output-buffer
-    identity, persistent RNG advancement, and separate mass/charge conservation.
+  - Delivered: Charged rates and a compact O(A²) majorant use prepared private
+    per-particle total mass; charged mode forces finite-charge preflight and
+    retains one selector/apply pass with charge-conserving merges.
+  - Tests: Deterministic rate/majorant, multi-species, invalid-input,
+    ownership/capacity, invariants, mass/charge conservation, and aggregate
+    stochastic charged-only coverage.
 
 - [ ] **E5-F3-P3:** Enable Brownian-plus-charged execution with integration tests
   - Issue: TBD | Size: S | Status: Not Started

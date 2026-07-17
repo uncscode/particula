@@ -24,8 +24,19 @@
   coagulation module?
   - Resolved 2026-07-16: no. Import it from
     `particula.gpu.kernels.coagulation`; E5-F3 adds no second export path.
+- [x] Can charged-only reuse the shared selector and apply kernels without a
+  separate collision buffer or a per-pair species reduction?
+  - Resolved 2026-07-17 by #1343: yes. A private fp64 total-mass scratch array
+    is populated once per valid active slot, then consumed by the compact O(A²)
+    majorant and charged candidate-rate path; one selector and one apply launch
+    preserve the existing collision-buffer and merge ownership contracts.
+- [x] Is finite-charge validation mandatory for charged-only requests even when
+  Brownian's optional validation flag is omitted?
+  - Resolved 2026-07-17 by #1343: yes. Charged-only preflight scans charge before
+    output/RNG work or mutation; Brownian retains opt-in finite-charge validation.
 
-Resolved scope boundaries: particle-resolved only; one stochastic pass;
+Open: P3 must define and prove the combined Brownian-plus-charged additive
+execution path. Resolved scope boundaries: particle-resolved only; one stochastic pass;
 caller-owned buffers/RNG; Warp CPU required when Warp is installed; CUDA
 optional; no high-level runnable or general performance redesign. Classifier
 diagnostics: none.

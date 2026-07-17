@@ -3,13 +3,13 @@
 ## High-Level Design
 
 ```text
-P1 private dispatcher
-  -> receives E5-F1 compact active indices and term mask
-  -> Brownian: existing majorant path (unchanged)
-  -> charged hard sphere: scan each compact rank pair i < j
-       -> evaluate E5-F2 charged_hard_sphere_wp
-       -> sanitize candidate; retain finite non-negative maximum
-  -> return dispatcher result
+Charged-only `coagulation_step_gpu`
+  -> complete capability, buffer, RNG, and forced finite-charge preflight
+  -> allocate private fp64 total_masses after preflight
+  -> prepare compact active slots and sum each valid slot's species once
+  -> scan charged compact rank pairs i < j for finite non-negative O(A²) bound
+  -> shared selector evaluates charged_hard_sphere_wp and accepts candidates
+  -> existing apply kernel merges accepted pairs and conserves/clears charge
 ```
 
 The initial charged bound is an exhaustive active-pair maximum. Charged kernels
@@ -19,26 +19,31 @@ deterministic, and reviewable. Any later optimization must retain a mathematical
 proof and pairwise regression evidence. For a combined request, summing valid
 per-term majorants safely bounds the sum of enabled pair rates.
 
-P1 does not connect the charged term to selection or acceptance. It is read-only:
-it does not allocate, mutate simulation state, access RNG state, or build the
-compact active list. Zero or non-finite candidate results are handled by the
-existing sanitizer. P2/P3 will connect enabled terms to one selection and
-acceptance pass without creating mechanism-specific selectors.
+P2 connects the exact charged-only mask to the existing selection and acceptance
+pass without a mechanism-specific selector. Active-slot preparation clears and
+then writes one summed species mass per valid slot into private call-local fp64
+`total_masses`; the charged O(A²) scan and candidate-rate path consume that
+prepared value without per-pair species reductions. The scratch is allocated
+only after all caller-resource preflight succeeds and is neither returned nor
+caller-owned. Zero or non-finite candidate results use the existing sanitizer.
 
 ## Data / API / Workflow Changes
 
 - **Data Model:** No particle schema changes. Continue using E5-F1's frozen
   mechanism configuration/mask and E5-F2's existing fp64
   `WarpParticleData.charge` field.
-- **API Surface:** No public API or capability-matrix change in P1;
-  `coagulation_step_gpu` continues to reject charged execution.
-- **Kernel Interface:** The internal majorant dispatcher gains the charged
-  branch only. No selector, pair-rate execution dispatch, merge path, callback,
-  or stochastic launch changes.
-- **Ownership:** The helper is read-only and adds no buffer, RNG, transfer, or
-  allocation ownership.
-- **Workflow Hooks:** E5-F3 consumes E5-F1/F2 and supplies an internal charged
-  majorant foundation to P2/P3.
+- **API Surface:** The existing keyword-only mechanism configuration now permits
+  only exact charged-hard-sphere, particle-resolved execution in addition to
+  Brownian; its signature and three-item return tuple are unchanged.
+- **Kernel Interface:** The existing selector receives total masses, signed
+  charge, per-box thermodynamics, and physical constants for the charged rate.
+  It still performs one selector and one apply launch.
+- **Ownership:** `total_masses` is the sole new private scratch allocation.
+  Caller collision buffers and persistent RNG retain identity and reuse rules.
+- **Validation:** Charged-only execution forces finite-charge preflight even
+  when Brownian's optional charge validation is disabled.
+- **Workflow Hooks:** E5-F3 consumes E5-F1/F2; P2 supplies charged-only
+  execution and P3 will extend the same path for combined execution.
 
 ## Security & Compliance
 

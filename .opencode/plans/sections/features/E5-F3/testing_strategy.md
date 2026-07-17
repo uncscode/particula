@@ -16,11 +16,13 @@ under test as the oracle.
   dispatcher probes are compared with a local NumPy pair enumeration, including
   charged-dispatch addition and Brownian-only regression. These tests do not
   invoke public charged execution.
-- **P2 — Charged-only unit/integration tests:** Validate capability resolution
-  and pre-mutation failures. Across fixed seeds, assert accepted pair invariants,
-  bounded collision-count statistics against an independent expected sum, one
-  RNG stream, caller-buffer identity, and separate per-box species-mass and
-  total-charge conservation. Verify donor mass/concentration/charge clearing.
+- **P2 — Charged-only unit/integration tests (completed, issue #1343):** Exact
+  charged-only capability and forced finite-charge preflight are tested before
+  caller-output/RNG mutation. Independent NumPy rate and compact-majorant probes
+  cover signs, scales, sparse lists, nonuniform boxes, and multi-species summed
+  total mass. Deterministic tests cover selector invariants, capacity, ownership,
+  mass/charge conservation, and donor clearing; fixed fresh-seed aggregate tests
+  cover neutral, same-sign, opposite-sign, and mixed-scale behavior.
 - **P3 — Combined integration/regression tests:** Assert candidate rates equal
   Brownian plus charged terms and the total bound covers each sum. Use repeated
   fresh seeded runs with declared aggregate/sigma bounds, not exact CPU/Warp pair

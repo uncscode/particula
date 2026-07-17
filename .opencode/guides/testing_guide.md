@@ -238,8 +238,8 @@ imply exact replay requirements.
 Document the chosen tolerances in the test body or nearby comments when they
 are not already obvious from the physics or baseline study.
 
-For GPU Brownian coagulation acceptance work, keep attempted-vs-accepted
-collision instrumentation private to
+For GPU coagulation acceptance work, including exact charged-only hard-sphere
+coverage, keep attempted-vs-accepted collision instrumentation private to
 `particula/gpu/kernels/tests/coagulation_test.py`. The shipped
 `coagulation_step_gpu(...)` API and production synchronization behavior should
 stay unchanged when the work is diagnostic-only.
@@ -346,8 +346,10 @@ For the mixed NPF/droplet coagulation diagnostic coverage added in
 low-active regressions focused on seeded invariants: accepted pairs stay
 sorted, in bounds, and limited to originally active slots; zero/one-active
 inputs early-return cleanly; exactly-two-active inputs fall back to the only
-valid pair; and accepted collisions conserve total mass. Use focused local runs
-such as:
+valid pair; and accepted collisions conserve total mass. For exact charged-only
+coverage, also assert signed-charge conservation and test aggregate stochastic
+behavior against an independent oracle rather than exact pair replay. Use
+focused local runs such as:
 
 ```bash
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale

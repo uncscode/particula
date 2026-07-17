@@ -414,8 +414,10 @@ def charged_hard_sphere_wp(  # noqa: C901
     """Calculate an internal charged hard-sphere pair rate in SI units.
 
     This device-only, concrete-module-only helper is the pair-rate primitive for
-    charged-only low-level GPU coagulation. It ports the charged CPU calculation
-    from ``particula.dynamics.coagulation.charged_dimensional_kernel`` and the
+    charged-only, particle-resolved low-level GPU coagulation. It receives each
+    particle's total mass across species and is used for candidate rates and
+    compact-active majorants. It ports the charged CPU calculation from
+    ``particula.dynamics.coagulation.charged_dimensional_kernel`` and the
     hard-sphere fit from
     ``particula.dynamics.coagulation.charged_dimensionless_kernel``. It does
     not change public exports.
