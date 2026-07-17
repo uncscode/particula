@@ -11,21 +11,26 @@ reused without a separate safety proof.
 
 ## Current Delivery
 
-E5-F3-P1 is complete for issue #1342. The private GPU term-majorant dispatcher
-now supports the approved charged hard-sphere term using a finite,
-non-negative, exhaustive maximum over unique compact active pairs. It reuses
-the E5-F2 charged physics and sanitizes invalid candidates.
+E5-F3-P1 is complete for issue #1342 and E5-F3-P2 is complete for issue
+#1343. The low-level `coagulation_step_gpu` now accepts exactly
+`("charged_hard_sphere",)` with `distribution_type="particle_resolved"`.
+It prepares a private fp64 `(n_boxes, n_particles)` total-mass scratch array,
+uses the compact-active O(A²) charged majorant, evaluates charged candidate
+rates in the existing one-pass selector, and reuses the existing
+charge-conserving apply merge.
 
-This is internal dispatcher support only. `coagulation_step_gpu` still does not
-execute charged-only or Brownian-plus-charged configurations; P2 and P3 retain
-capability registration, selection, acceptance, and merge integration.
+Charged-only preflight always scans caller-owned charge for finite values before
+output allocation, RNG initialization, launches, or mutation. Deterministic and
+stochastic charged coverage now exercises rates, majorants, multi-species total
+mass, ownership, capacity, conservation, and bounded aggregate behavior.
+Brownian-plus-charged execution remains deferred to P3.
 
 ## User Stories
 
-- As a maintainer, I want an independently tested charged majorant so later
-  execution phases have a safe internal bound.
-- As a GPU user, I will receive charged-only and combined execution only after
-  P2 and P3 complete their public-step integration.
+- As a maintainer, I want charged-only execution to retain the shared sampler,
+  ownership, and conservation contracts.
+- As a GPU user, I can run the approved charged-only low-level configuration;
+  combined Brownian-plus-charged execution remains unavailable until P3.
 
 Parent epic: [E5](../../epics/E5/vision_problem.md), **GPU Coagulation Physics
 Coverage**. This feature is track T3, follows E5-F1 and E5-F2, and enables E5-F6

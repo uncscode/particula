@@ -136,7 +136,7 @@ class CoagulationMechanismConfig:
 
 @dataclass(frozen=True)
 class _ResolvedCoagulationMechanismConfig:
-    """Store the normalized result of concrete-module P1 validation.
+    """Store the normalized result of concrete-module configuration validation.
 
     This private result is not a public API or a ``coagulation_step_gpu``
     argument. Structural resolution retains recognized reserved mechanisms for
@@ -322,10 +322,12 @@ def _total_pair_rate(  # noqa: PLR0913
     ref_temperature: Any,
     sutherland_constant: Any,
 ) -> Any:
-    """Accumulate enabled finite, positive pair-rate terms.
+    """Return the enabled finite, positive pair rate.
 
-    The fixed mask dispatches Brownian or charged hard-sphere physics without
-    dynamic mechanism iteration. Capability validation prevents additive use.
+    The fixed mask dispatches either Brownian or charged hard-sphere physics
+    without dynamic mechanism iteration. Entry-point capability validation
+    admits only one mechanism, so the apparent additive implementation is not
+    an executable combined-mechanism path. Invalid rate terms contribute zero.
     """
     total_rate = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
@@ -703,9 +705,13 @@ def brownian_coagulation_kernel(  # noqa: C901
         rng_states: Per-box RNG states ``(n_boxes,)`` mutated in place during
             pair selection. Reusing this buffer across calls preserves
             caller-owned persistent state unless it is reset before launch.
-        total_masses: Private fp64 per-particle total-mass scratch.
-        charge: Caller-owned signed elementary-charge counts.
-        mechanism_mask: Fixed internal mask for one executable rate term.
+        total_masses: Private ``wp.float64`` total-mass scratch
+            ``(n_boxes, n_particles)``. The kernel clears each slot and stores
+            the sum over species only for active particles.
+        charge: Caller-owned signed elementary-charge counts
+            ``(n_boxes, n_particles)``.
+        mechanism_mask: Fixed internal mask for Brownian or charged-only
+            particle-resolved execution.
         collision_capacity: Maximum accepted collisions per box for this call.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]
@@ -1515,6 +1521,13 @@ def coagulation_step_gpu(  # noqa: C901
         n_particles``) launch and a private one-element status-scalar
         allocation/readback to reject non-finite charge. Brownian's default
         avoids the scan, allocation, synchronization, and host readback.
+
+        A successful call allocates private, call-local selector scratch,
+        including a ``wp.float64`` ``(n_boxes, n_particles)`` total-mass array.
+        The selector clears every scratch slot and sums each active particle's
+        species masses once for charged pair rates and their compact-active
+        majorant. This scratch is not a caller-owned output, is not returned,
+        and is allocated only after caller-resource preflight succeeds.
 
         Supported RNG setup cases are:
 

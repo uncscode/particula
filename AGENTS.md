@@ -424,21 +424,22 @@ for _ in range(n_steps):
   `particula.gpu.kernels.coagulation`; configuration APIs are deliberately not
   re-exported through `particula.gpu.kernels`.
 - Omitting `mechanism_config` preserves Brownian, particle-resolved execution.
-  This is the only executable mechanism/distribution combination. Malformed
-  configuration, unsupported distributions, and reserved mechanisms fail during
-  host-side preflight before runtime state access, allocation, mutation, RNG
-  initialization, or kernel launch.
+  The only additional executable configuration is exact charged-only
+  `("charged_hard_sphere",)` with `distribution_type="particle_resolved"`.
+  Combined Brownian-plus-charged execution and other mechanisms remain
+  deferred. Malformed configuration, unsupported distributions, and deferred
+  mechanisms fail during host-side preflight before runtime state access,
+  allocation, mutation, RNG initialization, or kernel launch.
 - `WarpParticleData.charge` is caller-owned, device-resident state containing
   dimensionless elementary-charge counts with shape `(n_boxes, n_particles)`.
-  It is not a sidecar or a hidden transfer result. Before Brownian execution,
-  it must be a finite, same-device `wp.float64` Warp array with that matching
-  shape on the particle-data device.
-  Non-finite charge is detected by one read-only device scan and private-status
-  readback; failure occurs before environment or volume normalization,
-  caller-output validation or allocation, RNG setup, and Brownian/apply work.
+  It is not a sidecar or a hidden transfer result. It must be a same-device
+  `wp.float64` Warp array with that matching shape on the particle-data device.
+  Charged-only execution always scans it for finite values before environment
+  or volume normalization, caller-output validation or allocation, RNG setup,
+  and selector/apply work. Brownian finite-charge validation remains opt-in.
   Accepted merge application adds donor charge to the recipient and clears the
-  donor. This bookkeeping conserves charge, but does not affect current
-  Brownian rates or selection.
+  donor. This bookkeeping conserves charge; charge affects charged-only rates
+  and selection but not current Brownian rates or selection.
 - Shipped baseline: caller-owned persistent `rng_states` are seeded once and
   then reused across repeated calls.
 - Omitting `rng_states` keeps the convenience allocate-and-seed-per-call path.
@@ -449,19 +450,18 @@ for _ in range(n_steps):
   `rng_states` before capture or before entering the loop.
 - Coagulation `rng_states` are Warp-resident sidecar state, not fields on
   `ParticleData`, `GasData`, `EnvironmentData`, or their Warp mirrors.
-- Mixed NPF/droplet Brownian acceptance diagnostics live only in
+- Mixed NPF/droplet coagulation acceptance diagnostics live only in
   `particula/gpu/kernels/tests/coagulation_test.py`; keep attempted-count
   instrumentation test-local and leave the public `coagulation_step_gpu(...)`
   API unchanged for debug-only coverage.
-- The bounded Brownian selector hardening is regression-covered only through
+- The bounded coagulation selector is regression-covered only through
   test-local diagnostics: accepted pairs must remain sorted, in bounds, and
   drawn from originally active slots; zero/one-active inputs must early-return;
   exactly-two-active inputs must collapse to the sole valid pair; and accepted
   collisions must conserve total mass.
 - Warp CPU is the baseline when installed; CUDA evidence is optional and must
-  skip cleanly when unavailable. Charged candidate selection, majorants,
-  stochastic execution, broader mechanisms, and performance claims remain
-  deferred.
+  skip cleanly when unavailable. Combined mechanisms, alternate charged
+  models, broader mechanisms, and performance claims remain deferred.
 - See `docs/Features/data-containers-and-gpu-foundations.md` and
   `docs/Features/Roadmap/data-oriented-gpu.md` for the user-facing ownership
   and graph-capture guidance.
