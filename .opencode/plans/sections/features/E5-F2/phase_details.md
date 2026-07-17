@@ -40,15 +40,23 @@
   - Tests: Wrong shape, dtype, device, NaN, and infinity failures plus snapshots
     proving masses, concentration, charge, output buffers, and RNG are unchanged.
 
-- [ ] **E5-F2-P4:** Transfer and clear charge during merges with conservation tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add donor charge to the recipient and clear the donor atomically with
-    existing mass/concentration updates for each accepted disjoint pair.
+- [x] **E5-F2-P4:** Transfer and clear charge during merges with conservation tests
+  - Issue: #1339 | Size: S | Status: Completed
+  - Delivered: The private `apply_coagulation_kernel` now accepts the existing
+    fp64 particle charge buffer, adds donor charge to the recipient, and clears
+    donor charge with donor mass and concentration for each accepted disjoint
+    pair. Production and all direct test launches pass that buffer.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: Direct merge-kernel fixtures, multi-species/multi-box accepted pairs,
-    zero-collision and inactive slots, donor clearing, recipient sums, and
-    separate per-box mass/charge conservation on supported devices.
+  - Tests: Deterministic direct signed-charge, multi-box/multi-species fixtures
+    compare complete mass, concentration, and charge arrays against independent
+    expected state and separately conserve per-box species mass and total charge.
+    Merge, zero-count, self-pair, and empty-pair coverage verifies donor clearing
+    and no-op paths; step-level signed-charge coverage conserves charge while
+    retaining supplied sidecar identity.
+  - Boundary: Brownian selection remains charge-neutral. The public
+    `coagulation_step_gpu` API and three-item return tuple, collision sidecars,
+    and persistent RNG ownership are unchanged.
 
 - [ ] **E5-F2-P5:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

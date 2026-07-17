@@ -24,9 +24,9 @@
 - [ ] Extend `_validate_device_arrays` to require charge on the masses device.
 - [ ] Add active-device finite-value preflight for charge before volume setup,
   RNG initialization, work allocation, or coagulation launches.
-- [ ] Add `particles.charge` to `apply_coagulation_kernel`; sum recipient and
+- [x] Add `particles.charge` to `apply_coagulation_kernel`; sum recipient and
   donor charge and zero donor charge before returning.
-- [ ] Keep the public `coagulation_step_gpu` return tuple, collision buffers,
+- [x] Keep the public `coagulation_step_gpu` return tuple, collision buffers,
   persistent RNG behavior, and Brownian default unchanged.
 
 ## Tooling / Tests
@@ -42,9 +42,9 @@
 - [ ] Add malformed shape/dtype/device/non-finite charge cases to
   `particula/gpu/kernels/tests/coagulation_test.py` with complete before/after
   state and persistent-RNG snapshots.
-- [ ] Add deterministic direct `apply_coagulation_kernel` tests for donor clear,
+- [x] Add deterministic direct `apply_coagulation_kernel` tests for donor clear,
   recipient sum, no-collision behavior, multiple species, and multiple boxes.
-- [ ] Extend step-level conservation tests to assert species mass and charge
+- [x] Extend step-level conservation tests to assert species mass and charge
   separately per box on Warp CPU and optional CUDA.
 - [ ] Run focused fast tests, Ruff, and mypy without lowering the configured
   coverage threshold.

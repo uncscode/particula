@@ -433,7 +433,8 @@ for _ in range(n_steps):
   Non-finite charge is detected by one read-only device scan and private-status
   readback; failure occurs before environment or volume normalization,
   caller-output validation or allocation, RNG setup, and Brownian/apply work.
-  This validation does not enable charged coagulation physics.
+  Accepted merge application adds donor charge to the recipient and clears the
+  donor. This bookkeeping does not enable charge-dependent selection or rates.
 - Shipped baseline: caller-owned persistent `rng_states` are seeded once and
   then reused across repeated calls.
 - Omitting `rng_states` keeps the convenience allocate-and-seed-per-call path.
