@@ -49,9 +49,9 @@ permission:
   get_version: allow
   refactor_astgrep_preview: deny
   refactor_astgrep_apply: deny
-  webfetch: deny
-  websearch: deny
-  codesearch: deny
+  webfetch: ask
+  websearch: ask
+  codesearch: ask
   bash: deny
   glob: deny
   grep: deny
@@ -111,7 +111,7 @@ approves. This gives the user a clear sense of progress through the template.
 
 Before starting any conversation, read files and run commands for current state:
 
-- `.github/ISSUE_TEMPLATE/planner.md` -- The template structure to fill out
+- `.opencode/guides/planner_issue_format.md` -- The canonical issue metadata and body structure to fill out
 - active epics via:
   `adw_plans_read({"command": "list", "plan_type": "epic", "lifecycle": "active", "options": "json"})`
 - active features via:
@@ -124,7 +124,7 @@ Before starting any conversation, read files and run commands for current state:
 
 # The Template
 
-The planner rough-scoping template (`.github/ISSUE_TEMPLATE/planner.md`) has these
+The planner rough-scoping format (`.opencode/guides/planner_issue_format.md`) has these
 sections that the `plan-scope-analyzer` agent will parse downstream:
 
 1. **Type** -- Feature, Maintenance, Research, or Multi-track epic (exactly one)
