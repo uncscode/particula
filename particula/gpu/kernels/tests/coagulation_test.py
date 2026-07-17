@@ -954,8 +954,52 @@ def test_charged_majorant_matches_independent_pair_maximum(
             pressure,
         )
         assert np.isfinite(rate) and rate >= 0.0
-        assert rate <= direct[0]
-        assert rate <= dispatched[0]
+        assert rate <= np.nextafter(direct[0], np.inf)
+        assert rate <= np.nextafter(dispatched[0], np.inf)
+
+
+@pytest.mark.gpu_parity
+def test_charged_majorant_bounds_equal_radius_active_pair(
+    device: str,
+) -> None:
+    """Direct and dispatched bounds cover an equal-radius active pair."""
+    radii = np.array([[4.0e-9, 4.0e-9, 2.0e-7]], dtype=np.float64)
+    masses = np.array([[3.0e-23, 3.0e-23, 4.0e-17]], dtype=np.float64)
+    charges = np.array([[2.0, -3.0, 1.0]], dtype=np.float64)
+    compact = np.array([[2, 1, 0]], dtype=np.int32)
+    temperature = np.float64(298.15)
+    pressure = np.float64(101325.0)
+    expected = _charged_majorant_oracle(
+        compact[0], 3, radii[0], masses[0], charges[0], temperature, pressure
+    )
+    direct, dispatched = _run_charged_majorant_probes(
+        device,
+        compact,
+        np.array([3], dtype=np.int32),
+        radii,
+        masses,
+        charges,
+        np.array([temperature], dtype=np.float64),
+        np.array([pressure], dtype=np.float64),
+    )
+
+    npt.assert_allclose(direct, [expected], rtol=1.0e-11, atol=0.0)
+    npt.assert_allclose(dispatched, [expected], rtol=1.0e-11, atol=0.0)
+    for first, second in itertools.combinations(compact[0], 2):
+        rate = _charged_hard_sphere_oracle(
+            radii[0, first],
+            radii[0, second],
+            masses[0, first],
+            masses[0, second],
+            charges[0, first],
+            charges[0, second],
+            temperature,
+            pressure,
+        )
+        assert np.isfinite(rate) and rate >= 0.0
+        # Permit one ULP between independent scalar and Warp fp64 arithmetic.
+        assert rate <= np.nextafter(direct[0], np.inf)
+        assert rate <= np.nextafter(dispatched[0], np.inf)
 
 
 @pytest.mark.gpu_parity
