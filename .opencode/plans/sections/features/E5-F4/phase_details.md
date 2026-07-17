@@ -1,15 +1,17 @@
 # Phase Details
 
-- [ ] **E5-F4-P1:** Port mixture-density, settling-velocity, and SP2016 pair physics with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E5-F4-P1:** Port mixture-density, settling-velocity, and SP2016 pair physics with unit tests
+  - Issue: #1347 | Size: S | Status: Complete
   - Goal: Add scalar fp64 Warp helpers for effective particle density, Stokes
     settling with Cunningham slip correction, and
     `pi * (r_i + r_j)^2 * abs(v_i - v_j)` with efficiency fixed at 1.
   - Files: `particula/gpu/dynamics/coagulation_funcs.py`,
-    `particula/gpu/kernels/tests/coagulation_test.py`
+    `particula/gpu/dynamics/tests/coagulation_funcs_test.py`
+  - Delivered: internal device-only helpers and direct Warp probes; no public
+    dispatch, mechanism registration, majorant, or runnable API.
   - Tests: independent NumPy fixtures for single- and multi-species density,
-    radius/settling properties, symmetry, zero equal-velocity rate, unit
-    efficiency, finite non-negative output, Warp CPU, and optional CUDA.
+    radius/settling properties, symmetry, zero equal-velocity rate, batched
+    invalid/overflow/underflow safe-zero behavior, Warp CPU, and optional CUDA.
 
 - [ ] **E5-F4-P2:** Add a safe sedimentation majorant and bounded mechanism dispatch with unit tests
   - Issue: TBD | Size: S | Status: Not Started

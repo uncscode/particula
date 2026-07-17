@@ -7,12 +7,15 @@ Warp is absent.
 
 ## Per-Phase Coverage
 
-- **P1 -- physics helpers:** Add small Warp probe kernels in
-  `particula/gpu/kernels/tests/coagulation_test.py`. Compare effective density,
-  settling velocity, and scalar SP2016 rates against independently evaluated
-  NumPy equations for single/multiple species and multiple size/density scales.
-  Assert symmetry, units-consistent non-negative values, zero rate for equal
-  settling velocity, and collision efficiency exactly 1.
+- **P1 -- physics helpers (complete):** Direct Warp probe kernels and
+  independent NumPy safe-zero oracles are in
+  `particula/gpu/dynamics/tests/coagulation_funcs_test.py`. They cover
+  one-/multi-species effective density, nanometer-to-droplet Stokes/Cunningham
+  settling, SP2016 parity and symmetry, equal-velocity zero, and batched
+  invalid/overflow/underflow exact-zero cases. Finite nonzero fp64 parity uses
+  `rtol=1e-12, atol=0.0`; safe-zero branches use exact equality. An AST check
+  verifies that the pair helper has exactly its four physics arguments and no
+  collision-efficiency argument.
 - **P2 -- majorant and dispatch:** Enumerate all active unordered fixture pairs
   on the test side and prove each rate is finite, non-negative, and no greater
   than the device majorant. Cover zero/one/two active slots, equal velocities,
@@ -41,9 +44,7 @@ Warp is absent.
 
 ## Coverage Impact
 
-Primary coverage remains in
-`particula/gpu/kernels/tests/coagulation_test.py`, colocated with the existing
-direct coagulation path. If helper volume makes that module unwieldy, a focused
-`particula/gpu/kernels/tests/sedimentation_coagulation_test.py` may be added,
-still using the `*_test.py` suffix and shared device fixtures. No slow or
-performance marker is needed for required correctness evidence.
+P1 helper coverage is colocated with the helpers in
+`particula/gpu/dynamics/tests/coagulation_funcs_test.py`; later execution
+coverage remains in the direct-kernel test module. No slow or performance
+marker is needed for required correctness evidence.
