@@ -23,12 +23,15 @@ under test as the oracle.
   total mass. Deterministic tests cover selector invariants, capacity, ownership,
   mass/charge conservation, and donor clearing; fixed fresh-seed aggregate tests
   cover neutral, same-sign, opposite-sign, and mixed-scale behavior.
-- **P3 — Combined integration/regression tests:** Assert candidate rates equal
-  Brownian plus charged terms and the total bound covers each sum. Use repeated
-  fresh seeded runs with declared aggregate/sigma bounds, not exact CPU/Warp pair
-  replay. Prove canonical mechanism order is equivalent, only one pair buffer
-  and RNG pass are used, persistent RNG advances without hidden reseeding, and
-  legacy omitted/explicit Brownian results remain compatible.
+- **P3 — Combined integration/regression tests (completed, issue #1344):**
+  Independent NumPy fp64 probes assert candidate rates equal Brownian plus
+  charged terms and that the one exhaustive additive-rate majorant covers each
+  active-pair sum. Fresh seeded aggregate tests use declared bounds rather than
+  exact CPU/Warp pair replay. Regression coverage proves canonical-order
+  equivalence, exactly one selector and apply launch, one pair-buffer/RNG pass,
+  persistent RNG reuse/reset behavior, Brownian compatibility, preflight state
+  preservation, and tight per-box/per-species mass plus signed-charge
+  conservation.
 - **P4 — Documentation validation:** Check Markdown links, import paths,
   signature references, mechanism names, and any executable snippets.
 

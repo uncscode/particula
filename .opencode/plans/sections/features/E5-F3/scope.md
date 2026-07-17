@@ -1,8 +1,8 @@
 # Scope
 
-E5-F3 stages E5-F2 charged physics for charged-only and later
-Brownian-plus-charged particle-resolved execution. Issues #1342 and #1343
-completed the private majorant foundation and charged-only execution.
+E5-F3 stages E5-F2 charged physics for charged-only and Brownian-plus-charged
+particle-resolved execution. Issues #1342, #1343, and #1344 completed the
+private majorant foundation, charged-only execution, and combined execution.
 
 ## In Scope
 
@@ -16,6 +16,10 @@ completed the private majorant foundation and charged-only execution.
 - Execute only exact `charged_hard_sphere` particle-resolved requests through one
   selection/acceptance pass, using private summed-total-mass scratch and forced
   finite-charge preflight while preserving API, buffer, RNG, and merge contracts.
+- Execute only canonical Brownian-plus-charged particle-resolved requests through
+  the same single selector and apply path. Normalize either requested order, sum
+  independently sanitized terms, and bound the sum with one exhaustive active-
+  pair scan; preserve preflight state, caller-buffer identity, and RNG reuse.
 
 ## Out of Scope
 
@@ -27,5 +31,3 @@ completed the private majorant foundation and charged-only execution.
   slot allocation, hidden CPU fallback or transfers, graph capture, adaptive
   stepping, and general performance redesign.
 - Exact CPU/Warp stochastic pair replay or CUDA as a release requirement.
-- Brownian-plus-charged execution, including additive rates/majorants and its
-  integration evidence, which remains P3 work.

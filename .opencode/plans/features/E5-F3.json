@@ -58,11 +58,11 @@
     {
       "id": "E5-F3-P3",
       "title": "Enable Brownian-plus-charged execution with integration tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-17",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,

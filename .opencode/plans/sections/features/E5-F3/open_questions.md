@@ -35,8 +35,19 @@
   - Resolved 2026-07-17 by #1343: yes. Charged-only preflight scans charge before
     output/RNG work or mutation; Brownian retains opt-in finite-charge validation.
 
-Open: P3 must define and prove the combined Brownian-plus-charged additive
-execution path. Resolved scope boundaries: particle-resolved only; one stochastic pass;
+- [x] How is the combined additive majorant formed without a second selection
+  pass or double-counting the charged bound?
+  - Resolved 2026-07-17 by #1344: normalize either canonical requested order to
+    the combined mask and scan each compact active pair once with
+    `_total_pair_rate(actual_mask)`. The finite non-negative maximum bounds the
+    summed candidate rate and feeds the existing single selector/apply path.
+- [x] Does combined execution retain charged preflight and caller resource
+  ownership?
+  - Resolved 2026-07-17 by #1344: yes. Finite-charge and charged-physics
+    preflight precede output allocation, RNG initialization, and mutation; the
+    existing caller buffers and persistent RNG stream are reused.
+
+Resolved scope boundaries: particle-resolved only; one stochastic pass;
 caller-owned buffers/RNG; Warp CPU required when Warp is installed; CUDA
 optional; no high-level runnable or general performance redesign. Classifier
 diagnostics: none.

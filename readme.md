@@ -68,10 +68,13 @@ before launch.
 `coagulation_step_gpu` accepts an optional keyword-only `mechanism_config`
 from `particula.gpu.kernels.coagulation`; this configuration API is not
 re-exported from `particula.gpu.kernels`. Omitting it preserves the Brownian,
-particle-resolved path. That is the only executable mechanism/distribution
-combination: malformed configurations, unsupported distributions, and reserved
-mechanisms fail during host-side preflight before runtime state is accessed,
-allocated, mutated, reseeded, or launched.
+particle-resolved path. The low-level entry point also supports exact
+charged-hard-sphere-only and canonical Brownian-plus-charged
+`particle_resolved` configurations. The combined configuration accepts either
+requested mechanism order and uses one shared stochastic selection path.
+Malformed configurations, unsupported distributions, and deferred mechanisms
+fail during host-side preflight before runtime state is accessed, allocated,
+mutated, reseeded, or launched.
 
 `condensation_step_gpu` additionally requires a keyword-only
 `ThermodynamicsConfig` through `thermodynamics=`. After all inputs and optional

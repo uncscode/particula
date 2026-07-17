@@ -424,22 +424,25 @@ for _ in range(n_steps):
   `particula.gpu.kernels.coagulation`; configuration APIs are deliberately not
   re-exported through `particula.gpu.kernels`.
 - Omitting `mechanism_config` preserves Brownian, particle-resolved execution.
-  The only additional executable configuration is exact charged-only
-  `("charged_hard_sphere",)` with `distribution_type="particle_resolved"`.
-  Combined Brownian-plus-charged execution and other mechanisms remain
-  deferred. Malformed configuration, unsupported distributions, and deferred
-  mechanisms fail during host-side preflight before runtime state access,
-  allocation, mutation, RNG initialization, or kernel launch.
+  Exact charged-only `("charged_hard_sphere",)` and canonical combined
+  Brownian-plus-charged `("brownian", "charged_hard_sphere")` configurations
+  are also executable with `distribution_type="particle_resolved"`; either
+  requested combined order normalizes to the canonical mask and uses one shared
+  stochastic selection path. Other mechanisms remain deferred. Malformed
+  configurations, unsupported distributions, and deferred mechanisms fail
+  during host-side preflight before runtime state access, allocation, mutation,
+  RNG initialization, or kernel launch.
 - `WarpParticleData.charge` is caller-owned, device-resident state containing
   dimensionless elementary-charge counts with shape `(n_boxes, n_particles)`.
   It is not a sidecar or a hidden transfer result. It must be a same-device
   `wp.float64` Warp array with that matching shape on the particle-data device.
-  Charged-only execution always scans it for finite values before environment
-  or volume normalization, caller-output validation or allocation, RNG setup,
-  and selector/apply work. Brownian finite-charge validation remains opt-in.
+  Every execution mode containing charged hard-sphere physics scans it for
+  finite values before environment or volume normalization, caller-output
+  validation or allocation, RNG setup, and selector/apply work. Brownian
+  finite-charge validation remains opt-in.
   Accepted merge application adds donor charge to the recipient and clears the
-  donor. This bookkeeping conserves charge; charge affects charged-only rates
-  and selection but not current Brownian rates or selection.
+  donor. This bookkeeping conserves charge; charge affects charged-hard-sphere
+  rates and selection but not Brownian rates or selection.
 - Shipped baseline: caller-owned persistent `rng_states` are seeded once and
   then reused across repeated calls.
 - Omitting `rng_states` keeps the convenience allocate-and-seed-per-call path.

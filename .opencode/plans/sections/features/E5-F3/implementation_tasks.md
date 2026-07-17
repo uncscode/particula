@@ -11,10 +11,10 @@
   charged helper, majorant, validation, and merge prerequisites are present.
 - [x] Route charged-only candidate rates through the shared acceptance ratio and
   existing disjoint active-rank removal.
-- [ ] Register canonical Brownian-plus-charged capability and sum both candidate
+- [x] Register canonical Brownian-plus-charged capability and sum both candidate
   rates before one acceptance draw.
-- [ ] Sum the Brownian and charged term bounds for combined execution and retain
-  E5-F1 finite/non-negative device guards.
+- [x] Use one exhaustive additive-rate majorant scan for combined execution and
+  retain E5-F1 finite/non-negative device guards.
 - [x] Preserve omitted-config Brownian behavior, keyword-only API shape, return
   tuple, output-buffer identity, and persistent RNG reset/reuse semantics.
 - [x] Update kernel, entry-point, and charged helper docstrings with the exact
@@ -35,7 +35,7 @@
 - [x] Add snapshots proving invalid charged capability/model/input requests,
   including non-finite charge, leave particles, output buffers, and persistent
   RNG state unchanged.
-- [ ] Add Brownian-plus-charged additive-rate and total-majorant probes and prove
+- [x] Add Brownian-plus-charged additive-rate and total-majorant probes and prove
   only one RNG/selection pass occurs.
 - [x] Add caller-owned buffer identity, persistent RNG, inactive-slot,
   multi-box, capacity, and multi-species total-mass tests for charged-only.
