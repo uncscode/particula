@@ -19,6 +19,12 @@
   private charge-transfer/clear merge semantics and deterministic conservation
   evidence. No README, API reference, or user-facing guide changed because the
   public coagulation API and charged-execution support boundary are unchanged.
+- Completed for P5 (#1340): published documentation now identifies charge as
+  caller-owned dimensionless elementary-charge counts with fp64/shape/device/
+  finiteness preflight and recipient-add/donor-clear bookkeeping. It documents
+  the approved helper subset, bounded evidence, and E5-F3 handoff without a
+  public charged-execution claim; AGENTS.md records the warning-clean focused
+  evidence commands.
 - Defer user-facing direct charged execution examples and final support/import
   matrix changes to E5-F9 after E5-F3 and E5-F7 establish execution evidence.
   Do not update README quick-start claims in this foundational feature.

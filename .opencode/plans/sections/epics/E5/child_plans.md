@@ -5,7 +5,7 @@
 | ID | Feature Plan | Status | Notes |
 |----|--------------|--------|-------|
 | E5-F1 | Mechanism Configuration and Sampling Contract | Draft | Define mechanism configuration, additive semantics, pair-kernel/majorant interface, pre-mutation validation, and particle-resolved support boundary. |
-| E5-F2 | Charged Pair Physics and Charge-Conserving Merges | Draft | Port approved Coulomb/reduced-property calculations and transfer/clear charge during merges with mass and charge tests. |
+| E5-F2 | Charged Pair Physics and Charge-Conserving Merges | Completed | Delivered internal approved pair helpers, charge preflight, recipient-add/donor-clear merges, focused evidence, and bounded documentation; charged execution remains E5-F3. |
 | E5-F3 | Charged and Brownian-Plus-Charged Execution | Draft | Integrate charged selection, prove a safe majorant, preserve buffers/RNG, and execute charged or Brownian-plus-charged in one pass. |
 | E5-F4 | SP2016 Sedimentation GPU Execution | Draft | Port settling properties and the SP2016 kernel with efficiency 1, bounded sampling, parity, multi-box, and conservation coverage. |
 | E5-F5 | ST1956 Turbulent-Shear GPU Execution | Draft | Add explicit dissipation/fluid-density inputs, viscosity and ST1956 pair physics, a safe majorant, and per-box validation. |

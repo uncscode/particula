@@ -428,13 +428,16 @@ for _ in range(n_steps):
   configuration, unsupported distributions, and reserved mechanisms fail during
   host-side preflight before runtime state access, allocation, mutation, RNG
   initialization, or kernel launch.
-- Before Brownian execution, `particles.charge` must be a finite `wp.float64`
-  Warp array with shape `(n_boxes, n_particles)` on the particle-data device.
+- `WarpParticleData.charge` is caller-owned, device-resident state containing
+  dimensionless elementary-charge counts with shape `(n_boxes, n_particles)`.
+  It is not a sidecar or a hidden transfer result. Before Brownian execution,
+  it must be a finite `wp.float64` Warp array on the particle-data device.
   Non-finite charge is detected by one read-only device scan and private-status
   readback; failure occurs before environment or volume normalization,
   caller-output validation or allocation, RNG setup, and Brownian/apply work.
   Accepted merge application adds donor charge to the recipient and clears the
-  donor. This bookkeeping does not enable charge-dependent selection or rates.
+  donor. This bookkeeping conserves charge, but does not affect current
+  Brownian rates or selection.
 - Shipped baseline: caller-owned persistent `rng_states` are seeded once and
   then reused across repeated calls.
 - Omitting `rng_states` keeps the convenience allocate-and-seed-per-call path.
@@ -454,6 +457,10 @@ for _ in range(n_steps):
   drawn from originally active slots; zero/one-active inputs must early-return;
   exactly-two-active inputs must collapse to the sole valid pair; and accepted
   collisions must conserve total mass.
+- Warp CPU is the baseline when installed; CUDA evidence is optional and must
+  skip cleanly when unavailable. Charged candidate selection, majorants,
+  stochastic execution, broader mechanisms, and performance claims remain
+  deferred.
 - See `docs/Features/data-containers-and-gpu-foundations.md` and
   `docs/Features/Roadmap/data-oriented-gpu.md` for the user-facing ownership
   and graph-capture guidance.
@@ -461,6 +468,8 @@ for _ in range(n_steps):
 Focused diagnostic runs:
 
 ```bash
+pytest particula/gpu/dynamics/tests/coagulation_funcs_test.py -q -Werror
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate or conservation" -Werror
 ```
