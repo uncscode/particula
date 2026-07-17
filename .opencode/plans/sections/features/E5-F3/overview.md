@@ -9,23 +9,23 @@ Brownian and charged rates in one stochastic pass. Charged rates also depend on
 particle charge as well as size, so the Brownian extreme-radius bound cannot be
 reused without a separate safety proof.
 
-## Value Proposition
+## Current Delivery
 
-E5-F3 makes the first non-Brownian mechanism executable through the existing
-particle-resolved `coagulation_step_gpu` boundary. It registers charged-only and
-Brownian-plus-charged capability, uses a finite upper bound that covers every
-active charged pair, and preserves caller-owned collision buffers and persistent
-RNG state. Accepted collisions continue to conserve species mass and, through
-E5-F2, total particle charge.
+E5-F3-P1 is complete for issue #1342. The private GPU term-majorant dispatcher
+now supports the approved charged hard-sphere term using a finite,
+non-negative, exhaustive maximum over unique compact active pairs. It reuses
+the E5-F2 charged physics and sanitizes invalid candidates.
+
+This is internal dispatcher support only. `coagulation_step_gpu` still does not
+execute charged-only or Brownian-plus-charged configurations; P2 and P3 retain
+capability registration, selection, acceptance, and merge integration.
 
 ## User Stories
 
-- As a GPU user, I want charged-only coagulation so electrostatic interactions
-  can drive a direct particle-resolved step.
-- As a GPU user, I want Brownian and charged rates combined before one
-  acceptance decision so mechanisms do not create duplicate collision chances.
-- As a maintainer, I want the charged majorant and stochastic behavior covered
-  by deterministic and bounded tests so later E5 combinations can reuse them.
+- As a maintainer, I want an independently tested charged majorant so later
+  execution phases have a safe internal bound.
+- As a GPU user, I will receive charged-only and combined execution only after
+  P2 and P3 complete their public-step integration.
 
 Parent epic: [E5](../../epics/E5/vision_problem.md), **GPU Coagulation Physics
 Coverage**. This feature is track T3, follows E5-F1 and E5-F2, and enables E5-F6

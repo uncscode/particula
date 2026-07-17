@@ -1,24 +1,21 @@
 # Scope
 
-E5-F3 extends the E5-F1 sampler with E5-F2 charged physics so the direct GPU
-step supports charged-only and Brownian-plus-charged particle-resolved execution
-through one bounded candidate and acceptance pass.
+E5-F3 stages E5-F2 charged physics for eventual charged-only and
+Brownian-plus-charged particle-resolved execution. Issue #1342 completed only
+the P1 private term-majorant foundation; public execution remains deferred.
 
 ## In Scope
 
-- Register the E5-approved charged model as executable in the mechanism
-  capability matrix established by E5-F1.
 - Compute a finite, non-negative charged majorant that bounds all active charged
-  pair rates; use an exhaustive active-pair maximum unless a tighter bound is
-  proved and regression-tested.
-- Dispatch charged pair rates for charged-only requests.
-- Sum Brownian and charged pair rates before one acceptance draw and use a safe
-  total majorant for Brownian-plus-charged requests.
-- Preserve legacy Brownian behavior, public return values, caller-owned output
-  buffer identity, persistent RNG ownership, and fail-before-mutation behavior.
-- Cover neutral, same-sign, opposite-sign, inactive-slot, mixed-scale,
-  multi-box, conservation, and stochastic execution cases on Warp CPU, with
-  optional CUDA coverage that skips cleanly.
+  pair rates by exhaustively scanning unique compact active pairs.
+- Dispatch the approved charged hard-sphere term internally through the existing
+  term-majorant dispatcher, while retaining Brownian dispatcher behavior.
+- Cover physics fixtures, invalid/zero candidates, sparse compact active lists,
+  per-box behavior, dispatcher addition, and Brownian regression with
+  co-located independent deterministic tests.
+- In later phases, register executable capability; route candidate rates through
+  one selection/acceptance pass; and preserve public API, buffer, RNG, and
+  mass/charge-merge contracts.
 
 ## Out of Scope
 
@@ -30,3 +27,5 @@ through one bounded candidate and acceptance pass.
   slot allocation, hidden CPU fallback or transfers, graph capture, adaptive
   stepping, and general performance redesign.
 - Exact CPU/Warp stochastic pair replay or CUDA as a release requirement.
+- Public charged-only or Brownian-plus-charged execution in P1, including
+  capability registration, selection, acceptance, merging, or API changes.

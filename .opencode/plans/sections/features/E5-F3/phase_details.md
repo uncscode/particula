@@ -1,14 +1,16 @@
 # Phase Details
 
-- [ ] **E5-F3-P1:** Prove and implement a safe charged majorant with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E5-F3-P1:** Prove and implement a safe charged majorant with unit tests
+  - Issue: #1342 | Size: S | Status: Completed
   - Goal: Compute a finite non-negative upper bound over every active charged
     pair and expose it through the E5-F1 term-majorant dispatcher.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: Exhaustive independent pair-matrix comparisons for neutral,
-    same-sign, opposite-sign, mixed-size, equal-size, inactive, and multi-box
-    fixtures; assert every pair rate is at most the majorant.
+  - Delivered: Private charged hard-sphere majorant scans every unique compact
+    active pair, sanitizes candidates, and is dispatched internally without
+    changing public charged execution.
+  - Tests: Independent deterministic physics, invalid/zero candidate, sparse
+    active-list, per-box, dispatcher-addition, and Brownian-regression coverage.
 
 - [ ] **E5-F3-P2:** Enable charged-only one-pass execution with unit tests
   - Issue: TBD | Size: S | Status: Not Started

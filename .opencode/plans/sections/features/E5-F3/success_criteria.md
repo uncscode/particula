@@ -2,8 +2,9 @@
 
 - [ ] The E5-approved charged identifier resolves as executable alone and with
   Brownian; unsupported variants and distributions fail before mutation.
-- [ ] The charged majorant is finite and non-negative and bounds 100% of unique
-  active charged pair rates in every deterministic proof fixture.
+- [x] The private charged majorant is finite and non-negative and bounds 100% of
+  unique compact-active charged pair rates in every deterministic P1 proof
+  fixture; invalid and zero candidates safely produce zero.
 - [ ] Brownian-plus-charged pair rates are the sum of enabled terms, and the sum
   of term majorants bounds every tested combined pair rate.
 - [ ] Each call performs one candidate/acceptance pass, writes one collision
@@ -36,3 +37,9 @@
 | Caller-owned output/RNG identity preservation | Brownian baseline | 100% | Ownership regression tests |
 | Validation failures after state or RNG mutation | 0 tolerated | 0 | Snapshot tests |
 | Required Warp CPU focused tests passing | Brownian baseline | 100% | Focused pytest run |
+
+## P1 Completion Boundary
+
+P1 satisfies only the charged-majorant criterion above and Brownian dispatcher
+regression coverage. Executable charged configurations, selection/acceptance,
+merge behavior, public API support, and stochastic metrics remain P2/P3 work.
