@@ -14,6 +14,12 @@ implemented only in `particula/gpu/dynamics/coagulation_funcs.py` and
 not change public exports, data containers, Brownian dispatch, charged
 execution wiring, or module boundaries.
 
+**Completed increment (E5-F2-P2, issue #1337):** the same two files now add
+the internal scalar `charged_hard_sphere_wp` helper and its independent NumPy
+oracle/probe coverage. It composes the existing property and Coulomb helpers,
+returns exact safe zero for invalid, non-finite, or non-positive physical
+inputs, and has no execution or dispatch integration.
+
 ## In Scope
 
 - Add focused `@wp.func` helpers in

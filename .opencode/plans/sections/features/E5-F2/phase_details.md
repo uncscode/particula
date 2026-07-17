@@ -15,15 +15,21 @@
   - Boundary: No public exports, data-container changes, Brownian dispatch,
     charged execution wiring, or module-boundary changes.
 
-- [ ] **E5-F2-P2:** Port approved charged pair models with CPU parity tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Implement only the E5-approved charged model identifiers behind
-    scalar pair helpers without wiring stochastic execution.
+- [x] **E5-F2-P2:** Port approved charged pair models with CPU parity tests
+  - Issue: #1337 | Size: S | Status: Completed
+  - Delivered: Internal scalar fp64 `charged_hard_sphere_wp` composes the
+    existing property, Coulomb, reduced-value, and diffusive-Knudsen helpers.
+    It preserves finite/non-negative exact-safe-zero behavior, including the
+    clipped extreme-repulsion path, without adding dispatch or execution.
   - Files: `particula/gpu/dynamics/coagulation_funcs.py`,
     `particula/gpu/dynamics/tests/coagulation_funcs_test.py`
-  - Tests: Deterministic CPU/Warp pair matrices for zero, same-sign, and
-    opposite-sign charge across representative radius, mass, temperature, and
-    pressure fixtures; unsupported model names remain unavailable.
+  - Tests: Independent NumPy-oracle and fp64 Warp CPU/optional-CUDA parity for
+    neutral, same-sign, opposite-sign, mixed-scale, temperature, and pressure
+    cases; pair-order symmetry, exact extreme-repulsion zero, and exhaustive
+    invalid state/charge/constant safe-zero cases.
+  - Boundary: No public exports, model dispatch, kernel-entry integration,
+    charged workflow, or changes to Brownian execution; unsupported models
+    remain unavailable.
 
 - [ ] **E5-F2-P3:** Add charge preflight validation with state-preservation tests
   - Issue: TBD | Size: S | Status: Not Started

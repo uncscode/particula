@@ -8,9 +8,8 @@
 - [x] What exact `rtol`/`atol` applies to each approved pair model and extreme
   repulsive fixture?
   - Resolved 2026-07-16: positive finite hard-sphere pair rates use
-    `rtol=1e-6, atol=0`. Neutral-limit exact zeros are asserted exactly. The
-    extreme repulsive fixture uses `rtol=1e-6, atol=1e-30` so its physical floor
-    is tested without NumPy's broad default absolute tolerance.
+    `rtol=1e-6, atol=0`. Neutral-limit and extreme-repulsion zeros are asserted
+    exactly with `0.0`.
 - [x] Should invalid duplicate recipient indices in a caller-supplied collision
   buffer be defensively ignored, rejected, or remain a documented private-kernel
   precondition?
