@@ -17,14 +17,197 @@ from particula.gpu.properties.particle_properties import (
     friction_factor_wp,
     knudsen_number_wp,
 )
+from particula.util.constants import STANDARD_GRAVITY
 
 _PI = wp.constant(wp.float64(3.141592653589793))
+_STANDARD_GRAVITY = wp.constant(wp.float64(STANDARD_GRAVITY))
 _COULOMB_SERIES_THRESHOLD = wp.constant(wp.float64(1.0e-5))
 _KINETIC_LIMIT_CUTOFF = wp.constant(wp.float64(1.0e-80))
 _HARD_SPHERE_LINEAR = wp.constant(wp.float64(25.836))
 _HARD_SPHERE_QUARTIC = wp.constant(wp.float64(11.211))
 _HARD_SPHERE_DENOMINATOR_LINEAR = wp.constant(wp.float64(3.502))
 _HARD_SPHERE_DENOMINATOR_QUADRATIC = wp.constant(wp.float64(7.211))
+
+
+@wp.func
+def effective_density_wp(
+    total_mass: wp.float64,
+    total_volume: wp.float64,
+) -> wp.float64:
+    """Calculate an effective mixture density from scalar SI totals.
+
+    Callers provide total mass [kg] and total component volume [m³]. Invalid,
+    non-positive, or overflowed values return exact safe zero.
+
+    Args:
+        total_mass: Total particle mass [kg].
+        total_volume: Total particle volume [m³].
+
+    Returns:
+        Effective density [kg/m³], or exact ``0.0`` for invalid inputs.
+    """
+    zero = wp.float64(0.0)
+    if (
+        not wp.isfinite(total_mass)
+        or total_mass <= zero
+        or not wp.isfinite(total_volume)
+        or total_volume <= zero
+    ):
+        return zero
+    density = total_mass / total_volume
+    if not wp.isfinite(density) or density <= zero:
+        return zero
+    return density
+
+
+@wp.func
+def settling_velocity_stokes_wp(
+    particle_radius: wp.float64,
+    effective_density: wp.float64,
+    temperature: wp.float64,
+    pressure: wp.float64,
+    gas_constant: wp.float64,
+    molecular_weight_air: wp.float64,
+    ref_viscosity: wp.float64,
+    ref_temperature: wp.float64,
+    sutherland_constant: wp.float64,
+) -> wp.float64:
+    """Calculate Stokes settling velocity with Cunningham slip in SI units.
+
+    Gas viscosity, molecular mean free path, Knudsen number, and Cunningham
+    slip are derived once from the supplied gas state. Invalid, non-positive,
+    underflowed, or overflowed inputs and intermediates return exact safe zero.
+
+    Args:
+        particle_radius: Particle radius [m].
+        effective_density: Effective particle density [kg/m³].
+        temperature: Gas temperature [K].
+        pressure: Gas pressure [Pa].
+        gas_constant: Universal gas constant [J/(mol K)].
+        molecular_weight_air: Air molar mass [kg/mol].
+        ref_viscosity: Reference dynamic viscosity [Pa s].
+        ref_temperature: Reference temperature [K].
+        sutherland_constant: Sutherland temperature constant [K].
+
+    Returns:
+        Settling velocity [m/s], or exact ``0.0`` for an invalid calculation.
+    """
+    zero = wp.float64(0.0)
+    if (
+        not wp.isfinite(particle_radius)
+        or particle_radius <= zero
+        or not wp.isfinite(effective_density)
+        or effective_density <= zero
+        or not wp.isfinite(temperature)
+        or temperature <= zero
+        or not wp.isfinite(pressure)
+        or pressure <= zero
+        or not wp.isfinite(gas_constant)
+        or gas_constant <= zero
+        or not wp.isfinite(molecular_weight_air)
+        or molecular_weight_air <= zero
+        or not wp.isfinite(ref_viscosity)
+        or ref_viscosity <= zero
+        or not wp.isfinite(ref_temperature)
+        or ref_temperature <= zero
+        or not wp.isfinite(sutherland_constant)
+        or sutherland_constant <= zero
+    ):
+        return zero
+    dynamic_viscosity = dynamic_viscosity_wp(
+        temperature,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+    )
+    if not wp.isfinite(dynamic_viscosity) or dynamic_viscosity <= zero:
+        return zero
+    mean_free_path = molecule_mean_free_path_wp(
+        molecular_weight_air,
+        temperature,
+        pressure,
+        dynamic_viscosity,
+        gas_constant,
+    )
+    if not wp.isfinite(mean_free_path) or mean_free_path <= zero:
+        return zero
+    knudsen_number = knudsen_number_wp(mean_free_path, particle_radius)
+    if not wp.isfinite(knudsen_number) or knudsen_number <= zero:
+        return zero
+    slip_correction = cunningham_slip_correction_wp(knudsen_number)
+    if not wp.isfinite(slip_correction) or slip_correction <= zero:
+        return zero
+    radius_squared = particle_radius * particle_radius
+    if not wp.isfinite(radius_squared) or radius_squared <= zero:
+        return zero
+    numerator = (
+        wp.float64(2.0)
+        * radius_squared
+        * effective_density
+        * slip_correction
+        * _STANDARD_GRAVITY
+    )
+    if not wp.isfinite(numerator) or numerator <= zero:
+        return zero
+    denominator = wp.float64(9.0) * dynamic_viscosity
+    if not wp.isfinite(denominator) or denominator <= zero:
+        return zero
+    velocity = numerator / denominator
+    if not wp.isfinite(velocity) or velocity <= zero:
+        return zero
+    return velocity
+
+
+@wp.func
+def sedimentation_sp2016_pair_rate_wp(
+    radius_i: wp.float64,
+    radius_j: wp.float64,
+    velocity_i: wp.float64,
+    velocity_j: wp.float64,
+) -> wp.float64:
+    """Calculate the SP2016 Eq. 13A.4 sedimentation pair rate in SI units.
+
+    This unit-efficiency rate is ``pi * (r_i + r_j)² * abs(v_i - v_j)``.
+    Invalid, negative, underflowed, or overflowed values return exact safe zero.
+
+    Args:
+        radius_i: Particle i radius [m].
+        radius_j: Particle j radius [m].
+        velocity_i: Particle i settling velocity [m/s].
+        velocity_j: Particle j settling velocity [m/s].
+
+    Returns:
+        Sedimentation pair rate [m³/s], or exact ``0.0`` for invalid inputs.
+
+    References:
+        Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry and
+        Physics* (3rd ed.), Eq. 13A.4.
+    """
+    zero = wp.float64(0.0)
+    if (
+        not wp.isfinite(radius_i)
+        or radius_i <= zero
+        or not wp.isfinite(radius_j)
+        or radius_j <= zero
+        or not wp.isfinite(velocity_i)
+        or velocity_i < zero
+        or not wp.isfinite(velocity_j)
+        or velocity_j < zero
+    ):
+        return zero
+    radius_sum = radius_i + radius_j
+    if not wp.isfinite(radius_sum) or radius_sum <= zero:
+        return zero
+    area = _PI * radius_sum * radius_sum
+    if not wp.isfinite(area) or area <= zero:
+        return zero
+    relative_velocity = wp.abs(velocity_i - velocity_j)
+    if not wp.isfinite(relative_velocity):
+        return zero
+    rate = area * relative_velocity
+    if not wp.isfinite(rate) or rate <= zero:
+        return zero
+    return rate
 
 
 @wp.func
