@@ -50,6 +50,7 @@ if wp is not None:
         brownian_kernel_pair_wp,
         g_collection_term_wp,
         particle_mean_free_path_wp,
+        sedimentation_sp2016_pair_rate_wp,
     )
     from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
         particle_radius_from_volume_wp,
@@ -76,6 +77,7 @@ if wp is not None:
         _resolve_active_pair_by_rank,
         _resolve_collision_capacity,
         _sanitize_positive_finite,
+        _sedimentation_majorant_from_active_pairs,
         _select_active_pair_by_rank,
         _total_majorant,
         _total_pair_rate,
@@ -116,6 +118,9 @@ if wp is not None:
     # pyright: reportAssignmentType=false
     from particula.particles.particle_data import ParticleData  # noqa: E402
     from particula.util import constants  # noqa: E402
+
+
+BROWNIAN_COAGULATION_MASK_INPUT_INDEX = 26
 
 
 def test_mechanism_default_matches_explicit_brownian() -> None:
@@ -532,6 +537,9 @@ def test_charged_only_multispecies_total_mass_regression(
     diffusivities_buffer = wp.zeros((1, 3), dtype=wp.float64, device=device)
     g_terms_buffer = wp.zeros((1, 3), dtype=wp.float64, device=device)
     speeds_buffer = wp.zeros((1, 3), dtype=wp.float64, device=device)
+    settling_velocities_buffer = wp.zeros(
+        (1, 3), dtype=wp.float64, device=device
+    )
     active_indices = wp.zeros((1, 3), dtype=wp.int32, device=device)
 
     wp.launch(
@@ -557,6 +565,7 @@ def test_charged_only_multispecies_total_mass_regression(
             diffusivities_buffer,
             g_terms_buffer,
             speeds_buffer,
+            settling_velocities_buffer,
             total_masses_buffer,
             gpu_particles.charge,
             active_indices,
@@ -1106,6 +1115,198 @@ def _run_charged_majorant_probes(
     return np.asarray(direct.numpy()), np.asarray(dispatched.numpy())
 
 
+def _sedimentation_sp2016_oracle(
+    radius_i: float,
+    radius_j: float,
+    velocity_i: float,
+    velocity_j: float,
+) -> float:
+    """Return an independent guarded SP2016 sedimentation pair rate."""
+    values = np.array(
+        [radius_i, radius_j, velocity_i, velocity_j], dtype=np.float64
+    )
+    if (
+        not np.all(np.isfinite(values))
+        or np.any(values[:2] <= 0.0)
+        or np.any(values[2:] < 0.0)
+    ):
+        return 0.0
+    with np.errstate(over="ignore", invalid="ignore", under="ignore"):
+        rate = np.pi * (radius_i + radius_j) ** 2 * abs(velocity_i - velocity_j)
+    return float(rate) if np.isfinite(rate) and rate > 0.0 else 0.0
+
+
+def _sedimentation_majorant_oracle(
+    active_indices: np.ndarray,
+    active_count: int,
+    radii: np.ndarray,
+    velocities: np.ndarray,
+) -> float:
+    """Return the independent exhaustive compact-active SP2016 maximum."""
+    candidates = (
+        _sedimentation_sp2016_oracle(
+            radii[first], radii[second], velocities[first], velocities[second]
+        )
+        for first, second in itertools.combinations(
+            active_indices[:active_count], 2
+        )
+    )
+    return max(candidates, default=0.0)
+
+
+def _settling_velocity_oracle(radius: float, density: float) -> float:
+    """Return an independent Stokes/Cunningham velocity for the test fixture."""
+    temperature = 298.15
+    pressure = 101325.0
+    with np.errstate(all="ignore"):
+        viscosity = (
+            constants.REF_VISCOSITY_AIR_STP
+            * (temperature / constants.REF_TEMPERATURE_STP) ** 1.5
+            * (constants.REF_TEMPERATURE_STP + constants.SUTHERLAND_CONSTANT)
+            / (temperature + constants.SUTHERLAND_CONSTANT)
+        )
+        mean_free_path = (2.0 * viscosity / pressure) / np.sqrt(
+            8.0
+            * constants.MOLECULAR_WEIGHT_AIR
+            / (np.pi * constants.GAS_CONSTANT * temperature)
+        )
+        knudsen = mean_free_path / radius
+        slip = 1.0 + knudsen * (1.257 + 0.4 * np.exp(-1.1 / knudsen))
+        velocity = (
+            2.0
+            * radius**2
+            * density
+            * slip
+            * constants.STANDARD_GRAVITY
+            / (9.0 * viscosity)
+        )
+    return float(velocity) if np.isfinite(velocity) and velocity > 0.0 else 0.0
+
+
+@_warp_kernel
+def _sedimentation_pair_rate_probe_kernel(
+    radii: Any,
+    settling_velocities: Any,
+    direct: Any,
+    dispatched: Any,
+) -> None:
+    """Probe the P1 rate and fixed-mask pair-rate dispatcher."""
+    direct[0] = sedimentation_sp2016_pair_rate_wp(
+        radii[0], radii[1], settling_velocities[0], settling_velocities[1]
+    )
+    dispatched[0] = _total_pair_rate(
+        wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG),
+        radii[0],
+        radii[1],
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        settling_velocities[0],
+        settling_velocities[1],
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+    )
+
+
+@_warp_kernel
+def _sedimentation_majorant_probe_kernel(
+    active_indices: Any,
+    active_counts: Any,
+    radii: Any,
+    settling_velocities: Any,
+    total_masses: Any,
+    charges: Any,
+    temperature: Any,
+    pressure: Any,
+    direct: Any,
+    dispatched: Any,
+) -> None:
+    """Probe direct and fixed-mask dispatched sedimentation majorants."""
+    box_idx = wp.tid()
+    active_count = active_counts[box_idx]
+    direct[box_idx] = _sedimentation_majorant_from_active_pairs(
+        active_indices,
+        box_idx,
+        active_count,
+        radii,
+        settling_velocities,
+    )
+    dispatched[box_idx] = _total_majorant(
+        wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        active_indices,
+        box_idx,
+        active_count,
+        radii,
+        settling_velocities,
+        total_masses,
+        charges,
+        temperature,
+        pressure,
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+    )
+
+
+def _run_sedimentation_majorant_probes(
+    device: str,
+    compact: np.ndarray,
+    active_counts: np.ndarray,
+    radii: np.ndarray,
+    velocities: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Run direct and dispatched SP2016 majorant probes on explicit fixtures."""
+    direct = wp.zeros((compact.shape[0],), dtype=wp.float64, device=device)
+    dispatched = wp.zeros((compact.shape[0],), dtype=wp.float64, device=device)
+    wp.launch(
+        _sedimentation_majorant_probe_kernel,
+        dim=compact.shape[0],
+        inputs=[
+            wp.array(compact, dtype=wp.int32, device=device),
+            wp.array(active_counts, dtype=wp.int32, device=device),
+            wp.array(radii, dtype=wp.float64, device=device),
+            wp.array(velocities, dtype=wp.float64, device=device),
+            wp.zeros(radii.shape, dtype=wp.float64, device=device),
+            wp.zeros(radii.shape, dtype=wp.float64, device=device),
+            wp.ones((compact.shape[0],), dtype=wp.float64, device=device),
+            wp.ones((compact.shape[0],), dtype=wp.float64, device=device),
+            direct,
+            dispatched,
+        ],
+        device=device,
+    )
+    wp.synchronize_device(device)
+    return np.asarray(direct.numpy()), np.asarray(dispatched.numpy())
+
+
 _INT32_MAX = np.iinfo(np.int32).max
 
 
@@ -1210,6 +1411,8 @@ def _additive_helper_probe_kernel(
         values[5],
         values[6],
         values[7],
+        wp.float64(0.0),
+        wp.float64(0.0),
         total_masses[0, 0],
         total_masses[0, 1],
         charges[0, 0],
@@ -1238,6 +1441,7 @@ def _additive_helper_probe_kernel(
         active_indices,
         wp.int32(0),
         wp.int32(0),
+        radii,
         radii,
         total_masses,
         charges,
@@ -1303,6 +1507,7 @@ def _charged_majorant_probe_kernel(
         active_indices,
         box_idx,
         active_count,
+        radii,
         radii,
         total_masses,
         charges,
@@ -1958,6 +2163,104 @@ def test_charged_majorant_dispatcher_adds_brownian_term(device: str) -> None:
     )
 
 
+@pytest.mark.gpu_parity
+def test_sedimentation_majorant_matches_independent_sparse_pair_oracle(
+    device: str,
+) -> None:
+    """Direct and dispatched SP2016 bounds scan all compact sparse pairs."""
+    compact = np.array([[5, 1, 4, 2, -1, -1]], dtype=np.int32)
+    radii = np.array(
+        [[2.0e-6, 1.0e-6, 4.0e-6, 8.0e-6, 3.0e-6, 6.0e-6]],
+        dtype=np.float64,
+    )
+    velocities = np.array([[3.0, 0.5, 8.0, 2.0, 4.0, 6.0]], dtype=np.float64)
+    expected = _sedimentation_majorant_oracle(
+        compact[0], 4, radii[0], velocities[0]
+    )
+    direct, dispatched = _run_sedimentation_majorant_probes(
+        device, compact, np.array([4], dtype=np.int32), radii, velocities
+    )
+
+    assert expected > 0.0
+    npt.assert_allclose(direct, [expected], rtol=1.0e-12, atol=0.0)
+    npt.assert_allclose(dispatched, [expected], rtol=1.0e-12, atol=0.0)
+    for first, second in itertools.combinations(compact[0, :4], 2):
+        rate = _sedimentation_sp2016_oracle(
+            radii[0, first],
+            radii[0, second],
+            velocities[0, first],
+            velocities[0, second],
+        )
+        assert rate <= np.nextafter(direct[0], np.inf)
+
+
+@pytest.mark.parametrize("active_count", [0, 1])
+def test_sedimentation_majorant_returns_zero_before_low_active_indexing(
+    device: str, active_count: int
+) -> None:
+    """SP2016 majorants return exact zero for zero or one compact active slot."""
+    direct, dispatched = _run_sedimentation_majorant_probes(
+        device,
+        np.array([[0, 1]], dtype=np.int32),
+        np.array([active_count], dtype=np.int32),
+        np.array([[2.0e-6, 4.0e-6]], dtype=np.float64),
+        np.array([[1.0, 4.0]], dtype=np.float64),
+    )
+    npt.assert_array_equal(direct, np.zeros(1, dtype=np.float64))
+    npt.assert_array_equal(dispatched, np.zeros(1, dtype=np.float64))
+
+
+@pytest.mark.parametrize(
+    "velocities",
+    [
+        np.array([[2.0, 2.0]], dtype=np.float64),
+        np.array([[np.nan, 2.0]], dtype=np.float64),
+        np.array([[np.inf, 2.0]], dtype=np.float64),
+        np.array([[-1.0, 2.0]], dtype=np.float64),
+    ],
+)
+def test_sedimentation_majorant_excludes_equal_and_invalid_velocities(
+    device: str, velocities: np.ndarray
+) -> None:
+    """Equal, non-finite, and negative velocities make no SP2016 bound."""
+    direct, dispatched = _run_sedimentation_majorant_probes(
+        device,
+        np.array([[0, 1]], dtype=np.int32),
+        np.array([2], dtype=np.int32),
+        np.array([[2.0e-6, 4.0e-6]], dtype=np.float64),
+        velocities,
+    )
+    npt.assert_array_equal(direct, np.zeros(1, dtype=np.float64))
+    npt.assert_array_equal(dispatched, np.zeros(1, dtype=np.float64))
+
+
+def test_sedimentation_pair_rate_contributes_through_fixed_dispatch(
+    device: str,
+) -> None:
+    """The sedimentation-only mask preserves the P1 pair rate in dispatch."""
+    radii = np.array([2.0e-6, 6.0e-6], dtype=np.float64)
+    velocities = np.array([0.5, 3.0], dtype=np.float64)
+    direct = wp.zeros((1,), dtype=wp.float64, device=device)
+    dispatched = wp.zeros((1,), dtype=wp.float64, device=device)
+    wp.launch(
+        _sedimentation_pair_rate_probe_kernel,
+        dim=1,
+        inputs=[
+            wp.array(radii, dtype=wp.float64, device=device),
+            wp.array(velocities, dtype=wp.float64, device=device),
+            direct,
+            dispatched,
+        ],
+        device=device,
+    )
+    wp.synchronize_device(device)
+
+    expected = _sedimentation_sp2016_oracle(*radii, *velocities)
+    assert expected > 0.0
+    npt.assert_allclose(direct.numpy(), [expected], rtol=1.0e-12, atol=0.0)
+    npt.assert_allclose(dispatched.numpy(), [expected], rtol=1.0e-12, atol=0.0)
+
+
 def _run_synthetic_total_sampling_probe(
     device: str,
     rate_terms: tuple[float, float],
@@ -2481,6 +2784,8 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
                 g_terms[box_idx, second_idx],
                 speeds[box_idx, first_idx],
                 speeds[box_idx, second_idx],
+                wp.float64(0.0),
+                wp.float64(0.0),
                 wp.float64(1.0),
                 wp.float64(1.0),
                 wp.float64(0.0),
@@ -2570,6 +2875,8 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
             g_terms[box_idx, selected_j],
             speeds[box_idx, selected_i],
             speeds[box_idx, selected_j],
+            wp.float64(0.0),
+            wp.float64(0.0),
             wp.float64(1.0),
             wp.float64(1.0),
             wp.float64(0.0),
@@ -3154,7 +3461,9 @@ def test_coagulation_step_gpu_explicit_brownian_matches_default_and_dispatches_m
 
     def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
         if getattr(kernel, "key", "") == "brownian_coagulation_kernel":
-            masks.append(kwargs["inputs"][25])
+            masks.append(
+                kwargs["inputs"][BROWNIAN_COAGULATION_MASK_INPUT_INDEX]
+            )
         return original_launch(kernel, *args, **kwargs)
 
     monkeypatch.setattr(coagulation_module.wp, "launch", _tracking_launch)
@@ -5491,6 +5800,188 @@ def test_coagulation_marks_inactive_particles(device: str) -> None:
     assert np.max(result.masses) >= np.max(particles.masses)
 
 
+def _launch_private_coagulation_sampler(
+    device: str,
+    masses: np.ndarray,
+    concentration: np.ndarray,
+    mechanism_mask: int,
+    *,
+    time_step: float,
+    volume: float = 1.0,
+    rng_state: int = 17,
+) -> dict[str, Any]:
+    """Launch the private selector with caller-visible scratch for regression tests."""
+    n_boxes, n_particles, _ = masses.shape
+    masses_wp = wp.array(masses, dtype=wp.float64, device=device)
+    concentration_wp = wp.array(concentration, dtype=wp.float64, device=device)
+    radii = wp.full(
+        (n_boxes, n_particles), 9.0, dtype=wp.float64, device=device
+    )
+    diffusivities = wp.zeros_like(radii)
+    g_terms = wp.zeros_like(radii)
+    speeds = wp.zeros_like(radii)
+    settling_velocities = wp.full(
+        (n_boxes, n_particles), 7.0, dtype=wp.float64, device=device
+    )
+    total_masses = wp.zeros_like(radii)
+    active_indices = wp.zeros(
+        (n_boxes, n_particles), dtype=wp.int32, device=device
+    )
+    pairs = wp.full(
+        (n_boxes, n_particles, 2), -7, dtype=wp.int32, device=device
+    )
+    counts = wp.full((n_boxes,), -7, dtype=wp.int32, device=device)
+    states = wp.full((n_boxes,), rng_state, dtype=wp.uint32, device=device)
+    wp.launch(
+        brownian_coagulation_kernel,
+        dim=n_boxes,
+        inputs=[
+            masses_wp,
+            concentration_wp,
+            wp.array([1000.0], dtype=wp.float64, device=device),
+            wp.full((n_boxes,), volume, dtype=wp.float64, device=device),
+            wp.full((n_boxes,), 298.15, dtype=wp.float64, device=device),
+            wp.full((n_boxes,), 101325.0, dtype=wp.float64, device=device),
+            wp.float64(constants.GAS_CONSTANT),
+            wp.float64(constants.BOLTZMANN_CONSTANT),
+            wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+            wp.float64(constants.REF_VISCOSITY_AIR_STP),
+            wp.float64(constants.REF_TEMPERATURE_STP),
+            wp.float64(constants.SUTHERLAND_CONSTANT),
+            wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+            wp.float64(constants.ELECTRIC_PERMITTIVITY),
+            wp.float64(time_step),
+            radii,
+            diffusivities,
+            g_terms,
+            speeds,
+            settling_velocities,
+            total_masses,
+            wp.zeros_like(radii),
+            active_indices,
+            pairs,
+            counts,
+            states,
+            wp.int32(mechanism_mask),
+            wp.int32(n_particles),
+        ],
+        device=device,
+    )
+    wp.synchronize_device(device)
+    return {
+        "masses": masses_wp,
+        "concentration": concentration_wp,
+        "radii": radii,
+        "settling_velocities": settling_velocities,
+        "active_indices": active_indices,
+        "pairs": pairs,
+        "counts": counts,
+        "states": states,
+    }
+
+
+@pytest.mark.stochastic
+def test_private_sedimentation_sampler_bounds_pairs_and_advances_rng(
+    device: str,
+) -> None:
+    """Exact SP2016 dispatch shares the bounded selector and persistent RNG path."""
+    masses = np.array([[[1.0e-15], [8.0e-15], [2.7e-14], [6.4e-14]]])
+    concentration = np.ones((1, 4), dtype=np.float64)
+    first = _launch_private_coagulation_sampler(
+        device,
+        masses,
+        concentration,
+        SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        time_step=1.0e308,
+    )
+    second = _launch_private_coagulation_sampler(
+        device,
+        masses,
+        concentration,
+        SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        time_step=1.0e308,
+    )
+    count = int(first["counts"].numpy()[0])
+    pairs = np.asarray(first["pairs"].numpy())[0, :count]
+
+    assert 0 <= count <= 2 <= MAX_SCHEDULED_TRIALS_PER_BOX
+    assert np.all(pairs[:, 0] < pairs[:, 1])
+    assert set(pairs.ravel()).issubset({0, 1, 2, 3})
+    assert len(np.unique(pairs)) == 2 * count
+    assert int(first["states"].numpy()[0]) != 17
+    npt.assert_array_equal(first["pairs"].numpy(), second["pairs"].numpy())
+    npt.assert_array_equal(first["counts"].numpy(), second["counts"].numpy())
+    npt.assert_array_equal(first["states"].numpy(), second["states"].numpy())
+
+
+def test_private_mixed_sedimentation_mask_rejects_without_rng_or_pair_work(
+    device: str,
+) -> None:
+    """Unsupported direct Brownian-plus-SP2016 masks perform no schedule work."""
+    masses = np.array([[[1.0e-15], [8.0e-15]]])
+    result = _launch_private_coagulation_sampler(
+        device,
+        masses,
+        np.ones((1, 2), dtype=np.float64),
+        BROWNIAN_MECHANISM_FLAG | SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        time_step=1.0e308,
+    )
+
+    npt.assert_array_equal(result["counts"].numpy(), [0])
+    npt.assert_array_equal(result["pairs"].numpy(), [[[-7, -7], [-7, -7]]])
+    npt.assert_array_equal(result["states"].numpy(), [17])
+    npt.assert_array_equal(result["masses"].numpy(), masses)
+
+
+def test_private_sampler_clears_and_populates_sedimentation_velocity_scratch(
+    device: str,
+) -> None:
+    """Settling scratch clears on every launch and only valid SP2016 slots fill."""
+    masses = np.array([[[1.0e-15], [8.0e-15], [0.0]]])
+    concentration = np.array([[1.0, 1.0, 1.0]], dtype=np.float64)
+    brownian = _launch_private_coagulation_sampler(
+        device, masses, concentration, BROWNIAN_MECHANISM_FLAG, time_step=0.0
+    )
+    sedimentation = _launch_private_coagulation_sampler(
+        device,
+        masses,
+        concentration,
+        SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        time_step=0.0,
+    )
+
+    npt.assert_array_equal(brownian["settling_velocities"].numpy(), [[0.0] * 3])
+    velocities = np.asarray(sedimentation["settling_velocities"].numpy())[0]
+    expected = np.array(
+        [
+            _settling_velocity_oracle(
+                (3.0 * mass / (4.0 * np.pi * 1000.0)) ** (1.0 / 3.0),
+                1000.0,
+            )
+            for mass in masses[0, :2, 0]
+        ]
+    )
+    npt.assert_allclose(velocities[:2], expected, rtol=1.0e-12, atol=0.0)
+    assert velocities[2] == 0.0
+
+
+def test_private_sedimentation_invalid_particles_clear_scratch_and_rng(
+    device: str,
+) -> None:
+    """Invalid private sedimentation slots cannot schedule or advance RNG."""
+    result = _launch_private_coagulation_sampler(
+        device,
+        np.array([[[0.0], [np.nan], [-1.0]]], dtype=np.float64),
+        np.ones((1, 3), dtype=np.float64),
+        SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        time_step=1.0e308,
+    )
+
+    npt.assert_array_equal(result["settling_velocities"].numpy(), [[0.0] * 3])
+    npt.assert_array_equal(result["counts"].numpy(), [0])
+    npt.assert_array_equal(result["states"].numpy(), [17])
+
+
 def test_brownian_coagulation_kernel_inactive_particles(
     device: str,
 ) -> None:
@@ -5535,6 +6026,7 @@ def test_brownian_coagulation_kernel_inactive_particles(
     )
     g_terms = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     speeds = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
+    settling_velocities = wp.zeros_like(speeds)
     total_masses = wp.zeros_like(speeds)
     charge = wp.zeros_like(speeds)
     active_flags = wp.zeros(
@@ -5567,6 +6059,7 @@ def test_brownian_coagulation_kernel_inactive_particles(
             diffusivities,
             g_terms,
             speeds,
+            settling_velocities,
             total_masses,
             charge,
             active_flags,
@@ -5611,6 +6104,7 @@ def test_brownian_kernel_zero_mask_rejects_work_and_caps_overflow_schedule(
     diffusivities = wp.zeros_like(radii)
     g_terms = wp.zeros_like(radii)
     speeds = wp.zeros_like(radii)
+    settling_velocities = wp.zeros_like(radii)
     total_masses = wp.zeros_like(radii)
     charge = wp.zeros_like(radii)
     active_indices = wp.zeros(
@@ -5645,6 +6139,7 @@ def test_brownian_kernel_zero_mask_rejects_work_and_caps_overflow_schedule(
                 diffusivities,
                 g_terms,
                 speeds,
+                settling_velocities,
                 total_masses,
                 charge,
                 active_indices,
@@ -6470,7 +6965,7 @@ def test_coagulation_step_gpu_forced_collision_transfers_charge_exactly(
             return launch(
                 _force_pair,
                 dim=(1,),
-                inputs=[inputs[22], inputs[23]],
+                inputs=[inputs[23], inputs[24]],
                 device=kwargs["device"],
             )
         return launch(kernel, *args, **kwargs)
