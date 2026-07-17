@@ -79,7 +79,7 @@ leading `n_boxes` axis.
 | --- | --- | --- |
 | `masses` | `(n_boxes, n_particles, n_species)` | Authoritative per-particle, per-species masses. |
 | `concentration` | `(n_boxes, n_particles)` | Per-box particle concentration or count, depending on workflow. |
-| `charge` | `(n_boxes, n_particles)` | Per-box particle charge state. |
+| `charge` | `(n_boxes, n_particles)` | Per-box particle charge state as dimensionless elementary-charge counts. |
 | `density` | `(n_species,)` | Shared-across-box species density. |
 | `volume` | `(n_boxes,)` | Authoritative per-box simulation volume. |
 
@@ -205,13 +205,27 @@ Across this boundary, the shipped particle schema stays aligned:
 | --- | --- | --- | --- |
 | `masses` | `(n_boxes, n_particles, n_species)` | `(n_boxes, n_particles, n_species)` | Authoritative per-particle, per-species masses round-trip without shape drift. |
 | `concentration` | `(n_boxes, n_particles)` | `(n_boxes, n_particles)` | Preserves the leading `n_boxes` axis for single-box and multi-box storage. |
-| `charge` | `(n_boxes, n_particles)` | `(n_boxes, n_particles)` | Preserves particle charge state without hidden conversion. |
+| `charge` | `(n_boxes, n_particles)` | `(n_boxes, n_particles)` | Preserves dimensionless elementary-charge counts without hidden conversion. |
 | `density` | `(n_species,)` | `(n_species,)` | Shared species density remains shared; it does not gain a box axis. |
 | `volume` | `(n_boxes,)` | `(n_boxes,)` | Per-box simulation volume stays particle-owned across the helper boundary. |
 
 As with the gas and environment helpers, kernels and runnables do not perform
 hidden CPU↔GPU synchronization or implicit container transfers for particle
 state.
+
+For direct GPU coagulation, `WarpParticleData.charge` is caller-owned,
+device-resident particle state, not a sidecar or hidden transfer result. It
+must be a `wp.float64` array with shape `(n_boxes, n_particles)` on the same
+device as the other particle arrays, and every value must be finite. Before
+downstream runtime work or mutation, coagulation performs a read-only
+device-side finite-value scan. A failing scan rejects the call without copying
+or mutating the caller-owned charge array.
+
+When a collision is accepted, the recipient receives the donor charge and the
+donor charge is cleared together with donor mass and concentration. Supported
+evidence conserves charge independently in each box. This merge bookkeeping
+does not make charged selection, charged majorants, Brownian-plus-charged
+execution, or public charged stochastic execution available.
 
 ### GPU coagulation configuration and sidecar ownership
 
@@ -248,6 +262,11 @@ Structural recognition is not executability. Any reserved ID, including a
 Brownian-plus-reserved combination, raises `ValueError` in host capability
 preflight before runtime input access, allocation, launch, or mutable state
 changes.
+
+The charge foundations above do not change this capability table:
+`charged_hard_sphere` remains reserved. They do not provide charged selection,
+charged majorants, Brownian-plus-charged execution, or public charged
+stochastic execution.
 
 The fixed sampler has one normalized active set, one total safe majorant, one
 candidate stream, one total pair-rate acceptance decision for each valid

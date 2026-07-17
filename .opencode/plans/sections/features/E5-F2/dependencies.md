@@ -29,8 +29,9 @@
 
 ## Phase Ordering
 
-P1 establishes shared pair properties before P2 composes model-specific rates.
-P2 is gated by the E5-F1/F2 model decision. P3 makes charge input safe before P4
-mutates it. P4 must ship before E5-F3 can expose charged execution. P5 documents
-only tested behavior and remains last. Tests are co-located with P1-P4 rather
-than deferred to a standalone testing phase. Classifier diagnostics: none.
+P1 established shared pair properties before P2 composed model-specific rates.
+P2 was gated by the E5-F1/F2 model decision. P3 made charge input safe before
+P4 mutated it. P4 shipped before E5-F3 can expose charged execution. P5
+documented only tested behavior after focused validation. Tests remain
+co-located with P1-P4 rather than deferred to a standalone testing phase.
+Classifier diagnostics: none.

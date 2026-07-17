@@ -31,10 +31,11 @@
     charged workflow, or changes to Brownian execution; unsupported models
     remain unavailable.
 
-- [ ] **E5-F2-P3:** Add charge preflight validation with state-preservation tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Reject malformed charge buffers before allocation, launch, particle
-    mutation, or persistent RNG advancement.
+- [x] **E5-F2-P3:** Add charge preflight validation with state-preservation tests
+  - Issue: TBD | Size: S | Status: Completed
+  - Delivered: Charge shape, `wp.float64` dtype, active-device ownership, and
+    finite values are validated before downstream runtime work or mutation. The
+    finite-value scan is read-only and uses only private status state.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
   - Tests: Wrong shape, dtype, device, NaN, and infinity failures plus snapshots
@@ -58,10 +59,12 @@
     `coagulation_step_gpu` API and three-item return tuple, collision sidecars,
     and persistent RNG ownership are unchanged.
 
-- [ ] **E5-F2-P5:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Record charged helper ownership, merge semantics, validated limits,
-    and the E5-F3 handoff without claiming charged execution is available.
+- [x] **E5-F2-P5:** Update development documentation
+  - Issue: #1340 | Size: XS | Status: Completed
+  - Delivered: Recorded charged-helper ownership, preflight and merge semantics,
+    bounded evidence, and the E5-F3 handoff without claiming charged execution.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Features/coagulation_strategy_system.md`, `AGENTS.md`, E5 plan sections
-  - Tests: Documentation link/reference validation and focused command checks.
+  - Tests: Resolved published links and ran warning-clean focused evidence:
+    `pytest particula/gpu/dynamics/tests/coagulation_funcs_test.py -q -Werror`
+    and `pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror`.

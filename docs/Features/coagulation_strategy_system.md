@@ -436,6 +436,34 @@ aerosol.particles = particle_resolved.step(
 - No built-in high-level orchestrator; you control the time loop and pipeline ordering.
 - DNS parameterization assumes applicability of Ayala et al. (2008) fits; verify for extreme regimes.
 
+### GPU direct-kernel foundations and limitations
+
+This section is separate from the CPU `particula.dynamics` strategy API above.
+The direct GPU coagulation path executes Brownian particle-resolved coagulation
+only; it is not a GPU runnable for `ChargedCoagulationStrategy` or the other
+CPU strategies.
+
+The approved internal E5-F2 helper subset is
+`coulomb_potential_ratio_wp`, `coulomb_kinetic_limit_wp`,
+`coulomb_continuum_limit_wp`, `reduced_value_wp`,
+`diffusive_knudsen_number_wp`, and `charged_hard_sphere_wp`. The CPU formula
+and strategy reference sources are
+`particula/dynamics/coagulation/charged_dimensional_kernel.py`,
+`charged_dimensionless_kernel.py`, and `charged_kernel_strategy.py`; they are
+not a public GPU runnable.
+
+Current bounded evidence covers deterministic helper parity; neutral,
+attractive, repulsive, and safe-zero cases; charge-buffer validation; and
+recipient-add/donor-clear merge behavior. Warp CPU is the baseline when Warp
+is installed; CUDA evidence is optional and skips cleanly when unavailable.
+The published [GPU container and direct-kernel contract](./data-containers-and-gpu-foundations.md)
+defines the associated ownership boundary.
+
+E5-F3 remains the downstream implementation track for safe majorants,
+candidate selection, and executable charged sampling. No charged candidate
+selection, majorants, Brownian-plus-charged execution, or public charged
+stochastic execution is available from these foundations.
+
 ## Related Documentation
 
 - **Wall loss strategies**: [wall_loss_strategy_system.md](./wall_loss_strategy_system.md)

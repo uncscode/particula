@@ -7,7 +7,7 @@
   tolerances for neutral, same-sign, opposite-sign, and mixed-scale fixtures.
 - [x] Supported pair-helper inputs produce finite, symmetric, non-negative rates
   and preserve the neutral limit without divide-by-zero or overflow.
-- [ ] Charge shape, dtype, device, NaN, and infinity failures occur before any
+- [x] Charge shape, dtype, device, NaN, and infinity failures occur before any
   particle/output-buffer mutation or persistent RNG advancement.
 - [x] Every accepted merge adds donor charge to recipient charge and clears
   donor mass, concentration, and charge; zero-collision calls are no-ops.
@@ -15,9 +15,9 @@
   one-box, multi-box, multi-species, zero-charge, and mixed-sign fixtures.
 - [x] Existing Brownian behavior, return tuple, output-buffer identity, and
   persistent RNG tests remain compatible.
-- [ ] Warp CPU evidence passes when Warp is installed; optional CUDA either
+- [x] Warp CPU evidence passes when Warp is installed; optional CUDA either
   passes the same deterministic checks or skips cleanly.
-- [ ] Documentation describes only pair-helper/merge support and identifies
+- [x] Documentation describes only pair-helper/merge support and identifies
   E5-F3 as the owner of charged stochastic execution and majorants.
 
 ## Metrics

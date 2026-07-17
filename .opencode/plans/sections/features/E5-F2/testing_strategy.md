@@ -24,7 +24,7 @@ parameterize optional CUDA with a clean skip when unavailable.
   exhaustive non-finite/zero/negative safe-zero inputs for pair state, charge,
   and all eight scalar constants. Valid positive rates use `rtol=1e-6,
   atol=0`; invalid and extreme-repulsion results are exact zero.
-- **P3 — Validation/regression tests:** Extend
+- **P3 — Validation/regression tests (completed, issue: TBD):** Extend
   `particula/gpu/kernels/tests/coagulation_test.py` with wrong shape, wrong dtype,
   wrong device, NaN, and infinity cases. Snapshot masses, concentration, charge,
   collision buffers, counts, and persistent RNG to prove validation fails before
@@ -39,9 +39,12 @@ parameterize optional CUDA with a clean skip when unavailable.
   clearing and no-op paths. Step-level zero-charge and signed-charge tests retain
   return and supplied-sidecar identity assertions; signed charge is conserved
   per box rather than incorrectly required to remain slotwise unchanged.
-- **P5 — Documentation validation:** Check links, imports, support wording, and
-  focused reproduction commands. Documentation must say pair physics and merges
-  are foundational, not claim E5-F3 execution before it ships.
+- **P5 — Documentation validation (completed, #1340):** Resolved published
+  links, checked support wording, and ran the warning-clean focused commands:
+  `pytest particula/gpu/dynamics/tests/coagulation_funcs_test.py -q -Werror`
+  and `pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror`.
+  Documentation says pair physics and merges are foundational and does not claim
+  E5-F3 execution before it ships.
 
 ## Coverage and Evidence Boundaries
 

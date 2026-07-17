@@ -20,8 +20,10 @@ unit validation to a standalone testing phase.
 
 - Callers continue to own `WarpParticleData`, fixed-shape work buffers, and
   optional persistent `rng_states`; the step mutates only documented fields.
-- Particle charge remains in `WarpParticleData.charge`. A merge adds donor
-  charge to the recipient and clears the donor alongside its mass/state.
+- Particle charge remains caller-owned in `WarpParticleData.charge` as
+  dimensionless elementary-charge counts. It is fp64, fixed-shape,
+  active-device, and finite before downstream work; a merge adds donor charge
+  to the recipient and clears the donor alongside its mass/state.
 - Mechanism-specific scalar or per-box inputs are explicitly supplied,
   validated on the active device, and never fetched through hidden transfers.
 - Combined mechanisms share one candidate/acceptance pass; they do not advance
