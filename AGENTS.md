@@ -409,7 +409,7 @@ import warp as wp
 
 rng_states = wp.zeros((n_boxes,), dtype=wp.uint32, device=device)
 
-# Seed once before a repeated-step loop or before graph capture.
+# Seed once before a repeated-step loop.
 coagulation_step_gpu(..., rng_seed=41, rng_states=rng_states,
                      initialize_rng=True)
 

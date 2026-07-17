@@ -24,7 +24,7 @@
 - [x] Existing omitted/explicit Brownian regressions remain compatible.
 - [ ] Warp CPU evidence passes when Warp is installed; optional CUDA passes or
   skips cleanly; changed-code coverage is at least 80% without threshold changes.
-- [ ] Documentation states exact supported mechanisms, ownership, devices,
+- [x] Documentation states exact supported mechanisms, ownership, devices,
   limitations, and focused reproduction commands without broader claims.
 
 ## Metrics
@@ -40,8 +40,9 @@
 | Validation failures after state or RNG mutation | 0 tolerated | 0 | Snapshot tests |
 | Required Warp CPU focused tests passing | Brownian baseline | 100% | Focused pytest run |
 
-## P3 Completion Boundary
+## Completion Boundary
 
 P3 satisfies the combined capability, additive-rate/majorant, one-pass
 selection, preflight, ownership/RNG, conservation, and stochastic criteria. P4
-remains responsible for broader development-documentation updates.
+/ #1345 completed the corresponding development documentation using P1-P3
+evidence only and added no runtime behavior.
