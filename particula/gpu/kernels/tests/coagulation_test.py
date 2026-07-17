@@ -4585,6 +4585,7 @@ def test_coagulation_step_gpu_rejects_charge_metadata_before_downstream_work(
         dtype=wp.float32 if charge.dtype == np.float32 else wp.float64,
         device=device,
     )
+    particle_input: Any
     if charge.dtype == np.float32:
         particle_input = SimpleNamespace(
             masses=gpu_particles.masses,
