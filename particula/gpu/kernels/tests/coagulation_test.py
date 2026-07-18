@@ -3957,6 +3957,7 @@ def test_turbulent_p2_preflight_precedes_capability_and_runtime_work(
         raise AssertionError("invalid P2 input reached downstream work")
 
     for helper_name in (
+        "_broadcast_scalar_array",
         "_ensure_environment_arrays",
         "_ensure_volume_array",
         "initialize_coagulation_rng_states",
@@ -3999,18 +4000,45 @@ def test_turbulent_p2_preflight_precedes_capability_and_runtime_work(
 
 @pytest.mark.parametrize("dtype", [None, wp.float32, wp.float64])
 def test_turbulent_p2_valid_inputs_reach_reserved_capability_gate(
+    monkeypatch: pytest.MonkeyPatch,
     device: str,
     dtype: Any | None,
 ) -> None:
-    """Valid turbulent P2 values fail closed at the unchanged capability gate."""
+    """Valid turbulent P2 requests reject without normalization or mutation."""
     particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array(np.full((2, 1, 2), -7), dtype=wp.int32, device=device)
+    counts = wp.array([3, 4], dtype=wp.int32, device=device)
+    rng_states = wp.array([5, 6], dtype=wp.uint32, device=device)
+    initial_particles = from_warp_particle_data(gpu_particles, sync=True)
+    initial_pairs = np.asarray(pairs.numpy()).copy()
+    initial_counts = np.asarray(counts.numpy()).copy()
+    initial_rng = np.asarray(rng_states.numpy()).copy()
+    particle_arrays = (
+        gpu_particles.masses,
+        gpu_particles.concentration,
+        gpu_particles.charge,
+    )
     if dtype is None:
         turbulent_dissipation: Any = 1.0
         fluid_density: Any = np.float64(1000.0)
     else:
         turbulent_dissipation = wp.array([1.0, 2.0], dtype=dtype, device=device)
         fluid_density = wp.array([1000.0, 997.0], dtype=dtype, device=device)
+
+    def _unexpected(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError(
+            "reserved turbulent request reached downstream work"
+        )
+
+    for helper_name in (
+        "_broadcast_scalar_array",
+        "_ensure_environment_arrays",
+        "_ensure_volume_array",
+        "initialize_coagulation_rng_states",
+    ):
+        monkeypatch.setattr(coagulation_module, helper_name, _unexpected)
+    monkeypatch.setattr(coagulation_module.wp, "zeros", _unexpected)
 
     with pytest.raises(
         ValueError,
@@ -4021,12 +4049,27 @@ def test_turbulent_p2_valid_inputs_reach_reserved_capability_gate(
             temperature=298.15,
             pressure=101325.0,
             time_step=0.1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=rng_states,
+            initialize_rng=True,
             mechanism_config=CoagulationMechanismConfig(
                 mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
             ),
             turbulent_dissipation=turbulent_dissipation,
             fluid_density=fluid_density,
         )
+
+    restored = from_warp_particle_data(gpu_particles, sync=True)
+    assert particle_arrays[0] is gpu_particles.masses
+    assert particle_arrays[1] is gpu_particles.concentration
+    assert particle_arrays[2] is gpu_particles.charge
+    npt.assert_allclose(restored.masses, initial_particles.masses)
+    npt.assert_allclose(restored.concentration, initial_particles.concentration)
+    npt.assert_allclose(restored.charge, initial_particles.charge)
+    npt.assert_array_equal(np.asarray(pairs.numpy()), initial_pairs)
+    npt.assert_array_equal(np.asarray(counts.numpy()), initial_counts)
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng)
 
 
 def test_brownian_ignores_turbulent_p2_inputs(device: str) -> None:
