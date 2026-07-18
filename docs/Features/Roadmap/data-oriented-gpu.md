@@ -824,8 +824,9 @@ Shipped scope:
       `temperature` / `pressure` inputs
     - CPU↔GPU movement remains explicit through `to_warp_*` and `from_warp_*`
       helpers, including lossy gas restore for names and helper-only state
-    - no hidden transfers, hidden synchronization, or automatic top-level
-      fallback imports should be implied by roadmap prose
+    - no hidden container transfers or automatic top-level fallback imports
+      should be implied by roadmap prose; read-only device validation may
+      synchronize and read back status to surface invalid values
     - focused local validation can use
       `pytest particula/gpu/tests/cuda_availability_test.py -q` for the shared
       skip contract and `pytest particula/gpu/kernels/tests/environment_test.py
@@ -1047,10 +1048,12 @@ with Cunningham slip correction (Seinfeld & Pandis, 2016, Eq. 13A.4).
 Collision efficiency is fixed at 1 and no public efficiency argument exists.
 It is a direct-kernel-only mode: it uses fp64 particle mass state, but direct
 scalar temperature/pressure, supported-float same-device Warp arrays of shape
-`(n_boxes,)`, or same-device `WarpEnvironmentData` are alternatives. Only
-private, call-local fp64 total-mass and settling-velocity scratch has shape
-`(n_boxes, n_particles)`; caller-owned particle, collision-output, and RNG
-resources retain their documented dtypes and identity.
+`(n_boxes,)`, or same-device `WarpEnvironmentData` are alternatives.
+Helper-owned, call-local fp64 work buffers hold per-particle properties as
+needed; scalar turbulence inputs use private device-local `(n_boxes,)`
+broadcast/property storage, while valid supplied arrays retain identity.
+ST1956 has no dedicated settling-velocity buffer; caller-owned particle,
+collision-output, and RNG resources retain their documented dtypes and identity.
 The combined tuple `("brownian", "charged_hard_sphere")` is accepted in either
 requested order and normalizes to one executable mask. Reserved IDs, including
 Brownian-plus-sedimentation combinations, raise `ValueError` in host capability
@@ -1062,12 +1065,14 @@ not make unrelated later validation failures atomic.
 The exact turbulent-shear mode is selected with
 `CoagulationMechanismConfig(("turbulent_shear_st1956",))`. Its keyword-only
 `turbulent_dissipation` input is in `m^2/s^3`, and keyword-only `fluid_density`
-is in `kg/m^3`. Both are required positive finite inputs only for this
-singleton. Each accepts a Python or NumPy floating scalar with private broadcast
-storage, or an active-device `wp.float64` Warp array shaped `(n_boxes,)` that
-retains supplied identity. They are not inferred from a shared container, and
-Python lists, NumPy arrays, and hidden transfers are not accepted as array
-inputs. Turbulent mixed mechanisms validate both P2 inputs, then raise
+is in `kg/m^3`. Both are required positive finite inputs for structurally valid
+requests containing the turbulent mechanism. Only the exact ST1956 singleton
+executes. Each accepts a Python or NumPy floating scalar with private
+device-local broadcast/property work storage, or an active-device `wp.float64`
+Warp array shaped `(n_boxes,)` that retains supplied identity. They are not
+inferred from a shared container, and Python lists, NumPy arrays, and hidden
+host-to-device transfers are not accepted as array inputs. Turbulent mixed
+mechanisms validate both P2 inputs, then raise
 `ValueError` before normalization, allocation, RNG work, launch, or mutation.
 Non-turbulent masks ignore both turbulence arguments.
 
@@ -1096,9 +1101,11 @@ loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
 integration, graph-capture claims, sedimentation combinations or variants, or
 turbulent additive combinations. DNS/general turbulence, non-unit efficiency,
-alternate drag physics, Runnable integration, CPU fallback, hidden transfers,
-graph capture, and performance guarantees are unsupported. The ST1956 singleton
-does not establish CPU-strategy parity. E5-F6 owns additive combinations,
+alternate drag physics, Runnable integration, CPU fallback, hidden
+simulation-state transfers, graph capture, and performance guarantees are
+unsupported. Read-only P2 validation may synchronize and read back device
+status, including on CUDA, to report invalid values. The ST1956 singleton does
+not establish CPU-strategy parity. E5-F6 owns additive combinations,
 E5-F7 consumes ST1956 singleton validation/evidence, and E5-F9 owns the later
 consolidated support table and direct example; none of that downstream work is
 delivered here.
