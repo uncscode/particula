@@ -267,15 +267,20 @@ The charged-only tuple is `("charged_hard_sphere",)`. Exact SP2016
 sedimentation is selected with
 `CoagulationMechanismConfig(("sedimentation_sp2016",))`; it uses fp64
 particle state, validates finite/nonnegative mass and concentration plus
-finite/positive density before mutable work, and has no efficiency parameter.
+finite/positive density before mutable work, requires equal positive particle
+concentrations within each box for representable inventory-preserving merges,
+and has no efficiency parameter.
 It is a direct-kernel path only: it establishes neither CPU-strategy parity nor
 general accuracy or performance claims. The combined tuple
 `("brownian", "charged_hard_sphere")` is accepted in either requested order
 and normalizes to one executable mask. Reserved IDs, including
 Brownian-plus-sedimentation combinations and turbulent shear, raise `ValueError`
 in host capability preflight before runtime input access, allocation, launch, or
-mutable state changes. No mode performs hidden CPU↔GPU transfers or falls back
-to another mechanism.
+mutable state changes. No mode performs hidden caller simulation-state CPU↔GPU
+transfers, synchronization, or fallback to another mechanism. Read-only
+preflight validation does use a private device-status buffer and one bounded
+device synchronization/readback to report invalid caller state; it never
+copies, mutates, or CPU-falls-back caller simulation state.
 
 Charged-only execution uses a bounded compact active-pair majorant. Combined
 execution independently sanitizes and sums Brownian and charged terms, then

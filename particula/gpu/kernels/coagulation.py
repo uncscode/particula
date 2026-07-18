@@ -98,6 +98,9 @@ MAX_SCHEDULED_TRIALS_PER_BOX = 65_536
 # pair in one thread. This limit caps that O(A²) pre-launch work at 32,640
 # pairs per box and applies to every charged-containing execution mode.
 MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX = 256
+# Exact SP2016 selection also visits every compact active pair in one thread.
+# Keep its work bounded independently of the charged-mode public contract.
+MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX = 256
 
 BROWNIAN_MECHANISM = "brownian"
 CHARGED_HARD_SPHERE_MECHANISM = "charged_hard_sphere"
@@ -795,9 +798,48 @@ def _validate_sedimentation_particle_physics_kernel(
         mass = masses[box_idx, particle_idx, species_idx]
         if not wp.isfinite(mass) or mass < wp.float64(0.0):
             wp.atomic_max(invalid, 0, 1)
-        density_value = density[species_idx]
-        if not wp.isfinite(density_value) or density_value <= wp.float64(0.0):
-            wp.atomic_max(invalid, 2, 1)
+
+
+@no_type_check
+@wp.kernel
+# type: ignore[misc]
+def _validate_sedimentation_density_kernel(density: Any, invalid: Any) -> None:
+    """Record invalid shared SP2016 species density without mutation."""  # type: ignore
+    species_idx = wp.tid()  # type: ignore[misc]
+    density_value = density[species_idx]
+    if not wp.isfinite(density_value) or density_value <= wp.float64(0.0):
+        wp.atomic_max(invalid, 2, 1)
+
+
+@no_type_check
+@wp.kernel
+# type: ignore[misc]
+def _validate_sedimentation_active_particles_kernel(
+    masses: Any,
+    concentration: Any,
+    active_limit: Any,
+    invalid: Any,
+) -> None:
+    """Count active SP2016 slots and reject incompatible concentrations."""  # type: ignore
+    box_idx = wp.tid()  # type: ignore[misc]
+    reference_concentration = wp.float64(0.0)
+    active_count = wp.int32(0)
+    for particle_idx in range(masses.shape[1]):
+        concentration_value = concentration[box_idx, particle_idx]
+        if concentration_value > wp.float64(0.0):
+            if (
+                reference_concentration > wp.float64(0.0)
+                and concentration_value != reference_concentration
+            ):
+                wp.atomic_max(invalid, 3, 1)
+            reference_concentration = concentration_value
+            total_mass = wp.float64(0.0)
+            for species_idx in range(masses.shape[2]):
+                total_mass += masses[box_idx, particle_idx, species_idx]
+            if total_mass > wp.float64(0.0):
+                active_count += wp.int32(1)
+    if active_count > active_limit:
+        wp.atomic_max(invalid, 4, 1)
 
 
 @no_type_check
@@ -890,11 +932,6 @@ def brownian_coagulation_kernel(  # noqa: C901
     box_idx = wp.tid()  # type: ignore[misc]
     n_particles = masses.shape[1]
 
-    # Clear private settling scratch before any eligibility filtering so stale
-    # values cannot leak through unsupported or retrying launches.
-    for particle_idx in range(n_particles):
-        settling_velocities[box_idx, particle_idx] = wp.float64(0.0)
-
     executable_brownian_mask = mechanism_mask == wp.int32(
         BROWNIAN_MECHANISM_FLAG
     ) or mechanism_mask == wp.int32(
@@ -910,6 +947,12 @@ def brownian_coagulation_kernel(  # noqa: C901
     ):
         return
 
+    if executable_sedimentation_mask:
+        # Clear this singleton-mode scratch so stale values cannot leak between
+        # launches. Other modes do not allocate or write settling storage.
+        for particle_idx in range(n_particles):
+            settling_velocities[box_idx, particle_idx] = wp.float64(0.0)
+
     # One thread per box keeps the pair selection sequential and avoids
     # cross-thread races when writing collision pairs.
     n_species = masses.shape[2]
@@ -917,19 +960,22 @@ def brownian_coagulation_kernel(  # noqa: C901
     temperature_value = temperature[box_idx]
     pressure_value = pressure[box_idx]
 
-    dynamic_viscosity = dynamic_viscosity_wp(
-        temperature_value,
-        ref_viscosity,
-        ref_temperature,
-        sutherland_constant,
-    )
-    mean_free_path = molecule_mean_free_path_wp(
-        molecular_weight_air,
-        temperature_value,
-        pressure_value,
-        dynamic_viscosity,
-        gas_constant,
-    )
+    dynamic_viscosity = wp.float64(0.0)
+    mean_free_path = wp.float64(0.0)
+    if executable_brownian_mask or executable_sedimentation_mask:
+        dynamic_viscosity = dynamic_viscosity_wp(
+            temperature_value,
+            ref_viscosity,
+            ref_temperature,
+            sutherland_constant,
+        )
+        mean_free_path = molecule_mean_free_path_wp(
+            molecular_weight_air,
+            temperature_value,
+            pressure_value,
+            dynamic_viscosity,
+            gas_constant,
+        )
 
     active_count = wp.int32(0)
     for particle_idx in range(n_particles):
@@ -958,17 +1004,23 @@ def brownian_coagulation_kernel(  # noqa: C901
             continue
 
         radius = particle_radius_from_volume_wp(total_volume)
-        knudsen = knudsen_number_wp(mean_free_path, radius)
-        slip = cunningham_slip_correction_wp(knudsen)
-        mobility = aerodynamic_mobility_wp(radius, slip, dynamic_viscosity)
-        diffusivity = brownian_diffusivity_wp(
-            temperature_value, mobility, boltzmann_constant
-        )
-        speed = mean_thermal_speed_wp(
-            total_mass, temperature_value, boltzmann_constant
-        )
-        particle_mean_free_path = particle_mean_free_path_wp(diffusivity, speed)
-        g_term = g_collection_term_wp(particle_mean_free_path, radius)
+        diffusivity = wp.float64(0.0)
+        speed = wp.float64(0.0)
+        g_term = wp.float64(0.0)
+        if executable_brownian_mask:
+            knudsen = knudsen_number_wp(mean_free_path, radius)
+            slip = cunningham_slip_correction_wp(knudsen)
+            mobility = aerodynamic_mobility_wp(radius, slip, dynamic_viscosity)
+            diffusivity = brownian_diffusivity_wp(
+                temperature_value, mobility, boltzmann_constant
+            )
+            speed = mean_thermal_speed_wp(
+                total_mass, temperature_value, boltzmann_constant
+            )
+            particle_mean_free_path = particle_mean_free_path_wp(
+                diffusivity, speed
+            )
+            g_term = g_collection_term_wp(particle_mean_free_path, radius)
         settling_velocity = wp.float64(0.0)
         if executable_sedimentation_mask:
             settling_velocity = settling_velocity_stokes_from_transport_wp(
@@ -1450,12 +1502,16 @@ def _validate_sedimentation_particle_physics(
     n_particles: int,
     device: Any,
 ) -> None:
-    """Reject invalid SP2016 particle inputs through one read-only scan.
+    """Reject invalid or excessive SP2016 inputs through read-only scans.
 
     The fixed-size error state permits a single device-to-host readback while
-    retaining field-specific errors. Zero mass and concentration are valid,
-    allowing inactive slots without applying charged-only constraints. This
-    preflight runs before time-step, environment, output-buffer, or RNG work.
+    retaining field-specific errors. Density is scanned once at species scope,
+    independently of particle capacity, and every box has bounded exact-pair
+    work. Positive concentrations must agree within a box because this
+    particle-resolved merge representation stores one concentration per slot.
+    Zero mass and concentration are valid, allowing inactive slots without
+    applying charged-only constraints. This preflight runs before time-step,
+    environment, output-buffer, or RNG work.
 
     Args:
         particles: Caller-owned Warp particle data with validated shape and
@@ -1465,10 +1521,17 @@ def _validate_sedimentation_particle_physics(
         device: Warp device that owns the particle arrays and status buffer.
 
     Raises:
-        ValueError: If mass or concentration is non-finite or negative, or if
-            density is non-finite or nonpositive.
+        ValueError: If mass or concentration is non-finite or negative, density
+            is non-finite or nonpositive, concentrations are incompatible, or a
+            box exceeds the sedimentation active limit.
     """
-    invalid = wp.zeros((3,), dtype=wp.int32, device=device)
+    invalid = wp.zeros((5,), dtype=wp.int32, device=device)
+    wp.launch(
+        _validate_sedimentation_density_kernel,
+        dim=(particles.density.shape[0],),
+        inputs=[particles.density, invalid],
+        device=device,
+    )
     wp.launch(
         _validate_sedimentation_particle_physics_kernel,
         dim=(n_boxes, n_particles),
@@ -1476,6 +1539,17 @@ def _validate_sedimentation_particle_physics(
             particles.masses,
             particles.concentration,
             particles.density,
+            invalid,
+        ],
+        device=device,
+    )
+    wp.launch(
+        _validate_sedimentation_active_particles_kernel,
+        dim=(n_boxes,),
+        inputs=[
+            particles.masses,
+            particles.concentration,
+            wp.int32(MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX),
             invalid,
         ],
         device=device,
@@ -1494,6 +1568,15 @@ def _validate_sedimentation_particle_physics(
     if invalid_values[2] != 0:
         raise ValueError(
             "sedimentation particle density must be finite and > 0"
+        )
+    if invalid_values[3] != 0:
+        raise ValueError(
+            "sedimentation particle concentrations must be equal when positive"
+        )
+    if invalid_values[4] != 0:
+        raise ValueError(
+            "sedimentation active particle count exceeds "
+            "MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX"
         )
 
 
@@ -1900,8 +1983,9 @@ def coagulation_step_gpu(  # noqa: C901
             nonpositive, or a box exceeds
             ``MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX`` active particles.
         ValueError: If SP2016 sedimentation masses or concentrations are
-            non-finite or negative, or species density is non-finite or
-            nonpositive.
+            non-finite or negative, positive concentrations differ within a
+            box, species density is non-finite or nonpositive, or a box exceeds
+            ``MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX`` active particles.
 
     Notes:
         Accepted environment sources are scalar direct inputs, direct
@@ -1930,10 +2014,12 @@ def coagulation_step_gpu(  # noqa: C901
         allocation, synchronization, and host readback.
 
         Exact SP2016 sedimentation read-only-validates finite/nonnegative
-        masses and concentrations and finite/positive density before time-step,
-        environment, output, or RNG work. Zero masses and concentrations remain
-        valid inactive-slot state; this mode does not impose charged-only
-        constraints.
+        masses and concentrations, finite/positive density, compatible positive
+        concentrations, and its bounded active count before time-step,
+        environment, output, or RNG work. Its exact compact-active O(A²)
+        majorant is capped at 32,640 pairs per box. Zero masses and
+        concentrations remain valid inactive-slot state; this mode does not
+        impose charged-only constraints.
 
         A successful call allocates private, call-local selector scratch,
         including ``wp.float64`` ``(n_boxes, n_particles)`` total-mass and
@@ -2074,9 +2160,14 @@ def coagulation_step_gpu(  # noqa: C901
     )
     g_terms = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
     speeds = wp.zeros((n_boxes, n_particles), dtype=wp.float64, device=device)
-    settling_velocities = wp.zeros(
-        (n_boxes, n_particles), dtype=wp.float64, device=device
-    )
+    # Settling velocities are meaningful only for exact singleton SP2016. For
+    # all other modes pass an unused existing float64 scratch to avoid an
+    # allocation and clear of settling-only storage.
+    settling_velocities = radii
+    if sedimentation_enabled:
+        settling_velocities = wp.zeros(
+            (n_boxes, n_particles), dtype=wp.float64, device=device
+        )
     total_masses = wp.zeros(
         (n_boxes, n_particles), dtype=wp.float64, device=device
     )
