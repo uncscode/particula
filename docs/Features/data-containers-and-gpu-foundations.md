@@ -19,8 +19,8 @@ python docs/Examples/data_containers_and_gpu_foundations.py
 
 For the low-level direct-kernel path, use the canonical quick-start at
 [`docs/Examples/gpu_direct_kernels_quick_start.py`](../Examples/gpu_direct_kernels_quick_start.py).
-That example imports step entry points from `particula.gpu.kernels` while
-keeping top-level `particula.gpu` focused on `WARP_AVAILABLE` and the
+That example keeps direct step imports explicit through `particula.gpu.kernels`
+while top-level `particula.gpu` stays focused on `WARP_AVAILABLE` and the
 `to_warp_*` / `from_warp_*` transfer helpers.
 
 Use this guide when you need the current contract for:
@@ -249,22 +249,31 @@ supplied `rng_states` are caller-owned, same-device Warp resources. Omitted
 collision outputs and RNG state use call-local convenience allocation. A
 supplied RNG sidecar is reused and changes in place; it resets only with
 `initialize_rng=True`. Configuration and caller-owned sidecars have no implicit
-CPU↔GPU transfer. Reuse of a supplied persistent `rng_states` buffer is
-unsynchronized, while omitted RNG state and `initialize_rng=True` use the
-initialization path, which synchronizes after initializing or resetting state.
+CPU↔GPU transfer.
 
 Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 `"continuous_pdf"` raise `ValueError`; they do not fall back or convert.
 
-| Identifier | Status | Owner |
+| Identifier | Bit | Status |
 | --- | --- | --- |
-| `brownian` | Bit `1`; executable in approved masks | Shipped direct-kernel term |
-| `charged_hard_sphere` | Bit `2`; executable in approved masks | Shipped direct-kernel term |
-| `sedimentation_sp2016` | Bit `4`; exact unit-efficiency term in approved masks | Shipped direct-kernel term |
-| `turbulent_shear_st1956` | Bit `8`; executable in approved masks with turbulent inputs | Shipped direct-kernel term |
+| `brownian` | `1` | Executable singleton |
+| `charged_hard_sphere` | `2` | Executable singleton |
+| `sedimentation_sp2016` | `4` | Executable singleton |
+| `turbulent_shear_st1956` | `8` | Executable singleton |
+| `brownian + charged_hard_sphere` | `3` | Executable two-way mask |
+| `brownian + sedimentation_sp2016` | `5` | Executable two-way mask |
+| `charged_hard_sphere + sedimentation_sp2016` | `6` | Executable two-way mask |
+| `brownian + turbulent_shear_st1956` | `9` | Executable two-way mask |
+| `charged_hard_sphere + turbulent_shear_st1956` | `10` | Executable two-way mask |
+| `sedimentation_sp2016 + turbulent_shear_st1956` | `12` | Executable two-way mask |
+| `brownian + charged_hard_sphere + sedimentation_sp2016 + turbulent_shear_st1956` | `15` | Executable four-way mask |
+| `brownian + charged_hard_sphere + sedimentation_sp2016` | `7` | Rejected three-way mask |
+| `brownian + charged_hard_sphere + turbulent_shear_st1956` | `11` | Rejected three-way mask |
+| `brownian + sedimentation_sp2016 + turbulent_shear_st1956` | `13` | Rejected three-way mask |
+| `charged_hard_sphere + sedimentation_sp2016 + turbulent_shear_st1956` | `14` | Rejected three-way mask |
 
-The charged-only tuple is `("charged_hard_sphere",)`. Exact SP2016
-sedimentation is selected with
+Requested tuples normalize to the canonical Brownian, charged, sedimentation,
+then turbulent order. Exact SP2016 sedimentation is selected with
 `CoagulationMechanismConfig(("sedimentation_sp2016",))`. Its shipped pair rate
 is `K = π (r_i + r_j)^2 |v_i - v_j|` in m³/s, where settling velocities use
 Stokes settling with Cunningham slip correction (Seinfeld & Pandis, 2016,
@@ -278,37 +287,28 @@ or particle state can be mutated.
 
 The exact turbulent-shear singleton is selected with
 `CoagulationMechanismConfig(("turbulent_shear_st1956",))`; approved mixed masks
-that include this term use the same inputs. Keyword-only
-`turbulent_dissipation` is in `m^2/s^3` and `fluid_density` is in `kg/m^3`.
-Both are positive finite Python or NumPy floating scalars, or active-device
-`wp.float64` Warp arrays shaped `(n_boxes,)`; supplied arrays retain identity
-and scalars use private device-local broadcast/property storage. They are
-required for structurally valid turbulent requests, including rejected
-three-way requests during enabled-term validation, and ignored by
-non-turbulent masks. They are not inferred from a container: NumPy arrays,
-Python lists, and hidden host-to-device conversion are not supported as array
-inputs.
+that include this term use the same inputs. Keyword-only `turbulent_dissipation`
+is in `m^2/s^3` and `fluid_density` is in `kg/m^3`. Both are positive finite
+Python or NumPy floating scalars, or active-device `wp.float64` Warp arrays
+shaped `(n_boxes,)`; supplied arrays retain identity and scalars use private
+device-local broadcast/property storage. They are required for structurally
+valid turbulent requests, including rejected three-way requests during
+enabled-term validation, and ignored by non-turbulent masks. They are not
+inferred from a container: NumPy arrays, Python lists, and hidden host-to-device
+conversion are not supported as array inputs.
 
 Supply temperature and pressure either as direct scalars, supported-float Warp
 arrays of shape `(n_boxes,)` on the particle device, or same-device
-`WarpEnvironmentData` with both direct inputs set to `None`. These
-thermodynamic inputs are not required to be fp64. Caller-owned particle,
-collision-output, and RNG resources retain their documented dtypes and identity.
-Helper-owned, call-local fp64 work buffers hold per-particle properties as
-needed; scalar turbulence inputs use private device-local `(n_boxes,)`
-broadcast/property storage, while valid supplied arrays retain identity. Exact
-SP2016 sedimentation uses settling storage only for that mechanism; ST1956 has
-no dedicated settling-velocity buffer.
+`WarpEnvironmentData` with both direct inputs set to `None`. These thermodynamic
+inputs are not required to be fp64. Caller-owned particle, collision-output, and
+RNG resources retain their documented dtypes and identity. Helper-owned,
+call-local fp64 work buffers hold per-particle properties as needed; scalar
+turbulence inputs use private device-local `(n_boxes,)` broadcast/property
+storage, while valid supplied arrays retain identity. Exact SP2016 sedimentation
+uses settling storage only for that mechanism; ST1956 has no dedicated
+settling-velocity buffer.
 It is a direct-kernel path only: it establishes neither CPU-strategy parity nor
-general accuracy or performance claims. The executable matrix is four
-singletons (`1`, `2`, `4`, `8`), six unordered two-way masks (`3`, `5`, `6`,
-`9`, `10`, `12`), and four-way mask `15`. Requested tuples normalize to the
-canonical Brownian, charged, sedimentation, turbulent order. Three-way masks
-`7`, `11`, `13`, and `14` validate enabled terms, then raise
-`ValueError("Additive coagulation execution is deferred.")`; malformed,
-duplicate, unknown, and non-`particle_resolved` configurations reject during
-structural preflight. No mode performs hidden caller simulation-state CPU↔GPU
-transfers or falls back to another mechanism.
+general accuracy or performance claims.
 
 Approved masks sanitize fp64 component rates and use their summed safe bound:
 `sum_m K_m(i, j) <= sum_m M_m`. Component maxima can occur on different pairs,
@@ -322,8 +322,9 @@ a bounded synchronization/readback to report invalid caller state without
 copying, mutating, or CPU-falling-back caller simulation state.
 
 The return tuple is exactly `(particles, collision_pairs, n_collisions)`.
-Supplied collision buffers are returned by identity. Supplied `rng_states`
-mutates in place but is never returned; omitted buffers are call-local
+Supplied collision buffers are returned by identity. Supplied `rng_states` are
+caller-owned same-device Warp state, are reused in place, and reset only when
+`initialize_rng=True` explicitly opts in; omitted buffers are call-local
 conveniences. Sedimentation-specific read-only preflight fails before output
 allocation, RNG initialization, or particle mutation, but does not make
 unrelated later validation failures atomic. Warp CPU is the baseline when Warp
@@ -591,7 +592,7 @@ than storage support.
 | CPU↔GPU transfer | Explicit helper calls only | No hidden container movement or hidden environment synchronization. |
 | Warp/CUDA support | Optional | Warp `device="cpu"` is the baseline when Warp is installed; CUDA is additive local evidence and unavailable devices skip cleanly. |
 | Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
-| Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Executable masks are singletons `1`, `2`, `4`, `8`; unordered pairs `3`, `5`, `6`, `9`, `10`, `12`; and four-way `15`; tuples normalize to canonical order. Three-way masks `7`, `11`, `13`, `14` validate enabled terms then reject. Turbulent masks require explicit turbulent inputs. This path establishes no Runnable support, CPU parity, or performance claim. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state and explicit resets synchronize during initialization. |
+| Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Executable masks are singletons `1`, `2`, `4`, `8`; unordered pairs `3`, `5`, `6`, `9`, `10`, `12`; and four-way `15`; tuples normalize to canonical order. Three-way masks `7`, `11`, `13`, `14` validate enabled terms then reject. Turbulent masks require explicit turbulent inputs. This path establishes no Runnable support, CPU parity, or performance claim. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state allocates call-local storage, and `initialize_rng=True` explicitly resets the caller-owned buffer. |
 | Fixed-shape GPU/runtime roadmap work | Not current runtime behavior | Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior. |
 
 Additional shipped boundaries:

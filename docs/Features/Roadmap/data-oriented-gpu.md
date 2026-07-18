@@ -174,13 +174,16 @@ Known GPU physics gaps remain:
   concentration, and records a signed energy diagnostic. Temperature feedback
   and high-level `Runnable` integration remain future work outside this
   low-level publication.
-- Particle charge supports direct low-level particle-resolved charged hard-sphere
-  coagulation and charge-aware merges in every approved additive mask.
-- The GPU coagulation path executes particle-resolved singleton masks `1`, `2`,
-  `4`, `8`; two-way masks `3`, `5`, `6`, `9`, `10`, `12`; and four-way mask
-  `15`. The three-way masks `7`, `11`, `13`, `14` remain deferred after their
-  enabled-term validation. Alternate charged models, broader distributions, and
-  mechanism variants remain outside this direct-kernel contract.
+- Particle charge supports direct low-level particle-resolved charged
+  hard-sphere coagulation and charge-aware merges in every approved additive
+  mask.
+- The GPU coagulation path executes singleton masks `1`, `2`, `4`, `8`; the
+  two-way masks `3`, `5`, `6`, `9`, `10`, `12`; and four-way mask `15`. The
+  three-way masks `7`, `11`, `13`, `14` remain deferred after their
+  enabled-term validation. Requested tuples normalize to canonical Brownian,
+  charged, sedimentation, then turbulent order. Alternate charged models,
+  broader distributions, and mechanism variants remain outside this direct-
+  kernel contract.
 - CPU sedimentation coagulation and simple turbulent shear coagulation exist.
   The shipped GPU paths do not establish CPU-strategy parity; DNS and general
   turbulence remain deferred from the near-term GPU scope.
