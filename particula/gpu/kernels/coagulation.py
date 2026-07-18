@@ -853,6 +853,34 @@ def _validate_charged_density_kernel(density: Any, invalid: Any) -> None:
 @no_type_check
 @wp.kernel
 # type: ignore[misc]
+def _validate_turbulent_particle_physics_kernel(
+    masses: Any,
+    concentration: Any,
+    density: Any,
+    invalid: Any,
+) -> None:
+    """Record invalid ST1956 particle state without mutating caller inputs."""  # type: ignore
+    box_idx = wp.tid()
+    for species_idx in range(density.shape[0]):
+        density_value = density[species_idx]
+        if not wp.isfinite(density_value) or density_value <= wp.float64(0.0):
+            wp.atomic_max(invalid, 0, 1)
+
+    for particle_idx in range(masses.shape[1]):
+        concentration_value = concentration[box_idx, particle_idx]
+        if not wp.isfinite(concentration_value) or concentration_value < (
+            wp.float64(0.0)
+        ):
+            wp.atomic_max(invalid, 0, 1)
+        for species_idx in range(masses.shape[2]):
+            mass = masses[box_idx, particle_idx, species_idx]
+            if not wp.isfinite(mass) or mass < wp.float64(0.0):
+                wp.atomic_max(invalid, 0, 1)
+
+
+@no_type_check
+@wp.kernel
+# type: ignore[misc]
 def _validate_sedimentation_particle_physics_kernel(  # noqa: C901
     masses: Any,
     concentration: Any,
@@ -1678,6 +1706,38 @@ def _validate_sedimentation_particle_physics(
         )
 
 
+def _validate_turbulent_particle_physics(
+    particles: Any,
+    n_boxes: int,
+    device: Any,
+) -> None:
+    """Reject invalid ST1956 particle physics before mutable runtime work.
+
+    Turbulent-shear selection uses the same physical particle fields as the
+    other direct mechanisms, but does not impose their charge, concentration
+    uniformity, or active-count constraints. This read-only scan runs before
+    time, environment, output, or RNG processing.
+    """
+    invalid = wp.zeros((1,), dtype=wp.int32, device=device)
+    wp.launch(
+        _validate_turbulent_particle_physics_kernel,
+        dim=(n_boxes,),
+        inputs=[
+            particles.masses,
+            particles.concentration,
+            particles.density,
+            invalid,
+        ],
+        device=device,
+    )
+    wp.synchronize_device(device)
+    if invalid.numpy()[0] != 0:
+        raise ValueError(
+            "turbulent particle masses and concentrations must be finite and "
+            "nonnegative, and density must be finite and > 0"
+        )
+
+
 def _validate_collision_pairs(
     collision_pairs: Any,
     expected_shape: tuple[int, int, int],
@@ -1919,10 +1979,22 @@ def _ensure_turbulent_input_array(
 
     Raises:
         ValueError: If the value is not a supported floating scalar or a
-            same-device Warp array with shape ``(n_boxes,)``, a supported
-            floating dtype, and positive finite values.
+            same-device ``wp.float64`` Warp array with shape ``(n_boxes,)``
+            and positive finite values.
     """
     _validate_turbulent_input(name, value, n_boxes, device)
+    return _normalize_turbulent_input_array(value, n_boxes, device)
+
+
+def _normalize_turbulent_input_array(
+    value: Any,
+    n_boxes: int,
+    device: Any,
+) -> Any:
+    """Normalize an already-validated turbulent P2 input.
+
+    This helper does not repeat validation.
+    """
     if _is_warp_array_like(value):
         return value
     return _broadcast_scalar_array(float(value), n_boxes, device)
@@ -1944,8 +2016,8 @@ def _validate_turbulent_input(
         if value.shape != (n_boxes,):
             raise ValueError(f"{name} shape does not match (n_boxes,)")
         _validate_device_match(name, value, device)
-        if not _is_supported_warp_float_dtype(value.dtype):
-            raise ValueError(f"{name} must use a supported Warp floating dtype")
+        if value.dtype != wp.float64:
+            raise ValueError(f"{name} must use dtype float64")
         _validate_positive_finite_array(name, value, "coagulation_step_gpu")
         return
 
@@ -2138,13 +2210,14 @@ def coagulation_step_gpu(  # noqa: C901
             rate [m^2/s^3] for the turbulent-shear P2 boundary. For a
             structurally valid ST1956 turbulent request, accepts a positive
             finite Python or NumPy floating scalar, or a positive finite,
-            active-device Warp array with shape ``(n_boxes,)``. Supplied arrays
-            retain identity; scalar broadcasts use private helper-owned storage.
+            active-device ``wp.float64`` Warp array with shape ``(n_boxes,)``.
+            Supplied arrays retain identity; scalar broadcasts use private
+            helper-owned storage.
             This input is not inferred from shared containers and is ignored by
             non-turbulent masks.
         fluid_density: Explicit carrier-fluid density [kg/m^3] for the
             turbulent-shear P2 boundary. It has the same conditional scalar and
-            active-device ``(n_boxes,)`` Warp-array contract as
+            active-device ``wp.float64`` ``(n_boxes,)`` Warp-array contract as
             ``turbulent_dissipation``, is not inferred from shared containers,
             and is ignored by non-turbulent masks.
 
@@ -2163,9 +2236,10 @@ def coagulation_step_gpu(  # noqa: C901
             caller device.
         ValueError: If mechanism_config has the wrong type, is malformed, or
             requests an unsupported distribution or mechanism combination.
-        ValueError: If a structurally valid turbulent-shear request omits either
-            explicit turbulent input or supplies an input with an unsupported
-            type, shape, device, dtype, or value domain. Turbulent combinations
+        ValueError: If a structurally valid turbulent-shear request omits
+            either explicit turbulent input or supplies an input with an
+            unsupported type, shape, device, ``wp.float64`` dtype, or value
+            domain. Turbulent combinations
             other than the exact ST1956 singleton reject after this P2 boundary.
         ValueError: If particle charge does not have shape
             ``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle
@@ -2281,7 +2355,7 @@ def coagulation_step_gpu(  # noqa: C901
 
     device = particles.masses.device
     _validate_device_arrays(particles, device)
-    if turbulent_enabled:
+    if turbulent_enabled and not turbulent_singleton:
         _validate_turbulent_input(
             "turbulent_dissipation",
             turbulent_dissipation,
@@ -2294,22 +2368,34 @@ def coagulation_step_gpu(  # noqa: C901
             n_boxes,
             device,
         )
+    if turbulent_enabled:
         validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
     normalized_turbulent_dissipation = None
     normalized_fluid_density = None
     if turbulent_singleton:
-        normalized_turbulent_dissipation = _ensure_turbulent_input_array(
+        _validate_turbulent_input(
             "turbulent_dissipation",
             turbulent_dissipation,
             n_boxes,
             device,
         )
-        normalized_fluid_density = _ensure_turbulent_input_array(
+        _validate_turbulent_input(
             "fluid_density",
             fluid_density,
             n_boxes,
             device,
         )
+        normalized_turbulent_dissipation = _normalize_turbulent_input_array(
+            turbulent_dissipation,
+            n_boxes,
+            device,
+        )
+        normalized_fluid_density = _normalize_turbulent_input_array(
+            fluid_density,
+            n_boxes,
+            device,
+        )
+        _validate_turbulent_particle_physics(particles, n_boxes, device)
     charged_enabled = bool(
         resolved_mechanism_config.mask & CHARGED_HARD_SPHERE_MECHANISM_FLAG
     )

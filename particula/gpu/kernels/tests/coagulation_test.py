@@ -3831,7 +3831,7 @@ def test_ensure_turbulent_input_array_broadcasts_floating_scalars(
 
 
 @pytest.mark.parametrize("name", ["turbulent_dissipation", "fluid_density"])
-@pytest.mark.parametrize("dtype", [wp.float32, wp.float64])
+@pytest.mark.parametrize("dtype", [wp.float64])
 def test_ensure_turbulent_input_array_reuses_valid_warp_arrays(
     device: str,
     name: str,
@@ -3888,7 +3888,13 @@ def test_ensure_turbulent_input_array_rejects_invalid_host_values(
         ),
         (
             lambda device: wp.array([1, 2], dtype=wp.int32, device=device),
-            "supported Warp floating dtype",
+            "dtype float64",
+        ),
+        (
+            lambda device: wp.array(
+                [1.0, 2.0], dtype=wp.float32, device=device
+            ),
+            "dtype float64",
         ),
         (
             lambda device: wp.array(
@@ -4084,6 +4090,304 @@ def test_turbulent_singleton_executes_and_conserves_mass(
         rtol=1.0e-12,
         atol=1.0e-30,
     )
+
+
+@pytest.mark.parametrize(
+    ("invalid_field", "invalid_value"),
+    [
+        ("masses", np.nan),
+        ("masses", np.inf),
+        ("masses", -1.0),
+        ("concentration", np.nan),
+        ("concentration", np.inf),
+        ("concentration", -1.0),
+        ("density", np.nan),
+        ("density", np.inf),
+        ("density", 0.0),
+        ("density", -1.0),
+    ],
+)
+def test_turbulent_particle_preflight_rejects_before_mutable_runtime_work(
+    device: str,
+    invalid_field: str,
+    invalid_value: float,
+) -> None:
+    """Invalid ST1956 particle state leaves caller-owned resources unchanged."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    setattr(particles, invalid_field, getattr(particles, invalid_field).copy())
+    if invalid_field == "masses":
+        particles.masses[0, 0, 0] = invalid_value
+    elif invalid_field == "concentration":
+        particles.concentration[0, 0] = invalid_value
+    else:
+        particles.density[0] = invalid_value
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
+    counts = wp.array([7], dtype=wp.int32, device=device)
+    states = wp.array([7], dtype=wp.uint32, device=device)
+    initial_pairs = np.asarray(pairs.numpy()).copy()
+    initial_counts = np.asarray(counts.numpy()).copy()
+    initial_states = np.asarray(states.numpy()).copy()
+    initial_particles = from_warp_particle_data(gpu_particles, sync=True)
+
+    with pytest.raises(ValueError, match="turbulent particle"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+            ),
+            turbulent_dissipation=1.0,
+            fluid_density=1000.0,
+        )
+
+    restored = from_warp_particle_data(gpu_particles, sync=True)
+    npt.assert_allclose(restored.masses, initial_particles.masses)
+    npt.assert_allclose(restored.concentration, initial_particles.concentration)
+    npt.assert_allclose(restored.density, initial_particles.density)
+    npt.assert_array_equal(pairs.numpy(), initial_pairs)
+    npt.assert_array_equal(counts.numpy(), initial_counts)
+    npt.assert_array_equal(states.numpy(), initial_states)
+
+
+@pytest.mark.parametrize(
+    "float32_input",
+    ["turbulent_dissipation", "fluid_density"],
+)
+def test_turbulent_singleton_rejects_float32_p2_arrays_without_mutation(
+    device: str,
+    float32_input: str,
+) -> None:
+    """ST1956 rejects fp32 P2 arrays before caller-owned state changes."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
+    counts = wp.array([7], dtype=wp.int32, device=device)
+    states = wp.array([7], dtype=wp.uint32, device=device)
+    initial_particles = from_warp_particle_data(gpu_particles, sync=True)
+    dissipation = wp.array([1.0], dtype=wp.float64, device=device)
+    density = wp.array([1000.0], dtype=wp.float64, device=device)
+    if float32_input == "turbulent_dissipation":
+        dissipation = wp.array([1.0], dtype=wp.float32, device=device)
+    else:
+        density = wp.array([1000.0], dtype=wp.float32, device=device)
+
+    with pytest.raises(
+        ValueError,
+        match=f"{float32_input} must use dtype float64",
+    ):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+            ),
+            turbulent_dissipation=dissipation,
+            fluid_density=density,
+        )
+
+    _assert_particles_unchanged(gpu_particles, initial_particles)
+    npt.assert_array_equal(pairs.numpy(), [[[7, 7]]])
+    npt.assert_array_equal(counts.numpy(), [7])
+    npt.assert_array_equal(states.numpy(), [7])
+
+
+@pytest.mark.parametrize(
+    ("concentration", "expected_count", "active_slots"),
+    [
+        (np.zeros((1, 4), dtype=np.float64), 0, set()),
+        (np.array([[0.0, 1.0, 0.0, 0.0]]), 0, {1}),
+        (np.array([[1.0, 0.0, 0.0, 1.0]]), 1, {0, 3}),
+    ],
+)
+def test_turbulent_singleton_selector_handles_sparse_active_slots(
+    device: str,
+    concentration: np.ndarray,
+    expected_count: int,
+    active_slots: set[int],
+) -> None:
+    """ST1956 public selection handles degenerate and gapped active slots."""
+    particles = _make_particle_data(n_boxes=1, n_particles=4, n_species=1)
+    particles.concentration = concentration
+    particles.volume[:] = 1.0e-18
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.full((1, 1, 2), -1, dtype=wp.int32, device=device)
+    counts = wp.zeros((1,), dtype=wp.int32, device=device)
+    states = wp.zeros((1,), dtype=wp.uint32, device=device)
+
+    _, returned_pairs, returned_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0e308,
+        max_collisions=1,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        rng_states=states,
+        initialize_rng=True,
+        mechanism_config=CoagulationMechanismConfig(
+            mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+        ),
+        turbulent_dissipation=1.0,
+        fluid_density=1000.0,
+    )
+
+    assert returned_pairs is pairs
+    assert returned_counts is counts
+    count = int(counts.numpy()[0])
+    selected = np.asarray(pairs.numpy())[0, :count]
+    assert count == expected_count
+    if count:
+        assert np.all(selected[:, 0] < selected[:, 1])
+        assert set(selected.ravel()).issubset(active_slots)
+
+
+def test_turbulent_selector_keeps_heterogeneous_box_pairs_active_and_sorted(
+    device: str,
+) -> None:
+    """ST1956 selects only initially active, in-bounds pairs per box."""
+    particles = _make_particle_data(n_boxes=2, n_particles=4, n_species=1)
+    particles.volume[:] = 1.0e-18
+    particles.concentration[:] = [
+        [1.0, 0.0, 0.0, 1.0],
+        [0.0, 1.0, 1.0, 0.0],
+    ]
+    initially_active = [{0, 3}, {1, 2}]
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.full((2, 1, 2), -1, dtype=wp.int32, device=device)
+    counts = wp.zeros((2,), dtype=wp.int32, device=device)
+    states = wp.zeros((2,), dtype=wp.uint32, device=device)
+
+    returned_particles, returned_pairs, returned_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0e308,
+        max_collisions=1,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        rng_states=states,
+        initialize_rng=True,
+        mechanism_config=CoagulationMechanismConfig(
+            mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+        ),
+        turbulent_dissipation=1.0,
+        fluid_density=1000.0,
+    )
+
+    assert returned_particles is gpu_particles
+    assert returned_pairs is pairs
+    assert returned_counts is counts
+    npt.assert_array_equal(counts.numpy(), [1, 1])
+    for box_idx, pair in enumerate(pairs.numpy()[:, 0]):
+        assert 0 <= pair[0] < pair[1] < particles.masses.shape[1]
+        assert set(pair).issubset(initially_active[box_idx])
+
+
+def test_turbulent_persistent_rng_reuses_state_and_explicit_reset_replays(
+    device: str,
+) -> None:
+    """ST1956 advances persistent RNG state unless explicitly reset."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    particles.volume[:] = 1.0e-18
+    states = wp.zeros((1,), dtype=wp.uint32, device=device)
+    replay_states = wp.zeros((1,), dtype=wp.uint32, device=device)
+    initialize_coagulation_rng_states(9, replay_states, device=device)
+    pairs = []
+    counts = []
+    state_snapshots = []
+    for rng_states, reset in (
+        (states, True),
+        (states, False),
+        (replay_states, True),
+    ):
+        gpu_particles = to_warp_particle_data(particles, device=device)
+        collision_pairs = wp.full((1, 1, 2), -1, dtype=wp.int32, device=device)
+        n_collisions = wp.zeros((1,), dtype=wp.int32, device=device)
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0e308,
+            max_collisions=1,
+            rng_seed=41,
+            collision_pairs=collision_pairs,
+            n_collisions=n_collisions,
+            rng_states=rng_states,
+            initialize_rng=reset,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+            ),
+            turbulent_dissipation=1.0,
+            fluid_density=1000.0,
+        )
+        pairs.append(np.asarray(collision_pairs.numpy()).copy())
+        counts.append(np.asarray(n_collisions.numpy()).copy())
+        state_snapshots.append(np.asarray(rng_states.numpy()).copy())
+
+    assert not np.array_equal(state_snapshots[0], state_snapshots[1])
+    npt.assert_array_equal(pairs[0], pairs[2])
+    npt.assert_array_equal(counts[0], counts[2])
+    npt.assert_array_equal(state_snapshots[0], state_snapshots[2])
+
+
+@pytest.mark.stochastic
+def test_turbulent_fresh_seed_acceptance_matches_rate_to_majorant_ratio(
+    device: str,
+) -> None:
+    """ST1956 fresh-seed acceptance stays within a documented 4-sigma bound."""
+    temperature = 298.15
+    fluid_density = 1000.0
+    dissipation = 1.0
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    particles.masses[:] = 1.0e-15
+    radius = (3.0e-15 / (4.0 * np.pi * particles.density[0])) ** (1.0 / 3.0)
+    viscosity = (
+        constants.REF_VISCOSITY_AIR_STP
+        * (temperature / constants.REF_TEMPERATURE_STP) ** 1.5
+        * (constants.REF_TEMPERATURE_STP + constants.SUTHERLAND_CONSTANT)
+        / (temperature + constants.SUTHERLAND_CONSTANT)
+    )
+    rate = np.sqrt(np.pi * dissipation / (120.0 * (viscosity / fluid_density)))
+    rate *= (4.0 * radius) ** 3
+    trial_probability = 0.2
+    observations = 64
+    accepted = 0
+    for seed in range(observations):
+        gpu_particles = to_warp_particle_data(particles, device=device)
+        _, _, counts = coagulation_step_gpu(
+            gpu_particles,
+            temperature=temperature,
+            pressure=101325.0,
+            time_step=1.0,
+            volume=rate / trial_probability,
+            max_collisions=1,
+            rng_seed=seed,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+            ),
+            turbulent_dissipation=dissipation,
+            fluid_density=fluid_density,
+        )
+        accepted += int(counts.numpy()[0])
+
+    expected = observations * trial_probability
+    sigma = np.sqrt(
+        observations * trial_probability * (1.0 - trial_probability)
+    )
+    assert abs(accepted - expected) <= 4.0 * sigma + 1.0
 
 
 def test_turbulent_mixed_mask_rejects_before_runtime_mutation(
