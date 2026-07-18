@@ -43,7 +43,7 @@
 
 ## Documentation
 
-- [ ] Document import path, inputs, units, shape/device rules, and explicit
-  ST1956-only/no-DNS support language.
-- [ ] Update E5 handoff references for E5-F6, E5-F7, and E5-F9 without claiming
-  additive combinations before those tracks ship.
+ - [x] Document import path, inputs, units, shape/device rules, and explicit
+   ST1956-only/no-DNS support language.
+ - [x] Update E5 handoff references for E5-F6, E5-F7, and E5-F9 without claiming
+   additive combinations before those tracks ship.

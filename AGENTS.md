@@ -490,9 +490,10 @@ for _ in range(n_steps):
   collisions must conserve total mass.
 - Warp CPU is the baseline when installed; CUDA evidence is optional and must
   skip cleanly when unavailable. Brownian, charged-only, canonical
-  Brownian-plus-charged, and exact sedimentation-only modes are supported;
-  sedimentation combinations, alternate charged models, broader distributions,
-  and performance claims remain deferred.
+  Brownian-plus-charged, exact sedimentation-only, and exact ST1956
+  turbulent-shear-only modes are supported; sedimentation or turbulent
+  combinations, alternate charged models, broader distributions, and
+  performance claims remain deferred.
 - See `docs/Features/data-containers-and-gpu-foundations.md` and
   `docs/Features/Roadmap/data-oriented-gpu.md` for user-facing ownership
   guidance.

@@ -11,11 +11,12 @@
   support table/direct example to E5-F9.
 - Inspected: `docs/Features/condensation_strategy_system.md` has no shared
   coagulation support table and is out of scope for this delivery.
-- Add or extend a direct low-level example only after the final concrete API is
-  stable. Keep transfers explicit, default to Warp CPU, and show heterogeneous
-  `(n_boxes,)` dissipation/fluid-density arrays when useful.
-- Completed: the E5-F5 P4 plan records now state the delivered direct contract,
-  ST1956-only scope, device policy, and E5-F6/E5-F7 handoffs.
+- Deferred to E5-F9: add or extend a direct low-level example after combination
+  and support-matrix boundaries settle. Any later example must keep transfers
+  explicit, default to Warp CPU, and show heterogeneous `(n_boxes,)`
+  dissipation/fluid-density arrays when useful.
+- Completed: the relevant E5-F5 P4 plan records state the delivered direct
+  contract, ST1956-only scope, device policy, and E5-F6/E5-F7/E5-F9 handoffs.
 - State prominently in every support table/example that this is the ST1956
   turbulent-shear kernel only. Do not use “DNS parity,” “DNS turbulence,” or
   general turbulence support wording except to mark those capabilities

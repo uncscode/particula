@@ -28,13 +28,14 @@ to device physics and co-located equation/invariant coverage; it does not yet
 add direct-step inputs, mechanism dispatch, sampling, public exports, or CPU
 fallback behavior.
 
-E5-F5-P2 is complete: `coagulation_step_gpu` now accepts keyword-only
-`turbulent_dissipation` and `fluid_density` inputs. Its local normalizer accepts
-positive finite Python/NumPy floating scalars or supported same-device Warp
-arrays shaped `(n_boxes,)`, preserves valid array identity, and uses private
-same-device storage for scalar broadcasts. Turbulent requests validate both
-inputs before downstream runtime setup and then fail at the unchanged reserved
-ST1956 capability gate; non-turbulent calls ignore these arguments.
+E5-F5-P2/P3 are complete: `coagulation_step_gpu` accepts keyword-only
+`turbulent_dissipation` and `fluid_density` inputs and executes the exact
+particle-resolved ST1956 singleton. Each input accepts a positive finite
+Python/NumPy floating scalar or an active-device `wp.float64` `(n_boxes,)` Warp
+array; valid arrays retain identity and scalar broadcasts use private same-device
+storage. Turbulent mixed masks validate both P2 inputs and then reject before
+normalization, allocation, RNG work, launch, or mutation. Non-turbulent masks
+ignore these arguments.
 
 ## User Stories
 
