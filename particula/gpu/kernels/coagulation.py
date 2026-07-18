@@ -2,8 +2,8 @@
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
 coagulation pipeline. Its fixed-mask sampler executes particle-resolved
-Brownian, charged hard-sphere, exact unit-efficiency SP2016 sedimentation, or
-the supported Brownian-plus-charged configuration in either requested order.
+Brownian, charged hard-sphere, exact unit-efficiency SP2016 sedimentation,
+ST1956 turbulent shear, or the supported Brownian-plus-charged configuration.
 It normalizes the combined configuration to one mask, accumulates a finite
 positive additive rate and safe majorant, then makes one acceptance draw for
 each valid candidate. Entry-point validation accepts scalar direct inputs,
@@ -25,11 +25,11 @@ defaults to Brownian, particle-resolved execution and also accepts charged-only,
 exact SP2016 sedimentation-only, and canonical Brownian-plus-charged
 particle-resolved execution. It rejects otherwise unsupported configurations
 during structural preflight, before runtime state is accessed or mutated.
-Turbulent-shear configurations intentionally cross a later P2 boundary:
-explicit turbulent dissipation and fluid density inputs are validated after
-particle schema/device metadata is available, then stop at the reserved
-capability gate without dispatch, sampling, or mutation. Supplied particles,
-collision outputs, and RNG sidecars are caller-owned same-device Warp resources.
+The ST1956 turbulent singleton crosses a later P2 boundary: explicit turbulent
+dissipation and fluid density inputs are validated and normalized after particle
+schema/device metadata is available. Mixed turbulent masks are rejected before
+normalization, allocation, RNG work, or mutation. Supplied particles, collision
+outputs, and RNG sidecars are caller-owned same-device Warp resources.
 
 The exact ``SEDIMENTATION_SP2016_MECHANISM_FLAG`` is a public direct-kernel
 mode for particle-resolved, unit-efficiency SP2016 scheduling. It shares the
@@ -70,9 +70,11 @@ from particula.gpu.dynamics.coagulation_funcs import (
     charged_hard_sphere_wp,
     effective_density_wp,
     g_collection_term_wp,
+    kinematic_viscosity_wp,
     particle_mean_free_path_wp,
     sedimentation_sp2016_pair_rate_wp,
     settling_velocity_stokes_from_transport_wp,
+    turbulent_shear_st1956_pair_rate_wp,
 )
 from particula.gpu.dynamics.condensation_funcs import (
     particle_radius_from_volume_wp,
@@ -279,18 +281,15 @@ def validate_coagulation_mechanism_capabilities(
         BROWNIAN_MECHANISM_FLAG,
         CHARGED_HARD_SPHERE_MECHANISM_FLAG,
         SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
         BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG,
     ):
         return
-    reserved_messages = {
-        TURBULENT_SHEAR_ST1956_MECHANISM: (
-            "Coagulation mechanism 'turbulent_shear_st1956' is reserved for "
-            "E5-F5."
-        ),
-    }
-    for mechanism in resolved.mechanisms:
-        if mechanism in reserved_messages:
-            raise ValueError(reserved_messages[mechanism])
+    if resolved.mask & TURBULENT_SHEAR_ST1956_MECHANISM_FLAG:
+        raise ValueError(
+            "Turbulent-shear coagulation supports only the exact "
+            "('turbulent_shear_st1956',) mechanism configuration."
+        )
     raise ValueError("Unsupported coagulation mechanism configuration.")
 
 
@@ -334,6 +333,8 @@ def _total_pair_rate(  # noqa: PLR0913
     speed_j: Any,
     settling_velocity_i: Any,
     settling_velocity_j: Any,
+    turbulent_dissipation: Any,
+    kinematic_viscosity: Any,
     total_mass_i: Any,
     total_mass_j: Any,
     charge_i: Any,
@@ -400,6 +401,15 @@ def _total_pair_rate(  # noqa: PLR0913
                 radius_j,
                 settling_velocity_i,
                 settling_velocity_j,
+            )
+        )
+    if mechanism_mask & wp.int32(TURBULENT_SHEAR_ST1956_MECHANISM_FLAG):
+        total_rate += _sanitize_positive_finite(
+            turbulent_shear_st1956_pair_rate_wp(
+                radius_i,
+                radius_j,
+                turbulent_dissipation,
+                kinematic_viscosity,
             )
         )
     return total_rate
@@ -541,6 +551,42 @@ def _sedimentation_majorant_from_active_pairs(
 
 @no_type_check
 @wp.func
+def _turbulent_majorant_from_active_radii(
+    active_indices: Any,
+    box_idx: Any,
+    active_count: Any,
+    radii: Any,
+    turbulent_dissipation: Any,
+    kinematic_viscosity: Any,
+) -> Any:
+    """Return the ST1956 rate for the two largest compact active radii.
+
+    The ST1956 prefactor is constant within a box and its diameter-sum cubed
+    term is monotonic, making this O(A) compact-rank scan a safe majorant.
+    """
+    if active_count < wp.int32(2):
+        return wp.float64(0.0)
+    largest = wp.float64(0.0)
+    second_largest = wp.float64(0.0)
+    for rank in range(active_count):
+        radius = radii[box_idx, wp.int32(active_indices[box_idx, rank])]
+        if radius > largest:
+            second_largest = largest
+            largest = radius
+        elif radius > second_largest:
+            second_largest = radius
+    return _sanitize_positive_finite(
+        turbulent_shear_st1956_pair_rate_wp(
+            largest,
+            second_largest,
+            turbulent_dissipation,
+            kinematic_viscosity,
+        )
+    )
+
+
+@no_type_check
+@wp.func
 def _total_majorant(  # noqa: PLR0913
     mechanism_mask: Any,
     radius_min: Any,
@@ -556,6 +602,8 @@ def _total_majorant(  # noqa: PLR0913
     active_count: Any,
     radii: Any,
     settling_velocities: Any,
+    turbulent_dissipation: Any,
+    kinematic_viscosity: Any,
     total_masses: Any,
     charges: Any,
     temperature: Any,
@@ -624,6 +672,15 @@ def _total_majorant(  # noqa: PLR0913
                 radii,
                 settling_velocities,
             )
+        )
+    if mechanism_mask == wp.int32(TURBULENT_SHEAR_ST1956_MECHANISM_FLAG):
+        total_majorant += _turbulent_majorant_from_active_radii(
+            active_indices,
+            box_idx,
+            active_count,
+            radii,
+            turbulent_dissipation,
+            kinematic_viscosity,
         )
     # Other reserved mechanism bits deliberately contribute no term.
     return total_majorant
@@ -861,6 +918,8 @@ def brownian_coagulation_kernel(  # noqa: C901
     g_terms: Any,
     speeds: Any,
     settling_velocities: Any,
+    turbulent_dissipation: Any,
+    fluid_density: Any,
     total_masses: Any,
     charge: Any,
     active_indices: Any,
@@ -935,10 +994,14 @@ def brownian_coagulation_kernel(  # noqa: C901
     executable_sedimentation_mask = mechanism_mask == wp.int32(
         SEDIMENTATION_SP2016_MECHANISM_FLAG
     )
+    executable_turbulent_mask = mechanism_mask == wp.int32(
+        TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
+    )
     if not (
         executable_brownian_mask
         or mechanism_mask == wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG)
         or executable_sedimentation_mask
+        or executable_turbulent_mask
     ):
         return
 
@@ -951,20 +1014,31 @@ def brownian_coagulation_kernel(  # noqa: C901
 
     dynamic_viscosity = wp.float64(0.0)
     mean_free_path = wp.float64(0.0)
-    if executable_brownian_mask or executable_sedimentation_mask:
+    kinematic_viscosity = wp.float64(0.0)
+    if (
+        executable_brownian_mask
+        or executable_sedimentation_mask
+        or executable_turbulent_mask
+    ):
         dynamic_viscosity = dynamic_viscosity_wp(
             temperature_value,
             ref_viscosity,
             ref_temperature,
             sutherland_constant,
         )
-        mean_free_path = molecule_mean_free_path_wp(
-            molecular_weight_air,
-            temperature_value,
-            pressure_value,
-            dynamic_viscosity,
-            gas_constant,
-        )
+        if executable_brownian_mask or executable_sedimentation_mask:
+            mean_free_path = molecule_mean_free_path_wp(
+                molecular_weight_air,
+                temperature_value,
+                pressure_value,
+                dynamic_viscosity,
+                gas_constant,
+            )
+        if executable_turbulent_mask:
+            kinematic_viscosity = kinematic_viscosity_wp(
+                dynamic_viscosity,
+                fluid_density[box_idx],
+            )
 
     active_count = wp.int32(0)
     for particle_idx in range(n_particles):
@@ -1039,9 +1113,11 @@ def brownian_coagulation_kernel(  # noqa: C901
     # Charged-only and exact SP2016 sedimentation-only rates require exact
     # compact active-pair maxima. Brownian masks use the shared scan below.
     majorant_total = wp.float64(0.0)
-    if mechanism_mask == wp.int32(
-        CHARGED_HARD_SPHERE_MECHANISM_FLAG
-    ) or mechanism_mask == wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG):
+    if (
+        mechanism_mask == wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG)
+        or mechanism_mask == wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG)
+        or executable_turbulent_mask
+    ):
         majorant_total = _total_majorant(
             mechanism_mask,
             wp.float64(0.0),
@@ -1057,6 +1133,8 @@ def brownian_coagulation_kernel(  # noqa: C901
             active_count,
             radii,
             settling_velocities,
+            turbulent_dissipation[box_idx],
+            kinematic_viscosity,
             total_masses,
             charge,
             temperature,
@@ -1091,6 +1169,8 @@ def brownian_coagulation_kernel(  # noqa: C901
                     speeds[box_idx, second_idx],
                     settling_velocities[box_idx, first_idx],
                     settling_velocities[box_idx, second_idx],
+                    turbulent_dissipation[box_idx],
+                    kinematic_viscosity,
                     total_masses[box_idx, first_idx],
                     total_masses[box_idx, second_idx],
                     charge[box_idx, first_idx],
@@ -1194,6 +1274,8 @@ def brownian_coagulation_kernel(  # noqa: C901
             speeds[box_idx, selected_j],
             settling_velocities[box_idx, selected_i],
             settling_velocities[box_idx, selected_j],
+            turbulent_dissipation[box_idx],
+            kinematic_viscosity,
             total_masses[box_idx, selected_i],
             total_masses[box_idx, selected_j],
             charge[box_idx, selected_i],
@@ -1212,7 +1294,10 @@ def brownian_coagulation_kernel(  # noqa: C901
         if not (wp.isfinite(total_rate) and total_rate > wp.float64(0.0)):
             continue
         # Every valid candidate gets exactly one acceptance draw.
-        if wp.randf(state) < total_rate / majorant_total:
+        acceptance_probability = total_rate / majorant_total
+        if acceptance_probability > wp.float64(1.0):
+            acceptance_probability = wp.float64(1.0)
+        if wp.randf(state) < acceptance_probability:
             merged_charge = (
                 charge[box_idx, selected_i] + charge[box_idx, selected_j]
             )
@@ -1796,9 +1881,9 @@ def _ensure_turbulent_input_array(
     """Validate and normalize a turbulent-shear P2 per-box input.
 
     This private helper validates explicitly supplied state only; it neither
-    infers turbulent properties from shared containers nor enables turbulent
-    execution. ``coagulation_step_gpu`` uses it only for a structurally valid
-    ST1956 turbulent-shear mechanism before the reserved capability gate.
+    infers turbulent properties from shared containers nor transfers host data.
+    ``coagulation_step_gpu`` uses it only for the exact executable ST1956
+    turbulent-shear singleton.
 
     Args:
         name: Input name used in contract errors.
@@ -1944,11 +2029,12 @@ def coagulation_step_gpu(  # noqa: C901
     variants, other charged variants, and non-particle-resolved distributions
     reject during preflight without runtime mutation. Structural configuration
     validation occurs before all runtime access. A structurally valid
-    turbulent-shear request intentionally reaches a later P2 boundary after
-    particle metadata and device checks: it normalizes its explicit inputs and
-    then fails at the reserved capability gate, before any rate dispatch,
-    sampling, majorant construction, RNG work, or mutation. After particle
-    metadata and device checks, direct temperature and pressure inputs are
+    turbulent-shear request reaches a later P2 boundary after particle metadata
+    and device checks. Only the exact ``("turbulent_shear_st1956",)`` singleton
+    normalizes its explicit per-box inputs, calculates ST1956 rates, and
+    executes; every turbulent combination rejects before normalization,
+    allocation, RNG work, or mutation. After particle metadata and device
+    checks, direct temperature and pressure inputs are
     validated and normalized before volume setup or selector launches.
     ``particles`` and supplied ``collision_pairs``, ``n_collisions``,
     and ``rng_states`` are caller-owned same-device Warp resources; the step
@@ -2002,12 +2088,13 @@ def coagulation_step_gpu(  # noqa: C901
             ``particula.gpu.kernels``. This keyword-only configuration does not
             transfer, synchronize, or own Warp state. Omission selects
             Brownian, particle-resolved execution. Charged-only and
-            Brownian-plus-charged particle-resolved execution, and exact
-            singleton SP2016 sedimentation are also supported; either requested
-            Brownian-plus-charged order normalizes to the same execution.
-            Malformed configurations, unsupported distributions, and reserved
-            mechanism combinations fail before runtime inputs are accessed or
-            mutable runtime state is changed. A
+            Brownian-plus-charged particle-resolved execution, exact singleton
+            SP2016 sedimentation, and exact singleton ST1956 turbulent shear are
+            also supported; either requested Brownian-plus-charged order
+            normalizes to the same execution. Malformed configurations,
+            unsupported distributions, and unsupported mechanism combinations
+            fail before runtime inputs are accessed or mutable runtime state is
+            changed. A
             wrong type raises exactly ``ValueError`` with the message
             ``"mechanism_config must be a CoagulationMechanismConfig."``;
             other errors are delegated to the resolver and capability gate.
@@ -2055,11 +2142,11 @@ def coagulation_step_gpu(  # noqa: C901
         ValueError: If environment arrays do not match ``(n_boxes,)`` or the
             caller device.
         ValueError: If mechanism_config has the wrong type, is malformed, or
-            requests an unsupported distribution or reserved mechanism.
+            requests an unsupported distribution or mechanism combination.
         ValueError: If a structurally valid turbulent-shear request omits either
             explicit turbulent input or supplies an input with an unsupported
-            type, shape, device, dtype, or value domain. Valid turbulent inputs
-            then raise the reserved-mechanism capability error before execution.
+            type, shape, device, dtype, or value domain. Turbulent combinations
+            other than the exact ST1956 singleton reject after this P2 boundary.
         ValueError: If particle charge does not have shape
             ``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle
             device. Charged-containing and exact SP2016 sedimentation
@@ -2090,10 +2177,11 @@ def coagulation_step_gpu(  # noqa: C901
         Structurally valid turbulent-shear requests require explicit
         ``turbulent_dissipation`` and ``fluid_density`` only after structural
         configuration resolution and particle schema/device metadata validation.
-        Once both inputs validate, the reserved capability gate rejects the
-        request before normalization, allocation, rate dispatch, sampling,
-        majorant construction, RNG work, or mutation. Non-turbulent masks do
-        not inspect, validate, or allocate either input.
+        Valid turbulent combinations then reject before normalization,
+        allocation, rate dispatch, sampling, majorant construction, RNG work, or
+        mutation. The supported singleton normalizes both inputs and uses their
+        active-device values for ST1956 execution. Non-turbulent masks do not
+        inspect or validate either input.
 
         Validation runs before volume normalization, RNG setup, and Brownian or
         apply launches so invalid ``time_step``, shape, dtype, or device
@@ -2142,6 +2230,12 @@ def coagulation_step_gpu(  # noqa: C901
         ``initialize_rng=True`` is passed. Initialize caller-owned buffers once
         before repeated timesteps, then reuse them without hidden per-step
         resets. Graph-capture support remains deferred.
+
+        After a successful preflight, this is an in-place asynchronous Warp API.
+        A device-launch or runtime failure has no rollback guarantee for
+        particles, collision outputs, or RNG state. Callers must synchronize and
+        check Warp errors, then restore or discard their own snapshots before
+        retrying.
     """
     if mechanism_config is None:
         mechanism_config = CoagulationMechanismConfig()
@@ -2154,6 +2248,9 @@ def coagulation_step_gpu(  # noqa: C901
     )
     turbulent_enabled = bool(
         resolved_mechanism_config.mask & TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
+    )
+    turbulent_singleton = (
+        resolved_mechanism_config.mask == TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
     )
     if not turbulent_enabled:
         validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
@@ -2177,6 +2274,21 @@ def coagulation_step_gpu(  # noqa: C901
             device,
         )
         validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
+    normalized_turbulent_dissipation = None
+    normalized_fluid_density = None
+    if turbulent_singleton:
+        normalized_turbulent_dissipation = _ensure_turbulent_input_array(
+            "turbulent_dissipation",
+            turbulent_dissipation,
+            n_boxes,
+            device,
+        )
+        normalized_fluid_density = _ensure_turbulent_input_array(
+            "fluid_density",
+            fluid_density,
+            n_boxes,
+            device,
+        )
     charged_enabled = bool(
         resolved_mechanism_config.mask & CHARGED_HARD_SPHERE_MECHANISM_FLAG
     )
@@ -2291,6 +2403,18 @@ def coagulation_step_gpu(  # noqa: C901
         settling_velocities = wp.zeros(
             (n_boxes, n_particles), dtype=wp.float64, device=device
         )
+    # Only the exact ST1956 singleton reads these normalized caller inputs.
+    # Other masks receive unused fp64 storage without inspecting P2 arguments.
+    if turbulent_singleton:
+        turbulent_dissipation_array = normalized_turbulent_dissipation
+        fluid_density_array = normalized_fluid_density
+    else:
+        turbulent_dissipation_array = wp.zeros(
+            (n_boxes,), dtype=wp.float64, device=device
+        )
+        fluid_density_array = wp.zeros(
+            (n_boxes,), dtype=wp.float64, device=device
+        )
     total_masses = wp.zeros(
         (n_boxes, n_particles), dtype=wp.float64, device=device
     )
@@ -2329,6 +2453,8 @@ def coagulation_step_gpu(  # noqa: C901
             g_terms,
             speeds,
             settling_velocities,
+            turbulent_dissipation_array,
+            fluid_density_array,
             total_masses,
             particles.charge,
             active_indices,
