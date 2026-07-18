@@ -37,7 +37,7 @@ the repository's `*_test.py` convention and collect cleanly without Warp.
 - **P4 -- documentation (completed):** Review the two feature pages and E5-F5
   plan records for direct imports/API names, SI units, scalar or active-device
   `wp.float64` `(n_boxes,)` inputs, caller ownership, ST1956-only support,
-  no-DNS/additive boundaries, and E5-F6/E5-F7 handoffs. Run the focused
+  no-DNS/additive boundaries, and E5-F6/E5-F7/E5-F9 handoffs. Run the focused
   `coagulation_test.py -q -Werror` Warp CPU baseline; CUDA is optional and
   skips cleanly when unavailable. No coverage or test-module change is needed.
 

@@ -21,11 +21,15 @@
 - [x] **E5-F5-P4:** Update development documentation
   - Issue: #1355 | Size: XS | Status: Completed
   - Delivered: Documented the exact direct particle-resolved ST1956 singleton,
-    its `m^2/s^3` dissipation and `kg/m^3` fluid-density inputs, Python/NumPy
-    floating scalars or active-device `wp.float64` `(n_boxes,)` arrays, and
-    caller-owned output/RNG behavior. DNS/general turbulence and additive
-    combinations remain deferred; E5-F6 owns combinations and E5-F7 consumes
-    singleton evidence.
+    keyword-only `turbulent_dissipation` (`m^2/s^3`) and `fluid_density`
+    (`kg/m^3`) inputs, Python/NumPy floating scalars or active-device
+    `wp.float64` `(n_boxes,)` arrays (`wp.float32` is rejected), and
+    caller-owned output/RNG behavior. Mixed turbulent configurations validate
+    P2 inputs before rejecting without mutable runtime work. Warp CPU is the
+    installed-Warp baseline; CUDA is optional and skips cleanly when unavailable.
+    DNS/general turbulence and additive combinations remain deferred; E5-F6 owns
+    combinations, E5-F7 consumes singleton evidence, and E5-F9 owns the later
+    consolidated support table/direct example.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`, `docs/Features/Roadmap/data-oriented-gpu.md`, `.opencode/plans/sections/features/E5-F5/*.md`
   - Tests: Markdown/API/support-boundary review and the focused Warp CPU
     baseline; CUDA remains optional and skips cleanly when unavailable.

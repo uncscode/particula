@@ -3,13 +3,16 @@
 ## High-Level Design
 
 ```text
-coagulation_step_gpu(..., mechanisms=("turbulent_shear",),
-                     turbulent_dissipation=scalar-or-(n_boxes,),
-                     fluid_density=scalar-or-(n_boxes,))
+coagulation_step_gpu(...,
+                      mechanism_config=CoagulationMechanismConfig(
+                          ("turbulent_shear_st1956",)),
+                      turbulent_dissipation=scalar-or-(n_boxes,),
+                      fluid_density=scalar-or-(n_boxes,))
   -> canonicalize the mechanism mask and validate its structure
-  -> validate/normalize explicit positive-finite per-box P2 inputs
-  -> unchanged reserved-capability gate (no execution)
-  -> [P3 deferred] validate particles, environment, volume, outputs, and RNG
+  -> validate particle schema/device metadata
+  -> validate and normalize explicit positive-finite per-box P2 inputs
+  -> reject a turbulent mixed mask after P2 validation, before mutable work
+  -> validate environment, volume, outputs, and RNG
   -> for each box on device
        mu = dynamic_viscosity_wp(temperature[box])
        nu = mu / fluid_density[box]
@@ -47,8 +50,8 @@ this proved bound; no alternate unproved extrema heuristic is acceptable.
 ### Implemented P2 Direct-Step Boundary
 
 - `coagulation_step_gpu` has keyword-only `turbulent_dissipation` and
-  `fluid_density` inputs. For a structurally valid ST1956 mask, both are
-  required before capability preflight.
+  `fluid_density` inputs. For a structurally valid ST1956 request, both are
+  required after particle schema/device metadata validation.
 - `_ensure_turbulent_input_array` in
   `particula/gpu/kernels/coagulation.py` accepts positive finite Python or
   NumPy floating scalars and broadcasts them privately on the active device, or
@@ -59,7 +62,8 @@ this proved bound; no alternate unproved extrema heuristic is acceptable.
   validation. Invalid P2 input fails before environment/volume normalization,
   output or RNG setup, allocation, kernel launch, output writes, particle
   mutation, or RNG advancement. Valid singleton input proceeds to execution;
-  valid mixed turbulent masks reject in capability preflight before runtime work.
+  valid mixed turbulent masks validate P2 first, then reject before
+  normalization, allocation, RNG work, launch, or mutation.
 - Non-turbulent masks do not inspect, normalize, allocate for, or reject either
   turbulence argument, preserving Brownian/charged/sedimentation behavior.
 
@@ -71,7 +75,7 @@ this proved bound; no alternate unproved extrema heuristic is acceptable.
   inputs. They are required only when turbulent shear is enabled and are ignored
   for non-turbulent masks. Existing positional calls and the return tuple remain
   source compatible.
-- **Kernel Interface:** Add a focused ST1956 pair helper and pass normalized
+- **Kernel Interface:** Use the focused ST1956 pair helper and pass normalized
   per-box arrays to the shared property/majorant/selection path. Do not add a
   separate public turbulent step or separate stochastic pass.
 - **Workflow Hooks:** E5-F5 depends on E5-F1, runs independently of E5-F3/F4,
@@ -81,8 +85,8 @@ this proved bound; no alternate unproved extrema heuristic is acceptable.
 ### Implemented P3 Execution Boundary
 
 - The capability matrix executes only the exact ST1956 singleton. Valid mixed
-  turbulent masks reject during preflight before normalization, allocation, RNG
-  setup, launch, or mutation.
+  turbulent masks validate their required P2 inputs, then reject during
+  preflight before normalization, allocation, RNG setup, launch, or mutation.
 - The singleton uses normalized same-device fp64 per-box state, derives
   kinematic viscosity and active radii on device, and uses the ST1956 rate at
   the two largest compact active radii as an O(A) safe majorant.

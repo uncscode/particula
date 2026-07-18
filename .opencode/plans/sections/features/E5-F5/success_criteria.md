@@ -15,8 +15,11 @@
   buffer identity, and documented persistent RNG reuse/reset behavior.
 - [x] Focused Warp CPU tests cover the implemented path; CUDA remains optional
   and skips cleanly when unavailable.
-- [ ] Documentation says ST1956 turbulent shear only and makes no DNS,
-  clustering, inertial-enhancement, general turbulence, or performance claim.
+- [x] Documentation says the direct particle-resolved ST1956 singleton only;
+  specifies keyword-only positive finite `turbulent_dissipation` (`m^2/s^3`) and
+  `fluid_density` (`kg/m^3`) scalar or active-device `wp.float64` `(n_boxes,)`
+  forms; and makes no DNS, clustering, inertial-enhancement, general-turbulence,
+  or performance claim.
 
 ## Metrics
 
