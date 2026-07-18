@@ -71,6 +71,7 @@ if wp is not None:
         _bound_scheduled_trials,
         _charged_majorant_from_active_pairs,
         _compact_applied_collision_pairs_kernel,
+        _ensure_turbulent_input_array,
         _ensure_volume_array,
         _initialize_rng_states,
         _remove_active_pair_by_rank_swap_pop,
@@ -3514,6 +3515,13 @@ def test_coagulation_step_gpu_signature_keeps_runtime_options_keyword_only() -> 
     assert parameters["initialize_rng"].default is False
     assert parameters["initialize_rng"].kind is inspect.Parameter.KEYWORD_ONLY
     assert parameters["environment"].kind is inspect.Parameter.KEYWORD_ONLY
+    assert parameters["turbulent_dissipation"].default is None
+    assert (
+        parameters["turbulent_dissipation"].kind
+        is inspect.Parameter.KEYWORD_ONLY
+    )
+    assert parameters["fluid_density"].default is None
+    assert parameters["fluid_density"].kind is inspect.Parameter.KEYWORD_ONLY
 
 
 class _ParticlesAccessSentinel:
@@ -3614,12 +3622,6 @@ def test_coagulation_step_gpu_rejects_config_before_runtime_access(
         (
             CoagulationMechanismConfig(distribution_type="discrete"),
             "distribution_type must be exactly 'particle_resolved'.",
-        ),
-        (
-            CoagulationMechanismConfig(
-                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
-            ),
-            "Coagulation mechanism 'turbulent_shear_st1956' is reserved for E5-F5.",
         ),
         (
             CoagulationMechanismConfig(
@@ -3792,6 +3794,256 @@ def test_coagulation_config_rejection_bypasses_runtime_helpers(
             time_step=object(),
             mechanism_config=config,  # type: ignore[arg-type]
         )
+
+
+@pytest.mark.parametrize("name", ["turbulent_dissipation", "fluid_density"])
+@pytest.mark.parametrize("value", [1.5, np.float64(2.5)])
+def test_ensure_turbulent_input_array_broadcasts_floating_scalars(
+    device: str,
+    name: str,
+    value: float | np.floating[Any],
+) -> None:
+    """Turbulent floating scalars broadcast into private per-box storage."""
+    result = _ensure_turbulent_input_array(
+        name, value, 2, wp.get_device(device)
+    )
+
+    assert result.shape == (2,)
+    assert result.dtype == wp.float64
+    npt.assert_allclose(np.asarray(result.numpy()), float(value))
+
+
+@pytest.mark.parametrize("name", ["turbulent_dissipation", "fluid_density"])
+@pytest.mark.parametrize("dtype", [wp.float32, wp.float64])
+def test_ensure_turbulent_input_array_reuses_valid_warp_arrays(
+    device: str,
+    name: str,
+    dtype: Any,
+) -> None:
+    """Valid heterogeneous per-box Warp inputs retain their identity and dtype."""
+    expected = np.array([1.5, 2.5], dtype=np.float64)
+    value = wp.array(expected, dtype=dtype, device=device)
+
+    result = _ensure_turbulent_input_array(
+        name, value, 2, wp.get_device(device)
+    )
+
+    assert result is value
+    assert result.dtype == dtype
+    npt.assert_allclose(np.asarray(result.numpy()), expected, rtol=1e-6)
+
+
+@pytest.mark.parametrize(
+    ("value", "message"),
+    [
+        (None, "floating scalar"),
+        (True, "floating scalar"),
+        (1, "floating scalar"),
+        ("1.0", "floating scalar"),
+        (np.array([1.0]), "shape"),
+        (0.0, "finite and > 0"),
+        (-1.0, "finite and > 0"),
+        (np.nan, "finite and > 0"),
+        (np.inf, "finite and > 0"),
+    ],
+)
+def test_ensure_turbulent_input_array_rejects_invalid_host_values(
+    device: str,
+    value: object,
+    message: str,
+) -> None:
+    """Turbulent scalar contracts reject invalid host values by name."""
+    with pytest.raises(
+        ValueError,
+        match=f"turbulent_dissipation.*{re.escape(message)}",
+    ):
+        _ensure_turbulent_input_array("turbulent_dissipation", value, 2, device)
+
+
+@pytest.mark.parametrize(
+    ("value_factory", "message"),
+    [
+        (
+            lambda device: wp.array(
+                [1.0, 2.0, 3.0], dtype=wp.float64, device=device
+            ),
+            "shape",
+        ),
+        (
+            lambda device: wp.array([1, 2], dtype=wp.int32, device=device),
+            "supported Warp floating dtype",
+        ),
+        (
+            lambda device: wp.array(
+                [1.0, 0.0], dtype=wp.float64, device=device
+            ),
+            "finite and > 0",
+        ),
+    ],
+)
+def test_ensure_turbulent_input_array_rejects_invalid_warp_arrays(
+    device: str,
+    value_factory: Any,
+    message: str,
+) -> None:
+    """Turbulent Warp inputs reject malformed shape, dtype, and values."""
+    value = value_factory(device)
+
+    with pytest.raises(
+        ValueError,
+        match=f"fluid_density.*{re.escape(message)}",
+    ):
+        _ensure_turbulent_input_array(
+            "fluid_density", value, 2, wp.get_device(device)
+        )
+
+
+def test_ensure_turbulent_input_array_rejects_different_device(
+    device: str,
+) -> None:
+    """Turbulent arrays must reside on the active particle device."""
+    alternatives = [
+        candidate for candidate in warp_devices(wp) if candidate != device
+    ]
+    if not alternatives:
+        pytest.skip("No second Warp device available")
+    value = wp.array([1.0, 2.0], dtype=wp.float64, device=alternatives[0])
+
+    with pytest.raises(ValueError, match="fluid_density.*device"):
+        _ensure_turbulent_input_array(
+            "fluid_density", value, 2, wp.get_device(device)
+        )
+
+
+@pytest.mark.parametrize(
+    ("turbulent_dissipation", "fluid_density", "message"),
+    [
+        (None, 1000.0, "turbulent_dissipation.*floating scalar"),
+        (1.0, None, "fluid_density.*floating scalar"),
+        (True, 1000.0, "turbulent_dissipation.*floating scalar"),
+        (1.0, 1000, "fluid_density.*floating scalar"),
+        ("invalid", 1000.0, "turbulent_dissipation.*floating scalar"),
+        (1.0, np.array([1000.0]), "fluid_density.*shape"),
+        (0.0, 1000.0, "turbulent_dissipation.*finite and > 0"),
+        (1.0, 0.0, "fluid_density.*finite and > 0"),
+        (np.nan, 1000.0, "turbulent_dissipation.*finite and > 0"),
+        (1.0, np.inf, "fluid_density.*finite and > 0"),
+    ],
+)
+def test_turbulent_p2_preflight_precedes_capability_and_runtime_work(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    turbulent_dissipation: object,
+    fluid_density: object,
+    message: str,
+) -> None:
+    """Invalid P2 input stops before downstream allocation, RNG, or launch."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array(np.full((2, 1, 2), -7), dtype=wp.int32, device=device)
+    counts = wp.array([3, 4], dtype=wp.int32, device=device)
+    rng_states = wp.array([5, 6], dtype=wp.uint32, device=device)
+    initial_particles = from_warp_particle_data(gpu_particles, sync=True)
+    initial_pairs = np.asarray(pairs.numpy()).copy()
+    initial_counts = np.asarray(counts.numpy()).copy()
+    initial_rng = np.asarray(rng_states.numpy()).copy()
+    particle_arrays = (
+        gpu_particles.masses,
+        gpu_particles.concentration,
+        gpu_particles.charge,
+    )
+
+    def _unexpected(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("invalid P2 input reached downstream work")
+
+    for helper_name in (
+        "_ensure_environment_arrays",
+        "_ensure_volume_array",
+        "initialize_coagulation_rng_states",
+    ):
+        monkeypatch.setattr(coagulation_module, helper_name, _unexpected)
+    monkeypatch.setattr(coagulation_module.wp, "zeros", _unexpected)
+    monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected)
+
+    with pytest.raises(
+        ValueError,
+        match=message,
+    ):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=rng_states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+            ),
+            turbulent_dissipation=turbulent_dissipation,
+            fluid_density=fluid_density,
+        )
+
+    restored = from_warp_particle_data(gpu_particles, sync=True)
+    assert particle_arrays[0] is gpu_particles.masses
+    assert particle_arrays[1] is gpu_particles.concentration
+    assert particle_arrays[2] is gpu_particles.charge
+    npt.assert_allclose(restored.masses, initial_particles.masses)
+    npt.assert_allclose(restored.concentration, initial_particles.concentration)
+    npt.assert_allclose(restored.charge, initial_particles.charge)
+    npt.assert_array_equal(np.asarray(pairs.numpy()), initial_pairs)
+    npt.assert_array_equal(np.asarray(counts.numpy()), initial_counts)
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng)
+
+
+@pytest.mark.parametrize("dtype", [None, wp.float32, wp.float64])
+def test_turbulent_p2_valid_inputs_reach_reserved_capability_gate(
+    device: str,
+    dtype: Any | None,
+) -> None:
+    """Valid turbulent P2 values fail closed at the unchanged capability gate."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    if dtype is None:
+        turbulent_dissipation: Any = 1.0
+        fluid_density: Any = np.float64(1000.0)
+    else:
+        turbulent_dissipation = wp.array([1.0, 2.0], dtype=dtype, device=device)
+        fluid_density = wp.array([1000.0, 997.0], dtype=dtype, device=device)
+
+    with pytest.raises(
+        ValueError,
+        match="^Coagulation mechanism 'turbulent_shear_st1956' is reserved for E5-F5\\.$",
+    ):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+            ),
+            turbulent_dissipation=turbulent_dissipation,
+            fluid_density=fluid_density,
+        )
+
+
+def test_brownian_ignores_turbulent_p2_inputs(device: str) -> None:
+    """Non-turbulent calls do not validate irrelevant turbulent P2 inputs."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+
+    result, _, _ = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.1,
+        turbulent_dissipation="invalid",
+        fluid_density=np.array([0.0]),
+    )
+
+    assert result is gpu_particles
 
 
 @pytest.mark.parametrize(

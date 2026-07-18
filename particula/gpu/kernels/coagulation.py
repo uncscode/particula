@@ -1,4 +1,4 @@
-"""GPU Brownian, charged, and sedimentation coagulation utilities.
+"""GPU Brownian, charged, sedimentation, and turbulent-boundary utilities.
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
 coagulation pipeline. Its fixed-mask sampler executes particle-resolved
@@ -25,9 +25,13 @@ host-side metadata, not device-resident simulation state. The public step
     defaults to Brownian, particle-resolved execution and also accepts
     charged-only, exact SP2016 sedimentation-only, and canonical
     Brownian-plus-charged particle-resolved execution. It rejects otherwise
-    unsupported configurations during preflight, before runtime state is
-    accessed or mutated. Supplied particles, collision outputs, and RNG sidecars
-    are caller-owned same-device Warp resources.
+    unsupported configurations during structural preflight, before runtime state
+    is accessed or mutated. Turbulent-shear configurations intentionally cross a
+    later P2 boundary: explicit turbulent dissipation and fluid density inputs
+    are validated after particle schema/device metadata is available, then stop
+    at the reserved capability gate without dispatch, sampling, or mutation.
+    Supplied particles, collision outputs, and RNG sidecars are caller-owned
+    same-device Warp resources.
 
 The exact ``SEDIMENTATION_SP2016_MECHANISM_FLAG`` is a public direct-kernel
 mode for particle-resolved, unit-efficiency SP2016 scheduling. It shares the
@@ -1781,6 +1785,51 @@ def initialize_coagulation_rng_states(
     return rng_states
 
 
+def _ensure_turbulent_input_array(
+    name: str,
+    value: float | Any | None,
+    n_boxes: int,
+    device: Any,
+) -> Any:
+    """Validate and normalize a turbulent-shear per-box input.
+
+    Args:
+        name: Input name used in contract errors.
+        value: Positive finite floating scalar or Warp array.
+        n_boxes: Number of boxes.
+        device: Active particle device.
+
+    Returns:
+        A same-device Warp array with shape ``(n_boxes,)``. Valid supplied
+        arrays are returned by identity; scalar broadcasts use private storage.
+
+    Raises:
+        ValueError: If the value is not a supported scalar or same-device Warp
+            array with positive finite values.
+    """
+    if _is_warp_array_like(value):
+        if value.shape != (n_boxes,):
+            raise ValueError(f"{name} shape does not match (n_boxes,)")
+        _validate_device_match(name, value, device)
+        if not _is_supported_warp_float_dtype(value.dtype):
+            raise ValueError(f"{name} must use a supported Warp floating dtype")
+        _validate_positive_finite_array(name, value, "coagulation_step_gpu")
+        return value
+
+    if isinstance(value, bool) or not isinstance(value, (float, np.floating)):
+        if hasattr(value, "shape"):
+            raise ValueError(
+                f"{name} must be a Warp array with shape (n_boxes,)"
+            )
+        raise ValueError(f"{name} must be a floating scalar or Warp array")
+
+    scalar_value = float(value)
+    if not np.isfinite(scalar_value) or scalar_value <= 0.0:
+        raise ValueError(f"{name} must be finite and > 0")
+
+    return _broadcast_scalar_array(scalar_value, n_boxes, device)
+
+
 def _ensure_volume_array(
     volume: float | Any,
     n_boxes: int,
@@ -1845,6 +1894,8 @@ def coagulation_step_gpu(  # noqa: C901
     initialize_rng: bool = False,
     environment: Any | None = None,
     validate_charge_finite: bool = False,
+    turbulent_dissipation: float | Any | None = None,
+    fluid_density: float | Any | None = None,
 ) -> tuple[Any, Any, Any]:
     """Execute one direct, particle-resolved Warp coagulation timestep.
 
@@ -1865,9 +1916,14 @@ def coagulation_step_gpu(  # noqa: C901
     implementation scope, not a throughput or scaling claim.
     Sedimentation is executable only as its exact singleton mask; its mixed
     variants, other charged variants, and non-particle-resolved distributions
-    reject during preflight without runtime mutation. After particle metadata
-    and device checks, direct temperature and pressure inputs are validated and
-    normalized before volume setup or selector launches.
+    reject during preflight without runtime mutation. Structural configuration
+    validation occurs before all runtime access. A structurally valid
+    turbulent-shear request intentionally reaches a later P2 boundary after
+    particle metadata and device checks: it normalizes its explicit inputs and
+    then fails at the reserved capability gate, before any rate dispatch,
+    sampling, majorant construction, RNG work, or mutation. After particle
+    metadata and device checks, direct temperature and pressure inputs are
+    validated and normalized before volume setup or selector launches.
     ``particles`` and supplied ``collision_pairs``, ``n_collisions``,
     and ``rng_states`` are caller-owned same-device Warp resources; the step
     mutates them in place as applicable. The three-item return tuple contains
@@ -1945,6 +2001,17 @@ def coagulation_step_gpu(  # noqa: C901
             default False avoids per-step allocation, synchronization, and host
             readback for Brownian execution. Every charged-containing mode
             performs this scan before caller output or RNG mutation.
+        turbulent_dissipation: Explicit turbulent kinetic-energy dissipation
+            rate [m^2/s^3] for turbulent-shear P2 validation. Accepts a positive
+            finite Python or NumPy floating scalar, or a positive finite,
+            active-device Warp array with shape ``(n_boxes,)``. Supplied arrays
+            retain identity; scalar broadcasts use private helper-owned storage.
+            This input is not inferred from shared containers.
+        fluid_density: Explicit carrier-fluid density [kg/m^3] for
+            turbulent-shear P2 validation. It has the same scalar and
+            active-device ``(n_boxes,)`` Warp-array contract as
+            ``turbulent_dissipation`` and is not inferred from shared
+            containers.
 
     Returns:
         Tuple containing ``particles`` after in-place coagulation, the
@@ -1980,12 +2047,19 @@ def coagulation_step_gpu(  # noqa: C901
         ``(n_boxes,)`` Warp arrays, hybrid scalar-plus-Warp-array direct
         inputs, or keyword-only ``environment=...`` execution.
 
-        ``mechanism_config``, ``initialize_rng``, ``environment``, and
-        ``validate_charge_finite`` remain
+        ``mechanism_config``, ``initialize_rng``, ``environment``,
+        ``validate_charge_finite``, ``turbulent_dissipation``, and
+        ``fluid_density`` remain
         keyword-only so existing positional scalar callers stay
         source-compatible. Configuration preflight occurs before all runtime
         input access, allocation, normalization, RNG work, and launches. It
         does not make unrelated later validation failures atomic.
+
+        Turbulent-shear requests require explicit ``turbulent_dissipation`` and
+        ``fluid_density`` only after structural configuration resolution and
+        particle schema/device metadata validation. Once both inputs normalize,
+        the reserved capability gate rejects the request without execution.
+        Non-turbulent masks do not inspect, validate, or allocate either input.
 
         Validation runs before volume normalization, RNG setup, and Brownian or
         apply launches so invalid ``time_step``, shape, dtype, or device
@@ -2044,13 +2118,31 @@ def coagulation_step_gpu(  # noqa: C901
     resolved_mechanism_config = resolve_coagulation_mechanism_config(
         mechanism_config
     )
-    validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
+    turbulent_enabled = bool(
+        resolved_mechanism_config.mask & TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
+    )
+    if not turbulent_enabled:
+        validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
 
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
 
     device = particles.masses.device
     _validate_device_arrays(particles, device)
+    if turbulent_enabled:
+        _ensure_turbulent_input_array(
+            "turbulent_dissipation",
+            turbulent_dissipation,
+            n_boxes,
+            device,
+        )
+        _ensure_turbulent_input_array(
+            "fluid_density",
+            fluid_density,
+            n_boxes,
+            device,
+        )
+        validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
     charged_enabled = bool(
         resolved_mechanism_config.mask & CHARGED_HARD_SPHERE_MECHANISM_FLAG
     )
