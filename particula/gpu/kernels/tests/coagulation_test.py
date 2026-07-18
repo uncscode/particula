@@ -220,36 +220,26 @@ def test_mechanism_rejects_invalid_distribution_type(
         resolve_coagulation_mechanism_config(config)
 
 
-@pytest.mark.parametrize(
-    ("mechanism", "flag", "message"),
-    [
-        (
-            SEDIMENTATION_SP2016_MECHANISM,
-            SEDIMENTATION_SP2016_MECHANISM_FLAG,
-            "Coagulation mechanism 'sedimentation_sp2016' is reserved for "
-            "E5-F4.",
-        ),
-        (
-            TURBULENT_SHEAR_ST1956_MECHANISM,
-            TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
-            "Coagulation mechanism 'turbulent_shear_st1956' is reserved for "
-            "E5-F5.",
-        ),
-    ],
-)
-def test_mechanism_support_rejects_reserved_terms(
-    mechanism: str,
-    flag: int,
-    message: str,
-) -> None:
-    """Reserved terms resolve structurally before P1 capability rejection."""
+def test_sedimentation_only_capability_is_accepted() -> None:
+    """Exact particle-resolved SP2016 is an executable public mechanism."""
     resolved = resolve_coagulation_mechanism_config(
-        CoagulationMechanismConfig(mechanisms=(mechanism,))
+        CoagulationMechanismConfig(mechanisms=(SEDIMENTATION_SP2016_MECHANISM,))
     )
 
-    assert resolved.mechanisms == (mechanism,)
-    assert resolved.mask == flag
-    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
+    assert resolved.mask == SEDIMENTATION_SP2016_MECHANISM_FLAG
+    validate_coagulation_mechanism_capabilities(resolved)
+
+
+def test_mechanism_support_rejects_turbulent_shear() -> None:
+    """Turbulent shear remains deferred after structural resolution."""
+    resolved = resolve_coagulation_mechanism_config(
+        CoagulationMechanismConfig(
+            mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+        )
+    )
+
+    assert resolved.mask == TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
+    with pytest.raises(ValueError, match="reserved for E5-F5"):
         validate_coagulation_mechanism_capabilities(resolved)
 
 
@@ -304,6 +294,165 @@ def test_charged_only_step_runs_and_preserves_output_identity(
     assert result_pairs is pairs
     assert result_counts is counts
     assert 0 <= int(counts.numpy()[0]) <= 1
+
+
+def test_sedimentation_public_step_preserves_caller_owned_return_identity(
+    device: str,
+) -> None:
+    """The public SP2016 call uses caller-owned outputs without charge checks."""
+    particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    particles.volume[:] = 1.0e-18
+    particles.masses[0, :, 0] = [1.0e-15, 8.0e-15, 2.7e-14]
+    particles.charge[:] = np.nan
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array(
+        np.full((1, 1, 2), -1, dtype=np.int32),
+        dtype=wp.int32,
+        device=device,
+    )
+    counts = wp.zeros((1,), dtype=wp.int32, device=device)
+    states = wp.zeros((1,), dtype=wp.uint32, device=device)
+
+    returned = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0e308,
+        max_collisions=1,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        rng_states=states,
+        initialize_rng=True,
+        mechanism_config=CoagulationMechanismConfig(
+            mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
+        ),
+    )
+
+    assert returned == (gpu_particles, pairs, counts)
+    assert 0 <= int(counts.numpy()[0]) <= 1
+
+
+def test_sedimentation_public_step_merges_sparse_multibox_particles(
+    device: str,
+) -> None:
+    """SP2016 conserves per-box species mass and excludes inactive gaps."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=2)
+    particles.volume[:] = 1.0e-18
+    particles.masses[:] = [
+        [[1.0e-15, 2.0e-15], [9.0e-15, 9.0e-15], [8.0e-15, 16.0e-15]],
+        [[2.0e-15, 3.0e-15], [9.0e-15, 9.0e-15], [16.0e-15, 24.0e-15]],
+    ]
+    particles.concentration[:] = [[1.0, 0.0, 1.0], [1.0, 0.0, 1.0]]
+    initial_mass = np.sum(particles.masses, axis=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    temperature = wp.array([298.15, 310.0], dtype=wp.float64, device=device)
+    pressure = wp.array([101325.0, 95000.0], dtype=wp.float64, device=device)
+    pairs = wp.full((2, 1, 2), -1, dtype=wp.int32, device=device)
+    counts = wp.zeros((2,), dtype=wp.int32, device=device)
+
+    result_particles, result_pairs, result_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=1.0e308,
+        max_collisions=1,
+        rng_seed=41,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        mechanism_config=CoagulationMechanismConfig(
+            mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
+        ),
+    )
+    result = from_warp_particle_data(result_particles, sync=True)
+
+    assert result_pairs is pairs
+    assert result_counts is counts
+    npt.assert_array_equal(counts.numpy(), [1, 1])
+    npt.assert_array_equal(pairs.numpy(), [[[0, 2]], [[0, 2]]])
+    npt.assert_allclose(
+        np.sum(result.masses, axis=1), initial_mass, rtol=1.0e-12, atol=0.0
+    )
+    npt.assert_array_equal(result.concentration[:, 1], [0.0, 0.0])
+    npt.assert_array_equal(result.concentration[:, 2], [0.0, 0.0])
+    npt.assert_array_equal(result.masses[:, 2], np.zeros((2, 2)))
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("masses", np.nan, "sedimentation particle masses"),
+        ("masses", np.inf, "sedimentation particle masses"),
+        ("masses", -np.inf, "sedimentation particle masses"),
+        ("masses", -1.0, "sedimentation particle masses"),
+        ("concentration", np.nan, "sedimentation particle concentration"),
+        ("concentration", np.inf, "sedimentation particle concentration"),
+        ("concentration", -np.inf, "sedimentation particle concentration"),
+        ("concentration", -1.0, "sedimentation particle concentration"),
+        ("density", np.inf, "sedimentation particle density"),
+        ("density", -np.inf, "sedimentation particle density"),
+        ("density", 0.0, "sedimentation particle density"),
+        ("density", -1.0, "sedimentation particle density"),
+        ("density", np.nan, "sedimentation particle density"),
+    ],
+)
+def test_sedimentation_preflight_rejects_invalid_physics(
+    device: str,
+    field: str,
+    value: float,
+    message: str,
+) -> None:
+    """SP2016 input-domain failures are field-specific and pre-mutation."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    getattr(particles, field)[...] = value
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
+    counts = wp.array([7], dtype=wp.int32, device=device)
+    states = wp.array([7], dtype=wp.uint32, device=device)
+
+    with pytest.raises(ValueError, match=message):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            max_collisions=1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
+            ),
+        )
+
+    npt.assert_array_equal(pairs.numpy(), [[[7, 7]]])
+    npt.assert_array_equal(counts.numpy(), [7])
+    npt.assert_array_equal(states.numpy(), [7])
+
+
+def test_sedimentation_preflight_accepts_zero_mass_and_concentration(
+    device: str,
+) -> None:
+    """SP2016 permits zero-valued inactive particle state."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    particles.masses[:] = 0.0
+    particles.concentration[:] = 0.0
+    gpu_particles = to_warp_particle_data(particles, device=device)
+
+    returned, pairs, counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+        max_collisions=1,
+        mechanism_config=CoagulationMechanismConfig(
+            mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
+        ),
+    )
+
+    assert returned is gpu_particles
+    assert int(counts.numpy()[0]) == 0
+    assert pairs.shape == (1, 1, 2)
 
 
 @pytest.mark.parametrize(
@@ -3267,15 +3416,24 @@ def test_coagulation_step_gpu_rejects_config_before_runtime_access(
         ),
         (
             CoagulationMechanismConfig(
-                mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
-            ),
-            "Coagulation mechanism 'sedimentation_sp2016' is reserved for E5-F4.",
-        ),
-        (
-            CoagulationMechanismConfig(
                 mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
             ),
             "Coagulation mechanism 'turbulent_shear_st1956' is reserved for E5-F5.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=(BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM)
+            ),
+            "Unsupported coagulation mechanism configuration.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=(
+                    CHARGED_HARD_SPHERE_MECHANISM,
+                    SEDIMENTATION_SP2016_MECHANISM,
+                )
+            ),
+            "Unsupported coagulation mechanism configuration.",
         ),
     ],
 )

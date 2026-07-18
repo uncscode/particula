@@ -260,15 +260,22 @@ Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 | --- | --- | --- |
 | `brownian` | Executable with `particle_resolved` only | Shipped E5-F1 baseline |
 | `charged_hard_sphere` | Executable alone or with Brownian, particle-resolved only | Shipped E5-F3 |
-| `sedimentation_sp2016` | Reserved; rejected in capability preflight | E5-F4 |
+| `sedimentation_sp2016` | Exact unit-efficiency mode, particle-resolved only | Shipped E5-F4 |
 | `turbulent_shear_st1956` | Reserved; rejected in capability preflight | E5-F5 |
 
-The charged-only tuple is `("charged_hard_sphere",)`. The combined tuple
+The charged-only tuple is `("charged_hard_sphere",)`. Exact SP2016
+sedimentation is selected with
+`CoagulationMechanismConfig(("sedimentation_sp2016",))`; it uses fp64
+particle state, validates finite/nonnegative mass and concentration plus
+finite/positive density before mutable work, and has no efficiency parameter.
+It is a direct-kernel path only: it establishes neither CPU-strategy parity nor
+general accuracy or performance claims. The combined tuple
 `("brownian", "charged_hard_sphere")` is accepted in either requested order
 and normalizes to one executable mask. Reserved IDs, including
-Brownian-plus-reserved combinations, raise `ValueError` in host capability
-preflight before runtime input access, allocation, launch, or mutable state
-changes.
+Brownian-plus-sedimentation combinations and turbulent shear, raise `ValueError`
+in host capability preflight before runtime input access, allocation, launch, or
+mutable state changes. No mode performs hidden CPU↔GPU transfers or falls back
+to another mechanism.
 
 Charged-only execution uses a bounded compact active-pair majorant. Combined
 execution independently sanitizes and sums Brownian and charged terms, then
@@ -292,7 +299,8 @@ additive majorant; a capability-table row; shared-dispatcher integration; and
 co-located `*_test.py` coverage. They must not add an independent sampling
 loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
-integration, graph-capture claims, sedimentation, or turbulent-shear physics.
+integration, graph-capture claims, sedimentation combinations/variants, or
+turbulent-shear physics.
 
 ### Environment transfer boundary
 
@@ -545,7 +553,7 @@ than storage support.
 | CPU↔GPU transfer | Explicit helper calls only | No hidden container movement or hidden environment synchronization. |
 | Warp/CUDA support | Optional | Warp `device="cpu"` is the baseline when Warp is installed; CUDA is additive local evidence and unavailable devices skip cleanly. |
 | Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
-| Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Executable configurations are `('brownian',)`, `('charged_hard_sphere',)`, and Brownian-plus-charged in either requested order; combined requests normalize to canonical order. This low-level path does not establish Runnable support, CPU parity, or performance claims. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state and explicit resets synchronize during initialization. |
+| Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Executable configurations are `('brownian',)`, `('charged_hard_sphere',)`, exact unit-efficiency `('sedimentation_sp2016',)`, and Brownian-plus-charged in either requested order; combined requests normalize to canonical order. This low-level path does not establish Runnable support, CPU parity, or performance claims. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state and explicit resets synchronize during initialization. |
 | Fixed-shape GPU/runtime roadmap work | Not current runtime behavior | Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior. |
 
 Additional shipped boundaries:
