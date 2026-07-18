@@ -455,6 +455,126 @@ def test_sedimentation_preflight_accepts_zero_mass_and_concentration(
     assert pairs.shape == (1, 1, 2)
 
 
+@pytest.mark.parametrize("density", [0.0, -1.0, np.nan, np.inf])
+def test_sedimentation_empty_particles_reject_invalid_density_atomically(
+    device: str,
+    density: float,
+) -> None:
+    """SP2016 validates shared density even when particle capacity is empty."""
+    particles = _make_particle_data(n_boxes=1, n_particles=0, n_species=1)
+    particles.density[:] = density
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
+    counts = wp.array([7], dtype=wp.int32, device=device)
+    states = wp.array([7], dtype=wp.uint32, device=device)
+
+    with pytest.raises(ValueError, match="sedimentation particle density"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            max_collisions=1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
+            ),
+        )
+
+    npt.assert_array_equal(pairs.numpy(), [[[7, 7]]])
+    npt.assert_array_equal(counts.numpy(), [7])
+    npt.assert_array_equal(states.numpy(), [7])
+
+
+def test_sedimentation_rejects_unequal_positive_concentrations_atomically(
+    device: str,
+) -> None:
+    """SP2016 rejects unrepresentable concentration-weighted merges."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    particles.concentration[:] = [[1.0, 2.0]]
+    initial_particles = particles.copy()
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
+    counts = wp.array([7], dtype=wp.int32, device=device)
+    states = wp.array([7], dtype=wp.uint32, device=device)
+
+    with pytest.raises(ValueError, match="concentrations must be equal"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0e308,
+            max_collisions=1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
+            ),
+        )
+
+    _assert_particles_unchanged(gpu_particles, initial_particles)
+    npt.assert_array_equal(pairs.numpy(), [[[7, 7]]])
+    npt.assert_array_equal(counts.numpy(), [7])
+    npt.assert_array_equal(states.numpy(), [7])
+
+
+def test_sedimentation_active_cap_accepts_boundary_and_rejects_overflow(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+) -> None:
+    """SP2016 caps exact-pair work before caller-owned state changes."""
+    monkeypatch.setattr(
+        coagulation_module, "MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX", 2
+    )
+    boundary = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    boundary_gpu = to_warp_particle_data(boundary, device=device)
+    _, _, boundary_counts = coagulation_step_gpu(
+        boundary_gpu,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=0.0,
+        max_collisions=1,
+        mechanism_config=CoagulationMechanismConfig(
+            mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
+        ),
+    )
+    npt.assert_array_equal(boundary_counts.numpy(), [0])
+
+    overflow = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
+    overflow_initial = overflow.copy()
+    overflow_gpu = to_warp_particle_data(overflow, device=device)
+    pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
+    counts = wp.array([7], dtype=wp.int32, device=device)
+    states = wp.array([7], dtype=wp.uint32, device=device)
+    with pytest.raises(
+        ValueError, match="MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX"
+    ):
+        coagulation_step_gpu(
+            overflow_gpu,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            max_collisions=1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
+            ),
+        )
+
+    _assert_particles_unchanged(overflow_gpu, overflow_initial)
+    npt.assert_array_equal(pairs.numpy(), [[[7, 7]]])
+    npt.assert_array_equal(counts.numpy(), [7])
+    npt.assert_array_equal(states.numpy(), [7])
+
+
 @pytest.mark.parametrize(
     "mechanisms",
     [
@@ -6125,7 +6245,7 @@ def test_private_mixed_sedimentation_mask_rejects_without_rng_or_pair_work(
     npt.assert_array_equal(result["masses"].numpy(), masses)
     npt.assert_array_equal(result["concentration"].numpy(), [[1.0, 1.0]])
     npt.assert_array_equal(result["radii"].numpy(), [[9.0, 9.0]])
-    npt.assert_array_equal(result["settling_velocities"].numpy(), [[0.0, 0.0]])
+    npt.assert_array_equal(result["settling_velocities"].numpy(), [[7.0, 7.0]])
 
 
 def test_private_sampler_clears_and_populates_sedimentation_velocity_scratch(
@@ -6145,7 +6265,7 @@ def test_private_sampler_clears_and_populates_sedimentation_velocity_scratch(
         time_step=0.0,
     )
 
-    npt.assert_array_equal(brownian["settling_velocities"].numpy(), [[0.0] * 3])
+    npt.assert_array_equal(brownian["settling_velocities"].numpy(), [[7.0] * 3])
     velocities = np.asarray(sedimentation["settling_velocities"].numpy())[0]
     expected = np.array(
         [
