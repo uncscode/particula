@@ -265,11 +265,22 @@ Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 
 The charged-only tuple is `("charged_hard_sphere",)`. Exact SP2016
 sedimentation is selected with
-`CoagulationMechanismConfig(("sedimentation_sp2016",))`; it uses fp64
-particle state, validates finite/nonnegative mass and concentration plus
-finite/positive density before mutable work, requires equal positive particle
-concentrations within each box for representable inventory-preserving merges,
-and has no efficiency parameter.
+`CoagulationMechanismConfig(("sedimentation_sp2016",))`. Its shipped pair rate
+is `K = π (r_i + r_j)^2 |v_i - v_j|` in m³/s, where settling velocities use
+Stokes settling with Cunningham slip correction (Seinfeld & Pandis, 2016,
+Eq. 13A.4). Collision efficiency is fixed at 1; no public efficiency argument
+exists. This mode uses fp64 particle mass state, validates finite/nonnegative
+mass and concentration plus finite/positive density before mutable work, and
+requires equal positive particle concentrations within each box for
+representable inventory-preserving merges.
+
+Supply temperature and pressure either as direct scalars, supported-float Warp
+arrays of shape `(n_boxes,)` on the particle device, or same-device
+`WarpEnvironmentData` with both direct inputs set to `None`. These
+thermodynamic inputs are not required to be fp64. Caller-owned particle,
+collision-output, and RNG resources retain their documented dtypes and identity;
+only private, call-local total-mass and settling-velocity scratch is fp64 with
+shape `(n_boxes, n_particles)`.
 It is a direct-kernel path only: it establishes neither CPU-strategy parity nor
 general accuracy or performance claims. The combined tuple
 `("brownian", "charged_hard_sphere")` is accepted in either requested order
@@ -295,8 +306,11 @@ terms do not add to totals; invalid candidates do not mutate state or output.
 The return tuple is exactly `(particles, collision_pairs, n_collisions)`.
 Supplied collision buffers are returned by identity. Supplied `rng_states`
 mutates in place but is never returned; omitted buffers are call-local
-conveniences. Warp CPU is the baseline when Warp is installed. CUDA is optional
-additive evidence and skips cleanly when unavailable.
+conveniences. Sedimentation-specific read-only preflight fails before output
+allocation, RNG initialization, or particle mutation, but does not make
+unrelated later validation failures atomic. Warp CPU is the baseline when Warp
+is installed. CUDA is optional additive evidence and skips cleanly when
+unavailable.
 
 Future mechanisms must provide a stable identifier; required host and device
 inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
@@ -689,7 +703,7 @@ the other evidence classes.
 | `pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror` | Primary direct CPU-oracle particle-mass/gas-concentration parity matrix. |
 | `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror` | Bounded direct-step stiffness coverage. |
 | `pytest particula/gpu/dynamics/tests/coagulation_funcs_test.py -q -Werror` | Deterministic GPU coagulation pair-helper parity. |
-| `pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror` | Charge-buffer preflight and recipient-add/donor-clear merge coverage. |
+| `pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror` | Direct coagulation coverage, including singleton sedimentation configuration, direct/environment inputs, caller-owned output/RNG behavior, conservation, and rejected-call state safety. |
 | `pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q` | CPU integration/inventory-conservation evidence (separate particle-plus-gas inventory conservation checks); not direct-GPU validation. |
 | `pytest particula/integration_tests/condensation_particle_resolved_test.py -q` | CPU integration evidence for particle-resolved condensation; not direct-GPU validation. |
 | `pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror` | Latent-heat energy/bookkeeping documentation checks. |

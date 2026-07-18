@@ -1041,13 +1041,23 @@ Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 
 The charged-only tuple is `("charged_hard_sphere",)`. Exact SP2016
 sedimentation is selected with
-`CoagulationMechanismConfig(("sedimentation_sp2016",))`; it is a fp64,
-unit-efficiency direct-kernel mode with no CPU fallback or efficiency parameter.
+`CoagulationMechanismConfig(("sedimentation_sp2016",))`. Its shipped pair rate
+is `K = π (r_i + r_j)^2 |v_i - v_j|` in m³/s, using Stokes settling velocities
+with Cunningham slip correction (Seinfeld & Pandis, 2016, Eq. 13A.4).
+Collision efficiency is fixed at 1 and no public efficiency argument exists.
+It is a direct-kernel-only mode: it uses fp64 particle mass state, but direct
+scalar temperature/pressure, supported-float same-device Warp arrays of shape
+`(n_boxes,)`, or same-device `WarpEnvironmentData` are alternatives. Only
+private, call-local fp64 total-mass and settling-velocity scratch has shape
+`(n_boxes, n_particles)`; caller-owned particle, collision-output, and RNG
+resources retain their documented dtypes and identity.
 The combined tuple `("brownian", "charged_hard_sphere")` is accepted in either
 requested order and normalizes to one executable mask. Reserved IDs, including
 Brownian-plus-sedimentation combinations, raise `ValueError` in host capability
 preflight before runtime input access, allocation, launch, or mutable state
-changes.
+changes. Sedimentation-specific preflight rejects invalid particle physics
+before output allocation, RNG initialization, or particle mutation; this does
+not make unrelated later validation failures atomic.
 
 `WarpParticleData.charge` is caller-owned same-device `wp.float64` state with
 shape `(n_boxes, n_particles)`, not a sidecar or transfer result. Charged calls
@@ -1073,9 +1083,11 @@ co-located `*_test.py` coverage. They must not add an independent sampling
 loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
 integration, graph-capture claims, sedimentation combinations or variants, or
-turbulent-shear physics.
-Alternate charged variants and broader combinations remain deferred; E5-F9 owns
-the canonical example and final support table.
+turbulent-shear physics. Non-unit efficiency, alternate drag/DNS physics,
+Runnable integration, CPU fallback, and hidden transfers are unsupported.
+E5-F6 owns additive combinations, E5-F7 consumes sedimentation evidence, and
+E5-F9 owns the eventual consolidated support table and direct example; none of
+that downstream work is delivered here.
 
 Planned features:
 

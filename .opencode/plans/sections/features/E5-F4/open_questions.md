@@ -27,5 +27,11 @@
   - Resolved 2026-07-15: No. The supported path is the existing Stokes settling
     formula with Cunningham slip correction. Non-Stokes drag and DNS variants
     are explicitly out of scope.
+- [x] Does Issue #1350 change the completed #1349 P3/P4 delivery or downstream
+  ownership?
+  - Resolved 2026-07-17: No. #1350 is a completed documentation follow-up that
+    records equation/citation, units, fixed-efficiency scope, and focused
+    evidence wording. E5-F6 retains additive combinations, E5-F7 consumes the
+    evidence, and E5-F9 retains the final consolidated support matrix/example.
 
 Classifier diagnostics: none.

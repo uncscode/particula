@@ -37,3 +37,7 @@ majorant and dispatch it. P2 must land before P3 registers public execution and
 state-safety evidence. P4 documents only behavior proven by P1-P3 and remains
 final. Every implementation phase includes co-located tests; there is no
 standalone testing phase. Classifier diagnostics: none.
+
+Issue #1350 is a completed documentation-only follow-up to #1349. It records
+existing E5-F4 evidence and boundaries; it does not deliver E5-F6 additive
+combinations, E5-F7 evidence consumption, or E5-F9's final matrix/example.
