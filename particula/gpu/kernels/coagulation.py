@@ -11,8 +11,9 @@ explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
 Particle metadata and device checks run before normalizing environment inputs,
 setting up volume, initializing RNG state, or executing Brownian work. An
 explicit opt-in finite-charge validation scan is available for Brownian
-callers; every mode containing charged hard-sphere physics always validates
-    finite charge before resource allocation or mutation. The kernels operate on
+callers; every mode containing charged hard-sphere physics or exact SP2016
+sedimentation always validates finite charge before resource allocation or
+mutation. The kernels operate on
     GPU-resident particle data and produce collision pairs that are applied in
     place: recipient particles receive
 donor mass and charge, while donor mass, concentration, and charge are cleared.
@@ -1976,8 +1977,9 @@ def coagulation_step_gpu(  # noqa: C901
             requests an unsupported distribution or reserved mechanism.
         ValueError: If particle charge does not have shape
             ``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle
-            device. Charged-containing execution, and Brownian with
-            ``validate_charge_finite=True``, also raise for NaN or infinity.
+            device. Charged-containing and exact SP2016 sedimentation
+            execution, and Brownian with ``validate_charge_finite=True``, also
+            raise for NaN or infinity.
         ValueError: If charged-containing masses or concentrations are
             non-finite or negative, species density is non-finite or
             nonpositive, or a box exceeds
@@ -2013,11 +2015,11 @@ def coagulation_step_gpu(  # noqa: C901
         ``validate_charge_finite=True`` and otherwise avoids this scan,
         allocation, synchronization, and host readback.
 
-        Exact SP2016 sedimentation read-only-validates finite/nonnegative
-        masses and concentrations, finite/positive density, compatible positive
-        concentrations, and its bounded active count before time-step,
-        environment, output, or RNG work. Its exact compact-active O(A²)
-        majorant is capped at 32,640 pairs per box. Zero masses and
+        Exact SP2016 sedimentation read-only-validates finite charge,
+        finite/nonnegative masses and concentrations, finite/positive density,
+        compatible positive concentrations, and its bounded active count before
+        time-step, environment, output, or RNG work. Its exact compact-active
+        O(A²) majorant is capped at 32,640 pairs per box. Zero masses and
         concentrations remain valid inactive-slot state; this mode does not
         impose charged-only constraints.
 
@@ -2069,7 +2071,7 @@ def coagulation_step_gpu(  # noqa: C901
     sedimentation_enabled = (
         resolved_mechanism_config.mask == SEDIMENTATION_SP2016_MECHANISM_FLAG
     )
-    if validate_charge_finite or charged_enabled:
+    if validate_charge_finite or charged_enabled or sedimentation_enabled:
         _validate_charge_finite(
             particles.charge,
             n_boxes,

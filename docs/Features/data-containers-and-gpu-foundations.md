@@ -269,10 +269,12 @@ sedimentation is selected with
 is `K = π (r_i + r_j)^2 |v_i - v_j|` in m³/s, where settling velocities use
 Stokes settling with Cunningham slip correction (Seinfeld & Pandis, 2016,
 Eq. 13A.4). Collision efficiency is fixed at 1; no public efficiency argument
-exists. This mode uses fp64 particle mass state, validates finite/nonnegative
-mass and concentration plus finite/positive density before mutable work, and
-requires equal positive particle concentrations within each box for
-representable inventory-preserving merges.
+exists. This mode uses fp64 particle mass state, validates finite particle
+charge, finite/nonnegative mass and concentration, plus finite/positive density
+before mutable work, and requires equal positive particle concentrations within
+each box for representable inventory-preserving merges. Non-finite charge is
+rejected during host-side preflight before caller-owned outputs, persistent RNG,
+or particle state can be mutated.
 
 Supply temperature and pressure either as direct scalars, supported-float Warp
 arrays of shape `(n_boxes,)` on the particle device, or same-device
