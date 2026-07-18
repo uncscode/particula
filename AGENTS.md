@@ -435,9 +435,18 @@ for _ in range(n_steps):
   allocation/writes, RNG setup, or particle mutation. Sedimentation combinations
   remain deferred. Either supported combined order normalizes to the canonical
   mask and uses one shared stochastic selection path. Malformed configurations,
-  unsupported distributions, and deferred mechanisms fail during host-side
-  preflight before runtime state access, allocation, mutation, RNG
-  initialization, or kernel launch.
+   unsupported distributions, and deferred mechanisms fail during host-side
+   preflight before runtime state access, allocation, mutation, RNG
+   initialization, or kernel launch.
+- A structurally valid ST1956 turbulent-shear request additionally requires
+  keyword-only, explicit `turbulent_dissipation` (m²/s³) and `fluid_density`
+  (kg/m³). Each accepts a positive finite Python/NumPy floating scalar or a
+  supported floating Warp array shaped `(n_boxes,)` on the active device;
+  supplied valid arrays retain identity, while scalar broadcasts use private
+  device storage. These are not container fields. Valid P2 inputs currently
+  reach the reserved-capability error: turbulent rate dispatch, sampling, and
+  merge behavior are intentionally not implemented. Non-turbulent calls ignore
+  both parameters.
 - `WarpParticleData.charge` is caller-owned, device-resident state containing
   dimensionless elementary-charge counts with shape `(n_boxes, n_particles)`.
   It is not a sidecar or a hidden transfer result. It must be a same-device

@@ -12,8 +12,10 @@
     nonnegative radii. Tests exhaustively compare every active pair to the bound.
 - [x] What should happen when turbulent inputs are supplied but the mechanism
   is not enabled?
-  - Resolved 2026-07-16: reject either argument as excess input, reject partial
-    input pairs, and fail before allocation, RNG initialization, or mutation.
+  - Resolved 2026-07-18: ignore both arguments without inspecting, validating,
+    transferring, or allocating for them. This preserves existing
+    non-turbulent Brownian/charged/sedimentation behavior; P2 requirements apply
+    only to structurally valid ST1956 requests.
 - [x] Does E5-F5 include DNS turbulence models?
   - Resolved 2026-07-15: No. Only the ST1956 turbulent-shear equation is in
     scope; DNS models and claims are explicitly excluded.

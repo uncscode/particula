@@ -10,13 +10,13 @@ physics and ownership contract ambiguous.
 
 ## Value Proposition
 
-E5-F5 adds bounded, fp64 turbulent-shear-only execution to the shared E5
-sampler. Callers provide explicit positive finite dissipation and fluid-density
-values per box; device code derives dynamic and kinematic viscosity and applies
-the existing ST1956 equation. The feature preserves fixed-shape buffers,
-persistent RNG ownership, fail-before-mutation validation, and the direct
-low-level return contract. It makes no DNS turbulence or general turbulence
-accuracy claim.
+E5-F5 is building bounded, fp64 turbulent-shear-only execution on the shared E5
+sampler. Its completed P2 boundary requires callers of a structurally valid
+ST1956 request to provide explicit positive finite dissipation and fluid-density
+values per box. The direct step normalizes those values before mutable runtime
+work, then retains the reserved-capability failure; rate dispatch, sampling, and
+merge behavior remain deferred. The feature makes no DNS turbulence or general
+turbulence accuracy claim.
 
 ## Implemented Foundation
 
@@ -26,6 +26,14 @@ viscosity (`mu / rho`) and the ST1956 pair rate in
 to device physics and co-located equation/invariant coverage; it does not yet
 add direct-step inputs, mechanism dispatch, sampling, public exports, or CPU
 fallback behavior.
+
+E5-F5-P2 is complete: `coagulation_step_gpu` now accepts keyword-only
+`turbulent_dissipation` and `fluid_density` inputs. Its local normalizer accepts
+positive finite Python/NumPy floating scalars or supported same-device Warp
+arrays shaped `(n_boxes,)`, preserves valid array identity, and uses private
+same-device storage for scalar broadcasts. Turbulent requests validate both
+inputs before downstream runtime setup and then fail at the unchanged reserved
+ST1956 capability gate; non-turbulent calls ignore these arguments.
 
 ## User Stories
 

@@ -171,9 +171,13 @@ print(result)
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
   explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
-  current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
-  such as coagulation `rng_states` and condensation thermodynamics. GPU
-  condensation requires keyword-only `thermodynamics=ThermodynamicsConfig`,
+   current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
+   such as coagulation `rng_states` and condensation thermodynamics. GPU
+   turbulent-shear coagulation structurally validates explicit P2
+   `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³) inputs but
+   remains reserved: it does not dispatch turbulent rates, sample collisions,
+   or merge particles. GPU condensation requires keyword-only
+   `thermodynamics=ThermodynamicsConfig`,
   validates an active-device binary per-box/species `gas.partitioning` mask
   before mutation, and runs exactly four equal substeps. Disabled species and
   zero-concentration particle slots receive no transfer. Each finalized
@@ -184,9 +188,9 @@ print(result)
    `WarpGasData.vapor_pressure` from the current device-resident temperature
    before mass transfer. For the supported low-level, direct-kernel-only
    walkthrough, use `python docs/Examples/gpu_direct_kernels_quick_start.py`.
-    This path does not add high-level `Aerosol`/`Runnable` support, implicit
-    simulation-state transfers or synchronization, automatic fallback or
-    migration, or CPU-strategy/runnable parity. See the [GPU condensation command
+   This path does not add high-level `Aerosol`/`Runnable` support, implicit
+   simulation-state transfers or synchronization, automatic fallback or
+   migration, or CPU-strategy/runnable parity. See the [GPU condensation command
     matrix](Features/data-containers-and-gpu-foundations.md#focused-reproduction-commands)
     for focused troubleshooting and reproduction commands. Entry-point
     validation can still perform synchronous device-to-host readbacks.

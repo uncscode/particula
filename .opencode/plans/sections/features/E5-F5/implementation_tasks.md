@@ -12,14 +12,14 @@
 
 ## Coagulation Orchestration
 
-- [ ] Add keyword-only `turbulent_dissipation` and `fluid_density` inputs to
+- [x] Add keyword-only `turbulent_dissipation` and `fluid_density` inputs to
   the E5-F1 concrete direct-step contract without changing legacy Brownian
   positional calls.
-- [ ] Implement one reusable scalar-or-Warp `(n_boxes,)` positive-finite input
+- [x] Implement one reusable scalar-or-Warp `(n_boxes,)` positive-finite input
   normalizer in `particula/gpu/kernels/coagulation.py`; preserve valid caller
   arrays by identity and reject NumPy arrays/unsupported dtypes/devices.
-- [ ] Require both inputs only for configurations containing turbulent shear
-  and apply E5-F1's policy to irrelevant supplied inputs.
+- [x] Require both inputs only for configurations containing turbulent shear;
+  ignore irrelevant supplied inputs for non-turbulent configurations.
 - [ ] Derive the per-box ST1956 prefactor and active radii entirely on device.
 - [ ] Implement and document the safe majorant; add the turbulent term to the
   shared pair-rate/majorant dispatcher and capability matrix.
@@ -36,8 +36,8 @@
   `turbulent_shear_coagulation_test.py` if module size requires it.
 - [ ] Add scalar/per-box, heterogeneous multi-box, inactive-slot, zero/one/two
   active, buffer identity, RNG reuse/reset, stochastic, and conservation cases.
-- [ ] Snapshot masses, concentration, charge, output buffers, and RNG state for
-  every invalid/unsupported preflight case.
+- [x] Snapshot masses, concentration, charge, output buffers, and RNG state for
+  invalid P2 preflight cases.
 - [ ] Run required Warp CPU tests and parametrized optional CUDA tests; use
   explicit fp64 tolerances and aggregate/sigma stochastic assertions.
 

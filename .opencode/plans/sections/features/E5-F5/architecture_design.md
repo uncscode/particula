@@ -6,9 +6,10 @@
 coagulation_step_gpu(..., mechanisms=("turbulent_shear",),
                      turbulent_dissipation=scalar-or-(n_boxes,),
                      fluid_density=scalar-or-(n_boxes,))
-  -> E5-F1 canonicalizes the mechanism mask and validates capability
-  -> validate/normalize explicit positive-finite per-box inputs
-  -> validate particles, environment, volume, outputs, and persistent RNG
+  -> canonicalize the mechanism mask and validate its structure
+  -> validate/normalize explicit positive-finite per-box P2 inputs
+  -> unchanged reserved-capability gate (no execution)
+  -> [P3 deferred] validate particles, environment, volume, outputs, and RNG
   -> for each box on device
        mu = dynamic_viscosity_wp(temperature[box])
        nu = mu / fluid_density[box]
@@ -43,14 +44,33 @@ this proved bound; no alternate unproved extrema heuristic is acceptable.
   fallback changed in P1. P2/P3 remain responsible for connecting these pure
   helpers to the direct execution path.
 
+### Implemented P2 Direct-Step Boundary
+
+- `coagulation_step_gpu` has keyword-only `turbulent_dissipation` and
+  `fluid_density` inputs. For a structurally valid ST1956 mask, both are
+  required before the existing reserved-capability gate.
+- `_ensure_turbulent_input_array` in
+  `particula/gpu/kernels/coagulation.py` accepts positive finite Python or
+  NumPy floating scalars and broadcasts them privately on the active device, or
+  returns a supported floating same-device Warp array of shape `(n_boxes,)` by
+  identity. It rejects missing, non-floating, non-finite, non-positive,
+  wrong-shape, wrong-dtype, and wrong-device values.
+- P2 performs only the particle schema/device metadata access needed for that
+  validation. Invalid P2 input fails before environment/volume normalization,
+  output or RNG setup, allocation, kernel launch, output writes, particle
+  mutation, or RNG advancement. Valid input then reaches the unchanged
+  `reserved for E5-F5` capability error; P3 dispatch and sampling are deferred.
+- Non-turbulent masks do not inspect, normalize, allocate for, or reject either
+  turbulence argument, preserving Brownian/charged/sedimentation behavior.
+
 - **Data Model:** No `WarpParticleData` or `WarpEnvironmentData` schema change.
   Dissipation `[m^2/s^3]` and fluid density `[kg/m^3]` are call-specific inputs,
-  normalized to active-device fp64 arrays shaped `(n_boxes,)`.
-- **API Surface:** Extend E5-F1's concrete mechanism configuration capability
-  matrix and `coagulation_step_gpu` with keyword-only mechanism inputs. They are
-  required when turbulent shear is enabled and ignored inputs should be
-  rejected or governed consistently by E5-F1's excess-input policy. Existing
-  Brownian calls and the return tuple remain source compatible.
+  normalized to active-device arrays shaped `(n_boxes,)`; supported supplied
+  `wp.float32` and `wp.float64` arrays retain identity.
+- **API Surface:** `coagulation_step_gpu` has the implemented keyword-only P2
+  inputs. They are required only when turbulent shear is enabled and are ignored
+  for non-turbulent masks. Existing positional calls and the return tuple remain
+  source compatible.
 - **Kernel Interface:** Add a focused ST1956 pair helper and pass normalized
   per-box arrays to the shared property/majorant/selection path. Do not add a
   separate public turbulent step or separate stochastic pass.
@@ -60,12 +80,13 @@ this proved bound; no alternate unproved extrema heuristic is acceptable.
 
 ## Explicit Scientific Boundary
 
-Supported behavior is the Saffman-Turner 1956 turbulent-shear collision kernel
-for direct particle-resolved fp64 execution with caller-supplied box state.
-This feature does not implement, validate, approximate, or claim parity with
-the repository's turbulent DNS models. It makes no DNS, clustering, inertial
-enhancement, general turbulence, or accuracy claim beyond the tested ST1956
-formula and bounded sampler.
+The currently supported direct-step behavior is P2 validation of
+caller-supplied ST1956 box state followed by the reserved-capability failure.
+It does not execute the turbulent-shear collision kernel. This feature does not
+implement, validate, approximate, or claim parity with the repository's
+turbulent DNS models. It makes no DNS, clustering, inertial enhancement,
+general turbulence, or accuracy claim beyond the tested ST1956 formula and
+deferred bounded-sampler design.
 
 ## Security & Compliance
 
