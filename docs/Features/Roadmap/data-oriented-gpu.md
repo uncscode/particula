@@ -177,13 +177,15 @@ Known GPU physics gaps remain:
 - Particle charge supports direct low-level particle-resolved charged hard-sphere
   coagulation, including the canonical Brownian-plus-charged combination.
 - The current GPU coagulation path supports Brownian-only, charged-hard-sphere-
-  only, and canonical Brownian-plus-charged `particle_resolved` inputs.
-  Turbulent, sedimentation, alternate charged models, other mechanism
-  combinations, and broader distributions remain reserved and rejected during
+  only, canonical Brownian-plus-charged, and exact unit-efficiency
+  SP2016-sedimentation-only `particle_resolved` inputs. Sedimentation is a
+  narrow direct-kernel mode; combinations and variants, turbulent physics,
+  alternate charged models, and broader distributions remain rejected during
   host capability preflight.
-- CPU sedimentation coagulation and simple turbulent shear coagulation exist,
-  but neither has a GPU kernel yet. DNS turbulence is intentionally deferred
-  from the near-term GPU scope.
+- CPU sedimentation coagulation and simple turbulent shear coagulation exist.
+  The shipped GPU sedimentation path does not establish CPU-strategy parity;
+  turbulent shear and DNS turbulence remain deferred from the near-term GPU
+  scope.
 - Wall loss, dilution, and other dynamics processes are CPU-only today. They
   need GPU implementations before a full simulation can remain GPU-resident for
   every timestep.
@@ -1034,13 +1036,16 @@ Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 | --- | --- | --- |
 | `brownian` | Executable with `particle_resolved` only | Shipped E5-F1 baseline |
 | `charged_hard_sphere` | Executable alone or with Brownian, particle-resolved only | Shipped E5-F3 |
-| `sedimentation_sp2016` | Reserved; rejected in capability preflight | E5-F4 |
+| `sedimentation_sp2016` | Exact unit-efficiency mode, particle-resolved only | Shipped E5-F4 |
 | `turbulent_shear_st1956` | Reserved; rejected in capability preflight | E5-F5 |
 
-The charged-only tuple is `("charged_hard_sphere",)`. The combined tuple
-`("brownian", "charged_hard_sphere")` is accepted in either requested order
-and normalizes to one executable mask. Reserved IDs, including
-Brownian-plus-reserved combinations, raise `ValueError` in host capability
+The charged-only tuple is `("charged_hard_sphere",)`. Exact SP2016
+sedimentation is selected with
+`CoagulationMechanismConfig(("sedimentation_sp2016",))`; it is a fp64,
+unit-efficiency direct-kernel mode with no CPU fallback or efficiency parameter.
+The combined tuple `("brownian", "charged_hard_sphere")` is accepted in either
+requested order and normalizes to one executable mask. Reserved IDs, including
+Brownian-plus-sedimentation combinations, raise `ValueError` in host capability
 preflight before runtime input access, allocation, launch, or mutable state
 changes.
 
@@ -1067,14 +1072,15 @@ additive majorant; a capability-table row; shared-dispatcher integration; and
 co-located `*_test.py` coverage. They must not add an independent sampling
 loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
-integration, graph-capture claims, sedimentation, or turbulent-shear physics.
+integration, graph-capture claims, sedimentation combinations or variants, or
+turbulent-shear physics.
 Alternate charged variants and broader combinations remain deferred; E5-F9 owns
 the canonical example and final support table.
 
 Planned features:
 
-1. Sedimentation coagulation matching the CPU Seinfeld-Pandis 2016
-   sedimentation kernel.
+1. Sedimentation combinations or variants beyond the exact unit-efficiency
+   SP2016 direct-kernel mode.
 2. Simple turbulent shear coagulation matching the CPU Saffman-Turner 1956
    kernel.
 3. Combined Brownian, charged, sedimentation, and turbulent shear kernels

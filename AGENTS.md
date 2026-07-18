@@ -424,14 +424,20 @@ for _ in range(n_steps):
   `particula.gpu.kernels.coagulation`; configuration APIs are deliberately not
   re-exported through `particula.gpu.kernels`.
 - Omitting `mechanism_config` preserves Brownian, particle-resolved execution.
-  Exact charged-only `("charged_hard_sphere",)` and canonical combined
-  Brownian-plus-charged `("brownian", "charged_hard_sphere")` configurations
-  are also executable with `distribution_type="particle_resolved"`; either
-  requested combined order normalizes to the canonical mask and uses one shared
-  stochastic selection path. Other mechanisms remain deferred. Malformed
-  configurations, unsupported distributions, and deferred mechanisms fail
-  during host-side preflight before runtime state access, allocation, mutation,
-  RNG initialization, or kernel launch.
+  Exact unit-efficiency SP2016 sedimentation-only
+  `("sedimentation_sp2016",)`, charged-only `("charged_hard_sphere",)`, and
+  canonical combined Brownian-plus-charged
+  `("brownian", "charged_hard_sphere")` configurations are executable with
+  `distribution_type="particle_resolved"`. Sedimentation is direct-kernel-only;
+  it uses caller-owned same-device state and preserves the existing output/RNG
+  contracts without hidden transfer or fallback. It read-only validates finite,
+  nonnegative mass and concentration and finite, positive density before output
+  allocation/writes, RNG setup, or particle mutation. Sedimentation combinations
+  remain deferred. Either supported combined order normalizes to the canonical
+  mask and uses one shared stochastic selection path. Malformed configurations,
+  unsupported distributions, and deferred mechanisms fail during host-side
+  preflight before runtime state access, allocation, mutation, RNG
+  initialization, or kernel launch.
 - `WarpParticleData.charge` is caller-owned, device-resident state containing
   dimensionless elementary-charge counts with shape `(n_boxes, n_particles)`.
   It is not a sidecar or a hidden transfer result. It must be a same-device
@@ -471,9 +477,10 @@ for _ in range(n_steps):
   exactly-two-active inputs must collapse to the sole valid pair; and accepted
   collisions must conserve total mass.
 - Warp CPU is the baseline when installed; CUDA evidence is optional and must
-  skip cleanly when unavailable. The canonical Brownian-plus-charged mechanism
-  is supported; other combined mechanisms, alternate charged models, broader
-  distributions, and performance claims remain deferred.
+  skip cleanly when unavailable. Brownian, charged-only, canonical
+  Brownian-plus-charged, and exact sedimentation-only modes are supported;
+  sedimentation combinations, alternate charged models, broader distributions,
+  and performance claims remain deferred.
 - See `docs/Features/data-containers-and-gpu-foundations.md` and
   `docs/Features/Roadmap/data-oriented-gpu.md` for user-facing ownership
   guidance.
@@ -629,6 +636,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2026-07-14  
+**Last Updated:** 2026-07-17  
 **For questions about ADW:** See `.opencode/guides/README.md`  
 **For questions about particula:** See main `readme.md`

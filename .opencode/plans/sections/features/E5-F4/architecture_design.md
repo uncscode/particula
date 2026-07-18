@@ -2,20 +2,22 @@
 
 ## High-Level Design
 
-### Implemented P1 boundary
+### Shipped direct-kernel boundary
 
 `particula/gpu/dynamics/coagulation_funcs.py` contains internal fp64 Warp
 helpers for scalar effective mixture density, Stokes/Cunningham settling
 velocity, and the unit-efficiency SP2016 pair rate. They safely return zero for
 invalid, non-finite, overflowed, or underflowed scalar stages. P2 imports those
-helpers into `particula/gpu/kernels/coagulation.py` for an internal exact-mask
-branch; it does not register public support, change capability validation, or
-add a runnable API.
+helpers into `particula/gpu/kernels/coagulation.py` for a public exact-mask
+branch. It adds no runnable API.
 
 ```text
-private direct sampler launch (exact sedimentation-only mask)
-  -> public `coagulation_step_gpu` still rejects sedimentation in preflight
-  -> private branch validates/prepares its existing fp64 sampler state
+public `coagulation_step_gpu` (exact sedimentation-only mask)
+  -> resolve capability before particle runtime access
+  -> validate particle shape/device, then read-only sedimentation domain scan
+     (finite nonnegative mass/concentration; finite positive density)
+  -> validate remaining resources before allocation, RNG work, or mutation
+  -> prepare existing fp64 sampler state
   -> derive each active particle on device
        total_mass = sum(species_mass)
        total_volume = sum(species_mass / species_density)
@@ -43,9 +45,10 @@ masses and species densities. No per-particle density sidecar is added to
 `WarpParticleData`; settling velocities are private call-local fp64 scratch and
 are cleared before eligibility work. Zero-concentration or non-positive-mass/
 volume slots remain inactive and contribute neither a property nor a pair. The
-public path rejects sedimentation in host preflight before allocation or
-mutation; private mixed sedimentation masks return without scheduling,
-collisions, mutation, or RNG advancement.
+public exact mask is accepted after host capability validation. Mixed,
+alternate, malformed, and non-particle-resolved sedimentation requests fail
+before particle runtime access; rejected physical-domain calls leave caller
+outputs, RNG state, and particle state unchanged.
 
 ## Data / API / Workflow Changes
 
@@ -54,10 +57,10 @@ collisions, mutation, or RNG advancement.
   and pressure. Temporary radius, effective-density, settling-velocity, and
   active-index arrays remain step-local unless E5-F1 already defines reusable
   work storage.
-- **API Surface:** No public capability-matrix change. Public sedimentation
-  remains rejected; no separate public step or collision-efficiency parameter is
-  added.
-- **Kernel Interface:** P2 adds an internal sedimentation branch to the shared
+- **API Surface:** `CoagulationMechanismConfig(("sedimentation_sp2016",))` is
+  accepted only for particle-resolved direct-kernel execution. No separate step
+  or collision-efficiency parameter is added.
+- **Kernel Interface:** The sedimentation branch uses the shared
   pair-rate/majorant dispatcher and uses the existing scheduler/RNG path. The
   constant efficiency is encoded as 1, not accepted from caller input.
 - **Workflow Hooks:** E5-F4 depends on E5-F1, supplies its term and majorant to
@@ -76,9 +79,8 @@ collisions, mutation, or RNG advancement.
   settling; binned/continuous-PDF distributions; high-level strategies or
   runnables; CPU fallback; hidden transfers/synchronization; dynamic slots;
   graph capture guarantees; adaptive stepping; exact CPU/Warp RNG replay.
-- Brownian-plus-sedimentation and larger combinations remain unavailable.
-  Private mixed sedimentation masks intentionally do no work; E5-F6 owns any
-  future combination registration and validation.
+- Brownian-plus-sedimentation and larger combinations remain unavailable and
+  fail capability preflight; E5-F6 owns future combination registration.
 
 ## Security & Compliance
 
