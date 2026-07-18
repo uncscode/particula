@@ -1,6 +1,6 @@
 # Success Criteria
 
-- [ ] The executable capability matrix explicitly registers every supported
+- [x] The executable capability matrix explicitly registers every supported
   two-way row and the full Brownian+charged+sedimentation+turbulent-shear row;
   canonical ordering is equivalent and unsupported rows fail closed.
 - [x] For every deterministic active-pair fixture, the private device total rate equals
@@ -11,20 +11,20 @@
 - [x] Private selector diagnostics show each valid scheduled proposal uses one
   active-pair stream and at most one acceptance draw, independent of enabled
   term count; rejected/materially unbounded ratios draw and mutate nothing.
-- [ ] Two-way and full four-way aggregate collision counts satisfy declared
+- [x] Two-way and full four-way aggregate collision counts satisfy declared
   stochastic bounds without requiring exact CPU/Warp pair replay.
-- [ ] Accepted pairs are sorted, in range, disjoint, and capacity bounded; one
+- [x] Accepted pairs are sorted, in range, disjoint, and capacity bounded; one
   merge pass conserves each species' mass and total charge separately.
-- [ ] Caller-owned pair/count buffers are returned by identity and persistent
+- [x] Caller-owned pair/count buffers are returned by identity and persistent
   RNG state advances/reinitializes only under the existing explicit contract.
 - [x] Invalid aggregate arithmetic and material rate-over-majorant violations
   fail closed before selector/output/RNG mutation; P1 retains its existing
   preflight atomicity contract for deferred masks and invalid inputs.
-- [ ] Existing Brownian-only, charged-only, Brownian-plus-charged,
+- [x] Existing Brownian-only, charged-only, Brownian-plus-charged,
   sedimentation-only, and turbulent-shear-only regressions remain passing.
-- [ ] Warp CPU tests pass when Warp is installed; CUDA tests pass when available
+- [x] Warp CPU tests pass when Warp is installed; CUDA tests pass when available
   and skip cleanly otherwise; coverage thresholds remain unchanged.
-- [ ] Documentation states the exact additive matrix, required inputs, safe
+- [x] Documentation states the exact additive matrix, required inputs, safe
   total-majorant rule, single-pass semantics, and support exclusions.
 
 ## Metrics

@@ -28,3 +28,8 @@
     removal. It permits only `rate - majorant <= 8 * eps * max(rate, majorant)`
     and maps that allowed fp64 roundoff overshoot to exactly `1.0`; no status
     buffer, host synchronization, or public API is introduced.
+- [x] Has P3 public-path evidence shipped for the approved matrix?
+  - Resolved 2026-07-18: yes. Existing `coagulation_test.py` coverage provides
+    public-path, conservation, ownership, selector, deferred-mask, and
+    persistent-RNG evidence. This does not close E5-F7 release validation or
+    E5-F9 example delivery.

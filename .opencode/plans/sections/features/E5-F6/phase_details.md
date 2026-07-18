@@ -29,23 +29,22 @@
     overflow aggregation cases, eight-versus-nine-ULP ratio cases, selector
     draw/mutation regressions, capped scheduling, and deferred-mask snapshots.
 
-- [ ] **E5-F6-P3:** Validate two-way and four-way single-pass execution with integration tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Execute approved additive masks through one candidate stream, one RNG
-    pass, one pair buffer, and one charge-aware merge pass.
+- [x] **E5-F6-P3:** Validate two-way and four-way single-pass execution with integration tests
+  - Issue: shipped | Size: S | Status: Implemented
+  - Delivered: Approved singleton, two-way, and four-way masks execute through
+    one candidate stream, one RNG stream, one pair buffer, and one charge-aware
+    merge/apply pass; three-way masks remain deferred after enabled-term checks.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: representative and matrix-wide two-way cases, full four-way case,
-    bounded aggregate collision rates, single/multi-box sparse populations,
-    sorted disjoint pairs, buffer identity, RNG reuse/reset, mass conservation,
-    charge conservation, and legacy single-term regression.
+  - Tests: Existing public-path, conservation, ownership, selector,
+    deferred-mask, and persistent-RNG evidence in `coagulation_test.py`.
 
-- [ ] **E5-F6-P4:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E5-F6-P4:** Update development documentation
+  - Issue: #1360 | Size: XS | Status: Implemented
   - Goal: Record the verified additive matrix, required inputs, total-majorant
     proof, single-pass semantics, support limits, and downstream handoff.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`, coagulation docstrings, and E5
     plan sections
-  - Tests: Markdown link/reference validation plus executable import/signature
-    checks where snippets are present.
+  - Tests: Markdown link/reference inspection, source/signature cross-check,
+    ruff, and the focused existing coagulation suite.

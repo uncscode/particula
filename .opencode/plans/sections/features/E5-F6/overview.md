@@ -10,22 +10,21 @@ composing enabled pair rates before selection.
 
 ## Value Proposition
 
-`coagulation_step_gpu` will evaluate every enabled mechanism for a candidate
+`coagulation_step_gpu` evaluates every enabled mechanism for a candidate
 pair, sum those rates, and compare the sum once against a safe total majorant.
 Users gain physically additive two-way and four-way particle-resolved GPU
 coagulation while retaining one collision buffer, one per-box RNG stream, one
 merge pass, and the existing direct low-level API ownership contract.
 
-## Implemented P1 Boundary
+## Shipped P1--P3 Boundary
 
-Issue #1357 delivered the recognition and atomic-preflight boundary, not
-additive execution. A private immutable table recognizes the four singleton,
+Issue #1357 delivered the recognition and atomic-preflight boundary. A private
+immutable table recognizes the four singleton,
 six unordered pair, and four-term masks. The four three-term masks reject
-before particle access. Recognized non-executable masks run only their
-enabled turbulent, charged, and sedimentation read-only validation, then raise
+before particle access. The rejected three-way masks run only their enabled
+turbulent, charged, and sedimentation read-only validation, then raise
 `ValueError("Additive coagulation execution is deferred.")` before runtime
-normalization, output/RNG work, kernels, or caller-state mutation. P2/P3 retain
- ownership of summed rates, majorants, and additive execution.
+normalization, output/RNG work, kernels, or caller-state mutation.
 
 ## Implemented P2 Boundary
 
@@ -37,8 +36,9 @@ two-way and four-way mask. Invalid, nonpositive, or overflowed aggregates
 become zero. Candidate acceptance now accepts only finite positive ratios and
 permits a rate-over-majorant roundoff excess of at most eight fp64 ULPs, mapped
 to exactly `1.0`; material violations cannot advance RNG or mutate selector
-state. This remains private helper/selector hardening: deferred masks are not
-executable, and P3 still owns public-path additive execution validation.
+state. P3 shipped approved-mask execution through the shared selector/apply
+path. Existing public-path tests cover approved masks, ownership, conservation,
+selector behavior, deferred masks, and persistent RNG behavior.
 
 ## User Stories
 

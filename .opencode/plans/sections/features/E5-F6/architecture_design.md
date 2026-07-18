@@ -32,17 +32,14 @@ trial cap. If the cap binds, replace the summed-component scheduling bound with
 the exhaustive maximum of the summed total pair rate for every active unordered
 pair; do not substitute an unproved heuristic.
 
-P1 separates recognition from executable support. Its private immutable host
+P1 separates structural recognition from the executable boundary. Its private immutable host
 table recognizes four singleton masks, all six unordered pair masks, and the
 four-term mask; canonical ordering resolves equivalent pairs identically and
-duplicates are never weights. Three-term masks are unrecognized and reject
-before particle access. Recognized masks use enabled bits to run turbulent,
-charged, and sedimentation read-only preflight in that order; a valid deferred
-pair/four-term mask then raises the stable deferred-execution error before
-normalization, output/RNG allocation or initialization, kernel launch, or
- mutation. The executable gate still admits only the shipped singleton modes and
- Brownian-plus-charged; P2 hardens private summed dispatch without extending
- that gate.
+duplicates are never weights. Three-term masks are recognized but deferred and
+reject before particle access after their enabled-term validation. Approved
+singleton, pair, and four-term masks enter the shared execution path; the
+deferred masks raise the stable error before normalization, output/RNG work,
+launch, or mutation.
 
 ## Data / API / Workflow Changes
 

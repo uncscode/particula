@@ -10,7 +10,7 @@
   sedimentation requirements are checked before volume/environment
   normalization, output/RNG work, allocations, or selection launch. Valid
   recognized deferred masks raise the stable deferred-execution error.
-- [ ] Reuse each sibling term's property preparation and majorant helper without
+- [x] Reuse each sibling term's property preparation and majorant helper without
   recomputing shared radius, viscosity, environment, or active-index state.
 - [x] Add enabled component majorants into a private fp64 `total_majorant`
   dispatch for all recognized two-way/four-way masks. Checked addition fails
@@ -19,9 +19,9 @@
   dispatch for each candidate. The acceptance guard admits finite positive
   ratios only, permits exactly the eight-ULP roundoff allowance, and rejects
   before any draw/write/removal on a material bound violation.
-- [ ] Keep one `collision_pairs`, `n_collisions`, and `rng_states` path and one
+- [x] Keep one `collision_pairs`, `n_collisions`, and `rng_states` path and one
   charge-aware apply launch. Do not add mechanism-specific output buffers.
-- [ ] Update `coagulation_step_gpu` docstrings with matrix, required inputs,
+- [x] Update `coagulation_step_gpu` docstrings with matrix, required inputs,
   single-pass semantics, and compatibility behavior.
 
 ## Tooling / Tests
@@ -37,13 +37,13 @@
 - [x] Add private selector/acceptance diagnostics and regressions proving a
   valid proposal has one candidate stream and at most one acceptance draw,
   while invalid/materially unbounded proposals cannot draw or mutate state.
-- [ ] Add bounded stochastic tests over fixed seed sets for additive collision
+- [x] Add bounded stochastic tests over fixed seed sets for additive collision
   counts; use aggregate or sigma bounds rather than exact pair replay.
-- [ ] Cover zero/one/two/many active particles, inactive gaps, mixed scales,
+- [x] Cover zero/one/two/many active particles, inactive gaps, mixed scales,
   one/multi-box inputs, capacity limits, and zero component contributions.
-- [ ] Assert caller buffer identity, persistent RNG reuse/reset, sorted in-range
+- [x] Assert caller buffer identity, persistent RNG reuse/reset, sorted in-range
   disjoint accepted pairs, species-mass conservation, and charge conservation.
-- [ ] Snapshot particle, output, and RNG buffers for every invalid additive call
+- [x] Snapshot particle, output, and RNG buffers for every invalid additive call
   to prove fail-before-mutation behavior.
-- [ ] Run focused Warp CPU tests, optional CUDA parameterization, the existing
+- [x] Run focused Warp CPU tests, optional CUDA parameterization, the existing
   coagulation regression suite, and repository lint/type checks.
