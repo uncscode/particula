@@ -2206,8 +2206,9 @@ def coagulation_step_gpu(  # noqa: C901
     Brownian; the other exact executable modes are ``"charged_hard_sphere"``,
     Brownian-plus-charged, and unit-efficiency ``"sedimentation_sp2016"``.
     ``mechanism_config`` is immutable, keyword-only
-    host metadata and is preflighted before any runtime input access,
-    allocation, normalization, RNG work, or launch. The supported charged-only
+    host metadata and is structurally preflighted before any runtime input
+    access, allocation, normalization, RNG work, or launch. The supported
+    charged-only
     configuration is ``("charged_hard_sphere",)``; the combined mode accepts
     ``("brownian", "charged_hard_sphere")`` in either requested order and
     normalizes it to one fixed mask, one shared selector, and one additive
@@ -2218,9 +2219,11 @@ def coagulation_step_gpu(  # noqa: C901
     implementation scope, not a throughput or scaling claim.
     Sedimentation is executable only as its exact singleton mask. Registered
     additive combinations are recognized for enabled-term, read-only preflight,
-    but execution remains deferred: after successful preflight they raise
+    which may use private Warp validation launches, but execution remains
+    deferred: after successful preflight they raise
     ``ValueError("Additive coagulation execution is deferred.")`` before
-    downstream normalization, allocation, RNG work, kernels, or mutation.
+    downstream normalization, allocation, RNG work, selector or executable
+    kernel launches, apply launches, or mutation.
     Malformed, duplicate, unknown, unsupported-distribution, and unrecognized
     combinations reject before particle state is accessed. A structurally valid
     turbulent-shear request reaches a later P2 boundary after particle metadata
@@ -2287,10 +2290,12 @@ def coagulation_step_gpu(  # noqa: C901
             normalizes to the same execution. Malformed configurations,
             unsupported distributions, and unrecognized mechanism combinations
             fail before particle state is accessed or mutated. Recognized
-            additive combinations run enabled-term read-only validation, then
+            additive combinations run enabled-term read-only validation, which
+            may use private Warp validation launches, then
             raise ``ValueError("Additive coagulation execution is deferred.")``
-            before downstream normalization, allocation, RNG work, kernel
-            launches, or mutation. A wrong type raises exactly ``ValueError``
+            before downstream normalization, allocation, RNG work, selector or
+            executable kernel launches, apply launches, or mutation. A wrong
+            type raises exactly ``ValueError``
             with the message
             ``"mechanism_config must be a CoagulationMechanismConfig."``;
             other errors are delegated to the resolver and capability gate.
@@ -2371,9 +2376,12 @@ def coagulation_step_gpu(  # noqa: C901
         ``validate_charge_finite``, ``turbulent_dissipation``, and
         ``fluid_density`` remain
         keyword-only so existing positional scalar callers stay
-        source-compatible. Configuration preflight occurs before all runtime
-        input access, allocation, normalization, RNG work, and launches. It
-        does not make unrelated later validation failures atomic.
+        source-compatible. Structural configuration preflight occurs before all
+        runtime input access, allocation, normalization, RNG work, and
+        launches. Recognized deferred masks may then use read-only validation
+        launches, but cannot reach downstream simulation, selector, or apply
+        launches, allocation, normalization, RNG work, or caller-owned
+        mutation. It does not make unrelated later validation failures atomic.
 
         Structurally valid turbulent-shear requests require explicit
         ``turbulent_dissipation`` and ``fluid_density`` only after structural
