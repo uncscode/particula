@@ -24,7 +24,9 @@ host-side metadata, not device-resident simulation state. The public step
 defaults to Brownian, particle-resolved execution and also accepts charged-only,
 exact SP2016 sedimentation-only, and canonical Brownian-plus-charged
 particle-resolved execution. It rejects otherwise unsupported configurations
-during structural preflight, before runtime state is accessed or mutated.
+outside the P1 recognition matrix during structural preflight, before runtime
+state is accessed or mutated. Recognized deferred combinations complete their
+enabled-term read-only preflight before reporting deferred execution.
 The ST1956 turbulent singleton crosses a later P2 boundary: explicit turbulent
 dissipation and fluid density inputs are validated and normalized after particle
 schema/device metadata is available. Mixed turbulent masks are rejected before
@@ -133,6 +135,40 @@ _COAGULATION_MECHANISM_FLAGS = MappingProxyType(
     }
 )
 
+# P1 recognizes these registered masks so their enabled-term validation can run
+# atomically. Recognition deliberately does not imply executable support.
+_P1_RECOGNIZED_COAGULATION_MASKS = frozenset(
+    (
+        BROWNIAN_MECHANISM_FLAG,
+        CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+        SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+        BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+        BROWNIAN_MECHANISM_FLAG | SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        BROWNIAN_MECHANISM_FLAG | TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+        CHARGED_HARD_SPHERE_MECHANISM_FLAG
+        | SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        CHARGED_HARD_SPHERE_MECHANISM_FLAG
+        | TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+        SEDIMENTATION_SP2016_MECHANISM_FLAG
+        | TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+        BROWNIAN_MECHANISM_FLAG
+        | CHARGED_HARD_SPHERE_MECHANISM_FLAG
+        | SEDIMENTATION_SP2016_MECHANISM_FLAG
+        | TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+    )
+)
+
+
+def _validate_p1_recognized_coagulation_mask(
+    resolved: "_ResolvedCoagulationMechanismConfig",
+) -> None:
+    """Reject masks outside the registered P1 preflight matrix."""
+    if resolved.mask not in _P1_RECOGNIZED_COAGULATION_MASKS:
+        raise ValueError(
+            "Coagulation mechanism configuration is not recognized."
+        )
+
 
 @dataclass(frozen=True)
 class CoagulationMechanismConfig:
@@ -147,13 +183,18 @@ class CoagulationMechanismConfig:
     ``"particle_resolved"`` modes are Brownian-only,
     ``("sedimentation_sp2016",)``,
     ``("charged_hard_sphere",)``, and either requested order of
-    ``("brownian", "charged_hard_sphere")``. The resolver normalizes the
-    combined mode to the canonical fixed mask. Deferred mechanisms and other
-    distribution types are rejected during host-side preflight before runtime
-    state access or mutation. Structurally valid turbulent-shear requests
-    validate their explicit P2 inputs after particle schema and device checks.
-    Only the exact ``("turbulent_shear_st1956",)`` singleton then normalizes
-    those inputs and executes; mixed turbulent masks reject before
+    ``("brownian", "charged_hard_sphere")``. P1 additionally recognizes
+    registered pair and four-term masks solely to perform enabled-term
+    preflight; recognition is not execution support. The resolver normalizes
+    the combined mode to the canonical fixed mask. Deferred mechanisms and
+    other distribution types are rejected during host-side structural preflight
+    before runtime state access or mutation. Recognized deferred masks validate
+    their enabled terms after particle schema/device metadata is available, then
+    reject before runtime allocation or mutation. Structurally valid
+    turbulent-shear requests validate their explicit P2 inputs after particle
+    schema and device checks. Only the exact ``("turbulent_shear_st1956",)``
+    singleton then normalizes those inputs and executes; mixed turbulent masks
+    reject before
     normalization, allocation, RNG work, or mutation.
 
     Attributes:
@@ -268,9 +309,8 @@ def validate_coagulation_mechanism_capabilities(
     exact SP2016 sedimentation, ``"charged_hard_sphere"``, the supported
     Brownian-plus-charged configuration, or exact ST1956 turbulent-shear
     singleton ``"particle_resolved"`` execution. ``coagulation_step_gpu``
-    invokes this validator during structural preflight for non-turbulent masks,
-    but invokes it after the turbulent P2 input boundary for structurally valid
-    turbulent-shear masks. Import it from
+    invokes this validator after recognized masks complete enabled-term
+    preflight. Import it from
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
 
     Args:
@@ -287,12 +327,7 @@ def validate_coagulation_mechanism_capabilities(
         BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG,
     ):
         return
-    if resolved.mask & TURBULENT_SHEAR_ST1956_MECHANISM_FLAG:
-        raise ValueError(
-            "Turbulent-shear coagulation supports only the exact "
-            "('turbulent_shear_st1956',) mechanism configuration."
-        )
-    raise ValueError("Unsupported coagulation mechanism configuration.")
+    raise ValueError("Additive coagulation execution is deferred.")
 
 
 @no_type_check
@@ -1758,6 +1793,50 @@ def _validate_turbulent_particle_physics(
         )
 
 
+def _preflight_enabled_coagulation_terms(
+    resolved: _ResolvedCoagulationMechanismConfig,
+    particles: Any,
+    n_boxes: int,
+    n_particles: int,
+    device: Any,
+    turbulent_dissipation: Any,
+    fluid_density: Any,
+    validate_charge_finite: bool,
+) -> None:
+    """Run enabled-term validation before executable resource preparation."""
+    mask = resolved.mask
+    turbulent_enabled = bool(mask & TURBULENT_SHEAR_ST1956_MECHANISM_FLAG)
+    charged_enabled = bool(mask & CHARGED_HARD_SPHERE_MECHANISM_FLAG)
+    sedimentation_enabled = bool(mask & SEDIMENTATION_SP2016_MECHANISM_FLAG)
+
+    if turbulent_enabled:
+        _validate_turbulent_input(
+            "turbulent_dissipation", turbulent_dissipation, n_boxes, device
+        )
+        _validate_turbulent_input(
+            "fluid_density", fluid_density, n_boxes, device
+        )
+        _validate_turbulent_particle_physics(particles, n_boxes, device)
+    if charged_enabled:
+        if not sedimentation_enabled:
+            _validate_charge_finite(
+                particles.charge, n_boxes, n_particles, device
+            )
+        _validate_charged_particle_physics(
+            particles, n_boxes, n_particles, device
+        )
+    if sedimentation_enabled:
+        _validate_sedimentation_particle_physics(
+            particles, n_boxes, n_particles, device
+        )
+    if (
+        validate_charge_finite
+        and not charged_enabled
+        and not sedimentation_enabled
+    ):
+        _validate_charge_finite(particles.charge, n_boxes, n_particles, device)
+
+
 def _validate_collision_pairs(
     collision_pairs: Any,
     expected_shape: tuple[int, int, int],
@@ -2204,9 +2283,11 @@ def coagulation_step_gpu(  # noqa: C901
             SP2016 sedimentation, and exact singleton ST1956 turbulent shear are
             also supported; either requested Brownian-plus-charged order
             normalizes to the same execution. Malformed configurations,
-            unsupported distributions, and unsupported mechanism combinations
+            unsupported distributions, and unrecognized mechanism combinations
             fail before runtime inputs are accessed or mutable runtime state is
-            changed. A
+            changed. Recognized deferred combinations run enabled-term read-only
+            validation, then fail before downstream runtime allocation or
+            mutation. A
             wrong type raises exactly ``ValueError`` with the message
             ``"mechanism_config must be a CoagulationMechanismConfig."``;
             other errors are delegated to the resolver and capability gate.
@@ -2361,50 +2442,31 @@ def coagulation_step_gpu(  # noqa: C901
     resolved_mechanism_config = resolve_coagulation_mechanism_config(
         mechanism_config
     )
-    turbulent_enabled = bool(
-        resolved_mechanism_config.mask & TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
-    )
-    turbulent_singleton = (
-        resolved_mechanism_config.mask == TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
-    )
-    if not turbulent_enabled:
-        validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
+    _validate_p1_recognized_coagulation_mask(resolved_mechanism_config)
 
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
 
     device = particles.masses.device
     _validate_device_arrays(particles, device)
-    if turbulent_enabled and not turbulent_singleton:
-        _validate_turbulent_input(
-            "turbulent_dissipation",
-            turbulent_dissipation,
-            n_boxes,
-            device,
-        )
-        _validate_turbulent_input(
-            "fluid_density",
-            fluid_density,
-            n_boxes,
-            device,
-        )
-    if turbulent_enabled:
-        validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
+    _preflight_enabled_coagulation_terms(
+        resolved_mechanism_config,
+        particles,
+        n_boxes,
+        n_particles,
+        device,
+        turbulent_dissipation,
+        fluid_density,
+        validate_charge_finite,
+    )
+    validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
+
+    turbulent_singleton = (
+        resolved_mechanism_config.mask == TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
+    )
     normalized_turbulent_dissipation = None
     normalized_fluid_density = None
     if turbulent_singleton:
-        _validate_turbulent_input(
-            "turbulent_dissipation",
-            turbulent_dissipation,
-            n_boxes,
-            device,
-        )
-        _validate_turbulent_input(
-            "fluid_density",
-            fluid_density,
-            n_boxes,
-            device,
-        )
         normalized_turbulent_dissipation = _normalize_turbulent_input_array(
             turbulent_dissipation,
             n_boxes,
@@ -2413,34 +2475,6 @@ def coagulation_step_gpu(  # noqa: C901
         normalized_fluid_density = _normalize_turbulent_input_array(
             fluid_density,
             n_boxes,
-            device,
-        )
-        _validate_turbulent_particle_physics(particles, n_boxes, device)
-    charged_enabled = bool(
-        resolved_mechanism_config.mask & CHARGED_HARD_SPHERE_MECHANISM_FLAG
-    )
-    sedimentation_enabled = (
-        resolved_mechanism_config.mask == SEDIMENTATION_SP2016_MECHANISM_FLAG
-    )
-    if validate_charge_finite or charged_enabled:
-        _validate_charge_finite(
-            particles.charge,
-            n_boxes,
-            n_particles,
-            device,
-        )
-    if charged_enabled:
-        _validate_charged_particle_physics(
-            particles,
-            n_boxes,
-            n_particles,
-            device,
-        )
-    if sedimentation_enabled:
-        _validate_sedimentation_particle_physics(
-            particles,
-            n_boxes,
-            n_particles,
             device,
         )
     time_step_value = _validate_time_step(time_step)
@@ -2513,6 +2547,9 @@ def coagulation_step_gpu(  # noqa: C901
     speeds = radii
     brownian_enabled = bool(
         resolved_mechanism_config.mask & BROWNIAN_MECHANISM_FLAG
+    )
+    sedimentation_enabled = bool(
+        resolved_mechanism_config.mask & SEDIMENTATION_SP2016_MECHANISM_FLAG
     )
     if brownian_enabled:
         diffusivities = wp.zeros(
