@@ -857,6 +857,7 @@ def _validate_turbulent_particle_physics_kernel(
     masses: Any,
     concentration: Any,
     density: Any,
+    charge: Any,
     invalid: Any,
 ) -> None:
     """Record invalid ST1956 particle state without mutating caller inputs."""  # type: ignore
@@ -868,14 +869,27 @@ def _validate_turbulent_particle_physics_kernel(
 
     for particle_idx in range(masses.shape[1]):
         concentration_value = concentration[box_idx, particle_idx]
+        if not wp.isfinite(charge[box_idx, particle_idx]):
+            wp.atomic_max(invalid, 0, 1)
         if not wp.isfinite(concentration_value) or concentration_value < (
             wp.float64(0.0)
         ):
             wp.atomic_max(invalid, 0, 1)
+        total_mass = wp.float64(0.0)
+        total_volume = wp.float64(0.0)
         for species_idx in range(masses.shape[2]):
             mass = masses[box_idx, particle_idx, species_idx]
             if not wp.isfinite(mass) or mass < wp.float64(0.0):
                 wp.atomic_max(invalid, 0, 1)
+            total_mass += mass
+            total_volume += mass / density[species_idx]
+        if concentration_value > wp.float64(0.0) and not (
+            wp.isfinite(total_mass)
+            and total_mass > wp.float64(0.0)
+            and wp.isfinite(total_volume)
+            and total_volume > wp.float64(0.0)
+        ):
+            wp.atomic_max(invalid, 0, 1)
 
 
 @no_type_check
@@ -1714,9 +1728,12 @@ def _validate_turbulent_particle_physics(
     """Reject invalid ST1956 particle physics before mutable runtime work.
 
     Turbulent-shear selection uses the same physical particle fields as the
-    other direct mechanisms, but does not impose their charge, concentration
-    uniformity, or active-count constraints. This read-only scan runs before
-    time, environment, output, or RNG processing.
+    other direct mechanisms, but does not impose their concentration uniformity
+    or active-count constraints. It validates finite charge because the shared
+    merge application consumes it, and rejects overflowed active mass/volume
+    totals before rate sanitization could turn them into no-collision behavior.
+    This read-only scan runs before time, environment, output, or RNG
+    processing.
     """
     invalid = wp.zeros((1,), dtype=wp.int32, device=device)
     wp.launch(
@@ -1726,6 +1743,7 @@ def _validate_turbulent_particle_physics(
             particles.masses,
             particles.concentration,
             particles.density,
+            particles.charge,
             invalid,
         ],
         device=device,
@@ -1733,8 +1751,10 @@ def _validate_turbulent_particle_physics(
     wp.synchronize_device(device)
     if invalid.numpy()[0] != 0:
         raise ValueError(
-            "turbulent particle masses and concentrations must be finite and "
-            "nonnegative, and density must be finite and > 0"
+            "turbulent particle charge, masses, and concentrations must be "
+            "finite; masses and concentrations must be nonnegative; density "
+            "must be finite and > 0; active mass and volume must be finite "
+            "and > 0"
         )
 
 
@@ -2491,7 +2511,10 @@ def coagulation_step_gpu(  # noqa: C901
     diffusivities = radii
     g_terms = radii
     speeds = radii
-    if not sedimentation_enabled:
+    brownian_enabled = bool(
+        resolved_mechanism_config.mask & BROWNIAN_MECHANISM_FLAG
+    )
+    if brownian_enabled:
         diffusivities = wp.zeros(
             (n_boxes, n_particles), dtype=wp.float64, device=device
         )
@@ -2511,17 +2534,14 @@ def coagulation_step_gpu(  # noqa: C901
             (n_boxes, n_particles), dtype=wp.float64, device=device
         )
     # Only the exact ST1956 singleton reads these normalized caller inputs.
-    # Other masks receive unused fp64 storage without inspecting P2 arguments.
+    # Other masks use normalized environment arrays, which their kernel branches
+    # never read, rather than allocating unused turbulence placeholders.
     if turbulent_singleton:
         turbulent_dissipation_array = normalized_turbulent_dissipation
         fluid_density_array = normalized_fluid_density
     else:
-        turbulent_dissipation_array = wp.zeros(
-            (n_boxes,), dtype=wp.float64, device=device
-        )
-        fluid_density_array = wp.zeros(
-            (n_boxes,), dtype=wp.float64, device=device
-        )
+        turbulent_dissipation_array = temperature_array
+        fluid_density_array = pressure_array
     total_masses = wp.zeros(
         (n_boxes, n_particles), dtype=wp.float64, device=device
     )

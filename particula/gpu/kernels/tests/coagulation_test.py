@@ -4105,6 +4105,8 @@ def test_turbulent_singleton_executes_and_conserves_mass(
         ("density", np.inf),
         ("density", 0.0),
         ("density", -1.0),
+        ("charge", np.nan),
+        ("charge", np.inf),
     ],
 )
 def test_turbulent_particle_preflight_rejects_before_mutable_runtime_work(
@@ -4119,6 +4121,8 @@ def test_turbulent_particle_preflight_rejects_before_mutable_runtime_work(
         particles.masses[0, 0, 0] = invalid_value
     elif invalid_field == "concentration":
         particles.concentration[0, 0] = invalid_value
+    elif invalid_field == "charge":
+        particles.charge[0, 0] = invalid_value
     else:
         particles.density[0] = invalid_value
     gpu_particles = to_warp_particle_data(particles, device=device)
@@ -4151,9 +4155,45 @@ def test_turbulent_particle_preflight_rejects_before_mutable_runtime_work(
     npt.assert_allclose(restored.masses, initial_particles.masses)
     npt.assert_allclose(restored.concentration, initial_particles.concentration)
     npt.assert_allclose(restored.density, initial_particles.density)
+    npt.assert_allclose(restored.charge, initial_particles.charge)
     npt.assert_array_equal(pairs.numpy(), initial_pairs)
     npt.assert_array_equal(counts.numpy(), initial_counts)
     npt.assert_array_equal(states.numpy(), initial_states)
+
+
+def test_turbulent_particle_preflight_rejects_overflowed_active_totals(
+    device: str,
+) -> None:
+    """ST1956 rejects finite masses whose derived active total overflows."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    particles.masses[0, 0] = np.finfo(np.float64).max
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
+    counts = wp.array([7], dtype=wp.int32, device=device)
+    states = wp.array([7], dtype=wp.uint32, device=device)
+    initial_particles = from_warp_particle_data(gpu_particles, sync=True)
+
+    with pytest.raises(ValueError, match="active mass and volume"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+            ),
+            turbulent_dissipation=1.0,
+            fluid_density=1000.0,
+        )
+
+    _assert_particles_unchanged(gpu_particles, initial_particles)
+    npt.assert_array_equal(pairs.numpy(), [[[7, 7]]])
+    npt.assert_array_equal(counts.numpy(), [7])
+    npt.assert_array_equal(states.numpy(), [7])
 
 
 @pytest.mark.parametrize(
@@ -4388,6 +4428,7 @@ def test_turbulent_fresh_seed_acceptance_matches_rate_to_majorant_ratio(
         observations * trial_probability * (1.0 - trial_probability)
     )
     assert abs(accepted - expected) <= 4.0 * sigma + 1.0
+    assert accepted > 0
 
 
 def test_turbulent_mixed_mask_rejects_before_runtime_mutation(

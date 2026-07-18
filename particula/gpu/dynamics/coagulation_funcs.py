@@ -307,7 +307,8 @@ def turbulent_shear_st1956_pair_rate_wp(
     positive radii ``r`` [m] and kinematic viscosity ``nu`` [m²/s], with finite
     non-negative turbulent dissipation ``epsilon`` [m²/s³]. Zero dissipation
     returns exact ``0.0`` before the diameter sum, preventing ``0 * inf`` for
-    finite extreme radii.
+    finite extreme radii. Callers must preflight derived transport and radius
+    state; they must not use rate sanitization to conceal invalid physics.
 
     Args:
         radius_i: Particle i radius [m].
