@@ -51,6 +51,7 @@ if wp is not None:
         g_collection_term_wp,
         particle_mean_free_path_wp,
         sedimentation_sp2016_pair_rate_wp,
+        turbulent_shear_st1956_pair_rate_wp,
     )
     from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
         particle_radius_from_volume_wp,
@@ -82,6 +83,7 @@ if wp is not None:
         _select_active_pair_by_rank,
         _total_majorant,
         _total_pair_rate,
+        _turbulent_majorant_from_active_radii,
         _validate_charge_finite_kernel,
         _validate_collision_counts,
         _validate_collision_pairs,
@@ -121,7 +123,7 @@ if wp is not None:
     from particula.util import constants  # noqa: E402
 
 
-BROWNIAN_COAGULATION_MASK_INPUT_INDEX = 26
+BROWNIAN_COAGULATION_MASK_INPUT_INDEX = 28
 
 
 def test_mechanism_default_matches_explicit_brownian() -> None:
@@ -231,8 +233,8 @@ def test_sedimentation_only_capability_is_accepted() -> None:
     validate_coagulation_mechanism_capabilities(resolved)
 
 
-def test_mechanism_support_rejects_turbulent_shear() -> None:
-    """Turbulent shear remains deferred after structural resolution."""
+def test_mechanism_support_accepts_turbulent_shear_singleton() -> None:
+    """The exact turbulent-shear singleton is executable."""
     resolved = resolve_coagulation_mechanism_config(
         CoagulationMechanismConfig(
             mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
@@ -240,8 +242,7 @@ def test_mechanism_support_rejects_turbulent_shear() -> None:
     )
 
     assert resolved.mask == TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
-    with pytest.raises(ValueError, match="reserved for E5-F5"):
-        validate_coagulation_mechanism_capabilities(resolved)
+    validate_coagulation_mechanism_capabilities(resolved)
 
 
 def test_mechanism_support_accepts_brownian() -> None:
@@ -917,6 +918,8 @@ def test_charged_only_multispecies_total_mass_regression(
             g_terms_buffer,
             speeds_buffer,
             settling_velocities_buffer,
+            wp.zeros((1,), dtype=wp.float64, device=device),
+            wp.zeros((1,), dtype=wp.float64, device=device),
             total_masses_buffer,
             gpu_particles.charge,
             active_indices,
@@ -1571,6 +1574,8 @@ def _sedimentation_pair_rate_probe_kernel(
         wp.float64(0.0),
         wp.float64(0.0),
         wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
     )
 
 
@@ -1612,6 +1617,8 @@ def _sedimentation_majorant_probe_kernel(
         active_count,
         radii,
         settling_velocities,
+        wp.float64(0.0),
+        wp.float64(0.0),
         total_masses,
         charges,
         temperature,
@@ -1764,6 +1771,8 @@ def _additive_helper_probe_kernel(
         values[7],
         wp.float64(0.0),
         wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
         total_masses[0, 0],
         total_masses[0, 1],
         charges[0, 0],
@@ -1794,6 +1803,8 @@ def _additive_helper_probe_kernel(
         wp.int32(0),
         radii,
         radii,
+        wp.float64(0.0),
+        wp.float64(0.0),
         total_masses,
         charges,
         temperature,
@@ -1860,6 +1871,8 @@ def _charged_majorant_probe_kernel(
         active_count,
         radii,
         radii,
+        wp.float64(0.0),
+        wp.float64(0.0),
         total_masses,
         charges,
         temperature,
@@ -3137,6 +3150,8 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
                 speeds[box_idx, second_idx],
                 wp.float64(0.0),
                 wp.float64(0.0),
+                wp.float64(0.0),
+                wp.float64(0.0),
                 wp.float64(1.0),
                 wp.float64(1.0),
                 wp.float64(0.0),
@@ -3226,6 +3241,8 @@ def _brownian_coagulation_attempt_diagnostic_kernel(  # noqa: C901
             g_terms[box_idx, selected_j],
             speeds[box_idx, selected_i],
             speeds[box_idx, selected_j],
+            wp.float64(0.0),
+            wp.float64(0.0),
             wp.float64(0.0),
             wp.float64(0.0),
             wp.float64(1.0),
@@ -3998,80 +4015,6 @@ def test_turbulent_p2_preflight_precedes_capability_and_runtime_work(
     npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng)
 
 
-@pytest.mark.parametrize("dtype", [None, wp.float32, wp.float64])
-def test_turbulent_p2_valid_inputs_reach_reserved_capability_gate(
-    monkeypatch: pytest.MonkeyPatch,
-    device: str,
-    dtype: Any | None,
-) -> None:
-    """Valid turbulent P2 requests reject without normalization or mutation."""
-    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=1)
-    gpu_particles = to_warp_particle_data(particles, device=device)
-    pairs = wp.array(np.full((2, 1, 2), -7), dtype=wp.int32, device=device)
-    counts = wp.array([3, 4], dtype=wp.int32, device=device)
-    rng_states = wp.array([5, 6], dtype=wp.uint32, device=device)
-    initial_particles = from_warp_particle_data(gpu_particles, sync=True)
-    initial_pairs = np.asarray(pairs.numpy()).copy()
-    initial_counts = np.asarray(counts.numpy()).copy()
-    initial_rng = np.asarray(rng_states.numpy()).copy()
-    particle_arrays = (
-        gpu_particles.masses,
-        gpu_particles.concentration,
-        gpu_particles.charge,
-    )
-    if dtype is None:
-        turbulent_dissipation: Any = 1.0
-        fluid_density: Any = np.float64(1000.0)
-    else:
-        turbulent_dissipation = wp.array([1.0, 2.0], dtype=dtype, device=device)
-        fluid_density = wp.array([1000.0, 997.0], dtype=dtype, device=device)
-
-    def _unexpected(*args: Any, **kwargs: Any) -> None:
-        raise AssertionError(
-            "reserved turbulent request reached downstream work"
-        )
-
-    for helper_name in (
-        "_broadcast_scalar_array",
-        "_ensure_environment_arrays",
-        "_ensure_volume_array",
-        "initialize_coagulation_rng_states",
-    ):
-        monkeypatch.setattr(coagulation_module, helper_name, _unexpected)
-    monkeypatch.setattr(coagulation_module.wp, "zeros", _unexpected)
-
-    with pytest.raises(
-        ValueError,
-        match="^Coagulation mechanism 'turbulent_shear_st1956' is reserved for E5-F5\\.$",
-    ):
-        coagulation_step_gpu(
-            gpu_particles,
-            temperature=298.15,
-            pressure=101325.0,
-            time_step=0.1,
-            collision_pairs=pairs,
-            n_collisions=counts,
-            rng_states=rng_states,
-            initialize_rng=True,
-            mechanism_config=CoagulationMechanismConfig(
-                mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
-            ),
-            turbulent_dissipation=turbulent_dissipation,
-            fluid_density=fluid_density,
-        )
-
-    restored = from_warp_particle_data(gpu_particles, sync=True)
-    assert particle_arrays[0] is gpu_particles.masses
-    assert particle_arrays[1] is gpu_particles.concentration
-    assert particle_arrays[2] is gpu_particles.charge
-    npt.assert_allclose(restored.masses, initial_particles.masses)
-    npt.assert_allclose(restored.concentration, initial_particles.concentration)
-    npt.assert_allclose(restored.charge, initial_particles.charge)
-    npt.assert_array_equal(np.asarray(pairs.numpy()), initial_pairs)
-    npt.assert_array_equal(np.asarray(counts.numpy()), initial_counts)
-    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng)
-
-
 def test_brownian_ignores_turbulent_p2_inputs(device: str) -> None:
     """Non-turbulent calls do not validate irrelevant turbulent P2 inputs."""
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
@@ -4087,6 +4030,267 @@ def test_brownian_ignores_turbulent_p2_inputs(device: str) -> None:
     )
 
     assert result is gpu_particles
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize("use_arrays", [False, True])
+def test_turbulent_singleton_executes_and_conserves_mass(
+    device: str,
+    use_arrays: bool,
+) -> None:
+    """ST1956 singleton normalizes P2 inputs and preserves species inventory."""
+    particles = _make_particle_data(n_boxes=2, n_particles=2, n_species=2)
+    particles.volume[:] = 1.0e-18
+    particles.masses[:] = [
+        [[1.0e-15, 2.0e-15], [8.0e-15, 16.0e-15]],
+        [[3.0e-15, 6.0e-15], [2.7e-14, 5.4e-14]],
+    ]
+    initial_inventory = np.sum(particles.masses, axis=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.full((2, 1, 2), -1, dtype=wp.int32, device=device)
+    counts = wp.zeros((2,), dtype=wp.int32, device=device)
+    states = wp.zeros((2,), dtype=wp.uint32, device=device)
+    dissipation: Any = 1.0
+    density: Any = np.float64(1000.0)
+    if use_arrays:
+        dissipation = wp.array([1.0, 2.0], dtype=wp.float64, device=device)
+        density = wp.array([1000.0, 997.0], dtype=wp.float64, device=device)
+
+    returned_particles, returned_pairs, returned_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0e308,
+        max_collisions=1,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        rng_states=states,
+        initialize_rng=True,
+        mechanism_config=CoagulationMechanismConfig(
+            mechanisms=(TURBULENT_SHEAR_ST1956_MECHANISM,)
+        ),
+        turbulent_dissipation=dissipation,
+        fluid_density=density,
+    )
+
+    assert returned_particles is gpu_particles
+    assert returned_pairs is pairs
+    assert returned_counts is counts
+    assert np.all((counts.numpy() >= 0) & (counts.numpy() <= 1))
+    result = from_warp_particle_data(gpu_particles, sync=True)
+    npt.assert_allclose(
+        np.sum(result.masses, axis=1),
+        initial_inventory,
+        rtol=1.0e-12,
+        atol=1.0e-30,
+    )
+
+
+def test_turbulent_mixed_mask_rejects_before_runtime_mutation(
+    device: str,
+) -> None:
+    """Valid P2 turbulent combinations fail at capability preflight."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
+    counts = wp.array([7], dtype=wp.int32, device=device)
+    states = wp.array([7], dtype=wp.uint32, device=device)
+    initial_mass = gpu_particles.masses.numpy().copy()
+
+    with pytest.raises(ValueError, match="supports only the exact"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(
+                    BROWNIAN_MECHANISM,
+                    TURBULENT_SHEAR_ST1956_MECHANISM,
+                )
+            ),
+            turbulent_dissipation=1.0,
+            fluid_density=1000.0,
+        )
+
+    npt.assert_equal(gpu_particles.masses.numpy(), initial_mass)
+    npt.assert_array_equal(pairs.numpy(), [[[7, 7]]])
+    npt.assert_array_equal(counts.numpy(), [7])
+    npt.assert_array_equal(states.numpy(), [7])
+
+
+@_warp_kernel
+def _turbulent_rate_and_majorant_probe_kernel(
+    active_indices: Any,
+    active_counts: Any,
+    radii: Any,
+    dissipation: Any,
+    kinematic_viscosity: Any,
+    temperature: Any,
+    pressure: Any,
+    pair_rates: Any,
+    dispatched_pair_rates: Any,
+    majorants: Any,
+    dispatched_majorants: Any,
+) -> None:
+    """Probe ST1956 pair-rate dispatch and compact-active majorants."""
+    box_idx = wp.tid()
+    pair_rates[box_idx] = turbulent_shear_st1956_pair_rate_wp(
+        radii[box_idx, 0],
+        radii[box_idx, 1],
+        dissipation[box_idx],
+        kinematic_viscosity[box_idx],
+    )
+    dispatched_pair_rates[box_idx] = _total_pair_rate(
+        wp.int32(TURBULENT_SHEAR_ST1956_MECHANISM_FLAG),
+        radii[box_idx, 0],
+        radii[box_idx, 1],
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        dissipation[box_idx],
+        kinematic_viscosity[box_idx],
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+    )
+    majorants[box_idx] = _turbulent_majorant_from_active_radii(
+        active_indices,
+        box_idx,
+        active_counts[box_idx],
+        radii,
+        dissipation[box_idx],
+        kinematic_viscosity[box_idx],
+    )
+    dispatched_majorants[box_idx] = _total_majorant(
+        wp.int32(TURBULENT_SHEAR_ST1956_MECHANISM_FLAG),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+        active_indices,
+        box_idx,
+        active_counts[box_idx],
+        radii,
+        radii,
+        dissipation[box_idx],
+        kinematic_viscosity[box_idx],
+        radii,
+        radii,
+        temperature,
+        pressure,
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+        wp.float64(1.0),
+    )
+
+
+@pytest.mark.gpu_parity
+def test_turbulent_pair_rate_and_majorant_match_independent_oracle(
+    device: str,
+) -> None:
+    """ST1956 dispatch and two-largest-radius bounds match the SI equation."""
+    radii = np.array(
+        [[1.0e-9, 3.0e-9, 2.0e-9, 4.0e-9], [5.0e-9] * 4],
+        dtype=np.float64,
+    )
+    active_indices = np.array([[3, 0, 2, 1], [0, -1, -1, -1]], dtype=np.int32)
+    active_counts = np.array([4, 1], dtype=np.int32)
+    dissipation = np.array([2.0, 0.5], dtype=np.float64)
+    viscosity = np.array([1.5e-5, 1.0e-5], dtype=np.float64)
+    pair_rates = wp.zeros((2,), dtype=wp.float64, device=device)
+    dispatched_pair_rates = wp.zeros((2,), dtype=wp.float64, device=device)
+    majorants = wp.zeros((2,), dtype=wp.float64, device=device)
+    dispatched_majorants = wp.zeros((2,), dtype=wp.float64, device=device)
+    wp.launch(
+        _turbulent_rate_and_majorant_probe_kernel,
+        dim=2,
+        inputs=[
+            wp.array(active_indices, dtype=wp.int32, device=device),
+            wp.array(active_counts, dtype=wp.int32, device=device),
+            wp.array(radii, dtype=wp.float64, device=device),
+            wp.array(dissipation, dtype=wp.float64, device=device),
+            wp.array(viscosity, dtype=wp.float64, device=device),
+            wp.array([298.15, 298.15], dtype=wp.float64, device=device),
+            wp.array([101325.0, 101325.0], dtype=wp.float64, device=device),
+            pair_rates,
+            dispatched_pair_rates,
+            majorants,
+            dispatched_majorants,
+        ],
+        device=device,
+    )
+    wp.synchronize_device(device)
+
+    def oracle(
+        radius_i: float,
+        radius_j: float,
+        epsilon: float,
+        nu: float,
+    ) -> float:
+        return float(
+            np.sqrt(np.pi * epsilon / (120.0 * nu))
+            * (2.0 * (radius_i + radius_j)) ** 3
+        )
+
+    expected_pair = np.array(
+        [
+            oracle(
+                radii[box, 0], radii[box, 1], dissipation[box], viscosity[box]
+            )
+            for box in range(2)
+        ],
+        dtype=np.float64,
+    )
+    expected_majorant = oracle(4.0e-9, 3.0e-9, dissipation[0], viscosity[0])
+    npt.assert_allclose(
+        pair_rates.numpy(), expected_pair, rtol=1.0e-12, atol=0.0
+    )
+    npt.assert_allclose(
+        dispatched_pair_rates.numpy(), expected_pair, rtol=1.0e-12, atol=0.0
+    )
+    npt.assert_allclose(
+        majorants.numpy(), [expected_majorant, 0.0], rtol=1.0e-12, atol=0.0
+    )
+    npt.assert_allclose(
+        dispatched_majorants.numpy(),
+        [expected_majorant, 0.0],
+        rtol=1.0e-12,
+        atol=0.0,
+    )
+    for first, second in itertools.combinations(active_indices[0], 2):
+        assert oracle(
+            radii[0, first], radii[0, second], dissipation[0], viscosity[0]
+        ) <= np.nextafter(expected_majorant, np.inf)
 
 
 @pytest.mark.parametrize(
@@ -6512,6 +6716,8 @@ def _launch_private_coagulation_sampler(
             g_terms,
             speeds,
             settling_velocities,
+            wp.zeros((n_boxes,), dtype=wp.float64, device=device),
+            wp.zeros((n_boxes,), dtype=wp.float64, device=device),
             total_masses,
             wp.zeros_like(radii),
             active_indices,
@@ -6777,6 +6983,8 @@ def test_brownian_coagulation_kernel_inactive_particles(
             g_terms,
             speeds,
             settling_velocities,
+            wp.zeros((n_boxes,), dtype=wp.float64, device=device),
+            wp.zeros((n_boxes,), dtype=wp.float64, device=device),
             total_masses,
             charge,
             active_flags,
@@ -6857,6 +7065,8 @@ def test_brownian_kernel_zero_mask_rejects_work_and_caps_overflow_schedule(
                 g_terms,
                 speeds,
                 settling_velocities,
+                wp.zeros((n_boxes,), dtype=wp.float64, device=device),
+                wp.zeros((n_boxes,), dtype=wp.float64, device=device),
                 total_masses,
                 charge,
                 active_indices,
@@ -7682,7 +7892,7 @@ def test_coagulation_step_gpu_forced_collision_transfers_charge_exactly(
             return launch(
                 _force_pair,
                 dim=(1,),
-                inputs=[inputs[23], inputs[24]],
+                inputs=[inputs[25], inputs[26]],
                 device=kwargs["device"],
             )
         return launch(kernel, *args, **kwargs)
