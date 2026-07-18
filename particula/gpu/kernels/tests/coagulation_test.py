@@ -299,11 +299,10 @@ def test_charged_only_step_runs_and_preserves_output_identity(
 def test_sedimentation_public_step_preserves_caller_owned_return_identity(
     device: str,
 ) -> None:
-    """The public SP2016 call uses caller-owned outputs without charge checks."""
+    """SP2016 accepts finite charge and preserves caller-owned outputs."""
     particles = _make_particle_data(n_boxes=1, n_particles=3, n_species=1)
     particles.volume[:] = 1.0e-18
     particles.masses[0, :, 0] = [1.0e-15, 8.0e-15, 2.7e-14]
-    particles.charge[:] = np.nan
     gpu_particles = to_warp_particle_data(particles, device=device)
     pairs = wp.array(
         np.full((1, 1, 2), -1, dtype=np.int32),
@@ -330,6 +329,44 @@ def test_sedimentation_public_step_preserves_caller_owned_return_identity(
 
     assert returned == (gpu_particles, pairs, counts)
     assert 0 <= int(counts.numpy()[0]) <= 1
+
+
+def test_sedimentation_preflight_rejects_nonfinite_charge_atomically(
+    device: str,
+) -> None:
+    """SP2016 rejects non-finite charge before mutating caller-owned state."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
+    particles.charge[0, 0] = np.nan
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    initial_mass = gpu_particles.masses.numpy().copy()
+    initial_concentration = gpu_particles.concentration.numpy().copy()
+    initial_charge = gpu_particles.charge.numpy().copy()
+    pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
+    counts = wp.array([7], dtype=wp.int32, device=device)
+    states = wp.array([7], dtype=wp.uint32, device=device)
+
+    with pytest.raises(ValueError, match="particle charge"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0e308,
+            max_collisions=1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
+            ),
+        )
+
+    npt.assert_equal(gpu_particles.masses.numpy(), initial_mass)
+    npt.assert_equal(gpu_particles.concentration.numpy(), initial_concentration)
+    npt.assert_equal(gpu_particles.charge.numpy(), initial_charge)
+    npt.assert_array_equal(pairs.numpy(), [[[7, 7]]])
+    npt.assert_array_equal(counts.numpy(), [7])
+    npt.assert_array_equal(states.numpy(), [7])
 
 
 def test_sedimentation_public_step_merges_sparse_multibox_particles(
