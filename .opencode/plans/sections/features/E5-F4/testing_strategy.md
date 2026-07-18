@@ -31,6 +31,10 @@ Warp is absent.
   nonpositive density, including accepted zero mass/concentration boundaries.
 - **P4 -- documentation (complete):** The canonical direct-kernel invocation
   and its support limits are recorded in the user-facing GPU contract guide.
+- **Issue #1350 documentation follow-up (complete):** The focused evidence
+  description now explicitly covers singleton sedimentation configuration,
+  direct and environment inputs, caller-owned output/RNG behavior, conservation,
+  and rejected-call state safety. No executable behavior or test is added.
 
 ## Device and Numerical Policy
 
@@ -49,3 +53,9 @@ P1 helper coverage is colocated with the helpers in
 `particula/gpu/dynamics/tests/coagulation_funcs_test.py`; later execution
 coverage remains in the direct-kernel test module. No slow or performance
 marker is needed for required correctness evidence.
+
+Issue #1350 retains the focused warning-clean commands
+`particula/gpu/dynamics/tests/coagulation_funcs_test.py` and
+`particula/gpu/kernels/tests/coagulation_test.py`, plus the documented
+`-m "warp and gpu_parity"` smoke selection. Warp CPU is the installed-Warp
+baseline; CUDA remains optional cleanly-skipped additive evidence.

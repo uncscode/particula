@@ -46,5 +46,16 @@
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`, relevant API docstrings, and
     E5/E5-F4 plan sections.
-  - Evidence: canonical support wording is recorded in the user-facing GPU
-    direct-kernel documentation.
+   - Evidence: canonical support wording is recorded in the user-facing GPU
+     direct-kernel documentation.
+
+- [x] **Issue #1350 follow-up:** Complete sedimentation documentation detail
+  - Status: Complete | Date: 2026-07-17
+  - Delivered: Added the SP2016 pair equation, m³/s units, Seinfeld & Pandis
+    citation, fixed-efficiency/no-argument scope, supported-float direct
+    thermodynamic-input boundary, private fp64 scratch distinction, and focused
+    sedimentation test evidence wording.
+  - Confirmed: Caller-owned output/RNG identity, same-device environment,
+    sedimentation preflight ordering, Warp CPU baseline, and optional
+    cleanly-skipped CUDA evidence. This follow-up supplements rather than
+    replaces #1349's completed P3/P4 delivery.
