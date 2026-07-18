@@ -30,6 +30,19 @@ this proved bound; no alternate unproved extrema heuristic is acceptable.
 
 ## Data / API / Workflow Changes
 
+### Implemented P1 Physics Boundary
+
+- `kinematic_viscosity_wp(dynamic_viscosity, fluid_density)` and
+  `turbulent_shear_st1956_pair_rate_wp(radius_i, radius_j,
+  turbulent_dissipation, kinematic_viscosity)` are internal typed fp64
+  `@wp.func` helpers in `particula/gpu/dynamics/coagulation_funcs.py`.
+- The ST1956 helper returns exact finite zero when dissipation is zero before
+  forming the cubic diameter sum, preventing a `0 * inf` result for finite
+  extreme radii. Public-input validation remains deferred to P2.
+- No public export, API, mechanism capability, sampler, container, or CPU
+  fallback changed in P1. P2/P3 remain responsible for connecting these pure
+  helpers to the direct execution path.
+
 - **Data Model:** No `WarpParticleData` or `WarpEnvironmentData` schema change.
   Dissipation `[m^2/s^3]` and fluid density `[kg/m^3]` are call-specific inputs,
   normalized to active-device fp64 arrays shaped `(n_boxes,)`.

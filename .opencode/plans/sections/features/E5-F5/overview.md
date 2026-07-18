@@ -18,6 +18,15 @@ persistent RNG ownership, fail-before-mutation validation, and the direct
 low-level return contract. It makes no DNS turbulence or general turbulence
 accuracy claim.
 
+## Implemented Foundation
+
+E5-F5-P1 is complete: internal fp64 Warp helpers now provide kinematic
+viscosity (`mu / rho`) and the ST1956 pair rate in
+`particula/gpu/dynamics/coagulation_funcs.py`. The implementation is limited
+to device physics and co-located equation/invariant coverage; it does not yet
+add direct-step inputs, mechanism dispatch, sampling, public exports, or CPU
+fallback behavior.
+
 ## User Stories
 
 - As a simulation developer, I want explicit per-box dissipation and fluid

@@ -1,10 +1,17 @@
 # Phase Details
 
-- [ ] **E5-F5-P1:** Port ST1956 pair physics and kinematic-viscosity helpers with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add focused fp64 Warp helpers matching the approved ST1956 and `nu = mu/rho` equations.
+- [x] **E5-F5-P1:** Port ST1956 pair physics and kinematic-viscosity helpers with unit tests
+  - Issue: #1352 | Size: S | Status: Completed
+  - Delivered: Internal typed fp64 `kinematic_viscosity_wp()` and
+    `turbulent_shear_st1956_pair_rate_wp()` helpers matching `nu = mu/rho` and
+    ST1956. The rate helper returns exact zero before its cubic expression when
+    dissipation is zero, avoiding `0 * inf` for finite extreme radii.
   - Files: `particula/gpu/dynamics/coagulation_funcs.py`, `particula/gpu/dynamics/tests/coagulation_funcs_test.py`
-  - Tests: Independent NumPy/CPU parity across radii, temperature, dissipation, and density scales; symmetry, cubic radius scaling, finite non-negative output, and zero-dissipation helper behavior where applicable.
+  - Tests: Independent fp64 NumPy parity and composed Sutherland-transport
+    coverage; radius symmetry, cubic scaling, finite non-negative ordinary
+    rates, and ordinary/overflow-guard exact-zero dissipation lanes.
+  - Boundary: No public exports, APIs, dispatch, samplers, containers, or CPU
+    fallbacks changed; P2 retains public-input validation.
 
 - [ ] **E5-F5-P2:** Validate explicit per-box dissipation and fluid-density inputs with unit tests
   - Issue: TBD | Size: S | Status: Not Started
