@@ -1,8 +1,8 @@
 # Scope
 
-E5-F4 delivers private sedimentation-only execution through the existing
-low-level sampler; the public `coagulation_step_gpu` preflight continues to
-reject sedimentation. It ports only the SP2016 geometric kernel using
+E5-F4 delivers public sedimentation-only execution through the existing
+low-level sampler via `("sedimentation_sp2016",)`. It ports only the SP2016
+geometric kernel using
 composition-derived particle density, Stokes settling velocity with existing
 air-property/slip formulas, and collision efficiency fixed at 1.
 
@@ -15,11 +15,13 @@ air-property/slip formulas, and collision efficiency fixed at 1.
   Cunningham slip correction on the active device.
 - Prove a safe sedimentation majorant, initially by exhaustively taking the
   maximum finite non-negative rate over active pairs.
-- Route only the exact private sedimentation-only mask through the shared
-  bounded candidate/acceptance pass; preserve public capability rejection.
+- Route only the exact public sedimentation-only mask through the shared bounded
+  candidate/acceptance pass and capability gate.
 - Preserve fixed-shape fp64 particle data, inactive slots, caller-owned
   collision buffers, optional persistent RNG state, and the current return
   tuple.
+- Preflight finite nonnegative mass/concentration and finite positive density
+  before allocation, output/RNG work, or mutation.
 - Add deterministic pair/property parity, bounded stochastic, multi-box,
   inactive-slot, mass-conservation, buffer-identity, RNG, and fail-before-
   mutation tests on Warp CPU; run optional CUDA cases when available.

@@ -16,11 +16,11 @@
   exhaustive maximum over `i < j`, including zero-rate and non-finite guards.
 - [x] Add internal sedimentation pair-rate/majorant dispatch to the shared
   bounded scheduler and one-pass acceptance/RNG path.
-- [x] Retain public capability-matrix rejection; private mixed sedimentation
-  masks return without scheduling or mutable-state access.
+- [x] Register only the exact public sedimentation-only capability; reject mixed
+  or unsupported sedimentation configurations before particle runtime access.
 - [x] Preserve collision-pair/count buffer identity, persistent RNG semantics,
   inactive slots, and existing apply behavior in the private exact-mask path.
-- [ ] Ensure unsupported configuration or invalid density/environment/buffer
+- [x] Ensure unsupported configuration or invalid density/environment/buffer
   requests fail before allocation, RNG initialization/advancement, output
   mutation, or particle mutation.
 
@@ -33,16 +33,16 @@
   new Warp helper to produce expected results.
 - [x] Add co-located private-dispatch coverage for the exhaustive majorant,
   bounded scheduling/RNG behavior, scratch clearing, and mixed-mask no-op.
-- [ ] Add end-to-end multi-box conservation and broader state-safety evidence
-  required before any public capability expansion.
-- [ ] Snapshot all caller-owned state around invalid non-unit-efficiency,
+- [x] Add end-to-end multi-box conservation and broader state-safety evidence
+  for the public capability.
+- [x] Snapshot all caller-owned state around invalid non-unit-efficiency,
   unsupported combination/distribution, shape, dtype, device, and domain cases.
-- [ ] Run focused Warp CPU tests when Warp is installed and optional CUDA tests
+- [x] Run focused Warp CPU tests when Warp is installed and optional CUDA tests
   with clean skips; retain the repository coverage threshold.
 
 ## Documentation
 
-- [x] Update internal module/dispatcher/sampler documentation for the private
-  exact-mask boundary and scratch ownership; no user-facing documentation is
-  needed while public sedimentation remains rejected.
-- [ ] Mark E5-F4 phases and parent E5 dependencies accurately as work ships.
+- [x] Publish the canonical direct-kernel contract in
+  `docs/Features/data-containers-and-gpu-foundations.md`, including ownership,
+  device, and unsupported-boundary wording.
+- [x] Mark E5-F4 delivery evidence accurately as work ships.

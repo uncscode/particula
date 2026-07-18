@@ -69,12 +69,19 @@ before launch.
 from `particula.gpu.kernels.coagulation`; this configuration API is not
 re-exported from `particula.gpu.kernels`. Omitting it preserves the Brownian,
 particle-resolved path. The low-level entry point also supports exact
-charged-hard-sphere-only and canonical Brownian-plus-charged
-`particle_resolved` configurations. The combined configuration accepts either
-requested mechanism order and uses one shared stochastic selection path.
-Malformed configurations, unsupported distributions, and deferred mechanisms
-fail during host-side preflight before runtime state is accessed, allocated,
-mutated, reseeded, or launched.
+unit-efficiency SP2016 sedimentation through
+`CoagulationMechanismConfig(("sedimentation_sp2016",))`, exact
+charged-hard-sphere-only, and canonical Brownian-plus-charged
+`particle_resolved` configurations. Sedimentation is direct-kernel-only: it
+uses caller-owned same-device state and RNG/output buffers, performs no hidden
+transfer or fallback, and requires finite, nonnegative particle mass and
+concentration with finite, positive density before mutable state work.
+Sedimentation combinations and other unsupported modes are deferred. The
+combined Brownian-plus-charged configuration accepts either requested mechanism
+order and uses one shared stochastic selection path. Malformed configurations,
+unsupported distributions, and deferred mechanisms fail during host-side
+preflight before runtime state is accessed, allocated, mutated, reseeded, or
+launched.
 
 `condensation_step_gpu` additionally requires a keyword-only
 `ThermodynamicsConfig` through `thermodynamics=`. After all inputs and optional

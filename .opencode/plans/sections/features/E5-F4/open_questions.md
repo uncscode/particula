@@ -17,11 +17,12 @@
 - [x] Are Brownian-plus-sedimentation calls accepted when E5-F4 ships?
   - Resolved 2026-07-15: No. E5-F4 registers sedimentation-only execution;
     E5-F6 owns additive combination registration and total-majorant evidence.
-- [x] Does P2 make sedimentation publicly executable?
-  - Resolved 2026-07-17: No. Only the exact private sampler mask executes
-    sedimentation. Public configurations and private mixed sedimentation masks
-    reject before scratch/output initialization, RNG access, kernel launch, or
-    particle mutation.
+- [x] Does the shipped direct kernel make sedimentation publicly executable?
+  - Resolved 2026-07-17: Yes, only the exact
+    `("sedimentation_sp2016",)` particle-resolved configuration is accepted.
+    Mixed, alternate, malformed, and non-particle-resolved requests fail before
+    particle runtime access; invalid sedimentation domains fail before outputs,
+    RNG, or particle state can change.
 - [x] Is drag-corrected settling part of the SP2016 GPU support claim?
   - Resolved 2026-07-15: No. The supported path is the existing Stokes settling
     formula with Cunningham slip correction. Non-Stokes drag and DNS variants

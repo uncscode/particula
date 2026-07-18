@@ -16,20 +16,21 @@ Warp is absent.
   `rtol=1e-12, atol=0.0`; safe-zero branches use exact equality. An AST check
   verifies that the pair helper has exactly its four physics arguments and no
   collision-efficiency argument.
-- **P2 -- majorant and private dispatch (complete):** Co-located direct-kernel
+- **P2 -- majorant and dispatch (complete):** Co-located direct-kernel
   tests cover the exhaustive compact active-pair majorant, the existing bounded
   scheduler/RNG path, cleared private settling-velocity scratch, and mixed
-  sedimentation-mask no-op behavior. Public preflight rejection remains a
-  separate preserved boundary.
-- **P3 -- end-to-end execution:** Run sedimentation-only one-box and multi-box/
+  sedimentation-mask rejection behavior.
+- **P3 -- end-to-end execution (complete):** Sedimentation-only one-box and multi-box/
   multi-species cases with differing temperature and pressure. Check particle
   and species-mass conservation, donor mass/concentration clearing, inactive
   slots, accepted-count capacity, caller buffer identity, RNG reuse/reset, and
   aggregate or sigma-bounded collision behavior over deterministic seeds.
   Snapshot masses, concentration, charge, pair/count buffers, and RNG state to
-  prove invalid and unsupported calls fail before mutation.
-- **P4 -- documentation:** Validate markdown links, references, import paths,
-  support-table wording, and executable snippets where present.
+  prove invalid and unsupported calls fail before mutation. Physical-domain
+  regressions cover nonfinite/negative mass and concentration and nonfinite/
+  nonpositive density, including accepted zero mass/concentration boundaries.
+- **P4 -- documentation (complete):** The canonical direct-kernel invocation
+  and its support limits are recorded in the user-facing GPU contract guide.
 
 ## Device and Numerical Policy
 

@@ -440,9 +440,23 @@ aerosol.particles = particle_resolved.step(
 
 This section is separate from the CPU `particula.dynamics` strategy API above.
 The direct GPU path supports particle-resolved Brownian,
-`("charged_hard_sphere",)`, and `("brownian", "charged_hard_sphere")` in
-either requested combined order. It is not a GPU runnable for
-`ChargedCoagulationStrategy` or another CPU strategy.
+`("charged_hard_sphere",)`, exact unit-efficiency SP2016 sedimentation-only
+`("sedimentation_sp2016",)`, and `("brownian", "charged_hard_sphere")` in
+either requested combined order. Select sedimentation only through
+`CoagulationMechanismConfig(("sedimentation_sp2016",))` on
+`coagulation_step_gpu`; it is not a GPU runnable for
+`SedimentationCoagulationStrategy` or another CPU strategy.
+
+The sedimentation-only path accepts fp64 Warp particle state with finite,
+nonnegative mass and concentration plus finite, positive density. Its collision
+pair/count and RNG buffers remain caller-owned same-device Warp resources; a
+supplied RNG state advances in place and resets only with
+`initialize_rng=True`. There is no hidden CPU/GPU transfer, fallback, or
+efficiency parameter. Brownian-plus-sedimentation combinations and other
+sedimentation variants are rejected. This narrow direct-kernel contract does
+not claim CPU-strategy parity, general accuracy, or performance. See the
+[GPU container and direct-kernel contract](./data-containers-and-gpu-foundations.md)
+for the canonical ownership and validation boundary.
 
 The approved internal E5-F2 helper subset is
 `coulomb_potential_ratio_wp`, `coulomb_kinetic_limit_wp`,

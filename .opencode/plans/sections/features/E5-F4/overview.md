@@ -11,14 +11,14 @@ not represented in the GPU API.
 
 ## Value Proposition
 
-E5-F4 now has the P1 helpers and a private P2 execution slice. The direct
-kernel can execute only the exact sedimentation-only mask through the existing
-bounded active-pair scheduler and RNG path. It uses an exhaustive compact
-active-pair majorant and private, cleared settling-velocity scratch. Public
-capability validation continues to reject sedimentation before allocation or
-mutation, and mixed sedimentation masks remain no-ops in private dispatch.
-This preserves a validated term for later additive-mechanism and public-support
-work without expanding the public API.
+E5-F4 ships the public direct-kernel configuration
+`CoagulationMechanismConfig(("sedimentation_sp2016",))` for particle-resolved
+fp64 Warp data. It uses the bounded active-pair scheduler, exhaustive compact
+majorant, and persistent RNG/output ownership contracts. A sedimentation-
+specific physical-domain preflight rejects invalid mass, concentration, or
+density before output allocation/writes, RNG work, or particle mutation.
+Additive sedimentation masks and other variants remain unsupported and fail at
+the capability boundary.
 
 ## User Stories
 

@@ -2,30 +2,31 @@
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
 coagulation pipeline. Its fixed-mask sampler executes particle-resolved
-Brownian, charged hard-sphere, or their combined configuration in either
-requested mechanism order. It normalizes that combined configuration to one
-mask, accumulates a finite positive additive rate and safe majorant, then
-makes one acceptance draw for each valid candidate. Entry-point validation
-accepts scalar direct inputs,
+Brownian, charged hard-sphere, exact unit-efficiency SP2016 sedimentation, or
+the supported Brownian-plus-charged configuration in either requested order.
+It normalizes the combined configuration to one mask, accumulates a finite
+positive additive rate and safe majorant, then makes one acceptance draw for
+each valid candidate. Entry-point validation accepts scalar direct inputs,
 explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
 Particle metadata and device checks run before normalizing environment inputs,
 setting up volume, initializing RNG state, or executing Brownian work. An
 explicit opt-in finite-charge validation scan is available for Brownian
 callers; every mode containing charged hard-sphere physics always validates
-finite charge before resource allocation or mutation. The kernels operate on
-GPU-resident particle data and
-produce collision pairs that are applied in place: recipient particles receive
+    finite charge before resource allocation or mutation. The kernels operate on
+    GPU-resident particle data and produce collision pairs that are applied in
+    place: recipient particles receive
 donor mass and charge, while donor mass, concentration, and charge are cleared.
 
 ``CoagulationMechanismConfig`` and its resolver are concrete-module APIs:
 import them from ``particula.gpu.kernels.coagulation``, not
 ``particula.gpu.kernels``. The immutable, keyword-only configuration is
 host-side metadata, not device-resident simulation state. The public step
-defaults to Brownian, particle-resolved execution and also accepts charged-only
-and canonical Brownian-plus-charged particle-resolved execution. It rejects
-otherwise unsupported configurations during preflight, before runtime state is
-accessed or mutated. Supplied particles, collision outputs, and RNG sidecars
-are caller-owned same-device Warp resources.
+    defaults to Brownian, particle-resolved execution and also accepts
+    charged-only, exact SP2016 sedimentation-only, and canonical
+    Brownian-plus-charged particle-resolved execution. It rejects otherwise
+    unsupported configurations during preflight, before runtime state is
+    accessed or mutated. Supplied particles, collision outputs, and RNG sidecars
+    are caller-owned same-device Warp resources.
 
 The exact ``SEDIMENTATION_SP2016_MECHANISM_FLAG`` is a public direct-kernel
 mode for particle-resolved, unit-efficiency SP2016 scheduling. It shares the
@@ -160,8 +161,8 @@ class _ResolvedCoagulationMechanismConfig:
     """Store the normalized result of concrete-module configuration validation.
 
     This private result is not a public API or a ``coagulation_step_gpu``
-    argument. Structural resolution retains recognized reserved mechanisms for
-    later capability validation.
+    argument. Structural resolution retains recognized, but potentially
+    deferred, mechanisms for later capability validation.
 
     Attributes:
         mechanisms: Structurally valid mechanism identifiers in canonical order.
@@ -252,9 +253,9 @@ def validate_coagulation_mechanism_capabilities(
     """Enforce the executable coagulation-mechanism boundary.
 
     This pure host-side, concrete-module-only validator accepts Brownian,
-    exact SP2016 sedimentation, ``"charged_hard_sphere"``, or their supported
-    Brownian-plus-charged ``"particle_resolved"`` execution. Deferred mechanisms
-    are rejected during configuration preflight,
+    exact SP2016 sedimentation, ``"charged_hard_sphere"``, or the supported
+    Brownian-plus-charged ``"particle_resolved"`` execution. Deferred
+    mechanisms are rejected during configuration preflight,
     before accessing or mutating runtime state. Import it from
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
 
@@ -343,7 +344,7 @@ def _total_pair_rate(  # noqa: PLR0913
     This helper dispatches fixed flag bits without dynamic mechanism iteration.
     Each enabled term is independently sanitized before its additive combined
     rate is returned. This helper's bit dispatch does not grant sampler
-    support: the sampler executes sedimentation only for its exact private
+    support: the sampler executes sedimentation only for its exact public
     sedimentation-only mask. Invalid rate terms contribute zero.
     """
     total_rate = wp.float64(0.0)
@@ -491,8 +492,8 @@ def _sedimentation_majorant_from_active_pairs(
 ) -> Any:
     """Return the finite sedimentation-rate maximum over active pairs.
 
-    This private helper exhaustively resolves compact active ranks, so sparse
-    source slots cannot affect the exact sedimentation-only sampler majorant.
+    This helper exhaustively resolves compact active ranks, so sparse source
+    slots cannot affect the exact SP2016 sedimentation sampler majorant.
     Invalid, zero, and nonpositive P1 rates contribute zero.
 
     Args:
@@ -561,9 +562,10 @@ def _total_majorant(  # noqa: PLR0913
     """Accumulate enabled finite, positive terms for private staged tests.
 
     This helper dispatches fixed flag bits for internal tests and for exact
-    charged-only or private sedimentation-only sampler execution. The sampler
-    separately enforces its executable-mask boundary; a helper contribution
-    does not make a mixed sedimentation mask executable. Brownian-containing
+    charged-only or exact SP2016 sedimentation-only sampler execution. The
+    sampler separately enforces its executable-mask boundary; a helper
+    contribution does not make a mixed sedimentation mask executable.
+    Brownian-containing
     production selection uses one exact active-pair scan through
     ``_total_pair_rate``. Other reserved bits contribute no term.
     """
@@ -776,7 +778,13 @@ def _validate_sedimentation_particle_physics_kernel(
     density: Any,
     invalid: Any,
 ) -> None:
-    """Record invalid public SP2016 particle physics without mutation."""  # type: ignore
+    """Record invalid SP2016 particle inputs without mutation.
+
+    The companion host preflight maps status entries to field-specific errors:
+    mass and concentration must be finite and nonnegative, while density must
+    be finite and strictly positive. Zero mass and concentration remain valid
+    inactive-slot state.
+    """  # type: ignore
     box_idx, particle_idx = wp.tid()  # type: ignore[misc]
     concentration_value = concentration[box_idx, particle_idx]
     if not wp.isfinite(concentration_value) or concentration_value < wp.float64(
@@ -833,7 +841,7 @@ def brownian_coagulation_kernel(  # noqa: C901
     box and one finite positive total pair rate per candidate. A valid candidate
     receives exactly one acceptance draw; invalid rates, invalid majorants, and
     rates above the majorant are skipped without collision-buffer or active-set
-    mutation. Only the exact private sedimentation-only mask joins the public
+    mutation. The exact public SP2016 sedimentation-only mask joins the public
     Brownian and charged masks; unsupported masks return before scheduling or
     accessing the RNG state.
 
@@ -860,7 +868,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         settling_velocities: Private fp64 settling-velocity scratch
             ``(n_boxes, n_particles)``. The kernel clears every slot on entry
             and populates this call-local scratch only for valid active slots
-            of the exact private sedimentation-only mask.
+            of the exact SP2016 sedimentation-only mask.
         active_indices: Output compact active indices
             ``(n_boxes, n_particles)``.
         collision_pairs: Output collision indices
@@ -875,8 +883,8 @@ def brownian_coagulation_kernel(  # noqa: C901
         charge: Caller-owned signed elementary-charge counts
             ``(n_boxes, n_particles)``.
         mechanism_mask: Fixed internal sampler mask. In addition to public
-            Brownian and charged masks, only the exact private
-            sedimentation-only mask is executable.
+            Brownian and charged masks, only the exact SP2016 sedimentation-
+            only mask is executable.
         collision_capacity: Maximum accepted collisions per box for this call.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]
@@ -984,7 +992,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         n_collisions[box_idx] = wp.int32(0)
         return
 
-    # Charged-only and exact private sedimentation-only rates require exact
+    # Charged-only and exact SP2016 sedimentation-only rates require exact
     # compact active-pair maxima. Brownian masks use the shared scan below.
     majorant_total = wp.float64(0.0)
     if mechanism_mask == wp.int32(
@@ -1446,7 +1454,19 @@ def _validate_sedimentation_particle_physics(
 
     The fixed-size error state permits a single device-to-host readback while
     retaining field-specific errors. Zero mass and concentration are valid,
-    allowing inactive slots without applying charged-only constraints.
+    allowing inactive slots without applying charged-only constraints. This
+    preflight runs before time-step, environment, output-buffer, or RNG work.
+
+    Args:
+        particles: Caller-owned Warp particle data with validated shape and
+            device placement.
+        n_boxes: Number of simulation boxes.
+        n_particles: Number of particle slots per box.
+        device: Warp device that owns the particle arrays and status buffer.
+
+    Raises:
+        ValueError: If mass or concentration is non-finite or negative, or if
+            density is non-finite or nonpositive.
     """
     invalid = wp.zeros((3,), dtype=wp.int32, device=device)
     wp.launch(
@@ -1791,6 +1811,9 @@ def coagulation_step_gpu(  # noqa: C901
             must be ``wp.float64`` with shape ``(n_boxes, n_particles)``.
             Charged-containing calls scan it for finite values before output
             validation or allocation, RNG setup, or selector/apply work.
+            Exact SP2016 sedimentation calls scan mass and concentration for
+            finite nonnegative values and density for finite positive values
+            before time-step, environment, output-buffer, or RNG work.
             Accepted collisions mutate mass, concentration, and charge in place:
             recipient particles receive donor mass and charge, and donor mass,
             concentration, and charge are cleared.
@@ -1917,7 +1940,7 @@ def coagulation_step_gpu(  # noqa: C901
         settling-velocity arrays. The selector clears every scratch slot and
         sums each active particle's species masses once for charged pair rates
         and their compact-active majorant. It populates settling velocities only
-        for valid active slots of the exact private sedimentation-only mask.
+        for valid active slots of the exact SP2016 sedimentation-only mask.
         This scratch is not a caller-owned output, is not returned, and is
         allocated only after caller-resource preflight succeeds.
 

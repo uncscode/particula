@@ -27,25 +27,24 @@
   - Tests: co-located majorant, scheduler/RNG, scratch, and mixed-mask
     state-preservation regressions.
 
-- [ ] **E5-F4-P3:** Integrate sedimentation execution with multi-box conservation and state-safety tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Register sedimentation-only execution at `coagulation_step_gpu`,
-    validate its support boundary before launch, and prove end-to-end state and
-    ownership behavior.
+- [x] **E5-F4-P3:** Integrate sedimentation execution with multi-box conservation and state-safety tests
+  - Issue: #1349 | Size: S | Status: Complete
+  - Delivered: Registered public particle-resolved
+    `("sedimentation_sp2016",)` execution, sedimentation-specific domain
+    preflight, and atomic rejected-call behavior before output/RNG/mutation.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: independent pair parity, bounded repeated-run statistics, multi-box
-    differing environment values, mass conservation, donor clearing, inactive
-    slots, caller-buffer identity, persistent RNG reuse/reset, and unchanged
-    particle/output/RNG snapshots for every unsupported or invalid request.
+  - Tests: independent pair parity, stochastic aggregate evidence, multi-box
+    direct/environment cases, per-box/species conservation, donor clearing,
+    inactive slots, caller-buffer identity, persistent RNG reuse/reset, and
+    unchanged particle/output/RNG snapshots for invalid or unsupported calls.
 
-- [ ] **E5-F4-P4:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Publish the sedimentation-only direct-kernel contract, collision
-    efficiency of 1, supported input/device boundary, exclusions, and focused
-    verification commands.
+- [x] **E5-F4-P4:** Update development documentation
+  - Issue: #1349 | Size: XS | Status: Complete
+  - Delivered: Published the canonical direct-kernel configuration and ownership,
+    fp64/unit-efficiency, no-transfer/no-fallback, and deferred-mode limits.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`, relevant API docstrings, and
     E5/E5-F4 plan sections.
-  - Tests: markdown link/reference validation and import/example checks for any
-    executable snippets.
+  - Evidence: canonical support wording is recorded in the user-facing GPU
+    direct-kernel documentation.

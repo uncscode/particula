@@ -10,23 +10,22 @@
   the exhaustive compact active-pair majorant in private-dispatch coverage.
 - [x] Exact private sedimentation-only execution uses the existing bounded
   single candidate/acceptance pass and does not add an RNG stream or selector.
-- [x] Private settling-velocity scratch is cleared each launch; public
-  sedimentation remains rejected and mixed sedimentation masks do no work or
-  advance RNG.
-- [ ] One-box and multi-box/multi-species tests cover differing environments,
+- [x] Settling-velocity scratch is cleared each launch; the exact public
+  sedimentation mask is accepted and mixed masks fail capability preflight.
+- [x] One-box and multi-box/multi-species tests cover differing environments,
   inactive slots, zero/one/two active particles, and equal settling velocity.
-- [ ] Accepted merges preserve total species mass per box, clear donor mass and
+- [x] Accepted merges preserve total species mass per box, clear donor mass and
   concentration, and retain legal sorted disjoint pair indices.
-- [ ] Caller-owned collision buffers and persistent RNG buffers are reused by
+- [x] Caller-owned collision buffers and persistent RNG buffers are reused by
   identity and keep documented reset/advancement semantics.
-- [ ] Unsupported distributions, non-unit/dynamic efficiency, unavailable
+- [x] Unsupported distributions, non-unit/dynamic efficiency, unavailable
   additive combinations, invalid domains, and shape/dtype/device mismatches
   raise before particle, output-buffer, or RNG mutation.
-- [ ] Warp CPU evidence passes when Warp is installed; CUDA runs when available
+- [x] Warp CPU evidence passes when Warp is installed; CUDA runs when available
   and skips cleanly otherwise.
-- [ ] Documentation states all support limits without claiming high-level,
+- [x] Documentation states all support limits without claiming high-level,
   additive, drag-corrected, DNS, fallback, or exact stochastic parity support.
-- [ ] Existing Brownian behavior and the public return tuple remain regression-
+- [x] Existing Brownian behavior and the public return tuple remain regression-
   clean, and coverage thresholds are not lowered.
 
 ## Metrics
