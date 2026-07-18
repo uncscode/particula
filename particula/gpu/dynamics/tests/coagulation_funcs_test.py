@@ -74,7 +74,7 @@ def _warp_kernel(function):
     return wp.kernel(function)
 
 
-def _available_warp_devices() -> list[str]:
+def _available_warp_devices() -> list[Any]:
     """Return collection-safe Warp device params."""
     if wp is None:
         return ["cpu"]
@@ -1916,15 +1916,12 @@ def test_settling_velocity_stokes_wp_invalid_overflow_or_underflow_returns_exact
 ) -> None:
     """Return finite exact zero for every invalid Stokes input category."""
     base = (1.0e-6, 1000.0, 298.15, 101325.0)
-    constants = np.array(
-        [
-            GAS_CONSTANT,
-            MOLECULAR_WEIGHT_AIR,
-            REF_VISCOSITY_AIR_STP,
-            REF_TEMPERATURE_STP,
-            SUTHERLAND_CONSTANT,
-        ],
-        dtype=np.float64,
+    constants = (
+        GAS_CONSTANT,
+        MOLECULAR_WEIGHT_AIR,
+        REF_VISCOSITY_AIR_STP,
+        REF_TEMPERATURE_STP,
+        SUTHERLAND_CONSTANT,
     )
     cases = []
     for value in (0.0, -1.0, np.nan, np.inf, -np.inf):
