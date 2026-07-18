@@ -1807,23 +1807,29 @@ def _ensure_turbulent_input_array(
         ValueError: If the value is not a supported scalar or same-device Warp
             array with positive finite values.
     """
-    if _is_warp_array_like(value):
-        if value.shape != (n_boxes,):
-            raise ValueError(f"{name} shape does not match (n_boxes,)")
-        _validate_device_match(name, value, device)
-        if not _is_supported_warp_float_dtype(value.dtype):
-            raise ValueError(f"{name} must use a supported Warp floating dtype")
-        _validate_positive_finite_array(name, value, "coagulation_step_gpu")
-        return value
+    turbulent_value: Any = value
 
-    if isinstance(value, bool) or not isinstance(value, (float, np.floating)):
-        if hasattr(value, "shape"):
+    if _is_warp_array_like(turbulent_value):
+        if turbulent_value.shape != (n_boxes,):
+            raise ValueError(f"{name} shape does not match (n_boxes,)")
+        _validate_device_match(name, turbulent_value, device)
+        if not _is_supported_warp_float_dtype(turbulent_value.dtype):
+            raise ValueError(f"{name} must use a supported Warp floating dtype")
+        _validate_positive_finite_array(
+            name, turbulent_value, "coagulation_step_gpu"
+        )
+        return turbulent_value
+
+    if isinstance(turbulent_value, bool) or not isinstance(
+        turbulent_value, (float, np.floating)
+    ):
+        if hasattr(turbulent_value, "shape"):
             raise ValueError(
                 f"{name} must be a Warp array with shape (n_boxes,)"
             )
         raise ValueError(f"{name} must be a floating scalar or Warp array")
 
-    scalar_value = float(value)
+    scalar_value = float(turbulent_value)
     if not np.isfinite(scalar_value) or scalar_value <= 0.0:
         raise ValueError(f"{name} must be finite and > 0")
 
