@@ -25,7 +25,20 @@ before particle access. Recognized non-executable masks run only their
 enabled turbulent, charged, and sedimentation read-only validation, then raise
 `ValueError("Additive coagulation execution is deferred.")` before runtime
 normalization, output/RNG work, kernels, or caller-state mutation. P2/P3 retain
-ownership of summed rates, majorants, and additive execution.
+ ownership of summed rates, majorants, and additive execution.
+
+## Implemented P2 Boundary
+
+Issue #1358 delivered private fp64 aggregation primitives in
+`particula/gpu/kernels/coagulation.py`. Enabled Brownian, charged hard-sphere,
+SP2016 sedimentation, and ST1956 turbulent-shear component rates and majorants
+are summed through checked, fail-closed addition for every P1-recognized
+two-way and four-way mask. Invalid, nonpositive, or overflowed aggregates
+become zero. Candidate acceptance now accepts only finite positive ratios and
+permits a rate-over-majorant roundoff excess of at most eight fp64 ULPs, mapped
+to exactly `1.0`; material violations cannot advance RNG or mutate selector
+state. This remains private helper/selector hardening: deferred masks are not
+executable, and P3 still owns public-path additive execution validation.
 
 ## User Stories
 

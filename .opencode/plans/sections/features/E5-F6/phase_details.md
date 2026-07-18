@@ -13,16 +13,21 @@
     mask launch/helper bypass, and snapshots proving particles, outputs, and
     persistent RNG remain unchanged.
 
-- [ ] **E5-F6-P2:** Implement safe summed majorants and additive pair dispatch with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Sum enabled component rates per candidate and proven component
-    majorants per box while enforcing finite non-negative bounded ratios.
+- [x] **E5-F6-P2:** Implement safe summed majorants and additive pair dispatch with unit tests
+  - Issue: #1358 | Size: S | Status: Implemented
+  - Delivered: Private checked fp64 addition and all-enabled-bit pair-rate and
+    majorant dispatch for masks `3`, `5`, `6`, `9`, `10`, `12`, and `15`.
+    Invalid/nonpositive/overflowed aggregates fail closed to zero. A private
+    ratio guard allows only an eight-ULP rate-over-majorant roundoff excess,
+    maps it to `1.0`, and rejects material violations before RNG advancement or
+    selector mutation. The public executable gate is unchanged: deferred masks
+    remain deferred.
   - Files: `particula/gpu/kernels/coagulation.py`,
-    `particula/gpu/dynamics/coagulation_funcs.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: independent component-sum parity, all-active-pair
-    `total_rate <= total_majorant`, zero terms, disparate scales, overflow/
-    non-finite guards, and one acceptance draw per proposal.
+  - Tests: independent deterministic fp64 Warp/NumPy component-sum and bound
+    oracles, sparse mixed-scale/non-coincident-maxima fixtures, invalid and
+    overflow aggregation cases, eight-versus-nine-ULP ratio cases, selector
+    draw/mutation regressions, capped scheduling, and deferred-mask snapshots.
 
 - [ ] **E5-F6-P3:** Validate two-way and four-way single-pass execution with integration tests
   - Issue: TBD | Size: S | Status: Not Started

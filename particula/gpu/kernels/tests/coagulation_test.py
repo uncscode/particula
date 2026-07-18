@@ -1,9 +1,9 @@
 """End-to-end tests for GPU coagulation kernels.
 
-This module covers Brownian coagulation execution, contract validation, and
-test-local mixed nanometer-particle-formation/droplet diagnostics used to
-measure attempted versus accepted collision counts without changing the public
-GPU API.
+This module covers coagulation execution, contract validation, and test-local
+deterministic probes for additive pair rates, majorants, and selector safety.
+The probes measure attempted versus accepted collision counts without changing
+the public GPU API.
 """
 
 # pyright: reportGeneralTypeIssues=false
@@ -2048,7 +2048,7 @@ def _all_mask_additive_probe_kernel(
     pair_rate: Any,
     majorant: Any,
 ) -> None:
-    """Probe all recognized additive masks against one compact active pair."""
+    """Probe all recognized additive masks against one active pair and majorant."""
     pair_rate[0] = _total_pair_rate(
         mechanism_mask,
         radii[0, 0],
@@ -2299,7 +2299,7 @@ def test_additive_helpers_ignore_reserved_bits(
     device: str,
     mechanism_mask: int,
 ) -> None:
-    """Enabled Brownian and charged terms sum while reserved bits contribute zero."""
+    """Fixed-mask helpers include only enabled, finite component contributions."""
     values = np.array(
         [1.0e-8, 5.0e-8, 1.0e-9, 2.0e-10, 2.0e-8, 4.0e-8, 0.2, 0.1, 3.0],
         dtype=np.float64,
