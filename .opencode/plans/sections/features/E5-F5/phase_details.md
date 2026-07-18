@@ -13,11 +13,19 @@
   - Boundary: No public exports, APIs, dispatch, samplers, containers, or CPU
     fallbacks changed; P2 retains public-input validation.
 
-- [ ] **E5-F5-P2:** Validate explicit per-box dissipation and fluid-density inputs with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Normalize required scalar or `(n_boxes,)` Warp inputs and reject missing, non-positive, non-finite, wrong-shape/dtype/device values before mutation.
-  - Files: `particula/gpu/kernels/coagulation.py`, `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: Scalar broadcast, heterogeneous per-box values, device reuse, and failure snapshots for particles, outputs, and RNG state.
+- [x] **E5-F5-P2:** Validate explicit per-box dissipation and fluid-density inputs with unit tests
+  - Issue: #1353 | Size: S | Status: Completed
+  - Delivered: Added keyword-only `turbulent_dissipation` and `fluid_density`
+    inputs plus `_ensure_turbulent_input_array` to the direct step. Enabled
+    ST1956 requests accept positive finite floating scalars or supported
+    same-device Warp `(n_boxes,)` arrays; supplied arrays retain identity and
+    scalar broadcasts use private device storage. Valid P2 input reaches the
+    unchanged reserved-capability error; no rate dispatch or execution shipped.
+  - Files: `particula/gpu/kernels/coagulation.py`,
+    `particula/gpu/kernels/tests/coagulation_test.py`
+  - Tests: Helper scalar/array, dtype, shape, device, and invalid-category
+    coverage; public ordering and failure-atomicity snapshots; runtime-helper
+    sentinels; and non-turbulent ignored-argument regression coverage.
 
 - [ ] **E5-F5-P3:** Integrate turbulent-shear-only sampling and safe majorant with execution tests
   - Issue: TBD | Size: S | Status: Not Started

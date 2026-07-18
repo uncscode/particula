@@ -13,25 +13,23 @@ setting up volume, initializing RNG state, or executing Brownian work. An
 explicit opt-in finite-charge validation scan is available for Brownian
 callers; every mode containing charged hard-sphere physics or exact SP2016
 sedimentation always validates finite charge before resource allocation or
-mutation. The kernels operate on
-    GPU-resident particle data and produce collision pairs that are applied in
-    place: recipient particles receive
-donor mass and charge, while donor mass, concentration, and charge are cleared.
+mutation. The kernels operate on GPU-resident particle data and produce
+collision pairs that are applied in place: recipient particles receive donor
+mass and charge, while donor mass, concentration, and charge are cleared.
 
 ``CoagulationMechanismConfig`` and its resolver are concrete-module APIs:
 import them from ``particula.gpu.kernels.coagulation``, not
 ``particula.gpu.kernels``. The immutable, keyword-only configuration is
 host-side metadata, not device-resident simulation state. The public step
-    defaults to Brownian, particle-resolved execution and also accepts
-    charged-only, exact SP2016 sedimentation-only, and canonical
-    Brownian-plus-charged particle-resolved execution. It rejects otherwise
-    unsupported configurations during structural preflight, before runtime state
-    is accessed or mutated. Turbulent-shear configurations intentionally cross a
-    later P2 boundary: explicit turbulent dissipation and fluid density inputs
-    are validated after particle schema/device metadata is available, then stop
-    at the reserved capability gate without dispatch, sampling, or mutation.
-    Supplied particles, collision outputs, and RNG sidecars are caller-owned
-    same-device Warp resources.
+defaults to Brownian, particle-resolved execution and also accepts charged-only,
+exact SP2016 sedimentation-only, and canonical Brownian-plus-charged
+particle-resolved execution. It rejects otherwise unsupported configurations
+during structural preflight, before runtime state is accessed or mutated.
+Turbulent-shear configurations intentionally cross a later P2 boundary:
+explicit turbulent dissipation and fluid density inputs are validated after
+particle schema/device metadata is available, then stop at the reserved
+capability gate without dispatch, sampling, or mutation. Supplied particles,
+collision outputs, and RNG sidecars are caller-owned same-device Warp resources.
 
 The exact ``SEDIMENTATION_SP2016_MECHANISM_FLAG`` is a public direct-kernel
 mode for particle-resolved, unit-efficiency SP2016 scheduling. It shares the
@@ -262,9 +260,11 @@ def validate_coagulation_mechanism_capabilities(
 
     This pure host-side, concrete-module-only validator accepts Brownian,
     exact SP2016 sedimentation, ``"charged_hard_sphere"``, or the supported
-    Brownian-plus-charged ``"particle_resolved"`` execution. Deferred
-    mechanisms are rejected during configuration preflight,
-    before accessing or mutating runtime state. Import it from
+    Brownian-plus-charged ``"particle_resolved"`` execution. Direct callers
+    receive the reserved-mechanism error immediately. ``coagulation_step_gpu``
+    invokes this validator during structural preflight for non-turbulent masks,
+    but invokes it after the turbulent P2 input boundary for structurally valid
+    turbulent-shear masks. Import it from
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
 
     Args:
@@ -1791,11 +1791,18 @@ def _ensure_turbulent_input_array(
     n_boxes: int,
     device: Any,
 ) -> Any:
-    """Validate and normalize a turbulent-shear per-box input.
+    """Validate and normalize a turbulent-shear P2 per-box input.
+
+    This private helper validates explicitly supplied state only; it neither
+    infers turbulent properties from shared containers nor enables turbulent
+    execution. ``coagulation_step_gpu`` uses it only for a structurally valid
+    ST1956 turbulent-shear mechanism before the reserved capability gate.
 
     Args:
         name: Input name used in contract errors.
-        value: Positive finite floating scalar or Warp array.
+        value: Positive finite floating scalar or Warp array. It represents
+            turbulent dissipation [m^2/s^3] or fluid density [kg/m^3], according
+            to ``name``.
         n_boxes: Number of boxes.
         device: Active particle device.
 
@@ -1804,8 +1811,9 @@ def _ensure_turbulent_input_array(
         arrays are returned by identity; scalar broadcasts use private storage.
 
     Raises:
-        ValueError: If the value is not a supported scalar or same-device Warp
-            array with positive finite values.
+        ValueError: If the value is not a supported floating scalar or a
+            same-device Warp array with shape ``(n_boxes,)``, a supported
+            floating dtype, and positive finite values.
     """
     turbulent_value: Any = value
 
@@ -2008,16 +2016,18 @@ def coagulation_step_gpu(  # noqa: C901
             readback for Brownian execution. Every charged-containing mode
             performs this scan before caller output or RNG mutation.
         turbulent_dissipation: Explicit turbulent kinetic-energy dissipation
-            rate [m^2/s^3] for turbulent-shear P2 validation. Accepts a positive
+            rate [m^2/s^3] for the turbulent-shear P2 boundary. For a
+            structurally valid ST1956 turbulent request, accepts a positive
             finite Python or NumPy floating scalar, or a positive finite,
             active-device Warp array with shape ``(n_boxes,)``. Supplied arrays
             retain identity; scalar broadcasts use private helper-owned storage.
-            This input is not inferred from shared containers.
-        fluid_density: Explicit carrier-fluid density [kg/m^3] for
-            turbulent-shear P2 validation. It has the same scalar and
+            This input is not inferred from shared containers and is ignored by
+            non-turbulent masks.
+        fluid_density: Explicit carrier-fluid density [kg/m^3] for the
+            turbulent-shear P2 boundary. It has the same conditional scalar and
             active-device ``(n_boxes,)`` Warp-array contract as
-            ``turbulent_dissipation`` and is not inferred from shared
-            containers.
+            ``turbulent_dissipation``, is not inferred from shared containers,
+            and is ignored by non-turbulent masks.
 
     Returns:
         Tuple containing ``particles`` after in-place coagulation, the
@@ -2034,6 +2044,10 @@ def coagulation_step_gpu(  # noqa: C901
             caller device.
         ValueError: If mechanism_config has the wrong type, is malformed, or
             requests an unsupported distribution or reserved mechanism.
+        ValueError: If a structurally valid turbulent-shear request omits either
+            explicit turbulent input or supplies an input with an unsupported
+            type, shape, device, dtype, or value domain. Valid turbulent inputs
+            then raise the reserved-mechanism capability error before execution.
         ValueError: If particle charge does not have shape
             ``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle
             device. Charged-containing and exact SP2016 sedimentation
@@ -2061,11 +2075,13 @@ def coagulation_step_gpu(  # noqa: C901
         input access, allocation, normalization, RNG work, and launches. It
         does not make unrelated later validation failures atomic.
 
-        Turbulent-shear requests require explicit ``turbulent_dissipation`` and
-        ``fluid_density`` only after structural configuration resolution and
-        particle schema/device metadata validation. Once both inputs normalize,
-        the reserved capability gate rejects the request without execution.
-        Non-turbulent masks do not inspect, validate, or allocate either input.
+        Structurally valid turbulent-shear requests require explicit
+        ``turbulent_dissipation`` and ``fluid_density`` only after structural
+        configuration resolution and particle schema/device metadata validation.
+        Once both inputs normalize, the reserved capability gate rejects the
+        request without rate dispatch, sampling, majorant construction, RNG
+        work, or mutation. Non-turbulent masks do not inspect, validate, or
+        allocate either input.
 
         Validation runs before volume normalization, RNG setup, and Brownian or
         apply launches so invalid ``time_step``, shape, dtype, or device

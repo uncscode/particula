@@ -14,12 +14,17 @@ the repository's `*_test.py` convention and collect cleanly without Warp.
   rate tests verify radius symmetry, cubic scaling, finite non-negative
   ordinary results, and exact finite zero for ordinary and overflow-guard
   zero-dissipation lanes.
-- **P2 -- input contract:** In
-  `particula/gpu/kernels/tests/coagulation_test.py`, cover scalar broadcast and
-  direct `(n_boxes,)` Warp inputs with heterogeneous values. Reject missing,
-  bool/integer/NumPy, zero, negative, NaN/Inf, wrong-shape, unsupported-dtype,
-  and wrong-device inputs. Snapshot masses, concentration, charge, collision
-  buffers/counts, and RNG state to prove fail-before-mutation behavior.
+- **P2 -- input contract (completed):**
+  `particula/gpu/kernels/tests/coagulation_test.py` covers Python/NumPy floating
+  scalar broadcasts, heterogeneous `wp.float32`/`wp.float64` `(n_boxes,)`
+  arrays, and supplied-array identity. It rejects missing, bool/integer,
+  non-floating host/NumPy values, zero, negative, NaN/Inf, wrong-shape,
+  unsupported-dtype, and wrong-device inputs. Public-step cases prove named P2
+  errors occur before the reserved-capability error and snapshot particle mass,
+  concentration, charge, collision buffers/counts, and RNG state for
+  failure-atomicity. Sentinels prove invalid P2 values bypass downstream
+  allocation, normalization, RNG initialization, and launches; non-turbulent
+  calls ignore supplied turbulence values.
 - **P3 -- majorant and execution:** Enumerate all active unordered pairs and
   prove every independent ST1956 rate is finite, non-negative, and no greater
   than the device majorant. Cover zero/one/two active slots, inactive gaps,
