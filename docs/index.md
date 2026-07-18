@@ -175,8 +175,9 @@ print(result)
    such as coagulation `rng_states` and condensation thermodynamics. GPU
    turbulent-shear coagulation supports only the direct, particle-resolved
    `("turbulent_shear_st1956",)` singleton. It requires keyword-only positive,
-   finite `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³) scalar or
-   active-device `wp.float64` `(n_boxes,)` Warp-array inputs; combinations,
+    finite `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³) Python
+    `float` or NumPy floating scalar, or active-device `wp.float64`
+    `(n_boxes,)` Warp-array inputs; combinations,
    runnable/API re-export, CPU fallback, and performance claims remain
    deferred. GPU condensation requires keyword-only
    `thermodynamics=ThermodynamicsConfig`,

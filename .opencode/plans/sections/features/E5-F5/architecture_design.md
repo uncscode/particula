@@ -99,7 +99,7 @@ this proved bound; no alternate unproved extrema heuristic is acceptable.
 
 The currently supported direct-step behavior is the exact particle-resolved
 ST1956 singleton with P2-normalized caller-supplied box state. This feature does
-implement, validate, approximate, or claim parity with the repository's
+not implement, validate, approximate, or claim parity with the repository's
 turbulent DNS models. It makes no DNS, clustering, inertial enhancement,
 general turbulence, or accuracy claim beyond the tested ST1956 formula and
 bounded-sampler design.
