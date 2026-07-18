@@ -38,10 +38,12 @@ if wp is not None:
         diffusive_knudsen_number_wp,
         effective_density_wp,
         g_collection_term_wp,
+        kinematic_viscosity_wp,
         particle_mean_free_path_wp,
         reduced_value_wp,
         sedimentation_sp2016_pair_rate_wp,
         settling_velocity_stokes_wp,
+        turbulent_shear_st1956_pair_rate_wp,
     )
     from particula.gpu.properties.gas_properties import (  # noqa: E402
         dynamic_viscosity_wp,
@@ -464,6 +466,68 @@ def _sedimentation_sp2016_pair_rate_kernel(
     )
 
 
+@_warp_kernel
+def _kinematic_viscosity_kernel(
+    dynamic_viscosities: Any,
+    fluid_densities: Any,
+    result: Any,
+) -> None:
+    """Compute kinematic viscosities for scalar lanes."""
+    tid = wp.tid()
+    result[tid] = kinematic_viscosity_wp(
+        dynamic_viscosities[tid], fluid_densities[tid]
+    )
+
+
+@_warp_kernel
+def _turbulent_shear_st1956_pair_rate_kernel(
+    radii_i: Any,
+    radii_j: Any,
+    dissipations: Any,
+    kinematic_viscosities: Any,
+    result: Any,
+) -> None:
+    """Compute ST1956 turbulent-shear pair rates for scalar lanes."""
+    tid = wp.tid()
+    result[tid] = turbulent_shear_st1956_pair_rate_wp(
+        radii_i[tid],
+        radii_j[tid],
+        dissipations[tid],
+        kinematic_viscosities[tid],
+    )
+
+
+@_warp_kernel
+def _turbulent_shear_st1956_transport_kernel(
+    radii_i: Any,
+    radii_j: Any,
+    temperatures: Any,
+    fluid_densities: Any,
+    dissipations: Any,
+    ref_viscosity: Any,
+    ref_temperature: Any,
+    sutherland_constant: Any,
+    result: Any,
+) -> None:
+    """Compute ST1956 rates after device-native Sutherland transport steps."""
+    tid = wp.tid()
+    dynamic_viscosity = dynamic_viscosity_wp(
+        temperatures[tid],
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+    )
+    kinematic_viscosity = kinematic_viscosity_wp(
+        dynamic_viscosity, fluid_densities[tid]
+    )
+    result[tid] = turbulent_shear_st1956_pair_rate_wp(
+        radii_i[tid],
+        radii_j[tid],
+        dissipations[tid],
+        kinematic_viscosity,
+    )
+
+
 @pytest.fixture(params=_available_warp_devices())
 def device(request) -> str:
     """Provide available Warp devices for testing."""
@@ -791,6 +855,58 @@ def _sedimentation_sp2016_pair_rate_oracle(
     return float(rate)
 
 
+def _kinematic_viscosity_oracle(
+    dynamic_viscosity: np.float64,
+    fluid_density: np.float64,
+) -> np.float64:
+    """Independently calculate kinematic viscosity in SI units."""
+    return dynamic_viscosity / fluid_density
+
+
+def _turbulent_shear_st1956_pair_rate_oracle(
+    radius_i: np.float64,
+    radius_j: np.float64,
+    turbulent_dissipation: np.float64,
+    kinematic_viscosity: np.float64,
+) -> np.float64:
+    """Independently calculate the ST1956 turbulent-shear pair rate."""
+    if turbulent_dissipation == np.float64(0.0):
+        return np.float64(0.0)
+    return np.sqrt(
+        np.float64(np.pi)
+        * turbulent_dissipation
+        / (np.float64(120.0) * kinematic_viscosity)
+    ) * (np.float64(2.0) * radius_i + np.float64(2.0) * radius_j) ** np.float64(
+        3.0
+    )
+
+
+def _turbulent_shear_st1956_transport_oracle(
+    radius_i: np.float64,
+    radius_j: np.float64,
+    temperature: np.float64,
+    fluid_density: np.float64,
+    turbulent_dissipation: np.float64,
+) -> np.float64:
+    """Independently compose Sutherland transport with the ST1956 equation."""
+    if turbulent_dissipation == np.float64(0.0):
+        return np.float64(0.0)
+    dynamic_viscosity = (
+        np.float64(REF_VISCOSITY_AIR_STP)
+        * (temperature / np.float64(REF_TEMPERATURE_STP)) ** np.float64(1.5)
+        * np.float64(REF_TEMPERATURE_STP + SUTHERLAND_CONSTANT)
+        / (temperature + np.float64(SUTHERLAND_CONSTANT))
+    )
+    kinematic_viscosity = dynamic_viscosity / fluid_density
+    return np.sqrt(
+        np.float64(np.pi)
+        * turbulent_dissipation
+        / (np.float64(120.0) * kinematic_viscosity)
+    ) * (np.float64(2.0) * radius_i + np.float64(2.0) * radius_j) ** np.float64(
+        3.0
+    )
+
+
 def _warp_array(values: np.ndarray, device: str) -> Any:
     """Create a float64 Warp array for a scalar parity probe."""
     return wp.array(values, dtype=wp.float64, device=device)
@@ -850,6 +966,160 @@ def _launch_charged_hard_sphere(
     )
     wp.synchronize()
     return result.numpy()
+
+
+def _launch_turbulent_shear_st1956_pair_rate(
+    device: str,
+    radii_i: np.ndarray,
+    radii_j: np.ndarray,
+    dissipations: np.ndarray,
+    kinematic_viscosities: np.ndarray,
+) -> np.ndarray:
+    """Launch the ST1956 pair-rate probe and return fp64 host results."""
+    result = wp.zeros(len(radii_i), dtype=wp.float64, device=device)
+    wp.launch(
+        _turbulent_shear_st1956_pair_rate_kernel,
+        dim=len(radii_i),
+        inputs=[
+            _warp_array(radii_i, device),
+            _warp_array(radii_j, device),
+            _warp_array(dissipations, device),
+            _warp_array(kinematic_viscosities, device),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    return result.numpy()
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.warp
+def test_kinematic_viscosity_wp_matches_independent_oracle(device: str) -> None:
+    """Validate fp64 kinematic viscosities across transport scales."""
+    dynamic_viscosities = np.array([1e-6, 1.8e-5, 1e-3], dtype=np.float64)
+    fluid_densities = np.array([0.1, 1.225, 1e3], dtype=np.float64)
+    expected = np.array(
+        [
+            _kinematic_viscosity_oracle(dynamic_viscosity, fluid_density)
+            for dynamic_viscosity, fluid_density in zip(
+                dynamic_viscosities, fluid_densities, strict=True
+            )
+        ],
+        dtype=np.float64,
+    )
+    result = wp.zeros(len(expected), dtype=wp.float64, device=device)
+    wp.launch(
+        _kinematic_viscosity_kernel,
+        dim=len(expected),
+        inputs=[
+            _warp_array(dynamic_viscosities, device),
+            _warp_array(fluid_densities, device),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    observed = result.numpy()
+    assert observed.dtype == np.float64
+    npt.assert_allclose(observed, expected, rtol=1e-12, atol=0.0)
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.warp
+def test_turbulent_shear_st1956_pair_rate_wp_invariants(device: str) -> None:
+    """Validate ST1956 parity, symmetry, cubic scaling, and zero recovery."""
+    radii_i = np.array([1e-9, 2e-8, 3e-7, 1e-6, 1e-8, 1e200], dtype=np.float64)
+    radii_j = np.array([2e-9, 5e-8, 8e-7, 3e-6, 2e-8, 1e200], dtype=np.float64)
+    dissipations = np.array([1e-8, 1e-5, 1e-3, 1.0, 0.0, 0.0], dtype=np.float64)
+    viscosities = np.array(
+        [1e-5, 1.5e-5, 2e-5, 1e-4, 1e-5, 1e-5], dtype=np.float64
+    )
+    observed = _launch_turbulent_shear_st1956_pair_rate(
+        device, radii_i, radii_j, dissipations, viscosities
+    )
+    expected = np.array(
+        [
+            _turbulent_shear_st1956_pair_rate_oracle(*values)
+            for values in zip(
+                radii_i[:4],
+                radii_j[:4],
+                dissipations[:4],
+                viscosities[:4],
+                strict=True,
+            )
+        ],
+        dtype=np.float64,
+    )
+    assert observed.dtype == np.float64
+    npt.assert_allclose(observed[:4], expected, rtol=1e-12, atol=0.0)
+    assert np.all(np.isfinite(observed))
+    assert np.all(observed[:4] > 0.0)
+    for zero_rate in observed[4:]:
+        assert np.isfinite(zero_rate)
+        assert zero_rate == np.float64(0.0)
+
+    swapped = _launch_turbulent_shear_st1956_pair_rate(
+        device, radii_j, radii_i, dissipations, viscosities
+    )
+    npt.assert_allclose(swapped, observed, rtol=1e-12, atol=0.0)
+    scale = np.float64(1.5)
+    scaled = _launch_turbulent_shear_st1956_pair_rate(
+        device,
+        radii_i[:4] * scale,
+        radii_j[:4] * scale,
+        dissipations[:4],
+        viscosities[:4],
+    )
+    npt.assert_allclose(scaled, observed[:4] * scale**3, rtol=1e-12, atol=0.0)
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.warp
+def test_turbulent_shear_st1956_transport_chain_matches_oracle(
+    device: str,
+) -> None:
+    """Validate composed Sutherland, kinematic-viscosity, and ST1956 physics."""
+    radii_i = np.array([1e-9, 1e-8, 1e-6], dtype=np.float64)
+    radii_j = np.array([2e-9, 5e-8, 3e-6], dtype=np.float64)
+    temperatures = np.array([250.0, 298.15, 350.0], dtype=np.float64)
+    fluid_densities = np.array([0.7, 1.225, 2.0], dtype=np.float64)
+    dissipations = np.array([1e-8, 1e-4, 1e-1], dtype=np.float64)
+    expected = np.array(
+        [
+            _turbulent_shear_st1956_transport_oracle(*values)
+            for values in zip(
+                radii_i,
+                radii_j,
+                temperatures,
+                fluid_densities,
+                dissipations,
+                strict=True,
+            )
+        ],
+        dtype=np.float64,
+    )
+    result = wp.zeros(len(expected), dtype=wp.float64, device=device)
+    wp.launch(
+        _turbulent_shear_st1956_transport_kernel,
+        dim=len(expected),
+        inputs=[
+            _warp_array(radii_i, device),
+            _warp_array(radii_j, device),
+            _warp_array(temperatures, device),
+            _warp_array(fluid_densities, device),
+            _warp_array(dissipations, device),
+            wp.float64(REF_VISCOSITY_AIR_STP),
+            wp.float64(REF_TEMPERATURE_STP),
+            wp.float64(SUTHERLAND_CONSTANT),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    observed = result.numpy()
+    assert observed.dtype == np.float64
+    npt.assert_allclose(observed, expected, rtol=1e-12, atol=0.0)
 
 
 @pytest.mark.gpu_parity
