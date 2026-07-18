@@ -261,7 +261,7 @@ Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 | `brownian` | Executable with `particle_resolved` only | Shipped E5-F1 baseline |
 | `charged_hard_sphere` | Executable alone or with Brownian, particle-resolved only | Shipped E5-F3 |
 | `sedimentation_sp2016` | Exact unit-efficiency mode, particle-resolved only | Shipped E5-F4 |
-| `turbulent_shear_st1956` | Reserved; rejected in capability preflight | E5-F5 |
+| `turbulent_shear_st1956` | Executable only as the exact particle-resolved ST1956 singleton | Shipped E5-F5 |
 
 The charged-only tuple is `("charged_hard_sphere",)`. Exact SP2016
 sedimentation is selected with
@@ -275,6 +275,16 @@ before mutable work, and requires equal positive particle concentrations within
 each box for representable inventory-preserving merges. Non-finite charge is
 rejected during host-side preflight before caller-owned outputs, persistent RNG,
 or particle state can be mutated.
+
+The exact turbulent-shear mode is selected with
+`CoagulationMechanismConfig(("turbulent_shear_st1956",))`. Its direct,
+keyword-only `turbulent_dissipation` input is in `m^2/s^3`, and its
+keyword-only `fluid_density` input is in `kg/m^3`. Both are required positive,
+finite inputs for this singleton. Each accepts a Python or NumPy floating
+scalar, which uses private broadcast storage, or an active-device `wp.float64`
+Warp array with shape `(n_boxes,)`, which retains its supplied identity. These
+inputs are not inferred from a shared container: NumPy arrays, Python lists,
+and hidden host-to-device conversion are not supported as array inputs.
 
 Supply temperature and pressure either as direct scalars, supported-float Warp
 arrays of shape `(n_boxes,)` on the particle device, or same-device
@@ -290,10 +300,13 @@ It is a direct-kernel path only: it establishes neither CPU-strategy parity nor
 general accuracy or performance claims. The combined tuple
 `("brownian", "charged_hard_sphere")` is accepted in either requested order
 and normalizes to one executable mask. Reserved IDs, including
-Brownian-plus-sedimentation combinations and turbulent shear, raise `ValueError`
-in host capability preflight before runtime input access, allocation, launch, or
-mutable state changes. No mode performs hidden caller simulation-state CPU↔GPU
-transfers, synchronization, or fallback to another mechanism. Read-only
+Brownian-plus-sedimentation combinations, raise `ValueError` in host capability
+preflight before runtime input access, allocation, launch, or mutable state
+changes. Turbulent Brownian, charged, or sedimentation combinations first
+validate their required turbulent P2 inputs, then raise `ValueError` before
+normalization, allocation, RNG work, launch, or mutation. Non-turbulent masks
+ignore both turbulence inputs. No mode performs hidden caller simulation-state
+CPU↔GPU transfers, synchronization, or fallback to another mechanism. Read-only
 preflight validation does use a private device-status buffer and one bounded
 device synchronization/readback to report invalid caller state; sedimentation
 combines charge, particle, derived-total, active-count, and equal-concentration
@@ -325,8 +338,11 @@ additive majorant; a capability-table row; shared-dispatcher integration; and
 co-located `*_test.py` coverage. They must not add an independent sampling
 loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
-integration, graph-capture claims, sedimentation combinations/variants, or
-turbulent-shear physics.
+integration, graph-capture claims, sedimentation combinations/variants, DNS or
+general turbulence, or turbulent additive combinations. The shipped ST1956
+singleton does not establish CPU-strategy parity, high-level runnable support,
+hidden CPU↔GPU transfers, graph capture, or performance/general-accuracy
+claims.
 
 ### Environment transfer boundary
 
@@ -579,7 +595,7 @@ than storage support.
 | CPU↔GPU transfer | Explicit helper calls only | No hidden container movement or hidden environment synchronization. |
 | Warp/CUDA support | Optional | Warp `device="cpu"` is the baseline when Warp is installed; CUDA is additive local evidence and unavailable devices skip cleanly. |
 | Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
-| Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Executable configurations are `('brownian',)`, `('charged_hard_sphere',)`, exact unit-efficiency `('sedimentation_sp2016',)`, and Brownian-plus-charged in either requested order; combined requests normalize to canonical order. This low-level path does not establish Runnable support, CPU parity, or performance claims. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state and explicit resets synchronize during initialization. |
+| Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Executable configurations are `('brownian',)`, `('charged_hard_sphere',)`, exact unit-efficiency `('sedimentation_sp2016',)`, exact `('turbulent_shear_st1956',)`, and Brownian-plus-charged in either requested order; combined requests normalize to canonical order. ST1956 requires its explicit turbulent inputs and does not support additive turbulent masks. This low-level path does not establish Runnable support, CPU parity, or performance claims. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state and explicit resets synchronize during initialization. |
 | Fixed-shape GPU/runtime roadmap work | Not current runtime behavior | Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior. |
 
 Additional shipped boundaries:
@@ -710,7 +726,7 @@ the other evidence classes.
 | `pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror` | Primary direct CPU-oracle particle-mass/gas-concentration parity matrix. |
 | `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror` | Bounded direct-step stiffness coverage. |
 | `pytest particula/gpu/dynamics/tests/coagulation_funcs_test.py -q -Werror` | Deterministic GPU coagulation pair-helper parity. |
-| `pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror` | Direct coagulation coverage, including singleton sedimentation configuration, direct/environment inputs, caller-owned output/RNG behavior, conservation, and rejected-call state safety. |
+| `pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror` | Direct coagulation coverage, including singleton sedimentation and ST1956 configurations, direct/environment inputs, caller-owned output/RNG behavior, conservation, and rejected-call state safety. |
 | `pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q` | CPU integration/inventory-conservation evidence (separate particle-plus-gas inventory conservation checks); not direct-GPU validation. |
 | `pytest particula/integration_tests/condensation_particle_resolved_test.py -q` | CPU integration evidence for particle-resolved condensation; not direct-GPU validation. |
 | `pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror` | Latent-heat energy/bookkeeping documentation checks. |

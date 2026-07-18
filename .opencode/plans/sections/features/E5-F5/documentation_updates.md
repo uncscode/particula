@@ -1,19 +1,21 @@
 # Documentation Updates
 
-- Update `docs/Features/data-containers-and-gpu-foundations.md` with the direct
-  turbulent-shear mechanism configuration, required dissipation `[m^2/s^3]`
-  and fluid-density `[kg/m^3]` inputs, scalar/per-box forms, device ownership,
-  and persistent RNG/buffer behavior.
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` with E5-F5's completed
-  ST1956-only support fact and handoffs to E5-F6/F7/F9.
-- Update `docs/Features/condensation_strategy_system.md` only if its shared
-  direct-kernel support table covers coagulation mechanisms; avoid unrelated
-  condensation-contract edits.
+- Completed: `docs/Features/data-containers-and-gpu-foundations.md` documents
+  the exact direct ST1956 mechanism configuration, required dissipation
+  `[m^2/s^3]` and fluid-density `[kg/m^3]` inputs, scalar/active-device
+  `wp.float64` per-box forms, device ownership, and persistent RNG/buffer
+  behavior.
+- Completed: `docs/Features/Roadmap/data-oriented-gpu.md` records E5-F5's
+  ST1956-singleton support fact and defers additive combinations to E5-F6,
+  singleton validation/evidence consumption to E5-F7, and the consolidated
+  support table/direct example to E5-F9.
+- Inspected: `docs/Features/condensation_strategy_system.md` has no shared
+  coagulation support table and is out of scope for this delivery.
 - Add or extend a direct low-level example only after the final concrete API is
   stable. Keep transfers explicit, default to Warp CPU, and show heterogeneous
   `(n_boxes,)` dissipation/fluid-density arrays when useful.
-- Update `.opencode/plans/sections/features/E5-F5/*.md` phase/status facts as
-  implementation ships and cross-reference parent E5 and downstream tracks.
+- Completed: the E5-F5 P4 plan records now state the delivered direct contract,
+  ST1956-only scope, device policy, and E5-F6/E5-F7 handoffs.
 - State prominently in every support table/example that this is the ST1956
   turbulent-shear kernel only. Do not use “DNS parity,” “DNS turbulence,” or
   general turbulence support wording except to mark those capabilities
