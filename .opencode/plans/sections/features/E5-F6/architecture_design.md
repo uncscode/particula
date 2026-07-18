@@ -5,8 +5,10 @@
 ```text
 coagulation_step_gpu(..., mechanisms=config, mechanism-specific inputs...)
   -> canonicalize config and resolve mechanism bit mask
-  -> validate mask against explicit executable combination matrix
-  -> validate every enabled term's required input before launch/mutation
+  -> validate mask against the P1 recognition table
+  -> obtain particle metadata, then validate every enabled term read-only
+  -> reject a recognized non-executable mask before runtime normalization/work
+  -> validate the distinct executable capability boundary
   -> prepare shared active indices and per-particle properties once
   -> for each box, compute each enabled term's proven majorant
   -> total_majorant = sum(enabled term majorants)
@@ -30,12 +32,16 @@ trial cap. If the cap binds, replace the summed-component scheduling bound with
 the exhaustive maximum of the summed total pair rate for every active unordered
 pair; do not substitute an unproved heuristic.
 
-The combination matrix is data-driven on the host and explicit in device mask
-branches. Canonical ordering means equivalent mechanism sets resolve to the
-same mask. The implementation must not interpret duplicates as weights. The
-matrix retains all shipped single-term rows, preserves Brownian-plus-charged,
-adds the approved two-way rows and the full four-way row, and fails closed for
-any row not deliberately registered.
+P1 separates recognition from executable support. Its private immutable host
+table recognizes four singleton masks, all six unordered pair masks, and the
+four-term mask; canonical ordering resolves equivalent pairs identically and
+duplicates are never weights. Three-term masks are unrecognized and reject
+before particle access. Recognized masks use enabled bits to run turbulent,
+charged, and sedimentation read-only preflight in that order; a valid deferred
+pair/four-term mask then raises the stable deferred-execution error before
+normalization, output/RNG allocation or initialization, kernel launch, or
+mutation. The executable gate still admits only the shipped singleton modes and
+Brownian-plus-charged; P2 will extend execution rather than recognition.
 
 ## Data / API / Workflow Changes
 

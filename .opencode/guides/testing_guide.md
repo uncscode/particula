@@ -246,12 +246,20 @@ behavior should stay unchanged when the work is diagnostic-only.
 
 The direct ST1956 turbulent-shear singleton uses explicit positive finite
 `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³) P2 inputs. Cover
-scalar and active-device `wp.float64` `(n_boxes,)` inputs, preflight rejection
-of invalid values and turbulent combinations, and unchanged caller-owned
-particle, collision-output, and persistent-RNG state after preflight errors.
-Test its O(A) two-largest-active-radii majorant against an independent NumPy
-oracle, keep mass conservation separate from stochastic acceptance checks, and
-use aggregate tolerance or sigma bounds rather than exact seeded pair replay.
+scalar and active-device `wp.float64` `(n_boxes,)` inputs. P1 recognizes the
+four singletons, six unordered two-term masks, and four-term mask for
+enabled-term read-only validation only. Valid recognized combinations that are
+not executable must raise
+`ValueError("Additive coagulation execution is deferred.")` before downstream
+normalization, output/RNG work, executable launches, or mutation; three-term
+masks must reject before particle access. Test turbulent, charged, and
+sedimentation validation according to the enabled mechanism bits, while proving
+non-turbulent masks ignore turbulent arguments and caller-owned particle,
+collision-output, and persistent-RNG state is unchanged after preflight errors.
+Test the turbulent singleton's O(A) two-largest-active-radii majorant against an
+independent NumPy oracle, keep mass conservation separate from stochastic
+acceptance checks, and use aggregate tolerance or sigma bounds rather than exact
+seeded pair replay.
 
 For the GPU condensation suite, keep shared helpers in support modules only when
 discoverable `*_test.py` wrappers expose the runnable cases. The current entry

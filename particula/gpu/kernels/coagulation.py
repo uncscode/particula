@@ -183,19 +183,19 @@ class CoagulationMechanismConfig:
     ``"particle_resolved"`` modes are Brownian-only,
     ``("sedimentation_sp2016",)``,
     ``("charged_hard_sphere",)``, and either requested order of
-    ``("brownian", "charged_hard_sphere")``. P1 additionally recognizes
-    registered pair and four-term masks solely to perform enabled-term
-    preflight; recognition is not execution support. The resolver normalizes
-    the combined mode to the canonical fixed mask. Deferred mechanisms and
-    other distribution types are rejected during host-side structural preflight
-    before runtime state access or mutation. Recognized deferred masks validate
-    their enabled terms after particle schema/device metadata is available, then
-    reject before runtime allocation or mutation. Structurally valid
-    turbulent-shear requests validate their explicit P2 inputs after particle
-    schema and device checks. Only the exact ``("turbulent_shear_st1956",)``
-    singleton then normalizes those inputs and executes; mixed turbulent masks
-    reject before
-    normalization, allocation, RNG work, or mutation.
+    ``("brownian", "charged_hard_sphere")``. Registered P1 combinations are
+    recognized only to perform enabled-term preflight; recognition is not
+    execution support. The resolver normalizes a combination to the canonical
+    fixed mask. Malformed, duplicate, unknown, unsupported-distribution, and
+    unrecognized requests reject before particle state is accessed or mutated.
+    Recognized deferred combinations validate their enabled terms after particle
+    schema/device metadata is available, then raise ``ValueError`` before
+    downstream normalization, allocation, RNG work, or mutation. Structurally
+    valid turbulent-shear requests validate their explicit P2 inputs after
+    particle schema and device checks. Only the exact
+    ``("turbulent_shear_st1956",)`` singleton then normalizes those inputs and
+    executes; mixed turbulent masks reject before normalization, allocation,
+    RNG work, or mutation.
 
     Attributes:
         mechanisms: Requested mechanism identifiers, or ``None`` to select
@@ -2216,17 +2216,19 @@ def coagulation_step_gpu(  # noqa: C901
     set, RNG stream, and apply pass. Its active-pair work is O(A²), while
     collision and selector buffers are O(A), for active count A; this is bounded
     implementation scope, not a throughput or scaling claim.
-    Sedimentation is executable only as its exact singleton mask; its mixed
-    variants, other charged variants, and non-particle-resolved distributions
-    reject during preflight without runtime mutation. Structural configuration
-    validation occurs before all runtime access. A structurally valid
+    Sedimentation is executable only as its exact singleton mask. Registered
+    additive combinations are recognized for enabled-term, read-only preflight,
+    but execution remains deferred: after successful preflight they raise
+    ``ValueError("Additive coagulation execution is deferred.")`` before
+    downstream normalization, allocation, RNG work, kernels, or mutation.
+    Malformed, duplicate, unknown, unsupported-distribution, and unrecognized
+    combinations reject before particle state is accessed. A structurally valid
     turbulent-shear request reaches a later P2 boundary after particle metadata
     and device checks. Only the exact ``("turbulent_shear_st1956",)`` singleton
     normalizes its explicit per-box inputs, calculates ST1956 rates, and
-    executes; every turbulent combination rejects before normalization,
-    allocation, RNG work, or mutation. After particle metadata and device
-    checks, direct temperature and pressure inputs are
-    validated and normalized before volume setup or selector launches.
+    executes. After particle metadata and device checks, direct temperature and
+    pressure inputs are validated and normalized before volume setup or selector
+    launches.
     ``particles`` and supplied ``collision_pairs``, ``n_collisions``,
     and ``rng_states`` are caller-owned same-device Warp resources; the step
     mutates them in place as applicable. The three-item return tuple contains
@@ -2284,11 +2286,12 @@ def coagulation_step_gpu(  # noqa: C901
             also supported; either requested Brownian-plus-charged order
             normalizes to the same execution. Malformed configurations,
             unsupported distributions, and unrecognized mechanism combinations
-            fail before runtime inputs are accessed or mutable runtime state is
-            changed. Recognized deferred combinations run enabled-term read-only
-            validation, then fail before downstream runtime allocation or
-            mutation. A
-            wrong type raises exactly ``ValueError`` with the message
+            fail before particle state is accessed or mutated. Recognized
+            additive combinations run enabled-term read-only validation, then
+            raise ``ValueError("Additive coagulation execution is deferred.")``
+            before downstream normalization, allocation, RNG work, kernel
+            launches, or mutation. A wrong type raises exactly ``ValueError``
+            with the message
             ``"mechanism_config must be a CoagulationMechanismConfig."``;
             other errors are delegated to the resolver and capability gate.
         initialize_rng: Explicit reset flag for caller-provided
@@ -2336,7 +2339,10 @@ def coagulation_step_gpu(  # noqa: C901
         ValueError: If environment arrays do not match ``(n_boxes,)`` or the
             caller device.
         ValueError: If mechanism_config has the wrong type, is malformed, or
-            requests an unsupported distribution or mechanism combination.
+            requests an unsupported distribution or unrecognized mechanism
+            combination.
+        ValueError: If a recognized additive mechanism combination completes
+            enabled-term preflight but has deferred execution.
         ValueError: If a structurally valid turbulent-shear request omits
             either explicit turbulent input or supplies an input with an
             unsupported type, shape, device, ``wp.float64`` dtype, or value

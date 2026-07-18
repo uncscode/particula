@@ -2,12 +2,14 @@
 
 ## GPU Backend
 
-- [ ] Extend E5-F1's capability table in
-  `particula/gpu/kernels/coagulation.py` with named approved two-way masks and
-  the full four-way mask; preserve canonical ordering and single-term rows.
-- [ ] Centralize per-mask required-input validation so every enabled mechanism
-  is checked before volume normalization, RNG initialization, allocations, or
-  selection launch.
+- [x] Add a private immutable P1 recognition table in
+  `particula/gpu/kernels/coagulation.py` for singleton, pair, and four-term
+  masks, distinct from the executable capability gate; reject three-term masks
+  before particle access.
+- [x] Centralize enabled-bit read-only preflight so turbulent, charged, and
+  sedimentation requirements are checked before volume/environment
+  normalization, output/RNG work, allocations, or selection launch. Valid
+  recognized deferred masks raise the stable deferred-execution error.
 - [ ] Reuse each sibling term's property preparation and majorant helper without
   recomputing shared radius, viscosity, environment, or active-index state.
 - [ ] Add enabled component majorants into an fp64 `total_majorant` and guard
@@ -21,9 +23,9 @@
 
 ## Tooling / Tests
 
-- [ ] Add table-driven configuration tests in
-  `particula/gpu/kernels/tests/coagulation_test.py` for every registered and
-  deliberately unsupported mask.
+- [x] Add table-driven recognition, validation, and atomicity tests in
+  `particula/gpu/kernels/tests/coagulation_test.py` for registered, rejected,
+  and deferred masks.
 - [ ] Build independent NumPy component-rate matrices and assert the device
   total equals their sum with explicit fp64 tolerances.
 - [ ] Enumerate every active unordered pair in deterministic fixtures and prove

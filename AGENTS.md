@@ -432,12 +432,20 @@ for _ in range(n_steps):
   it uses caller-owned same-device state and preserves the existing output/RNG
   contracts without hidden transfer or fallback. It read-only validates finite,
   nonnegative mass and concentration and finite, positive density before output
-  allocation/writes, RNG setup, or particle mutation. Sedimentation combinations
-  remain deferred. Either supported combined order normalizes to the canonical
-  mask and uses one shared stochastic selection path. Malformed configurations,
-   unsupported distributions, and deferred mechanisms fail during host-side
-   preflight before runtime state access, allocation, mutation, RNG
-   initialization, or kernel launch.
+  allocation/writes, RNG setup, or particle mutation. P1 recognizes the four
+  singleton mechanisms, all six unordered two-term combinations, and the
+  four-term combination only to perform enabled-term read-only validation; this
+  recognition is not execution support. The singleton modes and
+  Brownian-plus-charged remain the only executable configurations. Every other
+  valid recognized additive combination raises exactly
+  `ValueError("Additive coagulation execution is deferred.")` after its
+  enabled-term validation and before time, environment, or volume normalization;
+  collision-output/RNG allocation or initialization; kernel launch; or mutation.
+  Three-term combinations remain unrecognized and reject before particle access.
+  Either supported Brownian-plus-charged order normalizes to the canonical mask
+  and uses one shared stochastic selection path. Malformed configurations,
+  unsupported distributions, duplicate and unknown mechanisms reject through
+  resolver preflight.
 - The exact ST1956 turbulent-shear singleton
   `CoagulationMechanismConfig(("turbulent_shear_st1956",))` is executable with
   `distribution_type="particle_resolved"`. It requires keyword-only, explicit
@@ -445,11 +453,10 @@ for _ in range(n_steps):
   positive finite Python/NumPy floating scalar or an active-device `wp.float64`
   Warp array shaped `(n_boxes,)`; supplied valid arrays retain identity, while
   scalar broadcasts use private device storage. These are not container fields.
-  Turbulent combinations reject during capability preflight after P2 validation
-  and before normalization, allocation, RNG setup, launch, or mutation.
+  Recognized turbulent combinations validate these inputs before raising the
+  deferred-execution error; non-turbulent masks ignore both parameters.
   The direct singleton uses an O(A) two-largest-active-radii majorant. It adds
-  no runnable/API re-export, CPU fallback, or performance claim. Non-turbulent
-  calls ignore both parameters.
+  no runnable/API re-export, CPU fallback, or performance claim.
 - `WarpParticleData.charge` is caller-owned, device-resident state containing
   dimensionless elementary-charge counts with shape `(n_boxes, n_particles)`.
   It is not a sidecar or a hidden transfer result. It must be a same-device
@@ -649,6 +656,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2026-07-17  
+**Last Updated:** 2026-07-18  
 **For questions about ADW:** See `.opencode/guides/README.md`  
 **For questions about particula:** See main `readme.md`
