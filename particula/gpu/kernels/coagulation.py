@@ -147,8 +147,10 @@ class CoagulationMechanismConfig:
     ``("charged_hard_sphere",)``, and either requested order of
     ``("brownian", "charged_hard_sphere")``. The resolver normalizes the
     combined mode to the canonical fixed mask. Deferred mechanisms and other
-    distribution types are rejected during host-side preflight before any
-    runtime state access or mutation.
+    distribution types are rejected during host-side preflight before runtime
+    state access or mutation. Structurally valid turbulent-shear requests first
+    validate their explicit P2 inputs, then fail at the reserved capability
+    gate before normalization, allocation, RNG work, or mutation.
 
     Attributes:
         mechanisms: Requested mechanism identifiers, or ``None`` to select
@@ -1787,7 +1789,7 @@ def initialize_coagulation_rng_states(
 
 def _ensure_turbulent_input_array(
     name: str,
-    value: float | Any | None,
+    value: Any,
     n_boxes: int,
     device: Any,
 ) -> Any:
@@ -1815,33 +1817,43 @@ def _ensure_turbulent_input_array(
             same-device Warp array with shape ``(n_boxes,)``, a supported
             floating dtype, and positive finite values.
     """
-    turbulent_value: Any = value
+    _validate_turbulent_input(name, value, n_boxes, device)
+    if _is_warp_array_like(value):
+        return value
+    return _broadcast_scalar_array(float(value), n_boxes, device)
 
-    if _is_warp_array_like(turbulent_value):
-        if turbulent_value.shape != (n_boxes,):
+
+def _validate_turbulent_input(
+    name: str,
+    value: Any,
+    n_boxes: int,
+    device: Any,
+) -> None:
+    """Validate a turbulent-shear P2 input without scalar normalization.
+
+    This validation-only boundary lets deferred turbulent requests check both
+    required inputs before their reserved capability rejection. In particular,
+    valid scalars do not create private broadcast storage here.
+    """
+    if _is_warp_array_like(value):
+        if value.shape != (n_boxes,):
             raise ValueError(f"{name} shape does not match (n_boxes,)")
-        _validate_device_match(name, turbulent_value, device)
-        if not _is_supported_warp_float_dtype(turbulent_value.dtype):
+        _validate_device_match(name, value, device)
+        if not _is_supported_warp_float_dtype(value.dtype):
             raise ValueError(f"{name} must use a supported Warp floating dtype")
-        _validate_positive_finite_array(
-            name, turbulent_value, "coagulation_step_gpu"
-        )
-        return turbulent_value
+        _validate_positive_finite_array(name, value, "coagulation_step_gpu")
+        return
 
-    if isinstance(turbulent_value, bool) or not isinstance(
-        turbulent_value, (float, np.floating)
-    ):
-        if hasattr(turbulent_value, "shape"):
+    if isinstance(value, bool) or not isinstance(value, (float, np.floating)):
+        if hasattr(value, "shape"):
             raise ValueError(
                 f"{name} must be a Warp array with shape (n_boxes,)"
             )
         raise ValueError(f"{name} must be a floating scalar or Warp array")
 
-    scalar_value = float(turbulent_value)
+    scalar_value = float(value)
     if not np.isfinite(scalar_value) or scalar_value <= 0.0:
         raise ValueError(f"{name} must be finite and > 0")
-
-    return _broadcast_scalar_array(scalar_value, n_boxes, device)
 
 
 def _ensure_volume_array(
@@ -2078,10 +2090,10 @@ def coagulation_step_gpu(  # noqa: C901
         Structurally valid turbulent-shear requests require explicit
         ``turbulent_dissipation`` and ``fluid_density`` only after structural
         configuration resolution and particle schema/device metadata validation.
-        Once both inputs normalize, the reserved capability gate rejects the
-        request without rate dispatch, sampling, majorant construction, RNG
-        work, or mutation. Non-turbulent masks do not inspect, validate, or
-        allocate either input.
+        Once both inputs validate, the reserved capability gate rejects the
+        request before normalization, allocation, rate dispatch, sampling,
+        majorant construction, RNG work, or mutation. Non-turbulent masks do
+        not inspect, validate, or allocate either input.
 
         Validation runs before volume normalization, RNG setup, and Brownian or
         apply launches so invalid ``time_step``, shape, dtype, or device
@@ -2152,13 +2164,13 @@ def coagulation_step_gpu(  # noqa: C901
     device = particles.masses.device
     _validate_device_arrays(particles, device)
     if turbulent_enabled:
-        _ensure_turbulent_input_array(
+        _validate_turbulent_input(
             "turbulent_dissipation",
             turbulent_dissipation,
             n_boxes,
             device,
         )
-        _ensure_turbulent_input_array(
+        _validate_turbulent_input(
             "fluid_density",
             fluid_density,
             n_boxes,
