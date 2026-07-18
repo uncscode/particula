@@ -25,9 +25,9 @@ host-side metadata, not device-resident simulation state. The public step
 defaults to Brownian, particle-resolved execution and also accepts charged-only,
 exact SP2016 sedimentation-only, and canonical Brownian-plus-charged
 particle-resolved execution. It rejects otherwise unsupported configurations
-outside the P1 recognition matrix during structural preflight, before runtime
-state is accessed or mutated. Recognized deferred combinations complete their
-enabled-term read-only preflight before reporting deferred execution.
+before runtime state is accessed or mutated. Non-turbulent mixed masks retain
+the established unsupported-configuration error; mixed turbulent masks retain
+their exact-turbulent-singleton capability error after their P2 boundary.
 The ST1956 turbulent singleton crosses a later P2 boundary: explicit turbulent
 dissipation and fluid density inputs are validated and normalized after particle
 schema/device metadata is available. Mixed turbulent masks are rejected before
@@ -136,40 +136,6 @@ _COAGULATION_MECHANISM_FLAGS = MappingProxyType(
     }
 )
 
-# P1 recognizes these registered masks so their enabled-term validation can run
-# atomically. Recognition deliberately does not imply executable support.
-_P1_RECOGNIZED_COAGULATION_MASKS = frozenset(
-    (
-        BROWNIAN_MECHANISM_FLAG,
-        CHARGED_HARD_SPHERE_MECHANISM_FLAG,
-        SEDIMENTATION_SP2016_MECHANISM_FLAG,
-        TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
-        BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG,
-        BROWNIAN_MECHANISM_FLAG | SEDIMENTATION_SP2016_MECHANISM_FLAG,
-        BROWNIAN_MECHANISM_FLAG | TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
-        CHARGED_HARD_SPHERE_MECHANISM_FLAG
-        | SEDIMENTATION_SP2016_MECHANISM_FLAG,
-        CHARGED_HARD_SPHERE_MECHANISM_FLAG
-        | TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
-        SEDIMENTATION_SP2016_MECHANISM_FLAG
-        | TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
-        BROWNIAN_MECHANISM_FLAG
-        | CHARGED_HARD_SPHERE_MECHANISM_FLAG
-        | SEDIMENTATION_SP2016_MECHANISM_FLAG
-        | TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
-    )
-)
-
-
-def _validate_p1_recognized_coagulation_mask(
-    resolved: "_ResolvedCoagulationMechanismConfig",
-) -> None:
-    """Reject masks outside the registered P1 preflight matrix."""
-    if resolved.mask not in _P1_RECOGNIZED_COAGULATION_MASKS:
-        raise ValueError(
-            "Coagulation mechanism configuration is not recognized."
-        )
-
 
 @dataclass(frozen=True)
 class CoagulationMechanismConfig:
@@ -184,19 +150,14 @@ class CoagulationMechanismConfig:
     ``"particle_resolved"`` modes are Brownian-only,
     ``("sedimentation_sp2016",)``,
     ``("charged_hard_sphere",)``, and either requested order of
-    ``("brownian", "charged_hard_sphere")``. Registered P1 combinations are
-    recognized only to perform enabled-term preflight; recognition is not
-    execution support. The resolver normalizes a combination to the canonical
-    fixed mask. Malformed, duplicate, unknown, unsupported-distribution, and
-    unrecognized requests reject before particle state is accessed or mutated.
-    Recognized deferred combinations validate their enabled terms after particle
-    schema/device metadata is available, then raise ``ValueError`` before
-    downstream normalization, allocation, RNG work, or mutation. Structurally
-    valid turbulent-shear requests validate their explicit P2 inputs after
-    particle schema and device checks. Only the exact
-    ``("turbulent_shear_st1956",)`` singleton then normalizes those inputs and
-    executes; mixed turbulent masks reject before normalization, allocation,
-    RNG work, or mutation.
+    ``("brownian", "charged_hard_sphere")``. The resolver normalizes a
+    combination to the canonical fixed mask. Deferred mechanisms and other
+    distribution types reject during structural preflight before runtime state
+    access or mutation. Structurally valid turbulent-shear requests validate
+    their explicit P2 inputs after particle schema and device checks. Only the
+    exact ``("turbulent_shear_st1956",)`` singleton then normalizes those
+    inputs and executes; mixed turbulent masks reject before normalization,
+    allocation, RNG work, or mutation.
 
     Attributes:
         mechanisms: Requested mechanism identifiers, or ``None`` to select
@@ -310,8 +271,9 @@ def validate_coagulation_mechanism_capabilities(
     exact SP2016 sedimentation, ``"charged_hard_sphere"``, the supported
     Brownian-plus-charged configuration, or exact ST1956 turbulent-shear
     singleton ``"particle_resolved"`` execution. ``coagulation_step_gpu``
-    invokes this validator after recognized masks complete enabled-term
-    preflight. Import it from
+    invokes this validator during structural preflight for non-turbulent masks,
+    but invokes it after the turbulent P2 input boundary for structurally valid
+    turbulent-shear masks. Import it from
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
 
     Args:
@@ -328,7 +290,12 @@ def validate_coagulation_mechanism_capabilities(
         BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG,
     ):
         return
-    raise ValueError("Additive coagulation execution is deferred.")
+    if resolved.mask & TURBULENT_SHEAR_ST1956_MECHANISM_FLAG:
+        raise ValueError(
+            "Turbulent-shear coagulation supports only the exact "
+            "('turbulent_shear_st1956',) mechanism configuration."
+        )
+    raise ValueError("Unsupported coagulation mechanism configuration.")
 
 
 @no_type_check
@@ -374,11 +341,12 @@ def _checked_positive_finite_add(left: Any, right: Any) -> Any:
 @no_type_check
 @wp.func
 def _safe_acceptance_probability(total_rate: Any, total_majorant: Any) -> Any:
-    """Return a safe acceptance ratio or zero before RNG advancement.
+    """Return a safe acceptance ratio or zero before an acceptance RNG draw.
 
-    A rate may exceed its majorant only by eight fp64 ulps of rounding error;
-    that narrow case maps exactly to one. Material violations and non-finite
-    tolerance arithmetic fail closed before the caller draws acceptance RNG.
+    A rate may exceed its majorant only by an eight-machine-epsilon relative
+    tolerance; that narrow case maps exactly to one. Material violations and
+    non-finite tolerance arithmetic fail closed before the caller draws an
+    acceptance variate. Candidate-selection draws precede this calculation.
     """
     zero = wp.float64(0.0)
     one = wp.float64(1.0)
@@ -644,7 +612,7 @@ def _sedimentation_majorant_from_active_pairs(
 
     This helper exhaustively resolves compact active ranks, so sparse source
     slots cannot affect the exact SP2016 sedimentation sampler majorant.
-    Invalid, zero, and nonpositive P1 rates contribute zero.
+    Invalid, zero, and nonpositive rates contribute zero.
 
     Args:
         active_indices: Compact particle indices ``(n_boxes, n_particles)``.
@@ -2241,9 +2209,9 @@ def _validate_turbulent_input(
 ) -> None:
     """Validate a turbulent-shear P2 input without scalar normalization.
 
-    This validation-only boundary lets deferred turbulent requests check both
-    required inputs before their reserved capability rejection. In particular,
-    valid scalars do not create private broadcast storage here.
+    This validation-only boundary validates mixed turbulent requests before
+    their exact-singleton capability rejection. Valid scalars do not create
+    private broadcast storage here.
     """
     if _is_warp_array_like(value):
         if value.shape != (n_boxes,):
@@ -2351,15 +2319,11 @@ def coagulation_step_gpu(  # noqa: C901
     set, RNG stream, and apply pass. Its active-pair work is O(A²), while
     collision and selector buffers are O(A), for active count A; this is bounded
     implementation scope, not a throughput or scaling claim.
-    Sedimentation is executable only as its exact singleton mask. Registered
-    additive combinations are recognized for enabled-term, read-only preflight,
-    which may use private Warp validation launches, but execution remains
-    deferred: after successful preflight they raise
-    ``ValueError("Additive coagulation execution is deferred.")`` before
-    downstream normalization, allocation, RNG work, selector or executable
-    kernel launches, apply launches, or mutation.
-    Malformed, duplicate, unknown, unsupported-distribution, and unrecognized
-    combinations reject before particle state is accessed. A structurally valid
+    Sedimentation is executable only as its exact singleton mask. Unsupported
+    non-turbulent additive combinations reject during structural preflight
+    before particle access. Malformed, duplicate, unknown, and
+    unsupported-distribution combinations also reject before particle state is
+    accessed. A structurally valid
     turbulent-shear request reaches a later P2 boundary after particle metadata
     and device checks. Only the exact ``("turbulent_shear_st1956",)`` singleton
     normalizes its explicit per-box inputs, calculates ST1956 rates, and
@@ -2424,12 +2388,12 @@ def coagulation_step_gpu(  # noqa: C901
             normalizes to the same execution. Malformed configurations,
             unsupported distributions, and unrecognized mechanism combinations
             fail before particle state is accessed or mutated. Recognized
-            additive combinations run enabled-term read-only validation, which
-            may use private Warp validation launches, then
-            raise ``ValueError("Additive coagulation execution is deferred.")``
-            before downstream normalization, allocation, RNG work, selector or
-            executable kernel launches, apply launches, or mutation. A wrong
-            type raises exactly ``ValueError``
+            non-turbulent additive combinations reject before particle access.
+            Mixed turbulent combinations validate their P2 inputs after
+            particle schema/device checks, then reject before downstream
+            normalization, allocation, RNG work, selector or executable kernel
+            launches, apply launches, or mutation. A wrong type raises exactly
+            ``ValueError``
             with the message
             ``"mechanism_config must be a CoagulationMechanismConfig."``;
             other errors are delegated to the resolver and capability gate.
@@ -2480,8 +2444,7 @@ def coagulation_step_gpu(  # noqa: C901
         ValueError: If mechanism_config has the wrong type, is malformed, or
             requests an unsupported distribution or unrecognized mechanism
             combination.
-        ValueError: If a recognized additive mechanism combination completes
-            enabled-term preflight but has deferred execution.
+        ValueError: If an additive mechanism configuration is unsupported.
         ValueError: If a structurally valid turbulent-shear request omits
             either explicit turbulent input or supplies an input with an
             unsupported type, shape, device, ``wp.float64`` dtype, or value
@@ -2508,14 +2471,14 @@ def coagulation_step_gpu(  # noqa: C901
 
         ``mechanism_config``, ``initialize_rng``, ``environment``,
         ``validate_charge_finite``, ``turbulent_dissipation``, and
-        ``fluid_density`` remain
-        keyword-only so existing positional scalar callers stay
-        source-compatible. Structural configuration preflight occurs before all
-        runtime input access, allocation, normalization, RNG work, and
-        launches. Recognized deferred masks may then use read-only validation
-        launches, but cannot reach downstream simulation, selector, or apply
-        launches, allocation, normalization, RNG work, or caller-owned
-        mutation. It does not make unrelated later validation failures atomic.
+        ``fluid_density`` remain keyword-only so existing positional scalar
+        callers stay source-compatible. Structural configuration preflight
+        occurs before all runtime input access, allocation, normalization, RNG
+        work, and launches. Mixed turbulent masks validate their explicit P2
+        inputs after particle schema/device metadata, but cannot reach
+        downstream simulation, selector, apply launches, allocation,
+        normalization, RNG work, or caller-owned mutation. It does not make
+        unrelated later validation failures atomic.
 
         Structurally valid turbulent-shear requests require explicit
         ``turbulent_dissipation`` and ``fluid_density`` only after structural
@@ -2590,7 +2553,11 @@ def coagulation_step_gpu(  # noqa: C901
     resolved_mechanism_config = resolve_coagulation_mechanism_config(
         mechanism_config
     )
-    _validate_p1_recognized_coagulation_mask(resolved_mechanism_config)
+    turbulent_requested = bool(
+        resolved_mechanism_config.mask & TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
+    )
+    if not turbulent_requested:
+        validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
 
     n_boxes, n_particles, n_species = particles.masses.shape
     _validate_particle_arrays(particles, n_boxes, n_particles, n_species)
@@ -2607,7 +2574,8 @@ def coagulation_step_gpu(  # noqa: C901
         fluid_density,
         validate_charge_finite,
     )
-    validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
+    if turbulent_requested:
+        validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
 
     turbulent_singleton = (
         resolved_mechanism_config.mask == TURBULENT_SHEAR_ST1956_MECHANISM_FLAG

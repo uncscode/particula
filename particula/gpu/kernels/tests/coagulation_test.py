@@ -188,82 +188,6 @@ def test_mechanism_canonicalizes_order_and_mask() -> None:
 
 
 @pytest.mark.parametrize(
-    ("mechanisms", "expected_mask"),
-    [
-        ((BROWNIAN_MECHANISM,), 1),
-        ((CHARGED_HARD_SPHERE_MECHANISM,), 2),
-        ((SEDIMENTATION_SP2016_MECHANISM,), 4),
-        ((TURBULENT_SHEAR_ST1956_MECHANISM,), 8),
-        ((BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM), 3),
-        ((BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM), 5),
-        ((BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM), 9),
-        ((CHARGED_HARD_SPHERE_MECHANISM, SEDIMENTATION_SP2016_MECHANISM), 6),
-        ((CHARGED_HARD_SPHERE_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM), 10),
-        (
-            (SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-            12,
-        ),
-        (CANONICAL_COAGULATION_MECHANISMS, 15),
-    ],
-)
-def test_p1_recognition_accepts_only_registered_masks(
-    mechanisms: tuple[str, ...], expected_mask: int
-) -> None:
-    """Registered singleton, pair, and four-term masks pass P1 recognition."""
-    resolved = resolve_coagulation_mechanism_config(
-        CoagulationMechanismConfig(mechanisms=mechanisms)
-    )
-
-    assert resolved.mask == expected_mask
-    coagulation_module._validate_p1_recognized_coagulation_mask(resolved)
-    if len(mechanisms) == 2:
-        reversed_resolved = resolve_coagulation_mechanism_config(
-            CoagulationMechanismConfig(mechanisms=tuple(reversed(mechanisms)))
-        )
-        assert reversed_resolved == resolved
-
-
-@pytest.mark.parametrize(
-    "mechanisms",
-    [
-        (
-            BROWNIAN_MECHANISM,
-            CHARGED_HARD_SPHERE_MECHANISM,
-            SEDIMENTATION_SP2016_MECHANISM,
-        ),
-        (
-            BROWNIAN_MECHANISM,
-            CHARGED_HARD_SPHERE_MECHANISM,
-            TURBULENT_SHEAR_ST1956_MECHANISM,
-        ),
-        (
-            BROWNIAN_MECHANISM,
-            SEDIMENTATION_SP2016_MECHANISM,
-            TURBULENT_SHEAR_ST1956_MECHANISM,
-        ),
-        (
-            CHARGED_HARD_SPHERE_MECHANISM,
-            SEDIMENTATION_SP2016_MECHANISM,
-            TURBULENT_SHEAR_ST1956_MECHANISM,
-        ),
-    ],
-)
-def test_p1_recognition_rejects_three_term_masks(
-    mechanisms: tuple[str, ...],
-) -> None:
-    """Unregistered three-term masks fail before any runtime preflight."""
-    resolved = resolve_coagulation_mechanism_config(
-        CoagulationMechanismConfig(mechanisms=mechanisms)
-    )
-
-    with pytest.raises(
-        ValueError,
-        match="^Coagulation mechanism configuration is not recognized\\.$",
-    ):
-        coagulation_module._validate_p1_recognized_coagulation_mask(resolved)
-
-
-@pytest.mark.parametrize(
     ("mechanisms", "expected_calls"),
     [
         ((BROWNIAN_MECHANISM,), ()),
@@ -3997,37 +3921,7 @@ class _ParticlesAccessSentinel:
                     SEDIMENTATION_SP2016_MECHANISM,
                 )
             ),
-            "Coagulation mechanism configuration is not recognized.",
-        ),
-        (
-            CoagulationMechanismConfig(
-                mechanisms=(
-                    BROWNIAN_MECHANISM,
-                    CHARGED_HARD_SPHERE_MECHANISM,
-                    TURBULENT_SHEAR_ST1956_MECHANISM,
-                )
-            ),
-            "Coagulation mechanism configuration is not recognized.",
-        ),
-        (
-            CoagulationMechanismConfig(
-                mechanisms=(
-                    BROWNIAN_MECHANISM,
-                    SEDIMENTATION_SP2016_MECHANISM,
-                    TURBULENT_SHEAR_ST1956_MECHANISM,
-                )
-            ),
-            "Coagulation mechanism configuration is not recognized.",
-        ),
-        (
-            CoagulationMechanismConfig(
-                mechanisms=(
-                    CHARGED_HARD_SPHERE_MECHANISM,
-                    SEDIMENTATION_SP2016_MECHANISM,
-                    TURBULENT_SHEAR_ST1956_MECHANISM,
-                )
-            ),
-            "Coagulation mechanism configuration is not recognized.",
+            "Unsupported coagulation mechanism configuration.",
         ),
     ],
 )
@@ -4095,7 +3989,7 @@ def test_coagulation_step_gpu_rejects_config_before_runtime_access(
             CoagulationMechanismConfig(
                 mechanisms=(BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM)
             ),
-            "Additive coagulation execution is deferred.",
+            "Unsupported coagulation mechanism configuration.",
         ),
         (
             CoagulationMechanismConfig(
@@ -4104,7 +3998,7 @@ def test_coagulation_step_gpu_rejects_config_before_runtime_access(
                     SEDIMENTATION_SP2016_MECHANISM,
                 )
             ),
-            "Additive coagulation execution is deferred.",
+            "Unsupported coagulation mechanism configuration.",
         ),
     ],
 )
@@ -4173,18 +4067,40 @@ def test_coagulation_step_gpu_rejected_config_preserves_caller_state(
 
 
 @pytest.mark.parametrize(
-    "mechanisms",
+    ("mechanisms", "message"),
     [
-        (BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
-        (BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-        (CHARGED_HARD_SPHERE_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
-        (CHARGED_HARD_SPHERE_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-        (SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-        CANONICAL_COAGULATION_MECHANISMS,
+        (
+            (BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
+            "Unsupported coagulation mechanism configuration.",
+        ),
+        (
+            (CHARGED_HARD_SPHERE_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
+            "Unsupported coagulation mechanism configuration.",
+        ),
+        (
+            (BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
+            "Turbulent-shear coagulation supports only the exact "
+            "('turbulent_shear_st1956',) mechanism configuration.",
+        ),
+        (
+            (CHARGED_HARD_SPHERE_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
+            "Turbulent-shear coagulation supports only the exact "
+            "('turbulent_shear_st1956',) mechanism configuration.",
+        ),
+        (
+            (SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
+            "Turbulent-shear coagulation supports only the exact "
+            "('turbulent_shear_st1956',) mechanism configuration.",
+        ),
+        (
+            CANONICAL_COAGULATION_MECHANISMS,
+            "Turbulent-shear coagulation supports only the exact "
+            "('turbulent_shear_st1956',) mechanism configuration.",
+        ),
     ],
 )
-def test_deferred_p1_masks_preserve_caller_owned_state(
-    device: str, mechanisms: tuple[str, ...]
+def test_deferred_masks_preserve_caller_owned_state(
+    device: str, mechanisms: tuple[str, ...], message: str
 ) -> None:
     """Deferred masks finish read-only preflight without downstream mutation."""
     particles = _make_particle_data(n_boxes=1, n_particles=4, n_species=1)
@@ -4200,9 +4116,7 @@ def test_deferred_p1_masks_preserve_caller_owned_state(
     initial_rng_states = rng_states.numpy().copy()
     turbulent_enabled = TURBULENT_SHEAR_ST1956_MECHANISM in mechanisms
 
-    with pytest.raises(
-        ValueError, match="^Additive coagulation execution is deferred\\.$"
-    ):
+    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
         coagulation_step_gpu(
             gpu_particles,
             temperature=298.15,
@@ -4246,8 +4160,7 @@ def test_deferred_p1_masks_preserve_caller_owned_state(
             0.0,
             None,
             None,
-            "charged particle masses and concentrations must be finite and "
-            "nonnegative, and density must be finite and > 0",
+            "Unsupported coagulation mechanism configuration.",
         ),
         (
             (BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
@@ -4263,7 +4176,7 @@ def test_deferred_p1_masks_preserve_caller_owned_state(
             -1.0,
             None,
             None,
-            "sedimentation particle masses must be finite and nonnegative",
+            "Unsupported coagulation mechanism configuration.",
         ),
     ],
 )
@@ -4276,7 +4189,7 @@ def test_deferred_masks_reject_invalid_enabled_terms_atomically(
     fluid_density: float | None,
     message: str,
 ) -> None:
-    """Invalid enabled terms win over deferred execution without mutation."""
+    """Deferred masks preserve their established validation ordering."""
     particles = _make_particle_data(n_boxes=1, n_particles=4, n_species=1)
     if invalid_field is not None:
         getattr(particles, invalid_field)[...] = invalid_value
@@ -4325,22 +4238,45 @@ def test_deferred_masks_reject_invalid_enabled_terms_atomically(
 
 
 @pytest.mark.parametrize(
-    "mechanisms",
+    ("mechanisms", "message"),
     [
-        (BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
-        (BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-        (CHARGED_HARD_SPHERE_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
-        (CHARGED_HARD_SPHERE_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-        (SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-        CANONICAL_COAGULATION_MECHANISMS,
+        (
+            (BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
+            "Unsupported coagulation mechanism configuration.",
+        ),
+        (
+            (CHARGED_HARD_SPHERE_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
+            "Unsupported coagulation mechanism configuration.",
+        ),
+        (
+            (BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
+            "Turbulent-shear coagulation supports only the exact "
+            "('turbulent_shear_st1956',) mechanism configuration.",
+        ),
+        (
+            (CHARGED_HARD_SPHERE_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
+            "Turbulent-shear coagulation supports only the exact "
+            "('turbulent_shear_st1956',) mechanism configuration.",
+        ),
+        (
+            (SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
+            "Turbulent-shear coagulation supports only the exact "
+            "('turbulent_shear_st1956',) mechanism configuration.",
+        ),
+        (
+            CANONICAL_COAGULATION_MECHANISMS,
+            "Turbulent-shear coagulation supports only the exact "
+            "('turbulent_shear_st1956',) mechanism configuration.",
+        ),
     ],
 )
-def test_deferred_p1_masks_bypass_downstream_runtime_helpers(
+def test_deferred_masks_bypass_downstream_runtime_helpers(
     monkeypatch: pytest.MonkeyPatch,
     device: str,
     mechanisms: tuple[str, ...],
+    message: str,
 ) -> None:
-    """Deferred masks stop after read-only term preflight and before runtime work."""
+    """Deferred masks retain their capability errors before runtime work."""
     particles = _make_particle_data(n_boxes=1, n_particles=4, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
     turbulent_enabled = TURBULENT_SHEAR_ST1956_MECHANISM in mechanisms
@@ -4366,9 +4302,7 @@ def test_deferred_p1_masks_bypass_downstream_runtime_helpers(
         coagulation_module, "apply_coagulation_kernel", _unexpected
     )
 
-    with pytest.raises(
-        ValueError, match="^Additive coagulation execution is deferred\\.$"
-    ):
+    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
         coagulation_step_gpu(
             gpu_particles,
             temperature=298.15,
@@ -5093,7 +5027,7 @@ def test_turbulent_fresh_seed_acceptance_matches_rate_to_majorant_ratio(
 def test_turbulent_mixed_mask_rejects_before_runtime_mutation(
     device: str,
 ) -> None:
-    """Valid P2 turbulent combinations fail at capability preflight."""
+    """Mixed turbulent masks retain their established capability error."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
     pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
@@ -5102,7 +5036,11 @@ def test_turbulent_mixed_mask_rejects_before_runtime_mutation(
     initial_mass = gpu_particles.masses.numpy().copy()
 
     with pytest.raises(
-        ValueError, match="^Additive coagulation execution is deferred\\.$"
+        ValueError,
+        match=(
+            "^Turbulent-shear coagulation supports only the exact "
+            "\\('turbulent_shear_st1956',\\) mechanism configuration\\.$"
+        ),
     ):
         coagulation_step_gpu(
             gpu_particles,
