@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-17",
+  "last_updated": "2026-07-18",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E5-F4/architecture_design.md",
@@ -58,11 +58,11 @@
     {
       "id": "E5-F4-P3",
       "title": "Integrate sedimentation execution with multi-box conservation and state-safety tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-18",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
