@@ -282,7 +282,10 @@ arrays of shape `(n_boxes,)` on the particle device, or same-device
 thermodynamic inputs are not required to be fp64. Caller-owned particle,
 collision-output, and RNG resources retain their documented dtypes and identity;
 only private, call-local total-mass and settling-velocity scratch is fp64 with
-shape `(n_boxes, n_particles)`.
+shape `(n_boxes, n_particles)`. Sedimentation-only launches reuse the radius
+scratch for unused Brownian diffusivity, g-term, and speed arguments; they do
+not allocate those Brownian-specific buffers. Its settling storage is zeroed
+once at allocation and populated only for active slots.
 It is a direct-kernel path only: it establishes neither CPU-strategy parity nor
 general accuracy or performance claims. The combined tuple
 `("brownian", "charged_hard_sphere")` is accepted in either requested order
@@ -292,7 +295,9 @@ in host capability preflight before runtime input access, allocation, launch, or
 mutable state changes. No mode performs hidden caller simulation-state CPU↔GPU
 transfers, synchronization, or fallback to another mechanism. Read-only
 preflight validation does use a private device-status buffer and one bounded
-device synchronization/readback to report invalid caller state; it never
+device synchronization/readback to report invalid caller state; sedimentation
+combines charge, particle, derived-total, active-count, and equal-concentration
+checks in that one readback. It never
 copies, mutates, or CPU-falls-back caller simulation state.
 
 Charged-only execution uses a bounded compact active-pair majorant. Combined

@@ -467,6 +467,50 @@ def test_sedimentation_preflight_rejects_invalid_physics(
     npt.assert_array_equal(states.numpy(), [7])
 
 
+@pytest.mark.parametrize(
+    ("mass", "density"),
+    [
+        (np.finfo(np.float64).max, 1000.0),
+        (np.nextafter(0.0, 1.0), np.finfo(np.float64).max),
+    ],
+)
+def test_sedimentation_preflight_rejects_invalid_derived_totals_atomically(
+    device: str,
+    mass: float,
+    density: float,
+) -> None:
+    """SP2016 rejects overflowing or underflowing active derived totals."""
+    particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=2)
+    particles.masses[:] = mass
+    particles.density[:] = density
+    initial_particles = particles.copy()
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
+    counts = wp.array([7], dtype=wp.int32, device=device)
+    states = wp.array([7], dtype=wp.uint32, device=device)
+
+    with pytest.raises(ValueError, match="total mass and volume"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            max_collisions=1,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=(SEDIMENTATION_SP2016_MECHANISM,)
+            ),
+        )
+
+    _assert_particles_unchanged(gpu_particles, initial_particles)
+    npt.assert_array_equal(pairs.numpy(), [[[7, 7]]])
+    npt.assert_array_equal(counts.numpy(), [7])
+    npt.assert_array_equal(states.numpy(), [7])
+
+
 def test_sedimentation_preflight_accepts_zero_mass_and_concentration(
     device: str,
 ) -> None:
@@ -6136,8 +6180,8 @@ def _launch_private_coagulation_sampler(
     diffusivities = wp.zeros_like(radii)
     g_terms = wp.zeros_like(radii)
     speeds = wp.zeros_like(radii)
-    settling_velocities = wp.full(
-        (n_boxes, n_particles), 7.0, dtype=wp.float64, device=device
+    settling_velocities = wp.zeros(
+        (n_boxes, n_particles), dtype=wp.float64, device=device
     )
     total_masses = wp.zeros_like(radii)
     active_indices = wp.zeros(
@@ -6231,6 +6275,32 @@ def test_private_sedimentation_sampler_bounds_pairs_and_advances_rng(
     assert int(second["states"].numpy()[0]) != int(initial_states[0])
 
 
+@pytest.mark.stochastic
+def test_private_sedimentation_sampler_scales_trials_by_slot_concentration(
+    device: str,
+) -> None:
+    """Equal non-unit slot weights scale non-saturating SP2016 scheduling."""
+    masses = np.array([[[1.0e-15], [8.0e-15], [2.7e-14], [6.4e-14]]])
+    trial_counts: list[int] = []
+    for concentration_value in (0.25, 4.0):
+        count = 0
+        for seed in range(64):
+            result = _launch_private_coagulation_sampler(
+                device,
+                masses,
+                np.full((1, 4), concentration_value, dtype=np.float64),
+                SEDIMENTATION_SP2016_MECHANISM_FLAG,
+                time_step=1.0e12,
+                rng_state=seed + 1,
+            )
+            count += int(result["counts"].numpy()[0])
+        trial_counts.append(count)
+
+    # The 16x concentration change must increase the aggregate event count;
+    # use a conservative bound rather than exact per-seed stochastic replay.
+    assert trial_counts[1] >= 2 * trial_counts[0]
+
+
 @pytest.mark.parametrize(
     ("concentration", "expected_count", "active_slots"),
     [
@@ -6282,10 +6352,10 @@ def test_private_mixed_sedimentation_mask_rejects_without_rng_or_pair_work(
     npt.assert_array_equal(result["masses"].numpy(), masses)
     npt.assert_array_equal(result["concentration"].numpy(), [[1.0, 1.0]])
     npt.assert_array_equal(result["radii"].numpy(), [[9.0, 9.0]])
-    npt.assert_array_equal(result["settling_velocities"].numpy(), [[7.0, 7.0]])
+    npt.assert_array_equal(result["settling_velocities"].numpy(), [[0.0, 0.0]])
 
 
-def test_private_sampler_clears_and_populates_sedimentation_velocity_scratch(
+def test_private_sampler_populates_sedimentation_velocity_scratch(
     device: str,
 ) -> None:
     """Settling scratch is private to exact SP2016 launches and valid slots."""
@@ -6302,7 +6372,7 @@ def test_private_sampler_clears_and_populates_sedimentation_velocity_scratch(
         time_step=0.0,
     )
 
-    npt.assert_array_equal(brownian["settling_velocities"].numpy(), [[7.0] * 3])
+    npt.assert_array_equal(brownian["settling_velocities"].numpy(), [[0.0] * 3])
     velocities = np.asarray(sedimentation["settling_velocities"].numpy())[0]
     expected = np.array(
         [
