@@ -20,26 +20,26 @@
   arrays by identity and reject NumPy arrays/unsupported dtypes/devices.
 - [x] Require both inputs only for configurations containing turbulent shear;
   ignore irrelevant supplied inputs for non-turbulent configurations.
-- [ ] Derive the per-box ST1956 prefactor and active radii entirely on device.
-- [ ] Implement and document the safe majorant; add the turbulent term to the
+- [x] Derive the per-box ST1956 prefactor and active radii entirely on device.
+- [x] Implement and document the safe majorant; add the turbulent term to the
   shared pair-rate/majorant dispatcher and capability matrix.
-- [ ] Route turbulent-shear-only execution through the existing bounded
+- [x] Route turbulent-shear-only execution through the existing bounded
   candidate stream, one acceptance draw, one merge launch, caller buffers, and
   caller-owned persistent RNG state.
-- [ ] Guard non-finite/negative device results and preserve the defensive
+- [x] Guard non-finite/negative device results and preserve the defensive
   acceptance-ratio clamp without masking caller validation errors.
 
 ## Tooling / Tests
 
-- [ ] Add all-pairs pair-rate and majorant checks to
+- [x] Add all-pairs pair-rate and majorant checks to
   `particula/gpu/kernels/tests/coagulation_test.py` or a focused
   `turbulent_shear_coagulation_test.py` if module size requires it.
-- [ ] Add scalar/per-box, heterogeneous multi-box, inactive-slot, zero/one/two
+- [x] Add scalar/per-box, heterogeneous multi-box, inactive-slot, zero/one/two
   active, buffer identity, RNG reuse/reset, stochastic, and conservation cases.
 - [x] Snapshot masses, concentration, charge, output buffers, and RNG state for
   invalid P2 preflight cases.
-- [ ] Run required Warp CPU tests and parametrized optional CUDA tests; use
-  explicit fp64 tolerances and aggregate/sigma stochastic assertions.
+- [x] Run focused Warp CPU execution tests with explicit fp64 tolerances and
+  aggregate/sigma stochastic assertions; optional CUDA remains skippable.
 
 ## Documentation
 

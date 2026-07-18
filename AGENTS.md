@@ -438,15 +438,18 @@ for _ in range(n_steps):
    unsupported distributions, and deferred mechanisms fail during host-side
    preflight before runtime state access, allocation, mutation, RNG
    initialization, or kernel launch.
-- A structurally valid ST1956 turbulent-shear request additionally requires
-  keyword-only, explicit `turbulent_dissipation` (m²/s³) and `fluid_density`
-  (kg/m³). Each accepts a positive finite Python/NumPy floating scalar or a
-  supported floating Warp array shaped `(n_boxes,)` on the active device;
-  supplied valid arrays retain identity, while scalar broadcasts use private
-  device storage. These are not container fields. Valid P2 inputs currently
-  reach the reserved-capability error: turbulent rate dispatch, sampling, and
-  merge behavior are intentionally not implemented. Non-turbulent calls ignore
-  both parameters.
+- The exact ST1956 turbulent-shear singleton
+  `CoagulationMechanismConfig(("turbulent_shear_st1956",))` is executable with
+  `distribution_type="particle_resolved"`. It requires keyword-only, explicit
+  `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³). Each accepts a
+  positive finite Python/NumPy floating scalar or an active-device `wp.float64`
+  Warp array shaped `(n_boxes,)`; supplied valid arrays retain identity, while
+  scalar broadcasts use private device storage. These are not container fields.
+  Turbulent combinations reject during capability preflight after P2 validation
+  and before normalization, allocation, RNG setup, launch, or mutation.
+  The direct singleton uses an O(A) two-largest-active-radii majorant. It adds
+  no runnable/API re-export, CPU fallback, or performance claim. Non-turbulent
+  calls ignore both parameters.
 - `WarpParticleData.charge` is caller-owned, device-resident state containing
   dimensionless elementary-charge counts with shape `(n_boxes, n_particles)`.
   It is not a sidecar or a hidden transfer result. It must be a same-device

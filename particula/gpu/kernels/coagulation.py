@@ -1,4 +1,4 @@
-"""GPU Brownian, charged, sedimentation, and turbulent-boundary utilities.
+"""GPU direct-kernel utilities for Brownian, charged, and ST1956 shear.
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
 coagulation pipeline. Its fixed-mask sampler executes particle-resolved
@@ -150,9 +150,11 @@ class CoagulationMechanismConfig:
     ``("brownian", "charged_hard_sphere")``. The resolver normalizes the
     combined mode to the canonical fixed mask. Deferred mechanisms and other
     distribution types are rejected during host-side preflight before runtime
-    state access or mutation. Structurally valid turbulent-shear requests first
-    validate their explicit P2 inputs, then fail at the reserved capability
-    gate before normalization, allocation, RNG work, or mutation.
+    state access or mutation. Structurally valid turbulent-shear requests
+    validate their explicit P2 inputs after particle schema and device checks.
+    Only the exact ``("turbulent_shear_st1956",)`` singleton then normalizes
+    those inputs and executes; mixed turbulent masks reject before
+    normalization, allocation, RNG work, or mutation.
 
     Attributes:
         mechanisms: Requested mechanism identifiers, or ``None`` to select
@@ -263,9 +265,9 @@ def validate_coagulation_mechanism_capabilities(
     """Enforce the executable coagulation-mechanism boundary.
 
     This pure host-side, concrete-module-only validator accepts Brownian,
-    exact SP2016 sedimentation, ``"charged_hard_sphere"``, or the supported
-    Brownian-plus-charged ``"particle_resolved"`` execution. Direct callers
-    receive the reserved-mechanism error immediately. ``coagulation_step_gpu``
+    exact SP2016 sedimentation, ``"charged_hard_sphere"``, the supported
+    Brownian-plus-charged configuration, or exact ST1956 turbulent-shear
+    singleton ``"particle_resolved"`` execution. ``coagulation_step_gpu``
     invokes this validator during structural preflight for non-turbulent masks,
     but invokes it after the turbulent P2 input boundary for structurally valid
     turbulent-shear masks. Import it from
@@ -355,8 +357,8 @@ def _total_pair_rate(  # noqa: PLR0913
     This helper dispatches fixed flag bits without dynamic mechanism iteration.
     Each enabled term is independently sanitized before its additive combined
     rate is returned. This helper's bit dispatch does not grant sampler
-    support: the sampler executes sedimentation only for its exact public
-    sedimentation-only mask. Invalid rate terms contribute zero.
+    support: the sampler executes sedimentation and turbulent shear only for
+    their exact public singleton masks. Invalid rate terms contribute zero.
     """
     total_rate = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
@@ -559,10 +561,23 @@ def _turbulent_majorant_from_active_radii(
     turbulent_dissipation: Any,
     kinematic_viscosity: Any,
 ) -> Any:
-    """Return the ST1956 rate for the two largest compact active radii.
+    """Return an ST1956 majorant from the two largest compact active radii.
 
     The ST1956 prefactor is constant within a box and its diameter-sum cubed
     term is monotonic, making this O(A) compact-rank scan a safe majorant.
+
+    Args:
+        active_indices: Compact particle indices ``(n_boxes, n_particles)``.
+        box_idx: Index of the simulation box to scan.
+        active_count: Number of compact active ranks in ``box_idx``.
+        radii: Particle radii ``(n_boxes, n_particles)`` [m].
+        turbulent_dissipation: Per-box turbulent kinetic-energy dissipation
+            rate [m^2/s^3].
+        kinematic_viscosity: Per-box kinematic viscosity [m^2/s].
+
+    Returns:
+        Finite, nonnegative ST1956 majorant for the selected box, or zero when
+        fewer than two active particles exist or no finite positive rate exists.
     """
     if active_count < wp.int32(2):
         return wp.float64(0.0)
@@ -619,13 +634,12 @@ def _total_majorant(  # noqa: PLR0913
 ) -> Any:
     """Accumulate enabled finite, positive terms for private staged tests.
 
-    This helper dispatches fixed flag bits for internal tests and for exact
-    charged-only or exact SP2016 sedimentation-only sampler execution. The
-    sampler separately enforces its executable-mask boundary; a helper
-    contribution does not make a mixed sedimentation mask executable.
-    Brownian-containing
-    production selection uses one exact active-pair scan through
-    ``_total_pair_rate``. Other reserved bits contribute no term.
+    This helper dispatches fixed flag bits for internal tests and exact
+    charged-only, SP2016 sedimentation-only, or ST1956 turbulent-shear-only
+    sampler execution. The sampler separately enforces its executable-mask
+    boundary; helper contributions do not make mixed sedimentation or turbulent
+    masks executable. Brownian-containing production selection uses one exact
+    active-pair scan through ``_total_pair_rate``.
     """
     total_majorant = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
@@ -937,9 +951,9 @@ def brownian_coagulation_kernel(  # noqa: C901
     box and one finite positive total pair rate per candidate. A valid candidate
     receives exactly one acceptance draw; invalid rates, invalid majorants, and
     rates above the majorant are skipped without collision-buffer or active-set
-    mutation. The exact public SP2016 sedimentation-only mask joins the public
-    Brownian and charged masks; unsupported masks return before scheduling or
-    accessing the RNG state.
+    mutation. Exact SP2016 sedimentation-only and ST1956 turbulent-shear-only
+    masks join the public Brownian and charged masks; unsupported masks return
+    before scheduling or accessing the RNG state.
 
     Args:
         masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
@@ -965,6 +979,12 @@ def brownian_coagulation_kernel(  # noqa: C901
             ``(n_boxes, n_particles)``. The kernel clears every slot on entry
             and populates this call-local scratch only for valid active slots
             of the exact SP2016 sedimentation-only mask.
+        turbulent_dissipation: Per-box turbulent kinetic-energy dissipation
+            rate ``(n_boxes,)`` [m^2/s^3]. Read only by the exact ST1956
+            turbulent-shear-only mask.
+        fluid_density: Per-box carrier-fluid density ``(n_boxes,)`` [kg/m^3].
+            Read only by the exact ST1956 turbulent-shear-only mask to derive
+            kinematic viscosity.
         active_indices: Output compact active indices
             ``(n_boxes, n_particles)``.
         collision_pairs: Output collision indices
@@ -979,8 +999,8 @@ def brownian_coagulation_kernel(  # noqa: C901
         charge: Caller-owned signed elementary-charge counts
             ``(n_boxes, n_particles)``.
         mechanism_mask: Fixed internal sampler mask. In addition to public
-            Brownian and charged masks, only the exact SP2016 sedimentation-
-            only mask is executable.
+            Brownian and charged masks, only exact singleton SP2016
+            sedimentation and ST1956 turbulent shear masks are executable.
         collision_capacity: Maximum accepted collisions per box for this call.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]
@@ -2177,7 +2197,7 @@ def coagulation_step_gpu(  # noqa: C901
         Structurally valid turbulent-shear requests require explicit
         ``turbulent_dissipation`` and ``fluid_density`` only after structural
         configuration resolution and particle schema/device metadata validation.
-        Valid turbulent combinations then reject before normalization,
+        Mixed turbulent combinations then reject before normalization,
         allocation, rate dispatch, sampling, majorant construction, RNG work, or
         mutation. The supported singleton normalizes both inputs and uses their
         active-device values for ST1956 execution. Non-turbulent masks do not
@@ -2209,8 +2229,9 @@ def coagulation_step_gpu(  # noqa: C901
         including ``wp.float64`` ``(n_boxes, n_particles)`` total-mass and
         settling-velocity arrays. The selector clears every scratch slot and
         sums each active particle's species masses once for charged pair rates
-        and their compact-active majorant. It populates settling velocities only
-        for valid active slots of the exact SP2016 sedimentation-only mask.
+        and their compact-active majorant. It derives radii for ST1956
+        turbulent-shear rates and populates settling velocities only for valid
+        active slots of the exact SP2016 sedimentation-only mask.
         This scratch is not a caller-owned output, is not returned, and is
         allocated only after caller-resource preflight succeeds.
 

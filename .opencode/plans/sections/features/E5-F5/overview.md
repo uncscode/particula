@@ -10,12 +10,13 @@ physics and ownership contract ambiguous.
 
 ## Value Proposition
 
-E5-F5 is building bounded, fp64 turbulent-shear-only execution on the shared E5
-sampler. Its completed P2 boundary requires callers of a structurally valid
-ST1956 request to provide explicit positive finite dissipation and fluid-density
-values per box. The direct step normalizes those values before mutable runtime
-work, then retains the reserved-capability failure; rate dispatch, sampling, and
-merge behavior remain deferred. The feature makes no DNS turbulence or general
+E5-F5 now provides bounded, fp64 turbulent-shear-only execution on the shared
+E5 sampler. A structurally valid ST1956 singleton requires explicit positive
+finite scalar or same-device `wp.float64` `(n_boxes,)` dissipation and
+fluid-density inputs. Mixed turbulent masks reject in preflight; the singleton
+uses an O(A) two-largest-active-radii majorant and the shared single candidate
+and acceptance stream. Caller-owned collision buffers/RNG and the in-place,
+post-launch non-rollback model are retained. The feature makes no DNS or general
 turbulence accuracy claim.
 
 ## Implemented Foundation
