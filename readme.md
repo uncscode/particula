@@ -83,6 +83,15 @@ unsupported distributions, and deferred mechanisms fail during host-side
 preflight before runtime state is accessed, allocated, mutated, reseeded, or
 launched.
 
+The exact ST1956 turbulent-shear singleton is also available through
+`CoagulationMechanismConfig(("turbulent_shear_st1956",))`. It requires explicit
+keyword-only `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³), each
+as a positive finite scalar or an active-device `wp.float64` Warp array shaped
+`(n_boxes,)`. Supplied collision buffers and RNG state remain caller-owned.
+Turbulent mechanism combinations are rejected in preflight. This bounded,
+direct-kernel path uses an O(A) two-largest-active-radii majorant; it adds no
+high-level runnable or API re-export, CPU fallback, or performance claim.
+
 `condensation_step_gpu` additionally requires a keyword-only
 `ThermodynamicsConfig` through `thermodynamics=`. After all inputs and optional
 buffers validate, each successful call refreshes the caller-owned,

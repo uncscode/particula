@@ -244,6 +244,15 @@ instrumentation private to `particula/gpu/kernels/tests/coagulation_test.py`.
 The shipped `coagulation_step_gpu(...)` API and production synchronization
 behavior should stay unchanged when the work is diagnostic-only.
 
+The direct ST1956 turbulent-shear singleton uses explicit positive finite
+`turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³) P2 inputs. Cover
+scalar and active-device `wp.float64` `(n_boxes,)` inputs, preflight rejection
+of invalid values and turbulent combinations, and unchanged caller-owned
+particle, collision-output, and persistent-RNG state after preflight errors.
+Test its O(A) two-largest-active-radii majorant against an independent NumPy
+oracle, keep mass conservation separate from stochastic acceptance checks, and
+use aggregate tolerance or sigma bounds rather than exact seeded pair replay.
+
 For the GPU condensation suite, keep shared helpers in support modules only when
 discoverable `*_test.py` wrappers expose the runnable cases. The current entry
 points are:

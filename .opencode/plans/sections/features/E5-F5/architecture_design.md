@@ -48,25 +48,25 @@ this proved bound; no alternate unproved extrema heuristic is acceptable.
 
 - `coagulation_step_gpu` has keyword-only `turbulent_dissipation` and
   `fluid_density` inputs. For a structurally valid ST1956 mask, both are
-  required before the existing reserved-capability gate.
+  required before capability preflight.
 - `_ensure_turbulent_input_array` in
   `particula/gpu/kernels/coagulation.py` accepts positive finite Python or
   NumPy floating scalars and broadcasts them privately on the active device, or
-  returns a supported floating same-device Warp array of shape `(n_boxes,)` by
+  returns a same-device `wp.float64` Warp array of shape `(n_boxes,)` by
   identity. It rejects missing, non-floating, non-finite, non-positive,
   wrong-shape, wrong-dtype, and wrong-device values.
 - P2 performs only the particle schema/device metadata access needed for that
   validation. Invalid P2 input fails before environment/volume normalization,
   output or RNG setup, allocation, kernel launch, output writes, particle
-  mutation, or RNG advancement. Valid input then reaches the unchanged
-  `reserved for E5-F5` capability error; P3 dispatch and sampling are deferred.
+  mutation, or RNG advancement. Valid singleton input proceeds to execution;
+  valid mixed turbulent masks reject in capability preflight before runtime work.
 - Non-turbulent masks do not inspect, normalize, allocate for, or reject either
   turbulence argument, preserving Brownian/charged/sedimentation behavior.
 
 - **Data Model:** No `WarpParticleData` or `WarpEnvironmentData` schema change.
   Dissipation `[m^2/s^3]` and fluid density `[kg/m^3]` are call-specific inputs,
-  normalized to active-device arrays shaped `(n_boxes,)`; supported supplied
-  `wp.float32` and `wp.float64` arrays retain identity.
+  normalized to active-device `wp.float64` arrays shaped `(n_boxes,)`; supplied
+  valid arrays retain identity.
 - **API Surface:** `coagulation_step_gpu` has the implemented keyword-only P2
   inputs. They are required only when turbulent shear is enabled and are ignored
   for non-turbulent masks. Existing positional calls and the return tuple remain
@@ -75,18 +75,30 @@ this proved bound; no alternate unproved extrema heuristic is acceptable.
   per-box arrays to the shared property/majorant/selection path. Do not add a
   separate public turbulent step or separate stochastic pass.
 - **Workflow Hooks:** E5-F5 depends on E5-F1, runs independently of E5-F3/F4,
-  supplies the term/majorant to E5-F6, fixtures to E5-F7, and support facts to
-  E5-F9.
+   supplies the term/majorant to E5-F6, fixtures to E5-F7, and support facts to
+   E5-F9.
+
+### Implemented P3 Execution Boundary
+
+- The capability matrix executes only the exact ST1956 singleton. Valid mixed
+  turbulent masks reject during preflight before normalization, allocation, RNG
+  setup, launch, or mutation.
+- The singleton uses normalized same-device fp64 per-box state, derives
+  kinematic viscosity and active radii on device, and uses the ST1956 rate at
+  the two largest compact active radii as an O(A) safe majorant.
+- It retains the shared bounded selector, one acceptance draw per valid
+  candidate, existing merge pass, caller-owned collision outputs, and persistent
+  RNG behavior. Host-side preflight errors are non-mutating; runtime errors
+  after launch have no rollback guarantee for caller-owned mutable state.
 
 ## Explicit Scientific Boundary
 
-The currently supported direct-step behavior is P2 validation of
-caller-supplied ST1956 box state followed by the reserved-capability failure.
-It does not execute the turbulent-shear collision kernel. This feature does not
+The currently supported direct-step behavior is the exact particle-resolved
+ST1956 singleton with P2-normalized caller-supplied box state. This feature does
 implement, validate, approximate, or claim parity with the repository's
 turbulent DNS models. It makes no DNS, clustering, inertial enhancement,
 general turbulence, or accuracy claim beyond the tested ST1956 formula and
-deferred bounded-sampler design.
+bounded-sampler design.
 
 ## Security & Compliance
 

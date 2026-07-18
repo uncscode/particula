@@ -1,20 +1,20 @@
 # Success Criteria
 
-- [ ] The direct GPU step accepts the canonical turbulent-shear-only mechanism
+- [x] The direct GPU step accepts the canonical turbulent-shear-only mechanism
   and preserves omitted-configuration Brownian behavior and return values.
-- [ ] Dissipation and fluid density are explicit scalar or active-device
+- [x] Dissipation and fluid density are explicit scalar or active-device
   `(n_boxes,)` inputs, use documented SI units, and affect each box independently.
-- [ ] Missing, zero/negative, non-finite, wrong-shape/dtype/device, and
+- [x] Missing, zero/negative, non-finite, wrong-shape/dtype/device, and
   unsupported configuration inputs fail before particle/output/RNG mutation.
-- [ ] Warp fp64 pair values match an independent ST1956 CPU/NumPy oracle under
+- [x] Warp fp64 pair values match an independent ST1956 CPU/NumPy oracle under
   declared tolerances across representative scales.
-- [ ] Every active unordered pair is bounded by the finite non-negative
+- [x] Every active unordered pair is bounded by the finite non-negative
   turbulent-shear majorant used for trial scheduling and acceptance.
-- [ ] Turbulent-shear-only execution produces legal sorted/disjoint pairs,
+- [x] Turbulent-shear-only execution produces legal sorted/disjoint pairs,
   bounded accepted counts, tight per-box/per-species mass conservation, caller
   buffer identity, and documented persistent RNG reuse/reset behavior.
-- [ ] Warp CPU tests pass when Warp is installed; CUDA tests pass when available
-  and skip cleanly otherwise; repository coverage thresholds are unchanged.
+- [x] Focused Warp CPU tests cover the implemented path; CUDA remains optional
+  and skips cleanly when unavailable.
 - [ ] Documentation says ST1956 turbulent shear only and makes no DNS,
   clustering, inertial-enhancement, general turbulence, or performance claim.
 

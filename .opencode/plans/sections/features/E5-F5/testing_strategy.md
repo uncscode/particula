@@ -25,13 +25,15 @@ the repository's `*_test.py` convention and collect cleanly without Warp.
   failure-atomicity. Sentinels prove invalid P2 values bypass downstream
   allocation, normalization, RNG initialization, and launches; non-turbulent
   calls ignore supplied turbulence values.
-- **P3 -- majorant and execution:** Enumerate all active unordered pairs and
+- **P3 -- majorant and execution (completed):** Focused Warp tests enumerate all active unordered pairs and
   prove every independent ST1956 rate is finite, non-negative, and no greater
   than the device majorant. Cover zero/one/two active slots, inactive gaps,
   equal/different radii, one-box and heterogeneous multi-box state, bounded
   trial scheduling, sorted/in-range/disjoint pairs, mass conservation, output
   buffer identity, and persistent RNG reuse/reset. Use repeated-run means or
-  sigma bounds for stochastic rates, never exact CPU/Warp pair replay.
+   sigma bounds for stochastic rates, never exact CPU/Warp pair replay. They
+   also verify P2 failures and valid mixed turbulent-mask rejections occur
+   before caller-owned particle, output, or RNG state is changed.
 - **P4 -- documentation:** Validate links, direct import/API names, SI units,
   examples, support-table wording, and explicit no-DNS language.
 

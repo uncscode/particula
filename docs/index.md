@@ -173,10 +173,12 @@ print(result)
   explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
    current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
    such as coagulation `rng_states` and condensation thermodynamics. GPU
-   turbulent-shear coagulation structurally validates explicit P2
-   `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³) inputs but
-   remains reserved: it does not dispatch turbulent rates, sample collisions,
-   or merge particles. GPU condensation requires keyword-only
+   turbulent-shear coagulation supports only the direct, particle-resolved
+   `("turbulent_shear_st1956",)` singleton. It requires keyword-only positive,
+   finite `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³) scalar or
+   active-device `wp.float64` `(n_boxes,)` Warp-array inputs; combinations,
+   runnable/API re-export, CPU fallback, and performance claims remain
+   deferred. GPU condensation requires keyword-only
    `thermodynamics=ThermodynamicsConfig`,
   validates an active-device binary per-box/species `gas.partitioning` mask
   before mutation, and runs exactly four equal substeps. Disabled species and
