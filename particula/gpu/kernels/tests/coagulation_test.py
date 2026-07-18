@@ -4026,6 +4026,103 @@ def test_deferred_p1_masks_preserve_caller_owned_state(
 
 
 @pytest.mark.parametrize(
+    (
+        "mechanisms",
+        "invalid_field",
+        "invalid_value",
+        "turbulent_dissipation",
+        "fluid_density",
+        "message",
+    ),
+    [
+        (
+            (
+                CHARGED_HARD_SPHERE_MECHANISM,
+                SEDIMENTATION_SP2016_MECHANISM,
+            ),
+            "density",
+            0.0,
+            None,
+            None,
+            "charged particle masses and concentrations must be finite and "
+            "nonnegative, and density must be finite and > 0",
+        ),
+        (
+            (BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
+            None,
+            None,
+            0.0,
+            1000.0,
+            "turbulent_dissipation must be finite and > 0",
+        ),
+        (
+            (BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
+            "masses",
+            -1.0,
+            None,
+            None,
+            "sedimentation particle masses must be finite and nonnegative",
+        ),
+    ],
+)
+def test_deferred_masks_reject_invalid_enabled_terms_atomically(
+    device: str,
+    mechanisms: tuple[str, ...],
+    invalid_field: str | None,
+    invalid_value: float | None,
+    turbulent_dissipation: float | None,
+    fluid_density: float | None,
+    message: str,
+) -> None:
+    """Invalid enabled terms win over deferred execution without mutation."""
+    particles = _make_particle_data(n_boxes=1, n_particles=4, n_species=1)
+    if invalid_field is not None:
+        getattr(particles, invalid_field)[...] = invalid_value
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    collision_pairs = wp.array(
+        np.full((1, 2, 2), -7, dtype=np.int32), dtype=wp.int32, device=device
+    )
+    collision_counts = wp.array([3], dtype=wp.int32, device=device)
+    rng_states = wp.array([11], dtype=wp.uint32, device=device)
+    particle_arrays = (
+        gpu_particles.masses,
+        gpu_particles.concentration,
+        gpu_particles.charge,
+    )
+    initial_particles = from_warp_particle_data(gpu_particles, sync=True)
+    initial_pairs = np.asarray(collision_pairs.numpy()).copy()
+    initial_counts = np.asarray(collision_counts.numpy()).copy()
+    initial_rng_states = np.asarray(rng_states.numpy()).copy()
+
+    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
+        coagulation_step_gpu(
+            gpu_particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=0.1,
+            max_collisions=2,
+            collision_pairs=collision_pairs,
+            n_collisions=collision_counts,
+            rng_states=rng_states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
+            turbulent_dissipation=turbulent_dissipation,
+            fluid_density=fluid_density,
+        )
+
+    assert particle_arrays[0] is gpu_particles.masses
+    assert particle_arrays[1] is gpu_particles.concentration
+    assert particle_arrays[2] is gpu_particles.charge
+    npt.assert_array_equal(np.asarray(collision_pairs.numpy()), initial_pairs)
+    npt.assert_array_equal(np.asarray(collision_counts.numpy()), initial_counts)
+    npt.assert_array_equal(np.asarray(rng_states.numpy()), initial_rng_states)
+    restored = from_warp_particle_data(gpu_particles, sync=True)
+    npt.assert_allclose(restored.masses, initial_particles.masses)
+    npt.assert_allclose(restored.concentration, initial_particles.concentration)
+    npt.assert_allclose(restored.charge, initial_particles.charge)
+
+
+@pytest.mark.parametrize(
     "mechanisms",
     [
         (BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
