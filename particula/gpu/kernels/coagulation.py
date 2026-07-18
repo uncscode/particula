@@ -22,24 +22,19 @@ mass and charge, while donor mass, concentration, and charge are cleared.
 import them from ``particula.gpu.kernels.coagulation``, not
 ``particula.gpu.kernels``. The immutable, keyword-only configuration is
 host-side metadata, not device-resident simulation state. The public step
-defaults to Brownian, particle-resolved execution and also accepts charged-only,
-exact SP2016 sedimentation-only, and canonical Brownian-plus-charged
-particle-resolved execution. It rejects otherwise unsupported configurations
-before runtime state is accessed or mutated. Non-turbulent mixed masks retain
-the established unsupported-configuration error; mixed turbulent masks retain
-their exact-turbulent-singleton capability error after their P2 boundary.
-The ST1956 turbulent singleton crosses a later P2 boundary: explicit turbulent
-dissipation and fluid density inputs are validated and normalized after particle
-schema/device metadata is available. Mixed turbulent masks are rejected before
-normalization, allocation, RNG work, or mutation. Supplied particles, collision
-outputs, and RNG sidecars are caller-owned same-device Warp resources.
+defaults to Brownian, particle-resolved execution and accepts every singleton,
+two-way combination, and the four-way combination. Three-way masks remain
+deferred. Unsupported configurations reject before runtime state is accessed or
+mutated. Turbulent-shear-enabled masks validate and normalize explicit turbulent
+dissipation and fluid-density inputs after particle schema/device metadata is
+available. Supplied particles, collision outputs, and RNG sidecars are
+caller-owned same-device Warp resources.
 
-The exact ``SEDIMENTATION_SP2016_MECHANISM_FLAG`` is a public direct-kernel
-mode for particle-resolved, unit-efficiency SP2016 scheduling. It shares the
-bounded sampler and persistent RNG path. Mixed masks containing sedimentation
-remain non-executable. Sedimentation calls read-only validate finite,
-nonnegative masses and concentrations and finite, positive densities before
-any output, RNG, or particle-state mutation.
+The ``SEDIMENTATION_SP2016_MECHANISM_FLAG`` is a public direct-kernel mode for
+particle-resolved, unit-efficiency SP2016 scheduling. It shares the bounded
+sampler and persistent RNG path. Sedimentation-enabled calls read-only
+validate finite, nonnegative masses and concentrations and finite, positive
+densities before any output, RNG, or particle-state mutation.
 """
 
 # pyright: basic
@@ -147,17 +142,12 @@ class CoagulationMechanismConfig:
     ``coagulation_step_gpu`` accepts it only through its keyword-only
     ``mechanism_config`` argument. The configuration is host metadata and does
     not own, transfer, or synchronize Warp resources. Executable
-    ``"particle_resolved"`` modes are Brownian-only,
-    ``("sedimentation_sp2016",)``,
-    ``("charged_hard_sphere",)``, and either requested order of
-    ``("brownian", "charged_hard_sphere")``. The resolver normalizes a
-    combination to the canonical fixed mask. Deferred mechanisms and other
+    ``"particle_resolved"`` modes include every singleton, two-way
+    combination, and the four-way combination. The resolver normalizes a
+    combination to the canonical fixed mask. Three-way masks and other
     distribution types reject during structural preflight before runtime state
     access or mutation. Structurally valid turbulent-shear requests validate
-    their explicit P2 inputs after particle schema and device checks. Only the
-    exact ``("turbulent_shear_st1956",)`` singleton then normalizes those
-    inputs and executes; mixed turbulent masks reject before normalization,
-    allocation, RNG work, or mutation.
+    their explicit P2 inputs after particle schema and device checks.
 
     Attributes:
         mechanisms: Requested mechanism identifiers, or ``None`` to select
@@ -267,10 +257,9 @@ def validate_coagulation_mechanism_capabilities(
 ) -> None:
     """Enforce the executable coagulation-mechanism boundary.
 
-    This pure host-side, concrete-module-only validator accepts Brownian,
-    exact SP2016 sedimentation, ``"charged_hard_sphere"``, the supported
-    Brownian-plus-charged configuration, or exact ST1956 turbulent-shear
-    singleton ``"particle_resolved"`` execution. ``coagulation_step_gpu``
+    This pure host-side, concrete-module-only validator accepts every singleton,
+    two-way combination, and the four-way ``"particle_resolved"`` mask.
+    ``coagulation_step_gpu``
     invokes this validator during structural preflight for non-turbulent masks,
     but invokes it after the turbulent P2 input boundary for structurally valid
     turbulent-shear masks. Import it from
@@ -282,20 +271,9 @@ def validate_coagulation_mechanism_capabilities(
     Raises:
         ValueError: If a deferred mechanism is requested.
     """
-    if resolved.mask in (
-        BROWNIAN_MECHANISM_FLAG,
-        CHARGED_HARD_SPHERE_MECHANISM_FLAG,
-        SEDIMENTATION_SP2016_MECHANISM_FLAG,
-        TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
-        BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG,
-    ):
+    if resolved.mask in (1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15):
         return
-    if resolved.mask & TURBULENT_SHEAR_ST1956_MECHANISM_FLAG:
-        raise ValueError(
-            "Turbulent-shear coagulation supports only the exact "
-            "('turbulent_shear_st1956',) mechanism configuration."
-        )
-    raise ValueError("Unsupported coagulation mechanism configuration.")
+    raise ValueError("Additive coagulation execution is deferred.")
 
 
 @no_type_check
@@ -733,8 +711,8 @@ def _total_majorant(  # noqa: PLR0913
     Component maxima can occur on different active pairs, so each enabled
     component is bounded independently and then added with checked fp64
     arithmetic. An invalid or overflowing aggregate returns zero. This helper
-    supports deterministic internal probes and exact singleton execution; its
-    dispatch does not make mixed sedimentation or turbulent masks executable.
+    supports deterministic internal probes and public approved-mask execution;
+    its dispatch does not make three-way masks executable.
     Brownian-containing production selection instead uses one exact active-pair
     scan through ``_total_pair_rate``.
     """
@@ -1130,9 +1108,8 @@ def brownian_coagulation_kernel(  # noqa: C901
     box and one finite positive total pair rate per candidate. A valid candidate
     receives exactly one acceptance draw; invalid rates, invalid majorants, and
     rates above the majorant are skipped without collision-buffer or active-set
-    mutation. Exact SP2016 sedimentation-only and ST1956 turbulent-shear-only
-    masks join the public Brownian and charged masks; unsupported masks return
-    before scheduling or accessing the RNG state.
+    mutation. Supported singleton, two-way, and four-way masks share this path;
+    deferred masks return before scheduling or accessing the RNG state.
 
     Args:
         masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
@@ -1156,14 +1133,14 @@ def brownian_coagulation_kernel(  # noqa: C901
         speeds: Output mean thermal speeds ``(n_boxes, n_particles)``.
         settling_velocities: Private fp64 settling-velocity scratch
             ``(n_boxes, n_particles)``. The kernel clears every slot on entry
-            and populates this call-local scratch only for valid active slots
-            of the exact SP2016 sedimentation-only mask.
+            and populates this call-local scratch for valid active slots when
+            SP2016 sedimentation is enabled.
         turbulent_dissipation: Per-box turbulent kinetic-energy dissipation
-            rate ``(n_boxes,)`` [m^2/s^3]. Read only by the exact ST1956
-            turbulent-shear-only mask.
+            rate ``(n_boxes,)`` [m^2/s^3]. Read when ST1956 turbulent shear is
+            enabled.
         fluid_density: Per-box carrier-fluid density ``(n_boxes,)`` [kg/m^3].
-            Read only by the exact ST1956 turbulent-shear-only mask to derive
-            kinematic viscosity.
+            Read when ST1956 turbulent shear is enabled to derive kinematic
+            viscosity.
         active_indices: Output compact active indices
             ``(n_boxes, n_particles)``.
         collision_pairs: Output collision indices
@@ -1177,32 +1154,35 @@ def brownian_coagulation_kernel(  # noqa: C901
             the sum over species only for active particles.
         charge: Caller-owned signed elementary-charge counts
             ``(n_boxes, n_particles)``.
-        mechanism_mask: Fixed internal sampler mask. In addition to public
-            Brownian and charged masks, only exact singleton SP2016
-            sedimentation and ST1956 turbulent shear masks are executable.
+        mechanism_mask: Fixed internal sampler mask. Public singleton,
+            two-way, and four-way approved masks are executable.
         collision_capacity: Maximum accepted collisions per box for this call.
     """  # type: ignore
     box_idx = wp.tid()  # type: ignore[misc]
     n_particles = masses.shape[1]
 
-    executable_brownian_mask = mechanism_mask == wp.int32(
-        BROWNIAN_MECHANISM_FLAG
-    ) or mechanism_mask == wp.int32(
-        BROWNIAN_MECHANISM_FLAG | CHARGED_HARD_SPHERE_MECHANISM_FLAG
+    executable_mask = (
+        mechanism_mask == wp.int32(1)
+        or mechanism_mask == wp.int32(2)
+        or mechanism_mask == wp.int32(3)
+        or mechanism_mask == wp.int32(4)
+        or mechanism_mask == wp.int32(5)
+        or mechanism_mask == wp.int32(6)
+        or mechanism_mask == wp.int32(8)
+        or mechanism_mask == wp.int32(9)
+        or mechanism_mask == wp.int32(10)
+        or mechanism_mask == wp.int32(12)
+        or mechanism_mask == wp.int32(15)
     )
-    executable_sedimentation_mask = mechanism_mask == wp.int32(
+    if not executable_mask:
+        return
+    brownian_enabled = mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG)
+    sedimentation_enabled = mechanism_mask & wp.int32(
         SEDIMENTATION_SP2016_MECHANISM_FLAG
     )
-    executable_turbulent_mask = mechanism_mask == wp.int32(
+    turbulent_enabled = mechanism_mask & wp.int32(
         TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
     )
-    if not (
-        executable_brownian_mask
-        or mechanism_mask == wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG)
-        or executable_sedimentation_mask
-        or executable_turbulent_mask
-    ):
-        return
 
     # One thread per box keeps the pair selection sequential and avoids
     # cross-thread races when writing collision pairs.
@@ -1214,18 +1194,14 @@ def brownian_coagulation_kernel(  # noqa: C901
     dynamic_viscosity = wp.float64(0.0)
     mean_free_path = wp.float64(0.0)
     kinematic_viscosity = wp.float64(0.0)
-    if (
-        executable_brownian_mask
-        or executable_sedimentation_mask
-        or executable_turbulent_mask
-    ):
+    if brownian_enabled or sedimentation_enabled or turbulent_enabled:
         dynamic_viscosity = dynamic_viscosity_wp(
             temperature_value,
             ref_viscosity,
             ref_temperature,
             sutherland_constant,
         )
-        if executable_brownian_mask or executable_sedimentation_mask:
+        if brownian_enabled or sedimentation_enabled:
             mean_free_path = molecule_mean_free_path_wp(
                 molecular_weight_air,
                 temperature_value,
@@ -1233,7 +1209,7 @@ def brownian_coagulation_kernel(  # noqa: C901
                 dynamic_viscosity,
                 gas_constant,
             )
-        if executable_turbulent_mask:
+        if turbulent_enabled:
             kinematic_viscosity = kinematic_viscosity_wp(
                 dynamic_viscosity,
                 fluid_density[box_idx],
@@ -1245,7 +1221,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         if concentration[box_idx, particle_idx] <= wp.float64(0.0):
             active_indices[box_idx, particle_idx] = wp.int32(-1)
             radii[box_idx, particle_idx] = wp.float64(0.0)
-            if executable_brownian_mask:
+            if brownian_enabled:
                 diffusivities[box_idx, particle_idx] = wp.float64(0.0)
                 g_terms[box_idx, particle_idx] = wp.float64(0.0)
                 speeds[box_idx, particle_idx] = wp.float64(0.0)
@@ -1261,7 +1237,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         if total_volume <= wp.float64(0.0) or total_mass <= wp.float64(0.0):
             active_indices[box_idx, particle_idx] = wp.int32(-1)
             radii[box_idx, particle_idx] = wp.float64(0.0)
-            if executable_brownian_mask:
+            if brownian_enabled:
                 diffusivities[box_idx, particle_idx] = wp.float64(0.0)
                 g_terms[box_idx, particle_idx] = wp.float64(0.0)
                 speeds[box_idx, particle_idx] = wp.float64(0.0)
@@ -1271,7 +1247,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         diffusivity = wp.float64(0.0)
         speed = wp.float64(0.0)
         g_term = wp.float64(0.0)
-        if executable_brownian_mask:
+        if brownian_enabled:
             knudsen = knudsen_number_wp(mean_free_path, radius)
             slip = cunningham_slip_correction_wp(knudsen)
             mobility = aerodynamic_mobility_wp(radius, slip, dynamic_viscosity)
@@ -1286,7 +1262,7 @@ def brownian_coagulation_kernel(  # noqa: C901
             )
             g_term = g_collection_term_wp(particle_mean_free_path, radius)
         settling_velocity = wp.float64(0.0)
-        if executable_sedimentation_mask:
+        if sedimentation_enabled:
             settling_velocity = settling_velocity_stokes_from_transport_wp(
                 radius,
                 effective_density_wp(total_mass, total_volume),
@@ -1297,11 +1273,11 @@ def brownian_coagulation_kernel(  # noqa: C901
         active_indices[box_idx, active_count] = wp.int32(particle_idx)
         radii[box_idx, particle_idx] = radius
         total_masses[box_idx, particle_idx] = total_mass
-        if executable_brownian_mask:
+        if brownian_enabled:
             diffusivities[box_idx, particle_idx] = diffusivity
             g_terms[box_idx, particle_idx] = g_term
             speeds[box_idx, particle_idx] = speed
-        if executable_sedimentation_mask:
+        if sedimentation_enabled:
             settling_velocities[box_idx, particle_idx] = settling_velocity
         active_count += wp.int32(1)
 
@@ -1309,84 +1285,44 @@ def brownian_coagulation_kernel(  # noqa: C901
         n_collisions[box_idx] = wp.int32(0)
         return
 
-    # Charged-only and exact SP2016 sedimentation-only rates require exact
-    # compact active-pair maxima. Brownian masks use the shared scan below.
+    # The exact compact-pair scan bounds the complete additive rate, including
+    # combinations whose component maxima occur on different pairs.
     majorant_total = wp.float64(0.0)
-    if (
-        mechanism_mask == wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG)
-        or mechanism_mask == wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG)
-        or executable_turbulent_mask
-    ):
-        majorant_total = _total_majorant(
-            mechanism_mask,
-            wp.float64(0.0),
-            wp.float64(0.0),
-            wp.float64(0.0),
-            wp.float64(0.0),
-            wp.float64(0.0),
-            wp.float64(0.0),
-            wp.float64(0.0),
-            wp.float64(0.0),
-            active_indices,
-            box_idx,
-            active_count,
-            radii,
-            settling_velocities,
-            turbulent_dissipation[box_idx],
-            kinematic_viscosity,
-            total_masses,
-            charge,
-            temperature,
-            pressure,
-            boltzmann_constant,
-            elementary_charge_value,
-            electric_permittivity,
-            gas_constant,
-            molecular_weight_air,
-            ref_viscosity,
-            ref_temperature,
-            sutherland_constant,
-        )
-    # Brownian-containing masks use one compact active-pair scan. For the
-    # combined mask _total_pair_rate includes the charged term, so do not add a
-    # separate charged-only maximum that would double-count the majorant.
-    if executable_brownian_mask:
-        majorant_total = wp.float64(0.0)
-        for first_rank in range(active_count - wp.int32(1)):
-            first_idx = wp.int32(active_indices[box_idx, first_rank])
-            for second_rank in range(first_rank + wp.int32(1), active_count):
-                second_idx = wp.int32(active_indices[box_idx, second_rank])
-                pair_rate = _total_pair_rate(
-                    mechanism_mask,
-                    radii[box_idx, first_idx],
-                    radii[box_idx, second_idx],
-                    diffusivities[box_idx, first_idx],
-                    diffusivities[box_idx, second_idx],
-                    g_terms[box_idx, first_idx],
-                    g_terms[box_idx, second_idx],
-                    speeds[box_idx, first_idx],
-                    speeds[box_idx, second_idx],
-                    settling_velocities[box_idx, first_idx],
-                    settling_velocities[box_idx, second_idx],
-                    turbulent_dissipation[box_idx],
-                    kinematic_viscosity,
-                    total_masses[box_idx, first_idx],
-                    total_masses[box_idx, second_idx],
-                    charge[box_idx, first_idx],
-                    charge[box_idx, second_idx],
-                    temperature_value,
-                    pressure_value,
-                    boltzmann_constant,
-                    elementary_charge_value,
-                    electric_permittivity,
-                    gas_constant,
-                    molecular_weight_air,
-                    ref_viscosity,
-                    ref_temperature,
-                    sutherland_constant,
-                )
-                if pair_rate > majorant_total:
-                    majorant_total = pair_rate
+    for first_rank in range(active_count - wp.int32(1)):
+        first_idx = wp.int32(active_indices[box_idx, first_rank])
+        for second_rank in range(first_rank + wp.int32(1), active_count):
+            second_idx = wp.int32(active_indices[box_idx, second_rank])
+            pair_rate = _total_pair_rate(
+                mechanism_mask,
+                radii[box_idx, first_idx],
+                radii[box_idx, second_idx],
+                diffusivities[box_idx, first_idx],
+                diffusivities[box_idx, second_idx],
+                g_terms[box_idx, first_idx],
+                g_terms[box_idx, second_idx],
+                speeds[box_idx, first_idx],
+                speeds[box_idx, second_idx],
+                settling_velocities[box_idx, first_idx],
+                settling_velocities[box_idx, second_idx],
+                turbulent_dissipation[box_idx],
+                kinematic_viscosity,
+                total_masses[box_idx, first_idx],
+                total_masses[box_idx, second_idx],
+                charge[box_idx, first_idx],
+                charge[box_idx, second_idx],
+                temperature_value,
+                pressure_value,
+                boltzmann_constant,
+                elementary_charge_value,
+                electric_permittivity,
+                gas_constant,
+                molecular_weight_air,
+                ref_viscosity,
+                ref_temperature,
+                sutherland_constant,
+            )
+            if pair_rate > majorant_total:
+                majorant_total = pair_rate
 
     if not (wp.isfinite(majorant_total) and majorant_total > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)
@@ -1398,7 +1334,7 @@ def brownian_coagulation_kernel(  # noqa: C901
         / (wp.float64(2.0))
     )
     scheduling_concentration = wp.float64(1.0)
-    if executable_sedimentation_mask:
+    if sedimentation_enabled:
         scheduling_concentration = concentration[
             box_idx, active_indices[box_idx, 0]
         ]
@@ -2209,8 +2145,8 @@ def _validate_turbulent_input(
 ) -> None:
     """Validate a turbulent-shear P2 input without scalar normalization.
 
-    This validation-only boundary validates mixed turbulent requests before
-    their exact-singleton capability rejection. Valid scalars do not create
+    This validation-only boundary validates turbulent requests before deferred
+    three-way-mask capability rejection. Valid scalars do not create
     private broadcast storage here.
     """
     if _is_warp_array_like(value):
@@ -2305,29 +2241,25 @@ def coagulation_step_gpu(  # noqa: C901
 
     This low-level API is not a CPU strategy-composition or ``Runnable`` API.
     It supports only ``"particle_resolved"`` execution: omission selects
-    Brownian; the other exact executable modes are ``"charged_hard_sphere"``,
-    Brownian-plus-charged, and unit-efficiency ``"sedimentation_sp2016"``.
+    Brownian; all singleton and two-way combinations plus the four-way
+    combination are executable.
     ``mechanism_config`` is immutable, keyword-only
     host metadata and is structurally preflighted before any runtime input
     access, allocation, normalization, RNG work, or launch. The supported
-    charged-only
-    configuration is ``("charged_hard_sphere",)``; the combined mode accepts
-    ``("brownian", "charged_hard_sphere")`` in either requested order and
-    normalizes it to one fixed mask, one shared selector, and one additive
-    majorant. Independently sanitized Brownian and charged pair-rate terms are
-    summed before one candidate stream, acceptance stream, collision-buffer
-    set, RNG stream, and apply pass. Its active-pair work is O(A²), while
+    enabled pair-rate terms are summed before one candidate stream, acceptance
+    stream, collision-buffer set, RNG stream, and apply pass. Its active-pair
+    work is O(A²), while
     collision and selector buffers are O(A), for active count A; this is bounded
     implementation scope, not a throughput or scaling claim.
-    Sedimentation is executable only as its exact singleton mask. Unsupported
-    non-turbulent additive combinations reject during structural preflight
-    before particle access. Malformed, duplicate, unknown, and
+    All singleton and two-way masks plus the four-way mask are executable.
+    Three-way masks reject after their enabled-term validation. Malformed,
+    duplicate, unknown, and
     unsupported-distribution combinations also reject before particle state is
     accessed. A structurally valid
     turbulent-shear request reaches a later P2 boundary after particle metadata
-    and device checks. Only the exact ``("turbulent_shear_st1956",)`` singleton
-    normalizes its explicit per-box inputs, calculates ST1956 rates, and
-    executes. After particle metadata and device checks, direct temperature and
+    and device checks. Turbulent-shear-enabled executable masks normalize their
+    explicit per-box inputs and calculate ST1956 rates. After particle metadata
+    and device checks, direct temperature and
     pressure inputs are validated and normalized before volume setup or selector
     launches.
     ``particles`` and supplied ``collision_pairs``, ``n_collisions``,
@@ -2381,18 +2313,13 @@ def coagulation_step_gpu(  # noqa: C901
             ``particula.gpu.kernels.coagulation``; it is not re-exported by
             ``particula.gpu.kernels``. This keyword-only configuration does not
             transfer, synchronize, or own Warp state. Omission selects
-            Brownian, particle-resolved execution. Charged-only and
-            Brownian-plus-charged particle-resolved execution, exact singleton
-            SP2016 sedimentation, and exact singleton ST1956 turbulent shear are
-            also supported; either requested Brownian-plus-charged order
-            normalizes to the same execution. Malformed configurations,
+            Brownian, particle-resolved execution. Every singleton, two-way
+            combination, and the four-way combination are also supported.
+            Malformed configurations,
             unsupported distributions, and unrecognized mechanism combinations
-            fail before particle state is accessed or mutated. Recognized
-            non-turbulent additive combinations reject before particle access.
-            Mixed turbulent combinations validate their P2 inputs after
-            particle schema/device checks, then reject before downstream
-            normalization, allocation, RNG work, selector or executable kernel
-            launches, apply launches, or mutation. A wrong type raises exactly
+            fail before particle state is accessed or mutated. Deferred
+            three-way combinations validate enabled terms before rejecting. A
+            wrong type raises exactly
             ``ValueError``
             with the message
             ``"mechanism_config must be a CoagulationMechanismConfig."``;
@@ -2448,8 +2375,8 @@ def coagulation_step_gpu(  # noqa: C901
         ValueError: If a structurally valid turbulent-shear request omits
             either explicit turbulent input or supplies an input with an
             unsupported type, shape, device, ``wp.float64`` dtype, or value
-            domain. Turbulent combinations
-            other than the exact ST1956 singleton reject after this P2 boundary.
+            domain. Deferred turbulent three-way combinations reject after this
+            P2 boundary.
         ValueError: If particle charge does not have shape
             ``(n_boxes, n_particles)``, dtype ``wp.float64``, or the particle
             device. Charged-containing and exact SP2016 sedimentation
@@ -2474,20 +2401,20 @@ def coagulation_step_gpu(  # noqa: C901
         ``fluid_density`` remain keyword-only so existing positional scalar
         callers stay source-compatible. Structural configuration preflight
         occurs before all runtime input access, allocation, normalization, RNG
-        work, and launches. Mixed turbulent masks validate their explicit P2
-        inputs after particle schema/device metadata, but cannot reach
-        downstream simulation, selector, apply launches, allocation,
+        work, and launches. Deferred turbulent three-way masks validate their
+        explicit P2 inputs after particle schema/device metadata, but cannot
+        reach downstream simulation, selector, apply launches, allocation,
         normalization, RNG work, or caller-owned mutation. It does not make
         unrelated later validation failures atomic.
 
         Structurally valid turbulent-shear requests require explicit
         ``turbulent_dissipation`` and ``fluid_density`` only after structural
         configuration resolution and particle schema/device metadata validation.
-        Mixed turbulent combinations then reject before normalization,
-        allocation, rate dispatch, sampling, majorant construction, RNG work, or
-        mutation. The supported singleton normalizes both inputs and uses their
-        active-device values for ST1956 execution. Non-turbulent masks do not
-        inspect or validate either input.
+        Deferred turbulent three-way combinations then reject before
+        normalization, allocation, rate dispatch, sampling, majorant
+        construction, RNG work, or mutation. Executable turbulent masks
+        normalize both inputs and use their active-device values for ST1956
+        execution. Non-turbulent masks do not inspect or validate either input.
 
         Validation runs before volume normalization, RNG setup, and Brownian or
         apply launches so invalid ``time_step``, shape, dtype, or device
@@ -2577,12 +2504,12 @@ def coagulation_step_gpu(  # noqa: C901
     if turbulent_requested:
         validate_coagulation_mechanism_capabilities(resolved_mechanism_config)
 
-    turbulent_singleton = (
-        resolved_mechanism_config.mask == TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
+    turbulent_enabled = bool(
+        resolved_mechanism_config.mask & TURBULENT_SHEAR_ST1956_MECHANISM_FLAG
     )
     normalized_turbulent_dissipation = None
     normalized_fluid_density = None
-    if turbulent_singleton:
+    if turbulent_enabled:
         normalized_turbulent_dissipation = _normalize_turbulent_input_array(
             turbulent_dissipation,
             n_boxes,
@@ -2677,19 +2604,14 @@ def coagulation_step_gpu(  # noqa: C901
         speeds = wp.zeros(
             (n_boxes, n_particles), dtype=wp.float64, device=device
         )
-    # Settling velocities are meaningful only for exact singleton SP2016. For
-    # all other modes pass an unused existing float64 scratch to avoid an
-    # allocation. Sedimentation storage begins zeroed, so its kernel does not
-    # need a redundant full-capacity clear.
+    # Sedimentation storage begins zeroed, so its kernel does not need a
+    # redundant full-capacity clear.
     settling_velocities = radii
     if sedimentation_enabled:
         settling_velocities = wp.zeros(
             (n_boxes, n_particles), dtype=wp.float64, device=device
         )
-    # Only the exact ST1956 singleton reads these normalized caller inputs.
-    # Other masks use normalized environment arrays, which their kernel branches
-    # never read, rather than allocating unused turbulence placeholders.
-    if turbulent_singleton:
+    if turbulent_enabled:
         turbulent_dissipation_array = normalized_turbulent_dissipation
         fluid_density_array = normalized_fluid_density
     else:
