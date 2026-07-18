@@ -18,8 +18,14 @@
     rejection, independent pair-rate/majorant checks, sparse/degenerate active
     sets, execution invariants, conservation, output identity, and persistent
     RNG reuse/reset. CUDA remains optional/skippable.
-- [ ] **E5-F5-P4:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document the direct call, input units/shape/device contract, supported ST1956 claim, no-DNS boundary, and E5-F6/F7 handoff.
+- [x] **E5-F5-P4:** Update development documentation
+  - Issue: #1355 | Size: XS | Status: Completed
+  - Delivered: Documented the exact direct particle-resolved ST1956 singleton,
+    its `m^2/s^3` dissipation and `kg/m^3` fluid-density inputs, Python/NumPy
+    floating scalars or active-device `wp.float64` `(n_boxes,)` arrays, and
+    caller-owned output/RNG behavior. DNS/general turbulence and additive
+    combinations remain deferred; E5-F6 owns combinations and E5-F7 consumes
+    singleton evidence.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`, `docs/Features/Roadmap/data-oriented-gpu.md`, `.opencode/plans/sections/features/E5-F5/*.md`
-  - Tests: Markdown links, API names, examples, support-table language, and explicit no-DNS wording.
+  - Tests: Markdown/API/support-boundary review and the focused Warp CPU
+    baseline; CUDA remains optional and skips cleanly when unavailable.

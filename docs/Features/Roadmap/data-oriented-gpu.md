@@ -178,14 +178,14 @@ Known GPU physics gaps remain:
   coagulation, including the canonical Brownian-plus-charged combination.
 - The current GPU coagulation path supports Brownian-only, charged-hard-sphere-
   only, canonical Brownian-plus-charged, and exact unit-efficiency
-  SP2016-sedimentation-only `particle_resolved` inputs. Sedimentation is a
-  narrow direct-kernel mode; combinations and variants, turbulent physics,
-  alternate charged models, and broader distributions remain rejected during
-  host capability preflight.
+  SP2016-sedimentation-only `particle_resolved` inputs, plus the exact
+  ST1956-turbulent-shear singleton. Sedimentation and ST1956 are narrow direct-
+  kernel modes; combinations and variants, alternate charged models, and
+  broader distributions remain rejected during host capability preflight.
 - CPU sedimentation coagulation and simple turbulent shear coagulation exist.
   The shipped GPU sedimentation path does not establish CPU-strategy parity;
-  turbulent shear and DNS turbulence remain deferred from the near-term GPU
-  scope.
+  the direct, particle-resolved ST1956 singleton is shipped, while DNS and
+  general turbulence remain deferred from the near-term GPU scope.
 - Wall loss, dilution, and other dynamics processes are CPU-only today. They
   need GPU implementations before a full simulation can remain GPU-resident for
   every timestep.
@@ -1037,7 +1037,7 @@ Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 | `brownian` | Executable with `particle_resolved` only | Shipped E5-F1 baseline |
 | `charged_hard_sphere` | Executable alone or with Brownian, particle-resolved only | Shipped E5-F3 |
 | `sedimentation_sp2016` | Exact unit-efficiency mode, particle-resolved only | Shipped E5-F4 |
-| `turbulent_shear_st1956` | Reserved; rejected in capability preflight | E5-F5 |
+| `turbulent_shear_st1956` | Executable only as the exact particle-resolved ST1956 singleton | Shipped E5-F5 |
 
 The charged-only tuple is `("charged_hard_sphere",)`. Exact SP2016
 sedimentation is selected with
@@ -1058,6 +1058,18 @@ preflight before runtime input access, allocation, launch, or mutable state
 changes. Sedimentation-specific preflight rejects invalid particle physics
 before output allocation, RNG initialization, or particle mutation; this does
 not make unrelated later validation failures atomic.
+
+The exact turbulent-shear mode is selected with
+`CoagulationMechanismConfig(("turbulent_shear_st1956",))`. Its keyword-only
+`turbulent_dissipation` input is in `m^2/s^3`, and keyword-only `fluid_density`
+is in `kg/m^3`. Both are required positive finite inputs only for this
+singleton. Each accepts a Python or NumPy floating scalar with private broadcast
+storage, or an active-device `wp.float64` Warp array shaped `(n_boxes,)` that
+retains supplied identity. They are not inferred from a shared container, and
+Python lists, NumPy arrays, and hidden transfers are not accepted as array
+inputs. Turbulent mixed mechanisms validate both P2 inputs, then raise
+`ValueError` before normalization, allocation, RNG work, launch, or mutation.
+Non-turbulent masks ignore both turbulence arguments.
 
 `WarpParticleData.charge` is caller-owned same-device `wp.float64` state with
 shape `(n_boxes, n_particles)`, not a sidecar or transfer result. Charged calls
@@ -1083,19 +1095,21 @@ co-located `*_test.py` coverage. They must not add an independent sampling
 loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
 integration, graph-capture claims, sedimentation combinations or variants, or
-turbulent-shear physics. Non-unit efficiency, alternate drag/DNS physics,
-Runnable integration, CPU fallback, and hidden transfers are unsupported.
-E5-F6 owns additive combinations, E5-F7 consumes sedimentation evidence, and
-E5-F9 owns the eventual consolidated support table and direct example; none of
-that downstream work is delivered here.
+turbulent additive combinations. DNS/general turbulence, non-unit efficiency,
+alternate drag physics, Runnable integration, CPU fallback, hidden transfers,
+graph capture, and performance guarantees are unsupported. The ST1956 singleton
+does not establish CPU-strategy parity. E5-F6 owns additive combinations,
+E5-F7 consumes ST1956 singleton validation/evidence, and E5-F9 owns the later
+consolidated support table and direct example; none of that downstream work is
+delivered here.
 
 Planned features:
 
 1. Sedimentation combinations or variants beyond the exact unit-efficiency
    SP2016 direct-kernel mode.
-2. Simple turbulent shear coagulation matching the CPU Saffman-Turner 1956
-   kernel.
-3. Combined Brownian, charged, sedimentation, and turbulent shear kernels
+2. DNS/general turbulent-shear physics beyond the shipped exact ST1956
+   singleton.
+3. Combined Brownian, charged, sedimentation, and turbulent-shear kernels
    when multiple mechanisms are active.
 4. Parity and statistical validation: CPU/GPU parity or statistically
    bounded tests for each new kernel, with recorded tolerances.
@@ -1241,9 +1255,9 @@ Candidate GPU process coverage:
 
 - Condensation: isothermal and latent-heat variants (staggered stays
   CPU-only).
-- Coagulation: Brownian, charged particle-resolved, combined kernels, turbulent
-  shear, and sedimentation. DNS turbulence is deferred from the near-term GPU
-  scope.
+- Coagulation: Brownian, charged particle-resolved, exact ST1956 turbulent-
+  shear singleton, and sedimentation. Turbulent additive combinations and
+  DNS/general turbulence remain deferred from the near-term GPU scope.
 - Wall loss: neutral spherical/rectangular first, then charged wall loss.
 - Dilution: particle and gas concentration dilution on GPU-resident arrays.
 - Nucleation: particle-source process activating inactive slots, after the CPU

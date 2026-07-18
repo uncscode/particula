@@ -16,15 +16,15 @@ the repository's `*_test.py` convention and collect cleanly without Warp.
   zero-dissipation lanes.
 - **P2 -- input contract (completed):**
   `particula/gpu/kernels/tests/coagulation_test.py` covers Python/NumPy floating
-  scalar broadcasts, heterogeneous `wp.float32`/`wp.float64` `(n_boxes,)`
-  arrays, and supplied-array identity. It rejects missing, bool/integer,
-  non-floating host/NumPy values, zero, negative, NaN/Inf, wrong-shape,
-  unsupported-dtype, and wrong-device inputs. Public-step cases prove named P2
-  errors occur before the reserved-capability error and snapshot particle mass,
-  concentration, charge, collision buffers/counts, and RNG state for
-  failure-atomicity. Sentinels prove invalid P2 values bypass downstream
-  allocation, normalization, RNG initialization, and launches; non-turbulent
-  calls ignore supplied turbulence values.
+  scalar broadcasts, heterogeneous active-device `wp.float64` `(n_boxes,)`
+  arrays, and supplied-array identity. It rejects `wp.float32` arrays, missing,
+  bool/integer, non-floating host/NumPy values, zero, negative, NaN/Inf,
+  wrong-shape, unsupported-dtype, and wrong-device inputs. Public-step cases
+  prove named P2 errors occur before mixed-turbulent capability rejection and
+  snapshot particle mass, concentration, charge, collision buffers/counts, and
+  RNG state for failure-atomicity. Sentinels prove invalid P2 values bypass
+  downstream allocation, normalization, and RNG initialization or launches.
+  Non-turbulent calls ignore supplied turbulence values.
 - **P3 -- majorant and execution (completed):** Focused Warp tests enumerate all active unordered pairs and
   prove every independent ST1956 rate is finite, non-negative, and no greater
   than the device majorant. Cover zero/one/two active slots, inactive gaps,
@@ -34,8 +34,12 @@ the repository's `*_test.py` convention and collect cleanly without Warp.
    sigma bounds for stochastic rates, never exact CPU/Warp pair replay. They
    also verify P2 failures and valid mixed turbulent-mask rejections occur
    before caller-owned particle, output, or RNG state is changed.
-- **P4 -- documentation:** Validate links, direct import/API names, SI units,
-  examples, support-table wording, and explicit no-DNS language.
+- **P4 -- documentation (completed):** Review the two feature pages and E5-F5
+  plan records for direct imports/API names, SI units, scalar or active-device
+  `wp.float64` `(n_boxes,)` inputs, caller ownership, ST1956-only support,
+  no-DNS/additive boundaries, and E5-F6/E5-F7 handoffs. Run the focused
+  `coagulation_test.py -q -Werror` Warp CPU baseline; CUDA is optional and
+  skips cleanly when unavailable. No coverage or test-module change is needed.
 
 ## Device and Numerical Policy
 
