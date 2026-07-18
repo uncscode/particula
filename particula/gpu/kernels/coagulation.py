@@ -401,8 +401,8 @@ def _total_pair_rate(  # noqa: PLR0913
     Each enabled term is independently sanitized and added with checked fp64
     arithmetic. An invalid component contributes zero, while an invalid or
     overflowing aggregate returns zero. This helper's bit dispatch does not
-    grant sampler support: the sampler executes sedimentation and turbulent
-    shear only for their exact public singleton masks.
+    itself grant sampler support; the entry-point capability gate admits only
+    approved singleton, two-way, and four-way masks.
     """
     total_rate = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
