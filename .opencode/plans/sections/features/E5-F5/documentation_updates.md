@@ -15,8 +15,9 @@
   and support-matrix boundaries settle. Any later example must keep transfers
   explicit, default to Warp CPU, and show heterogeneous `(n_boxes,)`
   dissipation/fluid-density arrays when useful.
-- Completed: the relevant E5-F5 P4 plan records state the delivered direct
-  contract, ST1956-only scope, device policy, and E5-F6/E5-F7/E5-F9 handoffs.
+- Completed lifecycle record: the relevant E5-F5 P4 plan records now describe
+  the implemented direct contract, ST1956-only scope, device policy, and
+  E5-F6/E5-F7/E5-F9 handoffs.
 - State prominently in every support table/example that this is the ST1956
   turbulent-shear kernel only. Do not use “DNS parity,” “DNS turbulence,” or
   general turbulence support wording except to mark those capabilities

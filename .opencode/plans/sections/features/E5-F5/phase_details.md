@@ -19,7 +19,8 @@
     sets, execution invariants, conservation, output identity, and persistent
     RNG reuse/reset. CUDA remains optional/skippable.
 - [x] **E5-F5-P4:** Update development documentation
-  - Issue: #1355 | Size: XS | Status: Completed
+  - Issue: #1355 | Size: XS
+  - Status: Completed
   - Delivered: Documented the exact direct particle-resolved ST1956 singleton,
     keyword-only `turbulent_dissipation` (`m^2/s^3`) and `fluid_density`
     (`kg/m^3`) inputs, Python/NumPy floating scalars or active-device
@@ -30,6 +31,7 @@
     DNS/general turbulence and additive combinations remain deferred; E5-F6 owns
     combinations, E5-F7 consumes singleton evidence, and E5-F9 owns the later
     consolidated support table/direct example.
-  - Files: `docs/Features/data-containers-and-gpu-foundations.md`, `docs/Features/Roadmap/data-oriented-gpu.md`, `.opencode/plans/sections/features/E5-F5/*.md`
+  - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`, and the three P4 plan records.
   - Tests: Markdown/API/support-boundary review and the focused Warp CPU
     baseline; CUDA remains optional and skips cleanly when unavailable.

@@ -164,8 +164,8 @@ environment = EnvironmentData(
 ## Explicit CPU↔GPU transfer helpers
 
 Particula uses explicit helper calls for CPU↔GPU container movement. Kernels
-and runnables do not perform hidden synchronization or hidden container
-transfers.
+and runnables do not perform hidden container transfers. Read-only device
+validation may synchronize and read back status to surface invalid values.
 
 Available public helpers:
 
@@ -280,22 +280,25 @@ The exact turbulent-shear mode is selected with
 `CoagulationMechanismConfig(("turbulent_shear_st1956",))`. Its direct,
 keyword-only `turbulent_dissipation` input is in `m^2/s^3`, and its
 keyword-only `fluid_density` input is in `kg/m^3`. Both are required positive,
-finite inputs for this singleton. Each accepts a Python or NumPy floating
-scalar, which uses private broadcast storage, or an active-device `wp.float64`
-Warp array with shape `(n_boxes,)`, which retains its supplied identity. These
-inputs are not inferred from a shared container: NumPy arrays, Python lists,
-and hidden host-to-device conversion are not supported as array inputs.
+finite inputs for structurally valid requests containing the turbulent
+mechanism. Only the exact singleton executes; mixed turbulent configurations
+validate both P2 inputs and then reject. Each accepts a Python or NumPy floating
+scalar, which uses private device-local broadcast/property work storage, or an
+active-device `wp.float64` Warp array with shape `(n_boxes,)`, which retains its
+supplied identity. These inputs are not inferred from a shared container: NumPy
+arrays, Python lists, and hidden host-to-device conversion are not supported as
+array inputs.
 
 Supply temperature and pressure either as direct scalars, supported-float Warp
 arrays of shape `(n_boxes,)` on the particle device, or same-device
 `WarpEnvironmentData` with both direct inputs set to `None`. These
 thermodynamic inputs are not required to be fp64. Caller-owned particle,
-collision-output, and RNG resources retain their documented dtypes and identity;
-only private, call-local total-mass and settling-velocity scratch is fp64 with
-shape `(n_boxes, n_particles)`. Sedimentation-only launches reuse the radius
-scratch for unused Brownian diffusivity, g-term, and speed arguments; they do
-not allocate those Brownian-specific buffers. Its settling storage is zeroed
-once at allocation and populated only for active slots.
+collision-output, and RNG resources retain their documented dtypes and identity.
+Helper-owned, call-local fp64 work buffers hold per-particle properties as
+needed; scalar turbulence inputs use private device-local `(n_boxes,)`
+broadcast/property storage, while valid supplied arrays retain identity. Exact
+SP2016 sedimentation uses settling storage only for that mechanism; ST1956 has
+no dedicated settling-velocity buffer.
 It is a direct-kernel path only: it establishes neither CPU-strategy parity nor
 general accuracy or performance claims. The combined tuple
 `("brownian", "charged_hard_sphere")` is accepted in either requested order
@@ -306,12 +309,12 @@ changes. Turbulent Brownian, charged, or sedimentation combinations first
 validate their required turbulent P2 inputs, then raise `ValueError` before
 normalization, allocation, RNG work, launch, or mutation. Non-turbulent masks
 ignore both turbulence inputs. No mode performs hidden caller simulation-state
-CPU↔GPU transfers, synchronization, or fallback to another mechanism. Read-only
-preflight validation does use a private device-status buffer and one bounded
-device synchronization/readback to report invalid caller state; sedimentation
-combines charge, particle, derived-total, active-count, and equal-concentration
-checks in that one readback. It never
-copies, mutates, or CPU-falls-back caller simulation state.
+CPU↔GPU transfers or falls back to another mechanism. Read-only preflight
+validation can use a private device-status buffer and a bounded device
+synchronization/readback, including on CUDA, to report invalid caller state;
+sedimentation combines charge, particle, derived-total, active-count, and
+equal-concentration checks in that one readback. It never copies, mutates, or
+CPU-falls-back caller simulation state.
 
 Charged-only execution uses a bounded compact active-pair majorant. Combined
 execution independently sanitizes and sums Brownian and charged terms, then
@@ -643,9 +646,10 @@ Additional shipped boundaries:
 - The current low-level GPU coagulation path remains bounded direct-kernel
   implementation scope; it does not establish a general production-support
   claim beyond its documented helper boundary and supported inputs.
-- Do not expect kernels or runnables to perform hidden CPU↔GPU transfers or
-  hidden synchronization for particle, gas, or environment state; use the
-  explicit helper calls when state must cross the device boundary.
+- Do not expect kernels or runnables to perform hidden CPU↔GPU transfers for
+  particle, gas, or environment state; use the explicit helper calls when state
+  must cross the device boundary. Read-only device validation may synchronize
+  and read back status to surface invalid values.
 - Treat Warp and CUDA as optional runtime capabilities: without Warp, this
   low-level GPU path is unavailable. Warp `device="cpu"` is the baseline;
   CUDA support is optional and tests skip cleanly when CUDA is unavailable.
@@ -671,9 +675,11 @@ path.
 - **Explicit CPU↔GPU transfer boundary**
   - Kernels operate on Warp-backed container mirrors, not CPU `ParticleData`,
     `GasData`, or `EnvironmentData` objects directly.
-  - Move state across the boundary explicitly with `to_warp_*` and
-    `from_warp_*`; kernels and runnables do not perform hidden transfers,
-    hidden synchronization, or top-level fallback imports.
+  - Move simulation state across the boundary explicitly with `to_warp_*` and
+    `from_warp_*`; kernels and runnables do not perform hidden simulation-state
+    transfers or top-level fallback imports. Read-only device validation may
+    synchronize and read back status to surface invalid values, including on
+    CUDA.
 - **Device mismatch across particle, gas, environment, and sidecar buffers**
   - Keep Warp arrays and sidecar buffers such as `rng_states` on the same
     device as the particle/gas/environment inputs used by the kernel call.
