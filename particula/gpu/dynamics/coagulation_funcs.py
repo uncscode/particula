@@ -273,6 +273,69 @@ def sedimentation_sp2016_pair_rate_wp(
 
 
 @wp.func
+def kinematic_viscosity_wp(
+    dynamic_viscosity: wp.float64,
+    fluid_density: wp.float64,
+) -> wp.float64:
+    """Calculate kinematic viscosity from device-native SI transport inputs.
+
+    This device-only helper applies ``nu = mu / rho`` for positive finite
+    dynamic viscosity ``mu`` [Pa s] and fluid density ``rho`` [kg/m³].
+    Public-input validation is intentionally deferred to the calling boundary.
+
+    Args:
+        dynamic_viscosity: Dynamic viscosity ``mu`` [Pa s].
+        fluid_density: Fluid density ``rho`` [kg/m³].
+
+    Returns:
+        Kinematic viscosity ``nu`` [m²/s].
+    """
+    return dynamic_viscosity / fluid_density
+
+
+@wp.func
+def turbulent_shear_st1956_pair_rate_wp(
+    radius_i: wp.float64,
+    radius_j: wp.float64,
+    turbulent_dissipation: wp.float64,
+    kinematic_viscosity: wp.float64,
+) -> wp.float64:
+    """Calculate the ST1956 turbulent-shear pair rate in SI units.
+
+    This device-only helper applies
+    ``K = sqrt(pi * epsilon / (120 * nu)) * (2 r_i + 2 r_j)**3`` for finite
+    positive radii ``r`` [m] and kinematic viscosity ``nu`` [m²/s], with finite
+    non-negative turbulent dissipation ``epsilon`` [m²/s³]. Zero dissipation
+    returns exact ``0.0`` before the diameter sum, preventing ``0 * inf`` for
+    finite extreme radii.
+
+    Args:
+        radius_i: Particle i radius [m].
+        radius_j: Particle j radius [m].
+        turbulent_dissipation: Turbulent energy dissipation ``epsilon`` [m²/s³].
+        kinematic_viscosity: Fluid kinematic viscosity ``nu`` [m²/s].
+
+    Returns:
+        Turbulent-shear pair rate [m³/s].
+
+    References:
+        Saffman, P. G., & Turner, J. S. (1956). On the collision of drops in
+        turbulent clouds. *Journal of Fluid Mechanics*, 1(1), 16-30.
+        Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry and
+        Physics* (3rd ed.), Eq. 13A.2.
+    """
+    zero = wp.float64(0.0)
+    if turbulent_dissipation == zero:
+        return zero
+    return wp.sqrt(
+        _PI * turbulent_dissipation / (wp.float64(120.0) * kinematic_viscosity)
+    ) * wp.pow(
+        wp.float64(2.0) * radius_i + wp.float64(2.0) * radius_j,
+        wp.float64(3.0),
+    )
+
+
+@wp.func
 def brownian_diffusivity_wp(
     temperature: wp.float64,
     aerodynamic_mobility: wp.float64,
