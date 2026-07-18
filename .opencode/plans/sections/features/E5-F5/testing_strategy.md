@@ -6,12 +6,14 @@ the repository's `*_test.py` convention and collect cleanly without Warp.
 
 ## Per-Phase Coverage
 
-- **P1 -- physics helpers:** Probe Warp helpers in
-  `particula/gpu/dynamics/tests/coagulation_funcs_test.py`. Compare kinematic
-  viscosity and scalar ST1956 rates against independently evaluated CPU/NumPy
-  equations across radius, temperature, dissipation, and density scales. Assert
-  symmetry, cubic diameter-sum scaling, finite non-negative rates, and explicit
-  fp64 tolerances.
+- **P1 -- physics helpers (completed):**
+  `particula/gpu/dynamics/tests/coagulation_funcs_test.py` probes the internal
+  fp64 kinematic-viscosity and ST1956 helpers directly and through composition
+  with `dynamic_viscosity_wp`. Independent NumPy oracles cover transport,
+  radius, dissipation, and density scales at `rtol=1e-12, atol=0.0`; direct
+  rate tests verify radius symmetry, cubic scaling, finite non-negative
+  ordinary results, and exact finite zero for ordinary and overflow-guard
+  zero-dissipation lanes.
 - **P2 -- input contract:** In
   `particula/gpu/kernels/tests/coagulation_test.py`, cover scalar broadcast and
   direct `(n_boxes,)` Warp inputs with heterogeneous values. Reject missing,

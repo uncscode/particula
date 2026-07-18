@@ -2,12 +2,12 @@
 
 ## GPU Physics
 
-- [ ] Add a typed fp64 ST1956 pair function in
+- [x] Add a typed fp64 ST1956 pair function in
   `particula/gpu/dynamics/coagulation_funcs.py` with radius, dissipation, and
   kinematic-viscosity arguments and documented SI units.
-- [ ] Reuse `dynamic_viscosity_wp()` and add or inline the reviewed
+- [x] Add `kinematic_viscosity_wp()` as the reviewed
   `kinematic_viscosity = dynamic_viscosity / fluid_density` operation.
-- [ ] Add independent helper probes and CPU/NumPy equation comparisons in
+- [x] Add independent helper probes and NumPy equation comparisons in
   `particula/gpu/dynamics/tests/coagulation_funcs_test.py`.
 
 ## Coagulation Orchestration
