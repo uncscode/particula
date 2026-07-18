@@ -71,6 +71,7 @@ if wp is not None:
         CoagulationMechanismConfig,
         _bound_scheduled_trials,
         _charged_majorant_from_active_pairs,
+        _checked_positive_finite_add,
         _compact_applied_collision_pairs_kernel,
         _ensure_turbulent_input_array,
         _ensure_volume_array,
@@ -78,6 +79,7 @@ if wp is not None:
         _remove_active_pair_by_rank_swap_pop,
         _resolve_active_pair_by_rank,
         _resolve_collision_capacity,
+        _safe_acceptance_probability,
         _sanitize_positive_finite,
         _sedimentation_majorant_from_active_pairs,
         _select_active_pair_by_rank,
@@ -2031,6 +2033,84 @@ def _additive_helper_probe_kernel(
 
 
 @_warp_kernel
+def _all_mask_additive_probe_kernel(
+    mechanism_mask: Any,
+    values: Any,
+    velocities: Any,
+    active_indices: Any,
+    radii: Any,
+    total_masses: Any,
+    charges: Any,
+    temperature: Any,
+    pressure: Any,
+    turbulent_dissipation: Any,
+    kinematic_viscosity: Any,
+    pair_rate: Any,
+    majorant: Any,
+) -> None:
+    """Probe all recognized additive masks against one compact active pair."""
+    pair_rate[0] = _total_pair_rate(
+        mechanism_mask,
+        radii[0, 0],
+        radii[0, 1],
+        values[0],
+        values[1],
+        values[2],
+        values[3],
+        values[4],
+        values[5],
+        velocities[0, 0],
+        velocities[0, 1],
+        turbulent_dissipation[0],
+        kinematic_viscosity[0],
+        total_masses[0, 0],
+        total_masses[0, 1],
+        charges[0, 0],
+        charges[0, 1],
+        temperature[0],
+        pressure[0],
+        wp.float64(constants.BOLTZMANN_CONSTANT),
+        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+        wp.float64(constants.ELECTRIC_PERMITTIVITY),
+        wp.float64(constants.GAS_CONSTANT),
+        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+        wp.float64(constants.REF_VISCOSITY_AIR_STP),
+        wp.float64(constants.REF_TEMPERATURE_STP),
+        wp.float64(constants.SUTHERLAND_CONSTANT),
+    )
+    majorant[0] = _total_majorant(
+        mechanism_mask,
+        radii[0, 0],
+        radii[0, 1],
+        values[0],
+        values[1],
+        values[2],
+        values[3],
+        values[4],
+        values[5],
+        active_indices,
+        wp.int32(0),
+        wp.int32(2),
+        radii,
+        velocities,
+        turbulent_dissipation[0],
+        kinematic_viscosity[0],
+        total_masses,
+        charges,
+        temperature,
+        pressure,
+        wp.float64(constants.BOLTZMANN_CONSTANT),
+        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
+        wp.float64(constants.ELECTRIC_PERMITTIVITY),
+        wp.float64(constants.GAS_CONSTANT),
+        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+        wp.float64(constants.REF_VISCOSITY_AIR_STP),
+        wp.float64(constants.REF_TEMPERATURE_STP),
+        wp.float64(constants.SUTHERLAND_CONSTANT),
+    )
+
+
+@_warp_kernel
 def _charged_majorant_probe_kernel(
     active_indices: Any,
     active_counts: Any,
@@ -2108,10 +2188,10 @@ def _synthetic_total_sampling_probe_kernel(
     accepted_count: Any,
 ) -> None:
     """Exercise total-rate sampling guards with test-only synthetic terms."""
-    total_rate = _sanitize_positive_finite(rate_terms[0])
-    total_rate += _sanitize_positive_finite(rate_terms[1])
-    total_majorant = _sanitize_positive_finite(majorant_terms[0])
-    total_majorant += _sanitize_positive_finite(majorant_terms[1])
+    total_rate = _checked_positive_finite_add(rate_terms[0], rate_terms[1])
+    total_majorant = _checked_positive_finite_add(
+        majorant_terms[0], majorant_terms[1]
+    )
     totals[0] = total_rate
     totals[1] = total_majorant
 
@@ -2119,15 +2199,16 @@ def _synthetic_total_sampling_probe_kernel(
         return
 
     candidate_count[0] = wp.int32(1)
-    if not (wp.isfinite(total_rate) and total_rate > wp.float64(0.0)):
-        return
-    if total_rate > total_majorant:
+    acceptance_probability = _safe_acceptance_probability(
+        total_rate, total_majorant
+    )
+    if acceptance_probability <= wp.float64(0.0):
         return
 
     # Exactly one acceptance draw occurs for each otherwise valid candidate.
     acceptance_draw_count[0] = wp.int32(1)
     state = wp.rand_init(wp.int32(17))
-    if wp.randf(state) < total_rate / total_majorant:
+    if wp.randf(state) < acceptance_probability:
         pair_sentinel[0] = wp.int32(0)
         pair_sentinel[1] = wp.int32(1)
         accepted_count[0] = wp.int32(1)
@@ -2376,6 +2457,87 @@ def test_additive_sanitizer_rejects_invalid_terms(
     wp.synchronize()
 
     assert float(np.asarray(sanitized.numpy()).item()) == 0.0
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize("mechanism_mask", [3, 5, 6, 9, 10, 12, 15])
+def test_all_recognized_additive_masks_against_independent_pair_oracles(
+    device: str, mechanism_mask: int
+) -> None:
+    """Every recognized additive mask sums finite independent component rates."""
+    radii = np.array([[1.0e-8, 5.0e-8]], dtype=np.float64)
+    transport = np.array(
+        [1.0e-9, 2.0e-10, 2.0e-8, 4.0e-8, 0.2, 0.1], dtype=np.float64
+    )
+    velocities = np.array([[0.5, 3.0]], dtype=np.float64)
+    masses = np.array([[1.0e-23, 3.0e-22]], dtype=np.float64)
+    charges = np.array([[1.0, -2.0]], dtype=np.float64)
+    pair_rate = wp.zeros((1,), dtype=wp.float64, device=device)
+    majorant = wp.zeros((1,), dtype=wp.float64, device=device)
+    wp.launch(
+        _all_mask_additive_probe_kernel,
+        dim=1,
+        inputs=[
+            wp.int32(mechanism_mask),
+            wp.array(transport, dtype=wp.float64, device=device),
+            wp.array(velocities, dtype=wp.float64, device=device),
+            wp.array([[0, 1]], dtype=wp.int32, device=device),
+            wp.array(radii, dtype=wp.float64, device=device),
+            wp.array(masses, dtype=wp.float64, device=device),
+            wp.array(charges, dtype=wp.float64, device=device),
+            wp.array([298.15], dtype=wp.float64, device=device),
+            wp.array([101325.0], dtype=wp.float64, device=device),
+            wp.array([2.0], dtype=wp.float64, device=device),
+            wp.array([1.5e-5], dtype=wp.float64, device=device),
+            pair_rate,
+            majorant,
+        ],
+        device=device,
+    )
+    wp.synchronize_device(device)
+
+    brownian = (
+        4.0
+        * np.pi
+        * (transport[0] + transport[1])
+        * (radii[0, 0] + radii[0, 1])
+        / (
+            (radii[0, 0] + radii[0, 1])
+            / (radii[0, 0] + radii[0, 1] + np.hypot(transport[2], transport[3]))
+            + 4.0
+            * (transport[0] + transport[1])
+            / (
+                (radii[0, 0] + radii[0, 1])
+                * np.hypot(transport[4], transport[5])
+            )
+        )
+    )
+    components = [
+        brownian,
+        _charged_hard_sphere_oracle(
+            radii[0, 0],
+            radii[0, 1],
+            masses[0, 0],
+            masses[0, 1],
+            charges[0, 0],
+            charges[0, 1],
+            298.15,
+            101325.0,
+        ),
+        _sedimentation_sp2016_oracle(*radii[0], *velocities[0]),
+        np.sqrt(np.pi * 2.0 / (120.0 * 1.5e-5)) * (2.0 * np.sum(radii[0])) ** 3,
+    ]
+    expected = sum(
+        component
+        for bit, component in zip((1, 2, 4, 8), components, strict=True)
+        if mechanism_mask & bit
+    )
+    observed_rate = float(pair_rate.numpy()[0])
+    observed_majorant = float(majorant.numpy()[0])
+    assert np.isfinite(observed_rate) and observed_rate > 0.0
+    assert np.isfinite(observed_majorant) and observed_majorant >= observed_rate
+    # The two-active fixture makes every component maximum the selected pair.
+    npt.assert_allclose(observed_rate, expected, rtol=2.0e-10, atol=0.0)
 
 
 @pytest.mark.gpu_parity
@@ -2929,6 +3091,46 @@ def test_synthetic_invalid_totals_preserve_sampling_output_state(
     npt.assert_array_equal(draws, np.array([0], dtype=np.int32))
     npt.assert_array_equal(accepted, np.array([0], dtype=np.int32))
     npt.assert_array_equal(pair, np.array([-7, -7], dtype=np.int32))
+
+
+@pytest.mark.parametrize(
+    ("rate_terms", "majorant_terms"),
+    [
+        ((np.finfo(np.float64).max, np.finfo(np.float64).max), (1.0, 1.0)),
+        ((1.0, 1.0), (np.finfo(np.float64).max, np.finfo(np.float64).max)),
+    ],
+)
+def test_synthetic_overflowed_totals_fail_closed(
+    device: str,
+    rate_terms: tuple[float, float],
+    majorant_terms: tuple[float, float],
+) -> None:
+    """Overflowed additive totals become safe zero before selector work."""
+    pair, totals, _, draws, accepted = _run_synthetic_total_sampling_probe(
+        device, rate_terms, majorant_terms
+    )
+
+    assert np.any(totals == 0.0)
+    npt.assert_array_equal(draws, np.array([0], dtype=np.int32))
+    npt.assert_array_equal(accepted, np.array([0], dtype=np.int32))
+    npt.assert_array_equal(pair, np.array([-7, -7], dtype=np.int32))
+
+
+@pytest.mark.parametrize(("ulps", "expected_draws"), [(8, 1), (9, 0)])
+def test_selector_ratio_allows_only_eight_ulp_majorant_overshoot(
+    device: str, ulps: int, expected_draws: int
+) -> None:
+    """Only the bounded fp64 majorant overshoot can advance acceptance RNG."""
+    majorant = 1.0
+    rate = majorant
+    for _ in range(ulps):
+        rate = np.nextafter(rate, np.inf)
+    _, _, candidates, draws, _ = _run_synthetic_total_sampling_probe(
+        device, (rate, 0.0), (majorant, 0.0)
+    )
+
+    npt.assert_array_equal(candidates, np.array([1], dtype=np.int32))
+    npt.assert_array_equal(draws, np.array([expected_draws], dtype=np.int32))
 
 
 def _make_particle_data(

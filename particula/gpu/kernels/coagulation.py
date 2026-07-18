@@ -358,6 +358,57 @@ def _sanitize_positive_finite(value: Any) -> Any:
 
 @no_type_check
 @wp.func
+def _checked_positive_finite_add(left: Any, right: Any) -> Any:
+    """Add two sanitized fp64 terms, failing closed on invalid arithmetic.
+
+    Additive mechanism terms are independently optional, but an overflowing
+    aggregate cannot safely be used as a selector rate or majorant.
+    """
+    sanitized_left = _sanitize_positive_finite(left)
+    sanitized_right = _sanitize_positive_finite(right)
+    total = sanitized_left + sanitized_right
+    return _sanitize_positive_finite(total)
+
+
+@no_type_check
+@wp.func
+def _safe_acceptance_probability(total_rate: Any, total_majorant: Any) -> Any:
+    """Return a safe acceptance ratio or zero before RNG advancement.
+
+    A rate may exceed its majorant only by eight fp64 ulps of rounding error;
+    that narrow case maps exactly to one. Material violations and non-finite
+    tolerance arithmetic fail closed before the caller draws acceptance RNG.
+    """
+    zero = wp.float64(0.0)
+    one = wp.float64(1.0)
+    if not (
+        wp.isfinite(total_rate)
+        and total_rate > zero
+        and wp.isfinite(total_majorant)
+        and total_majorant > zero
+    ):
+        return zero
+
+    if total_rate > total_majorant:
+        larger = total_rate
+        if total_majorant > larger:
+            larger = total_majorant
+        tolerance = wp.float64(8.0) * wp.float64(2.220446049250313e-16) * larger
+        if (
+            not wp.isfinite(tolerance)
+            or total_rate - total_majorant > tolerance
+        ):
+            return zero
+        return one
+
+    probability = total_rate / total_majorant
+    if not wp.isfinite(probability) or probability <= zero or probability > one:
+        return zero
+    return probability
+
+
+@no_type_check
+@wp.func
 def _total_pair_rate(  # noqa: PLR0913
     mechanism_mask: Any,
     radius_i: Any,
@@ -397,7 +448,7 @@ def _total_pair_rate(  # noqa: PLR0913
     """
     total_rate = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
-        total_rate += _sanitize_positive_finite(
+        component_rate = _sanitize_positive_finite(
             brownian_kernel_pair_wp(
                 radius_i,
                 radius_j,
@@ -410,8 +461,18 @@ def _total_pair_rate(  # noqa: PLR0913
                 wp.float64(1.0),
             )
         )
+        accumulated_rate = _checked_positive_finite_add(
+            total_rate, component_rate
+        )
+        if (
+            total_rate > wp.float64(0.0)
+            and component_rate > wp.float64(0.0)
+            and accumulated_rate <= wp.float64(0.0)
+        ):
+            return wp.float64(0.0)
+        total_rate = accumulated_rate
     if mechanism_mask & wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG):
-        total_rate += _sanitize_positive_finite(
+        component_rate = _sanitize_positive_finite(
             charged_hard_sphere_wp(
                 radius_i,
                 radius_j,
@@ -431,8 +492,18 @@ def _total_pair_rate(  # noqa: PLR0913
                 sutherland_constant,
             )
         )
+        accumulated_rate = _checked_positive_finite_add(
+            total_rate, component_rate
+        )
+        if (
+            total_rate > wp.float64(0.0)
+            and component_rate > wp.float64(0.0)
+            and accumulated_rate <= wp.float64(0.0)
+        ):
+            return wp.float64(0.0)
+        total_rate = accumulated_rate
     if mechanism_mask & wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG):
-        total_rate += _sanitize_positive_finite(
+        component_rate = _sanitize_positive_finite(
             sedimentation_sp2016_pair_rate_wp(
                 radius_i,
                 radius_j,
@@ -440,8 +511,18 @@ def _total_pair_rate(  # noqa: PLR0913
                 settling_velocity_j,
             )
         )
+        accumulated_rate = _checked_positive_finite_add(
+            total_rate, component_rate
+        )
+        if (
+            total_rate > wp.float64(0.0)
+            and component_rate > wp.float64(0.0)
+            and accumulated_rate <= wp.float64(0.0)
+        ):
+            return wp.float64(0.0)
+        total_rate = accumulated_rate
     if mechanism_mask & wp.int32(TURBULENT_SHEAR_ST1956_MECHANISM_FLAG):
-        total_rate += _sanitize_positive_finite(
+        component_rate = _sanitize_positive_finite(
             turbulent_shear_st1956_pair_rate_wp(
                 radius_i,
                 radius_j,
@@ -449,6 +530,16 @@ def _total_pair_rate(  # noqa: PLR0913
                 kinematic_viscosity,
             )
         )
+        accumulated_rate = _checked_positive_finite_add(
+            total_rate, component_rate
+        )
+        if (
+            total_rate > wp.float64(0.0)
+            and component_rate > wp.float64(0.0)
+            and accumulated_rate <= wp.float64(0.0)
+        ):
+            return wp.float64(0.0)
+        total_rate = accumulated_rate
     return total_rate
 
 
@@ -678,7 +769,7 @@ def _total_majorant(  # noqa: PLR0913
     """
     total_majorant = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
-        total_majorant += _sanitize_positive_finite(
+        component_majorant = _sanitize_positive_finite(
             brownian_kernel_pair_wp(
                 radius_min,
                 radius_max,
@@ -691,8 +782,18 @@ def _total_majorant(  # noqa: PLR0913
                 wp.float64(1.0),
             )
         )
+        accumulated_majorant = _checked_positive_finite_add(
+            total_majorant, component_majorant
+        )
+        if (
+            total_majorant > wp.float64(0.0)
+            and component_majorant > wp.float64(0.0)
+            and accumulated_majorant <= wp.float64(0.0)
+        ):
+            return wp.float64(0.0)
+        total_majorant = accumulated_majorant
     if mechanism_mask & wp.int32(CHARGED_HARD_SPHERE_MECHANISM_FLAG):
-        total_majorant += _sanitize_positive_finite(
+        component_majorant = _sanitize_positive_finite(
             _charged_majorant_from_active_pairs(
                 active_indices,
                 box_idx,
@@ -712,8 +813,18 @@ def _total_majorant(  # noqa: PLR0913
                 sutherland_constant,
             )
         )
+        accumulated_majorant = _checked_positive_finite_add(
+            total_majorant, component_majorant
+        )
+        if (
+            total_majorant > wp.float64(0.0)
+            and component_majorant > wp.float64(0.0)
+            and accumulated_majorant <= wp.float64(0.0)
+        ):
+            return wp.float64(0.0)
+        total_majorant = accumulated_majorant
     if mechanism_mask & wp.int32(SEDIMENTATION_SP2016_MECHANISM_FLAG):
-        total_majorant += _sanitize_positive_finite(
+        component_majorant = _sanitize_positive_finite(
             _sedimentation_majorant_from_active_pairs(
                 active_indices,
                 box_idx,
@@ -722,8 +833,18 @@ def _total_majorant(  # noqa: PLR0913
                 settling_velocities,
             )
         )
-    if mechanism_mask == wp.int32(TURBULENT_SHEAR_ST1956_MECHANISM_FLAG):
-        total_majorant += _turbulent_majorant_from_active_radii(
+        accumulated_majorant = _checked_positive_finite_add(
+            total_majorant, component_majorant
+        )
+        if (
+            total_majorant > wp.float64(0.0)
+            and component_majorant > wp.float64(0.0)
+            and accumulated_majorant <= wp.float64(0.0)
+        ):
+            return wp.float64(0.0)
+        total_majorant = accumulated_majorant
+    if mechanism_mask & wp.int32(TURBULENT_SHEAR_ST1956_MECHANISM_FLAG):
+        component_majorant = _turbulent_majorant_from_active_radii(
             active_indices,
             box_idx,
             active_count,
@@ -731,6 +852,16 @@ def _total_majorant(  # noqa: PLR0913
             turbulent_dissipation,
             kinematic_viscosity,
         )
+        accumulated_majorant = _checked_positive_finite_add(
+            total_majorant, component_majorant
+        )
+        if (
+            total_majorant > wp.float64(0.0)
+            and component_majorant > wp.float64(0.0)
+            and accumulated_majorant <= wp.float64(0.0)
+        ):
+            return wp.float64(0.0)
+        total_majorant = accumulated_majorant
     # Other reserved mechanism bits deliberately contribute no term.
     return total_majorant
 
@@ -1388,12 +1519,12 @@ def brownian_coagulation_kernel(  # noqa: C901
             ref_temperature,
             sutherland_constant,
         )
-        if not (wp.isfinite(total_rate) and total_rate > wp.float64(0.0)):
+        acceptance_probability = _safe_acceptance_probability(
+            total_rate, majorant_total
+        )
+        if acceptance_probability <= wp.float64(0.0):
             continue
         # Every valid candidate gets exactly one acceptance draw.
-        acceptance_probability = total_rate / majorant_total
-        if acceptance_probability > wp.float64(1.0):
-            acceptance_probability = wp.float64(1.0)
         if wp.randf(state) < acceptance_probability:
             merged_charge = (
                 charge[box_idx, selected_i] + charge[box_idx, selected_j]
