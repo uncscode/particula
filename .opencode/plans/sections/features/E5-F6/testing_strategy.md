@@ -12,11 +12,17 @@ the repository's `*_test.py` convention and collect cleanly without Warp.
   mask-driven turbulent/charged/sedimentation preflight, non-turbulent ignoring
   turbulent arguments, the stable deferred error, downstream-helper bypass, and
   unchanged caller particle/output/RNG state for valid deferred calls.
-- **P2 — Additive math and bound:** Independently calculate each component pair
-  matrix, its valid majorant, and component sums. Across every active unordered
-  pair assert finite non-negative values, total-rate parity, and
-  `total_rate <= sum(term_majorants)`. Cover zero terms, different term maxima,
-  mixed scales, zero-total early return, defensive roundoff, and bounded trials.
+- **P2 — Additive math and bound (implemented in #1358):** Independent
+  deterministic fp64 NumPy oracles calculate Brownian, charged, sedimentation,
+  and ST1956 component rates without calling production aggregate helpers.
+  Private Warp probes cover all recognized two-way/four-way masks across sparse
+  mixed-scale fixtures with non-coincident component maxima, asserting finite
+  non-negative totals, explicit-tolerance parity, and checked summed-majorant
+  bounds. Regressions cover invalid/overflowed aggregates, zero totals, capped
+  scheduling, eight-ULP permitted overshoot versus ninth-ULP rejection, and no
+  acceptance draw or selector mutation on rejected ratios. These tests carry
+  `warp` and `gpu_parity` markers; Warp CPU is the required backend and CUDA is
+  optional.
 - **P3 — Single-pass integration:** Exercise approved two-way rows and the full
   four-way row on one-box and heterogeneous multi-box fixtures. Use test-local
   diagnostics to prove one proposal/acceptance stream and one apply pass. Check

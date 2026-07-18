@@ -4,9 +4,10 @@ This module composes Warp ``@wp.func`` building blocks into an end-to-end
 coagulation pipeline. Its fixed-mask sampler executes particle-resolved
 Brownian, charged hard-sphere, exact unit-efficiency SP2016 sedimentation,
 ST1956 turbulent shear, or the supported Brownian-plus-charged configuration.
-It normalizes the combined configuration to one mask, accumulates a finite
-positive additive rate and safe majorant, then makes one acceptance draw for
-each valid candidate. Entry-point validation accepts scalar direct inputs,
+Private fixed-mask helpers safely accumulate every enabled component for
+deterministic tests; this does not expand the sampler's executable-mask
+boundary. A valid sampler candidate uses one fail-closed acceptance ratio and
+one acceptance draw. Entry-point validation accepts scalar direct inputs,
 explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
 Particle metadata and device checks run before normalizing environment inputs,
 setting up volume, initializing RNG state, or executing Brownian work. An
@@ -441,10 +442,11 @@ def _total_pair_rate(  # noqa: PLR0913
     """Return the enabled finite, positive pair rate.
 
     This helper dispatches fixed flag bits without dynamic mechanism iteration.
-    Each enabled term is independently sanitized before its additive combined
-    rate is returned. This helper's bit dispatch does not grant sampler
-    support: the sampler executes sedimentation and turbulent shear only for
-    their exact public singleton masks. Invalid rate terms contribute zero.
+    Each enabled term is independently sanitized and added with checked fp64
+    arithmetic. An invalid component contributes zero, while an invalid or
+    overflowing aggregate returns zero. This helper's bit dispatch does not
+    grant sampler support: the sampler executes sedimentation and turbulent
+    shear only for their exact public singleton masks.
     """
     total_rate = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):
@@ -758,14 +760,15 @@ def _total_majorant(  # noqa: PLR0913
     ref_temperature: Any,
     sutherland_constant: Any,
 ) -> Any:
-    """Accumulate enabled finite, positive terms for private staged tests.
+    """Return a checked sum of enabled finite, positive majorant components.
 
-    This helper dispatches fixed flag bits for internal tests and exact
-    charged-only, SP2016 sedimentation-only, or ST1956 turbulent-shear-only
-    sampler execution. The sampler separately enforces its executable-mask
-    boundary; helper contributions do not make mixed sedimentation or turbulent
-    masks executable. Brownian-containing production selection uses one exact
-    active-pair scan through ``_total_pair_rate``.
+    Component maxima can occur on different active pairs, so each enabled
+    component is bounded independently and then added with checked fp64
+    arithmetic. An invalid or overflowing aggregate returns zero. This helper
+    supports deterministic internal probes and exact singleton execution; its
+    dispatch does not make mixed sedimentation or turbulent masks executable.
+    Brownian-containing production selection instead uses one exact active-pair
+    scan through ``_total_pair_rate``.
     """
     total_majorant = wp.float64(0.0)
     if mechanism_mask & wp.int32(BROWNIAN_MECHANISM_FLAG):

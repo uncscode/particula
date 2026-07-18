@@ -40,8 +40,9 @@ before particle access. Recognized masks use enabled bits to run turbulent,
 charged, and sedimentation read-only preflight in that order; a valid deferred
 pair/four-term mask then raises the stable deferred-execution error before
 normalization, output/RNG allocation or initialization, kernel launch, or
-mutation. The executable gate still admits only the shipped singleton modes and
-Brownian-plus-charged; P2 will extend execution rather than recognition.
+ mutation. The executable gate still admits only the shipped singleton modes and
+ Brownian-plus-charged; P2 hardens private summed dispatch without extending
+ that gate.
 
 ## Data / API / Workflow Changes
 
@@ -66,8 +67,11 @@ Brownian-plus-charged; P2 will extend execution rather than recognition.
 
 - Every component and total rate/majorant is finite and non-negative.
 - `total_pair_rate <= total_majorant`; only a narrowly documented roundoff clamp
-  may prevent a ratio infinitesimally above one. Material violations fail/guard
-  explicitly and are never silently normalized.
+  may prevent a ratio infinitesimally above one. The private acceptance guard
+  permits only `rate - majorant <= 8 * eps * max(rate, majorant)`, maps that
+  permitted overshoot to `1.0`, and otherwise rejects before an RNG draw,
+  selector write, or active-set removal. Material violations are never silently
+  normalized.
 - Trial scheduling remains bounded by `MAX_SCHEDULED_TRIALS_PER_BOX` and output
   capacity; no unsafe integer conversion is introduced.
 - One proposal consumes one acceptance draw regardless of enabled-term count.

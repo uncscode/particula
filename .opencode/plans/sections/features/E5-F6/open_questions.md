@@ -23,7 +23,8 @@
     unproved heuristic.
 - [x] How should device code surface a material `total_rate > total_majorant`
   violation without host synchronization?
-  - Resolved 2026-07-16: a preflight device scan writes an internal per-box
-    status buffer that is read before RNG/merge launches. Permit a ratio clamp
-    only within `8 * eps * max(abs(rate), abs(majorant), tiny)`; raise on larger
-    exceedance. The status buffer is not public API.
+  - Resolved 2026-07-18 by #1358: a private device-side ratio guard rejects
+    invalid or material violations before a draw, selector write, or active-set
+    removal. It permits only `rate - majorant <= 8 * eps * max(rate, majorant)`
+    and maps that allowed fp64 roundoff overshoot to exactly `1.0`; no status
+    buffer, host synchronization, or public API is introduced.
