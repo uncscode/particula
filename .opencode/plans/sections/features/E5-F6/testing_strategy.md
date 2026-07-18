@@ -6,10 +6,12 @@ the repository's `*_test.py` convention and collect cleanly without Warp.
 
 ## Per-Phase Coverage
 
-- **P1 — Combination contract:** Table-drive all canonical single, approved
-  two-way, and full four-way masks plus unsupported rows. Assert order
-  independence, duplicate/unknown rejection, required mechanism inputs, and
-  preflight snapshots of masses, concentration, charge, output buffers, and RNG.
+- **P1 — Combination contract (implemented in #1357):** Matrix tests cover the
+  four singleton, six pair, and four-term recognized masks, reverse pair order,
+  and all four rejected three-term masks. Validation and atomicity tests cover
+  mask-driven turbulent/charged/sedimentation preflight, non-turbulent ignoring
+  turbulent arguments, the stable deferred error, downstream-helper bypass, and
+  unchanged caller particle/output/RNG state for valid deferred calls.
 - **P2 — Additive math and bound:** Independently calculate each component pair
   matrix, its valid majorant, and component sums. Across every active unordered
   pair assert finite non-negative values, total-rate parity, and

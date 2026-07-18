@@ -12,8 +12,9 @@
     claiming unrequested three-way coverage.
 - [x] Should an unused turbulent dissipation/fluid-density argument be rejected
   for a mask without turbulent shear?
-  - Resolved 2026-07-16: yes. Reject excess or partial ST1956 inputs before any
-    allocation, RNG work, output clearing, or particle mutation.
+  - Resolved 2026-07-18 by #1357: no. P1's enabled-bit preflight does not inspect
+    turbulent arguments for non-turbulent masks; turbulent rows validate them
+    before any downstream runtime work.
 - [x] Is `sum(component_majorants)` too conservative for the bounded trial cap
   in realistic four-way fixtures?
   - Resolved 2026-07-16: use the sum as the initial proved bound and require

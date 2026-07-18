@@ -1,15 +1,17 @@
 # Phase Details
 
-- [ ] **E5-F6-P1:** Define additive combination matrix and preflight validation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Register four singleton rows, all six two-way rows, and the full
-    four-way canonical mask; reject three-way, unsupported, or under-specified
-    combinations before any launch or mutation.
+- [x] **E5-F6-P1:** Define additive combination matrix and preflight validation with unit tests
+  - Issue: #1357 | Size: S | Status: Implemented
+  - Delivered: A private immutable recognition table accepts four singleton,
+    six two-way, and one four-way mask. Three-way masks reject before particle
+    access. Recognition is separate from executable support: valid deferred
+    masks complete enabled-term read-only preflight then raise the stable
+    deferred-execution error before downstream work or mutation.
   - Files: `particula/gpu/kernels/coagulation.py`,
     `particula/gpu/kernels/tests/coagulation_test.py`
-  - Tests: canonical order equivalence, duplicate/unknown terms, explicit matrix
-    rows, missing/excess mechanism inputs, and snapshots proving particles,
-    outputs, and persistent RNG remain unchanged on failure.
+  - Tests: matrix/order and structural rejection, per-term validation, deferred
+    mask launch/helper bypass, and snapshots proving particles, outputs, and
+    persistent RNG remain unchanged.
 
 - [ ] **E5-F6-P2:** Implement safe summed majorants and additive pair dispatch with unit tests
   - Issue: TBD | Size: S | Status: Not Started

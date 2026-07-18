@@ -5,14 +5,15 @@
   `particula/gpu/kernels/coagulation.py` are the extension seam. Do not create a
   second selector or public step.
 - `brownian_coagulation_kernel` in
-  `particula/gpu/kernels/coagulation.py:169-427` contains the baseline compact
+  `particula/gpu/kernels/coagulation.py:991` contains the baseline compact
   active-index preparation, bounded trial scheduling, rank-based pair proposal,
   one-draw acceptance, and swap-pop removal behavior that E5-F1 generalizes.
 - `_bound_scheduled_trials()` at
-  `particula/gpu/kernels/coagulation.py:66-76` and constants at lines 62-63
+  `particula/gpu/kernels/coagulation.py:335` and mechanism/constants around
+  line 103
   preserve overflow and work bounds for a summed majorant.
 - `coagulation_step_gpu()` at
-  `particula/gpu/kernels/coagulation.py:792-1022` is the only orchestration and
+  `particula/gpu/kernels/coagulation.py:2183` is the only orchestration and
   launch boundary. Reuse its fail-before-launch validation, optional output
   buffers, persistent RNG state, and single apply launch.
 - E5-F3 supplies charged pair-rate/majorant dispatch and charge-conserving merge

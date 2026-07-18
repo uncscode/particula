@@ -16,6 +16,17 @@ Users gain physically additive two-way and four-way particle-resolved GPU
 coagulation while retaining one collision buffer, one per-box RNG stream, one
 merge pass, and the existing direct low-level API ownership contract.
 
+## Implemented P1 Boundary
+
+Issue #1357 delivered the recognition and atomic-preflight boundary, not
+additive execution. A private immutable table recognizes the four singleton,
+six unordered pair, and four-term masks. The four three-term masks reject
+before particle access. Recognized non-executable masks run only their
+enabled turbulent, charged, and sedimentation read-only validation, then raise
+`ValueError("Additive coagulation execution is deferred.")` before runtime
+normalization, output/RNG work, kernels, or caller-state mutation. P2/P3 retain
+ownership of summed rates, majorants, and additive execution.
+
 ## User Stories
 
 - As a simulation author, I want enabled collision mechanisms added for each
