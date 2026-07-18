@@ -1,13 +1,19 @@
-"""GPU direct-kernel utilities for Brownian, charged, and ST1956 shear.
+"""GPU direct-kernel utilities for additive particle-resolved coagulation.
 
 This module composes Warp ``@wp.func`` building blocks into an end-to-end
-coagulation pipeline. Its fixed-mask sampler executes particle-resolved
-Brownian, charged hard-sphere, exact unit-efficiency SP2016 sedimentation,
-ST1956 turbulent shear, or the supported Brownian-plus-charged configuration.
-Private fixed-mask helpers safely accumulate every enabled component for
-deterministic tests; this does not expand the sampler's executable-mask
-boundary. A valid sampler candidate uses one fail-closed acceptance ratio and
-one acceptance draw. Entry-point validation accepts scalar direct inputs,
+coagulation pipeline. Its fixed-mask sampler executes the particle-resolved
+singleton masks ``1``, ``2``, ``4``, and ``8``; two-way masks ``3``, ``5``,
+``6``, ``9``, ``10``, and ``12``; and four-way mask ``15``. Mechanism tuples
+normalize to Brownian, charged hard-sphere, SP2016 sedimentation, then ST1956
+turbulent shear. The three-way masks ``7``, ``11``, ``13``, and ``14`` perform
+their enabled-term validation, then raise
+``ValueError("Additive coagulation execution is deferred.")``.
+
+Enabled fp64 component rates are sanitized and summed. Their safe, potentially
+conservative component-majorant sum satisfies ``sum_m K_m(i, j) <= sum_m M_m``;
+component maxima may occur on different pairs. One shared candidate stream,
+acceptance stream, collision output, RNG stream, and apply pass serve every
+approved mask. Entry-point validation accepts scalar direct inputs,
 explicit ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container.
 Particle metadata and device checks run before normalizing environment inputs,
 setting up volume, initializing RNG state, or executing Brownian work. An
@@ -142,12 +148,14 @@ class CoagulationMechanismConfig:
     ``coagulation_step_gpu`` accepts it only through its keyword-only
     ``mechanism_config`` argument. The configuration is host metadata and does
     not own, transfer, or synchronize Warp resources. Executable
-    ``"particle_resolved"`` modes include every singleton, two-way
-    combination, and the four-way combination. The resolver normalizes a
-    combination to the canonical fixed mask. Three-way masks and other
-    distribution types reject during structural preflight before runtime state
-    access or mutation. Structurally valid turbulent-shear requests validate
-    their explicit P2 inputs after particle schema and device checks.
+    ``"particle_resolved"`` masks are ``1``, ``2``, ``3``, ``4``, ``5``, ``6``,
+    ``8``, ``9``, ``10``, ``12``, and ``15``. The resolver normalizes a
+    combination to the canonical fixed mask. Malformed, duplicate, unknown, and
+    non-particle-resolved configurations reject during structural preflight
+    before particle state is accessed. Three-way masks validate enabled terms
+    before their deferred-execution error. Structurally valid turbulent-shear
+    requests validate their explicit P2 inputs after particle schema and device
+    checks.
 
     Attributes:
         mechanisms: Requested mechanism identifiers, or ``None`` to select
@@ -257,8 +265,10 @@ def validate_coagulation_mechanism_capabilities(
 ) -> None:
     """Enforce the executable coagulation-mechanism boundary.
 
-    This pure host-side, concrete-module-only validator accepts every singleton,
-    two-way combination, and the four-way ``"particle_resolved"`` mask.
+    This pure host-side, concrete-module-only validator accepts masks ``1``,
+    ``2``, ``3``, ``4``, ``5``, ``6``, ``8``, ``9``, ``10``, ``12``, and ``15``.
+    It rejects the recognized three-way masks ``7``, ``11``, ``13``, and ``14``
+    with the stable deferred-execution error.
     ``coagulation_step_gpu``
     invokes this validator during structural preflight for non-turbulent masks,
     but invokes it after the turbulent P2 input boundary for structurally valid

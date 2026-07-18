@@ -23,15 +23,13 @@ the repository's `*_test.py` convention and collect cleanly without Warp.
   acceptance draw or selector mutation on rejected ratios. These tests carry
   `warp` and `gpu_parity` markers; Warp CPU is the required backend and CUDA is
   optional.
-- **P3 — Single-pass integration:** Exercise approved two-way rows and the full
-  four-way row on one-box and heterogeneous multi-box fixtures. Use test-local
-  diagnostics to prove one proposal/acceptance stream and one apply pass. Check
-  sorted, in-range, disjoint pairs; capacity; caller-buffer identity; persistent
-  RNG reuse/reset; inactive slots; per-box/per-species mass conservation; and
-  separate total-charge conservation.
-- **P4 — Documentation:** Validate Markdown links, direct import paths,
-  signature/configuration names, SI units, support-table rows, and executable
-  snippets where present.
+- **P3 — Single-pass integration (implemented):** Existing public-path tests
+  exercise approved masks and test-local diagnostics cover shared selection and
+  apply behavior, caller-buffer identity, persistent RNG, conservation,
+  inactive slots, and deferred-mask atomicity.
+- **P4 — Documentation (implemented):** Source/signature and Markdown
+  inspection verify links, direct imports, SI units, support-table rows, and
+  the absence of changed executable snippets.
 
 ## Deterministic and Stochastic Oracles
 
@@ -49,10 +47,8 @@ the repository's `*_test.py` convention and collect cleanly without Warp.
 
 ## Device and Coverage Policy
 
-- Primary tests live in
-  `particula/gpu/kernels/tests/coagulation_test.py`; a focused
-  `particula/gpu/kernels/tests/additive_coagulation_test.py` may be introduced
-  if matrix clarity warrants it.
+- Primary tests live in `particula/gpu/kernels/tests/coagulation_test.py`; no
+  additional additive test module is needed for this documentation-only phase.
 - Warp CPU is required when Warp is installed. CUDA reuses parameterized
   fixtures and skips cleanly when unavailable; it is additive evidence only.
 - Focused correctness tests require no slow/performance marker. Run the full

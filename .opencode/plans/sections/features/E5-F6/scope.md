@@ -6,6 +6,9 @@ combinations, sums component pair rates and their proven per-term majorants,
 and performs one bounded candidate/acceptance pass for representative two-way
 and full four-way execution.
 
+Status: P1--P4 are implemented. The approved matrix is four singleton masks,
+six two-way masks, and four-way mask `15`; three-way masks remain deferred.
+
 ## In Scope
 
 - Define and validate the canonical additive capability matrix after all four

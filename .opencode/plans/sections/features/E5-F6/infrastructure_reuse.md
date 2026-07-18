@@ -12,8 +12,8 @@
   `particula/gpu/kernels/coagulation.py:335` and mechanism/constants around
   line 103
   preserve overflow and work bounds for a summed majorant.
-- `coagulation_step_gpu()` at
-  `particula/gpu/kernels/coagulation.py:2183` is the only orchestration and
+- `coagulation_step_gpu()` in `particula/gpu/kernels/coagulation.py` is the only
+  orchestration and
   launch boundary. Reuse its fail-before-launch validation, optional output
   buffers, persistent RNG state, and single apply launch.
 - E5-F3 supplies charged pair-rate/majorant dispatch and charge-conserving merge

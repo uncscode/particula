@@ -30,10 +30,10 @@
 
 ## Phase Ordering
 
-P1 freezes the executable matrix and preflight contract. P2 consumes that mask
-to implement and prove summed rates/majorants. P3 validates end-to-end one-pass
-execution only after P2's deterministic bound proof. P4 documents only shipped,
-verified rows. E5-F7 starts after P3; E5-F9 consumes P4 and E5-F7 results.
+P1 froze the matrix and preflight contract. P2 implemented and proved summed
+rates/majorants; P3 shipped end-to-end shared-path execution; and P4 documents
+the verified rows. E5-F7 remains the release/cross-mechanism validation phase,
+while E5-F9 remains the consolidated example and closeout phase.
 
 The frozen matrix contains the four singleton rows, all six unordered two-way
 rows, and the full four-way row. Three-way masks are unsupported and must fail

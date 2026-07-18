@@ -175,17 +175,15 @@ Known GPU physics gaps remain:
   and high-level `Runnable` integration remain future work outside this
   low-level publication.
 - Particle charge supports direct low-level particle-resolved charged hard-sphere
-  coagulation, including the canonical Brownian-plus-charged combination.
-- The current GPU coagulation path supports Brownian-only, charged-hard-sphere-
-  only, canonical Brownian-plus-charged, and exact unit-efficiency
-  SP2016-sedimentation-only `particle_resolved` inputs, plus the exact
-  ST1956-turbulent-shear singleton. Sedimentation and ST1956 are narrow direct-
-  kernel modes; combinations and variants, alternate charged models, and
-  broader distributions remain rejected during host capability preflight.
+  coagulation and charge-aware merges in every approved additive mask.
+- The GPU coagulation path executes particle-resolved singleton masks `1`, `2`,
+  `4`, `8`; two-way masks `3`, `5`, `6`, `9`, `10`, `12`; and four-way mask
+  `15`. The three-way masks `7`, `11`, `13`, `14` remain deferred after their
+  enabled-term validation. Alternate charged models, broader distributions, and
+  mechanism variants remain outside this direct-kernel contract.
 - CPU sedimentation coagulation and simple turbulent shear coagulation exist.
-  The shipped GPU sedimentation path does not establish CPU-strategy parity;
-  the direct, particle-resolved ST1956 singleton is shipped, while DNS and
-  general turbulence remain deferred from the near-term GPU scope.
+  The shipped GPU paths do not establish CPU-strategy parity; DNS and general
+  turbulence remain deferred from the near-term GPU scope.
 - Wall loss, dilution, and other dynamics processes are CPU-only today. They
   need GPU implementations before a full simulation can remain GPU-resident for
   every timestep.
@@ -1035,10 +1033,10 @@ Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 
 | Identifier | Status | Owner |
 | --- | --- | --- |
-| `brownian` | Executable with `particle_resolved` only | Shipped E5-F1 baseline |
-| `charged_hard_sphere` | Executable alone or with Brownian, particle-resolved only | Shipped E5-F3 |
-| `sedimentation_sp2016` | Exact unit-efficiency mode, particle-resolved only | Shipped E5-F4 |
-| `turbulent_shear_st1956` | Executable only as the exact particle-resolved ST1956 singleton | Shipped E5-F5 |
+| `brownian` | Bit `1`; executable in approved masks | Shipped direct-kernel term |
+| `charged_hard_sphere` | Bit `2`; executable in approved masks | Shipped direct-kernel term |
+| `sedimentation_sp2016` | Bit `4`; exact unit-efficiency term in approved masks | Shipped direct-kernel term |
+| `turbulent_shear_st1956` | Bit `8`; executable in approved masks with turbulent inputs | Shipped direct-kernel term |
 
 The charged-only tuple is `("charged_hard_sphere",)`. Exact SP2016
 sedimentation is selected with
@@ -1054,27 +1052,30 @@ needed; scalar turbulence inputs use private device-local `(n_boxes,)`
 broadcast/property storage, while valid supplied arrays retain identity.
 ST1956 has no dedicated settling-velocity buffer; caller-owned particle,
 collision-output, and RNG resources retain their documented dtypes and identity.
-The combined tuple `("brownian", "charged_hard_sphere")` is accepted in either
-requested order and normalizes to one executable mask. Reserved IDs, including
-Brownian-plus-sedimentation combinations, raise `ValueError` in host capability
-preflight before runtime input access, allocation, launch, or mutable state
-changes. Sedimentation-specific preflight rejects invalid particle physics
-before output allocation, RNG initialization, or particle mutation; this does
-not make unrelated later validation failures atomic.
+The executable matrix is singleton masks `1`, `2`, `4`, `8`; unordered two-way
+masks `3`, `5`, `6`, `9`, `10`, `12`; and four-way mask `15`. Requested tuples
+normalize to canonical Brownian, charged, sedimentation, turbulent order.
+Three-way masks `7`, `11`, `13`, `14` validate enabled terms then raise
+`ValueError("Additive coagulation execution is deferred.")`. Malformed,
+duplicate, unknown, and non-`particle_resolved` configurations reject during
+structural preflight before particle state access. Sedimentation-specific
+preflight rejects invalid particle physics before output allocation, RNG
+initialization, or particle mutation; this does not make unrelated later
+validation failures atomic.
 
 The exact turbulent-shear mode is selected with
 `CoagulationMechanismConfig(("turbulent_shear_st1956",))`. Its keyword-only
 `turbulent_dissipation` input is in `m^2/s^3`, and keyword-only `fluid_density`
 is in `kg/m^3`. Both are required positive finite inputs for structurally valid
-requests containing the turbulent mechanism. Only the exact ST1956 singleton
-executes. Each accepts a Python or NumPy floating scalar with private
+requests containing the turbulent mechanism, including a deferred three-way
+mask during enabled-term validation. Each accepts a Python or NumPy floating scalar with private
 device-local broadcast/property work storage, or an active-device `wp.float64`
 Warp array shaped `(n_boxes,)` that retains supplied identity. They are not
 inferred from a shared container, and Python lists, NumPy arrays, and hidden
-host-to-device transfers are not accepted as array inputs. Turbulent mixed
-mechanisms validate both P2 inputs, then raise
-`ValueError` before normalization, allocation, RNG work, launch, or mutation.
-Non-turbulent masks ignore both turbulence arguments.
+host-to-device transfers are not accepted as array inputs. Approved mixed
+turbulent masks execute with these inputs; deferred turbulent three-way masks
+validate them, then raise the stable deferred-execution error. Non-turbulent
+masks ignore both turbulence arguments.
 
 `WarpParticleData.charge` is caller-owned same-device `wp.float64` state with
 shape `(n_boxes, n_particles)`, not a sidecar or transfer result. Charged calls
@@ -1082,12 +1083,13 @@ preflight finite charge before caller-output validation/allocation, RNG setup,
 or selector/apply work. Accepted merges add donor charge to the recipient and
 clear the donor.
 
-Combined execution independently sanitizes and sums Brownian and charged pair
-rates, then uses one active set, exhaustive additive majorant,
-candidate/acceptance pass, collision-buffer set, per-box RNG stream, and apply
-pass. For active count A, pair work is O(A²), preparation is O(N), and
-selector/collision storage is O(N), where N is total particle capacity. This is
-bounded implementation scope, not a performance claim. The return tuple is exactly
+Approved additive execution sanitizes and sums fp64 component pair rates. The
+safe component-majorant sum satisfies `sum_m K_m(i, j) <= sum_m M_m`; component
+maxima can occur on different pairs, so this bound is conservative. One active
+set, candidate stream, acceptance stream, collision-buffer set, per-box RNG
+stream, and apply pass serve every approved mask rather than sequential
+mechanism steps. This is bounded implementation scope, not a performance claim.
+The return tuple is exactly
 `(particles, collision_pairs, n_collisions)`: supplied collision buffers return
 by identity, while supplied `rng_states` mutates in place and is not returned.
 Warp CPU is the baseline when installed; CUDA is optional additive evidence and
@@ -1099,31 +1101,27 @@ additive majorant; a capability-table row; shared-dispatcher integration; and
 co-located `*_test.py` coverage. They must not add an independent sampling
 loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
-integration, graph-capture claims, sedimentation combinations or variants, or
-turbulent additive combinations. DNS/general turbulence, non-unit efficiency,
+integration, graph-capture claims, mechanism variants, and DNS/general
+turbulence. Non-unit efficiency,
 alternate drag physics, Runnable integration, CPU fallback, hidden
 simulation-state transfers, graph capture, and performance guarantees are
 unsupported. Read-only P2 validation may synchronize and read back device
-status, including on CUDA, to report invalid values. The ST1956 singleton does
-not establish CPU-strategy parity. E5-F6 owns additive combinations,
-E5-F7 consumes ST1956 singleton validation/evidence, and E5-F9 owns the later
-consolidated support table and direct example; none of that downstream work is
-delivered here.
+status, including on CUDA, to report invalid values. The direct path does not
+establish CPU-strategy parity. E5-F6 ships the additive contract and
+documentation; E5-F7 remains responsible for release/cross-mechanism validation,
+and E5-F9 remains responsible for the consolidated direct example and closeout.
 
 Planned features:
 
-1. Sedimentation combinations or variants beyond the exact unit-efficiency
-   SP2016 direct-kernel mode.
-2. DNS/general turbulent-shear physics beyond the shipped exact ST1956
-   singleton.
-3. Combined Brownian, charged, sedimentation, and turbulent-shear kernels
-   when multiple mechanisms are active.
-4. Parity and statistical validation: CPU/GPU parity or statistically
+1. Sedimentation variants beyond the exact unit-efficiency SP2016 direct-kernel
+   term.
+2. DNS/general turbulent-shear physics beyond the shipped ST1956 term.
+3. Parity and statistical validation: CPU/GPU parity or statistically
    bounded tests for each new kernel, with recorded tolerances.
-5. Distribution-support decision record: the current GPU path explicitly
+4. Distribution-support decision record: the current GPU path explicitly
    enforces particle-resolved semantics (per-slot merges, concentration
    zeroing); document which binned/moving-bin strategies remain CPU-only.
-6. Epic D carry-forward closure: publish an independent CPU/Warp condensation
+5. Epic D carry-forward closure: publish an independent CPU/Warp condensation
    parity walkthrough that separates physics, conservation, and energy
    tolerances, and maintain the downstream ownership record for every deferred
    condensation capability listed above.
@@ -1262,9 +1260,9 @@ Candidate GPU process coverage:
 
 - Condensation: isothermal and latent-heat variants (staggered stays
   CPU-only).
-- Coagulation: Brownian, charged particle-resolved, exact ST1956 turbulent-
-  shear singleton, and sedimentation. Turbulent additive combinations and
-  DNS/general turbulence remain deferred from the near-term GPU scope.
+- Coagulation: approved particle-resolved singleton, two-way, and four-way
+  masks. Three-way masks plus DNS/general turbulence remain deferred from the
+  near-term GPU scope.
 - Wall loss: neutral spherical/rectangular first, then charged wall loss.
 - Dilution: particle and gas concentration dilution on GPU-resident arrays.
 - Nucleation: particle-source process activating inactive slots, after the CPU
