@@ -14766,9 +14766,16 @@
 <li><a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
   — canonical reference for <code>ParticleData</code>, <code>GasData</code>, <code>EnvironmentData</code>,
   explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
-  current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
-  such as coagulation <code>rng_states</code> and condensation thermodynamics. GPU
-  condensation requires keyword-only <code>thermodynamics=ThermodynamicsConfig</code>,
+   current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
+   such as coagulation <code>rng_states</code> and condensation thermodynamics. GPU
+   turbulent-shear coagulation supports only the direct, particle-resolved
+   <code>("turbulent_shear_st1956",)</code> singleton. It requires keyword-only positive,
+    finite <code>turbulent_dissipation</code> (m²/s³) and <code>fluid_density</code> (kg/m³) Python
+    <code>float</code> or NumPy floating scalar, or active-device <code>wp.float64</code>
+    <code>(n_boxes,)</code> Warp-array inputs; combinations,
+   runnable/API re-export, CPU fallback, and performance claims remain
+   deferred. GPU condensation requires keyword-only
+   <code>thermodynamics=ThermodynamicsConfig</code>,
   validates an active-device binary per-box/species <code>gas.partitioning</code> mask
   before mutation, and runs exactly four equal substeps. Disabled species and
   zero-concentration particle slots receive no transfer. Each finalized
@@ -14779,9 +14786,9 @@
    <code>WarpGasData.vapor_pressure</code> from the current device-resident temperature
    before mass transfer. For the supported low-level, direct-kernel-only
    walkthrough, use <code>python docs/Examples/gpu_direct_kernels_quick_start.py</code>.
-    This path does not add high-level <code>Aerosol</code>/<code>Runnable</code> support, implicit
-    simulation-state transfers or synchronization, automatic fallback or
-    migration, or CPU-strategy/runnable parity. See the <a href="Features/data-containers-and-gpu-foundations/#focused-reproduction-commands">GPU condensation command
+   This path does not add high-level <code>Aerosol</code>/<code>Runnable</code> support, implicit
+   simulation-state transfers or synchronization, automatic fallback or
+   migration, or CPU-strategy/runnable parity. See the <a href="Features/data-containers-and-gpu-foundations/#focused-reproduction-commands">GPU condensation command
     matrix</a>
     for focused troubleshooting and reproduction commands. Entry-point
     validation can still perform synchronous device-to-host readbacks.</li>
