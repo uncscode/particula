@@ -852,6 +852,74 @@ def test_combined_step_normalizes_order_and_preserves_output_identity(
 @pytest.mark.parametrize(
     "mechanisms",
     [
+        (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
+        (SEDIMENTATION_SP2016_MECHANISM, BROWNIAN_MECHANISM),
+        (SEDIMENTATION_SP2016_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
+        (TURBULENT_SHEAR_ST1956_MECHANISM, BROWNIAN_MECHANISM),
+        (TURBULENT_SHEAR_ST1956_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
+        (TURBULENT_SHEAR_ST1956_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
+        (
+            TURBULENT_SHEAR_ST1956_MECHANISM,
+            SEDIMENTATION_SP2016_MECHANISM,
+            CHARGED_HARD_SPHERE_MECHANISM,
+            BROWNIAN_MECHANISM,
+        ),
+    ],
+)
+def test_approved_additive_masks_use_public_merge_path(
+    device: str,
+    mechanisms: tuple[str, ...],
+) -> None:
+    """Approved masks preserve public output and conservation contracts."""
+    particles = _make_particle_data(n_boxes=2, n_particles=3, n_species=2)
+    particles.volume[:] = 1.0e-18
+    particles.concentration[:] = [[1.0, 0.0, 1.0], [1.0, 0.0, 1.0]]
+    particles.masses[:] = [
+        [[1.0e-15, 2.0e-15], [9.0e-15, 9.0e-15], [3.0e-15, 4.0e-15]],
+        [[2.0e-15, 3.0e-15], [9.0e-15, 9.0e-15], [4.0e-15, 5.0e-15]],
+    ]
+    particles.charge[:] = [[2.0, 11.0, -5.0], [-3.0, 13.0, 7.0]]
+    initial_mass = np.sum(particles.masses, axis=1)
+    initial_charge = np.sum(particles.charge, axis=1)
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    pairs = wp.full((2, 1, 2), -1, dtype=wp.int32, device=device)
+    counts = wp.zeros((2,), dtype=wp.int32, device=device)
+    states = wp.zeros((2,), dtype=wp.uint32, device=device)
+
+    returned = coagulation_step_gpu(
+        gpu_particles,
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0e308,
+        max_collisions=1,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        rng_states=states,
+        initialize_rng=True,
+        mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
+        turbulent_dissipation=1.0,
+        fluid_density=1.2,
+    )
+    result = from_warp_particle_data(gpu_particles, sync=True)
+
+    assert returned == (gpu_particles, pairs, counts)
+    npt.assert_array_equal(counts.numpy(), [1, 1])
+    npt.assert_array_equal(pairs.numpy(), [[[0, 2]], [[0, 2]]])
+    npt.assert_allclose(
+        np.sum(result.masses, axis=1), initial_mass, rtol=1.0e-12, atol=0.0
+    )
+    npt.assert_allclose(
+        np.sum(result.charge, axis=1), initial_charge, rtol=0.0, atol=0.0
+    )
+    npt.assert_array_equal(result.masses[:, 1], particles.masses[:, 1])
+    npt.assert_array_equal(result.charge[:, 1], particles.charge[:, 1])
+    npt.assert_array_equal(result.masses[:, 2], np.zeros((2, 2)))
+    npt.assert_array_equal(result.charge[:, 2], [0.0, 0.0])
+
+
+@pytest.mark.parametrize(
+    "mechanisms",
+    [
         (CHARGED_HARD_SPHERE_MECHANISM,),
         (BROWNIAN_MECHANISM, CHARGED_HARD_SPHERE_MECHANISM),
     ],
@@ -3921,7 +3989,7 @@ class _ParticlesAccessSentinel:
                     SEDIMENTATION_SP2016_MECHANISM,
                 )
             ),
-            "Unsupported coagulation mechanism configuration.",
+            "Additive coagulation execution is deferred.",
         ),
     ],
 )
@@ -3987,18 +4055,13 @@ def test_coagulation_step_gpu_rejects_config_before_runtime_access(
         ),
         (
             CoagulationMechanismConfig(
-                mechanisms=(BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM)
-            ),
-            "Unsupported coagulation mechanism configuration.",
-        ),
-        (
-            CoagulationMechanismConfig(
                 mechanisms=(
+                    BROWNIAN_MECHANISM,
                     CHARGED_HARD_SPHERE_MECHANISM,
                     SEDIMENTATION_SP2016_MECHANISM,
                 )
             ),
-            "Unsupported coagulation mechanism configuration.",
+            "Additive coagulation execution is deferred.",
         ),
     ],
 )
@@ -4070,32 +4133,36 @@ def test_coagulation_step_gpu_rejected_config_preserves_caller_state(
     ("mechanisms", "message"),
     [
         (
-            (BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
-            "Unsupported coagulation mechanism configuration.",
+            (
+                BROWNIAN_MECHANISM,
+                CHARGED_HARD_SPHERE_MECHANISM,
+                SEDIMENTATION_SP2016_MECHANISM,
+            ),
+            "Additive coagulation execution is deferred.",
         ),
         (
-            (CHARGED_HARD_SPHERE_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
-            "Unsupported coagulation mechanism configuration.",
+            (
+                BROWNIAN_MECHANISM,
+                CHARGED_HARD_SPHERE_MECHANISM,
+                TURBULENT_SHEAR_ST1956_MECHANISM,
+            ),
+            "Additive coagulation execution is deferred.",
         ),
         (
-            (BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-            "Turbulent-shear coagulation supports only the exact "
-            "('turbulent_shear_st1956',) mechanism configuration.",
+            (
+                BROWNIAN_MECHANISM,
+                SEDIMENTATION_SP2016_MECHANISM,
+                TURBULENT_SHEAR_ST1956_MECHANISM,
+            ),
+            "Additive coagulation execution is deferred.",
         ),
         (
-            (CHARGED_HARD_SPHERE_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-            "Turbulent-shear coagulation supports only the exact "
-            "('turbulent_shear_st1956',) mechanism configuration.",
-        ),
-        (
-            (SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-            "Turbulent-shear coagulation supports only the exact "
-            "('turbulent_shear_st1956',) mechanism configuration.",
-        ),
-        (
-            CANONICAL_COAGULATION_MECHANISMS,
-            "Turbulent-shear coagulation supports only the exact "
-            "('turbulent_shear_st1956',) mechanism configuration.",
+            (
+                CHARGED_HARD_SPHERE_MECHANISM,
+                SEDIMENTATION_SP2016_MECHANISM,
+                TURBULENT_SHEAR_ST1956_MECHANISM,
+            ),
+            "Additive coagulation execution is deferred.",
         ),
     ],
 )
@@ -4153,6 +4220,7 @@ def test_deferred_masks_preserve_caller_owned_state(
     [
         (
             (
+                BROWNIAN_MECHANISM,
                 CHARGED_HARD_SPHERE_MECHANISM,
                 SEDIMENTATION_SP2016_MECHANISM,
             ),
@@ -4160,10 +4228,14 @@ def test_deferred_masks_preserve_caller_owned_state(
             0.0,
             None,
             None,
-            "Unsupported coagulation mechanism configuration.",
+            "Additive coagulation execution is deferred.",
         ),
         (
-            (BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
+            (
+                BROWNIAN_MECHANISM,
+                CHARGED_HARD_SPHERE_MECHANISM,
+                TURBULENT_SHEAR_ST1956_MECHANISM,
+            ),
             None,
             None,
             0.0,
@@ -4171,12 +4243,19 @@ def test_deferred_masks_preserve_caller_owned_state(
             "turbulent_dissipation must be finite and > 0",
         ),
         (
-            (BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
+            (
+                BROWNIAN_MECHANISM,
+                SEDIMENTATION_SP2016_MECHANISM,
+                TURBULENT_SHEAR_ST1956_MECHANISM,
+            ),
             "masses",
             -1.0,
-            None,
-            None,
-            "Unsupported coagulation mechanism configuration.",
+            1.0,
+            1000.0,
+            "turbulent particle charge, masses, and concentrations must be "
+            "finite; masses and concentrations must be nonnegative; density "
+            "must be finite and > 0; active mass and volume must be finite "
+            "and > 0",
         ),
     ],
 )
@@ -4241,32 +4320,36 @@ def test_deferred_masks_reject_invalid_enabled_terms_atomically(
     ("mechanisms", "message"),
     [
         (
-            (BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
-            "Unsupported coagulation mechanism configuration.",
+            (
+                BROWNIAN_MECHANISM,
+                CHARGED_HARD_SPHERE_MECHANISM,
+                SEDIMENTATION_SP2016_MECHANISM,
+            ),
+            "Additive coagulation execution is deferred.",
         ),
         (
-            (CHARGED_HARD_SPHERE_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
-            "Unsupported coagulation mechanism configuration.",
+            (
+                BROWNIAN_MECHANISM,
+                CHARGED_HARD_SPHERE_MECHANISM,
+                TURBULENT_SHEAR_ST1956_MECHANISM,
+            ),
+            "Additive coagulation execution is deferred.",
         ),
         (
-            (BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-            "Turbulent-shear coagulation supports only the exact "
-            "('turbulent_shear_st1956',) mechanism configuration.",
+            (
+                BROWNIAN_MECHANISM,
+                SEDIMENTATION_SP2016_MECHANISM,
+                TURBULENT_SHEAR_ST1956_MECHANISM,
+            ),
+            "Additive coagulation execution is deferred.",
         ),
         (
-            (CHARGED_HARD_SPHERE_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-            "Turbulent-shear coagulation supports only the exact "
-            "('turbulent_shear_st1956',) mechanism configuration.",
-        ),
-        (
-            (SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
-            "Turbulent-shear coagulation supports only the exact "
-            "('turbulent_shear_st1956',) mechanism configuration.",
-        ),
-        (
-            CANONICAL_COAGULATION_MECHANISMS,
-            "Turbulent-shear coagulation supports only the exact "
-            "('turbulent_shear_st1956',) mechanism configuration.",
+            (
+                CHARGED_HARD_SPHERE_MECHANISM,
+                SEDIMENTATION_SP2016_MECHANISM,
+                TURBULENT_SHEAR_ST1956_MECHANISM,
+            ),
+            "Additive coagulation execution is deferred.",
         ),
     ],
 )
@@ -5024,10 +5107,10 @@ def test_turbulent_fresh_seed_acceptance_matches_rate_to_majorant_ratio(
     assert accepted > 0
 
 
-def test_turbulent_mixed_mask_rejects_before_runtime_mutation(
+def test_turbulent_three_way_mask_rejects_before_runtime_mutation(
     device: str,
 ) -> None:
-    """Mixed turbulent masks retain their established capability error."""
+    """Deferred turbulent three-way masks reject before runtime mutation."""
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
     gpu_particles = to_warp_particle_data(particles, device=device)
     pairs = wp.array([[[7, 7]]], dtype=wp.int32, device=device)
@@ -5037,10 +5120,7 @@ def test_turbulent_mixed_mask_rejects_before_runtime_mutation(
 
     with pytest.raises(
         ValueError,
-        match=(
-            "^Turbulent-shear coagulation supports only the exact "
-            "\\('turbulent_shear_st1956',\\) mechanism configuration\\.$"
-        ),
+        match="^Additive coagulation execution is deferred\\.$",
     ):
         coagulation_step_gpu(
             gpu_particles,
@@ -5054,6 +5134,7 @@ def test_turbulent_mixed_mask_rejects_before_runtime_mutation(
             mechanism_config=CoagulationMechanismConfig(
                 mechanisms=(
                     BROWNIAN_MECHANISM,
+                    CHARGED_HARD_SPHERE_MECHANISM,
                     TURBULENT_SHEAR_ST1956_MECHANISM,
                 )
             ),
@@ -7778,16 +7859,18 @@ def test_private_sedimentation_sampler_sparse_active_slots(
         assert np.all(pairs[:, 0] < pairs[:, 1])
 
 
-def test_private_mixed_sedimentation_mask_rejects_without_rng_or_pair_work(
+def test_private_three_way_mask_rejects_without_rng_or_pair_work(
     device: str,
 ) -> None:
-    """Unsupported direct Brownian-plus-SP2016 masks perform no schedule work."""
+    """Deferred direct three-way masks perform no schedule work."""
     masses = np.array([[[1.0e-15], [8.0e-15]]])
     result = _launch_private_coagulation_sampler(
         device,
         masses,
         np.ones((1, 2), dtype=np.float64),
-        BROWNIAN_MECHANISM_FLAG | SEDIMENTATION_SP2016_MECHANISM_FLAG,
+        BROWNIAN_MECHANISM_FLAG
+        | CHARGED_HARD_SPHERE_MECHANISM_FLAG
+        | SEDIMENTATION_SP2016_MECHANISM_FLAG,
         time_step=1.0e308,
     )
 
