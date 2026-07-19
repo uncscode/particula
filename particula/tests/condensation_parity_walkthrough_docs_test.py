@@ -106,7 +106,8 @@ LINKS = (
         None,
     ),
     (
-        "[walkthrough regression test](../../../particula/gpu/tests/"
+        "[walkthrough regression test](https://github.com/Gorkowski/particula/"
+        "blob/main/particula/gpu/tests/"
         "gpu_condensation_parity_walkthrough_test.py)",
         "../../../particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py",
         None,

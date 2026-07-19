@@ -304,6 +304,10 @@ def _validate_fixture(fixture: ParityFixture) -> None:
         or fixture.thermodynamic_modes.dtype != np.int32
     ):
         raise ValueError("thermodynamic_modes must be int32 with shape (2,).")
+    if np.any(fixture.thermodynamic_modes != 0):
+        raise ValueError(
+            "thermodynamic_modes must use constant mode (0) for this oracle."
+        )
     if len(fixture.names) != 2:
         raise ValueError("names must contain the two species-aligned labels.")
 
@@ -340,6 +344,26 @@ def build_oracle_input(fixture: ParityFixture | None = None) -> OracleInput:
             partitioning=fixture.partitioning.copy(),
         ),
         fixture=fixture,
+    )
+
+
+def _copy_oracle_input(source: OracleInput) -> OracleInput:
+    """Copy caller-owned oracle state for private mutation during execution."""
+    return OracleInput(
+        particles=ParticleData(
+            masses=source.particles.masses.copy(),
+            concentration=source.particles.concentration.copy(),
+            charge=source.particles.charge.copy(),
+            density=source.particles.density.copy(),
+            volume=source.particles.volume.copy(),
+        ),
+        gas=GasData(
+            name=list(source.gas.name),
+            molar_mass=source.gas.molar_mass.copy(),
+            concentration=source.gas.concentration.copy(),
+            partitioning=source.gas.partitioning.copy(),
+        ),
+        fixture=source.fixture,
     )
 
 
@@ -487,13 +511,15 @@ def run_oracle(source: OracleInput | None = None) -> OracleResult:
 
     Args:
         source: Optional detached CPU state. A canonical detached source is
-            built when omitted and is mutated only within this call.
+            built when omitted. Supplied state is copied before mutation.
 
     Returns:
         Final independent state, coupled transfer diagnostics, signed-joule
         energy diagnostic, and immutable per-substep observations.
     """
-    state = build_oracle_input() if source is None else source
+    state = (
+        build_oracle_input() if source is None else _copy_oracle_input(source)
+    )
     total = np.zeros_like(state.particles.masses)
     raw_proposal = np.zeros_like(total)
     substeps: list[OracleSubstep] = []
@@ -787,11 +813,13 @@ def run_example(device: str = "cpu") -> ExampleRun:
     )
 
 
-def main() -> None:
-    """Run the walkthrough and print independent and optional Warp labels."""
-    for line in run_example().output:
+def main() -> int:
+    """Run the walkthrough, print results, and return its process status."""
+    result = run_example()
+    for line in result.output:
         print(line)
+    return int(any(item.status == "failed" for item in result.acceptance))
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

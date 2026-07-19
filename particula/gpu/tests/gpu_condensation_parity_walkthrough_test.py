@@ -103,6 +103,20 @@ def test_oracle_has_four_substep_uptake_evaporation_coupling_and_energy(
     )
 
 
+def test_oracle_does_not_mutate_supplied_source(
+    example_module: types.ModuleType,
+) -> None:
+    """Oracle execution preserves caller-owned source particles and gas."""
+    source = example_module.build_oracle_input()
+    initial_masses = source.particles.masses.copy()
+    initial_gas_concentration = source.gas.concentration.copy()
+
+    example_module.run_oracle(source)
+
+    npt.assert_array_equal(source.particles.masses, initial_masses)
+    npt.assert_array_equal(source.gas.concentration, initial_gas_concentration)
+
+
 @pytest.mark.parametrize(
     ("field", "value", "message"),
     [
@@ -121,6 +135,17 @@ def test_fixture_validation_rejects_nonfinite_and_invalid_physical_values(
     """Injected fixtures enforce direct-step numeric and physical domains."""
     fixture = replace(example_module.build_fixture(), **{field: value})
     with pytest.raises(ValueError, match=message):
+        example_module.build_oracle_input(fixture)
+
+
+def test_fixture_validation_rejects_unsupported_thermodynamic_mode(
+    example_module: types.ModuleType,
+) -> None:
+    """The constant-mode oracle rejects thermodynamics it cannot model."""
+    modes = np.array([1, 0], dtype=np.int32)
+    fixture = replace(example_module.build_fixture(), thermodynamic_modes=modes)
+
+    with pytest.raises(ValueError, match="constant mode"):
         example_module.build_oracle_input(fixture)
 
 
@@ -582,9 +607,11 @@ def test_acceptance_reports_all_categories_after_multiple_failures(
 @pytest.mark.gpu_parity
 @pytest.mark.skipif(not WARP_AVAILABLE, reason="Warp is not available")
 def test_warp_cpu_matches_independent_oracle(
+    monkeypatch: pytest.MonkeyPatch,
     example_module: types.ModuleType,
 ) -> None:
     """Warp CPU satisfies separate physics, conservation, and energy checks."""
+    monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
     result = example_module.run_example(device="cpu")
     assert result.particle_data is not None and result.gas_data is not None
     assert (
@@ -656,9 +683,11 @@ def test_warp_cpu_matches_independent_oracle(
 @pytest.mark.cuda
 @pytest.mark.gpu_parity
 def test_cuda_matches_independent_oracle_when_available(
+    monkeypatch: pytest.MonkeyPatch,
     example_module: types.ModuleType,
 ) -> None:
     """CUDA is optional additive evidence using the shared skip policy."""
+    monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
     if not WARP_AVAILABLE:
         pytest.skip(CUDA_SKIP_REASON)
     wp = importlib.import_module("warp")
@@ -743,9 +772,30 @@ def test_main_force_no_warp_prints_oracle_completion(
 ) -> None:
     """Direct script execution preserves the CPU-only walkthrough route."""
     monkeypatch.setenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", "1")
-    runpy.run_path(str(EXAMPLE_PATH), run_name="__main__")
+    with pytest.raises(SystemExit) as error:
+        runpy.run_path(str(EXAMPLE_PATH), run_name="__main__")
+    assert error.value.code == 0
     output = capsys.readouterr().out
     assert "oracle completed; no kernel ran" in output
     for category in ("physics", "conservation", "energy"):
         assert f"{category}: unavailable" in output
     assert "parity: passed" not in output
+
+
+def test_main_returns_nonzero_for_failed_acceptance(
+    monkeypatch: pytest.MonkeyPatch,
+    example_module: types.ModuleType,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A failed acceptance result produces a nonzero process status."""
+    failed = example_module.AcceptanceResult("physics", "failed", "mismatch")
+    monkeypatch.setattr(
+        example_module,
+        "run_example",
+        lambda: types.SimpleNamespace(
+            output=["physics: failed"], acceptance=(failed,)
+        ),
+    )
+
+    assert example_module.main() == 1
+    assert capsys.readouterr().out == "physics: failed\n"
