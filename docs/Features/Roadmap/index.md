@@ -107,11 +107,13 @@ meets its exit bar, the next pending epic in the sequence becomes active.
    sidecars, device-aware parity evidence, and the published direct-kernel
    support contract and example. It does not provide high-level runnable
    integration or general CPU-strategy parity.
-    - [Independent condensation walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
+     - Independent condensation walkthrough
+       (`docs/Examples/gpu_condensation_parity_walkthrough.py`)
        — fixed-four-substep low-level direct-kernel physics, conservation, and
          energy evidence, with Warp CPU as the installed-Warp baseline; CUDA is
          optional additive evidence
-     - [Downstream condensation ownership record](condensation-parity-walkthrough.md)
+      - Downstream condensation ownership record
+        (`condensation-parity-walkthrough.md`)
        — deferred work only; it does not alter Epic D production capability or
          activate later epics
      - The walkthrough's caller-owned, write-only `energy_transfer` diagnostic

@@ -995,7 +995,8 @@ general CPU-strategy parity remain future work outside the shipped scope.
 This leaves temperature feedback, gas mutation beyond the P2-finalized direct
 coupling, and all higher-level process integration outside this milestone.
 
-The [independent condensation walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
+The independent condensation walkthrough
+(`docs/Examples/gpu_condensation_parity_walkthrough.py`)
 provides fixed-four-substep low-level direct-kernel physics, conservation, and
 energy evidence. Run:
 
@@ -1006,7 +1007,8 @@ pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror
 ```
 
 Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
-The [downstream condensation ownership record](condensation-parity-walkthrough.md)
+The downstream condensation ownership record
+(`condensation-parity-walkthrough.md`)
 documents deferred work only, including temperature feedback, high-level
 integration, adaptive stepping, graph replay, broad autodiff, and performance;
 it does not change production capability. The caller-owned, write-only
