@@ -11,16 +11,16 @@ traceable E5/E5-F1 through E5-F9 closeout record with resolving artifact links.
 
 ## Value Proposition
 
-E5-F9 turns the dependency-complete implementation into a discoverable,
-runnable, and auditable release. Users receive a Warp-CPU-default direct
-coagulation example and explicit support caveats; maintainers receive a
-dependency-gated roadmap transition that cannot mark E5 shipped or Epic F
-active while any required child, test gate, or artifact remains incomplete.
+P1 has shipped the documentation-only portion of that release: the two
+canonical guides now publish the bounded direct particle-resolved contract,
+and a stdlib-only regression test protects the wording, commands, and links.
+The direct example and dependency-gated roadmap transition remain later phases;
+they are not implied by the published documentation contract.
 
 ## User Stories
 
-- As a user, I want a canonical GPU coagulation support guide and runnable
-  example so that I can call the supported low-level API without inferring a
+- As a user, I want a canonical GPU coagulation support guide so that I can
+  call the supported low-level API without inferring a
   high-level `Aerosol`/`Runnable`, fallback, CUDA, or performance guarantee.
 - As a contributor, I want focused reproduction commands and stable artifact
   links so that I can verify each supported mechanism and its validation

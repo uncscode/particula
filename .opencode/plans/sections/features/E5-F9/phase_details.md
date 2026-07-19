@@ -1,10 +1,15 @@
 # Phase Details
 
-- [ ] **E5-F9-P1:** Publish bounded GPU coagulation support contract with documentation tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E5-F9-P1:** Publish bounded GPU coagulation support contract with documentation tests
+  - Issue: #1372 | Size: S | Status: Shipped
   - Goal: Document the shipped mechanisms, configuration, import path, ownership, device policy, unsupported scope, and focused validation commands without broadening claims.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`, `docs/Features/coagulation_strategy_system.md`, `particula/tests/gpu_coagulation_docs_test.py`
-  - Tests: Exact support wording, import path, command matrix, deferred-capability ownership, and resolving cross-links.
+  - Delivered: canonical foundations and CPU strategy guides now publish the
+    executable/deferred direct particle-resolved masks, caller ownership,
+    preflight order, optional CUDA policy, and explicit exclusions.
+  - Tests: `particula/tests/gpu_coagulation_docs_test.py` is stdlib-only and
+    checks exact support wording, import path, command matrix,
+    deferred-capability ownership, and resolving cross-links.
 
 - [ ] **E5-F9-P2:** Add direct GPU coagulation example with co-located tests
   - Issue: TBD | Size: S | Status: Not Started

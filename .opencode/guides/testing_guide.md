@@ -186,6 +186,8 @@ pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror
 pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
+# Validate the published direct-GPU coagulation contract without Warp or CUDA.
+pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror
 ```
 
 Use CUDA-targeted runs only for optional local/manual validation when a

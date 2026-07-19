@@ -1,9 +1,16 @@
 # Documentation Updates
 
-- Update `docs/Features/data-containers-and-gpu-foundations.md` with the final
-  direct GPU coagulation support/import/ownership/device/distribution contract.
-- Update `docs/Features/coagulation_strategy_system.md` with the low-level GPU
-  mechanism matrix, combinations, limitations, and focused commands.
+- **Shipped (P1, issue #1372):** Updated
+  `docs/Features/data-containers-and-gpu-foundations.md` as the canonical
+  direct GPU coagulation ownership and preflight contract. It records supported
+  particle-resolved masks, caller-owned state, explicit transfer boundaries,
+  installed-Warp CPU baseline, and optional guarded CUDA evidence.
+- **Shipped (P1, issue #1372):** Replaced the GPU subsection in
+  `docs/Features/coagulation_strategy_system.md` with the bounded direct-kernel
+  mechanism/mask matrix, exclusions, and focused validation commands.
+- **Shipped (P1, issue #1372):** Added the stdlib-only regression coverage in
+  `particula/tests/gpu_coagulation_docs_test.py` and extended the exact command
+  matrix assertions in `particula/tests/condensation_latent_heat_docs_test.py`.
 - Create `docs/Examples/gpu_coagulation_direct.py` and link it from
   `docs/Examples/index.md` as Warp CPU default, CUDA optional.
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` with plan E5, E5-F1-F9,
