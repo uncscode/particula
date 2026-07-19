@@ -140,9 +140,18 @@ def test_disabled_or_unavailable_warp_completes_oracle_without_runtime_work(
         lambda *a, **k: pytest.fail("converted"),
     )
     result = example_module.run_example()
-    assert result.output[-1] == "oracle completed; no kernel ran"
+    assert "oracle completed; no kernel ran" in result.output
     assert result.particle_data is None
     assert result.oracle.total_mass_transfer.shape == (2, 2, 2)
+    assert [item.category for item in result.acceptance] == [
+        "physics",
+        "conservation",
+        "energy",
+    ]
+    assert all(item.status == "unavailable" for item in result.acceptance)
+    assert all(
+        "no-Warp observations" in item.diagnostic for item in result.acceptance
+    )
 
 
 def test_force_disabled_warp_defers_runtime_after_oracle(
@@ -161,7 +170,8 @@ def test_force_disabled_warp_defers_runtime_after_oracle(
         lambda *args, **kwargs: pytest.fail("converted"),
     )
     result = example_module.run_example()
-    assert result.output[-1] == "oracle completed; no kernel ran"
+    assert "oracle completed; no kernel ran" in result.output
+    assert all(item.status == "unavailable" for item in result.acceptance)
 
 
 class _FakeArray:
@@ -217,6 +227,14 @@ class _FakeThermodynamics:
         self.__dict__.update(kwargs)
 
 
+def _fake_gas_with_vapor_pressure(value: Any, **kwargs: Any) -> Any:
+    """Attach GPU-only vapor-pressure state to a fake converted gas object."""
+    value.vapor_pressure = _FakeArray(
+        kwargs["vapor_pressure"], _FakeWP.float64, "cpu"
+    )
+    return value
+
+
 def test_fake_enabled_route_has_explicit_sidecars_and_synchronized_readback(
     monkeypatch: pytest.MonkeyPatch,
     example_module: types.ModuleType,
@@ -243,7 +261,7 @@ def test_fake_enabled_route_has_explicit_sidecars_and_synchronized_readback(
         example_module, "to_warp_particle_data", lambda value, **k: value
     )
     monkeypatch.setattr(
-        example_module, "to_warp_gas_data", lambda value, **k: value
+        example_module, "to_warp_gas_data", _fake_gas_with_vapor_pressure
     )
     monkeypatch.setattr(
         example_module, "from_warp_particle_data", lambda value: value
@@ -260,10 +278,21 @@ def test_fake_enabled_route_has_explicit_sidecars_and_synchronized_readback(
     assert call["thermodynamics"].modes.dtype is _FakeWP.int32
     assert call["scratch_buffers"].total_mass_transfer.shape == (2, 2, 2)
     assert call["energy_transfer"].shape == (2, 2)
-    assert len(_FakeWP.events) == 5
+    assert len(_FakeWP.events) == 6
     npt.assert_allclose(result.raw_proposal, 2.0)
     npt.assert_allclose(result.total_mass_transfer, 3.0)
     npt.assert_allclose(result.energy_transfer, 4.0)
+    npt.assert_allclose(result.vapor_pressure, 0.0)
+    assert [item.category for item in result.acceptance] == [
+        "physics",
+        "conservation",
+        "energy",
+    ]
+    assert [item.status for item in result.acceptance] == [
+        "failed",
+        "passed",
+        "failed",
+    ]
 
 
 def test_oracle_completes_before_runtime_and_ignores_warp_source_mutation(
@@ -307,7 +336,7 @@ def test_oracle_completes_before_runtime_and_ignores_warp_source_mutation(
         example_module, "to_warp_particle_data", lambda value, **kwargs: value
     )
     monkeypatch.setattr(
-        example_module, "to_warp_gas_data", lambda value, **kwargs: value
+        example_module, "to_warp_gas_data", _fake_gas_with_vapor_pressure
     )
     monkeypatch.setattr(
         example_module, "from_warp_particle_data", lambda value: value
@@ -446,13 +475,110 @@ def test_enabled_failures_propagate_after_completed_oracle_without_restore(
     assert events == ["oracle"]
 
 
+def test_acceptance_categories_are_independently_evaluated(
+    example_module: types.ModuleType,
+) -> None:
+    """Each criterion can fail without hiding the two unrelated results."""
+    fixture = example_module.build_fixture()
+    oracle = example_module.run_oracle(
+        example_module.build_oracle_input(fixture)
+    )
+    vapor_pressure = np.broadcast_to(
+        fixture.thermodynamic_parameters[:, 0], (2, 2)
+    ).copy()
+    reference = replace(
+        oracle,
+        masses=fixture.masses.copy(),
+        gas_concentration=fixture.gas_concentration.copy(),
+        total_mass_transfer=np.zeros_like(oracle.total_mass_transfer),
+        energy_transfer=np.zeros_like(oracle.energy_transfer),
+    )
+
+    def statuses(
+        checked_fixture: Any,
+        checked_vapor_pressure: np.ndarray = vapor_pressure,
+        checked_energy: np.ndarray = reference.energy_transfer,
+    ) -> list[str]:
+        return [
+            item.status
+            for item in example_module.evaluate_acceptance(
+                checked_fixture,
+                reference,
+                fixture.masses,
+                fixture.gas_concentration,
+                reference.total_mass_transfer,
+                checked_energy,
+                checked_vapor_pressure,
+            )
+        ]
+
+    bad_vapor_pressure = vapor_pressure.copy()
+    bad_vapor_pressure[0, 0] += 1.0
+    assert statuses(fixture, bad_vapor_pressure) == [
+        "failed",
+        "passed",
+        "passed",
+    ]
+
+    bad_energy = reference.energy_transfer.copy()
+    bad_energy[0, 0] += 1.0
+    assert statuses(fixture, checked_energy=bad_energy) == [
+        "passed",
+        "passed",
+        "failed",
+    ]
+
+    conservation_fixture = replace(fixture, masses=fixture.masses.copy() * 2.0)
+    assert statuses(conservation_fixture) == ["passed", "failed", "passed"]
+
+
+def test_acceptance_reports_all_categories_after_multiple_failures(
+    example_module: types.ModuleType,
+) -> None:
+    """Multiple mismatches do not short-circuit later acceptance reporting."""
+    fixture = example_module.build_fixture()
+    oracle = example_module.run_oracle(
+        example_module.build_oracle_input(fixture)
+    )
+    vapor_pressure = np.broadcast_to(
+        fixture.thermodynamic_parameters[:, 0], (2, 2)
+    ).copy()
+    reference = replace(
+        oracle,
+        masses=fixture.masses.copy(),
+        gas_concentration=fixture.gas_concentration.copy(),
+        total_mass_transfer=np.zeros_like(oracle.total_mass_transfer),
+        energy_transfer=np.zeros_like(oracle.energy_transfer),
+    )
+    vapor_pressure[0, 0] += 1.0
+    energy = reference.energy_transfer.copy()
+    energy[0, 0] += 1.0
+    conservation_fixture = replace(fixture, masses=fixture.masses.copy() * 2.0)
+    results = example_module.evaluate_acceptance(
+        conservation_fixture,
+        reference,
+        fixture.masses,
+        fixture.gas_concentration,
+        reference.total_mass_transfer,
+        energy,
+        vapor_pressure,
+    )
+    assert [item.category for item in results] == [
+        "physics",
+        "conservation",
+        "energy",
+    ]
+    assert [item.status for item in results] == ["failed", "failed", "failed"]
+    assert all(example_module._format_acceptance(item) for item in results)
+
+
 @pytest.mark.warp
 @pytest.mark.gpu_parity
 @pytest.mark.skipif(not WARP_AVAILABLE, reason="Warp is not available")
 def test_warp_cpu_matches_independent_oracle(
     example_module: types.ModuleType,
 ) -> None:
-    """Warp CPU matches masses, gas, P2 total, raw proposal, and energy."""
+    """Warp CPU satisfies separate physics, conservation, and energy checks."""
     result = example_module.run_example(device="cpu")
     assert result.particle_data is not None and result.gas_data is not None
     assert (
@@ -460,6 +586,8 @@ def test_warp_cpu_matches_independent_oracle(
         and result.raw_proposal is not None
         and result.scratch_buffers is not None
     )
+    assert result.vapor_pressure is not None
+    assert [item.status for item in result.acceptance] == ["passed"] * 3
     npt.assert_allclose(
         result.particle_data.masses,
         result.oracle.masses,
@@ -494,6 +622,10 @@ def test_warp_cpu_matches_independent_oracle(
         atol=1e-30,
     )
     fixture = example_module.build_fixture()
+    npt.assert_array_equal(
+        result.vapor_pressure,
+        np.broadcast_to(fixture.thermodynamic_parameters[:, 0], (2, 2)),
+    )
     inventory = np.sum(
         (result.particle_data.masses - fixture.masses)
         * fixture.concentration[:, :, None],
@@ -505,6 +637,13 @@ def test_warp_cpu_matches_independent_oracle(
         # Four sequential fp64 gas updates accumulate host readback rounding.
         rtol=1e-10,
         atol=1e-30,
+    )
+    npt.assert_allclose(
+        result.energy_transfer,
+        np.sum(result.total_mass_transfer, axis=1)
+        * fixture.latent_heat[None, :],
+        rtol=1e-12,
+        atol=1e-18,
     )
 
 
@@ -527,6 +666,8 @@ def test_cuda_matches_independent_oracle_when_available(
         and result.energy_transfer is not None
         and result.scratch_buffers is not None
     )
+    assert result.vapor_pressure is not None
+    assert [item.status for item in result.acceptance] == ["passed"] * 3
     npt.assert_allclose(
         result.particle_data.masses,
         result.oracle.masses,
@@ -557,6 +698,38 @@ def test_cuda_matches_independent_oracle_when_available(
         rtol=1e-10,
         atol=1e-30,
     )
+    fixture = example_module.build_fixture()
+    npt.assert_array_equal(
+        result.vapor_pressure,
+        np.broadcast_to(fixture.thermodynamic_parameters[:, 0], (2, 2)),
+    )
+    particle_inventory_change = np.sum(
+        (result.particle_data.masses - fixture.masses)
+        * fixture.concentration[:, :, None],
+        axis=1,
+    )
+    drift = (
+        particle_inventory_change
+        + result.gas_data.concentration
+        - fixture.gas_concentration
+    )
+    conservation_scale = np.maximum(
+        np.abs(fixture.gas_concentration),
+        np.abs(result.gas_data.concentration),
+    )
+    npt.assert_allclose(
+        drift + conservation_scale,
+        conservation_scale,
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    npt.assert_allclose(
+        result.energy_transfer,
+        np.sum(result.total_mass_transfer, axis=1)
+        * fixture.latent_heat[None, :],
+        rtol=1e-12,
+        atol=1e-18,
+    )
 
 
 def test_main_force_no_warp_prints_oracle_completion(
@@ -565,4 +738,8 @@ def test_main_force_no_warp_prints_oracle_completion(
     """Direct script execution preserves the CPU-only walkthrough route."""
     monkeypatch.setenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", "1")
     runpy.run_path(str(EXAMPLE_PATH), run_name="__main__")
-    assert "oracle completed; no kernel ran" in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "oracle completed; no kernel ran" in output
+    for category in ("physics", "conservation", "energy"):
+        assert f"{category}: unavailable" in output
+    assert "parity: passed" not in output
