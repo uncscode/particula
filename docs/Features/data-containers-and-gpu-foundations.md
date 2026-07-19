@@ -346,7 +346,9 @@ Sedimentation-specific read-only preflight fails before output allocation, RNG
 initialization, or particle mutation, but does not make unrelated later runtime
 failures atomic. Transfers are explicit. Warp CPU is the baseline when Warp is
 installed. CUDA is optional additive evidence and guarded suites skip cleanly
-when unavailable.
+when unavailable. This direct path provides no high-level `Runnable`
+integration, automatic transfer, CPU fallback, mandatory CUDA requirement, or
+general-turbulence support.
 
 Future mechanisms must provide a stable identifier; required host and device
 inputs; property preparation; a sanitized additive pair-rate term; a proven-safe

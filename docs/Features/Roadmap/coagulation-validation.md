@@ -67,6 +67,7 @@ pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp an
 pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror
 pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and cuda" -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
+pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror
 ```
 
 Missing Warp or unavailable CUDA is valid only when an existing guarded test

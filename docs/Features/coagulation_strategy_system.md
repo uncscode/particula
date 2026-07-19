@@ -470,11 +470,12 @@ not returned.
 Malformed configuration and unsupported distributions fail before particle
 access. Same-device preflight validates caller state, but a later runtime
 failure has no rollback guarantee. Transfers are explicit: there is no automatic
-transfer, CPU fallback, or high-level integration. Warp CPU is the installed-Warp
-baseline. CUDA is optional/additive, and guarded suites skip cleanly when it is
-unavailable. This path makes no performance, broad CPU/GPU parity, graph-capture,
-broad autodiff, DNS/general-turbulence, unsupported-mechanism, or
-unsupported-distribution claim. See the [canonical ownership contract](./data-containers-and-gpu-foundations.md)
+transfer, CPU fallback, or high-level `Runnable` integration. Warp CPU is the
+installed-Warp baseline. CUDA is optional/additive, never mandatory, and guarded
+suites skip cleanly when it is unavailable. This path provides no performance,
+broad CPU/GPU parity, graph-capture, broad autodiff, DNS/general-turbulence
+support, unsupported-mechanism, or unsupported-distribution claim. See the
+[canonical ownership contract](./data-containers-and-gpu-foundations.md)
 and [evidence/command record](./Roadmap/coagulation-validation.md).
 
 Focused baseline commands:
