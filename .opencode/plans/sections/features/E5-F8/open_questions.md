@@ -11,7 +11,7 @@
 - [x] Should the optional CUDA run be exposed by a command-line flag or remain a
   pytest-only selection?
   - Resolved 2026-07-16: keep the script Warp-CPU-default with no new CLI flag.
-    Permit programmatic `run_walkthrough(device="cuda")` for guarded tests and
+    Permit programmatic `run_example(device="cuda")` for guarded tests and
     expose optional CUDA through existing pytest markers and skip helpers.
 - [x] Does Epic F formally accept both `thermal_work` consumption/temperature
   feedback and adaptive condensation stepping?

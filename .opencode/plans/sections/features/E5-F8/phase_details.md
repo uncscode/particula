@@ -1,18 +1,19 @@
 # Phase Details
 
-- [ ] **E5-F8-P1:** Create independent CPU-Warp condensation parity walkthrough
+- [x] **E5-F8-P1:** Create independent CPU-Warp condensation parity walkthrough
   with regression tests
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: #1367 | Size: S | Status: Implemented
   - Goal: Add a deterministic fp64 walkthrough that constructs CPU oracle and
     Warp execution inputs independently and runs the required Warp CPU path.
   - Files: `docs/Examples/gpu_condensation_parity_walkthrough.py`,
     `particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py`
-  - Tests: deterministic no-Warp behavior, independent input construction,
-    Warp CPU execution, explicit synchronization, and optional CUDA skip.
+  - Tests: immutable/non-aliasing construction, four-substep uptake/evaporation
+    oracle, no-Warp/force-disabled behavior, explicit sidecars and sync, enabled
+    failure propagation, Warp CPU parity, and optional CUDA parity.
 
 - [ ] **E5-F8-P2:** Publish separate physics, conservation, and energy acceptance
   criteria with tests
-  - Issue: TBD | Size: S | Status: Not Started
+  - Issue: TBD | Size: S | Status: Not Started (not part of #1367)
   - Goal: Produce three labeled result blocks whose thresholds and failures are
     evaluated independently.
   - Files: `docs/Examples/gpu_condensation_parity_walkthrough.py`,

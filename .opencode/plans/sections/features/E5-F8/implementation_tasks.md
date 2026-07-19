@@ -2,17 +2,18 @@
 
 ## Example and Evidence Code
 
-- [ ] Add `docs/Examples/gpu_condensation_parity_walkthrough.py` with immutable
+- [x] Add `docs/Examples/gpu_condensation_parity_walkthrough.py` with immutable
   physical fixture constants and separate NumPy/Warp builders.
-- [ ] Implement the independent NumPy fixed-four-substep oracle without reading
+- [x] Implement the independent NumPy fixed-four-substep oracle without reading
   mutated Warp buffers or calling production Warp kernels for expected values.
-- [ ] Build a compact fp64 multi-box/multi-species fixture containing uptake,
+- [x] Build a compact fp64 multi-box/multi-species fixture containing uptake,
   evaporation, gas coupling, and nonzero latent heat.
-- [ ] Run `condensation_step_gpu` on Warp CPU with explicit scratch,
+- [x] Run `condensation_step_gpu` on Warp CPU with explicit scratch,
   thermodynamics, latent-heat, and energy sidecars and explicit synchronization.
-- [ ] Emit machine-testable, human-readable physics, conservation, and energy
-  result blocks and return failure when any required category fails.
-- [ ] Keep optional CUDA execution additive and skip cleanly when unavailable.
+- [x] Keep optional CUDA execution additive and skip cleanly when unavailable.
+- [x] Test no-Warp/force-disabled control flow, fake enabled sidecars and sync,
+  runtime failure propagation and fresh-source recovery guidance, Warp CPU, and
+  optional CUDA.
 
 ## Documentation
 
@@ -31,12 +32,11 @@
 
 ## Tooling / Tests
 
-- [ ] Add
+- [x] Add
   `particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py` for import,
   deterministic fixtures, category separation, output, and device policy.
 - [ ] Add `particula/tests/condensation_parity_walkthrough_docs_test.py` for
   required ownership rows, thresholds, non-claims, commands, and link targets.
-- [ ] Include mutation tests that independently perturb each expected category
-  and verify only the corresponding result fails.
-- [ ] Run focused tests with `-Werror`; run optional CUDA selection locally when
-  available; do not lower configured coverage.
+- [ ] Add separate category-isolation and reporting-gate tests in P2.
+- [ ] Run the focused test suite with `-Werror`, optional CUDA selection when
+  available, and the repository coverage validation.
