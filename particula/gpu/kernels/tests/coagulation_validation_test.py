@@ -73,25 +73,25 @@ def _probe_factory() -> Any:  # noqa: C901
 
     @wp.kernel
     def observe(
-        radii: wp.array2d(dtype=wp.float64),
-        masses: wp.array2d(dtype=wp.float64),
-        density: wp.array2d(dtype=wp.float64),
-        charge: wp.array2d(dtype=wp.float64),
-        active: wp.array2d(dtype=wp.int32),
-        active_indices: wp.array2d(dtype=wp.int32),
-        active_count: wp.array(dtype=wp.int32),
-        temperature: wp.array(dtype=wp.float64),
-        pressure: wp.array(dtype=wp.float64),
-        dissipation: wp.array(dtype=wp.float64),
-        fluid_density: wp.array(dtype=wp.float64),
-        mask: wp.int32,
-        diffusivity: wp.array2d(dtype=wp.float64),
-        g_term: wp.array2d(dtype=wp.float64),
-        speed: wp.array2d(dtype=wp.float64),
-        settling: wp.array2d(dtype=wp.float64),
-        nu: wp.array(dtype=wp.float64),
-        rates: wp.array3d(dtype=wp.float64),
-        majorant: wp.array(dtype=wp.float64),
+        radii: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        masses: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        density: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        charge: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        active: wp.array2d(dtype=wp.int32),  # type: ignore[valid-type]
+        active_indices: wp.array2d(dtype=wp.int32),  # type: ignore[valid-type]
+        active_count: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
+        temperature: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+        pressure: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+        dissipation: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+        fluid_density: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+        mask: wp.int32,  # type: ignore[name-defined]
+        diffusivity: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        g_term: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        speed: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        settling: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        nu: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+        rates: wp.array3d(dtype=wp.float64),  # type: ignore[valid-type]
+        majorant: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
     ):
         box = wp.tid()
         mu = dynamic_viscosity_wp(
@@ -312,15 +312,23 @@ def test_brownian_public_reference_cross_checks_independent_oracle() -> None:
                 for j in indices[position + 1 :]:
                     npt.assert_allclose(
                         brownian_rate_from_properties(fixture, box, i, j),
-                        get_brownian_kernel_via_system_state(
-                            np.array(
-                                [fixture.radii[box, i], fixture.radii[box, j]]
-                            ),
-                            np.array(
-                                [fixture.masses[box, i], fixture.masses[box, j]]
-                            ),
-                            float(fixture.temperature[box]),
-                            float(fixture.pressure[box]),
+                        np.asarray(
+                            get_brownian_kernel_via_system_state(
+                                np.array(
+                                    [
+                                        fixture.radii[box, i],
+                                        fixture.radii[box, j],
+                                    ]
+                                ),
+                                np.array(
+                                    [
+                                        fixture.masses[box, i],
+                                        fixture.masses[box, j],
+                                    ]
+                                ),
+                                float(fixture.temperature[box]),
+                                float(fixture.pressure[box]),
+                            )
                         )[0, 1],
                         rtol=1e-12,
                         atol=0.0,
@@ -471,7 +479,7 @@ def _assert_observed_properties(
         if indices:
             npt.assert_allclose(
                 observed[key][box, list(indices)],
-                expected_properties[key][list(indices)],
+                np.asarray(expected_properties[key])[list(indices)],
                 rtol=1e-6,
                 atol=0.0,
             )

@@ -361,7 +361,7 @@ def pair_rate(fixture: Fixture, box: int, i: int, j: int, mask: int) -> float:
         total += float(
             np.pi
             * (r[i] + r[j]) ** 2
-            * abs(p["settling"][i] - p["settling"][j])
+            * abs(np.asarray(p["settling"])[i] - np.asarray(p["settling"])[j])
         )
     if mask & 8 and fixture.dissipation[box] != 0.0:
         total += float(
