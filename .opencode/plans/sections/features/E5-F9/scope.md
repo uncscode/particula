@@ -9,12 +9,16 @@ release artifacts, and performs an explicitly dependency-gated E5 closeout.
 - Publish the supported particle-resolved direct GPU coagulation mechanisms,
   configuration semantics, import path, mutation/sidecar ownership, validation
   behavior, device policy, distribution limits, and focused test commands.
-- Add `docs/Examples/gpu_coagulation_direct.py`, defaulting to Warp CPU when
-  Warp is installed, with explicit CPU↔Warp transfers, caller-owned collision
-  buffers and persistent RNG state, deterministic output, and a clean no-Warp
-  path.
-- Test example import/execution, lazy optional-runtime loading, buffer/RNG reuse,
-  output claims, support-boundary wording, roadmap IDs, and link resolution.
+- Shipped in P2: `docs/Examples/gpu_coagulation_direct.py`, defaulting to Warp
+  CPU when Warp is installed, explicitly transfers CPU `ParticleData`, makes
+  exactly two direct Brownian particle-resolved calls with caller-owned
+  collision buffers and initialized/reused persistent RNG state, then restores
+  CPU state only after both calls succeed. Its no-Warp route is lazy and has no
+  conversion, kernel execution, or CPU fallback.
+- Shipped in P2: co-located regression coverage for example import/execution,
+  forced and unavailable-Warp behavior, lazy optional-runtime loading,
+  sidecar/RNG reuse, failure propagation, and Warp CPU stochastic invariants;
+  general documentation now links to the example.
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` and
   `docs/Features/Roadmap/index.md` with E5, E5-F1 through E5-F9, completed scope,
   stable artifact links, and the next epic's status.

@@ -45,6 +45,13 @@ docs/Examples/gpu_direct_kernels_quick_start.py` to see explicit
 `to_warp_*` / `from_warp_*` boundaries, lazy kernel imports from
 `particula.gpu.kernels`, two direct condensation calls with reused scratch
 buffers, latent-heat, and energy sidecars on Warp's CPU backend by default.
+For the bounded Brownian particle-resolved coagulation path, run
+`python docs/Examples/gpu_coagulation_direct.py`. It explicitly transfers
+`ParticleData` to Warp's CPU backend by default, performs two direct calls
+with caller-owned collision and persistent RNG sidecars, and restores a CPU
+checkpoint. When Warp is unavailable or disabled, it reports that no kernel
+ran; it provides no CPU fallback, `Runnable` API, CUDA requirement, or
+performance claim.
 For migration details and updated API mappings, see the
 [ParticleData and GasData Migration Guide](./docs/Features/particle-data-migration.md).
 Legacy facades remain available, with deprecation planned for v0.3.0.

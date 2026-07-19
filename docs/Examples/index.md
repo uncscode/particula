@@ -159,12 +159,18 @@ Jump in by selecting any card below and follow along in your browser or local en
     Key examples:
     - [Data containers and GPU foundations](Data_Containers/index.md) —
       `ParticleData` / `GasData` shapes plus explicit transfer helpers
-    - [Direct GPU kernels quick-start source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
-      — a low-level explicit-transfer direct-condensation path with a Warp CPU
-      default when installed, lazy direct and concrete imports, caller-owned
-      fixed-shape fp64 scratch/latent/energy sidecars reused across explicit
-      calls, gas coupling, and explicit final checkpoint restoration
-    - [Canonical low-level direct-condensation contract](../Features/data-containers-and-gpu-foundations.md)
+     - [Direct GPU kernels quick-start source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
+       — a low-level explicit-transfer direct-condensation path with a Warp CPU
+       default when installed, lazy direct and concrete imports, caller-owned
+       fixed-shape fp64 scratch/latent/energy sidecars reused across explicit
+       calls, gas coupling, and explicit final checkpoint restoration
+     - [Direct GPU coagulation source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py)
+       — a standalone explicit-transfer, Warp CPU-default, low-level
+       particle-resolved Brownian path: two supported direct calls reuse
+       caller-owned collision and persistent RNG sidecars before an explicit
+       CPU checkpoint restore. When Warp is unavailable or disabled, it does
+       no conversion or kernel work and has no CPU fallback.
+     - [Canonical low-level direct-condensation contract](../Features/data-containers-and-gpu-foundations.md)
       — supported low-level scope and boundaries
     - [GPU condensation parity walkthrough](gpu_condensation_parity_walkthrough.py)
       — explicit-transfer, fixed-four-substep low-level direct-kernel evidence

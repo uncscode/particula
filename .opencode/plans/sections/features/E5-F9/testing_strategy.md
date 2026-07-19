@@ -7,10 +7,13 @@
   CPU commands, optional CUDA wording, and resolving guide links. The legacy
   exact command-matrix assertions in
   `particula/tests/condensation_latent_heat_docs_test.py` cover the new rows.
-- **P2:** `particula/gpu/tests/gpu_coagulation_direct_example_test.py` imports
-  without Warp, exercises the forced no-Warp branch, checks lazy imports and
-  deterministic output, and on Warp CPU verifies execution, buffer identity,
-  persistent-RNG advancement, valid pairs, and mass/charge conservation.
+- **P2 (shipped, issue #1373):**
+  `particula/gpu/tests/gpu_coagulation_direct_example_test.py` covers CPU-safe
+  import, forced/unavailable-Warp no-execution behavior, exact lazy-import
+  order, deterministic disabled output, shared sidecar identity, two-call RNG
+  initialization/reuse, and failure propagation. Guarded Warp CPU cases verify
+  RNG advancement, valid final-call pairs, mass/charge conservation, unchanged
+  inactive slots, and zero/one-active early returns; CUDA remains unrequired.
 - **P3:** docs tests require exactly one E5 row, all nine unique child IDs,
   matching artifact targets, no stale E5 placeholder, and valid local links.
 - **P4:** run E5-F7's focused parity/stochastic/conservation matrix, both new
