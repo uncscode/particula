@@ -712,9 +712,14 @@ def run_example(device: str = "cpu") -> ExampleRun:
     output = ["Independent NumPy oracle completed (four fixed substeps)."]
     if not _warp_enabled():
         output.append("oracle completed; no kernel ran")
+        categories: tuple[Literal["physics", "conservation", "energy"], ...] = (
+            "physics",
+            "conservation",
+            "energy",
+        )
         acceptance = tuple(
             AcceptanceResult(category, "unavailable", "no-Warp observations")
-            for category in ("physics", "conservation", "energy")
+            for category in categories
         )
         output.extend(_format_acceptance(result) for result in acceptance)
         return ExampleRun(output=output, oracle=oracle, acceptance=acceptance)
