@@ -11,11 +11,14 @@ fallback, or performance claim.
 
 - **P1 deterministic evidence:**
   `particula/gpu/kernels/tests/coagulation_validation_test.py`, with independent
-  support in `_coagulation_validation_support.py`. Brownian uses
-  `rtol=1e-7, atol=0`; other positive/additive rate, property, and majorant
-  comparisons use `rtol=1e-6, atol=0`; physical zeros are exact.
+  support in `_coagulation_validation_support.py`. Brownian pair-rate
+  comparisons use `rtol=1e-7, atol=0`; Brownian property and
+  selector-majorant checks, along with other applicable positive/additive rate,
+  property, and majorant comparisons, use `rtol=1e-6, atol=0`; physical zeros
+  are exact.
 - **P2 invariant/ownership evidence:**
-  `_coagulation_public_step_support.py` covers concentration-weighted
+  `coagulation_validation_test.py` contains executable assertions, supported by
+  `_coagulation_public_step_support.py`, for concentration-weighted
   per-box/per-species inventory at `rtol=1e-12, atol=1e-30`, applicable charge
   conservation, merge/inactive-slot bookkeeping, caller-buffer identity,
   persistent RNG lifecycle, and atomic preflight failures.
