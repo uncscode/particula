@@ -16,8 +16,9 @@
   other two categories.
 - [x] The support statement remains bounded to low-level fp64 fixed-four direct
   condensation and does not claim CPU strategy/`Runnable` parity.
-- [ ] Every deferred capability has a named downstream owner, entry gate, and
-  explicit E5-F8 non-claim; documentation tests fail if a row is removed.
+- [x] Every deferred capability has a named downstream owner, entry gate, and
+  explicit E5-F8 non-claim in the 14-row ownership record; documentation tests
+  fail if a row is removed, malformed, duplicated, or rerouted.
 - [ ] Canonical condensation, foundations, example, and roadmap documents link
   to the walkthrough; all links and focused commands validate.
 - [ ] E5-F9 receives stable artifact links and no E5-F1-F7 scope is duplicated.

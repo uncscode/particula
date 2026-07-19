@@ -21,6 +21,9 @@ CPU strategy or `Runnable` path.
   conversion, allocation, synchronization, or kernel execution.
 - Document explicit CPU/Warp transfers, caller-owned scratch/energy sidecars,
   synchronization, and recovery after a potentially partial failed call.
+- Publish the P3 record with one 14-row deferred-capability table, approved
+  downstream owners and entry gates, exact reproduction commands, and a
+  regression test for the direct-kernel-only evidence boundary.
 
 ## Out of Scope
 
@@ -29,5 +32,4 @@ CPU strategy or `Runnable` path.
 - Temperature evolution, adaptive stepping, new activity/surface-tension
   physics, graph replay, broad autodiff, or backend-selection implementation.
 - Performance targets, mixed/lower precision migration, or required CUDA CI.
-- Deferred-capability ownership tables and broad documentation/index changes
-  planned in later E5-F8 phases.
+- Broad canonical documentation/index integration, which remains P4 work.

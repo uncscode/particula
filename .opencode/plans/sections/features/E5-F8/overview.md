@@ -2,11 +2,10 @@
 
 ## Problem Statement
 
-Epic E inherits an Epic D closeout gap: direct GPU condensation has focused
-tests and support documentation, but no independent, user-followable CPU/Warp
-walkthrough that reports physics agreement, inventory conservation, and latent
-heat energy bookkeeping as three non-substitutable results. Deferred
-capabilities are described in several documents without one ownership record.
+Epic E inherited an Epic D closeout gap: direct GPU condensation needed an
+independent, user-followable CPU/Warp walkthrough with distinct physics,
+inventory-conservation, and latent-heat-energy results, plus one ownership
+record for deferred capabilities.
 
 ## Value Proposition
 
@@ -18,6 +17,10 @@ imports or allocates Warp state, then exposes separately synchronized
 direct-kernel observations. CUDA remains optional additive evidence; Warp CPU
 is exercised when Warp is installed.
 
+Issue #1369 delivered the P3 roadmap ownership record and its regression test.
+The record routes all 14 deferred capabilities to future approved
+numerical-method or physics-expansion work and Epics G--I with entry gates.
+
 ## User Stories
 
 - As a scientific reviewer, I want independent CPU and Warp inputs and
@@ -28,8 +31,8 @@ is exercised when Warp is installed.
   failure in another invariant.
 
 The implementation remains bounded direct-kernel evidence: it does not claim
-high-level CPU strategy or `Runnable` parity, adaptive stepping, performance,
-or required CUDA support.
+high-level CPU strategy, `Runnable`, or general CPU workflow parity, adaptive
+stepping, performance, or required CUDA support.
 
 Parent context: [E5](../../epics/E5/child_plans.md), track T8. E5-F8 closes
 the E4 carry-forward independently of coagulation tracks E5-F1 through E5-F7;
