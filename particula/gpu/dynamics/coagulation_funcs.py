@@ -1,3 +1,4 @@
+# mypy: disable-error-code="operator"
 """Warp device functions for Brownian, sedimentation, and charged coagulation.
 
 The Brownian helpers mirror ``particula.dynamics.coagulation.brownian_kernel``.
