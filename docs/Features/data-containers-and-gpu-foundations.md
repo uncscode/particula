@@ -746,6 +746,9 @@ the other evidence classes.
 | `pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q` | CPU integration/inventory-conservation evidence (separate particle-plus-gas inventory conservation checks); not direct-GPU validation. |
 | `pytest particula/integration_tests/condensation_particle_resolved_test.py -q` | CPU integration evidence for particle-resolved condensation; not direct-GPU validation. |
 | `pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror` | Latent-heat energy/bookkeeping documentation checks. |
+| `python docs/Examples/gpu_condensation_parity_walkthrough.py` | Fixed-four-substep low-level direct-kernel walkthrough with separate physics, conservation, and energy evidence. |
+| `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror` | Walkthrough regression. |
+| `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror` | Canonical walkthrough-link and evidence-boundary regression. |
 
 The required baseline is Warp `device="cpu"` when Warp is installed. The
 parity matrix, inventory conservation checks, and latent-heat energy/bookkeeping
@@ -759,6 +762,14 @@ pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -W
 
 This is additive to the required Warp `device="cpu"` baseline and skips
 cleanly when CUDA is unavailable.
+
+The [GPU condensation parity walkthrough](../Examples/gpu_condensation_parity_walkthrough.py)
+and its [condensation parity walkthrough ownership record](Roadmap/condensation-parity-walkthrough.md)
+document bounded physics, conservation, and energy evidence only. They retain
+the fixed-four-substep low-level direct-kernel boundary: Warp CPU is the
+installed-Warp baseline and CUDA is optional additive evidence, not required
+support. `energy_transfer` remains caller-owned, write-only diagnostic output,
+not a return value or temperature-feedback mechanism (`kg * J/kg = J`).
 
 ## Related references
 

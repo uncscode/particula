@@ -692,7 +692,7 @@ diagnostic output. It requires valid latent heat, is overwritten only after
 successful preflight, and is not a third return item. Its signed whole-call
 identity is `Q[box, species] = sum_particles(Delta m_finalized) * L[species]`:
 finalized `Delta m` is kg, `L` is J/kg, and `Q` is J, so condensation is
-positive and evaporation negative. The #1272 diagnostic uses strict
+positive and evaporation negative (`kg * J/kg = J`). The #1272 diagnostic uses strict
 `rtol=1e-12, atol=1e-18` evidence. `thermal_work` is validated but remains
 deferred and unused.
 
@@ -701,6 +701,15 @@ gas/full-system conservation. The direct step couples finalized particle and
 gas transfer through its stated P2-finalized direct coupling, but does not add strategy/
 `Runnable` integration, adaptive stepping, graph capture/replay, autodiff
 guarantees, or complete E4-F6 cross-device certification.
+
+The [GPU condensation parity walkthrough](../Examples/gpu_condensation_parity_walkthrough.py)
+separately reports physics, conservation, and energy evidence for this
+fixed-four-substep low-level direct-kernel comparison. Its
+[condensation parity walkthrough ownership record](Roadmap/condensation-parity-walkthrough.md)
+keeps deferred capabilities explicit. Warp CPU is the installed-Warp baseline;
+CUDA is optional additive evidence. The caller-owned, write-only
+`energy_transfer` output is a diagnostic, not a return value and not temperature
+feedback.
 
 #### P1--P4 direct-condensation evidence
 

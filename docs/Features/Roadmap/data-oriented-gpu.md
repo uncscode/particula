@@ -995,6 +995,22 @@ general CPU-strategy parity remain future work outside the shipped scope.
 This leaves temperature feedback, gas mutation beyond the P2-finalized direct
 coupling, and all higher-level process integration outside this milestone.
 
+The [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
+provides fixed-four-substep low-level direct-kernel physics, conservation, and
+energy evidence. Run:
+
+```bash
+python docs/Examples/gpu_condensation_parity_walkthrough.py
+pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror
+pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror
+```
+
+Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
+The [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md)
+documents deferred work only, including temperature feedback, high-level
+integration, adaptive stepping, graph replay, broad autodiff, and performance;
+it does not change production capability.
+
 ## Epic E: GPU Coagulation Physics Coverage
 
 Status: active. Epic E is the next ordered epic after the shipped E4 plan.

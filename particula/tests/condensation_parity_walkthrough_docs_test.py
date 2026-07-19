@@ -12,6 +12,59 @@ ROADMAP_PATH = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
 RECORD_TEST_PATH = (
     ROOT / "particula/tests/condensation_parity_walkthrough_docs_test.py"
 )
+WALKTHROUGH_PATH = ROOT / "docs/Examples/gpu_condensation_parity_walkthrough.py"
+CONDENSATION_GUIDE_PATH = ROOT / "docs/Features/condensation_strategy_system.md"
+FOUNDATIONS_GUIDE_PATH = (
+    ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
+)
+EXAMPLES_INDEX_PATH = ROOT / "docs/Examples/index.md"
+ROADMAP_INDEX_PATH = ROOT / "docs/Features/Roadmap/index.md"
+CANONICAL_P4_PATHS = (
+    CONDENSATION_GUIDE_PATH,
+    FOUNDATIONS_GUIDE_PATH,
+    EXAMPLES_INDEX_PATH,
+    ROADMAP_INDEX_PATH,
+    ROADMAP_PATH,
+)
+P4_LINKS = {
+    CONDENSATION_GUIDE_PATH: (
+        "[GPU condensation parity walkthrough](../Examples/"
+        "gpu_condensation_parity_walkthrough.py)",
+        "[condensation parity walkthrough ownership record](Roadmap/"
+        "condensation-parity-walkthrough.md)",
+    ),
+    FOUNDATIONS_GUIDE_PATH: (
+        "[GPU condensation parity walkthrough](../Examples/"
+        "gpu_condensation_parity_walkthrough.py)",
+        "[condensation parity walkthrough ownership record](Roadmap/"
+        "condensation-parity-walkthrough.md)",
+    ),
+    EXAMPLES_INDEX_PATH: (
+        "[GPU condensation parity walkthrough]("
+        "gpu_condensation_parity_walkthrough.py)",
+        "[condensation parity walkthrough ownership record](../Features/"
+        "Roadmap/condensation-parity-walkthrough.md)",
+    ),
+    ROADMAP_INDEX_PATH: (
+        "[GPU condensation parity walkthrough](../../Examples/"
+        "gpu_condensation_parity_walkthrough.py)",
+        "[condensation parity walkthrough ownership record]("
+        "condensation-parity-walkthrough.md)",
+    ),
+    ROADMAP_PATH: (
+        "[GPU condensation parity walkthrough](../../Examples/"
+        "gpu_condensation_parity_walkthrough.py)",
+        "[condensation parity walkthrough ownership record]("
+        "condensation-parity-walkthrough.md)",
+    ),
+}
+P4_COMMANDS = (
+    "python docs/Examples/gpu_condensation_parity_walkthrough.py",
+    "pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py "
+    "-q -Werror",
+    "pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q "
+    "-Werror",
+)
 
 LABELS = (
     "thermal_work consumption",
@@ -287,4 +340,64 @@ def test_record_preserves_supported_evidence_boundary_and_deferred_limits() -> (
         assert not positive_claim.search(normalized), (
             f"Deferred capability has a positive support/delivery claim: "
             f"{capability}"
+        )
+
+
+def test_canonical_pages_link_once_to_walkthrough_and_ownership_record() -> (
+    None
+):
+    """Canonical P4 pages link once to the local walkthrough artifacts."""
+    assert WALKTHROUGH_PATH.exists(), f"Missing walkthrough: {WALKTHROUGH_PATH}"
+    assert RECORD_PATH.exists(), f"Missing ownership record: {RECORD_PATH}"
+    for source_path, links in P4_LINKS.items():
+        assert source_path.exists(), f"Missing canonical source: {source_path}"
+        content = source_path.read_text(encoding="utf-8")
+        for link in links:
+            assert content.count(link) == 1, (
+                f"Link must occur once in {source_path}: {link}"
+            )
+            relative_target = link.removesuffix(")").rsplit("(", maxsplit=1)[1]
+            target = source_path.parent / relative_target
+            assert target.exists(), f"Missing linked target: {target}"
+
+
+def test_canonical_pages_preserve_p4_evidence_boundary() -> None:
+    """Canonical P4 pages state evidence categories and retained limits."""
+    contents = [path.read_text(encoding="utf-8") for path in CANONICAL_P4_PATHS]
+    normalized = " ".join("\n".join(contents).split())
+
+    for command in P4_COMMANDS:
+        assert command in normalized
+    for label in ("physics", "conservation", "energy"):
+        assert label in normalized
+    assert "fixed-four-substep" in normalized
+    assert "low-level direct-kernel" in normalized
+    assert "Warp CPU" in normalized
+    assert "optional additive CUDA" in normalized
+    assert "kg * J/kg = J" in normalized
+    assert "energy_transfer" in normalized
+    assert "caller-owned" in normalized
+    assert "write-only" in normalized
+    assert "not a return value" in normalized
+    assert "not temperature feedback" in normalized
+
+    unsupported = (
+        "temperature feedback",
+        "strategy/`Runnable` parity",
+        "graph capture/replay",
+        "broad autodiff",
+        "adaptive stepping",
+        "performance",
+        "required CUDA",
+    )
+    for capability in unsupported:
+        positive_claim = re.compile(
+            rf"(?:{re.escape(capability)}\s+(?:is\s+)?"
+            rf"(?:supported|delivered|implemented)|"
+            rf"(?:supports|delivers|implements)\s+(?:the\s+)?"
+            rf"{re.escape(capability)})",
+            re.IGNORECASE,
+        )
+        assert not positive_claim.search(normalized), (
+            f"Unsupported capability has a positive claim: {capability}"
         )
