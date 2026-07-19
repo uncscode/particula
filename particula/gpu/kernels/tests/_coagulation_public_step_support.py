@@ -87,6 +87,15 @@ def _public_snapshot(
     }
 
 
+def _initial_particle_snapshot(particles: Any) -> dict[str, np.ndarray]:
+    """Copy host particle state for post-step public invariant checks."""
+    return {
+        "masses": particles.masses.copy(),
+        "concentration": particles.concentration.copy(),
+        "charge": particles.charge.copy(),
+    }
+
+
 def _run_on_warp_devices(wp: Any) -> list[str]:
     """Return available Warp devices after lazy Warp import."""
     from particula.gpu.tests.cuda_availability import warp_devices
@@ -170,16 +179,15 @@ def _run_public_case(  # noqa: PLR0913
     from particula.gpu.conversion import to_warp_particle_data
     from particula.gpu.kernels.coagulation import coagulation_step_gpu
 
-    particles = to_warp_particle_data(
-        _materialize_public_particles(
-            fixture,
-            n_species=n_species,
-            active_by_box=active_by_box,
-            volume=volume,
-            concentration=concentration,
-        ),
-        device=device,
+    cpu_particles = _materialize_public_particles(
+        fixture,
+        n_species=n_species,
+        active_by_box=active_by_box,
+        volume=volume,
+        concentration=concentration,
     )
+    initial = _initial_particle_snapshot(cpu_particles)
+    particles = to_warp_particle_data(cpu_particles, device=device)
     active_device = particles.masses.device
     n_boxes, _ = fixture.radii.shape
     pairs = wp.full(
@@ -187,7 +195,6 @@ def _run_public_case(  # noqa: PLR0913
     )
     counts = wp.full((n_boxes,), -17, dtype=wp.int32, device=active_device)
     states = wp.full((n_boxes,), seed, dtype=wp.uint32, device=active_device)
-    initial = _public_snapshot(particles, pairs, counts, states)
     kwargs: dict[str, Any] = {}
     if row.mask & 8:
         dissipation = (

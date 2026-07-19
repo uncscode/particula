@@ -7,6 +7,7 @@ import pytest
 
 from particula.gpu.kernels.tests._coagulation_public_step_support import (
     _assert_public_invariants,
+    _initial_particle_snapshot,
     _materialize_public_particles,
     _require_warp,
     _run_public_case,
@@ -203,6 +204,22 @@ def test_public_materializer_retains_p3_overrides_and_inactive_sentinels() -> (
             particles.concentration[box, inactive], 0.0
         )
         np.testing.assert_array_equal(particles.charge[box, inactive], 29.0)
+
+
+def test_initial_particle_snapshot_retains_host_invariant_state() -> None:
+    """Initial public invariants use copied host particle state only."""
+    particles = _materialize_public_particles(
+        STOCHASTIC_CASES[0].fixture, n_species=1
+    )
+    initial = _initial_particle_snapshot(particles)
+    particles.masses[0, 0, 0] = 0.0
+    particles.concentration[0, 0] = 0.0
+    particles.charge[0, 0] = 0.0
+
+    assert initial.keys() == {"masses", "concentration", "charge"}
+    assert initial["masses"][0, 0, 0] != 0.0
+    assert initial["concentration"][0, 0] != 0.0
+    assert initial["charge"][0, 0] != 0.0
 
 
 DEVICE_PARAMS = (
