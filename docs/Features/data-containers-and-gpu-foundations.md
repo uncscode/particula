@@ -746,9 +746,6 @@ the other evidence classes.
 | `pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q` | CPU integration/inventory-conservation evidence (separate particle-plus-gas inventory conservation checks); not direct-GPU validation. |
 | `pytest particula/integration_tests/condensation_particle_resolved_test.py -q` | CPU integration evidence for particle-resolved condensation; not direct-GPU validation. |
 | `pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror` | Latent-heat energy/bookkeeping documentation checks. |
-| `python docs/Examples/gpu_condensation_parity_walkthrough.py` | Fixed-four-substep low-level direct-kernel walkthrough with separate physics, conservation, and energy evidence. |
-| `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror` | Walkthrough regression. |
-| `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror` | Canonical walkthrough-link and evidence-boundary regression. |
 
 The required baseline is Warp `device="cpu"` when Warp is installed. The
 parity matrix, inventory conservation checks, and latent-heat energy/bookkeeping
@@ -772,6 +769,13 @@ support. `energy_transfer` remains caller-owned, write-only diagnostic output,
 not a return value or temperature-feedback mechanism (`kg * J/kg = J`).
 
 ## Related references
+
+The fixed-four-substep low-level direct-kernel walkthrough can be run with
+`python docs/Examples/gpu_condensation_parity_walkthrough.py`. Its focused
+regressions are
+`pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`
+and
+`pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
 
 - [Data Containers example](../Examples/Data_Containers/index.md)
 - [Particle & Gas Data Migration](particle-data-migration.md)
