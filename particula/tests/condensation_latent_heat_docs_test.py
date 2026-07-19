@@ -52,6 +52,12 @@ P3_BASELINE_COMMANDS = (
     "-q -Werror",
     "pytest particula/gpu/dynamics/tests/coagulation_funcs_test.py -q -Werror",
     "pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror",
+    "pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q "
+    '-m "warp and gpu_parity" -Werror',
+    "pytest particula/gpu/kernels/tests/"
+    "coagulation_stochastic_validation_test.py -q "
+    '-m "warp and stochastic and not cuda" -Werror',
+    "pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror",
     "pytest particula/integration_tests/"
     "condensation_latent_heat_conservation_test.py -q",
     "pytest particula/integration_tests/"
@@ -65,14 +71,21 @@ P3_COMMAND_TARGETS = (
     ROOT / "particula/gpu/kernels/tests/condensation_stiffness_test.py",
     ROOT / "particula/gpu/dynamics/tests/coagulation_funcs_test.py",
     ROOT / "particula/gpu/kernels/tests/coagulation_test.py",
+    ROOT / "particula/gpu/kernels/tests/coagulation_validation_test.py",
+    ROOT
+    / "particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py",
+    ROOT / "particula/tests/gpu_coagulation_docs_test.py",
     ROOT
     / "particula/integration_tests/condensation_latent_heat_conservation_test.py",
     ROOT / "particula/integration_tests/condensation_particle_resolved_test.py",
     ROOT / "particula/tests/condensation_latent_heat_docs_test.py",
 )
-P3_CUDA_COMMAND = (
+P3_CUDA_COMMANDS = (
     "pytest particula/gpu/kernels/tests/condensation_test.py -q "
-    '-m "warp and cuda" -Werror'
+    '-m "warp and cuda" -Werror',
+    "pytest particula/gpu/kernels/tests/"
+    "coagulation_stochastic_validation_test.py -q "
+    '-m "warp and cuda" -Werror',
 )
 P3_FOUNDATIONS_SNIPPETS = (
     'Warp `device="cpu"`',
@@ -482,10 +495,11 @@ def test_p3_command_matrix_has_exact_commands_and_existing_targets() -> None:
     assert content.count(FOUNDATIONS_P3_HEADING) == 1
     for command in P3_BASELINE_COMMANDS:
         assert command in commands
-    assert P3_CUDA_COMMAND in commands
+    for command in P3_CUDA_COMMANDS:
+        assert command in commands
     assert '-m "warp and cuda"' in commands
     assert all("-q" in command for command in P3_BASELINE_COMMANDS[1:])
-    assert commands.count("-Werror") == 6
+    assert commands.count("-Werror") == 10
     for target in P3_COMMAND_TARGETS:
         assert target.exists()
 

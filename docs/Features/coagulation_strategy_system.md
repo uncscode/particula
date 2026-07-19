@@ -438,53 +438,61 @@ aerosol.particles = particle_resolved.step(
 
 ### GPU direct-kernel foundations and limitations
 
-This section is separate from the CPU `particula.dynamics` strategy API above.
-The direct GPU path supports particle-resolved Brownian,
-`("charged_hard_sphere",)`, exact unit-efficiency SP2016 sedimentation-only
-`("sedimentation_sp2016",)`, and `("brownian", "charged_hard_sphere")` in
-either requested combined order. Select sedimentation only through
-`CoagulationMechanismConfig(("sedimentation_sp2016",))` on
-`coagulation_step_gpu`; it is not a GPU runnable for
-`SedimentationCoagulationStrategy` or another CPU strategy.
+This direct-kernel-only path is separate from CPU strategies, builders,
+factories, and `Runnable` APIs. Import its direct step and immutable host
+configuration with:
 
-The sedimentation-only path accepts fp64 Warp particle state with finite,
-nonnegative mass and concentration plus finite, positive density. Its collision
-pair/count and RNG buffers remain caller-owned same-device Warp resources; a
-supplied RNG state advances in place and resets only with
-`initialize_rng=True`. There is no hidden CPU/GPU transfer, fallback, or
-efficiency parameter. Brownian-plus-sedimentation combinations and other
-sedimentation variants are rejected. This narrow direct-kernel contract does
-not claim CPU-strategy parity, general accuracy, or performance. See the
-[GPU container and direct-kernel contract](./data-containers-and-gpu-foundations.md)
-for the canonical ownership and validation boundary.
+```python
+from particula.gpu.kernels import coagulation_step_gpu
+from particula.gpu.kernels.coagulation import CoagulationMechanismConfig
+```
 
-The approved internal E5-F2 helper subset is
-`coulomb_potential_ratio_wp`, `coulomb_kinetic_limit_wp`,
-`coulomb_continuum_limit_wp`, `reduced_value_wp`,
-`diffusive_knudsen_number_wp`, and `charged_hard_sphere_wp`. The CPU formula
-and strategy reference sources are
-`particula/dynamics/coagulation/charged_dimensional_kernel.py`,
-`charged_dimensionless_kernel.py`, and `charged_kernel_strategy.py`; they are
-not a public GPU runnable.
+It accepts only `distribution_type="particle_resolved"`. The identifiers are
+`brownian`, `charged_hard_sphere`, `sedimentation_sp2016`, and
+`turbulent_shear_st1956`; requested tuples normalize to Brownian, charged,
+sedimentation, then turbulent order. Executable masks are singleton masks `1`,
+`2`, `4`, `8`; two-term masks `3`, `5`, `6`, `9`, `10`, `12`; and four-term
+mask `15`. Three-term masks `7`, `11`, `13`, and `14` are deferred and fail
+closed. Mask `7` rejects before particle metadata or enabled-term validation;
+masks `11`, `13`, and `14` validate metadata and enabled terms before failing.
 
-Current bounded evidence covers deterministic and stochastic execution;
-neutral, attractive, repulsive, and safe-zero cases; charge-buffer validation;
-and recipient-add/donor-clear merge behavior. Warp CPU is the baseline when
-Warp is installed; CUDA evidence is optional and skips cleanly when unavailable.
-The published
-[GPU container and direct-kernel contract](./data-containers-and-gpu-foundations.md)
-defines the associated ownership boundary, including caller-owned `wp.float64`
-charge state, read-only finite-value preflight, and recipient-add/donor-clear
-merge bookkeeping. These direct configurations do not expose a charged GPU
-strategy API, CPU/GPU stochastic parity, or high-level `Runnable` support.
+Every turbulent mask requires keyword-only positive finite
+`turbulent_dissipation` and `fluid_density`: either scalars or same-device
+`wp.float64` arrays with shape `(n_boxes,)`. Non-turbulent masks ignore these
+inputs. Particle data, including same-device fp64 `charge`, supplied collision
+pair/count outputs, and persistent RNG state are caller-owned Warp resources.
+Accepted collisions mutate particle mass, concentration, and charge in place;
+supplied outputs retain identity, persistent RNG advances in place and resets
+only with `initialize_rng=True`, and omitted outputs/state are call-local. The
+exact return tuple is `(particles, collision_pairs, n_collisions)`; RNG state is
+not returned.
 
-Charged-only execution uses its bounded compact active-pair majorant. Combined
-execution sums independently sanitized Brownian and charged rates and uses one
-exhaustive additive majorant, selector/acceptance path, collision-buffer set,
-RNG stream, and apply pass. For A active particles, pair work is O(A²),
-preparation is O(N), and selector/collision storage is O(N), where N is total
-particle capacity. This is bounded implementation scope, not performance
-evidence.
+Malformed configuration and unsupported distributions fail before particle
+access. Same-device preflight validates caller state, but a later runtime
+failure has no rollback guarantee. Transfers are explicit: there is no automatic
+transfer, CPU fallback, or high-level integration. Warp CPU is the installed-Warp
+baseline. CUDA is optional/additive, and guarded suites skip cleanly when it is
+unavailable. This path makes no performance, broad CPU/GPU parity, graph-capture,
+broad autodiff, DNS/general-turbulence, unsupported-mechanism, or
+unsupported-distribution claim. See the [canonical ownership contract](./data-containers-and-gpu-foundations.md)
+and [evidence/command record](./Roadmap/coagulation-validation.md).
+
+Focused baseline commands:
+
+```bash
+pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror
+pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror
+```
+
+**Optional/local CUDA evidence:**
+
+```bash
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and cuda" -Werror
+```
+
+This optional/local command is additive and skips cleanly when CUDA is
+unavailable.
 
 ## Related Documentation
 
