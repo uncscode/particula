@@ -16,6 +16,14 @@ test modules use the `*_test.py` suffix.
   atol=1e-30`; Warp CPU compares masses, gas, total transfer, final raw
   proposal, energy, and concentration-weighted inventory at `rtol=1e-10,
   atol=1e-30`. The CUDA test uses the same parity envelope when available.
+- **P2 — Categorized acceptance (implemented):** The same module covers three
+  ordered `AcceptanceResult` blocks. Physics uses final mass, gas, and P2 total
+  transfer at `rtol=2e-10, atol=1e-30` plus exact vapor pressure; conservation
+  recomputes observed concentration-weighted drift at `rtol=1e-12,
+  atol=1e-30`; energy recomputes signed P2-transfer times latent heat at
+  `rtol=1e-12, atol=1e-18`. No-Warp results are explicitly `unavailable`.
+  Isolated vapor-pressure, energy-sidecar, and detached conservation-input
+  mutations, plus a multi-failure case, verify all categories are reported.
 - **P3 — Ownership record (not implemented):** Add
   `particula/tests/condensation_parity_walkthrough_docs_test.py`. Parse the
   record and assert every required deferred capability has exactly one non-empty
@@ -32,8 +40,9 @@ test modules use the `*_test.py` suffix.
 
 1. Implemented parity compares Warp observations to an independently evaluated NumPy
    fixed-four-substep oracle; it is not high-level CPU-strategy parity.
-2. Warp-CPU coverage independently recomputes concentration-weighted inventory;
-   the oracle separately verifies the signed energy identity.
+2. Categorized acceptance independently recomputes concentration-weighted
+   inventory and signed energy from Warp observations; neither is inferred from
+   oracle parity.
 3. Warp CPU is the normal required backend when Warp is installed. Optional
    CUDA is additive and must skip cleanly when unavailable.
 

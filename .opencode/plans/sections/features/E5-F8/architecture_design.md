@@ -17,15 +17,18 @@ Immutable physical fixture constants
                 +--> synchronize and copy observations
 
 expected + observations
-  +--> masses / gas / P2 total / final raw proposal / energy comparisons
-  +--> concentration-weighted inventory diagnostic in Warp regression coverage
+  +--> physics: masses / gas / P2 total and exact vapor pressure
+  +--> conservation: concentration-weighted particle-plus-gas drift
+  +--> energy: P2 total transfer times latent heat
 ```
 
 `run_example(device="cpu")` returns the completed oracle and, when enabled,
-the restored particle/gas state plus copied raw-proposal, total-transfer, and
-energy observations. No-Warp routes return the completed oracle with the exact
-message `oracle completed; no kernel ran`. Enabled-route errors propagate; the
-detached Warp source and sidecars must be discarded and rebuilt before retrying.
+the restored particle/gas state plus copied raw-proposal, total-transfer,
+energy, and vapor-pressure observations. Its immutable `AcceptanceResult`
+blocks report all three categories without numerical-mismatch short-circuiting.
+No-Warp routes return all blocks as `unavailable` after the exact message
+`oracle completed; no kernel ran`. Enabled-route errors propagate; the detached
+Warp source and sidecars must be discarded and rebuilt before retrying.
 
 ## Data / API / Workflow Changes
 
@@ -44,13 +47,12 @@ detached Warp source and sidecars must be discarded and rebuilt before retrying.
 
 | Category | Quantity | Implemented criterion |
 |----------|----------|-------------------|
-| Parity | Final particle masses, gas concentrations, total transfer, final raw proposal, and energy vs independent oracle | `rtol=1e-10`, `atol=1e-30` in installed-Warp CPU/CUDA tests. |
-| Inventory | Per-box/per-species concentration-weighted particle-plus-gas inventory | `rtol=1e-10`, `atol=1e-30` in Warp-CPU regression coverage. |
-| Energy | `sum_particles(Delta m_finalized) * latent_heat` by box/species | Oracle identity at `rtol=1e-12`, `atol=1e-30`; parity coverage uses the direct-kernel envelope. |
+| Physics | Final particle masses, gas concentrations, and P2 total transfer vs independent oracle; constant-mode vapor pressure | `rtol=2e-10`, `atol=1e-30`; vapor pressure exact. |
+| Conservation | Per-box/per-species concentration-weighted particle-plus-gas drift | `rtol=1e-12`, `atol=1e-30`. |
+| Energy | `sum_particles(P2 finalized transfer) * latent_heat` by box/species | `rtol=1e-12`, `atol=1e-18`. |
 
-The example labels completed oracle and synchronized Warp observations; it does
-not implement the separately labeled pass/fail reporting system planned for a
-later phase.
+Raw proposal remains a P1 diagnostic and is not an acceptance input. The
+walkthrough does not claim high-level CPU-strategy parity.
 
 ## Security & Compliance
 

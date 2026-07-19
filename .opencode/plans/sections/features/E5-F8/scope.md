@@ -13,9 +13,10 @@ CPU strategy or `Runnable` path.
   evaporation, gas coupling, and latent-heat bookkeeping observable.
 - Run on Warp `device="cpu"` whenever Warp is installed; allow optional CUDA as
   additive evidence with a clean unavailable-device skip.
-- Compare final particle masses, gas concentrations, total finalized transfer,
-  final raw proposal, and energy against the independent oracle on available
-  Warp CPU and optional CUDA routes.
+- Report independent physics, conservation, and energy acceptance results on
+  available Warp CPU and optional CUDA routes. Physics compares final particle
+  masses, gas concentrations, P2 total transfer, and exact constant-mode vapor
+  pressure; conservation and energy use their own observed-state calculations.
 - Exercise no-Warp and force-disabled routes without concrete runtime imports,
   conversion, allocation, synchronization, or kernel execution.
 - Document explicit CPU/Warp transfers, caller-owned scratch/energy sidecars,
@@ -28,5 +29,5 @@ CPU strategy or `Runnable` path.
 - Temperature evolution, adaptive stepping, new activity/surface-tension
   physics, graph replay, broad autodiff, or backend-selection implementation.
 - Performance targets, mixed/lower precision migration, or required CUDA CI.
-- Deferred-capability ownership tables, broad documentation/index changes, and
-  category-isolation reporting infrastructure planned in later E5-F8 phases.
+- Deferred-capability ownership tables and broad documentation/index changes
+  planned in later E5-F8 phases.

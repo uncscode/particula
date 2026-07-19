@@ -11,16 +11,17 @@
     oracle, no-Warp/force-disabled behavior, explicit sidecars and sync, enabled
     failure propagation, Warp CPU parity, and optional CUDA parity.
 
-- [ ] **E5-F8-P2:** Publish separate physics, conservation, and energy acceptance
+- [x] **E5-F8-P2:** Publish separate physics, conservation, and energy acceptance
   criteria with tests
-  - Issue: TBD | Size: S | Status: Not Started (not part of #1367)
+  - Issue: #1368 | Size: S | Status: Implemented
   - Goal: Produce three labeled result blocks whose thresholds and failures are
-    evaluated independently.
+    evaluated independently, including explicit no-Warp unavailability.
   - Files: `docs/Examples/gpu_condensation_parity_walkthrough.py`,
     `particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py`
-  - Tests: particle/gas physics comparisons; per-box/per-species inventory
-    conservation; signed finalized-transfer energy identity; category-isolation
-    tests proving one passing category cannot satisfy another.
+  - Tests: independent physics parity plus exact vapor pressure;
+    per-box/per-species inventory conservation; signed finalized-transfer energy
+    identity; isolated category failures and multi-failure reporting proving one
+    result cannot hide another; Warp CPU and optional CUDA categorized results.
 
 - [ ] **E5-F8-P3:** Record downstream ownership for every deferred condensation
   capability with validation

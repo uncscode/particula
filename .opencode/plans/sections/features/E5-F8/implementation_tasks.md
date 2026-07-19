@@ -37,6 +37,8 @@
   deterministic fixtures, category separation, output, and device policy.
 - [ ] Add `particula/tests/condensation_parity_walkthrough_docs_test.py` for
   required ownership rows, thresholds, non-claims, commands, and link targets.
-- [ ] Add separate category-isolation and reporting-gate tests in P2.
+- [x] Add separate category-isolation and all-results reporting tests for P2,
+  including isolated vapor-pressure, energy-sidecar, and conservation-input
+  mutations plus a multi-failure case.
 - [ ] Run the focused test suite with `-Werror`, optional CUDA selection when
   available, and the repository coverage validation.

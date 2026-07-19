@@ -6,9 +6,12 @@ states the direct-kernel-only boundary, explicit transfers, no-Warp result,
 focused commands, caller-owned mutable outputs, and recovery after a failed
 enabled call.
 
-No roadmap report, documentation index, or canonical-feature-document updates
-were made for #1367. Those broader documentation and deferred-capability
-ownership changes remain future E5-F8 work.
+Issue #1368 extended the walkthrough's self-documenting result interface and
+emitted `physics`, `conservation`, and `energy` labels, including explicit
+no-Warp `unavailable` outcomes. No roadmap report, documentation index, or
+canonical-feature-document updates were made for #1367/#1368. Those broader
+documentation and deferred-capability ownership changes remain future E5-F8
+work.
 
 The example treats `energy_transfer` as caller-owned output and avoids claims of
 temperature feedback, general CPU strategy parity, graph replay, broad

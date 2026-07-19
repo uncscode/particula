@@ -1,20 +1,20 @@
 # Success Criteria
 
-- [ ] A standalone runnable walkthrough builds NumPy oracle and Warp inputs
+- [x] A standalone runnable walkthrough builds NumPy oracle and Warp inputs
   independently from immutable physical constants with no output aliasing.
-- [ ] The required Warp CPU path executes whenever Warp is installed; missing
+- [x] The required Warp CPU path executes whenever Warp is installed; missing
   Warp and unavailable CUDA outcomes are explicit and never reported as passes.
-- [ ] Physics results separately compare final particle masses and gas
+- [x] Physics results separately compare final particle masses and gas
   concentrations against the independent fixed-four-substep oracle using
   recorded canonical fp64 per-field tolerances.
-- [ ] Conservation separately checks concentration-weighted particle-plus-gas
+- [x] Conservation separately checks concentration-weighted particle-plus-gas
   inventory for every box and species at `rtol=1e-12, atol=1e-30`.
-- [ ] Energy separately checks signed whole-call P2-finalized transfer times
+- [x] Energy separately checks signed whole-call P2-finalized transfer times
   latent heat for every box and species at `rtol=1e-12, atol=1e-18`, including
   positive condensation and negative evaporation.
-- [ ] Tests prove that a passing category cannot mask a failure in either of the
+- [x] Tests prove that a passing category cannot mask a failure in either of the
   other two categories.
-- [ ] The support statement remains bounded to low-level fp64 fixed-four direct
+- [x] The support statement remains bounded to low-level fp64 fixed-four direct
   condensation and does not claim CPU strategy/`Runnable` parity.
 - [ ] Every deferred capability has a named downstream owner, entry gate, and
   explicit E5-F8 non-claim; documentation tests fail if a row is removed.
