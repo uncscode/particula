@@ -32,14 +32,14 @@
 
 ### Stochastic and Device Evidence
 
-- [ ] Define sample counts and independent expected collision aggregates before
-  observing implementation results; document the confidence or sigma formula.
-- [ ] Execute repeated fresh seeded trials per mechanism row and assert aggregate
-  bounds without requiring exact CPU/Warp accepted-pair replay.
-- [ ] Apply deterministic legal-pair, capacity, conservation, inactive-slot, and
+- [x] Define 100-sample fresh-seed cases and independent initial-state collision
+  aggregates with the predeclared `3 * sqrt(expected_mean)` formula.
+- [x] Execute repeated fresh seeded public-step trials for every executable mask
+  and assert aggregate bounds without requiring exact CPU/Warp pair replay.
+- [x] Apply deterministic legal-pair, capacity, conservation, inactive-slot, and
   ownership assertions to every stochastic trial.
-- [ ] Mark tests with `gpu_parity`, `stochastic`, and `cuda` as applicable and
-  verify Warp CPU failures cannot be hidden by CUDA availability.
+- [x] Mark observations with `gpu_parity`, `stochastic`, and `cuda` as applicable;
+  require Warp CPU when installed and skip CUDA only when unavailable.
 - [ ] Run focused deterministic/stochastic commands and the full coagulation
   suite without slow/performance markers.
 

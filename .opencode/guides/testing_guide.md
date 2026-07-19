@@ -183,6 +183,7 @@ pytest particula/gpu/kernels/tests/thermodynamics_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and gpu_parity"
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and stochastic"
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -Werror
 ```
 
 Use CUDA-targeted runs only for optional local/manual validation when a
@@ -193,6 +194,7 @@ CUDA is absent:
 ```bash
 pytest particula/gpu/kernels/tests/environment_test.py -q -m "warp and cuda"
 pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and cuda" -Werror
 ```
 
 These commands match the shipped marker and helper contract:
@@ -206,6 +208,11 @@ These commands match the shipped marker and helper contract:
   dependency.
 - Benchmark coverage stays opt-in behind `--benchmark` and remains separate
   from the default release-validation path above.
+
+The coagulation stochastic-validation matrix covers all executable mechanism
+masks with 100 fresh seeds per row and device. It compares aggregate accepted
+collisions to an independent initial-state expectation using a three-sigma
+bound; it does not require matching per-seed trajectories across devices.
 
 GPU thermodynamics refresh coverage belongs in
 `particula/gpu/kernels/tests/thermodynamics_test.py`. Test explicit

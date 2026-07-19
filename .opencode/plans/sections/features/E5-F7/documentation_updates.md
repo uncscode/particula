@@ -25,6 +25,7 @@ to surface the validation commands there; E5-F7 introduces no production API.
 
 ## Status
 
-Issues #1362 and #1363 added private validation-only P1/P2 coverage and made no
-user-facing documentation changes. The planned public evidence matrix and
+Issues #1362, #1363, and #1364 added private validation-only P1/P2/P3 coverage
+and made no user-facing documentation changes. Issue #1364 supplied the bounded
+stochastic/device evidence consumed by the planned public evidence matrix;
 documentation updates remain P4 work.

@@ -44,14 +44,28 @@ contract for E5-F9 closeout.
 
 ### Remaining scope
 
-- Deterministic fp64 pair/property parity for Brownian, charged, SP2016
-  sedimentation with efficiency 1, ST1956 turbulent shear, and every approved
-  additive row, using independent CPU APIs or direct NumPy equations.
-- Proof that each pair rate is finite and non-negative and does not exceed its
-  independently checked mechanism or summed majorant.
-- Bounded aggregate stochastic validation over repeated fresh seeds or steps,
-  with declared confidence or sigma bounds rather than exact pair replay.
 - A concise validation matrix and focused reproduction commands for E5-F9.
+
+### Completed in issue #1364 (P3)
+
+- `particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py` adds
+  host-only case/oracle, seed-schedule, and override-shape coverage plus the
+  collectable public-step matrix for all 11 executable masks.
+- `particula/gpu/kernels/tests/_coagulation_validation_support.py` now owns
+  bounded `StochasticCase` records and independent initial-state expectation
+  helpers. Each row uses 100 fresh uint32-compatible seeds, capacity 1,
+  per-box scheduling expectations in `(0, 1]`, and an aggregate
+  `3 * sqrt(expected_mean)` acceptance bound.
+- `particula/gpu/kernels/tests/_coagulation_public_step_support.py` is a
+  private lazy-Warp boundary shared by P2 and P3. It owns public-step
+  materialization, snapshots, invariant checks, and explicit volume and
+  concentration overrides; P3 verifies override shape failures and inactive
+  sentinel preservation.
+- Warp CPU observations are marked `warp`, `gpu_parity`, and `stochastic`.
+  CUDA reuses the same cases with the additional `cuda` mark and skips only
+  when the existing CUDA availability helper reports it unavailable.
+- The implementation is validation-only: no production physics, public API,
+  exports, shared CUDA-helper behavior, or user documentation changed.
 
 ## Out of Scope
 

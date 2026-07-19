@@ -598,6 +598,5 @@ cat agents/<adw-id>/<agent-name>/raw_output.log
 
 - **[Workflow JSON Schema](workflow-json-schema.md)** - Complete schema reference
 - **[Workflow Conditionals](workflow-conditionals.md)** - Conditional syntax guide
-- **[Workflow Migration Guide](workflow-migration-guide.md)** - Migrate Python workflows to JSON
 - **[Workflow Examples](workflow-examples.md)** - Usage patterns and examples
 - **[Architecture Reference](architecture_reference.md)** - Workflow engine architecture

@@ -7,8 +7,9 @@
   test.
 - [x] Every explicit active unordered pair has a finite non-negative rate bounded by its
   independently checked mechanism or summed majorant.
-- [ ] Repeated-run collision aggregates fall within a predeclared statistical
-  confidence or sigma bound without exact pair replay requirements.
+- [x] Repeated-run collision aggregates for every executable mask fall within
+  the predeclared 100-seed `3 * sqrt(expected_mean)` bound without exact pair
+  replay requirements.
 - [x] Per-box/per-species mass is conserved at `rtol=1e-12, atol=1e-30` for all
   executable rows in the P2 matrix and total charge is separately conserved for
   charge-bearing rows.
@@ -17,7 +18,7 @@
 - [x] Caller-owned pair/count output buffers retain identity; persistent RNG
   state advances or resets only as requested; selected invalid inputs preserve
   particles, buffers, and RNG state at preflight.
-- [x] Warp CPU executes P2 cases when Warp is installed. CUDA runs the same
+- [x] Warp CPU executes P2/P3 cases when Warp is installed. CUDA runs the same
   applicable matrix when available and otherwise skips cleanly.
 - [ ] Focused validation and the full coagulation suite pass without lowering
   coverage or requiring slow/performance benchmarks.
