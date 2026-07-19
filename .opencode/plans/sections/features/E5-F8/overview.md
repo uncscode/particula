@@ -11,10 +11,12 @@ capabilities are described in several documents without one ownership record.
 ## Value Proposition
 
 Issue #1367 delivered the deterministic fp64 walkthrough and its co-located
-regression tests. The example completes a detached NumPy fixed-four-substep
-oracle before it conditionally imports or allocates Warp state, then exposes
-separately synchronized direct-kernel observations. CUDA remains optional
-additive evidence; Warp CPU is exercised when Warp is installed.
+regression tests. Issue #1368 added independently evaluated, labeled
+`physics`, `conservation`, and `energy` acceptance results. The example
+completes a detached NumPy fixed-four-substep oracle before it conditionally
+imports or allocates Warp state, then exposes separately synchronized
+direct-kernel observations. CUDA remains optional additive evidence; Warp CPU
+is exercised when Warp is installed.
 
 ## User Stories
 
