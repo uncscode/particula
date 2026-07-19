@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://uncscode.github.io/particula/API/particula/gpu/kernels/coagulation/">
       
       
-        <link rel="prev" href="../../dynamics/condensation_funcs/">
+        <link rel="prev" href="../_coagulation_config/">
       
       
         <link rel="next" href="../condensation/">
@@ -5204,6 +5204,8 @@
       
         
       
+        
+      
     
     
     
@@ -5248,6 +5250,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../_coagulation_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels._coagulation_config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -5331,17 +5361,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#particula.gpu.kernels.coagulation.CoagulationMechanismConfig" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;CoagulationMechanismConfig
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#particula.gpu.kernels.coagulation.apply_coagulation_kernel" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5379,28 +5398,6 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;initialize_coagulation_rng_states
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particula.gpu.kernels.coagulation.resolve_coagulation_mechanism_config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;resolve_coagulation_mechanism_config
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particula.gpu.kernels.coagulation.validate_coagulation_mechanism_capabilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;validate_coagulation_mechanism_capabilities
       
     </span>
   </a>
@@ -11539,6 +11536,8 @@
       
         
       
+        
+      
     
     
     
@@ -11591,6 +11590,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../Features/Roadmap/coagulation-validation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU Coagulation Validation Record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -14346,17 +14373,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#particula.gpu.kernels.coagulation.CoagulationMechanismConfig" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;CoagulationMechanismConfig
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#particula.gpu.kernels.coagulation.apply_coagulation_kernel" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14394,28 +14410,6 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;initialize_coagulation_rng_states
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particula.gpu.kernels.coagulation.resolve_coagulation_mechanism_config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;resolve_coagulation_mechanism_config
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#particula.gpu.kernels.coagulation.validate_coagulation_mechanism_capabilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;validate_coagulation_mechanism_capabilities
       
     </span>
   </a>
@@ -14530,97 +14524,6 @@ before any output, RNG, or particle-state mutation.</p>
 
 
 
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="particula.gpu.kernels.coagulation.CoagulationMechanismConfig" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">CoagulationMechanismConfig</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-<a href="#particula.gpu.kernels.coagulation.CoagulationMechanismConfig" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">CoagulationMechanismConfig</span><span class="p">(</span><span class="n">mechanisms</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;particle_resolved&#39;</span><span class="p">)</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-
-
-        <p>Configure host-side coagulation mechanism selection.</p>
-<p>The default selects Brownian, particle-resolved coagulation. This immutable,
-concrete-module-only API must be imported from
-<code>particula.gpu.kernels.coagulation</code>, not <code>particula.gpu.kernels</code>.
-<code>coagulation_step_gpu</code> accepts it only through its keyword-only
-<code>mechanism_config</code> argument. The configuration is host metadata and does
-not own, transfer, or synchronize Warp resources. Executable
-<code>"particle_resolved"</code> masks are <code>1</code>, <code>2</code>, <code>3</code>, <code>4</code>, <code>5</code>, <code>6</code>,
-<code>8</code>, <code>9</code>, <code>10</code>, <code>12</code>, and <code>15</code>. The resolver normalizes supported
-mechanism tuples to the canonical fixed-mask order. Malformed, duplicate,
-unknown, and non-particle-resolved configurations reject during structural
-preflight before particle state is accessed. Mask <code>7</code> rejects at
-capability preflight before particle metadata or enabled-term validation.
-Turbulent masks <code>11</code>, <code>13</code>, and <code>14</code> validate particle metadata and
-enabled terms before their deferred-execution error. Structurally valid
-turbulent-shear requests validate their explicit P2 inputs after particle
-schema and device checks.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-          <b><code><span title="particula.gpu.kernels.coagulation.CoagulationMechanismConfig.mechanisms">mechanisms</span></code></b>
-              (<code><span title="tuple">tuple</span>[<span title="str">str</span>, ...] | None</code>)
-          –
-          <div class="doc-md-description">
-            <p>Requested mechanism identifiers, or <code>None</code> to select
-Brownian. The resolver normalizes supported identifiers to canonical
-order.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-          <b><code><span title="particula.gpu.kernels.coagulation.CoagulationMechanismConfig.distribution_type">distribution_type</span></code></b>
-              (<code><span title="str">str</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>Required distribution representation; only
-<code>"particle_resolved"</code> is structurally supported.</p>
-          </div>
-        </li>
-    </ul>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
 
 <div class="doc doc-object doc-function">
 
@@ -14693,76 +14596,76 @@ and then cleared.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1501</span>
-<span class="normal">1502</span>
-<span class="normal">1503</span>
-<span class="normal">1504</span>
-<span class="normal">1505</span>
-<span class="normal">1506</span>
-<span class="normal">1507</span>
-<span class="normal">1508</span>
-<span class="normal">1509</span>
-<span class="normal">1510</span>
-<span class="normal">1511</span>
-<span class="normal">1512</span>
-<span class="normal">1513</span>
-<span class="normal">1514</span>
-<span class="normal">1515</span>
-<span class="normal">1516</span>
-<span class="normal">1517</span>
-<span class="normal">1518</span>
-<span class="normal">1519</span>
-<span class="normal">1520</span>
-<span class="normal">1521</span>
-<span class="normal">1522</span>
-<span class="normal">1523</span>
-<span class="normal">1524</span>
-<span class="normal">1525</span>
-<span class="normal">1526</span>
-<span class="normal">1527</span>
-<span class="normal">1528</span>
-<span class="normal">1529</span>
-<span class="normal">1530</span>
-<span class="normal">1531</span>
-<span class="normal">1532</span>
-<span class="normal">1533</span>
-<span class="normal">1534</span>
-<span class="normal">1535</span>
-<span class="normal">1536</span>
-<span class="normal">1537</span>
-<span class="normal">1538</span>
-<span class="normal">1539</span>
-<span class="normal">1540</span>
-<span class="normal">1541</span>
-<span class="normal">1542</span>
-<span class="normal">1543</span>
-<span class="normal">1544</span>
-<span class="normal">1545</span>
-<span class="normal">1546</span>
-<span class="normal">1547</span>
-<span class="normal">1548</span>
-<span class="normal">1549</span>
-<span class="normal">1550</span>
-<span class="normal">1551</span>
-<span class="normal">1552</span>
-<span class="normal">1553</span>
-<span class="normal">1554</span>
-<span class="normal">1555</span>
-<span class="normal">1556</span>
-<span class="normal">1557</span>
-<span class="normal">1558</span>
-<span class="normal">1559</span>
-<span class="normal">1560</span>
-<span class="normal">1561</span>
-<span class="normal">1562</span>
-<span class="normal">1563</span>
-<span class="normal">1564</span>
-<span class="normal">1565</span>
-<span class="normal">1566</span>
-<span class="normal">1567</span>
-<span class="normal">1568</span>
-<span class="normal">1569</span>
-<span class="normal">1570</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1345</span>
+<span class="normal">1346</span>
+<span class="normal">1347</span>
+<span class="normal">1348</span>
+<span class="normal">1349</span>
+<span class="normal">1350</span>
+<span class="normal">1351</span>
+<span class="normal">1352</span>
+<span class="normal">1353</span>
+<span class="normal">1354</span>
+<span class="normal">1355</span>
+<span class="normal">1356</span>
+<span class="normal">1357</span>
+<span class="normal">1358</span>
+<span class="normal">1359</span>
+<span class="normal">1360</span>
+<span class="normal">1361</span>
+<span class="normal">1362</span>
+<span class="normal">1363</span>
+<span class="normal">1364</span>
+<span class="normal">1365</span>
+<span class="normal">1366</span>
+<span class="normal">1367</span>
+<span class="normal">1368</span>
+<span class="normal">1369</span>
+<span class="normal">1370</span>
+<span class="normal">1371</span>
+<span class="normal">1372</span>
+<span class="normal">1373</span>
+<span class="normal">1374</span>
+<span class="normal">1375</span>
+<span class="normal">1376</span>
+<span class="normal">1377</span>
+<span class="normal">1378</span>
+<span class="normal">1379</span>
+<span class="normal">1380</span>
+<span class="normal">1381</span>
+<span class="normal">1382</span>
+<span class="normal">1383</span>
+<span class="normal">1384</span>
+<span class="normal">1385</span>
+<span class="normal">1386</span>
+<span class="normal">1387</span>
+<span class="normal">1388</span>
+<span class="normal">1389</span>
+<span class="normal">1390</span>
+<span class="normal">1391</span>
+<span class="normal">1392</span>
+<span class="normal">1393</span>
+<span class="normal">1394</span>
+<span class="normal">1395</span>
+<span class="normal">1396</span>
+<span class="normal">1397</span>
+<span class="normal">1398</span>
+<span class="normal">1399</span>
+<span class="normal">1400</span>
+<span class="normal">1401</span>
+<span class="normal">1402</span>
+<span class="normal">1403</span>
+<span class="normal">1404</span>
+<span class="normal">1405</span>
+<span class="normal">1406</span>
+<span class="normal">1407</span>
+<span class="normal">1408</span>
+<span class="normal">1409</span>
+<span class="normal">1410</span>
+<span class="normal">1411</span>
+<span class="normal">1412</span>
+<span class="normal">1413</span>
+<span class="normal">1414</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
 <span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_coagulation_kernel</span><span class="p">(</span>
@@ -15126,7 +15029,163 @@ two-way, and four-way approved masks are executable.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1086</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 930</span>
+<span class="normal"> 931</span>
+<span class="normal"> 932</span>
+<span class="normal"> 933</span>
+<span class="normal"> 934</span>
+<span class="normal"> 935</span>
+<span class="normal"> 936</span>
+<span class="normal"> 937</span>
+<span class="normal"> 938</span>
+<span class="normal"> 939</span>
+<span class="normal"> 940</span>
+<span class="normal"> 941</span>
+<span class="normal"> 942</span>
+<span class="normal"> 943</span>
+<span class="normal"> 944</span>
+<span class="normal"> 945</span>
+<span class="normal"> 946</span>
+<span class="normal"> 947</span>
+<span class="normal"> 948</span>
+<span class="normal"> 949</span>
+<span class="normal"> 950</span>
+<span class="normal"> 951</span>
+<span class="normal"> 952</span>
+<span class="normal"> 953</span>
+<span class="normal"> 954</span>
+<span class="normal"> 955</span>
+<span class="normal"> 956</span>
+<span class="normal"> 957</span>
+<span class="normal"> 958</span>
+<span class="normal"> 959</span>
+<span class="normal"> 960</span>
+<span class="normal"> 961</span>
+<span class="normal"> 962</span>
+<span class="normal"> 963</span>
+<span class="normal"> 964</span>
+<span class="normal"> 965</span>
+<span class="normal"> 966</span>
+<span class="normal"> 967</span>
+<span class="normal"> 968</span>
+<span class="normal"> 969</span>
+<span class="normal"> 970</span>
+<span class="normal"> 971</span>
+<span class="normal"> 972</span>
+<span class="normal"> 973</span>
+<span class="normal"> 974</span>
+<span class="normal"> 975</span>
+<span class="normal"> 976</span>
+<span class="normal"> 977</span>
+<span class="normal"> 978</span>
+<span class="normal"> 979</span>
+<span class="normal"> 980</span>
+<span class="normal"> 981</span>
+<span class="normal"> 982</span>
+<span class="normal"> 983</span>
+<span class="normal"> 984</span>
+<span class="normal"> 985</span>
+<span class="normal"> 986</span>
+<span class="normal"> 987</span>
+<span class="normal"> 988</span>
+<span class="normal"> 989</span>
+<span class="normal"> 990</span>
+<span class="normal"> 991</span>
+<span class="normal"> 992</span>
+<span class="normal"> 993</span>
+<span class="normal"> 994</span>
+<span class="normal"> 995</span>
+<span class="normal"> 996</span>
+<span class="normal"> 997</span>
+<span class="normal"> 998</span>
+<span class="normal"> 999</span>
+<span class="normal">1000</span>
+<span class="normal">1001</span>
+<span class="normal">1002</span>
+<span class="normal">1003</span>
+<span class="normal">1004</span>
+<span class="normal">1005</span>
+<span class="normal">1006</span>
+<span class="normal">1007</span>
+<span class="normal">1008</span>
+<span class="normal">1009</span>
+<span class="normal">1010</span>
+<span class="normal">1011</span>
+<span class="normal">1012</span>
+<span class="normal">1013</span>
+<span class="normal">1014</span>
+<span class="normal">1015</span>
+<span class="normal">1016</span>
+<span class="normal">1017</span>
+<span class="normal">1018</span>
+<span class="normal">1019</span>
+<span class="normal">1020</span>
+<span class="normal">1021</span>
+<span class="normal">1022</span>
+<span class="normal">1023</span>
+<span class="normal">1024</span>
+<span class="normal">1025</span>
+<span class="normal">1026</span>
+<span class="normal">1027</span>
+<span class="normal">1028</span>
+<span class="normal">1029</span>
+<span class="normal">1030</span>
+<span class="normal">1031</span>
+<span class="normal">1032</span>
+<span class="normal">1033</span>
+<span class="normal">1034</span>
+<span class="normal">1035</span>
+<span class="normal">1036</span>
+<span class="normal">1037</span>
+<span class="normal">1038</span>
+<span class="normal">1039</span>
+<span class="normal">1040</span>
+<span class="normal">1041</span>
+<span class="normal">1042</span>
+<span class="normal">1043</span>
+<span class="normal">1044</span>
+<span class="normal">1045</span>
+<span class="normal">1046</span>
+<span class="normal">1047</span>
+<span class="normal">1048</span>
+<span class="normal">1049</span>
+<span class="normal">1050</span>
+<span class="normal">1051</span>
+<span class="normal">1052</span>
+<span class="normal">1053</span>
+<span class="normal">1054</span>
+<span class="normal">1055</span>
+<span class="normal">1056</span>
+<span class="normal">1057</span>
+<span class="normal">1058</span>
+<span class="normal">1059</span>
+<span class="normal">1060</span>
+<span class="normal">1061</span>
+<span class="normal">1062</span>
+<span class="normal">1063</span>
+<span class="normal">1064</span>
+<span class="normal">1065</span>
+<span class="normal">1066</span>
+<span class="normal">1067</span>
+<span class="normal">1068</span>
+<span class="normal">1069</span>
+<span class="normal">1070</span>
+<span class="normal">1071</span>
+<span class="normal">1072</span>
+<span class="normal">1073</span>
+<span class="normal">1074</span>
+<span class="normal">1075</span>
+<span class="normal">1076</span>
+<span class="normal">1077</span>
+<span class="normal">1078</span>
+<span class="normal">1079</span>
+<span class="normal">1080</span>
+<span class="normal">1081</span>
+<span class="normal">1082</span>
+<span class="normal">1083</span>
+<span class="normal">1084</span>
+<span class="normal">1085</span>
+<span class="normal">1086</span>
 <span class="normal">1087</span>
 <span class="normal">1088</span>
 <span class="normal">1089</span>
@@ -15382,163 +15441,7 @@ two-way, and four-way approved masks are executable.</p>
 <span class="normal">1339</span>
 <span class="normal">1340</span>
 <span class="normal">1341</span>
-<span class="normal">1342</span>
-<span class="normal">1343</span>
-<span class="normal">1344</span>
-<span class="normal">1345</span>
-<span class="normal">1346</span>
-<span class="normal">1347</span>
-<span class="normal">1348</span>
-<span class="normal">1349</span>
-<span class="normal">1350</span>
-<span class="normal">1351</span>
-<span class="normal">1352</span>
-<span class="normal">1353</span>
-<span class="normal">1354</span>
-<span class="normal">1355</span>
-<span class="normal">1356</span>
-<span class="normal">1357</span>
-<span class="normal">1358</span>
-<span class="normal">1359</span>
-<span class="normal">1360</span>
-<span class="normal">1361</span>
-<span class="normal">1362</span>
-<span class="normal">1363</span>
-<span class="normal">1364</span>
-<span class="normal">1365</span>
-<span class="normal">1366</span>
-<span class="normal">1367</span>
-<span class="normal">1368</span>
-<span class="normal">1369</span>
-<span class="normal">1370</span>
-<span class="normal">1371</span>
-<span class="normal">1372</span>
-<span class="normal">1373</span>
-<span class="normal">1374</span>
-<span class="normal">1375</span>
-<span class="normal">1376</span>
-<span class="normal">1377</span>
-<span class="normal">1378</span>
-<span class="normal">1379</span>
-<span class="normal">1380</span>
-<span class="normal">1381</span>
-<span class="normal">1382</span>
-<span class="normal">1383</span>
-<span class="normal">1384</span>
-<span class="normal">1385</span>
-<span class="normal">1386</span>
-<span class="normal">1387</span>
-<span class="normal">1388</span>
-<span class="normal">1389</span>
-<span class="normal">1390</span>
-<span class="normal">1391</span>
-<span class="normal">1392</span>
-<span class="normal">1393</span>
-<span class="normal">1394</span>
-<span class="normal">1395</span>
-<span class="normal">1396</span>
-<span class="normal">1397</span>
-<span class="normal">1398</span>
-<span class="normal">1399</span>
-<span class="normal">1400</span>
-<span class="normal">1401</span>
-<span class="normal">1402</span>
-<span class="normal">1403</span>
-<span class="normal">1404</span>
-<span class="normal">1405</span>
-<span class="normal">1406</span>
-<span class="normal">1407</span>
-<span class="normal">1408</span>
-<span class="normal">1409</span>
-<span class="normal">1410</span>
-<span class="normal">1411</span>
-<span class="normal">1412</span>
-<span class="normal">1413</span>
-<span class="normal">1414</span>
-<span class="normal">1415</span>
-<span class="normal">1416</span>
-<span class="normal">1417</span>
-<span class="normal">1418</span>
-<span class="normal">1419</span>
-<span class="normal">1420</span>
-<span class="normal">1421</span>
-<span class="normal">1422</span>
-<span class="normal">1423</span>
-<span class="normal">1424</span>
-<span class="normal">1425</span>
-<span class="normal">1426</span>
-<span class="normal">1427</span>
-<span class="normal">1428</span>
-<span class="normal">1429</span>
-<span class="normal">1430</span>
-<span class="normal">1431</span>
-<span class="normal">1432</span>
-<span class="normal">1433</span>
-<span class="normal">1434</span>
-<span class="normal">1435</span>
-<span class="normal">1436</span>
-<span class="normal">1437</span>
-<span class="normal">1438</span>
-<span class="normal">1439</span>
-<span class="normal">1440</span>
-<span class="normal">1441</span>
-<span class="normal">1442</span>
-<span class="normal">1443</span>
-<span class="normal">1444</span>
-<span class="normal">1445</span>
-<span class="normal">1446</span>
-<span class="normal">1447</span>
-<span class="normal">1448</span>
-<span class="normal">1449</span>
-<span class="normal">1450</span>
-<span class="normal">1451</span>
-<span class="normal">1452</span>
-<span class="normal">1453</span>
-<span class="normal">1454</span>
-<span class="normal">1455</span>
-<span class="normal">1456</span>
-<span class="normal">1457</span>
-<span class="normal">1458</span>
-<span class="normal">1459</span>
-<span class="normal">1460</span>
-<span class="normal">1461</span>
-<span class="normal">1462</span>
-<span class="normal">1463</span>
-<span class="normal">1464</span>
-<span class="normal">1465</span>
-<span class="normal">1466</span>
-<span class="normal">1467</span>
-<span class="normal">1468</span>
-<span class="normal">1469</span>
-<span class="normal">1470</span>
-<span class="normal">1471</span>
-<span class="normal">1472</span>
-<span class="normal">1473</span>
-<span class="normal">1474</span>
-<span class="normal">1475</span>
-<span class="normal">1476</span>
-<span class="normal">1477</span>
-<span class="normal">1478</span>
-<span class="normal">1479</span>
-<span class="normal">1480</span>
-<span class="normal">1481</span>
-<span class="normal">1482</span>
-<span class="normal">1483</span>
-<span class="normal">1484</span>
-<span class="normal">1485</span>
-<span class="normal">1486</span>
-<span class="normal">1487</span>
-<span class="normal">1488</span>
-<span class="normal">1489</span>
-<span class="normal">1490</span>
-<span class="normal">1491</span>
-<span class="normal">1492</span>
-<span class="normal">1493</span>
-<span class="normal">1494</span>
-<span class="normal">1495</span>
-<span class="normal">1496</span>
-<span class="normal">1497</span>
-<span class="normal">1498</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
+<span class="normal">1342</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
 <span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">brownian_coagulation_kernel</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
@@ -16136,7 +16039,7 @@ buffer and it is reused as-is across repeated calls unless
 
   
       dataclass
-   (particula.gpu.kernels.coagulation.CoagulationMechanismConfig)" href="#particula.gpu.kernels.coagulation.CoagulationMechanismConfig">CoagulationMechanismConfig</a> | None</code>, default:
+   (particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig)" href="../_coagulation_config/#particula.gpu.kernels._coagulation_config.CoagulationMechanismConfig">CoagulationMechanismConfig</a> | None</code>, default:
                   <code>None</code>
 )
           –
@@ -16437,7 +16340,163 @@ retrying.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2260</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2104</span>
+<span class="normal">2105</span>
+<span class="normal">2106</span>
+<span class="normal">2107</span>
+<span class="normal">2108</span>
+<span class="normal">2109</span>
+<span class="normal">2110</span>
+<span class="normal">2111</span>
+<span class="normal">2112</span>
+<span class="normal">2113</span>
+<span class="normal">2114</span>
+<span class="normal">2115</span>
+<span class="normal">2116</span>
+<span class="normal">2117</span>
+<span class="normal">2118</span>
+<span class="normal">2119</span>
+<span class="normal">2120</span>
+<span class="normal">2121</span>
+<span class="normal">2122</span>
+<span class="normal">2123</span>
+<span class="normal">2124</span>
+<span class="normal">2125</span>
+<span class="normal">2126</span>
+<span class="normal">2127</span>
+<span class="normal">2128</span>
+<span class="normal">2129</span>
+<span class="normal">2130</span>
+<span class="normal">2131</span>
+<span class="normal">2132</span>
+<span class="normal">2133</span>
+<span class="normal">2134</span>
+<span class="normal">2135</span>
+<span class="normal">2136</span>
+<span class="normal">2137</span>
+<span class="normal">2138</span>
+<span class="normal">2139</span>
+<span class="normal">2140</span>
+<span class="normal">2141</span>
+<span class="normal">2142</span>
+<span class="normal">2143</span>
+<span class="normal">2144</span>
+<span class="normal">2145</span>
+<span class="normal">2146</span>
+<span class="normal">2147</span>
+<span class="normal">2148</span>
+<span class="normal">2149</span>
+<span class="normal">2150</span>
+<span class="normal">2151</span>
+<span class="normal">2152</span>
+<span class="normal">2153</span>
+<span class="normal">2154</span>
+<span class="normal">2155</span>
+<span class="normal">2156</span>
+<span class="normal">2157</span>
+<span class="normal">2158</span>
+<span class="normal">2159</span>
+<span class="normal">2160</span>
+<span class="normal">2161</span>
+<span class="normal">2162</span>
+<span class="normal">2163</span>
+<span class="normal">2164</span>
+<span class="normal">2165</span>
+<span class="normal">2166</span>
+<span class="normal">2167</span>
+<span class="normal">2168</span>
+<span class="normal">2169</span>
+<span class="normal">2170</span>
+<span class="normal">2171</span>
+<span class="normal">2172</span>
+<span class="normal">2173</span>
+<span class="normal">2174</span>
+<span class="normal">2175</span>
+<span class="normal">2176</span>
+<span class="normal">2177</span>
+<span class="normal">2178</span>
+<span class="normal">2179</span>
+<span class="normal">2180</span>
+<span class="normal">2181</span>
+<span class="normal">2182</span>
+<span class="normal">2183</span>
+<span class="normal">2184</span>
+<span class="normal">2185</span>
+<span class="normal">2186</span>
+<span class="normal">2187</span>
+<span class="normal">2188</span>
+<span class="normal">2189</span>
+<span class="normal">2190</span>
+<span class="normal">2191</span>
+<span class="normal">2192</span>
+<span class="normal">2193</span>
+<span class="normal">2194</span>
+<span class="normal">2195</span>
+<span class="normal">2196</span>
+<span class="normal">2197</span>
+<span class="normal">2198</span>
+<span class="normal">2199</span>
+<span class="normal">2200</span>
+<span class="normal">2201</span>
+<span class="normal">2202</span>
+<span class="normal">2203</span>
+<span class="normal">2204</span>
+<span class="normal">2205</span>
+<span class="normal">2206</span>
+<span class="normal">2207</span>
+<span class="normal">2208</span>
+<span class="normal">2209</span>
+<span class="normal">2210</span>
+<span class="normal">2211</span>
+<span class="normal">2212</span>
+<span class="normal">2213</span>
+<span class="normal">2214</span>
+<span class="normal">2215</span>
+<span class="normal">2216</span>
+<span class="normal">2217</span>
+<span class="normal">2218</span>
+<span class="normal">2219</span>
+<span class="normal">2220</span>
+<span class="normal">2221</span>
+<span class="normal">2222</span>
+<span class="normal">2223</span>
+<span class="normal">2224</span>
+<span class="normal">2225</span>
+<span class="normal">2226</span>
+<span class="normal">2227</span>
+<span class="normal">2228</span>
+<span class="normal">2229</span>
+<span class="normal">2230</span>
+<span class="normal">2231</span>
+<span class="normal">2232</span>
+<span class="normal">2233</span>
+<span class="normal">2234</span>
+<span class="normal">2235</span>
+<span class="normal">2236</span>
+<span class="normal">2237</span>
+<span class="normal">2238</span>
+<span class="normal">2239</span>
+<span class="normal">2240</span>
+<span class="normal">2241</span>
+<span class="normal">2242</span>
+<span class="normal">2243</span>
+<span class="normal">2244</span>
+<span class="normal">2245</span>
+<span class="normal">2246</span>
+<span class="normal">2247</span>
+<span class="normal">2248</span>
+<span class="normal">2249</span>
+<span class="normal">2250</span>
+<span class="normal">2251</span>
+<span class="normal">2252</span>
+<span class="normal">2253</span>
+<span class="normal">2254</span>
+<span class="normal">2255</span>
+<span class="normal">2256</span>
+<span class="normal">2257</span>
+<span class="normal">2258</span>
+<span class="normal">2259</span>
+<span class="normal">2260</span>
 <span class="normal">2261</span>
 <span class="normal">2262</span>
 <span class="normal">2263</span>
@@ -16760,163 +16819,7 @@ retrying.</p>
 <span class="normal">2580</span>
 <span class="normal">2581</span>
 <span class="normal">2582</span>
-<span class="normal">2583</span>
-<span class="normal">2584</span>
-<span class="normal">2585</span>
-<span class="normal">2586</span>
-<span class="normal">2587</span>
-<span class="normal">2588</span>
-<span class="normal">2589</span>
-<span class="normal">2590</span>
-<span class="normal">2591</span>
-<span class="normal">2592</span>
-<span class="normal">2593</span>
-<span class="normal">2594</span>
-<span class="normal">2595</span>
-<span class="normal">2596</span>
-<span class="normal">2597</span>
-<span class="normal">2598</span>
-<span class="normal">2599</span>
-<span class="normal">2600</span>
-<span class="normal">2601</span>
-<span class="normal">2602</span>
-<span class="normal">2603</span>
-<span class="normal">2604</span>
-<span class="normal">2605</span>
-<span class="normal">2606</span>
-<span class="normal">2607</span>
-<span class="normal">2608</span>
-<span class="normal">2609</span>
-<span class="normal">2610</span>
-<span class="normal">2611</span>
-<span class="normal">2612</span>
-<span class="normal">2613</span>
-<span class="normal">2614</span>
-<span class="normal">2615</span>
-<span class="normal">2616</span>
-<span class="normal">2617</span>
-<span class="normal">2618</span>
-<span class="normal">2619</span>
-<span class="normal">2620</span>
-<span class="normal">2621</span>
-<span class="normal">2622</span>
-<span class="normal">2623</span>
-<span class="normal">2624</span>
-<span class="normal">2625</span>
-<span class="normal">2626</span>
-<span class="normal">2627</span>
-<span class="normal">2628</span>
-<span class="normal">2629</span>
-<span class="normal">2630</span>
-<span class="normal">2631</span>
-<span class="normal">2632</span>
-<span class="normal">2633</span>
-<span class="normal">2634</span>
-<span class="normal">2635</span>
-<span class="normal">2636</span>
-<span class="normal">2637</span>
-<span class="normal">2638</span>
-<span class="normal">2639</span>
-<span class="normal">2640</span>
-<span class="normal">2641</span>
-<span class="normal">2642</span>
-<span class="normal">2643</span>
-<span class="normal">2644</span>
-<span class="normal">2645</span>
-<span class="normal">2646</span>
-<span class="normal">2647</span>
-<span class="normal">2648</span>
-<span class="normal">2649</span>
-<span class="normal">2650</span>
-<span class="normal">2651</span>
-<span class="normal">2652</span>
-<span class="normal">2653</span>
-<span class="normal">2654</span>
-<span class="normal">2655</span>
-<span class="normal">2656</span>
-<span class="normal">2657</span>
-<span class="normal">2658</span>
-<span class="normal">2659</span>
-<span class="normal">2660</span>
-<span class="normal">2661</span>
-<span class="normal">2662</span>
-<span class="normal">2663</span>
-<span class="normal">2664</span>
-<span class="normal">2665</span>
-<span class="normal">2666</span>
-<span class="normal">2667</span>
-<span class="normal">2668</span>
-<span class="normal">2669</span>
-<span class="normal">2670</span>
-<span class="normal">2671</span>
-<span class="normal">2672</span>
-<span class="normal">2673</span>
-<span class="normal">2674</span>
-<span class="normal">2675</span>
-<span class="normal">2676</span>
-<span class="normal">2677</span>
-<span class="normal">2678</span>
-<span class="normal">2679</span>
-<span class="normal">2680</span>
-<span class="normal">2681</span>
-<span class="normal">2682</span>
-<span class="normal">2683</span>
-<span class="normal">2684</span>
-<span class="normal">2685</span>
-<span class="normal">2686</span>
-<span class="normal">2687</span>
-<span class="normal">2688</span>
-<span class="normal">2689</span>
-<span class="normal">2690</span>
-<span class="normal">2691</span>
-<span class="normal">2692</span>
-<span class="normal">2693</span>
-<span class="normal">2694</span>
-<span class="normal">2695</span>
-<span class="normal">2696</span>
-<span class="normal">2697</span>
-<span class="normal">2698</span>
-<span class="normal">2699</span>
-<span class="normal">2700</span>
-<span class="normal">2701</span>
-<span class="normal">2702</span>
-<span class="normal">2703</span>
-<span class="normal">2704</span>
-<span class="normal">2705</span>
-<span class="normal">2706</span>
-<span class="normal">2707</span>
-<span class="normal">2708</span>
-<span class="normal">2709</span>
-<span class="normal">2710</span>
-<span class="normal">2711</span>
-<span class="normal">2712</span>
-<span class="normal">2713</span>
-<span class="normal">2714</span>
-<span class="normal">2715</span>
-<span class="normal">2716</span>
-<span class="normal">2717</span>
-<span class="normal">2718</span>
-<span class="normal">2719</span>
-<span class="normal">2720</span>
-<span class="normal">2721</span>
-<span class="normal">2722</span>
-<span class="normal">2723</span>
-<span class="normal">2724</span>
-<span class="normal">2725</span>
-<span class="normal">2726</span>
-<span class="normal">2727</span>
-<span class="normal">2728</span>
-<span class="normal">2729</span>
-<span class="normal">2730</span>
-<span class="normal">2731</span>
-<span class="normal">2732</span>
-<span class="normal">2733</span>
-<span class="normal">2734</span>
-<span class="normal">2735</span>
-<span class="normal">2736</span>
-<span class="normal">2737</span>
-<span class="normal">2738</span>
-<span class="normal">2739</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coagulation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">2583</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coagulation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -17477,47 +17380,47 @@ buffer or if the provided device mismatches the buffer device.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2088</span>
-<span class="normal">2089</span>
-<span class="normal">2090</span>
-<span class="normal">2091</span>
-<span class="normal">2092</span>
-<span class="normal">2093</span>
-<span class="normal">2094</span>
-<span class="normal">2095</span>
-<span class="normal">2096</span>
-<span class="normal">2097</span>
-<span class="normal">2098</span>
-<span class="normal">2099</span>
-<span class="normal">2100</span>
-<span class="normal">2101</span>
-<span class="normal">2102</span>
-<span class="normal">2103</span>
-<span class="normal">2104</span>
-<span class="normal">2105</span>
-<span class="normal">2106</span>
-<span class="normal">2107</span>
-<span class="normal">2108</span>
-<span class="normal">2109</span>
-<span class="normal">2110</span>
-<span class="normal">2111</span>
-<span class="normal">2112</span>
-<span class="normal">2113</span>
-<span class="normal">2114</span>
-<span class="normal">2115</span>
-<span class="normal">2116</span>
-<span class="normal">2117</span>
-<span class="normal">2118</span>
-<span class="normal">2119</span>
-<span class="normal">2120</span>
-<span class="normal">2121</span>
-<span class="normal">2122</span>
-<span class="normal">2123</span>
-<span class="normal">2124</span>
-<span class="normal">2125</span>
-<span class="normal">2126</span>
-<span class="normal">2127</span>
-<span class="normal">2128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize_coagulation_rng_states</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1932</span>
+<span class="normal">1933</span>
+<span class="normal">1934</span>
+<span class="normal">1935</span>
+<span class="normal">1936</span>
+<span class="normal">1937</span>
+<span class="normal">1938</span>
+<span class="normal">1939</span>
+<span class="normal">1940</span>
+<span class="normal">1941</span>
+<span class="normal">1942</span>
+<span class="normal">1943</span>
+<span class="normal">1944</span>
+<span class="normal">1945</span>
+<span class="normal">1946</span>
+<span class="normal">1947</span>
+<span class="normal">1948</span>
+<span class="normal">1949</span>
+<span class="normal">1950</span>
+<span class="normal">1951</span>
+<span class="normal">1952</span>
+<span class="normal">1953</span>
+<span class="normal">1954</span>
+<span class="normal">1955</span>
+<span class="normal">1956</span>
+<span class="normal">1957</span>
+<span class="normal">1958</span>
+<span class="normal">1959</span>
+<span class="normal">1960</span>
+<span class="normal">1961</span>
+<span class="normal">1962</span>
+<span class="normal">1963</span>
+<span class="normal">1964</span>
+<span class="normal">1965</span>
+<span class="normal">1966</span>
+<span class="normal">1967</span>
+<span class="normal">1968</span>
+<span class="normal">1969</span>
+<span class="normal">1970</span>
+<span class="normal">1971</span>
+<span class="normal">1972</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize_coagulation_rng_states</span><span class="p">(</span>
     <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">rng_states</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -17558,331 +17461,6 @@ buffer or if the provided device mismatches the buffer device.</p>
     <span class="p">)</span>
     <span class="n">wp</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">rng_states</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="particula.gpu.kernels.coagulation.resolve_coagulation_mechanism_config" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">resolve_coagulation_mechanism_config</span>
-
-
-<a href="#particula.gpu.kernels.coagulation.resolve_coagulation_mechanism_config" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">resolve_coagulation_mechanism_config</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">CoagulationMechanismConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ResolvedCoagulationMechanismConfig</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Resolve a configuration through structural validation.</p>
-<p><code>config.mechanisms=None</code> defaults to Brownian; <code>config</code> itself remains
-required. Valid identifiers are normalized to canonical order and retained
-in the returned fixed-bit mask, including deferred configurations whose
-validation timing is determined by the caller's capability preflight. This
-pure host-side, concrete-module-only helper neither allocates device storage
-nor mutates its input or runtime state. Import it from
-<code>particula.gpu.kernels.coagulation</code>, not <code>particula.gpu.kernels</code>.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>config</code></b>
-              (<code><a class="autorefs autorefs-internal" title="            CoagulationMechanismConfig
-
-
-  
-      dataclass
-   (particula.gpu.kernels.coagulation.CoagulationMechanismConfig)" href="#particula.gpu.kernels.coagulation.CoagulationMechanismConfig">CoagulationMechanismConfig</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>Immutable host-side coagulation mechanism configuration.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="particula.gpu.kernels.coagulation._ResolvedCoagulationMechanismConfig">_ResolvedCoagulationMechanismConfig</span></code>
-          –
-          <div class="doc-md-description">
-            <p>Private resolved configuration with canonical mechanisms, validated</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-              <code><span title="particula.gpu.kernels.coagulation._ResolvedCoagulationMechanismConfig">_ResolvedCoagulationMechanismConfig</span></code>
-          –
-          <div class="doc-md-description">
-            <p>distribution type, and the combined fixed-bit mask.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If mechanisms are malformed, duplicate, or unknown, or if
-distribution_type is not exactly <code>"particle_resolved"</code>.</p>
-          </div>
-        </li>
-    </ul>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span>
-<span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
-<span class="normal">267</span>
-<span class="normal">268</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resolve_coagulation_mechanism_config</span><span class="p">(</span>
-    <span class="n">config</span><span class="p">:</span> <span class="n">CoagulationMechanismConfig</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ResolvedCoagulationMechanismConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a configuration through structural validation.</span>
-
-<span class="sd">    ``config.mechanisms=None`` defaults to Brownian; ``config`` itself remains</span>
-<span class="sd">    required. Valid identifiers are normalized to canonical order and retained</span>
-<span class="sd">    in the returned fixed-bit mask, including deferred configurations whose</span>
-<span class="sd">    validation timing is determined by the caller&#39;s capability preflight. This</span>
-<span class="sd">    pure host-side, concrete-module-only helper neither allocates device storage</span>
-<span class="sd">    nor mutates its input or runtime state. Import it from</span>
-<span class="sd">    ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        config: Immutable host-side coagulation mechanism configuration.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Private resolved configuration with canonical mechanisms, validated</span>
-<span class="sd">        distribution type, and the combined fixed-bit mask.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If mechanisms are malformed, duplicate, or unknown, or if</span>
-<span class="sd">            distribution_type is not exactly ``&quot;particle_resolved&quot;``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">distribution_type</span> <span class="o">!=</span> <span class="s2">&quot;particle_resolved&quot;</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;distribution_type must be exactly &#39;particle_resolved&#39;.&quot;</span>
-        <span class="p">)</span>
-
-    <span class="n">mechanisms</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">mechanisms</span>
-    <span class="k">if</span> <span class="n">mechanisms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">mechanisms</span> <span class="o">=</span> <span class="p">(</span><span class="n">BROWNIAN_MECHANISM</span><span class="p">,)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mechanisms</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">mechanisms</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mechanisms must be a non-empty tuple of strings.&quot;</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">mechanism</span> <span class="ow">in</span> <span class="n">mechanisms</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mechanism</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mechanisms must contain only string identifiers.&quot;</span><span class="p">)</span>
-
-    <span class="n">seen_mechanisms</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">mechanism</span> <span class="ow">in</span> <span class="n">mechanisms</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">mechanism</span> <span class="ow">in</span> <span class="n">seen_mechanisms</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate coagulation mechanism &#39;</span><span class="si">{</span><span class="n">mechanism</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
-        <span class="n">seen_mechanisms</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mechanism</span><span class="p">)</span>
-
-    <span class="n">unknown</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
-        <span class="p">(</span>
-            <span class="n">mechanism</span>
-            <span class="k">for</span> <span class="n">mechanism</span> <span class="ow">in</span> <span class="n">mechanisms</span>
-            <span class="k">if</span> <span class="n">mechanism</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_COAGULATION_MECHANISM_FLAGS</span>
-        <span class="p">),</span>
-        <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">unknown</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown coagulation mechanism &#39;</span><span class="si">{</span><span class="n">unknown</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
-
-    <span class="n">normalized_mechanisms</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
-        <span class="n">mechanism</span>
-        <span class="k">for</span> <span class="n">mechanism</span> <span class="ow">in</span> <span class="n">CANONICAL_COAGULATION_MECHANISMS</span>
-        <span class="k">if</span> <span class="n">mechanism</span> <span class="ow">in</span> <span class="n">mechanisms</span>
-    <span class="p">)</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">mechanism</span> <span class="ow">in</span> <span class="n">normalized_mechanisms</span><span class="p">:</span>
-        <span class="n">mask</span> <span class="o">|=</span> <span class="n">_COAGULATION_MECHANISM_FLAGS</span><span class="p">[</span><span class="n">mechanism</span><span class="p">]</span>
-
-    <span class="k">return</span> <span class="n">_ResolvedCoagulationMechanismConfig</span><span class="p">(</span>
-        <span class="n">mechanisms</span><span class="o">=</span><span class="n">normalized_mechanisms</span><span class="p">,</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">distribution_type</span><span class="p">,</span>
-        <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
-    <span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="particula.gpu.kernels.coagulation.validate_coagulation_mechanism_capabilities" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">validate_coagulation_mechanism_capabilities</span>
-
-
-<a href="#particula.gpu.kernels.coagulation.validate_coagulation_mechanism_capabilities" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">validate_coagulation_mechanism_capabilities</span><span class="p">(</span><span class="n">resolved</span><span class="p">:</span> <span class="n">_ResolvedCoagulationMechanismConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Enforce the executable coagulation-mechanism boundary.</p>
-<p>This pure host-side, concrete-module-only validator accepts masks <code>1</code>,
-<code>2</code>, <code>3</code>, <code>4</code>, <code>5</code>, <code>6</code>, <code>8</code>, <code>9</code>, <code>10</code>, <code>12</code>, and <code>15</code>.
-It rejects the recognized three-way masks <code>7</code>, <code>11</code>, <code>13</code>, and <code>14</code>
-with the stable deferred-execution error. Mask <code>7</code> reaches this validator
-during capability preflight before particle metadata or enabled-term
-validation. Turbulent masks <code>11</code>, <code>13</code>, and <code>14</code> reach it only after
-particle metadata and enabled-term validation, including the turbulent P2
-input boundary. Import it from
-<code>particula.gpu.kernels.coagulation</code>, not <code>particula.gpu.kernels</code>.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>resolved</code></b>
-              (<code><span title="particula.gpu.kernels.coagulation._ResolvedCoagulationMechanismConfig">_ResolvedCoagulationMechanismConfig</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>Structurally validated, normalized mechanism configuration.</p>
-          </div>
-        </li>
-    </ul>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><span title="ValueError">ValueError</span></code>
-            –
-          <div class="doc-md-description">
-            <p>If a deferred mechanism is requested.</p>
-          </div>
-        </li>
-    </ul>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span>
-<span class="normal">277</span>
-<span class="normal">278</span>
-<span class="normal">279</span>
-<span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_coagulation_mechanism_capabilities</span><span class="p">(</span>
-    <span class="n">resolved</span><span class="p">:</span> <span class="n">_ResolvedCoagulationMechanismConfig</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enforce the executable coagulation-mechanism boundary.</span>
-
-<span class="sd">    This pure host-side, concrete-module-only validator accepts masks ``1``,</span>
-<span class="sd">    ``2``, ``3``, ``4``, ``5``, ``6``, ``8``, ``9``, ``10``, ``12``, and ``15``.</span>
-<span class="sd">    It rejects the recognized three-way masks ``7``, ``11``, ``13``, and ``14``</span>
-<span class="sd">    with the stable deferred-execution error. Mask ``7`` reaches this validator</span>
-<span class="sd">    during capability preflight before particle metadata or enabled-term</span>
-<span class="sd">    validation. Turbulent masks ``11``, ``13``, and ``14`` reach it only after</span>
-<span class="sd">    particle metadata and enabled-term validation, including the turbulent P2</span>
-<span class="sd">    input boundary. Import it from</span>
-<span class="sd">    ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        resolved: Structurally validated, normalized mechanism configuration.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If a deferred mechanism is requested.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">resolved</span><span class="o">.</span><span class="n">mask</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">):</span>
-        <span class="k">return</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Additive coagulation execution is deferred.&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

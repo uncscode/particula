@@ -5450,6 +5450,8 @@
       
         
       
+        
+      
     
     
     
@@ -5494,6 +5496,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kernels/_coagulation_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels._coagulation_config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -11638,6 +11668,8 @@
       
         
       
+        
+      
     
     
     
@@ -11690,6 +11722,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../Features/Roadmap/coagulation-validation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU Coagulation Validation Record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -14755,8 +14815,7 @@ with the Stokes-Einstein relation.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">339</span>
-<span class="normal">340</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">340</span>
 <span class="normal">341</span>
 <span class="normal">342</span>
 <span class="normal">343</span>
@@ -14776,7 +14835,8 @@ with the Stokes-Einstein relation.</p>
 <span class="normal">357</span>
 <span class="normal">358</span>
 <span class="normal">359</span>
-<span class="normal">360</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">360</span>
+<span class="normal">361</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">brownian_diffusivity_wp</span><span class="p">(</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">aerodynamic_mobility</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -14914,8 +14974,7 @@ a scalar particle pair using the Fuchs correction to the continuum kernel.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">420</span>
-<span class="normal">421</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">421</span>
 <span class="normal">422</span>
 <span class="normal">423</span>
 <span class="normal">424</span>
@@ -14962,7 +15021,8 @@ a scalar particle pair using the Fuchs correction to the continuum kernel.</p>
 <span class="normal">465</span>
 <span class="normal">466</span>
 <span class="normal">467</span>
-<span class="normal">468</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">468</span>
+<span class="normal">469</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">brownian_kernel_pair_wp</span><span class="p">(</span>
     <span class="n">radius_i</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">radius_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -15226,8 +15286,7 @@ https://doi.org/10.1063/1.2713719</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">705</span>
-<span class="normal">706</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">706</span>
 <span class="normal">707</span>
 <span class="normal">708</span>
 <span class="normal">709</span>
@@ -15479,7 +15538,8 @@ https://doi.org/10.1063/1.2713719</p>
 <span class="normal">955</span>
 <span class="normal">956</span>
 <span class="normal">957</span>
-<span class="normal">958</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">958</span>
+<span class="normal">959</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">charged_hard_sphere_wp</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">radius_i</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">radius_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -15791,8 +15851,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">603</span>
-<span class="normal">604</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">604</span>
 <span class="normal">605</span>
 <span class="normal">606</span>
 <span class="normal">607</span>
@@ -15825,7 +15884,8 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="normal">634</span>
 <span class="normal">635</span>
 <span class="normal">636</span>
-<span class="normal">637</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">637</span>
+<span class="normal">638</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">coulomb_continuum_limit_wp</span><span class="p">(</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
@@ -15918,8 +15978,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">578</span>
-<span class="normal">579</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">579</span>
 <span class="normal">580</span>
 <span class="normal">581</span>
 <span class="normal">582</span>
@@ -15940,7 +15999,8 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="normal">597</span>
 <span class="normal">598</span>
 <span class="normal">599</span>
-<span class="normal">600</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">600</span>
+<span class="normal">601</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">coulomb_kinetic_limit_wp</span><span class="p">(</span>
     <span class="n">coulomb_potential_ratio</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
@@ -16087,8 +16147,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">471</span>
-<span class="normal">472</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">472</span>
 <span class="normal">473</span>
 <span class="normal">474</span>
 <span class="normal">475</span>
@@ -16162,7 +16221,8 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="normal">543</span>
 <span class="normal">544</span>
 <span class="normal">545</span>
-<span class="normal">546</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">546</span>
+<span class="normal">547</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">coulomb_potential_ratio_wp</span><span class="p">(</span>
     <span class="n">radius_i</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">radius_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -16373,8 +16433,7 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">640</span>
-<span class="normal">641</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">641</span>
 <span class="normal">642</span>
 <span class="normal">643</span>
 <span class="normal">644</span>
@@ -16435,7 +16494,8 @@ https://doi.org/10.1103/PhysRevE.85.026410</p>
 <span class="normal">699</span>
 <span class="normal">700</span>
 <span class="normal">701</span>
-<span class="normal">702</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">702</span>
+<span class="normal">703</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">diffusive_knudsen_number_wp</span><span class="p">(</span>
     <span class="n">radius_i</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">radius_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -16565,8 +16625,7 @@ the quotient is non-finite, non-positive, or underflowed.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">36</span>
-<span class="normal">37</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
@@ -16599,7 +16658,8 @@ the quotient is non-finite, non-positive, or underflowed.</p>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
-<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">70</span>
+<span class="normal">71</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">effective_density_wp</span><span class="p">(</span>
     <span class="n">total_mass</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">total_volume</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -16694,8 +16754,7 @@ the Fuchs form for the collection enhancement term.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">389</span>
-<span class="normal">390</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">390</span>
 <span class="normal">391</span>
 <span class="normal">392</span>
 <span class="normal">393</span>
@@ -16722,7 +16781,8 @@ the Fuchs form for the collection enhancement term.</p>
 <span class="normal">414</span>
 <span class="normal">415</span>
 <span class="normal">416</span>
-<span class="normal">417</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">417</span>
+<span class="normal">418</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">g_collection_term_wp</span><span class="p">(</span>
     <span class="n">mean_free_path_particle</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -16811,8 +16871,7 @@ Public-input validation is intentionally deferred to the calling boundary.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">275</span>
-<span class="normal">276</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">276</span>
 <span class="normal">277</span>
 <span class="normal">278</span>
 <span class="normal">279</span>
@@ -16829,7 +16888,8 @@ Public-input validation is intentionally deferred to the calling boundary.</p>
 <span class="normal">290</span>
 <span class="normal">291</span>
 <span class="normal">292</span>
-<span class="normal">293</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">293</span>
+<span class="normal">294</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">kinematic_viscosity_wp</span><span class="p">(</span>
     <span class="n">dynamic_viscosity</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">fluid_density</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -16908,8 +16968,7 @@ second.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">363</span>
-<span class="normal">364</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">364</span>
 <span class="normal">365</span>
 <span class="normal">366</span>
 <span class="normal">367</span>
@@ -16931,7 +16990,8 @@ second.</p>
 <span class="normal">383</span>
 <span class="normal">384</span>
 <span class="normal">385</span>
-<span class="normal">386</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">386</span>
+<span class="normal">387</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">particle_mean_free_path_wp</span><span class="p">(</span>
     <span class="n">diffusivity_particle</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">mean_thermal_speed_particle</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -17031,8 +17091,7 @@ https://doi.org/10.1080/02786826.2019.1614522</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">549</span>
-<span class="normal">550</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">550</span>
 <span class="normal">551</span>
 <span class="normal">552</span>
 <span class="normal">553</span>
@@ -17057,7 +17116,8 @@ https://doi.org/10.1080/02786826.2019.1614522</p>
 <span class="normal">572</span>
 <span class="normal">573</span>
 <span class="normal">574</span>
-<span class="normal">575</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">575</span>
+<span class="normal">576</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">reduced_value_wp</span><span class="p">(</span><span class="n">left</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate a scalar reduced value for mass or friction inputs.</span>
 
@@ -17174,8 +17234,7 @@ Physics</em> (3<sup>rd</sup> ed.), Eq. 13A.4.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">220</span>
-<span class="normal">221</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">221</span>
 <span class="normal">222</span>
 <span class="normal">223</span>
 <span class="normal">224</span>
@@ -17226,7 +17285,8 @@ Physics</em> (3<sup>rd</sup> ed.), Eq. 13A.4.</p>
 <span class="normal">269</span>
 <span class="normal">270</span>
 <span class="normal">271</span>
-<span class="normal">272</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">272</span>
+<span class="normal">273</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">sedimentation_sp2016_pair_rate_wp</span><span class="p">(</span>
     <span class="n">radius_i</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">radius_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -17352,8 +17412,7 @@ Physics</em> (3<sup>rd</sup> ed.), Eq. 13A.4.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
-<span class="normal">160</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">160</span>
 <span class="normal">161</span>
 <span class="normal">162</span>
 <span class="normal">163</span>
@@ -17410,7 +17469,8 @@ Physics</em> (3<sup>rd</sup> ed.), Eq. 13A.4.</p>
 <span class="normal">214</span>
 <span class="normal">215</span>
 <span class="normal">216</span>
-<span class="normal">217</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">217</span>
+<span class="normal">218</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">settling_velocity_stokes_from_transport_wp</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">effective_density</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -17594,8 +17654,7 @@ Physics</em> (3<sup>rd</sup> ed.). John Wiley &amp; Sons.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 73</span>
-<span class="normal"> 74</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 74</span>
 <span class="normal"> 75</span>
 <span class="normal"> 76</span>
 <span class="normal"> 77</span>
@@ -17677,7 +17736,8 @@ Physics</em> (3<sup>rd</sup> ed.). John Wiley &amp; Sons.</p>
 <span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
-<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">156</span>
+<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">settling_velocity_stokes_wp</span><span class="p">(</span>
     <span class="n">particle_radius</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">effective_density</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
@@ -17849,8 +17909,7 @@ Physics</em> (3<sup>rd</sup> ed.), Eq. 13A.2.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/dynamics/coagulation_funcs.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">296</span>
-<span class="normal">297</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">297</span>
 <span class="normal">298</span>
 <span class="normal">299</span>
 <span class="normal">300</span>
@@ -17889,7 +17948,8 @@ Physics</em> (3<sup>rd</sup> ed.), Eq. 13A.2.</p>
 <span class="normal">333</span>
 <span class="normal">334</span>
 <span class="normal">335</span>
-<span class="normal">336</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
+<span class="normal">336</span>
+<span class="normal">337</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@wp</span><span class="o">.</span><span class="n">func</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">turbulent_shear_st1956_pair_rate_wp</span><span class="p">(</span>
     <span class="n">radius_i</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
     <span class="n">radius_j</span><span class="p">:</span> <span class="n">wp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
