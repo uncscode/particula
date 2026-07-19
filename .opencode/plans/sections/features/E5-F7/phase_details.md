@@ -1,7 +1,7 @@
 # Phase Details
 
 - [x] **E5-F7-P1:** Publish independent deterministic pair-parity matrix and fixtures
-  - Issue: #1362 | Size: S | Status: Implemented
+  - Issue: #1362 | Size: S | Status: Shipped
   - Goal: Parameterize every shipped single and approved additive row against
     independent fp64 pair/property equations and explicit majorant checks.
   - Files: `particula/gpu/kernels/tests/coagulation_validation_test.py` and
@@ -13,7 +13,7 @@
   - Result: Validation-only commit; no production, public API, or user-doc change.
 
 - [x] **E5-F7-P2:** Validate cross-mechanism conservation, ownership, and edge cases
-  - Issue: #1363 | Size: S | Status: Implemented
+  - Issue: #1363 | Size: S | Status: Shipped
   - Goal: Run the executable public-entry matrix through one-/two-box and
     one-/two-species materializations while proving inventory, applicable charge,
     and caller-ownership invariants.
@@ -28,7 +28,7 @@
   - Result: Validation-only commit; no production, public API, or user-doc change.
 
 - [x] **E5-F7-P3:** Publish bounded stochastic and device validation matrix
-  - Issue: #1364 | Size: S | Status: Implemented
+  - Issue: #1364 | Size: S | Status: Shipped
   - Goal: Establish documented aggregate stochastic bounds for each executable
     row and execute the same correctness cases on required Warp CPU and optional
     CUDA.
@@ -44,11 +44,12 @@
   - Result: Validation-only commit; no production, public API, export, shared
     CUDA-helper, or user-documentation change.
 
-- [ ] **E5-F7-P4:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Publish the support/evidence matrix, limitations, and focused
+- [x] **E5-F7-P4:** Update development documentation
+  - Issue: #1365 | Size: XS | Status: Shipped
+  - Goal: Published the support/evidence matrix, limitations, and focused
     reproduction commands for E5-F9 and future release reviewers.
   - Files: `.opencode/guides/testing_guide.md`, relevant
     `docs/Features/Roadmap/` GPU roadmap document, and E5-F7 plan sections
-  - Tests: Markdown links, command references, marker selection, mechanism-row
-    names, required Warp CPU wording, and optional CUDA wording.
+  - Result: Documentation and plan-state metadata were synchronized; Markdown
+    links, commands, markers, mechanism rows, required Warp CPU, and optional
+    CUDA wording were validated.

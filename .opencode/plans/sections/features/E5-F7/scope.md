@@ -42,10 +42,6 @@ contract for E5-F9 closeout.
   API, user documentation, CPU fallback, repeated-seed statistics, or required
   CUDA evidence.
 
-### Remaining scope
-
-- A concise validation matrix and focused reproduction commands for E5-F9.
-
 ### Completed in issue #1364 (P3)
 
 - `particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py` adds
@@ -66,6 +62,14 @@ contract for E5-F9 closeout.
   when the existing CUDA availability helper reports it unavailable.
 - The implementation is validation-only: no production physics, public API,
   exports, shared CUDA-helper behavior, or user documentation changed.
+
+### Completed in issue #1365 (P4)
+
+- Development documentation now records the supported rows, independent parity,
+  stochastic, conservation, ownership, device-policy, and deferred-scope
+  evidence with focused reproduction commands.
+- E5-F7's shipped plan sections consistently record P1--P4 as complete; no
+  E5-F7 implementation or documentation work remains.
 
 ## Out of Scope
 

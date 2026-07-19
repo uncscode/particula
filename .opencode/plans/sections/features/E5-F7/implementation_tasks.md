@@ -40,14 +40,14 @@
   ownership assertions to every stochastic trial.
 - [x] Mark observations with `gpu_parity`, `stochastic`, and `cuda` as applicable;
   require Warp CPU when installed and skip CUDA only when unavailable.
-- [ ] Run focused deterministic/stochastic commands and the full coagulation
+- [x] Run focused deterministic/stochastic commands and the full coagulation
   suite without slow/performance markers.
 
 ### Documentation
 
-- [ ] Publish a matrix mapping each supported row to deterministic, stochastic,
+- [x] Publish a matrix mapping each supported row to deterministic, stochastic,
   conservation, edge, and device evidence.
-- [ ] Document tolerances, seed/sample policy, Warp CPU requirement, optional
+- [x] Document tolerances, seed/sample policy, Warp CPU requirement, optional
   CUDA behavior, known unsupported rows, and focused reproduction commands.
-- [ ] Validate documentation links, command names, pytest markers, and support
+- [x] Validate documentation links, command names, pytest markers, and support
   wording for E5-F9 consumption.
