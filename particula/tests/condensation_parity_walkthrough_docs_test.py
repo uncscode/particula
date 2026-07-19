@@ -174,7 +174,7 @@ def _parse_ownership_table(content: str) -> list[tuple[str, str, str, str]]:
         cells = _split_row(line)
         assert len(cells) == 4, f"Ownership row must have four cells: {line}"
         assert all(cells), f"Ownership row has a blank cell: {line}"
-        rows.append(tuple(cells))
+        rows.append((cells[0], cells[1], cells[2], cells[3]))
     return rows
 
 
