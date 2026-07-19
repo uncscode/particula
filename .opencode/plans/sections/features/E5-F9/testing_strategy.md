@@ -1,8 +1,12 @@
 # Testing Strategy
 
-- **P1:** `particula/tests/gpu_coagulation_docs_test.py` asserts the canonical
-  import, exact support/non-support claims, ownership language, required Warp
-  CPU commands, optional CUDA wording, and resolving guide links.
+- **P1 (shipped, issue #1372):**
+  `particula/tests/gpu_coagulation_docs_test.py` uses only the standard library
+  and asserts the canonical import, executable/deferred mask boundary, exact
+  support/non-support claims, ownership and preflight language, required Warp
+  CPU commands, optional CUDA wording, and resolving guide links. The legacy
+  exact command-matrix assertions in
+  `particula/tests/condensation_latent_heat_docs_test.py` cover the new rows.
 - **P2:** `particula/gpu/tests/gpu_coagulation_direct_example_test.py` imports
   without Warp, exercises the forced no-Warp branch, checks lazy imports and
   deterministic output, and on Warp CPU verifies execution, buffer identity,

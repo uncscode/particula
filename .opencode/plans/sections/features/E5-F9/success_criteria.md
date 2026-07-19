@@ -1,6 +1,6 @@
 # Success Criteria
 
-- [ ] Canonical guides accurately enumerate shipped mechanisms/combinations and
+- [x] Canonical guides accurately enumerate shipped mechanisms/combinations and
   explicitly exclude high-level integration, fallback, required CUDA, and
   deferred physics/runtime claims.
 - [ ] The direct example imports without Warp and runs on Warp CPU when installed

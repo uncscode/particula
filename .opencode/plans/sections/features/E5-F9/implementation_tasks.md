@@ -2,10 +2,10 @@
 
 ### Documentation and Example
 
-- [ ] Audit the final E5-F1-F7 API/evidence before writing support claims.
-- [ ] Update the foundations and coagulation strategy guides with supported
+- [x] Audit the final E5-F1-F7 API/evidence before writing support claims.
+- [x] Update the foundations and coagulation strategy guides with supported
   mechanisms, combinations, distribution boundary, ownership, and imports.
-- [ ] Add focused Warp CPU and optional CUDA reproduction commands.
+- [x] Add focused Warp CPU and optional CUDA reproduction commands.
 - [ ] Implement `docs/Examples/gpu_coagulation_direct.py` using public transfer
   helpers, lazy kernel imports, fixed-shape caller buffers, and persistent RNG.
 - [ ] Add the example and guide links to `docs/Examples/index.md`.
@@ -22,7 +22,7 @@
 ### Tooling / Tests
 
 - [ ] Add `particula/gpu/tests/gpu_coagulation_direct_example_test.py`.
-- [ ] Add `particula/tests/gpu_coagulation_docs_test.py` for claims, IDs, status,
-  commands, and links.
+- [x] Add `particula/tests/gpu_coagulation_docs_test.py` for direct-contract
+  claims, commands, and links using only the Python standard library.
 - [ ] Run E5-F7's required Warp CPU parity/stochastic matrix and standard docs,
   lint, and fast test checks; keep CUDA optional and skip-safe.
