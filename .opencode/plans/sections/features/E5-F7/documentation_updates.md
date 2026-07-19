@@ -25,7 +25,9 @@ to surface the validation commands there; E5-F7 introduces no production API.
 
 ## Status
 
-Issues #1362, #1363, and #1364 added private validation-only P1/P2/P3 coverage
-and made no user-facing documentation changes. Issue #1364 supplied the bounded
-stochastic/device evidence consumed by the planned public evidence matrix;
-documentation updates remain P4 work.
+P4 shipped in #1365. The
+[GPU coagulation validation record](../../../../../docs/Features/Roadmap/coagulation-validation.md)
+and updated testing guide publish the private validation-only P1/P2/P3 evidence
+paths, exact executable/deferred matrix, focused warning-clean commands, and
+the no-production-API boundary. Warp CPU remains the baseline when installed;
+CUDA is optional local/manual evidence that skips cleanly when unavailable.

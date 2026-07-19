@@ -40,9 +40,12 @@ use the `*_test.py` convention and collect cleanly when Warp is absent.
   one-proposal capacity and counts constrained to `[0, 1]`. Exact CPU/Warp pair
   replay is not a criterion. Warp CPU is required when installed; CUDA uses the
   same matrix and cleanly skips when unavailable.
-- **P4 — Documentation:** Validate Markdown links, mechanism/support table rows,
-  test marker names, tolerance descriptions, and executable reproduction
-  commands.
+- **P4 — Documentation (completed in #1365):** The
+  [GPU coagulation validation record](../../../../../docs/Features/Roadmap/coagulation-validation.md)
+  and testing guide publish the P1/P2/P3 distinctions, evidence paths,
+  executable/deferred masks, focused deterministic baseline, CPU-only
+  stochastic evidence, optional CUDA evidence, and full-regression command.
+  They retain the no-production-API boundary and CUDA clean-skip qualification.
 
 ## Test Locations and Markers
 
@@ -73,6 +76,12 @@ use the `*_test.py` convention and collect cleanly when Warp is absent.
    two-way rows, and the full four-way row; all four three-way masks must fail
    closed.
 
-Focused runs should include deterministic parity, stochastic markers, optional
-CUDA markers, then the complete coagulation suite to detect API and ownership
-regressions.
+Focused runs distinguish deterministic parity, CPU-only stochastic evidence,
+optional CUDA stochastic evidence, and the complete regression suite:
+
+```bash
+pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and cuda" -Werror
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
+```
