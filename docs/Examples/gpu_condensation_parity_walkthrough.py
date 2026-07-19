@@ -1,7 +1,7 @@
 """Compare an independent NumPy oracle with direct Warp condensation.
 
 This direct-kernel-only walkthrough defaults to Warp's CPU device and makes
-all CPU↔Warp transfers explicit.  It first completes an independent four
+all CPU↔Warp transfers explicit. It first completes an independent four
 substep NumPy calculation, then optionally runs the low-level Warp route.  If
 Warp is unavailable, or ``PARTICULA_EXAMPLE_FORCE_NO_WARP=1``, it reports the
 completed oracle and does not import a kernel or allocate device state.
@@ -197,7 +197,11 @@ class OracleSubstep:
 
 @dataclass(frozen=True)
 class AcceptanceResult:
-    """Record one categorized acceptance outcome and its diagnostic."""
+    """Record one categorized acceptance outcome and diagnostic.
+
+    The categories independently report physics parity, inventory
+    conservation, and signed energy bookkeeping.
+    """
 
     category: Literal["physics", "conservation", "energy"]
     status: Literal["passed", "failed", "unavailable"]
@@ -206,7 +210,11 @@ class AcceptanceResult:
 
 @dataclass
 class ExampleRun:
-    """Return completed oracle plus optional synchronized Warp observations."""
+    """Return the oracle, optional Warp observations, and acceptance results.
+
+    ``acceptance`` always contains physics, conservation, and energy results.
+    They are marked unavailable when the optional Warp route does not run.
+    """
 
     output: list[str]
     oracle: OracleResult
@@ -522,7 +530,15 @@ def _acceptance_result(
     category: Literal["physics", "conservation", "energy"],
     evaluate: Any,
 ) -> AcceptanceResult:
-    """Evaluate one criterion and retain an assertion diagnostic on failure."""
+    """Evaluate one criterion and retain any assertion diagnostic.
+
+    Args:
+        category: Label for the acceptance criterion.
+        evaluate: Zero-argument assertion-based criterion evaluator.
+
+    Returns:
+        Passed or failed result with a diagnostic string.
+    """
     try:
         evaluate()
     except AssertionError as error:
@@ -539,7 +555,23 @@ def evaluate_acceptance(
     observed_energy_transfer: np.ndarray,
     observed_vapor_pressure: np.ndarray,
 ) -> tuple[AcceptanceResult, ...]:
-    """Evaluate all independent acceptance criteria from complete observations."""
+    """Evaluate independent physics, conservation, and energy criteria.
+
+    Every criterion is evaluated even when an earlier criterion fails.
+
+    Args:
+        fixture: Immutable initial state and physical parameters.
+        oracle: Independent NumPy final state and transfer diagnostic.
+        observed_masses: Synchronized Warp final particle masses in kg.
+        observed_gas_concentration: Synchronized Warp final gas concentrations.
+        observed_total_mass_transfer: Synchronized finalized particle transfers
+            in kg.
+        observed_energy_transfer: Synchronized signed energy sidecar in J.
+        observed_vapor_pressure: Synchronized derived vapor pressure in Pa.
+
+    Returns:
+        Physics, conservation, and energy results in that order.
+    """
     expected_vapor_pressure = np.broadcast_to(
         fixture.thermodynamic_parameters[:, 0], (2, 2)
     )
@@ -576,8 +608,6 @@ def evaluate_acceptance(
             np.abs(fixture.gas_concentration),
             np.abs(observed_gas_concentration),
         )
-        # Compare the zero drift with the physical gas-inventory scale so the
-        # relative P2 tolerance remains meaningful for a residual near zero.
         np.testing.assert_allclose(
             drift + conservation_scale,
             conservation_scale,
@@ -602,7 +632,14 @@ def evaluate_acceptance(
 
 
 def _format_acceptance(result: AcceptanceResult) -> str:
-    """Format one machine-testable acceptance block for script output."""
+    """Format one machine-testable acceptance block for script output.
+
+    Args:
+        result: Categorized acceptance result to display.
+
+    Returns:
+        One labeled, human-readable output line.
+    """
     return f"{result.category}: {result.status} - {result.diagnostic}"
 
 
