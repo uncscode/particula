@@ -317,8 +317,10 @@ Production selection obtains its majorant by an exact compact-active scan of the
 summed pair rate. One shared active set, candidate stream, acceptance stream,
 collision-buffer set, per-box RNG stream, and apply pass serve each call;
 mechanisms are not sequential steps. Invalid, nonfinite, or nonpositive terms do
-not add to totals, and invalid candidates do not mutate state or output. This
-documents bounded implementation scope, not throughput or scaling evidence.
+not add to totals, and invalid candidates do not mutate particle or
+collision-output state. Persistent RNG state can advance before an invalid-rate
+rejection. This documents bounded implementation scope, not throughput or
+scaling evidence.
 Read-only preflight can use a private device-status buffer and a bounded
 synchronization/readback to report invalid caller state without copying,
 mutating, or CPU-falling-back caller simulation state.

@@ -12,8 +12,10 @@
 - [x] Private selector diagnostics show each valid scheduled proposal uses one
   active-pair stream and at most one acceptance draw, independent of enabled
   term count; rejected/materially unbounded ratios draw and mutate nothing.
-- [x] Approved-mask aggregate collision counts satisfy declared stochastic bounds
-  without requiring exact CPU/Warp pair replay.
+- [x] Combined mask `3` aggregate collision counts satisfy declared stochastic
+  bounds without requiring exact CPU/Warp pair replay. Masks `5`, `6`, `9`,
+  `10`, `12`, and `15` have deterministic or forced-path evidence; E5-F7
+  cross-mechanism stochastic validation remains incomplete.
 - [x] Accepted pairs are sorted, in range, disjoint, and capacity bounded; one
   merge pass conserves each species' mass and total charge separately.
 - [x] Caller-owned pair/count buffers are returned by identity and persistent

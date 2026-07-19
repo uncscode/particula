@@ -3,9 +3,9 @@
 ## High-Level Design
 
 ```text
-coagulation_step_gpu(..., mechanisms=config, mechanism-specific inputs...)
-  -> canonicalize config and resolve mechanism bit mask
-  -> validate mask against the P1 recognition table
+coagulation_step_gpu(..., mechanism_config=config, mechanism-specific inputs...)
+  -> canonicalize mechanism_config with the identifier-to-bit mapping
+  -> combine enabled bits with bitwise OR, then validate mask capability
   -> capability-reject non-turbulent deferred mask 7 before metadata access
   -> obtain particle metadata, then validate enabled terms read-only when needed
   -> capability-reject turbulent deferred masks 11, 13, and 14 before runtime
@@ -33,12 +33,14 @@ cross-mechanism extrema heuristic. The shipped production selector obtains its
 majorant by scanning summed active-pair rates; the summed component bound remains
 the proof and diagnostic reference.
 
-P1 separates structural recognition from the executable boundary. Its private
-immutable host table recognizes four singleton masks (`1`, `2`, `4`, `8`), all
-six unordered pair masks (`3`, `5`, `6`, `9`, `10`, `12`), and four-term mask
-`15`; canonical ordering resolves equivalent pairs identically and duplicates
-are never weights. Deferred non-turbulent mask `7` raises the stable error at
-the capability gate before particle metadata or enabled-term validation.
+P1 separates structural recognition from the executable boundary. An immutable
+identifier-to-bit mapping resolves valid mechanism identifiers; canonical
+ordering and bitwise-OR construction produce the mechanism mask, after which
+capability validation admits four singleton masks (`1`, `2`, `4`, `8`), all six
+unordered pair masks (`3`, `5`, `6`, `9`, `10`, `12`), and four-term mask `15`.
+Equivalent orderings resolve identically and duplicates are never weights.
+Deferred non-turbulent mask `7` raises the stable error at the capability gate
+before particle metadata or enabled-term validation.
 Deferred turbulent masks `11`, `13`, and `14` access metadata and validate their
 enabled terms, then raise that error before runtime normalization, output/RNG
 work, launch, or mutation. The approved masks enter the shared execution path.
