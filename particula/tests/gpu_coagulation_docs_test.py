@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[2]
 FOUNDATIONS_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
 STRATEGY_PATH = ROOT / "docs/Features/coagulation_strategy_system.md"
 VALIDATION_PATH = ROOT / "docs/Features/Roadmap/coagulation-validation.md"
+DETAILED_ROADMAP_PATH = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
+ROADMAP_INDEX_PATH = ROOT / "docs/Features/Roadmap/index.md"
 TESTING_GUIDE_PATH = ROOT / ".opencode/guides/testing_guide.md"
 FOUNDATIONS_HEADING = "### GPU coagulation configuration and sidecar ownership"
 STRATEGY_HEADING = "### GPU direct-kernel foundations and limitations"
@@ -28,6 +30,45 @@ OPTIONAL_CUDA_COMMAND = (
 )
 DIRECT_COAGULATION_COMMAND = (
     "pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror"
+)
+EXPECTED_E5_ROWS = (
+    (
+        "E5",
+        "GPU Coagulation Physics Coverage",
+        "Active — P4 closeout remains dependency-gated",
+    ),
+    ("E5-F1", "Mechanism Configuration and Sampling Contract", "Shipped"),
+    (
+        "E5-F2",
+        "Charged Pair Physics and Charge-Conserving Merges",
+        "Active — P1–P4 shipped; P5 documentation remains",
+    ),
+    ("E5-F3", "Charged and Brownian-Plus-Charged GPU Execution", "Shipped"),
+    ("E5-F4", "SP2016 Sedimentation GPU Execution", "Shipped"),
+    ("E5-F5", "ST1956 Turbulent-Shear GPU Execution", "Shipped"),
+    ("E5-F6", "Single-Pass Additive Multi-Mechanism Coagulation", "Shipped"),
+    ("E5-F7", "Cross-Mechanism GPU Validation Matrix", "Shipped"),
+    (
+        "E5-F8",
+        "Independent CPU-Warp Condensation Walkthrough",
+        "Shipped",
+    ),
+    (
+        "E5-F9",
+        "GPU Coagulation Support Documentation and Epic Closeout",
+        "Active — P1/P2 shipped; P3/P4 remain",
+    ),
+)
+EXPECTED_E5_ARTIFACTS = (
+    ("GPU coagulation validation record", "coagulation-validation.md"),
+    (
+        "condensation parity walkthrough ownership record",
+        "condensation-parity-walkthrough.md",
+    ),
+    (
+        "GPU condensation parity walkthrough",
+        "../../Examples/gpu_condensation_parity_walkthrough.py",
+    ),
 )
 
 
@@ -52,6 +93,31 @@ def _section(content: str, heading: str) -> str:
         ):
             return "\n".join(section.splitlines()[:line_index])
     return section
+
+
+def _roadmap_record(content: str) -> str:
+    """Return the unique E5 roadmap inventory section."""
+    heading = "### E5 roadmap inventory"
+    assert content.count(heading) == 1
+    return _section(content, heading)
+
+
+def _record_rows(record: str) -> list[tuple[str, str, str]]:
+    """Return strict three-cell E5 Markdown table rows from a record."""
+    rows = []
+    for line in record.splitlines():
+        cells = [cell.strip() for cell in line.strip().split("|")]
+        if len(cells) != 5 or cells[0] or cells[-1]:
+            continue
+        identifier = re.fullmatch(r"`(E5(?:-F[1-9])?)`", cells[1])
+        if identifier:
+            rows.append((identifier.group(1), cells[2], cells[3]))
+    return rows
+
+
+def _labeled_destinations(record: str) -> list[tuple[str, str]]:
+    """Return Markdown link labels and destinations from a record."""
+    return re.findall(r"\[([^]]+)\]\(([^)]+)\)", record)
 
 
 def _local_destinations(content: str) -> list[str]:
@@ -290,6 +356,56 @@ def test_guides_explicitly_exclude_deferred_runtime_capabilities() -> None:
         "dns/general-turbulence support",
     ):
         assert snippet in strategy
+
+
+def test_e5_roadmap_records_match_and_resolve_artifacts() -> None:
+    """Roadmap records retain one matching inventory and artifact set."""
+    records = []
+    for source_path in (DETAILED_ROADMAP_PATH, ROADMAP_INDEX_PATH):
+        content = source_path.read_text(encoding="utf-8")
+        record = _roadmap_record(content)
+
+        record_rows = _record_rows(record)
+        assert record_rows == list(EXPECTED_E5_ROWS)
+        assert "## Supported Evidence Matrix" not in record
+        assert "## Deferred capability ownership" not in record
+
+        record_destinations = _labeled_destinations(record)
+        source_destinations = _labeled_destinations(content)
+        for artifact in EXPECTED_E5_ARTIFACTS:
+            assert record_destinations.count(artifact) == 1
+            assert source_destinations.count(artifact) == 1
+            assert (source_path.parent / artifact[1]).resolve().exists()
+
+        all_rows = _record_rows(content)
+        for identifier, _, _ in EXPECTED_E5_ROWS:
+            assert sum(row[0] == identifier for row in all_rows) == 1
+
+        artifact_records = [
+            artifact
+            for artifact in record_destinations
+            if artifact in EXPECTED_E5_ARTIFACTS
+        ]
+        records.append((record_rows, artifact_records))
+
+    assert records[0] == records[1]
+
+
+def test_e5_roadmaps_keep_epic_statuses_and_reject_stale_claims() -> None:
+    """Roadmaps retain active E5, pending Epic F, and current E5 status."""
+    stale_epic_e_row = (
+        r"\|\s*5\s*\|\s*\[Epic E:.*?\|\s*Active\s*\|\s*"
+        r"not scheduled\s*\|"
+    )
+    for source_path in (DETAILED_ROADMAP_PATH, ROADMAP_INDEX_PATH):
+        content = source_path.read_text(encoding="utf-8")
+        normalized = _normalized(content).lower()
+
+        assert "status: active." in normalized or "e5 is active" in normalized
+        assert "| pending |" in normalized or "epic f is pending" in normalized
+        assert not re.search(stale_epic_e_row, content, flags=re.IGNORECASE)
+        assert "e5 shipped" not in normalized
+        assert "epic f active" not in normalized
 
 
 def test_testing_guide_publishes_hardware_free_docs_validation() -> None:
