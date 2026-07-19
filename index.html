@@ -14765,16 +14765,24 @@
   wall loss strategies with builders, factory, and runnable integration.</li>
 <li><a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
   — canonical reference for <code>ParticleData</code>, <code>GasData</code>, <code>EnvironmentData</code>,
-  explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
+   explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
    current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
-   such as coagulation <code>rng_states</code> and condensation thermodynamics. GPU
-   turbulent-shear coagulation supports only the direct, particle-resolved
-   <code>("turbulent_shear_st1956",)</code> singleton. It requires keyword-only positive,
-    finite <code>turbulent_dissipation</code> (m²/s³) and <code>fluid_density</code> (kg/m³) Python
-    <code>float</code> or NumPy floating scalar, or active-device <code>wp.float64</code>
-    <code>(n_boxes,)</code> Warp-array inputs; combinations,
-   runnable/API re-export, CPU fallback, and performance claims remain
-   deferred. GPU condensation requires keyword-only
+   such as coagulation <code>rng_states</code> and condensation thermodynamics. Direct,
+   particle-resolved GPU coagulation executes singleton masks <code>1</code>, <code>2</code>, <code>4</code>,
+   and <code>8</code>; unordered two-way masks <code>3</code>, <code>5</code>, <code>6</code>, <code>9</code>, <code>10</code>, and <code>12</code>; and
+   four-way mask <code>15</code> across Brownian, charged hard-sphere, SP2016
+   sedimentation, and ST1956 turbulent shear. Non-turbulent three-way mask <code>7</code>
+   rejects at capability preflight before particle metadata or enabled-term
+   validation. Turbulent three-way masks <code>11</code>, <code>13</code>, and <code>14</code> proceed through
+   particle metadata and enabled-term validation, then reject before downstream
+   normalization, allocation, RNG setup, kernel launch, or mutation. Approved
+   turbulent-shear masks require keyword-only positive, finite
+   <code>turbulent_dissipation</code> (m²/s³) and <code>fluid_density</code> (kg/m³) Python or NumPy
+   floating scalars, or active-device <code>wp.float64</code> <code>(n_boxes,)</code> Warp arrays.
+   This is a direct-kernel-only contract: high-level <code>Runnable</code> support, CPU
+   fallback, hidden state transfer, graph capture, performance claims, and
+   broad accuracy claims remain out of scope. GPU condensation requires
+   keyword-only
    <code>thermodynamics=ThermodynamicsConfig</code>,
   validates an active-device binary per-box/species <code>gas.partitioning</code> mask
   before mutation, and runs exactly four equal substeps. Disabled species and
