@@ -22,6 +22,23 @@ class MechanismRow:
     enabled: tuple[bool, bool, bool, bool]
 
 
+@dataclass(frozen=True)
+class StochasticCase:
+    """One bounded, one-proposal initial-state stochastic experiment.
+
+    The equations below describe this initial state only.  They deliberately do
+    not model later proposals after a merge has changed the active set.
+    """
+
+    row: MechanismRow
+    fixture: "Fixture"
+    concentration: np.ndarray
+    volume: np.ndarray
+    time_step: float
+    max_collisions: int = 1
+    sample_count: int = 100
+
+
 EXECUTABLE_ROWS = (
     MechanismRow(1, ("brownian",), (True, False, False, False)),
     MechanismRow(2, ("charged_hard_sphere",), (False, True, False, False)),
@@ -400,3 +417,145 @@ def selector_majorant(fixture: Fixture, box: int, mask: int) -> float:
         for position, i in enumerate(active)
         for j in active[position + 1 :]
     )
+
+
+def active_unordered_pairs(
+    case: StochasticCase, box: int
+) -> tuple[tuple[int, int], ...]:
+    """Return the initial compact active unordered pairs for one box."""
+    active = case.fixture.active[box]
+    return tuple(
+        (first, second)
+        for position, first in enumerate(active)
+        for second in active[position + 1 :]
+    )
+
+
+def enabled_component_rates(
+    case: StochasticCase, box: int, i: int, j: int
+) -> tuple[float, float, float, float]:
+    """Return independent Brownian, charged, SP2016, and ST1956 rates."""
+    return tuple(
+        pair_rate(case.fixture, box, i, j, flag)
+        if case.row.mask & flag
+        else 0.0
+        for flag in (1, 2, 4, 8)
+    )  # type: ignore[return-value]
+
+
+def enabled_pair_rate_sum(case: StochasticCase, box: int) -> float:
+    """Sum all enabled initial unordered-pair rates in one box."""
+    return float(
+        sum(
+            sum(enabled_component_rates(case, box, first, second))
+            for first, second in active_unordered_pairs(case, box)
+        )
+    )
+
+
+def scheduling_concentration(case: StochasticCase, box: int) -> float:
+    """Return the selector scheduling concentration for one initial box."""
+    if case.row.mask & 4:
+        return float(case.concentration[box, case.fixture.active[box][0]])
+    return 1.0
+
+
+def scheduler_expectation(case: StochasticCase, box: int) -> float:
+    """Return initial expected proposals before integer stochastic rounding."""
+    return float(
+        selector_majorant(case.fixture, box, case.row.mask)
+        * len(active_unordered_pairs(case, box))
+        * scheduling_concentration(case, box)
+        * case.time_step
+        / case.volume[box]
+    )
+
+
+def expected_accepted_count(case: StochasticCase) -> float:
+    """Return the one-proposal initial-state expected accepted count."""
+    return float(
+        sum(
+            scheduling_concentration(case, box)
+            * case.time_step
+            / case.volume[box]
+            * enabled_pair_rate_sum(case, box)
+            for box in range(case.fixture.radii.shape[0])
+        )
+    )
+
+
+def expected_mean(case: StochasticCase) -> float:
+    """Return the aggregate expected accepted count across all fresh trials."""
+    return case.sample_count * expected_accepted_count(case)
+
+
+def sigma_tolerance(case: StochasticCase) -> float:
+    """Return the documented three-sigma aggregate acceptance tolerance."""
+    return float(3.0 * np.sqrt(expected_mean(case)))
+
+
+def _stochastic_fixture() -> Fixture:
+    """Build discriminating four-box P3 state with inactive slot sentinels."""
+    base = _fixture(
+        "stochastic",
+        [
+            [8e-8, 9e-5, 2e-7, 3e-6],
+            [9e-8, 8e-5, 3e-7, 4e-6],
+            [7e-8, 7e-5, 4e-7, 5e-6],
+            [6e-8, 6e-5, 5e-7, 6e-6],
+        ],
+        [[1, 29, -2, 3], [2, 29, -1, 4], [3, 29, -3, 2], [1, 29, -4, 5]],
+        ((0, 2, 3), (0, 2, 3), (0, 2, 3), (0, 2, 3)),
+        (285.0, 295.0, 305.0, 315.0),
+        (90000.0, 95000.0, 100000.0, 105000.0),
+        (2e-4, 3e-4, 4e-4, 5e-4),
+    )
+    # Repeated explicit boxes increase aggregate evidence without changing the
+    # one-proposal schedule or introducing random fixture construction.
+    return Fixture(
+        name=base.name,
+        radii=np.tile(base.radii, (3, 1)),
+        density=np.tile(base.density, (3, 1)),
+        charges=np.tile(base.charges, (3, 1)),
+        temperature=np.tile(base.temperature, 3),
+        pressure=np.tile(base.pressure, 3),
+        dissipation=np.tile(base.dissipation, 3),
+        fluid_density=np.tile(base.fluid_density, 3),
+        active=base.active * 3,
+    )
+
+
+def _make_stochastic_cases() -> tuple[StochasticCase, ...]:
+    """Construct one explicit bounded experiment for every executable mask."""
+    fixture = _stochastic_fixture()
+    # The selected units keep each box below one scheduled proposal while the
+    # four boxes and 100 fresh trials retain useful aggregate evidence.
+    volume = np.full(fixture.radii.shape[0], 1.0e-18, dtype=np.float64)
+    cases = []
+    for row in EXECUTABLE_ROWS:
+        concentration = np.zeros_like(fixture.radii)
+        for box, active in enumerate(fixture.active):
+            concentration[box, list(active)] = 2.0 if row.mask & 4 else 1.0
+        scheduling = np.asarray(
+            [
+                selector_majorant(fixture, box, row.mask)
+                * (len(active) * (len(active) - 1) / 2.0)
+                * (2.0 if row.mask & 4 else 1.0)
+                / volume[box]
+                for box, active in enumerate(fixture.active)
+            ],
+            dtype=np.float64,
+        )
+        cases.append(
+            StochasticCase(
+                row=row,
+                fixture=fixture,
+                concentration=concentration,
+                volume=volume,
+                time_step=float(0.9 / scheduling.max()),
+            )
+        )
+    return tuple(cases)
+
+
+STOCHASTIC_CASES = _make_stochastic_cases()
