@@ -104,9 +104,16 @@ meets its exit bar, the next pending epic in the sequence becomes active.
   kappa activity, static and composition-weighted surface tension, fixed-four
   P2 inventory finalization, gas coupling and conservation, latent-heat rate
   correction and signed energy diagnostics, reusable caller-owned fp64
-  sidecars, device-aware parity evidence, and the published direct-kernel
-  support contract and example. It does not provide high-level runnable
-  integration or general CPU-strategy parity.
+   sidecars, device-aware parity evidence, and the published direct-kernel
+   support contract and example. It does not provide high-level runnable
+   integration or general CPU-strategy parity.
+    - [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
+      — fixed-four-substep low-level direct-kernel physics, conservation, and
+        energy evidence, with Warp CPU as the installed-Warp baseline and
+        optional additive CUDA evidence
+    - [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md)
+      — deferred work only; it does not alter Epic D production capability or
+        activate later epics
 
 ### Active
 
