@@ -2,8 +2,9 @@
 
 E5-F6 extends the mechanism contract established by E5-F1 and the executable
 terms delivered by E5-F3, E5-F4, and E5-F5. It registers approved additive
-combinations, sums component pair rates and their proven per-term majorants,
-and performs one bounded candidate/acceptance pass for every approved mask.
+combinations, sums component pair rates, scans compact active pairs for the
+exact summed-rate production majorant, and performs one bounded
+candidate/acceptance pass for every approved mask.
 
 Status: P1--P4 are implemented. Executable masks are `1`, `2`, `4`, `8`, `3`,
 `5`, `6`, `9`, `10`, `12`, and `15`; three-way masks `7`, `11`, `13`, and `14`
@@ -20,8 +21,9 @@ remain deferred.
   explicitly encode intentionally unsupported three-way rows rather than
   accepting them by accident.
 - Compute `total_pair_rate = sum(enabled_pair_rates)` for each sampled pair.
-- Compute `total_majorant = sum(enabled_term_majorants)` and prove every tested
-  active-pair sum is bounded by it.
+- Compute the production `total_majorant` by scanning compact active pairs for
+  the exact maximum summed rate. Retain `sum(enabled_term_majorants)` only as a
+  conservative proof/diagnostic bound for every tested active-pair sum.
 - Schedule trials and make exactly one acceptance decision per proposal using
   `total_pair_rate / total_majorant`.
 - Reuse one active set, collision-pair/count buffers, per-box RNG state, and
