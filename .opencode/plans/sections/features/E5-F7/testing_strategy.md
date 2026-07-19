@@ -19,12 +19,18 @@ use the `*_test.py` convention and collect cleanly when Warp is absent.
    Configuration resolution and deferred-error tests use the host-only resolver;
    pair/property/majorant observations are lazy Warp-CPU probes marked `warp`
    and `gpu_parity`.
-- **P2 — Conservation and edge matrix:** Exercise one-box and heterogeneous
-  multi-box, one/multiple species, zero/one/two/many active particles, inactive
-  gaps, mixed-sign charge, and mixed nanometer/droplet scales. Assert separate
-  per-box/per-species mass and total-charge conservation, donor clearing,
-  inactive preservation, sorted/in-range/disjoint pairs, capacity, caller-buffer
-  identity, RNG reuse/reset, and fail-before-mutation snapshots.
+- **P2 — Conservation and edge matrix (implemented in #1363):** The public-step
+  matrix runs every executable mask for `normal` and heterogeneous `two_box`
+  fixtures with one and two species, on each available Warp device. It asserts
+  per-box/per-species inventory at `rtol=1e-12, atol=1e-30`, charge conservation
+  for charge-enabled rows, donor clearing/recipient transfer, inactive-sentinel
+  preservation, sorted/in-range/disjoint accepted prefixes, capacity bounds,
+  collision/count sidecar identity, and persistent RNG initialization/advance.
+  Focused public cases cover zero/one/two active slots, charged and
+  sedimentation zero-rate no-ops, zero-capacity rejection, scalar/device-array
+  turbulent inputs (masks 8 and 10), and exact snapshots for deferred or
+  selected invalid-input preflight failures. It makes no repeated-seed or exact
+  replay claim.
 - **P3 — Stochastic/device matrix:** Use repeated fresh seeded runs and
   independently derived expected aggregates over 100 independent seeds. Use a
   predeclared `3 * sqrt(expected_mean)` bound and uncapped fixtures with expected

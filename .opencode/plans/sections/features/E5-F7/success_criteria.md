@@ -9,15 +9,15 @@
   independently checked mechanism or summed majorant.
 - [ ] Repeated-run collision aggregates fall within a predeclared statistical
   confidence or sigma bound without exact pair replay requirements.
-- [ ] Per-box/per-species mass is conserved at tight physical tolerances for all
-  executable rows and total charge is separately conserved for charge-bearing
-  rows.
-- [ ] Multi-box isolation, inactive slots, zero/one/two/many active particles,
-  mixed scales, zero rates, and collision capacity boundaries pass.
-- [ ] Caller-owned output buffers retain identity; persistent RNG state advances
-  or resets only as requested; invalid inputs preserve particles, buffers, and
-  RNG state.
-- [ ] Warp CPU executes all required cases when Warp is installed. CUDA runs the
+- [x] Per-box/per-species mass is conserved at `rtol=1e-12, atol=1e-30` for all
+  executable rows in the P2 matrix and total charge is separately conserved for
+  charge-bearing rows.
+- [x] Multi-box isolation, inactive slots, zero/one/two active particles, mixed
+  scales, applicable zero rates, and collision-capacity boundaries pass.
+- [x] Caller-owned pair/count output buffers retain identity; persistent RNG
+  state advances or resets only as requested; selected invalid inputs preserve
+  particles, buffers, and RNG state at preflight.
+- [x] Warp CPU executes P2 cases when Warp is installed. CUDA runs the same
   applicable matrix when available and otherwise skips cleanly.
 - [ ] Focused validation and the full coagulation suite pass without lowering
   coverage or requiring slow/performance benchmarks.

@@ -1,8 +1,9 @@
-"""Deterministic fp64 observations for the fixed-mask coagulation dispatcher.
+"""Validate fixed-mask GPU coagulation dispatch and public-step invariants.
 
-Expected values are intentionally isolated in the Warp-free support module.
-Warp is imported only after a runtime guard, so metadata coverage remains
-collectable on installations without the optional backend.
+Independent deterministic fp64 expectations remain in the Warp-free support
+module. Runtime-guarded Warp tests verify public-step state integrity,
+caller-owned sidecar and RNG lifecycles, and preflight atomicity. Host-only
+metadata coverage remains collectable without the optional backend.
 """
 
 from __future__ import annotations

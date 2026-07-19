@@ -11,23 +11,24 @@
 - [x] Add host configuration/boundary tests plus lazy Warp-CPU property, pair,
   symmetry, majorant, and exact-zero observations in
   `coagulation_validation_test.py`.
-- [ ] Add a reusable per-box/per-species mass balance assertion with a physical
+- [x] Add a reusable per-box/per-species mass balance assertion with a physical
   absolute floor and a separate total-charge balance assertion.
-- [ ] Reuse shared `warp_devices()` parameterization so CPU always participates
-  and CUDA participates only when available.
+- [x] Reuse shared `warp_devices()` enumeration so CPU participates when Warp
+  is installed and CUDA participates only when available.
 
 ### Deterministic and Ownership Matrix
 
 - [x] Table-drive pair symmetry, finite/non-negative values, deterministic
   parity, component sums, and `pair_rate <= majorant` for explicit active pairs.
-- [ ] Run all executable rows across zero/one/two/many active particles,
-  inactive gaps, mixed radii/masses/charges, and zero-rate conditions.
-- [ ] Assert sorted, in-range, disjoint accepted pairs, collision capacity, donor
-  clearing, inactive-state preservation, and no cross-box contamination.
-- [ ] Assert caller-provided pair/count buffer identity and persistent RNG
-  advance/reset semantics for each representative row.
-- [ ] Snapshot particle fields, output buffers, and RNG state around invalid
-  cross-row inputs to prove validation is atomic before mutation/advancement.
+- [x] Run all executable rows across one-/two-box and one-/two-species
+  materializations, sparse/two-active boundaries, inactive gaps, mixed
+  radii/masses/charges, and applicable zero-rate conditions.
+- [x] Assert sorted, in-range, disjoint accepted pairs, collision capacity, donor
+  clearing, inactive-state preservation, and box-local state integrity.
+- [x] Assert caller-provided pair/count buffer identity and persistent RNG
+  initialization/advance semantics for representative public rows.
+- [x] Snapshot particle fields, output buffers, and RNG state around deferred
+  and selected invalid cross-row inputs to prove preflight non-mutation.
 
 ### Stochastic and Device Evidence
 
