@@ -10,9 +10,6 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from particula.dynamics.coagulation.brownian_kernel import (
-    get_brownian_kernel_via_system_state,
-)
 from particula.util import constants
 
 
@@ -331,14 +328,7 @@ def pair_rate(fixture: Fixture, box: int, i: int, j: int, mask: int) -> float:
     r, m = fixture.radii[box], fixture.masses[box]
     total = 0.0
     if mask & 1:
-        total += float(
-            get_brownian_kernel_via_system_state(
-                np.array([r[i], r[j]]),
-                np.array([m[i], m[j]]),
-                float(fixture.temperature[box]),
-                float(fixture.pressure[box]),
-            )[0, 1]
-        )
+        total += brownian_rate_from_properties(fixture, box, i, j)
     if mask & 2:
         total += _charged(
             r[i],

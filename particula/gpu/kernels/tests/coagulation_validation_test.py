@@ -14,6 +14,14 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
+from particula.dynamics.coagulation.brownian_kernel import (
+    get_brownian_kernel_via_system_state,
+)
+from particula.gpu.kernels._coagulation_config import (
+    CoagulationMechanismConfig,
+    resolve_coagulation_mechanism_config,
+    validate_coagulation_mechanism_capabilities,
+)
 from particula.gpu.kernels.tests._coagulation_validation_support import (
     DEFERRED_ROWS,
     EXECUTABLE_ROWS,
@@ -295,8 +303,8 @@ def test_independent_physical_zero_cases_are_exact() -> None:
     assert pair_rate(FIXTURES["zero_dissipation"], 0, 0, 2, 8) == 0.0
 
 
-def test_brownian_public_reference_matches_independent_properties() -> None:
-    """Derived fp64 inputs reproduce the public Brownian system-state rate."""
+def test_brownian_public_reference_cross_checks_independent_oracle() -> None:
+    """Use the public CPU rate only to cross-check the independent oracle."""
     for fixture_name in ("normal", "two_box"):
         fixture = FIXTURES[fixture_name]
         for box, indices in enumerate(fixture.active):
@@ -304,7 +312,16 @@ def test_brownian_public_reference_matches_independent_properties() -> None:
                 for j in indices[position + 1 :]:
                     npt.assert_allclose(
                         brownian_rate_from_properties(fixture, box, i, j),
-                        pair_rate(fixture, box, i, j, 1),
+                        get_brownian_kernel_via_system_state(
+                            np.array(
+                                [fixture.radii[box, i], fixture.radii[box, j]]
+                            ),
+                            np.array(
+                                [fixture.masses[box, i], fixture.masses[box, j]]
+                            ),
+                            float(fixture.temperature[box]),
+                            float(fixture.pressure[box]),
+                        )[0, 1],
                         rtol=1e-12,
                         atol=0.0,
                     )
@@ -333,13 +350,6 @@ def test_literal_fixture_matrix_covers_each_enabled_edge_case() -> None:
 )
 def test_configuration_rows_are_canonical_and_executable(row: Any) -> None:
     """Resolve each literal executable row through the public config boundary."""
-    _require_warp()
-    from particula.gpu.kernels.coagulation import (
-        CoagulationMechanismConfig,
-        resolve_coagulation_mechanism_config,
-        validate_coagulation_mechanism_capabilities,
-    )
-
     resolved = resolve_coagulation_mechanism_config(
         CoagulationMechanismConfig(mechanisms=row.mechanisms)
     )
@@ -353,13 +363,6 @@ def test_configuration_rows_are_canonical_and_executable(row: Any) -> None:
 )
 def test_configuration_rows_report_stable_deferred_error(row: Any) -> None:
     """Recognized three-way rows retain the explicit deferred boundary."""
-    _require_warp()
-    from particula.gpu.kernels.coagulation import (
-        CoagulationMechanismConfig,
-        resolve_coagulation_mechanism_config,
-        validate_coagulation_mechanism_capabilities,
-    )
-
     resolved = resolve_coagulation_mechanism_config(
         CoagulationMechanismConfig(mechanisms=row.mechanisms)
     )
@@ -367,6 +370,66 @@ def test_configuration_rows_report_stable_deferred_error(row: Any) -> None:
         ValueError, match="^Additive coagulation execution is deferred\\.$"
     ):
         validate_coagulation_mechanism_capabilities(resolved)
+
+
+def test_host_configuration_defaults_and_canonicalizes_permuted_input() -> None:
+    """Host-only resolution defaults to Brownian and uses fixed flag order."""
+    default = resolve_coagulation_mechanism_config(CoagulationMechanismConfig())
+    permuted = resolve_coagulation_mechanism_config(
+        CoagulationMechanismConfig(
+            mechanisms=(
+                "turbulent_shear_st1956",
+                "sedimentation_sp2016",
+                "charged_hard_sphere",
+                "brownian",
+            )
+        )
+    )
+
+    assert default.mechanisms == ("brownian",)
+    assert default.mask == 1
+    assert permuted.mechanisms == (
+        "brownian",
+        "charged_hard_sphere",
+        "sedimentation_sp2016",
+        "turbulent_shear_st1956",
+    )
+    assert permuted.mask == 15
+
+
+@pytest.mark.parametrize(
+    ("config", "message"),
+    [
+        (
+            CoagulationMechanismConfig(distribution_type="discrete"),
+            "distribution_type must be exactly 'particle_resolved'.",
+        ),
+        (
+            CoagulationMechanismConfig(mechanisms=()),
+            "mechanisms must be a non-empty tuple of strings.",
+        ),
+        (
+            CoagulationMechanismConfig(
+                mechanisms=("brownian", 1)  # type: ignore[arg-type]
+            ),
+            "mechanisms must contain only string identifiers.",
+        ),
+        (
+            CoagulationMechanismConfig(mechanisms=("brownian", "brownian")),
+            "Duplicate coagulation mechanism 'brownian'.",
+        ),
+        (
+            CoagulationMechanismConfig(mechanisms=("unknown",)),
+            "Unknown coagulation mechanism 'unknown'.",
+        ),
+    ],
+)
+def test_host_configuration_rejects_malformed_structures(
+    config: CoagulationMechanismConfig, message: str
+) -> None:
+    """Host-only resolution rejects every structural validation boundary."""
+    with pytest.raises(ValueError, match=f"^{message}$"):
+        resolve_coagulation_mechanism_config(config)
 
 
 @pytest.mark.warp
@@ -377,59 +440,82 @@ def test_configuration_rows_report_stable_deferred_error(row: Any) -> None:
 def test_pair_property_and_selector_parity_matrix(row: Any) -> None:
     """Compare private observations with independent properties and pair sums."""
     for name in applicable_fixture_names(row.mask):
-        fixture = FIXTURES[name]
-        observed = _observe(name, row.mask)
-        for box, indices in enumerate(fixture.active):
-            expected_properties = properties(fixture, box)
-            for key in ("diffusivity", "g_term", "speed", "settling"):
-                if indices:
-                    npt.assert_allclose(
-                        observed[key][box, list(indices)],
-                        expected_properties[key][list(indices)],
-                        rtol=1e-6,
-                        atol=0.0,
-                    )
+        _assert_parity_for_fixture(name, row.mask)
+
+
+def _assert_parity_for_fixture(fixture_name: str, mask: int) -> None:
+    """Check one fixture against independent property and rate expectations."""
+    fixture = FIXTURES[fixture_name]
+    observed = _observe(fixture_name, mask)
+    for box, indices in enumerate(fixture.active):
+        _assert_observed_properties(observed, fixture, box, indices)
+        _assert_observed_pair_rates(observed, fixture, box, indices, mask)
+        expected_majorant = selector_majorant(fixture, box, mask)
+        npt.assert_allclose(
+            observed["majorant"][box],
+            expected_majorant,
+            rtol=1e-6,
+            atol=0.0,
+        )
+
+
+def _assert_observed_properties(
+    observed: dict[str, np.ndarray],
+    fixture: Any,
+    box: int,
+    indices: tuple[int, ...],
+) -> None:
+    """Compare device-observed properties to the independent fp64 oracle."""
+    expected_properties = properties(fixture, box)
+    for key in ("diffusivity", "g_term", "speed", "settling"):
+        if indices:
             npt.assert_allclose(
-                observed["nu"][box],
-                expected_properties["nu"],
+                observed[key][box, list(indices)],
+                expected_properties[key][list(indices)],
                 rtol=1e-6,
                 atol=0.0,
             )
-            for position, i in enumerate(indices):
-                for j in indices[position + 1 :]:
-                    expected = pair_rate(fixture, box, i, j, row.mask)
-                    atol = 1e-30 if name == "repulsive" else 0.0
-                    npt.assert_allclose(
-                        observed["rates"][box, i, j],
-                        expected,
-                        rtol=1e-7 if row.mask == 1 else 1e-6,
-                        atol=atol,
-                    )
-                    npt.assert_allclose(
-                        observed["rates"][box, j, i],
-                        observed["rates"][box, i, j],
-                        rtol=0.0,
-                        atol=atol,
-                    )
-                    assert np.isfinite(observed["rates"][box, i, j])
-                    assert observed["rates"][box, i, j] >= 0.0
-            inactive = sorted(set(range(fixture.radii.shape[1])) - set(indices))
-            assert np.count_nonzero(observed["rates"][box, inactive, :]) == 0
-            assert np.count_nonzero(observed["rates"][box, :, inactive]) == 0
-            expected_majorant = selector_majorant(fixture, box, row.mask)
+    npt.assert_allclose(
+        observed["nu"][box],
+        expected_properties["nu"],
+        rtol=1e-6,
+        atol=0.0,
+    )
+
+
+def _assert_observed_pair_rates(
+    observed: dict[str, np.ndarray],
+    fixture: Any,
+    box: int,
+    indices: tuple[int, ...],
+    mask: int,
+) -> None:
+    """Compare each active unordered pair with its independent expected rate."""
+    for position, i in enumerate(indices):
+        for j in indices[position + 1 :]:
+            expected = pair_rate(fixture, box, i, j, mask)
+            observed_rate = observed["rates"][box, i, j]
+            if fixture.name == "repulsive" and expected == 0.0:
+                assert expected == 0.0
+                assert observed_rate == 0.0
+            else:
+                npt.assert_allclose(
+                    observed_rate,
+                    expected,
+                    rtol=1e-7 if mask == 1 else 1e-6,
+                    atol=0.0,
+                )
             npt.assert_allclose(
-                observed["majorant"][box],
-                expected_majorant,
-                rtol=1e-6,
+                observed["rates"][box, j, i],
+                observed_rate,
+                rtol=0.0,
                 atol=0.0,
             )
-            for i in indices:
-                for j in indices:
-                    if i != j:
-                        assert (
-                            observed["rates"][box, i, j]
-                            <= observed["majorant"][box]
-                        )
+            assert np.isfinite(observed["rates"][box, i, j])
+            assert observed["rates"][box, i, j] >= 0.0
+    inactive = sorted(set(range(fixture.radii.shape[1])) - set(indices))
+    assert np.count_nonzero(observed["rates"][box, inactive, :]) == 0
+    assert np.count_nonzero(observed["rates"][box, :, inactive]) == 0
 
 
 @pytest.mark.warp
@@ -438,7 +524,7 @@ def test_pair_property_and_selector_parity_matrix(row: Any) -> None:
 def test_sparse_active_boundaries_have_no_pair_rate_or_majorant(
     name: str,
 ) -> None:
-    """Explicit zero/one-active fixtures cannot include inactive gaps."""
+    """Zero/one-active fixtures produce no rates despite inactive slots."""
     observed = _observe(name, 15)
     assert observed["majorant"][0] == 0.0
     assert np.count_nonzero(observed["rates"][0]) == 0

@@ -55,8 +55,6 @@ before any output, RNG, or particle-state mutation.
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
 
-from dataclasses import dataclass
-from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, cast, no_type_check
 
 import numpy as np
@@ -89,6 +87,16 @@ from particula.gpu.dynamics.coagulation_funcs import (
 from particula.gpu.dynamics.condensation_funcs import (
     particle_radius_from_volume_wp,
 )
+from particula.gpu.kernels._coagulation_config import (
+    BROWNIAN_MECHANISM_FLAG,
+    CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+    SEDIMENTATION_SP2016_MECHANISM_FLAG,
+    TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
+    CoagulationMechanismConfig,
+    _ResolvedCoagulationMechanismConfig,
+    resolve_coagulation_mechanism_config,
+    validate_coagulation_mechanism_capabilities,
+)
 from particula.gpu.kernels.environment import (
     _broadcast_scalar_array,
     _ensure_environment_arrays,
@@ -116,182 +124,6 @@ MAX_CHARGED_ACTIVE_PARTICLES_PER_BOX = 256
 # Exact SP2016 selection also visits every compact active pair in one thread.
 # Keep its work bounded independently of the charged-mode public contract.
 MAX_SEDIMENTATION_ACTIVE_PARTICLES_PER_BOX = 256
-
-BROWNIAN_MECHANISM = "brownian"
-CHARGED_HARD_SPHERE_MECHANISM = "charged_hard_sphere"
-SEDIMENTATION_SP2016_MECHANISM = "sedimentation_sp2016"
-TURBULENT_SHEAR_ST1956_MECHANISM = "turbulent_shear_st1956"
-
-CANONICAL_COAGULATION_MECHANISMS = (
-    BROWNIAN_MECHANISM,
-    CHARGED_HARD_SPHERE_MECHANISM,
-    SEDIMENTATION_SP2016_MECHANISM,
-    TURBULENT_SHEAR_ST1956_MECHANISM,
-)
-
-BROWNIAN_MECHANISM_FLAG = 1
-CHARGED_HARD_SPHERE_MECHANISM_FLAG = 2
-SEDIMENTATION_SP2016_MECHANISM_FLAG = 4
-TURBULENT_SHEAR_ST1956_MECHANISM_FLAG = 8
-
-_COAGULATION_MECHANISM_FLAGS = MappingProxyType(
-    {
-        BROWNIAN_MECHANISM: BROWNIAN_MECHANISM_FLAG,
-        CHARGED_HARD_SPHERE_MECHANISM: CHARGED_HARD_SPHERE_MECHANISM_FLAG,
-        SEDIMENTATION_SP2016_MECHANISM: SEDIMENTATION_SP2016_MECHANISM_FLAG,
-        TURBULENT_SHEAR_ST1956_MECHANISM: TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
-    }
-)
-
-
-@dataclass(frozen=True)
-class CoagulationMechanismConfig:
-    """Configure host-side coagulation mechanism selection.
-
-    The default selects Brownian, particle-resolved coagulation. This immutable,
-    concrete-module-only API must be imported from
-    ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
-    ``coagulation_step_gpu`` accepts it only through its keyword-only
-    ``mechanism_config`` argument. The configuration is host metadata and does
-    not own, transfer, or synchronize Warp resources. Executable
-    ``"particle_resolved"`` masks are ``1``, ``2``, ``3``, ``4``, ``5``, ``6``,
-    ``8``, ``9``, ``10``, ``12``, and ``15``. The resolver normalizes supported
-    mechanism tuples to the canonical fixed-mask order. Malformed, duplicate,
-    unknown, and non-particle-resolved configurations reject during structural
-    preflight before particle state is accessed. Mask ``7`` rejects at
-    capability preflight before particle metadata or enabled-term validation.
-    Turbulent masks ``11``, ``13``, and ``14`` validate particle metadata and
-    enabled terms before their deferred-execution error. Structurally valid
-    turbulent-shear requests validate their explicit P2 inputs after particle
-    schema and device checks.
-
-    Attributes:
-        mechanisms: Requested mechanism identifiers, or ``None`` to select
-            Brownian. The resolver normalizes supported identifiers to canonical
-            order.
-        distribution_type: Required distribution representation; only
-            ``"particle_resolved"`` is structurally supported.
-    """
-
-    mechanisms: tuple[str, ...] | None = None
-    distribution_type: str = "particle_resolved"
-
-
-@dataclass(frozen=True)
-class _ResolvedCoagulationMechanismConfig:
-    """Store the normalized result of concrete-module configuration validation.
-
-    This private result is not a public API or a ``coagulation_step_gpu``
-    argument. Structural resolution retains recognized, but potentially
-    deferred, mechanisms for later capability validation.
-
-    Attributes:
-        mechanisms: Structurally valid mechanism identifiers in canonical order.
-        distribution_type: Validated particle distribution representation.
-        mask: Bitwise OR of the fixed flags for ``mechanisms``.
-    """
-
-    mechanisms: tuple[str, ...]
-    distribution_type: str
-    mask: int
-
-
-def resolve_coagulation_mechanism_config(
-    config: CoagulationMechanismConfig,
-) -> _ResolvedCoagulationMechanismConfig:
-    """Resolve a configuration through structural validation.
-
-    ``config.mechanisms=None`` defaults to Brownian; ``config`` itself remains
-    required. Valid identifiers are normalized to canonical order and retained
-    in the returned fixed-bit mask, including deferred configurations whose
-    validation timing is determined by the caller's capability preflight. This
-    pure host-side, concrete-module-only helper neither allocates device storage
-    nor mutates its input or runtime state. Import it from
-    ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
-
-    Args:
-        config: Immutable host-side coagulation mechanism configuration.
-
-    Returns:
-        Private resolved configuration with canonical mechanisms, validated
-        distribution type, and the combined fixed-bit mask.
-
-    Raises:
-        ValueError: If mechanisms are malformed, duplicate, or unknown, or if
-            distribution_type is not exactly ``"particle_resolved"``.
-    """
-    if config.distribution_type != "particle_resolved":
-        raise ValueError(
-            "distribution_type must be exactly 'particle_resolved'."
-        )
-
-    mechanisms = config.mechanisms
-    if mechanisms is None:
-        mechanisms = (BROWNIAN_MECHANISM,)
-    if not isinstance(mechanisms, tuple) or not mechanisms:
-        raise ValueError("mechanisms must be a non-empty tuple of strings.")
-
-    for mechanism in mechanisms:
-        if not isinstance(mechanism, str):
-            raise ValueError("mechanisms must contain only string identifiers.")
-
-    seen_mechanisms: set[str] = set()
-    for mechanism in mechanisms:
-        if mechanism in seen_mechanisms:
-            raise ValueError(f"Duplicate coagulation mechanism '{mechanism}'.")
-        seen_mechanisms.add(mechanism)
-
-    unknown = next(
-        (
-            mechanism
-            for mechanism in mechanisms
-            if mechanism not in _COAGULATION_MECHANISM_FLAGS
-        ),
-        None,
-    )
-    if unknown is not None:
-        raise ValueError(f"Unknown coagulation mechanism '{unknown}'.")
-
-    normalized_mechanisms = tuple(
-        mechanism
-        for mechanism in CANONICAL_COAGULATION_MECHANISMS
-        if mechanism in mechanisms
-    )
-    mask = 0
-    for mechanism in normalized_mechanisms:
-        mask |= _COAGULATION_MECHANISM_FLAGS[mechanism]
-
-    return _ResolvedCoagulationMechanismConfig(
-        mechanisms=normalized_mechanisms,
-        distribution_type=config.distribution_type,
-        mask=mask,
-    )
-
-
-def validate_coagulation_mechanism_capabilities(
-    resolved: _ResolvedCoagulationMechanismConfig,
-) -> None:
-    """Enforce the executable coagulation-mechanism boundary.
-
-    This pure host-side, concrete-module-only validator accepts masks ``1``,
-    ``2``, ``3``, ``4``, ``5``, ``6``, ``8``, ``9``, ``10``, ``12``, and ``15``.
-    It rejects the recognized three-way masks ``7``, ``11``, ``13``, and ``14``
-    with the stable deferred-execution error. Mask ``7`` reaches this validator
-    during capability preflight before particle metadata or enabled-term
-    validation. Turbulent masks ``11``, ``13``, and ``14`` reach it only after
-    particle metadata and enabled-term validation, including the turbulent P2
-    input boundary. Import it from
-    ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
-
-    Args:
-        resolved: Structurally validated, normalized mechanism configuration.
-
-    Raises:
-        ValueError: If a deferred mechanism is requested.
-    """
-    if resolved.mask in (1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15):
-        return
-    raise ValueError("Additive coagulation execution is deferred.")
 
 
 @no_type_check
