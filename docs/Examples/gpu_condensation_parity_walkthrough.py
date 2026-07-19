@@ -20,7 +20,7 @@ from __future__ import annotations
 import importlib
 import os
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 from particula.dynamics.condensation.mass_transfer import (
@@ -195,6 +195,15 @@ class OracleSubstep:
     finalized_transfer: np.ndarray
 
 
+@dataclass(frozen=True)
+class AcceptanceResult:
+    """Record one categorized acceptance outcome and its diagnostic."""
+
+    category: Literal["physics", "conservation", "energy"]
+    status: Literal["passed", "failed", "unavailable"]
+    diagnostic: str
+
+
 @dataclass
 class ExampleRun:
     """Return completed oracle plus optional synchronized Warp observations."""
@@ -206,6 +215,8 @@ class ExampleRun:
     raw_proposal: np.ndarray | None = None
     total_mass_transfer: np.ndarray | None = None
     energy_transfer: np.ndarray | None = None
+    vapor_pressure: np.ndarray | None = None
+    acceptance: tuple[AcceptanceResult, ...] = ()
     scratch_buffers: Any | None = None
 
 
@@ -507,6 +518,94 @@ def run_oracle(source: OracleInput | None = None) -> OracleResult:
     )
 
 
+def _acceptance_result(
+    category: Literal["physics", "conservation", "energy"],
+    evaluate: Any,
+) -> AcceptanceResult:
+    """Evaluate one criterion and retain an assertion diagnostic on failure."""
+    try:
+        evaluate()
+    except AssertionError as error:
+        return AcceptanceResult(category, "failed", str(error))
+    return AcceptanceResult(category, "passed", "criteria satisfied")
+
+
+def evaluate_acceptance(
+    fixture: ParityFixture,
+    oracle: OracleResult,
+    observed_masses: np.ndarray,
+    observed_gas_concentration: np.ndarray,
+    observed_total_mass_transfer: np.ndarray,
+    observed_energy_transfer: np.ndarray,
+    observed_vapor_pressure: np.ndarray,
+) -> tuple[AcceptanceResult, ...]:
+    """Evaluate all independent acceptance criteria from complete observations."""
+    expected_vapor_pressure = np.broadcast_to(
+        fixture.thermodynamic_parameters[:, 0], (2, 2)
+    )
+
+    def evaluate_physics() -> None:
+        np.testing.assert_allclose(
+            observed_masses, oracle.masses, rtol=2e-10, atol=1e-30
+        )
+        np.testing.assert_allclose(
+            observed_gas_concentration,
+            oracle.gas_concentration,
+            rtol=2e-10,
+            atol=1e-30,
+        )
+        np.testing.assert_allclose(
+            observed_total_mass_transfer,
+            oracle.total_mass_transfer,
+            rtol=2e-10,
+            atol=1e-30,
+        )
+        np.testing.assert_array_equal(
+            observed_vapor_pressure, expected_vapor_pressure
+        )
+
+    def evaluate_conservation() -> None:
+        particle_inventory_change = np.sum(
+            (observed_masses - fixture.masses)
+            * fixture.concentration[:, :, None],
+            axis=1,
+        )
+        gas_change = observed_gas_concentration - fixture.gas_concentration
+        drift = particle_inventory_change + gas_change
+        conservation_scale = np.maximum(
+            np.abs(fixture.gas_concentration),
+            np.abs(observed_gas_concentration),
+        )
+        # Compare the zero drift with the physical gas-inventory scale so the
+        # relative P2 tolerance remains meaningful for a residual near zero.
+        np.testing.assert_allclose(
+            drift + conservation_scale,
+            conservation_scale,
+            rtol=1e-12,
+            atol=1e-30,
+        )
+
+    def evaluate_energy() -> None:
+        expected_energy = (
+            np.sum(observed_total_mass_transfer, axis=1)
+            * fixture.latent_heat[None, :]
+        )
+        np.testing.assert_allclose(
+            observed_energy_transfer, expected_energy, rtol=1e-12, atol=1e-18
+        )
+
+    return (
+        _acceptance_result("physics", evaluate_physics),
+        _acceptance_result("conservation", evaluate_conservation),
+        _acceptance_result("energy", evaluate_energy),
+    )
+
+
+def _format_acceptance(result: AcceptanceResult) -> str:
+    """Format one machine-testable acceptance block for script output."""
+    return f"{result.category}: {result.status} - {result.diagnostic}"
+
+
 def _warp_enabled() -> bool:
     """Return whether optional Warp execution is available and not disabled."""
     return WARP_AVAILABLE and os.getenv(_FORCE_NO_WARP_ENV) != "1"
@@ -550,7 +649,12 @@ def run_example(device: str = "cpu") -> ExampleRun:
     output = ["Independent NumPy oracle completed (four fixed substeps)."]
     if not _warp_enabled():
         output.append("oracle completed; no kernel ran")
-        return ExampleRun(output=output, oracle=oracle)
+        acceptance = tuple(
+            AcceptanceResult(category, "unavailable", "no-Warp observations")
+            for category in ("physics", "conservation", "energy")
+        )
+        output.extend(_format_acceptance(result) for result in acceptance)
+        return ExampleRun(output=output, oracle=oracle, acceptance=acceptance)
     wp, step, scratch_type, thermodynamics_type = _load_gpu_runtime()
     source = build_warp_source(fixture)
     names = list(source.gas.name)
@@ -614,21 +718,35 @@ def run_example(device: str = "cpu") -> ExampleRun:
     wp.synchronize_device(device)
     restored_gas = from_warp_gas_data(gas, name=names)
     wp.synchronize_device(device)
+    observed_vapor_pressure = gas.vapor_pressure.numpy().copy()
+    wp.synchronize_device(device)
     raw = scratch.work_mass_transfer.numpy().copy()
     wp.synchronize_device(device)
     applied = total.numpy().copy()
     wp.synchronize_device(device)
     observed_energy = energy.numpy().copy()
-    output.append("Synchronized Warp direct-kernel observations completed.")
-    return ExampleRun(
-        output,
+    acceptance = evaluate_acceptance(
+        fixture,
         oracle,
-        restored_particles,
-        restored_gas,
-        raw,
+        restored_particles.masses,
+        restored_gas.concentration,
         applied,
         observed_energy,
-        scratch,
+        observed_vapor_pressure,
+    )
+    output.append("Synchronized Warp direct-kernel observations completed.")
+    output.extend(_format_acceptance(result) for result in acceptance)
+    return ExampleRun(
+        output=output,
+        oracle=oracle,
+        particle_data=restored_particles,
+        gas_data=restored_gas,
+        raw_proposal=raw,
+        total_mass_transfer=applied,
+        energy_transfer=observed_energy,
+        vapor_pressure=observed_vapor_pressure,
+        acceptance=acceptance,
+        scratch_buffers=scratch,
     )
 
 
