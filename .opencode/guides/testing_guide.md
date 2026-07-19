@@ -183,7 +183,7 @@ pytest particula/gpu/kernels/tests/thermodynamics_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and gpu_parity"
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and stochastic"
-pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -Werror
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and not cuda" -Werror
 ```
 
 Use CUDA-targeted runs only for optional local/manual validation when a

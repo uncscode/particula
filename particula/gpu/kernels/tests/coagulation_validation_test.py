@@ -27,6 +27,7 @@ from particula.gpu.kernels.tests._coagulation_public_step_support import (
     _assert_public_invariants,
     _materialize_public_particles,
     _public_snapshot,
+    _require_warp,
     _run_on_warp_devices,
     _run_public_case,
 )
@@ -41,15 +42,6 @@ from particula.gpu.kernels.tests._coagulation_validation_support import (
     properties,
     selector_majorant,
 )
-
-
-def _require_warp() -> Any:
-    """Import Warp only for a selected runtime observation test."""
-    try:
-        import warp as wp
-    except ImportError:
-        pytest.skip("Warp not installed")
-    return wp
 
 
 @lru_cache(maxsize=1)
