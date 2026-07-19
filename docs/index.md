@@ -170,16 +170,24 @@ print(result)
   wall loss strategies with builders, factory, and runnable integration.
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
-  explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
+   explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
    current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
-   such as coagulation `rng_states` and condensation thermodynamics. GPU
-   turbulent-shear coagulation supports only the direct, particle-resolved
-   `("turbulent_shear_st1956",)` singleton. It requires keyword-only positive,
-    finite `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³) Python
-    `float` or NumPy floating scalar, or active-device `wp.float64`
-    `(n_boxes,)` Warp-array inputs; combinations,
-   runnable/API re-export, CPU fallback, and performance claims remain
-   deferred. GPU condensation requires keyword-only
+   such as coagulation `rng_states` and condensation thermodynamics. Direct,
+   particle-resolved GPU coagulation executes singleton masks `1`, `2`, `4`,
+   and `8`; unordered two-way masks `3`, `5`, `6`, `9`, `10`, and `12`; and
+   four-way mask `15` across Brownian, charged hard-sphere, SP2016
+   sedimentation, and ST1956 turbulent shear. Non-turbulent three-way mask `7`
+   rejects at capability preflight before particle metadata or enabled-term
+   validation. Turbulent three-way masks `11`, `13`, and `14` proceed through
+   particle metadata and enabled-term validation, then reject before downstream
+   normalization, allocation, RNG setup, kernel launch, or mutation. Approved
+   turbulent-shear masks require keyword-only positive, finite
+   `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³) Python or NumPy
+   floating scalars, or active-device `wp.float64` `(n_boxes,)` Warp arrays.
+   This is a direct-kernel-only contract: high-level `Runnable` support, CPU
+   fallback, hidden state transfer, graph capture, performance claims, and
+   broad accuracy claims remain out of scope. GPU condensation requires
+   keyword-only
    `thermodynamics=ThermodynamicsConfig`,
   validates an active-device binary per-box/species `gas.partitioning` mask
   before mutation, and runs exactly four equal substeps. Disabled species and

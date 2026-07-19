@@ -178,12 +178,15 @@ Known GPU physics gaps remain:
   hard-sphere coagulation and charge-aware merges in every approved additive
   mask.
 - The GPU coagulation path executes singleton masks `1`, `2`, `4`, `8`; the
-  two-way masks `3`, `5`, `6`, `9`, `10`, `12`; and four-way mask `15`. The
-  three-way masks `7`, `11`, `13`, `14` remain deferred after their
-  enabled-term validation. Requested tuples normalize to canonical Brownian,
-  charged, sedimentation, then turbulent order. Alternate charged models,
-  broader distributions, and mechanism variants remain outside this direct-
-  kernel contract.
+  two-way masks `3`, `5`, `6`, `9`, `10`, `12`; and four-way mask `15`.
+  Non-turbulent three-way mask `7` rejects at capability preflight before
+  particle metadata or enabled-term validation. Turbulent three-way masks
+  `11`, `13`, and `14` proceed through particle metadata and enabled-term
+  validation, then reject before downstream normalization, allocation, RNG
+  setup, kernel launch, or mutation. Requested tuples normalize to canonical
+  Brownian, charged, sedimentation, then turbulent order. Alternate charged
+  models, broader distributions, and mechanism variants remain outside this
+  direct-kernel contract.
 - CPU sedimentation coagulation and simple turbulent shear coagulation exist.
   The shipped GPU paths do not establish CPU-strategy parity; DNS and general
   turbulence remain deferred from the near-term GPU scope.
@@ -1058,13 +1061,17 @@ collision-output, and RNG resources retain their documented dtypes and identity.
 The executable matrix is singleton masks `1`, `2`, `4`, `8`; unordered two-way
 masks `3`, `5`, `6`, `9`, `10`, `12`; and four-way mask `15`. Requested tuples
 normalize to canonical Brownian, charged, sedimentation, turbulent order.
-Three-way masks `7`, `11`, `13`, `14` validate enabled terms then raise
-`ValueError("Additive coagulation execution is deferred.")`. Malformed,
-duplicate, unknown, and non-`particle_resolved` configurations reject during
-structural preflight before particle state access. Sedimentation-specific
-preflight rejects invalid particle physics before output allocation, RNG
-initialization, or particle mutation; this does not make unrelated later
-validation failures atomic.
+Non-turbulent three-way mask `7` raises
+`ValueError("Additive coagulation execution is deferred.")` during capability
+preflight before particle metadata or enabled-term validation. Turbulent
+three-way masks `11`, `13`, and `14` proceed through particle metadata and
+enabled-term validation, then raise that error before downstream normalization,
+allocation, RNG setup, kernel launch, or mutation. Malformed, duplicate,
+unknown, and non-`particle_resolved` configurations reject during structural
+preflight before particle state access. Sedimentation-specific preflight rejects
+invalid particle physics before output allocation, RNG initialization, or
+particle mutation; this does not make unrelated later validation failures
+atomic.
 
 The exact turbulent-shear mode is selected with
 `CoagulationMechanismConfig(("turbulent_shear_st1956",))`. Its keyword-only
@@ -1083,15 +1090,19 @@ masks ignore both turbulence arguments.
 `WarpParticleData.charge` is caller-owned same-device `wp.float64` state with
 shape `(n_boxes, n_particles)`, not a sidecar or transfer result. Charged calls
 preflight finite charge before caller-output validation/allocation, RNG setup,
-or selector/apply work. Accepted merges add donor charge to the recipient and
-clear the donor.
+or selector/apply work. An accepted representable merge adds donor charge to the
+recipient and clears the donor charge, mass, and concentration. A pair whose
+summed charge or species mass cannot be represented as finite, nonnegative
+`float64` state is not applied, so both particle inventories remain unchanged.
 
 Approved additive execution sanitizes and sums fp64 component pair rates. The
 safe component-majorant sum satisfies `sum_m K_m(i, j) <= sum_m M_m`; component
-maxima can occur on different pairs, so this bound is conservative. One active
-set, candidate stream, acceptance stream, collision-buffer set, per-box RNG
-stream, and apply pass serve every approved mask rather than sequential
-mechanism steps. This is bounded implementation scope, not a performance claim.
+maxima can occur on different pairs, so this bound can be conservative.
+Production selection obtains its majorant by an exact compact-active scan of the
+summed pair rate. One active set, candidate stream, acceptance stream,
+collision-buffer set, per-box RNG stream, and apply pass serve every approved
+mask rather than sequential mechanism steps. This is bounded implementation
+scope, not a performance claim.
 The return tuple is exactly
 `(particles, collision_pairs, n_collisions)`: supplied collision buffers return
 by identity, while supplied `rng_states` mutates in place and is not returned.
@@ -1111,8 +1122,10 @@ simulation-state transfers, graph capture, and performance guarantees are
 unsupported. Read-only P2 validation may synchronize and read back device
 status, including on CUDA, to report invalid values. The direct path does not
 establish CPU-strategy parity. E5-F6 ships the additive contract and
-documentation; E5-F7 remains responsible for release/cross-mechanism validation,
-and E5-F9 remains responsible for the consolidated direct example and closeout.
+documentation; no additional planned work remains for the shipped approved
+additive combinations. E5-F7 remains deferred and incomplete for
+release/cross-mechanism validation, and E5-F9 remains deferred and incomplete
+for the consolidated direct example and closeout.
 
 Planned features:
 

@@ -68,30 +68,33 @@ before launch.
 `coagulation_step_gpu` accepts an optional keyword-only `mechanism_config`
 from `particula.gpu.kernels.coagulation`; this configuration API is not
 re-exported from `particula.gpu.kernels`. Omitting it preserves the Brownian,
-particle-resolved path. The low-level entry point also supports exact
-unit-efficiency SP2016 sedimentation through
-`CoagulationMechanismConfig(("sedimentation_sp2016",))`, exact
-charged-hard-sphere-only, and canonical Brownian-plus-charged
-`particle_resolved` configurations. Sedimentation is direct-kernel-only: it
-uses caller-owned same-device state and RNG/output buffers, performs no hidden
-transfer or fallback, and requires finite, nonnegative particle mass and
-concentration with finite, positive density before mutable state work.
-Sedimentation combinations and other unsupported modes are deferred. The
-combined Brownian-plus-charged configuration accepts either requested mechanism
-order and uses one shared stochastic selection path. Malformed configurations,
-unsupported distributions, and deferred mechanisms fail during host-side
-preflight before runtime state is accessed, allocated, mutated, reseeded, or
-launched.
+particle-resolved path. The direct-kernel entry point executes all four
+singleton masks (`1`, `2`, `4`, `8`), six unordered two-way masks (`3`, `5`,
+`6`, `9`, `10`, `12`), and the four-way mask (`15`) for Brownian,
+charged-hard-sphere, SP2016 sedimentation, and ST1956 turbulent shear.
+Requested tuples normalize to that order. Non-turbulent three-way mask `7`
+raises the stable deferred-execution error at capability preflight, before
+particle metadata or enabled-term validation. Turbulent three-way masks (`11`,
+`13`, `14`) proceed through particle metadata and enabled-term validation, then
+raise that error before downstream normalization, allocation, RNG setup, kernel
+launch, or mutation.
 
-The exact ST1956 turbulent-shear singleton is also available through
-`CoagulationMechanismConfig(("turbulent_shear_st1956",))`. It requires explicit
-keyword-only `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³), each
-as a positive finite Python `float` or NumPy floating scalar, or an
-active-device `wp.float64` Warp array shaped
-`(n_boxes,)`. Supplied collision buffers and RNG state remain caller-owned.
-Turbulent mechanism combinations are rejected in preflight. This bounded,
-direct-kernel path uses an O(A) two-largest-active-radii majorant; it adds no
-high-level runnable or API re-export, CPU fallback, or performance claim.
+Approved combinations use sanitized fp64 component rates and one shared
+candidate, acceptance, RNG, collision-output, and apply path. A sum of
+component majorants is safe but may be conservative when component maxima occur
+on different pairs. Particle state and supplied collision/RNG buffers remain
+caller-owned same-device Warp resources; persistent RNG state is reused unless
+`initialize_rng=True` requests a reset. Sedimentation-enabled modes validate
+finite, nonnegative particle mass and concentration plus finite, positive
+density before mutable state work.
+
+Every turbulent-shear-enabled approved mask requires keyword-only
+`turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³), each as a positive
+finite Python or NumPy floating scalar or an active-device `wp.float64` Warp
+array shaped `(n_boxes,)`; non-turbulent masks ignore them. This remains a
+bounded direct-kernel path: it adds no high-level `Runnable`, CPU fallback,
+hidden state transfer, graph-capture guarantee, performance claim, or broad
+accuracy claim.
 
 `condensation_step_gpu` additionally requires a keyword-only
 `ThermodynamicsConfig` through `thermodynamics=`. After all inputs and optional

@@ -4,8 +4,10 @@
 
 - [x] Add a private immutable P1 recognition table in
   `particula/gpu/kernels/coagulation.py` for singleton, pair, and four-term
-  masks, distinct from the executable capability gate; reject three-term masks
-  before particle access.
+  masks, distinct from the executable capability gate; reject mask `7` at that
+  gate before particle shape/device metadata access or enabled-term validation,
+  while turbulent masks `11`, `13`, and `14` reject after those checks but before
+  downstream normalization, allocation, RNG work, launches, or mutation.
 - [x] Centralize enabled-bit read-only preflight so turbulent, charged, and
   sedimentation requirements are checked before volume/environment
   normalization, output/RNG work, allocations, or selection launch. Valid

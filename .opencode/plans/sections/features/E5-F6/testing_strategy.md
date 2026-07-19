@@ -24,12 +24,15 @@ the repository's `*_test.py` convention and collect cleanly without Warp.
   `warp` and `gpu_parity` markers; Warp CPU is the required backend and CUDA is
   optional.
 - **P3 — Single-pass integration (implemented):** Existing public-path tests
-  exercise approved masks and test-local diagnostics cover shared selection and
-  apply behavior, caller-buffer identity, persistent RNG, conservation,
-  inactive slots, and deferred-mask atomicity.
-- **P4 — Documentation (implemented):** Source/signature and Markdown
-  inspection verify links, direct imports, SI units, support-table rows, and
-  the absence of changed executable snippets.
+  exercise executable masks `1`, `2`, `4`, `8`, `3`, `5`, `6`, `9`, `10`, `12`,
+  and `15`; test-local diagnostics cover shared selection and apply behavior,
+  caller-buffer identity, persistent RNG, conservation, inactive slots, and
+  deferred-mask atomicity for `7`, `11`, `13`, and `14`.
+- **P4 — Documentation (implemented):** Final validation is source/signature and
+  Markdown inspection of links, direct imports, SI units, exact matrix rows,
+  and the absence of changed executable snippets, plus ruff and the existing
+  focused coagulation suite. These checks do not constitute E5-F7 release or
+  cross-mechanism closeout.
 
 ## Deterministic and Stochastic Oracles
 

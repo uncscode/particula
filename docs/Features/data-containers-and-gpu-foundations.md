@@ -310,16 +310,18 @@ settling-velocity buffer.
 It is a direct-kernel path only: it establishes neither CPU-strategy parity nor
 general accuracy or performance claims.
 
-Approved masks sanitize fp64 component rates and use their summed safe bound:
-`sum_m K_m(i, j) <= sum_m M_m`. Component maxima can occur on different pairs,
-so the bound is intentionally conservative. One shared active set, candidate
-stream, acceptance stream, collision-buffer set, per-box RNG stream, and apply
-pass serve each call; mechanisms are not sequential steps. Invalid, nonfinite,
-or nonpositive terms do not add to totals, and invalid candidates do not mutate
-state or output. This documents bounded implementation scope, not throughput or
-scaling evidence. Read-only preflight can use a private device-status buffer and
-a bounded synchronization/readback to report invalid caller state without
-copying, mutating, or CPU-falling-back caller simulation state.
+Approved masks sanitize and sum fp64 component rates. The safe summed
+component-majorant bound satisfies `sum_m K_m(i, j) <= sum_m M_m`; component
+maxima can occur on different pairs, so that bound can be conservative.
+Production selection obtains its majorant by an exact compact-active scan of the
+summed pair rate. One shared active set, candidate stream, acceptance stream,
+collision-buffer set, per-box RNG stream, and apply pass serve each call;
+mechanisms are not sequential steps. Invalid, nonfinite, or nonpositive terms do
+not add to totals, and invalid candidates do not mutate state or output. This
+documents bounded implementation scope, not throughput or scaling evidence.
+Read-only preflight can use a private device-status buffer and a bounded
+synchronization/readback to report invalid caller state without copying,
+mutating, or CPU-falling-back caller simulation state.
 
 The return tuple is exactly `(particles, collision_pairs, n_collisions)`.
 Supplied collision buffers are returned by identity. Supplied `rng_states` are
@@ -592,11 +594,23 @@ than storage support.
 | CPU↔GPU transfer | Explicit helper calls only | No hidden container movement or hidden environment synchronization. |
 | Warp/CUDA support | Optional | Warp `device="cpu"` is the baseline when Warp is installed; CUDA is additive local evidence and unavailable devices skip cleanly. |
 | Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
-| Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Executable masks are singletons `1`, `2`, `4`, `8`; unordered pairs `3`, `5`, `6`, `9`, `10`, `12`; and four-way `15`; tuples normalize to canonical order. Three-way masks `7`, `11`, `13`, `14` validate enabled terms then reject. Turbulent masks require explicit turbulent inputs. This path establishes no Runnable support, CPU parity, or performance claim. Supplied particle state, collision outputs, and persistent RNG are caller-owned same-device Warp resources. Persistent RNG reuse has no implicit transfer or synchronization; omitted state allocates call-local storage, and `initialize_rng=True` explicitly resets the caller-owned buffer. |
+| Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Exact mask and rejection boundaries follow below. This path establishes no Runnable support, CPU parity, or performance claim. |
 | Fixed-shape GPU/runtime roadmap work | Not current runtime behavior | Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior. |
 
 Additional shipped boundaries:
 
+- Executable coagulation masks are singletons `1`, `2`, `4`, `8`; unordered
+  pairs `3`, `5`, `6`, `9`, `10`, `12`; and four-way mask `15`. Tuples
+  normalize to canonical order. Non-turbulent three-way mask `7` rejects at
+  capability preflight before particle metadata or enabled-term validation.
+  Turbulent three-way masks `11`, `13`, `14` proceed through particle metadata
+  and enabled-term validation, then reject before downstream normalization,
+  allocation, RNG setup, kernel launch, or mutation. Turbulent masks require
+  explicit turbulent inputs.
+- Supplied coagulation particle state, collision outputs, and persistent RNG are
+  caller-owned same-device Warp resources. Persistent RNG reuse has no implicit
+  transfer or synchronization; omitted state allocates call-local storage, and
+  `initialize_rng=True` explicitly resets the caller-owned buffer.
 - `ParticleData.volume` remains the authoritative per-box simulation-volume
   owner; it does not move into `EnvironmentData`.
 - `EnvironmentData` is the shipped CPU thermodynamic owner for `temperature`,

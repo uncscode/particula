@@ -1,8 +1,9 @@
 # Success Criteria
 
-- [x] The executable capability matrix explicitly registers every supported
-  two-way row and the full Brownian+charged+sedimentation+turbulent-shear row;
-  canonical ordering is equivalent and unsupported rows fail closed.
+- [x] The executable capability matrix explicitly registers singleton masks
+  `1`, `2`, `4`, `8`, two-way masks `3`, `5`, `6`, `9`, `10`, `12`, and four-way
+  mask `15`; canonical ordering is equivalent and three-way masks `7`, `11`,
+  `13`, and `14` fail closed.
 - [x] For every deterministic active-pair fixture, the private device total rate equals
   the independently calculated sum of enabled component rates within declared
   fp64 tolerances.
@@ -11,8 +12,8 @@
 - [x] Private selector diagnostics show each valid scheduled proposal uses one
   active-pair stream and at most one acceptance draw, independent of enabled
   term count; rejected/materially unbounded ratios draw and mutate nothing.
-- [x] Two-way and full four-way aggregate collision counts satisfy declared
-  stochastic bounds without requiring exact CPU/Warp pair replay.
+- [x] Approved-mask aggregate collision counts satisfy declared stochastic bounds
+  without requiring exact CPU/Warp pair replay.
 - [x] Accepted pairs are sorted, in range, disjoint, and capacity bounded; one
   merge pass conserves each species' mass and total charge separately.
 - [x] Caller-owned pair/count buffers are returned by identity and persistent

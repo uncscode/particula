@@ -3,11 +3,11 @@
 E5-F6 extends the mechanism contract established by E5-F1 and the executable
 terms delivered by E5-F3, E5-F4, and E5-F5. It registers approved additive
 combinations, sums component pair rates and their proven per-term majorants,
-and performs one bounded candidate/acceptance pass for representative two-way
-and full four-way execution.
+and performs one bounded candidate/acceptance pass for every approved mask.
 
-Status: P1--P4 are implemented. The approved matrix is four singleton masks,
-six two-way masks, and four-way mask `15`; three-way masks remain deferred.
+Status: P1--P4 are implemented. Executable masks are `1`, `2`, `4`, `8`, `3`,
+`5`, `6`, `9`, `10`, `12`, and `15`; three-way masks `7`, `11`, `13`, and `14`
+remain deferred.
 
 ## In Scope
 
@@ -15,10 +15,10 @@ six two-way masks, and four-way mask `15`; three-way masks remain deferred.
   terms are executable: Brownian, charged, SP2016 sedimentation, and ST1956
   turbulent shear.
 - Preserve existing single-term modes and Brownian-plus-charged behavior.
-- Support and regression-test each approved two-way row plus the full
-  Brownian+charged+sedimentation+turbulent-shear row; explicitly encode any
-  intentionally unsupported three-way rows rather than accepting them by
-  accident.
+- Support and retain regression evidence for every approved singleton and
+  two-way row plus the full Brownian+charged+sedimentation+turbulent-shear row;
+  explicitly encode intentionally unsupported three-way rows rather than
+  accepting them by accident.
 - Compute `total_pair_rate = sum(enabled_pair_rates)` for each sampled pair.
 - Compute `total_majorant = sum(enabled_term_majorants)` and prove every tested
   active-pair sum is bounded by it.
