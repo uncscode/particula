@@ -23,7 +23,7 @@ documentation conventions.
 | 2 | [Epic B: Non-Isothermal Condensation Public API (CPU)](#epic-b-non-isothermal-condensation-public-api-cpu) | Shipped | E1 |
 | 3 | [Epic C: GPU Kernel Correctness and Low-Level API Hardening](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening) | Shipped | E3 |
 | 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | Shipped | E4 |
-| 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Active | not scheduled |
+| 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Active | E5 |
 | 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Pending | not scheduled |
 | 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Pending | not scheduled |
 | 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Pending | not scheduled |
@@ -995,7 +995,7 @@ general CPU-strategy parity remain future work outside the shipped scope.
 This leaves temperature feedback, gas mutation beyond the P2-finalized direct
 coupling, and all higher-level process integration outside this milestone.
 
-The [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
+The [independent condensation walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
 provides fixed-four-substep low-level direct-kernel physics, conservation, and
 energy evidence. Run:
 
@@ -1006,7 +1006,7 @@ pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror
 ```
 
 Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
-The [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md)
+The [downstream condensation ownership record](condensation-parity-walkthrough.md)
 documents deferred work only, including temperature feedback, high-level
 integration, adaptive stepping, graph replay, broad autodiff, and performance;
 it does not change production capability. The caller-owned, write-only
@@ -1016,6 +1016,26 @@ it does not change production capability. The caller-owned, write-only
 ## Epic E: GPU Coagulation Physics Coverage
 
 Status: active. Epic E is the next ordered epic after the shipped E4 plan.
+
+### E5 roadmap inventory
+
+| ID | Title | Status text |
+| --- | --- | --- |
+| `E5` | GPU Coagulation Physics Coverage | Active — P4 closeout remains dependency-gated |
+| `E5-F1` | Mechanism Configuration and Sampling Contract | Shipped |
+| `E5-F2` | Charged Pair Physics and Charge-Conserving Merges | Active — P1–P4 shipped; P5 documentation remains |
+| `E5-F3` | Charged and Brownian-Plus-Charged GPU Execution | Shipped |
+| `E5-F4` | SP2016 Sedimentation GPU Execution | Shipped |
+| `E5-F5` | ST1956 Turbulent-Shear GPU Execution | Shipped |
+| `E5-F6` | Single-Pass Additive Multi-Mechanism Coagulation | Shipped |
+| `E5-F7` | Cross-Mechanism GPU Validation Matrix | Shipped |
+| `E5-F8` | Independent CPU-Warp Condensation Walkthrough | Shipped |
+| `E5-F9` | GPU Coagulation Support Documentation and Epic Closeout | Active — P1/P2 shipped; P3/P4 remain |
+
+E5-F7 owns the [GPU coagulation validation record](coagulation-validation.md),
+E5-F8 owns the [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md),
+and the [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
+is runnable source.
 
 Extend GPU coagulation beyond the Brownian kernel to the collision
 mechanisms already available on CPU. DNS turbulence remains deferred (see
@@ -1141,9 +1161,9 @@ unsupported. Read-only P2 validation may synchronize and read back device
 status, including on CUDA, to report invalid values. The direct path does not
 establish CPU-strategy parity. E5-F6 ships the additive contract and
 documentation; no additional planned work remains for the shipped approved
-additive combinations. E5-F7 remains deferred and incomplete for
-release/cross-mechanism validation, and E5-F9 remains deferred and incomplete
-for the consolidated direct example and closeout.
+additive combinations. E5-F7 is shipped with the cross-mechanism validation
+record, and E5-F9 P1/P2 are shipped while P3/P4 remain for the consolidated
+direct example and closeout.
 
 Planned features:
 

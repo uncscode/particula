@@ -107,11 +107,11 @@ meets its exit bar, the next pending epic in the sequence becomes active.
    sidecars, device-aware parity evidence, and the published direct-kernel
    support contract and example. It does not provide high-level runnable
    integration or general CPU-strategy parity.
-    - [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
+    - [Independent condensation walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
        — fixed-four-substep low-level direct-kernel physics, conservation, and
          energy evidence, with Warp CPU as the installed-Warp baseline; CUDA is
          optional additive evidence
-     - [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md)
+     - [Downstream condensation ownership record](condensation-parity-walkthrough.md)
        — deferred work only; it does not alter Epic D production capability or
          activate later epics
      - The walkthrough's caller-owned, write-only `energy_transfer` diagnostic
@@ -127,10 +127,28 @@ meets its exit bar, the next pending epic in the sequence becomes active.
 ### Active
 
 - [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
-  extends the Brownian baseline across charged, sedimentation, turbulent-shear,
-  and combined coagulation mechanisms. Its closeout also owns the Epic D
-  carry-forward record: an independent CPU/Warp condensation parity walkthrough
-  and explicit downstream ownership for deferred condensation capabilities.
+
+### E5 roadmap inventory
+
+| ID | Title | Status text |
+| --- | --- | --- |
+| `E5` | GPU Coagulation Physics Coverage | Active — P4 closeout remains dependency-gated |
+| `E5-F1` | Mechanism Configuration and Sampling Contract | Shipped |
+| `E5-F2` | Charged Pair Physics and Charge-Conserving Merges | Active — P1–P4 shipped; P5 documentation remains |
+| `E5-F3` | Charged and Brownian-Plus-Charged GPU Execution | Shipped |
+| `E5-F4` | SP2016 Sedimentation GPU Execution | Shipped |
+| `E5-F5` | ST1956 Turbulent-Shear GPU Execution | Shipped |
+| `E5-F6` | Single-Pass Additive Multi-Mechanism Coagulation | Shipped |
+| `E5-F7` | Cross-Mechanism GPU Validation Matrix | Shipped |
+| `E5-F8` | Independent CPU-Warp Condensation Walkthrough | Shipped |
+| `E5-F9` | GPU Coagulation Support Documentation and Epic Closeout | Active — P1/P2 shipped; P3/P4 remain |
+
+E5-F7 owns the [GPU coagulation validation record](coagulation-validation.md),
+E5-F8 owns the [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md),
+and the [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
+is runnable source.
+
+E5 is active, E5-F9 P3/P4 remain, and Epic F is pending.
 
 ### Pending
 
