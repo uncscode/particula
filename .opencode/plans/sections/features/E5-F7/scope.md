@@ -8,6 +8,20 @@ contract for E5-F9 closeout.
 
 ## In Scope
 
+### Completed in issue #1362 (P1)
+
+- `particula/gpu/kernels/tests/_coagulation_validation_support.py` supplies
+  literal mask tables, explicit fp64 fixtures, and independent Brownian,
+  charged, SP2016, ST1956, additive, property, and selector-majorant oracles.
+- `particula/gpu/kernels/tests/coagulation_validation_test.py` supplies
+  Warp-free configuration/boundary coverage and lazy Warp-CPU pair, property,
+  and majorant observations for the executable matrix.
+- The implementation is validation-only: it adds no production physics, APIs,
+  CUDA coverage, end-to-end merge/conservation coverage, stochastic coverage,
+  caller-buffer coverage, CPU fallback, or user documentation.
+
+### Remaining scope
+
 - Deterministic fp64 pair/property parity for Brownian, charged, SP2016
   sedimentation with efficiency 1, ST1956 turbulent shear, and every approved
   additive row, using independent CPU APIs or direct NumPy equations.

@@ -1,13 +1,16 @@
 # Phase Details
 
-- [ ] **E5-F7-P1:** Publish independent deterministic pair-parity matrix and fixtures
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E5-F7-P1:** Publish independent deterministic pair-parity matrix and fixtures
+  - Issue: #1362 | Size: S | Status: Implemented
   - Goal: Parameterize every shipped single and approved additive row against
     independent fp64 pair/property equations and explicit majorant checks.
-  - Files: `particula/gpu/kernels/tests/coagulation_validation_test.py`,
-    optionally shared helpers under `particula/gpu/kernels/tests/`
-  - Tests: Symmetry, finite/non-negative rates, independent expected values,
-    summed-rate parity, and pair-rate-to-majorant inequalities across scales.
+  - Files: `particula/gpu/kernels/tests/coagulation_validation_test.py` and
+    `particula/gpu/kernels/tests/_coagulation_validation_support.py`
+  - Tests: Literal fixed-mask and deferred-mask configuration checks; independent
+    fp64 fixture/oracle validation; lazy Warp-CPU property, pair symmetry,
+    finite/non-negative, summed-rate, and selector-majorant observations;
+    active-index and exact-zero boundaries.
+  - Result: Validation-only commit; no production, public API, or user-doc change.
 
 - [ ] **E5-F7-P2:** Validate cross-mechanism conservation, ownership, and edge cases
   - Issue: TBD | Size: S | Status: Not Started

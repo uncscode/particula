@@ -7,13 +7,17 @@ use the `*_test.py` convention and collect cleanly when Warp is absent.
 
 ## Per-Phase Testing Approach
 
-- **P1 — Deterministic matrix:** Parameterize every shipped single and approved
+- **P1 — Deterministic matrix (implemented in #1362):** Parameterize every shipped single and approved
   additive mechanism. Compare explicit fp64 Warp pair/property values to public
   CPU formulas or direct NumPy equations. Assert symmetry, finite non-negative
   values, and independent majorant coverage for every active unordered pair.
   Use `rtol=1e-7, atol=0` for Brownian; `rtol=1e-6, atol=0` for positive charged,
   SP2016, ST1956, and additive rates; `atol=1e-30` for the extreme repulsive
-  charged fixture; and exact equality for exact-zero rates.
+  charged fixture; and exact equality for exact-zero rates. Literal executable
+  rows are `1`, `2`, `3`, `4`, `5`, `6`, `8`, `9`, `10`, `12`, and `15`;
+  three-way rows `7`, `11`, `13`, and `14` have Warp-free deferred-error tests.
+  Pair/property/majorant observations are lazy Warp-CPU probes marked `warp`
+  and `gpu_parity`; host metadata and configuration tests collect without Warp.
 - **P2 — Conservation and edge matrix:** Exercise one-box and heterogeneous
   multi-box, one/multiple species, zero/one/two/many active particles, inactive
   gaps, mixed-sign charge, and mixed nanometer/droplet scales. Assert separate

@@ -2,6 +2,15 @@
 
 ### High-Level Design
 
+Issue #1362 implements the deterministic oracle/observation boundary as two
+co-located private test modules. `_coagulation_validation_support.py` owns
+literal row metadata, fp64 fixtures, and host-only expected values; the
+discoverable `coagulation_validation_test.py` keeps Warp imports and private
+device-helper probes lazy. The latter observes properties, pair rates, and the
+selector majorant on Warp CPU, while the former never uses Warp aggregate logic
+as an expected-value source. Deferred masks are resolved and rejected on the
+host before any execution observation.
+
 E5-F7 is a validation layer around the stable low-level coagulation entry point;
 it does not add a production execution path. A canonical case table binds each
 supported mechanism mask to independently evaluated deterministic expectations,
@@ -34,10 +43,10 @@ under test.
   expected aggregate rates.
 - **API Surface:** No new public package API is planned. Tests call the shipped
   `coagulation_step_gpu()` configuration contract from E5-F1 through E5-F6.
-- **Workflow Hooks:** Register or reuse `warp`, `gpu_parity`, `stochastic`, and
-  `cuda` pytest markers. Focused release commands select deterministic,
-  stochastic, and device slices independently; normal collection remains valid
-  without Warp, and CUDA absence produces a clean skip.
+- **Workflow Hooks:** The shipped deterministic probes use `warp` and
+  `gpu_parity`, run on `device="cpu"`, and skip at runtime when Warp is absent;
+  normal collection therefore remains Warp-free. Stochastic and CUDA markers
+  remain deferred to later phases.
 - **Evidence Boundary:** The published table reports only rows implemented and
   approved by E5-F3 through E5-F6. Missing or unsupported rows are documented as
   unsupported, not silently skipped as successful.
