@@ -27,8 +27,9 @@
   condensation numerical-method plan; assign high-level backend/`Runnable`
   work and general workflow parity to Epic G, capture and performance work to
   Epic H, and broad autodiff to Epic I.
-- [ ] Link the artifact from canonical condensation, foundations, examples, and
-  both roadmap files without duplicating conflicting support language.
+- [x] Link the walkthrough and ownership record from canonical condensation,
+  foundations, examples, and both roadmap files without duplicating conflicting
+  support language.
 
 ## Tooling / Tests
 
@@ -41,5 +42,6 @@
 - [x] Add separate category-isolation and all-results reporting tests for P2,
   including isolated vapor-pressure, energy-sidecar, and conservation-input
   mutations plus a multi-failure case.
-- [ ] Run the focused test suite with `-Werror`, optional CUDA selection when
-  available, and the repository coverage validation.
+- [x] Extend the documentation regression for the five canonical pages: exact
+  resolving links, focused commands, evidence categories, `energy_transfer`
+  ownership, backend policy, and deferred-capability non-claims.

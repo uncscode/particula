@@ -34,13 +34,15 @@
     gates, and non-claims; exact links and anchors; focused commands; and the
     direct-kernel-only support boundary.
 
-- [ ] **E5-F8-P4:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E5-F8-P4:** Update development documentation
+  - Issue: #1370 | Size: XS | Status: Implemented
   - Goal: Link the walkthrough and ownership record from canonical condensation,
     foundations, example, and roadmap indexes for E5-F9 closeout.
   - Files: `docs/Features/condensation_strategy_system.md`,
     `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Examples/index.md`, `docs/Features/Roadmap/index.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`
-  - Tests: documentation link/content validation and warning-clean focused
-    reproduction commands.
+  - Tests: the documentation regression validates exact once-only resolving
+    links, focused reproduction commands, separate evidence labels, caller-owned
+    write-only `energy_transfer` wording, Warp CPU/optional-CUDA policy, and
+    deferred-capability non-claims across all five pages.

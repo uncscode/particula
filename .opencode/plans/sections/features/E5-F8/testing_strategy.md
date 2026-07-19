@@ -31,9 +31,16 @@ test modules use the `*_test.py` suffix.
   the boundary limiting evidence to the independent fp64 fixed-four-substep
   NumPy oracle versus the direct kernel. It rejects speculative plan IDs, Epic F
   ownership, and positive support claims for deferred capabilities.
-- **P4 — Documentation integration (not implemented):** Extend documentation checks for all
-  canonical inbound/outbound links, exact focused commands, Warp CPU/CUDA
-  policy, two-item return wording, and separate evidence labels.
+- **P4 — Documentation integration (implemented):**
+  `particula/tests/condensation_parity_walkthrough_docs_test.py` validates the
+  two exact once-only resolving links on each of the five canonical pages, the
+  walkthrough and focused pytest commands, separate `physics`,
+  `conservation`, and `energy` labels, fixed-four-substep low-level direct-kernel
+  wording, Warp CPU baseline/optional CUDA policy, and `energy_transfer` as
+  caller-owned write-only diagnostic output. Aggregate negative assertions
+  reject unsupported positive claims, including high-level strategy/`Runnable`
+  parity, temperature feedback, adaptive stepping, graph replay, broad autodiff,
+  performance, and required CUDA.
 
 ## Evidence Policy
 
