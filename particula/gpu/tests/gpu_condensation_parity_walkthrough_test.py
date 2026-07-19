@@ -6,6 +6,7 @@ import importlib
 import runpy
 import sys
 import types
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -85,6 +86,42 @@ def test_oracle_has_four_substep_uptake_evaporation_coupling_and_energy(
         atol=1e-30,
     )
     assert not np.array_equal(result.raw_proposal, result.total_mass_transfer)
+    assert len(result.substeps) == 4
+    assert all(substep.time_step == 0.08 / 4.0 for substep in result.substeps)
+    for earlier, later in zip(
+        result.substeps, result.substeps[1:], strict=False
+    ):
+        gas_after = earlier.gas_concentration_before - np.sum(
+            earlier.finalized_transfer * fixture.concentration[:, :, None],
+            axis=1,
+        )
+        gas_after = np.maximum(gas_after, 0.0)
+        npt.assert_allclose(later.gas_concentration_before, gas_after)
+    assert not np.array_equal(
+        result.substeps[0].raw_proposal,
+        result.substeps[1].raw_proposal,
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("temperature", np.array([np.nan, 298.15]), "finite"),
+        ("pressure", np.array([np.inf, 98000.0]), "finite"),
+        ("density", np.array([0.0, 1100.0]), "positive"),
+        ("gas_concentration", np.full((2, 2), -1.0), "nonnegative"),
+    ],
+)
+def test_fixture_validation_rejects_nonfinite_and_invalid_physical_values(
+    example_module: types.ModuleType,
+    field: str,
+    value: np.ndarray,
+    message: str,
+) -> None:
+    """Injected fixtures enforce direct-step numeric and physical domains."""
+    fixture = replace(example_module.build_fixture(), **{field: value})
+    with pytest.raises(ValueError, match=message):
+        example_module.build_oracle_input(fixture)
 
 
 def test_disabled_or_unavailable_warp_completes_oracle_without_runtime_work(
@@ -217,6 +254,7 @@ def test_fake_enabled_route_has_explicit_sidecars_and_synchronized_readback(
     result = example_module.run_example()
     assert len(calls) == 1
     call = calls[0]
+    assert result.scratch_buffers is call["scratch_buffers"]
     assert call["temperature"].shape == call["pressure"].shape == (2,)
     assert call["temperature"].dtype is _FakeWP.float64
     assert call["thermodynamics"].modes.dtype is _FakeWP.int32
@@ -236,6 +274,8 @@ def test_oracle_completes_before_runtime_and_ignores_warp_source_mutation(
     events: list[str] = []
     original_oracle = example_module.run_oracle
     original_source = example_module.build_warp_source
+    baseline_oracle = original_oracle(example_module.build_oracle_input())
+    untouched_source = original_source()
 
     def record_oracle(*args: Any, **kwargs: Any) -> Any:
         events.append("oracle")
@@ -253,11 +293,35 @@ def test_oracle_completes_before_runtime_and_ignores_warp_source_mutation(
     monkeypatch.setattr(
         example_module,
         "_load_gpu_runtime",
-        lambda: (_ for _ in ()).throw(RuntimeError("stop after oracle")),
+        lambda: (
+            _FakeWP,
+            lambda particles, gas, **kwargs: (
+                particles,
+                kwargs["scratch_buffers"].total_mass_transfer,
+            ),
+            _FakeScratch,
+            _FakeThermodynamics,
+        ),
     )
-    with pytest.raises(RuntimeError, match="stop after oracle"):
-        example_module.run_example()
-    assert events == ["oracle"]
+    monkeypatch.setattr(
+        example_module, "to_warp_particle_data", lambda value, **kwargs: value
+    )
+    monkeypatch.setattr(
+        example_module, "to_warp_gas_data", lambda value, **kwargs: value
+    )
+    monkeypatch.setattr(
+        example_module, "from_warp_particle_data", lambda value: value
+    )
+    monkeypatch.setattr(
+        example_module, "from_warp_gas_data", lambda value, **kwargs: value
+    )
+    result = example_module.run_example()
+    assert events == ["oracle", "source"]
+    npt.assert_allclose(result.oracle.masses, baseline_oracle.masses)
+    npt.assert_allclose(
+        untouched_source.particles.masses,
+        example_module.build_fixture().masses,
+    )
 
 
 @pytest.mark.parametrize(
@@ -394,6 +458,7 @@ def test_warp_cpu_matches_independent_oracle(
     assert (
         result.total_mass_transfer is not None
         and result.raw_proposal is not None
+        and result.scratch_buffers is not None
     )
     npt.assert_allclose(
         result.particle_data.masses,
@@ -415,6 +480,12 @@ def test_warp_cpu_matches_independent_oracle(
     )
     npt.assert_allclose(
         result.raw_proposal, result.oracle.raw_proposal, rtol=1e-10, atol=1e-30
+    )
+    npt.assert_allclose(
+        result.raw_proposal,
+        result.scratch_buffers.work_mass_transfer.numpy(),
+        rtol=1e-10,
+        atol=1e-30,
     )
     npt.assert_allclose(
         result.energy_transfer,
@@ -449,10 +520,40 @@ def test_cuda_matches_independent_oracle_when_available(
     if not cuda_available(wp):
         pytest.skip(CUDA_SKIP_REASON)
     result = example_module.run_example(device="cuda")
-    assert result.particle_data is not None
+    assert result.particle_data is not None and result.gas_data is not None
+    assert result.total_mass_transfer is not None
+    assert (
+        result.raw_proposal is not None
+        and result.energy_transfer is not None
+        and result.scratch_buffers is not None
+    )
     npt.assert_allclose(
         result.particle_data.masses,
         result.oracle.masses,
+        rtol=1e-10,
+        atol=1e-30,
+    )
+    npt.assert_allclose(
+        result.gas_data.concentration,
+        result.oracle.gas_concentration,
+        rtol=1e-10,
+        atol=1e-30,
+    )
+    npt.assert_allclose(
+        result.total_mass_transfer,
+        result.oracle.total_mass_transfer,
+        rtol=1e-10,
+        atol=1e-30,
+    )
+    npt.assert_allclose(
+        result.raw_proposal,
+        result.oracle.raw_proposal,
+        rtol=1e-10,
+        atol=1e-30,
+    )
+    npt.assert_allclose(
+        result.energy_transfer,
+        result.oracle.energy_transfer,
         rtol=1e-10,
         atol=1e-30,
     )
