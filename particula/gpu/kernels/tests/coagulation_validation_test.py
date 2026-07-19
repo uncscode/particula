@@ -652,6 +652,7 @@ def _run_public_case(
     n_species: int,
     max_collisions: int,
     device: str,
+    time_step: float = 1.0,
     turbulent_arrays: bool = False,
     active_by_box: tuple[tuple[int, ...], ...] | None = None,
 ) -> tuple[dict[str, np.ndarray], dict[str, np.ndarray], Any, Any, Any]:
@@ -696,7 +697,7 @@ def _run_public_case(
         pressure=wp.array(
             fixture.pressure, dtype=wp.float64, device=active_device
         ),
-        time_step=1.0,
+        time_step=time_step,
         volume=particles.volume,
         max_collisions=max_collisions,
         rng_seed=41,
@@ -738,6 +739,57 @@ def test_public_step_preserves_state_integrity_for_executable_masks(
         )
         _assert_public_invariants(
             initial, final, fixture.active, charge_transfers=bool(row.mask & 2)
+        )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "row", EXECUTABLE_ROWS, ids=lambda row: f"mask_{row.mask}"
+)
+def test_executable_masks_force_one_legal_merge(row: Any) -> None:
+    """Each executable mask accepts and applies a finite forced pair."""
+    wp = _require_warp()
+    fixture = FIXTURES["normal"]
+    active_by_box = ((0, 2),)
+    for device in _run_on_warp_devices(wp):
+        initial, final, _, _, _ = _run_public_case(
+            row,
+            fixture,
+            n_species=2,
+            max_collisions=1,
+            device=device,
+            time_step=1.0e12,
+            active_by_box=active_by_box,
+        )
+        npt.assert_array_equal(final["counts"], [1])
+        npt.assert_array_equal(final["pairs"][0, 0], [0, 2])
+        _assert_public_invariants(
+            initial, final, active_by_box, charge_transfers=True
+        )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_public_step_preserves_multi_pair_ordering_and_bookkeeping() -> None:
+    """Two capacity slots produce two sorted, disjoint applied merges."""
+    wp = _require_warp()
+    row = next(row for row in EXECUTABLE_ROWS if row.mask == 1)
+    fixture = FIXTURES["normal"]
+    active_by_box = ((0, 1, 2, 3),)
+    for device in _run_on_warp_devices(wp):
+        initial, final, _, _, _ = _run_public_case(
+            row,
+            fixture,
+            n_species=2,
+            max_collisions=2,
+            device=device,
+            time_step=1.0e12,
+            active_by_box=active_by_box,
+        )
+        npt.assert_array_equal(final["counts"], [2])
+        _assert_public_invariants(
+            initial, final, active_by_box, charge_transfers=True
         )
 
 
@@ -859,8 +911,12 @@ def test_persistent_rng_advances_only_after_explicit_initialization() -> None:
     row = next(row for row in EXECUTABLE_ROWS if row.mask == 1)
     device = "cpu"
     states = wp.zeros((1,), dtype=wp.uint32, device=device)
+    active_by_box = ((0, 1, 2, 3),)
     particles = to_warp_particle_data(
-        _materialize_public_particles(fixture, n_species=1), device=device
+        _materialize_public_particles(
+            fixture, n_species=1, active_by_box=active_by_box
+        ),
+        device=device,
     )
     kwargs = dict(
         temperature=298.15,
@@ -877,15 +933,27 @@ def test_persistent_rng_advances_only_after_explicit_initialization() -> None:
     coagulation_step_gpu(particles, initialize_rng=False, **kwargs)
     advanced = states.numpy().copy()
     assert not np.array_equal(advanced, initialized)
+    reset_particles = to_warp_particle_data(
+        _materialize_public_particles(
+            fixture, n_species=1, active_by_box=active_by_box
+        ),
+        device=device,
+    )
+    coagulation_step_gpu(reset_particles, initialize_rng=True, **kwargs)
+    reset = states.numpy().copy()
     control = wp.zeros((1,), dtype=wp.uint32, device=device)
     control_particles = to_warp_particle_data(
-        _materialize_public_particles(fixture, n_species=1), device=device
+        _materialize_public_particles(
+            fixture, n_species=1, active_by_box=active_by_box
+        ),
+        device=device,
     )
     coagulation_step_gpu(
         control_particles,
         **{**kwargs, "rng_states": control, "initialize_rng": True},
     )
     npt.assert_array_equal(control.numpy(), initialized)
+    npt.assert_array_equal(reset, control.numpy())
 
 
 def _assert_snapshot_unchanged(
