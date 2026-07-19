@@ -766,7 +766,7 @@ document bounded physics, conservation, and energy evidence only. They retain
 the fixed-four-substep low-level direct-kernel boundary: Warp CPU is the
 installed-Warp baseline and CUDA is optional additive evidence, not required
 support. `energy_transfer` remains caller-owned, write-only diagnostic output,
-not a return value or temperature-feedback mechanism (`kg * J/kg = J`).
+not a return value or temperature feedback mechanism (`kg * J/kg = J`).
 
 ## Related references
 

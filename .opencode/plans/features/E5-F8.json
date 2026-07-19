@@ -2,13 +2,13 @@
   "id": "E5-F8",
   "type": "feature",
   "title": "Independent CPU-Warp Condensation Walkthrough",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
+  "completion_date": "2026-07-19",
   "last_updated": "2026-07-19",
   "dependencies": [],
   "section_files": {
@@ -71,11 +71,11 @@
     {
       "id": "E5-F8-P4",
       "title": "Update development documentation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-19",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -83,5 +83,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "shipped"
 }

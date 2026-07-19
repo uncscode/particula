@@ -175,9 +175,11 @@ Jump in by selecting any card below and follow along in your browser or local en
     Run `python docs/Examples/gpu_condensation_parity_walkthrough.py`, then
     `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`
     and `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
-    Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
-    This direct-kernel example does not add high-level integration, adaptive
-    execution, temperature feedback, graph replay, broad autodiff, or performance claims.
+     Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
+     Its caller-owned, write-only `energy_transfer` output is a diagnostic, not
+     a return value or temperature feedback (`kg * J/kg = J`). This direct-kernel
+     example does not add high-level integration, adaptive execution, graph
+     replay, broad autodiff, or performance claims.
 
     [:octicons-arrow-right-24: Guide](Data_Containers/index.md)
 
