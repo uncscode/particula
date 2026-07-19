@@ -11695,6 +11695,8 @@
       
         
       
+        
+      
     
     
     
@@ -11767,6 +11769,34 @@
     
   
     GPU Coagulation Validation Record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Roadmap/condensation-parity-walkthrough/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Condensation Parity Walkthrough Ownership Record
   
 
     
@@ -15752,7 +15782,20 @@ checks are separate: no one class proves either of the others.</p>
 </code></pre></div>
 <p>This is additive to the required Warp <code>device="cpu"</code> baseline and skips
 cleanly when CUDA is unavailable.</p>
+<p>The <a href="../../Examples/gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>
+and its <a href="../Roadmap/condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>
+document bounded physics, conservation, and energy evidence only. They retain
+the fixed-four-substep low-level direct-kernel boundary: Warp CPU is the
+installed-Warp baseline and CUDA is optional additive evidence, not required
+support. <code>energy_transfer</code> remains caller-owned, write-only diagnostic output,
+not a return value or temperature feedback mechanism (<code>kg * J/kg = J</code>).</p>
 <h2 id="related-references">Related references<a class="headerlink" href="#related-references" title="Permanent link">&para;</a></h2>
+<p>The fixed-four-substep low-level direct-kernel walkthrough can be run with
+<code>python docs/Examples/gpu_condensation_parity_walkthrough.py</code>. Its focused
+regressions are
+<code>pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror</code>
+and
+<code>pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror</code>.</p>
 <ul>
 <li><a href="../../Examples/Data_Containers/">Data Containers example</a></li>
 <li><a href="../particle-data-migration/">Particle &amp; Gas Data Migration</a></li>

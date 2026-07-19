@@ -11934,6 +11934,8 @@
       
         
       
+        
+      
     
     
     
@@ -12006,6 +12008,34 @@
     
   
     GPU Coagulation Validation Record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Roadmap/condensation-parity-walkthrough/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Condensation Parity Walkthrough Ownership Record
   
 
     
@@ -15908,7 +15938,7 @@ diagnostic output. It requires valid latent heat, is overwritten only after
 successful preflight, and is not a third return item. Its signed whole-call
 identity is <code>Q[box, species] = sum_particles(Delta m_finalized) * L[species]</code>:
 finalized <code>Delta m</code> is kg, <code>L</code> is J/kg, and <code>Q</code> is J, so condensation is
-positive and evaporation negative. The #1272 diagnostic uses strict
+positive and evaporation negative (<code>kg * J/kg = J</code>). The #1272 diagnostic uses strict
 <code>rtol=1e-12, atol=1e-18</code> evidence. <code>thermal_work</code> is validated but remains
 deferred and unused.</p>
 <p>This is diagnostic bookkeeping, not temperature feedback, gas mutation or
@@ -15916,6 +15946,18 @@ gas/full-system conservation. The direct step couples finalized particle and
 gas transfer through its stated P2-finalized direct coupling, but does not add strategy/
 <code>Runnable</code> integration, adaptive stepping, graph capture/replay, autodiff
 guarantees, or complete E4-F6 cross-device certification.</p>
+<p>The <a href="../../Examples/gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>
+separately reports physics, conservation, and energy evidence for this
+fixed-four-substep low-level direct-kernel comparison. Its
+<a href="../Roadmap/condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>
+keeps deferred capabilities explicit. Warp CPU is the installed-Warp baseline;
+CUDA is optional additive evidence. The caller-owned, write-only
+<code>energy_transfer</code> output is a diagnostic, not a return value and not temperature
+feedback.</p>
+<p>Focused fixed-four-substep direct-kernel evidence commands are:
+<code>python docs/Examples/gpu_condensation_parity_walkthrough.py</code>,
+<code>pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror</code>,
+and <code>pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror</code>.</p>
 <h4 id="p1-p4-direct-condensation-evidence">P1--P4 direct-condensation evidence<a class="headerlink" href="#p1-p4-direct-condensation-evidence" title="Permanent link">&para;</a></h4>
 <table>
 <thead>

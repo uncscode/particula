@@ -11417,6 +11417,8 @@
       
         
       
+        
+      
     
     
     
@@ -11489,6 +11491,34 @@
     
   
     GPU Coagulation Validation Record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="condensation-parity-walkthrough/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Condensation Parity Walkthrough Ownership Record
   
 
     
@@ -14525,9 +14555,27 @@ meets its exit bar, the next pending epic in the sequence becomes active.</p>
   kappa activity, static and composition-weighted surface tension, fixed-four
   P2 inventory finalization, gas coupling and conservation, latent-heat rate
   correction and signed energy diagnostics, reusable caller-owned fp64
-  sidecars, device-aware parity evidence, and the published direct-kernel
-  support contract and example. It does not provide high-level runnable
-  integration or general CPU-strategy parity.</li>
+   sidecars, device-aware parity evidence, and the published direct-kernel
+   support contract and example. It does not provide high-level runnable
+   integration or general CPU-strategy parity.<ul>
+<li><a href="../../Examples/gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>
+   — fixed-four-substep low-level direct-kernel physics, conservation, and
+     energy evidence, with Warp CPU as the installed-Warp baseline; CUDA is
+     optional additive evidence</li>
+<li><a href="condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>
+   — deferred work only; it does not alter Epic D production capability or
+     activate later epics</li>
+<li>The walkthrough's caller-owned, write-only <code>energy_transfer</code> diagnostic
+   is not a return value or temperature feedback (<code>kg * J/kg = J</code>). It
+   preserves fixed-four-substep direct-kernel scope: no strategy/<code>Runnable</code>
+   parity, adaptive stepping, graph capture/replay, broad autodiff, or
+   performance claim.</li>
+<li>Focused evidence commands:
+   <code>python docs/Examples/gpu_condensation_parity_walkthrough.py</code>,
+   <code>pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror</code>,
+   and <code>pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror</code>.</li>
+</ul>
+</li>
 </ul>
 <h3 id="active">Active<a class="headerlink" href="#active" title="Permanent link">&para;</a></h3>
 <ul>

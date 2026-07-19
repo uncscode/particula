@@ -11417,6 +11417,8 @@
       
         
       
+        
+      
     
     
     
@@ -11489,6 +11491,34 @@
     
   
     GPU Coagulation Validation Record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../condensation-parity-walkthrough/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Condensation Parity Walkthrough Ownership Record
   
 
     
@@ -16779,6 +16809,20 @@ stepping, unsupported physics, graph capture/replay, broad autodiff, and
 general CPU-strategy parity remain future work outside the shipped scope.
 This leaves temperature feedback, gas mutation beyond the P2-finalized direct
 coupling, and all higher-level process integration outside this milestone.</p>
+<p>The <a href="../../../Examples/gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>
+provides fixed-four-substep low-level direct-kernel physics, conservation, and
+energy evidence. Run:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/gpu_condensation_parity_walkthrough.py
+pytest<span class="w"> </span>particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/tests/condensation_parity_walkthrough_docs_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+</code></pre></div>
+<p>Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
+The <a href="../condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>
+documents deferred work only, including temperature feedback, high-level
+integration, adaptive stepping, graph replay, broad autodiff, and performance;
+it does not change production capability. The caller-owned, write-only
+<code>energy_transfer</code> diagnostic is not a return value or temperature feedback
+(<code>kg * J/kg = J</code>).</p>
 <h2 id="epic-e-gpu-coagulation-physics-coverage">Epic E: GPU Coagulation Physics Coverage<a class="headerlink" href="#epic-e-gpu-coagulation-physics-coverage" title="Permanent link">&para;</a></h2>
 <p>Status: active. Epic E is the next ordered epic after the shipped E4 plan.</p>
 <p>Extend GPU coagulation beyond the Brownian kernel to the collision

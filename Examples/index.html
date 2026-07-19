@@ -11448,6 +11448,8 @@
       
         
       
+        
+      
     
     
     
@@ -11517,6 +11519,34 @@
     
   
     GPU Coagulation Validation Record
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Features/Roadmap/condensation-parity-walkthrough/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Condensation Parity Walkthrough Ownership Record
   
 
     
@@ -14452,7 +14482,20 @@ CPU-only and optional Warp CPU-backend flow.</p>
   fixed-shape fp64 scratch/latent/energy sidecars reused across explicit
   calls, gas coupling, and explicit final checkpoint restoration
 - <a href="../Features/data-containers-and-gpu-foundations/">Canonical low-level direct-condensation contract</a>
-  — supported low-level scope and boundaries</p>
+  — supported low-level scope and boundaries
+- <a href="gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>
+  — explicit-transfer, fixed-four-substep low-level direct-kernel evidence
+    with separately reported physics, conservation, and energy results
+- <a href="../Features/Roadmap/condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>
+  — deferred-capability ownership without expanding production support</p>
+<p>Run <code>python docs/Examples/gpu_condensation_parity_walkthrough.py</code>, then
+<code>pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror</code>
+and <code>pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror</code>.
+ Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
+ Its caller-owned, write-only <code>energy_transfer</code> output is a diagnostic, not
+ a return value or temperature feedback (<code>kg * J/kg = J</code>). This direct-kernel
+ example does not add high-level integration, adaptive execution, graph
+ replay, broad autodiff, or performance claims.</p>
 <p><a href="Data_Containers/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Guide</a></p>
 </li>
 <li>
