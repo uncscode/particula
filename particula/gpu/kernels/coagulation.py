@@ -88,9 +88,15 @@ from particula.gpu.dynamics.condensation_funcs import (
     particle_radius_from_volume_wp,
 )
 from particula.gpu.kernels._coagulation_config import (
+    _COAGULATION_MECHANISM_FLAGS,  # noqa: F401
+    BROWNIAN_MECHANISM,  # noqa: F401
     BROWNIAN_MECHANISM_FLAG,
+    CANONICAL_COAGULATION_MECHANISMS,  # noqa: F401
+    CHARGED_HARD_SPHERE_MECHANISM,  # noqa: F401
     CHARGED_HARD_SPHERE_MECHANISM_FLAG,
+    SEDIMENTATION_SP2016_MECHANISM,  # noqa: F401
     SEDIMENTATION_SP2016_MECHANISM_FLAG,
+    TURBULENT_SHEAR_ST1956_MECHANISM,  # noqa: F401
     TURBULENT_SHEAR_ST1956_MECHANISM_FLAG,
     CoagulationMechanismConfig,
     _ResolvedCoagulationMechanismConfig,
