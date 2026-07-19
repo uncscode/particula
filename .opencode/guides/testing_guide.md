@@ -181,9 +181,9 @@ pytest particula/gpu/tests/cuda_availability_test.py -q
 pytest particula/gpu/kernels/tests/environment_test.py -q
 pytest particula/gpu/kernels/tests/thermodynamics_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and gpu_parity"
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -m "warp and stochastic"
-pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and not cuda" -Werror
+pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
 ```
 
 Use CUDA-targeted runs only for optional local/manual validation when a
@@ -197,6 +197,8 @@ pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -W
 pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and cuda" -Werror
 ```
 
+For the full fixed-mask contract, see the
+[GPU coagulation validation record](../../docs/Features/Roadmap/coagulation-validation.md).
 These commands match the shipped marker and helper contract:
 
 - Warp CPU is the baseline parity backend when Warp is installed.
@@ -208,11 +210,28 @@ These commands match the shipped marker and helper contract:
   dependency.
 - Benchmark coverage stays opt-in behind `--benchmark` and remains separate
   from the default release-validation path above.
+- Marker selection describes test intent; it does not select a device. In
+  particular, deterministic P2 public-step checks enumerate available Warp
+  devices, so they are not strictly CPU-only when CUDA is available.
 
-The coagulation stochastic-validation matrix covers all executable mechanism
-masks with 100 fresh seeds per row and device. It compares aggregate accepted
-collisions to an independent initial-state expectation using a three-sigma
-bound; it does not require matching per-seed trajectories across devices.
+The coagulation validation matrix supports exactly the singleton masks `1`,
+`2`, `4`, and `8`; two-way masks `3`, `5`, `6`, `9`, `10`, and `12`; and
+four-way mask `15`. The three-way masks `7`, `11`, `13`, and `14` remain
+deferred/fail closed. P1 uses `rtol=1e-7, atol=0` for Brownian and
+`rtol=1e-6, atol=0` for other positive/additive rate, property, and majorant
+comparisons; physical zeros are exact. P2 keeps concentration-weighted,
+per-box/per-species inventory at `rtol=1e-12, atol=1e-30` and separates that
+ownership evidence from stochastic acceptance.
+
+The P3 coagulation stochastic-validation matrix uses 100 fresh seeds for every
+executable row and device. It compares aggregate accepted collisions with an
+independent initial-state expectation using `3 * sqrt(expected_mean)`. This
+bound is neither conservation evidence nor an exact accepted-pair, seed, RNG,
+CPU/Warp, or CUDA replay requirement.
+
+The record is limited to the existing direct path: it makes no mandatory-CUDA,
+production-API, new-physics, performance, CPU-fallback, runnable, graph-capture,
+autodiff, or adaptive-stepping conclusion.
 
 GPU thermodynamics refresh coverage belongs in
 `particula/gpu/kernels/tests/thermodynamics_test.py`. Test explicit
