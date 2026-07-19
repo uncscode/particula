@@ -1,9 +1,9 @@
 # Scope
 
-Deliver a standalone, deterministic CPU/Warp direct-condensation walkthrough,
-its regression coverage, and a durable deferred-capability ownership table.
-The CPU side is an independent NumPy fixed-four-substep oracle for the bounded
-low-level contract, not the high-level CPU strategy or `Runnable` path.
+Delivered a standalone, deterministic CPU/Warp direct-condensation walkthrough
+and its regression coverage. The CPU side is an independent NumPy
+fixed-four-substep oracle for the bounded low-level contract, not the high-level
+CPU strategy or `Runnable` path.
 
 ## In Scope
 
@@ -13,16 +13,13 @@ low-level contract, not the high-level CPU strategy or `Runnable` path.
   evaporation, gas coupling, and latent-heat bookkeeping observable.
 - Run on Warp `device="cpu"` whenever Warp is installed; allow optional CUDA as
   additive evidence with a clean unavailable-device skip.
-- Report physics parity for final particle masses and gas concentrations.
-- Report per-box/per-species concentration-weighted particle-plus-gas inventory
-  conservation separately from physics parity.
-- Report signed `energy_transfer = finalized mass transfer * latent_heat`
-  separately from both parity and conservation.
-- Record owner, entry gate, and non-claim for phase-aware surface tension, BAT
-  activity, `thermal_work` consumption and temperature feedback, adaptive
-  stepping, high-level integration, graph capture/replay, broad autodiff,
-  general CPU-strategy parity, and other explicitly deferred boundaries.
-- Add regression and documentation-link checks with each phase.
+- Compare final particle masses, gas concentrations, total finalized transfer,
+  final raw proposal, and energy against the independent oracle on available
+  Warp CPU and optional CUDA routes.
+- Exercise no-Warp and force-disabled routes without concrete runtime imports,
+  conversion, allocation, synchronization, or kernel execution.
+- Document explicit CPU/Warp transfers, caller-owned scratch/energy sidecars,
+  synchronization, and recovery after a potentially partial failed call.
 
 ## Out of Scope
 
@@ -31,5 +28,5 @@ low-level contract, not the high-level CPU strategy or `Runnable` path.
 - Temperature evolution, adaptive stepping, new activity/surface-tension
   physics, graph replay, broad autodiff, or backend-selection implementation.
 - Performance targets, mixed/lower precision migration, or required CUDA CI.
-- Coagulation work owned by E5-F1 through E5-F7 or roadmap closeout owned by
-  E5-F9.
+- Deferred-capability ownership tables, broad documentation/index changes, and
+  category-isolation reporting infrastructure planned in later E5-F8 phases.

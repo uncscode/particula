@@ -2,9 +2,10 @@
 
 ## High-Level Design
 
-This is an evidence and ownership feature layered on the shipped direct-kernel
-API. The walkthrough owns fixture construction and reporting; production
-condensation code remains unchanged.
+This implemented evidence feature is layered on the shipped direct-kernel API.
+The walkthrough owns fixture construction, the independent oracle, explicit
+Warp sidecars, and synchronized observations; production condensation code is
+unchanged.
 
 ```text
 Immutable physical fixture constants
@@ -16,43 +17,40 @@ Immutable physical fixture constants
                 +--> synchronize and copy observations
 
 expected + observations
-  +--> PHYSICS: particle mass and gas concentration parity
-  +--> CONSERVATION: initial vs final particle-plus-gas inventory
-  +--> ENERGY: signed finalized transfer times latent heat
-
-three independent results + support boundary
-  +--> published walkthrough
-  +--> deferred capability -> owner -> entry gate -> explicit non-claim table
+  +--> masses / gas / P2 total / final raw proposal / energy comparisons
+  +--> concentration-weighted inventory diagnostic in Warp regression coverage
 ```
 
-The result model should keep category name, observed metric, tolerance, and
-pass/fail state separate. The command must fail overall if any required
-category fails, while still printing all category diagnostics.
+`run_example(device="cpu")` returns the completed oracle and, when enabled,
+the restored particle/gas state plus copied raw-proposal, total-transfer, and
+energy observations. No-Warp routes return the completed oracle with the exact
+message `oracle completed; no kernel ran`. Enabled-route errors propagate; the
+detached Warp source and sidecars must be discarded and rebuilt before retrying.
 
 ## Data / API / Workflow Changes
 
 - **Data Model:** No production schema changes. The example may use a small
   local immutable fixture/result structure solely for deterministic reporting.
-- **API Surface:** No package export. Add a directly runnable documentation
-  example and a Markdown evidence/ownership record.
-- **Workflow Hooks:** E5-F8 depends only on shipped E4. E5-F9 consumes stable
-  artifact links and results. The normal documentation and pytest workflows
-  validate the files; CUDA remains optional.
+- **API Surface:** No package export. The shipped user-facing artifact is
+  `docs/Examples/gpu_condensation_parity_walkthrough.py`.
+- **Workflow Hooks:** The co-located pytest module validates CPU-safe,
+  force-disabled, fake enabled, failure-recovery, Warp-CPU, and optional CUDA
+  routes. CUDA remains optional.
 - **Ownership Boundary:** CPU expected arrays must not alias or be generated
   from Warp output arrays. Caller-owned `energy_transfer` is synchronized and
   observed as diagnostic state, not treated as a third return value.
 
 ## Acceptance Categories
 
-| Category | Quantity | Planned criterion |
+| Category | Quantity | Implemented criterion |
 |----------|----------|-------------------|
-| Physics | Final particle masses and gas concentrations vs independent oracle | Explicit per-field `rtol`/`atol` recorded beside each result; use the existing deterministic fp64 parity envelope and never conservation tolerance as a substitute. |
-| Conservation | Per-box/per-species concentration-weighted particle-plus-gas inventory | `rtol=1e-12`, `atol=1e-30`, reported independently of oracle agreement. |
-| Energy | `Q = sum_particles(Delta m_finalized) * L` by box/species | `rtol=1e-12`, `atol=1e-18`; condensation positive, evaporation negative. |
+| Parity | Final particle masses, gas concentrations, total transfer, final raw proposal, and energy vs independent oracle | `rtol=1e-10`, `atol=1e-30` in installed-Warp CPU/CUDA tests. |
+| Inventory | Per-box/per-species concentration-weighted particle-plus-gas inventory | `rtol=1e-10`, `atol=1e-30` in Warp-CPU regression coverage. |
+| Energy | `sum_particles(Delta m_finalized) * latent_heat` by box/species | Oracle identity at `rtol=1e-12`, `atol=1e-30`; parity coverage uses the direct-kernel envelope. |
 
-Final P2 physics tolerances must be copied from the current canonical
-`condensation_test.py` fixtures during implementation and printed in the
-walkthrough rather than invented or silently relaxed.
+The example labels completed oracle and synchronized Warp observations; it does
+not implement the separately labeled pass/fail reporting system planned for a
+later phase.
 
 ## Security & Compliance
 

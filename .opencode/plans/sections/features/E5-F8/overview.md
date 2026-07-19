@@ -10,11 +10,11 @@ capabilities are described in several documents without one ownership record.
 
 ## Value Proposition
 
-E5-F8 publishes a deterministic Warp CPU walkthrough whose expected values are
-built independently from the Warp execution state. It gives reviewers one
-reproducible report with separate pass/fail criteria and gives roadmap owners a
-single record for work that the bounded direct kernel does not claim. CUDA is
-optional evidence and cannot replace the required Warp CPU result.
+Issue #1367 delivered the deterministic fp64 walkthrough and its co-located
+regression tests. The example completes a detached NumPy fixed-four-substep
+oracle before it conditionally imports or allocates Warp state, then exposes
+separately synchronized direct-kernel observations. CUDA remains optional
+additive evidence; Warp CPU is exercised when Warp is installed.
 
 ## User Stories
 
@@ -24,9 +24,10 @@ optional evidence and cannot replace the required Warp CPU result.
 - As a release maintainer, I want conservation and energy checks to remain
   distinct from numerical parity so that one passing metric cannot mask a
   failure in another invariant.
-- As a roadmap owner, I want every deferred condensation capability assigned to
-  a named downstream epic or approval lane so that limitations are not mistaken
-  for abandoned or shipped work.
+
+The implementation remains bounded direct-kernel evidence: it does not claim
+high-level CPU strategy or `Runnable` parity, adaptive stepping, performance,
+or required CUDA support.
 
 Parent context: [E5](../../epics/E5/child_plans.md), track T8. E5-F8 closes
 the E4 carry-forward independently of coagulation tracks E5-F1 through E5-F7;
