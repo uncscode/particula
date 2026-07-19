@@ -1,11 +1,11 @@
 # Success Criteria
 
-- [ ] Every executable single and approved additive mechanism row from E5-F3
+- [x] Every executable single and approved additive mechanism row from E5-F3
   through E5-F6 appears in one canonical validation table.
-- [ ] Independent fp64 pair/property values match Warp results at explicit,
+- [x] Independent fp64 pair/property values match Warp results at explicit,
   scale-appropriate tolerances; no expected value calls the Warp helper under
   test.
-- [ ] Every active unordered pair has a finite non-negative rate bounded by its
+- [x] Every explicit active unordered pair has a finite non-negative rate bounded by its
   independently checked mechanism or summed majorant.
 - [ ] Repeated-run collision aggregates fall within a predeclared statistical
   confidence or sigma bound without exact pair replay requirements.

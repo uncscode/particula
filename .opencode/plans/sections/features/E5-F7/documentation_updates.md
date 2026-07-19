@@ -22,3 +22,9 @@
 
 No `README` or top-level public import update is required unless E5-F9 chooses
 to surface the validation commands there; E5-F7 introduces no production API.
+
+## Status
+
+Issue #1362 added private validation-only test coverage and made no user-facing
+documentation changes. The planned public evidence matrix and documentation
+updates remain P4 work.

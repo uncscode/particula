@@ -17,6 +17,16 @@ invariants, edge cases, and device coverage so each claim has an explicit
 pass/fail result. Warp CPU is the required baseline when Warp is installed;
 CUDA is optional additive evidence and skips cleanly when unavailable.
 
+## Implementation Status
+
+Issue #1362 completed the deterministic P1 slice. It adds private test-only
+fixture/oracle support and a collection-safe Warp-CPU observation matrix for
+the literal executable masks `1`, `2`, `3`, `4`, `5`, `6`, `8`, `9`, `10`,
+`12`, and `15`; deferred three-way masks `7`, `11`, `13`, and `14` are covered
+as host-only configuration failures. No production behavior, public API, or
+user documentation changed. Conservation, ownership, stochastic, CUDA, and
+published-evidence work remain subsequent phases.
+
 ## User Stories
 
 - As a scientific user, I want independently calculated pair-rate parity so I

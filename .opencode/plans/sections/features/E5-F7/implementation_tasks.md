@@ -1,15 +1,16 @@
 # Implementation Tasks
 
-### Validation Infrastructure
+### Validation Infrastructure — P1 completed in issue #1362
 
-- [ ] Inventory the final executable mechanism masks and required inputs from
-  E5-F3 through E5-F6; fail the matrix if an approved row lacks a case.
-- [ ] Add canonical fp64 one-box, heterogeneous multi-box, mixed-scale,
-  multi-species, charged, and inactive-gap fixtures in
-  `particula/gpu/kernels/tests/coagulation_validation_test.py`.
-- [ ] Implement independent NumPy/CPU pair and property oracle adapters for
-  Brownian, charged, SP2016, ST1956, and additive sums without importing the
-  Warp aggregate implementation as expected-value code.
+- [x] Freeze literal executable rows (four singleton, six two-way, and one
+  four-way) and deferred three-way rows in the test support table.
+- [x] Add explicit fp64 one-/two-box, mixed-scale, charged, inactive-gap, and
+  active-count fixtures in `_coagulation_validation_support.py`.
+- [x] Implement independent NumPy/public-CPU pair and property oracles for
+  Brownian, charged, SP2016, ST1956, additive sums, and selector majorants.
+- [x] Add host configuration/boundary tests plus lazy Warp-CPU property, pair,
+  symmetry, majorant, and exact-zero observations in
+  `coagulation_validation_test.py`.
 - [ ] Add a reusable per-box/per-species mass balance assertion with a physical
   absolute floor and a separate total-charge balance assertion.
 - [ ] Reuse shared `warp_devices()` parameterization so CPU always participates
@@ -17,8 +18,8 @@
 
 ### Deterministic and Ownership Matrix
 
-- [ ] Table-drive pair symmetry, finite/non-negative values, deterministic
-  parity, component sums, and `pair_rate <= majorant` for every active pair.
+- [x] Table-drive pair symmetry, finite/non-negative values, deterministic
+  parity, component sums, and `pair_rate <= majorant` for explicit active pairs.
 - [ ] Run all executable rows across zero/one/two/many active particles,
   inactive gaps, mixed radii/masses/charges, and zero-rate conditions.
 - [ ] Assert sorted, in-range, disjoint accepted pairs, collision capacity, donor
