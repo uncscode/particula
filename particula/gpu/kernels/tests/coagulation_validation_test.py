@@ -528,3 +528,486 @@ def test_sparse_active_boundaries_have_no_pair_rate_or_majorant(
     observed = _observe(name, 15)
     assert observed["majorant"][0] == 0.0
     assert np.count_nonzero(observed["rates"][0]) == 0
+
+
+def _materialize_public_particles(
+    fixture: Any,
+    *,
+    n_species: int,
+    active_by_box: tuple[tuple[int, ...], ...] | None = None,
+) -> Any:
+    """Build a CPU particle container with active and inactive sentinels."""
+    from particula.particles.particle_data import ParticleData
+
+    active_by_box = active_by_box or fixture.active
+    n_boxes, n_particles = fixture.radii.shape
+    masses = np.full((n_boxes, n_particles, n_species), 7.0e-31)
+    concentration = np.full((n_boxes, n_particles), 17.0)
+    charge = np.full((n_boxes, n_particles), 29.0)
+    fractions = np.arange(1, n_species + 1, dtype=np.float64)
+    fractions /= fractions.sum()
+    sphere_mass = fixture.masses
+    for box, active in enumerate(active_by_box):
+        concentration[box, :] = 0.0
+        for slot in active:
+            masses[box, slot] = sphere_mass[box, slot] * fractions
+            concentration[box, slot] = 1.0
+            charge[box, slot] = fixture.charges[box, slot]
+    return ParticleData(
+        masses=masses,
+        concentration=concentration,
+        charge=charge,
+        density=np.full(n_species, 1000.0),
+        volume=np.linspace(1.0e-18, 2.0e-18, n_boxes),
+    )
+
+
+def _public_snapshot(
+    particles: Any, pairs: Any, counts: Any, states: Any
+) -> dict[str, np.ndarray]:
+    """Synchronize the mutable public state used by one public-step call."""
+    return {
+        "masses": particles.masses.numpy().copy(),
+        "concentration": particles.concentration.numpy().copy(),
+        "charge": particles.charge.numpy().copy(),
+        "pairs": pairs.numpy().copy(),
+        "counts": counts.numpy().copy(),
+        "states": states.numpy().copy(),
+    }
+
+
+def _run_on_warp_devices(wp: Any) -> list[str]:
+    """Return available Warp devices after Warp has been imported lazily."""
+    from particula.gpu.tests.cuda_availability import warp_devices
+
+    return warp_devices(wp)
+
+
+def _assert_public_invariants(
+    initial: dict[str, np.ndarray],
+    final: dict[str, np.ndarray],
+    active_by_box: tuple[tuple[int, ...], ...],
+    *,
+    charge_transfers: bool,
+) -> None:
+    """Assert public collision buffers and particle bookkeeping invariants."""
+    initial_inventory = np.sum(
+        initial["masses"] * initial["concentration"][..., None], axis=1
+    )
+    final_inventory = np.sum(
+        final["masses"] * final["concentration"][..., None], axis=1
+    )
+    npt.assert_allclose(
+        final_inventory, initial_inventory, rtol=1e-12, atol=1e-30
+    )
+    if charge_transfers:
+        npt.assert_array_equal(
+            final["charge"].sum(axis=1), initial["charge"].sum(axis=1)
+        )
+    for box, active in enumerate(active_by_box):
+        count = int(final["counts"][box])
+        pairs = final["pairs"][box, :count]
+        assert 0 <= count <= final["pairs"].shape[1]
+        assert np.all(pairs[:, 0] < pairs[:, 1]) if count else True
+        if count > 1:
+            assert np.all(
+                np.lexsort((pairs[:, 1], pairs[:, 0])) == np.arange(count)
+            )
+        used = [int(slot) for pair in pairs for slot in pair]
+        assert len(used) == len(set(used))
+        assert set(used) <= set(active)
+        inactive = sorted(set(range(final["charge"].shape[1])) - set(active))
+        npt.assert_array_equal(
+            final["masses"][box, inactive], initial["masses"][box, inactive]
+        )
+        npt.assert_array_equal(
+            final["concentration"][box, inactive],
+            initial["concentration"][box, inactive],
+        )
+        npt.assert_array_equal(
+            final["charge"][box, inactive], initial["charge"][box, inactive]
+        )
+        for recipient, donor in pairs:
+            npt.assert_array_equal(final["masses"][box, donor], 0.0)
+            assert final["concentration"][box, donor] == 0.0
+            assert final["charge"][box, donor] == 0.0
+            npt.assert_allclose(
+                final["masses"][box, recipient],
+                initial["masses"][box, recipient]
+                + initial["masses"][box, donor],
+                rtol=1e-12,
+                atol=1e-30,
+            )
+            assert final["charge"][box, recipient] == (
+                initial["charge"][box, recipient]
+                + initial["charge"][box, donor]
+            )
+
+
+def _run_public_case(
+    row: Any,
+    fixture: Any,
+    *,
+    n_species: int,
+    max_collisions: int,
+    device: str,
+    turbulent_arrays: bool = False,
+    active_by_box: tuple[tuple[int, ...], ...] | None = None,
+) -> tuple[dict[str, np.ndarray], dict[str, np.ndarray], Any, Any, Any]:
+    """Execute one caller-owned public-step case and return its snapshots."""
+    wp = _require_warp()
+    from particula.gpu.conversion import to_warp_particle_data
+    from particula.gpu.kernels.coagulation import coagulation_step_gpu
+
+    particles = to_warp_particle_data(
+        _materialize_public_particles(
+            fixture, n_species=n_species, active_by_box=active_by_box
+        ),
+        device=device,
+    )
+    active_device = particles.masses.device
+    n_boxes, n_particles = fixture.radii.shape
+    pairs = wp.full(
+        (n_boxes, max_collisions, 2), -31, dtype=wp.int32, device=active_device
+    )
+    counts = wp.full((n_boxes,), -17, dtype=wp.int32, device=active_device)
+    states = wp.full((n_boxes,), 41, dtype=wp.uint32, device=active_device)
+    initial = _public_snapshot(particles, pairs, counts, states)
+    kwargs: dict[str, Any] = {}
+    if row.mask & 8:
+        if turbulent_arrays:
+            kwargs["turbulent_dissipation"] = wp.array(
+                np.maximum(fixture.dissipation, 1.0e-8),
+                dtype=wp.float64,
+                device=active_device,
+            )
+            kwargs["fluid_density"] = wp.array(
+                fixture.fluid_density, dtype=wp.float64, device=active_device
+            )
+        else:
+            kwargs["turbulent_dissipation"] = 2.0e-4
+            kwargs["fluid_density"] = 1.2
+    result, returned_pairs, returned_counts = coagulation_step_gpu(
+        particles,
+        temperature=wp.array(
+            fixture.temperature, dtype=wp.float64, device=active_device
+        ),
+        pressure=wp.array(
+            fixture.pressure, dtype=wp.float64, device=active_device
+        ),
+        time_step=1.0,
+        volume=particles.volume,
+        max_collisions=max_collisions,
+        rng_seed=41,
+        collision_pairs=pairs,
+        n_collisions=counts,
+        rng_states=states,
+        initialize_rng=True,
+        mechanism_config=CoagulationMechanismConfig(mechanisms=row.mechanisms),
+        **kwargs,
+    )
+    assert result is particles
+    assert returned_pairs is pairs
+    assert returned_counts is counts
+    return (
+        initial,
+        _public_snapshot(particles, pairs, counts, states),
+        particles,
+        pairs,
+        counts,
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "row", EXECUTABLE_ROWS, ids=lambda row: f"mask_{row.mask}"
+)
+@pytest.mark.parametrize("fixture_name", ("normal", "two_box"))
+@pytest.mark.parametrize("n_species", (1, 2))
+def test_public_step_preserves_state_integrity_for_executable_masks(
+    row: Any, fixture_name: str, n_species: int
+) -> None:
+    """Every executable public mask preserves inventory, ownership, and slots."""
+    wp = _require_warp()
+    fixture = FIXTURES[fixture_name]
+    for device in _run_on_warp_devices(wp):
+        initial, final, _, _, _ = _run_public_case(
+            row, fixture, n_species=n_species, max_collisions=1, device=device
+        )
+        _assert_public_invariants(
+            initial, final, fixture.active, charge_transfers=bool(row.mask & 2)
+        )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize("name", ("zero_active", "one_active"))
+def test_public_step_sparse_inputs_are_exact_noops(name: str) -> None:
+    """Zero and one active slots leave all caller-owned particle state intact."""
+    wp = _require_warp()
+    row = EXECUTABLE_ROWS[0]
+    fixture = FIXTURES[name]
+    for device in _run_on_warp_devices(wp):
+        initial, final, _, _, _ = _run_public_case(
+            row, fixture, n_species=2, max_collisions=1, device=device
+        )
+        npt.assert_array_equal(final["masses"], initial["masses"])
+        npt.assert_array_equal(final["concentration"], initial["concentration"])
+        npt.assert_array_equal(final["charge"], initial["charge"])
+        npt.assert_array_equal(final["counts"], [0])
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_zero_collision_capacity_is_rejected_at_public_preflight() -> None:
+    """The public API rejects zero capacity rather than silently truncating."""
+    wp = _require_warp()
+    row = next(row for row in EXECUTABLE_ROWS if row.mask == 1)
+    fixture = FIXTURES["normal"]
+    for device in _run_on_warp_devices(wp):
+        with pytest.raises(
+            ValueError, match="^max_collisions must be a positive integer"
+        ):
+            _run_public_case(
+                row, fixture, n_species=2, max_collisions=0, device=device
+            )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_two_active_slots_only_merge_the_single_local_pair() -> None:
+    """A two-slot case may only select its sole in-box active pair."""
+    wp = _require_warp()
+    row = next(row for row in EXECUTABLE_ROWS if row.mask == 1)
+    fixture = FIXTURES["normal"]
+    active_by_box = ((0, 2),)
+    for device in _run_on_warp_devices(wp):
+        initial, final, _, _, _ = _run_public_case(
+            row,
+            fixture,
+            n_species=2,
+            max_collisions=1,
+            device=device,
+            active_by_box=active_by_box,
+        )
+        _assert_public_invariants(
+            initial, final, active_by_box, charge_transfers=True
+        )
+        if final["counts"][0]:
+            npt.assert_array_equal(final["pairs"][0, 0], [0, 2])
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("mask", "fixture_name"),
+    ((2, "repulsive"), (4, "equal_velocity")),
+)
+def test_zero_effective_rate_cases_do_not_mutate_particles(
+    mask: int, fixture_name: str
+) -> None:
+    """Full enabled zero-rate mechanisms cleanly return without a merge."""
+    wp = _require_warp()
+    row = next(row for row in EXECUTABLE_ROWS if row.mask == mask)
+    fixture = FIXTURES[fixture_name]
+    for device in _run_on_warp_devices(wp):
+        initial, final, _, _, _ = _run_public_case(
+            row, fixture, n_species=1, max_collisions=1, device=device
+        )
+        npt.assert_array_equal(final["masses"], initial["masses"])
+        npt.assert_array_equal(final["concentration"], initial["concentration"])
+        npt.assert_array_equal(final["charge"], initial["charge"])
+        npt.assert_array_equal(final["counts"], 0)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize("mask", (8, 10))
+def test_turbulent_public_inputs_accept_scalars_and_device_arrays(
+    mask: int,
+) -> None:
+    """Turbulent scalar and caller-owned fp64 arrays preserve invariants."""
+    wp = _require_warp()
+    row = next(row for row in EXECUTABLE_ROWS if row.mask == mask)
+    fixture = FIXTURES["two_box"]
+    for device in _run_on_warp_devices(wp):
+        for turbulent_arrays in (False, True):
+            initial, final, _, _, _ = _run_public_case(
+                row,
+                fixture,
+                n_species=2,
+                max_collisions=1,
+                device=device,
+                turbulent_arrays=turbulent_arrays,
+            )
+            _assert_public_invariants(
+                initial, final, fixture.active, charge_transfers=bool(mask & 2)
+            )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_persistent_rng_advances_only_after_explicit_initialization() -> None:
+    """Caller-owned RNG state is reset only through initialize_rng=True."""
+    wp = _require_warp()
+    from particula.gpu.conversion import to_warp_particle_data
+    from particula.gpu.kernels.coagulation import coagulation_step_gpu
+
+    fixture = FIXTURES["normal"]
+    row = next(row for row in EXECUTABLE_ROWS if row.mask == 1)
+    device = "cpu"
+    states = wp.zeros((1,), dtype=wp.uint32, device=device)
+    particles = to_warp_particle_data(
+        _materialize_public_particles(fixture, n_species=1), device=device
+    )
+    kwargs = dict(
+        temperature=298.15,
+        pressure=101325.0,
+        time_step=1.0,
+        volume=particles.volume,
+        max_collisions=1,
+        rng_seed=73,
+        rng_states=states,
+        mechanism_config=CoagulationMechanismConfig(mechanisms=row.mechanisms),
+    )
+    coagulation_step_gpu(particles, initialize_rng=True, **kwargs)
+    initialized = states.numpy().copy()
+    coagulation_step_gpu(particles, initialize_rng=False, **kwargs)
+    advanced = states.numpy().copy()
+    assert not np.array_equal(advanced, initialized)
+    control = wp.zeros((1,), dtype=wp.uint32, device=device)
+    control_particles = to_warp_particle_data(
+        _materialize_public_particles(fixture, n_species=1), device=device
+    )
+    coagulation_step_gpu(
+        control_particles,
+        **{**kwargs, "rng_states": control, "initialize_rng": True},
+    )
+    npt.assert_array_equal(control.numpy(), initialized)
+
+
+def _assert_snapshot_unchanged(
+    before: dict[str, np.ndarray], after: dict[str, np.ndarray]
+) -> None:
+    """Require a rejected public preflight to leave every owned buffer intact."""
+    for key in before:
+        npt.assert_array_equal(after[key], before[key])
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize("mask", (7, 11, 13, 14))
+def test_deferred_masks_are_atomic_before_caller_owned_state_changes(
+    mask: int,
+) -> None:
+    """Deferred configurations leave particles, outputs, and RNG reusable."""
+    wp = _require_warp()
+    from particula.gpu.conversion import to_warp_particle_data
+    from particula.gpu.kernels.coagulation import coagulation_step_gpu
+
+    row = next(row for row in DEFERRED_ROWS if row.mask == mask)
+    fixture = FIXTURES["normal"]
+    particles = to_warp_particle_data(
+        _materialize_public_particles(fixture, n_species=2), device="cpu"
+    )
+    pairs = wp.full((1, 1, 2), -7, dtype=wp.int32, device="cpu")
+    counts = wp.full((1,), -7, dtype=wp.int32, device="cpu")
+    states = wp.full((1,), 17, dtype=wp.uint32, device="cpu")
+    before = _public_snapshot(particles, pairs, counts, states)
+    kwargs: dict[str, Any] = {}
+    if mask & 8:
+        kwargs = {"turbulent_dissipation": 2.0e-4, "fluid_density": 1.2}
+    with pytest.raises(
+        ValueError, match="^Additive coagulation execution is deferred\\.$"
+    ):
+        coagulation_step_gpu(
+            particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(
+                mechanisms=row.mechanisms
+            ),
+            **kwargs,
+        )
+    _assert_snapshot_unchanged(
+        before, _public_snapshot(particles, pairs, counts, states)
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "failure",
+    (
+        "charge",
+        "sedimentation_mass",
+        "sedimentation_concentration",
+        "sedimentation_density",
+        "turbulent_missing",
+        "turbulent_nonpositive",
+    ),
+)
+def test_selected_public_preflight_failures_are_atomic(failure: str) -> None:
+    """Enabled-term validation rejects invalid state before output or RNG work."""
+    wp = _require_warp()
+    from particula.gpu.conversion import to_warp_particle_data
+    from particula.gpu.kernels.coagulation import coagulation_step_gpu
+
+    fixture = FIXTURES["normal"]
+    cpu_particles = _materialize_public_particles(fixture, n_species=1)
+    if failure == "charge":
+        cpu_particles.charge[0, 0] = np.nan
+        mechanisms = ("charged_hard_sphere",)
+        kwargs: dict[str, Any] = {}
+        message = "particle charge"
+    elif failure == "sedimentation_mass":
+        cpu_particles.masses[0, 0, 0] = np.nan
+        mechanisms = ("sedimentation_sp2016",)
+        kwargs = {}
+        message = "sedimentation particle"
+    elif failure == "sedimentation_concentration":
+        cpu_particles.concentration[0, 0] = np.nan
+        mechanisms = ("sedimentation_sp2016",)
+        kwargs = {}
+        message = "sedimentation particle concentration"
+    elif failure == "sedimentation_density":
+        cpu_particles.density[0] = 0.0
+        mechanisms = ("sedimentation_sp2016",)
+        kwargs = {}
+        message = "sedimentation particle density"
+    else:
+        mechanisms = ("turbulent_shear_st1956",)
+        kwargs = {
+            "turbulent_dissipation": None
+            if failure == "turbulent_missing"
+            else -1.0,
+            "fluid_density": 1.2,
+        }
+        message = "turbulent_dissipation"
+    particles = to_warp_particle_data(cpu_particles, device="cpu")
+    pairs = wp.full((1, 1, 2), -7, dtype=wp.int32, device="cpu")
+    counts = wp.full((1,), -7, dtype=wp.int32, device="cpu")
+    states = wp.full((1,), 17, dtype=wp.uint32, device="cpu")
+    before = _public_snapshot(particles, pairs, counts, states)
+    with pytest.raises(ValueError, match=message):
+        coagulation_step_gpu(
+            particles,
+            temperature=298.15,
+            pressure=101325.0,
+            time_step=1.0,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=states,
+            initialize_rng=True,
+            mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
+            **kwargs,
+        )
+    _assert_snapshot_unchanged(
+        before, _public_snapshot(particles, pairs, counts, states)
+    )
