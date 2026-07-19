@@ -17,13 +17,13 @@
 
 ## Documentation
 
-- [ ] Add `docs/Features/Roadmap/condensation-parity-walkthrough.md` explaining
-  the independent setup, equations, thresholds, commands, and bounded claim.
-- [ ] Add a complete deferred-capability ownership table with owner, entry gate,
-  and explicit E5-F8 non-claim for every carry-forward item.
-- [ ] Assign phase-aware surface tension and BAT activity to a separately
+- [x] Add `docs/Features/Roadmap/condensation-parity-walkthrough.md` as the P3
+  bounded-evidence and deferred-capability ownership record.
+- [x] Add a complete 14-row deferred-capability ownership table with owner,
+  entry gate, and explicit E5-F8 non-claim for every carry-forward item.
+- [x] Assign phase-aware surface tension and BAT activity to a separately
   approved condensation-physics expansion rather than implying current support.
-- [ ] Assign thermal feedback/adaptive stepping to a future approved
+- [x] Assign thermal feedback/adaptive stepping to a future approved
   condensation numerical-method plan; assign high-level backend/`Runnable`
   work and general workflow parity to Epic G, capture and performance work to
   Epic H, and broad autodiff to Epic I.
@@ -35,8 +35,9 @@
 - [x] Add
   `particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py` for import,
   deterministic fixtures, category separation, output, and device policy.
-- [ ] Add `particula/tests/condensation_parity_walkthrough_docs_test.py` for
-  required ownership rows, thresholds, non-claims, commands, and link targets.
+- [x] Add `particula/tests/condensation_parity_walkthrough_docs_test.py` for
+  required ownership rows, evidence boundary, non-claims, commands, and link
+  targets.
 - [x] Add separate category-isolation and all-results reporting tests for P2,
   including isolated vapor-pressure, energy-sidecar, and conservation-input
   mutations plus a multi-failure case.

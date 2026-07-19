@@ -24,14 +24,13 @@ test modules use the `*_test.py` suffix.
   `rtol=1e-12, atol=1e-18`. No-Warp results are explicitly `unavailable`.
   Isolated vapor-pressure, energy-sidecar, and detached conservation-input
   mutations, plus a multi-failure case, verify all categories are reported.
-- **P3 — Ownership record (not implemented):** Add
-  `particula/tests/condensation_parity_walkthrough_docs_test.py`. Parse the
-  record and assert every required deferred capability has exactly one non-empty
-  future plan family, entry gate, and explicit non-claim. Thermal feedback and
-  adaptive stepping require a future approved condensation numerical-method
-  plan; phase-aware surface tension and BAT require a future approved
-  condensation-physics plan. Assign no speculative plan IDs and do not broaden
-  Epic F.
+- **P3 — Ownership record (implemented):**
+  `particula/tests/condensation_parity_walkthrough_docs_test.py` parses the sole
+  14-row record table and validates each owner, entry gate, and explicit
+  non-claim. It also validates exact links, anchors, seven focused commands, and
+  the boundary limiting evidence to the independent fp64 fixed-four-substep
+  NumPy oracle versus the direct kernel. It rejects speculative plan IDs, Epic F
+  ownership, and positive support claims for deferred capabilities.
 - **P4 — Documentation integration (not implemented):** Extend documentation checks for all
   canonical inbound/outbound links, exact focused commands, Warp CPU/CUDA
   policy, two-item return wording, and separate evidence labels.
@@ -50,6 +49,7 @@ test modules use the `*_test.py` suffix.
 
 ```bash
 pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror
+pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 python docs/Examples/gpu_condensation_parity_walkthrough.py
 ```

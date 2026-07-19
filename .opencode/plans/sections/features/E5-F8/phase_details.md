@@ -23,15 +23,16 @@
     identity; isolated category failures and multi-failure reporting proving one
     result cannot hide another; Warp CPU and optional CUDA categorized results.
 
-- [ ] **E5-F8-P3:** Record downstream ownership for every deferred condensation
+- [x] **E5-F8-P3:** Record downstream ownership for every deferred condensation
   capability with validation
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Publish one complete owner/gate/non-claim table for the E4
-    carry-forward and validate that required capabilities cannot disappear.
+  - Issue: #1369 | Size: S | Status: Implemented
+  - Goal: Publish and validate the complete owner/gate/non-claim record for the
+    E4 carry-forward without broadening the direct-kernel evidence boundary.
   - Files: `docs/Features/Roadmap/condensation-parity-walkthrough.md`,
     `particula/tests/condensation_parity_walkthrough_docs_test.py`
-  - Tests: required row coverage, unique non-empty owner and gate fields,
-    roadmap anchors, focused commands, and support-boundary wording.
+  - Tests: exactly one parseable 14-row ownership table with non-empty owners,
+    gates, and non-claims; exact links and anchors; focused commands; and the
+    direct-kernel-only support boundary.
 
 - [ ] **E5-F8-P4:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started
