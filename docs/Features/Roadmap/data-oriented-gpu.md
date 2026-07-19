@@ -1009,7 +1009,9 @@ Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
 The [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md)
 documents deferred work only, including temperature feedback, high-level
 integration, adaptive stepping, graph replay, broad autodiff, and performance;
-it does not change production capability.
+it does not change production capability. The caller-owned, write-only
+`energy_transfer` diagnostic is not a return value or temperature feedback
+(`kg * J/kg = J`).
 
 ## Epic E: GPU Coagulation Physics Coverage
 

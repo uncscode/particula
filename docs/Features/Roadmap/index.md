@@ -108,12 +108,21 @@ meets its exit bar, the next pending epic in the sequence becomes active.
    support contract and example. It does not provide high-level runnable
    integration or general CPU-strategy parity.
     - [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
-      — fixed-four-substep low-level direct-kernel physics, conservation, and
-        energy evidence, with Warp CPU as the installed-Warp baseline and
-        optional additive CUDA evidence
-    - [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md)
-      — deferred work only; it does not alter Epic D production capability or
-        activate later epics
+       — fixed-four-substep low-level direct-kernel physics, conservation, and
+         energy evidence, with Warp CPU as the installed-Warp baseline; CUDA is
+         optional additive evidence
+     - [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md)
+       — deferred work only; it does not alter Epic D production capability or
+         activate later epics
+     - The walkthrough's caller-owned, write-only `energy_transfer` diagnostic
+       is not a return value or temperature feedback (`kg * J/kg = J`). It
+       preserves fixed-four-substep direct-kernel scope: no strategy/`Runnable`
+       parity, adaptive stepping, graph capture/replay, broad autodiff, or
+       performance claim.
+     - Focused evidence commands:
+       `python docs/Examples/gpu_condensation_parity_walkthrough.py`,
+       `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`,
+       and `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
 
 ### Active
 
