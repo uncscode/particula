@@ -327,7 +327,7 @@ This pattern matches how other dynamics strategies are combined in chamber simul
 
 ## Related Documentation
 
-- **Hands-on guide**: [Chamber wall loss example](../Examples/Chamber_Wall_Loss/wall_loss_strategy.md)
+- **Hands-on guide**: [Wall loss tutorial](../Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial.ipynb)
 - **Notebooks**: [Spherical wall loss strategy](../Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy.ipynb)
 - **Dynamics overview**: [Wall loss strategies](../index.md#wall-loss-strategies-and-runnable)
 

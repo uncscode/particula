@@ -504,5 +504,4 @@ adw workflow custom-ci <issue-number>
 - **[Workflow Engine](workflow-engine.md)** - Main workflow engine guide
 - **[Workflow JSON Schema](workflow-json-schema.md)** - Complete schema reference
 - **[Workflow Conditionals](workflow-conditionals.md)** - Conditional syntax guide
-- **[Workflow Migration Guide](workflow-migration-guide.md)** - Migrate Python workflows
 - **Example Files:** `.opencode/workflow/examples/` - Actual example workflow definitions

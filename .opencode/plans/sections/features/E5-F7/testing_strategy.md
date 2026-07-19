@@ -31,13 +31,15 @@ use the `*_test.py` convention and collect cleanly when Warp is absent.
   turbulent inputs (masks 8 and 10), and exact snapshots for deferred or
   selected invalid-input preflight failures. It makes no repeated-seed or exact
   replay claim.
-- **P3 — Stochastic/device matrix:** Use repeated fresh seeded runs and
-  independently derived expected aggregates over 100 independent seeds. Use a
-  predeclared `3 * sqrt(expected_mean)` bound and uncapped fixtures with expected
-  aggregate count of at least 100. Exact CPU/Warp pair replay is prohibited as
-  a pass criterion. Apply deterministic invariants on every trial. Warp CPU is
-  mandatory when Warp is installed; CUDA reuses cases and skips cleanly when
-  unavailable.
+- **P3 — Stochastic/device matrix (implemented in #1364):** The dedicated
+  stochastic module runs 100 fresh unique seeds for every executable mask and
+  selected device. A host-only initial-state oracle sums enabled unordered-pair
+  rates and includes time step, volume, and SP2016 scheduling concentration;
+  it checks aggregate observations against `3 * sqrt(expected_mean)`. Every
+  trial retains P2 return/RNG identity and physical/ownership invariants, with
+  one-proposal capacity and counts constrained to `[0, 1]`. Exact CPU/Warp pair
+  replay is not a criterion. Warp CPU is required when installed; CUDA uses the
+  same matrix and cleanly skips when unavailable.
 - **P4 — Documentation:** Validate Markdown links, mechanism/support table rows,
   test marker names, tolerance descriptions, and executable reproduction
   commands.

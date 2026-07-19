@@ -11,14 +11,15 @@ selector majorant on Warp CPU, while the former never uses Warp aggregate logic
 as an expected-value source. Deferred masks are resolved and rejected on the
 host before any execution observation.
 
-Issue #1363 extends the discoverable test module with a separate public-step
-layer. Local materialization builds `ParticleData` with species-resolved mass,
-active-slot concentration, charge, and inactive sentinels; conversion then
-creates caller-owned Warp particle state. Local snapshots synchronize mutable
-particle, collision-pair/count, and RNG sidecars around each call. The invariant
-layer validates the accepted pair prefixes and resulting bookkeeping rather than
-expecting a stochastic pair sequence. Runtime device enumeration remains lazy:
-Warp CPU runs when available and CUDA is additive.
+Issues #1363 and #1364 share a private lazy-Warp public-step layer in
+`_coagulation_public_step_support.py`. It materializes `ParticleData` with
+species-resolved mass, active-slot concentration, charge, inactive sentinels,
+and optional P3 volume/concentration overrides; conversion creates caller-owned
+Warp state. Snapshots synchronize mutable particle, collision-pair/count, and
+RNG sidecars around each call. The invariant layer validates accepted pair
+prefixes and resulting bookkeeping rather than a stochastic pair sequence.
+Runtime device selection stays lazy: Warp CPU is required when installed and
+CUDA is additive.
 
 E5-F7 is a validation layer around the stable low-level coagulation entry point;
 it does not add a production execution path. A canonical case table binds each
@@ -52,10 +53,12 @@ under test.
   expected aggregate rates.
 - **API Surface:** No new public package API is planned. Tests call the shipped
   `coagulation_step_gpu()` configuration contract from E5-F1 through E5-F6.
-- **Workflow Hooks:** The shipped deterministic probes and P2 public-entry tests use `warp` and
-  `gpu_parity`, run on `device="cpu"`, and skip at runtime when Warp is absent;
-   normal collection therefore remains Warp-free. P2 enumerates CUDA when the
-   shared helper reports it; stochastic markers remain deferred to P3.
+- **Workflow Hooks:** Deterministic probes and P2 public-entry tests use `warp`
+  and `gpu_parity`. The P3 device matrix additionally uses `stochastic` and
+  statically parameterizes CPU/CUDA; only CUDA parameters carry `cuda` and
+  runtime-skip through the unchanged shared availability helper. Normal
+  collection stays Warp-free, while selected device observations import Warp
+  lazily.
 - **Evidence Boundary:** The published table reports only rows implemented and
   approved by E5-F3 through E5-F6. Missing or unsupported rows are documented as
   unsupported, not silently skipped as successful.

@@ -39,6 +39,17 @@ adds CUDA coverage only when the shared device helper reports it. No production
 behavior, public API, or user documentation changed. Bounded stochastic and
 published-evidence work remain subsequent phases.
 
+Issue #1364 completed P3 with a bounded fresh-seed public-step stochastic
+matrix in `particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py`.
+It covers all 11 executable masks on required Warp CPU and optional CUDA,
+using 100 unique fresh seeds per row/device, a one-proposal capacity, and an
+independent initial-state aggregate expectation with a
+`3 * sqrt(expected_mean)` bound. P2 public-step materialization, snapshots,
+and invariants were extracted to the private lazy-Warp
+`_coagulation_public_step_support.py`; P3 adds explicit volume/concentration
+override regressions while preserving inactive sentinels. No production API,
+kernel, export, shared CUDA helper, or user documentation changed.
+
 ## User Stories
 
 - As a scientific user, I want independently calculated pair-rate parity so I

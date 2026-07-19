@@ -513,6 +513,7 @@ pytest particula/gpu/dynamics/tests/coagulation_funcs_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate or conservation" -Werror
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -Werror
 ```
 
 ### GPU mass-precision baseline study
