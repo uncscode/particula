@@ -15,11 +15,6 @@ from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
-from particula.gpu import (
-    WARP_AVAILABLE,
-    from_warp_particle_data,
-    to_warp_particle_data,
-)
 from particula.particles import ParticleData
 
 _FORCE_NO_WARP_ENV = "PARTICULA_EXAMPLE_FORCE_NO_WARP"
@@ -87,7 +82,25 @@ def _warp_enabled() -> bool:
     Returns:
         ``True`` unless Warp is unavailable or the force-no-Warp flag is set.
     """
-    return WARP_AVAILABLE and os.getenv(_FORCE_NO_WARP_ENV) != "1"
+    if os.getenv(_FORCE_NO_WARP_ENV) == "1":
+        return False
+    warp_available, _, _ = _load_gpu_helpers()
+    return warp_available
+
+
+def _load_gpu_helpers() -> tuple[bool, Any, Any]:
+    """Lazily load GPU availability and explicit particle-transfer helpers.
+
+    Returns:
+        Warp availability, CPU-to-Warp conversion, and Warp-to-CPU restoration
+        helpers in that order.
+    """
+    gpu = importlib.import_module("particula.gpu")
+    return (
+        gpu.WARP_AVAILABLE,
+        gpu.to_warp_particle_data,
+        gpu.from_warp_particle_data,
+    )
 
 
 def _load_gpu_runtime() -> tuple[Any, Any, Any]:
@@ -143,6 +156,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
         output.append("Warp is unavailable or disabled; no kernel ran.")
         return ExampleRun(output=output)
 
+    _, to_warp_particle_data, from_warp_particle_data = _load_gpu_helpers()
     wp, coagulation_step_gpu, mechanism_config_type = _load_gpu_runtime()
     gpu_particle_data = to_warp_particle_data(particle_data, device=device)
     n_boxes = particle_data.n_boxes
