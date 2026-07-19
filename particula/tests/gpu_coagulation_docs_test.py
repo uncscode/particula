@@ -9,8 +9,10 @@ ROOT = Path(__file__).resolve().parents[2]
 FOUNDATIONS_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
 STRATEGY_PATH = ROOT / "docs/Features/coagulation_strategy_system.md"
 VALIDATION_PATH = ROOT / "docs/Features/Roadmap/coagulation-validation.md"
+TESTING_GUIDE_PATH = ROOT / ".opencode/guides/testing_guide.md"
 FOUNDATIONS_HEADING = "### GPU coagulation configuration and sidecar ownership"
 STRATEGY_HEADING = "### GPU direct-kernel foundations and limitations"
+RELEASE_VALIDATION_HEADING = "### Release-validation command sets"
 BASELINE_COMMANDS = (
     "pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q "
     '-m "warp and gpu_parity" -Werror',
@@ -39,8 +41,15 @@ def _section(content: str, heading: str) -> str:
     start = content.index(heading)
     section = content[start:]
     level = len(heading) - len(heading.lstrip("#"))
+    in_code_block = False
     for line_index, line in enumerate(section.splitlines()[1:], start=1):
-        if line.startswith("#") and len(line) - len(line.lstrip("#")) <= level:
+        if line.startswith("```"):
+            in_code_block = not in_code_block
+        if (
+            not in_code_block
+            and line.startswith("#")
+            and len(line) - len(line.lstrip("#")) <= level
+        ):
             return "\n".join(section.splitlines()[:line_index])
     return section
 
@@ -178,6 +187,7 @@ def test_gpu_coagulation_commands_and_optional_device_policy_are_resolvable() ->
     assert DIRECT_COAGULATION_COMMAND in foundations
     assert DIRECT_COAGULATION_COMMAND in validation
     assert _command_target(DIRECT_COAGULATION_COMMAND).exists()
+    assert BASELINE_COMMANDS[-1] in validation
 
     normalized_foundations = _normalized(foundations)
     normalized_strategy = _normalized(strategy)
@@ -192,7 +202,7 @@ def test_gpu_coagulation_commands_and_optional_device_policy_are_resolvable() ->
     )
     assert "Warp CPU is the installed-Warp baseline." in normalized_strategy
     assert (
-        "CUDA is optional/additive, and guarded suites skip cleanly"
+        "CUDA is optional/additive, never mandatory, and guarded suites skip cleanly"
         in normalized_strategy
     )
     assert (
@@ -253,3 +263,42 @@ def test_guides_do_not_promote_deferred_runtime_capabilities() -> None:
         "unsupported distributions are supported",
     ):
         assert affirmative_claim not in content
+
+
+def test_guides_explicitly_exclude_deferred_runtime_capabilities() -> None:
+    """Guides explicitly retain the bounded direct-kernel exclusions."""
+    foundations = _normalized(
+        _section(
+            FOUNDATIONS_PATH.read_text(encoding="utf-8"), FOUNDATIONS_HEADING
+        )
+    ).lower()
+    strategy = _normalized(
+        _section(STRATEGY_PATH.read_text(encoding="utf-8"), STRATEGY_HEADING)
+    ).lower()
+
+    for snippet in (
+        "no high-level `runnable` integration",
+        "automatic transfer",
+        "cpu fallback",
+        "mandatory cuda requirement",
+        "general-turbulence support",
+    ):
+        assert snippet in foundations
+    for snippet in (
+        "no automatic transfer, cpu fallback, or high-level `runnable` integration",
+        "cuda is optional/additive, never mandatory",
+        "dns/general-turbulence support",
+    ):
+        assert snippet in strategy
+
+
+def test_testing_guide_publishes_hardware_free_docs_validation() -> None:
+    """Release-validation commands include the hardware-free contract test."""
+    release_validation = _normalized(
+        _section(
+            TESTING_GUIDE_PATH.read_text(encoding="utf-8"),
+            RELEASE_VALIDATION_HEADING,
+        )
+    )
+
+    assert _normalized(BASELINE_COMMANDS[-1]) in release_validation
