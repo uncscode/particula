@@ -8,7 +8,9 @@ completed oracle and does not import a kernel or allocate device state.
 
 Run ``python docs/Examples/gpu_condensation_parity_walkthrough.py`` or
 ``pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q
--Werror``.  Warp outputs are mutable caller-owned state.  A failed kernel call
+-Werror``. Warp outputs are mutable caller-owned state. ``energy_transfer``
+is caller-owned ``(n_boxes, n_species)`` storage, mutated in place with signed
+joules, and is not a third returned value. A failed kernel call
 may have partially mutated that detached state; discard it and build fresh
 sources from the immutable fixture before retrying.
 """
@@ -113,7 +115,11 @@ class ParityFixture:
 
 
 def build_fixture() -> ParityFixture:
-    """Build immutable templates with simultaneous uptake and evaporation."""
+    """Build immutable templates with simultaneous uptake and evaporation.
+
+    Returns:
+        Immutable two-box, two-particle, two-species fp64 example fixture.
+    """
     modes = np.array([0, 0], dtype=np.int32)
     modes.setflags(write=False)
     return ParityFixture(
@@ -176,6 +182,17 @@ class OracleResult:
     total_mass_transfer: np.ndarray
     raw_proposal: np.ndarray
     energy_transfer: np.ndarray
+    substeps: tuple["OracleSubstep", ...]
+
+
+@dataclass(frozen=True)
+class OracleSubstep:
+    """Record one independent fixed substep for walkthrough diagnostics."""
+
+    time_step: float
+    gas_concentration_before: np.ndarray
+    raw_proposal: np.ndarray
+    finalized_transfer: np.ndarray
 
 
 @dataclass
@@ -190,6 +207,32 @@ class ExampleRun:
     total_mass_transfer: np.ndarray | None = None
     energy_transfer: np.ndarray | None = None
     scratch_buffers: Any | None = None
+
+
+def _validate_float_fields(
+    float_shapes: dict[str, tuple[np.ndarray, tuple[int, ...]]],
+) -> None:
+    """Validate floating-point array shapes and values."""
+    for name, (values, shape) in float_shapes.items():
+        if values.shape != shape or values.dtype != np.float64:
+            message = f"{name} must be float64 with shape {shape}."
+            raise ValueError(message)
+        if not np.all(np.isfinite(values)):
+            raise ValueError(f"{name} must contain only finite values.")
+
+
+def _validate_signed_fields(
+    fixture: ParityFixture,
+    field_names: tuple[str, ...],
+    strictly_positive: bool,
+    description: str,
+) -> None:
+    """Validate a shared lower bound for named fixture fields."""
+    for name in field_names:
+        values = getattr(fixture, name)
+        invalid_values = values <= 0.0 if strictly_positive else values < 0.0
+        if np.any(invalid_values):
+            raise ValueError(f"{name} must contain only {description} values.")
 
 
 def _validate_fixture(fixture: ParityFixture) -> None:
@@ -216,10 +259,25 @@ def _validate_fixture(fixture: ParityFixture) -> None:
         ),
         "latent_heat": (fixture.latent_heat, (2,)),
     }
-    for name, (values, shape) in float_shapes.items():
-        if values.shape != shape or values.dtype != np.float64:
-            message = f"{name} must be float64 with shape {shape}."
-            raise ValueError(message)
+    _validate_float_fields(float_shapes)
+    positive_fields = (
+        "temperature",
+        "pressure",
+        "density",
+        "volume",
+        "molar_mass",
+    )
+    nonnegative_fields = (
+        "masses",
+        "concentration",
+        "gas_concentration",
+        "surface_tension",
+        "mass_accommodation",
+        "diffusion_coefficient_vapor",
+        "latent_heat",
+    )
+    _validate_signed_fields(fixture, positive_fields, True, "positive")
+    _validate_signed_fields(fixture, nonnegative_fields, False, "nonnegative")
     if fixture.partitioning.shape != (2,) or fixture.partitioning.dtype != bool:
         raise ValueError("partitioning must be Boolean with shape (2,).")
     if (
@@ -243,7 +301,15 @@ def _particle_data(fixture: ParityFixture) -> ParticleData:
 
 
 def build_oracle_input(fixture: ParityFixture | None = None) -> OracleInput:
-    """Build detached oracle inputs without aliasing immutable templates."""
+    """Build detached oracle inputs without aliasing immutable templates.
+
+    Args:
+        fixture: Optional validated immutable template. A canonical template is
+            built when omitted.
+
+    Returns:
+        Detached CPU particle and gas state for the independent oracle.
+    """
     fixture = build_fixture() if fixture is None else fixture
     _validate_fixture(fixture)
     return OracleInput(
@@ -259,7 +325,15 @@ def build_oracle_input(fixture: ParityFixture | None = None) -> OracleInput:
 
 
 def build_warp_source(fixture: ParityFixture | None = None) -> WarpSource:
-    """Build separately detached conversion inputs and derived pressure storage."""
+    """Build separately detached conversion inputs and derived pressure storage.
+
+    Args:
+        fixture: Optional validated immutable template. A canonical template is
+            built when omitted.
+
+    Returns:
+        Detached CPU conversion source and zeroed derived vapor-pressure storage.
+    """
     fixture = build_fixture() if fixture is None else fixture
     _validate_fixture(fixture)
     return WarpSource(
@@ -390,13 +464,32 @@ def _finalize_transfer(state: OracleInput, proposal: np.ndarray) -> np.ndarray:
 
 
 def run_oracle(source: OracleInput | None = None) -> OracleResult:
-    """Run exactly four independent fixed substeps before any Warp action."""
+    """Run exactly four independent fixed substeps before any Warp action.
+
+    Args:
+        source: Optional detached CPU state. A canonical detached source is
+            built when omitted and is mutated only within this call.
+
+    Returns:
+        Final independent state, coupled transfer diagnostics, signed-joule
+        energy diagnostic, and immutable per-substep observations.
+    """
     state = build_oracle_input() if source is None else source
     total = np.zeros_like(state.particles.masses)
     raw_proposal = np.zeros_like(total)
+    substeps: list[OracleSubstep] = []
     for _ in range(4):
+        gas_before = state.gas.concentration.copy()
         raw_proposal = _proposal(state)
         applied = _finalize_transfer(state, raw_proposal)
+        substeps.append(
+            OracleSubstep(
+                time_step=_TIME_STEP / 4.0,
+                gas_concentration_before=gas_before,
+                raw_proposal=raw_proposal.copy(),
+                finalized_transfer=applied.copy(),
+            )
+        )
         state.particles.masses += applied
         state.gas.concentration -= np.sum(
             applied * state.particles.concentration[:, :, None], axis=1
@@ -410,6 +503,7 @@ def run_oracle(source: OracleInput | None = None) -> OracleResult:
         total_mass_transfer=total,
         raw_proposal=raw_proposal,
         energy_transfer=energy,
+        substeps=tuple(substeps),
     )
 
 
@@ -440,6 +534,16 @@ def run_example(device: str = "cpu") -> ExampleRun:
     Enabled-route errors intentionally propagate.  The detached source and its
     sidecars must be discarded after failure because opaque kernel mutation is
     not atomic; the completed oracle remains an independent clean result.
+
+    Args:
+        device: Warp device for the optional direct-kernel route. Defaults to
+            Warp's CPU device.
+
+    Returns:
+        Completed oracle and, when Warp is enabled, synchronized mutable
+        caller-owned outputs. ``energy_transfer`` has shape
+        ``(n_boxes, n_species)``, records signed joules in place, and is not a
+        third value returned by the direct kernel step.
     """
     fixture = build_fixture()
     oracle = run_oracle(build_oracle_input(fixture))
