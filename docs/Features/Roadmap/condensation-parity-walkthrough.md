@@ -7,7 +7,7 @@ from the bounded direct-condensation walkthrough.
 
 The [walkthrough source](../../Examples/gpu_condensation_parity_walkthrough.py)
 compares an independent fp64, fixed-four-substep NumPy oracle with the low-level
-direct GPU kernel. Its [walkthrough regression test](../../../particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py)
+direct GPU kernel. Its [walkthrough regression test](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py)
 keeps that bounded comparison executable.
 
 Physics, conservation, and energy are separately evaluated evidence. Warp CPU
