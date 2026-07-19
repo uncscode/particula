@@ -198,13 +198,20 @@ print(result)
   `energy_transfer` diagnostic, and refreshes caller-owned
    `WarpGasData.vapor_pressure` from the current device-resident temperature
    before mass transfer. For the supported low-level, direct-kernel-only
-   walkthrough, use `python docs/Examples/gpu_direct_kernels_quick_start.py`.
-   This path does not add high-level `Aerosol`/`Runnable` support, implicit
-   simulation-state transfers or synchronization, automatic fallback or
-   migration, or CPU-strategy/runnable parity. See the [GPU condensation command
-    matrix](Features/data-containers-and-gpu-foundations.md#focused-reproduction-commands)
-    for focused troubleshooting and reproduction commands. Entry-point
-    validation can still perform synchronous device-to-host readbacks.
+    walkthrough, use `python docs/Examples/gpu_direct_kernels_quick_start.py`.
+    This path does not add high-level `Aerosol`/`Runnable` support, implicit
+    simulation-state transfers or synchronization, automatic fallback or
+    migration, or CPU-strategy/runnable parity. See the [GPU condensation command
+     matrix](Features/data-containers-and-gpu-foundations.md#focused-reproduction-commands)
+     for focused troubleshooting and reproduction commands. Entry-point
+     validation can still perform synchronous device-to-host readbacks.
+   For a focused supported coagulation route, the
+   [direct GPU coagulation example](Examples/gpu_coagulation_direct.py)
+   explicitly transfers `ParticleData`, runs two Brownian particle-resolved
+   calls with caller-owned collision and persistent RNG sidecars on Warp CPU
+   by default, then restores a CPU checkpoint. When Warp is unavailable or
+   disabled, it runs no conversion or kernel and provides no CPU fallback.
+   It makes no `Runnable`, CUDA, or performance claim.
 - [ParticleData and GasData migration guide](Features/particle-data-migration.md)
   — migration workflow and before/after examples for moving from legacy facades
   to the canonical data-container contract documented in the foundation guide.

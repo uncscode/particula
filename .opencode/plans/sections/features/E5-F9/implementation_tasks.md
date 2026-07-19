@@ -6,9 +6,9 @@
 - [x] Update the foundations and coagulation strategy guides with supported
   mechanisms, combinations, distribution boundary, ownership, and imports.
 - [x] Add focused Warp CPU and optional CUDA reproduction commands.
-- [ ] Implement `docs/Examples/gpu_coagulation_direct.py` using public transfer
+- [x] Implement `docs/Examples/gpu_coagulation_direct.py` using public transfer
   helpers, lazy kernel imports, fixed-shape caller buffers, and persistent RNG.
-- [ ] Add the example and guide links to `docs/Examples/index.md`.
+- [x] Add the direct-example reference to `docs/index.md`.
 
 ### Roadmap and Closeout
 
@@ -21,7 +21,7 @@
 
 ### Tooling / Tests
 
-- [ ] Add `particula/gpu/tests/gpu_coagulation_direct_example_test.py`.
+- [x] Add `particula/gpu/tests/gpu_coagulation_direct_example_test.py`.
 - [x] Add `particula/tests/gpu_coagulation_docs_test.py` for direct-contract
   claims, commands, and links using only the Python standard library.
 - [ ] Run E5-F7's required Warp CPU parity/stochastic matrix and standard docs,

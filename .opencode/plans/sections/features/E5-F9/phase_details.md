@@ -11,11 +11,19 @@
     checks exact support wording, import path, command matrix,
     deferred-capability ownership, and resolving cross-links.
 
-- [ ] **E5-F9-P2:** Add direct GPU coagulation example with co-located tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E5-F9-P2:** Add direct GPU coagulation example with co-located tests
+  - Issue: #1373 | Size: S | Status: Shipped
   - Goal: Run a small supported particle-resolved configuration on Warp CPU by default with explicit transfers, caller buffers, and persistent RNG.
   - Files: `docs/Examples/gpu_coagulation_direct.py`, `particula/gpu/tests/gpu_coagulation_direct_example_test.py`
-  - Tests: CPU-only import/no-Warp branch, lazy runtime imports, deterministic metadata, execution, mutation/conservation checkpoint, buffer identity, and RNG advancement.
+  - Delivered: The standalone example explicitly converts CPU `ParticleData`,
+    invokes Brownian particle-resolved `coagulation_step_gpu` exactly twice with
+    shared collision/RNG sidecars (initializing the RNG only on call one), and
+    restores CPU state only after both calls succeed. The disabled route is lazy
+    and has no fallback; `docs/index.md` links the bounded route.
+  - Tests: CPU-only import/no-Warp branch, exact lazy runtime import order,
+    deterministic metadata, sidecar identity and RNG reuse, upstream failure
+    propagation, Warp CPU conservation/pair invariants and RNG advancement, and
+    zero/one-active-slot cases.
 
 - [ ] **E5-F9-P3:** Reconcile roadmap plan IDs and artifact links with validation tests
   - Issue: TBD | Size: S | Status: Not Started

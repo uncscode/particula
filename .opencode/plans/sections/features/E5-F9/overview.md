@@ -11,11 +11,13 @@ traceable E5/E5-F1 through E5-F9 closeout record with resolving artifact links.
 
 ## Value Proposition
 
-P1 has shipped the documentation-only portion of that release: the two
-canonical guides now publish the bounded direct particle-resolved contract,
-and a stdlib-only regression test protects the wording, commands, and links.
-The direct example and dependency-gated roadmap transition remain later phases;
-they are not implied by the published documentation contract.
+P1 shipped the documentation-only portion of the release, and P2 shipped the
+direct example. The canonical guides publish the bounded direct
+particle-resolved contract; `docs/Examples/gpu_coagulation_direct.py` now
+demonstrates two explicit Brownian calls on optional Warp CPU with caller-owned
+collision and persistent RNG sidecars, and co-located regression coverage
+protects the disabled, lazy-loading, error, ownership, and invariant paths.
+The dependency-gated roadmap transition remains in later phases.
 
 ## User Stories
 
