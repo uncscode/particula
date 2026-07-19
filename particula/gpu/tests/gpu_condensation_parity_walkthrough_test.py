@@ -293,6 +293,12 @@ def test_fake_enabled_route_has_explicit_sidecars_and_synchronized_readback(
         "passed",
         "failed",
     ]
+    for prefix in (
+        "physics: failed",
+        "conservation: passed",
+        "energy: failed",
+    ):
+        assert any(line.startswith(prefix) for line in result.output)
 
 
 def test_oracle_completes_before_runtime_and_ignores_warp_source_mutation(
