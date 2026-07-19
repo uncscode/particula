@@ -241,9 +241,10 @@ from particula.gpu.kernels import coagulation_step_gpu
 from particula.gpu.kernels.coagulation import CoagulationMechanismConfig
 ```
 
-Pass `mechanism_config=CoagulationMechanismConfig(...)` as keyword-only host
-metadata. The frozen dataclass is not device-resident simulation state and is
-not transferred, synchronized, or stored in a container schema. In contrast,
+Pass immutable `mechanism_config=CoagulationMechanismConfig(...)` as keyword-only
+host metadata. The frozen dataclass is not re-exported by
+`particula.gpu.kernels`, is not device-resident simulation state, and neither
+transfers nor owns Warp state. In contrast,
 `WarpParticleData`, supplied `collision_pairs`, supplied `n_collisions`, and
 supplied `rng_states` are caller-owned, same-device Warp resources. Omitted
 collision outputs and RNG state use call-local convenience allocation. A
@@ -253,6 +254,12 @@ CPU↔GPU transfer.
 
 Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 `"continuous_pdf"` raise `ValueError`; they do not fall back or convert.
+Malformed configuration and an unsupported distribution fail before particle
+access. Mask `7` fails at capability preflight before particle metadata or
+enabled-term validation. Masks `11`, `13`, and `14` validate particle metadata
+and enabled terms before they fail closed. These read-only preflight boundaries
+do not make a later runtime failure transactional: callers retain their mutable
+state, and no rollback is guaranteed after such a failure.
 
 | Identifier | Bit | Status |
 | --- | --- | --- |
@@ -271,6 +278,10 @@ Only `distribution_type="particle_resolved"` is accepted. `"discrete"` and
 | `brownian + charged_hard_sphere + turbulent_shear_st1956` | `11` | Rejected three-way mask |
 | `brownian + sedimentation_sp2016 + turbulent_shear_st1956` | `13` | Rejected three-way mask |
 | `charged_hard_sphere + sedimentation_sp2016 + turbulent_shear_st1956` | `14` | Rejected three-way mask |
+
+The executable singleton masks are `1`, `2`, `4`, and `8`; executable two-term
+masks are `3`, `5`, `6`, `9`, `10`, and `12`; and executable four-term mask is
+`15`. Deferred masks are exactly `7`, `11`, `13`, and `14`.
 
 Requested tuples normalize to the canonical Brownian, charged, sedimentation,
 then turbulent order. Exact SP2016 sedimentation is selected with
@@ -325,15 +336,17 @@ Read-only preflight can use a private device-status buffer and a bounded
 synchronization/readback to report invalid caller state without copying,
 mutating, or CPU-falling-back caller simulation state.
 
-The return tuple is exactly `(particles, collision_pairs, n_collisions)`.
-Supplied collision buffers are returned by identity. Supplied `rng_states` are
-caller-owned same-device Warp state, are reused in place, and reset only when
-`initialize_rng=True` explicitly opts in; omitted buffers are call-local
-conveniences. Sedimentation-specific read-only preflight fails before output
-allocation, RNG initialization, or particle mutation, but does not make
-unrelated later validation failures atomic. Warp CPU is the baseline when Warp
-is installed. CUDA is optional additive evidence and skips cleanly when
-unavailable.
+The return tuple is exactly `(particles, collision_pairs, n_collisions)`; RNG
+state is not returned. Accepted collisions mutate caller-owned particle mass,
+concentration, and charge in place. Supplied collision buffers are returned by
+identity. Supplied `rng_states` are caller-owned same-device Warp state, are
+reused and advanced in place, and reset only when `initialize_rng=True`
+explicitly opts in; omitted buffers and RNG state are call-local conveniences.
+Sedimentation-specific read-only preflight fails before output allocation, RNG
+initialization, or particle mutation, but does not make unrelated later runtime
+failures atomic. Transfers are explicit. Warp CPU is the baseline when Warp is
+installed. CUDA is optional additive evidence and guarded suites skip cleanly
+when unavailable.
 
 Future mechanisms must provide a stable identifier; required host and device
 inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
@@ -343,7 +356,8 @@ loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level `Runnable`
 integration, graph-capture claims, alternate mechanisms, DNS or general
 turbulence, CPU fallback, hidden transfer, and performance or broad-accuracy
-claims.
+claims. See the [validation/evidence record](Roadmap/coagulation-validation.md)
+for the focused fixed-mask and stochastic command record.
 
 ### Environment transfer boundary
 
@@ -743,6 +757,9 @@ the other evidence classes.
 | `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror` | Bounded direct-step stiffness coverage. |
 | `pytest particula/gpu/dynamics/tests/coagulation_funcs_test.py -q -Werror` | Deterministic GPU coagulation pair-helper parity. |
 | `pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror` | Direct coagulation coverage, including singleton sedimentation and ST1956 configurations, direct/environment inputs, caller-owned output/RNG behavior, conservation, and rejected-call state safety. |
+| `pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror` | Fixed-mask deterministic/ownership evidence. |
+| `pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror` | Stochastic evidence. |
+| `pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror` | Hardware-free documentation-contract coverage. |
 | `pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q` | CPU integration/inventory-conservation evidence (separate particle-plus-gas inventory conservation checks); not direct-GPU validation. |
 | `pytest particula/integration_tests/condensation_particle_resolved_test.py -q` | CPU integration evidence for particle-resolved condensation; not direct-GPU validation. |
 | `pytest particula/tests/condensation_latent_heat_docs_test.py -q -Werror` | Latent-heat energy/bookkeeping documentation checks. |
@@ -755,6 +772,7 @@ checks are separate: no one class proves either of the others.
 
 ```bash
 pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and cuda" -Werror
 ```
 
 This is additive to the required Warp `device="cpu"` baseline and skips
