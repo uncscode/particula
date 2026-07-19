@@ -17,6 +17,7 @@ from __future__ import annotations
 import ast
 import inspect
 import itertools
+import pickle
 import re
 from dataclasses import dataclass
 from types import SimpleNamespace
@@ -140,6 +141,22 @@ def test_mechanism_default_matches_explicit_brownian() -> None:
     assert default.mechanisms == (BROWNIAN_MECHANISM,)
     assert default.distribution_type == "particle_resolved"
     assert default.mask == BROWNIAN_MECHANISM_FLAG
+
+
+@pytest.mark.parametrize(
+    "public_api",
+    (
+        CoagulationMechanismConfig,
+        resolve_coagulation_mechanism_config,
+        validate_coagulation_mechanism_capabilities,
+    ),
+)
+def test_configuration_public_apis_retain_public_module_provenance(
+    public_api: object,
+) -> None:
+    """Public configuration APIs retain introspection and pickle compatibility."""
+    assert public_api.__module__ == "particula.gpu.kernels.coagulation"  # type: ignore[union-attr]
+    assert pickle.loads(pickle.dumps(public_api)) is public_api  # noqa: S301
 
 
 def test_mechanism_flags_have_documented_numeric_values() -> None:
@@ -340,6 +357,24 @@ def test_mechanism_rejects_structural_failures(
     config = CoagulationMechanismConfig(mechanisms=mechanisms)  # type: ignore[arg-type]
 
     with pytest.raises(ValueError, match=message):
+        resolve_coagulation_mechanism_config(config)
+
+
+def test_mechanism_duplicate_error_uses_first_repeated_identifier() -> None:
+    """Duplicate validation reports the first duplicate reached in input order."""
+    config = CoagulationMechanismConfig(
+        mechanisms=(
+            CHARGED_HARD_SPHERE_MECHANISM,
+            BROWNIAN_MECHANISM,
+            CHARGED_HARD_SPHERE_MECHANISM,
+            BROWNIAN_MECHANISM,
+        )
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Duplicate coagulation mechanism 'charged_hard_sphere'",
+    ):
         resolve_coagulation_mechanism_config(config)
 
 

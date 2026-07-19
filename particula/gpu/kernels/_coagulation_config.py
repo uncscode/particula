@@ -56,7 +56,19 @@ class _ResolvedCoagulationMechanismConfig:
 def resolve_coagulation_mechanism_config(
     config: CoagulationMechanismConfig,
 ) -> _ResolvedCoagulationMechanismConfig:
-    """Resolve a configuration through pure host-side structural validation."""
+    """Resolve a configuration through host-side structural validation.
+
+    Args:
+        config: Configuration whose distribution type and mechanism identifiers
+            are validated and normalized into canonical mechanism order.
+
+    Returns:
+        The normalized configuration, including its additive mechanism mask.
+
+    Raises:
+        ValueError: If the distribution type is unsupported, mechanisms are not
+            a non-empty tuple of strings, a mechanism is duplicated or unknown.
+    """
     if config.distribution_type != "particle_resolved":
         raise ValueError(
             "distribution_type must be exactly 'particle_resolved'."
@@ -68,13 +80,11 @@ def resolve_coagulation_mechanism_config(
         raise ValueError("mechanisms must be a non-empty tuple of strings.")
     if not all(isinstance(mechanism, str) for mechanism in mechanisms):
         raise ValueError("mechanisms must contain only string identifiers.")
-    if len(set(mechanisms)) != len(mechanisms):
-        duplicate = next(
-            mechanism
-            for mechanism in mechanisms
-            if mechanisms.count(mechanism) > 1
-        )
-        raise ValueError(f"Duplicate coagulation mechanism '{duplicate}'.")
+    seen: set[str] = set()
+    for mechanism in mechanisms:
+        if mechanism in seen:
+            raise ValueError(f"Duplicate coagulation mechanism '{mechanism}'.")
+        seen.add(mechanism)
     unknown = next(
         (
             mechanism
@@ -102,7 +112,17 @@ def resolve_coagulation_mechanism_config(
 def validate_coagulation_mechanism_capabilities(
     resolved: _ResolvedCoagulationMechanismConfig,
 ) -> None:
-    """Enforce the executable and deferred mechanism-mask boundary."""
+    """Enforce the executable and deferred mechanism-mask boundary.
+
+    Args:
+        resolved: Structurally valid, normalized configuration to check.
+
+    Returns:
+        None.
+
+    Raises:
+        ValueError: If the mechanism mask is a deferred three-way combination.
+    """
     if resolved.mask in (1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15):
         return
     raise ValueError("Additive coagulation execution is deferred.")

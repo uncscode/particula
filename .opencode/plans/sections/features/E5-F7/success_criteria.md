@@ -20,9 +20,9 @@
   particles, buffers, and RNG state at preflight.
 - [x] Warp CPU executes P2/P3 cases when Warp is installed. CUDA runs the same
   applicable matrix when available and otherwise skips cleanly.
-- [ ] Focused validation and the full coagulation suite pass without lowering
+- [x] Focused validation and the full coagulation suite pass without lowering
   coverage or requiring slow/performance benchmarks.
-- [ ] Published documentation states tested rows, tolerances, statistical
+- [x] Published documentation states tested rows, tolerances, statistical
   bounds, device policy, limitations, and reproduction commands.
 
 ## Metrics

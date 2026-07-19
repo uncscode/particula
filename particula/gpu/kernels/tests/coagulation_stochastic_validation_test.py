@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import numpy as np
 import pytest
 
@@ -120,7 +122,7 @@ def test_stochastic_oracle_responds_to_pair_set_time_volume_and_sedimentation() 
 
 
 def test_stochastic_oracle_sums_each_enabled_component_for_every_mask() -> None:
-    """Enabled additive components each change the independent total rate."""
+    """Each enabled component has a three-sigma distinguishable contribution."""
     for case in STOCHASTIC_CASES:
         for box in range(case.fixture.radii.shape[0]):
             explicit = sum(
@@ -149,6 +151,41 @@ def test_stochastic_oracle_sums_each_enabled_component_for_every_mask() -> None:
                     assert not np.isclose(
                         reduced, explicit, rtol=1e-12, atol=0.0
                     )
+                    one_trial = replace(case, sample_count=1)
+                    reduced_one_trial = replace(
+                        one_trial,
+                        row=replace(one_trial.row, mask=case.row.mask ^ flag),
+                    )
+                    difference = expected_mean(one_trial) - expected_mean(
+                        reduced_one_trial
+                    )
+                    required_samples = (
+                        int(
+                            np.ceil(
+                                9.0
+                                * (
+                                    expected_mean(one_trial)
+                                    + expected_mean(reduced_one_trial)
+                                )
+                                / difference**2
+                            )
+                        )
+                        + 1
+                    )
+                    discriminating_case = replace(
+                        one_trial, sample_count=required_samples
+                    )
+                    reduced_case = replace(
+                        reduced_one_trial, sample_count=required_samples
+                    )
+                    difference = expected_mean(
+                        discriminating_case
+                    ) - expected_mean(reduced_case)
+                    uncertainty = 3.0 * np.sqrt(
+                        expected_mean(discriminating_case)
+                        + expected_mean(reduced_case)
+                    )
+                    assert difference > uncertainty
 
 
 def test_seed_schedule_is_unique_and_uint32_compatible() -> None:
@@ -247,6 +284,7 @@ DEVICE_PARAMS = (
 @pytest.mark.parametrize(
     "case", STOCHASTIC_CASES, ids=lambda case: f"mask_{case.row.mask}"
 )
+@pytest.mark.slow
 def test_public_stochastic_aggregate_matches_independent_expectation(
     case: StochasticCase, device: str
 ) -> None:
@@ -289,3 +327,33 @@ def test_public_stochastic_aggregate_matches_independent_expectation(
         assert np.all((final["counts"] >= 0) & (final["counts"] <= 1))
         observed += int(final["counts"].sum())
     assert abs(observed - expected_mean(case)) <= sigma_tolerance(case)
+
+
+@pytest.mark.warp
+@pytest.mark.stochastic
+def test_public_stochastic_call_retains_rng_lifecycle_coverage() -> None:
+    """One public call retains the caller-owned RNG and output contracts."""
+    case = next(case for case in STOCHASTIC_CASES if case.row.mask == 15)
+    initial, final, particles, pairs, counts, states = _run_public_case(
+        case.row,
+        case.fixture,
+        n_species=1,
+        max_collisions=case.max_collisions,
+        device="cpu",
+        time_step=case.time_step,
+        volume=case.volume,
+        concentration=case.concentration,
+        seed=_seed_for_trial(case.row.mask, 0),
+        turbulent_arrays=True,
+        turbulent_dissipation=case.fixture.dissipation,
+        fluid_density=case.fixture.fluid_density,
+    )
+    assert particles is not None and pairs is not None and counts is not None
+    assert states is not None and final["states"].dtype == np.uint32
+    _assert_public_invariants(
+        initial,
+        final,
+        case.fixture.active,
+        charge_transfers=True,
+    )
+    assert np.all((final["counts"] >= 0) & (final["counts"] <= 1))

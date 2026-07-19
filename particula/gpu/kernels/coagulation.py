@@ -121,6 +121,12 @@ from particula.gpu.properties.particle_properties import (
     mean_thermal_speed_wp,
 )
 
+# These configuration APIs remain publicly owned by this concrete module even
+# though their host-only implementation is factored into a private module.
+CoagulationMechanismConfig.__module__ = __name__
+resolve_coagulation_mechanism_config.__module__ = __name__
+validate_coagulation_mechanism_capabilities.__module__ = __name__
+
 MAX_COLLISION_PAIR_BUFFER_BYTES = 256 * 1024 * 1024
 MAX_SCHEDULED_TRIALS_PER_BOX = 65_536
 # Charged selection obtains an exact majorant by visiting every compact active
