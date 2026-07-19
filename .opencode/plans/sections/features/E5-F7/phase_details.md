@@ -12,16 +12,18 @@
     active-index and exact-zero boundaries.
   - Result: Validation-only commit; no production, public API, or user-doc change.
 
-- [ ] **E5-F7-P2:** Validate cross-mechanism conservation, ownership, and edge cases
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Run the executable matrix through one-box/multi-box and active/inactive
-    fixtures while proving tight mass/charge and caller-ownership invariants.
-  - Files: `particula/gpu/kernels/tests/coagulation_validation_test.py`,
-    `particula/gpu/kernels/tests/coagulation_test.py` where legacy coverage is
-    extended
-  - Tests: Per-box/per-species mass, separate charge, inactive slots, zero/one/
-    two/many active particles, capacity, buffer identity, RNG reuse/reset, and
-    preflight atomicity.
+- [x] **E5-F7-P2:** Validate cross-mechanism conservation, ownership, and edge cases
+  - Issue: #1363 | Size: S | Status: Implemented
+  - Goal: Run the executable public-entry matrix through one-/two-box and
+    one-/two-species materializations while proving inventory, applicable charge,
+    and caller-ownership invariants.
+  - Files: `particula/gpu/kernels/tests/coagulation_validation_test.py` only.
+  - Tests: Every executable mask; per-box/per-species inventory and charge;
+    legal pair prefixes, donor/recipient bookkeeping, inactive sentinels, sparse
+    and two-active boundaries, zero-rate no-ops, capacity rejection, pair/count
+    ownership, RNG lifecycle, turbulent scalar/device inputs, and selected
+    preflight atomicity. Warp CPU runs when installed; CUDA is optional.
+  - Result: Validation-only commit; no production, public API, or user-doc change.
 
 - [ ] **E5-F7-P3:** Publish bounded stochastic and device validation matrix
   - Issue: TBD | Size: S | Status: Not Started

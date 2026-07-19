@@ -27,6 +27,18 @@ as host-only configuration failures. No production behavior, public API, or
 user documentation changed. Conservation, ownership, stochastic, CUDA, and
 published-evidence work remain subsequent phases.
 
+Issue #1363 completed the test-only P2 public-entry invariant slice in
+`particula/gpu/kernels/tests/coagulation_validation_test.py`. It exercises all
+11 executable masks with one- and two-box, one- and two-species
+materializations; verifies per-box/per-species inventory, applicable charge,
+legal accepted-pair, inactive-slot, and merge bookkeeping invariants; and
+checks caller-owned collision/count sidecars and persistent RNG lifecycle.
+It also covers turbulent scalar and device-array forms plus selected deferred
+and invalid-input preflight non-mutation cases. The suite runs on Warp CPU and
+adds CUDA coverage only when the shared device helper reports it. No production
+behavior, public API, or user documentation changed. Bounded stochastic and
+published-evidence work remain subsequent phases.
+
 ## User Stories
 
 - As a scientific user, I want independently calculated pair-rate parity so I
