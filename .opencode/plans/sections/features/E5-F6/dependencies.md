@@ -22,7 +22,8 @@
 ## Downstream
 
 - **E5-F7 — Cross-Mechanism Validation Matrix:** consumes the finalized
-  additive capability matrix and two-/four-way fixtures for release evidence.
+  singleton, two-way, and four-way capability matrix for remaining
+  release/cross-mechanism evidence.
 - **E5-F9 — Support Documentation, Example, and Roadmap Closeout:** consumes
   supported combination names, required inputs, and single-pass limits.
 - Future GPU-resident simulation work depends on E5-F6's stable combined

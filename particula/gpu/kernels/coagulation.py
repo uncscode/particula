@@ -4,16 +4,21 @@ This module composes Warp ``@wp.func`` building blocks into a direct-kernel
 coagulation pipeline. The executable particle-resolved masks are the four
 singletons ``1``, ``2``, ``4``, and ``8``; the six unordered two-way masks
 ``3``, ``5``, ``6``, ``9``, ``10``, and ``12``; and the four-way mask ``15``.
-The three-way masks ``7``, ``11``, ``13``, and ``14`` validate their enabled
-terms, then raise ``ValueError("Additive coagulation execution is deferred.")``.
+Mask ``7`` rejects at capability preflight before particle metadata or
+enabled-term validation. Turbulent masks ``11``, ``13``, and ``14`` validate
+particle metadata and enabled terms, then raise
+``ValueError("Additive coagulation execution is deferred.")`` before downstream
+work.
 Mechanism tuples normalize to Brownian, charged hard-sphere, SP2016
 sedimentation, then ST1956 turbulent shear.
 
-Enabled fp64 component rates are sanitized and summed. Their safe, potentially
-conservative component-majorant sum satisfies ``sum_m K_m(i, j) <= sum_m M_m``;
-component maxima may occur on different pairs. One shared candidate stream,
-acceptance stream, collision output, RNG stream, and apply pass serve every
-approved mask. Entry-point validation accepts scalar direct inputs, explicit
+Enabled fp64 component rates are sanitized and summed. A safe,
+potentially-conservative sum of component majorants satisfies
+``sum_m K_m(i, j) <= sum_m M_m``; component maxima may occur on different
+pairs. Production selection obtains its majorant from an exact compact-active
+scan of the summed rate. One shared candidate stream, acceptance stream,
+collision output, RNG stream, and apply pass serve every approved mask.
+Entry-point validation accepts scalar direct inputs, explicit
 ``(n_boxes,)`` Warp arrays, or a ``WarpEnvironmentData`` container. Particle
 metadata and device checks run before normalizing environment inputs, setting up
 volume, initializing RNG state, or executing Brownian work. An explicit opt-in
@@ -30,8 +35,9 @@ import them from ``particula.gpu.kernels.coagulation``, not
 host-side metadata, not device-resident simulation state. The public step
 defaults to Brownian, particle-resolved execution and accepts every singleton,
 two-way combination, and the four-way combination. Three-way masks remain
-deferred. Unsupported configurations reject before runtime state is accessed or
-mutated. Turbulent-shear-enabled masks validate and normalize explicit
+deferred. Malformed, duplicate, unknown, and non-particle-resolved
+configurations reject before runtime state is accessed or mutated.
+Turbulent-shear-enabled masks validate and normalize explicit
 turbulent dissipation and fluid-density inputs after particle schema/device
 metadata is available. Supplied particles, collision outputs, and RNG sidecars
 are caller-owned same-device Warp resources.
@@ -152,7 +158,9 @@ class CoagulationMechanismConfig:
     ``8``, ``9``, ``10``, ``12``, and ``15``. The resolver normalizes supported
     mechanism tuples to the canonical fixed-mask order. Malformed, duplicate,
     unknown, and non-particle-resolved configurations reject during structural
-    preflight before particle state is accessed. Three-way masks validate
+    preflight before particle state is accessed. Mask ``7`` rejects at
+    capability preflight before particle metadata or enabled-term validation.
+    Turbulent masks ``11``, ``13``, and ``14`` validate particle metadata and
     enabled terms before their deferred-execution error. Structurally valid
     turbulent-shear requests validate their explicit P2 inputs after particle
     schema and device checks.
@@ -195,10 +203,10 @@ def resolve_coagulation_mechanism_config(
 
     ``config.mechanisms=None`` defaults to Brownian; ``config`` itself remains
     required. Valid identifiers are normalized to canonical order and retained
-    in the returned fixed-bit mask, including reserved terms that the separate
-    capability validator rejects after enabled-term validation. This pure
-    host-side, concrete-module-only helper neither allocates device storage nor
-    mutates its input or runtime state. Import it from
+    in the returned fixed-bit mask, including deferred configurations whose
+    validation timing is determined by the caller's capability preflight. This
+    pure host-side, concrete-module-only helper neither allocates device storage
+    nor mutates its input or runtime state. Import it from
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
 
     Args:
@@ -268,10 +276,11 @@ def validate_coagulation_mechanism_capabilities(
     This pure host-side, concrete-module-only validator accepts masks ``1``,
     ``2``, ``3``, ``4``, ``5``, ``6``, ``8``, ``9``, ``10``, ``12``, and ``15``.
     It rejects the recognized three-way masks ``7``, ``11``, ``13``, and ``14``
-    with the stable deferred-execution error. ``coagulation_step_gpu`` invokes
-    this validator during structural preflight for non-turbulent masks, but
-    invokes it after the turbulent P2 input boundary for structurally valid
-    turbulent-shear masks. Import it from
+    with the stable deferred-execution error. Mask ``7`` reaches this validator
+    during capability preflight before particle metadata or enabled-term
+    validation. Turbulent masks ``11``, ``13``, and ``14`` reach it only after
+    particle metadata and enabled-term validation, including the turbulent P2
+    input boundary. Import it from
     ``particula.gpu.kernels.coagulation``, not ``particula.gpu.kernels``.
 
     Args:
@@ -1142,9 +1151,10 @@ def brownian_coagulation_kernel(  # noqa: C901
         g_terms: Output collection terms ``(n_boxes, n_particles)``.
         speeds: Output mean thermal speeds ``(n_boxes, n_particles)``.
         settling_velocities: Private fp64 settling-velocity scratch
-            ``(n_boxes, n_particles)``. The kernel clears every slot on entry
-            and populates this call-local scratch for valid active slots when
-            SP2016 sedimentation is enabled.
+            ``(n_boxes, n_particles)``. When separately allocated for SP2016
+            sedimentation, this scratch is zero-initialized before selector
+            launch. The selector populates valid active slots and does not
+            clear this scratch.
         turbulent_dissipation: Per-box turbulent kinetic-energy dissipation
             rate ``(n_boxes,)`` [m^2/s^3]. Read when ST1956 turbulent shear is
             enabled.
@@ -1485,7 +1495,13 @@ def apply_coagulation_kernel(
     collision_pairs: Any,
     n_collisions: Any,
 ) -> None:
-    """Apply coagulation collisions by merging particle state in place.
+    """Apply representable coagulation merges to caller-owned state in place.
+
+    A pair is applied only when the summed charge and every summed species mass
+    are finite and nonnegative. Applied merges add donor mass and charge to the
+    recipient, then clear the donor mass, concentration, and charge. A rejected
+    unrepresentable pair leaves both particle inventories unchanged and is
+    removed from the collision output during the following compaction pass.
 
     Args:
         masses: Particle masses array ``(n_boxes, n_particles, n_species)``.
@@ -2109,8 +2125,8 @@ def _ensure_turbulent_input_array(
 
     This private helper validates explicitly supplied state only; it neither
     infers turbulent properties from shared containers nor transfers host data.
-    ``coagulation_step_gpu`` uses it only for the exact executable ST1956
-    turbulent-shear singleton.
+    ``coagulation_step_gpu`` uses it for every executable mask containing
+    ST1956 turbulent shear.
 
     Args:
         name: Input name used in contract errors.
@@ -2251,15 +2267,23 @@ def coagulation_step_gpu(  # noqa: C901
 
     This low-level API is not a CPU strategy-composition or ``Runnable`` API.
     It supports only ``"particle_resolved"`` execution: omission selects
-    Brownian; the executable masks are ``1``, ``2``, ``4``, ``8``, ``3``, ``5``,
-    ``6``, ``9``, ``10``, ``12``, and ``15``. Three-way masks ``7``, ``11``,
-    ``13``, and ``14`` validate enabled terms, then raise the stable deferred
-    error.
+    Brownian; the executable singleton masks are ``1``, ``2``, ``4``, and ``8``;
+    unordered two-way masks are ``3``, ``5``, ``6``, ``9``, ``10``, and ``12``;
+    and the four-way mask is ``15``. Supported mechanism tuples normalize to
+    Brownian, charged hard-sphere, SP2016 sedimentation, and ST1956 turbulent
+    shear. Mask ``7`` raises the stable deferred error at capability preflight,
+    before particle metadata or enabled-term validation. Turbulent masks ``11``,
+    ``13``, and ``14`` validate particle metadata and enabled terms before
+    raising that error, without downstream work.
     ``mechanism_config`` is immutable, keyword-only host metadata and is
     structurally preflighted before any runtime input access, allocation,
-    normalization, RNG work, or launch. The supported enabled pair-rate terms
-    are summed before one candidate stream, acceptance stream, collision-buffer
-    set, RNG stream, and apply pass. Its active-pair work is O(A²), while
+    normalization, RNG work, or launch. Enabled fp64 pair-rate components are
+    sanitized and summed. A component-majorant sum is safe but can be
+    conservative because component maxima can occur on different pairs;
+    production selection obtains the majorant by scanning the summed active-pair
+    rates. Every approved mask uses one candidate stream, acceptance stream,
+    collision-buffer set, RNG stream, and apply pass. Its active-pair work is
+    O(A²), while
     collision and selector buffers are O(A), for active count A; this is bounded
     implementation scope, not a throughput or scaling claim. Malformed,
     duplicate, unknown, and unsupported-distribution combinations reject before
@@ -2324,8 +2348,10 @@ def coagulation_step_gpu(  # noqa: C901
             ``1``, ``2``, ``4``, ``8``, ``3``, ``5``, ``6``, ``9``, ``10``,
             ``12``, and ``15``. Malformed configurations, unsupported
             distributions, and unrecognized mechanism combinations fail before
-            particle state is accessed or mutated. Deferred three-way
-            combinations validate enabled terms before rejecting. A wrong type
+            particle state is accessed or mutated. Deferred mask ``7`` rejects
+            at capability preflight before particle metadata or enabled-term
+            validation. Turbulent masks ``11``, ``13``, and ``14`` validate
+            particle metadata and enabled terms before rejecting. A wrong type
             raises exactly
             ``ValueError``
             with the message
@@ -2446,12 +2472,14 @@ def coagulation_step_gpu(  # noqa: C901
         impose charged-only constraints.
 
         A successful call allocates private, call-local selector scratch,
-        including ``wp.float64`` ``(n_boxes, n_particles)`` total-mass and
-        settling-velocity arrays. The selector clears every scratch slot and
-        sums each active particle's species masses once for charged pair rates
-        and their compact-active majorant. It derives radii for ST1956
-        turbulent-shear rates and populates settling velocities only for valid
-        active slots of the exact SP2016 sedimentation-only mask.
+        including a ``wp.float64`` ``(n_boxes, n_particles)`` total-mass array.
+        Sedimentation-enabled masks allocate a separate zero-initialized
+        settling-velocity array; non-sedimentation paths alias that storage to
+        radii. The selector clears its own scratch slots and sums each active
+        particle's species masses once for charged pair rates and their
+        compact-active majorant. It derives radii for ST1956 turbulent-shear
+        rates and populates settling velocities for valid active slots whenever
+        sedimentation is enabled, including mixed masks.
         This scratch is not a caller-owned output, is not returned, and is
         allocated only after caller-resource preflight succeeds.
 

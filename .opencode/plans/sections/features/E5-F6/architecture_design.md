@@ -6,12 +6,14 @@
 coagulation_step_gpu(..., mechanisms=config, mechanism-specific inputs...)
   -> canonicalize config and resolve mechanism bit mask
   -> validate mask against the P1 recognition table
-  -> obtain particle metadata, then validate every enabled term read-only
-  -> reject a recognized non-executable mask before runtime normalization/work
+  -> capability-reject non-turbulent deferred mask 7 before metadata access
+  -> obtain particle metadata, then validate enabled terms read-only when needed
+  -> capability-reject turbulent deferred masks 11, 13, and 14 before runtime
+     normalization/work
   -> validate the distinct executable capability boundary
   -> prepare shared active indices and per-particle properties once
-  -> for each box, compute each enabled term's proven majorant
-  -> total_majorant = sum(enabled term majorants)
+   -> for each box, compute enabled fp64 pair-rate components
+   -> scan active pairs for the production total majorant
   -> schedule one bounded trial count from total_majorant
   -> for each proposed active pair
        total_pair_rate = sum(enabled pair-rate terms for i, j)
@@ -23,23 +25,23 @@ coagulation_step_gpu(..., mechanisms=config, mechanism-specific inputs...)
   -> return the existing particles/pairs/counts tuple
 ```
 
-The total bound is the sum of valid component bounds. For non-negative rates,
+The sum of valid component bounds is a safe conservative bound. For non-negative rates,
 if `K_m(i,j) <= M_m` for every enabled mechanism `m`, then
 `sum_m K_m(i,j) <= sum_m M_m`. This bound may be conservative because component
 maxima can occur at different pairs, but it is safe and avoids an unproved
-cross-mechanism extrema heuristic. Approved fixtures must not bind the bounded
-trial cap. If the cap binds, replace the summed-component scheduling bound with
-the exhaustive maximum of the summed total pair rate for every active unordered
-pair; do not substitute an unproved heuristic.
+cross-mechanism extrema heuristic. The shipped production selector obtains its
+majorant by scanning summed active-pair rates; the summed component bound remains
+the proof and diagnostic reference.
 
-P1 separates structural recognition from the executable boundary. Its private immutable host
-table recognizes four singleton masks, all six unordered pair masks, and the
-four-term mask; canonical ordering resolves equivalent pairs identically and
-duplicates are never weights. Three-term masks are recognized but deferred and
-reject before particle access after their enabled-term validation. Approved
-singleton, pair, and four-term masks enter the shared execution path; the
-deferred masks raise the stable error before normalization, output/RNG work,
-launch, or mutation.
+P1 separates structural recognition from the executable boundary. Its private
+immutable host table recognizes four singleton masks (`1`, `2`, `4`, `8`), all
+six unordered pair masks (`3`, `5`, `6`, `9`, `10`, `12`), and four-term mask
+`15`; canonical ordering resolves equivalent pairs identically and duplicates
+are never weights. Deferred non-turbulent mask `7` raises the stable error at
+the capability gate before particle metadata or enabled-term validation.
+Deferred turbulent masks `11`, `13`, and `14` access metadata and validate their
+enabled terms, then raise that error before runtime normalization, output/RNG
+work, launch, or mutation. The approved masks enter the shared execution path.
 
 ## Data / API / Workflow Changes
 
