@@ -21,6 +21,12 @@ Issue #1369 delivered the P3 roadmap ownership record and its regression test.
 The record routes all 14 deferred capabilities to future approved
 numerical-method or physics-expansion work and Epics G--I with entry gates.
 
+Issue #1370 completed P4 by linking both artifacts from the five canonical
+condensation, foundations, examples, and roadmap pages. The documentation
+regression now checks each page's exact resolving links, focused commands,
+evidence labels, energy-output wording, backend policy, and deferred
+capability non-claims.
+
 ## User Stories
 
 - As a scientific reviewer, I want independent CPU and Warp inputs and

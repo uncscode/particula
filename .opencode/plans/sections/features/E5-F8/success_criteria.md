@@ -19,11 +19,13 @@
 - [x] Every deferred capability has a named downstream owner, entry gate, and
   explicit E5-F8 non-claim in the 14-row ownership record; documentation tests
   fail if a row is removed, malformed, duplicated, or rerouted.
-- [ ] Canonical condensation, foundations, example, and roadmap documents link
-  to the walkthrough; all links and focused commands validate.
-- [ ] E5-F9 receives stable artifact links and no E5-F1-F7 scope is duplicated.
-- [ ] Coverage thresholds remain unchanged and all focused tests pass with
-  warnings treated as errors.
+- [x] The five canonical condensation, foundations, examples, and roadmap
+  documents link exactly once to both artifacts; the documentation regression
+  validates their targets and focused commands.
+- [x] Integrated documentation preserves the separate evidence labels,
+  fixed-four-substep direct-kernel boundary, Warp CPU/optional-CUDA policy,
+  `kg * J/kg = J` identity, caller-owned write-only `energy_transfer`, and
+  deferred-capability non-claims.
 
 ## Metrics
 

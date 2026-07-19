@@ -24,6 +24,10 @@ CPU strategy or `Runnable` path.
 - Publish the P3 record with one 14-row deferred-capability table, approved
   downstream owners and entry gates, exact reproduction commands, and a
   regression test for the direct-kernel-only evidence boundary.
+- Link both artifacts from the five canonical condensation, foundations,
+  examples, and roadmap pages, with documentation regression coverage for
+  resolving links, commands, evidence categories, ownership wording, backend
+  policy, and non-claims.
 
 ## Out of Scope
 
@@ -32,4 +36,3 @@ CPU strategy or `Runnable` path.
 - Temperature evolution, adaptive stepping, new activity/surface-tension
   physics, graph replay, broad autodiff, or backend-selection implementation.
 - Performance targets, mixed/lower precision migration, or required CUDA CI.
-- Broad canonical documentation/index integration, which remains P4 work.
