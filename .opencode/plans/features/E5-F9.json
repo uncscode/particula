@@ -45,11 +45,11 @@
     {
       "id": "E5-F9-P2",
       "title": "Add direct GPU coagulation example with co-located tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-19",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
