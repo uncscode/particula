@@ -11,8 +11,9 @@ The fixed-mask matrix has exactly 11 executable rows. P1 is deterministic
 validation in
 `particula/gpu/kernels/tests/coagulation_validation_test.py`, backed by the
 Warp-free independent support equations in
-`particula/gpu/kernels/tests/_coagulation_validation_support.py`. P2 is the
-public-step invariant and ownership evidence in
+`particula/gpu/kernels/tests/_coagulation_validation_support.py`. P2 public-
+step invariant and ownership assertions are in
+`particula/gpu/kernels/tests/coagulation_validation_test.py`, supported by
 `particula/gpu/kernels/tests/_coagulation_public_step_support.py`. P3 is the
 bounded stochastic evidence in
 `particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py`.
@@ -39,9 +40,10 @@ other combination.
 
 ## Evidence Boundaries
 
-- **P1 deterministic:** Brownian comparisons use `rtol=1e-7, atol=0`.
-  Other positive or additive rate, property, and majorant comparisons use
-  `rtol=1e-6, atol=0`. Physical zeros are exact.
+- **P1 deterministic:** Brownian pair-rate comparisons use
+  `rtol=1e-7, atol=0`. Brownian property and selector-majorant checks, along
+  with other applicable positive or additive rate, property, and majorant
+  comparisons, use `rtol=1e-6, atol=0`. Physical zeros are exact.
 - **P2 invariants and ownership:** concentration-weighted, per-box,
   per-species inventory uses `rtol=1e-12, atol=1e-30`. The same public-step
   evidence covers applicable charge conservation, legal pairs, merge

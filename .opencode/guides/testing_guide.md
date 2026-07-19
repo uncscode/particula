@@ -173,8 +173,10 @@ registered: `warp`, `cuda`, `gpu_parity`, and `stochastic`.
 
 ### Release-validation command sets
 
-Use focused Warp CPU runs for the default supported validation path. These are
-the shipped release-validation commands whenever Warp is installed:
+Use focused Warp runs for the default supported validation path. Warp CPU is
+the required baseline whenever Warp is installed; the deterministic focused
+command also exercises CUDA when it is available. These are the shipped
+release-validation commands:
 
 ```bash
 pytest particula/gpu/tests/cuda_availability_test.py -q
@@ -212,14 +214,16 @@ These commands match the shipped marker and helper contract:
   from the default release-validation path above.
 - Marker selection describes test intent; it does not select a device. In
   particular, deterministic P2 public-step checks enumerate available Warp
-  devices, so they are not strictly CPU-only when CUDA is available.
+  devices, so they exercise CUDA when it is available as well as the Warp CPU
+  baseline.
 
 The coagulation validation matrix supports exactly the singleton masks `1`,
 `2`, `4`, and `8`; two-way masks `3`, `5`, `6`, `9`, `10`, and `12`; and
 four-way mask `15`. The three-way masks `7`, `11`, `13`, and `14` remain
-deferred/fail closed. P1 uses `rtol=1e-7, atol=0` for Brownian and
-`rtol=1e-6, atol=0` for other positive/additive rate, property, and majorant
-comparisons; physical zeros are exact. P2 keeps concentration-weighted,
+deferred/fail closed. P1 uses `rtol=1e-7, atol=0` for Brownian pair-rate
+comparisons. Brownian property and selector-majorant checks, along with other
+applicable positive/additive rate, property, and majorant comparisons, use
+`rtol=1e-6, atol=0`; physical zeros are exact. P2 keeps concentration-weighted,
 per-box/per-species inventory at `rtol=1e-12, atol=1e-30` and separates that
 ownership evidence from stochastic acceptance.
 
