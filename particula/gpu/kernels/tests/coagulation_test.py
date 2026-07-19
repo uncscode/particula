@@ -14,6 +14,7 @@ the public GPU API.
 
 from __future__ import annotations
 
+import ast
 import inspect
 import itertools
 import re
@@ -917,6 +918,135 @@ def test_approved_additive_masks_use_public_merge_path(
     npt.assert_array_equal(result.charge[:, 2], [0.0, 0.0])
 
 
+@pytest.mark.stochastic
+@pytest.mark.parametrize(
+    "mechanisms",
+    [
+        (BROWNIAN_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
+        (CHARGED_HARD_SPHERE_MECHANISM, SEDIMENTATION_SP2016_MECHANISM),
+        (BROWNIAN_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
+        (CHARGED_HARD_SPHERE_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
+        (SEDIMENTATION_SP2016_MECHANISM, TURBULENT_SHEAR_ST1956_MECHANISM),
+        CANONICAL_COAGULATION_MECHANISMS,
+    ],
+)
+def test_additive_masks_public_mult_pair_counts_include_every_enabled_rate(
+    device: str,
+    mechanisms: tuple[str, ...],
+) -> None:
+    """Public additive masks match independent multi-pair rate statistics.
+
+    One public launch uses independent per-box RNG streams to keep this fast.
+    The finite timestep is chosen from the exhaustive initial pair-rate oracle.
+    Each enabled component is large enough that dropping it moves the expected
+    one-collision probability beyond the documented sampling uncertainty.
+    """
+    temperature = 298.15
+    pressure = 101325.0
+    fluid_density = 1000.0
+    turbulent_dissipation = 2.0e-4
+    observations = 2048
+    radii = np.array([0.7e-6, 0.9e-6, 1.1e-6, 1.3e-6])
+    masses = ((4.0 / 3.0) * np.pi * radii**3 * 1000.0).astype(np.float64)
+    particles = ParticleData(
+        masses=np.tile(masses, (observations, 1))[..., np.newaxis],
+        concentration=np.ones((observations, radii.size), dtype=np.float64),
+        charge=np.tile(np.array([0.0, 1.0, -1.0, 2.0]), (observations, 1)),
+        density=np.array([1000.0]),
+        volume=np.ones(observations, dtype=np.float64),
+    )
+    component_rates = _additive_component_rate_matrices(
+        radii=radii,
+        masses=masses,
+        charges=particles.charge[0],
+        temperature=temperature,
+        pressure=pressure,
+        turbulent_dissipation=turbulent_dissipation,
+        fluid_density=fluid_density,
+    )
+    enabled_bits = tuple(
+        bit
+        for bit, mechanism in zip(
+            (1, 2, 4, 8),
+            CANONICAL_COAGULATION_MECHANISMS,
+            strict=True,
+        )
+        if mechanism in mechanisms
+    )
+    total_rates = sum(component_rates[bit] for bit in enabled_bits)
+    total_rate = float(np.sum(np.triu(total_rates, k=1)))
+    majorant = float(np.max(total_rates))
+    assert total_rate > 0.0
+    assert majorant > 0.0
+    for bit in enabled_bits:
+        assert float(np.sum(np.triu(component_rates[bit], k=1))) > 0.0
+
+    # Set 2.5 expected candidate draws before acceptance.  This keeps the
+    # event probability finite and makes a missing component discriminating.
+    volume = majorant * 6.0 / 2.5
+    expected_probability = _one_collision_probability(
+        total_rate=total_rate,
+        majorant=majorant,
+        volume=volume,
+    )
+    for missing_bit in enabled_bits:
+        without_component = total_rates - component_rates[missing_bit]
+        missing_probability = _one_collision_probability(
+            total_rate=float(np.sum(np.triu(without_component, k=1))),
+            majorant=float(np.max(without_component)),
+            volume=volume,
+        )
+        standard_error = np.sqrt(
+            expected_probability * (1.0 - expected_probability) / observations
+        )
+        assert (
+            abs(expected_probability - missing_probability)
+            > 6.0 * standard_error
+        )
+
+    gpu_particles = to_warp_particle_data(particles, device=device)
+    initial_mass = np.sum(particles.masses, axis=1)
+    initial_charge = np.sum(particles.charge, axis=1)
+    collision_pairs = wp.full(
+        (observations, 1, 2), -1, dtype=wp.int32, device=device
+    )
+    collision_counts = wp.zeros((observations,), dtype=wp.int32, device=device)
+    _, returned_pairs, returned_counts = coagulation_step_gpu(
+        gpu_particles,
+        temperature=temperature,
+        pressure=pressure,
+        time_step=1.0,
+        volume=volume,
+        max_collisions=1,
+        rng_seed=731,
+        collision_pairs=collision_pairs,
+        n_collisions=collision_counts,
+        mechanism_config=CoagulationMechanismConfig(mechanisms=mechanisms),
+        turbulent_dissipation=turbulent_dissipation,
+        fluid_density=fluid_density,
+    )
+    result = from_warp_particle_data(gpu_particles, sync=True)
+    observed_counts = np.asarray(returned_counts.numpy(), dtype=np.int64)
+    observed_pairs = np.asarray(returned_pairs.numpy(), dtype=np.int64)
+    observed_probability = float(np.mean(observed_counts))
+    sigma = np.sqrt(
+        expected_probability * (1.0 - expected_probability) / observations
+    )
+
+    assert returned_pairs is collision_pairs
+    assert returned_counts is collision_counts
+    assert (
+        abs(observed_probability - expected_probability) <= 4.0 * sigma + 0.02
+    )
+    assert np.all((observed_counts == 0) | (observed_counts == 1))
+    accepted_pairs = observed_pairs[observed_counts.astype(bool), 0]
+    assert np.all(accepted_pairs[:, 0] >= 0)
+    assert np.all(accepted_pairs[:, 0] < accepted_pairs[:, 1])
+    assert np.all(accepted_pairs[:, 1] < radii.size)
+    npt.assert_allclose(np.sum(result.masses, axis=1), initial_mass, rtol=1e-12)
+    npt.assert_allclose(np.sum(result.charge, axis=1), initial_charge, rtol=0.0)
+
+
 @pytest.mark.parametrize(
     "mechanisms",
     [
@@ -1607,6 +1737,86 @@ def _charged_hard_sphere_oracle(
             / (reduced_mass * continuum)
         )
     return float(result) if np.isfinite(result) and result > 0.0 else 0.0
+
+
+def _additive_component_rate_matrices(
+    *,
+    radii: np.ndarray,
+    masses: np.ndarray,
+    charges: np.ndarray,
+    temperature: float,
+    pressure: float,
+    turbulent_dissipation: float,
+    fluid_density: float,
+) -> dict[int, np.ndarray]:
+    """Calculate independent rate matrices for every public component."""
+    brownian = np.asarray(
+        get_brownian_kernel_via_system_state(
+            particle_radius=radii,
+            particle_mass=masses,
+            temperature=temperature,
+            pressure=pressure,
+        ),
+        dtype=np.float64,
+    )
+    charged = np.zeros_like(brownian)
+    sedimentation = np.zeros_like(brownian)
+    turbulent = np.zeros_like(brownian)
+    viscosity = (
+        constants.REF_VISCOSITY_AIR_STP
+        * (temperature / constants.REF_TEMPERATURE_STP) ** 1.5
+        * (constants.REF_TEMPERATURE_STP + constants.SUTHERLAND_CONSTANT)
+        / (temperature + constants.SUTHERLAND_CONSTANT)
+    )
+    kinematic_viscosity = viscosity / fluid_density
+    velocities = np.array(
+        [_settling_velocity_oracle(radius, 1000.0) for radius in radii]
+    )
+    for first, second in itertools.combinations(range(radii.size), 2):
+        charged[first, second] = _charged_hard_sphere_oracle(
+            radii[first],
+            radii[second],
+            masses[first],
+            masses[second],
+            charges[first],
+            charges[second],
+            temperature,
+            pressure,
+        )
+        sedimentation[first, second] = _sedimentation_sp2016_oracle(
+            radii[first],
+            radii[second],
+            velocities[first],
+            velocities[second],
+        )
+        turbulent[first, second] = (
+            np.sqrt(
+                np.pi * turbulent_dissipation / (120.0 * kinematic_viscosity)
+            )
+            * (2.0 * (radii[first] + radii[second])) ** 3
+        )
+    return {
+        BROWNIAN_MECHANISM_FLAG: brownian,
+        CHARGED_HARD_SPHERE_MECHANISM_FLAG: charged,
+        SEDIMENTATION_SP2016_MECHANISM_FLAG: sedimentation,
+        TURBULENT_SHEAR_ST1956_MECHANISM_FLAG: turbulent,
+    }
+
+
+def _one_collision_probability(
+    *,
+    total_rate: float,
+    majorant: float,
+    volume: float,
+) -> float:
+    """Return the exact pre-merge chance of one accepted public trial."""
+    expected_trials = majorant * 6.0 / volume
+    scheduled_trials = int(np.floor(expected_trials))
+    remainder = expected_trials - scheduled_trials
+    acceptance_probability = total_rate / (6.0 * majorant)
+    no_collision = (1.0 - acceptance_probability) ** scheduled_trials
+    no_collision *= 1.0 - remainder * acceptance_probability
+    return 1.0 - no_collision
 
 
 def _charged_majorant_oracle(
@@ -5237,6 +5447,37 @@ def _turbulent_rate_and_majorant_probe_kernel(
         wp.float64(1.0),
         wp.float64(1.0),
     )
+
+
+def test_turbulent_public_dispatch_keeps_linear_majorant_path() -> None:
+    """The public singleton dispatch selects the test-local linear diagnostic.
+
+    Warp inlines ``@wp.func`` helpers into the public selector, so wall-clock
+    timing cannot reliably distinguish an O(A) scan from an O(A²) scan across
+    CPU and CUDA.  This structural diagnostic inspects the public kernel's
+    parsed source: the singleton branch must call the two-largest-radii helper,
+    while only its alternate branch may contain the exhaustive pair scan.
+    """
+    source = inspect.getsource(
+        coagulation_module.brownian_coagulation_kernel.func
+    )
+    tree = ast.parse(source)
+    singleton_branch = next(
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.If)
+        and "mechanism_mask == wp.int32(TURBULENT_SHEAR_ST1956_MECHANISM_FLAG)"
+        in ast.unparse(node.test)
+    )
+    singleton_calls = [
+        node.func.id
+        for node in ast.walk(singleton_branch)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    ]
+
+    assert "_turbulent_majorant_from_active_radii" in singleton_calls
+    assert any(isinstance(node, ast.For) for node in singleton_branch.orelse)
+    assert not any(isinstance(node, ast.For) for node in singleton_branch.body)
 
 
 @pytest.mark.gpu_parity

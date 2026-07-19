@@ -246,20 +246,24 @@ behavior should stay unchanged when the work is diagnostic-only.
 
 The direct ST1956 turbulent-shear singleton uses explicit positive finite
 `turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³) P2 inputs. Cover
-scalar and active-device `wp.float64` `(n_boxes,)` inputs. P1 recognizes the
-four singletons, six unordered two-term masks, and four-term mask for
-enabled-term read-only validation only. Valid recognized combinations that are
-not executable must raise
-`ValueError("Additive coagulation execution is deferred.")` before downstream
-normalization, output/RNG work, executable launches, or mutation; three-term
-masks must reject before particle access. Test turbulent, charged, and
-sedimentation validation according to the enabled mechanism bits, while proving
-non-turbulent masks ignore turbulent arguments and caller-owned particle,
-collision-output, and persistent-RNG state is unchanged after preflight errors.
-Test the turbulent singleton's O(A) two-largest-active-radii majorant against an
-independent NumPy oracle, keep mass conservation separate from stochastic
-acceptance checks, and use aggregate tolerance or sigma bounds rather than exact
-seeded pair replay.
+scalar and active-device `wp.float64` `(n_boxes,)` inputs. Executable masks are
+the singletons `1`, `2`, `4`, and `8`; two-term masks `3`, `5`, `6`, `9`, `10`,
+and `12`; and the four-term mask `15`. The three-term masks are deferred:
+mask `7` rejects at capability preflight before particle metadata or enabled-term
+validation, while masks `11`, `13`, and `14` validate particle metadata and all
+enabled terms (including turbulent P2 inputs where enabled) before raising
+`ValueError("Additive coagulation execution is deferred.")`. Deferred errors
+occur before downstream normalization, output/RNG work, executable launches, or
+mutation. Test turbulent, charged, and sedimentation validation according to the
+enabled mechanism bits, while proving non-turbulent masks ignore turbulent
+arguments and caller-owned particle, collision-output, and persistent-RNG state
+is unchanged after preflight errors. Test the turbulent singleton's O(A)
+two-largest-active-radii majorant against an independent NumPy oracle. For every
+executable additive mask, public-path multi-pair tests must independently sum
+enabled component rates and use finite, discriminating timesteps so omission of
+one contribution changes bounded selection outcomes. Keep mass conservation
+separate from stochastic acceptance checks and use aggregate tolerance or sigma
+bounds rather than exact seeded pair replay.
 
 For the GPU condensation suite, keep shared helpers in support modules only when
 discoverable `*_test.py` wrappers expose the runnable cases. The current entry

@@ -1305,44 +1305,57 @@ def brownian_coagulation_kernel(  # noqa: C901
         n_collisions[box_idx] = wp.int32(0)
         return
 
-    # The exact compact-pair scan bounds the complete additive rate, including
-    # combinations whose component maxima occur on different pairs.
-    majorant_total = wp.float64(0.0)
-    for first_rank in range(active_count - wp.int32(1)):
-        first_idx = wp.int32(active_indices[box_idx, first_rank])
-        for second_rank in range(first_rank + wp.int32(1), active_count):
-            second_idx = wp.int32(active_indices[box_idx, second_rank])
-            pair_rate = _total_pair_rate(
-                mechanism_mask,
-                radii[box_idx, first_idx],
-                radii[box_idx, second_idx],
-                diffusivities[box_idx, first_idx],
-                diffusivities[box_idx, second_idx],
-                g_terms[box_idx, first_idx],
-                g_terms[box_idx, second_idx],
-                speeds[box_idx, first_idx],
-                speeds[box_idx, second_idx],
-                settling_velocities[box_idx, first_idx],
-                settling_velocities[box_idx, second_idx],
-                turbulent_dissipation[box_idx],
-                kinematic_viscosity,
-                total_masses[box_idx, first_idx],
-                total_masses[box_idx, second_idx],
-                charge[box_idx, first_idx],
-                charge[box_idx, second_idx],
-                temperature_value,
-                pressure_value,
-                boltzmann_constant,
-                elementary_charge_value,
-                electric_permittivity,
-                gas_constant,
-                molecular_weight_air,
-                ref_viscosity,
-                ref_temperature,
-                sutherland_constant,
-            )
-            if pair_rate > majorant_total:
-                majorant_total = pair_rate
+    if mechanism_mask == wp.int32(TURBULENT_SHEAR_ST1956_MECHANISM_FLAG):
+        # ST1956 is monotonic in the pair diameter sum, so the two largest
+        # active radii provide an analytical O(A) majorant.
+        majorant_total = _turbulent_majorant_from_active_radii(
+            active_indices,
+            box_idx,
+            active_count,
+            radii,
+            turbulent_dissipation[box_idx],
+            kinematic_viscosity,
+        )
+    else:
+        # The exact compact-pair scan bounds the complete additive rate,
+        # including combinations whose component maxima occur on different
+        # pairs.
+        majorant_total = wp.float64(0.0)
+        for first_rank in range(active_count - wp.int32(1)):
+            first_idx = wp.int32(active_indices[box_idx, first_rank])
+            for second_rank in range(first_rank + wp.int32(1), active_count):
+                second_idx = wp.int32(active_indices[box_idx, second_rank])
+                pair_rate = _total_pair_rate(
+                    mechanism_mask,
+                    radii[box_idx, first_idx],
+                    radii[box_idx, second_idx],
+                    diffusivities[box_idx, first_idx],
+                    diffusivities[box_idx, second_idx],
+                    g_terms[box_idx, first_idx],
+                    g_terms[box_idx, second_idx],
+                    speeds[box_idx, first_idx],
+                    speeds[box_idx, second_idx],
+                    settling_velocities[box_idx, first_idx],
+                    settling_velocities[box_idx, second_idx],
+                    turbulent_dissipation[box_idx],
+                    kinematic_viscosity,
+                    total_masses[box_idx, first_idx],
+                    total_masses[box_idx, second_idx],
+                    charge[box_idx, first_idx],
+                    charge[box_idx, second_idx],
+                    temperature_value,
+                    pressure_value,
+                    boltzmann_constant,
+                    elementary_charge_value,
+                    electric_permittivity,
+                    gas_constant,
+                    molecular_weight_air,
+                    ref_viscosity,
+                    ref_temperature,
+                    sutherland_constant,
+                )
+                if pair_rate > majorant_total:
+                    majorant_total = pair_rate
 
     if not (wp.isfinite(majorant_total) and majorant_total > wp.float64(0.0)):
         n_collisions[box_idx] = wp.int32(0)

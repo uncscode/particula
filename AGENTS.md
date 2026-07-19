@@ -434,18 +434,19 @@ for _ in range(n_steps):
   nonnegative mass and concentration and finite, positive density before output
   allocation/writes, RNG setup, or particle mutation. P1 recognizes the four
   singleton mechanisms, all six unordered two-term combinations, and the
-  four-term combination only to perform enabled-term read-only validation; this
-  recognition is not execution support. The singleton modes and
-  Brownian-plus-charged remain the only executable configurations. Every other
-  valid recognized additive combination raises exactly
-  `ValueError("Additive coagulation execution is deferred.")` after its
-  enabled-term validation and before time, environment, or volume normalization;
-  collision-output/RNG allocation or initialization; kernel launch; or mutation.
-  Three-term combinations remain unrecognized and reject before particle access.
-  Either supported Brownian-plus-charged order normalizes to the canonical mask
-  and uses one shared stochastic selection path. Malformed configurations,
-  unsupported distributions, duplicate and unknown mechanisms reject through
-  resolver preflight.
+  four-term combination. Executable particle-resolved masks are the singletons
+  `1`, `2`, `4`, and `8`; the two-term masks `3`, `5`, `6`, `9`, `10`, and `12`;
+  and the four-term mask `15`. The deferred three-term masks have deliberate
+  validation ordering: mask `7` rejects at capability preflight before particle
+  metadata or enabled-term validation, while masks `11`, `13`, and `14` validate
+  particle metadata and their enabled terms before raising exactly
+  `ValueError("Additive coagulation execution is deferred.")`. Deferred errors
+  occur before time, environment, or volume normalization; collision-output/RNG
+  allocation or initialization; kernel launch; or mutation. Either supported
+  Brownian-plus-charged order normalizes to the canonical mask and uses one
+  shared stochastic selection path. Malformed configurations, unsupported
+  distributions, duplicate, and unknown mechanisms reject through resolver
+  preflight.
 - The exact ST1956 turbulent-shear singleton
   `CoagulationMechanismConfig(("turbulent_shear_st1956",))` is executable with
   `distribution_type="particle_resolved"`. It requires keyword-only, explicit
@@ -453,7 +454,7 @@ for _ in range(n_steps):
   positive finite Python/NumPy floating scalar or an active-device `wp.float64`
   Warp array shaped `(n_boxes,)`; supplied valid arrays retain identity, while
   scalar broadcasts use private device storage. These are not container fields.
-  Recognized turbulent combinations validate these inputs before raising the
+  Turbulent masks `11`, `13`, and `14` validate these inputs before their
   deferred-execution error; non-turbulent masks ignore both parameters.
   The direct singleton uses an O(A) two-largest-active-radii majorant. It adds
   no runnable/API re-export, CPU fallback, or performance claim.
