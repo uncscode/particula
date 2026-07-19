@@ -33,7 +33,7 @@ use the `*_test.py` convention and collect cleanly when Warp is absent.
   replay claim.
 - **P3 — Stochastic/device matrix (implemented in #1364):** The dedicated
   stochastic module runs 100 fresh unique seeds for every executable mask and
-  selected device. A host-only initial-state oracle sums enabled unordered-pair
+   selected device. A host-only initial-state oracle sums enabled unordered-pair
   rates and includes time step, volume, and SP2016 scheduling concentration;
   it checks aggregate observations against `3 * sqrt(expected_mean)`. Every
   trial retains P2 return/RNG identity and physical/ownership invariants, with
@@ -55,6 +55,8 @@ use the `*_test.py` convention and collect cleanly when Warp is absent.
   `particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py`.
 - Shared non-discoverable case table:
   `particula/gpu/kernels/tests/_coagulation_validation_support.py`.
+- Public-step invariant and ownership support:
+  `particula/gpu/kernels/tests/_coagulation_public_step_support.py`.
 - Existing mechanism-specific/regression coverage:
   `particula/gpu/kernels/tests/coagulation_test.py` and
   `particula/gpu/dynamics/tests/coagulation_funcs_test.py`.

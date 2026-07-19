@@ -1,33 +1,33 @@
 # Documentation Updates
 
-- Update `.opencode/guides/testing_guide.md` with the canonical E5
-  cross-mechanism fixture matrix, deterministic/stochastic separation, marker
-  commands, and conservation assertion policy if existing guidance is not
-  sufficient to reproduce the suite.
-- Publish `docs/Features/Roadmap/coagulation-validation.md` with a table for
-  Brownian, charged, Brownian-plus-charged, SP2016, ST1956, approved two-way
-  combinations, and the full four-way row. Record deterministic parity,
-  stochastic bounds, mass/charge, multi-box/inactive, Warp CPU, and optional
-  CUDA status separately.
-- Document focused commands such as deterministic `gpu_parity`, bounded
-  `stochastic`, optional `cuda`, and full coagulation regression runs.
-- State explicitly that CUDA is additive evidence, exact CPU/Warp pair replay is
-  not required, and no claims extend to unsupported mechanism rows, DNS,
-  non-unit sedimentation efficiency, or performance.
-- Provide E5-F9 with stable mechanism names, tested input conditions,
-  tolerances/bounds, and evidence-file references for user-facing support docs
-  and examples.
-- Update `.opencode/plans/sections/features/E5-F7/` with shipped statuses,
-  issue numbers, final commands, and resolved questions as phases complete.
-
-No `README` or top-level public import update is required unless E5-F9 chooses
-to surface the validation commands there; E5-F7 introduces no production API.
-
 ## Status
 
-P4 shipped in #1365. The
-[GPU coagulation validation record](../../../../../docs/Features/Roadmap/coagulation-validation.md)
-and updated testing guide publish the private validation-only P1/P2/P3 evidence
-paths, exact executable/deferred matrix, focused warning-clean commands, and
-the no-production-API boundary. Warp CPU remains the baseline when installed;
-CUDA is optional local/manual evidence that skips cleanly when unavailable.
+**P4 shipped/completed in #1365.**
+
+The [GPU coagulation validation record](../../../../../docs/Features/Roadmap/coagulation-validation.md)
+and `.opencode/guides/testing_guide.md` publish the existing direct-path
+validation contract; neither adds a production API, physics, runnable, CPU
+fallback, or performance claim.
+
+- **P1 deterministic evidence:**
+  `particula/gpu/kernels/tests/coagulation_validation_test.py`, with independent
+  support in `_coagulation_validation_support.py`. Brownian uses
+  `rtol=1e-7, atol=0`; other positive/additive rate, property, and majorant
+  comparisons use `rtol=1e-6, atol=0`; physical zeros are exact.
+- **P2 invariant/ownership evidence:**
+  `_coagulation_public_step_support.py` covers concentration-weighted
+  per-box/per-species inventory at `rtol=1e-12, atol=1e-30`, applicable charge
+  conservation, merge/inactive-slot bookkeeping, caller-buffer identity,
+  persistent RNG lifecycle, and atomic preflight failures.
+- **P3 bounded stochastic evidence:**
+  `coagulation_stochastic_validation_test.py` uses one-proposal capacity, 100
+  unique fresh seeds, an independent initial-state expectation, and
+  `3 * sqrt(expected_mean)`. It is not conservation or exact replay evidence.
+
+The executable masks are exactly `1`, `2`, `3`, `4`, `5`, `6`, `8`, `9`, `10`,
+`12`, and `15`; three-way masks `7`, `11`, `13`, and `14` are deferred/fail
+closed. Published warning-clean commands cover deterministic P1, CPU-only P3,
+optional CUDA P3, and full `coagulation_test.py` regression. Warp CPU is the
+baseline when Warp is installed. CUDA is optional local/manual additive
+evidence and cleanly skips when unavailable; marker selection is not device
+selection, and P2 enumerates available Warp devices.
