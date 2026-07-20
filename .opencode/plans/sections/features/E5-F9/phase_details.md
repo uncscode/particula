@@ -30,8 +30,8 @@
   - Goal: Record E5 and E5-F1 through E5-F9, canonical statuses, artifacts, and explicit pre-closeout status while keeping all links machine-checked.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, `docs/Features/Roadmap/index.md`, `particula/tests/gpu_coagulation_docs_test.py`
   - Documented implementation notes: Both roadmap records contain the same
-    unique inventory and three artifact links. E5 and E5-F9 remain active while
-    P4 remains, and Epic F remains pending.
+    unique inventory and three artifact links. P4 later completed the closeout,
+    and E5 and E5-F9 are now shipped with Epic F active.
   - Regression coverage: Hardware-free documentation coverage checks the complete unique ID
     matrix, exact artifact labels/targets, record equality, status consistency,
     anti-duplication boundaries, and local-link resolution.

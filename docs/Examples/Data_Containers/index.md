@@ -49,4 +49,4 @@ API.
 - [Feature guide: Data Containers and GPU Foundations](../../Features/data-containers-and-gpu-foundations.md)
 - [Runnable entrypoint source on GitHub](https://github.com/Gorkowski/particula/blob/main/docs/Examples/data_containers_and_gpu_foundations.py)
 - [Direct GPU kernels quick-start source on GitHub](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py)
-- [Direct GPU coagulation source on GitHub](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py)
+- [Direct GPU coagulation source](../gpu_coagulation_direct.py)

@@ -2,7 +2,7 @@
 
 E5-F9 publishes the final user-facing GPU coagulation contract and direct
 example, reconciles both GPU roadmap pages with assigned plan/child IDs and
-release artifacts, and performs an explicitly dependency-gated E5 closeout.
+release artifacts, and records the dependency-gated E5 closeout.
 
 ## In Scope
 
@@ -25,8 +25,8 @@ release artifacts, and performs an explicitly dependency-gated E5 closeout.
 - Link the support guide and example from `docs/Examples/index.md`,
   `docs/Features/coagulation_strategy_system.md`, and the foundations guide.
 - Verify E5-F1 through E5-F8 are shipped, their required evidence passes, all
-  artifacts resolve, and E5-F9's own pre-closeout phases pass before changing
-  E5 to shipped and Epic F from pending to active.
+  artifacts resolve, and E5-F9's own closeout phase passes so E5 is shipped and
+  Epic F is active.
 
 ## Out of Scope
 
