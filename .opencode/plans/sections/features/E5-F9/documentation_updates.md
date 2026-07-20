@@ -20,8 +20,9 @@
 - **Shipped P3 work (issue #1374):** Reconciled
   `docs/Features/Roadmap/data-oriented-gpu.md` and
   `docs/Features/Roadmap/index.md` with one matching E5 inventory containing
-  E5 and E5-F1 through E5-F9, their canonical statuses, and pre-closeout
-  wording. This historical reconciliation preceded P4 closeout.
+  E5 and E5-F1 through E5-F9, their canonical statuses, and resolving artifact
+  links. This historical reconciliation was followed by the shipped P4
+  closeout.
 - **Shipped P3 work (issue #1374):** Linked E5-F7's canonical validation artifact at
   `docs/Features/Roadmap/coagulation-validation.md` and E5-F8's
   `docs/Features/Roadmap/condensation-parity-walkthrough.md` plus
