@@ -164,7 +164,7 @@ Jump in by selecting any card below and follow along in your browser or local en
       default when installed, lazy direct and concrete imports, caller-owned
       fixed-shape fp64 scratch/latent/energy sidecars reused across explicit
       calls, gas coupling, and explicit final checkpoint restoration
-    - [Direct GPU coagulation source](gpu_coagulation_direct.py)
+    - [Direct GPU coagulation source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py)
       — a standalone explicit-transfer, Warp CPU-default, low-level
       particle-resolved Brownian path: two supported direct calls reuse
       caller-owned collision and persistent RNG sidecars before an explicit

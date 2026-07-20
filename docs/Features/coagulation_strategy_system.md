@@ -496,7 +496,7 @@ This optional/local command is additive and skips cleanly when CUDA is
 unavailable.
 
 For a runnable Brownian-only introduction to this direct path, see the
-[direct GPU coagulation example](../Examples/gpu_coagulation_direct.py). It
+[direct GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py). It
 keeps transfers and caller-owned collision/RNG sidecars explicit; it is an
 example of the supported direct interface, not a CPU fallback or a high-level
 `Runnable` workflow. The evidence/command record above defines the complete
@@ -506,7 +506,7 @@ approved-mask evidence boundary.
 
 - **Wall loss strategies**: [wall_loss_strategy_system.md](./wall_loss_strategy_system.md)
 - **Condensation strategies**: [condensation_strategy_system.md](./condensation_strategy_system.md)
-- **GPU direct example**: [gpu_coagulation_direct.py](../Examples/gpu_coagulation_direct.py)
+- **GPU direct example**: [gpu_coagulation_direct.py](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py)
 - **GPU roadmap**: [Data-Oriented Design and GPU Roadmap](./Roadmap/data-oriented-gpu.md)
 
 ## FAQ

@@ -20,15 +20,15 @@
   IDs, exact canonical rows and artifact targets, resolving local links, and no
   stale placeholder. It rejects duplicate
   records and duplicated artifact links without requiring GPU hardware.
-- **P4 closeout record (issue #1375, dated 2026-07-19):** Records the
+- **P4 closeout record (issue #1375, rerun 2026-07-20 after P3):** Records the
    fail-closed gate inputs: E5-F7's focused parity/stochastic/conservation
    matrix, both new test modules, the example, docs validation, fast tests, and
    lint. Gate fixtures assert that failed prerequisites block the successful
    status transition and that the final state depends on authoritative feature
    and phase status, issue references, resolving artifact paths, focused command
    results, and required Warp CPU evidence; issue closure alone is never
-   sufficient. Since P3 is recorded complete on 2026-07-20, this entry does not
-   establish that P4 followed P3.
+   sufficient. The canonical P4 evidence was rerun after P3 and records that
+   ordering explicitly.
 
 Tests ship in the same phase as changes and use `*_test.py`. Coverage thresholds
 must not be lowered; changed executable code must maintain at least 80% coverage.
@@ -49,10 +49,8 @@ aggregate behavior, never exact CPU/GPU pair replay.
   optional and must use the repository's clean unavailable-device skip, not an
   expected failure. Preserve caller-buffer identity and persistent RNG state
   checks in the same test that exercises the example.
-- P4 was specified as a release-gate validation phase, not a substitute for
-   feature tests. Its 2026-07-19 record cannot establish a post-P3 gate because
-   P3 is recorded complete on 2026-07-20; gate fixtures still cover failed and
-   complete prerequisites.
+- P4 is a release-gate validation phase, not a substitute for feature tests.
+  Its 2026-07-20 rerun records all mandatory command evidence after P3.
 
 ## Focused Verification Commands
 
