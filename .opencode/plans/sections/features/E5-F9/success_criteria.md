@@ -6,8 +6,10 @@
 - [ ] The direct example imports without Warp and runs on Warp CPU when installed
   with explicit transfers, caller buffers, persistent RNG, and valid restored
   conservation checkpoints.
-- [ ] Both roadmap files contain E5 and each ID E5-F1 through E5-F9 exactly once
-  in the closeout matrix, with completed scope and resolving artifact links.
+- [ ] P3: Both roadmap files contain E5 and each ID E5-F1 through E5-F9 exactly
+  once in the pre-closeout inventory, with canonical statuses and resolving
+  artifact links. The issue #1374 reconciliation notes are recorded, but P3
+  remains Not Started until its authoritative phase status changes.
 - [ ] E5-F1 through E5-F8 are shipped and all required E5-F7/E5-F8 evidence,
   example, docs, link, lint, and fast-test gates pass.
 - [ ] A negative closeout test proves any failed prerequisite leaves E5 active

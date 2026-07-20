@@ -14,8 +14,12 @@
   initialization/reuse, and failure propagation. Guarded Warp CPU cases verify
   RNG advancement, valid final-call pairs, mass/charge conservation, unchanged
   inactive slots, and zero/one-active early returns; CUDA remains unrequired.
-- **P3:** docs tests require exactly one E5 row, all nine unique child IDs,
-  matching artifact targets, no stale E5 placeholder, and valid local links.
+- **P3 (issue #1374 reconciliation notes; status Not Started):**
+  `particula/tests/gpu_coagulation_docs_test.py` uses only the standard library
+  to require one matching E5 inventory in each roadmap, all nine unique child
+  IDs, exact canonical rows and artifact targets, resolving local links, no
+  stale placeholder, and E5-active/Epic-F-pending wording. It rejects duplicate
+  records and duplicated artifact links without requiring GPU hardware.
 - **P4:** run E5-F7's focused parity/stochastic/conservation matrix, both new
   test modules, the example, docs validation, fast tests, and lint. Assert that
   failed prerequisites preserve E5 active/Epic F pending before testing the
