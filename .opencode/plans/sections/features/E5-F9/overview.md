@@ -18,8 +18,10 @@ demonstrates two explicit Brownian calls on optional Warp CPU with caller-owned
 collision and persistent RNG sidecars, and co-located regression coverage
 protects the disabled, lazy-loading, error, ownership, and invariant paths.
 The hardware-free documentation regression coverage protects the documented
-roadmap reconciliation. Issue #1375 shipped P4 after the fail-closed release
-gate passed: E5 and E5-F9 are shipped, and Epic F is active.
+roadmap reconciliation. The #1375 P4 closeout record is dated 2026-07-19,
+whereas P3 is recorded complete on 2026-07-20. The records therefore support
+the documented status projection, but not a claim that P4 occurred after P3 or
+completed a dependency-ordered gate.
 
 ## User Stories
 

@@ -30,16 +30,21 @@
   - Goal: Record E5 and E5-F1 through E5-F9, canonical statuses, artifacts, and explicit pre-closeout status while keeping all links machine-checked.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, `docs/Features/Roadmap/index.md`, `particula/tests/gpu_coagulation_docs_test.py`
   - Documented implementation notes: Both roadmap records contain the same
-    unique inventory and three artifact links. P4 later completed the closeout,
-    and E5 and E5-F9 are now shipped with Epic F active.
+    unique inventory and three artifact links. This phase's recorded completion
+    date is 2026-07-20, while the P4 closeout record is dated 2026-07-19.
+    Consequently, the P4 entry must not be described as later than P3 or as
+    evidence of a dependency-ordered closeout until the authoritative dates are
+    reconciled.
   - Regression coverage: Hardware-free documentation coverage checks the complete unique ID
     matrix, exact artifact labels/targets, record equality, status consistency,
     anti-duplication boundaries, and local-link resolution.
 
 - [x] **E5-F9-P4:** Update development documentation and complete dependency-gated epic closeout
   - Issue: #1375 | Size: S | Status: Shipped | Completed: 2026-07-19
-  - Delivered: Added local gallery discovery, passed the fail-closed gate, and
-    synchronized E5/E5-F9 as shipped with Epic F active.
+  - Recorded: Added local gallery discovery and synchronized the E5/E5-F9
+    closeout projection with Epic F active. Its 2026-07-19 record predates P3's
+    recorded 2026-07-20 completion, so it is not chronology evidence that P4
+    ran after P3.
   - Evidence (all exit 0 and warning-clean; marker-selected runs used Warp CPU):
     ```text
     pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror  # 12 passed
@@ -53,5 +58,6 @@
     The docs test was rerun after the mutating lint workflow.
 
 P1 and P2 may proceed in parallel. P3 consumes stable artifact paths from P1,
-P2, E5-F7, and E5-F8. P4 ran last after every listed dependency and validation
-command passed.
+P2, E5-F7, and E5-F8. P4 is specified to run after those dependencies, but the
+recorded P4 date precedes P3's recorded completion date; do not claim that P4
+ran last from these records.

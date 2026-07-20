@@ -13,7 +13,10 @@
 - [x] E5-F1 through E5-F8 are shipped and all required E5-F7/E5-F8 evidence,
   example, docs, link, lint, and fast-test gates passed.
 - [x] A negative closeout test proves any failed prerequisite blocks closeout.
-- [x] After all gates passed, E5 is consistently shipped and Epic F active.
+- [!] The status projection records E5 as shipped and Epic F as active, but the
+  P4 entry is dated 2026-07-19 and P3 is dated 2026-07-20. It must not be used
+  to claim that all dependency-ordered gates had passed until those authoritative
+  dates are reconciled.
 - [x] Classifier diagnostics remain recorded as `none`.
 
 | Metric | Baseline | Target | Source |

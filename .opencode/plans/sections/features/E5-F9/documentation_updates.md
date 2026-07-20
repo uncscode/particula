@@ -21,8 +21,8 @@
   `docs/Features/Roadmap/data-oriented-gpu.md` and
   `docs/Features/Roadmap/index.md` with one matching E5 inventory containing
   E5 and E5-F1 through E5-F9, their canonical statuses, and resolving artifact
-  links. This historical reconciliation was followed by the shipped P4
-  closeout.
+   links. Its recorded completion date is 2026-07-20; the P4 closeout record is
+   dated 2026-07-19, so the records do not establish P4 as a later closeout.
 - **Shipped P3 work (issue #1374):** Linked E5-F7's canonical validation artifact at
   `docs/Features/Roadmap/coagulation-validation.md` and E5-F8's
   `docs/Features/Roadmap/condensation-parity-walkthrough.md` plus
@@ -30,6 +30,8 @@
   their content, and added hardware-free regression coverage in
   `particula/tests/gpu_coagulation_docs_test.py` for record equality,
   uniqueness, status wording, and local-link resolution.
-- **Shipped P4 (issue #1375):** Added local gallery links for the direct
-  coagulation example and strategy guide, recorded passing release evidence,
-  and synchronized E5/E5-F9 as shipped with Epic F active.
+- **P4 closeout record (issue #1375, dated 2026-07-19):** Added local gallery
+   links for the direct coagulation example and strategy guide, recorded release
+   evidence, and synchronized the E5/E5-F9 status projection with Epic F active.
+   Because this record predates P3's recorded 2026-07-20 completion, it is not
+   evidence that the closeout followed P3.
