@@ -14,16 +14,16 @@ traceable E5/E5-F1 through E5-F9 closeout record with resolving artifact links.
 P1 shipped the documentation-only portion of the release and P2 shipped the
 direct example. Issue #1374 documents P3 reconciliation work for the two
 roadmap records, including one canonical E5/E5-F1--E5-F9 inventory and three
-resolving artifact links, but E5-F9-P3 remains Not Started in authoritative
-metadata. The canonical
+resolving artifact links; E5-F9-P3 is shipped in authoritative metadata. The
+canonical
 guides publish the bounded direct
 particle-resolved contract; `docs/Examples/gpu_coagulation_direct.py` now
 demonstrates two explicit Brownian calls on optional Warp CPU with caller-owned
 collision and persistent RNG sidecars, and co-located regression coverage
 protects the disabled, lazy-loading, error, ownership, and invariant paths.
 The hardware-free documentation regression coverage protects the documented
-roadmap reconciliation, while P3 and the dependency-gated E5/Epic F transition
-remain unfinished; P4 is the sole closeout phase.
+roadmap reconciliation. Issue #1375 shipped P4 after the fail-closed release
+gate passed: E5 and E5-F9 are shipped, and Epic F is active.
 
 ## User Stories
 

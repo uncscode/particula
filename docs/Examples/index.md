@@ -164,12 +164,15 @@ Jump in by selecting any card below and follow along in your browser or local en
        default when installed, lazy direct and concrete imports, caller-owned
        fixed-shape fp64 scratch/latent/energy sidecars reused across explicit
        calls, gas coupling, and explicit final checkpoint restoration
-     - [Direct GPU coagulation source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py)
-       — a standalone explicit-transfer, Warp CPU-default, low-level
+      - [Direct GPU coagulation source](gpu_coagulation_direct.py)
+        — a standalone explicit-transfer, Warp CPU-default, low-level
        particle-resolved Brownian path: two supported direct calls reuse
        caller-owned collision and persistent RNG sidecars before an explicit
        CPU checkpoint restore. When Warp is unavailable or disabled, it does
-       no conversion or kernel work and has no CPU fallback.
+        no conversion or kernel work and has no CPU fallback.
+      - [GPU coagulation strategy guide](../Features/coagulation_strategy_system.md)
+        — supported direct-kernel mechanisms, validation boundaries, and
+        release evidence.
      - [Canonical low-level direct-condensation contract](../Features/data-containers-and-gpu-foundations.md)
       — supported low-level scope and boundaries
     - [GPU condensation parity walkthrough](gpu_condensation_parity_walkthrough.py)
