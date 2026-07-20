@@ -14572,6 +14572,7 @@ available CUDA even when P2 tests are not <code>cuda</code>-marked.</p>
 pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and stochastic and not cuda&quot;</span><span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/tests/gpu_coagulation_docs_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 </code></pre></div>
 <p>Missing Warp or unavailable CUDA is valid only when an existing guarded test
 skips. A skip is not CPU/Warp or CUDA parity evidence.</p>

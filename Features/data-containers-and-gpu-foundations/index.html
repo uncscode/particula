@@ -15110,9 +15110,10 @@ caller buffer is never interpreted as a collision.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">coagulation_step_gpu</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoagulationMechanismConfig</span>
 </code></pre></div>
-<p>Pass <code>mechanism_config=CoagulationMechanismConfig(...)</code> as keyword-only host
-metadata. The frozen dataclass is not device-resident simulation state and is
-not transferred, synchronized, or stored in a container schema. In contrast,
+<p>Pass immutable <code>mechanism_config=CoagulationMechanismConfig(...)</code> as keyword-only
+host metadata. The frozen dataclass is not re-exported by
+<code>particula.gpu.kernels</code>, is not device-resident simulation state, and neither
+transfers nor owns Warp state. In contrast,
 <code>WarpParticleData</code>, supplied <code>collision_pairs</code>, supplied <code>n_collisions</code>, and
 supplied <code>rng_states</code> are caller-owned, same-device Warp resources. Omitted
 collision outputs and RNG state use call-local convenience allocation. A
@@ -15120,7 +15121,13 @@ supplied RNG sidecar is reused and changes in place; it resets only with
 <code>initialize_rng=True</code>. Configuration and caller-owned sidecars have no implicit
 CPU↔GPU transfer.</p>
 <p>Only <code>distribution_type="particle_resolved"</code> is accepted. <code>"discrete"</code> and
-<code>"continuous_pdf"</code> raise <code>ValueError</code>; they do not fall back or convert.</p>
+<code>"continuous_pdf"</code> raise <code>ValueError</code>; they do not fall back or convert.
+Malformed configuration and an unsupported distribution fail before particle
+access. Mask <code>7</code> fails at capability preflight before particle metadata or
+enabled-term validation. Masks <code>11</code>, <code>13</code>, and <code>14</code> validate particle metadata
+and enabled terms before they fail closed. These read-only preflight boundaries
+do not make a later runtime failure transactional: callers retain their mutable
+state, and no rollback is guaranteed after such a failure.</p>
 <table>
 <thead>
 <tr>
@@ -15207,6 +15214,9 @@ CPU↔GPU transfer.</p>
 </tr>
 </tbody>
 </table>
+<p>The executable singleton masks are <code>1</code>, <code>2</code>, <code>4</code>, and <code>8</code>; executable two-term
+masks are <code>3</code>, <code>5</code>, <code>6</code>, <code>9</code>, <code>10</code>, and <code>12</code>; and executable four-term mask is
+<code>15</code>. Deferred masks are exactly <code>7</code>, <code>11</code>, <code>13</code>, and <code>14</code>.</p>
 <p>Requested tuples normalize to the canonical Brownian, charged, sedimentation,
 then turbulent order. Exact SP2016 sedimentation is selected with
 <code>CoagulationMechanismConfig(("sedimentation_sp2016",))</code>. Its shipped pair rate
@@ -15256,15 +15266,19 @@ scaling evidence.
 Read-only preflight can use a private device-status buffer and a bounded
 synchronization/readback to report invalid caller state without copying,
 mutating, or CPU-falling-back caller simulation state.</p>
-<p>The return tuple is exactly <code>(particles, collision_pairs, n_collisions)</code>.
-Supplied collision buffers are returned by identity. Supplied <code>rng_states</code> are
-caller-owned same-device Warp state, are reused in place, and reset only when
-<code>initialize_rng=True</code> explicitly opts in; omitted buffers are call-local
-conveniences. Sedimentation-specific read-only preflight fails before output
-allocation, RNG initialization, or particle mutation, but does not make
-unrelated later validation failures atomic. Warp CPU is the baseline when Warp
-is installed. CUDA is optional additive evidence and skips cleanly when
-unavailable.</p>
+<p>The return tuple is exactly <code>(particles, collision_pairs, n_collisions)</code>; RNG
+state is not returned. Accepted collisions mutate caller-owned particle mass,
+concentration, and charge in place. Supplied collision buffers are returned by
+identity. Supplied <code>rng_states</code> are caller-owned same-device Warp state, are
+reused and advanced in place, and reset only when <code>initialize_rng=True</code>
+explicitly opts in; omitted buffers and RNG state are call-local conveniences.
+Sedimentation-specific read-only preflight fails before output allocation, RNG
+initialization, or particle mutation, but does not make unrelated later runtime
+failures atomic. Transfers are explicit. Warp CPU is the baseline when Warp is
+installed. CUDA is optional additive evidence and guarded suites skip cleanly
+when unavailable. This direct path provides no high-level <code>Runnable</code>
+integration, automatic transfer, CPU fallback, mandatory CUDA requirement, or
+general-turbulence support.</p>
 <p>Future mechanisms must provide a stable identifier; required host and device
 inputs; property preparation; a sanitized additive pair-rate term; a proven-safe
 additive majorant; a capability-table row; shared-dispatcher integration; and
@@ -15273,7 +15287,8 @@ loop, acceptance pass, collision buffer, or RNG stream. This boundary excludes
 binned/discrete/continuous-PDF GPU coagulation, high-level <code>Runnable</code>
 integration, graph-capture claims, alternate mechanisms, DNS or general
 turbulence, CPU fallback, hidden transfer, and performance or broad-accuracy
-claims.</p>
+claims. See the <a href="../Roadmap/coagulation-validation/">validation/evidence record</a>
+for the focused fixed-mask and stochastic command record.</p>
 <h3 id="environment-transfer-boundary">Environment transfer boundary<a class="headerlink" href="#environment-transfer-boundary" title="Permanent link">&para;</a></h3>
 <p>Use the environment helpers when thermodynamic state must cross the CPU↔GPU
 boundary:</p>
@@ -15761,6 +15776,18 @@ the other evidence classes.</p>
 <td>Direct coagulation coverage, including singleton sedimentation and ST1956 configurations, direct/environment inputs, caller-owned output/RNG behavior, conservation, and rejected-call state safety.</td>
 </tr>
 <tr>
+<td><code>pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror</code></td>
+<td>Fixed-mask deterministic/ownership evidence.</td>
+</tr>
+<tr>
+<td><code>pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror</code></td>
+<td>Stochastic evidence.</td>
+</tr>
+<tr>
+<td><code>pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror</code></td>
+<td>Hardware-free documentation-contract coverage.</td>
+</tr>
+<tr>
 <td><code>pytest particula/integration_tests/condensation_latent_heat_conservation_test.py -q</code></td>
 <td>CPU integration/inventory-conservation evidence (separate particle-plus-gas inventory conservation checks); not direct-GPU validation.</td>
 </tr>
@@ -15779,6 +15806,7 @@ parity matrix, inventory conservation checks, and latent-heat energy/bookkeeping
 checks are separate: no one class proves either of the others.</p>
 <p><strong>Optional/local CUDA evidence:</strong></p>
 <div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/kernels/tests/condensation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py<span class="w"> </span>-q<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span><span class="w"> </span>-Werror
 </code></pre></div>
 <p>This is additive to the required Warp <code>device="cpu"</code> baseline and skips
 cleanly when CUDA is unavailable.</p>

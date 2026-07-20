@@ -14325,19 +14325,32 @@ supporting context only.</p>
 <p>The CPU container portion always runs. Warp-backed particle and gas round
 trips run only when Warp is available, and they use <code>device="cpu"</code> so CUDA is
 not required.</p>
-<p>For the low-level direct kernel path, use the separate canonical quick-start:</p>
+<p>For the low-level direct condensation path, use the separate canonical
+quick-start:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/gpu_direct_kernels_quick_start.py
 </code></pre></div>
-<p>That runnable script is the single direct GPU condensation example. It
+<p>That runnable script is the direct GPU condensation example. It
 demonstrates explicit <code>to_warp_*</code> / <code>from_warp_*</code> transfers, lazy imports from
 <code>particula.gpu.kernels</code>, two fixed-four-substep condensation calls, and
 caller-owned fp64 scratch, physical-property, latent-heat, and energy sidecars
 reused on Warp <code>device="cpu"</code> by default. It does not invoke coagulation or
 configure RNG state.</p>
+<p>For the bounded, low-level particle-resolved Brownian coagulation path, run:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/gpu_coagulation_direct.py
+</code></pre></div>
+<p>This standalone example explicitly transfers <code>ParticleData</code> to Warp, defaults
+to Warp <code>device="cpu"</code>, and makes two supported Brownian direct calls. Its
+collision-pair, collision-count, and persistent RNG-state sidecars are
+caller-owned and reused across those calls before an explicit CPU checkpoint
+restore. Warp imports and all conversion/kernel work are skipped when Warp is
+unavailable or <code>PARTICULA_EXAMPLE_FORCE_NO_WARP=1</code>; this disabled route has no
+CPU coagulation fallback. The example is a direct-kernel path, not a Runnable
+API.</p>
 <ul>
 <li><a href="../../Features/data-containers-and-gpu-foundations/">Feature guide: Data Containers and GPU Foundations</a></li>
 <li><a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/data_containers_and_gpu_foundations.py">Runnable entrypoint source on GitHub</a></li>
 <li><a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_direct_kernels_quick_start.py">Direct GPU kernels quick-start source on GitHub</a></li>
+<li><a href="../gpu_coagulation_direct/">Direct GPU coagulation source</a></li>
 </ul>
 
 

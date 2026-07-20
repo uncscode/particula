@@ -11921,6 +11921,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Epic E: GPU Coagulation Physics Coverage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#e5-roadmap-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E5 roadmap inventory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -15095,6 +15112,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Epic E: GPU Coagulation Physics Coverage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#e5-roadmap-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E5 roadmap inventory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -15355,13 +15389,13 @@ documentation conventions.</p>
 <tr>
 <td>5</td>
 <td><a href="#epic-e-gpu-coagulation-physics-coverage">Epic E: GPU Coagulation Physics Coverage</a></td>
-<td>Active</td>
-<td>not scheduled</td>
+<td>Shipped</td>
+<td>E5</td>
 </tr>
 <tr>
 <td>6</td>
 <td><a href="#epic-f-gpu-process-completeness">Epic F: GPU Process Completeness</a></td>
-<td>Pending</td>
+<td>Active</td>
 <td>not scheduled</td>
 </tr>
 <tr>
@@ -16809,7 +16843,8 @@ stepping, unsupported physics, graph capture/replay, broad autodiff, and
 general CPU-strategy parity remain future work outside the shipped scope.
 This leaves temperature feedback, gas mutation beyond the P2-finalized direct
 coupling, and all higher-level process integration outside this milestone.</p>
-<p>The <a href="../../../Examples/gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>
+<p>The independent condensation walkthrough
+(<code>docs/Examples/gpu_condensation_parity_walkthrough.py</code>)
 provides fixed-four-substep low-level direct-kernel physics, conservation, and
 energy evidence. Run:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/gpu_condensation_parity_walkthrough.py
@@ -16817,14 +16852,82 @@ pytest<span class="w"> </span>particula/gpu/tests/gpu_condensation_parity_walkth
 pytest<span class="w"> </span>particula/tests/condensation_parity_walkthrough_docs_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 </code></pre></div>
 <p>Warp CPU is the installed-Warp baseline; CUDA is optional additive evidence.
-The <a href="../condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>
+The downstream condensation ownership record
+(<code>condensation-parity-walkthrough.md</code>)
 documents deferred work only, including temperature feedback, high-level
 integration, adaptive stepping, graph replay, broad autodiff, and performance;
 it does not change production capability. The caller-owned, write-only
 <code>energy_transfer</code> diagnostic is not a return value or temperature feedback
 (<code>kg * J/kg = J</code>).</p>
 <h2 id="epic-e-gpu-coagulation-physics-coverage">Epic E: GPU Coagulation Physics Coverage<a class="headerlink" href="#epic-e-gpu-coagulation-physics-coverage" title="Permanent link">&para;</a></h2>
-<p>Status: active. Epic E is the next ordered epic after the shipped E4 plan.</p>
+<p>Status: shipped. E5-F9 P3 completed no later than its P4 closeout, and Epic E
+completed its bounded direct-kernel coagulation scope; Epic F is active.</p>
+<h3 id="e5-roadmap-inventory">E5 roadmap inventory<a class="headerlink" href="#e5-roadmap-inventory" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Status text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>E5</code></td>
+<td>GPU Coagulation Physics Coverage</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F1</code></td>
+<td>Mechanism Configuration and Sampling Contract</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F2</code></td>
+<td>Charged Pair Physics and Charge-Conserving Merges</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F3</code></td>
+<td>Charged and Brownian-Plus-Charged GPU Execution</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F4</code></td>
+<td>SP2016 Sedimentation GPU Execution</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F5</code></td>
+<td>ST1956 Turbulent-Shear GPU Execution</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F6</code></td>
+<td>Single-Pass Additive Multi-Mechanism Coagulation</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F7</code></td>
+<td>Cross-Mechanism GPU Validation Matrix</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F8</code></td>
+<td>Independent CPU-Warp Condensation Walkthrough</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F9</code></td>
+<td>GPU Coagulation Support Documentation and Epic Closeout</td>
+<td>Shipped</td>
+</tr>
+</tbody>
+</table>
+<p>E5-F7 owns the <a href="../coagulation-validation/">GPU coagulation validation record</a>,
+E5-F8 owns the <a href="../condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>,
+and the <a href="../../../Examples/gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>
+is runnable source.</p>
 <p>Extend GPU coagulation beyond the Brownian kernel to the collision
 mechanisms already available on CPU. DNS turbulence remains deferred (see
 <a href="#non-goals">Non-Goals</a>). Every kernel in this epic ships with CPU/GPU
@@ -16962,9 +17065,9 @@ unsupported. Read-only P2 validation may synchronize and read back device
 status, including on CUDA, to report invalid values. The direct path does not
 establish CPU-strategy parity. E5-F6 ships the additive contract and
 documentation; no additional planned work remains for the shipped approved
-additive combinations. E5-F7 remains deferred and incomplete for
-release/cross-mechanism validation, and E5-F9 remains deferred and incomplete
-for the consolidated direct example and closeout.</p>
+additive combinations. E5-F7 is shipped with the cross-mechanism validation
+record. E5-F9 is shipped: its completed P3/P4 publish the consolidated direct
+example and closeout gate. Epic F is the active follow-on work.</p>
 <p>Planned features:</p>
 <ol>
 <li>Sedimentation variants beyond the exact unit-efficiency SP2016 direct-kernel

@@ -14379,6 +14379,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#e5-roadmap-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E5 roadmap inventory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pending" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14558,11 +14569,13 @@ meets its exit bar, the next pending epic in the sequence becomes active.</p>
    sidecars, device-aware parity evidence, and the published direct-kernel
    support contract and example. It does not provide high-level runnable
    integration or general CPU-strategy parity.<ul>
-<li><a href="../../Examples/gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>
+<li>Independent condensation walkthrough
+   (<code>docs/Examples/gpu_condensation_parity_walkthrough.py</code>)
    — fixed-four-substep low-level direct-kernel physics, conservation, and
      energy evidence, with Warp CPU as the installed-Warp baseline; CUDA is
      optional additive evidence</li>
-<li><a href="condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>
+<li>Downstream condensation ownership record
+    (<code>condensation-parity-walkthrough.md</code>)
    — deferred work only; it does not alter Epic D production capability or
      activate later epics</li>
 <li>The walkthrough's caller-owned, write-only <code>energy_transfer</code> diagnostic
@@ -14573,22 +14586,88 @@ meets its exit bar, the next pending epic in the sequence becomes active.</p>
 <li>Focused evidence commands:
    <code>python docs/Examples/gpu_condensation_parity_walkthrough.py</code>,
    <code>pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror</code>,
-   and <code>pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror</code>.</li>
+  and <code>pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror</code>.</li>
 </ul>
 </li>
+<li><a href="data-oriented-gpu/#epic-e-gpu-coagulation-physics-coverage">Epic E: GPU Coagulation Physics Coverage</a>
+   (ADW plan E5) shipped bounded direct-kernel coagulation mechanics, validation,
+   explicit-transfer documentation, local gallery discovery, and closeout gates;
+   E5-F9 P3 preceded or matched P4 and Epic E closure.</li>
 </ul>
 <h3 id="active">Active<a class="headerlink" href="#active" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="data-oriented-gpu/#epic-e-gpu-coagulation-physics-coverage">Epic E: GPU Coagulation Physics Coverage</a>
-  extends the Brownian baseline across charged, sedimentation, turbulent-shear,
-  and combined coagulation mechanisms. Its closeout also owns the Epic D
-  carry-forward record: an independent CPU/Warp condensation parity walkthrough
-  and explicit downstream ownership for deferred condensation capabilities.</li>
+<li><a href="data-oriented-gpu/#epic-f-gpu-process-completeness">Epic F: GPU Process Completeness</a></li>
 </ul>
+<h3 id="e5-roadmap-inventory">E5 roadmap inventory<a class="headerlink" href="#e5-roadmap-inventory" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Status text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>E5</code></td>
+<td>GPU Coagulation Physics Coverage</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F1</code></td>
+<td>Mechanism Configuration and Sampling Contract</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F2</code></td>
+<td>Charged Pair Physics and Charge-Conserving Merges</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F3</code></td>
+<td>Charged and Brownian-Plus-Charged GPU Execution</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F4</code></td>
+<td>SP2016 Sedimentation GPU Execution</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F5</code></td>
+<td>ST1956 Turbulent-Shear GPU Execution</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F6</code></td>
+<td>Single-Pass Additive Multi-Mechanism Coagulation</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F7</code></td>
+<td>Cross-Mechanism GPU Validation Matrix</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F8</code></td>
+<td>Independent CPU-Warp Condensation Walkthrough</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><code>E5-F9</code></td>
+<td>GPU Coagulation Support Documentation and Epic Closeout</td>
+<td>Shipped</td>
+</tr>
+</tbody>
+</table>
+<p>E5-F7 owns the <a href="coagulation-validation/">GPU coagulation validation record</a>,
+E5-F8 owns the <a href="condensation-parity-walkthrough/">condensation parity walkthrough ownership record</a>,
+and the <a href="../../Examples/gpu_condensation_parity_walkthrough/">GPU condensation parity walkthrough</a>
+is runnable source.</p>
+<p>E5 is shipped and Epic F is active.</p>
 <h3 id="pending">Pending<a class="headerlink" href="#pending" title="Permanent link">&para;</a></h3>
 <p>Listed in execution order; each becomes active when the previous epic ships.</p>
 <ul>
-<li><a href="data-oriented-gpu/#epic-f-gpu-process-completeness">Epic F: GPU Process Completeness</a></li>
 <li><a href="data-oriented-gpu/#epic-g-backend-selection-and-gpu-resident-simulation">Epic G: Backend Selection and GPU-Resident Simulation</a></li>
 <li><a href="data-oriented-gpu/#epic-h-graph-capture-and-performance">Epic H: Graph Capture and Performance</a></li>
 <li><a href="data-oriented-gpu/#epic-i-differentiability-and-global-optimization">Epic I: Differentiability and Global Optimization</a>
