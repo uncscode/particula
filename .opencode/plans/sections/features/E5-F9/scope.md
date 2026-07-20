@@ -20,7 +20,7 @@ release artifacts, and performs an explicitly dependency-gated E5 closeout.
   sidecar/RNG reuse, failure propagation, and Warp CPU stochastic invariants;
   general documentation now links to the example.
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` and
-  `docs/Features/Roadmap/index.md` with E5, E5-F1 through E5-F9, completed scope,
+  `docs/Features/Roadmap/index.md` with E5, E5-F1 through E5-F9, P3 reconciliation scope,
   stable artifact links, and the next epic's status.
 - Link the support guide and example from `docs/Examples/index.md`,
   `docs/Features/coagulation_strategy_system.md`, and the foundations guide.

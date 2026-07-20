@@ -26,10 +26,16 @@
     zero/one-active-slot cases.
 
 - [ ] **E5-F9-P3:** Reconcile roadmap plan IDs and artifact links with validation tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Record E5 and E5-F1 through E5-F9, completed scope, artifacts, and explicit pre-closeout status while keeping all links machine-checked.
+  - Issue: #1374 | Size: S | Status: Not Started
+  - Goal: Record E5 and E5-F1 through E5-F9, canonical statuses, artifacts, and explicit pre-closeout status while keeping all links machine-checked.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, `docs/Features/Roadmap/index.md`, `particula/tests/gpu_coagulation_docs_test.py`
-  - Tests: Complete unique ID matrix, expected artifact labels/targets, status consistency, and local-link resolution.
+  - Documented implementation notes: Both roadmap records contain the same
+    unique inventory and three artifact links. E5 and E5-F9 remain active,
+    E5-F9 P4 remains, and Epic F remains pending; these notes do not mark P3
+    shipped or closed.
+  - Regression coverage: Hardware-free documentation coverage checks the complete unique ID
+    matrix, exact artifact labels/targets, record equality, status consistency,
+    anti-duplication boundaries, and local-link resolution.
 
 - [ ] **E5-F9-P4:** Update development documentation and complete dependency-gated epic closeout
   - Issue: TBD | Size: S | Status: Not Started

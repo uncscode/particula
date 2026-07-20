@@ -12,9 +12,11 @@
 
 ### Roadmap and Closeout
 
-- [ ] Replace Epic E's `not scheduled` placeholder with plan `E5`.
-- [ ] Add a one-to-one E5-F1 through E5-F9 track table with shipped artifacts.
-- [ ] Reconcile completed scope and E5-F8 deferred owners in both roadmap files.
+- [ ] P3: Reconcile Epic E's `not scheduled` placeholder with plan `E5`.
+- [ ] P3: Add a one-to-one E5-F1 through E5-F9 track table with canonical statuses
+  and artifact links in both roadmap records.
+- [ ] P3: Reconcile E5-F7/E5-F8 artifact ownership and active/pre-closeout wording
+  in both roadmap files without duplicating their detailed evidence.
 - [ ] Encode and execute the closeout checklist; preserve E5 active/Epic F
   pending on any child, test, example, artifact, or link failure.
 - [ ] After a clean gate only, mark E5 shipped and Epic F active consistently.
