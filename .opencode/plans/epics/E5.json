@@ -2,14 +2,14 @@
   "id": "E5",
   "type": "epic",
   "title": "GPU Coagulation Physics Coverage",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-07-16",
+  "completion_date": "2026-07-19",
+  "last_updated": "2026-07-19",
   "dependencies": [],
   "section_files": {
     "appendix": ".opencode/plans/sections/epics/E5/appendix.md",
@@ -27,9 +27,19 @@
     "vision_problem": ".opencode/plans/sections/epics/E5/vision_problem.md"
   },
   "schema_version": "1.0",
-  "child_plans": [],
+  "child_plans": [
+    {"id": "E5-F1", "type": "feature"},
+    {"id": "E5-F2", "type": "feature"},
+    {"id": "E5-F3", "type": "feature"},
+    {"id": "E5-F4", "type": "feature"},
+    {"id": "E5-F5", "type": "feature"},
+    {"id": "E5-F6", "type": "feature"},
+    {"id": "E5-F7", "type": "feature"},
+    {"id": "E5-F8", "type": "feature"},
+    {"id": "E5-F9", "type": "feature"}
+  ],
   "milestones": [],
   "governance_log": [],
   "risk_register": [],
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

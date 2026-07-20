@@ -14,16 +14,17 @@
   initialization/reuse, and failure propagation. Guarded Warp CPU cases verify
   RNG advancement, valid final-call pairs, mass/charge conservation, unchanged
   inactive slots, and zero/one-active early returns; CUDA remains unrequired.
-- **P3 (issue #1374 reconciliation notes; status Not Started):**
+- **P3 (shipped, issue #1374):**
   `particula/tests/gpu_coagulation_docs_test.py` uses only the standard library
   to require one matching E5 inventory in each roadmap, all nine unique child
-  IDs, exact canonical rows and artifact targets, resolving local links, no
-  stale placeholder, and E5-active/Epic-F-pending wording. It rejects duplicate
+  IDs, exact canonical rows and artifact targets, resolving local links, and no
+  stale placeholder. It rejects duplicate
   records and duplicated artifact links without requiring GPU hardware.
-- **P4:** run E5-F7's focused parity/stochastic/conservation matrix, both new
-  test modules, the example, docs validation, fast tests, and lint. Assert that
-  failed prerequisites preserve E5 active/Epic F pending before testing the
-  successful status transition. Gate closeout on authoritative feature and
+- **P4 (shipped, issue #1375):** Ran E5-F7's focused parity/stochastic/
+  conservation matrix, both new test modules, the example, docs validation,
+  fast tests, and lint. Gate fixtures assert that failed prerequisites block the
+  successful status
+   transition. Gate closeout on authoritative feature and
   phase status, issue and commit references, resolving artifact paths, focused
   command results, and required Warp CPU evidence; issue closure alone is never
   sufficient.
@@ -47,10 +48,9 @@ aggregate behavior, never exact CPU/GPU pair replay.
   optional and must use the repository's clean unavailable-device skip, not an
   expected failure. Preserve caller-buffer identity and persistent RNG state
   checks in the same test that exercises the example.
-- P4 is a release-gate validation phase, not a substitute for feature tests:
-  it runs the P1--P3 test modules and E5-F7 evidence without moving their
-  assertions into a later change. Its status-transition test must cover both a
-  failed-prerequisite case and the all-prerequisites-passed case.
+- P4 is a release-gate validation phase, not a substitute for feature tests. It
+  ran the P1--P3 test modules and E5-F7 evidence without moving their assertions
+  into a later change; gate fixtures cover failed and complete prerequisites.
 
 ## Focused Verification Commands
 

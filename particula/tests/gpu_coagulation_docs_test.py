@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import re
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal, Mapping
 
 ROOT = Path(__file__).resolve().parents[2]
 FOUNDATIONS_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
@@ -12,6 +15,10 @@ VALIDATION_PATH = ROOT / "docs/Features/Roadmap/coagulation-validation.md"
 DETAILED_ROADMAP_PATH = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
 ROADMAP_INDEX_PATH = ROOT / "docs/Features/Roadmap/index.md"
 TESTING_GUIDE_PATH = ROOT / ".opencode/guides/testing_guide.md"
+EXAMPLES_INDEX_PATH = ROOT / "docs/Examples/index.md"
+E5_PLAN_PATH = ROOT / ".opencode/plans/epics/E5.json"
+E5_F2_PLAN_PATH = ROOT / ".opencode/plans/features/E5-F2.json"
+E5_F9_PLAN_PATH = ROOT / ".opencode/plans/features/E5-F9.json"
 FOUNDATIONS_HEADING = "### GPU coagulation configuration and sidecar ownership"
 STRATEGY_HEADING = "### GPU direct-kernel foundations and limitations"
 RELEASE_VALIDATION_HEADING = "### Release-validation command sets"
@@ -35,13 +42,13 @@ EXPECTED_E5_ROWS = (
     (
         "E5",
         "GPU Coagulation Physics Coverage",
-        "Active — P4 closeout remains dependency-gated",
+        "Shipped",
     ),
     ("E5-F1", "Mechanism Configuration and Sampling Contract", "Shipped"),
     (
         "E5-F2",
         "Charged Pair Physics and Charge-Conserving Merges",
-        "Active — P1–P4 shipped; P5 documentation remains",
+        "Shipped",
     ),
     ("E5-F3", "Charged and Brownian-Plus-Charged GPU Execution", "Shipped"),
     ("E5-F4", "SP2016 Sedimentation GPU Execution", "Shipped"),
@@ -56,7 +63,7 @@ EXPECTED_E5_ROWS = (
     (
         "E5-F9",
         "GPU Coagulation Support Documentation and Epic Closeout",
-        "Active — P1/P2 shipped; P3/P4 remain",
+        "Shipped",
     ),
 )
 EXPECTED_E5_ARTIFACTS = (
@@ -130,6 +137,60 @@ def _local_destinations(content: str) -> list[str]:
     ]
 
 
+def _data_containers_card(content: str) -> str:
+    """Return the Data Containers tutorial card."""
+    start = content.index("-   __[Data Containers]")
+    return content[start : content.index("-   __[Particle Phase]", start)]
+
+
+def _resolving_destinations(path: Path, content: str) -> list[str]:
+    """Return local Markdown destinations that resolve from a document."""
+    return [
+        destination
+        for destination in _local_destinations(content)
+        if (path.parent / destination).resolve().exists()
+    ]
+
+
+@dataclass(frozen=True)
+class _CloseoutInputs:
+    """Independent evidence inputs for the fail-closed closeout gate."""
+
+    child_states: Mapping[str, bool]
+    artifacts_valid: bool
+    references_valid: bool
+    links_valid: bool
+    focused_commands: Mapping[str, Literal["passed", "failed", "skipped"]]
+    warp_installed: bool
+    warp_cpu_result: Literal["passed", "failed", "skipped", "not_applicable"]
+    cuda_result: Literal["passed", "failed", "skipped", "not_applicable"]
+
+
+def _closeout_gate(
+    inputs: _CloseoutInputs,
+) -> Literal["blocked"] | tuple[str, str, str]:
+    """Return the permitted closeout transition only for complete evidence."""
+    if (
+        not inputs.child_states
+        or not all(inputs.child_states.values())
+        or not inputs.artifacts_valid
+        or not inputs.references_valid
+        or not inputs.links_valid
+        or not inputs.focused_commands
+        or any(
+            result != "passed" for result in inputs.focused_commands.values()
+        )
+        or (inputs.warp_installed and inputs.warp_cpu_result != "passed")
+        or (
+            not inputs.warp_installed
+            and inputs.warp_cpu_result != "not_applicable"
+        )
+        or inputs.cuda_result == "failed"
+    ):
+        return "blocked"
+    return ("E5 shipped", "E5-F9 shipped", "Epic F active")
+
+
 def _detailed_epic_index_statuses(content: str) -> dict[str, str]:
     """Return the Epic E and F statuses from the detailed index table."""
     statuses = {}
@@ -147,16 +208,18 @@ def _detailed_epic_index_statuses(content: str) -> dict[str, str]:
 
 def _roadmap_index_statuses(content: str) -> dict[str, str]:
     """Return Epic E and F statuses from their roadmap-index sections."""
+    shipped = _section(content, "### Shipped")
     active = _section(content, "### Active")
     pending = _section(content, "### Pending")
     epic_e = "[Epic E: GPU Coagulation Physics Coverage]("
     epic_f = "[Epic F: GPU Process Completeness]("
 
-    assert active.count(epic_e) == 1
+    assert shipped.count(epic_e) == 1
+    assert active.count(epic_e) == 0
     assert pending.count(epic_e) == 0
-    assert pending.count(epic_f) == 1
-    assert active.count(epic_f) == 0
-    return {"E": "active", "F": "pending"}
+    assert active.count(epic_f) == 1
+    assert pending.count(epic_f) == 0
+    return {"E": "shipped", "F": "active"}
 
 
 def _command_target(command: str) -> Path:
@@ -339,6 +402,119 @@ def test_gpu_coagulation_guide_cross_links_resolve_once() -> None:
         assert (path.parent / destination).resolve().exists()
 
 
+def test_data_containers_card_has_one_local_coagulation_link_each() -> None:
+    """Gallery card exposes one resolving guide and direct-example link."""
+    card = _data_containers_card(
+        EXAMPLES_INDEX_PATH.read_text(encoding="utf-8")
+    )
+    destinations = _resolving_destinations(EXAMPLES_INDEX_PATH, card)
+
+    assert destinations.count("gpu_coagulation_direct.py") == 1
+    assert destinations.count("../Features/coagulation_strategy_system.md") == 1
+
+
+def test_closeout_gate_is_fail_closed_and_cuda_skip_is_optional() -> None:
+    """Gate fixtures model decisions, not execution evidence."""
+    complete = _CloseoutInputs(
+        child_states={"E5-F2": True, "E5-F9-P3": True},
+        artifacts_valid=True,
+        references_valid=True,
+        links_valid=True,
+        focused_commands={"docs": "passed", "repository": "passed"},
+        warp_installed=True,
+        warp_cpu_result="passed",
+        cuda_result="skipped",
+    )
+    assert _closeout_gate(complete) == (
+        "E5 shipped",
+        "E5-F9 shipped",
+        "Epic F active",
+    )
+    for replacement in (
+        {},
+        {"E5-F2": False},
+        {"E5-F9-P3": False},
+    ):
+        assert (
+            _closeout_gate(
+                _CloseoutInputs(
+                    **{**complete.__dict__, "child_states": replacement}
+                )
+            )
+            == "blocked"
+        )
+    for field in ("artifacts_valid", "references_valid", "links_valid"):
+        assert (
+            _closeout_gate(
+                _CloseoutInputs(**{**complete.__dict__, field: False})
+            )
+            == "blocked"
+        )
+    for result in ("failed", "skipped"):
+        assert (
+            _closeout_gate(
+                _CloseoutInputs(
+                    **{**complete.__dict__, "warp_cpu_result": result}
+                )
+            )
+            == "blocked"
+        )
+    assert (
+        _closeout_gate(
+            _CloseoutInputs(
+                **{
+                    **complete.__dict__,
+                    "focused_commands": {"docs": "failed"},
+                }
+            )
+        )
+        == "blocked"
+    )
+    assert (
+        _closeout_gate(
+            _CloseoutInputs(**{**complete.__dict__, "focused_commands": {}})
+        )
+        == "blocked"
+    )
+    assert _closeout_gate(
+        _CloseoutInputs(
+            **{
+                **complete.__dict__,
+                "warp_installed": False,
+                "warp_cpu_result": "not_applicable",
+            }
+        )
+    ) == ("E5 shipped", "E5-F9 shipped", "Epic F active")
+
+
+def test_final_authoritative_records_are_completed() -> None:
+    """Parsed records require all prerequisites and closeout completion."""
+    feature_plans = [
+        json.loads(
+            (ROOT / f".opencode/plans/features/E5-F{number}.json").read_text()
+        )
+        for number in range(1, 9)
+    ]
+    assert all(plan["status"] == "Shipped" for plan in feature_plans)
+    assert all(plan["lifecycle"] == "completed" for plan in feature_plans)
+    feature_two = json.loads(E5_F2_PLAN_PATH.read_text())
+    feature_nine = json.loads(E5_F9_PLAN_PATH.read_text())
+    assert feature_two["phases"][-1]["status"] == "Shipped"
+    assert all(
+        phase["status"] == "Shipped" for phase in feature_nine["phases"][:3]
+    )
+    assert feature_nine["phases"][2]["issue_number"] == 1374
+    assert feature_nine["status"] == "Shipped"
+    assert feature_nine["lifecycle"] == "completed"
+    assert all(phase["status"] == "Shipped" for phase in feature_nine["phases"])
+    epic = json.loads(E5_PLAN_PATH.read_text())
+    assert epic["status"] == "Shipped"
+    assert epic["lifecycle"] == "completed"
+    assert [child["id"] for child in epic["child_plans"]] == [
+        f"E5-F{number}" for number in range(1, 10)
+    ]
+
+
 def test_guides_do_not_promote_deferred_runtime_capabilities() -> None:
     """Guides retain bounded negative claims without rejecting accurate negations."""
     content = _normalized(
@@ -422,8 +598,8 @@ def test_e5_roadmap_records_match_and_resolve_artifacts() -> None:
     assert records[0] == records[1]
 
 
-def test_e5_roadmaps_keep_epic_statuses_and_reject_stale_claims() -> None:
-    """Roadmaps retain active E5, pending Epic F, and current E5 status."""
+def test_e5_roadmaps_keep_final_epic_statuses() -> None:
+    """Roadmaps retain shipped E5 and active Epic F status."""
     stale_epic_e_row = (
         r"\|\s*5\s*\|\s*\[Epic E:.*?\|\s*Active\s*\|\s*"
         r"not scheduled\s*\|"
@@ -432,15 +608,14 @@ def test_e5_roadmaps_keep_epic_statuses_and_reject_stale_claims() -> None:
     index = ROADMAP_INDEX_PATH.read_text(encoding="utf-8")
 
     assert _detailed_epic_index_statuses(detailed) == {
-        "E": "active",
-        "F": "pending",
+        "E": "shipped",
+        "F": "active",
     }
-    assert _roadmap_index_statuses(index) == {"E": "active", "F": "pending"}
+    assert _roadmap_index_statuses(index) == {"E": "shipped", "F": "active"}
     for content in (detailed, index):
         normalized = _normalized(content).lower()
         assert not re.search(stale_epic_e_row, content, flags=re.IGNORECASE)
-        assert "e5 shipped" not in normalized
-        assert "epic f active" not in normalized
+        assert "e5-f9 p4 remains" not in normalized
 
 
 def test_testing_guide_publishes_hardware_free_docs_validation() -> None:

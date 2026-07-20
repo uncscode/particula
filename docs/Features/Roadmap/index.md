@@ -124,39 +124,41 @@ meets its exit bar, the next pending epic in the sequence becomes active.
      - Focused evidence commands:
        `python docs/Examples/gpu_condensation_parity_walkthrough.py`,
        `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`,
-       and `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
+      and `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
+- [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
+  (ADW plan E5) shipped bounded direct-kernel coagulation mechanics, validation,
+  explicit-transfer documentation, local gallery discovery, and closeout gates.
 
 ### Active
 
-- [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
+- [Epic F: GPU Process Completeness](data-oriented-gpu.md#epic-f-gpu-process-completeness)
 
 ### E5 roadmap inventory
 
 | ID | Title | Status text |
 | --- | --- | --- |
-| `E5` | GPU Coagulation Physics Coverage | Active — P4 closeout remains dependency-gated |
+| `E5` | GPU Coagulation Physics Coverage | Shipped |
 | `E5-F1` | Mechanism Configuration and Sampling Contract | Shipped |
-| `E5-F2` | Charged Pair Physics and Charge-Conserving Merges | Active — P1–P4 shipped; P5 documentation remains |
+| `E5-F2` | Charged Pair Physics and Charge-Conserving Merges | Shipped |
 | `E5-F3` | Charged and Brownian-Plus-Charged GPU Execution | Shipped |
 | `E5-F4` | SP2016 Sedimentation GPU Execution | Shipped |
 | `E5-F5` | ST1956 Turbulent-Shear GPU Execution | Shipped |
 | `E5-F6` | Single-Pass Additive Multi-Mechanism Coagulation | Shipped |
 | `E5-F7` | Cross-Mechanism GPU Validation Matrix | Shipped |
 | `E5-F8` | Independent CPU-Warp Condensation Walkthrough | Shipped |
-| `E5-F9` | GPU Coagulation Support Documentation and Epic Closeout | Active — P1/P2 shipped; P3/P4 remain |
+| `E5-F9` | GPU Coagulation Support Documentation and Epic Closeout | Shipped |
 
 E5-F7 owns the [GPU coagulation validation record](coagulation-validation.md),
 E5-F8 owns the [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md),
 and the [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
 is runnable source.
 
-E5 is active, E5-F9 P3/P4 remain, and Epic F is pending.
+E5 is shipped and Epic F is active.
 
 ### Pending
 
 Listed in execution order; each becomes active when the previous epic ships.
 
-- [Epic F: GPU Process Completeness](data-oriented-gpu.md#epic-f-gpu-process-completeness)
 - [Epic G: Backend Selection and GPU-Resident Simulation](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
 - [Epic H: Graph Capture and Performance](data-oriented-gpu.md#epic-h-graph-capture-and-performance)
 - [Epic I: Differentiability and Global Optimization](data-oriented-gpu.md#epic-i-differentiability-and-global-optimization)
