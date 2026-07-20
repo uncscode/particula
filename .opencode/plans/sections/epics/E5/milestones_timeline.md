@@ -1,9 +1,7 @@
 # Milestones and Timeline
 
-No fixed calendar deadline was assigned. The #1375 closeout record is dated
-2026-07-19, but E5-F9 P3 is recorded complete on 2026-07-20. The dates do not
-demonstrate that the dependency-ordered exit criteria were satisfied by that
-closeout record.
+No fixed calendar deadline was assigned. The #1375 closeout was rerun after
+E5-F9 P3 on 2026-07-20 and records the dependency-ordered exit evidence.
 
 | Milestone | Planned Date | Actual Date | Status | Notes |
 |-----------|--------------|-------------|--------|-------|
@@ -13,4 +11,4 @@ closeout record.
 | Additive combinations operational | TBD | 2026-07-19 | Completed | E5-F6 shipped with one summed-rate RNG pass and a safe total majorant. |
 | Cross-mechanism evidence published | TBD | 2026-07-19 | Completed | E5-F7 shipped; the required Warp CPU release matrix passed and CUDA remained optional. |
 | E4 condensation carry-forward closed | TBD | 2026-07-19 | Completed | E5-F8 shipped its independent walkthrough and ownership matrix. |
-| Epic documentation and roadmap closeout record | TBD | 2026-07-19 | Recorded | E5-F9's P4 record projects the gallery links and final statuses, but it predates P3's 2026-07-20 completion record and cannot establish that all nine tracks had passed their done signals. |
+| Epic documentation and roadmap closeout record | TBD | 2026-07-20 | Completed | E5-F9's P4 rerun followed P3 and records all mandatory closeout evidence. |

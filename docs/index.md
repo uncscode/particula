@@ -206,7 +206,7 @@ print(result)
      for focused troubleshooting and reproduction commands. Entry-point
      validation can still perform synchronous device-to-host readbacks.
    For a focused supported coagulation route, the
-   [direct GPU coagulation example](Examples/gpu_coagulation_direct.py)
+    [direct GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py)
    explicitly transfers `ParticleData`, runs two Brownian particle-resolved
    calls with caller-owned collision and persistent RNG sidecars on Warp CPU
    by default, then restores a CPU checkpoint. When Warp is unavailable or

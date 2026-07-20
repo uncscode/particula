@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal, Mapping
+from typing import Literal, TypedDict, cast
 
 ROOT = Path(__file__).resolve().parents[2]
 FOUNDATIONS_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
@@ -19,6 +18,32 @@ EXAMPLES_INDEX_PATH = ROOT / "docs/Examples/index.md"
 E5_PLAN_PATH = ROOT / ".opencode/plans/epics/E5.json"
 E5_F2_PLAN_PATH = ROOT / ".opencode/plans/features/E5-F2.json"
 E5_F9_PLAN_PATH = ROOT / ".opencode/plans/features/E5-F9.json"
+PHASE_DETAILS_PATH = (
+    ROOT / ".opencode/plans/sections/features/E5-F9/phase_details.md"
+)
+
+
+class _Phase(TypedDict):
+    """Typed representation of an E5-F9 phase record."""
+
+    id: str
+    status: str
+    issue_number: int | None
+    completion_date: str
+
+
+class _FeaturePlan(TypedDict):
+    """Typed representation of the E5-F9 plan payload."""
+
+    phases: list[_Phase]
+
+
+class _EpicPlan(TypedDict):
+    """Typed representation of the E5 epic plan payload."""
+
+    completion_date: str
+
+
 FOUNDATIONS_HEADING = "### GPU coagulation configuration and sidecar ownership"
 STRATEGY_HEADING = "### GPU direct-kernel foundations and limitations"
 RELEASE_VALIDATION_HEADING = "### Release-validation command sets"
@@ -85,12 +110,17 @@ REQUIRED_CLOSEOUT_CHILD_STATES = frozenset(
         "E5-F9-P3",
     }
 )
-REQUIRED_CLOSEOUT_COMMANDS = frozenset(
-    {"docs", "direct_coagulation", "parity", "stochastic"}
-)
-FAILURE_RESULTS: tuple[Literal["failed"], Literal["skipped"]] = (
-    "failed",
-    "skipped",
+REQUIRED_CLOSEOUT_COMMANDS = (
+    "pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror",
+    "pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror",
+    "pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q "
+    '-m "warp and gpu_parity" -Werror',
+    "pytest particula/gpu/kernels/tests/"
+    "coagulation_stochastic_validation_test.py -q "
+    '-m "warp and stochastic and not cuda" -Werror',
+    "pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror",
+    "python3 .opencode/tools/run_pytest.py",
+    "python3 .opencode/tools/run_linters.py",
 )
 
 
@@ -167,48 +197,38 @@ def _resolving_destinations(path: Path, content: str) -> list[str]:
     ]
 
 
-@dataclass(frozen=True)
-class _CloseoutInputs:
-    """Independent evidence inputs for the fail-closed closeout gate."""
-
-    child_states: Mapping[str, Literal["passed", "failed", "skipped"]]
-    artifacts_valid: bool
-    references_valid: bool
-    links_valid: bool
-    focused_commands: Mapping[str, Literal["passed", "failed", "skipped"]]
-    warp_installed: bool
-    warp_cpu_result: Literal["passed", "failed", "skipped", "not_applicable"]
-    cuda_result: Literal["passed", "failed", "skipped", "not_applicable"]
-    p3_completion_date: str
-    p4_completion_date: str
-    epic_completion_date: str
-
-
 def _closeout_gate(
-    inputs: _CloseoutInputs,
+    feature_plan: _FeaturePlan | None = None,
+    epic_plan: _EpicPlan | None = None,
+    phase_details: str | None = None,
 ) -> Literal["blocked"] | tuple[str, str, str]:
-    """Return the permitted closeout transition only for complete evidence."""
+    """Read canonical closeout evidence and return its permitted transition."""
+    feature_plan = cast(
+        _FeaturePlan, feature_plan or json.loads(E5_F9_PLAN_PATH.read_text())
+    )
+    epic_plan = cast(
+        _EpicPlan, epic_plan or json.loads(E5_PLAN_PATH.read_text())
+    )
+    phase_details = phase_details or PHASE_DETAILS_PATH.read_text()
+    phases = feature_plan["phases"]
+    phase_ids = {phase["id"] for phase in phases[:3]}
+    phase_issues = [phase["issue_number"] for phase in phases]
+    p3_completion = phases[2]["completion_date"]
+    p4_completion = phases[3]["completion_date"]
+    command_evidence = all(
+        re.search(
+            re.escape(command) + r"\s+#.*\bpassed\b",
+            phase_details,
+        )
+        for command in REQUIRED_CLOSEOUT_COMMANDS
+    )
     if (
-        frozenset(inputs.child_states) != REQUIRED_CLOSEOUT_CHILD_STATES
-        or any(result != "passed" for result in inputs.child_states.values())
-        or not inputs.artifacts_valid
-        or not inputs.references_valid
-        or not inputs.links_valid
-        or frozenset(inputs.focused_commands) != REQUIRED_CLOSEOUT_COMMANDS
-        or any(
-            result != "passed" for result in inputs.focused_commands.values()
-        )
-        or (inputs.warp_installed and inputs.warp_cpu_result != "passed")
-        or (
-            not inputs.warp_installed
-            and inputs.warp_cpu_result != "not_applicable"
-        )
-        or inputs.cuda_result == "failed"
-        or not (
-            inputs.p3_completion_date
-            <= inputs.p4_completion_date
-            <= inputs.epic_completion_date
-        )
+        phase_ids != {"E5-F9-P1", "E5-F9-P2", "E5-F9-P3"}
+        or any(phase["status"] != "Shipped" for phase in phases)
+        or phase_issues != [1372, 1373, 1374, 1375]
+        or not command_evidence
+        or "P4 closeout was rerun after P3" not in phase_details
+        or not (p3_completion <= p4_completion <= epic_plan["completion_date"])
     ):
         return "blocked"
     return ("E5 shipped", "E5-F9 shipped", "Epic F active")
@@ -426,172 +446,67 @@ def test_gpu_coagulation_guide_cross_links_resolve_once() -> None:
 
 
 def test_data_containers_card_has_one_local_coagulation_link_each() -> None:
-    """Gallery card exposes one resolving guide and direct-example link."""
+    """Gallery card exposes a resolving guide and published source link."""
     card = _data_containers_card(
         EXAMPLES_INDEX_PATH.read_text(encoding="utf-8")
     )
-    destinations = _resolving_destinations(EXAMPLES_INDEX_PATH, card)
+    destinations = _local_destinations(card)
 
-    assert destinations.count("gpu_coagulation_direct.py") == 1
+    source_url = (
+        "https://github.com/Gorkowski/particula/blob/main/docs/Examples/"
+        "gpu_coagulation_direct.py"
+    )
+    assert card.count(source_url) == 1
+    assert "gpu_coagulation_direct.py)" not in card.replace(source_url, "")
     assert destinations.count("../Features/coagulation_strategy_system.md") == 1
 
 
-def test_closeout_gate_is_fail_closed_and_cuda_skip_is_optional() -> None:
-    """Gate fixtures model decisions, not execution evidence."""
-    complete = _CloseoutInputs(
-        child_states={
-            prerequisite: "passed"
-            for prerequisite in REQUIRED_CLOSEOUT_CHILD_STATES
-        },
-        artifacts_valid=True,
-        references_valid=True,
-        links_valid=True,
-        focused_commands={
-            command: "passed" for command in REQUIRED_CLOSEOUT_COMMANDS
-        },
-        warp_installed=True,
-        warp_cpu_result="passed",
-        cuda_result="skipped",
-        p3_completion_date="2026-07-19",
-        p4_completion_date="2026-07-19",
-        epic_completion_date="2026-07-19",
+def test_direct_example_links_use_published_repository_destinations() -> None:
+    """Excluded Python examples link to their repository source, not site pages."""
+    source_url = (
+        "https://github.com/Gorkowski/particula/blob/main/docs/Examples/"
+        "gpu_coagulation_direct.py"
     )
-    assert _closeout_gate(complete) == (
+    for path in (EXAMPLES_INDEX_PATH, ROOT / "docs/index.md", STRATEGY_PATH):
+        content = path.read_text(encoding="utf-8")
+        assert source_url in content
+        assert "(../Examples/gpu_coagulation_direct.py)" not in content
+        assert "(Examples/gpu_coagulation_direct.py)" not in content
+
+
+def test_closeout_gate_is_fail_closed_and_cuda_skip_is_optional() -> None:
+    """Canonical evidence rejects omitted, failed, or unordered closeout data."""
+    feature_plan = json.loads(E5_F9_PLAN_PATH.read_text())
+    epic_plan = json.loads(E5_PLAN_PATH.read_text())
+    phase_details = PHASE_DETAILS_PATH.read_text()
+
+    assert _closeout_gate() == (
         "E5 shipped",
         "E5-F9 shipped",
         "Epic F active",
     )
-    for prerequisite in REQUIRED_CLOSEOUT_CHILD_STATES:
-        assert (
-            _closeout_gate(
-                _CloseoutInputs(
-                    **{
-                        **complete.__dict__,
-                        "child_states": {
-                            key: value
-                            for key, value in complete.child_states.items()
-                            if key != prerequisite
-                        },
-                    }
-                )
-            )
-            == "blocked"
-        )
-        for result in ("failed", "skipped"):
-            child_states = dict(complete.child_states)
-            child_states[prerequisite] = result
-            assert (
-                _closeout_gate(
-                    _CloseoutInputs(
-                        **{**complete.__dict__, "child_states": child_states}
-                    )
-                )
-                == "blocked"
-            )
-    assert (
-        _closeout_gate(
-            _CloseoutInputs(
-                **{
-                    **complete.__dict__,
-                    "child_states": {
-                        **complete.child_states,
-                        "E5-F10": "passed",
-                    },
-                }
-            )
-        )
-        == "blocked"
-    )
-    for field in ("artifacts_valid", "references_valid", "links_valid"):
-        assert (
-            _closeout_gate(
-                _CloseoutInputs(**{**complete.__dict__, field: False})
-            )
-            == "blocked"
-        )
-    for result in FAILURE_RESULTS:
-        assert (
-            _closeout_gate(
-                _CloseoutInputs(
-                    **{**complete.__dict__, "warp_cpu_result": result}
-                )
-            )
-            == "blocked"
-        )
     for command in REQUIRED_CLOSEOUT_COMMANDS:
-        for result in FAILURE_RESULTS:
-            focused_commands = dict(complete.focused_commands)
-            focused_commands[command] = result
-            assert (
-                _closeout_gate(
-                    _CloseoutInputs(
-                        **{
-                            **complete.__dict__,
-                            "focused_commands": focused_commands,
-                        }
-                    )
-                )
-                == "blocked"
-            )
-    for focused_commands in (
-        {
-            key: value
-            for key, value in complete.focused_commands.items()
-            if key != "docs"
-        },
-        {**complete.focused_commands, "extra": "passed"},
-    ):
+        missing_evidence = phase_details.replace(command, "", 1)
         assert (
-            _closeout_gate(
-                _CloseoutInputs(
-                    **{
-                        **complete.__dict__,
-                        "focused_commands": focused_commands,
-                    }
-                )
-            )
+            _closeout_gate(feature_plan, epic_plan, missing_evidence)
             == "blocked"
         )
+        failed_evidence = phase_details.replace(
+            f"{command}  # passed", f"{command}  # failed", 1
+        )
+        assert (
+            _closeout_gate(feature_plan, epic_plan, failed_evidence)
+            == "blocked"
+        )
+
+    unordered_feature = json.loads(E5_F9_PLAN_PATH.read_text())
+    unordered_feature["phases"][3]["completion_date"] = "2026-07-19"
     assert (
-        _closeout_gate(
-            _CloseoutInputs(**{**complete.__dict__, "cuda_result": "failed"})
-        )
-        == "blocked"
+        _closeout_gate(unordered_feature, epic_plan, phase_details) == "blocked"
     )
-    for dates in (
-        {
-            "p3_completion_date": "2026-07-20",
-            "p4_completion_date": "2026-07-19",
-        },
-        {
-            "p4_completion_date": "2026-07-20",
-            "epic_completion_date": "2026-07-19",
-        },
-    ):
-        assert _closeout_gate(
-            _CloseoutInputs(**{**complete.__dict__, **dates})
-        ) == ("blocked")
-    assert _closeout_gate(
-        _CloseoutInputs(
-            **{
-                **complete.__dict__,
-                "warp_installed": False,
-                "warp_cpu_result": "not_applicable",
-            }
-        )
-    ) == ("E5 shipped", "E5-F9 shipped", "Epic F active")
-    assert (
-        _closeout_gate(
-            _CloseoutInputs(
-                **{
-                    **complete.__dict__,
-                    "warp_installed": False,
-                    "warp_cpu_result": "passed",
-                }
-            )
-        )
-        == "blocked"
-    )
+    missing_issue = json.loads(E5_F9_PLAN_PATH.read_text())
+    missing_issue["phases"][0]["issue_number"] = None
+    assert _closeout_gate(missing_issue, epic_plan, phase_details) == "blocked"
 
 
 def test_final_authoritative_records_are_completed() -> None:
@@ -610,7 +525,12 @@ def test_final_authoritative_records_are_completed() -> None:
     assert all(
         phase["status"] == "Shipped" for phase in feature_nine["phases"][:3]
     )
-    assert feature_nine["phases"][2]["issue_number"] == 1374
+    assert [phase["issue_number"] for phase in feature_nine["phases"]] == [
+        1372,
+        1373,
+        1374,
+        1375,
+    ]
     assert feature_nine["status"] == "Shipped"
     assert feature_nine["lifecycle"] == "completed"
     assert all(phase["status"] == "Shipped" for phase in feature_nine["phases"])

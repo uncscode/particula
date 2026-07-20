@@ -30,34 +30,29 @@
   - Goal: Record E5 and E5-F1 through E5-F9, canonical statuses, artifacts, and explicit pre-closeout status while keeping all links machine-checked.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`, `docs/Features/Roadmap/index.md`, `particula/tests/gpu_coagulation_docs_test.py`
   - Documented implementation notes: Both roadmap records contain the same
-    unique inventory and three artifact links. This phase's recorded completion
-    date is 2026-07-20, while the P4 closeout record is dated 2026-07-19.
-    Consequently, the P4 entry must not be described as later than P3 or as
-    evidence of a dependency-ordered closeout until the authoritative dates are
-    reconciled.
+    unique inventory and three artifact links. This phase completed on
+    2026-07-20 before the rerun P4 closeout recorded below.
   - Regression coverage: Hardware-free documentation coverage checks the complete unique ID
     matrix, exact artifact labels/targets, record equality, status consistency,
     anti-duplication boundaries, and local-link resolution.
 
 - [x] **E5-F9-P4:** Update development documentation and complete dependency-gated epic closeout
-  - Issue: #1375 | Size: S | Status: Shipped | Completed: 2026-07-19
-  - Recorded: Added local gallery discovery and synchronized the E5/E5-F9
-    closeout projection with Epic F active. Its 2026-07-19 record predates P3's
-    recorded 2026-07-20 completion, so it is not chronology evidence that P4
-    ran after P3.
+  - Issue: #1375 | Size: S | Status: Shipped | Completed: 2026-07-20
+  - Recorded: P4 closeout was rerun after P3 on 2026-07-20. It replaces the
+    superseded 2026-07-19 closeout projection and synchronizes E5/E5-F9 as
+    shipped with Epic F active.
   - Evidence (all exit 0 and warning-clean; marker-selected runs used Warp CPU):
     ```text
-    pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror  # 12 passed
-    pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror  # 14 passed
-    pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror  # 88 passed
-    pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror  # 12 passed
-    pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror  # 802 passed
+    pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror  # passed
+    pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror  # passed
+    pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror  # passed
+    pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror  # passed
+    pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror  # passed
     python3 .opencode/tools/run_pytest.py  # passed
     python3 .opencode/tools/run_linters.py  # passed
     ```
     The docs test was rerun after the mutating lint workflow.
 
 P1 and P2 may proceed in parallel. P3 consumes stable artifact paths from P1,
-P2, E5-F7, and E5-F8. P4 is specified to run after those dependencies, but the
-recorded P4 date precedes P3's recorded completion date; do not claim that P4
-ran last from these records.
+P2, E5-F7, and E5-F8. This P4 rerun follows P3 and records the authoritative,
+dependency-ordered closeout evidence.
