@@ -77,6 +77,21 @@ EXPECTED_E5_ARTIFACTS = (
         "../../Examples/gpu_condensation_parity_walkthrough.py",
     ),
 )
+REQUIRED_CLOSEOUT_CHILD_STATES = frozenset(
+    {
+        *(f"E5-F{number}" for number in range(1, 9)),
+        "E5-F9-P1",
+        "E5-F9-P2",
+        "E5-F9-P3",
+    }
+)
+REQUIRED_CLOSEOUT_COMMANDS = frozenset(
+    {"docs", "direct_coagulation", "parity", "stochastic"}
+)
+FAILURE_RESULTS: tuple[Literal["failed"], Literal["skipped"]] = (
+    "failed",
+    "skipped",
+)
 
 
 def _normalized(content: str) -> str:
@@ -156,7 +171,7 @@ def _resolving_destinations(path: Path, content: str) -> list[str]:
 class _CloseoutInputs:
     """Independent evidence inputs for the fail-closed closeout gate."""
 
-    child_states: Mapping[str, bool]
+    child_states: Mapping[str, Literal["passed", "failed", "skipped"]]
     artifacts_valid: bool
     references_valid: bool
     links_valid: bool
@@ -164,6 +179,9 @@ class _CloseoutInputs:
     warp_installed: bool
     warp_cpu_result: Literal["passed", "failed", "skipped", "not_applicable"]
     cuda_result: Literal["passed", "failed", "skipped", "not_applicable"]
+    p3_completion_date: str
+    p4_completion_date: str
+    epic_completion_date: str
 
 
 def _closeout_gate(
@@ -171,12 +189,12 @@ def _closeout_gate(
 ) -> Literal["blocked"] | tuple[str, str, str]:
     """Return the permitted closeout transition only for complete evidence."""
     if (
-        not inputs.child_states
-        or not all(inputs.child_states.values())
+        frozenset(inputs.child_states) != REQUIRED_CLOSEOUT_CHILD_STATES
+        or any(result != "passed" for result in inputs.child_states.values())
         or not inputs.artifacts_valid
         or not inputs.references_valid
         or not inputs.links_valid
-        or not inputs.focused_commands
+        or frozenset(inputs.focused_commands) != REQUIRED_CLOSEOUT_COMMANDS
         or any(
             result != "passed" for result in inputs.focused_commands.values()
         )
@@ -186,6 +204,11 @@ def _closeout_gate(
             and inputs.warp_cpu_result != "not_applicable"
         )
         or inputs.cuda_result == "failed"
+        or not (
+            inputs.p3_completion_date
+            <= inputs.p4_completion_date
+            <= inputs.epic_completion_date
+        )
     ):
         return "blocked"
     return ("E5 shipped", "E5-F9 shipped", "Epic F active")
@@ -416,33 +439,69 @@ def test_data_containers_card_has_one_local_coagulation_link_each() -> None:
 def test_closeout_gate_is_fail_closed_and_cuda_skip_is_optional() -> None:
     """Gate fixtures model decisions, not execution evidence."""
     complete = _CloseoutInputs(
-        child_states={"E5-F2": True, "E5-F9-P3": True},
+        child_states={
+            prerequisite: "passed"
+            for prerequisite in REQUIRED_CLOSEOUT_CHILD_STATES
+        },
         artifacts_valid=True,
         references_valid=True,
         links_valid=True,
-        focused_commands={"docs": "passed", "repository": "passed"},
+        focused_commands={
+            command: "passed" for command in REQUIRED_CLOSEOUT_COMMANDS
+        },
         warp_installed=True,
         warp_cpu_result="passed",
         cuda_result="skipped",
+        p3_completion_date="2026-07-19",
+        p4_completion_date="2026-07-19",
+        epic_completion_date="2026-07-19",
     )
     assert _closeout_gate(complete) == (
         "E5 shipped",
         "E5-F9 shipped",
         "Epic F active",
     )
-    for replacement in (
-        {},
-        {"E5-F2": False},
-        {"E5-F9-P3": False},
-    ):
+    for prerequisite in REQUIRED_CLOSEOUT_CHILD_STATES:
         assert (
             _closeout_gate(
                 _CloseoutInputs(
-                    **{**complete.__dict__, "child_states": replacement}
+                    **{
+                        **complete.__dict__,
+                        "child_states": {
+                            key: value
+                            for key, value in complete.child_states.items()
+                            if key != prerequisite
+                        },
+                    }
                 )
             )
             == "blocked"
         )
+        for result in ("failed", "skipped"):
+            child_states = dict(complete.child_states)
+            child_states[prerequisite] = result
+            assert (
+                _closeout_gate(
+                    _CloseoutInputs(
+                        **{**complete.__dict__, "child_states": child_states}
+                    )
+                )
+                == "blocked"
+            )
+    assert (
+        _closeout_gate(
+            _CloseoutInputs(
+                **{
+                    **complete.__dict__,
+                    "child_states": {
+                        **complete.child_states,
+                        "E5-F10": "passed",
+                    },
+                }
+            )
+        )
+        == "blocked"
+    )
     for field in ("artifacts_valid", "references_valid", "links_valid"):
         assert (
             _closeout_gate(
@@ -450,7 +509,7 @@ def test_closeout_gate_is_fail_closed_and_cuda_skip_is_optional() -> None:
             )
             == "blocked"
         )
-    for result in ("failed", "skipped"):
+    for result in FAILURE_RESULTS:
         assert (
             _closeout_gate(
                 _CloseoutInputs(
@@ -459,23 +518,59 @@ def test_closeout_gate_is_fail_closed_and_cuda_skip_is_optional() -> None:
             )
             == "blocked"
         )
-    assert (
-        _closeout_gate(
-            _CloseoutInputs(
-                **{
-                    **complete.__dict__,
-                    "focused_commands": {"docs": "failed"},
-                }
+    for command in REQUIRED_CLOSEOUT_COMMANDS:
+        for result in FAILURE_RESULTS:
+            focused_commands = dict(complete.focused_commands)
+            focused_commands[command] = result
+            assert (
+                _closeout_gate(
+                    _CloseoutInputs(
+                        **{
+                            **complete.__dict__,
+                            "focused_commands": focused_commands,
+                        }
+                    )
+                )
+                == "blocked"
             )
+    for focused_commands in (
+        {
+            key: value
+            for key, value in complete.focused_commands.items()
+            if key != "docs"
+        },
+        {**complete.focused_commands, "extra": "passed"},
+    ):
+        assert (
+            _closeout_gate(
+                _CloseoutInputs(
+                    **{
+                        **complete.__dict__,
+                        "focused_commands": focused_commands,
+                    }
+                )
+            )
+            == "blocked"
         )
-        == "blocked"
-    )
     assert (
         _closeout_gate(
-            _CloseoutInputs(**{**complete.__dict__, "focused_commands": {}})
+            _CloseoutInputs(**{**complete.__dict__, "cuda_result": "failed"})
         )
         == "blocked"
     )
+    for dates in (
+        {
+            "p3_completion_date": "2026-07-20",
+            "p4_completion_date": "2026-07-19",
+        },
+        {
+            "p4_completion_date": "2026-07-20",
+            "epic_completion_date": "2026-07-19",
+        },
+    ):
+        assert _closeout_gate(
+            _CloseoutInputs(**{**complete.__dict__, **dates})
+        ) == ("blocked")
     assert _closeout_gate(
         _CloseoutInputs(
             **{
@@ -485,6 +580,18 @@ def test_closeout_gate_is_fail_closed_and_cuda_skip_is_optional() -> None:
             }
         )
     ) == ("E5 shipped", "E5-F9 shipped", "Epic F active")
+    assert (
+        _closeout_gate(
+            _CloseoutInputs(
+                **{
+                    **complete.__dict__,
+                    "warp_installed": False,
+                    "warp_cpu_result": "passed",
+                }
+            )
+        )
+        == "blocked"
+    )
 
 
 def test_final_authoritative_records_are_completed() -> None:
@@ -513,6 +620,9 @@ def test_final_authoritative_records_are_completed() -> None:
     assert [child["id"] for child in epic["child_plans"]] == [
         f"E5-F{number}" for number in range(1, 10)
     ]
+    p3_completion = feature_nine["phases"][2]["completion_date"]
+    p4_completion = feature_nine["phases"][3]["completion_date"]
+    assert p3_completion <= p4_completion <= epic["completion_date"]
 
 
 def test_guides_do_not_promote_deferred_runtime_capabilities() -> None:

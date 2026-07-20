@@ -126,8 +126,9 @@ meets its exit bar, the next pending epic in the sequence becomes active.
        `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`,
       and `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
 - [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
-  (ADW plan E5) shipped bounded direct-kernel coagulation mechanics, validation,
-  explicit-transfer documentation, local gallery discovery, and closeout gates.
+   (ADW plan E5) shipped bounded direct-kernel coagulation mechanics, validation,
+   explicit-transfer documentation, local gallery discovery, and closeout gates;
+   E5-F9 P3 preceded or matched P4 and Epic E closure.
 
 ### Active
 

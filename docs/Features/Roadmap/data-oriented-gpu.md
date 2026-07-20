@@ -1017,8 +1017,8 @@ it does not change production capability. The caller-owned, write-only
 
 ## Epic E: GPU Coagulation Physics Coverage
 
-Status: shipped. Epic E completed its bounded direct-kernel coagulation scope;
-Epic F is active.
+Status: shipped. E5-F9 P3 completed no later than its P4 closeout, and Epic E
+completed its bounded direct-kernel coagulation scope; Epic F is active.
 
 ### E5 roadmap inventory
 

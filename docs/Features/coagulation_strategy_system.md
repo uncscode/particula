@@ -499,9 +499,8 @@ For a runnable Brownian-only introduction to this direct path, see the
 [direct GPU coagulation example](../Examples/gpu_coagulation_direct.py). It
 keeps transfers and caller-owned collision/RNG sidecars explicit; it is an
 example of the supported direct interface, not a CPU fallback or a high-level
-`Runnable` workflow. See the
-[GPU coagulation validation record](./Roadmap/coagulation-validation.md) for
-the complete approved-mask evidence boundary.
+`Runnable` workflow. The evidence/command record above defines the complete
+approved-mask evidence boundary.
 
 ## Related Documentation
 

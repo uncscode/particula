@@ -13,8 +13,6 @@ from typing import Any
 import numpy as np
 import pytest
 
-from particula.gpu import WARP_AVAILABLE, to_warp_particle_data
-
 EXAMPLE_PATH = (
     Path(__file__).resolve().parents[3]
     / "docs"
@@ -34,6 +32,14 @@ DISABLED_OUTPUT = [
     "ParticleData constructed: masses=(1, 8, 1), concentration=(1, 8), charge=(1, 8), density=(1,), volume=(1,)",
     "Warp is unavailable or disabled; no kernel ran.",
 ]
+
+
+def _require_warp_gpu() -> Any:
+    """Return GPU helpers only from a Warp-enabled test path."""
+    gpu = pytest.importorskip("particula.gpu")
+    if not gpu.WARP_AVAILABLE:
+        pytest.skip("Warp is not available")
+    return gpu
 
 
 @pytest.fixture
@@ -413,12 +419,12 @@ def test_failures_propagate_without_success_output(
 
 @pytest.mark.warp
 @pytest.mark.stochastic
-@pytest.mark.skipif(not WARP_AVAILABLE, reason="Warp is not available")
 def test_real_warp_cpu_path_preserves_invariants_and_persistent_rng(
     monkeypatch: pytest.MonkeyPatch,
     example_module: types.ModuleType,
 ) -> None:
     """Test real CPU Warp sidecar reuse and conservation-safe invariants."""
+    _require_warp_gpu()
     original_loader = example_module._load_gpu_runtime
     states: list[np.ndarray] = []
     active_before_second: list[np.ndarray] = []
@@ -500,16 +506,16 @@ def test_real_warp_cpu_path_preserves_invariants_and_persistent_rng(
 
 @pytest.mark.warp
 @pytest.mark.parametrize("active_count", [0, 1])
-@pytest.mark.skipif(not WARP_AVAILABLE, reason="Warp is not available")
 def test_real_warp_zero_and_one_active_inputs_are_unchanged(
     example_module: types.ModuleType, active_count: int
 ) -> None:
     """Test degenerate valid fixtures return zero collisions without mutation."""
+    gpu = _require_warp_gpu()
     wp, step, config_type = example_module._load_gpu_runtime()
     particle_data = example_module._build_particle_data()
     particle_data.concentration[0, active_count:] = 0.0
     before = particle_data.copy()
-    particles = to_warp_particle_data(particle_data, device="cpu")
+    particles = gpu.to_warp_particle_data(particle_data, device="cpu")
     pairs = wp.zeros((1, 1, 2), dtype=wp.int32, device="cpu")
     counts = wp.zeros((1,), dtype=wp.int32, device="cpu")
     states = wp.zeros((1,), dtype=wp.uint32, device="cpu")
