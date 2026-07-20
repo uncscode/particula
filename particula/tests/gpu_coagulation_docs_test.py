@@ -130,6 +130,35 @@ def _local_destinations(content: str) -> list[str]:
     ]
 
 
+def _detailed_epic_index_statuses(content: str) -> dict[str, str]:
+    """Return the Epic E and F statuses from the detailed index table."""
+    statuses = {}
+    for number, epic in (("5", "E"), ("6", "F")):
+        match = re.search(
+            rf"^\|\s*{number}\s*\|\s*\[Epic {epic}:.*?\]\([^)]+\)"
+            r"\s*\|\s*([^|]+?)\s*\|",
+            content,
+            flags=re.IGNORECASE | re.MULTILINE,
+        )
+        assert match, f"Epic {epic} is missing from the detailed roadmap index"
+        statuses[epic] = match.group(1).strip().lower()
+    return statuses
+
+
+def _roadmap_index_statuses(content: str) -> dict[str, str]:
+    """Return Epic E and F statuses from their roadmap-index sections."""
+    active = _section(content, "### Active")
+    pending = _section(content, "### Pending")
+    epic_e = "[Epic E: GPU Coagulation Physics Coverage]("
+    epic_f = "[Epic F: GPU Process Completeness]("
+
+    assert active.count(epic_e) == 1
+    assert pending.count(epic_e) == 0
+    assert pending.count(epic_f) == 1
+    assert active.count(epic_f) == 0
+    return {"E": "active", "F": "pending"}
+
+
 def _command_target(command: str) -> Path:
     """Return the repository target named by a published pytest command."""
     match = re.search(r"\b(particula/[^\s]+)", command)
@@ -371,11 +400,13 @@ def test_e5_roadmap_records_match_and_resolve_artifacts() -> None:
         assert "## Deferred capability ownership" not in record
 
         record_destinations = _labeled_destinations(record)
-        source_destinations = _labeled_destinations(content)
         for artifact in EXPECTED_E5_ARTIFACTS:
             assert record_destinations.count(artifact) == 1
-            assert source_destinations.count(artifact) == 1
             assert (source_path.parent / artifact[1]).resolve().exists()
+
+        full_document_destinations = _labeled_destinations(content)
+        for artifact in EXPECTED_E5_ARTIFACTS:
+            assert full_document_destinations.count(artifact) == 1
 
         all_rows = _record_rows(content)
         for identifier, _, _ in EXPECTED_E5_ROWS:
@@ -397,12 +428,16 @@ def test_e5_roadmaps_keep_epic_statuses_and_reject_stale_claims() -> None:
         r"\|\s*5\s*\|\s*\[Epic E:.*?\|\s*Active\s*\|\s*"
         r"not scheduled\s*\|"
     )
-    for source_path in (DETAILED_ROADMAP_PATH, ROADMAP_INDEX_PATH):
-        content = source_path.read_text(encoding="utf-8")
-        normalized = _normalized(content).lower()
+    detailed = DETAILED_ROADMAP_PATH.read_text(encoding="utf-8")
+    index = ROADMAP_INDEX_PATH.read_text(encoding="utf-8")
 
-        assert "status: active." in normalized or "e5 is active" in normalized
-        assert "| pending |" in normalized or "epic f is pending" in normalized
+    assert _detailed_epic_index_statuses(detailed) == {
+        "E": "active",
+        "F": "pending",
+    }
+    assert _roadmap_index_statuses(index) == {"E": "active", "F": "pending"}
+    for content in (detailed, index):
+        normalized = _normalized(content).lower()
         assert not re.search(stale_epic_e_row, content, flags=re.IGNORECASE)
         assert "e5 shipped" not in normalized
         assert "epic f active" not in normalized
