@@ -495,10 +495,20 @@ pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q 
 This optional/local command is additive and skips cleanly when CUDA is
 unavailable.
 
+For a runnable Brownian-only introduction to this direct path, see the
+[direct GPU coagulation example](../Examples/gpu_coagulation_direct.py). It
+keeps transfers and caller-owned collision/RNG sidecars explicit; it is an
+example of the supported direct interface, not a CPU fallback or a high-level
+`Runnable` workflow. See the
+[GPU coagulation validation record](./Roadmap/coagulation-validation.md) for
+the complete approved-mask evidence boundary.
+
 ## Related Documentation
 
 - **Wall loss strategies**: [wall_loss_strategy_system.md](./wall_loss_strategy_system.md)
 - **Condensation strategies**: [condensation_strategy_system.md](./condensation_strategy_system.md)
+- **GPU direct example**: [gpu_coagulation_direct.py](../Examples/gpu_coagulation_direct.py)
+- **GPU roadmap**: [Data-Oriented Design and GPU Roadmap](./Roadmap/data-oriented-gpu.md)
 
 ## FAQ
 

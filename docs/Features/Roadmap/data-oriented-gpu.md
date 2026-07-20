@@ -1165,8 +1165,8 @@ status, including on CUDA, to report invalid values. The direct path does not
 establish CPU-strategy parity. E5-F6 ships the additive contract and
 documentation; no additional planned work remains for the shipped approved
 additive combinations. E5-F7 is shipped with the cross-mechanism validation
-record, and E5-F9 P1/P2 are shipped while P3/P4 remain for the consolidated
-direct example and closeout.
+record. E5-F9 is shipped: its completed P3/P4 publish the consolidated direct
+example and closeout gate. Epic F is the active follow-on work.
 
 Planned features:
 

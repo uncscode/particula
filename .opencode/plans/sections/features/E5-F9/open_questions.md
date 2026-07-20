@@ -15,8 +15,8 @@
     RNG. List approved alternative mechanism sets in prose and link the
     validation report rather than turning the example into a test matrix.
 - [x] How is the P4 gate represented when child issue numbers are assigned?
-  - Resolved 2026-07-16: require authoritative feature/phase status, issue and
-    commit references, resolving artifact paths, focused command results, and
+  - Resolved 2026-07-16: require authoritative feature/phase status, issue
+    references, resolving artifact paths, focused command results, and
     required Warp CPU evidence. Record CUDA as pass/skip/not-run. Issue closure
     alone never satisfies the gate.
 - [x] Are classifier diagnostics present?
