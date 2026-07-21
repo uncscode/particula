@@ -12,9 +12,12 @@ schedule.
   processes easier to compose in clear simulation pipelines.
 - **Particle and gas data containers**: Complete migration from legacy facades
   toward explicit `ParticleData` and `GasData` containers.
-- **GPU-backed particle-resolved simulations**: Move the existing Warp kernels
-  from tested lower-level APIs toward documented, high-level simulation
-  workflows.
+- **GPU process completeness**: Deliver dilution, wall loss, nucleation, and
+  fixed-slot particle management through
+  [Epic F](data-oriented-gpu.md#epic-f-gpu-process-completeness).
+- **GPU-resident user workflows**: Prepare backend selection and high-level
+  simulation integration for on-deck
+  [Epic G](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation).
 - **Documentation and examples**: Expand practical examples that connect feature
   guides, theory pages, and runnable notebooks.
 
@@ -126,13 +129,19 @@ meets its exit bar, the next pending epic in the sequence becomes active.
        `pytest particula/gpu/tests/gpu_condensation_parity_walkthrough_test.py -q -Werror`,
       and `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
 - [Epic E: GPU Coagulation Physics Coverage](data-oriented-gpu.md#epic-e-gpu-coagulation-physics-coverage)
-   (ADW plan E5) shipped bounded direct-kernel coagulation mechanics, validation,
-   explicit-transfer documentation, local gallery discovery, and closeout gates;
-   E5-F9 P3 preceded or matched P4 and Epic E closure.
+  (ADW plan E5) and all nine feature plans E5-F1 through E5-F9 shipped on
+  2026-07-20. The bounded direct-kernel release covers Brownian, charged
+  hard-sphere, SP2016 sedimentation, and ST1956 turbulent-shear terms; approved
+  additive masks; charge-conserving merges; deterministic and stochastic
+  validation; explicit-transfer documentation and examples; and the ordered
+  closeout gate. High-level `Runnable` integration remains deferred.
 
 ### Active
 
 - [Epic F: GPU Process Completeness](data-oriented-gpu.md#epic-f-gpu-process-completeness)
+  is the next and currently active epic. It adds CPU/GPU dilution, GPU wall
+  loss, CPU/GPU nucleation, and fixed-slot activation and exhaustion handling
+  needed for complete GPU-resident timesteps.
 
 ### E5 roadmap inventory
 
@@ -149,18 +158,32 @@ meets its exit bar, the next pending epic in the sequence becomes active.
 | `E5-F8` | Independent CPU-Warp Condensation Walkthrough | Shipped |
 | `E5-F9` | GPU Coagulation Support Documentation and Epic Closeout | Shipped |
 
-E5-F7 owns the [GPU coagulation validation record](coagulation-validation.md),
-E5-F8 owns the [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md),
-and the [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py)
-is runnable source.
+All E5 features are shipped. The public E5 cross-links are:
 
-E5 is shipped and Epic F is active.
+- E5-F7's [GPU coagulation validation record](coagulation-validation.md).
+- E5-F8's
+  [condensation parity walkthrough ownership record](condensation-parity-walkthrough.md)
+  and runnable
+  [GPU condensation parity walkthrough](../../Examples/gpu_condensation_parity_walkthrough.py).
+- E5-F9's
+  [canonical GPU coagulation ownership contract](../data-containers-and-gpu-foundations.md#gpu-coagulation-configuration-and-sidecar-ownership),
+  [direct-kernel support guide](../coagulation_strategy_system.md#gpu-direct-kernel-foundations-and-limitations),
+  and
+  [direct GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py).
+
+E5 and every E5 feature are shipped. Epic F is active next; Epic G is on deck.
+
+### On Deck
+
+- [Epic G: Backend Selection and GPU-Resident Simulation](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
+  follows Epic F. It will expose backend selection through user-facing APIs and
+  keep complete simulation loops resident on the selected device between
+  checkpoints.
 
 ### Pending
 
 Listed in execution order; each becomes active when the previous epic ships.
 
-- [Epic G: Backend Selection and GPU-Resident Simulation](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
 - [Epic H: Graph Capture and Performance](data-oriented-gpu.md#epic-h-graph-capture-and-performance)
 - [Epic I: Differentiability and Global Optimization](data-oriented-gpu.md#epic-i-differentiability-and-global-optimization)
   — implementation companion:
