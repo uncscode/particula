@@ -18,15 +18,19 @@ evidence established by those completed phases.
     invalid domains/types/shapes and `None`, NaN/Inf rejection, warning-clean
     extreme decay, input non-mutation, and package-surface boundary.
 
-- [ ] **E6-F1-P2:** Add particle and gas container dilution updates with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E6-F1-P2:** Add particle and gas container dilution updates with unit tests
+  - Issue: #1390 | Size: S | Status: Complete
   - Goal: Apply one CPU dilution step to particle number concentration and gas
     mass concentration while preserving every non-concentration field.
   - Files: `particula/dynamics/dilution.py`,
     `particula/dynamics/tests/dilution_test.py`
-  - Tests: particle distribution variants, scalar/multi-species gas, expected
-    concentration updates, exact no-ops, nonnegative outputs, object identity,
-    and snapshots of mass, charge, density, volume, and metadata.
+  - Delivered: unexported concrete-only `dilute_aerosol()` with strict scalar
+    validation, full candidate and representation-storage preflight, ordered
+    commit, and rollback after an unexpected commit failure.
+  - Tests: particle and scalar/multi-species gas updates, exact no-ops,
+    underflow, scalar-boundary errors, preflight atomicity for particle, both
+    gas groups, and converted storage, plus commit-recovery and identity/state
+    retention.
 
 - [ ] **E6-F1-P3:** Add dilution strategy and substepped runnable with unit tests
   - Issue: TBD | Size: S | Status: Not Started

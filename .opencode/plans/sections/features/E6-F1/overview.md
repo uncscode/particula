@@ -26,6 +26,15 @@ numerical contract without adding container mutation, a strategy/runnable,
 package exports, user documentation, examples, or GPU support; those remain in
 later phases.
 
+P2 is complete in issue #1390. The same concrete module now provides the
+unexported `dilute_aerosol(aerosol, coefficient, time_step)` reference
+primitive. It validates finite nonnegative scalar inputs, applies the exact P1
+decay to physical particle concentration and both atmosphere gas groups, and
+uses representation volume only when storing the particle result. Candidates
+and storage are preflighted before commit; an unexpected write failure rolls
+back already-written concentrations. No strategy/runnable, package export,
+user documentation, or GPU API was added.
+
 ## User Stories
 
 - As a simulation user, I want to compose dilution with existing runnables so

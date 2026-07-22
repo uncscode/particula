@@ -15,14 +15,19 @@
 
 ## E6-F1-P2 — Container Reference
 
-1. Add a pure calculation path that derives both new concentrations before any
-   write.
-2. Update `ParticleRepresentation` concentration using its representation
-   volume correctly; do not change per-particle/bin mass or distribution data.
-3. Update scalar or multi-species `GasSpecies` through its supported setter;
-   retain species metadata and partitioning configuration.
-4. Assert nonnegative finite results and exact zero-flow/time no-ops.
-5. Add before/after snapshots for all protected fields and identities.
+**Complete in issue #1390.**
+
+1. [x] Add `dilute_aerosol()` as an unexported concrete-module primitive with
+   finite, nonnegative scalar coefficient and duration validation.
+2. [x] Preflight physical particle and both gas-group candidates, then convert
+   particle concentration through representation volume before writing storage.
+3. [x] Commit particle then gas concentrations in declared order, retaining
+   snapshots and rolling back already-written values on an unexpected failure.
+4. [x] Preserve particle distribution state, gas metadata, atmosphere state,
+   and container identities; retain exact zero-input no-ops and finite
+   underflow to zero.
+5. [x] Add regression coverage for normal behavior, boundaries, preflight
+   atomicity, no-ops, underflow, and commit recovery.
 
 ## E6-F1-P3 — Strategy and Runnable
 

@@ -13,11 +13,15 @@ thresholds must never be lowered; changed code must meet at least the configured
   non-mutation; and the concrete-module-only package boundary for
   `get_dilution_step()`. The focused command is
   `pytest particula/dynamics/tests/dilution_test.py -q -Werror`.
-- **P2:** Add container fixtures and assertions to the dilution tests (or a
-  focused `dilution_strategy_test.py`) for particle distributions and
-  scalar/multi-species gas. Compare against an independently calculated NumPy
-  reference and snapshot mass, charge, density, distribution, volume, names,
-  molar mass, partitioning, temperature, and pressure.
+- **P2 (complete, issue #1390):**
+  `particula/dynamics/tests/dilution_test.py` covers direct container dilution
+  for physical particle concentration and scalar/multi-species atmosphere gas
+  groups, identity and protected-state retention, exact zero-input no-ops, and
+  finite extreme-decay underflow. It also covers zero-dimensional NumPy scalar
+  inputs; typed scalar-boundary errors; invalid particle, each gas-group, and
+  converted-storage preflight failures without writes; and rollback/recovery
+  after injected commit failures. Package-surface coverage confirms
+  `dilute_aerosol` remains concrete-module-only.
 - **P3:** Add `particula/dynamics/tests/dilution_runnable_test.py` for strategy
   versus runnable agreement, expected concentration changes, exact no-ops,
   substep count/splitting, returned identity, and `|` composition.
