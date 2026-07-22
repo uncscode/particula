@@ -186,6 +186,42 @@ For the direct-kernel example path, keep the import split explicit:
 - Do not expect top-level `particula.gpu` to re-export
   `condensation_step_gpu` or `coagulation_step_gpu`.
 
+### Direct GPU dilution
+
+Import the direct dilution operation from the low-level kernel namespace:
+
+```python
+from particula.gpu.kernels import dilution_step_gpu
+```
+
+This is distinct from the CPU↔Warp transfer helpers in `particula.gpu`.
+Callers own conversion, device placement, synchronization and checkpoint
+transfer, and the `WarpParticleData` and `WarpGasData` instances. The kernel
+does not provide hidden transfer or CPU fallback.
+
+`dilution_step_gpu` is a fixed-shape, caller-owned in-place operation. It
+returns the same particle and gas objects and changes only their
+`concentration` fields; masses and every other caller-owned particle or gas
+field remain unchanged. It applies `alpha = Q / V` in `s^-1` and
+`c_new = c * exp(-alpha * time_step)`. The coefficient is either a finite,
+nonnegative scalar or a caller-owned, same-device `wp.float64` Warp array with
+shape `(n_boxes,)`.
+
+Entry preflight is ordered and read-only. Rejected calls are atomic before
+kernel launch. A zero scalar coefficient or zero time step completes full
+preflight and is an exact write-free, allocation-free, launch-free no-op. The
+contract does not promise rollback after a launched-kernel failure.
+
+E6-F1 supplies the upstream CPU finite-step oracle; E6-F9 is the planned
+integrated direct-call consumer. Independent NumPy comparisons of particle and
+gas concentrations run on Warp CPU with float64 `rtol=1e-12, atol=0`; CUDA is
+optional and skips cleanly when unavailable. This tolerance-based evidence is
+not bitwise parity.
+
+GPU runnable or process orchestration, backend selection and scheduling,
+GPU-resident timestep integration, resizing, graph capture, autodiff,
+performance claims, wall loss, and nucleation remain deferred.
+
 ### Particle transfer boundary
 
 `WarpParticleData` is the explicit Warp mirror for `ParticleData`. Use the

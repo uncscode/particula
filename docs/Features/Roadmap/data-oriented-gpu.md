@@ -132,9 +132,11 @@ Known data-model gaps:
   downstream work (see [EnvironmentData Container](#environmentdata-container)).
 - `ParticleData.density` is shaped `(n_species,)` and shared across boxes, so
   boxes at different temperatures cannot carry per-box densities.
-- Dilution exists only as free functions (`get_volume_dilution_coefficient`,
-  `get_dilution_rate`); there is no `Dilution` strategy or runnable even on
-  the CPU side, so GPU dilution has no process-level CPU reference yet.
+- E6-F1 ships the CPU finite-step dilution oracle and E6-F2 ships P1–P4 direct
+  GPU dilution. Import the low-level operation with
+  `from particula.gpu.kernels import dilution_step_gpu`; this is not a
+  high-level process or runnable reference. E6-F9 remains the planned
+  integrated direct-call consumer.
 
 ### Warp GPU Backend
 
@@ -190,8 +192,24 @@ Known GPU physics gaps remain:
 - CPU sedimentation coagulation and simple turbulent shear coagulation exist.
   The shipped GPU paths do not establish CPU-strategy parity; DNS and general
   turbulence remain deferred from the near-term GPU scope.
-- Wall loss, dilution, and other dynamics processes are CPU-only today. They
-  need GPU implementations before a full simulation can remain GPU-resident for
+- Direct GPU dilution is shipped as a fixed-shape, caller-owned kernel. It
+  is imported with `from particula.gpu.kernels import dilution_step_gpu`.
+  E6-F1 supplies its upstream CPU finite-step oracle and E6-F9 remains its
+  future integrated direct-call consumer. It accepts a finite nonnegative scalar
+  coefficient or a same-device
+  `wp.float64` `(n_boxes,)` coefficient array, returns the same particle and
+  gas containers, and mutates only concentration fields in place. Callers own
+  CPU↔Warp transfer, device placement, and synchronization; there is no hidden
+  transfer or fallback. Complete ordered preflight rejects before launch, while
+  a scalar-zero coefficient or zero time step completes preflight then returns
+  as an exact write-free, allocation-free, launch-free no-op. Independent
+  float64 particle and gas comparisons on Warp CPU use `rtol=1e-12, atol=0`;
+  CUDA rows are optional and skip cleanly when unavailable. This is
+  tolerance-based evidence, not bitwise equality.
+- GPU runnable and process orchestration, backend selection/fallback policy,
+  scheduling, GPU-resident timestep integration, wall loss, nucleation,
+  resizing, graph capture, autodiff, and performance work remain future scope.
+  Those items are needed before a full simulation can remain GPU-resident for
   every timestep.
 - Direct GPU condensation supports ideal/kappa water activity and
   static/composition-weighted surface tension through fixed-shape,
@@ -1195,26 +1213,42 @@ GPU-resident between checkpoints — dilution, wall loss, and nucleation —
 plus the fixed-slot particle management that nucleation and graph capture
 depend on.
 
-Planned features:
+Delivered dilution scope:
 
-1. CPU `Dilution` strategy/runnable reference implementation (today dilution
-   exists only as free functions, so GPU dilution has no process-level CPU
-   reference).
-2. GPU dilution kernel with parity tests against the CPU reference.
-3. GPU neutral wall loss (spherical/rectangular) with parity tests.
-4. GPU charged wall loss, after neutral wall loss and the core condensation
+- E6-F1 provides the CPU finite-step oracle and E6-F2 delivers the P1–P4
+  direct GPU kernel: `from particula.gpu.kernels import dilution_step_gpu`.
+  It is a low-level, fixed-shape operation, not a GPU process or runnable.
+- Callers own CPU↔Warp transfer, device placement, and synchronization. The
+  kernel accepts finite nonnegative scalar or same-device `wp.float64`
+  `(n_boxes,)` coefficients, returns the same containers, and mutates only
+  particle and gas concentrations in place.
+- Ordered complete preflight is read-only; scalar-zero and zero-time calls are
+  fully preflighted exact write-free, allocation-free, launch-free no-ops.
+  Particle and gas parity evidence uses independent Warp CPU float64 checks at
+  `rtol=1e-12, atol=0`; CUDA is optional and skips cleanly when unavailable.
+  It is not bitwise parity. E6-F9 is the future integrated direct-call
+  consumer.
+
+Future features:
+
+1. GPU process orchestration, backend selection/fallback policy, scheduling,
+   and GPU-resident timestep integration for the delivered direct kernel.
+2. GPU neutral wall loss (spherical/rectangular) with parity tests.
+3. GPU charged wall loss, after neutral wall loss and the core condensation
    and coagulation GPU paths are stable.
-5. Nucleation/particle-source CPU reference process following the
+4. Nucleation/particle-source CPU reference process following the
    [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md)
    (no nucleation code exists in particula today).
-6. GPU nucleation via slot activation (see
+5. GPU nucleation via slot activation (see
    [Particle Slot Management](#particle-slot-management)).
-7. Particle slot management: inactive zero-mass slots, activation,
+6. Particle slot management: inactive zero-mass slots, activation,
    per-box active-count diagnostics, and an exhaustion policy (resampling or
    volume scaling).
-8. Slot and conservation validation: tests for inactive slots, activation,
+7. Slot and conservation validation: tests for inactive slots, activation,
    slot exhaustion handling, and conservation across resampling or volume
    scaling.
+8. Fixed-shape GPU workflow extensions: resizing policy, graph capture,
+   autodiff, and performance evidence.
 
 ### Particle Slot Management
 
