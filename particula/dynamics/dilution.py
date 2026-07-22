@@ -24,7 +24,7 @@ def _return_scalar_if_appropriate(
     *operands: float | NDArray[np.float64],
 ) -> float | NDArray[np.float64]:
     """Return a scalar result when every input is scalar."""
-    if all(np.ndim(operand) == 0 for operand in operands):
+    if all(np.isscalar(operand) for operand in operands):
         return result.item()
     return result
 
@@ -59,10 +59,10 @@ def get_volume_dilution_coefficient(
         raise TypeError("Argument 'input_flow_rate' must not be None.")
 
     volume_array, input_flow_rate_array = np.broadcast_arrays(
-        volume,
-        input_flow_rate,
+        np.asarray(volume, dtype=np.float64),
+        np.asarray(input_flow_rate, dtype=np.float64),
     )
-    result = input_flow_rate_array / volume_array
+    result = np.asarray(input_flow_rate_array / volume_array)
     return _return_scalar_if_appropriate(result, volume, input_flow_rate)
 
 
@@ -98,10 +98,10 @@ def get_dilution_rate(
         raise TypeError("Argument 'concentration' must not be None.")
 
     coefficient_array, concentration_array = np.broadcast_arrays(
-        coefficient,
-        concentration,
+        np.asarray(coefficient, dtype=np.float64),
+        np.asarray(concentration, dtype=np.float64),
     )
-    result = -coefficient_array * concentration_array
+    result = np.asarray(-coefficient_array * concentration_array)
     return _return_scalar_if_appropriate(result, coefficient, concentration)
 
 
@@ -153,10 +153,14 @@ def get_dilution_step(
         coefficient_array,
         concentration_array,
         time_step_array,
-    ) = np.broadcast_arrays(coefficient, concentration, time_step)
+    ) = np.broadcast_arrays(
+        np.asarray(coefficient, dtype=np.float64),
+        np.asarray(concentration, dtype=np.float64),
+        np.asarray(time_step, dtype=np.float64),
+    )
     with np.errstate(over="ignore", under="ignore"):
-        result = concentration_array * np.exp(
-            -coefficient_array * time_step_array
+        result = np.asarray(
+            concentration_array * np.exp(-coefficient_array * time_step_array)
         )
     return _return_scalar_if_appropriate(
         result,
