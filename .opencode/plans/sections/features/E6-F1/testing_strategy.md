@@ -42,8 +42,14 @@ thresholds must never be lowered; changed code must meet at least the configured
   `particula/dynamics/tests/dilution_exports_test.py` verifies direct dynamics
   imports, symbol identity, dynamic `__all__`, and `par.dynamics`
   construction/execution. Concrete helpers remain absent from that public API.
-- **P5:** Execute the CPU example in the docs test path, validate links, and run
-  all focused dilution tests.
+- **P5 (complete, issue #1393):**
+  `particula/tests/dilution_docs_test.py` loads the excluded example source via
+  `importlib`, executes `run_example()`, checks exact exponential decay and
+  detached result snapshots for particle, partitioning-gas, and gas-only
+  concentrations, and verifies `main()` output. It AST-checks public-only
+  imports and validates the guide/index contract text, source URL, and local
+  Markdown links. This documentation regression coverage is hardware-free;
+  focused direct, runnable, and export suites remain the CPU behavior evidence.
 
 ## Acceptance Matrix
 
@@ -64,11 +70,11 @@ helper imports and outputs so introducing the strategy cannot break users.
 ## Verification Commands
 
 ```bash
+python docs/Examples/cpu_dilution.py
+pytest particula/tests/dilution_docs_test.py -q -Werror
 pytest particula/dynamics/tests/dilution_test.py -q
 pytest particula/dynamics/tests/dilution_runnable_test.py -q
 pytest particula/dynamics/tests/dilution_exports_test.py -q
-ruff check particula/dynamics/ --fix
-ruff format particula/dynamics/
-ruff check particula/dynamics/
-mypy particula/dynamics/ --ignore-missing-imports
+ruff check docs/Examples/cpu_dilution.py particula/tests/dilution_docs_test.py
+ruff format --check docs/Examples/cpu_dilution.py particula/tests/dilution_docs_test.py
 ```

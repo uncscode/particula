@@ -1,5 +1,21 @@
 # Change Log
 
+## 2026-07-22 — P5 Complete (issue #1393)
+
+- Added the public-API deterministic CPU dilution example at
+  `docs/Examples/cpu_dilution.py`, including particle, partitioning-gas, and
+  gas-only exact-decay checks over two equal substeps.
+- Added `docs/Features/dilution_strategy_system.md` and discoverability entries
+  in the feature, example, and root documentation indexes. The guide identifies
+  E6-F2 as a downstream CPU-reference consumer and explicitly retains the
+  GPU/backend, multi-box transport, inlet/source, and performance boundaries.
+- Added hardware-free publication regressions in
+  `particula/tests/dilution_docs_test.py` for example execution and snapshots,
+  console output, import boundaries, guide/index wording, and documentation
+  links.
+- Kept the change documentation-only: no production dilution behavior, public
+  exports, GPU/backend implementation, or performance work changed.
+
 ## 2026-07-22 — P4 Complete (issue #1392)
 
 - Hardened `particula/dynamics/dilution.py` with shared concrete-path

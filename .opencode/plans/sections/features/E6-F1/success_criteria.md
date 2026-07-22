@@ -23,8 +23,9 @@
   top-level Particula usage is covered by an import smoke test.
 - [x] Focused co-located direct, runnable, and export regressions cover the
   shipped boundary without lowering coverage thresholds.
-- [ ] The CPU example executes and documentation records support/deferred
-  boundaries without claiming E6-F2 or Epic G functionality.
+- [x] The deterministic CPU example executes through the public API, and the
+  guide/indexes record support and deferred boundaries without claiming E6-F2,
+  GPU/backend, transport, inlet/source, or performance functionality.
 
 ## Metrics
 
