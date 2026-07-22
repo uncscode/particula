@@ -1,13 +1,15 @@
 # Documentation Updates
 
-## Shipped P1 Status (#1395)
+## Shipped P1/P2 Status (#1395, #1396)
 
 - No user-facing documentation files changed in P1. The concrete-only contract
   is recorded in `particula/gpu/kernels/dilution.py` and its co-located tests;
-  package-level import guidance remains premature because P1 intentionally does
-  not re-export the entry point.
-- This plan now records P1's supported metadata-only validation, no-launch/
-  no-write identity behavior, and the deferred P2/P3 boundaries.
+  package-level documentation remains P5 scope.
+- P2 ships the code-docstring contract and package export for
+  `particula.gpu.kernels.dilution_step_gpu`: it mutates only fixed-shape
+  particle/gas concentrations with finite-step exponential decay and preserves
+  identity/protected fields. P3 retains coefficient-value validation, complete
+  preflight, and rollback.
 
 ## Future P5 Updates
 

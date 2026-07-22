@@ -206,12 +206,13 @@ def dilution_step_gpu(
     SI units [s^-1], and ``time_step`` is in seconds. This function applies the
     finite-step update ``c_new = c * exp(-alpha * time_step)`` in place.
 
-    P1 accepts a finite, nonnegative Python/NumPy real scalar coefficient or a
-    caller-owned, active-device ``wp.float64`` array shaped ``(n_boxes,)``.
-    Valid per-box arrays are retained by identity and their values are not read
-    on the host. Non-no-op calls require same-device rank-2 particle and gas
-    concentration arrays with matching box dimensions. Only those two arrays
-    are mutated; masses and all other caller-owned fields are preserved.
+    P2 retains P1's coefficient-input contract: a finite, nonnegative
+    Python/NumPy real scalar or a caller-owned, active-device ``wp.float64``
+    array shaped ``(n_boxes,)``. Valid per-box arrays are retained by identity
+    and their values are not read on the host. Non-no-op calls require
+    same-device rank-2 particle and gas concentration arrays with matching box
+    dimensions. Only those two arrays are mutated; masses and all other
+    caller-owned fields are preserved.
 
     A zero scalar coefficient or zero time step returns before concentration
     metadata access, private allocation, or a launch. Per-box coefficient-value
