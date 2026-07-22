@@ -10,9 +10,11 @@ dilution helpers, container semantics, and process conventions.
    coefficient. Callers derive `alpha=Q/V` with
    `get_volume_dilution_coefficient`; volume and flow are not duplicate mutable
    strategy state.
-3. [x] **Rate return shape:** return a typed two-tuple in fixed
-   `(particle_rate, gas_rate)` order. Existing dual-container process APIs use
-   tuples, so a new result hierarchy is unnecessary.
+3. [x] **Rate return shape:** `DilutionStrategy.rate()` returns
+   `get_dilution_rate(coefficient, aerosol.particles.get_concentration())`
+   unchanged, so its scalar/array shape follows physical particle-number
+   concentration; `Dilution.rate()` delegates that result unchanged. No separate
+   particle/gas tuple or result hierarchy was added.
 4. [x] **Container mutation API:** update the underlying
    `ParticleData.concentration` storage in place with the representation-volume
    conversion, and use the supported gas concentration setter. Do not add a

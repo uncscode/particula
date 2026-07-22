@@ -32,16 +32,22 @@ evidence established by those completed phases.
     gas groups, and converted storage, plus commit-recovery and identity/state
     retention.
 
-- [ ] **E6-F1-P3:** Add dilution strategy and substepped runnable with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E6-F1-P3:** Add dilution strategy and substepped runnable with unit tests
+  - Issue: #1391 | Size: S | Status: Complete
   - Goal: Add the process-level strategy and `Dilution` runnable, including
     `rate()`, `execute()`, substep splitting, and runnable composition.
   - Files: `particula/dynamics/dilution.py`,
     `particula/dynamics/particle_process.py`,
     `particula/dynamics/tests/dilution_runnable_test.py`
-  - Tests: direct strategy/runnable agreement, substep behavior, returned
-    aerosol identity, particle-plus-gas updates, no-op behavior, and `|`
-    composition with a test runnable.
+  - Delivered: concrete-module-only `DilutionStrategy`, which validates its
+    scalar coefficient and delegates to `dilute_aerosol()`, plus
+    `Dilution(RunnableABC)`, which validates and evenly splits time before
+    strategy calls without replacing the input aerosol.
+  - Tests: direct strategy/runnable decay, rate delegation, P2 validation
+    propagation, invalid substep/time rejection before calls or mutation,
+    no-ops, large finite decay, identity under nonconforming strategies, and
+    `|`/`RunnableSequence` ordering. No exports, GPU work, examples, or general
+    user documentation were added.
 
 - [ ] **E6-F1-P4:** Harden validation and publish CPU dilution exports with tests
   - Issue: TBD | Size: S | Status: Not Started

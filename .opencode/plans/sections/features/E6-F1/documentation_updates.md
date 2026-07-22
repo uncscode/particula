@@ -13,6 +13,11 @@ container primitive but intentionally added no public user documentation,
 example, index, or export. Public strategy/runnable documentation remains
 deferred to P5.
 
+Issue #1391 added Google-style concrete-module docstrings for
+`DilutionStrategy` and `Dilution`, including their delegation and substep
+contracts. It deliberately added no package exports, public user documentation,
+examples, indexes, or GPU documentation; those remain P4/P5 work.
+
 - Update the dilution API documentation to distinguish equation helpers,
   strategy behavior, and the `Dilution` runnable.
 - State SI units for volume, inlet flow, coefficient, elapsed time, particle

@@ -10,8 +10,9 @@ The helpers validate finite physical domains, use ordinary NumPy broadcasting,
 and do not mutate caller-owned arrays. All-scalar inputs return a scalar;
 inputs including an array return a broadcast-shape array. The concrete
 ``dilute_aerosol`` primitive intentionally mutates its ``Aerosol`` argument in
-place. Neither it nor ``get_dilution_step`` is exported from
-``particula.dynamics``, and this module provides no GPU behavior.
+place. ``DilutionStrategy`` delegates its atomic update to that primitive.
+These concrete-module APIs are not exported from ``particula.dynamics``, and
+this module provides no GPU behavior.
 """
 
 from numbers import Number
@@ -435,7 +436,8 @@ def dilute_aerosol(
 class DilutionStrategy:
     """Apply a shared chamber dilution coefficient to an aerosol.
 
-    The strategy delegates all container mutation and time-step validation to
+    The strategy reports particle-number rates and delegates atomic particle
+    and gas concentration updates, including time-step validation, to
     :func:`dilute_aerosol`.
 
     Args:
@@ -472,13 +474,18 @@ class DilutionStrategy:
         aerosol: "Aerosol",
         time_step: float | np.number,
     ) -> "Aerosol":
-        """Apply dilution to the aerosol in place.
+        """Delegate an in-place aerosol dilution step to ``dilute_aerosol``.
 
         Args:
             aerosol: Aerosol whose particle and gas concentrations are diluted.
-            time_step: Elapsed time [s], validated by :func:`dilute_aerosol`.
+            time_step: Elapsed time [s], validated by ``dilute_aerosol``.
 
         Returns:
             The identical, mutated aerosol instance.
+
+        Raises:
+            TypeError: If ``time_step`` is not numeric.
+            ValueError: If ``time_step`` is nonfinite, negative, or nonscalar,
+                or dilution cannot be safely committed.
         """
         return dilute_aerosol(aerosol, self.coefficient, time_step)

@@ -318,9 +318,13 @@ class WallLoss(RunnableABC):
 class Dilution(RunnableABC):
     """Apply a dilution strategy over one or more equal substeps.
 
+    Each substep delegates aerosol mutation to the configured strategy. The
+    runnable preserves the input aerosol identity and ignores a strategy's
+    return value.
+
     Args:
-        dilution_strategy: Strategy that calculates dilution rates and updates
-            aerosol concentrations.
+        dilution_strategy: Strategy that reports particle-number rates and
+            applies aerosol dilution steps.
     """
 
     def __init__(self, dilution_strategy: DilutionStrategy):
@@ -332,13 +336,14 @@ class Dilution(RunnableABC):
         self.dilution_strategy = dilution_strategy
 
     def rate(self, aerosol: Aerosol) -> float | NDArray[np.float64]:
-        """Return the particle-number dilution rate.
+        """Delegate particle-number dilution-rate evaluation to the strategy.
 
         Args:
             aerosol: Aerosol whose particle concentration is evaluated.
 
         Returns:
-            Particle-number concentration rate [1/(m³ s)].
+            Particle-number concentration rate [1/(m³ s)] with the scalar or
+            array shape returned by the strategy.
         """
         return self.dilution_strategy.rate(aerosol)
 
@@ -348,7 +353,12 @@ class Dilution(RunnableABC):
         time_step: float | np.number,
         sub_steps: int | np.integer = 1,
     ) -> Aerosol:
-        """Apply dilution over the provided total time step.
+        """Apply dilution as equal, sequential substeps over a total duration.
+
+        The runnable validates the total duration and substep count before
+        calling the strategy. Each slice is delegated to ``strategy.step``;
+        particle and gas mutation, atomicity, and per-step validation remain
+        strategy responsibilities.
 
         Args:
             aerosol: Aerosol to mutate in place.
@@ -360,7 +370,7 @@ class Dilution(RunnableABC):
 
         Raises:
             ValueError: If ``sub_steps`` is not a positive integer or
-                ``time_step`` is invalid.
+                ``time_step`` is nonfinite, negative, or nonscalar.
             TypeError: If ``time_step`` is not numeric.
         """
         if (

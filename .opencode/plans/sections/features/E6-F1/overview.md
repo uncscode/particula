@@ -35,6 +35,16 @@ and storage are preflighted before commit; an unexpected write failure rolls
 back already-written concentrations. No strategy/runnable, package export,
 user documentation, or GPU API was added.
 
+P3 is complete in issue #1391. `DilutionStrategy` is concrete-module-only in
+`particula/dynamics/dilution.py` and delegates each step directly to P2's
+`dilute_aerosol()`. `Dilution(RunnableABC)` in
+`particula/dynamics/particle_process.py` validates a positive integral
+`sub_steps` value and a finite nonnegative total duration, then invokes that
+strategy once per equal time slice while retaining the original `Aerosol`
+identity. Regression coverage lives in
+`particula/dynamics/tests/dilution_runnable_test.py`. P3 deliberately added no
+package exports, GPU support, examples, or general user documentation.
+
 ## User Stories
 
 - As a simulation user, I want to compose dilution with existing runnables so
