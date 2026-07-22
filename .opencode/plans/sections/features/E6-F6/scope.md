@@ -11,8 +11,8 @@ activation contracts.
 - Independent controls and explicit resampling-first precedence when both are
   enabled.
 - Deterministic CPU resampling and allocation-stable Warp parity.
-- Optional per-box representative-volume scaling with reciprocal weighting
-  updates and explicit scale diagnostics.
+- Optional per-box representative-volume scaling with same-direction raw-weight
+  and source-demand updates plus explicit pre-scale/represented diagnostics.
 - Transactional preflight/plan/commit behavior; both policies disabled,
   malformed state, missing scratch, or unsatisfiable demand fails before writes.
 - Sparse, exact-capacity, full, and over-capacity multi-box tests for number,

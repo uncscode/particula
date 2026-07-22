@@ -2,11 +2,11 @@
 
 ## High-Level Design
 
-The equation helpers remain pure NumPy functions. A CPU strategy owns or is
-configured with the chamber dilution coefficient (directly or from volume and
-flow) and exposes rate/step behavior over Particula containers. The `Dilution`
-runnable delegates each internal substep to that strategy and updates the same
-`Aerosol` instance.
+The equation helpers remain pure NumPy functions. A CPU strategy is configured
+with one precomputed chamber dilution coefficient and exposes rate/step behavior
+over Particula containers. Callers may derive the coefficient from volume and
+flow with the existing pure helper. The `Dilution` runnable delegates each
+internal substep to that strategy and updates the same `Aerosol` instance.
 
 ```text
 volume [m³] + inlet flow [m³/s]
@@ -24,11 +24,10 @@ number concentration [1/m³]         mass concentration [kg/m³]
              Dilution.execute(aerosol, dt, sub_steps)
 ```
 
-P1 must select and document one canonical finite-step update derived from
-`dc/dt = -alpha*c` (including whether integration is exact exponential or the
-repository's bounded explicit-step convention). Both particle and gas paths
-must use that same update, and E6-F2 must treat it as the parity oracle. No path
-may encode dilution by changing particle mass.
+The canonical finite-step update is the exact solution
+`c_new = c * exp(-alpha * dt)`. Both particle and gas paths use that same update,
+and E6-F2 treats it as the parity oracle. No path may encode dilution by changing
+particle mass.
 
 ## Data / API / Workflow Changes
 
@@ -38,9 +37,8 @@ may encode dilution by changing particle mass.
 - **API surface:** Preserve `get_volume_dilution_coefficient()` and
   `get_dilution_rate()`. Add a named CPU dilution strategy and
   `particula.dynamics.Dilution` runnable with `rate(aerosol)` and
-  `execute(aerosol, time_step, sub_steps=1)`. Final constructor naming and
-  whether it accepts coefficient or volume/flow must be frozen in P1 and kept
-  unambiguous in units.
+  `execute(aerosol, time_step, sub_steps=1)`. The strategy constructor accepts
+  the coefficient in `s^-1`; volume/flow derivation remains in the pure helper.
 - **Container workflow:** Preflight all inputs before writes, compute updated
   particle and gas concentrations, verify finite/nonnegative outputs, then
   commit both updates. This avoids half-mutated aerosol state.

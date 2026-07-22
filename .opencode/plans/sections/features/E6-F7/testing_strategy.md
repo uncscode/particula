@@ -12,7 +12,7 @@ NumPy oracle rather than production helpers.
   NaN/Inf/negative rejection, and cited fixtures.
 - **P2:** `particle_source_test.py` covers one/many boxes and species, each
   limiting species, exact inventory exhaustion, zero inputs, survival factors,
-  represented packaging, diagnostics, and byte-for-byte input immutability.
+  provisional gas-admitted demand, diagnostics, and input immutability.
 - **P3:** Source interaction tests cover free/exact/sparse/full slots,
   resampling precedence, scaling fallback, both-off/unsatisfiable failures,
   deterministic order, no residual truncation, and all-box snapshots.
@@ -22,16 +22,18 @@ NumPy oracle rather than production helpers.
   `time_step/sub_steps`, current-gas recomputation, exact no-ops, invalid
   substeps, returned identity, and composability.
 - **P6:** `particula/integration_tests/nucleation_process_test.py` compares
-  potential/admitted events and per-species total inventory with independent
-  `float64` equations over repeated and substepped calls.
+  potential, gas-admitted, represented, and residual events plus per-species
+  total inventory with independent `float64` equations over repeated calls.
 - **P7:** Validate links, citations, imports, equations, snippets, and execute
   the supported example/notebook where applicable.
 
 ## Required Invariants
 
-- Per box/species, post particle represented mass plus post gas mass equals the
-  pre total (target `rtol=1e-12`, `atol=1e-30`; any fixture-specific adjustment
-  requires written numerical justification).
+- Without representation scaling, post particle represented mass plus post gas
+  mass equals the pre total. With scale `s`, compare final represented totals
+  against `s * pre_total` and independently require unchanged intensive
+  particle-plus-gas concentration plus the source transfer balance (target
+  `rtol=1e-12`, `atol=1e-30`; adjustments require written justification).
 - Gas remains finite/nonnegative; admitted events never exceed potential events
   or participating species inventory.
 - Zero time, coefficient, precursor, survival, and unsatisfied configured gate

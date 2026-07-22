@@ -1,20 +1,26 @@
 # Open Questions
 
-- [ ] What exact finite-step update does E6-F1 freeze: exact exponential or a
-  bounded explicit substep convention?
-  - Resolution gate: E6-F2-P1 must copy the shipped T1 contract and fixtures;
-    this plan deliberately does not choose a competing formula.
-- [ ] Should `coefficient` and `time_step` both support `(n_boxes,)` Warp arrays,
-  or should time remain a finite nonnegative scalar in the first direct API?
-  - Recommendation: require per-box coefficient and scalar time unless T1 or
-    existing direct-step conventions provide a clear need for per-box time.
-- [ ] Should a Python/NumPy floating scalar allocate a private device coefficient
-  buffer or launch a scalar kernel parameter?
-  - Decision criterion: preserve caller identity and no hidden host-array
-    transfer; implementation detail must be tested and documented.
-- [ ] Are concentration finiteness/nonnegativity scans required on every call or
-  available behind an explicit validation option?
-  - Recommendation: validate at the public boundary for atomic guarantees unless
-    repository-wide direct-kernel policy establishes a safe explicit opt-out.
-- [ ] What `rtol`/`atol` does the T1 fixture matrix justify on Warp CPU and CUDA?
-  - Record measured float64 tolerances in P4; do not use undocumented defaults.
+All E6-F2 planning questions were resolved on 2026-07-21 from the E6-F1
+reference decision and current direct-kernel conventions.
+
+- [x] Which finite-step update must GPU dilution mirror?
+  - Decision: apply the E6-F1 exact exponential factor per box. No GPU-specific
+    integrator, limiter, or competing formula is permitted.
+- [x] Which coefficient and time shapes are accepted?
+  - Decision: `coefficient` accepts a Python/NumPy floating scalar or a
+    same-device `wp.float64` array shaped `(n_boxes,)`; `time_step` remains one
+    finite nonnegative scalar for the whole step.
+- [x] How is a floating scalar coefficient represented on device?
+  - Decision: after complete read-only preflight, broadcast it into a private
+    same-device `wp.float64` buffer. A valid caller-owned Warp array is retained
+    by identity; host arrays are not transferred implicitly.
+- [x] Are concentration scans optional?
+  - Decision: no. Every public call validates finite nonnegative particle and
+    gas concentrations before output allocation, clearing, RNG work, or
+    mutation. E6-F2 exposes no validation opt-out.
+- [x] What CPU/Warp tolerance is frozen?
+  - Decision: begin with `rtol=1e-12`, `atol=0` for changed finite nonzero
+    concentrations and exact equality for no-ops, zeros, identities, and
+    protected fields on required Warp CPU and optional CUDA. P4 records measured
+    errors and may use only the smallest fixture-specific relaxation justified
+    by evidence.

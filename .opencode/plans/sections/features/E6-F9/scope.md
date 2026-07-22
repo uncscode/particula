@@ -7,7 +7,9 @@ physics or a runtime scheduler.
 ## In Scope
 
 - Multi-process fixed-shape fixtures for condensation, coagulation, dilution,
-  neutral or charged wall loss, slot management, and nucleation.
+  neutral and charged wall loss, slot management, and nucleation. Neutral wall
+  loss owns the integrated statistical fixture; charged mode receives a
+  deterministic integrated case plus its E6-F4 statistical evidence.
 - Required Warp CPU integration coverage, with optional CUDA coverage that
   skips cleanly when unavailable.
 - Process-specific parity, conservation/loss-budget, diagnostics, shape,

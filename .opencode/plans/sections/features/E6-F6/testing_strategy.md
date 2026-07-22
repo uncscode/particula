@@ -14,8 +14,9 @@ thresholds are never lowered; changed code must retain at least 80% coverage.
 - **P3:** `particula/gpu/kernels/tests/exhaustion_test.py` compares Warp CPU with
   the independent NumPy oracle; validates sidecar identity/shape/dtype/device,
   failure ordering, and optional CUDA clean skips.
-- **P4:** CPU/Warp tests for per-box scale factors, reciprocal weight updates,
-  allowed bounds, unaffected boxes/fields, and represented-inventory parity.
+- **P4:** CPU/Warp tests for per-box scale factors, same-direction raw-weight
+  and source-demand updates, allowed bounds, unaffected boxes/fields, and
+  represented-inventory parity.
 - **P5:** Integration tests cover enough-capacity bypass, resampling-only,
   scaling-only, resampling-sufficient, resampling-then-scaling, both-off
   exhausted error, and unsatisfiable demand without any write or truncation.

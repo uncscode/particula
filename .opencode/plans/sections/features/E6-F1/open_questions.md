@@ -1,25 +1,27 @@
 # Open Questions
 
-1. **Finite-step rule:** Should the canonical step use the exact first-order
-   solution `c_new = c * exp(-alpha * dt)` or the repository's explicit rate
-   update with a documented nonnegative limiter? P1 must resolve this before
-   container code; the choice becomes E6-F2's CPU parity oracle.
-2. **Strategy construction:** Should the strategy accept a precomputed
-   coefficient, or chamber volume plus inlet flow and derive the coefficient?
-   Prefer one unambiguous public constructor; avoid redundant mutable sources.
-3. **Rate return shape:** Should `rate(aerosol)` return a named pair/tuple of
-   particle and gas rates or a small immutable result type? Match existing
-   process conventions while keeping both concentration domains observable.
-4. **Container mutation API:** Is direct volume-aware particle concentration
-   assignment the current sanctioned path, or should this feature add/reuse a
-   public concentration setter on `ParticleRepresentation`? Do not use the
-   deprecated distribution-merging `add_concentration()` path accidentally.
-5. **Builder/factory surface:** The issue requires a strategy and runnable, not
-   builders/factories. Add those only if maintainers identify a concrete
-   consistency requirement before P4.
-6. **Free-function validation compatibility:** Which currently accepted NumPy
-   broadcasting cases are contractual? Preserve them unless physical-domain
-   validation requires an explicitly documented correction.
+All E6-F1 planning questions were resolved on 2026-07-21 from the existing
+dilution helpers, container semantics, and process conventions.
 
-All questions are non-blocking for plan drafting but questions 1–4 must be
-closed in E6-F1-P1 before mutation APIs are implemented.
+1. [x] **Finite-step rule:** use the exact first-order solution
+   `c_new = c * exp(-alpha * dt)` for both particle and gas concentrations.
+   This is nonnegative for all valid inputs and is E6-F2's CPU parity oracle.
+2. [x] **Strategy construction:** the strategy accepts one precomputed
+   coefficient. Callers derive `alpha=Q/V` with
+   `get_volume_dilution_coefficient`; volume and flow are not duplicate mutable
+   strategy state.
+3. [x] **Rate return shape:** return a typed two-tuple in fixed
+   `(particle_rate, gas_rate)` order. Existing dual-container process APIs use
+   tuples, so a new result hierarchy is unnecessary.
+4. [x] **Container mutation API:** update the underlying
+   `ParticleData.concentration` storage in place with the representation-volume
+   conversion, and use the supported gas concentration setter. Do not add a
+   setter to the deprecated facade or call distribution-merging
+   `add_concentration()`.
+5. [x] **Builder/factory surface:** omit builders and factories. A single
+   coefficient-configured strategy does not justify the multi-variant factory
+   surface used by wall loss.
+6. [x] **Free-function broadcasting compatibility:** preserve native NumPy
+   broadcasting for scalar/scalar, scalar/array, equal-shape arrays, and other
+   broadcast-compatible numeric arrays. Non-broadcastable shapes and invalid
+   physical values raise; validation must not accidentally add list support.

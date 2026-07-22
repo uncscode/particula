@@ -10,10 +10,11 @@
   switches; both switches off with exhausted demand raises before every write.
 - [ ] Invalid or unsatisfiable calls preserve particle fields, volume, request,
   diagnostics, work buffers, identities, and any caller RNG state.
-- [ ] No demand is truncated: admitted demand equals requested finalized demand
-  on success, otherwise the entire call fails closed.
-- [ ] Per-box represented number, every species mass, and charge equal the
-  independent pre-state-plus-demand oracle at recorded float64 tolerances.
+- [ ] No represented demand is truncated: with scale `s`, represented demand is
+  exactly `s * gas_admitted_demand`; otherwise the entire call fails closed.
+- [ ] Per-box post represented number, every species mass, and charge equal
+  `s * pre_state + represented_demand` at recorded float64 tolerances. Existing
+  and source intensive concentrations are unchanged by representation scaling.
 - [ ] Resampling satisfies P1's named radius/composition distribution-moment
   bounds and deterministic tie-break rules.
 - [ ] CPU and Warp CPU agree on plans, policy diagnostics, and resulting state;
@@ -27,7 +28,7 @@
 
 | Metric | Baseline | Target | Source |
 |--------|----------|--------|--------|
-| Silently dropped finalized demand | Undefined | 0 | Policy diagnostics and oracle |
+| Silently dropped represented demand | Undefined | 0 | Policy diagnostics and oracle |
 | Number/species-mass/charge conservation failures | No policy | 0 | Multi-box conservation matrix |
 | CPU/Warp plan or state mismatches | No shared API | 0 | Parity tests |
 | Invalid exhausted calls with observable writes | E6-F5 rejects capacity only | 0 | Snapshot tests |

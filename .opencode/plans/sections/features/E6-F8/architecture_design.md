@@ -14,14 +14,14 @@ WarpParticleData + WarpGasData + config + dt + fixed-shape sidecars
                               |
        E6-F7 equations -> potential events and source mass
                               |
-       shared per-box/species gas admission factor (P2 finalizer)
-                              |
-               immutable finalized demand sidecars
+       shared per-box/species gas admission factor
+                               |
+                 provisional demand sidecars
                               |
        E6-F5 slot discovery -> enough fixed slots?
                               | no
-                  E6-F6 complete exhaustion plan
-                 resampling first; scaling fallback only
+                   E6-F6 complete exhaustion plan
+             resampling first; scaling transforms demand
                               |
              every box feasible and conservative?
                   no -> error, no caller writes
@@ -33,13 +33,16 @@ WarpParticleData + WarpGasData + config + dt + fixed-shape sidecars
 For each box, the port preserves E6-F7's `E_pot = J*dt*V*f_survival` and
 `m_event,s = n_s*M_s/N_A`. It computes one `alpha` across participating species
 so `E_admit = alpha*E_pot`; therefore no species becomes negative and source
-composition is not skewed. Finalized demand, not potential demand, reaches
-capacity planning. E6-F6 may alter representation but cannot discard demand.
+composition is not skewed. Admitted demand reaches capacity planning. If E6-F6
+chooses representative scale `s`, it finalizes `V_new=s*V` and
+`E_new=s*E_admit` together before slot packaging and commit. No demand is
+discarded within the final represented domain.
 
 ## Data / API / Workflow Changes
 
-- **Data Model:** No required container fields. Add a concrete-module
-  `NucleationConfig` and `NucleationScratchBuffers` (names may be frozen in P1)
+- **Data Model:** No required container fields. Add concrete-module
+  `NucleationConfig`, `NucleationScratchBuffers`,
+  `NucleationFinalizedDemandBuffers`, and `NucleationDiagnosticBuffers`
   containing explicit same-device, fixed-shape arrays. Per-box fields use
   `(n_boxes,)`; species diagnostics use `(n_boxes, n_species)`; request fields
   use `(n_boxes, n_particles[, n_species])` with `wp.int32` valid-prefix counts.
@@ -47,7 +50,7 @@ capacity planning. E6-F6 may alter representation but cannot discard demand.
 - **API Surface:** Add keyword-oriented
   `nucleation_step_gpu(particles, gas, ..., config=..., scratch=...)` under
   `particula.gpu.kernels.nucleation`; lazily expose only the intended step from
-  `particula.gpu.kernels`. Keep kernels/config/scratch concrete-module APIs.
+  `particula.gpu.kernels`. Keep config and sidecars concrete-module APIs.
 - **Mutation Contract:** Success may change selected particle mass,
   concentration/weight and charge, matching gas concentration, and only the
   E6-F6-authorized volume/weights. Density, metadata, shapes, devices, dtypes,

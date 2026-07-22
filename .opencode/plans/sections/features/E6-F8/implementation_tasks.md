@@ -8,12 +8,12 @@
   read-only device-value preflight before clearing or allocating outputs.
 - [ ] Port E6-F7 activation/kinetic rate equations and SI conversions to Warp
   kernels without broadening their validity domain or model aliases.
-- [ ] Implement potential-event and shared per-box gas-inventory finalization;
-  store admitted events, limiting species, and gas removal explicitly.
-- [ ] Adapt finalized demand to E6-F5 fixed-shape requests and exact diagnostics
-  rather than reimplementing active/free predicates.
-- [ ] Invoke E6-F6 complete-demand exhaustion planning with resampling-first and
-  scaling-fallback precedence; reject any residual or truncated demand.
+- [ ] Implement potential-event and shared per-box gas admission; store
+  gas-admitted demand, limiting species, and provisional gas removal explicitly.
+- [ ] Adapt provisional demand to E6-F5 fixed-shape requests and exact
+  diagnostics rather than reimplementing active/free predicates.
+- [ ] Invoke E6-F6 exhaustion planning with resampling-first precedence; finalize
+  represented demand from its scale and reject any final-domain residual.
 - [ ] Implement commit kernels that add represented particle source and subtract
   the exact finalized gas mass only after every box is feasible.
 - [ ] Add `nucleation_step_gpu(...)` with stable return/identity behavior and

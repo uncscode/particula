@@ -37,19 +37,24 @@ boxes so one invalid box prevents writes to every caller-owned input/output.
 
 ## Conservation and Distribution Contract
 
-For box volume `V`, slot weight `w_j`, species mass `m_j,s`, and charge `q_j`,
-the independent oracle records represented number `V*sum(w_j)`, represented
-species mass `V*sum(w_j*m_j,s)`, and represented charge `V*sum(w_j*q_j)`.
-Commit must equal the pre-state plus the explicitly admitted source record at
-recorded float64 tolerances; no residual demand is discarded. Resampling
-preserves these required moments and uses deterministic ordering/tie breaks.
-Distribution shape is assessed using predeclared radius/composition moments and
-bounded error rather than an unsupported claim of sample identity.
+For box volume `V`, raw represented count/weight `w_j`, species mass `m_j,s`,
+and charge `q_j`, the independent oracle records represented number `sum(w_j)`,
+represented species mass `sum(w_j*m_j,s)`, and represented charge
+`sum(w_j*q_j)`. Their intensive values divide those totals by `V`. Without
+scaling, commit equals pre-state plus represented source. With scale `s`, commit
+equals `s*pre_state + represented_source` at recorded float64 tolerances.
+Resampling preserves these required moments and uses deterministic ordering/tie
+breaks. Distribution shape is assessed using the formulas and configured bounds
+frozen in `open_questions.md`, not an unsupported claim of sample identity.
 
-Representative-volume scaling updates `volume` and all affected active weights
-reciprocally as one per-box operation. P1 must freeze the allowed scale range,
-rounding, and source-demand transformation before implementation. Density,
-per-particle composition, and charge values are not scaling knobs.
+Representative-volume scaling applies `V_new=s*V_old` and `w_new=s*w_old` as
+one per-box operation. Source demand transforms as `E_new=s*E_old` before final
+slot packaging, so source and existing intensive concentrations are preserved.
+The planner chooses the largest feasible finite `0<s<=1` that satisfies the
+caller-configured minimum scale or volume. Pre-scale demand, represented demand,
+and scale remain explicit diagnostics; no demand is truncated within the scaled
+domain. Density, per-particle composition, and charge values are not scaling
+knobs.
 
 ## Data / API / Workflow Changes
 
@@ -63,8 +68,8 @@ per-particle composition, and charge values are not scaling knobs.
   Controls are independent. Both `False` is legal only when capacity is already
   sufficient; an exhausted box raises before mutation.
 - **Workflow Hooks:** E6-F5 supplies capacity and activation. E6-F7/E6-F8 supply
-  finalized source records and consume the policy plan. E6-F9 validates the
-  integrated direct sequence.
+  provisional gas-admitted demand, consume the policy scale, then finalize
+  represented source records. E6-F9 validates the integrated direct sequence.
 - **Mutation Boundary:** Commit may mutate selected mass, concentration/weight,
   charge, and (only for scaling) per-box volume. Shapes, dtypes, devices,
   container objects, density, unselected boxes/slots, requests, and sidecar

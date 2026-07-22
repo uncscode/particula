@@ -8,8 +8,10 @@
   species and never produces negative gas concentration.
 - [ ] E6-F5 slot and E6-F6 resampling-first/scaling-fallback semantics are
   consumed unchanged; exhausted demand is never silently truncated.
-- [ ] Successful calls conserve represented particle-plus-gas mass separately
-  for each box/species at recorded `float64` tolerances.
+- [ ] Without scaling, successful calls conserve represented particle-plus-gas
+  mass per box/species. With scale `s`, final represented totals match
+  `s * pre_total`; intensive particle-plus-gas concentration and source transfer
+  balance remain conserved at recorded `float64` tolerances.
 - [ ] Invalid multi-box calls preserve gas, particles, diagnostics, requests,
   and work state; zero time/rate/precursor/survival are exact no-ops.
 - [ ] Builders, factory, imports, and `Nucleation` runnable have fast tests and

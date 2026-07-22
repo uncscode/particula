@@ -14,8 +14,9 @@
 
 ## Downstream
 
-- **E6-F9 / T9** consumes the charged direct step in integrated validation,
-  explicit-transfer documentation, and Epic F closeout.
+- **E6-F9 / T9** consumes the charged direct step in deterministic integrated
+  validation and explicit-transfer documentation; E6-F4 retains charged
+  statistical evidence for Epic F closeout.
 - Epic G may later select/schedule the direct operation, but E6-F4 does not add
   backend selection, a resident loop, or a high-level runnable.
 

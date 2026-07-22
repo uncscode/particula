@@ -20,9 +20,11 @@ injection molecules/event * molar mass / N_A
           |
 joint per-box/species gas-inventory limiter
           |
-immutable source record + diagnostics
+provisional source demand + diagnostics
           |
 E6-F5 discover slots -> E6-F6 exhaustion plan if needed
+          |
+scale demand with representative volume when configured
           |
 all boxes feasible? no -> no writes | yes -> commit once
           |
@@ -30,12 +32,14 @@ particle activation + exactly matching gas depletion
 ```
 
 For species `s`, `m_event,s = n_s*M_s/N_A`. Potential represented events are
-`E_pot = J*dt*V*f_survival`. The shared admission factor is
+`E_pot = J*dt*V*f_survival`. Define available gas mass in the representative box
+as `G_s=c_g,s*V`; the shared admission factor is
 `alpha=min(1,min_s(G_s/(E_pot*m_event,s)))` over participating species, and
-`E_admit=alpha*E_pot`. Zero denominators are excluded. Particle represented
-mass added for each species equals gas mass removed. One computational particle
-may represent many events through its weight, but represented totals cannot
-change.
+`E_admit=alpha*E_pot`. Zero denominators are excluded. If E6-F6 scales the
+representative domain by `s`, final represented demand is `s*E_admit` and final
+volume is `s*V`, preserving source concentration. Particle represented mass
+added for each species equals gas mass removed in the final domain. One
+computational particle may represent many events through its raw count/weight.
 
 ## Scientific Contract
 
@@ -57,11 +61,14 @@ change.
 
 - **Data Model:** No required `ParticleData` or `GasData` schema change.
   Typed immutable CPU sidecars hold config, source records, and diagnostics:
-  potential/admitted events, limiting species, gas removed, slot counts,
-  exhaustion policy, and residual demand.
+  potential, gas-admitted, represented, gas-limited, representation-reduction,
+  and residual events; limiting species; gas removed; slot counts; exhaustion
+  policy; and scale.
 - **API Surface:** Add `NucleationStrategy`, activation/kinetic strategies,
   builders, `NucleationFactory`, source finalizer, and `Nucleation` runnable
-  under `particula.dynamics.nucleation` and intended package exports.
+  under `particula.dynamics.nucleation` and intended package exports. The
+  single-box runnable receives an `EnvironmentData` provider at construction;
+  multi-box source/finalization APIs remain container-level.
 - **Mutation Contract:** Success mutates participating gas concentrations and
   selected particle mass/concentration/charge; only configured E6-F6 scaling
   may change volume. Density, metadata, shapes, identities, requests, and
