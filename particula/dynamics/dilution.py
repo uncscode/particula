@@ -250,13 +250,17 @@ def _validate_nonnegative_scalar(value: object, argument: str) -> np.float64:
         raise ValueError(
             f"Argument '{argument}' must be a finite nonnegative scalar."
         )
+    if isinstance(value, (bool, np.bool_)) or np.issubdtype(
+        value_array.dtype, np.bool_
+    ):
+        raise TypeError(f"Argument '{argument}' must be numeric, not boolean.")
     if not isinstance(value, Number) and not np.issubdtype(
         value_array.dtype, np.number
     ):
         raise TypeError(f"Argument '{argument}' must be numeric.")
     try:
         scalar = np.float64(value_array)
-    except (TypeError, ValueError) as error:
+    except (TypeError, ValueError, OverflowError) as error:
         raise TypeError(f"Argument '{argument}' must be numeric.") from error
     if not np.isfinite(scalar):
         raise ValueError(f"Argument '{argument}' must be finite.")
@@ -366,15 +370,11 @@ def _preflight_dilution_aerosol(
     gas_only_source = _preflight_concentration(
         gas_sources[1], gas_sources[1], "gas-only concentration"
     )
-    try:
-        particle_storage_array = np.asarray(
-            particle_storage,
-            dtype=np.float64,
-        )
-    except (TypeError, ValueError, OverflowError) as error:
-        raise TypeError(
-            "particle concentration storage must be numeric."
-        ) from error
+    particle_storage_array = _preflight_concentration(
+        particle_storage,
+        particle_storage,
+        "particle concentration storage",
+    )
     try:
         volume = np.asarray(particle_volume, dtype=np.float64)
     except (TypeError, ValueError, OverflowError) as error:
@@ -418,7 +418,7 @@ def _preflight_dilution_aerosol(
         "gas_containers": gas_containers,
         "particle_candidate": stored_particle_candidate,
         "gas_candidates": (partitioning_candidate, gas_only_candidate),
-        "particle_snapshot": np.copy(particle_storage_array),
+        "particle_snapshot": _snapshot_particle_backing_state(particle),
         "gas_snapshots": gas_snapshots,
     }
 
@@ -440,6 +440,42 @@ def _snapshot_gas_backing_state(
         np.copy(np.asarray(data.concentration)),
         getattr(gas, "_single_species_concentration_mode", None),
     )
+
+
+def _snapshot_particle_backing_state(
+    particle: Any,
+) -> tuple[Any, NDArray[np.float64], Any | None]:
+    """Capture direct particle backing state for setter-independent rollback.
+
+    Args:
+        particle: Particle container providing a ``data.concentration`` backing
+            array.
+
+    Returns:
+        Backing data object, copied concentration, and private data state.
+    """
+    data = particle.data
+    return (
+        data,
+        np.copy(np.asarray(data.concentration)),
+        getattr(particle, "_data", None),
+    )
+
+
+def _restore_particle_backing_state(
+    particle: Any,
+    snapshot: tuple[Any, NDArray[np.float64], Any | None],
+) -> None:
+    """Restore particle backing state without invoking its public setter.
+
+    Args:
+        particle: Particle container whose state should be restored.
+        snapshot: Backing state captured before commit.
+    """
+    data, concentration, private_data = snapshot
+    data.concentration[...] = concentration
+    if hasattr(particle, "_data"):
+        particle._data = private_data if private_data is not None else data
 
 
 def _restore_gas_backing_state(
@@ -503,6 +539,8 @@ def dilute_aerosol(
         coefficient_scalar,
         time_step_scalar,
     )
+    if coefficient_scalar == 0.0 or time_step_scalar == 0.0:
+        return aerosol
     particle = preflight["particle"]
     gas_containers = preflight["gas_containers"]
     stored_particle_candidate = preflight["particle_candidate"]
@@ -525,7 +563,9 @@ def dilute_aerosol(
         for container in reversed(written):
             try:
                 if container is particle:
-                    container.concentration = particle_snapshot
+                    _restore_particle_backing_state(
+                        container, particle_snapshot
+                    )
                 else:
                     gas_index = gas_containers.index(container)
                     _restore_gas_backing_state(

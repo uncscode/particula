@@ -511,6 +511,40 @@ def test_dilute_aerosol_zero_coefficient_or_duration_is_exact_no_op(
     )
 
 
+@pytest.mark.parametrize("coefficient, time_step", [(0.0, 1.0), (1.0, 0.0)])
+def test_dilute_aerosol_no_op_does_not_call_concentration_setters(
+    monkeypatch, coefficient, time_step
+):
+    """A valid no-op preflights state without transient concentration writes."""
+    aerosol = _make_aerosol()
+    particle = aerosol.particles
+    setter_calls: list[str] = []
+    concentration = type(particle).concentration
+
+    def record_particle_setter(instance, candidate):
+        setter_calls.append("particle")
+        concentration.fset(instance, candidate)
+
+    monkeypatch.setattr(
+        type(particle),
+        "concentration",
+        property(concentration.fget, record_particle_setter),
+    )
+    for name, gas in (
+        ("partitioning", aerosol.atmosphere.partitioning_species),
+        ("gas_only", aerosol.atmosphere.gas_only_species),
+    ):
+        monkeypatch.setattr(
+            gas,
+            "set_concentration",
+            lambda _candidate, name=name: setter_calls.append(name),
+        )
+
+    assert dilute_aerosol(aerosol, coefficient, time_step) is aerosol
+
+    assert setter_calls == []
+
+
 def test_dilute_aerosol_zero_source_is_an_exact_no_op():
     """A zero physical particle and gas source remains exactly zero."""
     aerosol = _make_aerosol()
@@ -542,6 +576,14 @@ def test_dilute_aerosol_zero_source_is_an_exact_no_op():
         (1.0, np.inf, ValueError, "time_step.*finite"),
         (np.array([1.0]), 1.0, ValueError, "coefficient.*scalar"),
         (1.0, [1.0], ValueError, "time_step.*scalar"),
+        (True, 1.0, TypeError, "coefficient.*boolean"),
+        (False, 1.0, TypeError, "coefficient.*boolean"),
+        (np.bool_(True), 1.0, TypeError, "coefficient.*boolean"),
+        (np.bool_(False), 1.0, TypeError, "coefficient.*boolean"),
+        (1.0, True, TypeError, "time_step.*boolean"),
+        (1.0, False, TypeError, "time_step.*boolean"),
+        (1.0, np.bool_(True), TypeError, "time_step.*boolean"),
+        (1.0, np.bool_(False), TypeError, "time_step.*boolean"),
     ],
 )
 def test_dilute_aerosol_rejects_invalid_scalars_without_mutation(
@@ -886,6 +928,91 @@ def test_dilute_aerosol_rejects_invalid_particle_storage_before_writes(
         aerosol.atmosphere.gas_only_species.get_concentration(), sources[2]
     )
     npt.assert_array_equal(particle.data.concentration, storage_snapshot)
+
+
+@pytest.mark.parametrize(
+    "storage", [np.array([-1.0, 2.0]), np.array([np.nan, 2.0])]
+)
+def test_dilute_aerosol_invalid_backing_storage_has_no_setter_writes(
+    monkeypatch, storage
+):
+    """Invalid backing storage fails before a particle or gas setter is called."""
+    aerosol = _make_aerosol()
+    particle = aerosol.particles
+    source = particle.get_concentration().copy()
+    particle.data.concentration[0] = storage
+    calls: list[str] = []
+    concentration = type(particle).concentration
+
+    def record_particle_setter(instance, candidate):
+        calls.append("particle")
+        concentration.fset(instance, candidate)
+
+    monkeypatch.setattr(particle, "get_concentration", lambda: source)
+    monkeypatch.setattr(
+        type(particle),
+        "concentration",
+        property(concentration.fget, record_particle_setter),
+    )
+    for name, gas in (
+        ("partitioning", aerosol.atmosphere.partitioning_species),
+        ("gas_only", aerosol.atmosphere.gas_only_species),
+    ):
+        monkeypatch.setattr(
+            gas,
+            "set_concentration",
+            lambda _candidate, name=name: calls.append(name),
+        )
+
+    with pytest.raises(ValueError, match="particle concentration storage"):
+        dilute_aerosol(aerosol, 0.5, 1.0)
+
+    assert calls == []
+
+
+def test_dilute_aerosol_restores_particle_after_partial_setter_failure(
+    monkeypatch,
+):
+    """Particle backing state is restored without retrying a failing setter."""
+    aerosol = _make_aerosol()
+    particle = aerosol.particles
+    original_data = particle.data
+    original_concentration = original_data.concentration.copy()
+    partitioning_snapshot = (
+        aerosol.atmosphere.partitioning_species.get_concentration()
+    )
+    gas_only_snapshot = (
+        aerosol.atmosphere.gas_only_species.get_concentration().copy()
+    )
+    replacement_data = copy.deepcopy(original_data)
+    concentration = type(particle).concentration
+
+    def write_then_fail(instance, candidate):
+        instance._data = replacement_data
+        instance._data.concentration[0] = candidate
+        raise RuntimeError("partially mutating particle setter failure")
+
+    monkeypatch.setattr(
+        type(particle),
+        "concentration",
+        property(concentration.fget, write_then_fail),
+    )
+
+    with pytest.raises(
+        RuntimeError, match="partially mutating particle setter"
+    ):
+        dilute_aerosol(aerosol, 0.5, 1.0)
+
+    assert particle.data is original_data
+    npt.assert_array_equal(particle.data.concentration, original_concentration)
+    assert (
+        aerosol.atmosphere.partitioning_species.get_concentration()
+        == partitioning_snapshot
+    )
+    npt.assert_array_equal(
+        aerosol.atmosphere.gas_only_species.get_concentration(),
+        gas_only_snapshot,
+    )
 
 
 def test_dilute_aerosol_rolls_back_particle_after_gas_setter_failure(

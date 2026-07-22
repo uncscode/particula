@@ -3,7 +3,7 @@
 Includes condensation and evaporation, coagulation, wall loss, and dilution.
 """
 
-from typing import Any, cast
+from typing import Any, Protocol, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -26,6 +26,16 @@ from .condensation.condensation_strategies import (
     CondensationStrategy,
 )
 from .wall_loss.wall_loss_strategies import WallLossStrategy
+
+
+class DilutionStrategyProtocol(Protocol):
+    """Structural contract for strategies compatible with ``Dilution``."""
+
+    def rate(self, aerosol: Aerosol) -> float | NDArray[np.float64]:
+        """Return the particle-number concentration rate."""
+
+    def step(self, aerosol: Aerosol, time_step: float) -> Aerosol:
+        """Apply one dilution step to an aerosol."""
 
 
 class MassCondensation(RunnableABC):
@@ -333,7 +343,7 @@ class Dilution(RunnableABC):
             dilution steps.
     """
 
-    def __init__(self, dilution_strategy: DilutionStrategy):
+    def __init__(self, dilution_strategy: DilutionStrategyProtocol):
         """Initialize the dilution runnable.
 
         Args:
