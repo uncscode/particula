@@ -168,16 +168,13 @@ print(result)
   runnable pipelines.
 - [Wall loss strategy system](Features/wall_loss_strategy_system.md) — chamber
   wall loss strategies with builders, factory, and runnable integration.
-- **CPU dilution** — construct supported dilution processes with
-  `par.dynamics.DilutionStrategy(coefficient)` and
-  `par.dynamics.Dilution(strategy)`. A concrete strategy validates particle
-  and gas concentration/storage state before writing; failed preflight leaves
-  the aerosol unchanged, and unexpected setter failures roll back prior
-  writes. `Dilution.execute(..., sub_steps=n)` validates this concrete state
-  before its first equal substep. Compatible custom strategies retain generic
-  equal-substep delegation and are responsible for their own validation and
-  atomicity. Low-level `dilute_aerosol` and `get_dilution_step` are
-  concrete-module-only helpers, not `particula.dynamics` public APIs.
+- [CPU dilution strategy system](Features/dilution_strategy_system.md) —
+  construct supported processes with `par.dynamics.DilutionStrategy(coefficient)`
+  and `par.dynamics.Dilution(strategy)`. The concrete helper boundary remains:
+  `dilute_aerosol` and `get_dilution_step` are concrete-module-only helpers,
+  not `particula.dynamics` public APIs. Run the
+  [public API source example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py)
+  with `python docs/Examples/cpu_dilution.py`.
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the

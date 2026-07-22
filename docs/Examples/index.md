@@ -136,6 +136,10 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     Key examples:
     - [Wall Loss Builders and Factory](Chamber_Wall_Loss/Notebooks/wall_loss_builders_factory.ipynb)
+    - [Dilution Strategy System](../Features/dilution_strategy_system.md) —
+      public CPU scalar dilution API and contract
+    - [CPU dilution source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py)
+      — run `python docs/Examples/cpu_dilution.py`
 
     [:octicons-arrow-right-24: Tutorial](Dynamics/index.md)
 

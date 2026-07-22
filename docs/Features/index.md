@@ -42,6 +42,15 @@ Welcome to the Particula Features documentation! This section provides comprehen
 
     [:octicons-arrow-right-24: Learn more](wall_loss_strategy_system.md)
 
+-   __[Dilution Strategy System](dilution_strategy_system.md)__
+
+    ---
+
+    CPU scalar chamber dilution through the public strategy and runnable API,
+    with exact exponential concentration decay and recovery boundaries.
+
+    [:octicons-arrow-right-24: Learn more](dilution_strategy_system.md)
+
 -   __[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md)__
 
     ---
