@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+from dataclasses import dataclass
 from types import SimpleNamespace
 from typing import Any, cast
 
@@ -194,6 +195,150 @@ def _forbid_preflight_side_effects(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(dilution_module.wp, "launch", reject_dilution_launch)
 
 
+@dataclass(frozen=True)
+class P4DilutionCase:
+    """Immutable finite-step fixture for deterministic P4 parity coverage."""
+
+    name: str
+    particle_concentration: np.ndarray
+    gas_concentration: np.ndarray
+    coefficient: float | np.ndarray
+    time_step: float
+
+
+P4_CASES = (
+    P4DilutionCase(
+        name="one_box_scalar_zero_cells",
+        particle_concentration=np.array([[0.0, 2.0]], dtype=np.float64),
+        gas_concentration=np.array([[0.0, 4.0]], dtype=np.float64),
+        coefficient=0.25,
+        time_step=2.0,
+    ),
+    P4DilutionCase(
+        name="multi_box_scalar_multi_species",
+        particle_concentration=np.array(
+            [[1.0, 0.0], [3.0, 5.0]], dtype=np.float64
+        ),
+        gas_concentration=np.array(
+            [[0.0, 2.0, 4.0], [6.0, 8.0, 10.0]], dtype=np.float64
+        ),
+        coefficient=np.float64(0.5),
+        time_step=1.5,
+    ),
+    P4DilutionCase(
+        name="multi_box_per_box_nonuniform",
+        particle_concentration=np.array(
+            [[0.0, 1.0], [2.0, 0.0], [4.0, 8.0]], dtype=np.float64
+        ),
+        gas_concentration=np.array(
+            [[0.0, 1.0], [2.0, 3.0], [4.0, 0.0]], dtype=np.float64
+        ),
+        coefficient=np.array([0.0, 0.25, 1.0], dtype=np.float64),
+        time_step=2.0,
+    ),
+)
+
+# These bounds measure deterministic float64 NumPy/Warp agreement, not bitwise
+# replay across execution backends.
+P4_PARITY_RTOL = 1e-12
+P4_PARITY_ATOL = 0.0
+
+
+def _p4_numpy_oracle(
+    particle_concentration: np.ndarray,
+    gas_concentration: np.ndarray,
+    coefficient: float | np.ndarray,
+    time_step: float,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return independent finite-step dilution expectations using NumPy."""
+    n_boxes = particle_concentration.shape[0]
+    coefficient_array = np.asarray(coefficient, dtype=np.float64)
+    if coefficient_array.ndim == 0:
+        coefficient_array = np.full(
+            n_boxes, coefficient_array, dtype=np.float64
+        )
+    factors = np.exp(-coefficient_array[:, None] * time_step)
+    return (
+        particle_concentration.copy() * factors,
+        gas_concentration.copy() * factors,
+    )
+
+
+def _assert_p4_case_matches_reference(
+    case: P4DilutionCase, device: str
+) -> None:
+    """Assert one P4 finite-step case against its independent NumPy oracle."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution_step_gpu
+
+    n_boxes, n_particles = case.particle_concentration.shape
+    n_species = case.gas_concentration.shape[1]
+    particles, gas = _containers(n_boxes, n_particles, n_species, device)
+    particles.concentration = wp.array(
+        case.particle_concentration.copy(), dtype=wp.float64, device=device
+    )
+    gas.concentration = wp.array(
+        case.gas_concentration.copy(), dtype=wp.float64, device=device
+    )
+    coefficient: Any = case.coefficient
+    if isinstance(case.coefficient, np.ndarray):
+        coefficient = wp.array(
+            case.coefficient.copy(), dtype=wp.float64, device=device
+        )
+    coefficient_object = coefficient
+    snapshots = _state_snapshots(
+        particles,
+        gas,
+        coefficient if isinstance(case.coefficient, np.ndarray) else None,
+    )
+    field_objects = (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        gas.molar_mass,
+        gas.concentration,
+        gas.vapor_pressure,
+        gas.partitioning,
+    )
+    expected_particle, expected_gas = _p4_numpy_oracle(
+        case.particle_concentration.copy(),
+        case.gas_concentration.copy(),
+        case.coefficient,
+        case.time_step,
+    )
+
+    returned_particles, returned_gas = dilution_step_gpu(
+        particles, gas, coefficient, case.time_step
+    )
+
+    _assert_identities(
+        particles, gas, returned_particles, returned_gas, field_objects
+    )
+    _assert_protected_state(
+        particles,
+        gas,
+        snapshots,
+        coefficient if isinstance(case.coefficient, np.ndarray) else None,
+    )
+    npt.assert_allclose(
+        particles.concentration.numpy(),
+        expected_particle,
+        rtol=P4_PARITY_RTOL,
+        atol=P4_PARITY_ATOL,
+    )
+    npt.assert_allclose(
+        gas.concentration.numpy(),
+        expected_gas,
+        rtol=P4_PARITY_RTOL,
+        atol=P4_PARITY_ATOL,
+    )
+    if isinstance(case.coefficient, np.ndarray):
+        assert coefficient is coefficient_object
+        npt.assert_array_equal(coefficient.numpy(), case.coefficient)
+
+
 def test_package_export_is_the_sole_supported_entry_point() -> None:
     """Publish only the public dilution step through the kernel package."""
     from particula.gpu import kernels
@@ -332,6 +477,138 @@ def test_per_box_dilution_preserves_zero_slots_and_compounds() -> None:
         atol=0.0,
     )
     _assert_protected_state(particles, gas, snapshots, coefficient)
+
+
+# P4 deterministic CPU/Warp finite-step parity and invariant coverage.
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize("case", P4_CASES, ids=lambda case: case.name)
+def test_p4_warp_cpu_cases_match_independent_reference(
+    case: P4DilutionCase,
+) -> None:
+    """Warp CPU finite-step dilution matches each independent P4 reference."""
+    _assert_p4_case_matches_reference(case, device="cpu")
+
+
+@pytest.mark.warp
+@pytest.mark.cuda
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize("case", P4_CASES, ids=lambda case: case.name)
+def test_p4_cuda_cases_match_independent_reference(
+    case: P4DilutionCase,
+) -> None:
+    """CUDA finite-step dilution matches each independent P4 reference."""
+    wp = _warp()
+    if not wp.is_cuda_available():
+        pytest.skip("CUDA is unavailable")
+    _assert_p4_case_matches_reference(case, device="cuda:0")
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_p4_warp_cpu_repeated_per_box_dilution_matches_reference() -> None:
+    """Repeated nonuniform Warp CPU dilution compounds independently by box."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution_step_gpu
+
+    case = P4_CASES[2]
+    n_boxes, n_particles = case.particle_concentration.shape
+    n_species = case.gas_concentration.shape[1]
+    particles, gas = _containers(n_boxes, n_particles, n_species)
+    particles.concentration = wp.array(
+        case.particle_concentration.copy(), dtype=wp.float64, device="cpu"
+    )
+    gas.concentration = wp.array(
+        case.gas_concentration.copy(), dtype=wp.float64, device="cpu"
+    )
+    coefficient = wp.array(
+        case.coefficient.copy(), dtype=wp.float64, device="cpu"
+    )
+    coefficient_object = coefficient
+    snapshots = _state_snapshots(particles, gas, coefficient)
+    field_objects = (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        gas.molar_mass,
+        gas.concentration,
+        gas.vapor_pressure,
+        gas.partitioning,
+    )
+    expected_particle, expected_gas = _p4_numpy_oracle(
+        case.particle_concentration.copy(),
+        case.gas_concentration.copy(),
+        case.coefficient,
+        case.time_step,
+    )
+    expected_particle, expected_gas = _p4_numpy_oracle(
+        expected_particle, expected_gas, case.coefficient, case.time_step
+    )
+
+    returned_particles, returned_gas = dilution_step_gpu(
+        particles, gas, coefficient, case.time_step
+    )
+    returned_particles, returned_gas = dilution_step_gpu(
+        returned_particles, returned_gas, coefficient, case.time_step
+    )
+
+    _assert_identities(
+        particles, gas, returned_particles, returned_gas, field_objects
+    )
+    _assert_protected_state(particles, gas, snapshots, coefficient)
+    assert coefficient is coefficient_object
+    npt.assert_array_equal(coefficient.numpy(), case.coefficient)
+    npt.assert_allclose(
+        particles.concentration.numpy(),
+        expected_particle,
+        rtol=P4_PARITY_RTOL,
+        atol=P4_PARITY_ATOL,
+    )
+    npt.assert_allclose(
+        gas.concentration.numpy(),
+        expected_gas,
+        rtol=P4_PARITY_RTOL,
+        atol=P4_PARITY_ATOL,
+    )
+
+
+@pytest.mark.parametrize(("coefficient", "time_step"), [(0.0, 1.0), (1.0, 0.0)])
+def test_p4_warp_cpu_exact_no_ops_preserve_all_state(
+    coefficient: float, time_step: float
+) -> None:
+    """Valid scalar-zero and zero-time calls preserve concentrations exactly."""
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    snapshots = _state_snapshots(particles, gas)
+    field_objects = (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        gas.molar_mass,
+        gas.concentration,
+        gas.vapor_pressure,
+        gas.partitioning,
+    )
+
+    returned_particles, returned_gas = dilution_step_gpu(
+        particles, gas, coefficient, time_step
+    )
+
+    _assert_identities(
+        particles, gas, returned_particles, returned_gas, field_objects
+    )
+    _assert_protected_state(particles, gas, snapshots)
+    npt.assert_array_equal(
+        particles.concentration.numpy(), snapshots["particle_concentration"]
+    )
+    npt.assert_array_equal(
+        gas.concentration.numpy(), snapshots["gas_concentration"]
+    )
 
 
 def test_zero_scalar_and_zero_time_validate_container_metadata() -> None:
