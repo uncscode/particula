@@ -264,6 +264,48 @@ def test_zero_scalar_and_zero_time_short_circuit_bad_concentration_metadata() ->
     assert dilution_step_gpu(particles, gas, 1.0, 0.0) == (particles, gas)
 
 
+def test_per_box_zero_time_short_circuits_before_concentration_access() -> None:
+    """A valid per-box coefficient returns before container metadata access."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    coefficient = wp.array([np.inf, 0.5], dtype=wp.float64, device="cpu")
+    snapshots = _state_snapshots(particles, gas, coefficient)
+    field_objects = (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        gas.molar_mass,
+        gas.concentration,
+        gas.vapor_pressure,
+        gas.partitioning,
+    )
+
+    returned_particles, returned_gas = dilution_step_gpu(
+        particles, gas, coefficient, 0.0
+    )
+
+    _assert_identities(
+        particles, gas, returned_particles, returned_gas, field_objects
+    )
+    _assert_protected_state(particles, gas, snapshots, coefficient)
+    npt.assert_array_equal(
+        particles.concentration.numpy(), snapshots["particle_concentration"]
+    )
+    npt.assert_array_equal(
+        gas.concentration.numpy(), snapshots["gas_concentration"]
+    )
+
+    malformed_particles = SimpleNamespace(concentration="not a Warp array")
+    malformed_gas = SimpleNamespace(concentration="not a Warp array")
+    assert dilution_step_gpu(
+        malformed_particles, malformed_gas, coefficient, 0.0
+    ) == (malformed_particles, malformed_gas)
+
+
 def test_per_box_zero_coefficient_box_is_write_free() -> None:
     """A zero-coefficient box retains exact sentinel concentration values."""
     wp = _warp()
@@ -415,6 +457,76 @@ def test_concentration_shape_errors_reject_before_writes(
         npt.assert_array_equal(
             particles.concentration.numpy(), snapshots["particle_concentration"]
         )
+
+
+@pytest.mark.parametrize(
+    ("field", "message"),
+    [
+        ("particle", "dtype float64"),
+        ("gas", "dtype float64"),
+    ],
+)
+def test_float32_concentrations_reject_before_any_write(field, message) -> None:
+    """Float32 concentration metadata fails before either application launch."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    particle_values = particles.concentration.numpy().copy()
+    gas_values = gas.concentration.numpy().copy()
+    if field == "particle":
+        particles = SimpleNamespace(
+            masses=particles.masses,
+            concentration=wp.array(
+                particle_values, dtype=wp.float32, device="cpu"
+            ),
+        )
+    else:
+        gas = SimpleNamespace(
+            concentration=wp.array(gas_values, dtype=wp.float32, device="cpu")
+        )
+
+    with pytest.raises(ValueError, match=message):
+        dilution_step_gpu(particles, gas, 1.0, 1.0)
+
+    npt.assert_array_equal(particles.concentration.numpy(), particle_values)
+    npt.assert_array_equal(gas.concentration.numpy(), gas_values)
+
+
+@pytest.mark.cuda
+@pytest.mark.parametrize("mismatch", ["coefficient", "particle", "gas"])
+def test_device_mismatch_rejects_before_any_write(mismatch) -> None:
+    """Cross-device coefficient and concentration metadata rejects prelaunch."""
+    wp = _warp()
+    if not wp.is_cuda_available():
+        pytest.skip("CUDA is unavailable")
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    particle_values = particles.concentration.numpy().copy()
+    gas_values = gas.concentration.numpy().copy()
+    coefficient = 1.0
+    if mismatch == "coefficient":
+        coefficient = wp.ones(2, dtype=wp.float64, device="cuda:0")
+    elif mismatch == "particle":
+        particles = SimpleNamespace(
+            masses=particles.masses,
+            concentration=wp.array(
+                particle_values, dtype=wp.float64, device="cuda:0"
+            ),
+        )
+    else:
+        gas = SimpleNamespace(
+            concentration=wp.array(
+                gas_values, dtype=wp.float64, device="cuda:0"
+            )
+        )
+
+    with pytest.raises(ValueError, match="device must match particle device"):
+        dilution_step_gpu(particles, gas, coefficient, 1.0)
+
+    npt.assert_array_equal(particles.concentration.numpy(), particle_values)
+    npt.assert_array_equal(gas.concentration.numpy(), gas_values)
 
 
 @pytest.mark.parametrize(
