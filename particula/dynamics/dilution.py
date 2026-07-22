@@ -9,10 +9,14 @@ particle-number or gas-mass concentration ``c`` [1/m³ or kg/m³], it evaluates
 The helpers validate finite physical domains, use ordinary NumPy broadcasting,
 and do not mutate caller-owned arrays. All-scalar inputs return a scalar;
 inputs including an array return a broadcast-shape array. The concrete
-``dilute_aerosol`` primitive intentionally mutates its ``Aerosol`` argument in
-place. ``DilutionStrategy`` delegates its atomic update to that primitive.
-These concrete-module APIs are not exported from ``particula.dynamics``, and
-this module provides no GPU behavior.
+``dilute_aerosol`` intentionally mutates its ``Aerosol`` argument in place.
+It completely validates supported particle and gas concentration state and all
+updates before its first write, then restores prior backing state if a later
+write fails. ``DilutionStrategy`` is the supported public strategy and
+delegates this atomic update to the primitive. The low-level
+``dilute_aerosol`` and ``get_dilution_step`` helpers remain concrete-module
+APIs and are not exported from ``particula.dynamics``. This module provides no
+GPU behavior.
 """
 
 from numbers import Number
@@ -302,7 +306,13 @@ def _preflight_dilution_aerosol(
     coefficient: np.float64,
     time_step: np.float64,
 ) -> dict[str, Any]:
-    """Validate dilution state and candidates before a concentration write.
+    """Validate supported dilution state and candidates before any write.
+
+    This concrete-path preflight validates physical particle and gas sources,
+    particle storage, and particle volume; it also computes shape-compatible
+    finite candidates and captures rollback state. Therefore a malformed
+    supported aerosol fails without changing a concentration, including for a
+    zero elapsed time or dilution coefficient.
 
     Args:
         aerosol: Aerosol whose supported concentration state is inspected.
@@ -310,12 +320,15 @@ def _preflight_dilution_aerosol(
         time_step: Validated nonnegative elapsed time [s].
 
     Returns:
-        Sources, candidates, and rollback snapshots for an atomic commit.
+        Sources, candidates, and rollback snapshots for a subsequent atomic
+        commit.
 
     Raises:
-        TypeError: If a required concentration or storage value is not numeric.
-        ValueError: If a required value is invalid or a candidate has an
-            incompatible shape.
+        TypeError: If the aerosol does not provide the supported concentration
+            protocol or a required concentration or storage value is not
+            numeric.
+        ValueError: If a source, particle volume, stored concentration, or
+            candidate is invalid or has an incompatible shape.
     """
     try:
         particle = aerosol.particles
@@ -456,9 +469,12 @@ def dilute_aerosol(
 
     Applies ``c_new = c * exp(-coefficient * time_step)`` to physical
     particle-number concentration and, in order, the atmosphere's partitioning
-    and gas-only concentrations. It preflights every candidate before writing.
-    If an unexpected write fails, it restores concentrations already written
-    from snapshots before reraising the original exception.
+    and gas-only concentrations. Before writing, it validates every supported
+    source, particle-storage representation, volume, and candidate. Thus,
+    preflight failures are atomic; an unexpected later setter failure restores
+    concentrations already written from snapshots before reraising the
+    original exception. This low-level helper is deliberately concrete-module
+    only; construct :class:`DilutionStrategy` for the public API.
 
     Args:
         aerosol: Aerosol whose concentrations are updated in place.
@@ -470,9 +486,11 @@ def dilute_aerosol(
         The identical, mutated ``aerosol`` instance.
 
     Raises:
-        TypeError: If ``coefficient`` or ``time_step`` is not numeric.
+        TypeError: If a scalar or required supported aerosol concentration or
+            storage value is not numeric.
         ValueError: If either scalar is nonfinite, negative, or nonscalar, or
-            a concentration candidate cannot be safely committed.
+            supported aerosol state or a concentration candidate cannot be
+            safely committed.
     """
     coefficient_scalar = _validate_nonnegative_scalar(
         coefficient,
@@ -523,11 +541,13 @@ def dilute_aerosol(
 
 
 class DilutionStrategy:
-    """Apply a shared chamber dilution coefficient to an aerosol.
+    """Apply a shared, validated chamber dilution coefficient to an aerosol.
 
     The strategy reports particle-number rates and delegates atomic particle
-    and gas concentration updates, including time-step validation, to
-    :func:`dilute_aerosol`.
+    and gas concentration updates to the concrete dilution primitive. A step
+    validates its elapsed time and the supported aerosol state before the first
+    concentration write; malformed state therefore leaves it unchanged. This
+    strategy is exported from :mod:`particula.dynamics`.
 
     Args:
         coefficient: Scalar chamber dilution coefficient [s⁻¹], finite and
@@ -559,7 +579,17 @@ class DilutionStrategy:
         return get_dilution_rate(self.coefficient, concentration)
 
     def _preflight(self, aerosol: "Aerosol", time_step: np.float64) -> None:
-        """Validate concrete aerosol state before substep delegation."""
+        """Validate supported aerosol state before runnable substeps.
+
+        Args:
+            aerosol: Aerosol whose dilution state is validated without writes.
+            time_step: Validated total elapsed time [s].
+
+        Raises:
+            TypeError: If required supported aerosol state is missing or not
+                numeric.
+            ValueError: If supported aerosol state cannot be safely diluted.
+        """
         _preflight_dilution_aerosol(aerosol, self.coefficient, time_step)
 
     def step(
@@ -567,11 +597,15 @@ class DilutionStrategy:
         aerosol: "Aerosol",
         time_step: float | np.number,
     ) -> "Aerosol":
-        """Delegate an in-place aerosol dilution step to ``dilute_aerosol``.
+        """Apply one validated, atomic in-place aerosol dilution step.
+
+        Validates the concrete aerosol state and every candidate before its
+        first write. A preflight failure leaves the aerosol unchanged; a later
+        setter failure restores previously written concentration backing state.
 
         Args:
             aerosol: Aerosol whose particle and gas concentrations are diluted.
-            time_step: Elapsed time [s], validated by ``dilute_aerosol``.
+            time_step: Elapsed time [s], finite, nonnegative, and scalar.
 
         Returns:
             The identical, mutated aerosol instance.
@@ -579,6 +613,6 @@ class DilutionStrategy:
         Raises:
             TypeError: If ``time_step`` is not numeric.
             ValueError: If ``time_step`` is nonfinite, negative, or nonscalar,
-                or dilution cannot be safely committed.
+                or supported aerosol state cannot be safely committed.
         """
         return dilute_aerosol(aerosol, self.coefficient, time_step)

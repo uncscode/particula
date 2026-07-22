@@ -1,5 +1,6 @@
-"""Runnable process that are particle centric.
-Includes, condensation (and evaporation), coagulation, and deposition.
+"""Runnable particle-centric aerosol processes.
+
+Includes condensation and evaporation, coagulation, wall loss, and dilution.
 """
 
 from typing import Any, cast
@@ -320,18 +321,24 @@ class Dilution(RunnableABC):
 
     Each substep delegates aerosol mutation to the configured strategy. The
     runnable preserves the input aerosol identity and ignores a strategy's
-    return value.
+    return value. When configured with the public ``DilutionStrategy``, it
+    validates concrete aerosol state before its first delegated substep, so
+    malformed state cannot permit a partial multi-substep update. Compatible
+    custom strategies retain generic equal-substep delegation and own their
+    validation and atomicity.
 
     Args:
-        dilution_strategy: Strategy that reports particle-number rates and
-            applies aerosol dilution steps.
+        dilution_strategy: Public ``DilutionStrategy`` or a compatible custom
+            strategy that reports particle-number rates and applies aerosol
+            dilution steps.
     """
 
     def __init__(self, dilution_strategy: DilutionStrategy):
         """Initialize the dilution runnable.
 
         Args:
-            dilution_strategy: Strategy that applies dilution to an aerosol.
+        dilution_strategy: Public ``DilutionStrategy`` or compatible custom
+            strategy that applies dilution to an aerosol.
         """
         self.dilution_strategy = dilution_strategy
 
@@ -356,9 +363,12 @@ class Dilution(RunnableABC):
         """Apply dilution as equal, sequential substeps over a total duration.
 
         The runnable validates the total duration and substep count before
-        calling the strategy. Each slice is delegated to ``strategy.step``;
-        particle and gas mutation, atomicity, and per-step validation remain
-        strategy responsibilities.
+        calling the strategy. For a ``DilutionStrategy``, it additionally
+        validates the concrete aerosol state for the whole duration before the
+        first substep; that supported path is atomic for malformed initial
+        state. Each equal slice is then delegated to ``strategy.step``.
+        Custom strategies are not inspected and retain responsibility for
+        aerosol validation, mutation, and atomicity.
 
         Args:
             aerosol: Aerosol to mutate in place.
@@ -369,9 +379,11 @@ class Dilution(RunnableABC):
             The identical, mutated aerosol instance.
 
         Raises:
-            ValueError: If ``sub_steps`` is not a positive integer or
-                ``time_step`` is nonfinite, negative, or nonscalar.
-            TypeError: If ``time_step`` is not numeric.
+            ValueError: If ``sub_steps`` is not a positive integer,
+                ``time_step`` is nonfinite, negative, or nonscalar, or
+                supported concrete aerosol state is invalid.
+            TypeError: If ``time_step`` is not numeric or a required supported
+                concrete aerosol value is not numeric.
         """
         if (
             isinstance(sub_steps, bool)

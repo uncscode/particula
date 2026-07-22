@@ -1,5 +1,21 @@
 # Change Log
 
+## 2026-07-22 — P4 Complete (issue #1392)
+
+- Hardened `particula/dynamics/dilution.py` with shared concrete-path
+  preflight for particle and gas sources, particle volume/storage, and computed
+  candidate shapes before any concentration write; retained ordered commit and
+  rollback for unexpected setter failures.
+- Made `DilutionStrategy.step()` use that same preflight and made concrete
+  `Dilution.execute()` preflight once before its first substep. Custom compatible
+  strategies retain unchanged generic equal-substep delegation and own their
+  validation/atomicity.
+- Exported `DilutionStrategy` and `Dilution` from `particula.dynamics`; kept
+  `get_dilution_step` and `dilute_aerosol` concrete-module-only.
+- Added focused direct/runnable malformed-state, preflight-order, rollback, and
+  dynamics-export coverage in `dilution_test.py`, `dilution_runnable_test.py`,
+  and `dilution_exports_test.py`.
+
 ## 2026-07-21 — P3 Complete (issue #1391)
 
 - Added concrete-module-only `DilutionStrategy` in

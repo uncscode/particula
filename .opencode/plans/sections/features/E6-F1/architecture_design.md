@@ -2,12 +2,12 @@
 
 ## High-Level Design
 
-The shipped P1/P2/P3 reference consists of pure NumPy equation helpers, the
+The shipped P1-P4 reference consists of pure NumPy equation helpers, the
 concrete-module-only `dilute_aerosol()` container primitive, and a CPU strategy
-plus runnable. `DilutionStrategy`, also concrete-module-only, is configured
-with one precomputed chamber dilution coefficient and delegates every step to
-P2. `Dilution` delegates equal internal substeps to that strategy. Callers can
-derive the coefficient from volume and flow with the existing pure helper.
+plus runnable. `DilutionStrategy` is configured with one precomputed chamber
+dilution coefficient and delegates every step to P2. `Dilution` delegates equal
+internal substeps to that strategy. Callers can derive the coefficient from
+volume and flow with the existing pure helper.
 
 ```text
 volume [m³] + inlet flow [m³/s]
@@ -66,7 +66,24 @@ particle concentration unchanged; and `step()` is exactly a delegation to P2.
 mutation, `execute()` rejects invalid `sub_steps`, validates the total duration,
 splits it equally, and calls `step()` once per slice without adopting a custom
 strategy return value. It therefore returns the original aerosol identity.
-Both symbols remain unexported pending P4.
+Both symbols were unexported pending P4.
+
+### P4 Implementation Record
+
+Issue #1392 centralized concrete-path preflight in
+`particula/dynamics/dilution.py`. Before a commit, it validates physical
+particle and both gas-group sources, particle volume and backing storage, and
+all decay candidates and their public/storage shapes; snapshots are captured
+only after that validation. The existing ordered particle/partitioning-gas/
+gas-only commit and rollback path remain the mutation boundary.
+
+`DilutionStrategy.step()` receives the same concrete preflight. In
+`particula/dynamics/particle_process.py`, `Dilution.execute()` performs it once
+after scalar validation and before the first equal substep when its strategy is
+a `DilutionStrategy`. Strategy-like custom objects are not inspected and retain
+their prior generic delegation contract. `particula/dynamics/__init__.py` now
+exports `DilutionStrategy` and `Dilution`, but not `get_dilution_step()` or
+`dilute_aerosol()`.
 
 ## Data / API / Workflow Changes
 
@@ -81,15 +98,18 @@ Both symbols remain unexported pending P4.
   candidates and converted particle storage before writes, then commit particle
   storage followed by both gas groups. On an unexpected later write failure,
   restore already-written snapshots. This avoids a half-mutated aerosol state.
-- **Shipped P3 API:** `DilutionStrategy` and `Dilution` are available only from
-  their concrete modules. The strategy accepts the coefficient in `s^-1`, and
+- **Shipped P3/P4 API:** `DilutionStrategy` and `Dilution` are public through
+  `particula.dynamics`; `get_dilution_step()` and `dilute_aerosol()` remain
+  concrete-module-only. The strategy accepts the coefficient in `s^-1`, and
   volume/flow derivation remains in the pure helper.
 - **Shipped P3 substeps:** `Dilution.execute()` validates `sub_steps` as a
   positive non-boolean Python/NumPy integer, validates total time before
   delegation, uses `time_step / sub_steps`, and executes exactly that many
   strategy steps.
-- **Planned P4 exports:** Re-export the supported strategy/runnable symbols
-  from `particula.dynamics`; P2 does not change the package export surface.
+- **Shipped P4 validation:** Concrete malformed state fails before all writes,
+  including zero-duration/zero-coefficient cases. The supported runnable
+  preflights before its first substep; custom strategies retain their own
+  validation and atomicity.
 - **Downstream:** E6-F2 consumes the formula, validation ordering, scalar
   semantics, and deterministic fixtures. E6-F9 consumes the runnable in an
   integrated process example.
