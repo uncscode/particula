@@ -1,12 +1,17 @@
 # Documentation Updates
 
-## P1 Status
+## P1/P2 Status
 
 Issue #1389 updated only the module docstring in
 `particula/dynamics/dilution.py` to record the CPU equations, SI units,
 broadcasting, exact finite-step behavior, and P1 boundary. It deliberately made
 no public user-documentation, example, index, or package-export changes.
 Remaining items below belong to the later documentation phase.
+
+Issue #1390 updated the concrete module documentation for the in-place P2
+container primitive but intentionally added no public user documentation,
+example, index, or export. Public strategy/runnable documentation remains
+deferred to P5.
 
 - Update the dilution API documentation to distinguish equation helpers,
   strategy behavior, and the `Dilution` runnable.

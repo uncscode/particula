@@ -1,5 +1,18 @@
 # Change Log
 
+## 2026-07-21 — P2 Complete (issue #1390)
+
+- Added unexported concrete-only `dilute_aerosol()` in
+  `particula/dynamics/dilution.py`.
+- Implemented strict scalar coefficient/time validation, exact physical
+  particle and atmosphere gas-group decay, representation-volume conversion,
+  complete preflight, ordered commit, and rollback recovery.
+- Added regression coverage in `particula/dynamics/tests/dilution_test.py` for
+  normal and no-op behavior, underflow, boundary errors, preflight atomicity,
+  and commit-failure recovery.
+- Deliberately made no strategy/runnable, package-export, public-documentation,
+  or GPU changes.
+
 ## 2026-07-21 — P1 Complete (issue #1389)
 
 - Implemented validated, NumPy-broadcasting coefficient and instantaneous-rate

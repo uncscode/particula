@@ -30,7 +30,16 @@ def _return_scalar_if_appropriate(
     result: NDArray[np.float64],
     *operands: float | NDArray[np.float64],
 ) -> float | NDArray[np.float64]:
-    """Return a scalar result when every input is scalar."""
+    """Return a scalar result only when every operand is scalar.
+
+    Args:
+        result: NumPy result array from a broadcast calculation.
+        *operands: Original calculation operands used to determine scalar mode.
+
+    Returns:
+        The scalar value in ``result`` if all operands are scalars; otherwise,
+        ``result`` unchanged.
+    """
     if all(np.isscalar(operand) for operand in operands):
         return result.item()
     return result
@@ -178,7 +187,22 @@ def get_dilution_step(
 
 
 def _validate_nonnegative_scalar(value: object, argument: str) -> np.float64:
-    """Validate a finite, nonnegative Python or NumPy numeric scalar."""
+    """Validate and convert a finite, nonnegative numeric scalar.
+
+    Zero-dimensional NumPy numeric arrays are accepted; arrays with other
+    shapes are rejected so container dilution always has one shared decay.
+
+    Args:
+        value: Python or NumPy numeric scalar to validate.
+        argument: Argument name included in validation error messages.
+
+    Returns:
+        Validated scalar converted to ``np.float64``.
+
+    Raises:
+        TypeError: If ``value`` is ``None`` or is not numeric.
+        ValueError: If ``value`` is nonscalar, nonfinite, or negative.
+    """
     if value is None:
         raise TypeError(f"Argument '{argument}' must be numeric, not None.")
 
@@ -207,7 +231,20 @@ def _preflight_concentration(
     source: object,
     name: str,
 ) -> NDArray[np.float64]:
-    """Return a valid candidate with exactly the source shape."""
+    """Validate a concentration candidate before an in-place commit.
+
+    Args:
+        candidate: Proposed updated concentration.
+        source: Original concentration that determines the required shape.
+        name: Concentration name used in a validation error message.
+
+    Returns:
+        The finite, nonnegative candidate as a float64 array.
+
+    Raises:
+        ValueError: If the candidate is nonfinite, negative, or has a shape
+            different from ``source``.
+    """
     candidate_array = np.asarray(candidate, dtype=np.float64)
     source_array = np.asarray(source, dtype=np.float64)
     if (
@@ -228,6 +265,12 @@ def dilute_aerosol(
     time_step: float | np.number,
 ) -> "Aerosol":
     """Dilute an aerosol's particle and gas concentrations in place.
+
+    Applies ``c_new = c * exp(-coefficient * time_step)`` to physical
+    particle-number concentration and, in order, the atmosphere's partitioning
+    and gas-only concentrations. It preflights every candidate before writing.
+    If an unexpected write fails, it restores concentrations already written
+    from snapshots before reraising the original exception.
 
     Args:
         aerosol: Aerosol whose concentrations are updated in place.
