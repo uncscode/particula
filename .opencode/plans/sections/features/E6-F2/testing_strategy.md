@@ -29,8 +29,12 @@ least the configured 80% and are never lowered.
   caller-owned coefficient preservation, and exact scalar-zero/zero-time
   no-ops. The identical finite-step matrix runs on CUDA when available and
   otherwise skips cleanly.
-- **P5 docs validation:** Verify links, import snippets, support/deferred tables,
-  and focused commands.
+- **P5 docs validation (shipped, #1399):** Hardware-free tests in
+  `particula/tests/dilution_docs_test.py` verify scoped foundation/roadmap/
+  maintainer contract wording, E6-F1/E6-F9 references, deferred promises, lazy
+  package-export metadata without importing Warp-dependent implementation, and
+  local Markdown file/anchor resolution. They also retain README and index
+  discoverability coverage.
 
 ## Regression and Coverage
 
@@ -41,5 +45,7 @@ least the configured 80% and are never lowered.
 - Use `pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror` as the
   focused command; include relevant conversion/container tests when boundaries
   change.
+- Use `pytest particula/tests/dilution_docs_test.py -q -Werror` for the
+  hardware-free publication and link/anchor regression suite.
 - No exact CPU/GPU bitwise claim is required unless the chosen T1 operation is
   proven identical; acceptance uses documented deterministic float64 tolerances.

@@ -175,23 +175,23 @@ print(result)
    not `particula.dynamics` public APIs. Run the
    [public API source example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py)
    with `python docs/Examples/cpu_dilution.py`.
-- GPU dilution P3 is the direct low-level
-  `particula.gpu.kernels.dilution_step_gpu` entry point. It applies
-  `c_new = c * exp(-alpha * time_step)` in place to particle and gas
-  concentrations, where `alpha = Q / V` `[s^-1]`, while returning the identical
-   containers and preserving all other caller-owned fields. Deterministic,
-   read-only preflight orders coefficient form, time, mass schema, per-box
-   coefficient, particle concentration, then gas concentration validation.
-   Invalid forms, storage schemas, and nonfinite or negative values reject
-   before scalar/factor allocation, dilution launch, or mutation; array-value
-   scans stay device-resident and never materialize caller arrays on the CPU.
-   Masses must be same-device `wp.float64` rank-3 storage;
-   concentrations must be same-device `wp.float64` rank-2 storage with exact
-   mass-derived shapes; and per-box coefficients must be same-device
-   `wp.float64` arrays shaped `(n_boxes,)`. Valid zero scalar coefficients and
-   zero time steps complete preflight and then no-op without allocation or
-   launch. Rollback after a successfully launched kernel failure and broader
-   parity remain deferred.
+- GPU dilution P1–P4 is a direct, low-level operation imported with
+   `from particula.gpu.kernels import dilution_step_gpu`. It applies
+   `c_new = c * exp(-alpha * time_step)` in place to particle and gas
+   concentrations, where `alpha = Q / V` `[s^-1]`, returns the identical
+   containers, and preserves all other caller-owned fields. Callers own
+   CPU↔Warp transfers, device placement, and synchronization; there is no hidden
+   transfer or CPU fallback. Coefficients are finite nonnegative scalars or
+   same-device `wp.float64` Warp arrays shaped `(n_boxes,)`. Deterministic,
+   read-only preflight rejects invalid calls before allocation, launch, or
+   mutation. Scalar-zero coefficients and zero time steps complete preflight and
+   are write-free, allocation-free, launch-free no-ops. Warp CPU float64
+   particle and gas comparisons use `rtol=1e-12, atol=0`; CUDA is optional and
+   skips cleanly when unavailable. This is tolerance-based evidence, not
+   bitwise parity. GPU runnables, orchestration, resizing, graph capture,
+   autodiff, and performance claims remain deferred. See
+   [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
+   for the complete contract.
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the

@@ -27,3 +27,14 @@
   scalar/per-box, one/multi-box, multi-species, repeated-call, invariant, and
   exact no-op cases (P4, #1398).
 - [x] Add direct package-import/API smoke tests and the focused `pytest ... -q -Werror` command (P2, #1396).
+
+## Documentation and Publication
+
+- [x] Publish the P1–P4 contract in the foundation guide, GPU roadmap, and
+  `AGENTS.md`, including caller ownership, preflight/no-op boundaries, tolerances,
+  optional CUDA, and deferred functionality (P5, #1399).
+- [x] Reconcile README and documentation indexes with the direct-kernel guidance
+  (P5, #1399).
+- [x] Add hardware-free documentation regressions for scoped content, lazy export
+  metadata, and local Markdown file/anchor resolution in
+  `particula/tests/dilution_docs_test.py` (P5, #1399).

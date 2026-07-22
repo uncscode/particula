@@ -51,8 +51,15 @@ P4 in order; P5 documents only the shipped implementation and parity evidence.
     cells/inactive slots; CUDA skips cleanly when unavailable. Production API
     and documentation are unchanged.
 
-- [ ] **E6-F2-P5:** Update development documentation for direct GPU dilution
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document direct imports, explicit transfers, supported inputs, validation, parity evidence, and deferred scope.
-  - Files: `docs/Features/data-containers-and-gpu-foundations.md`, `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`
-  - Tests: Documentation links/import snippets and focused test command verification.
+- [x] **E6-F2-P5:** Update development documentation for direct GPU dilution
+  - Issue: #1399 | Size: XS | Status: Completed
+  - Delivered: Published the direct import, explicit-transfer, fixed-shape
+    concentration-only mutation, complete preflight/no-op, parity, and deferred
+    scope contract. Reconciled the foundation guide, GPU roadmap, `AGENTS.md`,
+    README, and documentation indexes without changing production API or physics.
+  - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`, `README.md`,
+    documentation indexes, `particula/tests/dilution_docs_test.py`
+  - Tests: Hardware-free scoped-content, lazy-export, and local-link/anchor
+    regression coverage; focused command is
+    `pytest particula/tests/dilution_docs_test.py -q -Werror`.
