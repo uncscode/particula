@@ -8,15 +8,22 @@ particle-number or gas-mass concentration ``c`` [1/m³ or kg/m³], it evaluates
 
 The helpers validate finite physical domains, use ordinary NumPy broadcasting,
 and do not mutate caller-owned arrays. All-scalar inputs return a scalar;
-inputs including an array return a broadcast-shape array. This module neither
-mutates containers nor provides GPU behavior. ``get_dilution_step`` is a
-module-only helper, deliberately not exported from ``particula.dynamics``.
+inputs including an array return a broadcast-shape array. The concrete
+``dilute_aerosol`` primitive intentionally mutates its ``Aerosol`` argument in
+place. Neither it nor ``get_dilution_step`` is exported from
+``particula.dynamics``, and this module provides no GPU behavior.
 """
+
+from numbers import Number
+from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy.typing import NDArray
 
 from particula.util.validate_inputs import validate_inputs
+
+if TYPE_CHECKING:
+    from particula.aerosol import Aerosol
 
 
 def _return_scalar_if_appropriate(
@@ -168,3 +175,139 @@ def get_dilution_step(
         concentration,
         time_step,
     )
+
+
+def _validate_nonnegative_scalar(value: object, argument: str) -> np.float64:
+    """Validate a finite, nonnegative Python or NumPy numeric scalar."""
+    if value is None:
+        raise TypeError(f"Argument '{argument}' must be numeric, not None.")
+
+    value_array = np.asarray(value)
+    if value_array.ndim != 0:
+        raise ValueError(
+            f"Argument '{argument}' must be a finite nonnegative scalar."
+        )
+    if not isinstance(value, Number) and not np.issubdtype(
+        value_array.dtype, np.number
+    ):
+        raise TypeError(f"Argument '{argument}' must be numeric.")
+    try:
+        scalar = np.float64(value_array)
+    except (TypeError, ValueError) as error:
+        raise TypeError(f"Argument '{argument}' must be numeric.") from error
+    if not np.isfinite(scalar):
+        raise ValueError(f"Argument '{argument}' must be finite.")
+    if scalar < 0.0:
+        raise ValueError(f"Argument '{argument}' must be nonnegative.")
+    return scalar
+
+
+def _preflight_concentration(
+    candidate: object,
+    source: object,
+    name: str,
+) -> NDArray[np.float64]:
+    """Return a valid candidate with exactly the source shape."""
+    candidate_array = np.asarray(candidate, dtype=np.float64)
+    source_array = np.asarray(source, dtype=np.float64)
+    if (
+        candidate_array.shape != source_array.shape
+        or not np.all(np.isfinite(candidate_array))
+        or np.any(candidate_array < 0.0)
+    ):
+        raise ValueError(
+            f"{name} candidate must be finite, nonnegative, and match "
+            "the source shape."
+        )
+    return candidate_array
+
+
+def dilute_aerosol(
+    aerosol: "Aerosol",
+    coefficient: float | np.number,
+    time_step: float | np.number,
+) -> "Aerosol":
+    """Dilute an aerosol's particle and gas concentrations in place.
+
+    Args:
+        aerosol: Aerosol whose concentrations are updated in place.
+        coefficient: Scalar chamber dilution coefficient [s⁻¹], finite and
+            nonnegative.
+        time_step: Scalar elapsed time [s], finite and nonnegative.
+
+    Returns:
+        The identical, mutated ``aerosol`` instance.
+
+    Raises:
+        TypeError: If ``coefficient`` or ``time_step`` is not numeric.
+        ValueError: If either scalar is nonfinite, negative, or nonscalar, or
+            a concentration candidate cannot be safely committed.
+    """
+    coefficient_scalar = _validate_nonnegative_scalar(
+        coefficient,
+        "coefficient",
+    )
+    time_step_scalar = _validate_nonnegative_scalar(time_step, "time_step")
+
+    particle = aerosol.particles
+    gas_containers = (
+        aerosol.atmosphere.partitioning_species,
+        aerosol.atmosphere.gas_only_species,
+    )
+    particle_source = particle.get_concentration()
+    gas_sources = tuple(gas.get_concentration() for gas in gas_containers)
+
+    particle_candidate = _preflight_concentration(
+        get_dilution_step(
+            coefficient_scalar,
+            particle_source,
+            time_step_scalar,
+        ),
+        particle_source,
+        "particle concentration",
+    )
+    gas_candidates = tuple(
+        _preflight_concentration(
+            get_dilution_step(coefficient_scalar, source, time_step_scalar),
+            source,
+            "gas concentration",
+        )
+        for source in gas_sources
+    )
+    volume = np.asarray(particle.get_volume(), dtype=np.float64)
+    with np.errstate(over="ignore", invalid="ignore"):
+        stored_particle_candidate = particle_candidate * volume
+    stored_particle_candidate = _preflight_concentration(
+        stored_particle_candidate,
+        particle_source,
+        "stored particle concentration",
+    )
+
+    particle_snapshot = np.copy(np.asarray(particle.concentration))
+    gas_snapshots = tuple(np.copy(np.asarray(source)) for source in gas_sources)
+    written: list[tuple[object, NDArray[np.float64]]] = []
+    try:
+        written.append((particle, particle_snapshot))
+        particle.concentration = stored_particle_candidate
+        for gas, candidate, snapshot in zip(
+            gas_containers,
+            gas_candidates,
+            gas_snapshots,
+            strict=True,
+        ):
+            written.append((gas, snapshot))
+            gas.set_concentration(candidate)
+    except Exception as original_error:
+        rollback_error: Exception | None = None
+        for container, snapshot in reversed(written):
+            try:
+                if container is particle:
+                    container.concentration = snapshot
+                else:
+                    container.set_concentration(snapshot)
+            except Exception as error:  # pragma: no cover - diagnostic path
+                rollback_error = error
+        if rollback_error is not None:
+            raise original_error from rollback_error
+        raise
+    return aerosol
