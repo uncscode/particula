@@ -33,13 +33,16 @@ does not imply multi-box transport support.
 
 ## Execution, validation, and recovery
 
-`sub_steps` must be a positive, non-boolean Python or NumPy integer. The
-runnable delegates equal `time_step / sub_steps` slices, whose product gives
-the same whole-step exact exponential factor. The coefficient and duration
-must be finite, nonnegative scalars; booleans and non-scalars are rejected.
+`sub_steps` must be a positive, non-boolean Python or NumPy integer. For the
+concrete exact-exponential strategy, the runnable performs one total-duration
+operation, independent of `sub_steps`, so the whole call is retry-safe. Custom
+compatible strategies retain equal `time_step / sub_steps` slice delegation.
+The coefficient and duration must be finite, nonnegative real scalars;
+complex values are rejected, and booleans and non-scalars are rejected.
 
 A zero coefficient or zero duration is an exact no-op, but supported state is
-still preflighted even for a no-op. Concrete CPU dilution validates state
+still preflighted even for a no-op. Concrete CPU dilution supports exactly one
+particle box and validates state
 before mutation. If validation fails, state is unchanged; if an unexpected
 setter failure occurs, already-written concentration state is rolled back.
 These atomicity and retry-safe failure guarantees let callers correct input and
@@ -54,7 +57,7 @@ atmospheric temperature and pressure.
 ## Boundaries and example
 
 This CPU scalar contract excludes inlet composition or source terms, multi-box
-transport, GPU, Warp, CUDA, alternate-backend implementation or parity,
+particle data and transport, GPU, Warp, CUDA, alternate-backend implementation or parity,
 backend selection, and performance claims.
 
 `dilute_aerosol` and `get_dilution_step` are concrete-module-only helpers;

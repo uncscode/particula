@@ -373,12 +373,10 @@ class Dilution(RunnableABC):
         """Apply dilution as equal, sequential substeps over a total duration.
 
         The runnable validates the total duration and substep count before
-        calling the strategy. For a ``DilutionStrategy``, it additionally
-        validates the concrete aerosol state for the whole duration before the
-        first substep; that supported path is atomic for malformed initial
-        state. Each equal slice is then delegated to ``strategy.step``.
-        Custom strategies are not inspected and retain responsibility for
-        aerosol validation, mutation, and atomicity.
+        calling the strategy. A ``DilutionStrategy`` validates and executes one
+        total-duration exact step, making the concrete path whole-call atomic.
+        Custom strategies are not inspected and retain equal-substep delegation
+        with responsibility for aerosol validation, mutation, and atomicity.
 
         Args:
             aerosol: Aerosol to mutate in place.
@@ -408,6 +406,8 @@ class Dilution(RunnableABC):
         )
         if isinstance(self.dilution_strategy, DilutionStrategy):
             self.dilution_strategy._preflight(aerosol, validated_time_step)
+            self.dilution_strategy.step(aerosol, validated_time_step)
+            return aerosol
         sub_step_time_step = validated_time_step / sub_steps
         for _ in range(sub_steps):
             self.dilution_strategy.step(aerosol, sub_step_time_step)

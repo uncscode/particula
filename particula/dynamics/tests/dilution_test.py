@@ -21,6 +21,7 @@ from particula.particles.distribution_strategies import (
     MassBasedMovingBin,
     SpeciatedMassMovingBin,
 )
+from particula.particles.particle_data import ParticleData
 from particula.particles.representation import ParticleRepresentation
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 
@@ -614,6 +615,61 @@ def test_dilute_aerosol_rejects_invalid_scalars_without_mutation(
     )
 
 
+@pytest.mark.parametrize(
+    "coefficient", [complex(0.5, 0.25), np.complex128(0.5 + 0.25j)]
+)
+def test_dilute_aerosol_rejects_complex_coefficient_warning_cleanly(
+    coefficient,
+):
+    """Complex coefficients fail before conversion or concentration mutation."""
+    aerosol = _make_aerosol()
+    snapshots = (
+        aerosol.particles.data.concentration.copy(),
+        aerosol.atmosphere.partitioning_species.data.concentration.copy(),
+        aerosol.atmosphere.gas_only_species.data.concentration.copy(),
+    )
+
+    with pytest.raises(TypeError, match="coefficient.*real-valued"):
+        dilute_aerosol(aerosol, coefficient, 1.0)
+
+    npt.assert_array_equal(aerosol.particles.data.concentration, snapshots[0])
+    npt.assert_array_equal(
+        aerosol.atmosphere.partitioning_species.data.concentration, snapshots[1]
+    )
+    npt.assert_array_equal(
+        aerosol.atmosphere.gas_only_species.data.concentration, snapshots[2]
+    )
+
+
+def test_dilute_aerosol_rejects_multi_box_particles_before_mutation():
+    """Unsupported multi-box particle state fails without changing any domain."""
+    aerosol = _make_aerosol()
+    data = aerosol.particles.data
+    aerosol.particles._data = ParticleData(
+        masses=np.repeat(data.masses, 2, axis=0),
+        concentration=np.repeat(data.concentration, 2, axis=0),
+        charge=np.repeat(data.charge, 2, axis=0),
+        density=data.density.copy(),
+        volume=np.repeat(data.volume, 2),
+    )
+    snapshots = (
+        aerosol.particles.data.concentration.copy(),
+        aerosol.atmosphere.partitioning_species.data.concentration.copy(),
+        aerosol.atmosphere.gas_only_species.data.concentration.copy(),
+    )
+
+    with pytest.raises(ValueError, match="exactly one particle box"):
+        dilute_aerosol(aerosol, 0.5, 1.0)
+
+    npt.assert_array_equal(aerosol.particles.data.concentration, snapshots[0])
+    npt.assert_array_equal(
+        aerosol.atmosphere.partitioning_species.data.concentration, snapshots[1]
+    )
+    npt.assert_array_equal(
+        aerosol.atmosphere.gas_only_species.data.concentration, snapshots[2]
+    )
+
+
 def test_dilute_aerosol_accepts_zero_dimensional_scalars_and_underflows():
     """Zero-dimensional numeric scalars are accepted and finite decay underflows."""
     aerosol = _make_aerosol()
@@ -630,6 +686,17 @@ def test_dilute_aerosol_accepts_zero_dimensional_scalars_and_underflows():
     npt.assert_array_equal(
         aerosol.atmosphere.gas_only_species.get_concentration(), np.zeros(2)
     )
+
+
+def test_dilute_aerosol_preserves_subnormal_particle_storage():
+    """Storage decay avoids erasing a representable count through volume scaling."""
+    aerosol = _make_aerosol()
+    aerosol.particles.data.concentration[0, 0] = np.nextafter(0.0, 1.0)
+    aerosol.particles.data.volume[0] = 1e308
+
+    dilute_aerosol(aerosol, 0.5, 1.0)
+
+    assert aerosol.particles.data.concentration[0, 0] > 0.0
 
 
 def test_dilute_aerosol_zero_dimensional_scalars_apply_normal_decay():
@@ -814,9 +881,9 @@ def test_dilute_aerosol_rejects_invalid_sources_before_writes(
 @pytest.mark.parametrize(
     ("call_index", "candidate", "message"),
     [
-        (0, 1.0, "particle concentration"),
-        (1, np.array([1.0, 2.0]), "partitioning gas concentration"),
-        (2, 1.0, "gas-only concentration"),
+        (0, np.array([1.0, 2.0]), "partitioning gas concentration"),
+        (1, 1.0, "gas-only concentration"),
+        (2, np.ones((2, 2)), "stored particle concentration"),
     ],
 )
 def test_dilute_aerosol_rejects_candidate_shape_before_writes(

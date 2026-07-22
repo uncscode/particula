@@ -254,6 +254,8 @@ def _validate_nonnegative_scalar(value: object, argument: str) -> np.float64:
         value_array.dtype, np.bool_
     ):
         raise TypeError(f"Argument '{argument}' must be numeric, not boolean.")
+    if np.issubdtype(value_array.dtype, np.complexfloating):
+        raise TypeError(f"Argument '{argument}' must be real-valued.")
     if not isinstance(value, Number) and not np.issubdtype(
         value_array.dtype, np.number
     ):
@@ -346,6 +348,8 @@ def _preflight_dilution_aerosol(
         raise TypeError(
             "Aerosol dilution requires supported concentration state."
         ) from error
+    if particle.data.n_boxes != 1:
+        raise ValueError("Aerosol dilution supports exactly one particle box.")
     try:
         particle_source = particle.get_concentration()
     except (AttributeError, TypeError, ValueError) as error:
@@ -375,6 +379,11 @@ def _preflight_dilution_aerosol(
         particle_storage,
         "particle concentration storage",
     )
+    if particle_storage_array.shape != particle_source_array.shape:
+        raise ValueError(
+            "stored particle concentration must match the particle "
+            "concentration shape."
+        )
     try:
         volume = np.asarray(particle_volume, dtype=np.float64)
     except (TypeError, ValueError, OverflowError) as error:
@@ -382,11 +391,6 @@ def _preflight_dilution_aerosol(
     if volume.ndim != 0 or not np.isfinite(volume) or volume <= 0.0:
         raise ValueError("particle volume must be a finite positive scalar.")
 
-    particle_candidate = _preflight_concentration(
-        get_dilution_step(coefficient, particle_source_array, time_step),
-        particle_source_array,
-        "particle concentration",
-    )
     partitioning_candidate = _preflight_concentration(
         get_dilution_step(coefficient, partitioning_source, time_step),
         partitioning_source,
@@ -397,8 +401,9 @@ def _preflight_dilution_aerosol(
         gas_only_source,
         "gas-only concentration",
     )
+    decay = get_dilution_step(coefficient, 1.0, time_step)
     with np.errstate(over="ignore", invalid="ignore"):
-        stored_particle_candidate = particle_candidate * volume
+        stored_particle_candidate = particle_storage_array * decay
     stored_particle_candidate = _preflight_concentration(
         stored_particle_candidate,
         particle_storage_array,
