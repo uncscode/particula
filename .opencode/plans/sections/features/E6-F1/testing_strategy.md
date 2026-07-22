@@ -22,9 +22,15 @@ thresholds must never be lowered; changed code must meet at least the configured
   converted-storage preflight failures without writes; and rollback/recovery
   after injected commit failures. Package-surface coverage confirms
   `dilute_aerosol` remains concrete-module-only.
-- **P3:** Add `particula/dynamics/tests/dilution_runnable_test.py` for strategy
-  versus runnable agreement, expected concentration changes, exact no-ops,
-  substep count/splitting, returned identity, and `|` composition.
+- **P3 (complete, issue #1391):**
+  `particula/dynamics/tests/dilution_runnable_test.py` covers strategy
+  coefficient validation and rate delegation; P2 step validation propagation;
+  direct strategy and substepped runnable exponential decay for particle,
+  partitioning-gas, and gas-only concentrations; exact no-ops; finite,
+  nonnegative large-decay results; and concrete-module-only import boundaries.
+  Spy strategies verify equal slice count, invalid substep/time failure before
+  strategy calls or mutation, preservation of original-aerosol identity despite
+  a nonconforming strategy return, and `|`/`RunnableSequence` ordering.
 - **P4:** Add public import and preflight immutability tests. Parameterize zero,
   negative, nonfinite, boolean/non-integer `sub_steps`, malformed shapes, and
   invalid existing state; verify both particle and gas snapshots remain exact.

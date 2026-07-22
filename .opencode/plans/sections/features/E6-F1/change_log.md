@@ -1,5 +1,19 @@
 # Change Log
 
+## 2026-07-21 — P3 Complete (issue #1391)
+
+- Added concrete-module-only `DilutionStrategy` in
+  `particula/dynamics/dilution.py`; its step delegates to P2's
+  `dilute_aerosol()` and its rate delegates to `get_dilution_rate()`.
+- Added substepped `Dilution(RunnableABC)` in
+  `particula/dynamics/particle_process.py`, with validation before division,
+  strategy calls, or mutation and original-aerosol identity retention.
+- Added regression coverage in
+  `particula/dynamics/tests/dilution_runnable_test.py` for direct/runnable
+  behavior, validation ordering, identity, no-op/large-decay cases, and
+  runnable composition.
+- Deliberately made no package-export, GPU, example, or general user-doc change.
+
 ## 2026-07-21 — P2 Complete (issue #1390)
 
 - Added unexported concrete-only `dilute_aerosol()` in

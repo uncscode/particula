@@ -31,13 +31,19 @@
 
 ## E6-F1-P3 — Strategy and Runnable
 
-1. Implement the named CPU strategy in the dilution module with typed,
-   Google-style documented rate and step methods.
-2. Add `Dilution(RunnableABC)` in `particle_process.py` and delegate to the
-   strategy for each validated substep.
-3. Return the same `Aerosol`; keep particle and atmosphere container identity
-   unless an existing public setter requires assignment.
-4. Exercise direct strategy use, runnable use, substeps, and `RunnableSequence`.
+**Complete in issue #1391.**
+
+1. [x] Added concrete-module-only `DilutionStrategy` in
+   `particula/dynamics/dilution.py`, with typed Google-style `rate()` and
+   P2-delegating `step()` methods.
+2. [x] Added `Dilution(RunnableABC)` in `particle_process.py`; it validates
+   total time and positive integral non-boolean `sub_steps`, then delegates
+   each equal substep to the strategy.
+3. [x] Preserved the supplied `Aerosol` identity even for a nonconforming custom
+   strategy return, while P2 retains particle and atmosphere container behavior.
+4. [x] Added `particula/dynamics/tests/dilution_runnable_test.py` covering
+   direct strategy/runnable use, substeps, validation ordering, no-ops, large
+   finite decay, identity, and `RunnableSequence` composition.
 
 ## E6-F1-P4 — Validation and Exports
 
