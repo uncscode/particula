@@ -425,6 +425,25 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
   transfer. Call it directly only when vapor pressure must be refreshed outside
   a condensation step.
 
+### GPU dilution P1 contract
+
+- `particula.gpu.kernels.dilution.dilution_step_gpu` is concrete-module-only;
+  do not import it from `particula.gpu.kernels` or treat it as a shipped
+  executable API.
+- P1 validates a finite, nonnegative scalar `time_step` and either a finite,
+  nonnegative scalar coefficient or metadata-only same-device `wp.float64`
+  coefficient array shaped `(n_boxes,)`. Valid calls return the identical
+  particle and gas containers without caller-state writes or a kernel launch.
+- `alpha = Q / V` has units `s^-1`. P2 will implement
+  `c_new = c * exp(-alpha * time_step)`; P3 owns per-box coefficient-value and
+  complete container-state validation.
+
+Focused P1 contract run:
+
+```bash
+pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
+```
+
 ### GPU coagulation RNG state ownership
 
 ```python

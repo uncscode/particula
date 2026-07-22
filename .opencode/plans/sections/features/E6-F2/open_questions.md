@@ -11,13 +11,13 @@ reference decision and current direct-kernel conventions.
     same-device `wp.float64` array shaped `(n_boxes,)`; `time_step` remains one
     finite nonnegative scalar for the whole step.
 - [x] How is a floating scalar coefficient represented on device?
-  - Decision: after complete read-only preflight, broadcast it into a private
-    same-device `wp.float64` buffer. A valid caller-owned Warp array is retained
-    by identity; host arrays are not transferred implicitly.
+  - Decision: P1 broadcasts an accepted scalar into a private same-device
+    `wp.float64` buffer. A valid caller-owned Warp array is retained by identity;
+    host arrays are not transferred implicitly.
 - [x] Are concentration scans optional?
-  - Decision: no. Every public call validates finite nonnegative particle and
-    gas concentrations before output allocation, clearing, RNG work, or
-    mutation. E6-F2 exposes no validation opt-out.
+  - Decision: P1 does not scan concentration or per-box coefficient values
+    because it has no launch/write path. P3 will require those scans before any
+    future mutation; there is no planned validation opt-out.
 - [x] What CPU/Warp tolerance is frozen?
   - Decision: begin with `rtol=1e-12`, `atol=0` for changed finite nonzero
     concentrations and exact equality for no-ops, zeros, identities, and

@@ -78,6 +78,18 @@ temperature and pressure arrays. All accepted temperature, pressure, and
 coagulation volume inputs are validated as positive finite physical values
 before launch.
 
+The concrete-only P1 dilution contract is available solely at
+`particula.gpu.kernels.dilution`. It is deliberately not exported from
+`particula.gpu.kernels` and does not execute dilution: valid
+`dilution_step_gpu(particles, gas, coefficient, time_step)` calls only validate
+the frozen inputs and return the identical containers without a kernel launch
+or state write. It accepts a finite, nonnegative scalar coefficient or a
+same-device `wp.float64` per-box `(n_boxes,)` coefficient array, plus a finite,
+nonnegative scalar time step in seconds. The coefficient is `alpha = Q / V`
+`[s^-1]`; P2, not P1, will implement `c_new = c * exp(-alpha * time_step)`.
+Per-box coefficient-value and complete container-state validation are deferred
+to P3.
+
 `coagulation_step_gpu` accepts an optional keyword-only `mechanism_config`
 from `particula.gpu.kernels.coagulation`; this configuration API is not
 re-exported from `particula.gpu.kernels`. Omitting it preserves the Brownian,

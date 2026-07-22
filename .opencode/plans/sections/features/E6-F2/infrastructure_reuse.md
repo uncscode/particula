@@ -23,5 +23,6 @@
 - `particula/gpu/kernels/tests/condensation_test.py` and
   `particula/gpu/kernels/tests/coagulation_test.py` provide parity, no-op,
   device-mismatch, invalid-call atomicity, and import-contract test patterns.
-- Export the supported direct step through `particula/gpu/kernels/__init__.py`;
-  do not add a top-level `particula.gpu` runnable or implicit transfer API.
+- P1 intentionally leaves `dilution_step_gpu` concrete-module-only at
+  `particula.gpu.kernels.dilution`; P2 owns any package re-export. Do not add a
+  top-level `particula.gpu` runnable or implicit transfer API.

@@ -24,5 +24,7 @@ private helpers for cross-kernel setup.
 **Key Components:**
 - `condensation.py` - Condensation GPU entry points and kernels
 - `coagulation.py` - Coagulation GPU entry points and kernels
+- `dilution.py` - Concrete P1 GPU dilution input boundary; validates inputs and
+  returns identical state without a launch or mutation
 - `environment.py` - Shared private normalization and validation for kernel environment inputs
 - `tests/` - Test coverage

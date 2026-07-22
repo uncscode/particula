@@ -35,6 +35,11 @@ kernel-entry responsibilities.
   `particula.gpu.kernels.condensation` and
   `particula.gpu.kernels.coagulation` unless a broader public contract is
   intentionally documented.
+- `particula.gpu.kernels.dilution` is an intentionally concrete-module-only
+  P1 input boundary and is not re-exported through `particula.gpu.kernels`.
+  Its current contract validates dilution inputs and returns identical state
+  without a kernel launch or mutation; P2 owns executable dilution and any
+  export decision, while P3 owns complete state and per-box value preflight.
 
 ## Design Intent
 

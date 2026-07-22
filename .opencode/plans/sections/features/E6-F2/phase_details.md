@@ -5,11 +5,16 @@
 E6-F1 must provide the canonical CPU contract before P1. Complete P1 through
 P4 in order; P5 documents only the shipped implementation and parity evidence.
 
-- [ ] **E6-F2-P1:** Define scalar and per-box dilution input contract with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Freeze coefficient, time, shape, dtype, device, return, and no-op semantics against T1.
+- [x] **E6-F2-P1:** Define scalar and per-box dilution input contract with unit tests
+  - Issue: #1395 | Size: S | Status: Completed
+  - Delivered: `dilution_step_gpu` is concrete-module-only and validates finite
+    nonnegative scalar coefficient/time inputs plus same-device `wp.float64`
+    `(n_boxes,)` coefficient metadata. Valid calls return identical containers
+    with no launch or caller-state write; per-box values and container state are
+    deferred to P3, and package re-export is deferred to P2.
   - Files: `particula/gpu/kernels/dilution.py`, `particula/gpu/kernels/tests/dilution_test.py`
-  - Tests: Signature, scalar normalization, per-box acceptance, units, and rejection ordering.
+  - Tests: Signature/import boundary, scalar normalization, per-box identity,
+    zero-box/no-write paths, units, and rejection ordering.
 
 - [ ] **E6-F2-P2:** Implement fixed-shape particle and gas dilution kernels with unit tests
   - Issue: TBD | Size: S | Status: Not Started

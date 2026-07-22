@@ -1,5 +1,18 @@
 # Success Criteria
 
+## P1 Status (#1395)
+
+- [x] Concrete-module-only `dilution_step_gpu(particles, gas, coefficient,
+  time_step)` accepts finite nonnegative real scalar metadata or a same-device
+  `wp.float64` `(n_boxes,)` coefficient array, and returns identical containers
+  without a launch or caller-state write.
+- [x] P1 tests cover direct import/no package re-export, scalar normalization,
+  per-box identity, zero/no-write paths, and scalar/metadata rejection order.
+- [x] P1 explicitly carries `alpha = Q / V` [s^-1] and the future P2 update
+  `c_new = c * exp(-alpha * time_step)` without executing it.
+
+## Feature Completion Criteria
+
 - [ ] E6-F1/T1 is an explicit upstream dependency and its finite-step equation,
   units, and validation semantics are the sole CPU parity oracle.
 - [ ] A public low-level `dilution_step_gpu` accepts documented scalar and
