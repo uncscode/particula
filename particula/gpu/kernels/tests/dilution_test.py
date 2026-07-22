@@ -113,6 +113,78 @@ def _assert_identities(
         assert current is original
 
 
+def _snapshot_field(value: Any) -> dict[str, Any]:
+    """Record field identity, metadata, and values without changing it."""
+    snapshot = {
+        "identity": value,
+        "shape": getattr(value, "shape", None),
+        "dtype": getattr(value, "dtype", None),
+        "device": getattr(value, "device", None),
+    }
+    to_numpy = getattr(value, "numpy", None)
+    if callable(to_numpy):
+        snapshot["values"] = to_numpy().copy()
+    return snapshot
+
+
+def _full_state_snapshot(
+    particles: Any, gas: Any, coefficient: Any
+) -> dict[str, Any]:
+    """Record every fixture container and caller-owned field for rejection."""
+    snapshot = {
+        "particles": particles,
+        "gas": gas,
+        "coefficient": _snapshot_field(coefficient),
+        "fields": {},
+    }
+    for container_name, container in (("particles", particles), ("gas", gas)):
+        for field in vars(container):
+            snapshot["fields"][(container_name, field)] = _snapshot_field(
+                getattr(container, field)
+            )
+    return snapshot
+
+
+def _assert_full_state_unchanged(
+    particles: Any, gas: Any, coefficient: Any, snapshot: dict[str, Any]
+) -> None:
+    """Assert rejected preflight preserved every fixture object and value."""
+    assert particles is snapshot["particles"]
+    assert gas is snapshot["gas"]
+    for value, expected in ((coefficient, snapshot["coefficient"]),):
+        assert value is expected["identity"]
+        assert getattr(value, "shape", None) == expected["shape"]
+        assert getattr(value, "dtype", None) == expected["dtype"]
+        assert getattr(value, "device", None) == expected["device"]
+        if "values" in expected:
+            assert np.array_equal(
+                value.numpy(), expected["values"], equal_nan=True
+            )
+    for (container_name, field), expected in snapshot["fields"].items():
+        container = particles if container_name == "particles" else gas
+        value = getattr(container, field)
+        assert value is expected["identity"]
+        assert getattr(value, "shape", None) == expected["shape"]
+        assert getattr(value, "dtype", None) == expected["dtype"]
+        assert getattr(value, "device", None) == expected["device"]
+        if "values" in expected:
+            assert np.array_equal(
+                value.numpy(), expected["values"], equal_nan=True
+            )
+
+
+def _forbid_preflight_side_effects(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Fail if preflight allocates private storage or launches a kernel."""
+    from particula.gpu.kernels import dilution as dilution_module
+
+    def unexpected_side_effect(*_args: Any, **_kwargs: Any) -> None:
+        pytest.fail("preflight allocated storage or launched a kernel")
+
+    monkeypatch.setattr(dilution_module.wp, "full", unexpected_side_effect)
+    monkeypatch.setattr(dilution_module.wp, "empty", unexpected_side_effect)
+    monkeypatch.setattr(dilution_module.wp, "launch", unexpected_side_effect)
+
+
 def test_package_export_is_the_sole_supported_entry_point() -> None:
     """Publish only the public dilution step through the kernel package."""
     from particula.gpu import kernels
@@ -153,17 +225,18 @@ def test_normalize_scalar_coefficient_allocates_private_broadcast(
     npt.assert_array_equal(normalized.numpy(), np.full(3, coefficient))
 
 
-@pytest.mark.parametrize("value", [-1.0, np.nan, np.inf])
-def test_normalize_per_box_coefficient_defers_value_validation(value) -> None:
-    """Metadata-valid per-box values retain P3 physical-value deferral."""
+@pytest.mark.parametrize("value", [-1.0, np.nan, np.inf, -np.inf])
+def test_per_box_coefficient_rejects_invalid_values(value) -> None:
+    """Public preflight rejects invalid per-box coefficient values."""
     wp = _warp()
-    from particula.gpu.kernels.dilution import _normalize_coefficient
+    from particula.gpu.kernels import dilution_step_gpu
 
     coefficient = wp.array([value, 0.0], dtype=wp.float64, device="cpu")
-    assert (
-        _normalize_coefficient(coefficient, 2, coefficient.device)
-        is coefficient
-    )
+    particles, gas = _containers()
+    with pytest.raises(
+        ValueError, match="coefficient must be finite and nonnegative"
+    ):
+        dilution_step_gpu(particles, gas, coefficient, 1.0)
 
 
 @pytest.mark.parametrize("coefficient", [0.5, np.float64(1.5)])
@@ -252,45 +325,36 @@ def test_per_box_dilution_preserves_zero_slots_and_compounds() -> None:
     _assert_protected_state(particles, gas, snapshots, coefficient)
 
 
-def test_zero_scalar_and_zero_time_short_circuit_bad_concentration_metadata() -> (
-    None
-):
-    """Scalar zero and zero time return before concentration metadata access."""
+def test_zero_scalar_and_zero_time_validate_container_metadata() -> None:
+    """Scalar zero and zero time still require complete preflight."""
     from particula.gpu.kernels import dilution_step_gpu
 
     particles = SimpleNamespace(concentration="not a Warp array")
     gas = SimpleNamespace(concentration="not a Warp array")
-    assert dilution_step_gpu(particles, gas, 0.0, 1.0) == (particles, gas)
-    assert dilution_step_gpu(particles, gas, 1.0, 0.0) == (particles, gas)
+    with pytest.raises(
+        ValueError, match="particles.masses must be a Warp array"
+    ):
+        dilution_step_gpu(particles, gas, 0.0, 1.0)
+    with pytest.raises(
+        ValueError, match="particles.masses must be a Warp array"
+    ):
+        dilution_step_gpu(particles, gas, 1.0, 0.0)
 
 
-def test_per_box_zero_time_short_circuits_before_concentration_access() -> None:
-    """A valid per-box coefficient returns before container metadata access."""
+def test_per_box_zero_time_validates_coefficient_and_containers() -> None:
+    """A zero time step occurs only after full read-only preflight."""
     wp = _warp()
     from particula.gpu.kernels import dilution_step_gpu
 
     particles, gas = _containers()
     coefficient = wp.array([np.inf, 0.5], dtype=wp.float64, device="cpu")
     snapshots = _state_snapshots(particles, gas, coefficient)
-    field_objects = (
-        particles.masses,
-        particles.concentration,
-        particles.charge,
-        particles.density,
-        particles.volume,
-        gas.molar_mass,
-        gas.concentration,
-        gas.vapor_pressure,
-        gas.partitioning,
-    )
 
-    returned_particles, returned_gas = dilution_step_gpu(
-        particles, gas, coefficient, 0.0
-    )
+    with pytest.raises(
+        ValueError, match="coefficient must be finite and nonnegative"
+    ):
+        dilution_step_gpu(particles, gas, coefficient, 0.0)
 
-    _assert_identities(
-        particles, gas, returned_particles, returned_gas, field_objects
-    )
     _assert_protected_state(particles, gas, snapshots, coefficient)
     npt.assert_array_equal(
         particles.concentration.numpy(), snapshots["particle_concentration"]
@@ -301,9 +365,10 @@ def test_per_box_zero_time_short_circuits_before_concentration_access() -> None:
 
     malformed_particles = SimpleNamespace(concentration="not a Warp array")
     malformed_gas = SimpleNamespace(concentration="not a Warp array")
-    assert dilution_step_gpu(
-        malformed_particles, malformed_gas, coefficient, 0.0
-    ) == (malformed_particles, malformed_gas)
+    with pytest.raises(
+        ValueError, match=r"particles\.masses must be a Warp array"
+    ):
+        dilution_step_gpu(malformed_particles, malformed_gas, coefficient, 0.0)
 
 
 def test_per_box_zero_coefficient_box_is_write_free() -> None:
@@ -606,6 +671,81 @@ def test_invalid_time_step_raises_before_container_access(value) -> None:
         dilution_step_gpu(None, None, 1.0, value)
 
 
+@pytest.mark.parametrize("value", [-1.0, np.nan, np.inf, -np.inf])
+def test_invalid_time_step_domain_raises_before_container_access(value) -> None:
+    """Non-finite and negative time steps reject before container access."""
+    from particula.gpu.kernels import dilution_step_gpu
+
+    with pytest.raises(
+        ValueError, match="time_step must be finite and nonnegative"
+    ):
+        dilution_step_gpu(None, None, 1.0, value)
+
+
+@pytest.mark.parametrize(
+    ("mass_kind", "message"),
+    [
+        ("missing", "particles.masses must be a Warp array"),
+        ("dtype", "particles.masses must use dtype float64"),
+        ("rank", "particles.masses must have rank 3"),
+    ],
+)
+def test_mass_schema_rejections_are_atomic_and_side_effect_free(
+    mass_kind, message, monkeypatch
+) -> None:
+    """Missing, wrong-dtype, and wrong-rank masses reject before effects."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    if mass_kind == "missing":
+        particles = SimpleNamespace(concentration=particles.concentration)
+    elif mass_kind == "dtype":
+        particles = SimpleNamespace(
+            masses=wp.ones((2, 2, 2), dtype=wp.float32, device="cpu"),
+            concentration=particles.concentration,
+        )
+    else:
+        particles = SimpleNamespace(
+            masses=wp.ones((2, 2), dtype=wp.float64, device="cpu"),
+            concentration=particles.concentration,
+        )
+    snapshot = _full_state_snapshot(particles, gas, 1.0)
+    _forbid_preflight_side_effects(monkeypatch)
+
+    with pytest.raises(ValueError, match=message):
+        dilution_step_gpu(particles, gas, 1.0, 1.0)
+
+    _assert_full_state_unchanged(particles, gas, 1.0, snapshot)
+
+
+@pytest.mark.parametrize(
+    ("container_name", "message"),
+    [
+        ("particles", "particles.concentration must be a Warp array"),
+        ("gas", "gas.concentration must be a Warp array"),
+    ],
+)
+def test_missing_concentration_fields_are_atomic_and_side_effect_free(
+    container_name, message, monkeypatch
+) -> None:
+    """Missing concentration fields reject without allocation, launch, or writes."""
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    if container_name == "particles":
+        particles = SimpleNamespace(masses=particles.masses)
+    else:
+        gas = SimpleNamespace()
+    snapshot = _full_state_snapshot(particles, gas, 1.0)
+    _forbid_preflight_side_effects(monkeypatch)
+
+    with pytest.raises(ValueError, match=message):
+        dilution_step_gpu(particles, gas, 1.0, 1.0)
+
+    _assert_full_state_unchanged(particles, gas, 1.0, snapshot)
+
+
 def test_invalid_coefficient_metadata_precedes_time_and_particle_access() -> (
     None
 ):
@@ -616,3 +756,179 @@ def test_invalid_coefficient_metadata_precedes_time_and_particle_access() -> (
     coefficient = wp.ones(2, dtype=wp.float32, device="cpu")
     with pytest.raises(ValueError, match="coefficient must use dtype float64"):
         dilution_step_gpu(object(), object(), coefficient, cast(Any, "invalid"))
+
+
+@pytest.mark.parametrize(
+    ("failure", "message"),
+    [
+        ("coefficient_form", "coefficient must have rank 1"),
+        ("time", "time_step must be a real scalar"),
+        ("masses", "particles.masses must be a Warp array"),
+        ("coefficient_values", "coefficient must be finite and nonnegative"),
+        (
+            "particle_values",
+            "particles.concentration must be finite and nonnegative",
+        ),
+        ("gas_values", "gas.concentration must be finite and nonnegative"),
+    ],
+)
+def test_preflight_rejections_are_atomic_and_side_effect_free(
+    failure, message, monkeypatch
+) -> None:
+    """Each preflight group rejects before allocation, launch, or mutation."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    coefficient: Any = 1.0
+    time_step: Any = 1.0
+    if failure == "coefficient_form":
+        coefficient = wp.ones((2, 1), dtype=wp.float64, device="cpu")
+    elif failure == "time":
+        time_step = cast(Any, "invalid")
+    elif failure == "masses":
+        particles = SimpleNamespace(
+            masses="invalid",
+            concentration=particles.concentration,
+            charge=particles.charge,
+            density=particles.density,
+            volume=particles.volume,
+        )
+    elif failure == "coefficient_values":
+        coefficient = wp.array([-1.0, 0.5], dtype=wp.float64, device="cpu")
+    elif failure == "particle_values":
+        particles.concentration = wp.array(
+            [[-1.0, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
+        )
+    else:
+        gas.concentration = wp.array(
+            [[np.inf, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
+        )
+
+    snapshot = _full_state_snapshot(particles, gas, coefficient)
+    _forbid_preflight_side_effects(monkeypatch)
+    with pytest.raises((TypeError, ValueError), match=message):
+        dilution_step_gpu(particles, gas, coefficient, time_step)
+    _assert_full_state_unchanged(particles, gas, coefficient, snapshot)
+
+
+@pytest.mark.parametrize(("coefficient", "time_step"), [(0.0, 1.0), (1.0, 0.0)])
+def test_valid_no_ops_complete_preflight_without_side_effects(
+    coefficient, time_step, monkeypatch
+) -> None:
+    """Valid scalar-zero and zero-time calls are fully validated write-free no-ops."""
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    snapshot = _full_state_snapshot(particles, gas, coefficient)
+    _forbid_preflight_side_effects(monkeypatch)
+
+    returned_particles, returned_gas = dilution_step_gpu(
+        particles, gas, coefficient, time_step
+    )
+
+    assert returned_particles is particles
+    assert returned_gas is gas
+    _assert_full_state_unchanged(particles, gas, coefficient, snapshot)
+
+
+@pytest.mark.parametrize("value", [-1.0, np.nan, np.inf, -np.inf])
+@pytest.mark.parametrize("field", ["particle", "gas"])
+def test_invalid_concentration_values_preserve_full_caller_state(
+    field, value
+) -> None:
+    """All nonnegative-domain failures preserve complete caller-owned state."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    if field == "particle":
+        particles.concentration = wp.array(
+            [[value, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
+        )
+    else:
+        gas.concentration = wp.array(
+            [[value, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
+        )
+    snapshot = _full_state_snapshot(particles, gas, 1.0)
+    name = "particles" if field == "particle" else "gas"
+    message = f"{name}.concentration must be finite and nonnegative"
+
+    with pytest.raises(ValueError, match=message):
+        dilution_step_gpu(particles, gas, 1.0, 1.0)
+
+    _assert_full_state_unchanged(particles, gas, 1.0, snapshot)
+
+
+@pytest.mark.parametrize("field", ["particle", "gas"])
+def test_concentration_second_dimension_mismatch_is_rejected(field) -> None:
+    """Concentration dimensions must exactly match mass particle/species axes."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    if field == "particle":
+        particles.concentration = wp.ones(
+            (2, 1), dtype=wp.float64, device="cpu"
+        )
+    else:
+        gas.concentration = wp.ones((2, 1), dtype=wp.float64, device="cpu")
+    snapshot = _full_state_snapshot(particles, gas, 1.0)
+
+    name = "particles" if field == "particle" else "gas"
+    with pytest.raises(
+        ValueError, match=f"{name}.concentration shape must match"
+    ):
+        dilution_step_gpu(particles, gas, 1.0, 1.0)
+
+    _assert_full_state_unchanged(particles, gas, 1.0, snapshot)
+
+
+def test_preflight_validation_order_at_remaining_boundaries() -> None:
+    """Mass, coefficient, and particle failures precede later validation groups."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    particles = SimpleNamespace(
+        masses="invalid",
+        concentration=particles.concentration,
+        charge=particles.charge,
+        density=particles.density,
+        volume=particles.volume,
+    )
+    invalid_coefficient = wp.array([-1.0, 0.5], dtype=wp.float64, device="cpu")
+    with pytest.raises(
+        ValueError, match="particles.masses must be a Warp array"
+    ):
+        dilution_step_gpu(particles, gas, invalid_coefficient, 1.0)
+
+    particles, gas = _containers()
+    particles = SimpleNamespace(
+        masses=particles.masses,
+        concentration="invalid",
+        charge=particles.charge,
+        density=particles.density,
+        volume=particles.volume,
+    )
+    invalid_coefficient = wp.array([-1.0, 0.5], dtype=wp.float64, device="cpu")
+    with pytest.raises(
+        ValueError, match="coefficient must be finite and nonnegative"
+    ):
+        dilution_step_gpu(particles, gas, invalid_coefficient, 1.0)
+
+    particles, gas = _containers()
+    particles.concentration = wp.array(
+        [[-1.0, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
+    )
+    gas = SimpleNamespace(
+        concentration="invalid",
+        molar_mass=gas.molar_mass,
+        vapor_pressure=gas.vapor_pressure,
+        partitioning=gas.partitioning,
+    )
+    with pytest.raises(
+        ValueError,
+        match="particles.concentration must be finite and nonnegative",
+    ):
+        dilution_step_gpu(particles, gas, 1.0, 1.0)

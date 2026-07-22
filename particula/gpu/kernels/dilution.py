@@ -6,10 +6,10 @@ update ``c_new = c * exp(-alpha * time_step)`` in place to particle and gas
 concentrations, while returning the identical containers.
 
 Scalar coefficients are normalized to private active-device ``wp.float64``
-storage; valid same-device per-box coefficients retain caller ownership and
-identity. Zero scalar coefficients and zero time steps are write-free no-ops.
-Per-box coefficient-value validation, complete container-state preflight, and
-atomic rollback after a kernel failure are deliberately deferred to P3.
+storage only after complete read-only preflight; valid same-device per-box
+coefficients retain caller ownership and identity. Zero scalar coefficients and
+zero time steps are write-free no-ops after that preflight. Rollback after a
+successfully launched kernel failure is not promised.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -121,12 +121,10 @@ def _normalize_coefficient(
     n_boxes: int,
     device: Any,
 ) -> Any:
-    """Normalize a dilution coefficient into an active-device Warp array.
+    """Normalize an already validated coefficient into a Warp array.
 
     A valid per-box Warp array is returned by identity. Scalar inputs allocate
     private ``wp.float64`` storage of shape ``(n_boxes,)`` without caching.
-    Per-box coefficient values are intentionally not read in P2; their
-    physical-domain validation is deferred to P3.
 
     Args:
         coefficient: Real scalar [s^-1] or per-box Warp coefficient array.
@@ -137,20 +135,13 @@ def _normalize_coefficient(
         A private scalar broadcast or the original valid Warp array.
 
     Raises:
-        TypeError: If a non-Warp input is not a supported real scalar.
-        ValueError: If a scalar domain or Warp-array metadata is invalid.
+        This helper assumes the public entry point has completed all input
+        validation. It performs allocation only for valid scalar inputs.
     """
     if _is_warp_array_like(coefficient):
-        warp_coefficient = _validate_warp_coefficient_form(coefficient)
-        if warp_coefficient.shape != (n_boxes,):
-            raise ValueError(
-                "coefficient shape must match expected (n_boxes,)."
-            )
-        if str(warp_coefficient.device) != str(device):
-            raise ValueError("coefficient device must match particle device.")
-        return warp_coefficient
+        return coefficient
 
-    scalar = _coerce_nonnegative_real(coefficient, "coefficient")
+    scalar = cast(float, coefficient)
     return wp.full(
         n_boxes,
         wp.float64(scalar),
@@ -175,24 +166,73 @@ def _normalize_time_step(time_step: float | Any) -> float:
     return _coerce_nonnegative_real(time_step, "time_step")
 
 
-def _validate_concentration_metadata(
-    values: Any,
-    name: str,
+def _get_required_field(container: Any, field: str, name: str) -> Any:
+    """Return a required container field with a stable schema failure."""
+    try:
+        return getattr(container, field)
+    except AttributeError as exc:
+        raise ValueError(f"{name} must be a Warp array.") from exc
+
+
+def _validate_mass_schema(particles: Any) -> tuple[Any, int, int, int, Any]:
+    """Validate masses before deriving authoritative dimensions and device."""
+    masses = _get_required_field(particles, "masses", "particles.masses")
+    if not _is_warp_array_like(masses):
+        raise ValueError("particles.masses must be a Warp array.")
+    if masses.dtype != wp.float64:
+        raise ValueError("particles.masses must use dtype float64.")
+    if masses.ndim != 3:
+        raise ValueError("particles.masses must have rank 3.")
+    n_boxes, n_particles, n_species = masses.shape
+    return masses, n_boxes, n_particles, n_species, masses.device
+
+
+def _validate_nonnegative_finite_values(values: Any, name: str) -> None:
+    """Read Warp values safely and reject non-finite or negative entries."""
+    if getattr(values.device, "is_cpu", False) or str(values.device).startswith(
+        "cpu"
+    ):
+        values_np = np.asarray(values.numpy(), dtype=np.float64)
+    else:
+        values_np = np.asarray(type(values).numpy(values), dtype=np.float64)
+    if not np.all(np.isfinite(values_np)) or np.any(values_np < 0.0):
+        raise ValueError(f"{name} must be finite and nonnegative.")
+
+
+def _validate_per_box_coefficient(
+    coefficient: Any,
     n_boxes: int,
     device: Any,
-) -> tuple[int, int]:
-    """Validate fixed-shape concentration metadata without reading values."""
+) -> Any:
+    """Validate exact same-device coefficient schema and physical values."""
+    if coefficient.shape != (n_boxes,):
+        raise ValueError("coefficient shape must match expected (n_boxes,).")
+    if str(coefficient.device) != str(device):
+        raise ValueError("coefficient device must match particle device.")
+    _validate_nonnegative_finite_values(coefficient, "coefficient")
+    return coefficient
+
+
+def _validate_concentration_schema(
+    values: Any,
+    name: str,
+    expected_shape: tuple[int, int],
+    device: Any,
+) -> None:
+    """Validate exact concentration schema and physical values read-only."""
     if not _is_warp_array_like(values):
         raise ValueError(f"{name} must be a Warp array.")
     if values.ndim != 2:
         raise ValueError(f"{name} must have rank 2.")
     if values.dtype != wp.float64:
         raise ValueError(f"{name} must use dtype float64.")
-    if values.shape[0] != n_boxes:
-        raise ValueError(f"{name} box dimension must match particle masses.")
     if str(values.device) != str(device):
         raise ValueError(f"{name} device must match particle device.")
-    return values.shape
+    if values.shape[0] != expected_shape[0]:
+        raise ValueError(f"{name} box dimension must match particle masses.")
+    if values.shape != expected_shape:
+        raise ValueError(f"{name} shape must match particle masses.")
+    _validate_nonnegative_finite_values(values, name)
 
 
 def dilution_step_gpu(
@@ -201,25 +241,27 @@ def dilution_step_gpu(
     coefficient: float | Any,
     time_step: float,
 ) -> tuple[Any, Any]:
-    """Apply P2 GPU dilution and return the identical containers.
+    """Apply GPU dilution after complete atomic entry-point preflight.
 
     Arguments are positional in the order ``particles``, ``gas``,
     ``coefficient``, and ``time_step``. The coefficient ``alpha = Q / V`` has
     SI units [s^-1], and ``time_step`` is in seconds. This function applies the
     finite-step update ``c_new = c * exp(-alpha * time_step)`` in place.
 
-    P2 retains P1's coefficient-input contract: a finite, nonnegative
+    P3 retains P1's coefficient-input contract: a finite, nonnegative
     Python/NumPy real scalar or a caller-owned, active-device ``wp.float64``
     array shaped ``(n_boxes,)``. Valid per-box arrays are retained by identity
-    and their values are not read on the host. Non-no-op calls require
-    same-device rank-2 particle and gas concentration arrays with matching box
-    dimensions. Only those two arrays are mutated; masses and all other
+    and their values are read only during preflight. Masses must be a
+    same-device ``wp.float64`` rank-3 array; particle and gas concentrations
+    must be same-device ``wp.float64`` rank-2 arrays with exact mass-derived
+    shapes. Coefficients and concentrations must be finite and nonnegative.
+    Only the two concentration arrays are mutated; masses and all other
     caller-owned fields are preserved.
 
-    A zero scalar coefficient or zero time step returns before concentration
-    metadata access, private allocation, or a launch. Per-box coefficient-value
-    validation, concentration value validation, full container preflight, and
-    rollback after a kernel failure remain deferred to P3.
+    Every rejected call completes no allocation, kernel launch, or mutation.
+    A zero scalar coefficient or zero time step returns only after full
+    preflight, without private allocation or a launch. Rollback after a
+    successfully launched kernel failure is not promised.
 
     Args:
         particles: Particle container with fixed-shape concentration storage.
@@ -233,43 +275,63 @@ def dilution_step_gpu(
     Raises:
         TypeError: If a scalar coefficient or ``time_step`` is not a supported
             real scalar.
-        ValueError: If scalar input is invalid, coefficient metadata is invalid,
-            or concentration launch metadata is incompatible.
+        ValueError: If a schema, shape, device, or physical domain is invalid.
     """
-    if _is_warp_array_like(coefficient):
-        _validate_warp_coefficient_form(coefficient)
+    is_per_box_coefficient = _is_warp_array_like(coefficient)
+    if is_per_box_coefficient:
+        validated_coefficient = _validate_warp_coefficient_form(coefficient)
     else:
         scalar_coefficient = _coerce_nonnegative_real(
             coefficient, "coefficient"
         )
     normalized_time_step = _normalize_time_step(time_step)
 
-    if normalized_time_step == 0.0:
-        return particles, gas
-    if not _is_warp_array_like(coefficient) and scalar_coefficient == 0.0:
-        return particles, gas
-
-    masses = particles.masses
-    n_boxes = masses.shape[0]
-    device = masses.device
-    normalized_coefficient = _normalize_coefficient(
-        coefficient, n_boxes, device
+    _, n_boxes, n_particles, n_species, device = _validate_mass_schema(
+        particles
     )
-    particle_shape = _validate_concentration_metadata(
-        particles.concentration,
+    if is_per_box_coefficient:
+        normalized_coefficient = _validate_per_box_coefficient(
+            validated_coefficient,
+            n_boxes,
+            device,
+        )
+
+    particle_concentration = _get_required_field(
+        particles,
+        "concentration",
         "particles.concentration",
-        n_boxes,
+    )
+    _validate_concentration_schema(
+        particle_concentration,
+        "particles.concentration",
+        (n_boxes, n_particles),
         device,
     )
-    gas_shape = _validate_concentration_metadata(
-        gas.concentration,
+    gas_concentration = _get_required_field(
+        gas,
+        "concentration",
         "gas.concentration",
-        n_boxes,
+    )
+    _validate_concentration_schema(
+        gas_concentration,
+        "gas.concentration",
+        (n_boxes, n_species),
         device,
     )
 
-    if n_boxes == 0:
+    if (
+        n_boxes == 0
+        or normalized_time_step == 0.0
+        or (not is_per_box_coefficient and scalar_coefficient == 0.0)
+    ):
         return particles, gas
+
+    if not is_per_box_coefficient:
+        normalized_coefficient = _normalize_coefficient(
+            scalar_coefficient,
+            n_boxes,
+            device,
+        )
 
     factors = wp.empty(n_boxes, dtype=wp.float64, device=device)
     wp.launch(
@@ -278,18 +340,18 @@ def dilution_step_gpu(
         inputs=[normalized_coefficient, normalized_time_step, factors],
         device=device,
     )
-    if particle_shape[1] > 0:
+    if n_particles > 0:
         wp.launch(
             _apply_particle_dilution,
-            dim=particle_shape,
-            inputs=[particles.concentration, normalized_coefficient, factors],
+            dim=(n_boxes, n_particles),
+            inputs=[particle_concentration, normalized_coefficient, factors],
             device=device,
         )
-    if gas_shape[1] > 0:
+    if n_species > 0:
         wp.launch(
             _apply_gas_dilution,
-            dim=gas_shape,
-            inputs=[gas.concentration, normalized_coefficient, factors],
+            dim=(n_boxes, n_species),
+            inputs=[gas_concentration, normalized_coefficient, factors],
             device=device,
         )
     return particles, gas
