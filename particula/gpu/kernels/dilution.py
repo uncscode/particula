@@ -186,6 +186,8 @@ def _validate_concentration_metadata(
         raise ValueError(f"{name} must be a Warp array.")
     if values.ndim != 2:
         raise ValueError(f"{name} must have rank 2.")
+    if values.dtype != wp.float64:
+        raise ValueError(f"{name} must use dtype float64.")
     if values.shape[0] != n_boxes:
         raise ValueError(f"{name} box dimension must match particle masses.")
     if str(values.device) != str(device):
@@ -242,9 +244,9 @@ def dilution_step_gpu(
         )
     normalized_time_step = _normalize_time_step(time_step)
 
-    if not _is_warp_array_like(coefficient) and (
-        scalar_coefficient == 0.0 or normalized_time_step == 0.0
-    ):
+    if normalized_time_step == 0.0:
+        return particles, gas
+    if not _is_warp_array_like(coefficient) and scalar_coefficient == 0.0:
         return particles, gas
 
     masses = particles.masses
