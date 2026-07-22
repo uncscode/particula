@@ -185,7 +185,8 @@ print(result)
    same-device `wp.float64` Warp arrays shaped `(n_boxes,)`. Deterministic,
    read-only preflight rejects invalid calls before allocation, launch, or
    mutation. Scalar-zero coefficients and zero time steps complete preflight and
-   are write-free, allocation-free, launch-free no-ops. Warp CPU float64
+   are write-free, no-update-kernel no-ops; validation scans may still allocate
+   or launch. Warp CPU float64
    particle and gas comparisons use `rtol=1e-12, atol=0`; CUDA is optional and
    skips cleanly when unavailable. This is tolerance-based evidence, not
    bitwise parity. GPU runnables, orchestration, resizing, graph capture,

@@ -446,7 +446,8 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
   `wp.float64` rank-3 storage. Particle and gas concentrations must be
   same-device `wp.float64` rank-2 storage with exact mass-derived shapes.
 - Zero scalar coefficients and zero time steps complete full preflight, then
-  return as write-free no-ops without private allocation or kernel launch.
+  return as write-free, no-update-kernel no-ops; validation scans may still
+  allocate or launch.
 - Rejected calls preserve caller-owned objects before launch. Rollback after a
   successfully launched kernel failure is not promised.
 - E6-F1 supplies the upstream CPU finite-step oracle; E6-F9 is the future

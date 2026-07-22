@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 pytestmark = pytest.mark.warp
+
+ROOT = Path(__file__).resolve().parents[3]
 
 SUPPORTED_STEP_SYMBOLS = (
     "coagulation_step_gpu",
@@ -64,6 +70,34 @@ def test_kernels_package_all_is_exact_supported_surface() -> None:
         "condensation_step_gpu",
         "dilution_step_gpu",
     ]
+
+
+def test_kernels_package_keeps_dilution_module_lazy_in_fresh_process() -> None:
+    """Package import publishes dilution without importing its implementation."""
+    script = "\n".join(
+        (
+            "import sys",
+            "import particula.gpu.kernels as kernels",
+            "assert 'dilution_step_gpu' in kernels.__all__",
+            "assert 'particula.gpu.kernels.dilution' not in sys.modules",
+        )
+    )
+    environment = os.environ | {
+        "PYTHONPATH": os.pathsep.join(
+            filter(None, (str(ROOT), os.environ.get("PYTHONPATH")))
+        )
+    }
+
+    result = subprocess.run(  # noqa: S603
+        [sys.executable, "-c", script],
+        cwd=ROOT,
+        env=environment,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
 
 
 @pytest.mark.parametrize("helper_name", INTERNAL_HELPER_SYMBOLS)

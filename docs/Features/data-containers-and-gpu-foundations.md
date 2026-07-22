@@ -209,8 +209,9 @@ shape `(n_boxes,)`.
 
 Entry preflight is ordered and read-only. Rejected calls are atomic before
 kernel launch. A zero scalar coefficient or zero time step completes full
-preflight and is an exact write-free, allocation-free, launch-free no-op. The
-contract does not promise rollback after a launched-kernel failure.
+preflight and is a write-free, no-update-kernel no-op; preflight validation
+scans may still allocate or launch. The contract does not promise rollback
+after a launched-kernel failure.
 
 E6-F1 supplies the upstream CPU finite-step oracle; E6-F9 is the planned
 integrated direct-call consumer. Independent NumPy comparisons of particle and

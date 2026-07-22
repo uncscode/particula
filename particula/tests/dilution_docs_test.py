@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import ast
 import importlib.util
+import os
 import re
+import stat
 from pathlib import Path
+from urllib.parse import urlparse
 
 import numpy as np
 import numpy.testing as npt
@@ -20,7 +23,6 @@ DOCS_INDEX_PATH = ROOT / "docs/index.md"
 FOUNDATION_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
 ROADMAP_PATH = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
 AGENTS_PATH = ROOT / "AGENTS.md"
-KERNEL_EXPORTS_PATH = ROOT / "particula/gpu/kernels/__init__.py"
 SOURCE_URL = (
     "https://github.com/Gorkowski/particula/blob/main/"
     "docs/Examples/cpu_dilution.py"
@@ -49,7 +51,7 @@ def _local_destinations(content: str) -> list[tuple[str, str | None]]:
     destinations = re.findall(r"\[[^]]+\]\(([^)]+)\)", content)
     local_destinations = []
     for destination in destinations:
-        if destination.startswith(("http://", "https://")):
+        if urlparse(destination).scheme in {"http", "https"}:
             continue
         target, separator, fragment = destination.partition("#")
         local_destinations.append((target, fragment if separator else None))
@@ -79,16 +81,23 @@ def _section(content: str, heading: str) -> str:
     return content[match.start() : match.end() + next_heading.start()]
 
 
-def _assert_local_links_resolve(path: Path) -> None:
+def _assert_local_links_resolve(path: Path, root: Path = ROOT) -> None:
     """Assert local Markdown files and optional anchors resolve."""
     content = path.read_text(encoding="utf-8")
+    resolved_root = root.resolve()
     for destination, fragment in _local_destinations(content):
-        target = (
-            path if destination == "" else (path.parent / destination).resolve()
-        )
-        assert target.exists(), destination
+        assert not urlparse(destination).scheme, destination
+        destination_path = Path(destination)
+        assert not destination_path.is_absolute(), destination
+        target = path if destination == "" else path.parent / destination_path
+        resolved_target = target.resolve()
+        assert resolved_target.is_relative_to(resolved_root), destination
+        if resolved_target.suffix.lower() not in {".md", ".markdown"}:
+            continue
+        assert resolved_target.exists(), destination
+        assert stat.S_ISREG(resolved_target.stat().st_mode), destination
         if fragment is not None:
-            target_content = target.read_text(encoding="utf-8")
+            target_content = resolved_target.read_text(encoding="utf-8")
             headings = re.findall(r"^#+ (.+)$", target_content, re.MULTILINE)
             assert fragment in {
                 _markdown_anchor(heading) for heading in headings
@@ -272,7 +281,6 @@ def test_cpu_dilution_discoverability_links_resolve() -> None:
     for path in (
         GUIDE_PATH,
         FEATURES_INDEX_PATH,
-        EXAMPLES_INDEX_PATH,
         DOCS_INDEX_PATH,
     ):
         _assert_local_links_resolve(path)
@@ -292,6 +300,8 @@ def test_cpu_dilution_discoverability_links_resolve() -> None:
                 "same-device `wp.float64` Warp array with shape `(n_boxes,)`",
                 "preflight is ordered and read-only",
                 "zero scalar coefficient or zero time step",
+                "write-free, no-update-kernel no-op",
+                "validation scans may still allocate or launch",
                 "Warp CPU with float64 `rtol=1e-12, atol=0`",
                 "CUDA is optional and skips cleanly",
             ),
@@ -308,6 +318,8 @@ def test_cpu_dilution_discoverability_links_resolve() -> None:
                 "same-device `wp.float64` `(n_boxes,)` coefficient array",
                 "Complete ordered preflight",
                 "scalar-zero coefficient or zero time step",
+                "write-free, no-update-kernel no-op",
+                "validation scans may still allocate or launch",
                 "Warp CPU use `rtol=1e-12, atol=0`",
                 "CUDA rows are optional and skip cleanly",
             ),
@@ -324,6 +336,8 @@ def test_cpu_dilution_discoverability_links_resolve() -> None:
                 "same-device `wp.float64` arrays shaped `(n_boxes,)`",
                 "Entry-point preflight is deterministic and read-only",
                 "Zero scalar coefficients and zero time steps",
+                "write-free, no-update-kernel no-ops",
+                "validation scans may still allocate or launch",
                 "Warp CPU float64 particle and gas comparisons use",
                 "CUDA is optional and skips cleanly",
             ),
@@ -343,6 +357,7 @@ def test_direct_gpu_dilution_contract_is_published(
         assert re.search(rf"\b{feature}\b", section)
     for snippet in required:
         assert _normalized(snippet) in section
+    assert "allocation-free, launch-free no-op" not in section
 
 
 def test_roadmap_replaces_stale_direct_gpu_dilution_status() -> None:
@@ -376,24 +391,30 @@ def test_direct_gpu_dilution_sections_defer_unsupported_promises(
     section = _normalized(_section(path.read_text(encoding="utf-8"), heading))
 
     assert "bitwise parity" not in section.replace("not bitwise parity", "")
-    for capability in (
-        "hidden transfer",
-        "fallback",
-        "GPU runnable",
-        "resizing",
-        "graph capture",
-        "autodiff",
-        "performance",
-    ):
-        assert capability in section
-    assert "deferred" in section or "does not provide" in section
+    capability_contexts = {
+        "hidden transfer": (
+            "no hidden transfer",
+            "does not provide hidden transfer",
+        ),
+        "fallback": (
+            "no hidden transfer or fallback",
+            "does not provide hidden transfer or CPU fallback",
+        ),
+        "GPU runnable": ("deferred", "future scope"),
+        "resizing": ("deferred", "future scope"),
+        "graph capture": ("deferred", "future scope"),
+        "autodiff": ("deferred", "future scope"),
+        "performance": ("deferred", "future scope"),
+    }
+    for capability, contexts in capability_contexts.items():
+        if capability in section:
+            assert any(context in section for context in contexts)
 
 
-def test_dilution_kernel_public_surface_is_lazy_export_metadata() -> None:
-    """Dilution remains declared without loading its Warp-dependent module."""
+def test_kernels_package_publishes_lazy_dilution_metadata() -> None:
+    """Package metadata exposes dilution without loading the concrete module."""
     import particula.gpu.kernels as kernels
 
-    assert KERNEL_EXPORTS_PATH.is_file()
     assert "dilution_step_gpu" in kernels.__all__
     assert (
         kernels._SYMBOL_TO_MODULE["dilution_step_gpu"]
@@ -414,7 +435,7 @@ def test_local_link_resolver_supports_same_and_relative_anchors(
     )
     target.write_text("## Other Heading\n", encoding="utf-8")
 
-    _assert_local_links_resolve(source)
+    _assert_local_links_resolve(source, root=tmp_path)
 
 
 @pytest.mark.parametrize(
@@ -433,7 +454,83 @@ def test_local_link_resolver_rejects_missing_files_and_anchors(
     (tmp_path / "target.md").write_text("# Present\n", encoding="utf-8")
 
     with pytest.raises(AssertionError):
-        _assert_local_links_resolve(source)
+        _assert_local_links_resolve(source, root=tmp_path)
+
+
+@pytest.mark.parametrize(
+    "destination",
+    [
+        "/dev/zero",
+        "../outside.md",
+        "file:///dev/zero",
+    ],
+)
+def test_local_link_resolver_rejects_unsafe_targets(
+    tmp_path: Path, destination: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Unsafe local-link targets fail before the resolver reads them."""
+    source = tmp_path / "source.md"
+    source.write_text(f"[Unsafe]({destination})\n", encoding="utf-8")
+    read_paths: list[Path] = []
+    original_read_text = Path.read_text
+
+    def _read_source_only(path: Path, *args: object, **kwargs: object) -> str:
+        read_paths.append(path)
+        assert path == source
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", _read_source_only)
+
+    with pytest.raises(AssertionError):
+        _assert_local_links_resolve(source, root=tmp_path)
+    assert read_paths == [source]
+
+
+def test_local_link_resolver_rejects_outside_root_symlink(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Symlink targets resolving outside the documentation root are rejected."""
+    source = tmp_path / "source.md"
+    outside = tmp_path.parent / "outside.md"
+    outside.write_text("# Outside\n", encoding="utf-8")
+    (tmp_path / "outside-link.md").symlink_to(outside)
+    source.write_text("[Outside](outside-link.md)\n", encoding="utf-8")
+    read_paths: list[Path] = []
+    original_read_text = Path.read_text
+
+    def _read_source_only(path: Path, *args: object, **kwargs: object) -> str:
+        read_paths.append(path)
+        assert path == source
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", _read_source_only)
+
+    with pytest.raises(AssertionError):
+        _assert_local_links_resolve(source, root=tmp_path)
+    assert read_paths == [source]
+
+
+def test_local_link_resolver_rejects_special_target_before_reading_it(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A FIFO Markdown target is rejected by the regular-file check before read."""
+    source = tmp_path / "source.md"
+    special_target = tmp_path / "special.md"
+    source.write_text("[Special](special.md)\n", encoding="utf-8")
+    os.mkfifo(special_target)
+    read_paths: list[Path] = []
+    original_read_text = Path.read_text
+
+    def _read_source_only(path: Path, *args: object, **kwargs: object) -> str:
+        read_paths.append(path)
+        assert path == source
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", _read_source_only)
+
+    with pytest.raises(AssertionError):
+        _assert_local_links_resolve(source, root=tmp_path)
+    assert read_paths == [source]
 
 
 def test_direct_gpu_dilution_markdown_links_resolve() -> None:

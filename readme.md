@@ -94,8 +94,9 @@ reject before allocation, launch, or caller mutation. Particle masses must be
 same-device `wp.float64` rank-3 storage; particle and gas concentrations must
 be same-device `wp.float64` rank-2 storage with exact mass-derived shapes.
 Valid zero scalar coefficients and zero time steps complete preflight and then
-are write-free, allocation-free, launch-free no-ops. Rollback after a launched
-kernel failure is not promised. E6-F1 is the upstream CPU finite-step oracle;
+are write-free, no-update-kernel no-ops; validation scans may still allocate or
+launch. Rollback after a launched kernel failure is not promised. E6-F1 is the
+upstream CPU finite-step oracle;
 E6-F9 is the planned integrated direct-call consumer. Independent float64
 particle and gas comparisons on Warp CPU use `rtol=1e-12, atol=0`; CUDA is
 optional and skips cleanly when unavailable. This is tolerance-based evidence,
