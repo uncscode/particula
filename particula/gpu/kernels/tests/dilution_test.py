@@ -521,8 +521,9 @@ def test_p4_warp_cpu_repeated_per_box_dilution_matches_reference() -> None:
     gas.concentration = wp.array(
         case.gas_concentration.copy(), dtype=wp.float64, device="cpu"
     )
+    coefficient_values = cast(np.ndarray, case.coefficient)
     coefficient = wp.array(
-        case.coefficient.copy(), dtype=wp.float64, device="cpu"
+        coefficient_values.copy(), dtype=wp.float64, device="cpu"
     )
     coefficient_object = coefficient
     snapshots = _state_snapshots(particles, gas, coefficient)
