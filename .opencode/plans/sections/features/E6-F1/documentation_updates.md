@@ -1,5 +1,13 @@
 # Documentation Updates
 
+## P1 Status
+
+Issue #1389 updated only the module docstring in
+`particula/dynamics/dilution.py` to record the CPU equations, SI units,
+broadcasting, exact finite-step behavior, and P1 boundary. It deliberately made
+no public user-documentation, example, index, or package-export changes.
+Remaining items below belong to the later documentation phase.
+
 - Update the dilution API documentation to distinguish equation helpers,
   strategy behavior, and the `Dilution` runnable.
 - State SI units for volume, inlet flow, coefficient, elapsed time, particle

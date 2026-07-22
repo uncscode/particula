@@ -2,12 +2,16 @@
 
 ## E6-F1-P1 — Semantics and Helpers
 
-1. Record `alpha = Q/V` and `dc/dt = -alpha*c`, with SI units and accepted
+**Complete in issue #1389.**
+
+1. [x] Record `alpha = Q/V` and `dc/dt = -alpha*c`, with SI units and accepted
    scalar/array broadcasting.
-2. Freeze the finite-step concentration update and numerical-stability rule.
-3. Apply repository validation to positive finite volume, nonnegative finite
-   flow/coefficient/concentration, and compatible shapes.
-4. Preserve existing helper return conventions and add regression/edge tests.
+2. [x] Freeze `c_new = c * exp(-alpha * time_step)` as a module-scoped exact
+   step helper with warning-clean extreme finite decay.
+3. [x] Apply finite-domain validation, explicit `None` rejection, and broadcast
+   preflight without mutating inputs.
+4. [x] Preserve existing helper return conventions and package exports; add
+   regression and edge-contract tests.
 
 ## E6-F1-P2 — Container Reference
 

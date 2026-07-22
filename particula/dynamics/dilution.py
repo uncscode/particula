@@ -1,12 +1,16 @@
-"""Validated, vectorized chamber-dilution calculations.
+"""Validated, vectorized CPU calculations for chamber dilution.
 
-This CPU-only module uses system volume ``V`` [m³], inlet flow ``Q`` [m³/s],
-and dilution coefficient ``alpha`` [s⁻¹], where ``alpha = Q / V``. For
-particle-number or gas-mass concentration ``c`` [1/m³ or kg/m³], the rate is
-``dc/dt = -alpha * c`` and the exact finite update over elapsed time [s] is
-``c_new = c * exp(-alpha * time_step)``. The helpers support ordinary NumPy
-broadcasting without mutating caller-owned arrays. They do not mutate
-containers and have no GPU implementation scope.
+This module uses chamber volume ``V`` [m³], inlet flow ``Q`` [m³/s], and
+dilution coefficient ``alpha`` [s⁻¹], where ``alpha = Q / V``. For
+particle-number or gas-mass concentration ``c`` [1/m³ or kg/m³], it evaluates
+``dc/dt = -alpha * c`` and the exact finite update
+``c_new = c * exp(-alpha * time_step)`` for elapsed time [s].
+
+The helpers validate finite physical domains, use ordinary NumPy broadcasting,
+and do not mutate caller-owned arrays. All-scalar inputs return a scalar;
+inputs including an array return a broadcast-shape array. This module neither
+mutates containers nor provides GPU behavior. ``get_dilution_step`` is a
+module-only helper, deliberately not exported from ``particula.dynamics``.
 """
 
 import numpy as np
@@ -32,12 +36,17 @@ def get_volume_dilution_coefficient(
 ) -> float | NDArray[np.float64]:
     """Calculate the volume dilution coefficient ``alpha = Q / V``.
 
+    Finite inputs are validated and broadcast with NumPy before division. The
+    function does not mutate inputs; all-scalar inputs return a scalar, and any
+    array input returns an array with the broadcast shape.
+
     Args:
         volume: Chamber volume ``V`` [m³], strictly positive and finite.
         input_flow_rate: Inlet flow rate ``Q`` [m³/s], nonnegative and finite.
 
     Returns:
-        Dilution coefficient [s⁻¹].
+        Dilution coefficient [s⁻¹] as a scalar for scalar inputs, otherwise an
+        array with the broadcast shape.
 
     Raises:
         TypeError: If an operand is ``None`` or is not numeric.
@@ -64,6 +73,10 @@ def get_dilution_rate(
 ) -> float | NDArray[np.float64]:
     """Calculate the instantaneous dilution rate ``dc/dt = -alpha * c``.
 
+    Finite inputs are validated and broadcast with NumPy before multiplication.
+    The function does not mutate inputs; all-scalar inputs return a scalar, and
+    any array input returns an array with the broadcast shape.
+
     Args:
         coefficient: Dilution coefficient ``alpha`` [s⁻¹], nonnegative and
             finite.
@@ -71,7 +84,8 @@ def get_dilution_rate(
             kg/m³], nonnegative and finite.
 
     Returns:
-        Concentration rate of change [1/(m³ s) or kg/(m³ s)].
+        Concentration rate of change [1/(m³ s) or kg/(m³ s)] as a scalar for
+        scalar inputs, otherwise an array with the broadcast shape.
 
     Raises:
         TypeError: If an operand is ``None`` or is not numeric.
@@ -103,7 +117,14 @@ def get_dilution_step(
     concentration: float | NDArray[np.float64],
     time_step: float | NDArray[np.float64],
 ) -> float | NDArray[np.float64]:
-    """Calculate the exact updated concentration, rather than a delta.
+    """Calculate the exact finite-step concentration, rather than a delta.
+
+    This evaluates ``c_new = c * exp(-alpha * time_step)``, not an Euler
+    approximation, so zero coefficient, concentration, or elapsed time is an
+    exact no-op. Finite inputs are validated and broadcast with NumPy without
+    mutating them. All-scalar inputs return a scalar, and any array input
+    returns an array with the broadcast shape. This helper is deliberately
+    module-only and is not exported from ``particula.dynamics``.
 
     Args:
         coefficient: Dilution coefficient ``alpha`` [s⁻¹], nonnegative and
@@ -113,8 +134,8 @@ def get_dilution_step(
         time_step: Elapsed time [s], nonnegative and finite.
 
     Returns:
-        Updated concentration ``c * exp(-alpha * time_step)`` with the
-        broadcast shape of the inputs.
+        Updated concentration ``c * exp(-alpha * time_step)`` as a scalar for
+        scalar inputs, otherwise an array with the broadcast shape.
 
     Raises:
         TypeError: If an operand is ``None`` or is not numeric.

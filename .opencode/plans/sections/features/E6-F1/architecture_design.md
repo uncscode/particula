@@ -29,6 +29,17 @@ The canonical finite-step update is the exact solution
 and E6-F2 treats it as the parity oracle. No path may encode dilution by changing
 particle mass.
 
+### P1 Implementation Record
+
+Issue #1389 implemented the pure numerical boundary in
+`particula/dynamics/dilution.py`. All three helpers validate finite physical
+domains, explicitly reject `None`, preflight operands with `np.broadcast_arrays`,
+preserve scalar returns for all-scalar calls, and do not mutate input arrays.
+`get_dilution_step()` evaluates the exact exponential under a local NumPy
+overflow/underflow suppression so finite extreme decay returns zero without a
+warning. It remains intentionally unexported from `particula.dynamics`; no
+container, strategy, runnable, or GPU workflow was introduced.
+
 ## Data / API / Workflow Changes
 
 - **Data model:** No schema or ownership changes. Only particle and gas

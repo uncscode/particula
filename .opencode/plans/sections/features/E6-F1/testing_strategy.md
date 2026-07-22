@@ -6,9 +6,13 @@ thresholds must never be lowered; changed code must meet at least the configured
 
 ## Per-Phase Coverage
 
-- **P1:** Extend `particula/dynamics/tests/dilution_test.py` with scalar and
-  NumPy-array equations, broadcasting, exact zero-flow/zero-concentration
-  behavior, invalid types/shapes, negative values, and NaN/Inf rejection.
+- **P1 (complete, issue #1389):** `particula/dynamics/tests/dilution_test.py`
+  covers the three helper equations; scalar and broadcast-array return shapes;
+  exact no-ops; elementwise invalid-domain, `None`, unsupported-type, and
+  incompatible-shape rejection; warning-clean extreme finite decay; input
+  non-mutation; and the concrete-module-only package boundary for
+  `get_dilution_step()`. The focused command is
+  `pytest particula/dynamics/tests/dilution_test.py -q -Werror`.
 - **P2:** Add container fixtures and assertions to the dilution tests (or a
   focused `dilution_strategy_test.py`) for particle distributions and
   scalar/multi-species gas. Compare against an independently calculated NumPy

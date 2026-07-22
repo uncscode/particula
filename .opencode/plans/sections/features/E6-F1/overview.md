@@ -17,6 +17,15 @@ representation volume, gas metadata, temperature, and pressure remain
 unchanged. A composable `Dilution` runnable gives users a normal Particula
 process API and supplies E6-F2 with a deterministic NumPy oracle.
 
+## Implementation Status
+
+P1 is complete in issue #1389. `particula/dynamics/dilution.py` now provides
+validated, broadcasting-capable coefficient and instantaneous-rate helpers and
+the concrete-module-only exact `get_dilution_step()` helper. It establishes the
+numerical contract without adding container mutation, a strategy/runnable,
+package exports, user documentation, examples, or GPU support; those remain in
+later phases.
+
 ## User Stories
 
 - As a simulation user, I want to compose dilution with existing runnables so
