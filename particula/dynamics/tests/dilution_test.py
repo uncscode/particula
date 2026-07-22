@@ -1,5 +1,7 @@
 """Numerical-contract tests for chamber dilution helpers."""
 
+import copy
+
 import numpy as np
 import numpy.testing as npt
 import particula.dynamics as dynamics
@@ -146,6 +148,29 @@ def test_dilution_rate_uint64_inputs_do_not_wrap_positive():
 
     assert result <= 0.0
     npt.assert_allclose(result, expected)
+
+
+@pytest.mark.parametrize(
+    ("function", "arguments", "quantity"),
+    [
+        (
+            get_volume_dilution_coefficient,
+            (np.finfo(np.float64).tiny, np.finfo(np.float64).max),
+            "dilution coefficient",
+        ),
+        (
+            get_dilution_rate,
+            (np.finfo(np.float64).max, np.finfo(np.float64).max),
+            "dilution rate",
+        ),
+    ],
+)
+def test_dilution_helpers_reject_overflowed_results_warning_cleanly(
+    function, arguments, quantity
+):
+    """Overflowed helper results fail clearly without emitting warnings."""
+    with pytest.raises(ValueError, match=f"Computed {quantity} must be finite"):
+        function(*arguments)
 
 
 def test_dilution_step_uint64_inputs_decay_without_overflow():
@@ -703,3 +728,66 @@ def test_dilute_aerosol_rolls_back_first_gas_after_second_gas_failure(
         aerosol.atmosphere.gas_only_species.get_concentration(),
         gas_only_snapshot,
     )
+
+
+def test_dilute_aerosol_restores_partially_mutating_failing_gas_setter(
+    monkeypatch,
+):
+    """Rollback bypasses a gas setter that writes before raising an error."""
+    aerosol = _make_aerosol()
+    particle_snapshot = aerosol.particles.get_concentration().copy()
+    partitioning_snapshot = (
+        aerosol.atmosphere.partitioning_species.get_concentration()
+    )
+    gas_only_snapshot = (
+        aerosol.atmosphere.gas_only_species.get_concentration().copy()
+    )
+    failing_gas = aerosol.atmosphere.gas_only_species
+
+    def write_then_fail(candidate):
+        failing_gas.data.concentration[...] = np.asarray(candidate).reshape(
+            1,
+            -1,
+        )
+        raise RuntimeError("partially mutating setter failure")
+
+    monkeypatch.setattr(failing_gas, "set_concentration", write_then_fail)
+    with pytest.raises(RuntimeError, match="partially mutating setter failure"):
+        dilute_aerosol(aerosol, 0.5, 1.0)
+
+    npt.assert_array_equal(
+        aerosol.particles.get_concentration(),
+        particle_snapshot,
+    )
+    assert (
+        aerosol.atmosphere.partitioning_species.get_concentration()
+        == partitioning_snapshot
+    )
+    npt.assert_array_equal(
+        aerosol.atmosphere.gas_only_species.get_concentration(),
+        gas_only_snapshot,
+    )
+
+
+def test_dilute_aerosol_restores_replaced_gas_backing_state(monkeypatch):
+    """Rollback restores a gas backing object and concentration-mode metadata."""
+    aerosol = _make_aerosol()
+    failing_gas = aerosol.atmosphere.partitioning_species
+    original_data = failing_gas.data
+    original_mode = failing_gas._single_species_concentration_mode
+    original_concentration = failing_gas.get_concentration()
+    replacement_data = copy.deepcopy(original_data)
+
+    def replace_then_fail(_):
+        failing_gas._data = replacement_data
+        failing_gas._single_species_concentration_mode = "array"
+        raise RuntimeError("backing-state setter failure")
+
+    monkeypatch.setattr(failing_gas, "set_concentration", replace_then_fail)
+
+    with pytest.raises(RuntimeError, match="backing-state setter failure"):
+        dilute_aerosol(aerosol, 0.5, 1.0)
+
+    assert failing_gas.data is original_data
+    assert failing_gas._single_species_concentration_mode == original_mode
+    assert failing_gas.get_concentration() == original_concentration

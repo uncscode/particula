@@ -15,7 +15,7 @@ place. Neither it nor ``get_dilution_step`` is exported from
 """
 
 from numbers import Number
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -42,6 +42,27 @@ def _return_scalar_if_appropriate(
     """
     if all(np.isscalar(operand) for operand in operands):
         return result.item()
+    return result
+
+
+def _require_finite_result(
+    result: NDArray[np.float64],
+    name: str,
+) -> NDArray[np.float64]:
+    """Raise when a computed dilution quantity is nonfinite.
+
+    Args:
+        result: Computed dilution quantity.
+        name: Quantity name included in the validation error.
+
+    Returns:
+        The validated result.
+
+    Raises:
+        ValueError: If any computed value is nonfinite.
+    """
+    if not np.all(np.isfinite(result)):
+        raise ValueError(f"Computed {name} must be finite.")
     return result
 
 
@@ -78,7 +99,14 @@ def get_volume_dilution_coefficient(
         np.asarray(volume, dtype=np.float64),
         np.asarray(input_flow_rate, dtype=np.float64),
     )
-    result = np.asarray(input_flow_rate_array / volume_array)
+    try:
+        with np.errstate(over="raise", invalid="raise"):
+            result = np.asarray(input_flow_rate_array / volume_array)
+    except FloatingPointError as error:
+        raise ValueError(
+            "Computed dilution coefficient must be finite."
+        ) from error
+    result = _require_finite_result(result, "dilution coefficient")
     return _return_scalar_if_appropriate(result, volume, input_flow_rate)
 
 
@@ -117,7 +145,12 @@ def get_dilution_rate(
         np.asarray(coefficient, dtype=np.float64),
         np.asarray(concentration, dtype=np.float64),
     )
-    result = np.asarray(-coefficient_array * concentration_array)
+    try:
+        with np.errstate(over="raise", invalid="raise"):
+            result = np.asarray(-coefficient_array * concentration_array)
+    except FloatingPointError as error:
+        raise ValueError("Computed dilution rate must be finite.") from error
+    result = _require_finite_result(result, "dilution rate")
     return _return_scalar_if_appropriate(result, coefficient, concentration)
 
 
@@ -178,6 +211,7 @@ def get_dilution_step(
         result = np.asarray(
             concentration_array * np.exp(-coefficient_array * time_step_array)
         )
+    result = _require_finite_result(result, "dilution step")
     return _return_scalar_if_appropriate(
         result,
         coefficient,
@@ -259,6 +293,43 @@ def _preflight_concentration(
     return candidate_array
 
 
+def _snapshot_gas_backing_state(
+    gas: Any,
+) -> tuple[Any, NDArray[np.float64], Any | None]:
+    """Capture direct gas backing state for setter-independent rollback.
+
+    Args:
+        gas: Gas container providing a ``data.concentration`` backing array.
+
+    Returns:
+        Backing data object, copied concentration, and concentration-mode state.
+    """
+    data = gas.data
+    return (
+        data,
+        np.copy(np.asarray(data.concentration)),
+        getattr(gas, "_single_species_concentration_mode", None),
+    )
+
+
+def _restore_gas_backing_state(
+    gas: Any,
+    snapshot: tuple[Any, NDArray[np.float64], Any | None],
+) -> None:
+    """Restore gas backing state without invoking its public setter.
+
+    Args:
+        gas: Gas container whose state should be restored.
+        snapshot: Backing state captured before commit.
+    """
+    data, concentration, concentration_mode = snapshot
+    data.concentration[...] = concentration
+    if hasattr(gas, "_data"):
+        gas._data = data
+    if hasattr(gas, "_single_species_concentration_mode"):
+        gas._single_species_concentration_mode = concentration_mode
+
+
 def dilute_aerosol(
     aerosol: "Aerosol",
     coefficient: float | np.number,
@@ -327,27 +398,32 @@ def dilute_aerosol(
     )
 
     particle_snapshot = np.copy(np.asarray(particle.concentration))
-    gas_snapshots = tuple(np.copy(np.asarray(source)) for source in gas_sources)
-    written: list[tuple[object, NDArray[np.float64]]] = []
+    gas_snapshots = tuple(
+        _snapshot_gas_backing_state(gas) for gas in gas_containers
+    )
+    written: list[Any] = []
     try:
-        written.append((particle, particle_snapshot))
+        written.append(particle)
         particle.concentration = stored_particle_candidate
-        for gas, candidate, snapshot in zip(
+        for gas, candidate in zip(
             gas_containers,
             gas_candidates,
-            gas_snapshots,
             strict=True,
         ):
-            written.append((gas, snapshot))
+            written.append(gas)
             gas.set_concentration(candidate)
     except Exception as original_error:
         rollback_error: Exception | None = None
-        for container, snapshot in reversed(written):
+        for container in reversed(written):
             try:
                 if container is particle:
-                    container.concentration = snapshot
+                    container.concentration = particle_snapshot
                 else:
-                    container.set_concentration(snapshot)
+                    gas_index = gas_containers.index(container)
+                    _restore_gas_backing_state(
+                        container,
+                        gas_snapshots[gas_index],
+                    )
             except Exception as error:  # pragma: no cover - diagnostic path
                 rollback_error = error
         if rollback_error is not None:
