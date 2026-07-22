@@ -86,11 +86,11 @@
     {
       "id": "E6-F2-P5",
       "title": "Update development documentation for direct GPU dilution",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-22",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
