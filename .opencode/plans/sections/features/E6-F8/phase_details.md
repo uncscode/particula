@@ -1,5 +1,10 @@
 # Phase Details
 
+## Sequencing
+
+E6-F5, E6-F6, and E6-F7 are required. Complete P1/P2 before P3, P4, and P5;
+run P6 parity and conservation checks before P7 documents the direct step.
+
 - [ ] **E6-F8-P1:** Define direct GPU nucleation configuration and preflight with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Freeze device configuration, fixed-shape sidecars, validation order, ownership, and failure-before-write contract matching E6-F7.

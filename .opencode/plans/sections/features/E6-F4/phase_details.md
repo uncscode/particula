@@ -1,5 +1,10 @@
 # Phase Details
 
+## Sequencing
+
+E6-F3 must ship first. Complete P1 before P2/P3, then integrate both physics
+terms in P4 before P5 validation and P6 documentation.
+
 - [ ] **E6-F4-P1:** Freeze charged wall-loss configuration and semantics with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Extend the E6-F3 contract with wall potential and scalar/vector field inputs while explicitly freezing neutral fallback, units, support, and atomic preflight behavior.

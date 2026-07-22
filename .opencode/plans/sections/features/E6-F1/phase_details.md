@@ -1,5 +1,10 @@
 # Phase Details
 
+## Sequencing
+
+Complete P1 through P4 in order; P5 documents only the CPU contract and
+evidence established by those completed phases.
+
 - [ ] **E6-F1-P1:** Freeze dilution semantics and validated rate helpers with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Document the CPU equation, units, accepted scalar/array inputs,

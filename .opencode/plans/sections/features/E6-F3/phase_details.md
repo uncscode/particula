@@ -1,5 +1,10 @@
 # Phase Details
 
+## Sequencing
+
+Complete P1 through P5 in order before P6 validates the complete step; P7
+documents only the validated direct-process contract and evidence.
+
 - [ ] **E6-F3-P1:** Port and validate neutral wall-loss transport primitives with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Inventory reusable Warp physics and implement only missing fp64 device functions needed by both geometries.
