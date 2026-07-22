@@ -9,8 +9,10 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-21",
-  "dependencies": ["E6-F1"],
+  "last_updated": "2026-07-22",
+  "dependencies": [
+    "E6-F1"
+  ],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E6-F2/architecture_design.md",
     "change_log": ".opencode/plans/sections/features/E6-F2/change_log.md",
@@ -32,11 +34,11 @@
     {
       "id": "E6-F2-P1",
       "title": "Define scalar and per-box dilution input contract with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-22",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
