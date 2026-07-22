@@ -250,15 +250,15 @@ invalid inputs leave the caller-owned vapor-pressure buffer unchanged. The
 refresh primitive remains a concrete-module API and is not condensation
 integration coverage.
 
-GPU dilution P1 coverage belongs in
+GPU dilution P2 coverage belongs in
 `particula/gpu/kernels/tests/dilution_test.py`. Mark it `warp`, defer Warp
-imports so missing Warp skips cleanly, and assert concrete-module-only status:
-the entry point must not be exported by `particula.gpu.kernels`. Cover scalar
-and metadata-valid per-box coefficient forms, identity return, and unchanged
-particle/gas concentrations on every valid and rejected path. P1 does not run
-a dilution kernel or establish numerical parity; the future finite-step equation
-`c_new = c * exp(-alpha * time_step)` and per-box value/state preflight belong
-to later phases.
+imports so missing Warp skips cleanly, and import `dilution_step_gpu` from
+`particula.gpu.kernels`. Cover scalar and metadata-valid per-box coefficient
+forms, identity return, protected-field preservation, write-free scalar-zero
+and zero-time paths, and the independent finite-step oracle
+`c_new = c * exp(-alpha * time_step)` for particle and gas concentrations.
+P2 defers per-box coefficient-value validation, complete container-state
+preflight and rollback, and broader CPU/Warp parity to later phases.
 
 ### Device-aware tolerance policy
 

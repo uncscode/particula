@@ -10,11 +10,12 @@ by the later integrated process sequence.
 ## Value Proposition
 
 E6-F2 ports the E6-F1/T1 dilution contract to a deterministic low-level Warp
-step. P1 is shipped in a concrete module: it freezes scalar/per-box coefficient
-metadata validation and a no-write, same-object return contract. P2 will add
-the concentration update, while P3/P4 will add complete state validation and
-CPU/Warp parity evidence without hidden transfers, fallback, resizing, or a
-high-level GPU runnable.
+step. P1 froze scalar/per-box coefficient metadata validation and a no-write,
+same-object return contract. P2 (#1396) now applies the finite-step
+concentration update in place and exports only `dilution_step_gpu` through
+`particula.gpu.kernels`. P3/P4 retain coefficient-value validation, complete
+state validation/rollback, and broader CPU/Warp parity evidence; the feature
+does not add hidden transfers, fallback, resizing, or a high-level GPU runnable.
 
 ## User Stories
 

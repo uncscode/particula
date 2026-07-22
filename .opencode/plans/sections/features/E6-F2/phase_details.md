@@ -16,11 +16,16 @@ P4 in order; P5 documents only the shipped implementation and parity evidence.
   - Tests: Signature/import boundary, scalar normalization, per-box identity,
     zero-box/no-write paths, units, and rejection ordering.
 
-- [ ] **E6-F2-P2:** Implement fixed-shape particle and gas dilution kernels with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Apply the T1 finite-step factor in place to particle and gas concentrations only.
-  - Files: `particula/gpu/kernels/dilution.py`, `particula/gpu/kernels/__init__.py`
-  - Tests: One/multi-box kernels, multi-species gas, inactive/zero concentrations, exact no-ops, field invariants.
+- [x] **E6-F2-P2:** Implement fixed-shape particle and gas dilution kernels with unit tests
+  - Issue: #1396 | Size: S | Status: Completed
+  - Delivered: `dilution_step_gpu` applies `exp(-alpha * time_step)` in place
+    to fixed-shape particle and gas concentrations, returns the original
+    containers, preserves protected fields, and retains scalar/per-box
+    coefficient and zero-time/scalar-zero no-op paths. Only this entry point is
+    exported through `particula.gpu.kernels`.
+  - Files: `particula/gpu/kernels/dilution.py`, `particula/gpu/kernels/__init__.py`, `particula/gpu/kernels/tests/dilution_test.py`
+  - Boundary: Per-box coefficient-value validation, complete preflight, and
+    rollback remain P3 work.
 
 - [ ] **E6-F2-P3:** Add atomic entry-point preflight validation with unit tests
   - Issue: TBD | Size: S | Status: Not Started

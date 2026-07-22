@@ -425,20 +425,22 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
   transfer. Call it directly only when vapor pressure must be refreshed outside
   a condensation step.
 
-### GPU dilution P1 contract
+### GPU dilution P2 contract
 
-- `particula.gpu.kernels.dilution.dilution_step_gpu` is concrete-module-only;
-  do not import it from `particula.gpu.kernels` or treat it as a shipped
-  executable API.
-- P1 validates a finite, nonnegative scalar `time_step` and either a finite,
-  nonnegative scalar coefficient or metadata-only same-device `wp.float64`
-  coefficient array shaped `(n_boxes,)`. Valid calls return the identical
-  particle and gas containers without caller-state writes or a kernel launch.
-- `alpha = Q / V` has units `s^-1`. P2 will implement
-  `c_new = c * exp(-alpha * time_step)`; P3 owns per-box coefficient-value and
-  complete container-state validation.
+- Import the supported direct low-level entry point with
+  `from particula.gpu.kernels import dilution_step_gpu`.
+- P2 applies `c_new = c * exp(-alpha * time_step)` in place to particle and
+  gas concentrations, where `alpha = Q / V` has units `s^-1`, and returns the
+  identical containers. It preserves all other caller-owned fields.
+- P2 retains P1's coefficient contract: scalar coefficients must be finite and
+  nonnegative; caller-owned per-box coefficients must be same-device
+  `wp.float64` arrays shaped `(n_boxes,)` and have metadata-only validation.
+  Zero scalar coefficients and zero time steps are write-free no-ops.
+- Per-box coefficient-value validation, concentration-value validation, full
+  container preflight, rollback after a kernel failure, and broader parity are
+  deferred to P3 and later phases.
 
-Focused P1 contract run:
+Focused P2 contract run:
 
 ```bash
 pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror

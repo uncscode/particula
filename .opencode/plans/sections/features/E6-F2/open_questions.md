@@ -15,9 +15,10 @@ reference decision and current direct-kernel conventions.
     `wp.float64` buffer. A valid caller-owned Warp array is retained by identity;
     host arrays are not transferred implicitly.
 - [x] Are concentration scans optional?
-  - Decision: P1 does not scan concentration or per-box coefficient values
-    because it has no launch/write path. P3 will require those scans before any
-    future mutation; there is no planned validation opt-out.
+  - Decision: P2 validates concentration launch-safety metadata before
+    non-no-op mutation but does not scan concentration or per-box coefficient
+    values. P3 will require those scans and atomic rollback; there is no planned
+    validation opt-out.
 - [x] What CPU/Warp tolerance is frozen?
   - Decision: begin with `rtol=1e-12`, `atol=0` for changed finite nonzero
     concentrations and exact equality for no-ops, zeros, identities, and

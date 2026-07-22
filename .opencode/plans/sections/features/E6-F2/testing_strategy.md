@@ -11,10 +11,11 @@ least the configured 80% and are never lowered.
   forms, scalar broadcast/per-box identity, units, zero-box and no-write
   identity returns, and deterministic validation ordering. Reject host arrays,
   ambiguous shapes, invalid dtype/device metadata, and invalid scalar domains.
-- **P2 kernel tests:** Compare one-box and multi-box/multi-species outputs with
-  an independent NumPy T1 oracle. Cover zeros, inactive particle slots,
-  nonuniform coefficients, repeated steps, exact no-ops, and unchanged masses,
-  charge, density, volume, gas metadata, vapor pressure, and partitioning.
+- **P2 kernel tests (shipped, #1396):** Exercise one-box and
+   multi-box/multi-species in-place decay with an independent NumPy E6-F1
+   oracle; cover zeros, inactive particle slots, nonuniform coefficients,
+   repeated steps, zero-time/scalar-zero and per-box-zero paths, zero extents,
+   package export, and protected-field/container identity invariants.
 - **P3 validation tests:** Parameterize negative/nonfinite coefficient or time,
   wrong rank/shape/dtype/device, inconsistent box dimensions, and invalid
   concentration state. Snapshot every caller field and assert no launch,
@@ -29,8 +30,9 @@ least the configured 80% and are never lowered.
 ## Regression and Coverage
 
 - Keep existing `particula/dynamics/tests/dilution_test.py` and E6-F1 tests green.
-- P1 tests assert direct concrete-module import; the package import smoke test
-  is P2 scope because P1 intentionally has no `particula.gpu.kernels` export.
+- P1 tests assert direct concrete-module import; P2 adds the package import
+  smoke test because it exports only `dilution_step_gpu` from
+  `particula.gpu.kernels`.
 - Use `pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror` as the
   focused command; include relevant conversion/container tests when boundaries
   change.
