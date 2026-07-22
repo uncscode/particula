@@ -384,6 +384,8 @@ class Dilution(RunnableABC):
             time_step,
             "time_step",
         )
+        if isinstance(self.dilution_strategy, DilutionStrategy):
+            self.dilution_strategy._preflight(aerosol, validated_time_step)
         sub_step_time_step = validated_time_step / sub_steps
         for _ in range(sub_steps):
             self.dilution_strategy.step(aerosol, sub_step_time_step)

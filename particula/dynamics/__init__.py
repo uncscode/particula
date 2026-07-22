@@ -7,7 +7,7 @@ helpers such as the thermal resistance factor. Includes neutral and
 charged wall loss for spherical and rectangular chambers. Charged wall
 loss adds image-charge enhancement even when wall potential is zero and
 optional electric-field drift. Also provides ``MassCondensation``,
-``Coagulation``, and ``WallLoss`` runnables.
+``Coagulation``, ``WallLoss``, and ``Dilution`` runnables.
 """
 
 
@@ -16,6 +16,7 @@ optional electric-field drift. Also provides ``MassCondensation``,
 # pyright: basic
 
 from particula.dynamics.dilution import (
+    DilutionStrategy,
     get_dilution_rate,
     get_volume_dilution_coefficient,
 )
@@ -37,6 +38,7 @@ from particula.dynamics.wall_loss import (
 from particula.dynamics.particle_process import (
     MassCondensation,
     Coagulation,
+    Dilution,
     WallLoss,
 )
 
