@@ -5,6 +5,7 @@ Import direct low-level step functions from this package:
     from particula.gpu.kernels import (
         coagulation_step_gpu,
         condensation_step_gpu,
+        dilution_step_gpu,
     )
 
 Lower-level helper kernels remain importable from their concrete modules.
@@ -15,11 +16,16 @@ from __future__ import annotations
 from importlib import import_module
 from typing import Any
 
-__all__ = ["coagulation_step_gpu", "condensation_step_gpu"]
+__all__ = [
+    "coagulation_step_gpu",
+    "condensation_step_gpu",
+    "dilution_step_gpu",
+]
 
 _SYMBOL_TO_MODULE = {
     "coagulation_step_gpu": "particula.gpu.kernels.coagulation",
     "condensation_step_gpu": "particula.gpu.kernels.condensation",
+    "dilution_step_gpu": "particula.gpu.kernels.dilution",
 }
 
 
