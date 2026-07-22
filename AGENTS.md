@@ -425,28 +425,39 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
   transfer. Call it directly only when vapor pressure must be refreshed outside
   a condensation step.
 
-### GPU dilution P3 contract
+### GPU dilution P1–P4 contract
 
 - Import the supported direct low-level entry point with
   `from particula.gpu.kernels import dilution_step_gpu`.
-- P3 applies `c_new = c * exp(-alpha * time_step)` in place to particle and
-  gas concentrations, where `alpha = Q / V` has units `s^-1`, and returns the
-  identical containers. It preserves all other caller-owned fields.
+- Callers own CPU↔Warp transfer, device placement, synchronization, and the
+  mutable `WarpParticleData` and `WarpGasData` containers. There is no hidden
+  transfer or fallback.
+- P3 applies `c_new = c * exp(-alpha * time_step)` in place to fixed-shape
+  particle and gas concentrations, where `alpha = Q / V` has units `s^-1`, and
+  returns the identical containers. Masses and all other caller-owned fields
+  remain unchanged.
 - Entry-point preflight is deterministic and read-only. It validates coefficient
   form, `time_step`, mass storage, per-box coefficients, particle
   concentration, then gas concentration before any allocation, launch, or
   caller mutation. Coefficients and concentrations must be finite and
   nonnegative.
-- Particle masses must be same-device `wp.float64` rank-3 storage. Particle
-  and gas concentrations must be same-device `wp.float64` rank-2 storage with
-  exact mass-derived shapes; per-box coefficients must be same-device
-  `wp.float64` arrays shaped `(n_boxes,)`.
+- Coefficients may be finite nonnegative scalars or caller-owned same-device
+  `wp.float64` arrays shaped `(n_boxes,)`. Particle masses must be same-device
+  `wp.float64` rank-3 storage. Particle and gas concentrations must be
+  same-device `wp.float64` rank-2 storage with exact mass-derived shapes.
 - Zero scalar coefficients and zero time steps complete full preflight, then
   return as write-free no-ops without private allocation or kernel launch.
-- Rejected calls preserve caller-owned objects. Rollback after a successfully
-  launched kernel failure and broader parity remain deferred.
+- Rejected calls preserve caller-owned objects before launch. Rollback after a
+  successfully launched kernel failure is not promised.
+- E6-F1 supplies the upstream CPU finite-step oracle; E6-F9 is the future
+  integrated direct-call consumer. Independent Warp CPU float64 particle and
+  gas comparisons use `rtol=1e-12, atol=0`; CUDA is optional and skips cleanly
+  when unavailable. This is tolerance-based evidence, not bitwise parity.
+- Hidden transfers/fallbacks, a GPU runnable, resizing, graph capture,
+  autodiff, performance claims, and broad integrated orchestration remain
+  deferred.
 
-Focused P3 contract run:
+Focused P1–P4 contract run:
 
 ```bash
 pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror

@@ -17,6 +17,10 @@ GUIDE_PATH = ROOT / "docs/Features/dilution_strategy_system.md"
 FEATURES_INDEX_PATH = ROOT / "docs/Features/index.md"
 EXAMPLES_INDEX_PATH = ROOT / "docs/Examples/index.md"
 DOCS_INDEX_PATH = ROOT / "docs/index.md"
+FOUNDATION_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
+ROADMAP_PATH = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
+AGENTS_PATH = ROOT / "AGENTS.md"
+KERNEL_EXPORTS_PATH = ROOT / "particula/gpu/kernels/__init__.py"
 SOURCE_URL = (
     "https://github.com/Gorkowski/particula/blob/main/"
     "docs/Examples/cpu_dilution.py"
@@ -40,21 +44,55 @@ def _normalized(content: str) -> str:
     return " ".join(content.split())
 
 
-def _local_destinations(content: str) -> list[str]:
-    """Return local Markdown link destinations without anchors or remote URLs."""
+def _local_destinations(content: str) -> list[tuple[str, str | None]]:
+    """Return local Markdown destinations and optional anchor fragments."""
     destinations = re.findall(r"\[[^]]+\]\(([^)]+)\)", content)
-    return [
-        destination.split("#", maxsplit=1)[0]
-        for destination in destinations
-        if not destination.startswith(("http://", "https://", "#"))
-    ]
+    local_destinations = []
+    for destination in destinations:
+        if destination.startswith(("http://", "https://")):
+            continue
+        target, separator, fragment = destination.partition("#")
+        local_destinations.append((target, fragment if separator else None))
+    return local_destinations
+
+
+def _markdown_anchor(heading: str) -> str:
+    """Return the normalized anchor corresponding to a Markdown heading."""
+    normalized = re.sub(r"[^\w\s-]", "", heading.lower())
+    return re.sub(r"[\s-]+", "-", normalized).strip("-")
+
+
+def _section(content: str, heading: str) -> str:
+    """Return a Markdown heading section through its next peer or parent."""
+    match = re.search(
+        rf"^(?P<marks>#+) {re.escape(heading)}\s*$",
+        content,
+        flags=re.MULTILINE,
+    )
+    assert match is not None, heading
+    level = len(match.group("marks"))
+    next_heading = re.search(
+        rf"^#{{1,{level}}} ", content[match.end() :], flags=re.MULTILINE
+    )
+    if next_heading is None:
+        return content[match.start() :]
+    return content[match.start() : match.end() + next_heading.start()]
 
 
 def _assert_local_links_resolve(path: Path) -> None:
-    """Assert every local Markdown destination from one document resolves."""
+    """Assert local Markdown files and optional anchors resolve."""
     content = path.read_text(encoding="utf-8")
-    for destination in _local_destinations(content):
-        assert (path.parent / destination).resolve().exists(), destination
+    for destination, fragment in _local_destinations(content):
+        target = (
+            path if destination == "" else (path.parent / destination).resolve()
+        )
+        assert target.exists(), destination
+        if fragment is not None:
+            target_content = target.read_text(encoding="utf-8")
+            headings = re.findall(r"^#+ (.+)$", target_content, re.MULTILINE)
+            assert fragment in {
+                _markdown_anchor(heading) for heading in headings
+            }
 
 
 def test_cpu_dilution_example_executes_exact_public_api_decay() -> None:
@@ -237,4 +275,168 @@ def test_cpu_dilution_discoverability_links_resolve() -> None:
         EXAMPLES_INDEX_PATH,
         DOCS_INDEX_PATH,
     ):
+        _assert_local_links_resolve(path)
+
+
+@pytest.mark.parametrize(
+    ("path", "heading", "required"),
+    [
+        pytest.param(
+            FOUNDATION_PATH,
+            "Direct GPU dilution",
+            (
+                "from particula.gpu.kernels import dilution_step_gpu",
+                "Callers own conversion, device placement, synchronization",
+                "fixed-shape, caller-owned in-place operation",
+                "changes only their `concentration` fields",
+                "same-device `wp.float64` Warp array with shape `(n_boxes,)`",
+                "preflight is ordered and read-only",
+                "zero scalar coefficient or zero time step",
+                "Warp CPU with float64 `rtol=1e-12, atol=0`",
+                "CUDA is optional and skips cleanly",
+            ),
+            id="foundation",
+        ),
+        pytest.param(
+            ROADMAP_PATH,
+            "Warp GPU Backend",
+            (
+                "from particula.gpu.kernels import dilution_step_gpu",
+                "Callers own CPU↔Warp transfer, device placement",
+                "fixed-shape, caller-owned kernel",
+                "mutates only concentration fields in place",
+                "same-device `wp.float64` `(n_boxes,)` coefficient array",
+                "Complete ordered preflight",
+                "scalar-zero coefficient or zero time step",
+                "Warp CPU use `rtol=1e-12, atol=0`",
+                "CUDA rows are optional and skip cleanly",
+            ),
+            id="roadmap",
+        ),
+        pytest.param(
+            AGENTS_PATH,
+            "GPU dilution P1–P4 contract",
+            (
+                "from particula.gpu.kernels import dilution_step_gpu",
+                "Callers own CPU↔Warp transfer, device placement",
+                "fixed-shape particle and gas concentrations",
+                "returns the identical containers",
+                "same-device `wp.float64` arrays shaped `(n_boxes,)`",
+                "Entry-point preflight is deterministic and read-only",
+                "Zero scalar coefficients and zero time steps",
+                "Warp CPU float64 particle and gas comparisons use",
+                "CUDA is optional and skips cleanly",
+            ),
+            id="maintainer-reference",
+        ),
+    ],
+)
+def test_direct_gpu_dilution_contract_is_published(
+    path: Path,
+    heading: str,
+    required: tuple[str, ...],
+) -> None:
+    """Each published direct-kernel contract retains its scoped guarantees."""
+    section = _normalized(_section(path.read_text(encoding="utf-8"), heading))
+
+    for feature in ("E6-F1", "E6-F9"):
+        assert re.search(rf"\b{feature}\b", section)
+    for snippet in required:
+        assert _normalized(snippet) in section
+
+
+def test_roadmap_replaces_stale_direct_gpu_dilution_status() -> None:
+    """Roadmap distinguishes delivered kernels from deferred orchestration."""
+    roadmap = ROADMAP_PATH.read_text(encoding="utf-8")
+    shipped = _section(roadmap, "Warp GPU Backend")
+    epic_f = _section(roadmap, "Epic F: GPU Process Completeness")
+    status = _normalized(shipped + epic_f)
+
+    assert "dilution has no process-level CPU reference" not in status
+    assert (
+        "GPU dilution kernel with parity tests against the CPU reference"
+        not in status
+    )
+    assert "Direct GPU dilution is shipped as a fixed-shape" in status
+    assert "GPU runnable and process orchestration" in status
+
+
+@pytest.mark.parametrize(
+    ("path", "heading"),
+    [
+        (FOUNDATION_PATH, "Direct GPU dilution"),
+        (ROADMAP_PATH, "Warp GPU Backend"),
+        (AGENTS_PATH, "GPU dilution P1–P4 contract"),
+    ],
+)
+def test_direct_gpu_dilution_sections_defer_unsupported_promises(
+    path: Path, heading: str
+) -> None:
+    """Direct-kernel documentation avoids unsupported capability guarantees."""
+    section = _normalized(_section(path.read_text(encoding="utf-8"), heading))
+
+    assert "bitwise parity" not in section.replace("not bitwise parity", "")
+    for capability in (
+        "hidden transfer",
+        "fallback",
+        "GPU runnable",
+        "resizing",
+        "graph capture",
+        "autodiff",
+        "performance",
+    ):
+        assert capability in section
+    assert "deferred" in section or "does not provide" in section
+
+
+def test_dilution_kernel_public_surface_is_lazy_export_metadata() -> None:
+    """Dilution remains declared without loading its Warp-dependent module."""
+    import particula.gpu.kernels as kernels
+
+    assert KERNEL_EXPORTS_PATH.is_file()
+    assert "dilution_step_gpu" in kernels.__all__
+    assert (
+        kernels._SYMBOL_TO_MODULE["dilution_step_gpu"]
+        == "particula.gpu.kernels.dilution"
+    )
+
+
+def test_local_link_resolver_supports_same_and_relative_anchors(
+    tmp_path: Path,
+) -> None:
+    """Local Markdown anchors resolve for same-document and relative links."""
+    source = tmp_path / "source.md"
+    target = tmp_path / "target.md"
+    source.write_text(
+        "# Source Heading\n[Same](source.md#source-heading) "
+        "[Other](target.md#other-heading)\n",
+        encoding="utf-8",
+    )
+    target.write_text("## Other Heading\n", encoding="utf-8")
+
+    _assert_local_links_resolve(source)
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "[Missing file](missing.md)",
+        "# Present\n[Missing anchor](target.md#absent)",
+    ],
+)
+def test_local_link_resolver_rejects_missing_files_and_anchors(
+    tmp_path: Path, content: str
+) -> None:
+    """Local Markdown resolver reports missing targets and fragments."""
+    source = tmp_path / "source.md"
+    source.write_text(content, encoding="utf-8")
+    (tmp_path / "target.md").write_text("# Present\n", encoding="utf-8")
+
+    with pytest.raises(AssertionError):
+        _assert_local_links_resolve(source)
+
+
+def test_direct_gpu_dilution_markdown_links_resolve() -> None:
+    """Edited Markdown guides retain valid local files and anchors."""
+    for path in (FOUNDATION_PATH, ROADMAP_PATH):
         _assert_local_links_resolve(path)
