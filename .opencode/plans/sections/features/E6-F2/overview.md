@@ -3,9 +3,9 @@
 ## Problem Statement
 
 Epic F needs dilution to run directly over fixed-shape Warp particle and gas
-containers. Today dilution is CPU-only, and adding host-side orchestration around
-each step would violate the explicit-transfer and GPU-residency boundaries needed
-by the later integrated process sequence.
+containers. E6-F2 now supplies that bounded direct-kernel capability; high-level
+host/process orchestration remains deferred so explicit-transfer and GPU-residency
+boundaries are preserved for the later integrated process sequence.
 
 ## Value Proposition
 
@@ -21,6 +21,10 @@ parity and invariant evidence for scalar/per-box, one/multi-box, multi-species,
 repeated-call, and exact no-op cases on Warp CPU, with CUDA exercised only when
 available. Rollback after a launched-kernel failure remains deferred; the feature
 does not add hidden transfers, fallback, resizing, or a high-level GPU runnable.
+P5 (#1399) publishes this delivered P1–P4 contract in the foundation guide,
+GPU roadmap, maintainer reference, README, and documentation indexes, with
+hardware-free regression tests for scoped wording, lazy export metadata, and
+local Markdown links/anchors.
 
 ## User Stories
 

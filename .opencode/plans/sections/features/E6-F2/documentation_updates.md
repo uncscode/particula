@@ -1,6 +1,6 @@
 # Documentation Updates
 
-## Shipped P1/P4 Status (#1395–#1398)
+## Shipped P1–P5 Status (#1395–#1399)
 
 - No user-facing documentation files changed in P1. The concrete-only contract
   is recorded in `particula/gpu/kernels/dilution.py` and its co-located tests;
@@ -16,22 +16,19 @@
 - P4 (#1398) changes only `particula/gpu/kernels/tests/dilution_test.py` to add
   independent NumPy-reference Warp CPU/CUDA-optional parity and invariant
   evidence. No production API or user-facing documentation files changed.
+- P5 (#1399) publishes the bounded P1–P4 direct-kernel contract in
+  `docs/Features/data-containers-and-gpu-foundations.md`,
+  `docs/Features/Roadmap/data-oriented-gpu.md`, and `AGENTS.md`. It reconciles
+  the README and documentation indexes, and extends
+  `particula/tests/dilution_docs_test.py` with hardware-free checks for scoped
+  contract/deferred wording, lazy `particula.gpu.kernels` export metadata, and
+  local Markdown file and anchor resolution. The documentation retains caller
+  ownership, Warp-CPU `rtol=1e-12, atol=0` evidence, optional CUDA, and the
+  non-bitwise/deferred-scope boundaries.
 
-## Future P5 Updates
+## Deferred Documentation Scope
 
-- Update `docs/Features/data-containers-and-gpu-foundations.md` with field
-  ownership: dilution mutates particle/gas concentration only, while transfers
-  remain explicit caller actions.
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` with E6-F2/T2 status,
-  supported scalar/per-box direct inputs, Warp CPU parity evidence, and deferred
-  Epic G orchestration.
-- Update `AGENTS.md` with the canonical direct import, input shapes, exact no-op
-  behavior, atomic validation, protected fields, and focused test command.
-- Cross-reference E6-F1 as the CPU oracle and E6-F9 as the future integrated
-  direct-call consumer; do not claim wall loss, nucleation, backend selection,
-  scheduling, graph capture, or performance support.
-- If a runnable example is added, keep CPU-to-Warp and Warp-to-CPU conversion
-  calls visible and outside `dilution_step_gpu`; default to Warp CPU and make
-  CUDA optional. A broader integrated example remains E6-F9 scope.
-- Update these plan sections with final API names, phase issue numbers, recorded
-  tolerances, focused commands, and shipped statuses as implementation lands.
+- A runnable example must keep CPU-to-Warp and Warp-to-CPU conversion calls
+  visible and outside `dilution_step_gpu`; it remains E6-F9 scope.
+- Do not claim wall loss, nucleation, backend selection, scheduling, graph
+  capture, autodiff, resizing, hidden fallbacks, or performance support.

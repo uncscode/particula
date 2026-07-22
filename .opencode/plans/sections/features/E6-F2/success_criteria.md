@@ -25,9 +25,9 @@
 
 ## Feature Completion Criteria
 
-- [ ] E6-F1/T1 is an explicit upstream dependency and its finite-step equation,
+- [x] E6-F1/T1 is an explicit upstream dependency and its finite-step equation,
   units, and validation semantics are the sole CPU parity oracle.
-- [ ] A public low-level `dilution_step_gpu` accepts documented scalar and
+- [x] A public low-level `dilution_step_gpu` accepts documented scalar and
   same-device per-box inputs and returns the same Warp container objects.
 - [x] Particle number concentration and scalar/multi-species gas mass
   concentration match the independent NumPy reference at `rtol=1e-12`,
@@ -39,15 +39,15 @@
   owner, and all shapes/devices/dtypes remain unchanged (P4 invariants, #1398).
 - [x] Supplied Warp input arrays and all container fields retain identity; the
   step performs no hidden transfer, CPU fallback, resizing, or host conversion.
-- [ ] Negative/nonfinite physical values, wrong types/shapes/dtypes/devices,
+- [x] Negative/nonfinite physical values, wrong types/shapes/dtypes/devices,
   inconsistent box dimensions, and invalid concentration state fail before any
   particle or gas mutation.
 - [x] Warp CPU parity is required and passes; CUDA executes the same matrix when
   available and skips cleanly otherwise (P4, #1398).
-- [ ] The direct API is exported through `particula.gpu.kernels`, focused tests
+- [x] The direct API is exported through `particula.gpu.kernels`, focused tests
   pass with warnings as errors, changed code meets >=80% coverage, and no
   threshold is lowered.
-- [ ] Documentation states explicit-transfer, support, and deferred boundaries
+- [x] Documentation states explicit-transfer, support, and deferred boundaries
   and does not claim an Epic G runnable, scheduler, or performance capability.
 
 ## Metrics

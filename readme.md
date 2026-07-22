@@ -78,23 +78,29 @@ temperature and pressure arrays. All accepted temperature, pressure, and
 coagulation volume inputs are validated as positive finite physical values
 before launch.
 
-The direct GPU dilution entry point is
-`particula.gpu.kernels.dilution_step_gpu`. It applies
+The direct GPU dilution P1–P4 entry point is imported with
+`from particula.gpu.kernels import dilution_step_gpu`. It applies
 `c_new = c * exp(-alpha * time_step)` in place to particle and gas
-concentrations, where `alpha = Q / V` `[s^-1]`, and returns the identical
-containers. Its P3 entry-point preflight is deterministic and read-only: it
-validates coefficient form, time, mass schema, per-box coefficient, particle
-concentration, then gas concentration. Invalid forms, storage schemas, and
-nonfinite or negative values reject before scalar/factor allocation, dilution
-launch, or caller mutation; array-value scans remain device-resident and do not
-materialize caller arrays on the CPU. Particle masses must be same-device
-`wp.float64`
-rank-3 storage; particle and gas concentrations must be same-device
-`wp.float64` rank-2 storage with exact mass-derived shapes. Per-box
-coefficients must be same-device `wp.float64` arrays shaped `(n_boxes,)`.
-Valid zero scalar coefficients and zero time steps complete this preflight and
-then return without a write, allocation, or launch. Rollback after a
-successfully launched kernel failure and broader parity remain deferred.
+concentrations, where `alpha = Q / V` `[s^-1]`, returns the identical
+containers, and preserves every other caller-owned field. Callers own CPU↔Warp
+transfers, device placement, and synchronization; there is no hidden transfer
+or CPU fallback. Coefficients are finite nonnegative scalars or same-device
+`wp.float64` Warp arrays shaped `(n_boxes,)`.
+
+Preflight is deterministic and read-only: it validates coefficient form, time,
+mass schema, per-box coefficient, particle concentration, then gas
+concentration. Invalid forms, storage schemas, and nonfinite or negative values
+reject before allocation, launch, or caller mutation. Particle masses must be
+same-device `wp.float64` rank-3 storage; particle and gas concentrations must
+be same-device `wp.float64` rank-2 storage with exact mass-derived shapes.
+Valid zero scalar coefficients and zero time steps complete preflight and then
+are write-free, allocation-free, launch-free no-ops. Rollback after a launched
+kernel failure is not promised. E6-F1 is the upstream CPU finite-step oracle;
+E6-F9 is the planned integrated direct-call consumer. Independent float64
+particle and gas comparisons on Warp CPU use `rtol=1e-12, atol=0`; CUDA is
+optional and skips cleanly when unavailable. This is tolerance-based evidence,
+not bitwise parity. GPU runnables, orchestration, resizing, graph capture,
+autodiff, and performance claims remain deferred.
 
 `coagulation_step_gpu` accepts an optional keyword-only `mechanism_config`
 from `particula.gpu.kernels.coagulation`; this configuration API is not
