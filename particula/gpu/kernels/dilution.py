@@ -5,9 +5,10 @@ rate and ``V`` is volume. This P3 module applies
 ``c_new = c * exp(-alpha * time_step)`` in place to particle and gas
 concentrations and returns the identical containers.
 
-Before allocating private storage, launching a kernel, or mutating
-concentrations, the entry point read-only validates the coefficient, time step,
-particle-mass schema, and particle and gas concentration schemas and values.
+Before allocating scalar/factor storage, launching a dilution kernel, or
+mutating concentrations, the entry point read-only validates the coefficient,
+time step, particle-mass schema, and particle and gas concentration schemas and
+values.
 Valid same-device per-box coefficients retain caller ownership and identity;
 scalar coefficients are broadcast into private active-device ``wp.float64``
 storage only after preflight. Zero scalar coefficients and zero time steps are
@@ -70,6 +71,28 @@ def _apply_gas_dilution(
     box, species = wp.tid()
     if coefficient[box] != 0.0:
         concentration[box, species] = concentration[box, species] * factors[box]
+
+
+@wp.kernel
+def _scan_nonnegative_finite_1d(
+    values: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Record whether a one-dimensional array has an invalid value."""
+    index = wp.tid()
+    if not wp.isfinite(values[index]) or values[index] < 0.0:
+        wp.atomic_add(invalid, 0, 1)
+
+
+@wp.kernel
+def _scan_nonnegative_finite_2d(
+    values: wp.array2d(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Record whether a two-dimensional array has an invalid value."""
+    row, column = wp.tid()
+    if not wp.isfinite(values[row, column]) or values[row, column] < 0.0:
+        wp.atomic_add(invalid, 0, 1)
 
 
 def _coerce_nonnegative_real(value: Any, name: str) -> float:
@@ -191,14 +214,24 @@ def _validate_mass_schema(particles: Any) -> tuple[Any, int, int, int, Any]:
 
 
 def _validate_nonnegative_finite_values(values: Any, name: str) -> None:
-    """Read Warp values safely and reject non-finite or negative entries."""
-    if getattr(values.device, "is_cpu", False) or str(values.device).startswith(
-        "cpu"
-    ):
-        values_np = np.asarray(values.numpy(), dtype=np.float64)
-    else:
-        values_np = np.asarray(type(values).numpy(values), dtype=np.float64)
-    if not np.all(np.isfinite(values_np)) or np.any(values_np < 0.0):
+    """Reject non-finite or negative values with a device-resident scan.
+
+    The single integer result is the only validation state copied to the host;
+    caller-owned arrays are never materialized on the host during preflight.
+    """
+    invalid = wp.zeros(1, dtype=wp.int32, device=values.device)
+    scan_kernel = (
+        _scan_nonnegative_finite_1d
+        if values.ndim == 1
+        else _scan_nonnegative_finite_2d
+    )
+    wp.launch(
+        scan_kernel,
+        dim=values.shape,
+        inputs=[values, invalid],
+        device=values.device,
+    )
+    if invalid.numpy()[0] != 0:
         raise ValueError(f"{name} must be finite and nonnegative.")
 
 
@@ -261,11 +294,16 @@ def dilution_step_gpu(
     Only the two concentration arrays are mutated; masses and all other
     caller-owned fields are preserved.
 
-    Rejected calls complete read-only preflight without allocation, kernel
-    launch, or mutation. A zero scalar coefficient or zero time step returns
-    only after full preflight, without private allocation or a launch. This
-    atomicity guarantee applies only before launch; rollback after a launched
-    kernel failure is not promised.
+    Validation order is coefficient form, time step, particle-mass schema,
+    per-box coefficient schema and values, particle concentration schema and
+    values, then gas concentration schema and values. Array values are scanned
+    on their active device, with only a scalar validation result observed by the
+    host; preflight never materializes a caller-owned array on the CPU.
+    Rejected calls complete read-only preflight before scalar/factor allocation,
+    dilution-kernel launch, or mutation. A zero scalar coefficient or zero time
+    step returns only after full preflight, without private scalar/factor
+    allocation or a dilution launch. This atomicity guarantee applies only
+    before launch; rollback after a launched kernel failure is not promised.
 
     Args:
         particles: Particle container with fixed-shape concentration storage.

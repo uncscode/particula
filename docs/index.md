@@ -180,9 +180,12 @@ print(result)
   `c_new = c * exp(-alpha * time_step)` in place to particle and gas
   concentrations, where `alpha = Q / V` `[s^-1]`, while returning the identical
    containers and preserving all other caller-owned fields. Deterministic,
-   read-only preflight rejects invalid coefficient/time forms, storage schemas,
-   and nonfinite or negative coefficient/concentration values before allocation,
-   launch, or mutation. Masses must be same-device `wp.float64` rank-3 storage;
+   read-only preflight orders coefficient form, time, mass schema, per-box
+   coefficient, particle concentration, then gas concentration validation.
+   Invalid forms, storage schemas, and nonfinite or negative values reject
+   before scalar/factor allocation, dilution launch, or mutation; array-value
+   scans stay device-resident and never materialize caller arrays on the CPU.
+   Masses must be same-device `wp.float64` rank-3 storage;
    concentrations must be same-device `wp.float64` rank-2 storage with exact
    mass-derived shapes; and per-box coefficients must be same-device
    `wp.float64` arrays shaped `(n_boxes,)`. Valid zero scalar coefficients and

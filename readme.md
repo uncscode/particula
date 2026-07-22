@@ -82,10 +82,13 @@ The direct GPU dilution entry point is
 `particula.gpu.kernels.dilution_step_gpu`. It applies
 `c_new = c * exp(-alpha * time_step)` in place to particle and gas
 concentrations, where `alpha = Q / V` `[s^-1]`, and returns the identical
-containers. Its P3 entry-point preflight is deterministic and read-only:
-invalid coefficient/time forms, storage schemas, and nonfinite or negative
-coefficient/concentration values reject before private allocation, kernel
-launch, or caller mutation. Particle masses must be same-device `wp.float64`
+containers. Its P3 entry-point preflight is deterministic and read-only: it
+validates coefficient form, time, mass schema, per-box coefficient, particle
+concentration, then gas concentration. Invalid forms, storage schemas, and
+nonfinite or negative values reject before scalar/factor allocation, dilution
+launch, or caller mutation; array-value scans remain device-resident and do not
+materialize caller arrays on the CPU. Particle masses must be same-device
+`wp.float64`
 rank-3 storage; particle and gas concentrations must be same-device
 `wp.float64` rank-2 storage with exact mass-derived shapes. Per-box
 coefficients must be same-device `wp.float64` arrays shaped `(n_boxes,)`.

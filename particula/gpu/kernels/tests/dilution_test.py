@@ -174,7 +174,7 @@ def _assert_full_state_unchanged(
 
 
 def _forbid_preflight_side_effects(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Fail if preflight allocates private storage or launches a kernel."""
+    """Fail if preflight allocates factors or launches dilution kernels."""
     from particula.gpu.kernels import dilution as dilution_module
 
     def unexpected_side_effect(*_args: Any, **_kwargs: Any) -> None:
@@ -182,7 +182,16 @@ def _forbid_preflight_side_effects(monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr(dilution_module.wp, "full", unexpected_side_effect)
     monkeypatch.setattr(dilution_module.wp, "empty", unexpected_side_effect)
-    monkeypatch.setattr(dilution_module.wp, "launch", unexpected_side_effect)
+    original_launch = dilution_module.wp.launch
+
+    def reject_dilution_launch(kernel: Any, *args: Any, **kwargs: Any) -> None:
+        assert kernel in (
+            dilution_module._scan_nonnegative_finite_1d,
+            dilution_module._scan_nonnegative_finite_2d,
+        )
+        original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(dilution_module.wp, "launch", reject_dilution_launch)
 
 
 def test_package_export_is_the_sole_supported_entry_point() -> None:
@@ -858,6 +867,85 @@ def test_invalid_concentration_values_preserve_full_caller_state(
         dilution_step_gpu(particles, gas, 1.0, 1.0)
 
     _assert_full_state_unchanged(particles, gas, 1.0, snapshot)
+
+
+@pytest.mark.parametrize("value", [-1.0, np.nan, np.inf, -np.inf])
+@pytest.mark.parametrize(
+    ("field", "coefficient", "time_step"),
+    [
+        ("coefficient", "per_box", 1.0),
+        ("coefficient", "per_box", 0.0),
+        ("particle", 1.0, 1.0),
+        ("particle", 0.0, 1.0),
+        ("particle", 1.0, 0.0),
+        ("gas", 1.0, 1.0),
+        ("gas", 0.0, 1.0),
+        ("gas", 1.0, 0.0),
+    ],
+)
+def test_invalid_values_reject_before_no_op_or_dilution_effects(
+    field, coefficient, time_step, value, monkeypatch
+) -> None:
+    """Invalid arrays reject before no-op return, allocation, or dilution."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    if field == "coefficient":
+        coefficient = wp.array([value, 0.5], dtype=wp.float64, device="cpu")
+        message = "coefficient"
+    elif field == "particle":
+        particles.concentration = wp.array(
+            [[value, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
+        )
+        message = "particles.concentration"
+    else:
+        gas.concentration = wp.array(
+            [[value, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
+        )
+        message = "gas.concentration"
+    snapshot = _full_state_snapshot(particles, gas, coefficient)
+    _forbid_preflight_side_effects(monkeypatch)
+
+    with pytest.raises(ValueError, match=f"{message} must be finite"):
+        dilution_step_gpu(particles, gas, coefficient, time_step)
+
+    _assert_full_state_unchanged(particles, gas, coefficient, snapshot)
+
+
+@pytest.mark.cuda
+@pytest.mark.parametrize("field", ["coefficient", "particle", "gas"])
+def test_cuda_invalid_values_use_device_scan(field) -> None:
+    """CUDA invalid arrays reject through the device scan without source copies."""
+    wp = _warp()
+    if not wp.is_cuda_available():
+        pytest.skip("CUDA is unavailable")
+    from particula.gpu.kernels import dilution as dilution_module
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers(device="cuda:0")
+    coefficient: Any = 1.0
+    if field == "coefficient":
+        coefficient = wp.array([np.nan, 0.5], dtype=wp.float64, device="cuda:0")
+        message = "coefficient"
+    elif field == "particle":
+        particles.concentration = wp.array(
+            [[np.nan, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cuda:0"
+        )
+        message = "particles.concentration"
+    else:
+        gas.concentration = wp.array(
+            [[np.nan, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cuda:0"
+        )
+        message = "gas.concentration"
+    snapshot = _full_state_snapshot(particles, gas, coefficient)
+
+    assert "values.numpy" not in inspect.getsource(
+        dilution_module._validate_nonnegative_finite_values
+    )
+    with pytest.raises(ValueError, match=f"{message} must be finite"):
+        dilution_step_gpu(particles, gas, coefficient, 1.0)
+    _assert_full_state_unchanged(particles, gas, coefficient, snapshot)
 
 
 @pytest.mark.parametrize("field", ["particle", "gas"])
