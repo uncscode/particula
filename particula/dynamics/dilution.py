@@ -280,8 +280,11 @@ def _preflight_concentration(
         ValueError: If the candidate is nonfinite, negative, or has a shape
             different from ``source``.
     """
-    candidate_array = np.asarray(candidate, dtype=np.float64)
-    source_array = np.asarray(source, dtype=np.float64)
+    try:
+        candidate_array = np.asarray(candidate, dtype=np.float64)
+        source_array = np.asarray(source, dtype=np.float64)
+    except (TypeError, ValueError) as error:
+        raise TypeError(f"{name} must be numeric.") from error
     if (
         candidate_array.shape != source_array.shape
         or not np.all(np.isfinite(candidate_array))
@@ -292,6 +295,119 @@ def _preflight_concentration(
             "the source shape."
         )
     return candidate_array
+
+
+def _preflight_dilution_aerosol(
+    aerosol: "Aerosol",
+    coefficient: np.float64,
+    time_step: np.float64,
+) -> dict[str, Any]:
+    """Validate dilution state and candidates before a concentration write.
+
+    Args:
+        aerosol: Aerosol whose supported concentration state is inspected.
+        coefficient: Validated nonnegative dilution coefficient [s⁻¹].
+        time_step: Validated nonnegative elapsed time [s].
+
+    Returns:
+        Sources, candidates, and rollback snapshots for an atomic commit.
+
+    Raises:
+        TypeError: If a required concentration or storage value is not numeric.
+        ValueError: If a required value is invalid or a candidate has an
+            incompatible shape.
+    """
+    try:
+        particle = aerosol.particles
+        gas_containers = (
+            aerosol.atmosphere.partitioning_species,
+            aerosol.atmosphere.gas_only_species,
+        )
+        particle_storage = particle.concentration
+        particle_volume = particle.get_volume()
+    except AttributeError as error:
+        raise TypeError(
+            "Aerosol dilution requires supported concentration state."
+        ) from error
+    try:
+        particle_source = particle.get_concentration()
+    except (AttributeError, TypeError, ValueError) as error:
+        raise TypeError("particle concentration must be numeric.") from error
+    gas_sources: list[object] = []
+    for gas, name in zip(
+        gas_containers,
+        ("partitioning gas concentration", "gas-only concentration"),
+        strict=True,
+    ):
+        try:
+            gas_sources.append(gas.get_concentration())
+        except (AttributeError, TypeError, ValueError) as error:
+            raise TypeError(f"{name} must be numeric.") from error
+
+    particle_source_array = _preflight_concentration(
+        particle_source, particle_source, "particle concentration"
+    )
+    partitioning_source = _preflight_concentration(
+        gas_sources[0], gas_sources[0], "partitioning gas concentration"
+    )
+    gas_only_source = _preflight_concentration(
+        gas_sources[1], gas_sources[1], "gas-only concentration"
+    )
+    try:
+        particle_storage_array = np.asarray(
+            particle_storage,
+            dtype=np.float64,
+        )
+    except (TypeError, ValueError, OverflowError) as error:
+        raise TypeError(
+            "particle concentration storage must be numeric."
+        ) from error
+    try:
+        volume = np.asarray(particle_volume, dtype=np.float64)
+    except (TypeError, ValueError, OverflowError) as error:
+        raise TypeError("particle volume must be numeric.") from error
+    if volume.ndim != 0 or not np.isfinite(volume) or volume <= 0.0:
+        raise ValueError("particle volume must be a finite positive scalar.")
+
+    particle_candidate = _preflight_concentration(
+        get_dilution_step(coefficient, particle_source_array, time_step),
+        particle_source_array,
+        "particle concentration",
+    )
+    partitioning_candidate = _preflight_concentration(
+        get_dilution_step(coefficient, partitioning_source, time_step),
+        partitioning_source,
+        "partitioning gas concentration",
+    )
+    gas_only_candidate = _preflight_concentration(
+        get_dilution_step(coefficient, gas_only_source, time_step),
+        gas_only_source,
+        "gas-only concentration",
+    )
+    with np.errstate(over="ignore", invalid="ignore"):
+        stored_particle_candidate = particle_candidate * volume
+    stored_particle_candidate = _preflight_concentration(
+        stored_particle_candidate,
+        particle_storage_array,
+        "stored particle concentration",
+    )
+
+    try:
+        gas_snapshots = tuple(
+            _snapshot_gas_backing_state(gas) for gas in gas_containers
+        )
+    except (AttributeError, TypeError, ValueError) as error:
+        raise TypeError(
+            "Aerosol dilution requires supported gas concentration storage."
+        ) from error
+    return {
+        "particle": particle,
+        "gas_containers": gas_containers,
+        "particle_candidate": stored_particle_candidate,
+        "gas_candidates": (partitioning_candidate, gas_only_candidate),
+        "particle_snapshot": np.copy(particle_storage_array),
+        "gas_snapshots": gas_snapshots,
+    }
 
 
 def _snapshot_gas_backing_state(
@@ -364,44 +480,17 @@ def dilute_aerosol(
     )
     time_step_scalar = _validate_nonnegative_scalar(time_step, "time_step")
 
-    particle = aerosol.particles
-    gas_containers = (
-        aerosol.atmosphere.partitioning_species,
-        aerosol.atmosphere.gas_only_species,
+    preflight = _preflight_dilution_aerosol(
+        aerosol,
+        coefficient_scalar,
+        time_step_scalar,
     )
-    particle_source = particle.get_concentration()
-    gas_sources = tuple(gas.get_concentration() for gas in gas_containers)
-
-    particle_candidate = _preflight_concentration(
-        get_dilution_step(
-            coefficient_scalar,
-            particle_source,
-            time_step_scalar,
-        ),
-        particle_source,
-        "particle concentration",
-    )
-    gas_candidates = tuple(
-        _preflight_concentration(
-            get_dilution_step(coefficient_scalar, source, time_step_scalar),
-            source,
-            "gas concentration",
-        )
-        for source in gas_sources
-    )
-    volume = np.asarray(particle.get_volume(), dtype=np.float64)
-    with np.errstate(over="ignore", invalid="ignore"):
-        stored_particle_candidate = particle_candidate * volume
-    stored_particle_candidate = _preflight_concentration(
-        stored_particle_candidate,
-        particle_source,
-        "stored particle concentration",
-    )
-
-    particle_snapshot = np.copy(np.asarray(particle.concentration))
-    gas_snapshots = tuple(
-        _snapshot_gas_backing_state(gas) for gas in gas_containers
-    )
+    particle = preflight["particle"]
+    gas_containers = preflight["gas_containers"]
+    stored_particle_candidate = preflight["particle_candidate"]
+    gas_candidates = preflight["gas_candidates"]
+    particle_snapshot = preflight["particle_snapshot"]
+    gas_snapshots = preflight["gas_snapshots"]
     written: list[Any] = []
     try:
         written.append(particle)
@@ -468,6 +557,10 @@ class DilutionStrategy:
         """
         concentration = aerosol.particles.get_concentration()
         return get_dilution_rate(self.coefficient, concentration)
+
+    def _preflight(self, aerosol: "Aerosol", time_step: np.float64) -> None:
+        """Validate concrete aerosol state before substep delegation."""
+        _preflight_dilution_aerosol(aerosol, self.coefficient, time_step)
 
     def step(
         self,

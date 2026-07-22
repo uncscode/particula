@@ -174,6 +174,29 @@ def test_dilution_execute_no_ops_are_exact(coefficient, time_step):
         npt.assert_array_equal(result, source)
 
 
+@pytest.mark.parametrize("time_step", [0.0, 2.0])
+def test_concrete_dilution_preflights_before_first_substep(
+    monkeypatch, time_step
+):
+    """Malformed concrete state raises before runnable strategy delegation."""
+    aerosol = _make_aerosol()
+    aerosol.particles.data.concentration[0, 0] = np.nan
+    strategy = DilutionStrategy(0.25)
+    calls: list[float] = []
+    original_step = strategy.step
+
+    def record_step(step_aerosol, step_time):
+        calls.append(step_time)
+        return original_step(step_aerosol, step_time)
+
+    monkeypatch.setattr(strategy, "step", record_step)
+
+    with pytest.raises(ValueError, match="particle concentration"):
+        Dilution(strategy).execute(aerosol, time_step, sub_steps=2)
+
+    assert calls == []
+
+
 @pytest.mark.parametrize(
     "coefficient, time_step", [(1e100, 1e100), (1e300, 2.0)]
 )
