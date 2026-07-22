@@ -1,5 +1,16 @@
 # Documentation Updates
 
+## Shipped P1 Status (#1395)
+
+- No user-facing documentation files changed in P1. The concrete-only contract
+  is recorded in `particula/gpu/kernels/dilution.py` and its co-located tests;
+  package-level import guidance remains premature because P1 intentionally does
+  not re-export the entry point.
+- This plan now records P1's supported metadata-only validation, no-launch/
+  no-write identity behavior, and the deferred P2/P3 boundaries.
+
+## Future P5 Updates
+
 - Update `docs/Features/data-containers-and-gpu-foundations.md` with field
   ownership: dilution mutates particle/gas concentration only, while transfers
   remain explicit caller actions.

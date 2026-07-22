@@ -182,6 +182,7 @@ release-validation commands:
 pytest particula/gpu/tests/cuda_availability_test.py -q
 pytest particula/gpu/kernels/tests/environment_test.py -q
 pytest particula/gpu/kernels/tests/thermodynamics_test.py -q -Werror
+pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror
 pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror
@@ -248,6 +249,16 @@ constant and canonical Buck modes across the freezing boundary, and verify
 invalid inputs leave the caller-owned vapor-pressure buffer unchanged. The
 refresh primitive remains a concrete-module API and is not condensation
 integration coverage.
+
+GPU dilution P1 coverage belongs in
+`particula/gpu/kernels/tests/dilution_test.py`. Mark it `warp`, defer Warp
+imports so missing Warp skips cleanly, and assert concrete-module-only status:
+the entry point must not be exported by `particula.gpu.kernels`. Cover scalar
+and metadata-valid per-box coefficient forms, identity return, and unchanged
+particle/gas concentrations on every valid and rejected path. P1 does not run
+a dilution kernel or establish numerical parity; the future finite-step equation
+`c_new = c * exp(-alpha * time_step)` and per-box value/state preflight belong
+to later phases.
 
 ### Device-aware tolerance policy
 

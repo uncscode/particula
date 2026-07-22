@@ -10,15 +10,17 @@ by the later integrated process sequence.
 ## Value Proposition
 
 E6-F2 ports the E6-F1/T1 dilution contract to a deterministic low-level Warp
-step. It gives GPU callers scalar and per-box dilution inputs, updates only
-particle number concentration and gas mass concentration in place, and provides
-CPU/Warp parity without hidden transfers, fallback, resizing, or a high-level
-GPU runnable.
+step. P1 is shipped in a concrete module: it freezes scalar/per-box coefficient
+metadata validation and a no-write, same-object return contract. P2 will add
+the concentration update, while P3/P4 will add complete state validation and
+CPU/Warp parity evidence without hidden transfers, fallback, resizing, or a
+high-level GPU runnable.
 
 ## User Stories
 
-- As a GPU simulation developer, I want dilution to mutate caller-owned Warp
-  concentrations directly so that timesteps remain device resident.
+- As a GPU simulation developer, I want a frozen direct-call input contract so
+  later resident dilution kernels can safely mutate caller-owned Warp
+  concentrations.
 - As a scientific maintainer, I want single- and multi-box results compared with
   the T1 CPU oracle so that finite-step semantics and units remain consistent.
 - As an API user, I want malformed calls rejected before mutation so that failed

@@ -1,10 +1,15 @@
 """Validate direct GPU dilution inputs without changing caller-owned state.
 
-The dilution coefficient is ``alpha = Q / V`` [s^-1].  This P1 entry point
-only freezes input ownership and validation: P2 will apply
-``c_new = c * exp(-alpha * time_step)``.  It launches no kernel and does not
-validate container state or values within per-box coefficient arrays; those
-responsibilities are deferred to later phases.
+The dilution coefficient is ``alpha = Q / V`` [s^-1], where ``Q`` is flow
+rate and ``V`` is volume. This concrete P1 module freezes input ownership and
+validation only. P2 will apply the finite-step update
+``c_new = c * exp(-alpha * time_step)``. P1 launches no kernel and returns the
+identical particle and gas containers without writing caller-owned state.
+
+Scalar coefficients are normalized to private active-device ``wp.float64``
+storage; valid same-device per-box coefficients retain caller ownership and
+identity. Validation of values within per-box coefficient arrays and complete
+particle/gas container-state preflight are deliberately deferred to P3.
 """
 
 from __future__ import annotations
@@ -100,7 +105,18 @@ def _normalize_coefficient(
 
 
 def _normalize_time_step(time_step: float | Any) -> float:
-    """Validate and return a finite, nonnegative time step in seconds."""
+    """Validate and return a finite, nonnegative time step in seconds.
+
+    Args:
+        time_step: Candidate Python or NumPy scalar duration [s].
+
+    Returns:
+        The duration as a Python float.
+
+    Raises:
+        TypeError: If ``time_step`` is not a supported real scalar.
+        ValueError: If ``time_step`` is non-finite or negative.
+    """
     return _coerce_nonnegative_real(time_step, "time_step")
 
 
@@ -119,11 +135,12 @@ def dilution_step_gpu(
 
     P1 accepts a finite, nonnegative Python/NumPy real scalar coefficient or a
     caller-owned, active-device ``wp.float64`` array shaped ``(n_boxes,)``.
-    Valid per-box arrays are retained by identity; their values are not scanned
-    until P3. This phase performs no kernel launch, state preflight, allocation
-    beyond private scalar normalization, or caller-state write. Therefore zero
-    scalar coefficients, zero time steps, and all per-box coefficients return
-    the same ``particles`` and ``gas`` objects unchanged.
+    Valid per-box arrays are retained by identity; P1 does not scan their
+    values, which is deferred to P3. Complete particle/gas state validation is
+    also deferred. This phase performs no kernel launch, state preflight,
+    allocation beyond private scalar normalization, or caller-state write.
+    Thus, zero scalar coefficients, zero time steps, and all valid per-box
+    coefficients return the same ``particles`` and ``gas`` objects unchanged.
 
     Args:
         particles: Particle container whose mass array supplies box/device
@@ -134,6 +151,12 @@ def dilution_step_gpu(
 
     Returns:
         The identical ``(particles, gas)`` input objects.
+
+    Raises:
+        TypeError: If a scalar coefficient or ``time_step`` is not a supported
+            real scalar.
+        ValueError: If a scalar value is non-finite or negative, or a per-box
+            coefficient has invalid dtype, rank, shape, or device metadata.
     """
     if not _is_warp_array_like(coefficient):
         _coerce_nonnegative_real(coefficient, "coefficient")

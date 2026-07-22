@@ -35,7 +35,9 @@ graph TD
 3. [Add Unit Tests](Details/Add_Unit_Test.md): Write unit tests to ensure the function works as intended.
 4. [Add Class](Details/Add_Class.md): Write the class that implements the functions.
 5. [Add Unit Tests](Details/Add_Unit_Test.md): Write unit tests for the class to ensure it works as intended.
-6. [Add to init](Details/Add_to_init.md): Add the new functions/class to the `__init__.py` file to make it accessible from the package.
+6. [Add to init](Details/Add_to_init.md): Export approved public functions/classes
+   through `__init__.py`; concrete or staged internal contracts may intentionally
+   remain unexported.
 7. [Add Examples](Details/Add_Example.md): Write examples to demonstrate the feature.
 
 > _Note:_ Each step would be one or more issues, e.g., one for the theory, 1+ for the functions, etc.

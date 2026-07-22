@@ -16,7 +16,9 @@ Create or update a module under particula/<area>/.
 1. Create a new issue on GitHub and assign it to yourself.
    1. Create a branch on your forked repo for this issue.
 2. Add a new function(s) to the appropriate module in particula/<area>/.
-   1. If the module is new, add it to `__init__.py`.
+   1. Add a package `__init__.py` export only when the function is an approved
+      public API. Concrete, staged, or internal-module contracts may deliberately
+      remain unexported.
    2. If the function is a helper, add prefix `_` to the function name.
    3. Write a docstring.
 4. Add type hints for all parameters and return values.

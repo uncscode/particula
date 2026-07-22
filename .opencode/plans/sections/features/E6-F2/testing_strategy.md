@@ -6,9 +6,11 @@ least the configured 80% and are never lowered.
 
 ## Per-Phase Approach
 
-- **P1 contract tests:** Assert public signature/import, scalar and same-device
-  `(n_boxes,)` coefficient forms, units, return identity, and deterministic
-  validation ordering. Reject host arrays and ambiguous shapes.
+- **P1 contract tests (shipped, #1395):** Assert concrete-module signature and
+  no-package-export boundary, scalar and same-device `(n_boxes,)` coefficient
+  forms, scalar broadcast/per-box identity, units, zero-box and no-write
+  identity returns, and deterministic validation ordering. Reject host arrays,
+  ambiguous shapes, invalid dtype/device metadata, and invalid scalar domains.
 - **P2 kernel tests:** Compare one-box and multi-box/multi-species outputs with
   an independent NumPy T1 oracle. Cover zeros, inactive particle slots,
   nonuniform coefficients, repeated steps, exact no-ops, and unchanged masses,
@@ -27,7 +29,8 @@ least the configured 80% and are never lowered.
 ## Regression and Coverage
 
 - Keep existing `particula/dynamics/tests/dilution_test.py` and E6-F1 tests green.
-- Add an import smoke test for `from particula.gpu.kernels import dilution_step_gpu`.
+- P1 tests assert direct concrete-module import; the package import smoke test
+  is P2 scope because P1 intentionally has no `particula.gpu.kernels` export.
 - Use `pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror` as the
   focused command; include relevant conversion/container tests when boundaries
   change.
