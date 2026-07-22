@@ -1,6 +1,6 @@
 # Documentation Updates
 
-## Shipped P1/P3 Status (#1395–#1397)
+## Shipped P1/P4 Status (#1395–#1398)
 
 - No user-facing documentation files changed in P1. The concrete-only contract
   is recorded in `particula/gpu/kernels/dilution.py` and its co-located tests;
@@ -13,6 +13,9 @@
   schemas, finite/nonnegative physical values, and validation before no-op
   returns/allocation/launches. Rollback after a launched-kernel failure remains
   deferred.
+- P4 (#1398) changes only `particula/gpu/kernels/tests/dilution_test.py` to add
+  independent NumPy-reference Warp CPU/CUDA-optional parity and invariant
+  evidence. No production API or user-facing documentation files changed.
 
 ## Future P5 Updates
 
