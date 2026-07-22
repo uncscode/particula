@@ -11,6 +11,18 @@
 - [x] P1 explicitly carries `alpha = Q / V` [s^-1] and the future P2 update
   `c_new = c * exp(-alpha * time_step)` without executing it.
 
+## P3 Status (#1397)
+
+- [x] Entry-point preflight validates coefficient form, time, masses, per-box
+  coefficient schema/values, particle concentration schema/values, then gas
+  concentration schema/values before an allocation, kernel launch, or write.
+- [x] Masses, coefficients, and concentration fields use their exact
+  same-device `wp.float64` Warp schemas; physical coefficient and concentration
+  values are finite and nonnegative.
+- [x] Rejections and valid scalar-zero/zero-time no-ops complete full
+  validation without private allocation or launch, as covered by state snapshots
+  and allocation/launch spies. Post-launch rollback remains deferred.
+
 ## Feature Completion Criteria
 
 - [ ] E6-F1/T1 is an explicit upstream dependency and its finite-step equation,

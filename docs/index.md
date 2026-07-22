@@ -175,15 +175,20 @@ print(result)
    not `particula.dynamics` public APIs. Run the
    [public API source example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py)
    with `python docs/Examples/cpu_dilution.py`.
-- GPU dilution P2 is the direct low-level
+- GPU dilution P3 is the direct low-level
   `particula.gpu.kernels.dilution_step_gpu` entry point. It applies
   `c_new = c * exp(-alpha * time_step)` in place to particle and gas
   concentrations, where `alpha = Q / V` `[s^-1]`, while returning the identical
-  containers and preserving all other caller-owned fields. It validates finite,
-  nonnegative scalar `coefficient` and `time_step`, or metadata-only
-  same-device `wp.float64` per-box coefficient arrays. Per-box value validation,
-  complete container preflight and rollback, and broader parity remain P3+
-  scope.
+   containers and preserving all other caller-owned fields. Deterministic,
+   read-only preflight rejects invalid coefficient/time forms, storage schemas,
+   and nonfinite or negative coefficient/concentration values before allocation,
+   launch, or mutation. Masses must be same-device `wp.float64` rank-3 storage;
+   concentrations must be same-device `wp.float64` rank-2 storage with exact
+   mass-derived shapes; and per-box coefficients must be same-device
+   `wp.float64` arrays shaped `(n_boxes,)`. Valid zero scalar coefficients and
+   zero time steps complete preflight and then no-op without allocation or
+   launch. Rollback after a successfully launched kernel failure and broader
+   parity remain deferred.
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the

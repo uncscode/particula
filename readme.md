@@ -78,17 +78,20 @@ temperature and pressure arrays. All accepted temperature, pressure, and
 coagulation volume inputs are validated as positive finite physical values
 before launch.
 
-The concrete-only P1 dilution contract is available solely at
-`particula.gpu.kernels.dilution`. It is deliberately not exported from
-`particula.gpu.kernels` and does not execute dilution: valid
-`dilution_step_gpu(particles, gas, coefficient, time_step)` calls only validate
-the frozen inputs and return the identical containers without a kernel launch
-or state write. It accepts a finite, nonnegative scalar coefficient or a
-same-device `wp.float64` per-box `(n_boxes,)` coefficient array, plus a finite,
-nonnegative scalar time step in seconds. The coefficient is `alpha = Q / V`
-`[s^-1]`; P2, not P1, will implement `c_new = c * exp(-alpha * time_step)`.
-Per-box coefficient-value and complete container-state validation are deferred
-to P3.
+The direct GPU dilution entry point is
+`particula.gpu.kernels.dilution_step_gpu`. It applies
+`c_new = c * exp(-alpha * time_step)` in place to particle and gas
+concentrations, where `alpha = Q / V` `[s^-1]`, and returns the identical
+containers. Its P3 entry-point preflight is deterministic and read-only:
+invalid coefficient/time forms, storage schemas, and nonfinite or negative
+coefficient/concentration values reject before private allocation, kernel
+launch, or caller mutation. Particle masses must be same-device `wp.float64`
+rank-3 storage; particle and gas concentrations must be same-device
+`wp.float64` rank-2 storage with exact mass-derived shapes. Per-box
+coefficients must be same-device `wp.float64` arrays shaped `(n_boxes,)`.
+Valid zero scalar coefficients and zero time steps complete this preflight and
+then return without a write, allocation, or launch. Rollback after a
+successfully launched kernel failure and broader parity remain deferred.
 
 `coagulation_step_gpu` accepts an optional keyword-only `mechanism_config`
 from `particula.gpu.kernels.coagulation`; this configuration API is not

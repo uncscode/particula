@@ -16,10 +16,12 @@ least the configured 80% and are never lowered.
    oracle; cover zeros, inactive particle slots, nonuniform coefficients,
    repeated steps, zero-time/scalar-zero and per-box-zero paths, zero extents,
    package export, and protected-field/container identity invariants.
-- **P3 validation tests:** Parameterize negative/nonfinite coefficient or time,
-  wrong rank/shape/dtype/device, inconsistent box dimensions, and invalid
-  concentration state. Snapshot every caller field and assert no launch,
-  allocation where contractually avoidable, or mutation occurs on failure.
+- **P3 validation tests (shipped, #1397):** Parameterize invalid coefficient or
+  time types/domains, host/Warp rank/shape/dtype/device errors, inconsistent
+  dimensions, and negative/nonfinite coefficient or concentration values.
+  Full-state snapshots and allocation/launch spies prove rejected calls and
+  valid scalar-zero/zero-time no-ops allocate and launch nothing; conflict cases
+  lock the documented validation precedence.
 - **P4 parity tests:** Require Warp CPU for scalar/per-box, single/multi-box,
   particle/gas, and edge-case fixtures. Record explicit `rtol`/`atol` for
   float64 CPU parity; run the same deterministic matrix on CUDA when available
