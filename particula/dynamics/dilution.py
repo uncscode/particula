@@ -430,3 +430,55 @@ def dilute_aerosol(
             raise original_error from rollback_error
         raise
     return aerosol
+
+
+class DilutionStrategy:
+    """Apply a shared chamber dilution coefficient to an aerosol.
+
+    The strategy delegates all container mutation and time-step validation to
+    :func:`dilute_aerosol`.
+
+    Args:
+        coefficient: Scalar chamber dilution coefficient [s⁻¹], finite and
+            nonnegative.
+    """
+
+    def __init__(self, coefficient: float | np.number):
+        """Initialize the strategy with a validated dilution coefficient.
+
+        Args:
+            coefficient: Scalar chamber dilution coefficient [s⁻¹], finite and
+                nonnegative.
+        """
+        self.coefficient = _validate_nonnegative_scalar(
+            coefficient, "coefficient"
+        )
+
+    def rate(self, aerosol: "Aerosol") -> float | NDArray[np.float64]:
+        """Calculate the particle-number dilution rate.
+
+        Args:
+            aerosol: Aerosol providing physical particle-number concentration.
+
+        Returns:
+            Particle-number concentration rate [1/(m³ s)] with the scalar or
+            array shape of the physical particle-number concentration.
+        """
+        concentration = aerosol.particles.get_concentration()
+        return get_dilution_rate(self.coefficient, concentration)
+
+    def step(
+        self,
+        aerosol: "Aerosol",
+        time_step: float | np.number,
+    ) -> "Aerosol":
+        """Apply dilution to the aerosol in place.
+
+        Args:
+            aerosol: Aerosol whose particle and gas concentrations are diluted.
+            time_step: Elapsed time [s], validated by :func:`dilute_aerosol`.
+
+        Returns:
+            The identical, mutated aerosol instance.
+        """
+        return dilute_aerosol(aerosol, self.coefficient, time_step)

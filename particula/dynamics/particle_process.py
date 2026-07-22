@@ -5,8 +5,13 @@ Includes, condensation (and evaporation), coagulation, and deposition.
 from typing import Any, cast
 
 import numpy as np
+from numpy.typing import NDArray
 
 from particula.aerosol import Aerosol
+from particula.dynamics.dilution import (
+    DilutionStrategy,
+    _validate_nonnegative_scalar,
+)
 from particula.gas.species import GasSpecies
 from particula.particles.representation import ParticleRepresentation
 
@@ -308,3 +313,68 @@ class WallLoss(RunnableABC):
             temperature=aerosol.atmosphere.temperature,
             pressure=aerosol.atmosphere.total_pressure,
         )
+
+
+class Dilution(RunnableABC):
+    """Apply a dilution strategy over one or more equal substeps.
+
+    Args:
+        dilution_strategy: Strategy that calculates dilution rates and updates
+            aerosol concentrations.
+    """
+
+    def __init__(self, dilution_strategy: DilutionStrategy):
+        """Initialize the dilution runnable.
+
+        Args:
+            dilution_strategy: Strategy that applies dilution to an aerosol.
+        """
+        self.dilution_strategy = dilution_strategy
+
+    def rate(self, aerosol: Aerosol) -> float | NDArray[np.float64]:
+        """Return the particle-number dilution rate.
+
+        Args:
+            aerosol: Aerosol whose particle concentration is evaluated.
+
+        Returns:
+            Particle-number concentration rate [1/(m³ s)].
+        """
+        return self.dilution_strategy.rate(aerosol)
+
+    def execute(
+        self,
+        aerosol: Aerosol,
+        time_step: float | np.number,
+        sub_steps: int | np.integer = 1,
+    ) -> Aerosol:
+        """Apply dilution over the provided total time step.
+
+        Args:
+            aerosol: Aerosol to mutate in place.
+            time_step: Total elapsed time [s], finite and nonnegative.
+            sub_steps: Positive count of equal internal dilution steps.
+
+        Returns:
+            The identical, mutated aerosol instance.
+
+        Raises:
+            ValueError: If ``sub_steps`` is not a positive integer or
+                ``time_step`` is invalid.
+            TypeError: If ``time_step`` is not numeric.
+        """
+        if (
+            isinstance(sub_steps, bool)
+            or not isinstance(sub_steps, (int, np.integer))
+            or sub_steps <= 0
+        ):
+            raise ValueError("sub_steps must be a positive integer.")
+
+        validated_time_step = _validate_nonnegative_scalar(
+            time_step,
+            "time_step",
+        )
+        sub_step_time_step = validated_time_step / sub_steps
+        for _ in range(sub_steps):
+            self.dilution_strategy.step(aerosol, sub_step_time_step)
+        return aerosol
