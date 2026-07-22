@@ -1,5 +1,10 @@
 # Phase Details
 
+## Sequencing
+
+E6-F5 and E6-F6 must ship first. Complete P1 through P3 before public APIs in
+P4/P5, then run P6 conservation validation before P7 documentation.
+
 - [ ] **E6-F7-P1:** Freeze bounded nucleation strategy and scientific contract with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Define activation/kinetic equations, SI units, validity gates, injection composition, citations, and fail-closed behavior.

@@ -1,5 +1,10 @@
 # Phase Details
 
+## Sequencing
+
+Complete the CPU predicate and activation phases P1/P2 before GPU discovery in
+P3 and GPU activation/parity in P4; P5 documents the completed contract.
+
 - [ ] **E6-F5-P1:** Define CPU slot predicates and exact diagnostics with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Freeze active, free, and invalid-state semantics and return exact per-box counts plus ascending free indices without mutation.

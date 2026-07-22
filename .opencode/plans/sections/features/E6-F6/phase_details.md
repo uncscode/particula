@@ -1,5 +1,10 @@
 # Phase Details
 
+## Sequencing
+
+E6-F5 is required. Complete P1 through P5 in order before P6 conservation
+validation; P7 documents only the validated policy, precedence, and bounds.
+
 - [ ] **E6-F6-P1:** Freeze exhaustion policy, precedence, and conservation contracts with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Define defaults, independent controls, transactional failure ordering, diagnostics, and exact versus bounded invariants.

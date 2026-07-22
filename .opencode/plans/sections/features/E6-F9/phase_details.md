@@ -1,5 +1,10 @@
 # Phase Details
 
+## Sequencing
+
+All E6-F1 through E6-F8 plans must ship before integration. Complete P1 before
+P2, use P2 evidence for P3, and close E6 in P4 only after P1-P3 pass.
+
 - [ ] **E6-F9-P1:** Build integrated fixed-shape validation fixtures and invariants with tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Define deterministic multi-process fixtures, snapshots, and

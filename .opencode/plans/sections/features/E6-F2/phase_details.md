@@ -1,5 +1,10 @@
 # Phase Details
 
+## Sequencing
+
+E6-F1 must provide the canonical CPU contract before P1. Complete P1 through
+P4 in order; P5 documents only the shipped implementation and parity evidence.
+
 - [ ] **E6-F2-P1:** Define scalar and per-box dilution input contract with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Freeze coefficient, time, shape, dtype, device, return, and no-op semantics against T1.
