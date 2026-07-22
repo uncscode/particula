@@ -425,22 +425,28 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
   transfer. Call it directly only when vapor pressure must be refreshed outside
   a condensation step.
 
-### GPU dilution P2 contract
+### GPU dilution P3 contract
 
 - Import the supported direct low-level entry point with
   `from particula.gpu.kernels import dilution_step_gpu`.
-- P2 applies `c_new = c * exp(-alpha * time_step)` in place to particle and
+- P3 applies `c_new = c * exp(-alpha * time_step)` in place to particle and
   gas concentrations, where `alpha = Q / V` has units `s^-1`, and returns the
   identical containers. It preserves all other caller-owned fields.
-- P2 retains P1's coefficient contract: scalar coefficients must be finite and
-  nonnegative; caller-owned per-box coefficients must be same-device
-  `wp.float64` arrays shaped `(n_boxes,)` and have metadata-only validation.
-  Zero scalar coefficients and zero time steps are write-free no-ops.
-- Per-box coefficient-value validation, concentration-value validation, full
-  container preflight, rollback after a kernel failure, and broader parity are
-  deferred to P3 and later phases.
+- Entry-point preflight is deterministic and read-only. It validates coefficient
+  form, `time_step`, mass storage, per-box coefficients, particle
+  concentration, then gas concentration before any allocation, launch, or
+  caller mutation. Coefficients and concentrations must be finite and
+  nonnegative.
+- Particle masses must be same-device `wp.float64` rank-3 storage. Particle
+  and gas concentrations must be same-device `wp.float64` rank-2 storage with
+  exact mass-derived shapes; per-box coefficients must be same-device
+  `wp.float64` arrays shaped `(n_boxes,)`.
+- Zero scalar coefficients and zero time steps complete full preflight, then
+  return as write-free no-ops without private allocation or kernel launch.
+- Rejected calls preserve caller-owned objects. Rollback after a successfully
+  launched kernel failure and broader parity remain deferred.
 
-Focused P2 contract run:
+Focused P3 contract run:
 
 ```bash
 pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror

@@ -27,11 +27,17 @@ P4 in order; P5 documents only the shipped implementation and parity evidence.
   - Boundary: Per-box coefficient-value validation, complete preflight, and
     rollback remain P3 work.
 
-- [ ] **E6-F2-P3:** Add atomic entry-point preflight validation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Reject invalid physical values and structural metadata before launches, allocation, or mutation.
+- [x] **E6-F2-P3:** Add atomic entry-point preflight validation with unit tests
+  - Issue: #1397 | Size: S | Status: Completed
+  - Delivered: Read-only preflight validates coefficient form, time, masses,
+    per-box coefficient schema/values, particle concentration, then gas
+    concentration. It requires exact same-device `wp.float64` Warp schemas and
+    finite nonnegative coefficient/concentration values before every no-op,
+    allocation, or launch; rejected calls preserve caller-owned state.
   - Files: `particula/gpu/kernels/dilution.py`, `particula/gpu/kernels/tests/dilution_test.py`
-  - Tests: Invalid type/rank/shape/dtype/device/domain/state and snapshot-based atomicity.
+  - Tests: Invalid type/rank/shape/dtype/device/domain/state, precedence,
+    full-state snapshots, and no-allocation/no-launch spies. Rollback after a
+    successfully launched kernel failure remains out of scope.
 
 - [ ] **E6-F2-P4:** Add CPU and Warp multi-box parity and invariant tests
   - Issue: TBD | Size: S | Status: Not Started

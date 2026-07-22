@@ -1,15 +1,18 @@
 """Apply fixed-shape direct GPU dilution to caller-owned concentrations.
 
 The dilution coefficient is ``alpha = Q / V`` [s^-1], where ``Q`` is flow
-rate and ``V`` is volume. This concrete P2 module applies the finite-step
-update ``c_new = c * exp(-alpha * time_step)`` in place to particle and gas
-concentrations, while returning the identical containers.
+rate and ``V`` is volume. This P3 module applies
+``c_new = c * exp(-alpha * time_step)`` in place to particle and gas
+concentrations and returns the identical containers.
 
-Scalar coefficients are normalized to private active-device ``wp.float64``
-storage only after complete read-only preflight; valid same-device per-box
-coefficients retain caller ownership and identity. Zero scalar coefficients and
-zero time steps are write-free no-ops after that preflight. Rollback after a
-successfully launched kernel failure is not promised.
+Before allocating private storage, launching a kernel, or mutating
+concentrations, the entry point read-only validates the coefficient, time step,
+particle-mass schema, and particle and gas concentration schemas and values.
+Valid same-device per-box coefficients retain caller ownership and identity;
+scalar coefficients are broadcast into private active-device ``wp.float64``
+storage only after preflight. Zero scalar coefficients and zero time steps are
+write-free no-ops only after full preflight. Rollback after a successfully
+launched kernel failure is not promised.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -258,10 +261,11 @@ def dilution_step_gpu(
     Only the two concentration arrays are mutated; masses and all other
     caller-owned fields are preserved.
 
-    Every rejected call completes no allocation, kernel launch, or mutation.
-    A zero scalar coefficient or zero time step returns only after full
-    preflight, without private allocation or a launch. Rollback after a
-    successfully launched kernel failure is not promised.
+    Rejected calls complete read-only preflight without allocation, kernel
+    launch, or mutation. A zero scalar coefficient or zero time step returns
+    only after full preflight, without private allocation or a launch. This
+    atomicity guarantee applies only before launch; rollback after a launched
+    kernel failure is not promised.
 
     Args:
         particles: Particle container with fixed-shape concentration storage.

@@ -2,9 +2,10 @@
 
 Deliver a low-level `dilution_step_gpu` over fixed-shape `WarpParticleData` and
 `WarpGasData`, using the E6-F1 CPU finite-step contract as the parity oracle.
-P1 (#1395) shipped the concrete-module input contract. P2 (#1396) ships the
-in-place concentration mutation and package export; P3-P4 retain full
-preflight/rollback and broader parity evidence.
+P1 (#1395) shipped the concrete-module input contract. P2 (#1396) shipped the
+in-place concentration mutation and package export. P3 (#1397) shipped full
+ordered read-only preflight; launched-kernel rollback and broader parity
+evidence remain P4 work.
 
 ## In Scope
 
@@ -14,8 +15,9 @@ preflight/rollback and broader parity evidence.
   array identity retention and P1 no-write identity return.
 - Fixed-shape particle-number and gas-mass concentration kernels for one or
   multiple boxes/species, applying `exp(-alpha * time_step)` in place.
-- Scalar coefficient/time validation plus launch-safety container shape, dtype,
-  and device metadata validation before non-no-op writes.
+- Complete ordered preflight before all no-op returns, allocation, and launches:
+  exact same-device float64 Warp schemas plus finite nonnegative per-box
+  coefficient and concentration values.
 - Exact zero-coefficient and zero-time no-ops.
 - Identity/value invariants for caller inputs and all nondiluted container
   fields, and the sole public low-level export through `particula.gpu.kernels`.
@@ -28,5 +30,5 @@ preflight/rollback and broader parity evidence.
   allocation/resizing, graph capture, autodiff, or performance claims.
 - Wall loss, nucleation, slot activation/exhaustion, or integrated Epic F
   sequencing, which belong to sibling E6 features.
-- Per-box coefficient-value validation, complete concentration/container
-  preflight, atomic rollback, and broader CPU/Warp parity, which remain P3/P4.
+- Rollback after a successfully launched kernel failure and broader CPU/Warp
+  parity evidence, which remain P4.

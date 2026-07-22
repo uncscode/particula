@@ -12,14 +12,15 @@
 
 - [x] Validate launch-safety concentration ranks, box dimensions, `wp.float64` arrays, and same-device ownership before non-no-op launches (P2, #1396).
 - [x] Validate scalar coefficient and time forms/domains and per-box coefficient rank, shape, dtype, and device metadata without a caller-state write (P1, #1395).
-- [ ] Validate per-box coefficient values and finite nonnegative concentrations (P3).
-- [ ] Establish rejection ordering before private scalar-buffer allocation and before particle or gas mutation.
-- [ ] Reject NumPy/host arrays at the process boundary instead of transferring or falling back.
+- [x] Validate per-box coefficient values and finite nonnegative concentrations (P3, #1397).
+- [x] Establish documented rejection ordering before private scalar-buffer allocation and before particle or gas mutation (P3, #1397).
+- [x] Reject NumPy/host arrays at the process boundary instead of transferring or falling back (P3, #1397).
 
 ## Tooling / Tests
 
 - [x] Add `particula/gpu/kernels/tests/dilution_test.py` with P1 signature/import, normalization, identity/no-write, zero-box, and rejection-order coverage (#1395).
 - [x] Cover scalar and nonuniform per-box inputs, one/multiple boxes and species, inactive slots, repeated calls, and zero inputs (P2, #1396).
 - [x] Snapshot protected fields and caller-owned identities for P2 execution and metadata failures (#1396); full invalid-call atomicity remains P3.
+- [x] Add P3 snapshots, precedence cases, and allocation/launch spies for rejected and valid no-op calls (#1397).
 - [ ] Require Warp CPU parity and skip optional CUDA evidence cleanly when unavailable.
 - [x] Add direct package-import/API smoke tests and the focused `pytest ... -q -Werror` command (P2, #1396).

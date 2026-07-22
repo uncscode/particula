@@ -1,6 +1,6 @@
 # Documentation Updates
 
-## Shipped P1/P2 Status (#1395, #1396)
+## Shipped P1/P3 Status (#1395–#1397)
 
 - No user-facing documentation files changed in P1. The concrete-only contract
   is recorded in `particula/gpu/kernels/dilution.py` and its co-located tests;
@@ -8,8 +8,11 @@
 - P2 ships the code-docstring contract and package export for
   `particula.gpu.kernels.dilution_step_gpu`: it mutates only fixed-shape
   particle/gas concentrations with finite-step exponential decay and preserves
-  identity/protected fields. P3 retains coefficient-value validation, complete
-  preflight, and rollback.
+  identity/protected fields. P3 (#1397) updates the code-docstring contract and
+  co-located tests for ordered full preflight, exact same-device float64 Warp
+  schemas, finite/nonnegative physical values, and validation before no-op
+  returns/allocation/launches. Rollback after a launched-kernel failure remains
+  deferred.
 
 ## Future P5 Updates
 

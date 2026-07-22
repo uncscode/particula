@@ -2,14 +2,16 @@
 
 ## High-Level Design
 
-The P2 low-level step receives caller-owned Warp containers and
-either a finite nonnegative scalar coefficient or a same-device `wp.float64`
-per-box coefficient array. It validates scalar domains and Warp-array metadata.
-A scalar is normalized into private active-device storage, while a valid
-supplied Warp array is retained by identity. P2 validates launch-safety
-concentration metadata and applies the E6-F1 factor `exp(-alpha * time_step)`
-only to particle and gas concentrations. Per-box coefficient-value and complete
-container-state scans, plus rollback, are P3 work.
+The low-level step receives caller-owned Warp containers and either a finite
+nonnegative scalar coefficient or a same-device `wp.float64` per-box
+coefficient array. P3 completes read-only preflight in a fixed order:
+coefficient form/domain, time, mass schema, per-box coefficient schema/values,
+particle concentration schema/values, then gas concentration schema/values.
+Masses establish the active device and dimensions; scalar normalization into
+private device storage occurs only after all checks pass, while a valid supplied
+Warp array is retained by identity. Only then may P2's kernels apply E6-F1's
+`exp(-alpha * time_step)` to particle and gas concentrations. Rollback after a
+successfully launched-kernel failure remains deferred.
 
 ```text
 E6-F1 coefficient/update contract
@@ -18,7 +20,7 @@ caller explicit CPU -> Warp conversion (outside this API)
              |
 WarpParticleData + WarpGasData + alpha(scalar | n_boxes) + dt
              |
- P1/P2 scalar/domain + launch-safety metadata preflight
+ P3 complete ordered read-only preflight
               |
   scalar-zero/zero-time return identical containers (no launch/write)
                |
@@ -44,11 +46,11 @@ optional caller explicit Warp -> CPU conversion (outside this API)
   exported from `particula.gpu.kernels`, with no private helper exports.
 - **Finite Step:** P2 applies E6-F1's `alpha = Q / V` [s^-1] update
   `c_new = c * exp(-alpha * time_step)` in place.
-- **Validation Ordering:** P1 rejects invalid scalar coefficient form/domain
-  and Warp coefficient dtype/rank before `time_step` or container access.
-  After valid `time_step` input, it obtains particle metadata to check per-box
-  coefficient shape/device compatibility. Per-box values and complete container
-  state remain P3 scope.
+- **Validation Ordering:** P3 rejects coefficient form/domain before time or
+  container access; time before masses; masses before later fields; per-box
+  coefficient schema/values before concentrations; and particle schema/values
+  before gas schema/values. All accepted array fields have exact float64,
+  same-device Warp schemas and finite nonnegative values where physical.
 - **Workflow Hooks:** E6-F2 depends on E6-F1 fixtures and feeds E6-F9's direct
   GPU process sequence. It introduces no scheduler or high-level runnable.
 

@@ -11,11 +11,14 @@ by the later integrated process sequence.
 
 E6-F2 ports the E6-F1/T1 dilution contract to a deterministic low-level Warp
 step. P1 froze scalar/per-box coefficient metadata validation and a no-write,
-same-object return contract. P2 (#1396) now applies the finite-step
-concentration update in place and exports only `dilution_step_gpu` through
-`particula.gpu.kernels`. P3/P4 retain coefficient-value validation, complete
-state validation/rollback, and broader CPU/Warp parity evidence; the feature
-does not add hidden transfers, fallback, resizing, or a high-level GPU runnable.
+same-object return contract. P2 (#1396) applies the finite-step concentration
+update in place and exports only `dilution_step_gpu` through
+`particula.gpu.kernels`. P3 (#1397) adds ordered, read-only full preflight:
+exact float64 same-device Warp schemas and finite/nonnegative coefficient and
+concentration values are checked before no-op returns, private allocation, or a
+launch. Rollback after a launched-kernel failure and broader CPU/Warp parity
+evidence remain P4 scope; the feature does not add hidden transfers, fallback,
+resizing, or a high-level GPU runnable.
 
 ## User Stories
 
