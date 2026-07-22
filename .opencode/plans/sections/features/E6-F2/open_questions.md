@@ -17,12 +17,12 @@ reference decision and current direct-kernel conventions.
 - [x] Are concentration scans optional?
   - Decision: P3 requires finite nonnegative per-box coefficient and
     concentration scans, with exact float64 same-device Warp schemas, before
-    every no-op, allocation, or launch. Rejected-call atomicity is guaranteed by
-    read-only preflight; rollback after a launched-kernel failure remains P4
-    scope. There is no validation opt-out.
+every no-op, allocation, or launch. Rejected-call atomicity is guaranteed by
+read-only preflight; rollback after a launched-kernel failure remains deferred
+outside P4. There is no validation opt-out.
 - [x] What CPU/Warp tolerance is frozen?
-  - Decision: begin with `rtol=1e-12`, `atol=0` for changed finite nonzero
-    concentrations and exact equality for no-ops, zeros, identities, and
-    protected fields on required Warp CPU and optional CUDA. P4 records measured
-    errors and may use only the smallest fixture-specific relaxation justified
-    by evidence.
+  - Decision: P4 (#1398) uses `rtol=1e-12`, `atol=0` for changed finite-step
+    concentrations against an independent NumPy oracle, and exact equality for
+    scalar-zero/zero-time no-op concentrations, identities, and protected
+    fields on required Warp CPU and optional CUDA. This is deterministic
+    float64 agreement, not a bitwise replay claim.

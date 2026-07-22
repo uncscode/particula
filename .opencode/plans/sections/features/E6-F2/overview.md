@@ -16,9 +16,11 @@ update in place and exports only `dilution_step_gpu` through
 `particula.gpu.kernels`. P3 (#1397) adds ordered, read-only full preflight:
 exact float64 same-device Warp schemas and finite/nonnegative coefficient and
 concentration values are checked before no-op returns, private allocation, or a
-launch. Rollback after a launched-kernel failure and broader CPU/Warp parity
-evidence remain P4 scope; the feature does not add hidden transfers, fallback,
-resizing, or a high-level GPU runnable.
+launch. P4 (#1398) adds deterministic independent NumPy-reference finite-step
+parity and invariant evidence for scalar/per-box, one/multi-box, multi-species,
+repeated-call, and exact no-op cases on Warp CPU, with CUDA exercised only when
+available. Rollback after a launched-kernel failure remains deferred; the feature
+does not add hidden transfers, fallback, resizing, or a high-level GPU runnable.
 
 ## User Stories
 

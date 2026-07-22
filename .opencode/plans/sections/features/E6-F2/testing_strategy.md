@@ -22,10 +22,13 @@ least the configured 80% and are never lowered.
   Full-state snapshots and allocation/launch spies prove rejected calls and
   valid scalar-zero/zero-time no-ops allocate and launch nothing; conflict cases
   lock the documented validation precedence.
-- **P4 parity tests:** Require Warp CPU for scalar/per-box, single/multi-box,
-  particle/gas, and edge-case fixtures. Record explicit `rtol`/`atol` for
-  float64 CPU parity; run the same deterministic matrix on CUDA when available
-  and skip cleanly otherwise.
+- **P4 parity tests (shipped, #1398):** A test-local independent NumPy oracle
+  checks particle and gas concentrations separately at `rtol=1e-12`, `atol=0`.
+  Required Warp CPU covers scalar/per-box, one/multi-box, multi-species gas,
+  zero/inactive cells, repeated nonuniform calls, identities, protected state,
+  caller-owned coefficient preservation, and exact scalar-zero/zero-time
+  no-ops. The identical finite-step matrix runs on CUDA when available and
+  otherwise skips cleanly.
 - **P5 docs validation:** Verify links, import snippets, support/deferred tables,
   and focused commands.
 

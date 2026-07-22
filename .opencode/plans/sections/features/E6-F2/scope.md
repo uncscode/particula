@@ -4,8 +4,8 @@ Deliver a low-level `dilution_step_gpu` over fixed-shape `WarpParticleData` and
 `WarpGasData`, using the E6-F1 CPU finite-step contract as the parity oracle.
 P1 (#1395) shipped the concrete-module input contract. P2 (#1396) shipped the
 in-place concentration mutation and package export. P3 (#1397) shipped full
-ordered read-only preflight; launched-kernel rollback and broader parity
-evidence remain P4 work.
+ordered read-only preflight, and P4 (#1398) shipped test-only independent
+NumPy-reference Warp CPU/CUDA-optional parity and invariant evidence.
 
 ## In Scope
 
@@ -30,5 +30,5 @@ evidence remain P4 work.
   allocation/resizing, graph capture, autodiff, or performance claims.
 - Wall loss, nucleation, slot activation/exhaustion, or integrated Epic F
   sequencing, which belong to sibling E6 features.
-- Rollback after a successfully launched kernel failure and broader CPU/Warp
-  parity evidence, which remain P4.
+- Rollback after a successfully launched kernel failure; it remains deferred
+  after P4.

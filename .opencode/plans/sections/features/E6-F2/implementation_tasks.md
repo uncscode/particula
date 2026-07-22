@@ -22,5 +22,8 @@
 - [x] Cover scalar and nonuniform per-box inputs, one/multiple boxes and species, inactive slots, repeated calls, and zero inputs (P2, #1396).
 - [x] Snapshot protected fields and caller-owned identities for P2 execution and metadata failures (#1396); full invalid-call atomicity remains P3.
 - [x] Add P3 snapshots, precedence cases, and allocation/launch spies for rejected and valid no-op calls (#1397).
-- [ ] Require Warp CPU parity and skip optional CUDA evidence cleanly when unavailable.
+- [x] Require Warp CPU finite-step parity and run the identical optional CUDA
+  matrix with a clean unavailable-CUDA skip; cover independent NumPy-reference
+  scalar/per-box, one/multi-box, multi-species, repeated-call, invariant, and
+  exact no-op cases (P4, #1398).
 - [x] Add direct package-import/API smoke tests and the focused `pytest ... -q -Werror` command (P2, #1396).

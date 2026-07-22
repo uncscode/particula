@@ -29,21 +29,21 @@
   units, and validation semantics are the sole CPU parity oracle.
 - [ ] A public low-level `dilution_step_gpu` accepts documented scalar and
   same-device per-box inputs and returns the same Warp container objects.
-- [ ] Particle number concentration and scalar/multi-species gas mass
-  concentration match the independent CPU reference at recorded float64
-  tolerances for one and multiple boxes.
-- [ ] Zero coefficient/flow-equivalent input and zero elapsed time are exact
-  no-ops with no concentration or metadata writes.
-- [ ] Particle mass, charge, density, distribution coordinates and volume remain
+- [x] Particle number concentration and scalar/multi-species gas mass
+  concentration match the independent NumPy reference at `rtol=1e-12`,
+  `atol=0` for one and multiple boxes (P4, #1398).
+- [x] Zero coefficient/flow-equivalent input and zero elapsed time are exact
+  no-ops with no concentration or metadata writes (P4, #1398).
+- [x] Particle mass, charge, density, distribution coordinates and volume remain
   unchanged; gas molar mass, vapor pressure, partitioning, names held by the CPU
-  owner, and all shapes/devices/dtypes remain unchanged.
-- [ ] Supplied Warp input arrays and all container fields retain identity; the
+  owner, and all shapes/devices/dtypes remain unchanged (P4 invariants, #1398).
+- [x] Supplied Warp input arrays and all container fields retain identity; the
   step performs no hidden transfer, CPU fallback, resizing, or host conversion.
 - [ ] Negative/nonfinite physical values, wrong types/shapes/dtypes/devices,
   inconsistent box dimensions, and invalid concentration state fail before any
   particle or gas mutation.
-- [ ] Warp CPU parity is required and passes; CUDA executes the same matrix when
-  available and skips cleanly otherwise.
+- [x] Warp CPU parity is required and passes; CUDA executes the same matrix when
+  available and skips cleanly otherwise (P4, #1398).
 - [ ] The direct API is exported through `particula.gpu.kernels`, focused tests
   pass with warnings as errors, changed code meets >=80% coverage, and no
   threshold is lowered.

@@ -39,11 +39,17 @@ P4 in order; P5 documents only the shipped implementation and parity evidence.
     full-state snapshots, and no-allocation/no-launch spies. Rollback after a
     successfully launched kernel failure remains out of scope.
 
-- [ ] **E6-F2-P4:** Add CPU and Warp multi-box parity and invariant tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Record float64 tolerances and prove deterministic parity with E6-F1 across the acceptance matrix.
+- [x] **E6-F2-P4:** Add CPU and Warp multi-box parity and invariant tests
+  - Issue: #1398 | Size: S | Status: Completed
+  - Delivered: Test-only independent NumPy-reference finite-step evidence uses
+    `rtol=1e-12`, `atol=0` for required Warp CPU scalar/per-box cases and the
+    same optional CUDA matrix. It separately proves repeated nonuniform decay,
+    exact scalar-zero/zero-time no-ops, container/field identity, protected
+    state, and caller-owned per-box coefficient preservation.
   - Files: `particula/gpu/kernels/tests/dilution_test.py`
-  - Tests: Warp CPU required; optional CUDA; scalar/per-box, particle/gas, repeated-step, identity, and protected-field cases.
+  - Tests: One/multi-box and multi-species particle/gas fixtures include zero
+    cells/inactive slots; CUDA skips cleanly when unavailable. Production API
+    and documentation are unchanged.
 
 - [ ] **E6-F2-P5:** Update development documentation for direct GPU dilution
   - Issue: TBD | Size: XS | Status: Not Started
