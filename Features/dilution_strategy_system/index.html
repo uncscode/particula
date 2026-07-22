@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://uncscode.github.io/particula/Features/wall_loss_strategy_system/">
+        <link rel="canonical" href="https://uncscode.github.io/particula/Features/dilution_strategy_system/">
       
       
-        <link rel="prev" href="../particle-data-migration/">
+        <link rel="prev" href="../data-containers-and-gpu-foundations/">
       
       
-        <link rel="next" href="../Roadmap/">
+        <link rel="next" href="../particle-data-migration/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Wall Loss Strategy System - Particula</title>
+        <title>Dilution Strategy System - Particula</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#wall-loss-strategy-system" class="md-skip">
+        <a href="#dilution-strategy-system" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Wall Loss Strategy System
+              Dilution Strategy System
             
           </span>
         </div>
@@ -11342,10 +11342,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../dilution_strategy_system/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dilution Strategy System
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -11361,6 +11388,65 @@
   
 
       </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#public-api-and-equation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Public API and equation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#execution-validation-and-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Execution, validation, and recovery
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boundaries-and-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boundaries and example
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+
+    
+    
+  
+</nav>
+      
     </li>
   
 
@@ -11398,37 +11484,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Wall Loss Strategy System
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../wall_loss_strategy_system/" class="md-nav__link">
         
   
   
@@ -11444,387 +11503,6 @@
   
 
       </a>
-      
-        
-
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-benefits" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key Benefits
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#who-its-for" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Who It's For
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#capabilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Capabilities
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Capabilities">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#unified-wall-loss-api-in-particuladynamics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Unified wall loss API in particula.dynamics
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Unified wall loss API in particula.dynamics">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#charged-wall-loss-support" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Charged wall loss support
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#runnable-entry-point-wallloss" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Runnable entry point: WallLoss
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#spherical-wall-loss-strategy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Spherical wall loss strategy
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rectangular-wall-loss-strategy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rectangular wall loss strategy
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#builder-and-factory-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Builder and factory workflow
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#support-for-multiple-distribution-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Support for multiple distribution types
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#getting-started" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Getting Started
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Getting Started">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#quick-start-wall-loss-on-a-discrete-distribution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick start: wall loss on a discrete distribution
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prerequisites
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#typical-workflows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Typical Workflows
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Typical Workflows">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-build-a-particlerepresentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Build a ParticleRepresentation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-configure-a-sphericalwalllossstrategy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Configure a SphericalWallLossStrategy
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-combine-wall-loss-with-other-dynamics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Combine wall loss with other dynamics
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use Cases
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Use Cases">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#use-case-1-standalone-chamber-wall-loss" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use case 1: Standalone chamber wall loss
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#use-case-2-full-chamber-dynamics-with-wall-loss" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use case 2: Full chamber dynamics with wall loss
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Best Practices
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Limitations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related-documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related Documentation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#faq" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        FAQ
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="FAQ">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#should-i-use-the-function-based-or-strategy-based-wall-loss-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Should I use the function-based or strategy-based wall loss API?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#how-do-i-add-a-new-wall-loss-model-or-geometry" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How do I add a new wall loss model or geometry?
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See Also
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-
-    
-    
-  
-</nav>
-      
     </li>
   
 
@@ -14709,10 +14387,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#public-api-and-equation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Overview
+        Public API and equation
       
     </span>
   </a>
@@ -14720,10 +14398,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-benefits" class="md-nav__link">
+  <a href="#execution-validation-and-recovery" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Benefits
+        Execution, validation, and recovery
       
     </span>
   </a>
@@ -14731,332 +14409,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#who-its-for" class="md-nav__link">
+  <a href="#boundaries-and-example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Who It's For
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#capabilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Capabilities
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Capabilities">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#unified-wall-loss-api-in-particuladynamics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Unified wall loss API in particula.dynamics
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Unified wall loss API in particula.dynamics">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#charged-wall-loss-support" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Charged wall loss support
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#runnable-entry-point-wallloss" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Runnable entry point: WallLoss
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#spherical-wall-loss-strategy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Spherical wall loss strategy
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rectangular-wall-loss-strategy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rectangular wall loss strategy
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#builder-and-factory-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Builder and factory workflow
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#support-for-multiple-distribution-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Support for multiple distribution types
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#getting-started" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Getting Started
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Getting Started">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#quick-start-wall-loss-on-a-discrete-distribution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick start: wall loss on a discrete distribution
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prerequisites
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#typical-workflows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Typical Workflows
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Typical Workflows">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-build-a-particlerepresentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Build a ParticleRepresentation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-configure-a-sphericalwalllossstrategy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Configure a SphericalWallLossStrategy
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-combine-wall-loss-with-other-dynamics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Combine wall loss with other dynamics
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use Cases
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Use Cases">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#use-case-1-standalone-chamber-wall-loss" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use case 1: Standalone chamber wall loss
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#use-case-2-full-chamber-dynamics-with-wall-loss" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use case 2: Full chamber dynamics with wall loss
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Best Practices
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#limitations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Limitations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related-documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related Documentation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#faq" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        FAQ
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="FAQ">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#should-i-use-the-function-based-or-strategy-based-wall-loss-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Should I use the function-based or strategy-based wall loss API?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#how-do-i-add-a-new-wall-loss-model-or-geometry" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How do I add a new wall loss model or geometry?
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See Also
+        Boundaries and example
       
     </span>
   </a>
@@ -15086,313 +14442,67 @@
   
 
 
-<h1 id="wall-loss-strategy-system">Wall Loss Strategy System<a class="headerlink" href="#wall-loss-strategy-system" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p>Strategy-based wall loss for chamber simulations that plugs directly into particula's dynamics workflow.</p>
-</blockquote>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The wall loss strategy system lets you model particle deposition onto chamber walls using the same object-oriented patterns as condensation and coagulation. Instead of calling standalone rate functions, you work with strategy objects that operate on <code>ParticleRepresentation</code>, support multiple distribution types, and expose a consistent <code>rate</code> / <code>step</code> interface.</p>
-<p>This feature is built around user-facing APIs exposed via <code>particula.dynamics</code>:</p>
-<ul>
-<li><code>WallLossStrategy</code> – abstract base class for wall loss models.</li>
-<li><code>SphericalWallLossStrategy</code>, <code>RectangularWallLossStrategy</code>, and
-  <code>ChargedWallLossStrategy</code> – chamber implementations using existing wall loss
-  coefficient utilities plus electrostatic modifiers for charged particles.</li>
-<li><code>SphericalWallLossBuilder</code>, <code>RectangularWallLossBuilder</code>, and
-  <code>ChargedWallLossBuilder</code> – validated, unit-aware builders for configuring
-  strategies and electrostatic parameters (wall potential, electric field).</li>
-<li><code>WallLossFactory</code> – factory for selecting a wall loss geometry by name with
-  builder defaults.</li>
-<li><code>WallLoss</code> runnable – delegates to a wall loss strategy on <code>Aerosol</code>, splits
-  <code>time_step</code> across <code>sub_steps</code>, and clamps concentrations non-negative.</li>
-</ul>
-<h2 id="key-benefits">Key Benefits<a class="headerlink" href="#key-benefits" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Consistent dynamics workflow</strong>: Use the same strategy-based API (<code>rate</code>, <code>step</code>, <code>distribution_type</code>) as for condensation and coagulation.</li>
-<li><strong>Builder/factory parity with validation</strong>: Configure wall loss using the same unit-aware builder and factory patterns as other dynamics modules, with built-in checks for geometry and distribution types.</li>
-<li><strong>Direct integration with ParticleRepresentation</strong>: Apply wall loss directly to particle distributions without writing glue code.</li>
-<li><strong>Extensible wall loss models</strong>: Add new chamber geometries or wall loss models as additional <code>WallLossStrategy</code> implementations.</li>
-</ul>
-<h2 id="who-its-for">Who It's For<a class="headerlink" href="#who-its-for" title="Permanent link">&para;</a></h2>
-<p>This feature is designed for:</p>
-<ul>
-<li><strong>Chamber simulation users</strong>: Running time-dependent simulations where wall deposition competes with processes like condensation, coagulation, and dilution.</li>
-<li><strong>Model developers</strong>: Implementing new wall loss parameterizations while reusing particula's particle and dynamics infrastructure.</li>
-<li><strong>Experiment interpreters</strong>: Matching chamber experiments with simulations that treat wall loss as a first-class process.</li>
-</ul>
-<h2 id="capabilities">Capabilities<a class="headerlink" href="#capabilities" title="Permanent link">&para;</a></h2>
-<h3 id="unified-wall-loss-api-in-particuladynamics">Unified wall loss API in <code>particula.dynamics</code><a class="headerlink" href="#unified-wall-loss-api-in-particuladynamics" title="Permanent link">&para;</a></h3>
-<p>Wall loss is exposed alongside other dynamics components:</p>
+<h1 id="dilution-strategy-system">Dilution Strategy System<a class="headerlink" href="#dilution-strategy-system" title="Permanent link">&para;</a></h1>
+<p>The CPU dilution system provides a bounded chamber-loss process for a single
+<code>Aerosol</code>. It is the completed CPU contract from parent <strong>E6</strong>. <strong>E6-F2</strong> is a
+downstream consumer of this CPU reference only; this guide does not deliver
+E6-F2 or CPU/GPU parity.</p>
+<h2 id="public-api-and-equation">Public API and equation<a class="headerlink" href="#public-api-and-equation" title="Permanent link">&para;</a></h2>
+<p>Construct the public strategy and runnable through <code>particula.dynamics</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
 
-<span class="c1"># Abstract interface (not instantiated directly)</span>
-<span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLossStrategy</span>
-
-<span class="c1"># Concrete chamber implementations</span>
-<span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span>
-<span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">RectangularWallLossStrategy</span>
-
-<span class="c1"># Builder and factory API (also re-exported via particula.dynamics.wall_loss)</span>
-<span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossBuilder</span>
-<span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">RectangularWallLossBuilder</span>
-<span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLossFactory</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">DilutionStrategy</span><span class="p">(</span><span class="n">coefficient</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">dilution</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Dilution</span><span class="p">(</span><span class="n">strategy</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">dilution</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">sub_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">result</span> <span class="ow">is</span> <span class="n">aerosol</span>
 </code></pre></div>
-<p>All wall loss strategies share a common shape:</p>
+<p>Execution mutates the supplied <code>Aerosol</code> and returns that same <code>Aerosol</code>
+object. For chamber volume <code>V</code> [m³] and dilution flow <code>Q</code> [m³/s], the scalar
+coefficient is <code>alpha = Q / V</code> [s⁻¹]. Every supported concentration follows
+the exact exponential update</p>
+<p><code>c_new = c * exp(-alpha * time_step)</code>.</p>
+<p>Here <code>time_step</code> is in [s], particle number concentration is in [1/m³], and
+gas mass concentration is in [kg/m³]. The runnable operates on CPU scalar
+state: elementwise particle concentration, scalar partitioning gas
+concentration, and multi-species gas-only concentration are supported. This
+does not imply multi-box transport support.</p>
+<h2 id="execution-validation-and-recovery">Execution, validation, and recovery<a class="headerlink" href="#execution-validation-and-recovery" title="Permanent link">&para;</a></h2>
+<p><code>sub_steps</code> must be a positive, non-boolean Python or NumPy integer. For the
+concrete exact-exponential strategy, the runnable performs one total-duration
+operation, independent of <code>sub_steps</code>, so the whole call is retry-safe. Custom
+compatible strategies retain equal <code>time_step / sub_steps</code> slice delegation.
+The coefficient and duration must be finite, nonnegative real scalars;
+complex values are rejected, and booleans and non-scalars are rejected.</p>
+<p>A zero coefficient or zero duration is an exact no-op, but supported state is
+still preflighted even for a no-op. Concrete CPU dilution supports exactly one
+particle box and validates state
+before mutation. If validation fails, state is unchanged; if an unexpected
+setter failure occurs, already-written concentration state is rolled back.
+These atomicity and retry-safe failure guarantees let callers correct input and
+retry safely. Extreme finite decay may underflow to zero, but outputs remain
+finite and nonnegative.</p>
+<p>Dilution changes only particle number concentration and gas mass
+concentrations. It protects particle distribution/mass, charge, density,
+representation volume, gas names, molar masses, partitioning metadata, and
+atmospheric temperature and pressure.</p>
+<h2 id="boundaries-and-example">Boundaries and example<a class="headerlink" href="#boundaries-and-example" title="Permanent link">&para;</a></h2>
+<p>This CPU scalar contract excludes inlet composition or source terms, multi-box
+particle data and transport, GPU, Warp, CUDA, alternate-backend implementation or parity,
+backend selection, and performance claims.</p>
+<p><code>dilute_aerosol</code> and <code>get_dilution_step</code> are concrete-module-only helpers;
+they are not public <code>particula.dynamics</code> imports. Use the public strategy and
+runnable above for supported execution.</p>
+<p>The deterministic, hardware-free example uses only this public API:</p>
 <ul>
-<li>Initialize with physical parameters (e.g., wall eddy diffusivity, chamber
-  radius).</li>
-<li>Call <code>rate(particle, temperature, pressure)</code> to compute instantaneous loss
-  rate.</li>
-<li>Call <code>step(particle, temperature, pressure, time_step)</code> to advance the
-  system.</li>
+<li>Source: <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py">https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py</a></li>
+<li>Run: <code>python docs/Examples/cpu_dilution.py</code></li>
 </ul>
-<h4 id="charged-wall-loss-support">Charged wall loss support<a class="headerlink" href="#charged-wall-loss-support" title="Permanent link">&para;</a></h4>
-<p><code>ChargedWallLossStrategy</code> augments neutral wall loss with image-charge and
-optional electric-field drift effects. Configure it via
-<code>ChargedWallLossBuilder</code> or directly:</p>
-<div class="highlight"><pre><span></span><code><span class="n">charged_wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">ChargedWallLossStrategy</span><span class="p">(</span>
-    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
-    <span class="n">chamber_geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
-    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">wall_potential</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>        <span class="c1"># volts (optional)</span>
-    <span class="n">wall_electric_field</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span>  <span class="c1"># V/m (optional drift term)</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-<span class="p">)</span>
+<p>Focused regression commands are:</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/tests/dilution_docs_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/dynamics/tests/dilution_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/dynamics/tests/dilution_runnable_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/dynamics/tests/dilution_exports_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 </code></pre></div>
-<h3 id="runnable-entry-point-wallloss">Runnable entry point: <code>WallLoss</code><a class="headerlink" href="#runnable-entry-point-wallloss" title="Permanent link">&para;</a></h3>
-<p><code>WallLoss</code> is a <code>RunnableABC</code> implementation exported as <code>par.dynamics.WallLoss</code>.
-It operates on an <code>Aerosol</code> in the runnable pipeline, delegates <code>rate</code> and
-<code>step</code> to the provided wall loss strategy, splits <code>time_step</code> across any
-<code>sub_steps</code>, clamps concentrations to be non-negative after each sub-step, and
-works with spherical or rectangular strategies across all supported
-distribution types.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-
-<span class="n">wall_loss_strategy</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
-    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
-    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLoss</span><span class="p">(</span>
-    <span class="n">wall_loss_strategy</span><span class="o">=</span><span class="n">wall_loss_strategy</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Sub-steps split time_step and clamp concentrations after each sub-step</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-    <span class="n">aerosol</span><span class="p">,</span>
-    <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">,</span>
-    <span class="n">sub_steps</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Chain with another runnable in a single pipeline</span>
-<span class="n">coagulation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">Coagulation</span><span class="p">(</span>
-    <span class="n">coagulation_strategy</span><span class="o">=</span><span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">BrownianCoagulationStrategy</span><span class="p">(</span>
-        <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-    <span class="p">),</span>
-<span class="p">)</span>
-<span class="n">combined</span> <span class="o">=</span> <span class="n">coagulation</span> <span class="o">|</span> <span class="n">wall_loss</span>
-<span class="n">aerosol</span> <span class="o">=</span> <span class="n">combined</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="spherical-wall-loss-strategy">Spherical wall loss strategy<a class="headerlink" href="#spherical-wall-loss-strategy" title="Permanent link">&para;</a></h3>
-<p><code>SphericalWallLossStrategy</code> models deposition in a well-mixed spherical chamber. It:</p>
-<ul>
-<li>Reuses existing wall loss coefficient utilities for the underlying physics.</li>
-<li>Works with any <code>ParticleRepresentation</code> compatible with particula dynamics.</li>
-<li>Computes size-dependent loss rates and updates particle concentration over time.</li>
-</ul>
-<p>Typical initialization:</p>
-<div class="highlight"><pre><span></span><code><span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
-    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
-    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>          <span class="c1"># m</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div>
-<h3 id="rectangular-wall-loss-strategy">Rectangular wall loss strategy<a class="headerlink" href="#rectangular-wall-loss-strategy" title="Permanent link">&para;</a></h3>
-<p><code>RectangularWallLossStrategy</code> models deposition in box-shaped chambers. Pair it with <code>RectangularWallLossBuilder</code> to validate a (length, width, height) tuple and convert units before constructing the strategy.</p>
-<h3 id="builder-and-factory-workflow">Builder and factory workflow<a class="headerlink" href="#builder-and-factory-workflow" title="Permanent link">&para;</a></h3>
-<p>Builders and the factory give you a validated, unit-aware way to construct wall loss strategies and keep parity with other dynamics modules. Geometry lengths convert to meters and wall eddy diffusivity converts to 1/s; setters validate positivity and enforce a length-3 tuple for rectangular chambers. Distribution types are restricted to the supported set and default to <code>"discrete"</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-
-<span class="c1"># Chained builder with unit conversion and validation</span>
-<span class="n">wall_loss</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_wall_eddy_diffusivity</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">,</span> <span class="s2">&quot;1/s&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">set_chamber_radius</span><span class="p">(</span><span class="mf">50.0</span><span class="p">,</span> <span class="s2">&quot;cm&quot;</span><span class="p">)</span>  <span class="c1"># converts to 0.5 m</span>
-    <span class="o">.</span><span class="n">set_distribution_type</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="p">)</span>
-</code></pre></div>
-<p>For rectangular chambers, use <code>set_chamber_dimensions((L, W, H), units)</code>; each side must be positive and provided as a 3-tuple.</p>
-<div class="highlight"><pre><span></span><code><span class="n">factory</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">WallLossFactory</span><span class="p">()</span>
-<span class="n">rectangular</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(</span>
-    <span class="n">strategy_type</span><span class="o">=</span><span class="s2">&quot;rectangular&quot;</span><span class="p">,</span>
-    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;wall_eddy_diffusivity&quot;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">,</span>
-        <span class="s2">&quot;chamber_dimensions&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
-        <span class="s2">&quot;distribution_type&quot;</span><span class="p">:</span> <span class="s2">&quot;continuous_pdf&quot;</span><span class="p">,</span>
-    <span class="p">},</span>
-<span class="p">)</span>
-</code></pre></div>
-<p><code>WallLossFactory</code> is exported via both <code>particula.dynamics.wall_loss</code> and <code>particula.dynamics</code>, letting you select a geometry by name without manually instantiating builders.</p>
-<h3 id="support-for-multiple-distribution-types">Support for multiple distribution types<a class="headerlink" href="#support-for-multiple-distribution-types" title="Permanent link">&para;</a></h3>
-<p>The strategy system operates on the same distribution types used elsewhere in particula:</p>
-<ul>
-<li>"discrete" – radius-binned distributions.</li>
-<li>"continuous_pdf" – continuous probability-density representations.</li>
-<li>"particle_resolved" – ensembles of individual particles.</li>
-</ul>
-<p>You select the appropriate mode at initialization (or via builder/factory parameters) with <code>distribution_type</code>, and the strategy adjusts its <code>step</code> behavior to match the representation.</p>
-<h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
-<h3 id="quick-start-wall-loss-on-a-discrete-distribution">Quick start: wall loss on a discrete distribution<a class="headerlink" href="#quick-start-wall-loss-on-a-discrete-distribution" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">particula</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
-
-<span class="c1"># 1. Build a radius-binned particle distribution</span>
-<span class="n">particle</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-
-<span class="c1"># 2. Configure spherical wall loss</span>
-<span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
-    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
-    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># 3. Compute instantaneous wall loss rate</span>
-<span class="n">T</span> <span class="o">=</span> <span class="mf">298.15</span>  <span class="c1"># K</span>
-<span class="n">P</span> <span class="o">=</span> <span class="mf">101325.0</span>  <span class="c1"># Pa</span>
-<span class="n">rate</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">rate</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">)</span>
-
-<span class="c1"># 4. Advance the system by one time step</span>
-<span class="n">particle</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-    <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
-    <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-    <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">,</span>
-    <span class="n">time_step</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>  <span class="c1"># s</span>
-<span class="p">)</span>
-</code></pre></div>
-<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>particula</code> version 0.2.6 or later installed.</li>
-<li>A <code>ParticleRepresentation</code> instance (e.g., from one of the preset builders).</li>
-<li>Basic familiarity with particula's dynamics and particle-phase examples.</li>
-</ul>
-<h2 id="typical-workflows">Typical Workflows<a class="headerlink" href="#typical-workflows" title="Permanent link">&para;</a></h2>
-<h3 id="1-build-a-particlerepresentation">1. Build a ParticleRepresentation<a class="headerlink" href="#1-build-a-particlerepresentation" title="Permanent link">&para;</a></h3>
-<p>Start by constructing a particle distribution using existing builders:</p>
-<div class="highlight"><pre><span></span><code><span class="n">particle</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">par</span><span class="o">.</span><span class="n">particles</span><span class="o">.</span><span class="n">PresetParticleRadiusBuilder</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;m^3&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="p">)</span>
-</code></pre></div>
-<p>You can also use particle-resolved or continuous-PDF builders from the particle phase examples when you need finer control.</p>
-<h3 id="2-configure-a-sphericalwalllossstrategy">2. Configure a SphericalWallLossStrategy<a class="headerlink" href="#2-configure-a-sphericalwalllossstrategy" title="Permanent link">&para;</a></h3>
-<p>Choose physical parameters for your chamber and distribution type:</p>
-<div class="highlight"><pre><span></span><code><span class="n">wall_loss</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">SphericalWallLossStrategy</span><span class="p">(</span>
-    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
-    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">distribution_type</span><span class="o">=</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span>  <span class="c1"># or &quot;continuous_pdf&quot; / &quot;particle_resolved&quot;</span>
-<span class="p">)</span>
-</code></pre></div>
-<p>At this point you can:</p>
-<ul>
-<li>Inspect <code>wall_loss.rate(...)</code> to understand size-dependent loss.</li>
-<li>Call <code>wall_loss.step(...)</code> in a loop to model concentration decay.</li>
-</ul>
-<h3 id="3-combine-wall-loss-with-other-dynamics">3. Combine wall loss with other dynamics<a class="headerlink" href="#3-combine-wall-loss-with-other-dynamics" title="Permanent link">&para;</a></h3>
-<p>Wall loss strategies are designed to compose with other dynamics, such as condensation and coagulation, in a single time-stepping loop:</p>
-<div class="highlight"><pre><span></span><code><span class="n">condensation</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">CondensationIsothermal</span><span class="p">(</span>
-    <span class="n">molar_mass</span><span class="o">=</span><span class="mf">180e-3</span><span class="p">,</span>
-    <span class="n">diffusion_coefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
-    <span class="n">accommodation_coefficient</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># Time loop (pseudo-code)</span>
-<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_steps</span><span class="p">):</span>
-    <span class="c1"># Update particle size/composition</span>
-    <span class="n">particle</span> <span class="o">=</span> <span class="n">condensation</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-        <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-        <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">,</span>
-        <span class="n">time_step</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="c1"># Apply wall loss to the updated distribution</span>
-    <span class="n">particle</span> <span class="o">=</span> <span class="n">wall_loss</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-        <span class="n">particle</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-        <span class="n">pressure</span><span class="o">=</span><span class="n">P</span><span class="p">,</span>
-        <span class="n">time_step</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
-    <span class="p">)</span>
-</code></pre></div>
-<p>This pattern matches how other dynamics strategies are combined in chamber simulations.</p>
-<h2 id="use-cases">Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
-<h3 id="use-case-1-standalone-chamber-wall-loss">Use case 1: Standalone chamber wall loss<a class="headerlink" href="#use-case-1-standalone-chamber-wall-loss" title="Permanent link">&para;</a></h3>
-<p><strong>Scenario:</strong> You want to understand how quickly particles are lost to the walls of a well-mixed spherical chamber.</p>
-<p><strong>Solution:</strong> Build a radius-binned <code>ParticleRepresentation</code>, configure <code>SphericalWallLossStrategy</code>, and integrate <code>step</code> over the experiment duration to track normalized concentration decay.</p>
-<h3 id="use-case-2-full-chamber-dynamics-with-wall-loss">Use case 2: Full chamber dynamics with wall loss<a class="headerlink" href="#use-case-2-full-chamber-dynamics-with-wall-loss" title="Permanent link">&para;</a></h3>
-<p><strong>Scenario:</strong> You are modeling a chamber experiment where condensation growth, coagulation, and wall loss all act simultaneously.</p>
-<p><strong>Solution:</strong> Combine <code>SphericalWallLossStrategy</code> with existing condensation or coagulation strategies in a shared time loop. This lets you track how wall loss interacts with growth and collisions without custom coupling code.</p>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>wall_eddy_diffusivity</code></td>
-<td>Wall eddy diffusivity controlling wall mixing [m^2/s].</td>
-<td>Required</td>
-</tr>
-<tr>
-<td><code>chamber_radius</code></td>
-<td>Radius of the spherical chamber [m] (spherical builder).</td>
-<td>Required</td>
-</tr>
-<tr>
-<td><code>chamber_dimensions</code></td>
-<td>Length, width, height of rectangular chamber [m].</td>
-<td>Required (rectangular)</td>
-</tr>
-<tr>
-<td><code>distribution_type</code></td>
-<td><code>"discrete"</code>, <code>"continuous_pdf"</code>, or <code>"particle_resolved"</code>.</td>
-<td><code>"discrete"</code></td>
-</tr>
-</tbody>
-</table>
-<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>Match distribution type to your builder</strong>: Ensure <code>distribution_type</code> matches how your <code>ParticleRepresentation</code> was constructed to avoid unintended behavior.</li>
-<li><strong>Use builder/factory validation</strong>: Set parameters through the builders or factory to enforce positivity, 3D chamber dimensions, and allowed distribution types with automatic unit conversion.</li>
-<li><strong>Use physically reasonable parameters</strong>: Choose <code>wall_eddy_diffusivity</code>, <code>chamber_radius</code>, or <code>chamber_dimensions</code> consistent with your experimental setup.</li>
-<li><strong>Compose processes explicitly</strong>: When combining wall loss with other dynamics, keep a clear, ordered time loop so you can reason about which processes act first in each step.</li>
-</ol>
-<h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Supports spherical and rectangular chambers; other geometries require new strategies/builders to be added to the factory.</li>
-<li>Factory selection is limited to registered strategy names.</li>
-<li>Does not include a high-level chamber orchestrator; you are responsible for building the main time-stepping loop that combines multiple strategies.</li>
-</ul>
-<h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Hands-on guide</strong>: <a href="../../Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial/">Wall loss tutorial</a></li>
-<li><strong>Notebooks</strong>: <a href="../../Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy/">Spherical wall loss strategy</a></li>
-<li><strong>Dynamics overview</strong>: <a href="../../#wall-loss-strategies-and-runnable">Wall loss strategies</a></li>
-</ul>
-<h2 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h2>
-<h3 id="should-i-use-the-function-based-or-strategy-based-wall-loss-api">Should I use the function-based or strategy-based wall loss API?<a class="headerlink" href="#should-i-use-the-function-based-or-strategy-based-wall-loss-api" title="Permanent link">&para;</a></h3>
-<p>Use <code>SphericalWallLossStrategy</code> whenever you are already working with <code>ParticleRepresentation</code> and other dynamics strategies. The function-based API remains available for lower-level or legacy workflows.</p>
-<h3 id="how-do-i-add-a-new-wall-loss-model-or-geometry">How do I add a new wall loss model or geometry?<a class="headerlink" href="#how-do-i-add-a-new-wall-loss-model-or-geometry" title="Permanent link">&para;</a></h3>
-<p>Subclass <code>WallLossStrategy</code> in your own code or contribute a new strategy to particula that implements <code>loss_coefficient</code> using the appropriate wall loss physics, then expose it through <code>particula.dynamics</code>.</p>
-<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="../../Examples/Simulations/">Condensation strategies</a></li>
-<li><a href="../../Examples/Particle_Phase/">Particle phase examples</a></li>
-</ul>
 
 
 

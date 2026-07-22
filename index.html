@@ -11479,6 +11479,8 @@
       
         
       
+        
+      
     
     
     
@@ -11652,6 +11654,34 @@
   
   
     <li class="md-nav__item">
+      <a href="Features/dilution_strategy_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dilution Strategy System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="Features/particle-data-migration/" class="md-nav__link">
         
   
@@ -11739,7 +11769,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -11761,14 +11791,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -14853,6 +14883,13 @@
   runnable pipelines.</li>
 <li><a href="Features/wall_loss_strategy_system/">Wall loss strategy system</a> — chamber
   wall loss strategies with builders, factory, and runnable integration.</li>
+<li><a href="Features/dilution_strategy_system/">CPU dilution strategy system</a> —
+  construct supported processes with <code>par.dynamics.DilutionStrategy(coefficient)</code>
+  and <code>par.dynamics.Dilution(strategy)</code>. The concrete helper boundary remains:
+  <code>dilute_aerosol</code> and <code>get_dilution_step</code> are concrete-module-only helpers,
+  not <code>particula.dynamics</code> public APIs. Run the
+  <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py">public API source example</a>
+  with <code>python docs/Examples/cpu_dilution.py</code>.</li>
 <li><a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
   — canonical reference for <code>ParticleData</code>, <code>GasData</code>, <code>EnvironmentData</code>,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
