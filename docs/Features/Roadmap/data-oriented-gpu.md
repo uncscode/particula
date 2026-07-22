@@ -199,9 +199,10 @@ Known GPU physics gaps remain:
   coefficient or a same-device
   `wp.float64` `(n_boxes,)` coefficient array, returns the same particle and
   gas containers, and mutates only concentration fields in place. Callers own
-  CPU↔Warp transfer, device placement, and synchronization; there is no hidden
-  transfer or fallback. Complete ordered preflight rejects before launch, while
-  a scalar-zero coefficient or zero time step completes preflight then returns
+   CPU↔Warp transfer, device placement, and synchronization; there is no hidden
+   transfer or fallback. Complete ordered preflight may run validation scans that
+   allocate or launch, but rejected calls have no update launch or caller
+   mutation. A scalar-zero coefficient or zero time step completes preflight then returns
   as a write-free, no-update-kernel no-op; validation scans may still allocate
   or launch. Independent
   float64 particle and gas comparisons on Warp CPU use `rtol=1e-12, atol=0`;

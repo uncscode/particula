@@ -1226,28 +1226,88 @@ def test_cuda_invalid_values_use_device_scan(field) -> None:
     _assert_full_state_unchanged(particles, gas, coefficient, snapshot)
 
 
-@pytest.mark.parametrize("field", ["particle", "gas"])
-def test_concentration_second_dimension_mismatch_is_rejected(field) -> None:
-    """Concentration dimensions must exactly match mass particle/species axes."""
+def test_particle_concentration_second_dimension_mismatch_is_rejected() -> None:
+    """Particle concentration width must match the mass particle axis."""
     wp = _warp()
     from particula.gpu.kernels import dilution_step_gpu
 
     particles, gas = _containers()
-    if field == "particle":
-        particles.concentration = wp.ones(
-            (2, 1), dtype=wp.float64, device="cpu"
-        )
-    else:
-        gas.concentration = wp.ones((2, 1), dtype=wp.float64, device="cpu")
+    particles.concentration = wp.ones((2, 1), dtype=wp.float64, device="cpu")
     snapshot = _full_state_snapshot(particles, gas, 1.0)
 
-    name = "particles" if field == "particle" else "gas"
     with pytest.raises(
-        ValueError, match=f"{name}.concentration shape must match"
+        ValueError, match="particles.concentration shape must match"
     ):
         dilution_step_gpu(particles, gas, 1.0, 1.0)
 
     _assert_full_state_unchanged(particles, gas, 1.0, snapshot)
+
+
+def test_gas_concentration_width_is_independent_of_particle_species() -> None:
+    """Particle and gas concentration widths independently receive dilution."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers(n_boxes=2, n_particles=2, n_species=3)
+    gas.concentration = wp.array(
+        [[2.0, 3.0], [4.0, 5.0]], dtype=wp.float64, device="cpu"
+    )
+    particle_before = particles.concentration.numpy().copy()
+    gas_before = gas.concentration.numpy().copy()
+
+    dilution_step_gpu(particles, gas, 0.5, 2.0)
+
+    factor = np.exp(-1.0)
+    npt.assert_allclose(
+        particles.concentration.numpy(), particle_before * factor
+    )
+    npt.assert_allclose(gas.concentration.numpy(), gas_before * factor)
+
+
+def test_particle_and_gas_concentration_alias_is_rejected() -> None:
+    """Shared mutable particle and gas storage rejects before an update."""
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    gas.concentration = particles.concentration
+    snapshot = _full_state_snapshot(particles, gas, 1.0)
+
+    with pytest.raises(ValueError, match="must not overlap"):
+        dilution_step_gpu(particles, gas, 1.0, 1.0)
+
+    _assert_full_state_unchanged(particles, gas, 1.0, snapshot)
+
+
+@pytest.mark.parametrize("output", ["particle", "gas"])
+def test_coefficient_output_storage_overlap_is_rejected(
+    output: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Overlapping coefficient/output ranges reject before concentration updates."""
+    wp = _warp()
+    from particula.gpu.kernels import dilution as dilution_module
+    from particula.gpu.kernels import dilution_step_gpu
+
+    particles, gas = _containers()
+    coefficient = wp.array([0.5, 0.25], dtype=wp.float64, device="cpu")
+    target = (
+        particles.concentration if output == "particle" else gas.concentration
+    )
+    snapshot = _full_state_snapshot(particles, gas, coefficient)
+    original_memory_range = dilution_module._warp_array_memory_range
+
+    def overlapping_ranges(array: Any) -> tuple[int, int]:
+        """Make the requested valid caller arrays overlap deterministically."""
+        if array is coefficient or array is target:
+            return 0, 16
+        return original_memory_range(array)
+
+    monkeypatch.setattr(
+        dilution_module, "_warp_array_memory_range", overlapping_ranges
+    )
+    with pytest.raises(ValueError, match="must not overlap"):
+        dilution_step_gpu(particles, gas, coefficient, 1.0)
+
+    _assert_full_state_unchanged(particles, gas, coefficient, snapshot)
 
 
 def test_preflight_validation_order_at_remaining_boundaries() -> None:

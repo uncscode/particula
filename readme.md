@@ -90,9 +90,11 @@ or CPU fallback. Coefficients are finite nonnegative scalars or same-device
 Preflight is deterministic and read-only: it validates coefficient form, time,
 mass schema, per-box coefficient, particle concentration, then gas
 concentration. Invalid forms, storage schemas, and nonfinite or negative values
-reject before allocation, launch, or caller mutation. Particle masses must be
-same-device `wp.float64` rank-3 storage; particle and gas concentrations must
-be same-device `wp.float64` rank-2 storage with exact mass-derived shapes.
+may run validation scans that allocate or launch, but do not launch updates or
+mutate caller-owned state. Particle masses must be same-device `wp.float64`
+rank-3 storage; particle and gas concentrations must be same-device `wp.float64`
+rank-2 storage. Particle concentration width matches particle capacity; gas
+width is independent but shares the particle mass box count.
 Valid zero scalar coefficients and zero time steps complete preflight and then
 are write-free, no-update-kernel no-ops; validation scans may still allocate or
 launch. Rollback after a launched kernel failure is not promised. E6-F1 is the

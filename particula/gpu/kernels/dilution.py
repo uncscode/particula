@@ -5,10 +5,11 @@ rate and ``V`` is volume. This P3 module applies
 ``c_new = c * exp(-alpha * time_step)`` in place to particle and gas
 concentrations and returns the identical containers.
 
-Before allocating scalar/factor storage, launching a dilution kernel, or
-mutating concentrations, the entry point read-only validates the coefficient,
-time step, particle-mass schema, and particle and gas concentration schemas and
-values.
+Before allocating scalar/factor storage, launching an update kernel, or
+mutating concentrations, the entry point validates the coefficient, time step,
+particle-mass schema, and particle and gas concentration schemas and values.
+Device-resident validation scans may allocate or launch, but rejected calls do
+not launch update kernels or mutate caller-owned state.
 Valid same-device per-box coefficients retain caller ownership and identity;
 scalar coefficients are broadcast into private active-device ``wp.float64``
 storage only after preflight. Zero scalar coefficients and zero time steps are
@@ -252,10 +253,11 @@ def _validate_per_box_coefficient(
 def _validate_concentration_schema(
     values: Any,
     name: str,
-    expected_shape: tuple[int, int],
+    n_boxes: int,
     device: Any,
+    expected_width: int | None = None,
 ) -> None:
-    """Validate exact concentration schema and physical values read-only."""
+    """Validate concentration schema and physical values read-only."""
     if not _is_warp_array_like(values):
         raise ValueError(f"{name} must be a Warp array.")
     if values.ndim != 2:
@@ -264,11 +266,50 @@ def _validate_concentration_schema(
         raise ValueError(f"{name} must use dtype float64.")
     if str(values.device) != str(device):
         raise ValueError(f"{name} device must match particle device.")
-    if values.shape[0] != expected_shape[0]:
+    if values.shape[0] != n_boxes:
         raise ValueError(f"{name} box dimension must match particle masses.")
-    if values.shape != expected_shape:
+    if expected_width is not None and values.shape[1] != expected_width:
         raise ValueError(f"{name} shape must match particle masses.")
     _validate_nonnegative_finite_values(values, name)
+
+
+def _warp_array_memory_range(array: Any) -> tuple[int, int]:
+    """Return a contiguous Warp array's byte range for ownership checks."""
+    if getattr(array, "strides", None) is not None:
+        itemsize = np.dtype(np.float64).itemsize
+        expected_strides: list[int] = []
+        stride = itemsize
+        for dimension in reversed(array.shape):
+            expected_strides.insert(0, stride)
+            stride *= dimension
+        if tuple(array.strides) != tuple(expected_strides):
+            raise ValueError(
+                "overlap-checked Warp arrays must be contiguous, non-view "
+                "arrays"
+            )
+    item_count = int(np.prod(array.shape, dtype=np.int64))
+    if item_count == 0:
+        return 0, 0
+    start = int(array.ptr)
+    return start, start + item_count * np.dtype(np.float64).itemsize
+
+
+def _validate_no_overlap(
+    read_side_arrays: tuple[Any, ...],
+    mutable_arrays: tuple[Any, ...],
+) -> None:
+    """Reject caller storage that aliases a concentration update target."""
+    for read_side in read_side_arrays:
+        read_start, read_end = _warp_array_memory_range(read_side)
+        for mutable in mutable_arrays:
+            write_start, write_end = _warp_array_memory_range(mutable)
+            if read_side is mutable or (
+                read_start < write_end and write_start < read_end
+            ):
+                raise ValueError(
+                    "dilution read-side and mutable concentration storage must "
+                    "not overlap"
+                )
 
 
 def dilution_step_gpu(
@@ -288,9 +329,11 @@ def dilution_step_gpu(
     Python/NumPy real scalar or a caller-owned, active-device ``wp.float64``
     array shaped ``(n_boxes,)``. Valid per-box arrays are retained by identity
     and their values are read only during preflight. Masses must be a
-    same-device ``wp.float64`` rank-3 array; particle and gas concentrations
-    must be same-device ``wp.float64`` rank-2 arrays with exact mass-derived
-    shapes. Coefficients and concentrations must be finite and nonnegative.
+    same-device ``wp.float64`` rank-3 array. Particle and gas concentrations
+    must be same-device ``wp.float64`` rank-2 arrays. Particle concentration
+    width matches the particle dimension; gas concentration has an independent
+    width but must share the mass-derived box count. Coefficients and
+    concentrations must be finite and nonnegative.
     Only the two concentration arrays are mutated; masses and all other
     caller-owned fields are preserved.
 
@@ -299,11 +342,12 @@ def dilution_step_gpu(
     values, then gas concentration schema and values. Array values are scanned
     on their active device, with only a scalar validation result observed by the
     host; preflight never materializes a caller-owned array on the CPU.
-    Rejected calls complete read-only preflight before scalar/factor allocation,
-    dilution-kernel launch, or mutation. A zero scalar coefficient or zero time
-    step returns only after full preflight, without private scalar/factor
-    allocation or a dilution launch. This atomicity guarantee applies only
-    before launch; rollback after a launched kernel failure is not promised.
+    Validation scans may allocate or launch, but rejected calls perform no
+    update-kernel launch or caller mutation. A zero scalar coefficient or zero
+    time step returns only after full preflight, without private scalar/factor
+    allocation or an update launch. This atomicity guarantee applies only
+    before an update launch; rollback after a launched kernel failure is not
+    promised.
 
     Args:
         particles: Particle container with fixed-shape concentration storage.
@@ -328,9 +372,7 @@ def dilution_step_gpu(
         )
     normalized_time_step = _normalize_time_step(time_step)
 
-    _, n_boxes, n_particles, n_species, device = _validate_mass_schema(
-        particles
-    )
+    _, n_boxes, n_particles, _, device = _validate_mass_schema(particles)
     if is_per_box_coefficient:
         normalized_coefficient = _validate_per_box_coefficient(
             validated_coefficient,
@@ -346,8 +388,9 @@ def dilution_step_gpu(
     _validate_concentration_schema(
         particle_concentration,
         "particles.concentration",
-        (n_boxes, n_particles),
+        n_boxes,
         device,
+        n_particles,
     )
     gas_concentration = _get_required_field(
         gas,
@@ -357,9 +400,15 @@ def dilution_step_gpu(
     _validate_concentration_schema(
         gas_concentration,
         "gas.concentration",
-        (n_boxes, n_species),
+        n_boxes,
         device,
     )
+    _validate_no_overlap((particle_concentration,), (gas_concentration,))
+    if is_per_box_coefficient:
+        _validate_no_overlap(
+            (normalized_coefficient,),
+            (particle_concentration, gas_concentration),
+        )
 
     if (
         n_boxes == 0
@@ -389,10 +438,11 @@ def dilution_step_gpu(
             inputs=[particle_concentration, normalized_coefficient, factors],
             device=device,
         )
-    if n_species > 0:
+    n_gas_species = gas_concentration.shape[1]
+    if n_gas_species > 0:
         wp.launch(
             _apply_gas_dilution,
-            dim=(n_boxes, n_species),
+            dim=(n_boxes, n_gas_species),
             inputs=[gas_concentration, normalized_coefficient, factors],
             device=device,
         )
