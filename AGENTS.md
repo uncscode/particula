@@ -438,18 +438,19 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
   remain unchanged.
 - Entry-point preflight is deterministic and read-only. It validates coefficient
   form, `time_step`, mass storage, per-box coefficients, particle
-  concentration, then gas concentration before any allocation, launch, or
-  caller mutation. Coefficients and concentrations must be finite and
-  nonnegative.
+  concentration, then gas concentration. Validation scans may allocate or
+  launch, but rejected calls perform no update-kernel launch or caller mutation.
+  Coefficients and concentrations must be finite and nonnegative.
 - Coefficients may be finite nonnegative scalars or caller-owned same-device
   `wp.float64` arrays shaped `(n_boxes,)`. Particle masses must be same-device
   `wp.float64` rank-3 storage. Particle and gas concentrations must be
-  same-device `wp.float64` rank-2 storage with exact mass-derived shapes.
+  same-device `wp.float64` rank-2 storage. Particle concentration width must
+  match particle capacity; gas width is independent but shares box count.
 - Zero scalar coefficients and zero time steps complete full preflight, then
   return as write-free, no-update-kernel no-ops; validation scans may still
   allocate or launch.
-- Rejected calls preserve caller-owned objects before launch. Rollback after a
-  successfully launched kernel failure is not promised.
+- Rejected calls preserve caller-owned objects without an update launch.
+  Rollback after a successfully launched update kernel failure is not promised.
 - E6-F1 supplies the upstream CPU finite-step oracle; E6-F9 is the future
   integrated direct-call consumer. Independent Warp CPU float64 particle and
   gas comparisons use `rtol=1e-12, atol=0`; CUDA is optional and skips cleanly

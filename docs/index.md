@@ -183,8 +183,9 @@ print(result)
    CPU↔Warp transfers, device placement, and synchronization; there is no hidden
    transfer or CPU fallback. Coefficients are finite nonnegative scalars or
    same-device `wp.float64` Warp arrays shaped `(n_boxes,)`. Deterministic,
-   read-only preflight rejects invalid calls before allocation, launch, or
-   mutation. Scalar-zero coefficients and zero time steps complete preflight and
+   read-only preflight may run validation scans that allocate or launch, but
+   invalid calls have no update-kernel launch or caller mutation. Scalar-zero
+   coefficients and zero time steps complete preflight and
    are write-free, no-update-kernel no-ops; validation scans may still allocate
    or launch. Warp CPU float64
    particle and gas comparisons use `rtol=1e-12, atol=0`; CUDA is optional and
