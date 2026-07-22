@@ -202,7 +202,8 @@ Known GPU physics gaps remain:
   CPU↔Warp transfer, device placement, and synchronization; there is no hidden
   transfer or fallback. Complete ordered preflight rejects before launch, while
   a scalar-zero coefficient or zero time step completes preflight then returns
-  as an exact write-free, allocation-free, launch-free no-op. Independent
+  as a write-free, no-update-kernel no-op; validation scans may still allocate
+  or launch. Independent
   float64 particle and gas comparisons on Warp CPU use `rtol=1e-12, atol=0`;
   CUDA rows are optional and skip cleanly when unavailable. This is
   tolerance-based evidence, not bitwise equality.
@@ -1223,7 +1224,8 @@ Delivered dilution scope:
   `(n_boxes,)` coefficients, returns the same containers, and mutates only
   particle and gas concentrations in place.
 - Ordered complete preflight is read-only; scalar-zero and zero-time calls are
-  fully preflighted exact write-free, allocation-free, launch-free no-ops.
+  fully preflighted write-free, no-update-kernel no-ops, though validation
+  scans may still allocate or launch.
   Particle and gas parity evidence uses independent Warp CPU float64 checks at
   `rtol=1e-12, atol=0`; CUDA is optional and skips cleanly when unavailable.
   It is not bitwise parity. E6-F9 is the future integrated direct-call
