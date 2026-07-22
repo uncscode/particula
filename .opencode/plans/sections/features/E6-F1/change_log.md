@@ -1,5 +1,17 @@
 # Change Log
 
+## 2026-07-21 — P1 Complete (issue #1389)
+
+- Implemented validated, NumPy-broadcasting coefficient and instantaneous-rate
+  helpers in `particula/dynamics/dilution.py`.
+- Added the exact, concrete-module-only `get_dilution_step()` and preserved the
+  existing `particula.dynamics` export surface.
+- Added P1 numerical-contract coverage in
+  `particula/dynamics/tests/dilution_test.py`, including validation,
+  broadcasting, no-op, extreme-decay, non-mutation, and export-boundary cases.
+- Deliberately made no changes to containers, strategies/runnables, public user
+  documentation, examples, GPU code, or package exports.
+
 ## 2026-07-21 — Initial Draft
 
 - Created the first-pass E6-F1 feature plan from issue #1377 track T1.

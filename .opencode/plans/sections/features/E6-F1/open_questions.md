@@ -22,6 +22,8 @@ dilution helpers, container semantics, and process conventions.
    coefficient-configured strategy does not justify the multi-variant factory
    surface used by wall loss.
 6. [x] **Free-function broadcasting compatibility:** preserve native NumPy
-   broadcasting for scalar/scalar, scalar/array, equal-shape arrays, and other
-   broadcast-compatible numeric arrays. Non-broadcastable shapes and invalid
-   physical values raise; validation must not accidentally add list support.
+    broadcasting for scalar/scalar, scalar/array, equal-shape arrays, and other
+    broadcast-compatible numeric arrays. Non-broadcastable shapes and invalid
+    physical values raise; validation must not accidentally add list support.
+    Implemented in P1 (issue #1389) with `np.broadcast_arrays` preflight and
+    all-scalar return preservation.

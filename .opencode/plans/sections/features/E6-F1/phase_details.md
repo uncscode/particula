@@ -5,14 +5,18 @@
 Complete P1 through P4 in order; P5 documents only the CPU contract and
 evidence established by those completed phases.
 
-- [ ] **E6-F1-P1:** Freeze dilution semantics and validated rate helpers with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E6-F1-P1:** Freeze dilution semantics and validated rate helpers with unit tests
+  - Issue: #1389 | Size: S | Status: Complete
   - Goal: Document the CPU equation, units, accepted scalar/array inputs,
     nonnegative domain, no-op rules, and numerical update contract.
   - Files: `particula/dynamics/dilution.py`,
     `particula/dynamics/tests/dilution_test.py`
-  - Tests: scalar/array broadcasting, zero flow, zero concentration, invalid
-    volume/flow/coefficient, NaN/Inf rejection, and input non-mutation.
+  - Delivered: validated/broadcast-capable coefficient and instantaneous-rate
+    helpers plus module-scoped exact `get_dilution_step()`; no package export,
+    containers, runnable, docs/examples, or GPU changes.
+  - Tests: scalar/array broadcasting and return conventions, exact no-ops,
+    invalid domains/types/shapes and `None`, NaN/Inf rejection, warning-clean
+    extreme decay, input non-mutation, and package-surface boundary.
 
 - [ ] **E6-F1-P2:** Add particle and gas container dilution updates with unit tests
   - Issue: TBD | Size: S | Status: Not Started
