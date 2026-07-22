@@ -59,7 +59,9 @@ def _concentrations(
         np.asarray(
             aerosol.atmosphere.partitioning_species.get_concentration()
         ).copy(),
-        aerosol.atmosphere.gas_only_species.get_concentration().copy(),
+        np.asarray(
+            aerosol.atmosphere.gas_only_species.get_concentration()
+        ).copy(),
     )
 
 
