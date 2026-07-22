@@ -46,9 +46,11 @@ optional caller explicit Warp -> CPU conversion (outside this API)
   that export.
 - **Finite Step:** P1 records E6-F1's `alpha = Q / V` [s^-1] and future P2
   update `c_new = c * exp(-alpha * time_step)` without executing it.
-- **Validation Ordering:** P1 rejects invalid coefficient form/domain before
-  `time_step` and container access, and invalid `time_step` before container
-  access. Per-box values and complete container state remain P3 scope.
+- **Validation Ordering:** P1 rejects invalid scalar coefficient form/domain
+  and Warp coefficient dtype/rank before `time_step` or container access.
+  After valid `time_step` input, it obtains particle metadata to check per-box
+  coefficient shape/device compatibility. Per-box values and complete container
+  state remain P3 scope.
 - **Workflow Hooks:** E6-F2 depends on E6-F1 fixtures and feeds E6-F9's direct
   GPU process sequence. It introduces no scheduler or high-level runnable.
 

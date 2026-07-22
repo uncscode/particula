@@ -50,19 +50,32 @@ def _containers(n_boxes: int = 2, device: str = "cpu"):
     return particles, gas
 
 
-def _concentration_snapshots(particles, gas) -> tuple[np.ndarray, np.ndarray]:
-    """Copy caller-owned concentration fields for no-write assertions."""
-    return (
-        particles.concentration.numpy().copy(),
-        gas.concentration.numpy().copy(),
-    )
+def _state_snapshots(particles, gas, coefficient=None) -> dict[str, np.ndarray]:
+    """Copy every mutable caller-owned field reachable by the P1 API."""
+    snapshots = {
+        "particle_masses": particles.masses.numpy().copy(),
+        "particle_concentration": particles.concentration.numpy().copy(),
+        "particle_charge": particles.charge.numpy().copy(),
+        "particle_density": particles.density.numpy().copy(),
+        "particle_volume": particles.volume.numpy().copy(),
+        "gas_molar_mass": gas.molar_mass.numpy().copy(),
+        "gas_concentration": gas.concentration.numpy().copy(),
+        "gas_vapor_pressure": gas.vapor_pressure.numpy().copy(),
+        "gas_partitioning": gas.partitioning.numpy().copy(),
+    }
+    if coefficient is not None:
+        snapshots["coefficient"] = coefficient.numpy().copy()
+    return snapshots
 
 
-def _assert_concentrations_unchanged(particles, gas, snapshots) -> None:
-    """Assert particle and gas concentrations match their exact snapshots."""
-    particle_snapshot, gas_snapshot = snapshots
-    npt.assert_array_equal(particles.concentration.numpy(), particle_snapshot)
-    npt.assert_array_equal(gas.concentration.numpy(), gas_snapshot)
+def _assert_state_unchanged(
+    particles, gas, snapshots, coefficient=None
+) -> None:
+    """Assert every mutable caller-owned field matches its exact snapshot."""
+    current = _state_snapshots(particles, gas, coefficient)
+    assert current.keys() == snapshots.keys()
+    for field, snapshot in snapshots.items():
+        npt.assert_array_equal(current[field], snapshot)
 
 
 def test_concrete_module_signature_docstring_and_no_package_export() -> None:
@@ -145,29 +158,33 @@ def test_public_scalar_calls_are_identity_no_writes(
     from particula.gpu.kernels.dilution import dilution_step_gpu
 
     particles, gas = _containers()
-    snapshots = _concentration_snapshots(particles, gas)
+    snapshots = _state_snapshots(particles, gas)
     returned_particles, returned_gas = dilution_step_gpu(
         particles, gas, coefficient, time_step
     )
     assert returned_particles is particles
     assert returned_gas is gas
-    _assert_concentrations_unchanged(particles, gas, snapshots)
+    _assert_state_unchanged(particles, gas, snapshots)
 
 
-@pytest.mark.parametrize("values", [[0.0, 0.0], [0.0, 1.0]])
+@pytest.mark.parametrize(
+    "values",
+    [[0.0, 0.0], [0.0, 1.0], [-1.0, 0.0], [np.nan, 0.0], [np.inf, 0.0]],
+)
 def test_public_per_box_calls_are_identity_no_writes(values) -> None:
-    """All-zero and mixed valid per-box inputs remain P1 identity calls."""
+    """P1 retains every metadata-valid per-box coefficient without writes."""
     wp = _warp()
     from particula.gpu.kernels.dilution import dilution_step_gpu
 
     particles, gas = _containers()
-    snapshots = _concentration_snapshots(particles, gas)
     coefficient = wp.array(values, dtype=wp.float64, device="cpu")
-    assert dilution_step_gpu(particles, gas, coefficient, 1.0) == (
-        particles,
-        gas,
+    snapshots = _state_snapshots(particles, gas, coefficient)
+    returned_particles, returned_gas = dilution_step_gpu(
+        particles, gas, coefficient, 1.0
     )
-    _assert_concentrations_unchanged(particles, gas, snapshots)
+    assert returned_particles is particles
+    assert returned_gas is gas
+    _assert_state_unchanged(particles, gas, snapshots, coefficient)
 
 
 def test_documented_p2_equation_is_not_executed_in_p1() -> None:
@@ -175,17 +192,18 @@ def test_documented_p2_equation_is_not_executed_in_p1() -> None:
     from particula.gpu.kernels.dilution import dilution_step_gpu
 
     particles, gas = _containers()
-    snapshots = _concentration_snapshots(particles, gas)
+    snapshots = _state_snapshots(particles, gas)
     coefficient = 0.5  # s^-1
     time_step = 2.0  # s
     expected_p2_factor = np.exp(-coefficient * time_step)
 
     assert expected_p2_factor == pytest.approx(np.exp(-1.0))
-    assert dilution_step_gpu(particles, gas, coefficient, time_step) == (
-        particles,
-        gas,
+    returned_particles, returned_gas = dilution_step_gpu(
+        particles, gas, coefficient, time_step
     )
-    _assert_concentrations_unchanged(particles, gas, snapshots)
+    assert returned_particles is particles
+    assert returned_gas is gas
+    _assert_state_unchanged(particles, gas, snapshots)
 
 
 def test_zero_box_scalar_and_per_box_calls_are_identity_no_writes() -> None:
@@ -194,14 +212,19 @@ def test_zero_box_scalar_and_per_box_calls_are_identity_no_writes() -> None:
     from particula.gpu.kernels.dilution import dilution_step_gpu
 
     particles, gas = _containers(n_boxes=0)
-    snapshots = _concentration_snapshots(particles, gas)
-    assert dilution_step_gpu(particles, gas, 1.0, 1.0) == (particles, gas)
     coefficient = wp.zeros(0, dtype=wp.float64, device="cpu")
-    assert dilution_step_gpu(particles, gas, coefficient, 1.0) == (
-        particles,
-        gas,
+    snapshots = _state_snapshots(particles, gas, coefficient)
+    returned_particles, returned_gas = dilution_step_gpu(
+        particles, gas, 1.0, 1.0
     )
-    _assert_concentrations_unchanged(particles, gas, snapshots)
+    assert returned_particles is particles
+    assert returned_gas is gas
+    returned_particles, returned_gas = dilution_step_gpu(
+        particles, gas, coefficient, 1.0
+    )
+    assert returned_particles is particles
+    assert returned_gas is gas
+    _assert_state_unchanged(particles, gas, snapshots, coefficient)
 
 
 @pytest.mark.parametrize(
@@ -227,17 +250,33 @@ def test_invalid_scalar_domains_raise_valueerror_before_time(value) -> None:
         dilution_step_gpu(None, None, value, cast(Any, "invalid"))
 
 
-def test_invalid_scalar_coefficient_leaves_container_concentrations_unchanged() -> (
+def test_invalid_scalar_coefficient_leaves_full_container_state_unchanged() -> (
     None
 ):
     """Coefficient-domain failures occur before any P1 caller-state write."""
     from particula.gpu.kernels.dilution import dilution_step_gpu
 
     particles, gas = _containers()
-    snapshots = _concentration_snapshots(particles, gas)
+    snapshots = _state_snapshots(particles, gas)
     with pytest.raises(ValueError, match="coefficient.*finite and nonnegative"):
         dilution_step_gpu(particles, gas, -1.0, 1.0)
-    _assert_concentrations_unchanged(particles, gas, snapshots)
+    _assert_state_unchanged(particles, gas, snapshots)
+
+
+def test_huge_integer_scalars_raise_stable_valueerrors_without_writes() -> None:
+    """Huge scalar conversions do not leak ``OverflowError`` or mutate state."""
+    from particula.gpu.kernels.dilution import dilution_step_gpu
+
+    huge_integer = 10**10000
+    particles, gas = _containers()
+    snapshots = _state_snapshots(particles, gas)
+    with pytest.raises(ValueError, match="coefficient.*finite and nonnegative"):
+        dilution_step_gpu(particles, gas, huge_integer, 1.0)
+    _assert_state_unchanged(particles, gas, snapshots)
+
+    with pytest.raises(ValueError, match="time_step.*finite and nonnegative"):
+        dilution_step_gpu(particles, gas, 1.0, huge_integer)
+    _assert_state_unchanged(particles, gas, snapshots)
 
 
 @pytest.mark.parametrize(
@@ -280,6 +319,16 @@ def test_valid_scalars_access_particle_masses_only_after_validation() -> None:
         dilution_step_gpu(object(), object(), 1.0, 1.0)
 
 
+def test_invalid_warp_metadata_precedes_time_and_particle_access() -> None:
+    """Malformed Warp coefficient metadata wins over later invalid inputs."""
+    wp = _warp()
+    from particula.gpu.kernels.dilution import dilution_step_gpu
+
+    coefficient = wp.ones(2, dtype=wp.float32, device="cpu")
+    with pytest.raises(ValueError, match="coefficient must use dtype float64"):
+        dilution_step_gpu(object(), object(), coefficient, cast(Any, "invalid"))
+
+
 @pytest.mark.parametrize(
     ("coefficient", "message"),
     [
@@ -296,16 +345,16 @@ def test_invalid_warp_coefficient_metadata_raises_without_writes(
     from particula.gpu.kernels.dilution import dilution_step_gpu
 
     particles, gas = _containers()
-    snapshots = _concentration_snapshots(particles, gas)
     if coefficient == "float32":
         value = wp.ones(2, dtype=wp.float32, device="cpu")
     elif coefficient == "rank":
         value = wp.ones((1, 2), dtype=wp.float64, device="cpu")
     else:
         value = wp.ones(1, dtype=wp.float64, device="cpu")
+    snapshots = _state_snapshots(particles, gas, value)
     with pytest.raises(ValueError, match=message):
         dilution_step_gpu(particles, gas, value, 1.0)
-    _assert_concentrations_unchanged(particles, gas, snapshots)
+    _assert_state_unchanged(particles, gas, snapshots, value)
 
 
 def test_warp_coefficient_device_mismatch_raises_without_writes() -> None:
@@ -319,8 +368,8 @@ def test_warp_coefficient_device_mismatch_raises_without_writes() -> None:
         pytest.skip("CUDA is unavailable for cross-device metadata validation.")
 
     particles, gas = _containers()
-    snapshots = _concentration_snapshots(particles, gas)
     coefficient = wp.ones(2, dtype=wp.float64, device=alternate_device)
+    snapshots = _state_snapshots(particles, gas, coefficient)
     with pytest.raises(ValueError, match="device must match"):
         dilution_step_gpu(particles, gas, coefficient, 1.0)
-    _assert_concentrations_unchanged(particles, gas, snapshots)
+    _assert_state_unchanged(particles, gas, snapshots, coefficient)
