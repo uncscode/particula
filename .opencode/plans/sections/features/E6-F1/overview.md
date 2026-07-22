@@ -57,6 +57,16 @@ place. `DilutionStrategy` and `Dilution` are now supported exports from
 module-only. Focused direct, runnable, and export regressions record this
 boundary.
 
+P5 is complete in issue #1393. It adds the deterministic public-API example
+`docs/Examples/cpu_dilution.py`, canonical guide
+`docs/Features/dilution_strategy_system.md`, and dilution discoverability
+entries in `docs/Features/index.md`, `docs/Examples/index.md`, and
+`docs/index.md`. `particula/tests/dilution_docs_test.py` provides hardware-free
+regression coverage for example execution and isolation, public-only imports,
+guide scope/contract wording, and resolving local documentation links. The
+change is documentation-only: no dilution production behavior, exports, GPU or
+backend work was added.
+
 ## User Stories
 
 - As a simulation user, I want to compose dilution with existing runnables so

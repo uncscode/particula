@@ -66,10 +66,18 @@ evidence established by those completed phases.
     `dilution_exports_test.py` covers public imports, identity, `__all__`, and
     `par.dynamics` construction/execution.
 
-- [ ] **E6-F1-P5:** Update development documentation and CPU dilution example
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E6-F1-P5:** Update development documentation and CPU dilution example
+  - Issue: #1393 | Size: XS | Status: Complete
   - Goal: Publish units, construction, execution, invariants, downstream GPU
     reference status, and a runnable example without claiming GPU support.
-  - Files: `docs/Features/`, `docs/Examples/`, relevant indexes, and API docs
-  - Tests: execute the example, validate documentation links, and run focused
-    dilution tests.
+  - Delivered: `docs/Examples/cpu_dilution.py` demonstrates public
+    `par.dynamics.DilutionStrategy`/`Dilution` execution over two equal
+    substeps and verifies deterministic particle, partitioning-gas, and
+    gas-only decay. `docs/Features/dilution_strategy_system.md` documents the
+    bounded CPU contract; feature, example, and root indexes link to it and use
+    an absolute repository URL for the excluded example source.
+  - Tests: `particula/tests/dilution_docs_test.py` executes the example,
+    verifies detached snapshots and command output, enforces public-only
+    imports, and checks guide/index wording and local-link resolution without
+    GPU hardware. Focused CPU dilution direct, runnable, and export suites are
+    retained as validation evidence.

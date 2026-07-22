@@ -65,9 +65,18 @@
 
 ## E6-F1-P5 — Documentation
 
-1. Add a concise CPU runnable example that builds an aerosol, executes
-   dilution, and verifies particle and gas concentration changes.
-2. Document units, invariants, no-op behavior, supported container shapes, and
-   the E6-F2 downstream relationship.
-3. Update documentation indexes and links; explicitly defer GPU/backend claims.
-4. Execute the example and run docs validation plus focused dilution tests.
+**Complete in issue #1393.**
+
+1. [x] Added `docs/Examples/cpu_dilution.py`, a deterministic public-API
+   runnable example that verifies exact decay for particle, partitioning-gas,
+   and gas-only concentrations.
+2. [x] Added `docs/Features/dilution_strategy_system.md`, documenting units,
+   invariants, supported CPU shapes, substeps, validation/recovery/no-op
+   behavior, and E6-F2 as a downstream consumer only.
+3. [x] Added discoverability links in `docs/Features/index.md`,
+   `docs/Examples/index.md`, and `docs/index.md`, using the absolute GitHub URL
+   for the example source and retaining explicit GPU/backend/transport/inlet/
+   performance non-goals.
+4. [x] Added hardware-free `particula/tests/dilution_docs_test.py` coverage for
+   execution, isolated snapshots, console output, imports, documentation text,
+   and local link resolution; retained focused CPU dilution validation commands.

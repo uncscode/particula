@@ -38,6 +38,12 @@ aerosol = process.execute(aerosol, time_step=10, sub_steps=1000)
 
 ## Migration / What's New
 
+For the bounded CPU dilution contract, see the
+[Dilution Strategy System guide](./docs/Features/dilution_strategy_system.md).
+Use the public `particula.dynamics.DilutionStrategy` and `Dilution` APIs; the
+concrete `dilute_aerosol` and `get_dilution_step` helpers remain module-only.
+Run the hardware-free example with `python docs/Examples/cpu_dilution.py`.
+
 For the [Canonical low-level direct-condensation contract](./docs/Features/data-containers-and-gpu-foundations.md),
 see the container, shape, and CPU↔GPU transfer boundaries.
 For a runnable low-level walkthrough, run `python

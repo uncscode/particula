@@ -77,6 +77,25 @@ def test_cpu_dilution_example_executes_exact_public_api_decay() -> None:
         npt.assert_allclose(final, initial * factor, rtol=1e-12, atol=0.0)
 
 
+def test_cpu_dilution_example_uses_public_runnable_call_chain() -> None:
+    """Example constructs and executes the documented public runnable API."""
+    tree = ast.parse(EXAMPLE_PATH.read_text(encoding="utf-8"))
+    run_example = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "run_example"
+    )
+    calls = [
+        ast.unparse(node.func)
+        for node in ast.walk(run_example)
+        if isinstance(node, ast.Call)
+    ]
+
+    assert "par.dynamics.DilutionStrategy" in calls
+    assert "par.dynamics.Dilution" in calls
+    assert "dilution.execute" in calls
+
+
 def test_cpu_dilution_example_results_are_isolated_snapshots() -> None:
     """Fresh calls and all initial/final snapshots own independent arrays."""
     example = _load_example()
