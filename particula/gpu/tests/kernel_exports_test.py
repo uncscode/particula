@@ -11,6 +11,7 @@ pytestmark = pytest.mark.warp
 SUPPORTED_STEP_SYMBOLS = (
     "coagulation_step_gpu",
     "condensation_step_gpu",
+    "dilution_step_gpu",
 )
 
 INTERNAL_HELPER_SYMBOLS = (
@@ -41,22 +42,28 @@ def test_public_kernels_package_exports_supported_step_function(
     import particula.gpu.kernels as kernels
     from particula.gpu.kernels.coagulation import coagulation_step_gpu
     from particula.gpu.kernels.condensation import condensation_step_gpu
+    from particula.gpu.kernels.dilution import dilution_step_gpu
 
     concrete_symbol_map = {
         "coagulation_step_gpu": coagulation_step_gpu,
         "condensation_step_gpu": condensation_step_gpu,
+        "dilution_step_gpu": dilution_step_gpu,
     }
 
     assert getattr(kernels, symbol_name) is concrete_symbol_map[symbol_name]
 
 
 def test_kernels_package_all_is_exact_supported_surface() -> None:
-    """The package-level public surface is limited to the two step functions."""
+    """The package-level public surface is limited to supported step functions."""
     pytest.importorskip("warp")
 
     import particula.gpu.kernels as kernels
 
-    assert kernels.__all__ == ["coagulation_step_gpu", "condensation_step_gpu"]
+    assert kernels.__all__ == [
+        "coagulation_step_gpu",
+        "condensation_step_gpu",
+        "dilution_step_gpu",
+    ]
 
 
 @pytest.mark.parametrize("helper_name", INTERNAL_HELPER_SYMBOLS)
