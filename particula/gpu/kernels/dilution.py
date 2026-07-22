@@ -52,10 +52,29 @@ def _coerce_nonnegative_real(value: Any, name: str) -> float:
     if isinstance(value, (bool, np.bool_)) or not isinstance(value, Real):
         raise TypeError(f"{name} must be a real scalar.")
 
-    scalar = float(value)
+    try:
+        scalar = float(value)
+    except OverflowError as exc:
+        raise ValueError(f"{name} must be finite and nonnegative.") from exc
     if not np.isfinite(scalar) or scalar < 0.0:
         raise ValueError(f"{name} must be finite and nonnegative.")
     return scalar
+
+
+def _validate_warp_coefficient_form(coefficient: Any) -> Any:
+    """Validate Warp coefficient metadata independent of particle metadata.
+
+    Shape and device compatibility require particle metadata and are checked by
+    ``_normalize_coefficient`` after time-step validation. Dtype and rank are
+    checked first so malformed coefficient inputs fail before time or container
+    access.
+    """
+    warp_coefficient = cast(Any, coefficient)
+    if warp_coefficient.dtype != wp.float64:
+        raise ValueError("coefficient must use dtype float64.")
+    if warp_coefficient.ndim != 1:
+        raise ValueError("coefficient must have rank 1.")
+    return warp_coefficient
 
 
 def _normalize_coefficient(
@@ -82,11 +101,7 @@ def _normalize_coefficient(
         ValueError: If a scalar domain or Warp-array metadata is invalid.
     """
     if _is_warp_array_like(coefficient):
-        warp_coefficient = cast(Any, coefficient)
-        if warp_coefficient.dtype != wp.float64:
-            raise ValueError("coefficient must use dtype float64.")
-        if warp_coefficient.ndim != 1:
-            raise ValueError("coefficient must have rank 1.")
+        warp_coefficient = _validate_warp_coefficient_form(coefficient)
         if warp_coefficient.shape != (n_boxes,):
             raise ValueError(
                 "coefficient shape must match expected (n_boxes,)."
@@ -158,7 +173,9 @@ def dilution_step_gpu(
         ValueError: If a scalar value is non-finite or negative, or a per-box
             coefficient has invalid dtype, rank, shape, or device metadata.
     """
-    if not _is_warp_array_like(coefficient):
+    if _is_warp_array_like(coefficient):
+        _validate_warp_coefficient_form(coefficient)
+    else:
         _coerce_nonnegative_real(coefficient, "coefficient")
     _normalize_time_step(time_step)
 
