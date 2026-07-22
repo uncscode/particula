@@ -1,96 +1,145 @@
-"""General dilution rate for closed systems."""
+"""Validated, vectorized chamber-dilution calculations.
 
-from typing import Union
+This CPU-only module uses system volume ``V`` [m³], inlet flow ``Q`` [m³/s],
+and dilution coefficient ``alpha`` [s⁻¹], where ``alpha = Q / V``. For
+particle-number or gas-mass concentration ``c`` [1/m³ or kg/m³], the rate is
+``dc/dt = -alpha * c`` and the exact finite update over elapsed time [s] is
+``c_new = c * exp(-alpha * time_step)``. The helpers support ordinary NumPy
+broadcasting without mutating caller-owned arrays. They do not mutate
+containers and have no GPU implementation scope.
+"""
 
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.util.validate_inputs import validate_inputs
 
+
+def _return_scalar_if_appropriate(
+    result: NDArray[np.float64],
+    *operands: float | NDArray[np.float64],
+) -> float | NDArray[np.float64]:
+    """Return a scalar result when every input is scalar."""
+    if all(np.ndim(operand) == 0 for operand in operands):
+        return result.item()
+    return result
+
+
+@validate_inputs({"volume": "positive", "input_flow_rate": "nonnegative"})
 def get_volume_dilution_coefficient(
-    volume: Union[float, NDArray[np.float64]],
-    input_flow_rate: Union[float, NDArray[np.float64]],
-) -> Union[float, NDArray[np.float64]]:
-    """Calculate the volume dilution coefficient.
+    volume: float | NDArray[np.float64],
+    input_flow_rate: float | NDArray[np.float64],
+) -> float | NDArray[np.float64]:
+    """Calculate the volume dilution coefficient ``alpha = Q / V``.
 
-    This coefficient represents how quickly a substance is diluted within
-    a system of a given volume when a known input flow rate is supplied.
-    The equation is:
-
-    - α = Q / V
-        - α is the volume dilution coefficient [s⁻¹],
-        - Q is the input flow rate [m³/s],
-        - V is the system volume [m³].
-
-    Arguments:
-        - volume : The volume of the system in cubic meters (m³).
-        - input_flow_rate : The flow rate entering the system in
-            cubic meters per second (m³/s).
+    Args:
+        volume: Chamber volume ``V`` [m³], strictly positive and finite.
+        input_flow_rate: Inlet flow rate ``Q`` [m³/s], nonnegative and finite.
 
     Returns:
-        - The volume dilution coefficient in inverse seconds (s⁻¹).
+        Dilution coefficient [s⁻¹].
 
-    Examples:
-        ``` py title="Example (float input)"
-        get_volume_dilution_coefficient(volume=10, input_flow_rate=0.1)
-        # Returns 0.01
-        ```
-
-        ``` py title="Example (array input)"
-        get_volume_dilution_coefficient(
-            volume=np.array([10, 20, 30]),
-            input_flow_rate=np.array([0.1, 0.2, 0.3]),
-        )
-        # Returns array([0.01, 0.01, 0.01])
-        ```
-
-    References:
-        - O. Levenspiel, "Chemical Reaction Engineering," 3rd ed., Wiley, 1999.
-        [check]
+    Raises:
+        TypeError: If an operand is ``None`` or is not numeric.
+        ValueError: If an operand is outside its finite physical domain or the
+            operand shapes cannot be broadcast.
     """
-    return input_flow_rate / volume
+    if volume is None:
+        raise TypeError("Argument 'volume' must not be None.")
+    if input_flow_rate is None:
+        raise TypeError("Argument 'input_flow_rate' must not be None.")
+
+    volume_array, input_flow_rate_array = np.broadcast_arrays(
+        volume,
+        input_flow_rate,
+    )
+    result = input_flow_rate_array / volume_array
+    return _return_scalar_if_appropriate(result, volume, input_flow_rate)
 
 
+@validate_inputs({"coefficient": "nonnegative", "concentration": "nonnegative"})
 def get_dilution_rate(
-    coefficient: Union[float, NDArray[np.float64]],
-    concentration: Union[float, NDArray[np.float64]],
-) -> Union[float, NDArray[np.float64]]:
-    """Calculate the dilution rate of a substance in a system.
+    coefficient: float | NDArray[np.float64],
+    concentration: float | NDArray[np.float64],
+) -> float | NDArray[np.float64]:
+    """Calculate the instantaneous dilution rate ``dc/dt = -alpha * c``.
 
-    The dilution rate describes how quickly the concentration of a
-    substance decreases due to the volume dilution coefficient and
-    the current concentration. The calculation is:
-
-    - R = -(α × c)
-        - R is the dilution rate [s⁻¹],
-        - α is the volume dilution coefficient [s⁻¹],
-        - c is the current concentration [#/m³].
-
-    Arguments:
-        - coefficient : The volume dilution coefficient in inverse
-            seconds (s⁻¹).
-        - concentration : The concentration of the substance in #/m³
-            (or relevant units).
+    Args:
+        coefficient: Dilution coefficient ``alpha`` [s⁻¹], nonnegative and
+            finite.
+        concentration: Particle-number or gas-mass concentration [1/m³ or
+            kg/m³], nonnegative and finite.
 
     Returns:
-        - The dilution rate in s⁻¹, returned as a negative value
-          to indicate a decrease in concentration.
+        Concentration rate of change [1/(m³ s) or kg/(m³ s)].
 
-    Examples:
-        ``` py title="Example (float input)"
-        get_dilution_rate(coefficient=0.01, concentration=100)
-        # Returns -1.0
-        ```
-
-        ``` py title="Example (array input)"
-        get_dilution_rate(
-            coefficient=0.01,
-            concentration=np.array([100, 200, 300]),
-        )
-        # Returns array([-1., -2., -3.])
-        ```
-
-    References:
-        - H. Fogler, "Elements of Chemical Reaction Engineering,"
-          5th ed., Prentice Hall, 2016. [check]
+    Raises:
+        TypeError: If an operand is ``None`` or is not numeric.
+        ValueError: If an operand is outside its finite physical domain or the
+            operand shapes cannot be broadcast.
     """
-    return -coefficient * concentration
+    if coefficient is None:
+        raise TypeError("Argument 'coefficient' must not be None.")
+    if concentration is None:
+        raise TypeError("Argument 'concentration' must not be None.")
+
+    coefficient_array, concentration_array = np.broadcast_arrays(
+        coefficient,
+        concentration,
+    )
+    result = -coefficient_array * concentration_array
+    return _return_scalar_if_appropriate(result, coefficient, concentration)
+
+
+@validate_inputs(
+    {
+        "coefficient": "nonnegative",
+        "concentration": "nonnegative",
+        "time_step": "nonnegative",
+    }
+)
+def get_dilution_step(
+    coefficient: float | NDArray[np.float64],
+    concentration: float | NDArray[np.float64],
+    time_step: float | NDArray[np.float64],
+) -> float | NDArray[np.float64]:
+    """Calculate the exact updated concentration, rather than a delta.
+
+    Args:
+        coefficient: Dilution coefficient ``alpha`` [s⁻¹], nonnegative and
+            finite.
+        concentration: Initial concentration [1/m³ or kg/m³], nonnegative and
+            finite.
+        time_step: Elapsed time [s], nonnegative and finite.
+
+    Returns:
+        Updated concentration ``c * exp(-alpha * time_step)`` with the
+        broadcast shape of the inputs.
+
+    Raises:
+        TypeError: If an operand is ``None`` or is not numeric.
+        ValueError: If an operand is outside its finite physical domain or the
+            operand shapes cannot be broadcast.
+    """
+    if coefficient is None:
+        raise TypeError("Argument 'coefficient' must not be None.")
+    if concentration is None:
+        raise TypeError("Argument 'concentration' must not be None.")
+    if time_step is None:
+        raise TypeError("Argument 'time_step' must not be None.")
+
+    (
+        coefficient_array,
+        concentration_array,
+        time_step_array,
+    ) = np.broadcast_arrays(coefficient, concentration, time_step)
+    with np.errstate(over="ignore", under="ignore"):
+        result = concentration_array * np.exp(
+            -coefficient_array * time_step_array
+        )
+    return _return_scalar_if_appropriate(
+        result,
+        coefficient,
+        concentration,
+        time_step,
+    )
