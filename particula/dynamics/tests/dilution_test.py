@@ -103,6 +103,57 @@ def test_dilution_step_extreme_finite_decay_is_warning_clean():
 
 
 @pytest.mark.parametrize(
+    ("function", "arguments", "expected"),
+    [
+        (
+            get_volume_dilution_coefficient,
+            (np.array(10.0), 2.0),
+            np.array(0.2),
+        ),
+        (get_dilution_rate, (np.array(0.5), 10.0), np.array(-5.0)),
+        (get_dilution_step, (0.5, np.array(10.0), 2.0), np.array(10.0 / np.e)),
+    ],
+)
+def test_dilution_helpers_preserve_zero_dimensional_array_results(
+    function, arguments, expected
+):
+    """A zero-dimensional ndarray input produces a zero-dimensional ndarray."""
+    result = function(*arguments)
+
+    assert isinstance(result, np.ndarray)
+    assert result.shape == ()
+    npt.assert_allclose(result, expected)
+
+
+def test_dilution_rate_uint64_inputs_do_not_wrap_positive():
+    """Unsigned inputs are converted before signed rate arithmetic."""
+    coefficient = np.uint64(2**63)
+    concentration = np.uint64(2)
+
+    result = get_dilution_rate(coefficient, concentration)
+    expected = -np.float64(coefficient) * np.float64(concentration)
+
+    assert result <= 0.0
+    npt.assert_allclose(result, expected)
+
+
+def test_dilution_step_uint64_inputs_decay_without_overflow():
+    """Unsigned inputs are converted before exponential step arithmetic."""
+    coefficient = np.uint64(2**63)
+    concentration = np.uint64(3)
+    time_step = np.uint64(2)
+
+    result = get_dilution_step(coefficient, concentration, time_step)
+    expected = np.float64(concentration) * np.exp(
+        -np.float64(coefficient) * np.float64(time_step)
+    )
+
+    assert np.isfinite(result)
+    assert 0.0 <= result <= concentration
+    npt.assert_allclose(result, expected)
+
+
+@pytest.mark.parametrize(
     ("function", "arguments", "message"),
     [
         (get_volume_dilution_coefficient, (0.0, 1.0), "must be positive"),
