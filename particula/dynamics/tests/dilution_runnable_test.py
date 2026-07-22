@@ -170,6 +170,24 @@ def test_dilution_execute_substeps_matches_exact_decay(sub_steps):
         npt.assert_allclose(result, source * decay, rtol=1e-12, atol=0.0)
 
 
+def test_concrete_dilution_executes_one_total_duration_step(monkeypatch):
+    """Concrete exact dilution avoids partial mutations across substeps."""
+    aerosol = _make_aerosol()
+    strategy = DilutionStrategy(0.25)
+    calls: list[float] = []
+    original_step = strategy.step
+
+    def record_step(step_aerosol, step_time):
+        calls.append(step_time)
+        return original_step(step_aerosol, step_time)
+
+    monkeypatch.setattr(strategy, "step", record_step)
+
+    assert Dilution(strategy).execute(aerosol, 4.0, sub_steps=4) is aerosol
+
+    npt.assert_allclose(calls, [4.0])
+
+
 @pytest.mark.parametrize("coefficient, time_step", [(0.0, 2.0), (0.5, 0.0)])
 def test_dilution_execute_no_ops_are_exact(coefficient, time_step):
     """Zero coefficient or duration leaves every concentration unchanged."""
