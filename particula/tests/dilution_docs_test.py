@@ -474,10 +474,14 @@ def test_local_link_resolver_rejects_unsafe_targets(
     read_paths: list[Path] = []
     original_read_text = Path.read_text
 
-    def _read_source_only(path: Path, *args: object, **kwargs: object) -> str:
+    def _read_source_only(
+        path: Path,
+        encoding: str | None = None,
+        errors: str | None = None,
+    ) -> str:
         read_paths.append(path)
         assert path == source
-        return original_read_text(path, *args, **kwargs)
+        return original_read_text(path, encoding=encoding, errors=errors)
 
     monkeypatch.setattr(Path, "read_text", _read_source_only)
 
@@ -498,10 +502,14 @@ def test_local_link_resolver_rejects_outside_root_symlink(
     read_paths: list[Path] = []
     original_read_text = Path.read_text
 
-    def _read_source_only(path: Path, *args: object, **kwargs: object) -> str:
+    def _read_source_only(
+        path: Path,
+        encoding: str | None = None,
+        errors: str | None = None,
+    ) -> str:
         read_paths.append(path)
         assert path == source
-        return original_read_text(path, *args, **kwargs)
+        return original_read_text(path, encoding=encoding, errors=errors)
 
     monkeypatch.setattr(Path, "read_text", _read_source_only)
 
@@ -521,10 +529,14 @@ def test_local_link_resolver_rejects_special_target_before_reading_it(
     read_paths: list[Path] = []
     original_read_text = Path.read_text
 
-    def _read_source_only(path: Path, *args: object, **kwargs: object) -> str:
+    def _read_source_only(
+        path: Path,
+        encoding: str | None = None,
+        errors: str | None = None,
+    ) -> str:
         read_paths.append(path)
         assert path == source
-        return original_read_text(path, *args, **kwargs)
+        return original_read_text(path, encoding=encoding, errors=errors)
 
     monkeypatch.setattr(Path, "read_text", _read_source_only)
 
