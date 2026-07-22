@@ -49,15 +49,22 @@ evidence established by those completed phases.
     `|`/`RunnableSequence` ordering. No exports, GPU work, examples, or general
     user documentation were added.
 
-- [ ] **E6-F1-P4:** Harden validation and publish CPU dilution exports with tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E6-F1-P4:** Harden validation and publish CPU dilution exports with tests
+  - Issue: #1392 | Size: S | Status: Complete
   - Goal: Ensure invalid calls fail before mutation and expose the supported API
-    through `particula.dynamics` and the top-level package path.
+    through `particula.dynamics` and the `par.dynamics` path.
   - Files: `particula/dynamics/dilution.py`,
     `particula/dynamics/particle_process.py`, `particula/dynamics/__init__.py`,
     relevant import/validation tests
-  - Tests: public import smoke tests; zero/negative/nonfinite time; invalid
-    `sub_steps`; malformed shapes/types; and complete preflight immutability.
+  - Delivered: shared concrete preflight before writes; retained setter-failure
+    rollback; concrete-only runnable preflight before its first substep; and
+    unchanged generic custom-strategy delegation. Exported `DilutionStrategy`
+    and `Dilution`, while retaining concrete-only helpers.
+  - Tests: `dilution_test.py` and `dilution_runnable_test.py` cover malformed
+    sources, storage, volume, candidate shapes, zero-duration/zero-coefficient
+    validation ordering, rollback, and first-substep preflight;
+    `dilution_exports_test.py` covers public imports, identity, `__all__`, and
+    `par.dynamics` construction/execution.
 
 - [ ] **E6-F1-P5:** Update development documentation and CPU dilution example
   - Issue: TBD | Size: XS | Status: Not Started

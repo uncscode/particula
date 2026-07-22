@@ -31,9 +31,17 @@ thresholds must never be lowered; changed code must meet at least the configured
   Spy strategies verify equal slice count, invalid substep/time failure before
   strategy calls or mutation, preservation of original-aerosol identity despite
   a nonconforming strategy return, and `|`/`RunnableSequence` ordering.
-- **P4:** Add public import and preflight immutability tests. Parameterize zero,
-  negative, nonfinite, boolean/non-integer `sub_steps`, malformed shapes, and
-  invalid existing state; verify both particle and gas snapshots remain exact.
+- **P4 (complete, issue #1392):**
+  `particula/dynamics/tests/dilution_test.py` extends direct coverage with
+  malformed physical particle and both gas-group sources, particle backing
+  storage, volume, and candidate-shape failures before setters run, including
+  zero-duration/zero-coefficient ordering and rollback snapshots.
+  `particula/dynamics/tests/dilution_runnable_test.py` verifies concrete
+  supported-runnable preflight before the first substep while preserving valid
+  custom strategy equal-substep delegation. The new
+  `particula/dynamics/tests/dilution_exports_test.py` verifies direct dynamics
+  imports, symbol identity, dynamic `__all__`, and `par.dynamics`
+  construction/execution. Concrete helpers remain absent from that public API.
 - **P5:** Execute the CPU example in the docs test path, validate links, and run
   all focused dilution tests.
 
@@ -58,6 +66,7 @@ helper imports and outputs so introducing the strategy cannot break users.
 ```bash
 pytest particula/dynamics/tests/dilution_test.py -q
 pytest particula/dynamics/tests/dilution_runnable_test.py -q
+pytest particula/dynamics/tests/dilution_exports_test.py -q
 ruff check particula/dynamics/ --fix
 ruff format particula/dynamics/
 ruff check particula/dynamics/

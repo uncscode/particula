@@ -18,6 +18,11 @@ Issue #1391 added Google-style concrete-module docstrings for
 contracts. It deliberately added no package exports, public user documentation,
 examples, indexes, or GPU documentation; those remain P4/P5 work.
 
+Issue #1392 completed the P4 API publication only: `DilutionStrategy` and
+`Dilution` are available from `particula.dynamics` and `par.dynamics`, while
+`get_dilution_step` and `dilute_aerosol` remain concrete-module-only. It did
+not add a user guide, example, index, or GPU documentation; those remain P5.
+
 - Update the dilution API documentation to distinguish equation helpers,
   strategy behavior, and the `Dilution` runnable.
 - State SI units for volume, inlet flow, coefficient, elapsed time, particle

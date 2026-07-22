@@ -45,6 +45,18 @@ identity. Regression coverage lives in
 `particula/dynamics/tests/dilution_runnable_test.py`. P3 deliberately added no
 package exports, GPU support, examples, or general user documentation.
 
+P4 is complete in issue #1392. The concrete dilution path now completes its
+particle, gas, volume, storage, and candidate-shape preflight before any
+concentration write, including zero-duration and zero-coefficient calls.
+`DilutionStrategy.step()` uses the same preflight, while
+`Dilution.execute()` performs it once before its first substep only for a
+`DilutionStrategy`; compatible custom strategies retain generic equal-substep
+delegation and own validation/atomicity. Commit-failure rollback remains in
+place. `DilutionStrategy` and `Dilution` are now supported exports from
+`particula.dynamics` (and therefore `par.dynamics`); concrete helpers remain
+module-only. Focused direct, runnable, and export regressions record this
+boundary.
+
 ## User Stories
 
 - As a simulation user, I want to compose dilution with existing runnables so

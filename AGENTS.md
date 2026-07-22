@@ -258,6 +258,29 @@ aerosol = wall_loss.execute(aerosol, time_step=1.0, sub_steps=2)
 - Supported `distribution_type` values are `"discrete"`, `"continuous_pdf"`,
   and `"particle_resolved"`.
 
+### CPU dilution
+
+```python
+import particula as par
+
+strategy = par.dynamics.DilutionStrategy(coefficient=1.0e-4)  # 1/s
+dilution = par.dynamics.Dilution(strategy)
+aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
+```
+
+**Key points:**
+
+- `DilutionStrategy` and `Dilution` are the supported public APIs under
+  `particula.dynamics`.
+- The concrete strategy validates particle and gas concentration/storage state
+  before mutation. Preflight failures leave the aerosol unchanged; unexpected
+  setter failures restore already-written concentration state.
+- `Dilution.execute()` performs concrete-strategy preflight before its first
+  equal substep. Custom compatible strategies retain generic equal-substep
+  delegation and own validation and atomicity.
+- `dilute_aerosol` and `get_dilution_step` remain concrete-module-only helpers;
+  do not import them from `particula.dynamics`.
+
 ### GPU environment round trips
 
 ```python

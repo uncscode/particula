@@ -47,13 +47,21 @@
 
 ## E6-F1-P4 — Validation and Exports
 
-1. Centralize preflight so every error occurs before particle or gas writes.
-2. Cover nonfinite/negative time, invalid `sub_steps`, malformed NumPy shapes,
-   unsupported types, and invalid concentration state.
-3. Export strategy and runnable through `particula.dynamics` and verify the
-   normal `import particula as par` usage path.
-4. Run focused tests, Ruff, and mypy on touched modules without changing
-   coverage thresholds.
+**Complete in issue #1392.**
+
+1. [x] Centralized concrete-path preflight before every particle or gas write,
+   retaining rollback for unexpected later setter failures.
+2. [x] Added direct and runnable coverage for invalid scalar/state, storage,
+   volume, and candidate-shape inputs, including zero-duration/zero-coefficient
+   malformed state and supported-runnable preflight before its first substep.
+3. [x] Preserved generic equal-substep delegation for compatible custom
+   strategies without concrete-storage probing.
+4. [x] Exported `DilutionStrategy` and `Dilution` through `particula.dynamics`
+   and covered direct, `__all__`, and `import particula as par` import paths in
+   `particula/dynamics/tests/dilution_exports_test.py`.
+5. [x] Recorded focused validation in `dilution_test.py`,
+   `dilution_runnable_test.py`, and `dilution_exports_test.py`; the final
+   verification commands remain the focused pytest, Ruff, and mypy commands.
 
 ## E6-F1-P5 — Documentation
 

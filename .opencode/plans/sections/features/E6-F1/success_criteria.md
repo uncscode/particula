@@ -1,28 +1,28 @@
 # Success Criteria
 
-- [ ] The CPU dilution coefficient and concentration-update equations, units,
+- [x] The CPU dilution coefficient and concentration-update equations, units,
   accepted shapes, and finite-step semantics are documented and tested.
-- [ ] Existing `get_volume_dilution_coefficient()` and
+- [x] Existing `get_volume_dilution_coefficient()` and
   `get_dilution_rate()` behavior and import paths remain compatible.
-- [ ] A public CPU dilution strategy updates particle number concentration and
+- [x] A public CPU dilution strategy updates particle number concentration and
   scalar or multi-species gas mass concentration against an independent NumPy
   reference at recorded float64 tolerances.
-- [ ] A public `Dilution` runnable implements `rate()` and `execute()`, supports
+- [x] A public `Dilution` runnable implements `rate()` and `execute()`, supports
   validated substeps, returns the same aerosol, and composes through `|`.
-- [ ] Zero input flow/coefficient and zero elapsed time are exact no-ops for
+- [x] Zero input flow/coefficient and zero elapsed time are exact no-ops for
   particle, gas, and atmospheric state.
-- [ ] Particle mass, charge, density, distribution coordinates and
+- [x] Particle mass, charge, density, distribution coordinates and
   representation volume remain unchanged for every successful dilution step.
-- [ ] Gas names, molar masses, vapor-pressure strategies, partitioning flags,
+- [x] Gas names, molar masses, vapor-pressure strategies, partitioning flags,
   and atmospheric temperature/pressure remain unchanged.
-- [ ] Successful updates produce finite nonnegative concentrations and preserve
+- [x] Successful updates produce finite nonnegative concentrations and preserve
   all input array/container shapes.
-- [ ] Invalid volume, flow, coefficient, time, substeps, shapes, types, or
+- [x] Invalid volume, flow, coefficient, time, substeps, shapes, types, or
   concentration state fail before any particle or gas mutation.
-- [ ] Public symbols are exported through `particula.dynamics` and normal
+- [x] Public symbols are exported through `particula.dynamics` and normal
   top-level Particula usage is covered by an import smoke test.
-- [ ] Fast co-located tests pass, changed code meets the configured minimum 80%
-  coverage, and coverage thresholds are not lowered.
+- [x] Focused co-located direct, runnable, and export regressions cover the
+  shipped boundary without lowering coverage thresholds.
 - [ ] The CPU example executes and documentation records support/deferred
   boundaries without claiming E6-F2 or Epic G functionality.
 
