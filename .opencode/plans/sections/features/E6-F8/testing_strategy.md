@@ -31,9 +31,10 @@ independent E6-F7 float64 oracle, never the production GPU helper itself.
 
 ## Required Invariants
 
-- Per box/species, represented particle mass plus gas mass is conserved at
-  target `rtol=1e-12`, `atol=1e-30`; any fixture adjustment requires written
-  numerical justification. Aggregate-only checks are insufficient.
+- Without scaling, per-box/species represented particle plus gas mass is
+  conserved. With scale `s`, final represented totals match `s * pre_total` and
+  intensive concentration plus source transfer balance remain conserved at
+  target `rtol=1e-12`, `atol=1e-30`. Aggregate-only checks are insufficient.
 - Potential/admitted events and deterministic outputs match the CPU oracle at
   recorded float64 tolerances; gas remains finite and nonnegative.
 - Zero time, coefficient, precursor, survival, and unsatisfied configured gates

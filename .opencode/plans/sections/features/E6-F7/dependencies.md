@@ -6,9 +6,9 @@
   E6-F7 consumes its active/free truth table, ascending slot order, request
   shape, exact counts, and atomic CPU activation without weakening semantics.
 - **E6-F6 / T6: Slot-exhaustion resampling and volume scaling** is mandatory.
-  E6-F7 passes complete finalized demand to its resampling-first planner and
-  optional scaling fallback. Both policies off with insufficient capacity must
-  fail before gas or particle mutation.
+  E6-F7 passes provisional gas-admitted demand to its resampling-first planner
+  and optional scaling path, then finalizes represented demand from the returned
+  scale. Both policies off with insufficient capacity must fail before mutation.
 - Existing `GasData`, `ParticleData`, dynamics strategy/runnable conventions,
   and nucleation theory provide container and API foundations.
 
@@ -22,8 +22,8 @@
 
 ## Phase Ordering
 
-P1 freezes equations, units, domains, and strategy behavior before P2 source
-finalization. P2 precedes P3 because exhaustion consumes finalized complete
+P1 freezes equations, units, domains, and strategy behavior before P2 gas
+admission. P2 precedes P3 because exhaustion consumes provisional admitted
 demand. P4 exposes only the stable P1-P3 contract. P5 adds the runnable. P6
 verifies the complete transaction and creates the E6-F8 oracle. P7 is the final
 documentation phase. Every production phase includes co-located tests.

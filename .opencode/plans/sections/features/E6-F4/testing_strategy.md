@@ -37,10 +37,11 @@ scientific tolerance, or E6-F3 invariant may be weakened. Test modules use the
 - **P5 parity/stochastic validation:** In
   `particula/gpu/kernels/tests/wall_loss_parity_test.py`, require Warp CPU for a
   deterministic geometry/charge/field coefficient matrix. Compare the charged
-  mode with zero charge against the E6-F3 neutral device coefficient exactly or
-  at the documented zero-roundoff contract, and compare both to CPU at recorded
-  fp64 tolerances. Validate survival counts against `exp(-k*dt)` with predeclared
-  binomial confidence/sigma bounds over enough independent particles/seeds.
+  mode with zero charge against the E6-F3 neutral device coefficient, survivor
+  state, and final identically initialized RNG state by exact same-device
+  equality, and compare both modes to CPU at recorded fp64 tolerances. Validate
+  survival counts against `exp(-k*dt)` with the frozen eight-stratum exact
+  binomial contract over independent particles/seeds.
   Exact NumPy/Warp draws are never expected. Repeat on CUDA when available and
   skip cleanly otherwise.
 - **P6 documentation:** Validate links, imports, SI units, semantic examples,

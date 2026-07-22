@@ -10,7 +10,7 @@
   "target_date": null,
   "completion_date": null,
   "last_updated": "2026-07-21",
-  "dependencies": [],
+  "dependencies": ["E6-F3"],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E6-F4/architecture_design.md",
     "change_log": ".opencode/plans/sections/features/E6-F4/change_log.md",

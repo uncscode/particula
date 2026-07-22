@@ -22,7 +22,7 @@ active fixed slot --> E6-F3 neutral coefficient k_neutral
         +-- charge == 0 --> k = k_neutral (exact fallback)
         |
         +-- charge != 0 --> phi = exp(clip(abs(coulomb_ratio), -50, 50))
-                            E = |configured field| + potential / geometry scale
+                            E = resolved field + potential / geometry scale
                             drift = signed mobility(charge, radius, T) * E / scale
                             k = finite_nonnegative(k_neutral * phi + drift)
         |
@@ -35,8 +35,9 @@ The zero-charge branch must use the same neutral value and stochastic decision
 machinery as E6-F3. A configured field without charge does not alter the
 coefficient. Nonzero charge retains image-charge enhancement when wall
 potential is zero. Potential-derived field and explicit field magnitude are
-additive, while charge sign is preserved by the drift term before final
-nonnegative clipping.
+additive. The resolved field retains a spherical scalar's sign and uses the
+Euclidean norm of a rectangular vector. Charge sign is preserved by the drift
+term before final nonnegative clipping.
 
 ## Data / API / Workflow Changes
 

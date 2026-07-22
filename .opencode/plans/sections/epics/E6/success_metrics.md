@@ -5,8 +5,9 @@
 - [ ] GPU dilution and wall-loss coefficients/results meet recorded
   deterministic or statistical tolerances against CPU references.
 - [ ] Zero charge and zero field reproduce neutral wall-loss behavior.
-- [ ] CPU/GPU nucleation conserves per-box/species inventory and never creates
-  negative gas concentration.
+- [ ] CPU/GPU nucleation conserves unscaled per-box/species inventory; scaled
+  cases match `s * pre_total` and preserve intensive concentration plus source
+  transfer balance. Gas concentration never becomes negative.
 - [ ] Slot activation preserves every array shape and reports exact per-box
   activated, resampled, scaled, and rejected demand diagnostics.
 - [ ] Resampling defaults on; representative-volume scaling defaults off; both

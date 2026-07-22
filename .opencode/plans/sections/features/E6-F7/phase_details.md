@@ -6,17 +6,17 @@
   - Files: `particula/dynamics/nucleation/nucleation_strategies.py`, `particula/dynamics/nucleation/tests/nucleation_strategies_test.py`
   - Tests: Equation fixtures, unit conversion, linear/quadratic scaling, no-op gates, boundaries, and out-of-domain rejection.
 
-- [ ] **E6-F7-P2:** Finalize inventory-limited gas-to-particle source records with unit tests
+- [ ] **E6-F7-P2:** Compute inventory-limited provisional source demand with unit tests
   - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Convert potential events to immutable source records and jointly cap all species by gas availability before mutation.
+  - Goal: Convert potential events to immutable gas-admitted demand records and jointly cap all species by gas availability before representation planning or mutation.
   - Files: `particula/dynamics/nucleation/particle_source.py`, `particula/dynamics/nucleation/tests/particle_source_test.py`
   - Tests: Limiting species, exact depletion, zero inventory/time/rate, represented weight, diagnostics, and input snapshots.
 
 - [ ] **E6-F7-P3:** Integrate slot activation and exhaustion transaction with unit tests
   - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Plan complete E6-F5 activation and E6-F6 exhaustion before atomically committing particle source and gas depletion.
+  - Goal: Plan E6-F5 activation and E6-F6 exhaustion, finalize any scaled demand, then atomically commit particle source and matching gas depletion.
   - Files: `particula/dynamics/nucleation/particle_source.py`, `particula/dynamics/nucleation/tests/particle_source_test.py`
-  - Tests: Free/full/sparse slots, resampling-first and scaling fallback, policies-off failure, no truncation, and failure atomicity.
+  - Tests: Free/full/sparse slots, resampling-first and scaling fallback, provisional-to-represented demand diagnostics, policies-off failure, no final-domain residual, and failure atomicity.
 
 - [ ] **E6-F7-P4:** Add nucleation builders factory and public strategy APIs with unit tests
   - Issue: TBD | Size: S | Status: Not Started

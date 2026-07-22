@@ -6,8 +6,8 @@
   fixed-shape active/free diagnostics, deterministic free indices, request
   contracts, and atomic activation. Plan metadata must retain this dependency.
 - **E6-F6 / T6 (Particle Slot Exhaustion Handling):** mandatory source of
-  complete-demand resampling-first planning and optional representative-volume
-  scaling fallback. Plan metadata must retain this dependency.
+  resampling-first planning and optional representative-volume scaling of
+  provisional demand. Plan metadata must retain this dependency.
 - **E6-F7 / T7 (CPU Nucleation and Particle-Source Process):** mandatory
   scientific, inventory-finalization, no-op, mutation, and float64 oracle
   contract. GPU work must not begin by inventing alternate physics.
@@ -23,8 +23,8 @@
 
 ## Phase Ordering
 
-P1 freezes sidecars and validation before P2 writes finalization kernels. P3
-requires E6-F5; P4 requires E6-F6 and finalized demand from P2. P5 composes P2
+P1 freezes sidecars and validation before P2 writes gas-admission kernels. P3
+requires E6-F5; P4 requires E6-F6 and provisional demand from P2. P5 composes P2
 through P4 only after all contracts are tested. P6 supplies integration parity
 and conservation evidence before final P7 documentation. E6-F5, E6-F6, and
 E6-F7 remain dependencies of the whole feature, not merely optional phases.

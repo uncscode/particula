@@ -9,7 +9,8 @@
 - [ ] Implement read-only validation and feasibility planning across all boxes.
 - [ ] Implement deterministic resampling selection, moment accounting, and one
   commit boundary without resizing.
-- [ ] Implement bounded representative-volume/weight reciprocal scaling.
+- [ ] Implement bounded same-direction representative-volume, raw-weight, and
+  source-demand scaling.
 - [ ] Export only stable CPU helpers through `particula/particles/__init__.py`.
 
 ## Direct Warp

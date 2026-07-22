@@ -8,9 +8,9 @@
 
 - [ ] **E6-F6-P2:** Implement deterministic CPU resampling reference with unit tests
   - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Precompute and apply deterministic merge/redistribution operations that free enough slots while preserving required moments.
+  - Goal: Precompute and apply deterministic equal-weight conservative remapping that frees enough slots while preserving required moments.
   - Files: `particula/particles/exhaustion.py`, `particula/particles/tests/exhaustion_test.py`, `particula/particles/__init__.py`
-  - Tests: Sparse/full boxes, deterministic pair selection, multi-species mass/number/charge conservation, free-slot clearing, and bounded distribution distortion.
+  - Tests: Sparse/full boxes, stable ordering/tie breaks, multi-species mass/number/charge conservation, free-slot clearing, and bounded distribution distortion.
 
 - [ ] **E6-F6-P3:** Implement allocation-stable Warp resampling with parity tests
   - Issue: TBD | Size: S | Status: Not Started
@@ -20,9 +20,9 @@
 
 - [ ] **E6-F6-P4:** Add optional CPU and Warp representative-volume scaling with tests
   - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Scale per-box representative volume and particle weights reciprocally under an explicit bound while preserving represented inventories.
+  - Goal: Scale per-box representative volume, raw weights, and source demand in the same direction under explicit bounds while preserving intensive concentrations.
   - Files: `particula/particles/exhaustion.py`, `particula/gpu/kernels/exhaustion.py`, corresponding `*_test.py` files
-  - Tests: CPU/Warp scale-factor parity, per-box isolation, exact reciprocal updates, identity preservation, bound failures, and inventory conservation.
+  - Tests: CPU/Warp scale-factor parity, per-box isolation, exact same-direction updates, source-demand transformation, identity preservation, bound failures, and concentration conservation.
 
 - [ ] **E6-F6-P5:** Enforce independent controls, resampling-first precedence, and fail-closed validation
   - Issue: TBD | Size: S | Status: Not Started

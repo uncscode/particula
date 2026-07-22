@@ -23,8 +23,9 @@
 ## Sibling Boundaries
 
 - E6-F5 classifies/activates slots but never chooses an exhaustion policy.
-- E6-F7/E6-F8 own nucleation physics, gas inventory limitation, and source
-  records; E6-F6 owns only fixed-slot resolution of already-finalized demand.
+- E6-F7/E6-F8 own nucleation physics and gas inventory limitation. E6-F6 owns
+  fixed-slot resolution of provisional gas-admitted demand and returns the
+  representation scale used by E6-F7/E6-F8 to finalize source records.
 - E6-F3/E6-F4 can create free slots through wall loss but do not invoke E6-F6.
 
 ## Phase Ordering
