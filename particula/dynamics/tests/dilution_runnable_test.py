@@ -75,6 +75,10 @@ def _concentrations(
         (np.nan, ValueError, "coefficient.*finite"),
         (np.inf, ValueError, "coefficient.*finite"),
         (np.array([1.0]), ValueError, "coefficient.*scalar"),
+        (True, TypeError, "coefficient.*boolean"),
+        (False, TypeError, "coefficient.*boolean"),
+        (np.bool_(True), TypeError, "coefficient.*boolean"),
+        (np.bool_(False), TypeError, "coefficient.*boolean"),
     ],
 )
 def test_dilution_strategy_rejects_invalid_coefficients(
@@ -124,6 +128,10 @@ def test_dilution_strategy_rate_and_step_follow_primitive_contract():
         (np.nan, ValueError, "time_step.*finite"),
         (np.inf, ValueError, "time_step.*finite"),
         (np.array([1.0]), ValueError, "time_step.*scalar"),
+        (True, TypeError, "time_step.*boolean"),
+        (False, TypeError, "time_step.*boolean"),
+        (np.bool_(True), TypeError, "time_step.*boolean"),
+        (np.bool_(False), TypeError, "time_step.*boolean"),
     ],
 )
 def test_dilution_strategy_step_propagates_validation_without_mutation(
@@ -220,7 +228,7 @@ class SpyStrategy:
         self.rate_result = rate_result
         self.calls: list[tuple[Aerosol, float]] = []
 
-    def rate(self, aerosol: Aerosol):
+    def rate(self, aerosol: Aerosol) -> float | np.ndarray:
         return self.rate_result
 
     def step(self, aerosol: Aerosol, time_step: float) -> Aerosol:
@@ -233,7 +241,7 @@ def test_dilution_delegates_rate_and_equal_substeps():
     aerosol = _make_aerosol()
     rate_result = np.array([-1.0, -2.0])
     strategy = SpyStrategy(rate_result)
-    dilution = Dilution(strategy)  # type: ignore[arg-type]
+    dilution = Dilution(strategy)
 
     assert dilution.rate(aerosol) is rate_result
     assert dilution.execute(aerosol, 3.0, 3) is aerosol
@@ -279,6 +287,23 @@ def test_dilution_rejects_invalid_duration_before_delegation(
         Dilution(strategy).execute(aerosol, time_step)  # type: ignore[arg-type]
 
     assert strategy.calls == []
+    for result, source in zip(_concentrations(aerosol), sources, strict=True):
+        npt.assert_array_equal(result, source)
+
+
+@pytest.mark.parametrize(
+    "time_step", [True, False, np.bool_(True), np.bool_(False)]
+)
+def test_concrete_dilution_execute_rejects_boolean_duration_without_mutation(
+    time_step,
+):
+    """Concrete runnable execution rejects booleans before preflight writes."""
+    aerosol = _make_aerosol()
+    sources = _concentrations(aerosol)
+
+    with pytest.raises(TypeError, match="time_step.*boolean"):
+        Dilution(DilutionStrategy(0.25)).execute(aerosol, time_step, 2)
+
     for result, source in zip(_concentrations(aerosol), sources, strict=True):
         npt.assert_array_equal(result, source)
 
