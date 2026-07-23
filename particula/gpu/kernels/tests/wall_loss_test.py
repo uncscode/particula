@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import FrozenInstanceError
 from types import SimpleNamespace
+from typing import Any, cast
 
 import numpy as np
 import numpy.testing as npt
@@ -274,10 +275,12 @@ def test_config_physical_payload_validation_fails_before_particles(
             "spherical", 0.0, chamber_radius=1.0
         ),
         "string_radius": NeutralWallLossConfig(
-            "spherical", 0.01, chamber_radius="1"
+            "spherical", 0.01, chamber_radius=cast(Any, "1")
         ),
         "list_dimensions": NeutralWallLossConfig(
-            "rectangular", 0.01, chamber_dimensions=[1.0, 2.0, 3.0]
+            "rectangular",
+            0.01,
+            chamber_dimensions=cast(Any, [1.0, 2.0, 3.0]),
         ),
         "infinite_dimension": NeutralWallLossConfig(
             "rectangular", 0.01, chamber_dimensions=(1.0, np.inf, 3.0)
