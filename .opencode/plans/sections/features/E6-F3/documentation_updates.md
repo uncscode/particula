@@ -51,3 +51,19 @@ slots. They state that zero time is write-free after preflight, supplied
 `rng_states` is not initialized or advanced, pre-launch failures are atomic, and
 rollback after a mutation launch is not promised. P5/P6 retain persistent-RNG and
 CPU/Warp stochastic-parity documentation ownership.
+
+## P5 / #1405 Status
+
+P5 updates `particula/gpu/kernels/wall_loss.py`, `AGENTS.md`, `readme.md`,
+`docs/index.md`, `docs/Features/data-containers-and-gpu-foundations.md`,
+`docs/Features/Roadmap/data-oriented-gpu.md`, and
+`.opencode/guides/architecture/architecture_outline.md` for the shipped
+caller-owned lifecycle. They state that an omitted RNG sidecar is private and
+initialized for each successful positive-time call; a supplied same-device
+`(n_boxes,)` `wp.uint32` sidecar mutates in place and is reset only by
+`initialize_rng=True`; and repeated `rng_seed` values do not implicitly reset
+supplied state. The contract also records sequential per-box eligible-slot
+advancement, write-free zero time and rejected preflight, explicit ownership/no
+hidden transfers, and no CPU/Warp or cross-device stochastic-trajectory claim.
+Focused normal and `--benchmark` smoke commands are documented. P6 remains
+responsible for the full statistical CPU/Warp parity matrix.

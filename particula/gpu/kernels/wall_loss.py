@@ -1,7 +1,11 @@
 """Apply bounded neutral direct GPU wall loss to fixed particle slots.
 
-The P5 boundary retains P3 preflight ordering and supports caller-owned,
-per-box RNG state for eligible particle-resolved slots.
+This concrete direct-kernel boundary supports only neutral,
+particle-resolved wall loss. It retains P3's read-only preflight ordering and
+uses sequential per-box random-number generation for eligible fixed slots.
+An omitted RNG sidecar is private and seeded for each successful positive-time
+call. A supplied ``uint32`` Warp sidecar remains caller-owned, advances in
+place only for eligible slots, and resets only when explicitly requested.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -380,7 +384,7 @@ def _should_remove_for_survival_draw(
 @no_type_check
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 def _initialize_rng_states(seed: Any, rng_states: Any) -> None:
-    """Initialize or reset one caller-owned RNG state per particle box."""
+    """Initialize or reset one execution RNG state per particle box."""
     box = wp.tid()
     rng_states[box] = wp.rand_init(wp.int32(seed), wp.int32(box))
 
@@ -505,7 +509,7 @@ def wall_loss_step_gpu(
 ) -> Any:
     """Apply P5 neutral wall loss to eligible particle-resolved slots.
 
-    The configuration supports only particle-resolved neutral wall loss.  SI
+    The configuration supports only particle-resolved neutral wall loss. SI
     inputs are wall eddy diffusivity [m^2 s^-1], geometry dimensions [m],
     temperature [K], pressure [Pa], and ``time_step`` [s]. After frozen P3
     preflight, positive-time calls evaluate neutral coefficients for usable
@@ -514,12 +518,14 @@ def wall_loss_step_gpu(
     post-preflight write-free no-op.
 
     Omitted ``rng_states`` uses a private per-call sidecar initialized from
-    ``rng_seed``. A supplied sidecar remains caller-owned, advances in place
-    only for eligible slots, and resets only when ``initialize_rng=True``.
-    Eligible slots have positive concentration, positive usable mass and derived
-    transport properties, and a finite positive wall-loss coefficient. Zero
-    time and pre-launch validation failures leave supplied state unchanged.
-    Rollback is not promised after a mutation kernel has launched.
+    ``rng_seed`` after successful positive-time preflight. A supplied
+    same-device ``uint32`` sidecar with shape ``(n_boxes,)`` remains
+    caller-owned, advances in place only for eligible slots, and resets only
+    when ``initialize_rng=True``. Eligible slots have positive concentration,
+    usable positive mass and derived transport properties, and a finite
+    positive wall-loss coefficient. Zero time and pre-launch validation
+    failures leave supplied state unchanged. Rollback is not promised after a
+    mutation kernel has launched.
 
     Args:
         particles: Caller-owned fixed-shape ``WarpParticleData``-like object.
@@ -527,13 +533,16 @@ def wall_loss_step_gpu(
         pressure: Scalar or per-box Warp pressure [Pa].
         time_step: Finite nonnegative duration [s].
         config: Exact neutral geometry and representation configuration.
-        rng_seed: Unsigned 32-bit seed used for private state or explicit reset.
-        rng_states: Optional caller-owned per-box unsigned RNG state.
-        initialize_rng: Whether to reset a supplied state from ``rng_seed``.
+        rng_seed: Unsigned 32-bit seed for private state or an explicit reset.
+        rng_states: Optional caller-owned same-device ``uint32`` Warp array
+            with shape ``(n_boxes,)``. The array is mutated in place only by
+            eligible positive-time work.
+        initialize_rng: Whether to reset supplied ``rng_states`` from
+            ``rng_seed`` before a successful positive-time call.
         environment: Optional explicit Warp environment source.
 
     Returns:
-        The identical ``particles`` object after successful execution.
+        The identical ``particles`` object. Private RNG state is not returned.
 
     Raises:
         TypeError: If the configuration, time step, RNG metadata, or direct

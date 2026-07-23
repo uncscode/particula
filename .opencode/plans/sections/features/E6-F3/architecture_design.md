@@ -105,17 +105,24 @@ validation before caller mutation. Documentation must not claim exact cross-
 backend RNG sequences, mandatory CUDA, charged support, hidden transfer,
 general multi-box transport, graph capture, or performance guarantees.
 
-## Shipped P4 Execution Design
+## Shipped P4-P5 Execution and RNG Design
 
 P4 retains P3's entry-point signature and validation order. Only after preflight
 succeeds, a positive-time call normalizes environment values, allocates a private
 removal mask, evaluates the applicable neutral coefficient for each usable slot,
-and applies a separate clearing kernel. Each eligible slot uses exactly one
-call-local deterministic seed-plus-flattened-slot draw against
-`exp(-k * time_step)`. Unusable derived transport values and nonpositive or
-nonfinite coefficients survive without a draw. Marked slots have every mass
-lane, concentration, and charge zeroed; density, volume, inactive slots, and
-survivors remain unchanged. Zero time returns after preflight without runtime
-normalization or writes. P4 does not initialize, read, or advance `rng_states`;
-P5 owns lifecycle semantics. Rejected pre-launch calls are atomic, while
-post-launch rollback is not promised.
+and applies a separate clearing kernel. Unusable derived transport values and
+nonpositive or nonfinite coefficients survive without a draw. Marked slots have
+every mass lane, concentration, and charge zeroed; density, volume, inactive
+slots, and survivors remain unchanged.
+
+P5 resolves RNG state only after that successful positive-time preflight. An
+omitted sidecar receives a private per-call `(n_boxes,)` `wp.uint32` buffer
+initialized from `rng_seed`; a supplied buffer is retained by identity, reused
+as-is, and initialized from `rng_seed` only when `initialize_rng=True`. The
+removal-mask kernel has one sequential owner per box: it scans fixed slots in
+ascending order, consumes a draw only for an eligible slot, and writes the
+per-box state back once. This avoids shared-word races but deliberately limits
+RNG generation parallelism. Zero time returns after validation without state
+allocation, reset, advancement, normalization, or particle writes. Rejected
+pre-launch calls preserve particle and supplied-sidecar state; post-launch
+rollback is not promised.

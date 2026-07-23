@@ -24,6 +24,11 @@
 - [x] Add `wall_loss_step_gpu` to the lazy mapping in
   `particula/gpu/kernels/__init__.py`; do not top-level export configuration or
   introduce a high-level GPU runnable.
+- [x] Replace P4's local seed/slot draw path with a sequential per-box removal
+  mask that advances caller-owned RNG state only for eligible slots.
+- [x] Resolve omitted private state and supplied-state explicit reset only after
+  successful positive-time preflight; preserve supplied sidecars for zero time
+  and rejected calls.
 
 ## Tooling and Tests
 
@@ -64,3 +69,13 @@
   stochastic behavior, and pre-launch atomicity.
 - [x] Update bounded P4 contract documentation in the index and architecture
   guides without broadening exports or API boundaries.
+
+## P5 Completed Tasks (#1405)
+
+- [x] Add private per-box Warp RNG initialization and persistent supplied-sidecar
+  lifecycle in `particula/gpu/kernels/wall_loss.py`.
+- [x] Extend `particula/gpu/kernels/tests/wall_loss_test.py` with omitted-state,
+  initialize-once/reuse, explicit-reset, per-box, eligible-only, all-ineligible,
+  zero-time, rejection, and benchmark-smoke coverage.
+- [x] Update user and contract documentation for sidecar ownership, explicit
+  reset, sequential eligible-slot advancement, and bounded performance scope.

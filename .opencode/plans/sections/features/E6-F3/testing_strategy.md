@@ -69,7 +69,7 @@ scientific tolerance may be weakened. Test modules use the `*_test.py` suffix.
    Stochastic acceptance uses expected distributions, never exact CPU/GPU draw
    order. Zero-time and inactive-slot no-ops remain exact.
 
-## Shipped P4 Evidence (#1404)
+## Shipped P4-P5 Evidence (#1404, #1405)
 
 `particula/gpu/kernels/tests/wall_loss_test.py` now exercises P4 in the focused
 Warp-guarded suite. It covers both geometry paths, deterministic private-mask
@@ -78,5 +78,12 @@ one-/multi-box and one-/multi-species layouts, complete removal clearing,
 controlled survivor/removal paths, seeded same-device results, and aggregate
 interior-probability stochastic behavior. Snapshots assert preserved identities,
 shapes, dtypes, devices, density, volume, survivors, inactive gaps, and supplied
-`rng_states`; invalid pre-launch calls remain atomic. P4 sidecars are unchanged
-because RNG initialization/advancement is deferred to P5.
+`rng_states`; invalid pre-launch calls remain atomic.
+
+P5 adds same-device lifecycle evidence in the same module: omitted private
+state repeatability; supplied-sidecar initialize-once/reuse; explicit reset;
+independent per-box progression; eligible-only consumption; all-ineligible
+no-draw; and zero-time/rejection preservation. The opt-in
+`@pytest.mark.benchmark` smoke test records the sequential per-box lifecycle
+path without a throughput threshold. These tests intentionally do not assert
+CPU/Warp or CPU/CUDA stochastic-stream identity.

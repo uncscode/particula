@@ -40,7 +40,7 @@
 | Hidden per-step RNG reseeds with supplied state | N/A | 0 unless `initialize_rng=True` | Repeated-step RNG tests |
 | Required GPU backend evidence | N/A | Warp CPU 100%; CUDA optional clean skip | `warp_devices()` matrix |
 
-## P4 Criteria Met (#1404)
+## P4-P5 Criteria Met (#1404, #1405)
 
 - [x] Positive-time P4 execution supports both neutral spherical and rectangular
   particle-resolved configurations after frozen P3 preflight.
@@ -48,5 +48,8 @@
   changing density, volume, fixed storage, survivors, or inactive gaps.
 - [x] Zero time is an exact post-preflight write-free no-op, and rejected
   pre-launch calls preserve caller-owned particle and RNG-sidecar state.
-- [x] `rng_states` remains identity- and value-preserved because P4 neither
-  initializes nor advances it; persistent lifecycle is a P5 criterion.
+- [x] Supplied `(n_boxes,)` `wp.uint32` `rng_states` retains identity, advances
+  only for eligible successful positive-time work, and resets only with
+  `initialize_rng=True`. Omitted state remains private and per-call.
+- [x] Zero-time and preflight-rejected calls preserve supplied RNG sidecars
+  exactly; all-ineligible positive-time work consumes no RNG state.

@@ -80,7 +80,21 @@ RNG initialization/advancement, output allocation, or particle mutation.
 P4 now executes bounded neutral particle-resolved wall loss through
 `wall_loss_step_gpu`. After frozen P3 preflight, positive-time calls normalize
 the environment, evaluate the spherical or rectangular coefficient for usable
-slots, make one deterministic call-local seed-plus-slot draw per eligible slot,
-and clear every mass lane, concentration, and charge on removal. Zero-time calls
-complete preflight but make no writes. Optional `rng_states` is intentionally
-neither initialized nor advanced; persistent lifecycle remains P5 work.
+slots, make one deterministic local draw per eligible slot, and clear every mass
+lane, concentration, and charge on removal. Zero-time calls complete preflight
+but make no writes.
+
+## Delivered Phase: E6-F3-P5 (#1405)
+
+P5 ships persistent caller-owned RNG lifecycle in
+`particula/gpu/kernels/wall_loss.py`. A successful positive-time call with no
+sidecar uses a private per-call `(n_boxes,)` `wp.uint32` state initialized from
+`rng_seed`. With a supplied sidecar, the identical object is reused and mutates
+in place; it is initialized or reset only by `initialize_rng=True`, so repeating
+`rng_seed` alone never resets it. One sequential owner per box visits fixed
+slots in ascending order and advances its state only for eligible slots.
+
+`particula/gpu/kernels/tests/wall_loss_test.py` adds lifecycle, no-draw,
+atomicity, and benchmark-smoke coverage. Zero-time calls and rejected preflight
+leave supplied sidecars byte-for-byte unchanged. The P5 design makes no
+CPU/Warp stochastic trajectory or throughput claim.

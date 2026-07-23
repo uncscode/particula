@@ -54,11 +54,16 @@ kernel-entry responsibilities.
   a nonzero call evaluates coefficients and stochastically clears eligible fixed
   slots in place; zero time is write-free. Neutral coefficient helpers remain
   in `particula.gpu.dynamics.wall_loss_funcs`.
-- P4 returns the identical particle object and derives one local seed-plus-slot
-  draw per eligible slot without initializing or advancing supplied RNG state.
-  Pre-launch failures are atomic; rollback after mutation launch is not
-  promised. Charged physics, runnables, hidden transfers/fallbacks, CPU/Warp
-  stochastic parity, and P5/P6 lifecycle behavior remain deferred. See
+- P5 returns the identical particle object. Its optional `(n_boxes,)` `uint32`
+  RNG sidecar is external caller-owned state, not a `WarpParticleData` field:
+  successful positive-time calls advance each box sequentially for eligible
+  slots, while omitted state is private to the call. Explicit
+  `initialize_rng=True` is the only supplied-state reset path; zero-time and
+  preflight failures leave supplied state unchanged. This serial per-box
+  ownership is a correctness constraint, not a throughput claim. Pre-launch
+  failures are atomic; rollback after mutation launch is not promised. Charged
+  physics, runnables, hidden transfers/fallbacks, and CPU/Warp stochastic
+  parity remain deferred. See
   [ADR-001](decisions/ADR-001-neutral-gpu-wall-loss-boundary.md).
 
 ## Design Intent

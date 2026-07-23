@@ -53,17 +53,37 @@ documents only the validated direct-process contract and evidence.
      deferred execution limits, and focused test command. Comprehensive P4-P7
      behavior documentation remains deferred.
 
-- [ ] **E6-F3-P4:** Implement fixed-shape coefficient and stochastic removal kernels with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Evaluate active-slot coefficients, sample survival, and clear mass/concentration/charge for lost slots in place.
-  - Files: `particula/gpu/kernels/wall_loss.py`, `particula/gpu/kernels/tests/wall_loss_test.py`
-  - Tests: Inactive gaps, all-survive/all-remove bounds, zero-time no-op, multi-species clearing, identity and shape preservation.
+- [x] **E6-F3-P4:** Implement fixed-shape coefficient and stochastic removal kernels with unit tests
+  - Issue: #1404 | Size: S | Status: Shipped
+  - Delivered: Evaluates usable-slot neutral coefficients, makes local survival
+    draws, and clears mass/concentration/charge for removed fixed slots after
+    frozen preflight.
+  - Files: `particula/gpu/kernels/wall_loss.py`,
+    `particula/gpu/kernels/tests/wall_loss_test.py`
+  - Evidence: Inactive gaps, controlled survivor/removal paths, zero-time no-op,
+    multi-box/species layouts, fixed-slot clearing, identity preservation, and
+    pre-launch atomicity coverage.
 
-- [ ] **E6-F3-P5:** Add caller-owned persistent RNG lifecycle with repeated-step tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Reuse validated per-box RNG buffers without hidden reseeding and provide an explicit initialization/reset path.
-  - Files: `particula/gpu/kernels/wall_loss.py`, `particula/gpu/kernels/tests/wall_loss_test.py`
-  - Tests: Omitted convenience state, initialize-once reuse, explicit reset, per-box advancement, identity retention, and invalid-call non-advancement.
+- [x] **E6-F3-P5:** Add caller-owned persistent RNG lifecycle with repeated-step tests
+  - Issue: #1405 | Size: S | Status: Shipped
+  - Delivered: Replaced P4's local seed/slot draw path with caller-owned
+    per-box lifecycle. Successful positive-time calls allocate and seed omitted
+    private state, or reuse supplied state by identity; only
+    `initialize_rng=True` resets supplied state. One sequential owner advances
+    each box in ascending fixed-slot order for eligible slots only.
+  - Files: `particula/gpu/kernels/wall_loss.py`,
+    `particula/gpu/kernels/tests/wall_loss_test.py`, `AGENTS.md`, `readme.md`,
+    `docs/index.md`, `docs/Features/data-containers-and-gpu-foundations.md`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`, and
+    `.opencode/guides/architecture/architecture_outline.md`
+  - Evidence: Focused lifecycle coverage verifies omitted-state convenience,
+    initialize-once reuse, explicit reset, independent boxes, eligible-only
+    consumption, all-ineligible no-draw, and exact sidecar preservation for
+    zero time and rejected preflight. An opt-in benchmark-marked smoke test
+    covers the sequential path without a throughput threshold.
+  - Boundary: The sidecar remains external and is never returned. No hidden
+    transfer/fallback, runnable, charged physics, cross-device RNG-trajectory
+    parity, or GPU performance claim is added.
 
 - [ ] **E6-F3-P6:** Add deterministic coefficient and statistical CPU-Warp parity matrix
   - Issue: TBD | Size: S | Status: Not Started

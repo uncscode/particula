@@ -12,9 +12,9 @@ reference and existing direct-Warp process contracts.
     Device-only `debye_1_wp` and `x_coth_x_wp` were added in particle properties;
     no wall-loss coefficient or high-level API export was broadened.
 - [x] What does `time_step == 0` do to RNG state?
-  - Decision: after validation it performs no draws and no particle writes.
-    Supplied RNG is byte-for-byte unchanged unless the caller explicitly asks
-    for `initialize_rng=True`, whose reset remains an intentional side effect.
+  - Decision (implemented in P5 / #1405): after validation it performs no draws,
+    no particle writes, and no supplied-sidecar initialization or reset, even
+    when `initialize_rng=True`.
 - [x] Which fixed-slot active predicate applies?
   - Decision: use the E6 shared truth table. Positive finite concentration and
     positive finite total mass are active; the all-zero mass/concentration/
@@ -22,10 +22,11 @@ reference and existing direct-Warp process contracts.
     RNG or mutation. Legacy inactive sentinels outside new E6 APIs are not
     retrofitted here.
 - [x] How is wall-loss RNG initialized?
-  - Decision: extract a private shared per-box `wp.uint32` initialization
-    primitive and expose a wall-loss-specific concrete-module wrapper. Wall loss
-    and coagulation retain separate caller-owned streams; no generic shared
-    public stream is introduced.
+  - Decision (implemented in P5 / #1405): a private per-box `wp.uint32`
+    initializer seeds omitted private state for each successful positive-time
+    call and resets supplied state only with `initialize_rng=True`. Wall loss and
+    coagulation retain separate caller-owned streams; no generic public stream
+    is introduced.
 - [x] Are deterministic coefficients returned by the public step?
   - Decision: no. Return the same particle container and test coefficient
     parity through concrete-module helpers. Add a caller-owned diagnostic only
@@ -37,13 +38,15 @@ reference and existing direct-Warp process contracts.
   runnable, or backend selection?
   - Decision: no. Those remain owned by E6-F4, E6-F5/F6, and Epic G.
 
-## P4 Resolutions (#1404)
+## P4-P5 Resolutions (#1404, #1405)
 
 - [x] Does a valid positive-time P4 call mutate slots?
   - Decision: yes. Following frozen P3 preflight it evaluates neutral
     coefficients for usable slots and clears all mass lanes, concentration, and
     charge for stochastic removals. Zero time is the only execution no-op.
-- [x] Does P4 own caller RNG lifecycle?
-  - Decision: no. P4 uses deterministic call-local seed-plus-slot draws and
-    intentionally does not initialize or advance supplied `rng_states`; P5 owns
-    persistent lifecycle behavior.
+- [x] Does the shipped direct step own caller RNG lifecycle?
+  - Decision (implemented in P5 / #1405): supplied `rng_states` remains
+    caller-owned and mutates in place only after successful positive-time
+    preflight. One sequential owner advances each per-box state for eligible
+    fixed slots only; an omitted sidecar is private, and repeated `rng_seed`
+    values do not reseed supplied state without `initialize_rng=True`.
