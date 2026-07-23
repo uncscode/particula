@@ -465,6 +465,34 @@ Focused P1–P4 contract run:
 pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
 ```
 
+### GPU neutral wall-loss P3 preflight
+
+- Import the direct low-level boundary with
+  `from particula.gpu.kernels import wall_loss_step_gpu`.
+- Construct `NeutralWallLossConfig` only from
+  `particula.gpu.kernels.wall_loss`; it is deliberately not re-exported by
+  `particula.gpu.kernels` or `particula.gpu`.
+- P3 accepts only neutral, `particle_resolved` configurations and validates
+  spherical or rectangular geometry. Wall eddy diffusivity is in m²/s and
+  chamber radius/dimensions are in m.
+- It read-only validates fixed-shape, same-device `wp.float64` particle fields,
+  finite domain values, a finite nonnegative `time_step` [s], temperature [K],
+  pressure [Pa], and optional `wp.uint32` per-box RNG metadata. Particle charge
+  is validated as metadata but does not enable charged-wall physics.
+- A successful call returns the identical particle container. It does not
+  assemble coefficients, allocate output or RNG storage, initialize or advance
+  RNG state, or mutate particles. Rejected calls preserve caller-owned particle
+  and supplied RNG-sidecar state.
+- P4/P5 removal behavior, CPU parity, a runnable API, hidden transfers or
+  fallback, and performance claims remain deferred. Callers own transfers,
+  device placement, and synchronization.
+
+Focused P3 preflight run:
+
+```bash
+pytest particula/gpu/kernels/tests/wall_loss_test.py -q -Werror
+```
+
 ### GPU coagulation RNG state ownership
 
 ```python

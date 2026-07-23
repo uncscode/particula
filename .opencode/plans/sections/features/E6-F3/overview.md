@@ -47,6 +47,22 @@ comparisons record `rtol=1.002e-3` because of the existing CPU Debye endpoint
 quadrature discrepancy. P2 adds no public export, configuration/validation,
 CPU physics change, charged physics, container mutation, or RNG behavior.
 
+## Delivered Phase: E6-F3-P3 (#1403)
+
+P3 ships the neutral direct-kernel input boundary in
+`particula/gpu/kernels/wall_loss.py`: the frozen, concrete-module-only
+`NeutralWallLossConfig` and write-free `wall_loss_step_gpu` preflight. The
+step is lazily exported from `particula.gpu.kernels`, while the configuration
+remains deliberately unexported from package namespaces.
+
+Preflight validates neutral spherical/rectangular configuration, fixed-shape
+Warp particle metadata and finite physical domains, time, direct or explicit
+environment inputs, and optional RNG-sidecar metadata before any mutable
+runtime work. `particula/gpu/kernels/tests/wall_loss_test.py` provides
+Warp-guarded configuration, import-boundary, validation-order, and failure
+atomicity coverage. P3 performs no coefficient assembly, removal execution,
+RNG initialization/advancement, output allocation, or particle mutation.
+
 ## User Stories
 
 - As a particle-resolved simulation developer, I want neutral spherical and

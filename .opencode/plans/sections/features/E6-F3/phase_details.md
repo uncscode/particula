@@ -36,11 +36,22 @@ documents only the validated direct-process contract and evidence.
   - Boundary: No public export, CPU change, configuration/preflight, charged
     physics, containers/particle mutation, or RNG behavior.
 
-- [ ] **E6-F3-P3:** Define neutral wall-loss configuration and atomic preflight tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Freeze geometry, environment, time, particle schema, and caller-sidecar contracts before any mutation path exists.
-  - Files: `particula/gpu/kernels/wall_loss.py`, `particula/gpu/kernels/tests/wall_loss_test.py`
-  - Tests: Valid spherical/rectangular forms plus malformed geometry, dimensions, values, shapes, dtypes, devices, and failure immutability.
+- [x] **E6-F3-P3:** Define neutral wall-loss configuration and atomic preflight tests
+  - Issue: #1403 | Size: S | Status: Shipped
+  - Delivered: Added frozen concrete-module `NeutralWallLossConfig`, write-free
+    `wall_loss_step_gpu` preflight, and lazy direct-kernel export. Valid calls
+    return the original particle object; all execution, coefficient, removal,
+    RNG lifecycle, and output allocation remain deferred.
+  - Files: `particula/gpu/kernels/wall_loss.py`,
+    `particula/gpu/kernels/__init__.py`,
+    `particula/gpu/kernels/tests/wall_loss_test.py`
+   - Evidence: Warp-guarded tests cover configuration/import boundaries,
+     direct/environment inputs, particle/RNG metadata validation, and atomicity
+     snapshots; monkeypatched coefficient helpers confirm P3 never invokes them.
+   - Documentation: `docs/index.md` and `AGENTS.md` record the bounded P3
+     direct-kernel contract, concrete configuration import, caller ownership,
+     deferred execution limits, and focused test command. Comprehensive P4-P7
+     behavior documentation remains deferred.
 
 - [ ] **E6-F3-P4:** Implement fixed-shape coefficient and stochastic removal kernels with unit tests
   - Issue: TBD | Size: S | Status: Not Started

@@ -24,6 +24,14 @@
   `s^-1` units, and Crump-Seinfeld citations. No user-facing documentation
   update is required yet because the helpers are concrete-module internals with
   no public export; P7 remains responsible for supported direct-step docs.
+- **P3 / #1403 status:** `particula/gpu/kernels/wall_loss.py` documents the
+  concrete neutral configuration, SI inputs, and intentional write-free
+  preflight boundary. `docs/index.md` adds the bounded direct-step import,
+  concrete-module configuration location, validation/ownership contract, and
+  deferred P4/P5 behavior. `AGENTS.md` adds the corresponding developer
+  contract and focused `wall_loss_test.py` command. P7 remains responsible for
+  comprehensive direct-step documentation covering executed removal, persistent
+  RNG lifecycle, formulas, and parity evidence when those phases ship.
 - Cross-reference parent E6, downstream E6-F4 charged/fallback work, and E6-F9
   closeout. Explicitly list charged physics, scheduler/backend integration,
   graph capture, dynamic slots, and performance claims as deferred.
