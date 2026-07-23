@@ -85,11 +85,19 @@ documents only the validated direct-process contract and evidence.
     transfer/fallback, runnable, charged physics, cross-device RNG-trajectory
     parity, or GPU performance claim is added.
 
-- [ ] **E6-F3-P6:** Add deterministic coefficient and statistical CPU-Warp parity matrix
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Demonstrate both geometries match CPU coefficients and expected survival distributions on Warp CPU, with optional CUDA evidence.
-  - Files: `particula/gpu/kernels/tests/wall_loss_parity_test.py`, `particula/gpu/kernels/__init__.py`
-  - Tests: Single/multi-box, particle-scale, sparse/inactive, repeated-step, deterministic coefficient, survival confidence bounds, and import smoke coverage.
+- [x] **E6-F3-P6:** Add deterministic coefficient and statistical CPU-Warp parity matrix
+  - Issue: #1406 | Size: S | Status: Shipped
+  - Delivered: Added the test-only, non-mutating Warp CPU/optional-CUDA parity
+    matrix in `particula/gpu/kernels/tests/wall_loss_parity_test.py`. It compares
+    complete-slot spherical/rectangular coefficient eligibility and finite rates
+    with independent CPU system-state equations; spherical uses
+    `rtol=1.002e-3, atol=1e-20` and rectangular `rtol=1e-10, atol=1e-20`.
+  - Evidence: One-/multi-box, per-box environment, nanometer/micrometer,
+    sparse/unusable-slot fixtures; 100-seed fresh-state and persistent-sidecar
+    aggregate survival checks using 3-sigma binomial bounds; exact zero-time and
+    all-inactive no-ops; and lazy import/configuration-boundary smoke coverage.
+  - Boundary: No production physics, entry-point behavior, or public exports
+    changed. CPU/Warp random-stream replay remains explicitly unsupported.
 
 - [ ] **E6-F3-P7:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

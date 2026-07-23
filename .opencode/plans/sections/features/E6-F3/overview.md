@@ -98,3 +98,21 @@ slots in ascending order and advances its state only for eligible slots.
 atomicity, and benchmark-smoke coverage. Zero-time calls and rejected preflight
 leave supplied sidecars byte-for-byte unchanged. The P5 design makes no
 CPU/Warp stochastic trajectory or throughput claim.
+
+## Delivered Phase: E6-F3-P6 (#1406)
+
+P6 adds only the test-only, Warp-guarded parity diagnostic in
+`particula/gpu/kernels/tests/wall_loss_parity_test.py`. Its non-mutating
+coefficient kernel checks spherical and rectangular complete-slot rates and
+eligibility against independent NumPy CPU system-state equations across
+one-/multi-box, per-box environment, particle-scale, sparse, and unusable-slot
+fixtures. It uses the recorded fp64 tolerances: spherical `rtol=1.002e-3` and
+rectangular `rtol=1e-10`, both with `atol=1e-20`.
+
+The same module adds 100-seed fresh-state and persistent-sidecar aggregate
+survival checks with fixed 3-sigma binomial bounds, exact zero-time/all-inactive
+no-op checks, and lazy-import boundary smoke coverage. Warp CPU is required
+when Warp is installed and CUDA rows are additive when available. P6 changes no
+production physics, runtime API, or public export; `wall_loss_step_gpu` remains
+the sole lazy package symbol and `NeutralWallLossConfig` remains concrete-module
+only.

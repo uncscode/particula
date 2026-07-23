@@ -183,6 +183,7 @@ pytest particula/gpu/tests/cuda_availability_test.py -q
 pytest particula/gpu/kernels/tests/environment_test.py -q
 pytest particula/gpu/kernels/tests/thermodynamics_test.py -q -Werror
 pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
+pytest particula/gpu/kernels/tests/wall_loss_test.py particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror
 pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror
@@ -262,6 +263,20 @@ oracle on Warp CPU, with matching CUDA rows that skip cleanly when unavailable.
 Keep particle and gas parity assertions separate, preserve caller-owned per-box
 coefficient identity and values, and use exact equality for no-op checks. This
 is direct-kernel test evidence only; it does not establish CPU-runnable parity.
+
+Direct neutral GPU wall-loss parity coverage belongs in
+`particula/gpu/kernels/tests/wall_loss_parity_test.py`. Keep its non-mutating
+coefficient diagnostic independent of GPU property helpers and compare complete
+particle-resolved slots with the CPU system-state wall-loss functions. Cover
+spherical and rectangular geometries, one- and multi-box inputs, per-box
+environment state, particle scales, and inactive or unusable slots. Keep
+deterministic coefficient agreement separate from stochastic evidence. For
+stochastic removal, use aggregate survival counts across repeated fresh seeds
+and a documented binomial bound; do not require CPU/Warp RNG-stream, per-seed,
+or trajectory replay. Include distinct exact no-op checks for zero time and
+all-inactive inputs, including caller-owned RNG state. This suite validates the
+existing direct-kernel boundary only and must not imply a new public API or
+physics capability.
 
 ### Device-aware tolerance policy
 

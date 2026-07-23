@@ -44,13 +44,18 @@ scientific tolerance may be weakened. Test modules use the `*_test.py` suffix.
   reseeding; explicit reset; independent per-box advancement; supplied-buffer
   identity; and invalid-call non-initialization/non-advancement. A fixed seed
   must reproduce Warp runs after explicit reset, not CPU NumPy bitstreams.
-- **P6 parity:** In
-  `particula/gpu/kernels/tests/wall_loss_parity_test.py`, require Warp CPU for
-  deterministic spherical/rectangular coefficient comparisons and repeated
-  Bernoulli survival statistics. Compare observed survivor counts to
-  `exp(-k*dt)` using predeclared binomial confidence/sigma bounds and enough
-  independent particles/seeds to avoid flaky single-seed assertions. Run the
-  same matrix on CUDA when available and skip cleanly otherwise.
+- **P6 parity (shipped, #1406):**
+  `particula/gpu/kernels/tests/wall_loss_parity_test.py` uses an independent
+  NumPy system-state oracle and a non-mutating Warp diagnostic to compare
+  complete-slot spherical/rectangular eligibility and coefficient results.
+  Eligible finite rates use spherical `rtol=1.002e-3, atol=1e-20` and
+  rectangular `rtol=1e-10, atol=1e-20`. The matrix includes one-/multi-box,
+  per-box environment, nanometer/micrometer, sparse, and unusable-slot cases.
+  Fresh-seed and persistent-sidecar evidence each uses exactly 100 seeds and
+  fixed 3-sigma binomial bounds; zero-time and all-inactive paths are exact
+  no-ops. Import smoke coverage proves the lazy step remains public while the
+  configuration remains concrete-module-only. Warp CPU is the baseline; CUDA
+  rows are additive and absent when unavailable.
 - **P7 documentation:** Validate links, import snippets, SI units,
   support/deferred tables, and focused commands.
 
@@ -62,9 +67,9 @@ scientific tolerance may be weakened. Test modules use the `*_test.py` suffix.
 - Keep direct coagulation persistent-RNG and fixed-slot tests green because they
   define shared invariants.
 - Focused commands include:
-  `pytest particula/gpu/dynamics/tests/wall_loss_funcs_test.py -q -Werror` and
-  `pytest particula/gpu/kernels/tests/wall_loss_test.py -q -Werror`.
-  Add the parity module to this command when P6 ships.
+   `pytest particula/gpu/dynamics/tests/wall_loss_funcs_test.py -q -Werror`,
+   `pytest particula/gpu/kernels/tests/wall_loss_test.py -q -Werror`, and
+   `pytest particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror`.
 - Deterministic coefficient acceptance uses documented float64 tolerances.
    Stochastic acceptance uses expected distributions, never exact CPU/GPU draw
    order. Zero-time and inactive-slot no-ops remain exact.

@@ -32,8 +32,9 @@ reference and existing direct-Warp process contracts.
     parity through concrete-module helpers. Add a caller-owned diagnostic only
     if a later integration demonstrates a stable user need.
 - [x] Must CPU and Warp use identical random-number sequences?
-  - Decision: no. Require deterministic coefficient parity and statistically
-    bounded outcomes, not exact RNG sequence parity.
+  - Decision (validated in P6 / #1406): no. The shipped 100-seed fresh-state and
+    persistent-sidecar checks use fixed 3-sigma aggregate bounds, not stream
+    replay or per-seed CPU/Warp equality.
 - [x] Does E6-F3 include charged loss, slot management, a high-level GPU
   runnable, or backend selection?
   - Decision: no. Those remain owned by E6-F4, E6-F5/F6, and Epic G.
