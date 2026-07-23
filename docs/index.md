@@ -204,9 +204,11 @@ print(result)
     metadata, then returns the identical particle container without computing
     coefficients, initializing or advancing RNG state, allocating outputs, or
     removing particles. Callers retain ownership of Warp transfers, device
-    placement, synchronization, particle data, and any RNG sidecar. P4/P5
-    removal behavior, a runnable API, hidden transfers or fallback, and parity
-    claims remain deferred.
+    placement, synchronization, particle data, and any RNG sidecar. Preflight
+    may run device validation scans and synchronize to read back scalar status,
+    but it does not transfer or replace caller-owned buffers. P4/P5 removal
+    behavior, a runnable API, hidden transfers or fallback, and parity claims
+    remain deferred.
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the

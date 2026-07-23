@@ -478,14 +478,16 @@ pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
 - It read-only validates fixed-shape, same-device `wp.float64` particle fields,
   finite domain values, a finite nonnegative `time_step` [s], temperature [K],
   pressure [Pa], and optional `wp.uint32` per-box RNG metadata. Particle charge
-  is validated as metadata but does not enable charged-wall physics.
+  is finite signed metadata and does not enable charged-wall physics.
 - A successful call returns the identical particle container. It does not
   assemble coefficients, allocate output or RNG storage, initialize or advance
   RNG state, or mutate particles. Rejected calls preserve caller-owned particle
   and supplied RNG-sidecar state.
 - P4/P5 removal behavior, CPU parity, a runnable API, hidden transfers or
   fallback, and performance claims remain deferred. Callers own transfers,
-  device placement, and synchronization.
+  device placement, and synchronization. Device validation scans and scalar
+  status synchronization/readback are permitted; they do not transfer, replace,
+  or mutate caller-owned buffers.
 
 Focused P3 preflight run:
 

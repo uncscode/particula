@@ -37,7 +37,7 @@ API.
 
 ### Chosen Option
 
-**Option 1: Separate boundary and coefficient-helper ownership**
+**Option 2: Separate boundary and coefficient-helper ownership**
 
 The boundary owns immutable host configuration and ordered, read-only schema,
 domain, environment, and RNG-metadata validation. The existing
