@@ -781,13 +781,7 @@ def test_debye_1_matches_independent_quadrature(device: str) -> None:
 
     expected = np.array(
         [
-            1.0
-            if value == 0.0
-            else (
-                np.pi**2 / (6.0 * value)
-                if value >= 20.0
-                else quad(integrand, 0.0, value)[0] / value
-            )
+            1.0 if value == 0.0 else quad(integrand, 0.0, value)[0] / value
             for value in values
         ],
         dtype=np.float64,
@@ -795,6 +789,8 @@ def test_debye_1_matches_independent_quadrature(device: str) -> None:
     result = _evaluate_scalar_kernel(_debye_kernel, values, device)
     assert np.all(np.isfinite(result))
     npt.assert_allclose(result, expected, rtol=1e-9, atol=1e-12)
+    npt.assert_allclose(result[3], expected[3], rtol=1e-12, atol=1e-14)
+    assert np.ptp(result[6:]) < 1e-14
 
 
 def test_debye_1_invalid_inputs_return_exact_zero(device: str) -> None:

@@ -334,7 +334,7 @@ def debye_1_wp(x: wp.float64) -> wp.float64:
     limit is exactly ``1.0``; negative and non-finite inputs return exact
     ``0.0``. The implementation uses a Bernoulli series for ``x <= 1``,
     32-node Gauss--Legendre quadrature for ``1 < x < 20``, and the
-    ``pi² / (6 x)`` asymptote at larger ``x``.
+    finite-tail-corrected ``pi² / (6 x)`` asymptote at larger ``x``.
 
     Args:
         x: Dimensionless spherical wall-loss geometry argument.
@@ -370,7 +370,7 @@ def debye_1_wp(x: wp.float64) -> wp.float64:
             * x2
             * x2
             * x2
-            / wp.float64(1699976678400.0)
+            / wp.float64(16999766784000.0)
             + wp.float64(7.0)
             * x2
             * x2
@@ -382,7 +382,7 @@ def debye_1_wp(x: wp.float64) -> wp.float64:
             / wp.float64(7846048170000.0)
         )
     if x >= wp.float64(20.0):
-        return _PI_SQUARED_OVER_SIX / x
+        return (_PI_SQUARED_OVER_SIX - (x + wp.float64(1.0)) * wp.exp(-x)) / x
     half_x = x / wp.float64(2.0)
     integral = _debye_gauss_pair_wp(
         half_x,
