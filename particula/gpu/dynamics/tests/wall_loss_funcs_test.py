@@ -25,8 +25,13 @@ if wp is not None:
         get_spherical_wall_loss_coefficient_via_system_state,
     )
     from particula.gpu.dynamics.wall_loss_funcs import (  # noqa: E402
+        _combine_charged_wall_loss_coefficient_wp,
         _coulomb_self_potential_ratio_wp,
+        _electric_field_drift_wp,
+        _geometry_scale_wp,
         _image_charge_enhancement_wp,
+        _resolve_rectangular_electric_field_wp,
+        _resolve_spherical_electric_field_wp,
         rectangle_wall_loss_coefficient_wp,
         spherical_wall_loss_coefficient_wp,
     )
@@ -169,6 +174,84 @@ if wp is not None:
             boltzmann_constant,
         )
 
+    @wp.kernel
+    def _resolved_electric_field_kernel(
+        geometry_modes: Any,
+        chamber_radii: Any,
+        chamber_lengths: Any,
+        chamber_widths: Any,
+        chamber_heights: Any,
+        field_x: Any,
+        field_y: Any,
+        field_z: Any,
+        wall_potentials: Any,
+        spherical_result: Any,
+        rectangular_result: Any,
+        geometry_result: Any,
+    ) -> None:
+        """Calculate geometry scales and both geometry-specific field forms."""
+        tid = wp.tid()
+        scale = _geometry_scale_wp(
+            geometry_modes[tid],
+            chamber_radii[tid],
+            chamber_lengths[tid],
+            chamber_widths[tid],
+            chamber_heights[tid],
+        )
+        geometry_result[tid] = scale
+        spherical_result[tid] = _resolve_spherical_electric_field_wp(
+            field_x[tid], wall_potentials[tid], scale
+        )
+        rectangular_result[tid] = _resolve_rectangular_electric_field_wp(
+            field_x[tid],
+            field_y[tid],
+            field_z[tid],
+            wall_potentials[tid],
+            scale,
+        )
+
+    @wp.kernel
+    def _electric_field_drift_kernel(
+        particle_radii: Any,
+        particle_charges: Any,
+        temperatures: Any,
+        resolved_fields: Any,
+        geometry_scales: Any,
+        elementary_charge_value: wp.float64,
+        ref_viscosity: wp.float64,
+        ref_temperature: wp.float64,
+        sutherland_constant: wp.float64,
+        result: Any,
+    ) -> None:
+        """Calculate one electric-field drift coefficient per lane."""
+        tid = wp.tid()
+        result[tid] = _electric_field_drift_wp(
+            particle_radii[tid],
+            particle_charges[tid],
+            temperatures[tid],
+            resolved_fields[tid],
+            geometry_scales[tid],
+            elementary_charge_value,
+            ref_viscosity,
+            ref_temperature,
+            sutherland_constant,
+        )
+
+    @wp.kernel
+    def _combine_charged_coefficient_kernel(
+        neutral_coefficients: Any,
+        electrostatic_factors: Any,
+        drift_terms: Any,
+        result: Any,
+    ) -> None:
+        """Combine one charged coefficient per lane."""
+        tid = wp.tid()
+        result[tid] = _combine_charged_wall_loss_coefficient_wp(
+            neutral_coefficients[tid],
+            electrostatic_factors[tid],
+            drift_terms[tid],
+        )
+
 
 @pytest.fixture(params=_available_warp_devices())
 def device(request) -> str:
@@ -292,6 +375,186 @@ def _launch_image_charge_enhancement(
             wp.float64(ELEMENTARY_CHARGE_VALUE),
             wp.float64(ELECTRIC_PERMITTIVITY),
             wp.float64(BOLTZMANN_CONSTANT),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    return result.numpy()
+
+
+def _field_resolution_oracle(
+    geometry_modes: np.ndarray,
+    chamber_radii: np.ndarray,
+    chamber_lengths: np.ndarray,
+    chamber_widths: np.ndarray,
+    chamber_heights: np.ndarray,
+    field_x: np.ndarray,
+    field_y: np.ndarray,
+    field_z: np.ndarray,
+    wall_potentials: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Calculate independent geometry scales and resolved field forms."""
+    scales = np.where(
+        geometry_modes == 0,
+        chamber_radii,
+        np.minimum(
+            chamber_lengths, np.minimum(chamber_widths, chamber_heights)
+        ),
+    )
+    potential = np.where(
+        (wall_potentials != 0.0) & (scales > 0.0),
+        wall_potentials / scales,
+        0.0,
+    )
+    spherical = field_x + potential
+    rectangular = np.sqrt(field_x**2 + field_y**2 + field_z**2) + potential
+    return scales, spherical, rectangular
+
+
+def _launch_resolved_electric_fields(
+    geometry_modes: np.ndarray,
+    chamber_radii: np.ndarray,
+    chamber_lengths: np.ndarray,
+    chamber_widths: np.ndarray,
+    chamber_heights: np.ndarray,
+    field_x: np.ndarray,
+    field_y: np.ndarray,
+    field_z: np.ndarray,
+    wall_potentials: np.ndarray,
+    device: str,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Launch field-resolution helpers and return synchronized fp64 outputs."""
+    count = len(geometry_modes)
+    spherical = wp.zeros(count, dtype=wp.float64, device=device)
+    rectangular = wp.zeros(count, dtype=wp.float64, device=device)
+    scales = wp.zeros(count, dtype=wp.float64, device=device)
+    wp.launch(
+        _resolved_electric_field_kernel,
+        dim=count,
+        inputs=[
+            wp.array(geometry_modes, dtype=wp.int32, device=device),
+            *_warp_arrays(
+                (
+                    chamber_radii,
+                    chamber_lengths,
+                    chamber_widths,
+                    chamber_heights,
+                    field_x,
+                    field_y,
+                    field_z,
+                    wall_potentials,
+                ),
+                device,
+            ),
+        ],
+        outputs=[spherical, rectangular, scales],
+        device=device,
+    )
+    wp.synchronize()
+    return scales.numpy(), spherical.numpy(), rectangular.numpy()
+
+
+def _electric_field_drift_oracle(
+    particle_radii: np.ndarray,
+    particle_charges: np.ndarray,
+    temperatures: np.ndarray,
+    resolved_fields: np.ndarray,
+    geometry_scales: np.ndarray,
+) -> np.ndarray:
+    """Calculate independent Sutherland-viscosity signed drift terms."""
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        viscosity = (
+            REF_VISCOSITY_AIR_STP
+            * (temperatures / REF_TEMPERATURE_STP) ** 1.5
+            * (REF_TEMPERATURE_STP + SUTHERLAND_CONSTANT)
+            / (temperatures + SUTHERLAND_CONSTANT)
+        )
+        diameter = 2.0 * np.maximum(particle_radii, 1.0e-30)
+        mobility = (
+            np.abs(particle_charges)
+            * ELEMENTARY_CHARGE_VALUE
+            / (3.0 * np.pi * viscosity * diameter)
+        )
+        drift = (
+            mobility
+            * resolved_fields
+            * np.sign(particle_charges)
+            / np.maximum(geometry_scales, 1.0e-30)
+        )
+    drift[(particle_charges == 0.0) | (resolved_fields == 0.0)] = 0.0
+    return np.nan_to_num(drift, nan=0.0)
+
+
+def _launch_electric_field_drift(
+    particle_radii: np.ndarray,
+    particle_charges: np.ndarray,
+    temperatures: np.ndarray,
+    resolved_fields: np.ndarray,
+    geometry_scales: np.ndarray,
+    device: str,
+) -> np.ndarray:
+    """Launch the drift helper and return synchronized fp64 results."""
+    result = wp.zeros(len(particle_radii), dtype=wp.float64, device=device)
+    wp.launch(
+        _electric_field_drift_kernel,
+        dim=len(particle_radii),
+        inputs=[
+            *_warp_arrays(
+                (
+                    particle_radii,
+                    particle_charges,
+                    temperatures,
+                    resolved_fields,
+                    geometry_scales,
+                ),
+                device,
+            ),
+            wp.float64(ELEMENTARY_CHARGE_VALUE),
+            wp.float64(REF_VISCOSITY_AIR_STP),
+            wp.float64(REF_TEMPERATURE_STP),
+            wp.float64(SUTHERLAND_CONSTANT),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    return result.numpy()
+
+
+def _combine_charged_coefficient_oracle(
+    neutral_coefficients: np.ndarray,
+    electrostatic_factors: np.ndarray,
+    drift_terms: np.ndarray,
+) -> np.ndarray:
+    """Calculate independently sanitized charged coefficient sums."""
+    with np.errstate(over="ignore", invalid="ignore"):
+        combined = neutral_coefficients * electrostatic_factors + drift_terms
+    return np.clip(
+        np.nan_to_num(combined, nan=0.0),
+        0.0,
+        np.finfo(np.float64).max,
+    )
+
+
+def _launch_combined_charged_coefficients(
+    neutral_coefficients: np.ndarray,
+    electrostatic_factors: np.ndarray,
+    drift_terms: np.ndarray,
+    device: str,
+) -> np.ndarray:
+    """Launch coefficient composition and return synchronized fp64 outputs."""
+    result = wp.zeros(
+        len(neutral_coefficients), dtype=wp.float64, device=device
+    )
+    wp.launch(
+        _combine_charged_coefficient_kernel,
+        dim=len(neutral_coefficients),
+        inputs=[
+            *_warp_arrays(
+                (neutral_coefficients, electrostatic_factors, drift_terms),
+                device,
+            ),
         ],
         outputs=[result],
         device=device,
@@ -662,3 +925,121 @@ def test_image_charge_enhancement_clipping_matches_oracle(
 
     assert np.all(np.isfinite(actual))
     npt.assert_allclose(actual, expected, rtol=1e-12, atol=0.0)
+
+
+@pytest.mark.gpu_parity
+def test_charged_field_helpers_match_geometry_specific_cpu_semantics(
+    device: str,
+) -> None:
+    """Match signed spherical and norm-based rectangular field resolution."""
+    geometry_modes = np.array([0, 1, 1, 0], dtype=np.int32)
+    chamber_radii = np.array([0.5, 9.0, 9.0, 1.0e-32], dtype=np.float64)
+    lengths = np.array([3.0, 2.0, 1.0, 2.0], dtype=np.float64)
+    widths = np.array([3.0, 0.5, 0.6, 2.0], dtype=np.float64)
+    heights = np.array([3.0, 1.0, 0.8, 2.0], dtype=np.float64)
+    field_x = np.array([-3.0, 3.0, 0.0, 0.0], dtype=np.float64)
+    field_y = np.array([0.0, 4.0, 0.0, 0.0], dtype=np.float64)
+    field_z = np.array([0.0, 12.0, 0.0, 0.0], dtype=np.float64)
+    potentials = np.array([1.0, -2.0, 1.5, 1.0e-32], dtype=np.float64)
+
+    expected = _field_resolution_oracle(
+        geometry_modes,
+        chamber_radii,
+        lengths,
+        widths,
+        heights,
+        field_x,
+        field_y,
+        field_z,
+        potentials,
+    )
+    actual = _launch_resolved_electric_fields(
+        geometry_modes,
+        chamber_radii,
+        lengths,
+        widths,
+        heights,
+        field_x,
+        field_y,
+        field_z,
+        potentials,
+        device,
+    )
+
+    for observed, reference in zip(actual, expected, strict=True):
+        assert observed.shape == reference.shape
+        npt.assert_allclose(observed, reference, rtol=1e-12, atol=0.0)
+    assert actual[2][1] < np.linalg.norm([3.0, 4.0, 12.0])
+    assert actual[0][3] == chamber_radii[3]
+
+
+@pytest.mark.gpu_parity
+def test_electric_field_drift_matches_independent_signed_fp64_oracle(
+    device: str,
+) -> None:
+    """Match charge sign, magnitude, zero controls, and guard boundaries."""
+    particle_radii = np.array(
+        [1.0e-8, 1.0e-8, 1.0e-8, 1.0e-8, 1.0e-40, 1.0e-8],
+        dtype=np.float64,
+    )
+    particle_charges = np.array([1.0, -1.0, 2.0, 0.0, 1.0, 1.0])
+    temperatures = np.full(6, 298.15, dtype=np.float64)
+    resolved_fields = np.array([10.0, 10.0, 10.0, 10.0, 10.0, 0.0])
+    geometry_scales = np.array([0.5, 0.5, 0.5, 0.5, 1.0e-40, 0.5])
+
+    expected = _electric_field_drift_oracle(
+        particle_radii,
+        particle_charges,
+        temperatures,
+        resolved_fields,
+        geometry_scales,
+    )
+    actual = _launch_electric_field_drift(
+        particle_radii,
+        particle_charges,
+        temperatures,
+        resolved_fields,
+        geometry_scales,
+        device,
+    )
+
+    assert actual.shape == expected.shape
+    assert np.all(np.isfinite(actual))
+    npt.assert_allclose(actual, expected, rtol=1e-12, atol=0.0)
+    assert actual[0] == -actual[1]
+    assert actual[2] == 2.0 * actual[0]
+    assert actual[3] == 0.0
+    assert actual[5] == 0.0
+
+
+@pytest.mark.gpu_parity
+def test_charged_coefficient_composition_sanitizes_defensive_lanes(
+    device: str,
+) -> None:
+    """Map cancellation and nonfinite combined rates to bounded fp64 values."""
+    neutral = np.array(
+        [2.0, 2.0, np.nan, 1.0, np.finfo(np.float64).max],
+        dtype=np.float64,
+    )
+    factor = np.array(
+        [3.0, 1.0, 1.0, 1.0, 2.0],
+        dtype=np.float64,
+    )
+    drift = np.array([1.0, -3.0, 0.0, -np.inf, 0.0], dtype=np.float64)
+
+    expected = _combine_charged_coefficient_oracle(neutral, factor, drift)
+    actual = _launch_combined_charged_coefficients(
+        neutral,
+        factor,
+        drift,
+        device,
+    )
+
+    assert actual.shape == expected.shape
+    assert np.all(np.isfinite(actual))
+    assert np.all(actual >= 0.0)
+    npt.assert_allclose(actual, expected, rtol=0.0, atol=0.0)
+    assert actual[1] == 0.0
+    assert actual[2] == 0.0
+    assert actual[3] == 0.0
+    assert actual[4] == np.finfo(np.float64).max
