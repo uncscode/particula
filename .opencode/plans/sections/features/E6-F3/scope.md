@@ -34,6 +34,12 @@ removed fixed slot, and supports persistent per-box RNG state.
   density, volume, and surviving slots.
 - Validation-before-allocation/RNG/mutation, CPU coefficient parity, statistical
   survival validation, Warp CPU baseline, and optional CUDA evidence.
+- **Shipped in P6 / #1406:** Add the test-only
+  `particula/gpu/kernels/tests/wall_loss_parity_test.py` diagnostic matrix.
+  It independently compares complete-slot coefficient/eligibility results with
+  CPU system-state equations; tests fresh-seed and persistent-sidecar aggregate
+  survival over 100 seeds; retains exact no-op checks; and smoke-tests the lazy
+  export boundary. Production code, physics, and exports are unchanged.
 
 ## Out of Scope
 
@@ -58,3 +64,12 @@ caller-owned, advances sequentially by box for eligible slots only, and resets
 only with `initialize_rng=True`. Zero time and rejected preflight leave supplied
 state unchanged. The serial per-box RNG loop is bounded correctness scope, not a
 performance claim.
+
+## P6 Delivered Scope (#1406)
+
+P6 is validation-only. The parity suite covers spherical/rectangular geometry,
+one-/multi-box layouts, per-box state, nanometer/micrometer scales, and
+inactive/unusable slots, with Warp CPU baseline and optional CUDA parameter rows.
+It deliberately makes distributional—not stream-replay—claims for stochastic
+survival and does not add a production diagnostic, API, transfer, fallback, or
+public export.

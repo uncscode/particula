@@ -67,3 +67,14 @@ advancement, write-free zero time and rejected preflight, explicit ownership/no
 hidden transfers, and no CPU/Warp or cross-device stochastic-trajectory claim.
 Focused normal and `--benchmark` smoke commands are documented. P6 remains
 responsible for the full statistical CPU/Warp parity matrix.
+
+## P6 / #1406 Status
+
+P6 adds test evidence in
+`particula/gpu/kernels/tests/wall_loss_parity_test.py`. Issue #1406 also adds
+test/contributor documentation in `readme.md`, `docs/index.md`, and
+`.opencode/guides/testing_guide.md`; public API, physics, and export
+documentation remain unchanged. The suite records the independent CPU-oracle
+coefficient matrix, 100-seed fresh/persistent RNG statistical checks, exact
+no-op coverage, and lazy-export boundary smoke test. P7 remains responsible for
+any final documentation updates.

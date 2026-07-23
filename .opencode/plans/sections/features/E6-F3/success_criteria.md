@@ -53,3 +53,14 @@
   `initialize_rng=True`. Omitted state remains private and per-call.
 - [x] Zero-time and preflight-rejected calls preserve supplied RNG sidecars
   exactly; all-ineligible positive-time work consumes no RNG state.
+
+## P6 Criteria Met (#1406)
+
+- [x] Test-only complete-slot diagnostics compare independent CPU system-state
+  coefficients and eligibility with recorded spherical/rectangular fp64
+  tolerances across the planned fixture matrix.
+- [x] Fresh-state and persistent-sidecar survival evidence uses exactly 100
+  seeds and explicit 3-sigma binomial bounds without asserting RNG-stream
+  identity.
+- [x] The parity module proves exact zero-time/all-inactive no-ops and preserves
+  the lazy-step/concrete-configuration public boundary without production edits.

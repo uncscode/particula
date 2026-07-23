@@ -41,12 +41,14 @@
   preflight ordering, and unchanged particle/sidecar state on valid and invalid
   P3 calls. Removal, inactive-gap execution, and RNG lifecycle tests remain
   P4-P5 work.
-- [ ] Add `particula/gpu/kernels/tests/wall_loss_parity_test.py` for one/multi-box
-  deterministic coefficients and statistically bounded survival frequencies.
+- [x] Add `particula/gpu/kernels/tests/wall_loss_parity_test.py` for independent
+  one-/multi-box coefficient/eligibility diagnostics, 100-seed fresh and
+  persistent-RNG survival statistics, exact no-ops, and lazy-import smoke
+  coverage (#1406).
 - [x] Snapshot particles and supplied RNG before invalid P3 calls and assert
   value equality plus identity retention after rejection.
-- [ ] Require Warp CPU using `warp_devices()` and run CUDA cases only when
-  available, with stable skip reasons and no CUDA-only acceptance criterion.
+- [x] Require Warp CPU using `warp_devices()` and run CUDA cases only when
+  available, with no CUDA-only acceptance criterion (#1406).
 - [ ] Keep configured coverage at or above 80%; do not weaken thresholds or
   stochastic assertions to accommodate implementation defects.
 
@@ -79,3 +81,12 @@
   zero-time, rejection, and benchmark-smoke coverage.
 - [x] Update user and contract documentation for sidecar ownership, explicit
   reset, sequential eligible-slot advancement, and bounded performance scope.
+
+## P6 Completed Tasks (#1406)
+
+- [x] Add test-only guarded Warp coefficient diagnostics against independent CPU
+  wall-loss equations for both neutral geometries and recorded tolerances.
+- [x] Add 100-seed fresh-state and persistent-sidecar statistical survival
+  checks with fixed 3-sigma bounds, plus exact zero-time/all-inactive no-ops.
+- [x] Smoke-test the lazy `wall_loss_step_gpu` export and concrete-only
+  `NeutralWallLossConfig` boundary without changing production modules.
