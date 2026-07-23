@@ -1,5 +1,9 @@
 """Regression tests for public GPU dynamics compatibility exports."""
 
+import pytest
+
+pytest.importorskip("warp")
+
 from particula.gpu import dynamics, properties
 from particula.gpu.dynamics import diffusion_coefficient_wp
 

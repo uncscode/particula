@@ -197,14 +197,10 @@ def rectangle_wall_loss_coefficient_wp(
     return (
         wp.float64(4.0)
         * transport_scale
-        / (
-            wp.float64(3.141592653589793)
-            * chamber_length
-            * chamber_width
-            * chamber_height
-        )
+        / wp.float64(3.141592653589793)
         * (
-            chamber_height * (chamber_length + chamber_width)
-            + chamber_length * chamber_width * x_coth_x_wp(x)
+            wp.float64(1.0) / chamber_length
+            + wp.float64(1.0) / chamber_width
+            + x_coth_x_wp(x) / chamber_height
         )
     )
