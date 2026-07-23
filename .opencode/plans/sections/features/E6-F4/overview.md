@@ -12,7 +12,7 @@ must exactly follow the neutral coefficient and stochastic path.
 
 ## Value Proposition
 
- E6-F4-P1 through P6 are shipped. P1 freezes the charged-mode configuration without
+E6-F4-P1 through P6 are shipped. P1 freezes the charged-mode configuration without
 changing the direct step's ownership, mutation, coefficient, or RNG contracts.
 P2 adds private fp64 Warp Coulomb self-potential-ratio and image-charge
 enhancement primitives, with independent NumPy/Warp parity and clipping tests.

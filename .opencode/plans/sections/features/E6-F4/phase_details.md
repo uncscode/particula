@@ -63,7 +63,7 @@ terms in P4 before P5 validation and P6 documentation.
     baseline; CUDA is optional.
 
 - [x] **E6-F4-P6:** Update development documentation
-  - Issue: #1414 | Size: XS | Status: Shipped
+  - Issue: #1414 | Size: XS | Status: Shipped | Completion: 2026-07-23
   - Goal: Delivered documentation-only direct charged use, image-charge/field
     semantics, neutral fallback, RNG ownership, validation commands, and
     supported/deferred boundaries without code, API, or test behavior changes.
