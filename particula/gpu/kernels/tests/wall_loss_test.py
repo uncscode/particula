@@ -1058,22 +1058,26 @@ def test_rng_form_rejections_preserve_particles(kwargs, error, match) -> None:
     _assert_snapshot_unchanged(particles, snapshot)
 
 
-def test_zero_time_never_calls_wall_loss_coefficient_helpers(
+def test_zero_time_never_launches_wall_loss_removal_kernels(
     monkeypatch,
 ) -> None:
-    """The post-preflight zero-time path does not calculate coefficients."""
+    """The post-preflight zero-time path does not launch removal kernels."""
     from particula.gpu.kernels import wall_loss as wall_loss_module
     from particula.gpu.kernels import wall_loss_step_gpu
 
-    def fail_if_called(*_args, **_kwargs):
-        pytest.fail("P3 preflight must not calculate wall-loss coefficients")
+    original_launch = wall_loss_module.wp.launch
+    removal_kernels = {
+        wall_loss_module._wall_loss_remove,
+        wall_loss_module._charged_spherical_wall_loss_remove,
+        wall_loss_module._charged_rectangular_wall_loss_remove,
+    }
 
-    monkeypatch.setattr(
-        wall_loss_module, "spherical_wall_loss_coefficient_wp", fail_if_called
-    )
-    monkeypatch.setattr(
-        wall_loss_module, "rectangle_wall_loss_coefficient_wp", fail_if_called
-    )
+    def fail_removal_launch(kernel, *args, **kwargs):
+        if kernel in removal_kernels:
+            pytest.fail("zero time must not launch a wall-loss removal kernel")
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(wall_loss_module.wp, "launch", fail_removal_launch)
     assert (
         wall_loss_step_gpu(
             _particles(), 298.15, 101325.0, 0.0, config=_config()
