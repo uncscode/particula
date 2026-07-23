@@ -1,16 +1,18 @@
 # Documentation Updates
 
-- [x] `AGENTS.md` records the P1 direct-wall-loss contract: charged inputs are
-  validation-only, rectangular field ownership/schema is explicit, and neutral
-  execution remains unchanged.
+- [x] `AGENTS.md` records the direct-wall-loss contract: charged selection is
+  configuration-selected in the existing step; nonzero charge uses image/drift
+  composition, zero charge falls back to neutral execution, and rectangular
+  field ownership/schema is explicit.
 - [x] Record P2's private primitive boundary in plan content: fp64
-  self-potential-ratio/image-enhancement helpers and their test evidence ship,
-  but no public or direct-kernel charged coefficient behavior is documented.
-- [ ] Defer charged coefficient equations and direct-step CPU-parity claims
-  until P3-P5; future documentation must distinguish P1/P2 primitives from
-  integrated charged physics.
-- Update `.opencode/guides/` testing or architecture references if E6-F3's
-  direct-kernel conventions gain charged-specific validation guidance.
+  self-potential-ratio/image-enhancement helpers and their test evidence ship;
+  P4 consumes them privately without adding a public charged-coefficient API.
+- [x] `.opencode/guides/architecture/architecture_outline.md` records the
+  configuration-selected fixed-slot boundary, private helper ownership,
+  nonzero-charge charged selection, zero-charge neutral fallback, frozen
+  preflight, and external RNG-sidecar ownership.
+- [ ] Defer direct-step CPU coefficient parity and statistical survival claims
+  to P5; distinguish implemented direct dispatch from those validation scopes.
 - Add or extend a `docs/Examples/` low-level example only if it can preserve
   explicit CPU-to-Warp transfers and does not imply a high-level runnable;
   otherwise defer the integrated example to E6-F9.

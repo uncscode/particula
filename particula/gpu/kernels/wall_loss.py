@@ -1,12 +1,12 @@
 """Apply bounded direct GPU wall loss to fixed particle slots.
 
 This concrete direct-kernel boundary supports particle-resolved neutral and
-charged wall loss. Charged execution composes private image-charge and
-electric-field helpers only for nonzero charge; zero-charge charged slots keep
+charged wall loss. In charged mode, only nonzero charge composes the private P2
+image-charge and P3 field-drift coefficient helpers; zero-charge slots retain
 the exact neutral coefficient and random-number path. A charged rectangular
-field is caller-owned same-device ``wp.float64`` storage with shape ``(3,)``;
-it is read only by the charged rectangular removal kernel and is never mutated.
-It retains P3's read-only preflight ordering and uses sequential per-box random
+field is caller-owned same-device ``wp.float64`` storage with shape ``(3,)``.
+Only the charged rectangular removal kernel reads it, and it is never mutated.
+The boundary retains frozen read-only preflight and sequential per-box random
 number generation for eligible fixed slots.
 An omitted RNG sidecar is private and seeded for each successful positive-time
 call. A supplied ``uint32`` Warp sidecar remains caller-owned, advances in
@@ -75,12 +75,12 @@ _ELECTRIC_PERMITTIVITY = wp.constant(wp.float64(ELECTRIC_PERMITTIVITY))
 class NeutralWallLossConfig:
     """Define immutable direct wall-loss geometry and charged inputs.
 
-    This concrete-module-only configuration is accepted by the direct P5
+    This concrete-module-only configuration is accepted by the direct P4
     boundary, which retains frozen P3 preflight. ``geometry`` selects spherical
     or rectangular SI dimensions, while ``distribution_type`` must remain
     ``"particle_resolved"``. ``mode`` is ``"neutral"`` or ``"charged"``.
-    Charged execution composes private image and drift helpers for nonzero
-    charges. Import this concrete configuration
+    Charged execution composes private P2 image and P3 drift helpers only for
+    nonzero charges. Import this concrete configuration
     from ``particula.gpu.kernels.wall_loss``. A charged rectangular electric
     field is caller-owned device storage and is never replaced or mutated.
 
@@ -870,12 +870,14 @@ def wall_loss_step_gpu(
     """Apply direct neutral or charged wall loss to eligible fixed slots.
 
     The configuration supports particle-resolved neutral and charged wall loss.
-    SI inputs are wall eddy diffusivity [m^2 s^-1],
+    Charged nonzero slots compose private P2 image enhancement and P3 signed
+    field drift with their neutral coefficient; zero-charge charged slots use
+    the exact neutral coefficient and RNG path. SI inputs are wall eddy
+    diffusivity [m^2 s^-1],
     geometry dimensions [m], potential [V], electric field [V m^-1],
-    temperature [K], pressure [Pa], and ``time_step`` [s]. In charged mode,
-    nonzero charge composes image enhancement and signed field drift with the
-    neutral coefficient. Zero-charge charged slots follow the exact neutral
-    coefficient and stochastic path.
+    temperature [K], pressure [Pa], and ``time_step`` [s]. A charged rectangular
+    electric-field vector is caller-owned read-only storage; only charged
+    rectangular execution reads its three lanes.
     After frozen P3 preflight, positive-time calls evaluate neutral coefficients
     for usable slots, apply survival probability ``exp(-k * time_step)``, and
     clear every mass lane, concentration, and charge for removed slots. Zero

@@ -1,14 +1,15 @@
 """Provide fp64 Warp wall-loss coefficient and private image-charge helpers.
 
 The helpers calculate Crump-Seinfeld spherical and rectangular chamber
-wall-loss coefficients in SI units [s^-1], plus private image-charge
+wall-loss coefficients in SI units [s^-1], plus private P2 image-charge
 enhancement primitives with dimensionless outputs. Coulomb self-potential
 ratios are lower-clipped at -200, while image-charge exponents use the CPU
-diagonal/self-pair absolute-value calculation and clip to [-50, 50]. P3 also
-provides private electric-field drift and charged-coefficient composition
-helpers. The helpers are device-only, have no public validation contract, and
-are composed by the direct wall-loss step after its frozen preflight owns input
-validation.
+diagonal/self-pair absolute-value calculation and clip to [-50, 50]. Private
+P3 helpers resolve geometry-specific fields, calculate signed drift, and
+sanitize charged coefficients. They are composed by the direct fixed-shape
+wall-loss step for nonzero charged slots; zero-charge slots retain its neutral
+coefficient and RNG path. The helpers are device-only and have no public
+validation contract; direct-step frozen preflight owns input validation.
 
 Crump, J. G., & Seinfeld, J. H. (1981). Turbulent deposition and
 gravitational sedimentation of an aerosol in a vessel of arbitrary shape.

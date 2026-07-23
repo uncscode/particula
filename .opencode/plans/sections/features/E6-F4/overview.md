@@ -12,7 +12,7 @@ must exactly follow the neutral coefficient and stochastic path.
 
 ## Value Proposition
 
-E6-F4-P1 through P3 are shipped. P1 freezes the charged-mode configuration without
+E6-F4-P1 through P4 are implemented. P1 freezes the charged-mode configuration without
 changing the direct step's ownership, mutation, coefficient, or RNG contracts.
 P2 adds private fp64 Warp Coulomb self-potential-ratio and image-charge
 enhancement primitives, with independent NumPy/Warp parity and clipping tests.
@@ -20,9 +20,11 @@ P3 adds private fp64 Warp helpers for geometry scale, spherical/rectangular
 electric-field resolution, signed mobility drift, and safely clipped charged
 coefficient composition, also with independent tests.
 `NeutralWallLossConfig` remains the sole concrete-module-only configuration
-type. The primitives are not public exports and are not composed into the
-direct wall-loss kernel; charged execution therefore remains the E6-F3 neutral
-coefficient and RNG path. P4 direct-kernel integration remains deferred.
+type. P4 connects the private helpers inside geometry-specialized charged
+removal kernels: nonzero charge uses image enhancement and signed field drift,
+while charged zero-charge slots retain the exact E6-F3 neutral coefficient and
+RNG path. No public entry point, export, runnable, container field, transfer,
+or RNG stream was added.
 
 ## User Stories
 

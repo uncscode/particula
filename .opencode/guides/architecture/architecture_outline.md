@@ -35,5 +35,6 @@ private helpers for cross-kernel setup.
   zero-charge slots retain the neutral path. The sidecar is not added to Warp
   particle schemas or package exports, and sequential per-box ownership
   advances it only for eligible slots.
-- `environment.py` - Shared private normalization and validation for kernel environment inputs
+- `environment.py` - Shared private normalization and validation for kernel
+  environment inputs
 - `tests/` - Test coverage

@@ -32,14 +32,17 @@ scientific tolerance, or E6-F3 invariant may be weakened. Test modules use the
   The tests cover cancellation, NaN, negative infinity, and positive-overflow
   sanitization; Warp CPU is required when available and CUDA rows are optional.
   This remains private-helper evidence, not direct-step integration parity.
-- **P4 step integration:** In
-  `particula/gpu/kernels/tests/wall_loss_test.py`, exercise mixed zero/nonzero
-  charges, sparse inactive gaps, one/multi-box, one/multi-species, exact zero
-  time, controlled all-survive/all-remove behavior, and repeated steps. Removed
-  slots clear every species mass, concentration, and charge; survivors preserve
-  values and all arrays preserve shape, device, dtype, and identity. Re-run the
-  E6-F3 omitted/supplied/reset RNG lifecycle matrix and invalid-call
-  non-advancement checks.
+- **P4 step integration (implemented, #1412):** In
+  `particula/gpu/kernels/tests/wall_loss_test.py`, public-step tests cover both
+  geometries, image-only nonzero-charge removal versus neutral survival,
+  zero-charge fallback, sparse/inactive and unusable slots, selected-slot
+  clearing, survivor preservation, and caller-owned field identity. Spherical
+  signed potential/charge controls and each rectangular x/y/z vector lane prove
+  field wiring; opposing drift clipping proves no-draw behavior. Charged
+  saturated coefficients consume a draw before removal, while zero-time,
+  rejected, and all-inactive calls preserve particle/field/RNG state. This is
+  dispatch and boundary evidence, not P5 CPU coefficient parity or statistical
+  survival validation.
 - **P5 parity/stochastic validation (deferred):** In
   `particula/gpu/kernels/tests/wall_loss_parity_test.py`, require Warp CPU for a
   deterministic geometry/charge/field coefficient matrix. Compare the charged

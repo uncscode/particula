@@ -13,24 +13,25 @@
 - [x] Private fp64 primitives calculate the CPU-equivalent self-pair Coulomb
   ratio and image-charge enhancement for nonzero charge, independent of wall
   potential; the ratio floor, exponent clipping, and exact zero-charge identity
-  are independently tested. They are not yet used by the direct step.
+  are independently tested and P4 uses them privately for nonzero charge.
 - [x] Private fp64 helpers preserve CPU geometry scaling, signed spherical and
   rectangular field semantics, potential contribution, and signed charge drift;
   independent tests cover guard and zero-control lanes.
 - [x] Private composition exactly sanitizes NaN, negative, negative-infinite,
   and positive-overflow results to finite nonnegative fp64 outputs.
-- [ ] Every zero-charge active slot reproduces the E6-F3 neutral coefficient and
-  survival probability, including when potential or field is configured.
+- [x] Every zero-charge active slot reproduces the E6-F3 neutral coefficient and
+  RNG path, including when potential or field is configured.
 - [ ] Charged spherical and rectangular coefficients match the CPU array oracle
   at recorded fp64 `rtol`/`atol` on required Warp CPU.
 - [ ] Charged and neutral-fallback survival counts pass predeclared statistical
   bounds without requiring exact CPU/Warp RNG sequences.
-- [ ] Supplied per-box RNG persists by identity without hidden reseeding;
-  explicit reset is reproducible and invalid/no-op calls do not advance it.
-- [ ] Removed slots clear every species mass, concentration, and charge;
+- [x] Supplied per-box RNG persists by identity without hidden reseeding;
+  invalid, zero-time, all-inactive, and nonpositive-composed-rate paths do not
+  advance it; charged saturation consumes the normal survival draw.
+- [x] Removed slots clear every species mass, concentration, and charge;
   survivors preserve all fields and all shapes/devices/dtypes/identities remain
   stable.
-- [ ] All detectable invalid calls fail before allocation, RNG mutation, or
+- [x] All detectable invalid calls fail before allocation, RNG mutation, or
   particle mutation.
 - [ ] CUDA validation skips cleanly when unavailable, and documentation states
   all explicit ownership and deferred boundaries.

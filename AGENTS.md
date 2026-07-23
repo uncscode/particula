@@ -472,22 +472,23 @@ pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
 - Construct `NeutralWallLossConfig` only from
   `particula.gpu.kernels.wall_loss`; it is deliberately not re-exported by
   `particula.gpu.kernels` or `particula.gpu`.
-- The direct boundary supports `particle_resolved` neutral configurations plus a
-  validation-only charged mode. Wall eddy diffusivity is in m²/s; radius and
-  dimensions are in m; temperature is in K; pressure is in Pa; and time is in s.
+- The direct boundary supports `particle_resolved` neutral and charged
+  configurations. Wall eddy diffusivity is in m²/s; radius and dimensions are
+  in m; temperature is in K; pressure is in Pa; and time is in s.
   A spherical configuration needs a positive radius and no dimensions. A
   rectangular configuration needs no radius and exactly three positive dimensions.
 - Charged mode accepts a finite signed wall potential [V] and a finite signed
   electric field [V/m]: a scalar for spherical geometry or a caller-owned,
   same-device `wp.float64` Warp array shaped `(3,)` for rectangular geometry.
-  It validates these inputs only. The direct boundary retains the neutral
-  coefficient and RNG path in both modes; image-charge and electric-field drift
-  physics remain deferred.
+  Nonzero charged slots use private image-charge and electric-field-drift
+  composition. Neutral mode and zero-charge charged slots retain the exact
+  neutral coefficient and RNG path. The rectangular vector remains
+  caller-owned and is read only by charged rectangular execution.
 - P3-frozen preflight validates fixed-shape, same-device `wp.float64` particle
   fields, finite domain values, a finite nonnegative `time_step` [s],
   temperature [K], pressure [Pa], and optional `wp.uint32` per-box RNG
-  metadata. Particle charge is finite signed metadata and does not enable
-  charged-wall physics.
+  metadata. In charged mode, finite nonzero particle charge selects the private
+  charged-coefficient path after successful preflight.
 - After successful preflight, eligible finite-rate fixed slots survive with
   `exp(-k * time_step)`. Selected slots have every mass lane, concentration,
   and charge cleared; density, volume, dtype, device, capacity, and unselected
@@ -506,12 +507,12 @@ pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
 - Deterministic geometry-specific coefficient tolerances and 100-seed,
   3-sigma aggregate survival checks provide bounded P6 evidence. Warp CPU is
   the baseline when available; CUDA is optional and skips cleanly when absent.
-  This is not CPU-strategy parity or per-seed trajectory replay. Charged,
-  image-charge, and electric-field physics; a high-level runnable, scheduler,
-  or backend integration; hidden transfer or CPU fallback; resizing, compaction,
-  activation, graph capture, differentiability, and performance claims remain
-  deferred. Device validation scans and scalar status synchronization/readback
-  are permitted; they do not transfer or replace caller-owned buffers.
+  This is not CPU-strategy parity or per-seed trajectory replay. A high-level
+  runnable, scheduler, or backend integration; hidden transfer or CPU fallback;
+  resizing, compaction, activation, graph capture, differentiability, and
+  performance claims remain deferred. Device validation scans and scalar status
+  synchronization/readback are permitted; they do not transfer or replace
+  caller-owned buffers.
 
 Focused P1–P6 contract runs:
 

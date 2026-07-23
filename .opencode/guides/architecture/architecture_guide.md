@@ -44,26 +44,31 @@ kernel-entry responsibilities.
 - The preflight guarantee ends at launch: post-launch rollback is not
   provided. This direct entry point does not imply CPU fallback or runnable
   support.
-- Import the supported neutral wall-loss boundary with
+- Import the supported fixed-slot wall-loss boundary with
   `from particula.gpu.kernels import wall_loss_step_gpu`. Its
   `NeutralWallLossConfig` is deliberately concrete-module-only at
   `particula.gpu.kernels.wall_loss`; do not re-export it through
   `particula.gpu.kernels` or `particula.gpu`.
-- `wall_loss_step_gpu` owns immutable host configuration and frozen P3
-  preflight for neutral, particle-resolved inputs. After successful preflight,
-  a nonzero call evaluates coefficients and stochastically clears eligible fixed
-  slots in place; zero time is write-free. Neutral coefficient helpers remain
-  in `particula.gpu.dynamics.wall_loss_funcs`.
-- P5 returns the identical particle object. Its optional `(n_boxes,)` `uint32`
-  RNG sidecar is external caller-owned state, not a `WarpParticleData` field:
-  successful positive-time calls advance each box sequentially for eligible
-  slots, while omitted state is private to the call. Explicit
-  `initialize_rng=True` is the only supplied-state reset path; zero-time and
-  preflight failures leave supplied state unchanged. This serial per-box
-  ownership is a correctness constraint, not a throughput claim. Pre-launch
-  failures are atomic; rollback after mutation launch is not promised. Charged
-  physics, runnables, hidden transfers/fallbacks, and CPU/Warp stochastic
-  parity remain deferred. See
+- `wall_loss_step_gpu` owns immutable host configuration and frozen preflight
+  for particle-resolved neutral and charged inputs. It dispatches the
+  unchanged neutral kernel for neutral mode; charged kernels compose the private
+  image-charge and electric-field-drift helpers in
+  `particula.gpu.dynamics.wall_loss_funcs` only for nonzero-charge slots.
+  Charged zero-charge slots retain the exact neutral coefficient and RNG path.
+  A charged rectangular field remains caller-owned `(3,)` `float64` Warp
+  storage and is passed only to the rectangular charged kernel.
+- After successful preflight, a nonzero call stochastically clears eligible
+  fixed slots in place and returns the identical particle object. Zero time is
+  write-free; pre-launch failures are atomic; rollback after a mutation launch
+  is not promised.
+- Its optional `(n_boxes,)` `uint32` RNG sidecar is external caller-owned
+  state, not a `WarpParticleData` field. Successful positive-time calls advance
+  each box sequentially only for eligible slots, while omitted state is private
+  to the call. Explicit `initialize_rng=True` is the only supplied-state reset
+  path. Zero-time, preflight failures, and positive-time inputs with no usable
+  slots leave supplied state unchanged. This serial per-box ownership is a
+  correctness constraint, not a throughput claim. Runnables, hidden
+  transfers/fallbacks, and CPU/Warp stochastic parity remain deferred. See
   [ADR-001](decisions/ADR-001-neutral-gpu-wall-loss-boundary.md).
 
 ## Design Intent
