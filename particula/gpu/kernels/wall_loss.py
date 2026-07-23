@@ -81,6 +81,17 @@ def _scan_nonnegative_finite_2d(
 
 
 @wp.kernel
+def _scan_finite_2d(
+    values: wp.array2d(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Record non-finite entries in two-dimensional metadata."""
+    row, column = wp.tid()
+    if not wp.isfinite(values[row, column]):
+        wp.atomic_add(invalid, 0, 1)
+
+
+@wp.kernel
 def _scan_nonnegative_finite_3d(
     values: wp.array3d(dtype=wp.float64),
     invalid: wp.array(dtype=wp.int32),
@@ -186,10 +197,17 @@ def _validate_array_schema(
     return values
 
 
-def _validate_values(values: Any, name: str, positive: bool = False) -> None:
+def _validate_values(
+    values: Any,
+    name: str,
+    positive: bool = False,
+    finite_only: bool = False,
+) -> None:
     """Run a device-resident finite-domain scan without host materialization."""
     invalid = wp.zeros(1, dtype=wp.int32, device=values.device)
-    if positive:
+    if finite_only:
+        kernel = _scan_finite_2d
+    elif positive:
         kernel = _scan_positive_finite_1d
     elif values.ndim == 1:
         kernel = _scan_nonnegative_finite_1d
@@ -203,7 +221,13 @@ def _validate_values(values: Any, name: str, positive: bool = False) -> None:
         inputs=[values, invalid],
         device=values.device,
     )
-    domain = "finite and positive" if positive else "finite and nonnegative"
+    domain = (
+        "finite"
+        if finite_only
+        else "finite and positive"
+        if positive
+        else "finite and nonnegative"
+    )
     if invalid.numpy()[0] != 0:
         raise ValueError(f"{name} must be {domain}.")
 
@@ -243,14 +267,14 @@ def _validate_particles(particles: Any) -> tuple[int, Any]:
         (n_boxes,),
         device,
     )
-    for values, name, positive in (
-        (masses, "particles.masses", False),
-        (concentration, "particles.concentration", False),
-        (charge, "particles.charge", False),
-        (density, "particles.density", True),
-        (volume, "particles.volume", True),
+    for values, name, positive, finite_only in (
+        (masses, "particles.masses", False, False),
+        (concentration, "particles.concentration", False, False),
+        (charge, "particles.charge", False, True),
+        (density, "particles.density", True, False),
+        (volume, "particles.volume", True, False),
     ):
-        _validate_values(values, name, positive)
+        _validate_values(values, name, positive, finite_only)
     return n_boxes, device
 
 

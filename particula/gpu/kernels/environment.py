@@ -9,6 +9,8 @@ read-only preflight phase: it completes before scalar broadcasting and does
 not mutate caller-owned environment arrays.
 """
 
+# mypy: disable-error-code="valid-type, misc"
+
 from __future__ import annotations
 
 from typing import Any
@@ -27,6 +29,28 @@ except ImportError as exc:  # pragma: no cover - handled via import guards
 _SUPPORTED_WARP_FLOAT_DTYPES = (wp.float32, wp.float64)
 _SCALAR_BROADCAST_CACHE: dict[tuple[str, int, float], Any] = {}
 _SCALAR_BROADCAST_CACHE_MAXSIZE = 32
+
+
+@wp.kernel
+def _scan_positive_finite_float32(
+    values: wp.array(dtype=wp.float32),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Record invalid positive physical values in a float32 array."""
+    index = wp.tid()
+    if not wp.isfinite(values[index]) or values[index] <= 0.0:
+        wp.atomic_add(invalid, 0, 1)
+
+
+@wp.kernel
+def _scan_positive_finite_float64(
+    values: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Record invalid positive physical values in a float64 array."""
+    index = wp.tid()
+    if not wp.isfinite(values[index]) or values[index] <= 0.0:
+        wp.atomic_add(invalid, 0, 1)
 
 
 def _device_key(device: Any) -> str:
@@ -96,17 +120,23 @@ def _validate_positive_finite_array(
     """Validate a per-box physical input domain before kernel launch.
 
     Notes:
-        The check reads values without modifying or replacing the supplied Warp
-        array. It is used by the preflight and normalization phases.
+        The check scans values on their device, then reads back one scalar
+        status flag without modifying or replacing the supplied Warp array.
+        It is used by the preflight and normalization phases.
     """
-    if not _is_cpu_device(values.device):
-        values_np = np.asarray(type(values).numpy(values), dtype=np.float64)
-        if not np.all(np.isfinite(values_np)) or np.any(values_np <= 0.0):
-            raise ValueError(f"{name} must be finite and > 0 in {caller_name}.")
-        return
-
-    values_np = np.asarray(values.numpy(), dtype=np.float64)
-    if not np.all(np.isfinite(values_np)) or np.any(values_np <= 0.0):
+    invalid = wp.zeros(1, dtype=wp.int32, device=values.device)
+    kernel = (
+        _scan_positive_finite_float32
+        if values.dtype == wp.float32
+        else _scan_positive_finite_float64
+    )
+    wp.launch(
+        kernel,
+        dim=values.shape,
+        inputs=[values, invalid],
+        device=values.device,
+    )
+    if invalid.numpy()[0] != 0:
         raise ValueError(f"{name} must be finite and > 0 in {caller_name}.")
 
 

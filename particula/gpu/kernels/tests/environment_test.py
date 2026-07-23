@@ -129,6 +129,55 @@ def test_environment_preflight_validates_arrays_without_scalar_broadcast(
     )
 
 
+@pytest.mark.parametrize(
+    ("name", "values", "raises"),
+    [
+        ("temperature", [298.15, 299.15], False),
+        ("pressure", [101325.0, 0.0], True),
+    ],
+)
+def test_environment_array_validation_avoids_input_materialization(
+    monkeypatch: pytest.MonkeyPatch,
+    device: str,
+    name: str,
+    values: list[float],
+    raises: bool,
+) -> None:
+    """Validate device arrays with a scalar status readback, not ``.numpy()``."""
+    temperature = wp.array([298.15, 299.15], dtype=wp.float64, device=device)
+    pressure = wp.array([101325.0, 101000.0], dtype=wp.float64, device=device)
+    supplied = wp.array(values, dtype=wp.float64, device=device)
+    if name == "temperature":
+        temperature = supplied
+    else:
+        pressure = supplied
+
+    def _forbidden_numpy(*_args: Any, **_kwargs: Any) -> np.ndarray:
+        raise AssertionError("input array was materialized on the host")
+
+    monkeypatch.setattr(supplied, "numpy", _forbidden_numpy, raising=False)
+
+    if raises:
+        with pytest.raises(ValueError, match=f"{name} must be finite and > 0"):
+            validate_environment_inputs(
+                temperature=temperature,
+                pressure=pressure,
+                environment=None,
+                n_boxes=2,
+                device=wp.get_device(device),
+                caller_name="test_caller",
+            )
+    else:
+        validate_environment_inputs(
+            temperature=temperature,
+            pressure=pressure,
+            environment=None,
+            n_boxes=2,
+            device=wp.get_device(device),
+            caller_name="test_caller",
+        )
+
+
 def test_environment_helper_returns_environment_arrays_unchanged(
     device: str,
 ) -> None:

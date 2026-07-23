@@ -205,6 +205,34 @@ def test_nonnegative_particle_metadata_rejects_nan(field: str) -> None:
     _assert_snapshot_unchanged(particles, snapshot)
 
 
+@pytest.mark.parametrize("charges", [[-2.0, -1.0], [-2.0, 3.0]])
+def test_signed_finite_charge_metadata_is_accepted_without_mutation(
+    charges: list[float],
+) -> None:
+    """Neutral P3 accepts signed finite charge metadata without writing state."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    particles.charge = wp.array(
+        [charges, [1.0, -4.0]], dtype=wp.float64, device="cpu"
+    )
+    rng_states = wp.array([3, 4], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, rng_states)
+
+    returned = wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        1.0,
+        config=_config(),
+        rng_states=rng_states,
+    )
+
+    assert returned is particles
+    _assert_snapshot_unchanged(particles, snapshot, rng_states)
+
+
 def test_rng_metadata_rejection_preserves_sidecar() -> None:
     """P3 validates but never consumes a supplied RNG sidecar."""
     wp = _warp()
