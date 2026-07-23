@@ -465,7 +465,7 @@ Focused P1–P4 contract run:
 pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
 ```
 
-### GPU wall-loss P1–P6
+### GPU wall-loss direct-kernel contract
 
 - Import the direct low-level boundary with
   `from particula.gpu.kernels import wall_loss_step_gpu`.

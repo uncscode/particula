@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import re
 import time
 from dataclasses import FrozenInstanceError
@@ -1198,48 +1199,6 @@ def test_zero_survival_removes_an_exact_zero_draw() -> None:
     npt.assert_array_equal(removal_mask.numpy(), [1, 0])
 
 
-def test_mask_application_preserves_unmarked_and_clears_marked_slots() -> None:
-    """Private mask application clears every mutable lane only when selected."""
-    wp = _warp()
-    from particula.gpu.kernels.wall_loss import _apply_wall_loss_mask
-
-    particles = _particles()
-    snapshot = _snapshot(particles)
-    mask = wp.array([[0, 1], [1, 0]], dtype=wp.int32, device="cpu")
-    wp.launch(
-        _apply_wall_loss_mask,
-        dim=mask.shape,
-        inputs=[
-            particles.masses,
-            particles.concentration,
-            particles.charge,
-            mask,
-            2,
-        ],
-        device="cpu",
-    )
-
-    for box, particle in ((0, 1), (1, 0)):
-        npt.assert_array_equal(particles.masses.numpy()[box, particle], 0.0)
-        assert particles.concentration.numpy()[box, particle] == 0.0
-        assert particles.charge.numpy()[box, particle] == 0.0
-    for box, particle in ((0, 0), (1, 1)):
-        npt.assert_array_equal(
-            particles.masses.numpy()[box, particle],
-            snapshot["masses"][1][box, particle],
-        )
-        assert (
-            particles.concentration.numpy()[box, particle]
-            == snapshot["concentration"][1][box, particle]
-        )
-        assert (
-            particles.charge.numpy()[box, particle]
-            == snapshot["charge"][1][box, particle]
-        )
-    npt.assert_array_equal(particles.density.numpy(), snapshot["density"][1])
-    npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
-
-
 def test_equal_inputs_and_explicit_reset_produce_equal_slot_updates() -> None:
     """Same-device explicit resets reproducibly initialize supplied sidecars."""
     wp = _warp()
@@ -1317,38 +1276,46 @@ def test_subnormal_mass_slot_survives_without_transport_calculation() -> None:
     _assert_snapshot_unchanged(particles, snapshot)
 
 
-@pytest.mark.parametrize("mask_values", [np.zeros((2, 2)), np.ones((2, 2))])
-def test_mask_application_handles_all_survivor_and_all_removal_masks(
-    mask_values: np.ndarray,
-) -> None:
-    """All-zero and all-one private masks preserve or clear complete slots."""
+def test_overflowed_derived_properties_do_not_reset_rng_sidecar() -> None:
+    """All slots with nonfinite derived density leave supplied RNG unchanged."""
     wp = _warp()
-    from particula.gpu.kernels.wall_loss import _apply_wall_loss_mask
+    from particula.gpu.kernels import wall_loss_step_gpu
 
     particles = _particles()
-    snapshot = _snapshot(particles)
-    mask = wp.array(mask_values, dtype=wp.int32, device="cpu")
-    wp.launch(
-        _apply_wall_loss_mask,
-        dim=mask.shape,
-        inputs=[
-            particles.masses,
-            particles.concentration,
-            particles.charge,
-            mask,
-            2,
-        ],
+    particles.masses = wp.array(
+        [[[1.0e308, 1.0e308], [0.0, 0.0]]],
+        dtype=wp.float64,
         device="cpu",
     )
+    particles.concentration = wp.array(
+        [[1.0, 0.0]], dtype=wp.float64, device="cpu"
+    )
+    particles.charge = wp.array([[1.0, 0.0]], dtype=wp.float64, device="cpu")
+    particles.volume = wp.array([1.0], dtype=wp.float64, device="cpu")
+    rng_states = wp.array([17], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, rng_states)
 
-    if np.all(mask_values == 0.0):
-        _assert_snapshot_unchanged(particles, snapshot)
-        return
-    npt.assert_array_equal(particles.masses.numpy(), 0.0)
-    npt.assert_array_equal(particles.concentration.numpy(), 0.0)
-    npt.assert_array_equal(particles.charge.numpy(), 0.0)
-    npt.assert_array_equal(particles.density.numpy(), snapshot["density"][1])
-    npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
+    wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        1.0,
+        config=_charged_config(),
+        rng_seed=19,
+        rng_states=rng_states,
+        initialize_rng=True,
+    )
+
+    _assert_snapshot_unchanged(particles, snapshot, rng_states)
+
+
+def test_direct_execution_source_has_no_host_readback_or_removal_mask() -> None:
+    """Keep the direct positive-time path asynchronous and O(1)-storage."""
+    from particula.gpu.kernels.wall_loss import wall_loss_step_gpu
+
+    source = inspect.getsource(wall_loss_step_gpu)
+    assert ".numpy()" not in source
+    assert "removal_mask" not in source
 
 
 def test_missing_particle_field_and_nonarray_field_have_stable_errors() -> None:
@@ -1738,7 +1705,8 @@ def test_charged_spherical_potential_and_charge_sign_control_draws(
         npt.assert_array_equal(particles.charge.numpy(), 0.0)
         assert not np.array_equal(states.numpy(), snapshot["rng_states"][1])
     else:
-        _assert_snapshot_unchanged(particles, snapshot, states)
+        _assert_snapshot_unchanged(particles, snapshot)
+        npt.assert_array_equal(states.numpy(), snapshot["rng_states"][1])
 
 
 @pytest.mark.parametrize("lane", [0, 1, 2], ids=["x", "y", "z"])
@@ -1809,7 +1777,7 @@ def test_charged_rectangular_zero_vector_uses_image_only_draw_path() -> None:
 def test_charged_rectangular_signed_potential_clips_opposing_vector_drift() -> (
     None
 ):
-    """A signed rectangular potential can oppose the vector field without a draw."""
+    """A clipped charged lane survives without advancing RNG state."""
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
@@ -1831,7 +1799,8 @@ def test_charged_rectangular_signed_potential_clips_opposing_vector_drift() -> (
         particles, 298.15, 101325.0, 1.0, config=config, rng_states=states
     )
 
-    _assert_snapshot_unchanged(particles, snapshot, states)
+    _assert_snapshot_unchanged(particles, snapshot)
+    npt.assert_array_equal(states.numpy(), snapshot["rng_states"][1])
     assert config.wall_electric_field is field
     npt.assert_array_equal(field.numpy(), [1.0e100, 0.0, 0.0])
 

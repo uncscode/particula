@@ -510,9 +510,10 @@ def _initialize_rng_states(seed: Any, rng_states: Any) -> None:
 
 @no_type_check
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-def _wall_loss_removal_mask(
+def _wall_loss_remove(  # noqa: C901
     masses: wp.array3d(dtype=wp.float64),
     concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
     density: wp.array(dtype=wp.float64),
     temperature: wp.array(dtype=wp.float64),
     pressure: wp.array(dtype=wp.float64),
@@ -526,11 +527,13 @@ def _wall_loss_removal_mask(
     n_particles: wp.int32,
     n_species: wp.int32,
     rng_states: wp.array(dtype=wp.uint32),
-    removal_mask: wp.array2d(dtype=wp.int32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
 ) -> None:
-    """Calculate stochastic removal flags without mutating caller fields."""
+    """Select and clear neutral wall-loss slots in one device launch."""
     box = wp.tid()
     state = rng_states[box]
+    has_usable_slot = wp.int32(0)
     for particle in range(n_particles):
         if concentration[box, particle] <= wp.float64(0.0):
             continue
@@ -553,6 +556,10 @@ def _wall_loss_removal_mask(
             or particle_density <= wp.float64(0.0)
         ):
             continue
+        if has_usable_slot == wp.int32(0):
+            has_usable_slot = wp.int32(1)
+            if initialize_rng != wp.int32(0):
+                state = wp.rand_init(rng_seed, box)
 
         coefficient = wp.float64(0.0)
         if geometry_mode == wp.int32(0):
@@ -590,43 +597,26 @@ def _wall_loss_removal_mask(
         if wp.isnan(coefficient) or coefficient <= wp.float64(0.0):
             continue
         if wp.isinf(coefficient):
-            removal_mask[box, particle] = wp.int32(1)
+            for species in range(n_species):
+                masses[box, particle, species] = wp.float64(0.0)
+            concentration[box, particle] = wp.float64(0.0)
+            charge[box, particle] = wp.float64(0.0)
             continue
 
         if _should_remove_for_survival_draw(
             wp.randf(state), wp.exp(-coefficient * time_step)
         ):
-            removal_mask[box, particle] = wp.int32(1)
-    rng_states[box] = state
-
-
-@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-def _scan_usable_wall_loss_slots(
-    masses: wp.array3d(dtype=wp.float64),
-    concentration: wp.array2d(dtype=wp.float64),
-    density: wp.array(dtype=wp.float64),
-    n_particles: wp.int32,
-    n_species: wp.int32,
-    usable: wp.array(dtype=wp.int32),
-) -> None:
-    """Record whether a box has an active slot with usable mass and volume."""
-    box = wp.tid()
-    for particle in range(n_particles):
-        if concentration[box, particle] <= wp.float64(0.0):
-            continue
-        total_mass = wp.float64(0.0)
-        total_volume = wp.float64(0.0)
-        for species in range(n_species):
-            mass = masses[box, particle, species]
-            total_mass += mass
-            total_volume += mass / density[species]
-        if total_mass > wp.float64(0.0) and total_volume > wp.float64(0.0):
-            wp.atomic_add(usable, 0, 1)
+            for species in range(n_species):
+                masses[box, particle, species] = wp.float64(0.0)
+            concentration[box, particle] = wp.float64(0.0)
+            charge[box, particle] = wp.float64(0.0)
+    if has_usable_slot != wp.int32(0):
+        rng_states[box] = state
 
 
 @no_type_check
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-def _charged_spherical_wall_loss_removal_mask(
+def _charged_spherical_wall_loss_remove(  # noqa: C901
     masses: wp.array3d(dtype=wp.float64),
     concentration: wp.array2d(dtype=wp.float64),
     charge: wp.array2d(dtype=wp.float64),
@@ -641,11 +631,13 @@ def _charged_spherical_wall_loss_removal_mask(
     n_particles: wp.int32,
     n_species: wp.int32,
     rng_states: wp.array(dtype=wp.uint32),
-    removal_mask: wp.array2d(dtype=wp.int32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
 ) -> None:
-    """Calculate charged spherical removal flags without caller mutation."""
+    """Select and clear charged spherical wall-loss slots in one launch."""
     box = wp.tid()
     state = rng_states[box]
+    has_usable_slot = wp.int32(0)
     geometry_scale = _geometry_scale_wp(
         wp.int32(0),
         chamber_radius,
@@ -676,6 +668,10 @@ def _charged_spherical_wall_loss_removal_mask(
             or particle_density <= wp.float64(0.0)
         ):
             continue
+        if has_usable_slot == wp.int32(0):
+            has_usable_slot = wp.int32(1)
+            if initialize_rng != wp.int32(0):
+                state = wp.rand_init(rng_seed, box)
         neutral_coefficient = spherical_wall_loss_coefficient_wp(
             wall_eddy_diffusivity,
             particle_radius,
@@ -718,18 +714,25 @@ def _charged_spherical_wall_loss_removal_mask(
         if wp.isnan(coefficient) or coefficient <= wp.float64(0.0):
             continue
         if particle_charge == wp.float64(0.0) and wp.isinf(coefficient):
-            removal_mask[box, particle] = wp.int32(1)
+            for species in range(n_species):
+                masses[box, particle, species] = wp.float64(0.0)
+            concentration[box, particle] = wp.float64(0.0)
+            charge[box, particle] = wp.float64(0.0)
             continue
         if _should_remove_for_survival_draw(
             wp.randf(state), wp.exp(-coefficient * time_step)
         ):
-            removal_mask[box, particle] = wp.int32(1)
-    rng_states[box] = state
+            for species in range(n_species):
+                masses[box, particle, species] = wp.float64(0.0)
+            concentration[box, particle] = wp.float64(0.0)
+            charge[box, particle] = wp.float64(0.0)
+    if has_usable_slot != wp.int32(0):
+        rng_states[box] = state
 
 
 @no_type_check
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-def _charged_rectangular_wall_loss_removal_mask(
+def _charged_rectangular_wall_loss_remove(  # noqa: C901
     masses: wp.array3d(dtype=wp.float64),
     concentration: wp.array2d(dtype=wp.float64),
     charge: wp.array2d(dtype=wp.float64),
@@ -746,11 +749,13 @@ def _charged_rectangular_wall_loss_removal_mask(
     n_particles: wp.int32,
     n_species: wp.int32,
     rng_states: wp.array(dtype=wp.uint32),
-    removal_mask: wp.array2d(dtype=wp.int32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
 ) -> None:
-    """Calculate charged rectangular removal flags without caller mutation."""
+    """Select and clear charged rectangular wall-loss slots in one launch."""
     box = wp.tid()
     state = rng_states[box]
+    has_usable_slot = wp.int32(0)
     geometry_scale = _geometry_scale_wp(
         wp.int32(1),
         wp.float64(0.0),
@@ -785,6 +790,10 @@ def _charged_rectangular_wall_loss_removal_mask(
             or particle_density <= wp.float64(0.0)
         ):
             continue
+        if has_usable_slot == wp.int32(0):
+            has_usable_slot = wp.int32(1)
+            if initialize_rng != wp.int32(0):
+                state = wp.rand_init(rng_seed, box)
         neutral_coefficient = rectangle_wall_loss_coefficient_wp(
             wall_eddy_diffusivity,
             particle_radius,
@@ -829,30 +838,20 @@ def _charged_rectangular_wall_loss_removal_mask(
         if wp.isnan(coefficient) or coefficient <= wp.float64(0.0):
             continue
         if particle_charge == wp.float64(0.0) and wp.isinf(coefficient):
-            removal_mask[box, particle] = wp.int32(1)
+            for species in range(n_species):
+                masses[box, particle, species] = wp.float64(0.0)
+            concentration[box, particle] = wp.float64(0.0)
+            charge[box, particle] = wp.float64(0.0)
             continue
         if _should_remove_for_survival_draw(
             wp.randf(state), wp.exp(-coefficient * time_step)
         ):
-            removal_mask[box, particle] = wp.int32(1)
-    rng_states[box] = state
-
-
-@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-def _apply_wall_loss_mask(
-    masses: wp.array3d(dtype=wp.float64),
-    concentration: wp.array2d(dtype=wp.float64),
-    charge: wp.array2d(dtype=wp.float64),
-    removal_mask: wp.array2d(dtype=wp.int32),
-    n_species: wp.int32,
-) -> None:
-    """Clear all mutable slot fields selected by a removal mask."""
-    box, particle = wp.tid()
-    if removal_mask[box, particle] != wp.int32(0):
-        for species in range(n_species):
-            masses[box, particle, species] = wp.float64(0.0)
-        concentration[box, particle] = wp.float64(0.0)
-        charge[box, particle] = wp.float64(0.0)
+            for species in range(n_species):
+                masses[box, particle, species] = wp.float64(0.0)
+            concentration[box, particle] = wp.float64(0.0)
+            charge[box, particle] = wp.float64(0.0)
+    if has_usable_slot != wp.int32(0):
+        rng_states[box] = state
 
 
 def wall_loss_step_gpu(
@@ -955,46 +954,21 @@ def wall_loss_step_gpu(
     )
     n_particles = particles.masses.shape[1]
     n_species = particles.masses.shape[2]
-    usable = wp.zeros(1, dtype=wp.int32, device=device)
-    wp.launch(
-        _scan_usable_wall_loss_slots,
-        dim=n_boxes,
-        inputs=[
-            particles.masses,
-            particles.concentration,
-            particles.density,
-            n_particles,
-            n_species,
-            usable,
-        ],
-        device=device,
-    )
-    if usable.numpy()[0] == 0:
-        return particles
     execution_rng_states = rng_states
     if execution_rng_states is None:
         execution_rng_states = wp.empty(n_boxes, dtype=wp.uint32, device=device)
         initialize_rng = True
-    if initialize_rng:
-        wp.launch(
-            _initialize_rng_states,
-            dim=n_boxes,
-            inputs=[int(rng_seed), execution_rng_states],
-            device=device,
-        )
-    removal_mask = wp.zeros(
-        (n_boxes, n_particles), dtype=wp.int32, device=device
-    )
     geometry_mode = 0 if validated_config.geometry == "spherical" else 1
     chamber_radius = float(validated_config.chamber_radius or 0.0)
     dimensions = validated_config.chamber_dimensions or (0.0, 0.0, 0.0)
     if validated_config.mode == "neutral":
         wp.launch(
-            _wall_loss_removal_mask,
+            _wall_loss_remove,
             dim=n_boxes,
             inputs=[
                 particles.masses,
                 particles.concentration,
+                particles.charge,
                 particles.density,
                 temperature_array,
                 pressure_array,
@@ -1008,13 +982,14 @@ def wall_loss_step_gpu(
                 n_particles,
                 n_species,
                 execution_rng_states,
-                removal_mask,
+                int(rng_seed),
+                int(initialize_rng),
             ],
             device=device,
         )
     elif validated_config.geometry == "spherical":
         wp.launch(
-            _charged_spherical_wall_loss_removal_mask,
+            _charged_spherical_wall_loss_remove,
             dim=n_boxes,
             inputs=[
                 particles.masses,
@@ -1031,13 +1006,14 @@ def wall_loss_step_gpu(
                 n_particles,
                 n_species,
                 execution_rng_states,
-                removal_mask,
+                int(rng_seed),
+                int(initialize_rng),
             ],
             device=device,
         )
     else:
         wp.launch(
-            _charged_rectangular_wall_loss_removal_mask,
+            _charged_rectangular_wall_loss_remove,
             dim=n_boxes,
             inputs=[
                 particles.masses,
@@ -1056,20 +1032,9 @@ def wall_loss_step_gpu(
                 n_particles,
                 n_species,
                 execution_rng_states,
-                removal_mask,
+                int(rng_seed),
+                int(initialize_rng),
             ],
             device=device,
         )
-    wp.launch(
-        _apply_wall_loss_mask,
-        dim=(n_boxes, n_particles),
-        inputs=[
-            particles.masses,
-            particles.concentration,
-            particles.charge,
-            removal_mask,
-            n_species,
-        ],
-        device=device,
-    )
     return particles

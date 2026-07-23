@@ -8,8 +8,9 @@
 - [x] P1 rejects malformed charged configurations before particle value scans,
   environment/RNG work, allocation, launch, or caller mutation; rectangular
   field errors precede coexisting charge errors.
-- [x] P1 valid charged calls preserve rectangular field identity and bytes and
-  execute the existing neutral coefficient/removal/RNG path.
+- [x] P1 valid charged calls preserve rectangular field identity and bytes;
+  nonzero-charge slots execute charged composition while zero-charge slots retain
+  the neutral coefficient/removal/RNG fallback.
 - [x] Private fp64 primitives calculate the CPU-equivalent self-pair Coulomb
   ratio and image-charge enhancement for nonzero charge, independent of wall
   potential; the ratio floor, exponent clipping, and exact zero-charge identity
@@ -26,8 +27,9 @@
 - [ ] Charged and neutral-fallback survival counts pass predeclared statistical
   bounds without requiring exact CPU/Warp RNG sequences.
 - [x] Supplied per-box RNG persists by identity without hidden reseeding;
-  invalid, zero-time, all-inactive, and nonpositive-composed-rate paths do not
-  advance it; charged saturation consumes the normal survival draw.
+  invalid, zero-time, all-unusable calls do not advance it, while usable clipped
+  charged slots consume a compatible discard draw and charged saturation uses the
+  normal survival draw.
 - [x] Removed slots clear every species mass, concentration, and charge;
   survivors preserve all fields and all shapes/devices/dtypes/identities remain
   stable.

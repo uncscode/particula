@@ -408,7 +408,7 @@ def _field_resolution_oracle(
         wall_potentials[valid_potential] / scales[valid_potential]
     )
     spherical = field_x + potential
-    rectangular = np.sqrt(field_x**2 + field_y**2 + field_z**2) + potential
+    rectangular = np.hypot(np.hypot(field_x, field_y), field_z) + potential
     return scales, spherical, rectangular
 
 
@@ -982,6 +982,29 @@ def test_charged_field_helpers_match_geometry_specific_cpu_semantics(
         rtol=0.0,
         atol=0.0,
     )
+
+
+@pytest.mark.gpu_parity
+def test_rectangular_field_resolution_is_stable_for_large_components(
+    device: str,
+) -> None:
+    """Resolve finite extreme field components without intermediate overflow."""
+    actual = _launch_resolved_electric_fields(
+        np.array([1, 1], dtype=np.int32),
+        np.ones(2),
+        np.ones(2),
+        np.ones(2),
+        np.ones(2),
+        np.array([1.0e200, 1.0e200]),
+        np.array([-1.0e200, 0.0]),
+        np.array([1.0e200, 0.0]),
+        np.array([-1.0e200, 0.0]),
+        device,
+    )
+
+    expected = np.array([np.sqrt(3.0) * 1.0e200 - 1.0e200, 1.0e200])
+    assert np.all(np.isfinite(actual[2]))
+    npt.assert_allclose(actual[2], expected, rtol=1e-12, atol=0.0)
 
 
 @pytest.mark.gpu_parity

@@ -391,9 +391,14 @@ def _resolve_rectangular_electric_field_wp(
     Returns:
         Signed resolved electric field in V/m.
     """
-    resolved_field = wp.sqrt(
-        field_x * field_x + field_y * field_y + field_z * field_z
-    )
+    scale = wp.max(wp.abs(field_x), wp.max(wp.abs(field_y), wp.abs(field_z)))
+    resolved_field = wp.float64(0.0)
+    if scale > wp.float64(0.0):
+        resolved_field = scale * wp.sqrt(
+            (field_x / scale) * (field_x / scale)
+            + (field_y / scale) * (field_y / scale)
+            + (field_z / scale) * (field_z / scale)
+        )
     if wall_potential != wp.float64(0.0) and geometry_scale > wp.float64(0.0):
         resolved_field = resolved_field + wall_potential / geometry_scale
     return resolved_field
