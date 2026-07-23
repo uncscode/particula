@@ -20,6 +20,7 @@ pytestmark = (
 
 if wp is not None:
     from particula.dynamics.properties.wall_loss_coefficient import (  # noqa: E402
+        get_particle_settling_velocity_via_system_state,
         get_rectangle_wall_loss_coefficient_via_system_state,
         get_spherical_wall_loss_coefficient_via_system_state,
     )
@@ -38,13 +39,6 @@ if wp is not None:
     )
 
 
-def _warp_kernel(function):
-    """Decorate kernels only when Warp is available."""
-    if wp is None:
-        return function
-    return wp.kernel(function)
-
-
 def _available_warp_devices() -> list[Any]:
     """Return collection-safe Warp device parameters."""
     if wp is None:
@@ -57,76 +51,77 @@ def _available_warp_devices() -> list[Any]:
     ]
 
 
-@_warp_kernel
-def _spherical_wall_loss_kernel(
-    eddy_diffusivities: Any,
-    particle_radii: Any,
-    particle_densities: Any,
-    temperatures: Any,
-    pressures: Any,
-    chamber_radii: Any,
-    boltzmann_constant: wp.float64,
-    gas_constant: wp.float64,
-    molecular_weight_air: wp.float64,
-    ref_viscosity: wp.float64,
-    ref_temperature: wp.float64,
-    sutherland_constant: wp.float64,
-    result: Any,
-) -> None:
-    """Calculate one spherical wall-loss coefficient per lane."""
-    tid = wp.tid()
-    result[tid] = spherical_wall_loss_coefficient_wp(
-        eddy_diffusivities[tid],
-        particle_radii[tid],
-        particle_densities[tid],
-        temperatures[tid],
-        pressures[tid],
-        chamber_radii[tid],
-        boltzmann_constant,
-        gas_constant,
-        molecular_weight_air,
-        ref_viscosity,
-        ref_temperature,
-        sutherland_constant,
-    )
+if wp is not None:
 
+    @wp.kernel
+    def _spherical_wall_loss_kernel(
+        eddy_diffusivities: Any,
+        particle_radii: Any,
+        particle_densities: Any,
+        temperatures: Any,
+        pressures: Any,
+        chamber_radii: Any,
+        boltzmann_constant: wp.float64,
+        gas_constant: wp.float64,
+        molecular_weight_air: wp.float64,
+        ref_viscosity: wp.float64,
+        ref_temperature: wp.float64,
+        sutherland_constant: wp.float64,
+        result: Any,
+    ) -> None:
+        """Calculate one spherical wall-loss coefficient per lane."""
+        tid = wp.tid()
+        result[tid] = spherical_wall_loss_coefficient_wp(
+            eddy_diffusivities[tid],
+            particle_radii[tid],
+            particle_densities[tid],
+            temperatures[tid],
+            pressures[tid],
+            chamber_radii[tid],
+            boltzmann_constant,
+            gas_constant,
+            molecular_weight_air,
+            ref_viscosity,
+            ref_temperature,
+            sutherland_constant,
+        )
 
-@_warp_kernel
-def _rectangle_wall_loss_kernel(
-    eddy_diffusivities: Any,
-    particle_radii: Any,
-    particle_densities: Any,
-    temperatures: Any,
-    pressures: Any,
-    chamber_lengths: Any,
-    chamber_widths: Any,
-    chamber_heights: Any,
-    boltzmann_constant: wp.float64,
-    gas_constant: wp.float64,
-    molecular_weight_air: wp.float64,
-    ref_viscosity: wp.float64,
-    ref_temperature: wp.float64,
-    sutherland_constant: wp.float64,
-    result: Any,
-) -> None:
-    """Calculate one rectangular wall-loss coefficient per lane."""
-    tid = wp.tid()
-    result[tid] = rectangle_wall_loss_coefficient_wp(
-        eddy_diffusivities[tid],
-        particle_radii[tid],
-        particle_densities[tid],
-        temperatures[tid],
-        pressures[tid],
-        chamber_lengths[tid],
-        chamber_widths[tid],
-        chamber_heights[tid],
-        boltzmann_constant,
-        gas_constant,
-        molecular_weight_air,
-        ref_viscosity,
-        ref_temperature,
-        sutherland_constant,
-    )
+    @wp.kernel
+    def _rectangle_wall_loss_kernel(
+        eddy_diffusivities: Any,
+        particle_radii: Any,
+        particle_densities: Any,
+        temperatures: Any,
+        pressures: Any,
+        chamber_lengths: Any,
+        chamber_widths: Any,
+        chamber_heights: Any,
+        boltzmann_constant: wp.float64,
+        gas_constant: wp.float64,
+        molecular_weight_air: wp.float64,
+        ref_viscosity: wp.float64,
+        ref_temperature: wp.float64,
+        sutherland_constant: wp.float64,
+        result: Any,
+    ) -> None:
+        """Calculate one rectangular wall-loss coefficient per lane."""
+        tid = wp.tid()
+        result[tid] = rectangle_wall_loss_coefficient_wp(
+            eddy_diffusivities[tid],
+            particle_radii[tid],
+            particle_densities[tid],
+            temperatures[tid],
+            pressures[tid],
+            chamber_lengths[tid],
+            chamber_widths[tid],
+            chamber_heights[tid],
+            boltzmann_constant,
+            gas_constant,
+            molecular_weight_air,
+            ref_viscosity,
+            ref_temperature,
+            sutherland_constant,
+        )
 
 
 @pytest.fixture(params=_available_warp_devices())
@@ -237,6 +232,58 @@ def test_rectangle_wall_loss_matches_cpu_vector_states(device: str) -> None:
     assert actual.shape == (len(expected),)
     assert np.all(np.isfinite(actual))
     npt.assert_allclose(actual, expected, rtol=1e-10, atol=1e-20)
+
+
+@pytest.mark.gpu_parity
+def test_rectangle_wall_loss_uses_settling_limit_at_zero_transport(
+    device: str,
+) -> None:
+    """Return finite settling limits for zero and underflow transport scales."""
+    particle_radii = np.array([3.0e-6, 3.0e-6], dtype=np.float64)
+    particle_densities = np.array([1800.0, 1800.0], dtype=np.float64)
+    temperatures = np.array([298.15, 298.15], dtype=np.float64)
+    pressures = np.array([101325.0, 101325.0], dtype=np.float64)
+    lengths = np.array([1.0, 1.0], dtype=np.float64)
+    widths = np.array([0.8, 0.8], dtype=np.float64)
+    heights = np.array([0.6, 0.6], dtype=np.float64)
+    eddy_diffusivities = np.array(
+        [0.0, np.nextafter(np.float64(0.0), np.float64(1.0))],
+        dtype=np.float64,
+    )
+    settling_velocity = get_particle_settling_velocity_via_system_state(
+        particle_radius=particle_radii,
+        particle_density=particle_densities,
+        temperature=298.15,
+        pressure=101325.0,
+    )
+    expected = settling_velocity / heights
+    result = wp.zeros(2, dtype=wp.float64, device=device)
+    wp.launch(
+        _rectangle_wall_loss_kernel,
+        dim=2,
+        inputs=[
+            *_warp_arrays(
+                (
+                    eddy_diffusivities,
+                    particle_radii,
+                    particle_densities,
+                    temperatures,
+                    pressures,
+                    lengths,
+                    widths,
+                    heights,
+                ),
+                device,
+            ),
+            *_constants(),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    actual = result.numpy()
+    assert np.all(np.isfinite(actual))
+    npt.assert_allclose(actual, expected, rtol=1e-12, atol=0.0)
 
 
 @pytest.mark.gpu_parity
