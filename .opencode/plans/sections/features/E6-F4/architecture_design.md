@@ -24,11 +24,12 @@ survive with p = exp(-k_neutral * dt) using E6-F3 caller-owned RNG
         +-- remove: clear all species mass, concentration, and charge
 ```
 
-P1/P2 do not branch on charge or pass potential/field to device kernels. Thus
-all slots, including zero-charge slots, retain the exact E6-F3 neutral
-coefficient and stochastic path. P2 privately supplies fp64 device helpers for
-the self-pair Coulomb ratio (lower-clipped at `-200`) and image enhancement
-(absolute ratio, exponent-clipped to `[-50, 50]`, exact zero-charge identity).
+The direct P1/P2 wall-loss kernel does not branch on charge or pass
+potential/field to device kernels. Thus all slots, including zero-charge slots,
+retain the exact E6-F3 neutral coefficient and stochastic path. P2 privately
+supplies fp64 device helpers for the self-pair Coulomb ratio (lower-clipped at
+`-200`) and image enhancement (absolute ratio, exponent-clipped to `[-50, 50]`,
+with `_image_charge_enhancement_wp` returning exact `1.0` for zero charge).
 They accept radius, charge, temperature, and explicit physical constants; they
 perform no public validation and have no direct-step call site. Field
 resolution, drift, and charged composition remain deferred to P3-P4.

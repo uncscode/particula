@@ -25,8 +25,8 @@ if wp is not None:
         get_spherical_wall_loss_coefficient_via_system_state,
     )
     from particula.gpu.dynamics.wall_loss_funcs import (  # noqa: E402
-        coulomb_self_potential_ratio_wp,
-        image_charge_enhancement_wp,
+        _coulomb_self_potential_ratio_wp,
+        _image_charge_enhancement_wp,
         rectangle_wall_loss_coefficient_wp,
         spherical_wall_loss_coefficient_wp,
     )
@@ -139,7 +139,7 @@ if wp is not None:
     ) -> None:
         """Calculate one Coulomb self-potential ratio per lane."""
         tid = wp.tid()
-        result[tid] = coulomb_self_potential_ratio_wp(
+        result[tid] = _coulomb_self_potential_ratio_wp(
             particle_radii[tid],
             particle_charges[tid],
             temperatures[tid],
@@ -160,7 +160,7 @@ if wp is not None:
     ) -> None:
         """Calculate one image-charge enhancement factor per lane."""
         tid = wp.tid()
-        result[tid] = image_charge_enhancement_wp(
+        result[tid] = _image_charge_enhancement_wp(
             particle_radii[tid],
             particle_charges[tid],
             temperatures[tid],

@@ -218,7 +218,7 @@ def rectangle_wall_loss_coefficient_wp(
 
 
 @wp.func
-def coulomb_self_potential_ratio_wp(
+def _coulomb_self_potential_ratio_wp(
     particle_radius: wp.float64,
     particle_charge: wp.float64,
     temperature: wp.float64,
@@ -261,7 +261,7 @@ def coulomb_self_potential_ratio_wp(
 
 
 @wp.func
-def image_charge_enhancement_wp(
+def _image_charge_enhancement_wp(
     particle_radius: wp.float64,
     particle_charge: wp.float64,
     temperature: wp.float64,
@@ -291,7 +291,7 @@ def image_charge_enhancement_wp(
     """
     if particle_charge == wp.float64(0.0):
         return wp.float64(1.0)
-    ratio = coulomb_self_potential_ratio_wp(
+    ratio = _coulomb_self_potential_ratio_wp(
         particle_radius,
         particle_charge,
         temperature,
