@@ -5064,6 +5064,8 @@
       
         
       
+        
+      
     
     
     
@@ -5165,6 +5167,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API/particula/gpu/dynamics/wall_loss_funcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.dynamics.wall_loss_funcs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -5181,6 +5211,8 @@
   
     
     
+      
+        
       
         
       
@@ -5394,6 +5426,34 @@
     
   
     particula.gpu.kernels.thermodynamics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API/particula/gpu/kernels/wall_loss/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.wall_loss
   
 
     
@@ -15647,8 +15707,11 @@ high-level dynamics workflows.</p>
   CUDA rows are optional and skip cleanly when unavailable. This is
   tolerance-based evidence, not bitwise equality.</li>
 <li>GPU runnable and process orchestration, backend selection/fallback policy,
-  scheduling, GPU-resident timestep integration, wall loss, nucleation,
-  resizing, graph capture, autodiff, and performance work remain future scope.
+  scheduling, GPU-resident timestep integration, high-level/runnable or broader
+  wall-loss integration, nucleation, resizing, graph capture, autodiff, and
+  performance work remain future scope. The bounded direct neutral wall-loss
+  P1–P6 kernel contract is shipped; it is not that deferred high-level
+  integration.
   Those items are needed before a full simulation can remain GPU-resident for
   every timestep.</li>
 <li>Direct GPU condensation supports ideal/kappa water activity and
@@ -17186,16 +17249,79 @@ depend on.</p>
   scans may still allocate or launch.
   Particle and gas parity evidence uses independent Warp CPU float64 checks at
   <code>rtol=1e-12, atol=0</code>; CUDA is optional and skips cleanly when unavailable.
-  It is not bitwise parity. E6-F9 is the future integrated direct-call
-  consumer.</li>
+   It is not bitwise parity. E6-F9 is the future integrated direct-call
+   consumer.</li>
 </ul>
+<p>Delivered bounded neutral wall-loss P1–P6 scope:</p>
+<ul>
+<li>E6-F3 provides <code>from particula.gpu.kernels import wall_loss_step_gpu</code> for
+  direct neutral, particle-resolved spherical or rectangular fixed-slot wall
+  loss. <code>NeutralWallLossConfig</code> remains concrete-module-only at
+  <code>particula.gpu.kernels.wall_loss</code>. SI inputs are wall eddy diffusivity in
+  m²/s, chamber dimensions in m, temperature in K, pressure in Pa, and time in
+  s. Spherical configurations require a positive radius and no dimensions;
+  rectangular configurations require no radius and three positive dimensions.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">wall_loss_step_gpu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.wall_loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeutralWallLossConfig</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">NeutralWallLossConfig</span><span class="p">(</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
+    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># m</span>
+<span class="p">)</span>
+<span class="n">wall_loss_step_gpu</span><span class="p">(</span>
+    <span class="n">particles</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>  <span class="c1"># K</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>  <span class="c1"># Pa</span>
+    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># s</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+    <span class="n">rng_states</span><span class="o">=</span><span class="n">rng_states</span><span class="p">,</span>
+    <span class="n">initialize_rng</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>This non-executed direct-call example uses caller-owned same-device Warp
+  state. Later calls reuse <code>rng_states</code> and omit <code>initialize_rng=True</code>.
+- The Crump--Seinfeld coefficient basis uses the 1981 spherical and 1982
+  rectangular chamber relations. Eligible finite-rate slots survive with
+  <code>exp(-k * time_step)</code>; selected slots clear all mass lanes, concentration, and
+  charge, while density, volume, dtype, device, capacity, and unselected storage
+  are preserved. Inactive and unusable slots are neither sampled nor reactivated.
+  The source citations are Crump, J. G., &amp; Seinfeld, J. H. (1981),
+  <em>Turbulent deposition and gravitational sedimentation of an aerosol in a
+  vessel of arbitrary shape</em>, <em>Journal of Aerosol Science</em>, 12(5),
+  https://doi.org/10.1016/0021-8502(81)90036-7; and Crump, J. G., Flagan,
+  R. C., &amp; Seinfeld, J. H. (1982), <em>Particle wall loss rates in vessels</em>,
+  <em>Aerosol Science and Technology</em>, 2(3), 303--309,
+  https://doi.org/10.1080/02786828308958636.
+- Preflight is read-only. Successful asynchronous calls mutate caller-owned,
+  same-device state in place; callers own transfer, synchronization, and
+  checkpointing. Rejected pre-launch calls do not mutate caller state, zero time
+  is write-free after preflight, and post-launch rollback is not promised.
+  Temperature and pressure are direct scalars or same-device <code>(n_boxes,)</code> Warp
+  arrays, or come exclusively from <code>environment=</code> with both direct inputs set to
+  <code>None</code>.
+- Omitted RNG state is private for each successful nonzero call. Supplied
+  <code>(n_boxes,)</code> same-device <code>wp.uint32</code> state advances in place; only
+  <code>initialize_rng=True</code> resets it. Consumption is sequential per box over
+  eligible finite positive-rate slots; positive infinite-rate removal is
+  deterministic and consumes no draw, so exact CPU/Warp or per-seed replay is
+  not supported.
+- P6 evidence is geometry-specific deterministic coefficient tolerances plus
+  100-seed, 3-sigma aggregate survival checks. Warp CPU is the installed-Warp
+  baseline; CUDA is optional additive evidence and skips cleanly when absent.
+  This is not CPU-strategy parity or a performance claim.
+- Deferred scope includes E6-F4 charged/image-charge/electric-field physics,
+  CPU fallback or hidden transfers, runnable/scheduler/backend integration,
+  dynamic slots, compaction/activation, graph capture, differentiability,
+  performance guarantees, and exact RNG replay. E6-F9 remains the future
+  integration and closeout work.</p>
 <p>Future features:</p>
 <ol>
 <li>GPU process orchestration, backend selection/fallback policy, scheduling,
-   and GPU-resident timestep integration for the delivered direct kernel.</li>
-<li>GPU neutral wall loss (spherical/rectangular) with parity tests.</li>
-<li>GPU charged wall loss, after neutral wall loss and the core condensation
-   and coagulation GPU paths are stable.</li>
+   and GPU-resident timestep integration for the delivered direct kernels.</li>
+<li>GPU charged wall loss, after the bounded neutral path and the core
+   condensation and coagulation GPU paths are stable.</li>
 <li>Nucleation/particle-source CPU reference process following the
    <a href="../../../Theory/Technical/Dynamics/Nucleation_Equations/">nucleation equations</a>
    (no nucleation code exists in particula today).</li>

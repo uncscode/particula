@@ -5076,6 +5076,8 @@
       
         
       
+        
+      
     
     
     
@@ -5177,6 +5179,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dynamics/wall_loss_funcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.dynamics.wall_loss_funcs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -5195,6 +5225,8 @@
   
     
     
+      
+        
       
         
       
@@ -5522,6 +5554,34 @@
     
   
     particula.gpu.kernels.thermodynamics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wall_loss/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.wall_loss
   
 
     
@@ -14686,7 +14746,9 @@ and then cleared.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1345</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1343</span>
+<span class="normal">1344</span>
+<span class="normal">1345</span>
 <span class="normal">1346</span>
 <span class="normal">1347</span>
 <span class="normal">1348</span>
@@ -14753,9 +14815,7 @@ and then cleared.</p>
 <span class="normal">1409</span>
 <span class="normal">1410</span>
 <span class="normal">1411</span>
-<span class="normal">1412</span>
-<span class="normal">1413</span>
-<span class="normal">1414</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
+<span class="normal">1412</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
 <span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_coagulation_kernel</span><span class="p">(</span>
@@ -15119,7 +15179,9 @@ two-way, and four-way approved masks are executable.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 930</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 928</span>
+<span class="normal"> 929</span>
+<span class="normal"> 930</span>
 <span class="normal"> 931</span>
 <span class="normal"> 932</span>
 <span class="normal"> 933</span>
@@ -15529,9 +15591,7 @@ two-way, and four-way approved masks are executable.</p>
 <span class="normal">1337</span>
 <span class="normal">1338</span>
 <span class="normal">1339</span>
-<span class="normal">1340</span>
-<span class="normal">1341</span>
-<span class="normal">1342</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
+<span class="normal">1340</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@no_type_check</span>
 <span class="nd">@wp</span><span class="o">.</span><span class="n">kernel</span>
 <span class="c1"># type: ignore[misc]</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">brownian_coagulation_kernel</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
@@ -16430,7 +16490,9 @@ retrying.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2104</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2102</span>
+<span class="normal">2103</span>
+<span class="normal">2104</span>
 <span class="normal">2105</span>
 <span class="normal">2106</span>
 <span class="normal">2107</span>
@@ -16905,11 +16967,7 @@ retrying.</p>
 <span class="normal">2576</span>
 <span class="normal">2577</span>
 <span class="normal">2578</span>
-<span class="normal">2579</span>
-<span class="normal">2580</span>
-<span class="normal">2581</span>
-<span class="normal">2582</span>
-<span class="normal">2583</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coagulation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
+<span class="normal">2579</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">coagulation_step_gpu</span><span class="p">(</span>  <span class="c1"># noqa: C901</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -17221,6 +17279,16 @@ retrying.</p>
             <span class="n">device</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="n">time_step_value</span> <span class="o">=</span> <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span>
+    <span class="n">max_collisions_value</span> <span class="o">=</span> <span class="n">_resolve_collision_capacity</span><span class="p">(</span>
+        <span class="n">max_collisions</span><span class="o">=</span><span class="n">max_collisions</span><span class="p">,</span>
+        <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
+        <span class="n">n_particles</span><span class="o">=</span><span class="n">n_particles</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">expected_counts_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,)</span>
+    <span class="n">initialize_rng_states_for_call</span> <span class="o">=</span> <span class="n">rng_states</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">rng_states</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_validate_rng_states</span><span class="p">(</span><span class="n">rng_states</span><span class="p">,</span> <span class="n">expected_counts_shape</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+        <span class="n">initialize_rng_states_for_call</span> <span class="o">=</span> <span class="n">initialize_rng</span>
     <span class="n">temperature_array</span><span class="p">,</span> <span class="n">pressure_array</span> <span class="o">=</span> <span class="n">_ensure_environment_arrays</span><span class="p">(</span>
         <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
         <span class="n">pressure</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span>
@@ -17233,12 +17301,6 @@ retrying.</p>
     <span class="k">if</span> <span class="n">volume</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">volume</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">volume</span>
     <span class="n">volume_array</span> <span class="o">=</span> <span class="n">_ensure_volume_array</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">n_boxes</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-
-    <span class="n">max_collisions_value</span> <span class="o">=</span> <span class="n">_resolve_collision_capacity</span><span class="p">(</span>
-        <span class="n">max_collisions</span><span class="o">=</span><span class="n">max_collisions</span><span class="p">,</span>
-        <span class="n">n_boxes</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
-        <span class="n">n_particles</span><span class="o">=</span><span class="n">n_particles</span><span class="p">,</span>
-    <span class="p">)</span>
 
     <span class="n">expected_pairs_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">max_collisions_value</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">collision_pairs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -17255,14 +17317,8 @@ retrying.</p>
             <span class="s2">&quot;collision_pairs buffer&quot;</span><span class="p">,</span> <span class="n">collision_pairs</span><span class="p">,</span> <span class="n">device</span>
         <span class="p">)</span>
 
-    <span class="n">expected_counts_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_boxes</span><span class="p">,)</span>
     <span class="k">if</span> <span class="n">n_collisions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_validate_collision_counts</span><span class="p">(</span><span class="n">n_collisions</span><span class="p">,</span> <span class="n">expected_counts_shape</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-
-    <span class="n">initialize_rng_states_for_call</span> <span class="o">=</span> <span class="n">rng_states</span> <span class="ow">is</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">rng_states</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">_validate_rng_states</span><span class="p">(</span><span class="n">rng_states</span><span class="p">,</span> <span class="n">expected_counts_shape</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
-        <span class="n">initialize_rng_states_for_call</span> <span class="o">=</span> <span class="n">initialize_rng</span>
 
     <span class="k">if</span> <span class="n">collision_pairs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">collision_pairs</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
@@ -17470,7 +17526,9 @@ buffer or if the provided device mismatches the buffer device.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/coagulation.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1932</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1930</span>
+<span class="normal">1931</span>
+<span class="normal">1932</span>
 <span class="normal">1933</span>
 <span class="normal">1934</span>
 <span class="normal">1935</span>
@@ -17508,9 +17566,7 @@ buffer or if the provided device mismatches the buffer device.</p>
 <span class="normal">1967</span>
 <span class="normal">1968</span>
 <span class="normal">1969</span>
-<span class="normal">1970</span>
-<span class="normal">1971</span>
-<span class="normal">1972</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize_coagulation_rng_states</span><span class="p">(</span>
+<span class="normal">1970</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">initialize_coagulation_rng_states</span><span class="p">(</span>
     <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">rng_states</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>

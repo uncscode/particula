@@ -5064,6 +5064,8 @@
       
         
       
+        
+      
     
     
     
@@ -5165,6 +5167,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/gpu/dynamics/wall_loss_funcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.dynamics.wall_loss_funcs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -5181,6 +5211,8 @@
   
     
     
+      
+        
       
         
       
@@ -5394,6 +5426,34 @@
     
   
     particula.gpu.kernels.thermodynamics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/gpu/kernels/wall_loss/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.wall_loss
   
 
     
@@ -11505,6 +11565,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#direct-neutral-gpu-wall-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct neutral GPU wall loss
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particle-transfer-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14717,6 +14788,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#direct-neutral-gpu-wall-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct neutral GPU wall loss
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particle-transfer-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -15140,9 +15222,102 @@ integrated direct-call consumer. Independent NumPy comparisons of particle and
 gas concentrations run on Warp CPU with float64 <code>rtol=1e-12, atol=0</code>; CUDA is
 optional and skips cleanly when unavailable. This tolerance-based evidence is
 not bitwise parity.</p>
-<p>GPU runnable or process orchestration, backend selection and scheduling,
-GPU-resident timestep integration, resizing, graph capture, autodiff,
-performance claims, wall loss, and nucleation remain deferred.</p>
+<h3 id="direct-neutral-gpu-wall-loss">Direct neutral GPU wall loss<a class="headerlink" href="#direct-neutral-gpu-wall-loss" title="Permanent link">&para;</a></h3>
+<p>The bounded direct wall-loss path is neutral and particle-resolved only. Import
+the step and its concrete-module-only configuration separately; the
+configuration is not re-exported by <code>particula.gpu.kernels</code> or <code>particula.gpu</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">wall_loss_step_gpu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.wall_loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeutralWallLossConfig</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">NeutralWallLossConfig</span><span class="p">(</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
+    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># m</span>
+<span class="p">)</span>
+<span class="n">wall_loss_step_gpu</span><span class="p">(</span>
+    <span class="n">particles</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">298.15</span><span class="p">,</span>  <span class="c1"># K</span>
+    <span class="n">pressure</span><span class="o">=</span><span class="mf">101325.0</span><span class="p">,</span>  <span class="c1"># Pa</span>
+    <span class="n">time_step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># s</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+    <span class="n">rng_states</span><span class="o">=</span><span class="n">rng_states</span><span class="p">,</span>
+    <span class="n">initialize_rng</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>The snippet is illustrative: <code>particles</code> and <code>rng_states</code> are caller-owned
+same-device Warp state. Later calls reuse <code>rng_states</code> and omit
+<code>initialize_rng=True</code>. Direct <code>temperature</code> and <code>pressure</code> each accept a scalar
+or same-device <code>(n_boxes,)</code> Warp array. Alternatively, pass
+<code>environment=...</code> and set both <code>temperature=None</code> and <code>pressure=None</code>; direct
+values and <code>environment=</code> are mutually exclusive.</p>
+<p>Wall eddy diffusivity is in m²/s, dimensions are in m, temperature is in K,
+pressure is in Pa, and time is in s. Spherical configurations require a
+positive radius and no dimensions; rectangular configurations require no radius
+and exactly three positive dimensions. The neutral coefficients use the
+Crump--Seinfeld spherical and rectangular chamber relations, including turbulent
+deposition and gravitational settling:</p>
+<ul>
+<li>Crump, J. G., &amp; Seinfeld, J. H. (1981), <em>Journal of Aerosol Science</em>, 12(5).
+  https://doi.org/10.1016/0021-8502(81)90036-7</li>
+<li>Crump, J. G., Flagan, R. C., &amp; Seinfeld, J. H. (1982), <em>Aerosol Science and
+  Technology</em>, 2(3), 303--309.
+  https://doi.org/10.1080/02786828308958636</li>
+</ul>
+<p>After read-only preflight, eligible finite positive-rate fixed slots survive with
+<code>exp(-k * time_step)</code>. A selected slot has every mass lane, concentration, and
+charge cleared. Density, volume, dtype, device, capacity, and unselected
+storage are preserved; inactive or unusable slots are neither sampled nor
+reactivated. The asynchronous call mutates caller-owned state in place. Callers
+own CPU↔Warp transfer, device placement, synchronization, and any checkpoint.
+There is no hidden CPU checkpoint transfer or fallback. Rejected pre-launch
+calls do not mutate caller-owned state, while rollback is not promised after a
+mutation kernel launches. Zero time completes preflight but is write-free.</p>
+<p>Omitted RNG state is private to each successful nonzero call. Supplied
+same-device <code>(n_boxes,)</code> <code>wp.uint32</code> state mutates in place;
+<code>initialize_rng=True</code> is the only reset, so repeating <code>rng_seed</code> alone does not
+reset persistent state. Consumption is sequential per box over eligible finite
+positive-rate slots; positive infinite-rate removal is deterministic and
+consumes no draw. Exact CPU/Warp or per-seed RNG replay is not promised.</p>
+<table>
+<thead>
+<tr>
+<th>Scope</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Neutral particle-resolved spherical/rectangular direct execution</td>
+<td>Supported</td>
+</tr>
+<tr>
+<td>Geometry-specific deterministic coefficient tolerances and 100-seed, 3-sigma aggregate survival evidence</td>
+<td>Supported bounded evidence</td>
+</tr>
+<tr>
+<td>CUDA validation</td>
+<td>Optional additive evidence; guarded skips are expected when unavailable</td>
+</tr>
+<tr>
+<td>Charged, image-charge, or electric-field physics; E6-F4 charged wall loss</td>
+<td>Deferred</td>
+</tr>
+<tr>
+<td>CPU fallback or hidden transfer; high-level runnable, scheduler, or backend integration</td>
+<td>Deferred (E6-F9 covers integration/closeout)</td>
+</tr>
+<tr>
+<td>Dynamic slots, compaction/activation, graph capture, differentiability, performance guarantees, or exact RNG replay</td>
+<td>Deferred</td>
+</tr>
+</tbody>
+</table>
+<p>Warp CPU is the baseline when Warp is installed; CUDA is optional and skips
+cleanly when unavailable. The evidence is not CPU-strategy parity or per-seed
+trajectory replay.</p>
+<p>GPU process orchestration, backend selection and scheduling, GPU-resident
+timestep integration, resizing, graph capture, autodiff, performance claims,
+and nucleation remain deferred.</p>
 <h3 id="particle-transfer-boundary">Particle transfer boundary<a class="headerlink" href="#particle-transfer-boundary" title="Permanent link">&para;</a></h3>
 <p><code>WarpParticleData</code> is the explicit Warp mirror for <code>ParticleData</code>. Use the
 helper boundary when particle-resident arrays must move between CPU-owned

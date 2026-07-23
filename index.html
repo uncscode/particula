@@ -5378,6 +5378,8 @@
       
         
       
+        
+      
     
     
     
@@ -5479,6 +5481,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="API/particula/gpu/dynamics/wall_loss_funcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.dynamics.wall_loss_funcs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -5495,6 +5525,8 @@
   
     
     
+      
+        
       
         
       
@@ -5708,6 +5740,34 @@
     
   
     particula.gpu.kernels.thermodynamics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="API/particula/gpu/kernels/wall_loss/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.wall_loss
   
 
     
@@ -14937,8 +14997,31 @@
    skips cleanly when unavailable. This is tolerance-based evidence, not
    bitwise parity. GPU runnables, orchestration, resizing, graph capture,
    autodiff, and performance claims remain deferred. See
-   <a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
-   for the complete contract.</li>
+    <a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
+    for the complete contract.</li>
+<li>GPU neutral wall loss P5 is a direct fixed-shape boundary imported with
+   <code>from particula.gpu.kernels import wall_loss_step_gpu</code>. It accepts only
+   particle-resolved neutral configurations. Create <code>NeutralWallLossConfig</code> from
+   <code>particula.gpu.kernels.wall_loss</code>; the configuration is intentionally not
+   exported from <code>particula.gpu.kernels</code> or <code>particula.gpu</code>. It validates
+   spherical or rectangular SI geometry, fixed <code>WarpParticleData</code> schema and
+   domains, environment inputs, and optional RNG metadata. Successful nonzero
+   calls evaluate bounded neutral coefficients and stochastically clear eligible
+   slots' mass lanes, concentration, and charge in place; zero time is a
+   post-preflight write-free no-op. P5 advances one sequential per-box RNG owner
+   for eligible slots. Omitted <code>rng_states</code> are private and seeded per call, while
+   supplied sidecars mutate in place and reset only with <code>initialize_rng=True</code>;
+   repeating <code>rng_seed</code> does not reset a supplied sidecar. Zero time and
+   pre-launch failures preserve supplied state. Callers retain ownership of Warp
+   transfers, device placement, synchronization, particle data, and any RNG
+   sidecar. Preflight may run device validation scans and synchronize to read back
+   scalar status, but it does not transfer or replace caller-owned buffers.
+   Rollback is not promised after a mutation kernel launches. Sequential per-box
+   RNG advancement limits parallelism and makes no performance claim. Test-only
+   validation compares deterministic coefficients with CPU system-state equations
+   and checks aggregate stochastic survival; it does not establish CPU/Warp
+   RNG-stream or trajectory replay. Charged wall loss, a runnable API, hidden
+   transfers or fallback, and broader integrated orchestration remain deferred.</li>
 <li><a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
   — canonical reference for <code>ParticleData</code>, <code>GasData</code>, <code>EnvironmentData</code>,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the

@@ -485,6 +485,10 @@
          <lastmod>2026-07-23</lastmod>
     </url>
     <url>
+         <loc>https://uncscode.github.io/particula/API/particula/gpu/dynamics/wall_loss_funcs/</loc>
+         <lastmod>2026-07-23</lastmod>
+    </url>
+    <url>
          <loc>https://uncscode.github.io/particula/API/particula/gpu/kernels/_coagulation_config/</loc>
          <lastmod>2026-07-23</lastmod>
     </url>
@@ -506,6 +510,10 @@
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/gpu/kernels/thermodynamics/</loc>
+         <lastmod>2026-07-23</lastmod>
+    </url>
+    <url>
+         <loc>https://uncscode.github.io/particula/API/particula/gpu/kernels/wall_loss/</loc>
          <lastmod>2026-07-23</lastmod>
     </url>
     <url>
