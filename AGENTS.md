@@ -465,18 +465,24 @@ Focused P1–P4 contract run:
 pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
 ```
 
-### GPU neutral wall-loss P1–P6
+### GPU wall-loss P1–P6
 
 - Import the direct low-level boundary with
   `from particula.gpu.kernels import wall_loss_step_gpu`.
 - Construct `NeutralWallLossConfig` only from
   `particula.gpu.kernels.wall_loss`; it is deliberately not re-exported by
   `particula.gpu.kernels` or `particula.gpu`.
-- The direct boundary supports only neutral, `particle_resolved` configurations.
-  Wall eddy diffusivity is in m²/s; radius and dimensions are in m; temperature
-  is in K; pressure is in Pa; and time is in s. A spherical configuration needs
-  a positive radius and no dimensions. A rectangular configuration needs no
-  radius and exactly three positive dimensions.
+- The direct boundary supports `particle_resolved` neutral configurations plus a
+  validation-only charged mode. Wall eddy diffusivity is in m²/s; radius and
+  dimensions are in m; temperature is in K; pressure is in Pa; and time is in s.
+  A spherical configuration needs a positive radius and no dimensions. A
+  rectangular configuration needs no radius and exactly three positive dimensions.
+- Charged mode accepts a finite signed wall potential [V] and a finite signed
+  electric field [V/m]: a scalar for spherical geometry or a caller-owned,
+  same-device `wp.float64` Warp array shaped `(3,)` for rectangular geometry.
+  It validates these inputs only. The direct boundary retains the neutral
+  coefficient and RNG path in both modes; image-charge and electric-field drift
+  physics remain deferred.
 - P3-frozen preflight validates fixed-shape, same-device `wp.float64` particle
   fields, finite domain values, a finite nonnegative `time_step` [s],
   temperature [K], pressure [Pa], and optional `wp.uint32` per-box RNG

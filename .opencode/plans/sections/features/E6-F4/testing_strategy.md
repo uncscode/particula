@@ -7,14 +7,15 @@ scientific tolerance, or E6-F3 invariant may be weakened. Test modules use the
 
 ## Per-Phase Approach
 
-- **P1 configuration/preflight:** In
+- **P1 configuration/preflight (shipped):** In
   `particula/gpu/kernels/tests/wall_loss_test.py`, cover spherical and
-  rectangular charged forms, zero defaults, finite signed potential, scalar and
-  three-component fields, and unsupported combinations. Reject malformed
-  fields, nonfinite charge/configuration, invalid particles/environment/time,
-  wrong shapes/ranks/dtypes/devices, and inconsistent boxes before allocation,
-  RNG initialization/advance, or any caller-array write. Snapshot identities
-  and all state.
+  rectangular charged forms, appended defaults, finite signed potential, and
+  scalar/three-component field schemas. Tests reject malformed mode, scalar,
+  field, particle, environment, time, and RNG inputs; assert field-before-charge
+  ordering; and snapshot particle, charge, field, and supplied RNG state for
+  preflight atomicity. Valid charged rectangular and zero-time cases preserve
+  field ownership. Matched zero-charge neutral/charged cases assert exact
+  particle and RNG equality because P1 leaves execution neutral.
 - **P2 image charge:** In
   `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`, compare the fp64 device
   factor to the independent CPU `ChargedWallLossStrategy` array oracle for zero,
@@ -34,7 +35,7 @@ scientific tolerance, or E6-F3 invariant may be weakened. Test modules use the
   values and all arrays preserve shape, device, dtype, and identity. Re-run the
   E6-F3 omitted/supplied/reset RNG lifecycle matrix and invalid-call
   non-advancement checks.
-- **P5 parity/stochastic validation:** In
+- **P5 parity/stochastic validation (deferred):** In
   `particula/gpu/kernels/tests/wall_loss_parity_test.py`, require Warp CPU for a
   deterministic geometry/charge/field coefficient matrix. Compare the charged
   mode with zero charge against the E6-F3 neutral device coefficient, survivor

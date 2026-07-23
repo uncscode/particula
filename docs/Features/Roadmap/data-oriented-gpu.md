@@ -1235,11 +1235,11 @@ Delivered dilution scope:
    It is not bitwise parity. E6-F9 is the future integrated direct-call
    consumer.
 
-Delivered bounded neutral wall-loss P1–P6 scope:
+Delivered bounded wall-loss P1–P6 scope:
 
 - E6-F3 provides `from particula.gpu.kernels import wall_loss_step_gpu` for
-  direct neutral, particle-resolved spherical or rectangular fixed-slot wall
-  loss. `NeutralWallLossConfig` remains concrete-module-only at
+   direct particle-resolved spherical or rectangular fixed-slot wall loss.
+   `NeutralWallLossConfig` remains concrete-module-only at
   `particula.gpu.kernels.wall_loss`. SI inputs are wall eddy diffusivity in
   m²/s, chamber dimensions in m, temperature in K, pressure in Pa, and time in
   s. Spherical configurations require a positive radius and no dimensions;
@@ -1265,8 +1265,21 @@ Delivered bounded neutral wall-loss P1–P6 scope:
   )
   ```
 
-  This non-executed direct-call example uses caller-owned same-device Warp
-  state. Later calls reuse `rng_states` and omit `initialize_rng=True`.
+   This non-executed direct-call example uses caller-owned same-device Warp
+   state. Later calls reuse `rng_states` and omit `initialize_rng=True`.
+- E6-F4 ships validation-only charged configuration semantics through the same
+  concrete-module-only `NeutralWallLossConfig`; it adds no entry point, export,
+  runnable, or transfer behavior. `mode` accepts `"neutral"` or `"charged"`.
+  Charged mode validates a finite signed scalar `wall_potential` in V. Its
+  spherical `wall_electric_field` is a finite signed scalar in V/m; its
+  rectangular field is a caller-owned, same-device `wp.float64` Warp array of
+  shape `(3,)` with finite signed V/m components. The boundary preserves the
+  identity and values of that rectangular field array.
+- Charged configuration is validation and ownership scope only. Execution keeps
+  the neutral Crump--Seinfeld coefficient, removal kernel, and RNG path; no
+  image-charge or electric-field-drift physics is evaluated. Matched zero-charge
+  slots therefore retain the neutral coefficient and stochastic path even with
+  a nonzero charged configuration.
 - The Crump--Seinfeld coefficient basis uses the 1981 spherical and 1982
   rectangular chamber relations. Eligible finite-rate slots survive with
   `exp(-k * time_step)`; selected slots clear all mass lanes, concentration, and
@@ -1296,8 +1309,8 @@ Delivered bounded neutral wall-loss P1–P6 scope:
   100-seed, 3-sigma aggregate survival checks. Warp CPU is the installed-Warp
   baseline; CUDA is optional additive evidence and skips cleanly when absent.
   This is not CPU-strategy parity or a performance claim.
-- Deferred scope includes E6-F4 charged/image-charge/electric-field physics,
-  CPU fallback or hidden transfers, runnable/scheduler/backend integration,
+- Deferred scope includes image-charge enhancement and electric-field-drift
+  physics, CPU fallback or hidden transfers, runnable/scheduler/backend integration,
   dynamic slots, compaction/activation, graph capture, differentiability,
   performance guarantees, and exact RNG replay. E6-F9 remains the future
   integration and closeout work.
@@ -1306,8 +1319,9 @@ Future features:
 
 1. GPU process orchestration, backend selection/fallback policy, scheduling,
    and GPU-resident timestep integration for the delivered direct kernels.
-2. GPU charged wall loss, after the bounded neutral path and the core
-   condensation and coagulation GPU paths are stable.
+2. GPU image-charge and electric-field-drift wall-loss physics, after the
+   bounded neutral execution path and the core condensation and coagulation GPU
+   paths are stable.
 3. Nucleation/particle-source CPU reference process following the
    [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md)
    (no nucleation code exists in particula today).

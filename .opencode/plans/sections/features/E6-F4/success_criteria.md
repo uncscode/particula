@@ -2,6 +2,14 @@
 
 - [ ] E6-F3 is recorded as the upstream dependency and its neutral API,
   preflight, fixed-slot, identity, and RNG contracts remain passing.
+- [x] P1 accepts only neutral/charged modes; validates signed finite potential,
+  charged spherical scalar fields, and charged rectangular caller-owned
+  same-device `wp.float64` `(3,)` fields without changing package exports.
+- [x] P1 rejects malformed charged configurations before particle value scans,
+  environment/RNG work, allocation, launch, or caller mutation; rectangular
+  field errors precede coexisting charge errors.
+- [x] P1 valid charged calls preserve rectangular field identity and bytes and
+  execute the existing neutral coefficient/removal/RNG path.
 - [ ] Nonzero particle charge receives CPU-equivalent image-charge enhancement
   even when wall potential is exactly zero.
 - [ ] Explicit field magnitude and potential-derived field preserve CPU

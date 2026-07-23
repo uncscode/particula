@@ -3,54 +3,43 @@
 ## High-Level Design
 
 E6-F4 is an additive charged mode inside the E6-F3 direct wall-loss operation,
-not a parallel entry point. Host-side immutable configuration selects neutral or
-charged capability and normalizes geometry-specific scalar/vector fields.
-Preflight validates every detectable contract before allocation, RNG
-initialization, launch, or particle write. Device code computes E6-F3's neutral
-coefficient and conditionally composes the charged terms per active slot.
+not a parallel entry point. P1 shipped host-side immutable configuration and
+staged preflight only. The concrete `NeutralWallLossConfig` selects `"neutral"`
+or `"charged"`; potential is a signed finite scalar, spherical charged fields
+are signed finite scalars, and rectangular charged fields are caller-owned,
+same-device `wp.float64` vectors of shape `(3,)`. No execution kernel reads
+these values in P1.
 
 ```text
-CPU ChargedWallLossStrategy oracle
-        | image factor, resolved field, drift, clipping
-        v
 E6-F3 config + charged config + WarpParticleData.charge + environment + dt
         |
-complete host/device preflight ---- invalid --> no particle/RNG mutation
+config validation -> particle schema/device -> rectangular field scan
+        -> particle value scans -> time/environment/RNG
+        | invalid --> no particle, field, or RNG mutation
         |
-active fixed slot --> E6-F3 neutral coefficient k_neutral
+active fixed slot --> unchanged E6-F3 neutral coefficient k_neutral
         |
-        +-- charge == 0 --> k = k_neutral (exact fallback)
-        |
-        +-- charge != 0 --> phi = exp(clip(abs(coulomb_ratio), -50, 50))
-                            E = resolved field + potential / geometry scale
-                            drift = signed mobility(charge, radius, T) * E / scale
-                            k = finite_nonnegative(k_neutral * phi + drift)
-        |
-survive with p = exp(-k * dt) using E6-F3 caller-owned RNG
+survive with p = exp(-k_neutral * dt) using E6-F3 caller-owned RNG
         +-- survive: preserve all state
         +-- remove: clear all species mass, concentration, and charge
 ```
 
-The zero-charge branch must use the same neutral value and stochastic decision
-machinery as E6-F3. A configured field without charge does not alter the
-coefficient. Nonzero charge retains image-charge enhancement when wall
-potential is zero. Potential-derived field and explicit field magnitude are
-additive. The resolved field retains a spherical scalar's sign and uses the
-Euclidean norm of a rectangular vector. Charge sign is preserved by the drift
-term before final nonnegative clipping.
+P1 does not branch on charge or pass potential/field to device kernels. Thus
+all slots, including zero-charge slots, retain the exact E6-F3 neutral
+coefficient and stochastic path. Image charge, field resolution, drift, and
+charged composition are explicitly deferred to P2-P4.
 
 ## Data / API / Workflow Changes
 
 - **Data Model:** No schema change. `WarpParticleData.charge` remains caller-
-  owned `wp.float64` elementary-charge counts shaped like concentration. It is
-  read for coefficients and cleared only when a slot is removed. Density,
+  owned `wp.float64` elementary-charge counts shaped like concentration. P1
+  validates it and the existing removal path clears it when a slot is removed;
+  P1 does not read it for coefficients. Density,
   volume, shapes, devices, dtypes, object identity, and survivor array values
   remain stable. RNG remains a `(n_boxes,)` `wp.uint32` sidecar.
-- **Configuration:** Extend E6-F3's concrete-module immutable config with a
-  bounded charged mode, finite `wall_potential` [V], and finite scalar or
-  length-three `wall_electric_field` [V/m]. Spherical geometry accepts scalar
-  field magnitude; rectangular geometry accepts the CPU-compatible vector form
-  resolved by Euclidean norm. Defaults are zero without disabling image charge.
+- **Configuration:** P1 extends E6-F3's concrete-module immutable config with
+  appended `mode`, `wall_potential` [V], and `wall_electric_field` [V/m]
+  fields. The rectangular field is never copied, replaced, or mutated.
 - **API Surface:** Reuse E6-F3's `wall_loss_step_gpu(...)` signature and lazy
   step export. Keep configuration and device helpers concrete-module-only.
   Charged mode is selected through configuration; no second public step,
@@ -58,7 +47,8 @@ term before final nonnegative clipping.
 - **Workflow Hooks:** E6-F3 must ship first. E6-F4 reuses its preflight,
   environment forms, fixed-slot mutation, and initialize-once RNG lifecycle.
   E6-F9 later exercises this mode in the integrated explicit-transfer sequence.
-- **Failure Boundary:** Malformed configuration, nonfinite charge, unsupported
+- **Failure Boundary:** Malformed configuration, nonfinite rectangular field or
+  charge, unsupported
   distributions, inconsistent boxes, wrong shapes/dtypes/devices, and invalid
   environment/time values fail before output allocation, RNG setup, launch, or
   mutation. Runtime launch failure after successful preflight has no rollback.

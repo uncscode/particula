@@ -12,17 +12,18 @@ must exactly follow the neutral coefficient and stochastic path.
 
 ## Value Proposition
 
-E6-F4 extends the E6-F3 direct, particle-resolved Warp step without changing
-its ownership or mutation contracts. Users gain deterministic fp64 coefficient
-parity with the CPU charged model, statistically validated survival behavior,
-and an exact neutral fallback while retaining fixed shapes, explicit transfers,
-caller-owned persistent RNG, and optional CUDA evidence.
+E6-F4-P1 is shipped: the existing direct, particle-resolved Warp step now has
+a frozen charged-mode configuration contract without changing its ownership,
+mutation, coefficient, or RNG contracts. `NeutralWallLossConfig` remains the
+sole concrete-module-only configuration type; it validates neutral/charged
+modes, signed finite potential, and geometry-specific electric-field payloads.
+Charged execution deliberately remains the E6-F3 neutral coefficient and RNG
+path. Image-charge and electric-field drift physics remain deferred.
 
 ## User Stories
 
-- As a physics developer, I want charged GPU wall loss to preserve the CPU
-  image-charge and electric-field equations so CPU and Warp studies have one
-  behavioral reference.
+- As a physics developer, I want charged inputs validated and owned
+  unambiguously before future device physics is introduced.
 - As a simulation developer, I want zero-charge particles to use the neutral
   E6-F3 behavior exactly so enabling charged configuration does not perturb
   neutral populations.
