@@ -1,6 +1,6 @@
 """Validate neutral direct GPU wall-loss inputs without executing removal.
 
-This P3 boundary accepts only neutral particle-resolved configurations.  It
+This P3 boundary accepts only neutral particle-resolved configurations. It
 performs read-only schema and domain preflight and intentionally does not
 assemble coefficients, allocate output or RNG storage, advance RNG state, or
 mutate caller-owned particle data.  Later wall-loss phases reuse this callable
@@ -33,14 +33,22 @@ from particula.gpu.kernels.environment import (
 
 @dataclass(frozen=True)
 class NeutralWallLossConfig:
-    """Neutral wall-loss geometry and representation configuration.
+    """Define immutable neutral wall-loss geometry and representation inputs.
 
-    Args:
+    This concrete-module-only configuration is accepted only by the direct P3
+    preflight boundary. ``geometry`` selects spherical or rectangular SI
+    dimensions, while ``distribution_type`` must remain ``"particle_resolved"``.
+    It contains no charged-wall-loss settings.
+
+    Attributes:
         geometry: Exact chamber geometry, ``"spherical"`` or ``"rectangular"``.
         wall_eddy_diffusivity: Positive wall eddy diffusivity [m^2 s^-1].
-        chamber_radius: Positive spherical chamber radius [m].
-        chamber_dimensions: Positive rectangular chamber dimensions [m].
-        distribution_type: Required particle representation selector.
+        chamber_radius: Positive spherical chamber radius [m]; required only
+            for spherical geometry.
+        chamber_dimensions: Tuple of three positive rectangular chamber
+            dimensions [m]; required only for rectangular geometry.
+        distribution_type: Required ``"particle_resolved"`` representation
+            selector.
     """
 
     geometry: str
@@ -324,6 +332,12 @@ def wall_loss_step_gpu(
 
     Returns:
         The identical ``particles`` object after successful preflight.
+
+    Raises:
+        TypeError: If the configuration, time step, RNG metadata, or direct
+            environment inputs use an unsupported type.
+        ValueError: If configuration, particle, time-step, environment, or RNG
+            values, shapes, dtypes, or devices violate the P3 contract.
     """
     _validate_config(config)
     n_boxes, device = _validate_particles(particles)

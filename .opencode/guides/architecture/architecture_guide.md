@@ -44,6 +44,19 @@ kernel-entry responsibilities.
 - The preflight guarantee ends at launch: post-launch rollback is not
   provided. This direct entry point does not imply CPU fallback or runnable
   support.
+- Import the supported neutral wall-loss boundary with
+  `from particula.gpu.kernels import wall_loss_step_gpu`. Its
+  `NeutralWallLossConfig` is deliberately concrete-module-only at
+  `particula.gpu.kernels.wall_loss`; do not re-export it through
+  `particula.gpu.kernels` or `particula.gpu`.
+- `wall_loss_step_gpu` owns immutable host configuration and read-only P3
+  preflight for neutral, particle-resolved inputs. It delegates neither
+  coefficient ownership nor execution to the boundary: neutral coefficient
+  helpers remain in `particula.gpu.dynamics.wall_loss_funcs`.
+- P3 returns the identical particle object without coefficient assembly,
+  removal, output allocation, or RNG initialization/advancement. P4 and P5
+  retain this signature when adding deferred execution behavior. See
+  [ADR-001](decisions/ADR-001-neutral-gpu-wall-loss-boundary.md).
 
 ## Design Intent
 

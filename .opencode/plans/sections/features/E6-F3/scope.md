@@ -15,13 +15,17 @@ removed fixed slot, and supports persistent per-box RNG state.
 - **Shipped in P2 / #1402:** Add concrete internal fp64 Warp spherical and
   rectangular neutral Crump-Seinfeld coefficient helpers in
   `particula/gpu/dynamics/wall_loss_funcs.py`, with guarded CPU/Warp parity and
-  smoke coverage in `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`.
+   smoke coverage in `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`.
+- **Shipped in P3 / #1403:** Add frozen concrete-module
+  `NeutralWallLossConfig`, write-free `wall_loss_step_gpu` preflight in
+  `particula/gpu/kernels/wall_loss.py`, its lazy kernel-package export, and
+  Warp-guarded atomicity contract coverage in
+  `particula/gpu/kernels/tests/wall_loss_test.py`. P3 accepts only neutral
+  particle-resolved spherical or rectangular configuration and validates
+  particle, environment, time, and optional RNG-sidecar metadata without
+  mutable-runtime work.
 - Validate or add the remaining Warp device primitives needed for coefficient
   assembly, using the P1 property import surface.
-- Immutable host configuration for exactly `"spherical"` and `"rectangular"`
-  geometry, with SI-unit chamber parameters and wall eddy diffusivity.
-- Scalar, same-device per-box, or explicit `WarpEnvironmentData` temperature and
-  pressure following existing direct-kernel normalization conventions.
 - Deterministic fp64 coefficient evaluation for active particle-resolved slots.
 - Stochastic survival with probability `exp(-k * time_step)` and caller-owned
   `(n_boxes,)` `wp.uint32` RNG state that is not implicitly reseeded.
@@ -33,9 +37,9 @@ removed fixed slot, and supports persistent per-box RNG state.
 
 ## Out of Scope
 
-- A direct wall-loss API/configuration, removal kernels, and RNG lifecycle;
-  these remain later E6-F3 phases. P2 coefficient helpers remain internal and
-  do not provide public validation.
+- Coefficient/removal kernels and RNG lifecycle remain later E6-F3 phases. P3
+  supplies only the validated input boundary and does not invoke its existing
+  internal coefficient helpers.
 - Charged, image-charge, wall-potential, or electric-field physics (E6-F4).
 - Discrete or continuous-PDF GPU wall loss, gas wall loss, multi-box transport,
   or changes to CPU strategy behavior.

@@ -192,8 +192,21 @@ print(result)
    skips cleanly when unavailable. This is tolerance-based evidence, not
    bitwise parity. GPU runnables, orchestration, resizing, graph capture,
    autodiff, and performance claims remain deferred. See
-   [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
-   for the complete contract.
+    [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
+    for the complete contract.
+- GPU neutral wall loss P3 is a direct, write-free preflight boundary imported
+    with `from particula.gpu.kernels import wall_loss_step_gpu`. It accepts only
+    particle-resolved neutral configurations. Create
+    `NeutralWallLossConfig` from `particula.gpu.kernels.wall_loss`; the
+    configuration is intentionally not exported from `particula.gpu.kernels` or
+    `particula.gpu`. It validates spherical or rectangular SI geometry, fixed
+    `WarpParticleData` schema and domains, environment inputs, and optional RNG
+    metadata, then returns the identical particle container without computing
+    coefficients, initializing or advancing RNG state, allocating outputs, or
+    removing particles. Callers retain ownership of Warp transfers, device
+    placement, synchronization, particle data, and any RNG sidecar. P4/P5
+    removal behavior, a runnable API, hidden transfers or fallback, and parity
+    claims remain deferred.
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the

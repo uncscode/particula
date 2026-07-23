@@ -33,7 +33,17 @@ _SYMBOL_TO_MODULE = {
 
 
 def __getattr__(name: str) -> Any:
-    """Lazily resolve the supported public direct-kernel entry points."""
+    """Lazily resolve a supported public direct-kernel entry point.
+
+    Args:
+        name: Name of the direct GPU kernel entry point to import.
+
+    Returns:
+        The resolved callable entry point.
+
+    Raises:
+        AttributeError: If ``name`` is not a supported public entry point.
+    """
     module_name = _SYMBOL_TO_MODULE.get(name)
     if module_name is None:
         raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -32,18 +32,25 @@ and SI `s^-1`. The rectangular helper uses `x_coth_x_wp` to retain the CPU
 terms while avoiding direct small-argument coth cancellation.
 
 These pure per-lane helpers do not allocate, transfer, mutate, validate public
-inputs, expose a package API, or own state. Configuration, preflight,
-particle-state mutation, and RNG remain deferred to P3-P5; charged terms
-remain E6-F4 work.
+inputs, expose a package API, or own state. Configuration and public preflight
+are supplied by P3; particle-state mutation and RNG lifecycle remain deferred
+to P4-P5. Charged terms remain E6-F4 work.
 
-The feature is a low-level, particle-resolved Warp operation. Immutable host
-configuration selects one neutral geometry. The public step validates the
-configuration, particle schema and physical state, direct/environment inputs,
-time step, and optional RNG sidecar before allocation, initialization, or
-particle writes. Device functions derive radius and effective density from
-fixed particle masses and species density, calculate the CPU-reference
-transport terms and coefficient, then draw one survival decision per active
-slot. A removal pass clears every mutable per-slot field.
+### Shipped P3 input boundary
+
+`particula.gpu.kernels.wall_loss` owns the frozen host-side
+`NeutralWallLossConfig` and `wall_loss_step_gpu` boundary. The entry point is
+lazily exported by `particula.gpu.kernels`; its configuration stays a
+concrete-module-only API. It validates canonical neutral particle-resolved
+configuration, particle schemas/domains, time, environment, and optional RNG
+metadata in that order, then returns the identical particle container without
+writes. Validation may use private read-only scan storage but does not call
+coefficient helpers, allocate output/RNG resources, initialize or advance RNG,
+or mutate particle fields.
+
+The feature is a low-level, particle-resolved Warp operation. P3 freezes the
+input contract; P4-P5 will add coefficient execution, survival, removal, and
+RNG lifecycle behind that unchanged signature.
 
 ```text
 CPU Spherical/RectangularWallLossStrategy coefficient oracle
@@ -52,22 +59,14 @@ caller-owned WarpParticleData + environment + geometry config + dt
                             |
        complete host/device preflight; failure => no writes/RNG advance
                             |
-       active slot: concentration > 0 and total species mass > 0
+     P3 successful preflight -> same particle object, no writes or RNG changes
                             |
- radius/density -> transport primitives -> neutral coefficient k [1/s]
-                            |
- caller-owned RNG state -> survive with p = exp(-k * dt)
-                      /                 \
-                  survives             removed
-                state unchanged   zero masses, concentration, charge
-                      \                 /
-          same fixed-shape particle object + advanced RNG sidecar
+              P4-P5 deferred: coefficient/removal/RNG execution
 ```
 
-Inactive slots are never sampled or reactivated. Successful calls may advance
-RNG and mutate removed slots asynchronously; runtime launch failure has no
-rollback guarantee. All contractually detectable invalid input is rejected
-before that boundary.
+P3 invalid calls are rejected before mutable-runtime work and preserve supplied
+particle and RNG-sidecar state. Execution-time mutation and rollback semantics
+remain deferred.
 
 ## Data / API / Workflow Changes
 
@@ -90,9 +89,9 @@ before that boundary.
   forms, or explicit `WarpEnvironmentData`; mixing direct values with
   `environment=` fails before mutation. Scalars may use private device buffers;
   supplied arrays are not copied or replaced.
-- **RNG Workflow:** Omitted RNG uses a seeded call-local convenience buffer.
-  Supplied `(n_boxes,)` `wp.uint32` state is reused as-is by default and reset
-  only with `initialize_rng=True`. Invalid calls do not initialize or advance it.
+- **RNG Workflow:** P3 validates `rng_seed`, `initialize_rng`, and an optional
+  `(n_boxes,)` `wp.uint32` sidecar only. Omitted-sidecar allocation, seeding,
+  reset, and advancement are deferred to P5.
 - **Epic Integration:** E6-F3 is an independent upstream track and provides the
   neutral coefficient/removal foundation for E6-F4. E6-F9 consumes the direct
   step in integration validation; no scheduler or high-level runnable is added.
