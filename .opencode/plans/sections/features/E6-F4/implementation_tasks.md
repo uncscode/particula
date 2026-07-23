@@ -6,10 +6,11 @@
 - [x] Add private fp64 Coulomb self-potential-ratio and image-charge helpers in
   `particula/gpu/dynamics/wall_loss_funcs.py`, matching the CPU self-pair
   ratio floor, absolute value, exponent clipping, and zero-charge identity.
-- [ ] Add geometry-scale and resolved-field helpers matching scalar/vector and
-  wall-potential semantics.
-- [ ] Add signed electric mobility/drift helper with radius and scale guards.
-- [ ] Compose `neutral * electrostatic_factor + drift` with CPU-equivalent NaN
+- [x] Add private geometry-scale and resolved-field helpers matching
+  scalar/vector and wall-potential semantics.
+- [x] Add private signed electric mobility/drift helper with radius and scale
+  guards.
+- [x] Compose `neutral * electrostatic_factor + drift` with CPU-equivalent NaN
   sanitization and finite nonnegative clipping.
 
 ## Kernel Contract
@@ -36,7 +37,9 @@
   clipping domains.
 - [x] Add P1 configuration, preflight, ordering, ownership, atomicity, and
   zero-charge neutral-equivalence cases to
-  `particula/gpu/kernels/tests/wall_loss_test.py`.
+   `particula/gpu/kernels/tests/wall_loss_test.py`.
+- [x] Add independent P3 NumPy/Warp field-resolution, signed-drift, guard, and
+  defensive composition tests in `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`.
 - [ ] Extend `particula/gpu/kernels/tests/wall_loss_parity_test.py` with a
   deterministic CPU/Warp geometry/charge/field matrix.
 - [ ] Compare survival counts with predeclared binomial confidence or sigma

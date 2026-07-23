@@ -14,8 +14,11 @@
   ratio and image-charge enhancement for nonzero charge, independent of wall
   potential; the ratio floor, exponent clipping, and exact zero-charge identity
   are independently tested. They are not yet used by the direct step.
-- [ ] Explicit field magnitude and potential-derived field preserve CPU
-  geometry scaling and signed charge drift semantics.
+- [x] Private fp64 helpers preserve CPU geometry scaling, signed spherical and
+  rectangular field semantics, potential contribution, and signed charge drift;
+  independent tests cover guard and zero-control lanes.
+- [x] Private composition exactly sanitizes NaN, negative, negative-infinite,
+  and positive-overflow results to finite nonnegative fp64 outputs.
 - [ ] Every zero-charge active slot reproduces the E6-F3 neutral coefficient and
   survival probability, including when potential or field is configured.
 - [ ] Charged spherical and rectangular coefficients match the CPU array oracle

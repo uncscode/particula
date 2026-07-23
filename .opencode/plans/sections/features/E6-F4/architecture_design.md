@@ -31,8 +31,12 @@ supplies fp64 device helpers for the self-pair Coulomb ratio (lower-clipped at
 `-200`) and image enhancement (absolute ratio, exponent-clipped to `[-50, 50]`,
 with `_image_charge_enhancement_wp` returning exact `1.0` for zero charge).
 They accept radius, charge, temperature, and explicit physical constants; they
-perform no public validation and have no direct-step call site. Field
-resolution, drift, and charged composition remain deferred to P3-P4.
+perform no public validation and have no direct-step call site. P3 additionally
+privately supplies geometry-scale selection; signed spherical and norm-based
+rectangular field resolution with conditional potential scaling; signed
+mobility drift with radius/scale guards; and `neutral * factor + drift`
+composition sanitized to finite nonnegative fp64 values. P4 alone must connect
+these helpers to fixed-slot execution.
 
 ## Data / API / Workflow Changes
 
