@@ -4,10 +4,11 @@ The helpers calculate Crump-Seinfeld spherical and rectangular chamber
 wall-loss coefficients in SI units [s^-1], plus private image-charge
 enhancement primitives with dimensionless outputs. Coulomb self-potential
 ratios are lower-clipped at -200, while image-charge exponents use the CPU
-diagonal/self-pair absolute-value calculation and clip to [-50, 50]. The
-helpers are device-only, have no public validation contract, and are not
-integrated into a direct wall-loss step; future step preflight owns input
-validation.
+diagonal/self-pair absolute-value calculation and clip to [-50, 50]. P3 also
+provides private electric-field drift and charged-coefficient composition
+helpers. The helpers are device-only, have no public validation contract, and
+direct-step integration remains deferred to P4; future step preflight owns
+input validation.
 
 Crump, J. G., & Seinfeld, J. H. (1981). Turbulent deposition and
 gravitational sedimentation of an aerosol in a vessel of arbitrary shape.
@@ -38,6 +39,8 @@ _PI = wp.constant(wp.float64(3.141592653589793))
 _COULOMB_RATIO_LOWER_LIMIT = wp.constant(wp.float64(-200.0))
 _IMAGE_CHARGE_EXPONENT_LOWER_LIMIT = wp.constant(wp.float64(-50.0))
 _IMAGE_CHARGE_EXPONENT_UPPER_LIMIT = wp.constant(wp.float64(50.0))
+_CHARGED_DRIFT_LOWER_GUARD = wp.constant(wp.float64(1.0e-30))
+_FLOAT64_MAX = wp.constant(wp.float64(1.7976931348623157e308))
 
 
 @wp.func
@@ -307,3 +310,105 @@ def _image_charge_enhancement_wp(
         _IMAGE_CHARGE_EXPONENT_UPPER_LIMIT,
     )
     return wp.exp(exponent)
+
+
+@wp.func
+def _geometry_scale_wp(
+    geometry_mode: wp.int32,
+    chamber_radius: wp.float64,
+    chamber_length: wp.float64,
+    chamber_width: wp.float64,
+    chamber_height: wp.float64,
+) -> wp.float64:
+    """Return the characteristic geometry scale without lower guarding it."""
+    if geometry_mode == wp.int32(0):
+        return chamber_radius
+    return wp.min(chamber_length, wp.min(chamber_width, chamber_height))
+
+
+@wp.func
+def _resolve_spherical_electric_field_wp(
+    wall_electric_field: wp.float64,
+    wall_potential: wp.float64,
+    geometry_scale: wp.float64,
+) -> wp.float64:
+    """Resolve a signed spherical scalar field with potential contribution."""
+    resolved_field = wall_electric_field
+    if wall_potential != wp.float64(0.0) and geometry_scale > wp.float64(0.0):
+        resolved_field = resolved_field + wall_potential / geometry_scale
+    return resolved_field
+
+
+@wp.func
+def _resolve_rectangular_electric_field_wp(
+    field_x: wp.float64,
+    field_y: wp.float64,
+    field_z: wp.float64,
+    wall_potential: wp.float64,
+    geometry_scale: wp.float64,
+) -> wp.float64:
+    """Resolve a rectangular field-vector norm with potential contribution."""
+    resolved_field = wp.sqrt(
+        field_x * field_x + field_y * field_y + field_z * field_z
+    )
+    if wall_potential != wp.float64(0.0) and geometry_scale > wp.float64(0.0):
+        resolved_field = resolved_field + wall_potential / geometry_scale
+    return resolved_field
+
+
+@wp.func
+def _electric_field_drift_wp(
+    particle_radius: wp.float64,
+    particle_charge: wp.float64,
+    temperature: wp.float64,
+    resolved_electric_field: wp.float64,
+    geometry_scale: wp.float64,
+    elementary_charge_value: wp.float64,
+    ref_viscosity: wp.float64,
+    ref_temperature: wp.float64,
+    sutherland_constant: wp.float64,
+) -> wp.float64:
+    """Calculate signed electric-field drift contribution in s^-1."""
+    if particle_charge == wp.float64(
+        0.0
+    ) or resolved_electric_field == wp.float64(0.0):
+        return wp.float64(0.0)
+    viscosity = dynamic_viscosity_wp(
+        temperature,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+    )
+    diameter = wp.float64(2.0) * wp.max(
+        particle_radius,
+        _CHARGED_DRIFT_LOWER_GUARD,
+    )
+    mobility = (
+        wp.abs(particle_charge)
+        * elementary_charge_value
+        / (wp.float64(3.0) * _PI * viscosity * diameter)
+    )
+    drift = (
+        mobility
+        * resolved_electric_field
+        * wp.sign(particle_charge)
+        / wp.max(geometry_scale, _CHARGED_DRIFT_LOWER_GUARD)
+    )
+    if wp.isnan(drift):
+        return wp.float64(0.0)
+    return drift
+
+
+@wp.func
+def _combine_charged_wall_loss_coefficient_wp(
+    neutral_coefficient: wp.float64,
+    electrostatic_factor: wp.float64,
+    drift_term: wp.float64,
+) -> wp.float64:
+    """Combine and sanitize charged wall-loss coefficient contributions."""
+    combined = neutral_coefficient * electrostatic_factor + drift_term
+    if wp.isnan(combined) or combined <= wp.float64(0.0):
+        return wp.float64(0.0)
+    if wp.isinf(combined) or combined > _FLOAT64_MAX:
+        return _FLOAT64_MAX
+    return combined
