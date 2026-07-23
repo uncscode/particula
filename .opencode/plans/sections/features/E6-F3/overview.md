@@ -114,5 +114,5 @@ survival checks with fixed 3-sigma binomial bounds, exact zero-time/all-inactive
 no-op checks, and lazy-import boundary smoke coverage. Warp CPU is required
 when Warp is installed and CUDA rows are additive when available. P6 changes no
 production physics, runtime API, or public export; `wall_loss_step_gpu` remains
-the sole lazy package symbol and `NeutralWallLossConfig` remains concrete-module
+the sole lazy wall-loss symbol and `NeutralWallLossConfig` remains concrete-module
 only.
