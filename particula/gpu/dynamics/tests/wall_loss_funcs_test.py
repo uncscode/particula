@@ -25,12 +25,16 @@ if wp is not None:
         get_spherical_wall_loss_coefficient_via_system_state,
     )
     from particula.gpu.dynamics.wall_loss_funcs import (  # noqa: E402
+        coulomb_self_potential_ratio_wp,
+        image_charge_enhancement_wp,
         rectangle_wall_loss_coefficient_wp,
         spherical_wall_loss_coefficient_wp,
     )
     from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
     from particula.util.constants import (  # noqa: E402
         BOLTZMANN_CONSTANT,
+        ELECTRIC_PERMITTIVITY,
+        ELEMENTARY_CHARGE_VALUE,
         GAS_CONSTANT,
         MOLECULAR_WEIGHT_AIR,
         REF_TEMPERATURE_STP,
@@ -123,6 +127,48 @@ if wp is not None:
             sutherland_constant,
         )
 
+    @wp.kernel
+    def _coulomb_self_potential_ratio_kernel(
+        particle_radii: Any,
+        particle_charges: Any,
+        temperatures: Any,
+        elementary_charge_value: wp.float64,
+        electric_permittivity: wp.float64,
+        boltzmann_constant: wp.float64,
+        result: Any,
+    ) -> None:
+        """Calculate one Coulomb self-potential ratio per lane."""
+        tid = wp.tid()
+        result[tid] = coulomb_self_potential_ratio_wp(
+            particle_radii[tid],
+            particle_charges[tid],
+            temperatures[tid],
+            elementary_charge_value,
+            electric_permittivity,
+            boltzmann_constant,
+        )
+
+    @wp.kernel
+    def _image_charge_enhancement_kernel(
+        particle_radii: Any,
+        particle_charges: Any,
+        temperatures: Any,
+        elementary_charge_value: wp.float64,
+        electric_permittivity: wp.float64,
+        boltzmann_constant: wp.float64,
+        result: Any,
+    ) -> None:
+        """Calculate one image-charge enhancement factor per lane."""
+        tid = wp.tid()
+        result[tid] = image_charge_enhancement_wp(
+            particle_radii[tid],
+            particle_charges[tid],
+            temperatures[tid],
+            elementary_charge_value,
+            electric_permittivity,
+            boltzmann_constant,
+        )
+
 
 @pytest.fixture(params=_available_warp_devices())
 def device(request) -> str:
@@ -158,6 +204,100 @@ def _warp_arrays(values: tuple[np.ndarray, ...], device: str) -> list[Any]:
     return [
         wp.array(value, dtype=wp.float64, device=device) for value in values
     ]
+
+
+def _coulomb_self_potential_ratio_oracle(
+    particle_radii: np.ndarray,
+    particle_charges: np.ndarray,
+    temperatures: np.ndarray,
+) -> np.ndarray:
+    """Calculate independent NumPy Coulomb self-potential ratios."""
+    raw_ratio = -(particle_charges**2 * ELEMENTARY_CHARGE_VALUE**2) / (
+        4.0
+        * np.pi
+        * ELECTRIC_PERMITTIVITY
+        * (particle_radii + particle_radii)
+        * BOLTZMANN_CONSTANT
+        * temperatures
+    )
+    return np.maximum(raw_ratio, -200.0)
+
+
+def _image_charge_enhancement_oracle(
+    particle_radii: np.ndarray,
+    particle_charges: np.ndarray,
+    temperatures: np.ndarray,
+) -> np.ndarray:
+    """Calculate independent pairwise-diagonal image-charge factors."""
+    pairwise_ratio = -(
+        particle_charges[:, None]
+        * particle_charges[None, :]
+        * ELEMENTARY_CHARGE_VALUE**2
+    ) / (
+        4.0
+        * np.pi
+        * ELECTRIC_PERMITTIVITY
+        * (particle_radii[:, None] + particle_radii[None, :])
+        * BOLTZMANN_CONSTANT
+        * temperatures[:, None]
+    )
+    self_ratio = np.maximum(np.diagonal(pairwise_ratio), -200.0)
+    enhancement = np.exp(np.clip(np.abs(self_ratio), -50.0, 50.0))
+    return np.where(particle_charges == 0.0, 1.0, enhancement)
+
+
+def _launch_coulomb_self_potential_ratio(
+    particle_radii: np.ndarray,
+    particle_charges: np.ndarray,
+    temperatures: np.ndarray,
+    device: str,
+) -> np.ndarray:
+    """Launch the scalar-ratio helper and return synchronized fp64 results."""
+    result = wp.zeros(len(particle_radii), dtype=wp.float64, device=device)
+    wp.launch(
+        _coulomb_self_potential_ratio_kernel,
+        dim=len(particle_radii),
+        inputs=[
+            *_warp_arrays(
+                (particle_radii, particle_charges, temperatures),
+                device,
+            ),
+            wp.float64(ELEMENTARY_CHARGE_VALUE),
+            wp.float64(ELECTRIC_PERMITTIVITY),
+            wp.float64(BOLTZMANN_CONSTANT),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    return result.numpy()
+
+
+def _launch_image_charge_enhancement(
+    particle_radii: np.ndarray,
+    particle_charges: np.ndarray,
+    temperatures: np.ndarray,
+    device: str,
+) -> np.ndarray:
+    """Launch the enhancement helper and return synchronized fp64 results."""
+    result = wp.zeros(len(particle_radii), dtype=wp.float64, device=device)
+    wp.launch(
+        _image_charge_enhancement_kernel,
+        dim=len(particle_radii),
+        inputs=[
+            *_warp_arrays(
+                (particle_radii, particle_charges, temperatures),
+                device,
+            ),
+            wp.float64(ELEMENTARY_CHARGE_VALUE),
+            wp.float64(ELECTRIC_PERMITTIVITY),
+            wp.float64(BOLTZMANN_CONSTANT),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    return result.numpy()
 
 
 @pytest.mark.gpu_parity
@@ -405,3 +545,120 @@ def test_wall_loss_helper_smoke_launches(device: str) -> None:
     wp.synchronize()
     assert np.isfinite(sphere_result.numpy()[0])
     assert np.isfinite(rectangle_result.numpy()[0])
+
+
+@pytest.mark.gpu_parity
+def test_coulomb_self_potential_ratio_matches_independent_oracle(
+    device: str,
+) -> None:
+    """Match ordinary and clipped Coulomb self-potential ratios."""
+    particle_radii = np.array([1.0e-7, 1.0e-9, 1.0e-10], dtype=np.float64)
+    particle_charges = np.array([1.0, 2.0, 1.0], dtype=np.float64)
+    temperatures = np.array([300.0, 300.0, 300.0], dtype=np.float64)
+
+    expected = _coulomb_self_potential_ratio_oracle(
+        particle_radii,
+        particle_charges,
+        temperatures,
+    )
+    actual = _launch_coulomb_self_potential_ratio(
+        particle_radii,
+        particle_charges,
+        temperatures,
+        device,
+    )
+
+    npt.assert_allclose(actual, expected, rtol=1e-12, atol=0.0)
+    assert np.all(np.isfinite(actual))
+    assert np.all(actual <= 0.0)
+    assert actual[2] == -200.0
+    assert -200.0 < actual[1] < -50.0
+
+
+@pytest.mark.gpu_parity
+def test_image_charge_enhancement_matches_independent_oracle(
+    device: str,
+) -> None:
+    """Match signed, zero, and mixed-scale image-charge lane factors."""
+    particle_radii = np.array(
+        [1.0e-9, 1.0e-8, 1.0e-6, 1.0e-8, 1.0e-9],
+        dtype=np.float64,
+    )
+    particle_charges = np.array(
+        [-3.0, -1.0, 0.0, 1.0, 3.0],
+        dtype=np.float64,
+    )
+    temperatures = np.array(
+        [300.0, 280.0, 310.0, 280.0, 300.0],
+        dtype=np.float64,
+    )
+
+    expected = _image_charge_enhancement_oracle(
+        particle_radii,
+        particle_charges,
+        temperatures,
+    )
+    actual = _launch_image_charge_enhancement(
+        particle_radii,
+        particle_charges,
+        temperatures,
+        device,
+    )
+
+    assert actual.shape == (len(particle_charges),)
+    assert np.all(np.isfinite(actual))
+    npt.assert_allclose(actual, expected, rtol=1e-12, atol=0.0)
+    assert actual[2] == 1.0
+    assert actual[0] == actual[4]
+    assert actual[1] == actual[3]
+
+
+@pytest.mark.gpu_parity
+def test_image_charge_enhancement_is_greater_than_unity_without_field_inputs(
+    device: str,
+) -> None:
+    """Apply image-charge enhancement without wall-potential or field inputs."""
+    particle_radii = np.array([1.0e-7], dtype=np.float64)
+    particle_charges = np.array([1.0], dtype=np.float64)
+    temperatures = np.array([298.15], dtype=np.float64)
+
+    actual = _launch_image_charge_enhancement(
+        particle_radii,
+        particle_charges,
+        temperatures,
+        device,
+    )
+
+    assert actual[0] > 1.0
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("particle_radius", "particle_charge"),
+    [(1.0e-9, 2.0), (1.0e-9, 3.0)],
+    ids=["exponent_clip", "raw_ratio_and_exponent_clip"],
+)
+def test_image_charge_enhancement_clipping_matches_oracle(
+    device: str,
+    particle_radius: float,
+    particle_charge: float,
+) -> None:
+    """Match valid image-charge clipping domains without warnings."""
+    particle_radii = np.array([particle_radius], dtype=np.float64)
+    particle_charges = np.array([particle_charge], dtype=np.float64)
+    temperatures = np.array([300.0], dtype=np.float64)
+
+    expected = _image_charge_enhancement_oracle(
+        particle_radii,
+        particle_charges,
+        temperatures,
+    )
+    actual = _launch_image_charge_enhancement(
+        particle_radii,
+        particle_charges,
+        temperatures,
+        device,
+    )
+
+    assert np.all(np.isfinite(actual))
+    npt.assert_allclose(actual, expected, rtol=1e-12, atol=0.0)

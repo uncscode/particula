@@ -1,8 +1,9 @@
-"""Neutral fp64 Warp wall-loss coefficient device helpers.
+"""fp64 Warp wall-loss coefficient and image-charge device helpers.
 
 The helpers calculate Crump-Seinfeld spherical and rectangular chamber
-wall-loss coefficients in SI units [s^-1]. They are concrete device helpers
-only and intentionally exclude charged-particle physics and public validation.
+wall-loss coefficients in SI units [s^-1], plus concrete image-charge
+enhancement primitives. They are device helpers only and intentionally exclude
+public validation and direct-step composition.
 
 Crump, J. G., & Seinfeld, J. H. (1981). Turbulent deposition and
 gravitational sedimentation of an aerosol in a vessel of arbitrary shape.
@@ -27,6 +28,12 @@ from particula.gpu.properties import (
     settling_velocity_stokes_from_transport_wp,
     x_coth_x_wp,
 )
+
+# Clip limits mirror the CPU Coulomb-ratio and image-charge authorities.
+_PI = wp.constant(wp.float64(3.141592653589793))
+_COULOMB_RATIO_LOWER_LIMIT = wp.constant(wp.float64(-200.0))
+_IMAGE_CHARGE_EXPONENT_LOWER_LIMIT = wp.constant(wp.float64(-50.0))
+_IMAGE_CHARGE_EXPONENT_UPPER_LIMIT = wp.constant(wp.float64(50.0))
 
 
 @wp.func
@@ -204,3 +211,83 @@ def rectangle_wall_loss_coefficient_wp(
             + x_coth_x_wp(x) / chamber_height
         )
     )
+
+
+@wp.func
+def coulomb_self_potential_ratio_wp(
+    particle_radius: wp.float64,
+    particle_charge: wp.float64,
+    temperature: wp.float64,
+    elementary_charge_value: wp.float64,
+    electric_permittivity: wp.float64,
+    boltzmann_constant: wp.float64,
+) -> wp.float64:
+    """Calculate the dimensionless Coulomb self-potential ratio.
+
+    Args:
+        particle_radius: Particle radius in m.
+        particle_charge: Particle charge in elementary-charge units.
+        temperature: Gas temperature in K.
+        elementary_charge_value: Elementary charge in C.
+        electric_permittivity: Electric permittivity in F/m.
+        boltzmann_constant: Boltzmann constant in J/K.
+
+    Returns:
+        Dimensionless, lower-clipped Coulomb self-potential ratio.
+    """
+    raw_ratio = -(
+        particle_charge
+        * particle_charge
+        * elementary_charge_value
+        * elementary_charge_value
+    ) / (
+        wp.float64(4.0)
+        * _PI
+        * electric_permittivity
+        * (particle_radius + particle_radius)
+        * boltzmann_constant
+        * temperature
+    )
+    return wp.max(raw_ratio, _COULOMB_RATIO_LOWER_LIMIT)
+
+
+@wp.func
+def image_charge_enhancement_wp(
+    particle_radius: wp.float64,
+    particle_charge: wp.float64,
+    temperature: wp.float64,
+    elementary_charge_value: wp.float64,
+    electric_permittivity: wp.float64,
+    boltzmann_constant: wp.float64,
+) -> wp.float64:
+    """Calculate the dimensionless image-charge wall-loss enhancement.
+
+    Args:
+        particle_radius: Particle radius in m.
+        particle_charge: Particle charge in elementary-charge units.
+        temperature: Gas temperature in K.
+        elementary_charge_value: Elementary charge in C.
+        electric_permittivity: Electric permittivity in F/m.
+        boltzmann_constant: Boltzmann constant in J/K.
+
+    Returns:
+        Dimensionless image-charge enhancement factor.
+    """
+    if particle_charge == wp.float64(0.0):
+        return wp.float64(1.0)
+    ratio = coulomb_self_potential_ratio_wp(
+        particle_radius,
+        particle_charge,
+        temperature,
+        elementary_charge_value,
+        electric_permittivity,
+        boltzmann_constant,
+    )
+    exponent = wp.min(
+        wp.max(
+            wp.abs(ratio),
+            _IMAGE_CHARGE_EXPONENT_LOWER_LIMIT,
+        ),
+        _IMAGE_CHARGE_EXPONENT_UPPER_LIMIT,
+    )
+    return wp.exp(exponent)
