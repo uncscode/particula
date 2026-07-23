@@ -39,3 +39,14 @@
 | Invalid-call caller mutations | N/A | 0 across particle and RNG snapshots | Preflight tests |
 | Hidden per-step RNG reseeds with supplied state | N/A | 0 unless `initialize_rng=True` | Repeated-step RNG tests |
 | Required GPU backend evidence | N/A | Warp CPU 100%; CUDA optional clean skip | `warp_devices()` matrix |
+
+## P4 Criteria Met (#1404)
+
+- [x] Positive-time P4 execution supports both neutral spherical and rectangular
+  particle-resolved configurations after frozen P3 preflight.
+- [x] Eligible removals clear every mass lane, concentration, and charge without
+  changing density, volume, fixed storage, survivors, or inactive gaps.
+- [x] Zero time is an exact post-preflight write-free no-op, and rejected
+  pre-launch calls preserve caller-owned particle and RNG-sidecar state.
+- [x] `rng_states` remains identity- and value-preserved because P4 neither
+  initializes nor advances it; persistent lifecycle is a P5 criterion.

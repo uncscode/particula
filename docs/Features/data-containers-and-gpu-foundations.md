@@ -219,9 +219,18 @@ gas concentrations run on Warp CPU with float64 `rtol=1e-12, atol=0`; CUDA is
 optional and skips cleanly when unavailable. This tolerance-based evidence is
 not bitwise parity.
 
-GPU runnable or process orchestration, backend selection and scheduling,
-GPU-resident timestep integration, resizing, graph capture, autodiff,
-performance claims, wall loss, and nucleation remain deferred.
+Bounded direct neutral, particle-resolved GPU wall loss is available through
+`from particula.gpu.kernels import wall_loss_step_gpu`. After read-only P3
+preflight, a positive-time call stochastically removes eligible fixed slots in
+place; zero time remains a post-preflight, write-free no-op. Each eligible slot
+uses a local seed-plus-slot-derived draw, and optional `rng_states` is validated
+but left untouched. Charged wall loss, persistent RNG lifecycle behavior (P5),
+runnables, hidden transfers or fallbacks, and cross-device or CPU stochastic
+trajectory parity remain deferred.
+
+GPU process orchestration, backend selection and scheduling, GPU-resident
+timestep integration, resizing, graph capture, autodiff, performance claims,
+and nucleation remain deferred.
 
 ### Particle transfer boundary
 

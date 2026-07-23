@@ -104,3 +104,18 @@ fp64 coefficient parity, statistically justified stochastic bounds, and
 validation before caller mutation. Documentation must not claim exact cross-
 backend RNG sequences, mandatory CUDA, charged support, hidden transfer,
 general multi-box transport, graph capture, or performance guarantees.
+
+## Shipped P4 Execution Design
+
+P4 retains P3's entry-point signature and validation order. Only after preflight
+succeeds, a positive-time call normalizes environment values, allocates a private
+removal mask, evaluates the applicable neutral coefficient for each usable slot,
+and applies a separate clearing kernel. Each eligible slot uses exactly one
+call-local deterministic seed-plus-flattened-slot draw against
+`exp(-k * time_step)`. Unusable derived transport values and nonpositive or
+nonfinite coefficients survive without a draw. Marked slots have every mass
+lane, concentration, and charge zeroed; density, volume, inactive slots, and
+survivors remain unchanged. Zero time returns after preflight without runtime
+normalization or writes. P4 does not initialize, read, or advance `rng_states`;
+P5 owns lifecycle semantics. Rejected pre-launch calls are atomic, while
+post-launch rollback is not promised.

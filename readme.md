@@ -64,8 +64,8 @@ Legacy facades remain available, with deprecation planned for v0.3.0.
 `EnvironmentData` now also participates in the public Warp CPU↔GPU helpers via
 `particula.gpu.{to_warp_environment_data, from_warp_environment_data}` for
 single-box and multi-box round trips.
-Import GPU kernel entry points `condensation_step_gpu` and
-`coagulation_step_gpu` from `particula.gpu.kernels`. Top-level
+Import GPU kernel entry points `condensation_step_gpu`, `coagulation_step_gpu`,
+and `wall_loss_step_gpu` from `particula.gpu.kernels`. Top-level
 `particula.gpu` remains the transfer/context-helper surface and does not
 re-export those direct kernel step functions. The kernel entry points accept
 scalar `temperature` / `pressure` inputs, per-box Warp arrays with shape
@@ -77,6 +77,17 @@ environment inputs must match the particle/gas device and use `(n_boxes,)`
 temperature and pressure arrays. All accepted temperature, pressure, and
 coagulation volume inputs are validated as positive finite physical values
 before launch.
+
+`wall_loss_step_gpu` is the bounded P4 direct neutral, particle-resolved
+wall-loss boundary. Construct `NeutralWallLossConfig` from
+`particula.gpu.kernels.wall_loss`; it is not re-exported. After frozen
+preflight, positive-time calls evaluate neutral coefficients and use one local
+seed-plus-slot draw to stochastically clear an eligible slot's mass lanes,
+concentration, and charge in place. Zero time is a post-preflight, write-free
+no-op. Optional `rng_states` is validated but neither initialized nor mutated;
+persistent lifecycle behavior is deferred to P5. Charged wall loss, a runnable,
+hidden transfers/fallback, and CPU/Warp stochastic trajectory parity are out of
+scope.
 
 The direct GPU dilution P1–P4 entry point is imported with
 `from particula.gpu.kernels import dilution_step_gpu`. It applies

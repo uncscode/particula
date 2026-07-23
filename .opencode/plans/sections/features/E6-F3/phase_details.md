@@ -76,3 +76,24 @@ documents only the validated direct-process contract and evidence.
   - Goal: Document direct use, persistent RNG ownership, fixed-slot removal, support boundaries, and focused validation commands.
   - Files: `AGENTS.md`, `docs/Features/`, `.opencode/guides/`, E6 plan sections as needed
   - Tests: Markdown links, import snippets, support/deferred tables, and focused commands.
+
+## P4 Delivery Update (#1404)
+
+- [x] **E6-F3-P4:** Implement fixed-shape coefficient and stochastic removal
+  kernels with unit tests
+  - Status: Shipped.
+  - Delivered: Positive-time calls retain P3 validation ordering, normalize the
+    environment only after preflight, evaluate neutral spherical/rectangular
+    coefficients for usable active fixed slots, use deterministic local
+    seed-plus-flattened-slot draws, and clear all mass lanes, concentration, and
+    charge for removed slots. Zero time is post-preflight and write-free.
+  - Files: `particula/gpu/kernels/wall_loss.py`,
+    `particula/gpu/kernels/tests/wall_loss_test.py`, `docs/index.md`,
+    `.opencode/guides/architecture/architecture_outline.md`, and
+    `.opencode/guides/architecture/architecture_guide.md`.
+  - Evidence: Focused Warp-guarded coverage includes both geometries, private
+    mask survivor/clearing branches, sparse one-/multi-box and species layouts,
+    zero time, controlled survival/removal, aggregate stochastic behavior, and
+    pre-launch atomicity.
+  - Boundary: `rng_states` remains validated but unmodified; its initialization
+    and advancement are P5 work. CPU/Warp stochastic trajectory parity is P6.

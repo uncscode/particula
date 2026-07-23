@@ -39,3 +39,15 @@
 No README change is required unless the direct kernel becomes part of a public
 quick-start surface. Documentation must be reviewed against implementation and
 validated for links/imports in P7.
+
+## P4 / #1404 Status
+
+`particula/gpu/kernels/wall_loss.py`, `docs/index.md`,
+`.opencode/guides/architecture/architecture_outline.md`, and
+`.opencode/guides/architecture/architecture_guide.md` document the shipped P4
+boundary: successful positive-time calls normalize environments, evaluate neutral
+coefficients, apply call-local seed/slot stochastic removal, and clear removed
+slots. They state that zero time is write-free after preflight, supplied
+`rng_states` is not initialized or advanced, pre-launch failures are atomic, and
+rollback after a mutation launch is not promised. P5/P6 retain persistent-RNG and
+CPU/Warp stochastic-parity documentation ownership.
