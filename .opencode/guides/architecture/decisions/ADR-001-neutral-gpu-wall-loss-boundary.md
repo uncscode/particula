@@ -1,4 +1,4 @@
-# ADR-001: Neutral GPU Wall-Loss Boundary
+# ADR-001: GPU Wall-Loss Direct Boundary
 
 **Status:** Accepted
 **Date:** 2026-07-23
@@ -30,7 +30,7 @@ add execution without changing the callable interface.
 
 ## Decision
 
-Use `particula.gpu.kernels.wall_loss` as the P3 direct neutral wall-loss
+Use `particula.gpu.kernels.wall_loss` as the direct neutral and charged wall-loss
 boundary. Export only `wall_loss_step_gpu` lazily from
 `particula.gpu.kernels`; retain `NeutralWallLossConfig` as a concrete-module
 API.
@@ -42,8 +42,9 @@ API.
 The boundary owns immutable host configuration and ordered, read-only schema,
 domain, environment, and RNG-metadata validation. The existing
 `particula.gpu.dynamics.wall_loss_funcs` module remains the owner of neutral
-device coefficient helpers. P3 performs no coefficient assembly, removal,
-RNG mutation, output allocation, or particle mutation.
+device coefficient helpers. The boundary performs frozen preflight, then one
+device-resident selection/removal pass without host readback or particle-sized
+temporary storage.
 
 ## Alternatives Considered
 
@@ -102,20 +103,22 @@ phases introduce mutable state.
 
 1. **Longer configuration import**: Callers import configuration from its
    concrete module.
-2. **Deferred functionality**: P3 validates only; it does not remove particles.
+2. **Bounded functionality**: The direct call mutates fixed particle slots but
+   does not provide a runnable, hidden transfer, or CPU fallback.
 
 ## Consequences
 
 ### Positive
 
-- Invalid P3 calls do not mutate particles or supplied RNG sidecars.
-- P4/P5 can reuse the frozen callable signature.
+- Invalid calls do not mutate particles or supplied RNG sidecars.
+- Positive-time execution keeps RNG state and selection device-resident.
 - Neutral coefficient helpers retain a single owner.
 
 ### Negative
 
-- The direct boundary is not yet a wall-loss execution API.
-- Charged wall loss remains outside this contract.
+- Execution is limited to particle-resolved fixed-shape neutral and charged
+  slots; nonzero charge uses charged composition while zero charge follows the
+  neutral fallback.
 
 ### Neutral
 
@@ -134,9 +137,9 @@ phases introduce mutable state.
 
 ### Testing Strategy
 
-Exercise valid spherical/rectangular preflight, invalid schemas and domains,
-environment forms, and unchanged particle/RNG state after valid or rejected
-calls.
+Exercise valid spherical/rectangular execution, invalid schemas and domains,
+environment forms, slot clearing, and unchanged particle/RNG state after
+rejected or true no-op calls.
 
 ### Rollback Plan
 
@@ -149,7 +152,8 @@ unchanged.
 
 - [x] Only `wall_loss_step_gpu` is lazily exported from the kernels package.
 - [x] Configuration remains concrete-module-only.
-- [x] P3 preflight is write-free and does not invoke coefficient helpers.
+- [x] Preflight is read-only; positive-time execution is device-resident and
+  clears selected fixed slots in one pass.
 
 ## References
 

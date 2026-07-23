@@ -215,9 +215,9 @@ print(result)
     mutate in place and reset only with `initialize_rng=True`; repeating `rng_seed`
     does not reset a supplied sidecar. Zero time and pre-launch failures preserve
     supplied state. Callers retain ownership of Warp transfers, device placement,
-    synchronization, particle data, and any RNG sidecar. Preflight may run device
-    validation scans and synchronize to read back scalar status, but it does not
-    transfer or replace caller-owned buffers. Rollback is not promised after a
+    synchronization, particle data, and any RNG sidecar. Positive-time execution
+    performs no host status readback, uses no particle-sized temporary mask, and
+    selects and clears slots in one device pass. Rollback is not promised after a
     mutation kernel launches. Sequential per-box RNG advancement limits parallelism
     and makes no performance claim. Test-only validation compares deterministic
     coefficients with CPU system-state equations and checks aggregate stochastic
