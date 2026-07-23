@@ -12,7 +12,7 @@ must exactly follow the neutral coefficient and stochastic path.
 
 ## Value Proposition
 
- E6-F4-P1 through P5 are implemented. P1 freezes the charged-mode configuration without
+ E6-F4-P1 through P6 are shipped. P1 freezes the charged-mode configuration without
 changing the direct step's ownership, mutation, coefficient, or RNG contracts.
 P2 adds private fp64 Warp Coulomb self-potential-ratio and image-charge
 enhancement primitives, with independent NumPy/Warp parity and clipping tests.
@@ -29,6 +29,10 @@ RNG path. No public entry point, export, runnable, container field, transfer,
  CPU/Warp coefficient parity, exact zero-charge neutral fallback and ownership
  checks, invalid-call/no-mutation regressions, and exact-binomial charged
  survival validation. It makes no production API or kernel change.
+P6 is the documentation-only closeout for #1414: it records the direct charged
+configuration and geometry semantics, caller-owned state and mutation limits,
+focused commands, and supported/deferred scope. It changes no code, API, or
+test behavior.
 
 ## User Stories
 
@@ -42,6 +46,7 @@ RNG path. No public entry point, export, runnable, container field, transfer,
 
 ## Parent Context
 
-This is parent epic E6 track T4. It depends on E6-F3/T3 and is consumed by the
-E6-F9 integrated direct-step validation. Slot activation/exhaustion remains in
+This is parent epic E6 track T4. It depends on the shipped E6-F3/T3 foundation,
+is documented by E6-F4/P6, and is consumed by E6-F9's downstream direct-call
+and explicit-transfer validation. Slot activation/exhaustion remains in
 E6-F5/E6-F6, and backend orchestration remains deferred to Epic G.

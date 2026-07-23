@@ -62,8 +62,10 @@ terms in P4 before P5 validation and P6 documentation.
     survival validation plus a persistent-sidecar lifecycle case. Warp CPU is
     baseline; CUDA is optional.
 
-- [ ] **E6-F4-P6:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document charged direct use, image-charge/field semantics, neutral fallback, RNG ownership, validation commands, and supported/deferred boundaries.
+- [x] **E6-F4-P6:** Update development documentation
+  - Issue: #1414 | Size: XS | Status: Shipped
+  - Goal: Delivered documentation-only direct charged use, image-charge/field
+    semantics, neutral fallback, RNG ownership, validation commands, and
+    supported/deferred boundaries without code, API, or test behavior changes.
   - Files: `AGENTS.md`, `docs/Features/`, `.opencode/guides/`, E6 plan sections as needed
   - Tests: Markdown links, imports, SI units, focused commands, and support/deferred table review.

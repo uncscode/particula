@@ -480,10 +480,15 @@ pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
 - Charged mode accepts a finite signed wall potential [V] and a finite signed
   electric field [V/m]: a scalar for spherical geometry or a caller-owned,
   same-device `wp.float64` Warp array shaped `(3,)` for rectangular geometry.
-  Nonzero charged slots use private image-charge and electric-field-drift
-  composition. Neutral mode and zero-charge charged slots retain the exact
-  neutral coefficient and RNG path. The rectangular vector remains
-  caller-owned and is read only by charged rectangular execution.
+  Spherical execution preserves the signed scalar field and adds the signed
+  potential-derived field. Rectangular execution reduces the three field lanes
+  to their Euclidean magnitude, then adds the signed potential-derived field;
+  individual component signs do not select drift direction. Nonzero charged
+  slots use private image-charge and electric-field-drift composition, and
+  image-charge enhancement remains active when `wall_potential=0`. Neutral
+  mode and zero-charge charged slots retain the exact neutral coefficient and
+  RNG path. The rectangular vector remains caller-owned and is read only by
+  charged rectangular execution.
 - P3-frozen preflight validates fixed-shape, same-device `wp.float64` particle
   fields, finite domain values, a finite nonnegative `time_step` [s],
   temperature [K], pressure [Pa], and optional `wp.uint32` per-box RNG

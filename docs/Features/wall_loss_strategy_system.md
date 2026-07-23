@@ -121,6 +121,65 @@ combined = coagulation | wall_loss
 aerosol = combined.execute(aerosol, time_step=60.0)
 ```
 
+## Direct GPU charged wall loss
+
+The GPU boundary is a low-level, caller-managed fixed-slot operation. It is
+not an extension of `WallLoss`, does not create a runnable, and does not
+transfer data between CPU and Warp. Import only the direct step from the kernel
+package; the configuration intentionally remains a concrete-module import:
+
+```python
+from particula.gpu.kernels import wall_loss_step_gpu
+from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+config = NeutralWallLossConfig(
+    geometry="spherical",
+    wall_eddy_diffusivity=1e-3,  # m^2/s
+    chamber_radius=0.5,  # m
+    mode="charged",
+    wall_potential=-1.0,  # V
+    wall_electric_field=25.0,  # V/m; signed spherical scalar
+)
+```
+
+The direct boundary supports only `particle_resolved` storage. Its SI inputs
+are wall eddy diffusivity [m^2/s], chamber radius or dimensions [m],
+temperature [K], pressure [Pa], time [s], signed wall potential [V], and
+electric field [V/m]. A spherical configuration requires a positive radius and
+no dimensions. A rectangular configuration requires exactly three positive
+dimensions, no radius, and a caller-owned, same-device `wp.float64` electric
+field vector shaped `(3,)`.
+
+For charged spherical execution, the signed scalar field is preserved and the
+signed potential-derived field is added. For charged rectangular execution,
+the three field components are reduced to their Euclidean magnitude before the
+signed potential-derived field is added; individual component signs do not
+select a drift direction. Nonzero-charge slots use image-charge enhancement
+and field drift, including image-charge enhancement when `wall_potential=0`.
+Charged zero-charge slots use the exact neutral coefficient and RNG path.
+
+Callers own `WarpParticleData.charge`, device placement, explicit CPU-to-Warp
+transfer, synchronization, and any optional persistent `(n_boxes,)` `wp.uint32`
+RNG sidecar. Successful positive-time calls mutate the supplied fixed-capacity
+particle container in place and return that same container. Selected removed
+slots have every mass lane, concentration, and charge cleared; surviving,
+unselected storage retains its capacity and other fields. Rejected preflight
+calls do not mutate caller-owned particle or RNG state. Rollback is not
+promised after a mutation kernel launches.
+
+Warp CPU is the baseline when Warp is installed. CUDA is optional and the
+focused suites skip cleanly when it is unavailable:
+
+```bash
+pytest particula/gpu/dynamics/tests/wall_loss_funcs_test.py -q -Werror
+pytest particula/gpu/kernels/tests/wall_loss_test.py \
+  particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror
+```
+
+Hidden transfer or CPU fallback, dynamic-slot management, scheduler/runnable or
+backend integration, graph capture, differentiability, exact cross-backend RNG
+replay, mandatory CUDA support, and performance claims remain deferred.
+
 ### Spherical wall loss strategy
 
 `SphericalWallLossStrategy` models deposition in a well-mixed spherical chamber. It:

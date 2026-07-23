@@ -54,21 +54,30 @@ kernel-entry responsibilities.
   unchanged neutral kernel for neutral mode; charged kernels compose the private
   image-charge and electric-field-drift helpers in
   `particula.gpu.dynamics.wall_loss_funcs` only for nonzero-charge slots.
-  Charged zero-charge slots retain the exact neutral coefficient and RNG path.
-  A charged rectangular field remains caller-owned `(3,)` `float64` Warp
-  storage and is passed only to the rectangular charged kernel.
+  Image-charge enhancement remains active for nonzero charge at zero wall
+  potential, while charged zero-charge slots retain the exact neutral
+  coefficient and RNG path. Spherical charged execution preserves a signed
+  scalar field before adding the signed potential-derived contribution.
+  Rectangular execution reduces caller-owned `(3,)` `float64` Warp field
+  storage to its Euclidean magnitude before adding the signed
+  potential-derived contribution; component signs do not individually select
+  drift direction. The rectangular field is passed only to the charged
+  rectangular kernel.
 - After successful preflight, a nonzero call stochastically clears eligible
-  fixed slots in place and returns the identical particle object. Zero time is
-  write-free; pre-launch failures are atomic; rollback after a mutation launch
-  is not promised.
-- Its optional `(n_boxes,)` `uint32` RNG sidecar is external caller-owned
-  state, not a `WarpParticleData` field. Successful positive-time calls advance
-  each box sequentially only for eligible slots, while omitted state is private
-  to the call. Explicit `initialize_rng=True` is the only supplied-state reset
-  path. Zero-time, preflight failures, and positive-time inputs with no usable
-  slots leave supplied state unchanged. This serial per-box ownership is a
-  correctness constraint, not a throughput claim. Runnables, hidden
-  transfers/fallbacks, and CPU/Warp stochastic parity remain deferred. See
+  fixed slots in place and returns the identical particle object. Removed slots
+  have every mass lane, concentration, and caller-owned `charge` cleared;
+  capacity and unselected storage are preserved. Zero time is write-free;
+  pre-launch failures are atomic; rollback after a mutation launch is not
+  promised.
+- Its caller-owned `WarpParticleData.charge` field and optional `(n_boxes,)`
+  `uint32` RNG sidecar remain external state rather than hidden transfer
+  results. Successful positive-time calls advance each box sequentially only
+  for eligible slots, while omitted RNG state is private to the call. Explicit
+  `initialize_rng=True` is the only supplied-state reset path. Zero-time,
+  preflight failures, and positive-time inputs with no usable slots leave a
+  supplied sidecar unchanged. This serial per-box ownership is a correctness
+  constraint, not a throughput claim. Runnables, hidden transfers/fallbacks,
+  and CPU/Warp stochastic parity remain deferred. See
   [ADR-001](decisions/ADR-001-neutral-gpu-wall-loss-boundary.md).
 
 ## Design Intent
