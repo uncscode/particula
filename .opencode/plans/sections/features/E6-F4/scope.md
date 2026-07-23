@@ -1,9 +1,9 @@
 # Scope
 
 Extend E6-F3's low-level particle-resolved Warp wall-loss operation in staged
-phases. P1-P3 are shipped: configuration/preflight semantics are frozen and
-private fp64 charged-coefficient primitives are available, while the existing
-neutral execution path remains unchanged.
+phases. P1-P4 are implemented: configuration/preflight semantics and private
+fp64 charged-coefficient primitives are frozen, and charged selection now
+executes in the existing fixed-shape direct step without changing neutral mode.
 
 ## In Scope
 
@@ -17,10 +17,15 @@ neutral execution path remains unchanged.
   occur after particle schema/device discovery but before particle value scans,
   environment/RNG work, allocation, or mutation. Rejections preserve supplied
   particle, field, and RNG state.
-- **Shipped P1:** valid charged configurations execute the unchanged neutral
-  coefficient/removal kernel and RNG path; rectangular field buffers retain
-  identity and values. Zero-charge configurations therefore exactly retain the
-  existing neutral behavior.
+- **Implemented P4 (#1412):** geometry-specialized charged removal kernels
+  dispatch after successful positive-time preflight. Nonzero charged slots use
+  the private image-enhancement, field-resolution, signed-drift, and safe
+  composition helpers; exact zero-charge slots retain the neutral coefficient
+  and RNG path.
+- **Implemented P4 (#1412):** neutral mode retains its unchanged kernel and
+  launch. Charged spherical launches receive scalar field data only; charged
+  rectangular launches read the validated caller-owned `(3,)` vector by
+  identity, without copying or mutating it.
 - **Shipped P2:** private `@wp.func` helpers implement the fp64 Coulomb
   self-potential ratio and image enhancement with CPU-equivalent clipping and
   exact zero-charge identity. Independent NumPy/Warp parity and clipping tests
@@ -30,10 +35,12 @@ neutral execution path remains unchanged.
   finite nonnegative charged coefficients with CPU-equivalent sanitization.
   Independent tests cover ordinary, zero, guard-boundary, and defensive
   nonfinite/overflow lanes in `wall_loss_funcs_test.py`.
-- **Deferred P4-P5:** direct-kernel use of the P2/P3 helpers, integrated CPU
-  coefficient parity, and stochastic charged-physics validation.
 - Integration with E6-F3's active predicate, fixed-shape removal clearing,
   environment normalization, preflight ordering, and caller-owned RNG lifecycle.
+- **Implemented P4 (#1412):** active eligible slots draw at most once; selected
+  slots clear all mass lanes, concentration, and charge. Nonpositive composed
+  rates consume no draw; saturated charged coefficients use the charged
+  survival-draw path, unlike the neutral positive-infinity shortcut.
 - **Deferred P5:** Warp CPU deterministic coefficient parity, predeclared
   statistical survival bounds, and optional CUDA execution with clean skips.
 - Focused support/deferred documentation and direct-kernel import coverage.
@@ -41,8 +48,8 @@ neutral execution path remains unchanged.
 ## Out of Scope
 
 - Changes to the CPU charged or neutral wall-loss equations or public strategy.
-- Public exports/API, direct-kernel integration, configuration/preflight
-  changes, potential/field composition, or RNG changes for P2.
+- Public exports/API, a second direct-step entry point, container schema
+  changes, hidden transfer/fallback, or a separate RNG stream.
 - Discrete/continuous distributions, a GPU `Runnable`, backend selection,
   scheduling, adaptive stepping, multi-box transport, or process composition.
 - Dynamic particle allocation, resizing, compaction, activation, resampling, or
