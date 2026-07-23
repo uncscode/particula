@@ -5192,6 +5192,8 @@
       
         
       
+        
+      
     
     
     
@@ -5308,6 +5310,34 @@
     
   
     particula.gpu.kernels.condensation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API/particula/gpu/kernels/dilution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.dilution
   
 
     
@@ -15542,9 +15572,11 @@ and <code>GasSpecies</code> remain available for compatibility.</p>
   downstream work (see <a href="#environmentdata-container">EnvironmentData Container</a>).</li>
 <li><code>ParticleData.density</code> is shaped <code>(n_species,)</code> and shared across boxes, so
   boxes at different temperatures cannot carry per-box densities.</li>
-<li>Dilution exists only as free functions (<code>get_volume_dilution_coefficient</code>,
-  <code>get_dilution_rate</code>); there is no <code>Dilution</code> strategy or runnable even on
-  the CPU side, so GPU dilution has no process-level CPU reference yet.</li>
+<li>E6-F1 ships the CPU finite-step dilution oracle and E6-F2 ships P1–P4 direct
+  GPU dilution. Import the low-level operation with
+  <code>from particula.gpu.kernels import dilution_step_gpu</code>; this is not a
+  high-level process or runnable reference. E6-F9 remains the planned
+  integrated direct-call consumer.</li>
 </ul>
 <h3 id="warp-gpu-backend">Warp GPU Backend<a class="headerlink" href="#warp-gpu-backend" title="Permanent link">&para;</a></h3>
 <p>The lower-level Warp backend is implemented and covered by targeted tests.</p>
@@ -15598,8 +15630,26 @@ high-level dynamics workflows.</p>
 <li>CPU sedimentation coagulation and simple turbulent shear coagulation exist.
   The shipped GPU paths do not establish CPU-strategy parity; DNS and general
   turbulence remain deferred from the near-term GPU scope.</li>
-<li>Wall loss, dilution, and other dynamics processes are CPU-only today. They
-  need GPU implementations before a full simulation can remain GPU-resident for
+<li>Direct GPU dilution is shipped as a fixed-shape, caller-owned kernel. It
+  is imported with <code>from particula.gpu.kernels import dilution_step_gpu</code>.
+  E6-F1 supplies its upstream CPU finite-step oracle and E6-F9 remains its
+  future integrated direct-call consumer. It accepts a finite nonnegative scalar
+  coefficient or a same-device
+  <code>wp.float64</code> <code>(n_boxes,)</code> coefficient array, returns the same particle and
+  gas containers, and mutates only concentration fields in place. Callers own
+   CPU↔Warp transfer, device placement, and synchronization; there is no hidden
+   transfer or fallback. Complete ordered preflight may run validation scans that
+   allocate or launch, but rejected calls have no update launch or caller
+   mutation. A scalar-zero coefficient or zero time step completes preflight then returns
+  as a write-free, no-update-kernel no-op; validation scans may still allocate
+  or launch. Independent
+  float64 particle and gas comparisons on Warp CPU use <code>rtol=1e-12, atol=0</code>;
+  CUDA rows are optional and skip cleanly when unavailable. This is
+  tolerance-based evidence, not bitwise equality.</li>
+<li>GPU runnable and process orchestration, backend selection/fallback policy,
+  scheduling, GPU-resident timestep integration, wall loss, nucleation,
+  resizing, graph capture, autodiff, and performance work remain future scope.
+  Those items are needed before a full simulation can remain GPU-resident for
   every timestep.</li>
 <li>Direct GPU condensation supports ideal/kappa water activity and
   static/composition-weighted surface tension through fixed-shape,
@@ -17122,12 +17172,27 @@ Epic D carry-forward walkthrough and ownership record are published.</p>
 GPU-resident between checkpoints — dilution, wall loss, and nucleation —
 plus the fixed-slot particle management that nucleation and graph capture
 depend on.</p>
-<p>Planned features:</p>
+<p>Delivered dilution scope:</p>
+<ul>
+<li>E6-F1 provides the CPU finite-step oracle and E6-F2 delivers the P1–P4
+  direct GPU kernel: <code>from particula.gpu.kernels import dilution_step_gpu</code>.
+  It is a low-level, fixed-shape operation, not a GPU process or runnable.</li>
+<li>Callers own CPU↔Warp transfer, device placement, and synchronization. The
+  kernel accepts finite nonnegative scalar or same-device <code>wp.float64</code>
+  <code>(n_boxes,)</code> coefficients, returns the same containers, and mutates only
+  particle and gas concentrations in place.</li>
+<li>Ordered complete preflight is read-only; scalar-zero and zero-time calls are
+  fully preflighted write-free, no-update-kernel no-ops, though validation
+  scans may still allocate or launch.
+  Particle and gas parity evidence uses independent Warp CPU float64 checks at
+  <code>rtol=1e-12, atol=0</code>; CUDA is optional and skips cleanly when unavailable.
+  It is not bitwise parity. E6-F9 is the future integrated direct-call
+  consumer.</li>
+</ul>
+<p>Future features:</p>
 <ol>
-<li>CPU <code>Dilution</code> strategy/runnable reference implementation (today dilution
-   exists only as free functions, so GPU dilution has no process-level CPU
-   reference).</li>
-<li>GPU dilution kernel with parity tests against the CPU reference.</li>
+<li>GPU process orchestration, backend selection/fallback policy, scheduling,
+   and GPU-resident timestep integration for the delivered direct kernel.</li>
 <li>GPU neutral wall loss (spherical/rectangular) with parity tests.</li>
 <li>GPU charged wall loss, after neutral wall loss and the core condensation
    and coagulation GPU paths are stable.</li>
@@ -17142,6 +17207,8 @@ depend on.</p>
 <li>Slot and conservation validation: tests for inactive slots, activation,
    slot exhaustion handling, and conservation across resampling or volume
    scaling.</li>
+<li>Fixed-shape GPU workflow extensions: resizing policy, graph capture,
+   autodiff, and performance evidence.</li>
 </ol>
 <h3 id="particle-slot-management">Particle Slot Management<a class="headerlink" href="#particle-slot-management" title="Permanent link">&para;</a></h3>
 <ul>

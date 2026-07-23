@@ -5192,6 +5192,8 @@
       
         
       
+        
+      
     
     
     
@@ -5308,6 +5310,34 @@
     
   
     particula.gpu.kernels.condensation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../API/particula/gpu/kernels/dilution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.dilution
   
 
     
@@ -14464,7 +14494,9 @@
 <li>Create a new issue on GitHub and assign it to yourself.</li>
 <li>Create a branch on your forked repo for this issue.</li>
 <li>Add a new function(s) to the appropriate module in particula/<area>/.</li>
-<li>If the module is new, add it to <code>__init__.py</code>.</li>
+<li>Add a package <code>__init__.py</code> export only when the function is an approved
+      public API. Concrete, staged, or internal-module contracts may deliberately
+      remain unexported.</li>
 <li>If the function is a helper, add prefix <code>_</code> to the function name.</li>
 <li>Write a docstring.</li>
 <li>Add type hints for all parameters and return values.</li>

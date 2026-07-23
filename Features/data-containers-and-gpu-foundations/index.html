@@ -5192,6 +5192,8 @@
       
         
       
+        
+      
     
     
     
@@ -5308,6 +5310,34 @@
     
   
     particula.gpu.kernels.condensation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/gpu/kernels/dilution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.dilution
   
 
     
@@ -11464,6 +11494,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#direct-gpu-dilution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct GPU dilution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particle-transfer-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -14665,6 +14706,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#direct-gpu-dilution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct GPU dilution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particle-transfer-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -15063,6 +15115,34 @@ validation may synchronize and read back status to surface invalid values.</p>
 <li>Do not expect top-level <code>particula.gpu</code> to re-export
   <code>condensation_step_gpu</code> or <code>coagulation_step_gpu</code>.</li>
 </ul>
+<h3 id="direct-gpu-dilution">Direct GPU dilution<a class="headerlink" href="#direct-gpu-dilution" title="Permanent link">&para;</a></h3>
+<p>Import the direct dilution operation from the low-level kernel namespace:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">dilution_step_gpu</span>
+</code></pre></div>
+<p>This is distinct from the CPU↔Warp transfer helpers in <code>particula.gpu</code>.
+Callers own conversion, device placement, synchronization and checkpoint
+transfer, and the <code>WarpParticleData</code> and <code>WarpGasData</code> instances. The kernel
+does not provide hidden transfer or CPU fallback.</p>
+<p><code>dilution_step_gpu</code> is a fixed-shape, caller-owned in-place operation. It
+returns the same particle and gas objects and changes only their
+<code>concentration</code> fields; masses and every other caller-owned particle or gas
+field remain unchanged. It applies <code>alpha = Q / V</code> in <code>s^-1</code> and
+<code>c_new = c * exp(-alpha * time_step)</code>. The coefficient is either a finite,
+nonnegative scalar or a caller-owned, same-device <code>wp.float64</code> Warp array with
+shape <code>(n_boxes,)</code>.</p>
+<p>Entry preflight is ordered and read-only. Rejected calls are atomic before
+kernel launch. A zero scalar coefficient or zero time step completes full
+preflight and is a write-free, no-update-kernel no-op; preflight validation
+scans may still allocate or launch. The contract does not promise rollback
+after a launched-kernel failure.</p>
+<p>E6-F1 supplies the upstream CPU finite-step oracle; E6-F9 is the planned
+integrated direct-call consumer. Independent NumPy comparisons of particle and
+gas concentrations run on Warp CPU with float64 <code>rtol=1e-12, atol=0</code>; CUDA is
+optional and skips cleanly when unavailable. This tolerance-based evidence is
+not bitwise parity.</p>
+<p>GPU runnable or process orchestration, backend selection and scheduling,
+GPU-resident timestep integration, resizing, graph capture, autodiff,
+performance claims, wall loss, and nucleation remain deferred.</p>
 <h3 id="particle-transfer-boundary">Particle transfer boundary<a class="headerlink" href="#particle-transfer-boundary" title="Permanent link">&para;</a></h3>
 <p><code>WarpParticleData</code> is the explicit Warp mirror for <code>ParticleData</code>. Use the
 helper boundary when particle-resident arrays must move between CPU-owned

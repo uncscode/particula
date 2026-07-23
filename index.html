@@ -5506,6 +5506,8 @@
       
         
       
+        
+      
     
     
     
@@ -5622,6 +5624,34 @@
     
   
     particula.gpu.kernels.condensation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="API/particula/gpu/kernels/dilution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.dilution
   
 
     
@@ -14884,12 +14914,31 @@
 <li><a href="Features/wall_loss_strategy_system/">Wall loss strategy system</a> — chamber
   wall loss strategies with builders, factory, and runnable integration.</li>
 <li><a href="Features/dilution_strategy_system/">CPU dilution strategy system</a> —
-  construct supported processes with <code>par.dynamics.DilutionStrategy(coefficient)</code>
-  and <code>par.dynamics.Dilution(strategy)</code>. The concrete helper boundary remains:
-  <code>dilute_aerosol</code> and <code>get_dilution_step</code> are concrete-module-only helpers,
-  not <code>particula.dynamics</code> public APIs. Run the
-  <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py">public API source example</a>
-  with <code>python docs/Examples/cpu_dilution.py</code>.</li>
+   construct supported processes with <code>par.dynamics.DilutionStrategy(coefficient)</code>
+   and <code>par.dynamics.Dilution(strategy)</code>. The concrete helper boundary remains:
+   <code>dilute_aerosol</code> and <code>get_dilution_step</code> are concrete-module-only helpers,
+   not <code>particula.dynamics</code> public APIs. Run the
+   <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py">public API source example</a>
+   with <code>python docs/Examples/cpu_dilution.py</code>.</li>
+<li>GPU dilution P1–P4 is a direct, low-level operation imported with
+   <code>from particula.gpu.kernels import dilution_step_gpu</code>. It applies
+   <code>c_new = c * exp(-alpha * time_step)</code> in place to particle and gas
+   concentrations, where <code>alpha = Q / V</code> <code>[s^-1]</code>, returns the identical
+   containers, and preserves all other caller-owned fields. Callers own
+   CPU↔Warp transfers, device placement, and synchronization; there is no hidden
+   transfer or CPU fallback. Coefficients are finite nonnegative scalars or
+   same-device <code>wp.float64</code> Warp arrays shaped <code>(n_boxes,)</code>. Deterministic,
+   read-only preflight may run validation scans that allocate or launch, but
+   invalid calls have no update-kernel launch or caller mutation. Scalar-zero
+   coefficients and zero time steps complete preflight and
+   are write-free, no-update-kernel no-ops; validation scans may still allocate
+   or launch. Warp CPU float64
+   particle and gas comparisons use <code>rtol=1e-12, atol=0</code>; CUDA is optional and
+   skips cleanly when unavailable. This is tolerance-based evidence, not
+   bitwise parity. GPU runnables, orchestration, resizing, graph capture,
+   autodiff, and performance claims remain deferred. See
+   <a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
+   for the complete contract.</li>
 <li><a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
   — canonical reference for <code>ParticleData</code>, <code>GasData</code>, <code>EnvironmentData</code>,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
