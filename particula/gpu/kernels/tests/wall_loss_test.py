@@ -1,4 +1,4 @@
-"""Tests for fixed-shape GPU neutral wall-loss P5 execution."""
+"""Tests for fixed-shape GPU neutral and charged wall-loss execution."""
 
 from __future__ import annotations
 
@@ -56,7 +56,7 @@ def _config(geometry: str = "spherical"):
 
 
 def _charged_config(geometry: str = "spherical", device: str = "cpu"):
-    """Build one valid P1 charged configuration without adding charged physics."""
+    """Build one valid charged configuration with caller-owned field state."""
     wp = _warp()
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
 
@@ -374,18 +374,16 @@ def test_neutral_mode_rejects_rectangular_warp_field_before_particles() -> None:
 
 
 @pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
-@pytest.mark.parametrize("charge", [0.0, 2.0, -3.0])
-def test_charged_mode_matches_neutral_execution_for_finite_charge(
+def test_zero_charge_charged_mode_matches_neutral_execution(
     geometry: str,
-    charge: float,
 ) -> None:
-    """P1 charged mode keeps every finite charge on the neutral path exactly."""
+    """Zero-charge charged slots retain the exact neutral path and RNG state."""
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
     neutral_particles = _particles()
     charged_particles = _particles()
-    charges = np.full((2, 2), charge, dtype=np.float64)
+    charges = np.zeros((2, 2), dtype=np.float64)
     neutral_particles.charge = wp.array(charges, dtype=wp.float64, device="cpu")
     charged_particles.charge = wp.array(charges, dtype=wp.float64, device="cpu")
     neutral_rng = wp.array([7, 11], dtype=wp.uint32, device="cpu")
@@ -1528,23 +1526,15 @@ def test_all_ineligible_positive_time_preserves_rng_state() -> None:
 
 
 @pytest.mark.stochastic
-def test_all_ineligible_positive_time_explicitly_resets_rng_state() -> None:
-    """An explicit reset initializes state without changing ineligible slots."""
+def test_all_ineligible_positive_time_does_not_reset_rng_state() -> None:
+    """An explicit reset request is ignored when no slot can consume a draw."""
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
-    from particula.gpu.kernels.wall_loss import _initialize_rng_states
 
     particles = _particles()
     particles.concentration = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
     states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
-    particle_snapshot = _snapshot(particles)
-    expected_states = wp.empty(2, dtype=wp.uint32, device="cpu")
-    wp.launch(
-        _initialize_rng_states,
-        dim=2,
-        inputs=[41, expected_states],
-        device="cpu",
-    )
+    snapshot = _snapshot(particles, states)
 
     returned = wall_loss_step_gpu(
         particles,
@@ -1558,8 +1548,7 @@ def test_all_ineligible_positive_time_explicitly_resets_rng_state() -> None:
     )
 
     assert returned is particles
-    _assert_snapshot_unchanged(particles, particle_snapshot)
-    npt.assert_array_equal(states.numpy(), expected_states.numpy())
+    _assert_snapshot_unchanged(particles, snapshot, states)
 
 
 @pytest.mark.stochastic
@@ -1619,6 +1608,314 @@ def test_rng_state_consumes_only_eligible_slots() -> None:
     npt.assert_array_equal(
         candidate.charge.numpy()[0, 1:], candidate_snapshot["charge"][1][0, 1:]
     )
+
+
+def _nanoparticle(charge: float = 1.0) -> SimpleNamespace:
+    """Create one active 1 nm particle with explicit float64 storage."""
+    wp = _warp()
+    radius = 1.0e-9
+    mass = 4.0 * np.pi * radius**3 * 1000.0 / 3.0
+    return SimpleNamespace(
+        masses=wp.array([[[mass]]], dtype=wp.float64, device="cpu"),
+        concentration=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
+        charge=wp.array([[charge]], dtype=wp.float64, device="cpu"),
+        density=wp.array([1000.0], dtype=wp.float64, device="cpu"),
+        volume=wp.array([1.0], dtype=wp.float64, device="cpu"),
+    )
+
+
+def _charged_dispatch_config(
+    geometry: str,
+    *,
+    potential: float = 0.0,
+    field: float = 0.0,
+) -> Any:
+    """Create one charged public-step configuration for dispatch tests."""
+    wp = _warp()
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    if geometry == "spherical":
+        return NeutralWallLossConfig(
+            "spherical",
+            0.01,
+            chamber_radius=1.0,
+            mode="charged",
+            wall_potential=potential,
+            wall_electric_field=field,
+        )
+    return NeutralWallLossConfig(
+        "rectangular",
+        0.01,
+        chamber_dimensions=(1.0, 2.0, 3.0),
+        mode="charged",
+        wall_potential=potential,
+        wall_electric_field=wp.array(
+            [field, 0.0, 0.0], dtype=wp.float64, device="cpu"
+        ),
+    )
+
+
+@pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
+def test_charged_image_only_dispatch_removes_when_neutral_control_survives(
+    geometry: str,
+) -> None:
+    """Nonzero charge wires image enhancement through both public geometries."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    neutral = _nanoparticle(charge=0.0)
+    charged = _nanoparticle(charge=3.0)
+    neutral_states = wp.array([17], dtype=wp.uint32, device="cpu")
+    charged_states = wp.array([17], dtype=wp.uint32, device="cpu")
+    neutral_before = _snapshot(neutral, neutral_states)
+    charged_before = _snapshot(charged, charged_states)
+
+    wall_loss_step_gpu(
+        neutral,
+        298.15,
+        101325.0,
+        10.0,
+        config=_config(geometry),
+        rng_states=neutral_states,
+    )
+    wall_loss_step_gpu(
+        charged,
+        298.15,
+        101325.0,
+        10.0,
+        config=_charged_dispatch_config(geometry),
+        rng_states=charged_states,
+    )
+
+    npt.assert_array_equal(neutral.masses.numpy(), neutral_before["masses"][1])
+    npt.assert_array_equal(
+        neutral.concentration.numpy(), neutral_before["concentration"][1]
+    )
+    npt.assert_array_equal(charged.masses.numpy(), 0.0)
+    npt.assert_array_equal(charged.concentration.numpy(), 0.0)
+    npt.assert_array_equal(charged.charge.numpy(), 0.0)
+    assert not np.array_equal(
+        neutral_states.numpy(), neutral_before["rng_states"][1]
+    )
+    assert not np.array_equal(
+        charged_states.numpy(), charged_before["rng_states"][1]
+    )
+
+
+@pytest.mark.parametrize(
+    ("charge", "potential", "removes"),
+    [
+        (1.0, 1.0e100, True),
+        (1.0, -1.0e100, False),
+        (-1.0, -1.0e100, True),
+        (-1.0, 1.0e100, False),
+    ],
+)
+def test_charged_spherical_potential_and_charge_sign_control_draws(
+    charge: float,
+    potential: float,
+    removes: bool,
+) -> None:
+    """Spherical signed potential drift removes only aligned charge lanes."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _nanoparticle(charge=charge)
+    states = wp.array([23], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, states)
+    wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        1.0,
+        config=_charged_dispatch_config("spherical", potential=potential),
+        rng_states=states,
+    )
+
+    if removes:
+        npt.assert_array_equal(particles.masses.numpy(), 0.0)
+        npt.assert_array_equal(particles.concentration.numpy(), 0.0)
+        npt.assert_array_equal(particles.charge.numpy(), 0.0)
+        assert not np.array_equal(states.numpy(), snapshot["rng_states"][1])
+    else:
+        _assert_snapshot_unchanged(particles, snapshot, states)
+
+
+@pytest.mark.parametrize("lane", [0, 1, 2], ids=["x", "y", "z"])
+def test_charged_rectangular_field_vector_lanes_drive_public_step(
+    lane: int,
+) -> None:
+    """Each rectangular field lane produces aligned drift through dispatch."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    field_values = np.zeros(3, dtype=np.float64)
+    field_values[lane] = 1.0e6
+    field = wp.array(field_values, dtype=wp.float64, device="cpu")
+    config = NeutralWallLossConfig(
+        "rectangular",
+        0.01,
+        chamber_dimensions=(1.0, 2.0, 3.0),
+        mode="charged",
+        wall_electric_field=field,
+    )
+    particles = _nanoparticle(charge=1.0)
+    states = wp.array([29], dtype=wp.uint32, device="cpu")
+    field_before = field.numpy().copy()
+
+    wall_loss_step_gpu(
+        particles, 298.15, 101325.0, 1.0, config=config, rng_states=states
+    )
+
+    npt.assert_array_equal(particles.masses.numpy(), 0.0)
+    npt.assert_array_equal(particles.concentration.numpy(), 0.0)
+    npt.assert_array_equal(particles.charge.numpy(), 0.0)
+    assert config.wall_electric_field is field
+    npt.assert_array_equal(field.numpy(), field_before)
+
+
+def test_charged_rectangular_zero_vector_uses_image_only_draw_path() -> None:
+    """A zero rectangular vector leaves image-only survival stochastic."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _nanoparticle(charge=1.0)
+    states = wp.array([29], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, states)
+    config = _charged_dispatch_config("rectangular")
+    field = config.wall_electric_field
+    field_before = field.numpy().copy()
+
+    wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        np.nextafter(0.0, 1.0),
+        config=config,
+        rng_states=states,
+    )
+
+    npt.assert_array_equal(particles.masses.numpy(), snapshot["masses"][1])
+    npt.assert_array_equal(
+        particles.concentration.numpy(), snapshot["concentration"][1]
+    )
+    npt.assert_array_equal(particles.charge.numpy(), snapshot["charge"][1])
+    assert not np.array_equal(states.numpy(), snapshot["rng_states"][1])
+    assert config.wall_electric_field is field
+    npt.assert_array_equal(field.numpy(), field_before)
+
+
+def test_charged_rectangular_signed_potential_clips_opposing_vector_drift() -> (
+    None
+):
+    """A signed rectangular potential can oppose the vector field without a draw."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    field = wp.array([1.0e100, 0.0, 0.0], dtype=wp.float64, device="cpu")
+    config = NeutralWallLossConfig(
+        "rectangular",
+        0.01,
+        chamber_dimensions=(1.0, 2.0, 3.0),
+        mode="charged",
+        wall_potential=-2.0e100,
+        wall_electric_field=field,
+    )
+    particles = _nanoparticle(charge=1.0)
+    states = wp.array([31], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, states)
+
+    wall_loss_step_gpu(
+        particles, 298.15, 101325.0, 1.0, config=config, rng_states=states
+    )
+
+    _assert_snapshot_unchanged(particles, snapshot, states)
+    assert config.wall_electric_field is field
+    npt.assert_array_equal(field.numpy(), [1.0e100, 0.0, 0.0])
+
+
+@pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
+def test_charged_saturated_coefficient_consumes_rng_before_removal(
+    geometry: str,
+) -> None:
+    """Charged saturation uses a survival draw rather than neutral infinity."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    tiny_dimension = np.nextafter(0.0, 1.0)
+    field = (
+        0.0
+        if geometry == "spherical"
+        else wp.zeros(3, dtype=wp.float64, device="cpu")
+    )
+    config = (
+        NeutralWallLossConfig(
+            "spherical",
+            0.01,
+            chamber_radius=tiny_dimension,
+            mode="charged",
+            wall_electric_field=field,
+        )
+        if geometry == "spherical"
+        else NeutralWallLossConfig(
+            "rectangular",
+            0.01,
+            chamber_dimensions=(tiny_dimension, 1.0, 1.0),
+            mode="charged",
+            wall_electric_field=field,
+        )
+    )
+    particles = _nanoparticle(charge=1.0)
+    states = wp.array([31], dtype=wp.uint32, device="cpu")
+    before = _snapshot(particles, states)
+
+    wall_loss_step_gpu(
+        particles, 298.15, 101325.0, 1.0, config=config, rng_states=states
+    )
+
+    npt.assert_array_equal(particles.masses.numpy(), 0.0)
+    npt.assert_array_equal(particles.concentration.numpy(), 0.0)
+    npt.assert_array_equal(particles.charge.numpy(), 0.0)
+    assert not np.array_equal(states.numpy(), before["rng_states"][1])
+
+
+@pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
+def test_charged_all_inactive_positive_time_preserves_requested_rng_reset(
+    geometry: str,
+) -> None:
+    """Charged all-inactive calls leave supplied sidecars untouched."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _nanoparticle(charge=-2.0)
+    particles.concentration = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    states = wp.array([37], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, states)
+    config = _charged_dispatch_config(geometry)
+    field = config.wall_electric_field
+    field_before = field.numpy().copy() if hasattr(field, "numpy") else field
+
+    assert (
+        wall_loss_step_gpu(
+            particles,
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+            rng_seed=99,
+            rng_states=states,
+            initialize_rng=True,
+        )
+        is particles
+    )
+
+    _assert_snapshot_unchanged(particles, snapshot, states)
+    if hasattr(field, "numpy"):
+        assert config.wall_electric_field is field
+        npt.assert_array_equal(field.numpy(), field_before)
 
 
 @pytest.mark.benchmark

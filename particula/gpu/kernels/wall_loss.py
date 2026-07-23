@@ -1,11 +1,11 @@
 """Apply bounded direct GPU wall loss to fixed particle slots.
 
-This concrete direct-kernel boundary supports particle-resolved neutral wall
-loss and P1 charged-configuration validation. Charged mode deliberately retains
-the neutral coefficient and random-number path until charged physics is added.
-Its potential and electric-field inputs are validated only; a charged
-rectangular field is caller-owned same-device ``wp.float64`` storage with shape
-``(3,)`` and is never read by the removal kernel or mutated.
+This concrete direct-kernel boundary supports particle-resolved neutral and
+charged wall loss. Charged execution composes private image-charge and
+electric-field helpers only for nonzero charge; zero-charge charged slots keep
+the exact neutral coefficient and random-number path. A charged rectangular
+field is caller-owned same-device ``wp.float64`` storage with shape ``(3,)``;
+it is read only by the charged rectangular removal kernel and is never mutated.
 It retains P3's read-only preflight ordering and uses sequential per-box random
 number generation for eligible fixed slots.
 An omitted RNG sidecar is private and seeded for each successful positive-time
@@ -32,6 +32,12 @@ except ImportError as exc:  # pragma: no cover - handled by test guards
     ) from exc
 
 from particula.gpu.dynamics.wall_loss_funcs import (
+    _combine_charged_wall_loss_coefficient_wp,
+    _electric_field_drift_wp,
+    _geometry_scale_wp,
+    _image_charge_enhancement_wp,
+    _resolve_rectangular_electric_field_wp,
+    _resolve_spherical_electric_field_wp,
     rectangle_wall_loss_coefficient_wp,
     spherical_wall_loss_coefficient_wp,
 )
@@ -46,6 +52,8 @@ from particula.gpu.properties import (
 )
 from particula.util.constants import (
     BOLTZMANN_CONSTANT,
+    ELECTRIC_PERMITTIVITY,
+    ELEMENTARY_CHARGE_VALUE,
     GAS_CONSTANT,
     MOLECULAR_WEIGHT_AIR,
     REF_TEMPERATURE_STP,
@@ -59,18 +67,20 @@ _MOLECULAR_WEIGHT_AIR = wp.constant(wp.float64(MOLECULAR_WEIGHT_AIR))
 _REF_VISCOSITY_AIR_STP = wp.constant(wp.float64(REF_VISCOSITY_AIR_STP))
 _REF_TEMPERATURE_STP = wp.constant(wp.float64(REF_TEMPERATURE_STP))
 _SUTHERLAND_CONSTANT = wp.constant(wp.float64(SUTHERLAND_CONSTANT))
+_ELEMENTARY_CHARGE_VALUE = wp.constant(wp.float64(ELEMENTARY_CHARGE_VALUE))
+_ELECTRIC_PERMITTIVITY = wp.constant(wp.float64(ELECTRIC_PERMITTIVITY))
 
 
 @dataclass(frozen=True)
 class NeutralWallLossConfig:
-    """Define immutable direct wall-loss geometry and P1 charged inputs.
+    """Define immutable direct wall-loss geometry and charged inputs.
 
     This concrete-module-only configuration is accepted by the direct P5
     boundary, which retains frozen P3 preflight. ``geometry`` selects spherical
     or rectangular SI dimensions, while ``distribution_type`` must remain
     ``"particle_resolved"``. ``mode`` is ``"neutral"`` or ``"charged"``.
-    Charged P1 values are validation-only: execution retains neutral P5
-    coefficients and stochastic behavior. Import this concrete configuration
+    Charged execution composes private image and drift helpers for nonzero
+    charges. Import this concrete configuration
     from ``particula.gpu.kernels.wall_loss``. A charged rectangular electric
     field is caller-owned device storage and is never replaced or mutated.
 
@@ -83,8 +93,8 @@ class NeutralWallLossConfig:
             dimensions [m]; required only for rectangular geometry.
         distribution_type: Required ``"particle_resolved"`` representation
             selector.
-        mode: ``"neutral"`` or validation-only ``"charged"`` mode. Charged
-            mode still executes the neutral P5 coefficient and RNG path.
+        mode: ``"neutral"`` or ``"charged"`` execution mode. Zero-charge
+            charged slots retain the neutral coefficient and RNG path.
         wall_potential: Finite signed wall potential [V].
         wall_electric_field: Finite signed spherical scalar field [V m^-1], or
             caller-owned same-device charged rectangular ``wp.float64`` vector
@@ -591,6 +601,244 @@ def _wall_loss_removal_mask(
 
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+def _scan_usable_wall_loss_slots(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    usable: wp.array(dtype=wp.int32),
+) -> None:
+    """Record whether a box has an active slot with usable mass and volume."""
+    box = wp.tid()
+    for particle in range(n_particles):
+        if concentration[box, particle] <= wp.float64(0.0):
+            continue
+        total_mass = wp.float64(0.0)
+        total_volume = wp.float64(0.0)
+        for species in range(n_species):
+            mass = masses[box, particle, species]
+            total_mass += mass
+            total_volume += mass / density[species]
+        if total_mass > wp.float64(0.0) and total_volume > wp.float64(0.0):
+            wp.atomic_add(usable, 0, 1)
+
+
+@no_type_check
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+def _charged_spherical_wall_loss_removal_mask(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_radius: wp.float64,
+    wall_potential: wp.float64,
+    wall_electric_field: wp.float64,
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_states: wp.array(dtype=wp.uint32),
+    removal_mask: wp.array2d(dtype=wp.int32),
+) -> None:
+    """Calculate charged spherical removal flags without caller mutation."""
+    box = wp.tid()
+    state = rng_states[box]
+    geometry_scale = _geometry_scale_wp(
+        wp.int32(0),
+        chamber_radius,
+        wp.float64(0.0),
+        wp.float64(0.0),
+        wp.float64(0.0),
+    )
+    resolved_field = _resolve_spherical_electric_field_wp(
+        wall_electric_field, wall_potential, geometry_scale
+    )
+    for particle in range(n_particles):
+        if concentration[box, particle] <= wp.float64(0.0):
+            continue
+        total_mass = wp.float64(0.0)
+        total_volume = wp.float64(0.0)
+        for species in range(n_species):
+            mass = masses[box, particle, species]
+            total_mass += mass
+            total_volume += mass / density[species]
+        if total_mass <= wp.float64(0.0) or total_volume <= wp.float64(0.0):
+            continue
+        particle_radius = particle_radius_from_volume_wp(total_volume)
+        particle_density = effective_density_wp(total_mass, total_volume)
+        if (
+            not wp.isfinite(particle_radius)
+            or particle_radius <= wp.float64(0.0)
+            or not wp.isfinite(particle_density)
+            or particle_density <= wp.float64(0.0)
+        ):
+            continue
+        neutral_coefficient = spherical_wall_loss_coefficient_wp(
+            wall_eddy_diffusivity,
+            particle_radius,
+            particle_density,
+            temperature[box],
+            pressure[box],
+            chamber_radius,
+            _BOLTZMANN_CONSTANT,
+            _GAS_CONSTANT,
+            _MOLECULAR_WEIGHT_AIR,
+            _REF_VISCOSITY_AIR_STP,
+            _REF_TEMPERATURE_STP,
+            _SUTHERLAND_CONSTANT,
+        )
+        coefficient = neutral_coefficient
+        particle_charge = charge[box, particle]
+        if particle_charge != wp.float64(0.0):
+            enhancement = _image_charge_enhancement_wp(
+                particle_radius,
+                particle_charge,
+                temperature[box],
+                _ELEMENTARY_CHARGE_VALUE,
+                _ELECTRIC_PERMITTIVITY,
+                _BOLTZMANN_CONSTANT,
+            )
+            drift = _electric_field_drift_wp(
+                particle_radius,
+                particle_charge,
+                temperature[box],
+                resolved_field,
+                geometry_scale,
+                _ELEMENTARY_CHARGE_VALUE,
+                _REF_VISCOSITY_AIR_STP,
+                _REF_TEMPERATURE_STP,
+                _SUTHERLAND_CONSTANT,
+            )
+            coefficient = _combine_charged_wall_loss_coefficient_wp(
+                neutral_coefficient, enhancement, drift
+            )
+        if wp.isnan(coefficient) or coefficient <= wp.float64(0.0):
+            continue
+        if particle_charge == wp.float64(0.0) and wp.isinf(coefficient):
+            removal_mask[box, particle] = wp.int32(1)
+            continue
+        if _should_remove_for_survival_draw(
+            wp.randf(state), wp.exp(-coefficient * time_step)
+        ):
+            removal_mask[box, particle] = wp.int32(1)
+    rng_states[box] = state
+
+
+@no_type_check
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+def _charged_rectangular_wall_loss_removal_mask(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_length: wp.float64,
+    chamber_width: wp.float64,
+    chamber_height: wp.float64,
+    wall_potential: wp.float64,
+    wall_electric_field: wp.array(dtype=wp.float64),
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_states: wp.array(dtype=wp.uint32),
+    removal_mask: wp.array2d(dtype=wp.int32),
+) -> None:
+    """Calculate charged rectangular removal flags without caller mutation."""
+    box = wp.tid()
+    state = rng_states[box]
+    geometry_scale = _geometry_scale_wp(
+        wp.int32(1),
+        wp.float64(0.0),
+        chamber_length,
+        chamber_width,
+        chamber_height,
+    )
+    resolved_field = _resolve_rectangular_electric_field_wp(
+        wall_electric_field[0],
+        wall_electric_field[1],
+        wall_electric_field[2],
+        wall_potential,
+        geometry_scale,
+    )
+    for particle in range(n_particles):
+        if concentration[box, particle] <= wp.float64(0.0):
+            continue
+        total_mass = wp.float64(0.0)
+        total_volume = wp.float64(0.0)
+        for species in range(n_species):
+            mass = masses[box, particle, species]
+            total_mass += mass
+            total_volume += mass / density[species]
+        if total_mass <= wp.float64(0.0) or total_volume <= wp.float64(0.0):
+            continue
+        particle_radius = particle_radius_from_volume_wp(total_volume)
+        particle_density = effective_density_wp(total_mass, total_volume)
+        if (
+            not wp.isfinite(particle_radius)
+            or particle_radius <= wp.float64(0.0)
+            or not wp.isfinite(particle_density)
+            or particle_density <= wp.float64(0.0)
+        ):
+            continue
+        neutral_coefficient = rectangle_wall_loss_coefficient_wp(
+            wall_eddy_diffusivity,
+            particle_radius,
+            particle_density,
+            temperature[box],
+            pressure[box],
+            chamber_length,
+            chamber_width,
+            chamber_height,
+            _BOLTZMANN_CONSTANT,
+            _GAS_CONSTANT,
+            _MOLECULAR_WEIGHT_AIR,
+            _REF_VISCOSITY_AIR_STP,
+            _REF_TEMPERATURE_STP,
+            _SUTHERLAND_CONSTANT,
+        )
+        coefficient = neutral_coefficient
+        particle_charge = charge[box, particle]
+        if particle_charge != wp.float64(0.0):
+            enhancement = _image_charge_enhancement_wp(
+                particle_radius,
+                particle_charge,
+                temperature[box],
+                _ELEMENTARY_CHARGE_VALUE,
+                _ELECTRIC_PERMITTIVITY,
+                _BOLTZMANN_CONSTANT,
+            )
+            drift = _electric_field_drift_wp(
+                particle_radius,
+                particle_charge,
+                temperature[box],
+                resolved_field,
+                geometry_scale,
+                _ELEMENTARY_CHARGE_VALUE,
+                _REF_VISCOSITY_AIR_STP,
+                _REF_TEMPERATURE_STP,
+                _SUTHERLAND_CONSTANT,
+            )
+            coefficient = _combine_charged_wall_loss_coefficient_wp(
+                neutral_coefficient, enhancement, drift
+            )
+        if wp.isnan(coefficient) or coefficient <= wp.float64(0.0):
+            continue
+        if particle_charge == wp.float64(0.0) and wp.isinf(coefficient):
+            removal_mask[box, particle] = wp.int32(1)
+            continue
+        if _should_remove_for_survival_draw(
+            wp.randf(state), wp.exp(-coefficient * time_step)
+        ):
+            removal_mask[box, particle] = wp.int32(1)
+    rng_states[box] = state
+
+
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
 def _apply_wall_loss_mask(
     masses: wp.array3d(dtype=wp.float64),
     concentration: wp.array2d(dtype=wp.float64),
@@ -619,14 +867,14 @@ def wall_loss_step_gpu(
     initialize_rng: bool = False,
     environment: Any | None = None,
 ) -> Any:
-    """Apply P5 neutral wall loss to eligible particle-resolved slots.
+    """Apply direct neutral or charged wall loss to eligible fixed slots.
 
-    The configuration supports particle-resolved neutral wall loss and charged
-    P1 validation only. SI inputs are wall eddy diffusivity [m^2 s^-1],
+    The configuration supports particle-resolved neutral and charged wall loss.
+    SI inputs are wall eddy diffusivity [m^2 s^-1],
     geometry dimensions [m], potential [V], electric field [V m^-1],
-    temperature [K], pressure [Pa], and ``time_step`` [s]. Charged mode does
-    not yet alter coefficients, drift, or random-number consumption: zero-charge
-    slots with any finite signed charge follow the exact existing neutral
+    temperature [K], pressure [Pa], and ``time_step`` [s]. In charged mode,
+    nonzero charge composes image enhancement and signed field drift with the
+    neutral coefficient. Zero-charge charged slots follow the exact neutral
     coefficient and stochastic path.
     After frozen P3 preflight, positive-time calls evaluate neutral coefficients
     for usable slots, apply survival probability ``exp(-k * time_step)``, and
@@ -639,19 +887,19 @@ def wall_loss_step_gpu(
     caller-owned, advances in place only for eligible slots, and resets only
     when ``initialize_rng=True``. Eligible slots have positive concentration,
     usable positive mass and derived transport properties, and a positive
-    non-NaN wall-loss coefficient. An infinite positive coefficient causes a
-    deterministic removal without consuming RNG state. Zero time and
-    pre-launch validation failures leave supplied state unchanged. Rollback is
-    not promised after a mutation kernel has launched.
+    non-NaN wall-loss coefficient. An infinite positive neutral coefficient
+    causes deterministic removal without consuming RNG state; charged
+    composition saturates to a finite coefficient and consumes its draw. Zero
+    time and pre-launch validation failures leave supplied state unchanged.
+    Rollback is not promised after a mutation kernel has launched.
 
     Args:
         particles: Caller-owned fixed-shape ``WarpParticleData``-like object.
         temperature: Scalar or per-box Warp temperature [K].
         pressure: Scalar or per-box Warp pressure [Pa].
         time_step: Finite nonnegative duration [s].
-        config: Exact concrete geometry, representation, and P1 charged
-            configuration. Charged potential and field inputs are validated but
-            do not change the neutral coefficient or RNG path.
+        config: Exact concrete geometry, representation, and charged
+            configuration. Rectangular fields remain caller-owned storage.
         rng_seed: Unsigned 32-bit seed for private state or an explicit reset.
         rng_states: Optional caller-owned same-device ``uint32`` Warp array
             with shape ``(n_boxes,)``. The array is mutated in place only by
@@ -668,7 +916,7 @@ def wall_loss_step_gpu(
         TypeError: If the configuration, scalar charged input, time step, or
             RNG metadata uses an unsupported type.
         ValueError: If configuration, particle, time-step, environment, or RNG
-            values, shapes, dtypes, or devices violate the P1/P3/P5 contract,
+            values, shapes, dtypes, or devices violate the direct contract,
             including an invalid charged field or combining ``environment``
             with direct environment inputs.
     """
@@ -703,6 +951,24 @@ def wall_loss_step_gpu(
     pressure_array = _normalize_execution_environment_array(
         pressure_array, n_boxes
     )
+    n_particles = particles.masses.shape[1]
+    n_species = particles.masses.shape[2]
+    usable = wp.zeros(1, dtype=wp.int32, device=device)
+    wp.launch(
+        _scan_usable_wall_loss_slots,
+        dim=n_boxes,
+        inputs=[
+            particles.masses,
+            particles.concentration,
+            particles.density,
+            n_particles,
+            n_species,
+            usable,
+        ],
+        device=device,
+    )
+    if usable.numpy()[0] == 0:
+        return particles
     execution_rng_states = rng_states
     if execution_rng_states is None:
         execution_rng_states = wp.empty(n_boxes, dtype=wp.uint32, device=device)
@@ -714,37 +980,84 @@ def wall_loss_step_gpu(
             inputs=[int(rng_seed), execution_rng_states],
             device=device,
         )
-    n_particles = particles.masses.shape[1]
-    n_species = particles.masses.shape[2]
     removal_mask = wp.zeros(
         (n_boxes, n_particles), dtype=wp.int32, device=device
     )
     geometry_mode = 0 if validated_config.geometry == "spherical" else 1
     chamber_radius = float(validated_config.chamber_radius or 0.0)
     dimensions = validated_config.chamber_dimensions or (0.0, 0.0, 0.0)
-    wp.launch(
-        _wall_loss_removal_mask,
-        dim=n_boxes,
-        inputs=[
-            particles.masses,
-            particles.concentration,
-            particles.density,
-            temperature_array,
-            pressure_array,
-            validated_time_step,
-            float(validated_config.wall_eddy_diffusivity),
-            chamber_radius,
-            float(dimensions[0]),
-            float(dimensions[1]),
-            float(dimensions[2]),
-            geometry_mode,
-            n_particles,
-            n_species,
-            execution_rng_states,
-            removal_mask,
-        ],
-        device=device,
-    )
+    if validated_config.mode == "neutral":
+        wp.launch(
+            _wall_loss_removal_mask,
+            dim=n_boxes,
+            inputs=[
+                particles.masses,
+                particles.concentration,
+                particles.density,
+                temperature_array,
+                pressure_array,
+                validated_time_step,
+                float(validated_config.wall_eddy_diffusivity),
+                chamber_radius,
+                float(dimensions[0]),
+                float(dimensions[1]),
+                float(dimensions[2]),
+                geometry_mode,
+                n_particles,
+                n_species,
+                execution_rng_states,
+                removal_mask,
+            ],
+            device=device,
+        )
+    elif validated_config.geometry == "spherical":
+        wp.launch(
+            _charged_spherical_wall_loss_removal_mask,
+            dim=n_boxes,
+            inputs=[
+                particles.masses,
+                particles.concentration,
+                particles.charge,
+                particles.density,
+                temperature_array,
+                pressure_array,
+                validated_time_step,
+                float(validated_config.wall_eddy_diffusivity),
+                chamber_radius,
+                float(validated_config.wall_potential),
+                float(validated_config.wall_electric_field),
+                n_particles,
+                n_species,
+                execution_rng_states,
+                removal_mask,
+            ],
+            device=device,
+        )
+    else:
+        wp.launch(
+            _charged_rectangular_wall_loss_removal_mask,
+            dim=n_boxes,
+            inputs=[
+                particles.masses,
+                particles.concentration,
+                particles.charge,
+                particles.density,
+                temperature_array,
+                pressure_array,
+                validated_time_step,
+                float(validated_config.wall_eddy_diffusivity),
+                float(dimensions[0]),
+                float(dimensions[1]),
+                float(dimensions[2]),
+                float(validated_config.wall_potential),
+                validated_config.wall_electric_field,
+                n_particles,
+                n_species,
+                execution_rng_states,
+                removal_mask,
+            ],
+            device=device,
+        )
     wp.launch(
         _apply_wall_loss_mask,
         dim=(n_boxes, n_particles),
