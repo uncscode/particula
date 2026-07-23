@@ -9,8 +9,10 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-21",
-  "dependencies": ["E6-F3"],
+  "last_updated": "2026-07-23",
+  "dependencies": [
+    "E6-F3"
+  ],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E6-F4/architecture_design.md",
     "change_log": ".opencode/plans/sections/features/E6-F4/change_log.md",
@@ -32,11 +34,11 @@
     {
       "id": "E6-F4-P1",
       "title": "Freeze charged wall-loss configuration and semantics with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-23",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
