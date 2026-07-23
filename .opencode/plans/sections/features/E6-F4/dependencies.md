@@ -30,9 +30,11 @@
 
 ## Phase Ordering
 
-E6-F3 must ship before E6-F4 implementation. Within E6-F4, P1 freezes semantics
-and validation before P2/P3 port image and field physics. P4 integrates those
-terms into E6-F3's mutation path. P5 validates deterministic coefficients,
-neutral fallback, stochastic outcomes, and RNG invariants. P6 is the required
-final documentation phase. Every implementation phase carries co-located tests;
-there is no standalone testing phase.
+The shipped E6-F3 foundation preceded E6-F4 implementation. Within E6-F4, P1
+froze semantics and validation before P2/P3 ported image and field physics. P4
+integrated those terms into E6-F3's mutation path. P5 validated deterministic
+coefficients, neutral fallback, stochastic outcomes, and RNG invariants. P6
+shipped as #1414's documentation-only closeout, preserving E6-F3 as the
+upstream foundation and E6-F9 as the downstream direct-call and
+explicit-transfer consumer. Every implementation phase carries co-located
+tests; there is no standalone testing phase.
