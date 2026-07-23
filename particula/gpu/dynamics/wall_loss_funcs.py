@@ -187,6 +187,8 @@ def rectangle_wall_loss_coefficient_wp(
         mean_free_path,
     )
     transport_scale = wp.sqrt(wall_eddy_diffusivity * diffusion_coefficient)
+    if transport_scale == wp.float64(0.0):
+        return settling_velocity / chamber_height
     x = (
         wp.float64(3.141592653589793)
         * settling_velocity
