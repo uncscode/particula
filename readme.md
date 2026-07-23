@@ -81,11 +81,13 @@ before launch.
 `wall_loss_step_gpu` is the bounded P5 direct, particle-resolved wall-loss
 boundary. Construct `NeutralWallLossConfig` from
 `particula.gpu.kernels.wall_loss`; it is not re-exported. Its validation-only
-`mode="charged"` accepts a finite signed wall potential and either a finite
-signed spherical scalar electric field or a caller-owned, same-device
-`wp.float64` rectangular field with shape `(3,)`. The direct boundary still
-uses the neutral coefficients and RNG path for both modes; charged physics is
-deferred. After frozen preflight, positive-time calls evaluate neutral
+`mode="charged"` is supported for validation and ownership handling. It accepts
+a finite signed wall potential [V] and either a finite signed spherical scalar
+electric field [V/m] or a caller-owned, same-device `wp.float64` rectangular
+field [V/m] with shape `(3,)`. The direct boundary still uses the neutral
+coefficients and RNG path for both modes; image-charge enhancement and
+electric-field drift physics remain deferred. After frozen preflight,
+positive-time calls evaluate neutral
 coefficients and sequentially advance one per-box RNG state for each eligible
 slot before stochastically clearing its mass lanes, concentration, and charge.
 Omitted state is private and seeded per call; supplied same-device `rng_states`
@@ -94,8 +96,9 @@ alone does not reset it. Zero time and preflight failure preserve supplied state
 Sequential per-box RNG advancement limits parallelism and makes no performance
 claim. Test-only coverage compares deterministic coefficients with the CPU
 system-state equations and validates aggregate stochastic survival across seeds;
-it does not require CPU/Warp RNG-stream or trajectory replay. Charged wall loss,
-a runnable, and hidden transfers/fallback remain out of scope.
+it does not require CPU/Warp RNG-stream or trajectory replay. A charged-wall
+physics implementation, a runnable, and hidden transfers/fallback remain out
+of scope.
 
 The direct GPU dilution P1–P4 entry point is imported with
 `from particula.gpu.kernels import dilution_step_gpu`. It applies

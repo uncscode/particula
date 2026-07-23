@@ -177,7 +177,10 @@ def _require_positive_real(value: Any, name: str) -> float:
         value, Real
     ):
         raise TypeError(f"{name} must be a positive real scalar.")
-    scalar = float(value)
+    try:
+        scalar = float(value)
+    except OverflowError as exc:
+        raise ValueError(f"{name} must be finite and > 0.") from exc
     if not np.isfinite(scalar) or scalar <= 0.0:
         raise ValueError(f"{name} must be finite and > 0.")
     return scalar
@@ -189,7 +192,10 @@ def _require_finite_real(value: Any, name: str) -> float:
         value, Real
     ):
         raise TypeError(f"{name} must be a finite real scalar.")
-    scalar = float(value)
+    try:
+        scalar = float(value)
+    except OverflowError as exc:
+        raise ValueError(f"{name} must be finite.") from exc
     if not np.isfinite(scalar):
         raise ValueError(f"{name} must be finite.")
     return scalar
@@ -197,7 +203,10 @@ def _require_finite_real(value: Any, name: str) -> float:
 
 def _validate_geometry(config: NeutralWallLossConfig) -> None:
     """Validate geometry and its scalar payload without particle access."""
-    if config.geometry not in ("spherical", "rectangular"):
+    if type(config.geometry) is not str or config.geometry not in (
+        "spherical",
+        "rectangular",
+    ):
         raise ValueError(
             "config.geometry must be 'spherical' or 'rectangular'."
         )
@@ -242,11 +251,17 @@ def _validate_config(config: Any) -> NeutralWallLossConfig:
     """Validate configuration without reading Warp fields or particles."""
     if type(config) is not NeutralWallLossConfig:
         raise TypeError("config must be a NeutralWallLossConfig.")
-    if config.distribution_type != "particle_resolved":
+    if (
+        type(config.distribution_type) is not str
+        or config.distribution_type != "particle_resolved"
+    ):
         raise ValueError(
             "config.distribution_type must be 'particle_resolved'."
         )
-    if config.mode not in ("neutral", "charged"):
+    if type(config.mode) is not str or config.mode not in (
+        "neutral",
+        "charged",
+    ):
         raise ValueError("config.mode must be 'neutral' or 'charged'.")
     _require_positive_real(
         config.wall_eddy_diffusivity,
@@ -404,7 +419,10 @@ def _validate_time_step(time_step: Any) -> float:
         time_step, Real
     ):
         raise TypeError("time_step must be a real scalar.")
-    scalar = float(time_step)
+    try:
+        scalar = float(time_step)
+    except OverflowError as exc:
+        raise ValueError("time_step must be finite and nonnegative.") from exc
     if not np.isfinite(scalar) or scalar < 0.0:
         raise ValueError("time_step must be finite and nonnegative.")
     return scalar
@@ -608,7 +626,8 @@ def wall_loss_step_gpu(
     geometry dimensions [m], potential [V], electric field [V m^-1],
     temperature [K], pressure [Pa], and ``time_step`` [s]. Charged mode does
     not yet alter coefficients, drift, or random-number consumption: zero-charge
-    slots follow the exact existing neutral coefficient and stochastic path.
+    slots with any finite signed charge follow the exact existing neutral
+    coefficient and stochastic path.
     After frozen P3 preflight, positive-time calls evaluate neutral coefficients
     for usable slots, apply survival probability ``exp(-k * time_step)``, and
     clear every mass lane, concentration, and charge for removed slots. Zero
