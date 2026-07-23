@@ -637,7 +637,7 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
     """Select and clear charged spherical wall-loss slots in one launch."""
     box = wp.tid()
     state = rng_states[box]
-    has_usable_slot = wp.int32(0)
+    has_draw_eligible_slot = wp.int32(0)
     geometry_scale = _geometry_scale_wp(
         wp.int32(0),
         chamber_radius,
@@ -668,10 +668,6 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
             or particle_density <= wp.float64(0.0)
         ):
             continue
-        if has_usable_slot == wp.int32(0):
-            has_usable_slot = wp.int32(1)
-            if initialize_rng != wp.int32(0):
-                state = wp.rand_init(rng_seed, box)
         neutral_coefficient = spherical_wall_loss_coefficient_wp(
             wall_eddy_diffusivity,
             particle_radius,
@@ -713,12 +709,16 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
             )
         if wp.isnan(coefficient) or coefficient <= wp.float64(0.0):
             continue
-        if particle_charge == wp.float64(0.0) and wp.isinf(coefficient):
+        if wp.isinf(coefficient):
             for species in range(n_species):
                 masses[box, particle, species] = wp.float64(0.0)
             concentration[box, particle] = wp.float64(0.0)
             charge[box, particle] = wp.float64(0.0)
             continue
+        if has_draw_eligible_slot == wp.int32(0):
+            has_draw_eligible_slot = wp.int32(1)
+            if initialize_rng != wp.int32(0):
+                state = wp.rand_init(rng_seed, box)
         if _should_remove_for_survival_draw(
             wp.randf(state), wp.exp(-coefficient * time_step)
         ):
@@ -726,7 +726,7 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
                 masses[box, particle, species] = wp.float64(0.0)
             concentration[box, particle] = wp.float64(0.0)
             charge[box, particle] = wp.float64(0.0)
-    if has_usable_slot != wp.int32(0):
+    if has_draw_eligible_slot != wp.int32(0):
         rng_states[box] = state
 
 
@@ -755,7 +755,7 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
     """Select and clear charged rectangular wall-loss slots in one launch."""
     box = wp.tid()
     state = rng_states[box]
-    has_usable_slot = wp.int32(0)
+    has_draw_eligible_slot = wp.int32(0)
     geometry_scale = _geometry_scale_wp(
         wp.int32(1),
         wp.float64(0.0),
@@ -790,10 +790,6 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
             or particle_density <= wp.float64(0.0)
         ):
             continue
-        if has_usable_slot == wp.int32(0):
-            has_usable_slot = wp.int32(1)
-            if initialize_rng != wp.int32(0):
-                state = wp.rand_init(rng_seed, box)
         neutral_coefficient = rectangle_wall_loss_coefficient_wp(
             wall_eddy_diffusivity,
             particle_radius,
@@ -837,12 +833,16 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
             )
         if wp.isnan(coefficient) or coefficient <= wp.float64(0.0):
             continue
-        if particle_charge == wp.float64(0.0) and wp.isinf(coefficient):
+        if wp.isinf(coefficient):
             for species in range(n_species):
                 masses[box, particle, species] = wp.float64(0.0)
             concentration[box, particle] = wp.float64(0.0)
             charge[box, particle] = wp.float64(0.0)
             continue
+        if has_draw_eligible_slot == wp.int32(0):
+            has_draw_eligible_slot = wp.int32(1)
+            if initialize_rng != wp.int32(0):
+                state = wp.rand_init(rng_seed, box)
         if _should_remove_for_survival_draw(
             wp.randf(state), wp.exp(-coefficient * time_step)
         ):
@@ -850,7 +850,7 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
                 masses[box, particle, species] = wp.float64(0.0)
             concentration[box, particle] = wp.float64(0.0)
             charge[box, particle] = wp.float64(0.0)
-    if has_usable_slot != wp.int32(0):
+    if has_draw_eligible_slot != wp.int32(0):
         rng_states[box] = state
 
 
@@ -887,11 +887,10 @@ def wall_loss_step_gpu(
     same-device ``uint32`` sidecar with shape ``(n_boxes,)`` remains
     caller-owned, advances in place only for eligible slots, and resets only
     when ``initialize_rng=True``. Eligible slots have positive concentration,
-    usable positive mass and derived transport properties, and a positive
-    non-NaN wall-loss coefficient. An infinite positive neutral coefficient
-    causes deterministic removal without consuming RNG state; charged
-    composition saturates to a finite coefficient and consumes its draw. Zero
-    time and pre-launch validation failures leave supplied state unchanged.
+    usable positive mass and derived transport properties, and a finite positive
+    wall-loss coefficient. An infinite positive coefficient causes deterministic
+    removal without consuming RNG state. Zero time and pre-launch validation
+    failures leave supplied state unchanged.
     Rollback is not promised after a mutation kernel has launched.
 
     Args:

@@ -1,4 +1,4 @@
-"""Parity and statistical validation for direct neutral GPU wall loss."""
+"""Parity and statistical validation for direct neutral and charged GPU wall loss."""
 
 from __future__ import annotations
 
@@ -647,6 +647,38 @@ def _charged_diagnostic(
     return eligible.numpy().astype(bool), rates.numpy()
 
 
+def _neutral_diagnostic(
+    particles: Any, temperature: Any, pressure: Any, config: Any, device: str
+) -> tuple[np.ndarray, np.ndarray]:
+    """Run the non-mutating neutral Warp diagnostic and return bulk results."""
+    runtime_wp = _warp()
+    shape = particles.concentration.shape
+    rates = runtime_wp.zeros(shape, dtype=runtime_wp.float64, device=device)
+    eligible = runtime_wp.zeros(shape, dtype=runtime_wp.int32, device=device)
+    dimensions = config.chamber_dimensions or (0.0, 0.0, 0.0)
+    runtime_wp.launch(
+        _wall_loss_rate_diagnostic,
+        dim=shape,
+        inputs=[
+            particles.masses,
+            particles.concentration,
+            particles.density,
+            temperature,
+            pressure,
+            config.wall_eddy_diffusivity,
+            config.chamber_radius or 0.0,
+            *dimensions,
+            0 if config.geometry == "spherical" else 1,
+            particles.masses.shape[2],
+            rates,
+            eligible,
+        ],
+        device=device,
+    )
+    runtime_wp.synchronize()
+    return eligible.numpy().astype(bool), rates.numpy()
+
+
 @pytest.mark.gpu_parity
 @pytest.mark.parametrize(
     ("geometry", "n_boxes", "potential", "field"),
@@ -714,12 +746,8 @@ def test_zero_charge_charged_mode_exactly_matches_neutral_diagnostics_and_state(
     charged_config = _charged_config(
         geometry, device, potential=-9.0, field=4.0
     )
-    neutral_mask, neutral_rates = _charged_diagnostic(
-        neutral_particles,
-        temperature,
-        pressure,
-        _charged_config(geometry, device, potential=0.0, field=0.0),
-        device,
+    neutral_mask, neutral_rates = _neutral_diagnostic(
+        neutral_particles, temperature, pressure, neutral_config, device
     )
     charged_mask, charged_rates = _charged_diagnostic(
         charged_particles, temperature, pressure, charged_config, device
@@ -952,6 +980,8 @@ def test_charged_persistent_sidecar_survival_and_noop_lifecycle(
     particles = _charged_homogeneous_particles(device, radius, 2.0, active)
     states = runtime_wp.zeros(1, dtype=runtime_wp.uint32, device=device)
     owner = states
+    initialized_state: np.ndarray | None = None
+    previous_state: np.ndarray | None = None
     for step in range(steps):
         wall_loss_step_gpu(
             particles,
@@ -964,6 +994,31 @@ def test_charged_persistent_sidecar_survival_and_noop_lifecycle(
             initialize_rng=step == 0,
         )
         assert states is owner
+        current_state = states.numpy().copy()
+        if step == 0:
+            initialized_state = current_state
+        else:
+            assert previous_state is not None
+            assert not np.array_equal(current_state, previous_state)
+        previous_state = current_state
+    assert initialized_state is not None
+    reset_particles = _charged_homogeneous_particles(
+        device, radius, 2.0, active
+    )
+    reset_states = runtime_wp.array(
+        [91], dtype=runtime_wp.uint32, device=device
+    )
+    wall_loss_step_gpu(
+        reset_particles,
+        298.15,
+        101325.0,
+        time_step,
+        config=config,
+        rng_seed=73,
+        rng_states=reset_states,
+        initialize_rng=True,
+    )
+    npt.assert_array_equal(reset_states.numpy(), initialized_state)
     observed = int(
         np.count_nonzero(particles.concentration.numpy()[0, :active])
     )
@@ -975,6 +1030,52 @@ def test_charged_persistent_sidecar_survival_and_noop_lifecycle(
         particles, 298.15, 101325.0, 0.0, config=config, rng_states=states
     )
     npt.assert_array_equal(states.numpy(), before)
+
+
+@pytest.mark.gpu_parity
+def test_charged_opposing_field_does_not_reset_supplied_sidecar(
+    device: str,
+) -> None:
+    """Keep a supplied sidecar unchanged when clipped charged rates draw never."""
+    runtime_wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    field = runtime_wp.array(
+        [1.0e100, 0.0, 0.0], dtype=runtime_wp.float64, device=device
+    )
+    config = NeutralWallLossConfig(
+        "rectangular",
+        0.01,
+        chamber_dimensions=(1.0, 2.0, 3.0),
+        mode="charged",
+        wall_potential=-2.0e100,
+        wall_electric_field=field,
+    )
+    particles = _charged_homogeneous_particles(
+        device, radius=50.0e-9, charge=1.0, active=1
+    )
+    states = runtime_wp.array([31], dtype=runtime_wp.uint32, device=device)
+    particle_before = {
+        name: getattr(particles, name).numpy().copy()
+        for name in ("masses", "concentration", "charge")
+    }
+    state_before = states.numpy().copy()
+
+    wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        1.0,
+        config=config,
+        rng_seed=73,
+        rng_states=states,
+        initialize_rng=True,
+    )
+
+    for name, expected in particle_before.items():
+        npt.assert_array_equal(getattr(particles, name).numpy(), expected)
+    npt.assert_array_equal(states.numpy(), state_before)
 
 
 @pytest.mark.gpu_parity
