@@ -232,6 +232,29 @@ def test_nonnegative_particle_metadata_rejects_nan(field: str) -> None:
     _assert_snapshot_unchanged(particles, snapshot)
 
 
+@pytest.mark.parametrize("field", ["masses", "concentration"])
+def test_nonnegative_particle_storage_rejects_negative_values(
+    field: str,
+) -> None:
+    """Mass and concentration storage reject negative values atomically."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    values = getattr(particles, field).numpy()
+    values.flat[0] = -1.0
+    setattr(particles, field, wp.array(values, dtype=wp.float64, device="cpu"))
+    snapshot = _snapshot(particles)
+
+    with pytest.raises(
+        ValueError,
+        match=rf"particles\.{field} must be finite and nonnegative",
+    ):
+        wall_loss_step_gpu(particles, 298.15, 101325.0, 1.0, config=_config())
+
+    _assert_snapshot_unchanged(particles, snapshot)
+
+
 @pytest.mark.parametrize("charges", [[-2.0, -1.0], [-2.0, 3.0]])
 def test_signed_finite_charge_metadata_is_accepted_with_complete_slot_updates(
     charges: list[float],
@@ -427,19 +450,49 @@ def test_environment_preflight_errors_preserve_particles(
     _assert_snapshot_unchanged(particles, snapshot)
 
 
-def test_explicit_environment_and_float32_direct_array_are_accepted() -> None:
-    """Accept explicit and hybrid scalar/per-box environment input forms."""
+@pytest.mark.parametrize("source", ["direct", "environment"])
+def test_positive_time_float32_environment_arrays_are_private_normalized(
+    source: str,
+) -> None:
+    """Execute accepted float32 environments through private float64 buffers."""
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
     particles = _particles()
+    rng_states = wp.array([3, 4], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, rng_states)
     temperature = wp.array([298.15, 300.0], dtype=wp.float32, device="cpu")
-    assert (
-        wall_loss_step_gpu(
-            particles, temperature, 101325.0, np.array(0.0), config=_config()
-        )
-        is particles
+    pressure = wp.array([101325.0, 100000.0], dtype=wp.float32, device="cpu")
+    environment = (
+        SimpleNamespace(temperature=temperature, pressure=pressure)
+        if source == "environment"
+        else None
     )
+    returned = wall_loss_step_gpu(
+        particles,
+        None if environment else temperature,
+        None if environment else pressure,
+        1.0,
+        config=_config(),
+        rng_states=rng_states,
+        environment=environment,
+    )
+
+    assert returned is particles
+    assert temperature.dtype == wp.float32
+    assert pressure.dtype == wp.float32
+    npt.assert_allclose(temperature.numpy(), [298.15, 300.0], rtol=1e-6)
+    npt.assert_allclose(pressure.numpy(), [101325.0, 100000.0], rtol=1e-6)
+    _assert_slots_preserved_or_cleared(particles, snapshot)
+    npt.assert_array_equal(rng_states.numpy(), snapshot["rng_states"][1])
+
+
+def test_explicit_float64_environment_is_accepted() -> None:
+    """Accept an explicit float64 environment input source."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
     environment = SimpleNamespace(
         temperature=wp.array([298.15, 300.0], dtype=wp.float64, device="cpu"),
         pressure=wp.array([101325.0, 100000.0], dtype=wp.float64, device="cpu"),
@@ -586,6 +639,38 @@ def test_large_time_step_removes_only_eligible_slots(geometry: str) -> None:
     assert particles.charge.numpy()[1, 1] == snapshot["charge"][1][1, 1]
     npt.assert_array_equal(particles.density.numpy(), snapshot["density"][1])
     npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
+
+
+def test_zero_survival_removes_an_exact_zero_draw() -> None:
+    """An exact-zero draw selects removal when survival probability is zero."""
+    wp = _warp()
+    from particula.gpu.kernels.wall_loss import _should_remove_for_survival_draw
+
+    @wp.kernel
+    def select_removals(
+        draws: Any,
+        survival_probabilities: Any,
+        removal_mask: Any,
+    ) -> None:
+        index = wp.tid()
+        if _should_remove_for_survival_draw(
+            draws[index], survival_probabilities[index]
+        ):
+            removal_mask[index] = wp.int32(1)
+
+    draws = wp.array([0.0, 0.25], dtype=wp.float32, device="cpu")
+    survival_probabilities = wp.array(
+        [0.0, 0.5], dtype=wp.float64, device="cpu"
+    )
+    removal_mask = wp.zeros(2, dtype=wp.int32, device="cpu")
+    wp.launch(
+        select_removals,
+        dim=2,
+        inputs=[draws, survival_probabilities, removal_mask],
+        device="cpu",
+    )
+
+    npt.assert_array_equal(removal_mask.numpy(), [1, 0])
 
 
 def test_mask_application_preserves_unmarked_and_clears_marked_slots() -> None:
