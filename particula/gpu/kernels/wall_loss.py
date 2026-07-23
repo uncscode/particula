@@ -33,13 +33,13 @@ except ImportError as exc:  # pragma: no cover - handled by test guards
 
 from particula.gpu.dynamics.wall_loss_funcs import (
     _combine_charged_wall_loss_coefficient_wp,
-    _electric_field_drift_wp,
+    _electric_field_drift_from_viscosity_wp,
     _geometry_scale_wp,
     _image_charge_enhancement_wp,
     _resolve_rectangular_electric_field_wp,
     _resolve_spherical_electric_field_wp,
-    rectangle_wall_loss_coefficient_wp,
-    spherical_wall_loss_coefficient_wp,
+    rectangle_wall_loss_coefficient_from_transport_wp,
+    spherical_wall_loss_coefficient_from_transport_wp,
 )
 from particula.gpu.kernels.environment import (
     _ensure_environment_arrays,
@@ -47,7 +47,9 @@ from particula.gpu.kernels.environment import (
     validate_environment_inputs,
 )
 from particula.gpu.properties import (
+    dynamic_viscosity_wp,
     effective_density_wp,
+    molecule_mean_free_path_wp,
     particle_radius_from_volume_wp,
 )
 from particula.util.constants import (
@@ -534,6 +536,19 @@ def _wall_loss_remove(  # noqa: C901
     box = wp.tid()
     state = rng_states[box]
     has_usable_slot = wp.int32(0)
+    dynamic_viscosity = dynamic_viscosity_wp(
+        temperature[box],
+        _REF_VISCOSITY_AIR_STP,
+        _REF_TEMPERATURE_STP,
+        _SUTHERLAND_CONSTANT,
+    )
+    mean_free_path = molecule_mean_free_path_wp(
+        _MOLECULAR_WEIGHT_AIR,
+        temperature[box],
+        pressure[box],
+        dynamic_viscosity,
+        _GAS_CONSTANT,
+    )
     for particle in range(n_particles):
         if concentration[box, particle] <= wp.float64(0.0):
             continue
@@ -562,36 +577,28 @@ def _wall_loss_remove(  # noqa: C901
                 state = wp.rand_init(rng_seed, box)
         coefficient = wp.float64(0.0)
         if geometry_mode == wp.int32(0):
-            coefficient = spherical_wall_loss_coefficient_wp(
+            coefficient = spherical_wall_loss_coefficient_from_transport_wp(
                 wall_eddy_diffusivity,
                 particle_radius,
                 particle_density,
                 temperature[box],
-                pressure[box],
                 chamber_radius,
+                dynamic_viscosity,
+                mean_free_path,
                 _BOLTZMANN_CONSTANT,
-                _GAS_CONSTANT,
-                _MOLECULAR_WEIGHT_AIR,
-                _REF_VISCOSITY_AIR_STP,
-                _REF_TEMPERATURE_STP,
-                _SUTHERLAND_CONSTANT,
             )
         else:
-            coefficient = rectangle_wall_loss_coefficient_wp(
+            coefficient = rectangle_wall_loss_coefficient_from_transport_wp(
                 wall_eddy_diffusivity,
                 particle_radius,
                 particle_density,
                 temperature[box],
-                pressure[box],
                 chamber_length,
                 chamber_width,
                 chamber_height,
+                dynamic_viscosity,
+                mean_free_path,
                 _BOLTZMANN_CONSTANT,
-                _GAS_CONSTANT,
-                _MOLECULAR_WEIGHT_AIR,
-                _REF_VISCOSITY_AIR_STP,
-                _REF_TEMPERATURE_STP,
-                _SUTHERLAND_CONSTANT,
             )
         if wp.isnan(coefficient) or coefficient <= wp.float64(0.0):
             continue
@@ -647,6 +654,19 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
     resolved_field = _resolve_spherical_electric_field_wp(
         wall_electric_field, wall_potential, geometry_scale
     )
+    dynamic_viscosity = dynamic_viscosity_wp(
+        temperature[box],
+        _REF_VISCOSITY_AIR_STP,
+        _REF_TEMPERATURE_STP,
+        _SUTHERLAND_CONSTANT,
+    )
+    mean_free_path = molecule_mean_free_path_wp(
+        _MOLECULAR_WEIGHT_AIR,
+        temperature[box],
+        pressure[box],
+        dynamic_viscosity,
+        _GAS_CONSTANT,
+    )
     for particle in range(n_particles):
         if concentration[box, particle] <= wp.float64(0.0):
             continue
@@ -674,19 +694,15 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
             has_draw_eligible_slot = wp.int32(1)
             if initialize_rng != wp.int32(0):
                 state = wp.rand_init(rng_seed, box)
-        neutral_coefficient = spherical_wall_loss_coefficient_wp(
+        neutral_coefficient = spherical_wall_loss_coefficient_from_transport_wp(
             wall_eddy_diffusivity,
             particle_radius,
             particle_density,
             temperature[box],
-            pressure[box],
             chamber_radius,
+            dynamic_viscosity,
+            mean_free_path,
             _BOLTZMANN_CONSTANT,
-            _GAS_CONSTANT,
-            _MOLECULAR_WEIGHT_AIR,
-            _REF_VISCOSITY_AIR_STP,
-            _REF_TEMPERATURE_STP,
-            _SUTHERLAND_CONSTANT,
         )
         coefficient = neutral_coefficient
         if particle_charge != wp.float64(0.0):
@@ -698,16 +714,13 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
                 _ELECTRIC_PERMITTIVITY,
                 _BOLTZMANN_CONSTANT,
             )
-            drift = _electric_field_drift_wp(
+            drift = _electric_field_drift_from_viscosity_wp(
                 particle_radius,
                 particle_charge,
-                temperature[box],
                 resolved_field,
                 geometry_scale,
                 _ELEMENTARY_CHARGE_VALUE,
-                _REF_VISCOSITY_AIR_STP,
-                _REF_TEMPERATURE_STP,
-                _SUTHERLAND_CONSTANT,
+                dynamic_viscosity,
             )
             coefficient = _combine_charged_wall_loss_coefficient_wp(
                 neutral_coefficient, enhancement, drift
@@ -775,6 +788,19 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
         wall_potential,
         geometry_scale,
     )
+    dynamic_viscosity = dynamic_viscosity_wp(
+        temperature[box],
+        _REF_VISCOSITY_AIR_STP,
+        _REF_TEMPERATURE_STP,
+        _SUTHERLAND_CONSTANT,
+    )
+    mean_free_path = molecule_mean_free_path_wp(
+        _MOLECULAR_WEIGHT_AIR,
+        temperature[box],
+        pressure[box],
+        dynamic_viscosity,
+        _GAS_CONSTANT,
+    )
     for particle in range(n_particles):
         if concentration[box, particle] <= wp.float64(0.0):
             continue
@@ -802,21 +828,17 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
             has_draw_eligible_slot = wp.int32(1)
             if initialize_rng != wp.int32(0):
                 state = wp.rand_init(rng_seed, box)
-        neutral_coefficient = rectangle_wall_loss_coefficient_wp(
+        neutral_coefficient = rectangle_wall_loss_coefficient_from_transport_wp(
             wall_eddy_diffusivity,
             particle_radius,
             particle_density,
             temperature[box],
-            pressure[box],
             chamber_length,
             chamber_width,
             chamber_height,
+            dynamic_viscosity,
+            mean_free_path,
             _BOLTZMANN_CONSTANT,
-            _GAS_CONSTANT,
-            _MOLECULAR_WEIGHT_AIR,
-            _REF_VISCOSITY_AIR_STP,
-            _REF_TEMPERATURE_STP,
-            _SUTHERLAND_CONSTANT,
         )
         coefficient = neutral_coefficient
         if particle_charge != wp.float64(0.0):
@@ -828,16 +850,13 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
                 _ELECTRIC_PERMITTIVITY,
                 _BOLTZMANN_CONSTANT,
             )
-            drift = _electric_field_drift_wp(
+            drift = _electric_field_drift_from_viscosity_wp(
                 particle_radius,
                 particle_charge,
-                temperature[box],
                 resolved_field,
                 geometry_scale,
                 _ELEMENTARY_CHARGE_VALUE,
-                _REF_VISCOSITY_AIR_STP,
-                _REF_TEMPERATURE_STP,
-                _SUTHERLAND_CONSTANT,
+                dynamic_viscosity,
             )
             coefficient = _combine_charged_wall_loss_coefficient_wp(
                 neutral_coefficient, enhancement, drift

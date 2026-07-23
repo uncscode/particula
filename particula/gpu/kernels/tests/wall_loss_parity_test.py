@@ -245,7 +245,10 @@ def _charged_cpu_oracle(
     field = config.wall_electric_field
     field_value: float | tuple[float, float, float]
     if config.geometry == "rectangular":
-        field_value = tuple(float(value) for value in field.numpy())
+        field_value = cast(
+            tuple[float, float, float],
+            tuple(float(value) for value in field.numpy()),
+        )
     else:
         field_value = float(field)
     strategy = ChargedWallLossStrategy(
@@ -967,15 +970,22 @@ def test_charged_survival_matches_frozen_exact_binomial_interval(
 
 @pytest.mark.gpu_parity
 @pytest.mark.stochastic
+@pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
 def test_charged_persistent_sidecar_survival_and_noop_lifecycle(
     device: str,
+    geometry: str,
 ) -> None:
-    """Validate persistent charged state without reset and exact no-op paths."""
+    """Validate persistent charged state for both geometries and no-op paths."""
     runtime_wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
     radius, active, steps = 50.0e-9, 128, 3
-    config = _charged_config("spherical", device, potential=0.0, field=0.0)
+    config = _charged_config(
+        geometry,
+        device,
+        potential=0.0 if geometry == "spherical" else 2.0,
+        field=0.0 if geometry == "spherical" else 3.0,
+    )
     time_step = _charged_half_survival_time(config, device, radius)
     particles = _charged_homogeneous_particles(device, radius, 2.0, active)
     states = runtime_wp.zeros(1, dtype=runtime_wp.uint32, device=device)

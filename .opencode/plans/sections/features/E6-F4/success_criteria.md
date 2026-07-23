@@ -1,12 +1,13 @@
 # Success Criteria
 
-- [ ] E6-F3 is recorded as the upstream dependency and its neutral API,
+- [x] E6-F3 is recorded as the upstream dependency and its neutral API,
   preflight, fixed-slot, identity, and RNG contracts remain passing.
 - [x] P1 accepts only neutral/charged modes; validates signed finite potential,
   charged spherical scalar fields, and charged rectangular caller-owned
   same-device `wp.float64` `(3,)` fields without changing package exports.
 - [x] P1 rejects malformed charged configurations before particle value scans,
-  environment/RNG work, allocation, launch, or caller mutation; rectangular
+  environment/RNG work, output allocation, update-kernel launch, or caller
+  mutation; private validation scans/status scratch may allocate. Rectangular
   field errors precede coexisting charge errors.
 - [x] P1 valid charged calls preserve rectangular field identity and bytes;
   nonzero-charge slots execute charged composition while zero-charge slots retain
@@ -37,8 +38,9 @@
 - [x] Removed slots clear every species mass, concentration, and charge;
   survivors preserve all fields and all shapes/devices/dtypes/identities remain
   stable.
-- [x] All detectable invalid calls fail before allocation, RNG mutation, or
-  particle mutation.
+- [x] All detectable invalid calls avoid output allocation, RNG initialization or
+  mutation, update-kernel launch, and particle mutation; private validation
+  scans/status scratch may allocate.
 - [x] CUDA validation is additive and skips cleanly when unavailable; P5 adds no
   documentation or public-boundary change.
 

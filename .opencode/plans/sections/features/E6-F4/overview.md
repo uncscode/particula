@@ -3,9 +3,9 @@
 ## Problem Statement
 
 E6-F3 provides neutral spherical and rectangular wall-loss kernels, fixed-slot
-removal, and persistent RNG ownership, but the direct GPU path cannot yet model
-the charged behavior already defined by `ChargedWallLossStrategy`. A separate
-charged implementation risks changing subtle CPU semantics: image-charge
+removal, and persistent RNG ownership. E6-F4 extends that direct GPU path with
+the charged behavior already defined by `ChargedWallLossStrategy` while
+preserving subtle CPU semantics: image-charge
 enhancement remains active for nonzero particle charge when wall potential is
 zero, field and potential contribute signed drift, and a zero-charge particle
 must exactly follow the neutral coefficient and stochastic path.

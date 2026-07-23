@@ -15,14 +15,15 @@ executes in the existing fixed-shape direct step without changing neutral mode.
   caller-owned same-device `wp.float64` `(3,)` field validation.
 - **Shipped P1:** staged rectangular-field validation and finite device scan
   occur after particle schema/device discovery but before particle value scans,
-  environment/RNG work, allocation, or mutation. Rejections preserve supplied
-  particle, field, and RNG state.
-- **Implemented P4 (#1412):** geometry-specialized charged removal kernels
+  environment/RNG work, output allocation, update-kernel launch, or caller
+  mutation. Private validation scans/status scratch may allocate. Rejections
+  preserve supplied particle, field, and RNG state.
+- **Shipped P4 (#1412):** geometry-specialized charged removal kernels
   dispatch after successful positive-time preflight. Nonzero charged slots use
   the private image-enhancement, field-resolution, signed-drift, and safe
   composition helpers; exact zero-charge slots retain the neutral coefficient
   and RNG path.
-- **Implemented P4 (#1412):** neutral mode retains its unchanged kernel and
+- **Shipped P4 (#1412):** neutral mode retains its unchanged kernel and
   launch. Charged spherical launches receive scalar field data only; charged
   rectangular launches read the validated caller-owned `(3,)` vector by
   identity, without copying or mutating it.
@@ -37,17 +38,17 @@ executes in the existing fixed-shape direct step without changing neutral mode.
   nonfinite/overflow lanes in `wall_loss_funcs_test.py`.
 - Integration with E6-F3's active predicate, fixed-shape removal clearing,
   environment normalization, preflight ordering, and caller-owned RNG lifecycle.
-- **Implemented P4 (#1412):** active eligible slots draw at most once; selected
+- **Shipped P4 (#1412):** active eligible slots draw at most once; selected
   slots clear all mass lanes, concentration, and charge. Nonpositive composed
   rates consume no draw; saturated charged coefficients use the charged
   survival-draw path, unlike the neutral positive-infinity shortcut.
-- **Implemented P5 (#1413):**
+- **Shipped P5 (#1413):**
   `particula/gpu/kernels/tests/wall_loss_parity_test.py` adds independent CPU
   strategy versus non-mutating Warp charged-coefficient parity for an explicit
   spherical/rectangular matrix. It checks particle and caller-owned rectangular
   field non-mutation, uses spherical `rtol=1.002e-3, atol=1e-20` and rectangular
   `rtol=1e-6, atol=0`, and retains Warp CPU with optional clean CUDA skips.
-- **Implemented P5 (#1413):** exact zero-charge charged/neutral diagnostic,
+- **Shipped P5 (#1413):** exact zero-charge charged/neutral diagnostic,
   survivor-state, RNG-sidecar, and rectangular-field ownership equality;
   invalid/no-op non-mutation regressions; and four-radius by two-geometry
   charged survival evidence. Each of the eight strata uses 16 fresh seeded
