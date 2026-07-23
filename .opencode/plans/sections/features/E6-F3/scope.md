@@ -11,7 +11,11 @@ removed fixed slot, and supports persistent per-box RNG state.
   helpers in `particula.gpu.properties`, migrate all consumers, and remove
   legacy `particula.gpu.dynamics` definitions and re-exports. The shipped
   property primitives include defined slip zero/invalid behavior plus
-  device-only Debye and rectangular `x_coth_x` geometry factors.
+   device-only Debye and rectangular `x_coth_x` geometry factors.
+- **Shipped in P2 / #1402:** Add concrete internal fp64 Warp spherical and
+  rectangular neutral Crump-Seinfeld coefficient helpers in
+  `particula/gpu/dynamics/wall_loss_funcs.py`, with guarded CPU/Warp parity and
+  smoke coverage in `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`.
 - Validate or add the remaining Warp device primitives needed for coefficient
   assembly, using the P1 property import surface.
 - Immutable host configuration for exactly `"spherical"` and `"rectangular"`
@@ -29,8 +33,9 @@ removed fixed slot, and supports persistent per-box RNG state.
 
 ## Out of Scope
 
-- Wall-loss coefficient assembly, a direct wall-loss API/configuration,
-  removal kernels, and RNG lifecycle in P1; these remain later E6-F3 phases.
+- A direct wall-loss API/configuration, removal kernels, and RNG lifecycle;
+  these remain later E6-F3 phases. P2 coefficient helpers remain internal and
+  do not provide public validation.
 - Charged, image-charge, wall-potential, or electric-field physics (E6-F4).
 - Discrete or continuous-PDF GPU wall loss, gas wall loss, multi-box transport,
   or changes to CPU strategy behavior.

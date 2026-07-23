@@ -21,6 +21,21 @@ device-only functions with explicit zero limits and invalid-domain sentinels.
 They are foundations for later coefficient work; P1 adds neither coefficient
 assembly nor a wall-loss entry point.
 
+### Shipped P2 coefficient assembly
+
+`particula.gpu.dynamics.wall_loss_funcs` now owns two concrete internal
+device helpers: `spherical_wall_loss_coefficient_wp` and
+`rectangle_wall_loss_coefficient_wp`. Each derives viscosity, mean free path,
+Knudsen number, slip, mobility, diffusion, and transport-input settling once,
+then assembles the corresponding neutral Crump-Seinfeld coefficient in fp64
+and SI `s^-1`. The rectangular helper uses `x_coth_x_wp` to retain the CPU
+terms while avoiding direct small-argument coth cancellation.
+
+These pure per-lane helpers do not allocate, transfer, mutate, validate public
+inputs, expose a package API, or own state. Configuration, preflight,
+particle-state mutation, and RNG remain deferred to P3-P5; charged terms
+remain E6-F4 work.
+
 The feature is a low-level, particle-resolved Warp operation. Immutable host
 configuration selects one neutral geometry. The public step validates the
 configuration, particle schema and physical state, direct/environment inputs,

@@ -44,7 +44,30 @@ def spherical_wall_loss_coefficient_wp(
     ref_temperature: wp.float64,
     sutherland_constant: wp.float64,
 ) -> wp.float64:
-    """Calculate a neutral spherical chamber wall-loss coefficient [s^-1]."""
+    """Calculate the neutral spherical wall-loss coefficient in s^-1.
+
+    Combines diffusion-driven turbulent deposition with gravitational
+    sedimentation using the Crump-Seinfeld spherical-chamber relation. This
+    concrete Warp device helper assumes supported physical inputs and performs
+    no public input validation or charged-particle correction.
+
+    Args:
+        wall_eddy_diffusivity: Wall eddy diffusivity in m^2/s.
+        particle_radius: Particle radius in m.
+        particle_density: Particle material density in kg/m^3.
+        temperature: Gas temperature in K.
+        pressure: Gas pressure in Pa.
+        chamber_radius: Spherical chamber radius in m.
+        boltzmann_constant: Boltzmann constant in J/K.
+        gas_constant: Universal gas constant in J/(mol K).
+        molecular_weight_air: Mean molecular weight of air in kg/mol.
+        ref_viscosity: Reference dynamic viscosity in Pa s.
+        ref_temperature: Reference temperature for viscosity in K.
+        sutherland_constant: Sutherland temperature constant in K.
+
+    Returns:
+        Neutral particle wall-loss coefficient in s^-1.
+    """
     dynamic_viscosity = dynamic_viscosity_wp(
         temperature,
         ref_viscosity,
@@ -106,7 +129,32 @@ def rectangle_wall_loss_coefficient_wp(
     ref_temperature: wp.float64,
     sutherland_constant: wp.float64,
 ) -> wp.float64:
-    """Calculate a neutral rectangular chamber wall-loss coefficient [s^-1]."""
+    """Calculate the neutral rectangular wall-loss coefficient in s^-1.
+
+    Combines side-wall turbulent deposition with gravitational sedimentation
+    using the Crump-Seinfeld rectangular-chamber relation. This concrete Warp
+    device helper assumes supported physical inputs and performs no public
+    input validation or charged-particle correction.
+
+    Args:
+        wall_eddy_diffusivity: Wall eddy diffusivity in m^2/s.
+        particle_radius: Particle radius in m.
+        particle_density: Particle material density in kg/m^3.
+        temperature: Gas temperature in K.
+        pressure: Gas pressure in Pa.
+        chamber_length: Rectangular chamber length in m.
+        chamber_width: Rectangular chamber width in m.
+        chamber_height: Rectangular chamber height in m.
+        boltzmann_constant: Boltzmann constant in J/K.
+        gas_constant: Universal gas constant in J/(mol K).
+        molecular_weight_air: Mean molecular weight of air in kg/mol.
+        ref_viscosity: Reference dynamic viscosity in Pa s.
+        ref_temperature: Reference temperature for viscosity in K.
+        sutherland_constant: Sutherland temperature constant in K.
+
+    Returns:
+        Neutral particle wall-loss coefficient in s^-1.
+    """
     dynamic_viscosity = dynamic_viscosity_wp(
         temperature,
         ref_viscosity,

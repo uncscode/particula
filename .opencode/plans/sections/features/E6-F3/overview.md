@@ -30,6 +30,23 @@ No coefficient assembly, wall-loss configuration or API, slot removal/RNG
 behavior, charged physics, or CPU behavior shipped in P1. Those remain the
 scope of later E6-F3 phases and E6-F4.
 
+## Delivered Phase: E6-F3-P2 (#1402)
+
+P2 adds the concrete, internal fp64 Warp helpers
+`spherical_wall_loss_coefficient_wp` and
+`rectangle_wall_loss_coefficient_wp` in
+`particula/gpu/dynamics/wall_loss_funcs.py`. They compose the P1 transport and
+geometry primitives to implement the neutral Crump-Seinfeld spherical and
+rectangular coefficients in SI units (`s^-1`), including the cancellation-safe
+rectangular `x_coth_x_wp` form.
+
+`particula/gpu/dynamics/tests/wall_loss_funcs_test.py` provides guarded Warp
+CPU parity and smoke coverage for scalar diffusion/gravity regimes and vector
+lanes. Rectangular comparisons use `rtol=1e-10, atol=1e-20`; spherical
+comparisons record `rtol=1.002e-3` because of the existing CPU Debye endpoint
+quadrature discrepancy. P2 adds no public export, configuration/validation,
+CPU physics change, charged physics, container mutation, or RNG behavior.
+
 ## User Stories
 
 - As a particle-resolved simulation developer, I want neutral spherical and

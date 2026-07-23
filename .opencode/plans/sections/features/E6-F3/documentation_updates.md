@@ -19,6 +19,11 @@
   skip behavior.
 - Update all E6-F3 plan sections after implementation with final symbol names,
   file paths, recorded tolerances, issue numbers, and shipped phase statuses.
+- **P2 / #1402 status:** Code documentation was added to
+  `particula/gpu/dynamics/wall_loss_funcs.py` with neutral-only scope, SI
+  `s^-1` units, and Crump-Seinfeld citations. No user-facing documentation
+  update is required yet because the helpers are concrete-module internals with
+  no public export; P7 remains responsible for supported direct-step docs.
 - Cross-reference parent E6, downstream E6-F4 charged/fallback work, and E6-F9
   closeout. Explicitly list charged physics, scheduler/backend integration,
   graph capture, dynamic slots, and performance claims as deferred.

@@ -18,7 +18,11 @@
   `particula/gpu/dynamics/condensation_funcs.py` provide viscosity, Knudsen,
   Cunningham slip, diffusion, and settling building blocks; P1 must inventory
   these and add only genuinely missing neutral primitives such as Debye or a
-  numerically safe coth helper.
+   numerically safe coth helper.
+- Shipped P2 `particula/gpu/dynamics/wall_loss_funcs.py` composes the P1
+  property import surface with `settling_velocity_stokes_from_transport_wp`;
+  it does not duplicate transport formulas or use the convenience settling
+  wrapper that recomputes gas-state transport.
 - `WarpParticleData` and `WarpEnvironmentData` in
   `particula/gpu/warp_types.py:24-78` and `:164-184` define fixed fp64 shapes,
   per-box environment state, and caller ownership.

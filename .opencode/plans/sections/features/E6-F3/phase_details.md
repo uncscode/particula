@@ -19,11 +19,22 @@ documents only the validated direct-process contract and evidence.
   - Boundary: No wall-loss coefficient assembly/API, charged physics, removal
     or RNG logic, or CPU behavior change.
 
-- [ ] **E6-F3-P2:** Implement spherical and rectangular coefficient device functions with CPU parity tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Port the authoritative neutral Crump-Seinfeld coefficient equations without changing CPU behavior.
+- [x] **E6-F3-P2:** Implement spherical and rectangular coefficient device functions with CPU parity tests
+  - Issue: #1402 | Size: S | Status: Shipped
+  - Delivered: Added concrete internal fp64 Warp helpers
+    `spherical_wall_loss_coefficient_wp` and
+    `rectangle_wall_loss_coefficient_wp`. They compose P1 transport primitives,
+    use transport-input settling, and implement neutral Crump-Seinfeld
+    spherical/rectangular coefficients; the rectangular form uses
+    `x_coth_x_wp` for small-argument stability.
   - Files: `particula/gpu/dynamics/wall_loss_funcs.py`, `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`
-  - Tests: One-particle/vector spherical and rectangular comparisons to independent CPU functions at explicit fp64 tolerances.
+  - Evidence: Guarded Warp CPU/optional-CUDA smoke and CPU-oracle parity tests
+    cover scalar diffusion/gravity regimes and vector nanometer-to-micrometer
+    lanes. Rectangular parity uses `rtol=1e-10, atol=1e-20`; spherical parity
+    records `rtol=1.002e-3` for the measured existing CPU Debye endpoint
+    quadrature discrepancy.
+  - Boundary: No public export, CPU change, configuration/preflight, charged
+    physics, containers/particle mutation, or RNG behavior.
 
 - [ ] **E6-F3-P3:** Define neutral wall-loss configuration and atomic preflight tests
   - Issue: TBD | Size: S | Status: Not Started
