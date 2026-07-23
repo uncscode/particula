@@ -73,11 +73,11 @@
     {
       "id": "E6-F4-P4",
       "title": "Integrate charged mode into the neutral fixed-shape wall-loss step with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-23",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
