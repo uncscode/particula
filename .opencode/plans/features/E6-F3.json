@@ -2,13 +2,13 @@
   "id": "E6-F3",
   "type": "feature",
   "title": "Neutral Spherical and Rectangular GPU Wall Loss",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
+  "completion_date": "2026-07-23",
   "last_updated": "2026-07-23",
   "dependencies": [],
   "section_files": {
@@ -110,11 +110,11 @@
     {
       "id": "E6-F3-P7",
       "title": "Update development documentation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
-      "issue_number": null,
+      "issue_number": 1407,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-23",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -122,5 +122,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

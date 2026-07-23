@@ -1234,18 +1234,65 @@ Delivered dilution scope:
    It is not bitwise parity. E6-F9 is the future integrated direct-call
    consumer.
 
-Delivered bounded neutral wall-loss P5 scope:
+Delivered bounded neutral wall-loss P1–P6 scope:
 
-- E6-F3-P5 provides `from particula.gpu.kernels import wall_loss_step_gpu` for
-  direct neutral, particle-resolved wall loss with fixed slots. After read-only
-  P3 preflight, positive-time calls stochastically remove eligible slots in
-  place. Zero time is a post-preflight, write-free no-op. Each box sequentially
-  advances its state for eligible slots; omitted `rng_states` are private and
-  seeded per call, while supplied caller-owned sidecars reset only with
-  `initialize_rng=True` and otherwise persist in place.
-- This bounded P5 path does not provide charged wall loss, a runnable API,
-  hidden transfers or fallbacks, or cross-device or CPU stochastic trajectory
-  parity. RNG generation is sequential per box, with no performance claim.
+- E6-F3 provides `from particula.gpu.kernels import wall_loss_step_gpu` for
+  direct neutral, particle-resolved spherical or rectangular fixed-slot wall
+  loss. `NeutralWallLossConfig` remains concrete-module-only at
+  `particula.gpu.kernels.wall_loss`. SI inputs are wall eddy diffusivity in
+  m²/s, chamber dimensions in m, temperature in K, pressure in Pa, and time in
+  s. Spherical configurations require a positive radius and no dimensions;
+  rectangular configurations require no radius and three positive dimensions.
+
+  ```python
+  from particula.gpu.kernels import wall_loss_step_gpu
+  from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+  config = NeutralWallLossConfig(
+      geometry="spherical",
+      wall_eddy_diffusivity=1.0e-4,  # m^2/s
+      chamber_radius=0.5,  # m
+  )
+  wall_loss_step_gpu(
+      particles,
+      temperature=298.15,  # K
+      pressure=101325.0,  # Pa
+      time_step=1.0,  # s
+      config=config,
+      rng_states=rng_states,
+      initialize_rng=True,
+  )
+  ```
+
+  This non-executed direct-call example uses caller-owned same-device Warp
+  state. Later calls reuse `rng_states` and omit `initialize_rng=True`.
+- The Crump--Seinfeld coefficient basis uses the 1981 spherical and 1982
+  rectangular chamber relations. Eligible finite-rate slots survive with
+  `exp(-k * time_step)`; selected slots clear all mass lanes, concentration, and
+  charge, while density, volume, dtype, device, capacity, and unselected storage
+  are preserved. Inactive and unusable slots are neither sampled nor reactivated.
+  The source citations are https://doi.org/10.1016/0021-8502(81)90036-7 and
+  https://doi.org/10.1080/02786828308958636.
+- Preflight is read-only. Successful asynchronous calls mutate caller-owned,
+  same-device state in place; callers own transfer, synchronization, and
+  checkpointing. Rejected pre-launch calls do not mutate caller state, zero time
+  is write-free after preflight, and post-launch rollback is not promised.
+  Temperature and pressure are direct scalars or same-device `(n_boxes,)` Warp
+  arrays, or come exclusively from `environment=` with both direct inputs set to
+  `None`.
+- Omitted RNG state is private for each successful nonzero call. Supplied
+  `(n_boxes,)` same-device `wp.uint32` state advances in place; only
+  `initialize_rng=True` resets it. Consumption is sequential per box over
+  eligible slots, so exact CPU/Warp or per-seed replay is not supported.
+- P6 evidence is geometry-specific deterministic coefficient tolerances plus
+  100-seed, 3-sigma aggregate survival checks. Warp CPU is the installed-Warp
+  baseline; CUDA is optional additive evidence and skips cleanly when absent.
+  This is not CPU-strategy parity or a performance claim.
+- Deferred scope includes E6-F4 charged/image-charge/electric-field physics,
+  CPU fallback or hidden transfers, runnable/scheduler/backend integration,
+  dynamic slots, compaction/activation, graph capture, differentiability,
+  performance guarantees, and exact RNG replay. E6-F9 remains the future
+  integration and closeout work.
 
 Future features:
 

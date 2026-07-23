@@ -72,4 +72,14 @@ one-/multi-box layouts, per-box state, nanometer/micrometer scales, and
 inactive/unusable slots, with Warp CPU baseline and optional CUDA parameter rows.
 It deliberately makes distributional—not stream-replay—claims for stochastic
 survival and does not add a production diagnostic, API, transfer, fallback, or
-public export.
+   public export.
+
+## P7 Delivered Scope (#1407)
+
+P7 is documentation-only. It publishes the direct-neutral contract and focused
+existing validation commands in `AGENTS.md`,
+`docs/Features/data-containers-and-gpu-foundations.md`, and
+`docs/Features/Roadmap/data-oriented-gpu.md`. It does not alter production
+kernels, exports, physics, tests, or runtime behavior. The parent
+[E6](../../../epics/E6.json), future charged [E6-F4](../../../features/E6-F4.json),
+and future closeout [E6-F9](../../../features/E6-F9.json) remain separate work.

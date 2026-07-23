@@ -219,15 +219,80 @@ gas concentrations run on Warp CPU with float64 `rtol=1e-12, atol=0`; CUDA is
 optional and skips cleanly when unavailable. This tolerance-based evidence is
 not bitwise parity.
 
-Bounded direct neutral, particle-resolved GPU wall loss is available through
-`from particula.gpu.kernels import wall_loss_step_gpu`. After read-only P3
-preflight, a positive-time call stochastically removes eligible fixed slots in
-place; zero time remains a post-preflight, write-free no-op. One sequential
-owner advances each box's RNG state only for eligible slots. Omitted
-`rng_states` are private and initialized per call; supplied same-device
-`(n_boxes,)` `wp.uint32` state is caller-owned, mutates in place, and resets only
-with `initialize_rng=True`. Charged wall loss, runnables, hidden transfers or
-fallbacks, and cross-device or CPU stochastic trajectory parity remain deferred.
+### Direct neutral GPU wall loss
+
+The bounded direct wall-loss path is neutral and particle-resolved only. Import
+the step and its concrete-module-only configuration separately; the
+configuration is not re-exported by `particula.gpu.kernels` or `particula.gpu`:
+
+```python
+from particula.gpu.kernels import wall_loss_step_gpu
+from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+config = NeutralWallLossConfig(
+    geometry="spherical",
+    wall_eddy_diffusivity=1.0e-4,  # m^2/s
+    chamber_radius=0.5,  # m
+)
+wall_loss_step_gpu(
+    particles,
+    temperature=298.15,  # K
+    pressure=101325.0,  # Pa
+    time_step=1.0,  # s
+    config=config,
+    rng_states=rng_states,
+    initialize_rng=True,
+)
+```
+
+The snippet is illustrative: `particles` and `rng_states` are caller-owned
+same-device Warp state. Later calls reuse `rng_states` and omit
+`initialize_rng=True`. Direct `temperature` and `pressure` each accept a scalar
+or same-device `(n_boxes,)` Warp array. Alternatively, pass
+`environment=...` and set both `temperature=None` and `pressure=None`; direct
+values and `environment=` are mutually exclusive.
+
+Wall eddy diffusivity is in m²/s, dimensions are in m, temperature is in K,
+pressure is in Pa, and time is in s. Spherical configurations require a
+positive radius and no dimensions; rectangular configurations require no radius
+and exactly three positive dimensions. The neutral coefficients use the
+Crump--Seinfeld spherical and rectangular chamber relations, including turbulent
+deposition and gravitational settling:
+
+- Crump, J. G., & Seinfeld, J. H. (1981), *Journal of Aerosol Science*, 12(5).
+  https://doi.org/10.1016/0021-8502(81)90036-7
+- Crump, J. G., Flagan, R. C., & Seinfeld, J. H. (1982), *Aerosol Science and
+  Technology*, 2(3), 303--309.
+  https://doi.org/10.1080/02786828308958636
+
+After read-only preflight, eligible finite-rate fixed slots survive with
+`exp(-k * time_step)`. A selected slot has every mass lane, concentration, and
+charge cleared. Density, volume, dtype, device, capacity, and unselected
+storage are preserved; inactive or unusable slots are neither sampled nor
+reactivated. The asynchronous call mutates caller-owned state in place. Callers
+own CPU↔Warp transfer, device placement, synchronization, and any checkpoint.
+There is no hidden CPU checkpoint transfer or fallback. Rejected pre-launch
+calls do not mutate caller-owned state, while rollback is not promised after a
+mutation kernel launches. Zero time completes preflight but is write-free.
+
+Omitted RNG state is private to each successful nonzero call. Supplied
+same-device `(n_boxes,)` `wp.uint32` state mutates in place;
+`initialize_rng=True` is the only reset, so repeating `rng_seed` alone does not
+reset persistent state. Consumption is sequential per box over eligible slots;
+exact CPU/Warp or per-seed RNG replay is not promised.
+
+| Scope | Status |
+| --- | --- |
+| Neutral particle-resolved spherical/rectangular direct execution | Supported |
+| Geometry-specific deterministic coefficient tolerances and 100-seed, 3-sigma aggregate survival evidence | Supported bounded evidence |
+| CUDA validation | Optional additive evidence; guarded skips are expected when unavailable |
+| Charged, image-charge, or electric-field physics; E6-F4 charged wall loss | Deferred |
+| CPU fallback or hidden transfer; high-level runnable, scheduler, or backend integration | Deferred (E6-F9 covers integration/closeout) |
+| Dynamic slots, compaction/activation, graph capture, differentiability, performance guarantees, or exact RNG replay | Deferred |
+
+Warp CPU is the baseline when Warp is installed; CUDA is optional and skips
+cleanly when unavailable. The evidence is not CPU-strategy parity or per-seed
+trajectory replay.
 
 GPU process orchestration, backend selection and scheduling, GPU-resident
 timestep integration, resizing, graph capture, autodiff, performance claims,

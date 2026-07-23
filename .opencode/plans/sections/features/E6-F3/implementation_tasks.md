@@ -90,3 +90,14 @@
   checks with fixed 3-sigma bounds, plus exact zero-time/all-inactive no-ops.
 - [x] Smoke-test the lazy `wall_loss_step_gpu` export and concrete-only
   `NeutralWallLossConfig` boundary without changing production modules.
+
+## P7 Completed Tasks (#1407)
+
+- [x] Publish direct-neutral P1–P6 development and Feature documentation in
+  `AGENTS.md`, `docs/Features/data-containers-and-gpu-foundations.md`, and
+  `docs/Features/Roadmap/data-oriented-gpu.md`.
+- [x] Record the documentation-only delivery and focused Warp validation without
+  changing production kernels, exports, physics, or the runtime test matrix.
+- [x] Cross-reference parent [E6](../../../epics/E6.json), future charged
+  [E6-F4](../../../features/E6-F4.json), and future closeout
+  [E6-F9](../../../features/E6-F9.json) without changing downstream status.

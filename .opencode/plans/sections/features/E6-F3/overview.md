@@ -116,3 +116,14 @@ when Warp is installed and CUDA rows are additive when available. P6 changes no
 production physics, runtime API, or public export; `wall_loss_step_gpu` remains
 the sole lazy wall-loss symbol and `NeutralWallLossConfig` remains concrete-module
 only.
+
+## Delivered Phase: E6-F3-P7 (#1407)
+
+P7 shipped the documentation-only closeout on 2026-07-23. `AGENTS.md` and the
+two Feature references publish the validated direct-neutral P1–P6 boundary,
+including import/configuration placement, units, environment exclusivity,
+fixed-slot clearing/preservation, caller-owned asynchronous mutation, RNG
+lifecycle, evidence, and deferrals. It adds no production behavior, export,
+physics, or runtime test-matrix change. Parent [E6](../../../epics/E6.json) and
+future [E6-F4](../../../features/E6-F4.json) / [E6-F9](../../../features/E6-F9.json)
+work retain their recorded statuses.
