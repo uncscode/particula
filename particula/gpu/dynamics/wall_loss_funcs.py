@@ -7,8 +7,8 @@ ratios are lower-clipped at -200, while image-charge exponents use the CPU
 diagonal/self-pair absolute-value calculation and clip to [-50, 50]. P3 also
 provides private electric-field drift and charged-coefficient composition
 helpers. The helpers are device-only, have no public validation contract, and
-direct-step integration remains deferred to P4; future step preflight owns
-input validation.
+are composed by the direct wall-loss step after its frozen preflight owns input
+validation.
 
 Crump, J. G., & Seinfeld, J. H. (1981). Turbulent deposition and
 gravitational sedimentation of an aerosol in a vessel of arbitrary shape.
@@ -233,8 +233,8 @@ def _coulomb_self_potential_ratio_wp(
 
     Calculates the particle self-pair ratio and lower-clips it at -200. This
     private device helper expects finite physical constants and positive,
-    finite radius and temperature. It performs no validation; a future direct
-    wall-loss-step preflight owns validation.
+    finite radius and temperature. It performs no validation; direct-step
+    preflight owns validation.
 
     Args:
         particle_radius: Particle radius in m.
@@ -279,7 +279,7 @@ def _image_charge_enhancement_wp(
     diagonal/self-pair physics, clips the exponent to [-50, 50], and
     exponentiates it. This private device helper expects finite physical
     constants and positive, finite radius and temperature. It performs no
-    validation; a future direct wall-loss-step preflight owns validation.
+    validation; direct-step preflight owns validation.
 
     Args:
         particle_radius: Particle radius in m.

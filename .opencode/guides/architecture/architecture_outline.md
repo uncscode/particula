@@ -27,11 +27,13 @@ private helpers for cross-kernel setup.
 - `dilution.py` - Concrete P1 GPU dilution input boundary; validation scans may
   allocate or launch, but rejected calls have no update-kernel launch or caller
   mutation
-- `wall_loss.py` - Concrete P5 neutral GPU wall-loss boundary; owns immutable
-  host configuration, frozen preflight, bounded fixed-slot removal, and the
-  external caller-owned per-box RNG sidecar lifecycle. The sidecar is not added
-  to Warp particle schemas or package exports; sequential per-box ownership
-  advances it only for eligible slots. Neutral coefficient helpers remain in
-  `particula.gpu.dynamics.wall_loss_funcs`.
+- `wall_loss.py` - Concrete fixed-slot neutral/charged GPU wall-loss boundary;
+  owns immutable host configuration, frozen preflight, bounded fixed-slot
+  removal, and the external caller-owned per-box RNG sidecar lifecycle. Charged
+  mode composes private image-charge and field-drift helpers from
+  `particula.gpu.dynamics.wall_loss_funcs` only for nonzero-charge slots;
+  zero-charge slots retain the neutral path. The sidecar is not added to Warp
+  particle schemas or package exports, and sequential per-box ownership
+  advances it only for eligible slots.
 - `environment.py` - Shared private normalization and validation for kernel environment inputs
 - `tests/` - Test coverage
