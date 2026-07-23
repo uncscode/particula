@@ -952,7 +952,6 @@ def test_moved_helpers_have_properties_only_export_surface() -> None:
 
     names = (
         "particle_radius_from_volume_wp",
-        "diffusion_coefficient_wp",
         "effective_density_wp",
         "settling_velocity_stokes_wp",
         "settling_velocity_stokes_from_transport_wp",

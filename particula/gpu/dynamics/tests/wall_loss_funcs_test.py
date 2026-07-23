@@ -234,6 +234,30 @@ def test_rectangle_wall_loss_matches_cpu_vector_states(device: str) -> None:
     npt.assert_allclose(actual, expected, rtol=1e-10, atol=1e-20)
 
 
+def test_rectangle_wall_loss_handles_extreme_finite_dimensions(
+    device: str,
+) -> None:
+    """Avoid product overflow for extreme but finite rectangular dimensions."""
+    state = tuple(value[:1] for value in _state_lanes())
+    dimensions = tuple(np.array([1.0e200], dtype=np.float64) for _ in range(3))
+    result = wp.zeros(1, dtype=wp.float64, device=device)
+    wp.launch(
+        _rectangle_wall_loss_kernel,
+        dim=1,
+        inputs=[
+            *_warp_arrays((*state, *dimensions), device),
+            *_constants(),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+
+    actual = result.numpy()
+    assert np.all(np.isfinite(actual))
+    assert np.all(actual > 0.0)
+
+
 @pytest.mark.gpu_parity
 def test_rectangle_wall_loss_uses_settling_limit_at_zero_transport(
     device: str,

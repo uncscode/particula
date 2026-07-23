@@ -543,16 +543,18 @@ def wall_loss_step_gpu(
             eligible positive-time work.
         initialize_rng: Whether to reset supplied ``rng_states`` from
             ``rng_seed`` before a successful positive-time call.
-        environment: Optional explicit Warp environment source.
+        environment: Optional explicit Warp environment source. Cannot be
+            combined with direct ``temperature`` or ``pressure`` inputs.
 
     Returns:
         The identical ``particles`` object. Private RNG state is not returned.
 
     Raises:
-        TypeError: If the configuration, time step, RNG metadata, or direct
-            environment inputs use an unsupported type.
+        TypeError: If the configuration, time step, or RNG metadata uses an
+            unsupported type.
         ValueError: If configuration, particle, time-step, environment, or RNG
-            values, shapes, dtypes, or devices violate the P3/P5 contract.
+            values, shapes, dtypes, or devices violate the P3/P5 contract,
+            including combining ``environment`` with direct environment inputs.
     """
     validated_config = _validate_config(config)
     n_boxes, device = _validate_particles(particles)
