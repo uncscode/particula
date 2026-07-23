@@ -16,6 +16,20 @@ geometries. It keeps particle arrays resident and allocation-stable, makes RNG
 ownership explicit, rejects invalid calls before mutation, and establishes the
 neutral foundation required by sibling E6-F4's charged wall-loss extension.
 
+## Delivered Phase: E6-F3-P1 (#1401)
+
+P1 shipped the reusable neutral fp64 Warp transport foundation, not a wall-loss
+step. `particula.gpu.properties` is now the sole owner and import surface for
+the migrated particle radius, diffusion, effective-density, settling, and slip
+helpers; legacy definitions and re-exports under `particula.gpu.dynamics` were
+removed and consumers were migrated. The phase also adds device-only
+`debye_1_wp` and `x_coth_x_wp` geometry factors and defines safe zero/invalid
+behavior for `cunningham_slip_correction_wp`.
+
+No coefficient assembly, wall-loss configuration or API, slot removal/RNG
+behavior, charged physics, or CPU behavior shipped in P1. Those remain the
+scope of later E6-F3 phases and E6-F4.
+
 ## User Stories
 
 - As a particle-resolved simulation developer, I want neutral spherical and

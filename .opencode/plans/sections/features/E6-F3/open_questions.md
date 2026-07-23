@@ -4,10 +4,13 @@ All E6-F3 planning questions were resolved on 2026-07-21 from the CPU wall-loss
 reference and existing direct-Warp process contracts.
 
 - [x] Which neutral transport primitives are reused?
-  - Decision: reuse existing viscosity, mean-free-path, Knudsen, slip,
-    mobility, diffusion, radius, density, and settling functions at their
-    current export levels. Add only concrete-module Debye/coth-safe and
-    wall-loss coefficient helpers; do not broaden unrelated public exports.
+  - Decision (implemented in P1 / #1401): `particula.gpu.properties` is the
+    canonical owner/import surface for neutral particle radius, slip, diffusion,
+    effective density, and settling helpers. Gas viscosity and mean free path
+    remain in `gas_properties.py`. Legacy `particula.gpu.dynamics` definitions
+    and re-exports were removed rather than retained as compatibility wrappers.
+    Device-only `debye_1_wp` and `x_coth_x_wp` were added in particle properties;
+    no wall-loss coefficient or high-level API export was broadened.
 - [x] What does `time_step == 0` do to RNG state?
   - Decision: after validation it performs no draws and no particle writes.
     Supplied RNG is byte-for-byte unchanged unless the caller explicitly asks

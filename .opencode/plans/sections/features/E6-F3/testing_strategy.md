@@ -9,8 +9,15 @@ scientific tolerance may be weakened. Test modules use the `*_test.py` suffix.
 - **P1 transport primitives:** In `particula/gpu/properties/tests/` and
   `particula/gpu/dynamics/tests/`, compare each reused or new device function to
   an independent CPU implementation over representative radius, density,
-  temperature, and pressure values. Include small-argument limits for Debye and
-  coth-like terms, finite outputs, and explicit domain rejection.
+  temperature, and pressure values. **Shipped evidence:**
+  `particula/gpu/properties/tests/particle_properties_test.py` covers the
+  consolidated property helpers, slip's exact zero/invalid sentinels,
+  branch-adjacent Debye quadrature/asymptote behavior against an independent
+  host oracle, and `x_coth_x` series/direct threshold and invalid-domain
+  behavior. Migration consumers retain their behavioral coverage, and an
+  import-surface regression confirms property exports and the absence of moved
+  names from `particula.gpu.dynamics`. Warp tests use guarded device execution;
+  CUDA remains optional.
 - **P2 coefficient functions:** In
   `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`, compare spherical and
   rectangular fp64 coefficients against
