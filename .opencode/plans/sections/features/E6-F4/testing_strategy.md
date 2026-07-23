@@ -43,16 +43,20 @@ scientific tolerance, or E6-F3 invariant may be weakened. Test modules use the
   rejected, and all-inactive calls preserve particle/field/RNG state. This is
   dispatch and boundary evidence, not P5 CPU coefficient parity or statistical
   survival validation.
-- **P5 parity/stochastic validation (deferred):** In
-  `particula/gpu/kernels/tests/wall_loss_parity_test.py`, require Warp CPU for a
-  deterministic geometry/charge/field coefficient matrix. Compare the charged
-  mode with zero charge against the E6-F3 neutral device coefficient, survivor
-  state, and final identically initialized RNG state by exact same-device
-  equality, and compare both modes to CPU at recorded fp64 tolerances. Validate
-  survival counts against `exp(-k*dt)` with the frozen eight-stratum exact
-  binomial contract over independent particles/seeds.
-  Exact NumPy/Warp draws are never expected. Repeat on CUDA when available and
-  skip cleanly otherwise.
+- **P5 parity/stochastic validation (implemented, #1413):** In
+  `particula/gpu/kernels/tests/wall_loss_parity_test.py`, a non-mutating Warp
+  charged diagnostic is compared with an independent CPU strategy oracle over
+  an explicit geometry/box/potential/field matrix, including image-only
+  spherical operation, four physical radii, and protected inactive/unusable
+  slots. It snapshots all particle fields and caller-owned rectangular fields;
+  spherical comparisons use `rtol=1.002e-3, atol=1e-20` and rectangular use
+  `rtol=1e-6, atol=0`. Zero-charge charged/neutral coefficients, survivor
+  state, and identically initialized RNG sidecars are exact. The tests also
+  cover invalid helper parameters and zero-time/all-inactive exact no-ops. The
+  eight charged geometry/radius strata each collect 4,096 observations against
+  an inclusive equal-tail exact-binomial interval at alpha `1.25e-7`; a small
+  persistent-sidecar case checks non-reset lifecycle. Exact NumPy/Warp draw
+  replay is not claimed. Warp CPU is baseline and CUDA skips cleanly when absent.
 - **P6 documentation:** Validate links, imports, SI units, semantic examples,
   support/deferred tables, and focused commands.
 

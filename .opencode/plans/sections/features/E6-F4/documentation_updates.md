@@ -11,8 +11,11 @@
   configuration-selected fixed-slot boundary, private helper ownership,
   nonzero-charge charged selection, zero-charge neutral fallback, frozen
   preflight, and external RNG-sidecar ownership.
-- [ ] Defer direct-step CPU coefficient parity and statistical survival claims
-  to P5; distinguish implemented direct dispatch from those validation scopes.
+- [x] #1413 records completed direct-step charged CPU/Warp coefficient parity,
+  exact zero-charge fallback/ownership, invalid/no-op non-mutation, and the
+  frozen eight-stratum exact-binomial survival validation in the plan and
+  regression module only. No user-facing documentation changed and no broader
+  parity or RNG-replay claim is made.
 - Add or extend a `docs/Examples/` low-level example only if it can preserve
   explicit CPU-to-Warp transfers and does not imply a high-level runnable;
   otherwise defer the integrated example to E6-F9.

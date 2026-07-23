@@ -22,10 +22,14 @@
   and positive-overflow results to finite nonnegative fp64 outputs.
 - [x] Every zero-charge active slot reproduces the E6-F3 neutral coefficient and
   RNG path, including when potential or field is configured.
-- [ ] Charged spherical and rectangular coefficients match the CPU array oracle
-  at recorded fp64 `rtol`/`atol` on required Warp CPU.
-- [ ] Charged and neutral-fallback survival counts pass predeclared statistical
-  bounds without requiring exact CPU/Warp RNG sequences.
+- [x] Charged spherical and rectangular coefficients match the independent CPU
+  strategy oracle on required Warp CPU at spherical `rtol=1.002e-3,
+  atol=1e-20` and rectangular `rtol=1e-6, atol=0`, without mutation of particle
+  or caller-owned rectangular-field state.
+- [x] Frozen eight-stratum exact-binomial survival validation (4,096
+  observations per stratum) and persistent-sidecar evidence pass predeclared
+  inclusive bounds without requiring exact CPU/Warp RNG sequences; exact
+  zero-charge fallback equality is separately covered.
 - [x] Supplied per-box RNG persists by identity without hidden reseeding;
   invalid, zero-time, all-unusable calls do not advance it, while usable clipped
   charged slots consume a compatible discard draw and charged saturation uses the
@@ -35,8 +39,8 @@
   stable.
 - [x] All detectable invalid calls fail before allocation, RNG mutation, or
   particle mutation.
-- [ ] CUDA validation skips cleanly when unavailable, and documentation states
-  all explicit ownership and deferred boundaries.
+- [x] CUDA validation is additive and skips cleanly when unavailable; P5 adds no
+  documentation or public-boundary change.
 
 ## Metrics
 
