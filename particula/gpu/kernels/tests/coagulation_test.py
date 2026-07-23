@@ -6011,7 +6011,10 @@ def test_coagulation_step_gpu_invalid_environment_domains_short_circuit_before_l
     original_launch = coagulation_module.wp.launch
 
     def _tracking_launch(kernel: Any, *args: Any, **kwargs: Any) -> Any:
-        calls.append(getattr(kernel, "key", str(kernel)))
+        name = getattr(kernel, "key", str(kernel))
+        if name.startswith("_scan_positive_finite_"):
+            return original_launch(kernel, *args, **kwargs)
+        calls.append(name)
         return original_launch(kernel, *args, **kwargs)
 
     monkeypatch.setattr(
@@ -6080,6 +6083,10 @@ def test_coagulation_step_gpu_invalid_environment_preserves_buffers_and_particle
         raise AssertionError("_ensure_volume_array should not be called")
 
     def _unexpected_launch(*args: Any, **kwargs: Any) -> None:
+        kernel = args[0]
+        name = getattr(kernel, "key", str(kernel))
+        if name.startswith("_scan_positive_finite_"):
+            return original_launch(*args, **kwargs)
         calls.append("launch")
         raise AssertionError("wp.launch should not be called")
 
@@ -6091,6 +6098,7 @@ def test_coagulation_step_gpu_invalid_environment_preserves_buffers_and_particle
     monkeypatch.setattr(
         coagulation_module, "_validate_charge_finite", lambda *_: None
     )
+    original_launch = coagulation_module.wp.launch
     monkeypatch.setattr(coagulation_module.wp, "launch", _unexpected_launch)
 
     with pytest.raises(
