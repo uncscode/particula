@@ -194,21 +194,23 @@ print(result)
    autodiff, and performance claims remain deferred. See
     [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
     for the complete contract.
-- GPU neutral wall loss P3 is a direct, write-free preflight boundary imported
-    with `from particula.gpu.kernels import wall_loss_step_gpu`. It accepts only
+- GPU neutral wall loss P4 is a direct fixed-shape boundary imported with
+    `from particula.gpu.kernels import wall_loss_step_gpu`. It accepts only
     particle-resolved neutral configurations. Create
     `NeutralWallLossConfig` from `particula.gpu.kernels.wall_loss`; the
     configuration is intentionally not exported from `particula.gpu.kernels` or
     `particula.gpu`. It validates spherical or rectangular SI geometry, fixed
     `WarpParticleData` schema and domains, environment inputs, and optional RNG
-    metadata, then returns the identical particle container without computing
-    coefficients, initializing or advancing RNG state, allocating outputs, or
-    removing particles. Callers retain ownership of Warp transfers, device
-    placement, synchronization, particle data, and any RNG sidecar. Preflight
-    may run device validation scans and synchronize to read back scalar status,
-    but it does not transfer or replace caller-owned buffers. P4/P5 removal
-    behavior, a runnable API, hidden transfers or fallback, and parity claims
-    remain deferred.
+    metadata. Successful nonzero calls evaluate bounded neutral coefficients
+    and stochastically remove eligible fixed slots in place; zero time is a
+    post-preflight write-free no-op. P4 derives one local draw from the seed and
+    slot and does not initialize, advance, or otherwise mutate `rng_states`;
+    P5 owns lifecycle semantics. Callers retain ownership of Warp transfers,
+    device placement, synchronization, particle data, and any RNG sidecar.
+    Preflight may run device validation scans and synchronize to read back scalar
+    status, but it does not transfer or replace caller-owned buffers. Charged
+    wall loss, a runnable API, hidden transfers or fallback, CPU/Warp stochastic
+    parity, and P5/P6 behavior remain deferred.
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the

@@ -49,13 +49,16 @@ kernel-entry responsibilities.
   `NeutralWallLossConfig` is deliberately concrete-module-only at
   `particula.gpu.kernels.wall_loss`; do not re-export it through
   `particula.gpu.kernels` or `particula.gpu`.
-- `wall_loss_step_gpu` owns immutable host configuration and read-only P3
-  preflight for neutral, particle-resolved inputs. It delegates neither
-  coefficient ownership nor execution to the boundary: neutral coefficient
-  helpers remain in `particula.gpu.dynamics.wall_loss_funcs`.
-- P3 returns the identical particle object without coefficient assembly,
-  removal, output allocation, or RNG initialization/advancement. P4 and P5
-  retain this signature when adding deferred execution behavior. See
+- `wall_loss_step_gpu` owns immutable host configuration and frozen P3
+  preflight for neutral, particle-resolved inputs. After successful preflight,
+  a nonzero call evaluates coefficients and stochastically clears eligible fixed
+  slots in place; zero time is write-free. Neutral coefficient helpers remain
+  in `particula.gpu.dynamics.wall_loss_funcs`.
+- P4 returns the identical particle object and derives one local seed-plus-slot
+  draw per eligible slot without initializing or advancing supplied RNG state.
+  Pre-launch failures are atomic; rollback after mutation launch is not
+  promised. Charged physics, runnables, hidden transfers/fallbacks, CPU/Warp
+  stochastic parity, and P5/P6 lifecycle behavior remain deferred. See
   [ADR-001](decisions/ADR-001-neutral-gpu-wall-loss-boundary.md).
 
 ## Design Intent

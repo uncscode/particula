@@ -1,4 +1,4 @@
-"""Tests for the write-free GPU neutral wall-loss P3 boundary."""
+"""Tests for fixed-shape GPU neutral wall-loss P4 execution."""
 
 from __future__ import annotations
 
@@ -80,6 +80,32 @@ def _assert_snapshot_unchanged(particles, snapshot, rng_states=None) -> None:
         npt.assert_array_equal(rng_states.numpy(), expected)
 
 
+def _assert_slots_preserved_or_cleared(particles, snapshot) -> None:
+    """Assert P4 only clears complete active slots and preserves protected data."""
+    original_masses = snapshot["masses"][1]
+    original_concentration = snapshot["concentration"][1]
+    original_charge = snapshot["charge"][1]
+    for box, particle in np.ndindex(original_concentration.shape):
+        current_mass = particles.masses.numpy()[box, particle]
+        current_concentration = particles.concentration.numpy()[box, particle]
+        current_charge = particles.charge.numpy()[box, particle]
+        if (
+            original_concentration[box, particle] > 0.0
+            and np.sum(original_masses[box, particle]) > 0.0
+            and current_concentration == 0.0
+            and np.all(current_mass == 0.0)
+        ):
+            assert current_charge == 0.0
+        else:
+            npt.assert_array_equal(current_mass, original_masses[box, particle])
+            assert (
+                current_concentration == original_concentration[box, particle]
+            )
+            assert current_charge == original_charge[box, particle]
+    npt.assert_array_equal(particles.density.numpy(), snapshot["density"][1])
+    npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
+
+
 def test_public_step_is_lazy_and_config_is_concrete_only() -> None:
     """Expose only the direct step from the lazy kernel package namespace."""
     from particula.gpu import kernels
@@ -102,10 +128,10 @@ def test_public_step_is_lazy_and_config_is_concrete_only() -> None:
 
 
 @pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
-def test_valid_preflight_returns_identity_without_mutation(
+def test_valid_execution_returns_identity_and_preserves_rng_sidecar(
     geometry: str,
 ) -> None:
-    """Both supported geometries validate without writing particle state."""
+    """Both supported geometries only preserve or fully clear active slots."""
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
@@ -124,7 +150,8 @@ def test_valid_preflight_returns_identity_without_mutation(
     )
 
     assert returned is particles
-    _assert_snapshot_unchanged(particles, snapshot, rng_states)
+    _assert_slots_preserved_or_cleared(particles, snapshot)
+    npt.assert_array_equal(rng_states.numpy(), snapshot["rng_states"][1])
 
 
 def test_config_type_fails_before_particle_access() -> None:
@@ -206,10 +233,10 @@ def test_nonnegative_particle_metadata_rejects_nan(field: str) -> None:
 
 
 @pytest.mark.parametrize("charges", [[-2.0, -1.0], [-2.0, 3.0]])
-def test_signed_finite_charge_metadata_is_accepted_without_mutation(
+def test_signed_finite_charge_metadata_is_accepted_with_complete_slot_updates(
     charges: list[float],
 ) -> None:
-    """Neutral P3 accepts signed finite charge metadata without writing state."""
+    """Neutral P4 retains signed charge or clears it with a removed slot."""
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
@@ -230,7 +257,8 @@ def test_signed_finite_charge_metadata_is_accepted_without_mutation(
     )
 
     assert returned is particles
-    _assert_snapshot_unchanged(particles, snapshot, rng_states)
+    _assert_slots_preserved_or_cleared(particles, snapshot)
+    npt.assert_array_equal(rng_states.numpy(), snapshot["rng_states"][1])
 
 
 def test_rng_metadata_rejection_preserves_sidecar() -> None:
@@ -412,7 +440,6 @@ def test_explicit_environment_and_float32_direct_array_are_accepted() -> None:
         )
         is particles
     )
-
     environment = SimpleNamespace(
         temperature=wp.array([298.15, 300.0], dtype=wp.float64, device="cpu"),
         pressure=wp.array([101325.0, 100000.0], dtype=wp.float64, device="cpu"),
@@ -428,6 +455,48 @@ def test_explicit_environment_and_float32_direct_array_are_accepted() -> None:
         )
         is particles
     )
+
+
+@pytest.mark.parametrize("source", ["direct", "environment"])
+def test_zero_time_is_byte_for_byte_write_free_after_preflight(
+    source: str,
+) -> None:
+    """Zero time validates every source form without normalizing or writing."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    rng_states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, rng_states)
+    if source == "direct":
+        returned = wall_loss_step_gpu(
+            particles,
+            wp.array([298.15, 300.0], dtype=wp.float64, device="cpu"),
+            wp.array([101325.0, 100000.0], dtype=wp.float64, device="cpu"),
+            0.0,
+            config=_config(),
+            rng_states=rng_states,
+        )
+    else:
+        environment = SimpleNamespace(
+            temperature=wp.array(
+                [298.15, 300.0], dtype=wp.float64, device="cpu"
+            ),
+            pressure=wp.array(
+                [101325.0, 100000.0], dtype=wp.float64, device="cpu"
+            ),
+        )
+        returned = wall_loss_step_gpu(
+            particles,
+            None,
+            None,
+            np.array(0.0),
+            config=_config(),
+            rng_states=rng_states,
+            environment=environment,
+        )
+    assert returned is particles
+    _assert_snapshot_unchanged(particles, snapshot, rng_states)
 
 
 @pytest.mark.parametrize(
@@ -452,28 +521,221 @@ def test_rng_form_rejections_preserve_particles(kwargs, error, match) -> None:
     _assert_snapshot_unchanged(particles, snapshot)
 
 
-def test_preflight_never_calls_wall_loss_coefficient_helpers(
+def test_zero_time_never_calls_wall_loss_coefficient_helpers(
     monkeypatch,
 ) -> None:
-    """P3 does not reach either deferred neutral coefficient helper."""
-    from particula.gpu.dynamics import wall_loss_funcs
+    """The post-preflight zero-time path does not calculate coefficients."""
+    from particula.gpu.kernels import wall_loss as wall_loss_module
     from particula.gpu.kernels import wall_loss_step_gpu
 
     def fail_if_called(*_args, **_kwargs):
         pytest.fail("P3 preflight must not calculate wall-loss coefficients")
 
     monkeypatch.setattr(
-        wall_loss_funcs, "spherical_wall_loss_coefficient_wp", fail_if_called
+        wall_loss_module, "spherical_wall_loss_coefficient_wp", fail_if_called
     )
     monkeypatch.setattr(
-        wall_loss_funcs, "rectangle_wall_loss_coefficient_wp", fail_if_called
+        wall_loss_module, "rectangle_wall_loss_coefficient_wp", fail_if_called
     )
     assert (
         wall_loss_step_gpu(
-            _particles(), 298.15, 101325.0, 1.0, config=_config()
+            _particles(), 298.15, 101325.0, 0.0, config=_config()
         )
         is not None
     )
+
+
+@pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
+def test_large_time_step_removes_only_eligible_slots(geometry: str) -> None:
+    """Finite positive coefficients clear eligible slots at underflow time."""
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    particles.masses = _warp().array(
+        np.array(
+            [
+                [[1.0, 2.0], [0.0, 0.0]],
+                [[3.0, 4.0], [0.0, 0.0]],
+            ],
+            dtype=np.float64,
+        ),
+        dtype=_warp().float64,
+        device="cpu",
+    )
+    snapshot = _snapshot(particles)
+
+    returned = wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        1.0e300,
+        config=_config(geometry),
+        rng_seed=42,
+    )
+
+    assert returned is particles
+    for box, particle in ((0, 0), (1, 0)):
+        npt.assert_array_equal(particles.masses.numpy()[box, particle], 0.0)
+        assert particles.concentration.numpy()[box, particle] == 0.0
+        assert particles.charge.numpy()[box, particle] == 0.0
+    # The inactive and zero-mass slots are never sampled or modified.
+    npt.assert_array_equal(particles.masses.numpy()[0, 1], [0.0, 0.0])
+    assert particles.charge.numpy()[0, 1] == snapshot["charge"][1][0, 1]
+    npt.assert_array_equal(particles.masses.numpy()[1, 1], [0.0, 0.0])
+    assert particles.concentration.numpy()[1, 1] == 3.0
+    assert particles.charge.numpy()[1, 1] == snapshot["charge"][1][1, 1]
+    npt.assert_array_equal(particles.density.numpy(), snapshot["density"][1])
+    npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
+
+
+def test_mask_application_preserves_unmarked_and_clears_marked_slots() -> None:
+    """Private mask application clears every mutable lane only when selected."""
+    wp = _warp()
+    from particula.gpu.kernels.wall_loss import _apply_wall_loss_mask
+
+    particles = _particles()
+    snapshot = _snapshot(particles)
+    mask = wp.array([[0, 1], [1, 0]], dtype=wp.int32, device="cpu")
+    wp.launch(
+        _apply_wall_loss_mask,
+        dim=mask.shape,
+        inputs=[
+            particles.masses,
+            particles.concentration,
+            particles.charge,
+            mask,
+            2,
+        ],
+        device="cpu",
+    )
+
+    for box, particle in ((0, 1), (1, 0)):
+        npt.assert_array_equal(particles.masses.numpy()[box, particle], 0.0)
+        assert particles.concentration.numpy()[box, particle] == 0.0
+        assert particles.charge.numpy()[box, particle] == 0.0
+    for box, particle in ((0, 0), (1, 1)):
+        npt.assert_array_equal(
+            particles.masses.numpy()[box, particle],
+            snapshot["masses"][1][box, particle],
+        )
+        assert (
+            particles.concentration.numpy()[box, particle]
+            == snapshot["concentration"][1][box, particle]
+        )
+        assert (
+            particles.charge.numpy()[box, particle]
+            == snapshot["charge"][1][box, particle]
+        )
+    npt.assert_array_equal(particles.density.numpy(), snapshot["density"][1])
+    npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
+
+
+def test_equal_inputs_and_seed_produce_equal_slot_updates() -> None:
+    """Call-local seed-plus-slot draws are reproducible on one device."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    first = _particles()
+    second = _particles()
+    first_rng = wp.array([13, 17], dtype=wp.uint32, device="cpu")
+    second_rng = wp.array([13, 17], dtype=wp.uint32, device="cpu")
+    first_rng_before = first_rng.numpy().copy()
+    second_rng_before = second_rng.numpy().copy()
+
+    wall_loss_step_gpu(
+        first,
+        298.15,
+        101325.0,
+        1.0,
+        config=_config(),
+        rng_seed=97,
+        rng_states=first_rng,
+    )
+    wall_loss_step_gpu(
+        second,
+        298.15,
+        101325.0,
+        1.0,
+        config=_config(),
+        rng_seed=97,
+        rng_states=second_rng,
+    )
+
+    for field in ("masses", "concentration", "charge", "density", "volume"):
+        npt.assert_array_equal(
+            getattr(first, field).numpy(), getattr(second, field).numpy()
+        )
+    npt.assert_array_equal(first_rng.numpy(), first_rng_before)
+    npt.assert_array_equal(second_rng.numpy(), second_rng_before)
+
+
+def test_subnormal_mass_slot_survives_without_transport_calculation() -> None:
+    """Keep an active slot unchanged when its derived volume underflows."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    particles.masses = wp.array(
+        np.array(
+            [
+                [[np.nextafter(0.0, 1.0), 0.0], [0.0, 0.0]],
+                [[0.0, 0.0], [0.0, 0.0]],
+            ],
+            dtype=np.float64,
+        ),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    particles.concentration = wp.array(
+        [[1.0, 0.0], [0.0, 0.0]], dtype=wp.float64, device="cpu"
+    )
+    snapshot = _snapshot(particles)
+
+    returned = wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        1.0e300,
+        config=_config(),
+        rng_seed=2**32 - 1,
+    )
+
+    assert returned is particles
+    _assert_snapshot_unchanged(particles, snapshot)
+
+
+@pytest.mark.parametrize("mask_values", [np.zeros((2, 2)), np.ones((2, 2))])
+def test_mask_application_handles_all_survivor_and_all_removal_masks(
+    mask_values: np.ndarray,
+) -> None:
+    """All-zero and all-one private masks preserve or clear complete slots."""
+    wp = _warp()
+    from particula.gpu.kernels.wall_loss import _apply_wall_loss_mask
+
+    particles = _particles()
+    snapshot = _snapshot(particles)
+    mask = wp.array(mask_values, dtype=wp.int32, device="cpu")
+    wp.launch(
+        _apply_wall_loss_mask,
+        dim=mask.shape,
+        inputs=[
+            particles.masses,
+            particles.concentration,
+            particles.charge,
+            mask,
+            2,
+        ],
+        device="cpu",
+    )
+
+    if np.all(mask_values == 0.0):
+        _assert_snapshot_unchanged(particles, snapshot)
+        return
+    npt.assert_array_equal(particles.masses.numpy(), 0.0)
+    npt.assert_array_equal(particles.concentration.numpy(), 0.0)
+    npt.assert_array_equal(particles.charge.numpy(), 0.0)
+    npt.assert_array_equal(particles.density.numpy(), snapshot["density"][1])
+    npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
 
 
 def test_missing_particle_field_and_nonarray_field_have_stable_errors() -> None:

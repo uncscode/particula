@@ -1,10 +1,8 @@
-"""Validate neutral direct GPU wall-loss inputs without executing removal.
+"""Apply bounded neutral direct GPU wall loss to fixed particle slots.
 
-This P3 boundary accepts only neutral particle-resolved configurations. It
-performs read-only schema and domain preflight and intentionally does not
-assemble coefficients, allocate output or RNG storage, advance RNG state, or
-mutate caller-owned particle data.  Later wall-loss phases reuse this callable
-interface to add the deferred execution behavior.
+The P4 boundary retains P3 preflight ordering, then evaluates neutral wall-loss
+coefficients for usable particle-resolved slots. Each eligible slot receives one
+call-local deterministic survival draw and removed slots are cleared in place.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -25,10 +23,34 @@ except ImportError as exc:  # pragma: no cover - handled by test guards
         "Install with: pip install warp-lang"
     ) from exc
 
+from particula.gpu.dynamics.wall_loss_funcs import (
+    rectangle_wall_loss_coefficient_wp,
+    spherical_wall_loss_coefficient_wp,
+)
 from particula.gpu.kernels.environment import (
+    _ensure_environment_arrays,
     _is_warp_array_like,
     validate_environment_inputs,
 )
+from particula.gpu.properties import (
+    effective_density_wp,
+    particle_radius_from_volume_wp,
+)
+from particula.util.constants import (
+    BOLTZMANN_CONSTANT,
+    GAS_CONSTANT,
+    MOLECULAR_WEIGHT_AIR,
+    REF_TEMPERATURE_STP,
+    REF_VISCOSITY_AIR_STP,
+    SUTHERLAND_CONSTANT,
+)
+
+_BOLTZMANN_CONSTANT = wp.constant(wp.float64(BOLTZMANN_CONSTANT))
+_GAS_CONSTANT = wp.constant(wp.float64(GAS_CONSTANT))
+_MOLECULAR_WEIGHT_AIR = wp.constant(wp.float64(MOLECULAR_WEIGHT_AIR))
+_REF_VISCOSITY_AIR_STP = wp.constant(wp.float64(REF_VISCOSITY_AIR_STP))
+_REF_TEMPERATURE_STP = wp.constant(wp.float64(REF_TEMPERATURE_STP))
+_SUTHERLAND_CONSTANT = wp.constant(wp.float64(SUTHERLAND_CONSTANT))
 
 
 @dataclass(frozen=True)
@@ -322,6 +344,111 @@ def _validate_rng(
         raise ValueError("rng_states device must match particle device.")
 
 
+@wp.kernel
+def _wall_loss_removal_mask(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_radius: wp.float64,
+    chamber_length: wp.float64,
+    chamber_width: wp.float64,
+    chamber_height: wp.float64,
+    geometry_mode: wp.int32,
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_seed: wp.uint32,
+    removal_mask: wp.array2d(dtype=wp.int32),
+) -> None:
+    """Calculate stochastic removal flags without mutating caller fields."""
+    box, particle = wp.tid()
+    if concentration[box, particle] <= wp.float64(0.0):
+        return
+
+    total_mass = wp.float64(0.0)
+    total_volume = wp.float64(0.0)
+    for species in range(n_species):
+        mass = masses[box, particle, species]
+        total_mass += mass
+        total_volume += mass / density[species]
+    if total_mass <= wp.float64(0.0) or total_volume <= wp.float64(0.0):
+        return
+
+    particle_radius = particle_radius_from_volume_wp(total_volume)
+    particle_density = effective_density_wp(total_mass, total_volume)
+    # Invalid derived transport values survive without coefficient or RNG work.
+    if (
+        not wp.isfinite(particle_radius)
+        or particle_radius <= wp.float64(0.0)
+        or not wp.isfinite(particle_density)
+        or particle_density <= wp.float64(0.0)
+    ):
+        return
+
+    coefficient = wp.float64(0.0)
+    if geometry_mode == wp.int32(0):
+        coefficient = spherical_wall_loss_coefficient_wp(
+            wall_eddy_diffusivity,
+            particle_radius,
+            particle_density,
+            temperature[box],
+            pressure[box],
+            chamber_radius,
+            _BOLTZMANN_CONSTANT,
+            _GAS_CONSTANT,
+            _MOLECULAR_WEIGHT_AIR,
+            _REF_VISCOSITY_AIR_STP,
+            _REF_TEMPERATURE_STP,
+            _SUTHERLAND_CONSTANT,
+        )
+    else:
+        coefficient = rectangle_wall_loss_coefficient_wp(
+            wall_eddy_diffusivity,
+            particle_radius,
+            particle_density,
+            temperature[box],
+            pressure[box],
+            chamber_length,
+            chamber_width,
+            chamber_height,
+            _BOLTZMANN_CONSTANT,
+            _GAS_CONSTANT,
+            _MOLECULAR_WEIGHT_AIR,
+            _REF_VISCOSITY_AIR_STP,
+            _REF_TEMPERATURE_STP,
+            _SUTHERLAND_CONSTANT,
+        )
+    if not wp.isfinite(coefficient) or coefficient <= wp.float64(0.0):
+        return
+
+    # The seed and flattened fixed slot define one call-local random stream.
+    state = wp.rand_init(
+        wp.int32(rng_seed), wp.int32(box * n_particles + particle)
+    )
+    if wp.randf(state) > wp.exp(-coefficient * time_step):
+        removal_mask[box, particle] = wp.int32(1)
+
+
+@wp.kernel
+def _apply_wall_loss_mask(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    removal_mask: wp.array2d(dtype=wp.int32),
+    n_species: wp.int32,
+) -> None:
+    """Clear all mutable slot fields selected by a removal mask."""
+    box, particle = wp.tid()
+    if removal_mask[box, particle] != wp.int32(0):
+        for species in range(n_species):
+            masses[box, particle, species] = wp.float64(0.0)
+        concentration[box, particle] = wp.float64(0.0)
+        charge[box, particle] = wp.float64(0.0)
+
+
 def wall_loss_step_gpu(
     particles: Any,
     temperature: float | Any | None,
@@ -334,14 +461,20 @@ def wall_loss_step_gpu(
     initialize_rng: bool = False,
     environment: Any | None = None,
 ) -> Any:
-    """Perform write-free P3 neutral wall-loss preflight.
+    """Apply P4 neutral wall loss to eligible particle-resolved slots.
 
     The configuration supports only particle-resolved neutral wall loss.  SI
     inputs are wall eddy diffusivity [m^2 s^-1], geometry dimensions [m],
-    temperature [K], pressure [Pa], and ``time_step`` [s].  This deferred P3
-    boundary validates every input but performs no coefficient assembly, RNG
-    initialization or advancement, allocation of output resources, or particle
-    mutation.  P4 and P5 reuse this exact signature for execution.
+    temperature [K], pressure [Pa], and ``time_step`` [s]. After frozen P3
+    preflight, positive-time calls evaluate neutral coefficients for usable
+    slots, apply survival probability ``exp(-k * time_step)``, and clear every
+    mass lane, concentration, and charge for removed slots. Zero time is a
+    post-preflight write-free no-op.
+
+    Supplied ``rng_states`` remains uninitialized and unchanged. P4 uses one
+    call-local seed-plus-slot draw per eligible slot; P5 owns persistent RNG
+    lifecycle semantics. Pre-launch validation errors are atomic, while rollback
+    is not promised after a mutation kernel has launched.
 
     Args:
         particles: Caller-owned fixed-shape ``WarpParticleData``-like object.
@@ -349,23 +482,23 @@ def wall_loss_step_gpu(
         pressure: Scalar or per-box Warp pressure [Pa].
         time_step: Finite nonnegative duration [s].
         config: Exact neutral geometry and representation configuration.
-        rng_seed: Deferred unsigned 32-bit seed metadata.
-        rng_states: Optional deferred per-box unsigned 32-bit state.
-        initialize_rng: Deferred request to initialize supplied state.
+        rng_seed: Unsigned 32-bit seed for call-local slot-derived draws.
+        rng_states: Optional P3-validated, unchanged per-box unsigned state.
+        initialize_rng: P3-validated deferred P5 lifecycle request.
         environment: Optional explicit Warp environment source.
 
     Returns:
-        The identical ``particles`` object after successful preflight.
+        The identical ``particles`` object after successful execution.
 
     Raises:
         TypeError: If the configuration, time step, RNG metadata, or direct
             environment inputs use an unsupported type.
         ValueError: If configuration, particle, time-step, environment, or RNG
-            values, shapes, dtypes, or devices violate the P3 contract.
+            values, shapes, dtypes, or devices violate the P3/P4 contract.
     """
-    _validate_config(config)
+    validated_config = _validate_config(config)
     n_boxes, device = _validate_particles(particles)
-    _validate_time_step(time_step)
+    validated_time_step = _validate_time_step(time_step)
     validate_environment_inputs(
         temperature,
         pressure,
@@ -375,4 +508,58 @@ def wall_loss_step_gpu(
         caller_name="wall_loss_step_gpu",
     )
     _validate_rng(rng_seed, rng_states, initialize_rng, n_boxes, device)
+    if validated_time_step == 0.0:
+        return particles
+
+    temperature_array, pressure_array = _ensure_environment_arrays(
+        temperature,
+        pressure,
+        environment,
+        n_boxes,
+        device,
+        caller_name="wall_loss_step_gpu",
+    )
+    n_particles = particles.masses.shape[1]
+    n_species = particles.masses.shape[2]
+    removal_mask = wp.zeros(
+        (n_boxes, n_particles), dtype=wp.int32, device=device
+    )
+    geometry_mode = 0 if validated_config.geometry == "spherical" else 1
+    chamber_radius = float(validated_config.chamber_radius or 0.0)
+    dimensions = validated_config.chamber_dimensions or (0.0, 0.0, 0.0)
+    wp.launch(
+        _wall_loss_removal_mask,
+        dim=(n_boxes, n_particles),
+        inputs=[
+            particles.masses,
+            particles.concentration,
+            particles.density,
+            temperature_array,
+            pressure_array,
+            validated_time_step,
+            float(validated_config.wall_eddy_diffusivity),
+            chamber_radius,
+            float(dimensions[0]),
+            float(dimensions[1]),
+            float(dimensions[2]),
+            geometry_mode,
+            n_particles,
+            n_species,
+            int(rng_seed),
+            removal_mask,
+        ],
+        device=device,
+    )
+    wp.launch(
+        _apply_wall_loss_mask,
+        dim=(n_boxes, n_particles),
+        inputs=[
+            particles.masses,
+            particles.concentration,
+            particles.charge,
+            removal_mask,
+            n_species,
+        ],
+        device=device,
+    )
     return particles
