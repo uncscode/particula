@@ -194,36 +194,36 @@ print(result)
    autodiff, and performance claims remain deferred. See
     [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
     for the complete contract.
-- GPU wall loss P4 is a direct fixed-shape boundary imported with
-    `from particula.gpu.kernels import wall_loss_step_gpu`. Create
-    `NeutralWallLossConfig` from `particula.gpu.kernels.wall_loss`; the
-    configuration is intentionally not exported from `particula.gpu.kernels` or
-     `particula.gpu`. It supports particle-resolved neutral and charged
-     configurations. Charged mode accepts finite signed wall potential plus a
-     finite signed spherical scalar electric field or a caller-owned, same-device
-     `wp.float64` rectangular field shaped `(3,)`. Nonzero charged slots compose
-     private image-charge and electric-field-drift helpers. Neutral mode and
-     zero-charge charged slots preserve the neutral coefficient and RNG path.
-     The rectangular field remains caller-owned and is read only by charged
-     rectangular execution. The step validates spherical or rectangular SI
-     geometry, fixed `WarpParticleData` schema and domains, environment inputs,
-     and optional RNG metadata. Successful nonzero calls evaluate bounded
-     coefficients and stochastically clear eligible slots' mass lanes,
-     concentration, and charge in place; zero time is a post-preflight write-free
-      no-op. P4 advances one sequential per-box RNG owner for eligible slots.
-    Omitted `rng_states` are private and seeded per call, while supplied sidecars
-    mutate in place and reset only with `initialize_rng=True`; repeating `rng_seed`
-    does not reset a supplied sidecar. Zero time and pre-launch failures preserve
-    supplied state. Callers retain ownership of Warp transfers, device placement,
-    synchronization, particle data, and any RNG sidecar. Positive-time execution
-    performs no host status readback, uses no particle-sized temporary mask, and
-    selects and clears slots in one device pass. Rollback is not promised after a
-    mutation kernel launches. Sequential per-box RNG advancement limits parallelism
-    and makes no performance claim. Test-only validation compares deterministic
-    coefficients with CPU system-state equations and checks aggregate stochastic
-    survival; it does not establish CPU/Warp RNG-stream or trajectory replay.
-     A runnable API, hidden transfers or fallback, and broader integrated
-     orchestration remain deferred.
+- GPU wall loss is a direct, caller-managed fixed-slot boundary imported with
+    `from particula.gpu.kernels import wall_loss_step_gpu`. Construct
+    `NeutralWallLossConfig` only from `particula.gpu.kernels.wall_loss`; it is
+    deliberately not re-exported from `particula.gpu.kernels` or `particula.gpu`.
+    It supports particle-resolved neutral and charged configurations. Inputs use
+    SI units: wall eddy diffusivity [m²/s], radius or dimensions [m], temperature
+    [K], pressure [Pa], time [s], signed wall potential [V], and electric field
+    [V/m]. Charged spherical execution preserves a signed scalar field and adds
+    the signed potential-derived field. Charged rectangular execution accepts a
+    caller-owned, same-device `wp.float64` field shaped `(3,)`, reduces its lanes
+    to their Euclidean magnitude, then adds the signed potential-derived field;
+    component signs do not select drift direction. Nonzero-charge slots retain
+    image-charge enhancement when `wall_potential=0`; zero-charge charged slots
+    use the exact neutral coefficient and RNG path. Callers own particle charge,
+    optional `(n_boxes,)` `wp.uint32` RNG state, explicit transfers, device
+    placement, and synchronization. After read-only preflight, selected eligible
+    slots have all mass lanes, concentration, and charge cleared in place, while
+    fixed capacity and unselected storage are preserved. Rejected pre-launch calls
+    do not mutate caller-owned state; rollback is not promised after launch.
+    Warp CPU is the baseline when available, and CUDA is optional with clean skips:
+
+    ```bash
+    pytest particula/gpu/dynamics/tests/wall_loss_funcs_test.py -q -Werror
+    pytest particula/gpu/kernels/tests/wall_loss_test.py \
+      particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror
+    ```
+
+    Hidden transfers or CPU fallback, a GPU runnable or scheduler/backend
+    integration, dynamic slots, graph capture, differentiability, exact
+    cross-backend RNG replay, mandatory CUDA, and performance claims are deferred.
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
