@@ -1232,17 +1232,18 @@ Delivered dilution scope:
    It is not bitwise parity. E6-F9 is the future integrated direct-call
    consumer.
 
-Delivered bounded neutral wall-loss scope:
+Delivered bounded neutral wall-loss P5 scope:
 
-- E6-F3-P4 provides `from particula.gpu.kernels import wall_loss_step_gpu` for
+- E6-F3-P5 provides `from particula.gpu.kernels import wall_loss_step_gpu` for
   direct neutral, particle-resolved wall loss with fixed slots. After read-only
   P3 preflight, positive-time calls stochastically remove eligible slots in
-  place. Zero time is a post-preflight, write-free no-op. Each eligible slot
-  uses a local seed-plus-slot-derived draw; optional `rng_states` is validated
-  but neither initialized nor mutated.
-- This bounded P4 path does not provide charged wall loss, persistent RNG
-  lifecycle behavior (P5), a runnable API, hidden transfers or fallbacks, or
-  cross-device or CPU stochastic trajectory parity.
+  place. Zero time is a post-preflight, write-free no-op. Each box sequentially
+  advances its state for eligible slots; omitted `rng_states` are private and
+  seeded per call, while supplied caller-owned sidecars reset only with
+  `initialize_rng=True` and otherwise persist in place.
+- This bounded P5 path does not provide charged wall loss, a runnable API,
+  hidden transfers or fallbacks, or cross-device or CPU stochastic trajectory
+  parity. RNG generation is sequential per box, with no performance claim.
 
 Future features:
 

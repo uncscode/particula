@@ -1,8 +1,9 @@
-"""Tests for fixed-shape GPU neutral wall-loss P4 execution."""
+"""Tests for fixed-shape GPU neutral wall-loss P5 execution."""
 
 from __future__ import annotations
 
 import re
+import time
 from dataclasses import FrozenInstanceError
 from types import SimpleNamespace
 from typing import Any, cast
@@ -81,7 +82,7 @@ def _assert_snapshot_unchanged(particles, snapshot, rng_states=None) -> None:
 
 
 def _assert_slots_preserved_or_cleared(particles, snapshot) -> None:
-    """Assert P4 only clears complete active slots and preserves protected data."""
+    """Assert P5 only clears complete active slots and preserves protected data."""
     original_masses = snapshot["masses"][1]
     original_concentration = snapshot["concentration"][1]
     original_charge = snapshot["charge"][1]
@@ -128,7 +129,7 @@ def test_public_step_is_lazy_and_config_is_concrete_only() -> None:
 
 
 @pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
-def test_valid_execution_returns_identity_and_preserves_rng_sidecar(
+def test_valid_execution_returns_identity_and_advances_rng_sidecar(
     geometry: str,
 ) -> None:
     """Both supported geometries only preserve or fully clear active slots."""
@@ -151,7 +152,8 @@ def test_valid_execution_returns_identity_and_preserves_rng_sidecar(
 
     assert returned is particles
     _assert_slots_preserved_or_cleared(particles, snapshot)
-    npt.assert_array_equal(rng_states.numpy(), snapshot["rng_states"][1])
+    assert rng_states is snapshot["rng_states"][0]
+    assert not np.array_equal(rng_states.numpy(), snapshot["rng_states"][1])
 
 
 def test_config_type_fails_before_particle_access() -> None:
@@ -259,7 +261,7 @@ def test_nonnegative_particle_storage_rejects_negative_values(
 def test_signed_finite_charge_metadata_is_accepted_with_complete_slot_updates(
     charges: list[float],
 ) -> None:
-    """Neutral P4 retains signed charge or clears it with a removed slot."""
+    """Neutral P5 retains signed charge or clears it with a removed slot."""
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
@@ -281,7 +283,8 @@ def test_signed_finite_charge_metadata_is_accepted_with_complete_slot_updates(
 
     assert returned is particles
     _assert_slots_preserved_or_cleared(particles, snapshot)
-    npt.assert_array_equal(rng_states.numpy(), snapshot["rng_states"][1])
+    assert rng_states is snapshot["rng_states"][0]
+    assert not np.array_equal(rng_states.numpy(), snapshot["rng_states"][1])
 
 
 def test_rng_metadata_rejection_preserves_sidecar() -> None:
@@ -450,6 +453,28 @@ def test_environment_preflight_errors_preserve_particles(
     _assert_snapshot_unchanged(particles, snapshot)
 
 
+def test_late_environment_preflight_error_preserves_rng_sidecar() -> None:
+    """Environment rejection leaves a validated caller-owned sidecar intact."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    rng_states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, rng_states)
+
+    with pytest.raises(ValueError, match="wall_loss_step_gpu"):
+        wall_loss_step_gpu(
+            particles,
+            None,
+            101325.0,
+            1.0,
+            config=_config(),
+            rng_states=rng_states,
+        )
+
+    _assert_snapshot_unchanged(particles, snapshot, rng_states)
+
+
 @pytest.mark.parametrize("source", ["direct", "environment"])
 def test_positive_time_float32_environment_arrays_are_private_normalized(
     source: str,
@@ -484,7 +509,8 @@ def test_positive_time_float32_environment_arrays_are_private_normalized(
     npt.assert_allclose(temperature.numpy(), [298.15, 300.0], rtol=1e-6)
     npt.assert_allclose(pressure.numpy(), [101325.0, 100000.0], rtol=1e-6)
     _assert_slots_preserved_or_cleared(particles, snapshot)
-    npt.assert_array_equal(rng_states.numpy(), snapshot["rng_states"][1])
+    assert rng_states is snapshot["rng_states"][0]
+    assert not np.array_equal(rng_states.numpy(), snapshot["rng_states"][1])
 
 
 def test_explicit_float64_environment_is_accepted() -> None:
@@ -529,6 +555,7 @@ def test_zero_time_is_byte_for_byte_write_free_after_preflight(
             0.0,
             config=_config(),
             rng_states=rng_states,
+            initialize_rng=True,
         )
     else:
         environment = SimpleNamespace(
@@ -546,6 +573,7 @@ def test_zero_time_is_byte_for_byte_write_free_after_preflight(
             np.array(0.0),
             config=_config(),
             rng_states=rng_states,
+            initialize_rng=True,
             environment=environment,
         )
     assert returned is particles
@@ -715,15 +743,15 @@ def test_mask_application_preserves_unmarked_and_clears_marked_slots() -> None:
     npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
 
 
-def test_equal_inputs_and_seed_produce_equal_slot_updates() -> None:
-    """Call-local seed-plus-slot draws are reproducible on one device."""
+def test_equal_inputs_and_explicit_reset_produce_equal_slot_updates() -> None:
+    """Same-device explicit resets reproducibly initialize supplied sidecars."""
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
     first = _particles()
     second = _particles()
     first_rng = wp.array([13, 17], dtype=wp.uint32, device="cpu")
-    second_rng = wp.array([13, 17], dtype=wp.uint32, device="cpu")
+    second_rng = wp.array([23, 29], dtype=wp.uint32, device="cpu")
     first_rng_before = first_rng.numpy().copy()
     second_rng_before = second_rng.numpy().copy()
 
@@ -735,6 +763,7 @@ def test_equal_inputs_and_seed_produce_equal_slot_updates() -> None:
         config=_config(),
         rng_seed=97,
         rng_states=first_rng,
+        initialize_rng=True,
     )
     wall_loss_step_gpu(
         second,
@@ -744,14 +773,16 @@ def test_equal_inputs_and_seed_produce_equal_slot_updates() -> None:
         config=_config(),
         rng_seed=97,
         rng_states=second_rng,
+        initialize_rng=True,
     )
 
     for field in ("masses", "concentration", "charge", "density", "volume"):
         npt.assert_array_equal(
             getattr(first, field).numpy(), getattr(second, field).numpy()
         )
-    npt.assert_array_equal(first_rng.numpy(), first_rng_before)
-    npt.assert_array_equal(second_rng.numpy(), second_rng_before)
+    assert not np.array_equal(first_rng.numpy(), first_rng_before)
+    assert not np.array_equal(second_rng.numpy(), second_rng_before)
+    npt.assert_array_equal(first_rng.numpy(), second_rng.numpy())
 
 
 def test_subnormal_mass_slot_survives_without_transport_calculation() -> None:
@@ -852,6 +883,7 @@ def test_missing_particle_field_and_nonarray_field_have_stable_errors() -> None:
     ("rng_states", "match"),
     [
         (lambda wp: wp.zeros(2, dtype=wp.int32, device="cpu"), "dtype"),
+        (lambda wp: wp.zeros((2, 1), dtype=wp.uint32, device="cpu"), "shape"),
         (lambda wp: wp.zeros(3, dtype=wp.uint32, device="cpu"), "shape"),
     ],
 )
@@ -873,3 +905,193 @@ def test_rng_sidecar_schema_rejections_are_atomic(rng_states, match) -> None:
             rng_states=sidecar,
         )
     _assert_snapshot_unchanged(particles, snapshot, sidecar)
+
+
+@pytest.mark.cuda
+def test_rng_sidecar_device_rejection_is_atomic_when_cuda_available() -> None:
+    """Reject CUDA state for CPU particles without mutating either owner."""
+    wp = _warp()
+    if not wp.is_cuda_available():
+        pytest.skip("CUDA is unavailable")
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles(device="cpu")
+    sidecar = wp.array([7, 11], dtype=wp.uint32, device="cuda:0")
+    snapshot = _snapshot(particles, sidecar)
+    with pytest.raises(ValueError, match="rng_states device"):
+        wall_loss_step_gpu(
+            particles,
+            298.15,
+            101325.0,
+            1.0,
+            config=_config(),
+            rng_states=sidecar,
+        )
+    _assert_snapshot_unchanged(particles, snapshot, sidecar)
+
+
+@pytest.mark.stochastic
+def test_omitted_rng_state_is_private_seeded_convenience() -> None:
+    """Fresh omitted state produces repeatable same-device slot outcomes."""
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    first = _particles()
+    second = _particles()
+    for particles in (first, second):
+        wall_loss_step_gpu(
+            particles, 298.15, 101325.0, 1.0, config=_config(), rng_seed=91
+        )
+    for field in ("masses", "concentration", "charge"):
+        npt.assert_array_equal(
+            getattr(first, field).numpy(), getattr(second, field).numpy()
+        )
+
+
+@pytest.mark.stochastic
+def test_supplied_rng_state_advances_without_implicit_reseed() -> None:
+    """A caller-owned state advances across eligible calls with one seed."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    states = wp.zeros(2, dtype=wp.uint32, device="cpu")
+    tiny_time = np.nextafter(0.0, 1.0)
+    wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        tiny_time,
+        config=_config(),
+        rng_seed=41,
+        rng_states=states,
+        initialize_rng=True,
+    )
+    first_advance = states.numpy().copy()
+    returned = wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        tiny_time,
+        config=_config(),
+        rng_seed=41,
+        rng_states=states,
+    )
+    assert returned is particles
+    assert not np.array_equal(states.numpy(), first_advance)
+
+
+@pytest.mark.stochastic
+def test_rng_states_advance_per_box_for_eligible_slots() -> None:
+    """Each box owns and advances its own RNG word without a shared race."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import _initialize_rng_states
+
+    particles = _particles()
+    states = wp.zeros(2, dtype=wp.uint32, device="cpu")
+    initialized = wp.zeros(2, dtype=wp.uint32, device="cpu")
+    wp.launch(
+        _initialize_rng_states,
+        dim=2,
+        inputs=[5, initialized],
+        device="cpu",
+    )
+    expected_initialized = initialized.numpy().copy()
+    wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        np.nextafter(0.0, 1.0),
+        config=_config(),
+        rng_seed=5,
+        rng_states=states,
+        initialize_rng=True,
+    )
+    initialized_and_advanced = states.numpy()
+    assert np.all(initialized_and_advanced != expected_initialized)
+
+
+@pytest.mark.stochastic
+def test_all_ineligible_positive_time_preserves_rng_state() -> None:
+    """Positive calls consume no state when every fixed slot is ineligible."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    particles.concentration = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
+    states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, states)
+    returned = wall_loss_step_gpu(
+        particles, 298.15, 101325.0, 1.0, config=_config(), rng_states=states
+    )
+    assert returned is particles
+    _assert_snapshot_unchanged(particles, snapshot, states)
+
+
+@pytest.mark.stochastic
+def test_rng_state_consumes_only_eligible_slots() -> None:
+    """Inactive, zero-mass, and unusable slots do not advance box state."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    candidate = SimpleNamespace(
+        masses=wp.array(
+            [[[1.0, 2.0], [0.0, 0.0], [0.0, 0.0], [5e-324, 0.0]]],
+            dtype=wp.float64,
+            device="cpu",
+        ),
+        concentration=wp.array(
+            [[1.0, 0.0, 1.0, 1.0]], dtype=wp.float64, device="cpu"
+        ),
+        charge=wp.array(
+            [[0.0, 3.0, -2.0, 4.0]], dtype=wp.float64, device="cpu"
+        ),
+        density=wp.array([1000.0, 1200.0], dtype=wp.float64, device="cpu"),
+        volume=wp.array([1.0], dtype=wp.float64, device="cpu"),
+    )
+    control = SimpleNamespace(
+        masses=wp.array([[[1.0, 2.0]]], dtype=wp.float64, device="cpu"),
+        concentration=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
+        charge=wp.array([[0.0]], dtype=wp.float64, device="cpu"),
+        density=wp.array([1000.0, 1200.0], dtype=wp.float64, device="cpu"),
+        volume=wp.array([1.0], dtype=wp.float64, device="cpu"),
+    )
+    candidate_states = wp.zeros(1, dtype=wp.uint32, device="cpu")
+    control_states = wp.zeros(1, dtype=wp.uint32, device="cpu")
+    candidate_snapshot = _snapshot(candidate, candidate_states)
+    tiny_time = np.nextafter(0.0, 1.0)
+    for particles, states in (
+        (candidate, candidate_states),
+        (control, control_states),
+    ):
+        wall_loss_step_gpu(
+            particles,
+            298.15,
+            101325.0,
+            tiny_time,
+            config=_config(),
+            rng_seed=31,
+            rng_states=states,
+            initialize_rng=True,
+        )
+    npt.assert_array_equal(candidate_states.numpy(), control_states.numpy())
+    npt.assert_array_equal(
+        candidate.masses.numpy()[0, 1:], candidate_snapshot["masses"][1][0, 1:]
+    )
+    npt.assert_array_equal(
+        candidate.concentration.numpy()[0, 1:],
+        candidate_snapshot["concentration"][1][0, 1:],
+    )
+    npt.assert_array_equal(
+        candidate.charge.numpy()[0, 1:], candidate_snapshot["charge"][1][0, 1:]
+    )
+
+
+@pytest.mark.benchmark
+def test_wall_loss_p5_benchmark_smoke() -> None:
+    """Record an opt-in P5 execution duration without a throughput target."""
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    started = time.perf_counter()
+    wall_loss_step_gpu(_particles(), 298.15, 101325.0, 1.0, config=_config())
+    assert time.perf_counter() >= started

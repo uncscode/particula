@@ -27,9 +27,9 @@ private helpers for cross-kernel setup.
 - `dilution.py` - Concrete P1 GPU dilution input boundary; validation scans may
   allocate or launch, but rejected calls have no update-kernel launch or caller
   mutation
-- `wall_loss.py` - Concrete P4 neutral GPU wall-loss boundary; owns immutable
+- `wall_loss.py` - Concrete P5 neutral GPU wall-loss boundary; owns immutable
   host configuration, frozen preflight, and bounded fixed-slot removal, while
   coefficient helpers remain in `particula.gpu.dynamics.wall_loss_funcs`; it
-  uses local seed-plus-slot draws and does not mutate supplied RNG state
+  owns per-box caller RNG lifecycle with sequential eligible-slot advancement
 - `environment.py` - Shared private normalization and validation for kernel environment inputs
 - `tests/` - Test coverage
