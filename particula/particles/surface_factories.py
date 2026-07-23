@@ -45,7 +45,16 @@ class SurfaceFactory(
           required parameters are missing during check_keys/pre_build_check.
     """
 
-    def get_builders(self):
+    def get_builders(
+        self,
+    ) -> dict[
+        str,
+        Union[
+            SurfaceStrategyVolumeBuilder,
+            SurfaceStrategyMassBuilder,
+            SurfaceStrategyMolarBuilder,
+        ],
+    ]:
         """Return a mapping of strategy types to builder instances.
 
         Returns:

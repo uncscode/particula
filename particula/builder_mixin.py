@@ -8,7 +8,7 @@ chamber geometry while handling unit conversions and input validation.
 # pylint: disable=too-few-public-methods
 
 import logging
-from typing import Optional, Sequence, Tuple, Union, cast
+from typing import Optional, Self, Sequence, Tuple, Union, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -184,7 +184,7 @@ class BuilderConcentrationMixin:
         default_units: Default units applied when no conversion is needed.
     """
 
-    def __init__(self, default_units: str = "kg/m^3"):
+    def __init__(self, default_units: str = "kg/m^3") -> None:
         """Initialize concentration mixin."""
         self.concentration: Optional[Union[float, NDArray[np.float64]]] = None
         self.default_units = default_units if default_units else "kg/m^3"
@@ -194,7 +194,7 @@ class BuilderConcentrationMixin:
         self,
         concentration: Union[float, NDArray[np.float64]],
         concentration_units: str,
-    ):
+    ) -> Self:
         """Assign the concentration normalized to the default units.
 
         Args:
@@ -229,7 +229,7 @@ class BuilderChargeMixin:
         self,
         charge: Union[float, NDArray[np.float64]],
         charge_units: Optional[str] = None,
-    ):
+    ) -> Self:
         """Set the particle charge count.
 
         Args:
@@ -283,7 +283,7 @@ class BuilderMassMixin:
         mass: Particle mass in kg after conversion.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mass mixin."""
         self.mass: Optional[Union[float, NDArray[np.float64]]] = None
 
@@ -316,7 +316,7 @@ class BuilderVolumeMixin:
         volume: Particle volume in m^3 after conversion.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize volume mixin."""
         self.volume: Optional[Union[float, NDArray[np.float64]]] = None
 
@@ -349,7 +349,7 @@ class BuilderRadiusMixin:
         radius: Particle radius in meters after conversion.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize radius mixin."""
         self.radius: Optional[Union[float, NDArray[np.float64]]] = None
 
@@ -382,12 +382,16 @@ class BuilderTemperatureMixin:
         temperature: Temperature in Kelvin after conversion.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize temperature mixin."""
         self.temperature: Optional[float] = None
 
     @validate_inputs({"temperature": "finite"})
-    def set_temperature(self, temperature: float, temperature_units: str = "K"):
+    def set_temperature(
+        self,
+        temperature: float,
+        temperature_units: str = "K",
+    ) -> Self:
         """Set the temperature in Kelvin.
 
         Args:
@@ -417,7 +421,7 @@ class BuilderTemperatureTableMixin:
         temperature_table: Array of temperatures in Kelvin after conversion.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize temperature table mixin."""
         self.temperature_table: Optional[NDArray[np.float64]] = None
 
@@ -456,7 +460,7 @@ class BuilderPressureMixin:
         pressure: Total pressure in Pa after conversion.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize pressure mixin."""
         self.pressure: Optional[Union[float, NDArray[np.float64]]] = None
 
@@ -491,7 +495,7 @@ class BuilderLognormalMixin:
         geometric_standard_deviation: Geometric standard deviation values.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize lognormal distribution mixin."""
         self.mode: Optional[NDArray[np.float64]] = None
         self.number_concentration: Optional[NDArray[np.float64]] = None
@@ -571,7 +575,7 @@ class BuilderParticleResolvedCountMixin:
         particle_resolved_count: Number of particles to resolve.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize particle-resolved count mixin."""
         self.particle_resolved_count: Optional[int] = None
 
@@ -607,7 +611,7 @@ class BuilderWallEddyDiffusivityMixin:
         wall_eddy_diffusivity: Wall eddy diffusivity in 1/s.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize wall eddy diffusivity mixin."""
         self.wall_eddy_diffusivity: Optional[float] = None
 
@@ -654,7 +658,7 @@ class BuilderChamberRadiusMixin:
         chamber_radius: Chamber radius in meters.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize chamber radius mixin."""
         self.chamber_radius: Optional[float] = None
 
@@ -703,7 +707,7 @@ class BuilderChamberDimensionsMixin:
         chamber_dimensions: Tuple of (length, width, height) in meters.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize chamber dimensions mixin."""
         self.chamber_dimensions: Optional[Tuple[float, float, float]] = None
 
@@ -786,7 +790,7 @@ class BuilderWallPotentialMixin:
         wall_potential: Electrostatic wall potential in volts.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize wall potential mixin."""
         self.wall_potential: float = 0.0
 
@@ -828,7 +832,7 @@ class BuilderWallElectricFieldMixin:
         wall_electric_field: Electric field magnitude (scalar or tuple) in V/m.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize wall electric field mixin."""
         self.wall_electric_field: Union[float, Tuple[float, float, float]] = 0.0
 
@@ -935,11 +939,11 @@ class BuilderDistributionTypeMixin:
         distribution_type: Distribution type string.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize distribution type mixin."""
         self.distribution_type: str = "discrete"
 
-    def set_distribution_type(self, distribution_type: str):
+    def set_distribution_type(self, distribution_type: str) -> Self:
         """Set the distribution type.
 
         Args:

@@ -509,15 +509,15 @@ pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
   container.
 - Rejected pre-launch calls preserve caller-owned particle and RNG-sidecar state.
   Rollback is not promised after a mutation kernel launches.
-- Deterministic geometry-specific coefficient tolerances and 100-seed,
-  3-sigma aggregate survival checks provide bounded P6 evidence. Warp CPU is
-  the baseline when available; CUDA is optional and skips cleanly when absent.
-  This is not CPU-strategy parity or per-seed trajectory replay. A high-level
-  runnable, scheduler, or backend integration; hidden transfer or CPU fallback;
-  resizing, compaction, activation, graph capture, differentiability, and
-  performance claims remain deferred. Device validation scans and scalar status
-  synchronization/readback are permitted; they do not transfer or replace
-  caller-owned buffers.
+- Deterministic geometry-specific coefficient tolerances and eight charged
+  geometry-radius strata of 4,096 exact-binomial survival observations provide
+  bounded P5 evidence. Warp CPU is the baseline when available; CUDA is
+  optional and skips cleanly when absent. This is not CPU-strategy parity or
+  per-seed trajectory replay. A high-level runnable, scheduler, or backend
+  integration; hidden transfer or CPU fallback; resizing, compaction,
+  activation, graph capture, differentiability, and performance claims remain
+  deferred. Device validation scans and scalar status synchronization/readback
+  are permitted; they do not transfer or replace caller-owned buffers.
 
 Focused P1–P6 contract runs:
 

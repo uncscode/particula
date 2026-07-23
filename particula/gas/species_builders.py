@@ -74,7 +74,7 @@ class GasSpeciesBuilder(
         ```
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the Gas Species builder.
 
         Sets up the builder with required parameters for creating a
@@ -91,9 +91,11 @@ class GasSpeciesBuilder(
         BuilderABC.__init__(self, required_parameters)
         BuilderMolarMassMixin.__init__(self)
         BuilderConcentrationMixin.__init__(self, default_units="kg/m^3")
-        self.name = None
-        self.vapor_pressure_strategy = None
-        self.partitioning = None
+        self.name: Union[str, NDArray[np.str_]] | None = None
+        self.vapor_pressure_strategy: (
+            VaporPressureStrategy | list[VaporPressureStrategy] | None
+        ) = None
+        self.partitioning: bool | None = None
 
     def set_name(
         self, name: Union[str, NDArray[np.str_]]
