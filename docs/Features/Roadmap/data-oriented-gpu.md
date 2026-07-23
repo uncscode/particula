@@ -1289,7 +1289,9 @@ Delivered bounded neutral wall-loss P1–P6 scope:
 - Omitted RNG state is private for each successful nonzero call. Supplied
   `(n_boxes,)` same-device `wp.uint32` state advances in place; only
   `initialize_rng=True` resets it. Consumption is sequential per box over
-  eligible slots, so exact CPU/Warp or per-seed replay is not supported.
+  eligible finite positive-rate slots; positive infinite-rate removal is
+  deterministic and consumes no draw, so exact CPU/Warp or per-seed replay is
+  not supported.
 - P6 evidence is geometry-specific deterministic coefficient tolerances plus
   100-seed, 3-sigma aggregate survival checks. Warp CPU is the installed-Warp
   baseline; CUDA is optional additive evidence and skips cleanly when absent.
