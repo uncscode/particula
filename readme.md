@@ -78,16 +78,16 @@ temperature and pressure arrays. All accepted temperature, pressure, and
 coagulation volume inputs are validated as positive finite physical values
 before launch.
 
-`wall_loss_step_gpu` is the bounded P4 direct neutral, particle-resolved
+`wall_loss_step_gpu` is the bounded P5 direct neutral, particle-resolved
 wall-loss boundary. Construct `NeutralWallLossConfig` from
 `particula.gpu.kernels.wall_loss`; it is not re-exported. After frozen
-preflight, positive-time calls evaluate neutral coefficients and use one local
-seed-plus-slot draw to stochastically clear an eligible slot's mass lanes,
-concentration, and charge in place. Zero time is a post-preflight, write-free
-no-op. Optional `rng_states` is validated but neither initialized nor mutated;
-persistent lifecycle behavior is deferred to P5. Charged wall loss, a runnable,
-hidden transfers/fallback, and CPU/Warp stochastic trajectory parity are out of
-scope.
+preflight, positive-time calls evaluate neutral coefficients and sequentially
+advance one per-box RNG state for each eligible slot before stochastically
+clearing its mass lanes, concentration, and charge. Omitted state is private and
+seeded per call; supplied same-device `rng_states` mutates in place and resets
+only with `initialize_rng=True`. Zero time is write-free. Charged wall loss, a
+runnable, hidden transfers/fallback, and CPU/Warp stochastic trajectory parity
+are out of scope.
 
 The direct GPU dilution P1–P4 entry point is imported with
 `from particula.gpu.kernels import dilution_step_gpu`. It applies

@@ -222,11 +222,12 @@ not bitwise parity.
 Bounded direct neutral, particle-resolved GPU wall loss is available through
 `from particula.gpu.kernels import wall_loss_step_gpu`. After read-only P3
 preflight, a positive-time call stochastically removes eligible fixed slots in
-place; zero time remains a post-preflight, write-free no-op. Each eligible slot
-uses a local seed-plus-slot-derived draw, and optional `rng_states` is validated
-but left untouched. Charged wall loss, persistent RNG lifecycle behavior (P5),
-runnables, hidden transfers or fallbacks, and cross-device or CPU stochastic
-trajectory parity remain deferred.
+place; zero time remains a post-preflight, write-free no-op. One sequential
+owner advances each box's RNG state only for eligible slots. Omitted
+`rng_states` are private and initialized per call; supplied same-device
+`(n_boxes,)` `wp.uint32` state is caller-owned, mutates in place, and resets only
+with `initialize_rng=True`. Charged wall loss, runnables, hidden transfers or
+fallbacks, and cross-device or CPU stochastic trajectory parity remain deferred.
 
 GPU process orchestration, backend selection and scheduling, GPU-resident
 timestep integration, resizing, graph capture, autodiff, performance claims,

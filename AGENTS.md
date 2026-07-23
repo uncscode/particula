@@ -465,14 +465,14 @@ Focused P1–P4 contract run:
 pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
 ```
 
-### GPU neutral wall-loss P4
+### GPU neutral wall-loss P5
 
 - Import the direct low-level boundary with
   `from particula.gpu.kernels import wall_loss_step_gpu`.
 - Construct `NeutralWallLossConfig` only from
   `particula.gpu.kernels.wall_loss`; it is deliberately not re-exported by
   `particula.gpu.kernels` or `particula.gpu`.
-- P4 accepts only neutral, `particle_resolved` configurations and validates
+- P5 accepts only neutral, `particle_resolved` configurations and validates
   spherical or rectangular geometry. Wall eddy diffusivity is in m²/s and
   chamber radius/dimensions are in m.
 - P3-frozen preflight validates fixed-shape, same-device `wp.float64` particle
@@ -481,22 +481,21 @@ pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
   metadata. Particle charge is finite signed metadata and does not enable
   charged-wall physics.
 - After successful preflight, a positive-time call normalizes environment state,
-  evaluates neutral coefficients for eligible fixed slots, takes one local
-  seed-plus-flattened-slot draw per eligible slot, and clears removed slots'
-  mass lanes, concentration, and charge in place. Zero time remains a
-  post-preflight, write-free no-op. The call returns the identical particle
-  container.
-- `rng_states` is validated but intentionally neither initialized nor mutated;
-  P5 owns persistent RNG lifecycle semantics. Rejected pre-launch calls preserve
-  caller-owned particle and RNG-sidecar state. Rollback is not promised after a
-  mutation kernel launches.
+  evaluates neutral coefficients, and sequentially advances one per-box RNG word
+  for each eligible fixed slot before clearing selected slots' mass lanes,
+  concentration, and charge. Omitted state is private and seeded per call;
+  supplied same-device `(n_boxes,)` `wp.uint32` state mutates in place and resets
+  only with `initialize_rng=True`. Zero time remains write-free. The call returns
+  the identical particle container.
+- Rejected pre-launch calls preserve caller-owned particle and RNG-sidecar state.
+  Rollback is not promised after a mutation kernel launches.
 - CPU/Warp stochastic trajectory parity, charged wall loss, a runnable API,
-  hidden transfers or fallback, and P5/P6 behavior remain deferred. Callers own
+  hidden transfers or fallback, and P6 behavior remain deferred. Callers own
   transfers, device placement, and synchronization. Device validation scans and
   scalar status synchronization/readback are permitted; they do not transfer or
   replace caller-owned buffers.
 
-Focused P4 contract run:
+Focused P5 contract run:
 
 ```bash
 pytest particula/gpu/kernels/tests/wall_loss_test.py -q -Werror
