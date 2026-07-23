@@ -10,10 +10,12 @@ from particula.gpu.dynamics.condensation_funcs import (
     first_order_mass_transport_k_wp,
     mass_transfer_rate_wp,
 )
+from particula.gpu.properties import diffusion_coefficient_wp
 
 __all__ = [
     "brownian_diffusivity_wp",
     "brownian_kernel_pair_wp",
+    "diffusion_coefficient_wp",
     "first_order_mass_transport_k_wp",
     "g_collection_term_wp",
     "mass_transfer_rate_wp",
