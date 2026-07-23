@@ -1,8 +1,9 @@
 # Open Questions
 
-P1 configuration questions shipped for issue #1409 and P2 private primitive
-questions shipped for issue #1410 on 2026-07-23. Integrated charged-physics
-questions remain deferred to P3-P5.
+P1 configuration questions shipped for issue #1409, P2 private primitive
+questions shipped for issue #1410, and P3 field/drift/composition questions
+shipped for issue #1411 on 2026-07-23. Direct-step integration and validation
+questions remain deferred to P4-P5.
 
 - [x] What image-charge primitive contract is available before step integration?
   - Decision: P2 provides private fp64 Warp self-pair Coulomb-ratio and
@@ -25,8 +26,16 @@ questions remain deferred to P3-P5.
     execution.
 - [x] How strong is zero-charge fallback parity?
   - Decision: P1 leaves all execution neutral, so matched zero-charge charged
-    and neutral calls have exact particle and final-RNG equality. Future
-    charged arithmetic must preserve this fallback.
+     and neutral calls have exact particle and final-RNG equality. Future
+     charged arithmetic must preserve this fallback.
+- [x] How are geometry, electric fields, drift, and unsafe coefficients handled
+  before direct-step integration?
+  - Decision: P3 privately selects radius or minimum rectangular dimension;
+    resolves signed spherical fields and rectangular vector norms with the CPU
+    conditional potential contribution; calculates signed mobility drift with
+    radius/scale guards; and clips the composed rate to finite nonnegative fp64.
+    The helpers do not validate configuration, mutate state, or have a kernel
+    call site; P4 owns that integration.
 - [x] Which deterministic and statistical bounds cover the charged matrix?
   - Decision: test 2 nm, 50 nm, 1 micrometer, and 50 micrometer strata. Full
     CPU/Warp coefficients use `rtol=1e-6`, `atol=0`; reused/component helpers

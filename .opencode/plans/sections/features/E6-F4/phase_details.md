@@ -24,11 +24,20 @@ terms in P4 before P5 validation and P6 documentation.
   - Boundary: No public export/API, kernel integration, configuration or
     preflight change, potential/field composition, CPU change, or RNG change.
 
-- [ ] **E6-F4-P3:** Implement electric-field drift and charged coefficient composition with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Match CPU field magnitude, potential scaling, signed mobility drift, and nonnegative finite composition around E6-F3's neutral coefficient.
+- [x] **E6-F4-P3:** Implement electric-field drift and charged coefficient composition with unit tests
+  - Issue: #1411 | Size: S | Status: Shipped
+  - Goal: Delivered private fp64 Warp geometry-scale, spherical/rectangular
+    field-resolution, signed mobility-drift, and safely composed charged-
+    coefficient helpers matching CPU semantics.
   - Files: `particula/gpu/dynamics/wall_loss_funcs.py`, `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`
-  - Tests: Spherical scalar and rectangular vector fields, potential-only drift, charge sign, zero field, zero charge, geometry scale, clipping, and fp64 CPU parity.
+  - Tests: Independent NumPy/Warp tests cover signed spherical and rectangular
+    vector fields, potential-only and explicit fields, signed and scaled charge,
+    zero field/charge controls, radius and geometry guards, cancellation, NaN,
+    negative infinity, and positive-overflow composition on Warp CPU with
+    optional CUDA rows.
+  - Boundary: No public export/API, direct-kernel integration, configuration or
+    preflight change, CPU change, caller-state mutation, or RNG change; P4 owns
+    direct-step integration.
 
 - [ ] **E6-F4-P4:** Integrate charged mode into the neutral fixed-shape wall-loss step with unit tests
   - Issue: TBD | Size: S | Status: Not Started

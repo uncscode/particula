@@ -25,11 +25,13 @@ scientific tolerance, or E6-F3 invariant may be weakened. Test modules use the
   ratio-floor-plus-exponent clipping. Warp CPU is required when installed and
   CUDA rows remain optional. This is primitive evidence only, not direct-step
   or CPU-strategy integration parity.
-- **P3 field/composition:** In the same module, compare scalar spherical and
-  vector rectangular field magnitudes, potential-derived fields, geometry
-  scales, charge signs, zero-field drift, and final nonnegative clipping. Verify
-  `neutral * factor + drift` against CPU fp64 outputs, including cancellation
-  and extreme-but-valid cases.
+- **P3 field/composition (shipped):** In the same module, independent NumPy
+  oracles compare fp64 Warp geometry-scale and signed spherical/vector
+  rectangular field resolution, potential-derived and explicit fields, signed
+  charge drift, zero controls, radius/geometry guards, and final composition.
+  The tests cover cancellation, NaN, negative infinity, and positive-overflow
+  sanitization; Warp CPU is required when available and CUDA rows are optional.
+  This remains private-helper evidence, not direct-step integration parity.
 - **P4 step integration:** In
   `particula/gpu/kernels/tests/wall_loss_test.py`, exercise mixed zero/nonzero
   charges, sparse inactive gaps, one/multi-box, one/multi-species, exact zero

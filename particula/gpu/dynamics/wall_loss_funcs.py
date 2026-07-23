@@ -320,7 +320,22 @@ def _geometry_scale_wp(
     chamber_width: wp.float64,
     chamber_height: wp.float64,
 ) -> wp.float64:
-    """Return the characteristic geometry scale without lower guarding it."""
+    """Return the unguarded characteristic chamber scale in m.
+
+    Spherical chambers use their radius; rectangular chambers use their
+    smallest dimension. Field resolution deliberately uses this unguarded
+    scale to match the CPU charged-wall-loss strategy.
+
+    Args:
+        geometry_mode: Zero for spherical geometry; nonzero for rectangular.
+        chamber_radius: Spherical chamber radius in m.
+        chamber_length: Rectangular chamber length in m.
+        chamber_width: Rectangular chamber width in m.
+        chamber_height: Rectangular chamber height in m.
+
+    Returns:
+        Characteristic geometry scale in m without a lower-bound guard.
+    """
     if geometry_mode == wp.int32(0):
         return chamber_radius
     return wp.min(chamber_length, wp.min(chamber_width, chamber_height))
@@ -332,7 +347,19 @@ def _resolve_spherical_electric_field_wp(
     wall_potential: wp.float64,
     geometry_scale: wp.float64,
 ) -> wp.float64:
-    """Resolve a signed spherical scalar field with potential contribution."""
+    """Resolve a signed spherical electric field in V/m.
+
+    Adds the potential-derived field only for a nonzero potential and positive
+    geometry scale. The supplied scalar field remains signed.
+
+    Args:
+        wall_electric_field: Signed scalar electric field in V/m.
+        wall_potential: Wall potential in V.
+        geometry_scale: Unguarded characteristic chamber scale in m.
+
+    Returns:
+        Signed resolved electric field in V/m.
+    """
     resolved_field = wall_electric_field
     if wall_potential != wp.float64(0.0) and geometry_scale > wp.float64(0.0):
         resolved_field = resolved_field + wall_potential / geometry_scale
@@ -347,7 +374,22 @@ def _resolve_rectangular_electric_field_wp(
     wall_potential: wp.float64,
     geometry_scale: wp.float64,
 ) -> wp.float64:
-    """Resolve a rectangular field-vector norm with potential contribution."""
+    """Resolve a rectangular electric-field magnitude in V/m.
+
+    Computes the Euclidean magnitude of the three supplied field components,
+    then conditionally adds the potential-derived field. A signed potential
+    may therefore decrease the resolved magnitude.
+
+    Args:
+        field_x: X electric-field component in V/m.
+        field_y: Y electric-field component in V/m.
+        field_z: Z electric-field component in V/m.
+        wall_potential: Wall potential in V.
+        geometry_scale: Unguarded characteristic chamber scale in m.
+
+    Returns:
+        Resolved electric field in V/m.
+    """
     resolved_field = wp.sqrt(
         field_x * field_x + field_y * field_y + field_z * field_z
     )
@@ -368,7 +410,27 @@ def _electric_field_drift_wp(
     ref_temperature: wp.float64,
     sutherland_constant: wp.float64,
 ) -> wp.float64:
-    """Calculate signed electric-field drift contribution in s^-1."""
+    """Calculate signed electric-field drift contribution in s^-1.
+
+    Uses Sutherland dynamic viscosity and charge mobility. Particle radius and
+    the drift denominator are lower-guarded at 1e-30; NaN drift is mapped to
+    zero while finite signed values and infinities are retained for final
+    coefficient composition.
+
+    Args:
+        particle_radius: Particle radius in m.
+        particle_charge: Particle charge in elementary-charge units.
+        temperature: Gas temperature in K.
+        resolved_electric_field: Geometry-resolved electric field in V/m.
+        geometry_scale: Characteristic chamber scale in m.
+        elementary_charge_value: Elementary charge in C.
+        ref_viscosity: Reference dynamic viscosity in Pa s.
+        ref_temperature: Reference temperature for viscosity in K.
+        sutherland_constant: Sutherland temperature constant in K.
+
+    Returns:
+        Signed electric-field drift contribution in s^-1.
+    """
     if particle_charge == wp.float64(
         0.0
     ) or resolved_electric_field == wp.float64(0.0):
@@ -405,7 +467,20 @@ def _combine_charged_wall_loss_coefficient_wp(
     electrostatic_factor: wp.float64,
     drift_term: wp.float64,
 ) -> wp.float64:
-    """Combine and sanitize charged wall-loss coefficient contributions."""
+    """Combine and sanitize charged wall-loss coefficient contributions.
+
+    Calculates ``neutral_coefficient * electrostatic_factor + drift_term``.
+    NaN and nonpositive results map to zero, while positive overflow and
+    infinity map to the largest finite float64 value.
+
+    Args:
+        neutral_coefficient: Neutral wall-loss coefficient in s^-1.
+        electrostatic_factor: Dimensionless image-charge enhancement factor.
+        drift_term: Signed electric-field drift contribution in s^-1.
+
+    Returns:
+        Finite nonnegative charged wall-loss coefficient in s^-1.
+    """
     combined = neutral_coefficient * electrostatic_factor + drift_term
     if wp.isnan(combined) or combined <= wp.float64(0.0):
         return wp.float64(0.0)
