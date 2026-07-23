@@ -402,10 +402,10 @@ def _field_resolution_oracle(
             chamber_lengths, np.minimum(chamber_widths, chamber_heights)
         ),
     )
-    potential = np.where(
-        (wall_potentials != 0.0) & (scales > 0.0),
-        wall_potentials / scales,
-        0.0,
+    potential = np.zeros_like(scales)
+    valid_potential = (wall_potentials != 0.0) & (scales > 0.0)
+    potential[valid_potential] = (
+        wall_potentials[valid_potential] / scales[valid_potential]
     )
     spherical = field_x + potential
     rectangular = np.sqrt(field_x**2 + field_y**2 + field_z**2) + potential
@@ -483,7 +483,7 @@ def _electric_field_drift_oracle(
             / np.maximum(geometry_scales, 1.0e-30)
         )
     drift[(particle_charges == 0.0) | (resolved_fields == 0.0)] = 0.0
-    return np.nan_to_num(drift, nan=0.0)
+    return np.nan_to_num(drift, nan=0.0, posinf=np.inf, neginf=-np.inf)
 
 
 def _launch_electric_field_drift(
@@ -932,15 +932,17 @@ def test_charged_field_helpers_match_geometry_specific_cpu_semantics(
     device: str,
 ) -> None:
     """Match signed spherical and norm-based rectangular field resolution."""
-    geometry_modes = np.array([0, 1, 1, 0], dtype=np.int32)
-    chamber_radii = np.array([0.5, 9.0, 9.0, 1.0e-32], dtype=np.float64)
-    lengths = np.array([3.0, 2.0, 1.0, 2.0], dtype=np.float64)
-    widths = np.array([3.0, 0.5, 0.6, 2.0], dtype=np.float64)
-    heights = np.array([3.0, 1.0, 0.8, 2.0], dtype=np.float64)
-    field_x = np.array([-3.0, 3.0, 0.0, 0.0], dtype=np.float64)
-    field_y = np.array([0.0, 4.0, 0.0, 0.0], dtype=np.float64)
-    field_z = np.array([0.0, 12.0, 0.0, 0.0], dtype=np.float64)
-    potentials = np.array([1.0, -2.0, 1.5, 1.0e-32], dtype=np.float64)
+    geometry_modes = np.array([0, 1, 1, 0, 0, 0], dtype=np.int32)
+    chamber_radii = np.array(
+        [0.5, 9.0, 9.0, 1.0e-32, 0.0, -0.5], dtype=np.float64
+    )
+    lengths = np.array([3.0, 2.0, 1.0, 2.0, 2.0, 2.0], dtype=np.float64)
+    widths = np.array([3.0, 0.5, 0.6, 2.0, 2.0, 2.0], dtype=np.float64)
+    heights = np.array([3.0, 1.0, 0.8, 2.0, 2.0, 2.0], dtype=np.float64)
+    field_x = np.array([-3.0, 3.0, 0.0, 0.0, -3.0, -3.0])
+    field_y = np.array([0.0, 4.0, 0.0, 0.0, 4.0, 4.0])
+    field_z = np.array([0.0, 12.0, 0.0, 0.0, 12.0, 12.0])
+    potentials = np.array([1.0, -2.0, 1.5, 1.0e-32, 2.0, 2.0])
 
     expected = _field_resolution_oracle(
         geometry_modes,
@@ -971,6 +973,15 @@ def test_charged_field_helpers_match_geometry_specific_cpu_semantics(
         npt.assert_allclose(observed, reference, rtol=1e-12, atol=0.0)
     assert actual[2][1] < np.linalg.norm([3.0, 4.0, 12.0])
     assert actual[0][3] == chamber_radii[3]
+    npt.assert_allclose(actual[1][4:], field_x[4:], rtol=0.0, atol=0.0)
+    npt.assert_allclose(
+        actual[2][4:],
+        np.linalg.norm(
+            np.array([field_x[4:], field_y[4:], field_z[4:]]), axis=0
+        ),
+        rtol=0.0,
+        atol=0.0,
+    )
 
 
 @pytest.mark.gpu_parity
@@ -979,13 +990,37 @@ def test_electric_field_drift_matches_independent_signed_fp64_oracle(
 ) -> None:
     """Match charge sign, magnitude, zero controls, and guard boundaries."""
     particle_radii = np.array(
-        [1.0e-8, 1.0e-8, 1.0e-8, 1.0e-8, 1.0e-40, 1.0e-8],
+        [
+            1.0e-8,
+            1.0e-8,
+            1.0e-8,
+            1.0e-8,
+            1.0e-40,
+            1.0e-8,
+            1.0e-8,
+            1.0e-8,
+            1.0e-8,
+        ],
         dtype=np.float64,
     )
-    particle_charges = np.array([1.0, -1.0, 2.0, 0.0, 1.0, 1.0])
-    temperatures = np.full(6, 298.15, dtype=np.float64)
-    resolved_fields = np.array([10.0, 10.0, 10.0, 10.0, 10.0, 0.0])
-    geometry_scales = np.array([0.5, 0.5, 0.5, 0.5, 1.0e-40, 0.5])
+    particle_charges = np.array([1.0, -1.0, 2.0, 0.0, 1.0, 1.0, 1.0, -1.0, 1.0])
+    temperatures = np.full(len(particle_radii), 298.15, dtype=np.float64)
+    resolved_fields = np.array(
+        [
+            10.0,
+            10.0,
+            10.0,
+            10.0,
+            10.0,
+            0.0,
+            -10.0,
+            -10.0,
+            np.nan,
+        ]
+    )
+    geometry_scales = np.array(
+        [0.5, 0.5, 0.5, 0.5, 1.0e-40, 0.5, 0.5, 0.5, 0.5]
+    )
 
     expected = _electric_field_drift_oracle(
         particle_radii,
@@ -1010,6 +1045,9 @@ def test_electric_field_drift_matches_independent_signed_fp64_oracle(
     assert actual[2] == 2.0 * actual[0]
     assert actual[3] == 0.0
     assert actual[5] == 0.0
+    assert actual[6] == -actual[7]
+    assert actual[6] < 0.0
+    assert actual[8] == 0.0
 
 
 @pytest.mark.gpu_parity
