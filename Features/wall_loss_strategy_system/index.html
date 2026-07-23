@@ -11637,6 +11637,23 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#direct-gpu-charged-wall-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct GPU charged wall loss
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Direct GPU charged wall loss">
+      <ul class="md-nav__list">
+        
           <li class="md-nav__item">
   <a href="#spherical-wall-loss-strategy" class="md-nav__link">
     <span class="md-ellipsis">
@@ -14882,6 +14899,23 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#direct-gpu-charged-wall-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct GPU charged wall loss
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Direct GPU charged wall loss">
+      <ul class="md-nav__list">
+        
           <li class="md-nav__item">
   <a href="#spherical-wall-loss-strategy" class="md-nav__link">
     <span class="md-ellipsis">
@@ -15283,6 +15317,54 @@ distribution types.</p>
 <span class="n">combined</span> <span class="o">=</span> <span class="n">coagulation</span> <span class="o">|</span> <span class="n">wall_loss</span>
 <span class="n">aerosol</span> <span class="o">=</span> <span class="n">combined</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">aerosol</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">60.0</span><span class="p">)</span>
 </code></pre></div>
+<h2 id="direct-gpu-charged-wall-loss">Direct GPU charged wall loss<a class="headerlink" href="#direct-gpu-charged-wall-loss" title="Permanent link">&para;</a></h2>
+<p>The GPU boundary is a low-level, caller-managed fixed-slot operation. It is
+not an extension of <code>WallLoss</code>, does not create a runnable, and does not
+transfer data between CPU and Warp. Import only the direct step from the kernel
+package; the configuration intentionally remains a concrete-module import:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">wall_loss_step_gpu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.wall_loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeutralWallLossConfig</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">NeutralWallLossConfig</span><span class="p">(</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;spherical&quot;</span><span class="p">,</span>
+    <span class="n">wall_eddy_diffusivity</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>  <span class="c1"># m^2/s</span>
+    <span class="n">chamber_radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># m</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;charged&quot;</span><span class="p">,</span>
+    <span class="n">wall_potential</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>  <span class="c1"># V</span>
+    <span class="n">wall_electric_field</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span>  <span class="c1"># V/m; signed spherical scalar</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>The direct boundary supports only <code>particle_resolved</code> storage. Its SI inputs
+are wall eddy diffusivity [m^2/s], chamber radius or dimensions [m],
+temperature [K], pressure [Pa], time [s], signed wall potential [V], and
+electric field [V/m]. A spherical configuration requires a positive radius and
+no dimensions. A rectangular configuration requires exactly three positive
+dimensions, no radius, and a caller-owned, same-device <code>wp.float64</code> electric
+field vector shaped <code>(3,)</code>.</p>
+<p>For charged spherical execution, the signed scalar field is preserved and the
+signed potential-derived field is added. For charged rectangular execution,
+the three field components are reduced to their Euclidean magnitude before the
+signed potential-derived field is added; individual component signs do not
+select a drift direction. Nonzero-charge slots use image-charge enhancement
+and field drift, including image-charge enhancement when <code>wall_potential=0</code>.
+Charged zero-charge slots use the exact neutral coefficient and RNG path.</p>
+<p>Callers own <code>WarpParticleData.charge</code>, device placement, explicit CPU-to-Warp
+transfer, synchronization, and any optional persistent <code>(n_boxes,)</code> <code>wp.uint32</code>
+RNG sidecar. Successful positive-time calls mutate the supplied fixed-capacity
+particle container in place and return that same container. Selected removed
+slots have every mass lane, concentration, and charge cleared; surviving,
+unselected storage retains its capacity and other fields. Rejected preflight
+calls do not mutate caller-owned particle or RNG state. Rollback is not
+promised after a mutation kernel launches.</p>
+<p>Warp CPU is the baseline when Warp is installed. CUDA is optional and the
+focused suites skip cleanly when it is unavailable:</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/dynamics/tests/wall_loss_funcs_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/wall_loss_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/gpu/kernels/tests/wall_loss_parity_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+</code></pre></div>
+<p>Hidden transfer or CPU fallback, dynamic-slot management, scheduler/runnable or
+backend integration, graph capture, differentiability, exact cross-backend RNG
+replay, mandatory CUDA support, and performance claims remain deferred.</p>
 <h3 id="spherical-wall-loss-strategy">Spherical wall loss strategy<a class="headerlink" href="#spherical-wall-loss-strategy" title="Permanent link">&para;</a></h3>
 <p><code>SphericalWallLossStrategy</code> models deposition in a well-mixed spherical chamber. It:</p>
 <ul>
@@ -15471,7 +15553,8 @@ distribution types.</p>
 <ul>
 <li><strong>Hands-on guide</strong>: <a href="../../Examples/Chamber_Wall_Loss/Notebooks/Wall_Loss_Tutorial/">Wall loss tutorial</a></li>
 <li><strong>Notebooks</strong>: <a href="../../Examples/Chamber_Wall_Loss/Notebooks/Spherical_Wall_Loss_Strategy/">Spherical wall loss strategy</a></li>
-<li><strong>Dynamics overview</strong>: <a href="../../#wall-loss-strategies-and-runnable">Wall loss strategies</a></li>
+<li><strong>Dynamics overview</strong>:
+  <a href="../../#feature-deep-dives">Wall loss strategies</a></li>
 </ul>
 <h2 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h2>
 <h3 id="should-i-use-the-function-based-or-strategy-based-wall-loss-api">Should I use the function-based or strategy-based wall loss API?<a class="headerlink" href="#should-i-use-the-function-based-or-strategy-based-wall-loss-api" title="Permanent link">&para;</a></h3>

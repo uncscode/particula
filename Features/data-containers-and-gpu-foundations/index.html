@@ -11565,10 +11565,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#direct-neutral-gpu-wall-loss" class="md-nav__link">
+  <a href="#direct-gpu-wall-loss" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Direct neutral GPU wall loss
+        Direct GPU wall loss
       
     </span>
   </a>
@@ -14788,10 +14788,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#direct-neutral-gpu-wall-loss" class="md-nav__link">
+  <a href="#direct-gpu-wall-loss" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Direct neutral GPU wall loss
+        Direct GPU wall loss
       
     </span>
   </a>
@@ -15222,10 +15222,11 @@ integrated direct-call consumer. Independent NumPy comparisons of particle and
 gas concentrations run on Warp CPU with float64 <code>rtol=1e-12, atol=0</code>; CUDA is
 optional and skips cleanly when unavailable. This tolerance-based evidence is
 not bitwise parity.</p>
-<h3 id="direct-neutral-gpu-wall-loss">Direct neutral GPU wall loss<a class="headerlink" href="#direct-neutral-gpu-wall-loss" title="Permanent link">&para;</a></h3>
-<p>The bounded direct wall-loss path is neutral and particle-resolved only. Import
-the step and its concrete-module-only configuration separately; the
-configuration is not re-exported by <code>particula.gpu.kernels</code> or <code>particula.gpu</code>:</p>
+<h3 id="direct-gpu-wall-loss">Direct GPU wall loss<a class="headerlink" href="#direct-gpu-wall-loss" title="Permanent link">&para;</a></h3>
+<p>The bounded direct wall-loss path is particle-resolved. It supports neutral and
+charged execution. Import the step and its concrete-module-only configuration
+separately; the configuration is not
+re-exported by <code>particula.gpu.kernels</code> or <code>particula.gpu</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">wall_loss_step_gpu</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels.wall_loss</span><span class="w"> </span><span class="kn">import</span> <span class="n">NeutralWallLossConfig</span>
 
@@ -15260,9 +15261,21 @@ deposition and gravitational settling:</p>
 <li>Crump, J. G., &amp; Seinfeld, J. H. (1981), <em>Journal of Aerosol Science</em>, 12(5).
   https://doi.org/10.1016/0021-8502(81)90036-7</li>
 <li>Crump, J. G., Flagan, R. C., &amp; Seinfeld, J. H. (1982), <em>Aerosol Science and
-  Technology</em>, 2(3), 303--309.
-  https://doi.org/10.1080/02786828308958636</li>
+   Technology</em>, 2(3), 303--309.
+   https://doi.org/10.1080/02786828308958636</li>
 </ul>
+<p><code>NeutralWallLossConfig</code> remains the sole concrete configuration type. Its
+<code>mode</code> is either <code>"neutral"</code> or <code>"charged"</code>. Charged mode validates a finite,
+signed scalar <code>wall_potential</code> in V. For spherical geometry,
+<code>wall_electric_field</code> is a finite, signed scalar in V/m. For rectangular
+geometry, it is a caller-owned, same-device <code>wp.float64</code> Warp array of shape
+<code>(3,)</code>, with finite signed components in V/m. The boundary does not replace or
+mutate that rectangular field array.</p>
+<p>For charged mode, slots with finite nonzero charge use the private
+image-charge and electric-field-drift coefficient composition. Image-charge
+enhancement is active even when <code>wall_potential</code> is zero. Zero-charge slots
+retain the exact neutral coefficient and RNG path, including when the charged
+configuration supplies nonzero potential or electric field.</p>
 <p>After read-only preflight, eligible finite positive-rate fixed slots survive with
 <code>exp(-k * time_step)</code>. A selected slot has every mass lane, concentration, and
 charge cleared. Density, volume, dtype, device, capacity, and unselected
@@ -15287,20 +15300,24 @@ consumes no draw. Exact CPU/Warp or per-seed RNG replay is not promised.</p>
 </thead>
 <tbody>
 <tr>
-<td>Neutral particle-resolved spherical/rectangular direct execution</td>
+<td>Neutral and charged particle-resolved spherical/rectangular direct execution</td>
 <td>Supported</td>
 </tr>
 <tr>
-<td>Geometry-specific deterministic coefficient tolerances and 100-seed, 3-sigma aggregate survival evidence</td>
+<td>Charged nonzero-charge image/electric-field composition; zero-charge neutral fallback</td>
+<td>Supported</td>
+</tr>
+<tr>
+<td>Charged configuration and rectangular field ownership semantics</td>
+<td>Supported</td>
+</tr>
+<tr>
+<td>Geometry-specific deterministic coefficient tolerances and P5 eight-stratum exact-binomial survival evidence (4,096 observations per stratum; inclusive bounds with per-stratum alpha 1.25e-7)</td>
 <td>Supported bounded evidence</td>
 </tr>
 <tr>
 <td>CUDA validation</td>
 <td>Optional additive evidence; guarded skips are expected when unavailable</td>
-</tr>
-<tr>
-<td>Charged, image-charge, or electric-field physics; E6-F4 charged wall loss</td>
-<td>Deferred</td>
 </tr>
 <tr>
 <td>CPU fallback or hidden transfer; high-level runnable, scheduler, or backend integration</td>

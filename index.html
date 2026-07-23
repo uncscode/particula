@@ -14999,30 +14999,35 @@
    autodiff, and performance claims remain deferred. See
     <a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
     for the complete contract.</li>
-<li>GPU neutral wall loss P5 is a direct fixed-shape boundary imported with
-   <code>from particula.gpu.kernels import wall_loss_step_gpu</code>. It accepts only
-   particle-resolved neutral configurations. Create <code>NeutralWallLossConfig</code> from
-   <code>particula.gpu.kernels.wall_loss</code>; the configuration is intentionally not
-   exported from <code>particula.gpu.kernels</code> or <code>particula.gpu</code>. It validates
-   spherical or rectangular SI geometry, fixed <code>WarpParticleData</code> schema and
-   domains, environment inputs, and optional RNG metadata. Successful nonzero
-   calls evaluate bounded neutral coefficients and stochastically clear eligible
-   slots' mass lanes, concentration, and charge in place; zero time is a
-   post-preflight write-free no-op. P5 advances one sequential per-box RNG owner
-   for eligible slots. Omitted <code>rng_states</code> are private and seeded per call, while
-   supplied sidecars mutate in place and reset only with <code>initialize_rng=True</code>;
-   repeating <code>rng_seed</code> does not reset a supplied sidecar. Zero time and
-   pre-launch failures preserve supplied state. Callers retain ownership of Warp
-   transfers, device placement, synchronization, particle data, and any RNG
-   sidecar. Preflight may run device validation scans and synchronize to read back
-   scalar status, but it does not transfer or replace caller-owned buffers.
-   Rollback is not promised after a mutation kernel launches. Sequential per-box
-   RNG advancement limits parallelism and makes no performance claim. Test-only
-   validation compares deterministic coefficients with CPU system-state equations
-   and checks aggregate stochastic survival; it does not establish CPU/Warp
-   RNG-stream or trajectory replay. Charged wall loss, a runnable API, hidden
-   transfers or fallback, and broader integrated orchestration remain deferred.</li>
-<li><a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
+<li>
+<p>GPU wall loss is a direct, caller-managed fixed-slot boundary imported with
+    <code>from particula.gpu.kernels import wall_loss_step_gpu</code>. Construct
+    <code>NeutralWallLossConfig</code> only from <code>particula.gpu.kernels.wall_loss</code>; it is
+    deliberately not re-exported from <code>particula.gpu.kernels</code> or <code>particula.gpu</code>.
+    It supports particle-resolved neutral and charged configurations. Inputs use
+    SI units: wall eddy diffusivity [m²/s], radius or dimensions [m], temperature
+    [K], pressure [Pa], time [s], signed wall potential [V], and electric field
+    [V/m]. Charged spherical execution preserves a signed scalar field and adds
+    the signed potential-derived field. Charged rectangular execution accepts a
+    caller-owned, same-device <code>wp.float64</code> field shaped <code>(3,)</code>, reduces its lanes
+    to their Euclidean magnitude, then adds the signed potential-derived field;
+    component signs do not select drift direction. Nonzero-charge slots retain
+    image-charge enhancement when <code>wall_potential=0</code>; zero-charge charged slots
+    use the exact neutral coefficient and RNG path. Callers own particle charge,
+    optional <code>(n_boxes,)</code> <code>wp.uint32</code> RNG state, explicit transfers, device
+    placement, and synchronization. After read-only preflight, selected eligible
+    slots have all mass lanes, concentration, and charge cleared in place, while
+    fixed capacity and unselected storage are preserved. Rejected pre-launch calls
+    do not mutate caller-owned state; rollback is not promised after launch.
+    Warp CPU is the baseline when available, and CUDA is optional with clean skips:</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/gpu/dynamics/tests/wall_loss_funcs_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/kernels/tests/wall_loss_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/gpu/kernels/tests/wall_loss_parity_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+</code></pre></div>
+<p>Hidden transfers or CPU fallback, a GPU runnable or scheduler/backend
+integration, dynamic slots, graph capture, differentiability, exact
+cross-backend RNG replay, mandatory CUDA, and performance claims are deferred.
+- <a href="Features/data-containers-and-gpu-foundations/">Data containers and GPU foundations</a>
   — canonical reference for <code>ParticleData</code>, <code>GasData</code>, <code>EnvironmentData</code>,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the
    current shipped CPU/GPU support boundary, and caller-owned GPU sidecar state
@@ -15052,34 +15057,35 @@
   <code>energy_transfer</code> diagnostic, and refreshes caller-owned
    <code>WarpGasData.vapor_pressure</code> from the current device-resident temperature
    before mass transfer. For the supported low-level, direct-kernel-only
-    walkthrough, use <code>python docs/Examples/gpu_direct_kernels_quick_start.py</code>.
-    This path does not add high-level <code>Aerosol</code>/<code>Runnable</code> support, implicit
-    simulation-state transfers or synchronization, automatic fallback or
-    migration, or CPU-strategy/runnable parity. See the <a href="Features/data-containers-and-gpu-foundations/#focused-reproduction-commands">GPU condensation command
-     matrix</a>
-     for focused troubleshooting and reproduction commands. Entry-point
-     validation can still perform synchronous device-to-host readbacks.
+walkthrough, use <code>python docs/Examples/gpu_direct_kernels_quick_start.py</code>.
+This path does not add high-level <code>Aerosol</code>/<code>Runnable</code> support, implicit
+simulation-state transfers or synchronization, automatic fallback or
+migration, or CPU-strategy/runnable parity. See the <a href="Features/data-containers-and-gpu-foundations/#focused-reproduction-commands">GPU condensation command
+ matrix</a>
+ for focused troubleshooting and reproduction commands. Entry-point
+ validation can still perform synchronous device-to-host readbacks.
    For a focused supported coagulation route, the
-    <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py">direct GPU coagulation example</a>
+<a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py">direct GPU coagulation example</a>
    explicitly transfers <code>ParticleData</code>, runs two Brownian particle-resolved
    calls with caller-owned collision and persistent RNG sidecars on Warp CPU
    by default, then restores a CPU checkpoint. When Warp is unavailable or
    disabled, it runs no conversion or kernel and provides no CPU fallback.
-   It makes no <code>Runnable</code>, CUDA, or performance claim.</li>
-<li><a href="Features/particle-data-migration/">ParticleData and GasData migration guide</a>
+   It makes no <code>Runnable</code>, CUDA, or performance claim.
+- <a href="Features/particle-data-migration/">ParticleData and GasData migration guide</a>
   — migration workflow and before/after examples for moving from legacy facades
-  to the canonical data-container contract documented in the foundation guide.</li>
-<li><a href="Features/Roadmap/data-oriented-gpu/">Data-oriented design and GPU roadmap</a>
+  to the canonical data-container contract documented in the foundation guide.
+- <a href="Features/Roadmap/data-oriented-gpu/">Data-oriented design and GPU roadmap</a>
   — current schema inventory,
   <a href="Features/Roadmap/data-oriented-gpu/#authoritative-field-ownership-decisions">authoritative CPU/GPU field ownership policy</a>,
   shipped coagulation RNG ownership and graph-capture setup guidance,
   and the <a href="Features/Roadmap/data-oriented-gpu/#final-downstream-handoff-map-for-sibling-features">final downstream handoff map for sibling E2
-  features</a>.</li>
-<li><a href="Features/Roadmap/mass-precision-study/">Mass Precision Recommendation Report</a>
+  features</a>.
+- <a href="Features/Roadmap/mass-precision-study/">Mass Precision Recommendation Report</a>
   — final E2-F6 policy report covering deterministic NPF-to-droplet GPU
   evidence, the accepted unchanged <code>fp64</code>/<code>wp.float64</code> production baseline,
   study-only candidate fidelity checks, executable P3 thresholds, clamp
-  accounting, memory-footprint examples, and focused reproduction commands.</li>
+  accounting, memory-footprint examples, and focused reproduction commands.</p>
+</li>
 </ul>
 
 

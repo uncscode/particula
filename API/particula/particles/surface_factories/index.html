@@ -14679,7 +14679,7 @@ required parameters are missing during check_keys/pre_build_check.</p>
 
 
 <a href="#particula.particles.surface_factories.SurfaceFactory.get_builders" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_builders</span><span class="p">()</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_builders</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="n">SurfaceStrategyVolumeBuilder</span><span class="p">,</span> <span class="n">SurfaceStrategyMassBuilder</span><span class="p">,</span> <span class="n">SurfaceStrategyMolarBuilder</span><span class="p">]]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -14690,6 +14690,7 @@ required parameters are missing during check_keys/pre_build_check.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
+              <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="            SurfaceStrategyVolumeBuilder (particula.particles.surface_builders.SurfaceStrategyVolumeBuilder)" href="../surface_builders/#particula.particles.surface_builders.SurfaceStrategyVolumeBuilder">SurfaceStrategyVolumeBuilder</a>, <a class="autorefs autorefs-internal" title="            SurfaceStrategyMassBuilder (particula.particles.surface_builders.SurfaceStrategyMassBuilder)" href="../surface_builders/#particula.particles.surface_builders.SurfaceStrategyMassBuilder">SurfaceStrategyMassBuilder</a>, <a class="autorefs autorefs-internal" title="            SurfaceStrategyMolarBuilder (particula.particles.surface_builders.SurfaceStrategyMolarBuilder)" href="../surface_builders/#particula.particles.surface_builders.SurfaceStrategyMolarBuilder">SurfaceStrategyMolarBuilder</a>]]</code>
           –
           <div class="doc-md-description">
             <ul>
@@ -14734,7 +14735,25 @@ mapped to the corresponding builder class.</li>
 <span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
-<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_builders</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">[</span>
+        <span class="n">SurfaceStrategyVolumeBuilder</span><span class="p">,</span>
+        <span class="n">SurfaceStrategyMassBuilder</span><span class="p">,</span>
+        <span class="n">SurfaceStrategyMolarBuilder</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a mapping of strategy types to builder instances.</span>
 
 <span class="sd">    Returns:</span>

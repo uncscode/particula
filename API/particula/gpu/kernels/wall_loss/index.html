@@ -14565,10 +14565,15 @@
 
     <div class="doc doc-contents first">
 
-        <p>Apply bounded neutral direct GPU wall loss to fixed particle slots.</p>
-<p>This concrete direct-kernel boundary supports only neutral,
-particle-resolved wall loss. It retains P3's read-only preflight ordering and
-uses sequential per-box random-number generation for eligible fixed slots.
+        <p>Apply bounded direct GPU wall loss to fixed particle slots.</p>
+<p>This concrete direct-kernel boundary supports particle-resolved neutral and
+charged wall loss. In charged mode, only nonzero charge composes the private P2
+image-charge and P3 field-drift coefficient helpers; zero-charge slots retain
+the exact neutral coefficient and random-number path. A charged rectangular
+field is caller-owned same-device <code>wp.float64</code> storage with shape <code>(3,)</code>.
+Only the charged rectangular removal kernel reads it, and it is never mutated.
+The boundary retains frozen read-only preflight and sequential per-box random
+number generation for eligible fixed slots.
 An omitted RNG sidecar is private and seeded for each successful positive-time
 call. A supplied <code>uint32</code> Warp sidecar remains caller-owned, advances in
 place only for eligible slots, and resets only when explicitly requested.</p>
@@ -14605,18 +14610,22 @@ place only for eligible slots, and resets only when explicitly requested.</p>
   </span>
 
 <a href="#particula.gpu.kernels.wall_loss.NeutralWallLossConfig" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">NeutralWallLossConfig</span><span class="p">(</span><span class="n">geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;particle_resolved&#39;</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">NeutralWallLossConfig</span><span class="p">(</span><span class="n">geometry</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">wall_eddy_diffusivity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chamber_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">chamber_dimensions</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">distribution_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;particle_resolved&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;neutral&#39;</span><span class="p">,</span> <span class="n">wall_potential</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">wall_electric_field</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
 
 
-        <p>Define immutable neutral wall-loss geometry and representation inputs.</p>
-<p>This concrete-module-only configuration is accepted by the direct P5
+        <p>Define immutable direct wall-loss geometry and charged inputs.</p>
+<p>This concrete-module-only configuration is accepted by the direct P4
 boundary, which retains frozen P3 preflight. <code>geometry</code> selects spherical
 or rectangular SI dimensions, while <code>distribution_type</code> must remain
-<code>"particle_resolved"</code>. It contains no charged-wall-loss settings.</p>
+<code>"particle_resolved"</code>. <code>mode</code> is <code>"neutral"</code> or <code>"charged"</code>.
+Charged execution composes private P2 image and P3 drift helpers only for
+nonzero charges. Import this concrete configuration
+from <code>particula.gpu.kernels.wall_loss</code>. A charged rectangular electric
+field is caller-owned device storage and is never replaced or mutated.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -14664,6 +14673,34 @@ dimensions [m]; required only for rectangular geometry.</p>
 selector.</p>
           </div>
         </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gpu.kernels.wall_loss.NeutralWallLossConfig.mode">mode</span></code></b>
+              (<code><span title="str">str</span></code>)
+          –
+          <div class="doc-md-description">
+            <p><code>"neutral"</code> or <code>"charged"</code> execution mode. Zero-charge
+charged slots retain the neutral coefficient and RNG path.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gpu.kernels.wall_loss.NeutralWallLossConfig.wall_potential">wall_potential</span></code></b>
+              (<code><span title="float">float</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Finite signed wall potential [V].</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.gpu.kernels.wall_loss.NeutralWallLossConfig.wall_electric_field">wall_electric_field</span></code></b>
+              (<code><span title="typing.Any">Any</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Finite signed spherical scalar field [V m^-1], or
+caller-owned same-device charged rectangular <code>wp.float64</code> vector
+with shape <code>(3,)</code> [V m^-1]. A rectangular vector is invalid in
+neutral mode and is neither replaced nor mutated in charged mode.</p>
+          </div>
+        </li>
     </ul>
 
 
@@ -14709,24 +14746,30 @@ selector.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Apply P5 neutral wall loss to eligible particle-resolved slots.</p>
-<p>The configuration supports only particle-resolved neutral wall loss. SI
-inputs are wall eddy diffusivity [m^2 s^-1], geometry dimensions [m],
-temperature [K], pressure [Pa], and <code>time_step</code> [s]. After frozen P3
-preflight, positive-time calls evaluate neutral coefficients for usable
-slots, apply survival probability <code>exp(-k * time_step)</code>, and clear every
-mass lane, concentration, and charge for removed slots. Zero time is a
-post-preflight write-free no-op.</p>
+        <p>Apply direct neutral or charged wall loss to eligible fixed slots.</p>
+<p>The configuration supports particle-resolved neutral and charged wall loss.
+Charged nonzero slots compose private P2 image enhancement and P3 signed
+field drift with their neutral coefficient; zero-charge charged slots use
+the exact neutral coefficient and RNG path. SI inputs are wall eddy
+diffusivity [m^2 s^-1],
+geometry dimensions [m], potential [V], electric field [V m^-1],
+temperature [K], pressure [Pa], and <code>time_step</code> [s]. A charged rectangular
+electric-field vector is caller-owned read-only storage; only charged
+rectangular execution reads its three lanes.
+After frozen P3 preflight, positive-time calls evaluate neutral coefficients
+for usable slots, apply survival probability <code>exp(-k * time_step)</code>, and
+clear every mass lane, concentration, and charge for removed slots. Zero
+time is a post-preflight write-free no-op.</p>
 <p>Omitted <code>rng_states</code> uses a private per-call sidecar initialized from
 <code>rng_seed</code> after successful positive-time preflight. A supplied
 same-device <code>uint32</code> sidecar with shape <code>(n_boxes,)</code> remains
 caller-owned, advances in place only for eligible slots, and resets only
 when <code>initialize_rng=True</code>. Eligible slots have positive concentration,
-usable positive mass and derived transport properties, and a positive
-non-NaN wall-loss coefficient. An infinite positive coefficient causes a
-deterministic removal without consuming RNG state. Zero time and
-pre-launch validation failures leave supplied state unchanged. Rollback is
-not promised after a mutation kernel has launched.</p>
+usable positive mass and derived transport properties, and a finite positive
+wall-loss coefficient. An infinite positive coefficient causes deterministic
+removal without consuming RNG state. Zero time and pre-launch validation
+failures leave supplied state unchanged.
+Rollback is not promised after a mutation kernel has launched.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -14773,7 +14816,8 @@ not promised after a mutation kernel has launched.</p>
    (particula.gpu.kernels.wall_loss.NeutralWallLossConfig)" href="#particula.gpu.kernels.wall_loss.NeutralWallLossConfig">NeutralWallLossConfig</a></code>)
           –
           <div class="doc-md-description">
-            <p>Exact neutral geometry and representation configuration.</p>
+            <p>Exact concrete geometry, representation, and charged
+configuration. Rectangular fields remain caller-owned storage.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -14841,8 +14885,8 @@ combined with direct <code>temperature</code> or <code>pressure</code> inputs.</
               <code><span title="TypeError">TypeError</span></code>
             –
           <div class="doc-md-description">
-            <p>If the configuration, time step, or RNG metadata uses an
-unsupported type.</p>
+            <p>If the configuration, scalar charged input, time step, or
+RNG metadata uses an unsupported type.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -14850,8 +14894,9 @@ unsupported type.</p>
             –
           <div class="doc-md-description">
             <p>If configuration, particle, time-step, environment, or RNG
-values, shapes, dtypes, or devices violate the P3/P5 contract,
-including combining <code>environment</code> with direct environment inputs.</p>
+values, shapes, dtypes, or devices violate the direct contract,
+including an invalid charged field or combining <code>environment</code>
+with direct environment inputs.</p>
           </div>
         </li>
     </ul>
@@ -14859,148 +14904,189 @@ including combining <code>environment</code> with direct environment inputs.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/wall_loss.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">501</span>
-<span class="normal">502</span>
-<span class="normal">503</span>
-<span class="normal">504</span>
-<span class="normal">505</span>
-<span class="normal">506</span>
-<span class="normal">507</span>
-<span class="normal">508</span>
-<span class="normal">509</span>
-<span class="normal">510</span>
-<span class="normal">511</span>
-<span class="normal">512</span>
-<span class="normal">513</span>
-<span class="normal">514</span>
-<span class="normal">515</span>
-<span class="normal">516</span>
-<span class="normal">517</span>
-<span class="normal">518</span>
-<span class="normal">519</span>
-<span class="normal">520</span>
-<span class="normal">521</span>
-<span class="normal">522</span>
-<span class="normal">523</span>
-<span class="normal">524</span>
-<span class="normal">525</span>
-<span class="normal">526</span>
-<span class="normal">527</span>
-<span class="normal">528</span>
-<span class="normal">529</span>
-<span class="normal">530</span>
-<span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
-<span class="normal">538</span>
-<span class="normal">539</span>
-<span class="normal">540</span>
-<span class="normal">541</span>
-<span class="normal">542</span>
-<span class="normal">543</span>
-<span class="normal">544</span>
-<span class="normal">545</span>
-<span class="normal">546</span>
-<span class="normal">547</span>
-<span class="normal">548</span>
-<span class="normal">549</span>
-<span class="normal">550</span>
-<span class="normal">551</span>
-<span class="normal">552</span>
-<span class="normal">553</span>
-<span class="normal">554</span>
-<span class="normal">555</span>
-<span class="normal">556</span>
-<span class="normal">557</span>
-<span class="normal">558</span>
-<span class="normal">559</span>
-<span class="normal">560</span>
-<span class="normal">561</span>
-<span class="normal">562</span>
-<span class="normal">563</span>
-<span class="normal">564</span>
-<span class="normal">565</span>
-<span class="normal">566</span>
-<span class="normal">567</span>
-<span class="normal">568</span>
-<span class="normal">569</span>
-<span class="normal">570</span>
-<span class="normal">571</span>
-<span class="normal">572</span>
-<span class="normal">573</span>
-<span class="normal">574</span>
-<span class="normal">575</span>
-<span class="normal">576</span>
-<span class="normal">577</span>
-<span class="normal">578</span>
-<span class="normal">579</span>
-<span class="normal">580</span>
-<span class="normal">581</span>
-<span class="normal">582</span>
-<span class="normal">583</span>
-<span class="normal">584</span>
-<span class="normal">585</span>
-<span class="normal">586</span>
-<span class="normal">587</span>
-<span class="normal">588</span>
-<span class="normal">589</span>
-<span class="normal">590</span>
-<span class="normal">591</span>
-<span class="normal">592</span>
-<span class="normal">593</span>
-<span class="normal">594</span>
-<span class="normal">595</span>
-<span class="normal">596</span>
-<span class="normal">597</span>
-<span class="normal">598</span>
-<span class="normal">599</span>
-<span class="normal">600</span>
-<span class="normal">601</span>
-<span class="normal">602</span>
-<span class="normal">603</span>
-<span class="normal">604</span>
-<span class="normal">605</span>
-<span class="normal">606</span>
-<span class="normal">607</span>
-<span class="normal">608</span>
-<span class="normal">609</span>
-<span class="normal">610</span>
-<span class="normal">611</span>
-<span class="normal">612</span>
-<span class="normal">613</span>
-<span class="normal">614</span>
-<span class="normal">615</span>
-<span class="normal">616</span>
-<span class="normal">617</span>
-<span class="normal">618</span>
-<span class="normal">619</span>
-<span class="normal">620</span>
-<span class="normal">621</span>
-<span class="normal">622</span>
-<span class="normal">623</span>
-<span class="normal">624</span>
-<span class="normal">625</span>
-<span class="normal">626</span>
-<span class="normal">627</span>
-<span class="normal">628</span>
-<span class="normal">629</span>
-<span class="normal">630</span>
-<span class="normal">631</span>
-<span class="normal">632</span>
-<span class="normal">633</span>
-<span class="normal">634</span>
-<span class="normal">635</span>
-<span class="normal">636</span>
-<span class="normal">637</span>
-<span class="normal">638</span>
-<span class="normal">639</span>
-<span class="normal">640</span>
-<span class="normal">641</span>
-<span class="normal">642</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">wall_loss_step_gpu</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 887</span>
+<span class="normal"> 888</span>
+<span class="normal"> 889</span>
+<span class="normal"> 890</span>
+<span class="normal"> 891</span>
+<span class="normal"> 892</span>
+<span class="normal"> 893</span>
+<span class="normal"> 894</span>
+<span class="normal"> 895</span>
+<span class="normal"> 896</span>
+<span class="normal"> 897</span>
+<span class="normal"> 898</span>
+<span class="normal"> 899</span>
+<span class="normal"> 900</span>
+<span class="normal"> 901</span>
+<span class="normal"> 902</span>
+<span class="normal"> 903</span>
+<span class="normal"> 904</span>
+<span class="normal"> 905</span>
+<span class="normal"> 906</span>
+<span class="normal"> 907</span>
+<span class="normal"> 908</span>
+<span class="normal"> 909</span>
+<span class="normal"> 910</span>
+<span class="normal"> 911</span>
+<span class="normal"> 912</span>
+<span class="normal"> 913</span>
+<span class="normal"> 914</span>
+<span class="normal"> 915</span>
+<span class="normal"> 916</span>
+<span class="normal"> 917</span>
+<span class="normal"> 918</span>
+<span class="normal"> 919</span>
+<span class="normal"> 920</span>
+<span class="normal"> 921</span>
+<span class="normal"> 922</span>
+<span class="normal"> 923</span>
+<span class="normal"> 924</span>
+<span class="normal"> 925</span>
+<span class="normal"> 926</span>
+<span class="normal"> 927</span>
+<span class="normal"> 928</span>
+<span class="normal"> 929</span>
+<span class="normal"> 930</span>
+<span class="normal"> 931</span>
+<span class="normal"> 932</span>
+<span class="normal"> 933</span>
+<span class="normal"> 934</span>
+<span class="normal"> 935</span>
+<span class="normal"> 936</span>
+<span class="normal"> 937</span>
+<span class="normal"> 938</span>
+<span class="normal"> 939</span>
+<span class="normal"> 940</span>
+<span class="normal"> 941</span>
+<span class="normal"> 942</span>
+<span class="normal"> 943</span>
+<span class="normal"> 944</span>
+<span class="normal"> 945</span>
+<span class="normal"> 946</span>
+<span class="normal"> 947</span>
+<span class="normal"> 948</span>
+<span class="normal"> 949</span>
+<span class="normal"> 950</span>
+<span class="normal"> 951</span>
+<span class="normal"> 952</span>
+<span class="normal"> 953</span>
+<span class="normal"> 954</span>
+<span class="normal"> 955</span>
+<span class="normal"> 956</span>
+<span class="normal"> 957</span>
+<span class="normal"> 958</span>
+<span class="normal"> 959</span>
+<span class="normal"> 960</span>
+<span class="normal"> 961</span>
+<span class="normal"> 962</span>
+<span class="normal"> 963</span>
+<span class="normal"> 964</span>
+<span class="normal"> 965</span>
+<span class="normal"> 966</span>
+<span class="normal"> 967</span>
+<span class="normal"> 968</span>
+<span class="normal"> 969</span>
+<span class="normal"> 970</span>
+<span class="normal"> 971</span>
+<span class="normal"> 972</span>
+<span class="normal"> 973</span>
+<span class="normal"> 974</span>
+<span class="normal"> 975</span>
+<span class="normal"> 976</span>
+<span class="normal"> 977</span>
+<span class="normal"> 978</span>
+<span class="normal"> 979</span>
+<span class="normal"> 980</span>
+<span class="normal"> 981</span>
+<span class="normal"> 982</span>
+<span class="normal"> 983</span>
+<span class="normal"> 984</span>
+<span class="normal"> 985</span>
+<span class="normal"> 986</span>
+<span class="normal"> 987</span>
+<span class="normal"> 988</span>
+<span class="normal"> 989</span>
+<span class="normal"> 990</span>
+<span class="normal"> 991</span>
+<span class="normal"> 992</span>
+<span class="normal"> 993</span>
+<span class="normal"> 994</span>
+<span class="normal"> 995</span>
+<span class="normal"> 996</span>
+<span class="normal"> 997</span>
+<span class="normal"> 998</span>
+<span class="normal"> 999</span>
+<span class="normal">1000</span>
+<span class="normal">1001</span>
+<span class="normal">1002</span>
+<span class="normal">1003</span>
+<span class="normal">1004</span>
+<span class="normal">1005</span>
+<span class="normal">1006</span>
+<span class="normal">1007</span>
+<span class="normal">1008</span>
+<span class="normal">1009</span>
+<span class="normal">1010</span>
+<span class="normal">1011</span>
+<span class="normal">1012</span>
+<span class="normal">1013</span>
+<span class="normal">1014</span>
+<span class="normal">1015</span>
+<span class="normal">1016</span>
+<span class="normal">1017</span>
+<span class="normal">1018</span>
+<span class="normal">1019</span>
+<span class="normal">1020</span>
+<span class="normal">1021</span>
+<span class="normal">1022</span>
+<span class="normal">1023</span>
+<span class="normal">1024</span>
+<span class="normal">1025</span>
+<span class="normal">1026</span>
+<span class="normal">1027</span>
+<span class="normal">1028</span>
+<span class="normal">1029</span>
+<span class="normal">1030</span>
+<span class="normal">1031</span>
+<span class="normal">1032</span>
+<span class="normal">1033</span>
+<span class="normal">1034</span>
+<span class="normal">1035</span>
+<span class="normal">1036</span>
+<span class="normal">1037</span>
+<span class="normal">1038</span>
+<span class="normal">1039</span>
+<span class="normal">1040</span>
+<span class="normal">1041</span>
+<span class="normal">1042</span>
+<span class="normal">1043</span>
+<span class="normal">1044</span>
+<span class="normal">1045</span>
+<span class="normal">1046</span>
+<span class="normal">1047</span>
+<span class="normal">1048</span>
+<span class="normal">1049</span>
+<span class="normal">1050</span>
+<span class="normal">1051</span>
+<span class="normal">1052</span>
+<span class="normal">1053</span>
+<span class="normal">1054</span>
+<span class="normal">1055</span>
+<span class="normal">1056</span>
+<span class="normal">1057</span>
+<span class="normal">1058</span>
+<span class="normal">1059</span>
+<span class="normal">1060</span>
+<span class="normal">1061</span>
+<span class="normal">1062</span>
+<span class="normal">1063</span>
+<span class="normal">1064</span>
+<span class="normal">1065</span>
+<span class="normal">1066</span>
+<span class="normal">1067</span>
+<span class="normal">1068</span>
+<span class="normal">1069</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">wall_loss_step_gpu</span><span class="p">(</span>
     <span class="n">particles</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">pressure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -15012,33 +15098,40 @@ including combining <code>environment</code> with direct environment inputs.</p>
     <span class="n">initialize_rng</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">environment</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply P5 neutral wall loss to eligible particle-resolved slots.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply direct neutral or charged wall loss to eligible fixed slots.</span>
 
-<span class="sd">    The configuration supports only particle-resolved neutral wall loss. SI</span>
-<span class="sd">    inputs are wall eddy diffusivity [m^2 s^-1], geometry dimensions [m],</span>
-<span class="sd">    temperature [K], pressure [Pa], and ``time_step`` [s]. After frozen P3</span>
-<span class="sd">    preflight, positive-time calls evaluate neutral coefficients for usable</span>
-<span class="sd">    slots, apply survival probability ``exp(-k * time_step)``, and clear every</span>
-<span class="sd">    mass lane, concentration, and charge for removed slots. Zero time is a</span>
-<span class="sd">    post-preflight write-free no-op.</span>
+<span class="sd">    The configuration supports particle-resolved neutral and charged wall loss.</span>
+<span class="sd">    Charged nonzero slots compose private P2 image enhancement and P3 signed</span>
+<span class="sd">    field drift with their neutral coefficient; zero-charge charged slots use</span>
+<span class="sd">    the exact neutral coefficient and RNG path. SI inputs are wall eddy</span>
+<span class="sd">    diffusivity [m^2 s^-1],</span>
+<span class="sd">    geometry dimensions [m], potential [V], electric field [V m^-1],</span>
+<span class="sd">    temperature [K], pressure [Pa], and ``time_step`` [s]. A charged rectangular</span>
+<span class="sd">    electric-field vector is caller-owned read-only storage; only charged</span>
+<span class="sd">    rectangular execution reads its three lanes.</span>
+<span class="sd">    After frozen P3 preflight, positive-time calls evaluate neutral coefficients</span>
+<span class="sd">    for usable slots, apply survival probability ``exp(-k * time_step)``, and</span>
+<span class="sd">    clear every mass lane, concentration, and charge for removed slots. Zero</span>
+<span class="sd">    time is a post-preflight write-free no-op.</span>
 
 <span class="sd">    Omitted ``rng_states`` uses a private per-call sidecar initialized from</span>
 <span class="sd">    ``rng_seed`` after successful positive-time preflight. A supplied</span>
 <span class="sd">    same-device ``uint32`` sidecar with shape ``(n_boxes,)`` remains</span>
 <span class="sd">    caller-owned, advances in place only for eligible slots, and resets only</span>
 <span class="sd">    when ``initialize_rng=True``. Eligible slots have positive concentration,</span>
-<span class="sd">    usable positive mass and derived transport properties, and a positive</span>
-<span class="sd">    non-NaN wall-loss coefficient. An infinite positive coefficient causes a</span>
-<span class="sd">    deterministic removal without consuming RNG state. Zero time and</span>
-<span class="sd">    pre-launch validation failures leave supplied state unchanged. Rollback is</span>
-<span class="sd">    not promised after a mutation kernel has launched.</span>
+<span class="sd">    usable positive mass and derived transport properties, and a finite positive</span>
+<span class="sd">    wall-loss coefficient. An infinite positive coefficient causes deterministic</span>
+<span class="sd">    removal without consuming RNG state. Zero time and pre-launch validation</span>
+<span class="sd">    failures leave supplied state unchanged.</span>
+<span class="sd">    Rollback is not promised after a mutation kernel has launched.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        particles: Caller-owned fixed-shape ``WarpParticleData``-like object.</span>
 <span class="sd">        temperature: Scalar or per-box Warp temperature [K].</span>
 <span class="sd">        pressure: Scalar or per-box Warp pressure [Pa].</span>
 <span class="sd">        time_step: Finite nonnegative duration [s].</span>
-<span class="sd">        config: Exact neutral geometry and representation configuration.</span>
+<span class="sd">        config: Exact concrete geometry, representation, and charged</span>
+<span class="sd">            configuration. Rectangular fields remain caller-owned storage.</span>
 <span class="sd">        rng_seed: Unsigned 32-bit seed for private state or an explicit reset.</span>
 <span class="sd">        rng_states: Optional caller-owned same-device ``uint32`` Warp array</span>
 <span class="sd">            with shape ``(n_boxes,)``. The array is mutated in place only by</span>
@@ -15052,14 +15145,17 @@ including combining <code>environment</code> with direct environment inputs.</p>
 <span class="sd">        The identical ``particles`` object. Private RNG state is not returned.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        TypeError: If the configuration, time step, or RNG metadata uses an</span>
-<span class="sd">            unsupported type.</span>
+<span class="sd">        TypeError: If the configuration, scalar charged input, time step, or</span>
+<span class="sd">            RNG metadata uses an unsupported type.</span>
 <span class="sd">        ValueError: If configuration, particle, time-step, environment, or RNG</span>
-<span class="sd">            values, shapes, dtypes, or devices violate the P3/P5 contract,</span>
-<span class="sd">            including combining ``environment`` with direct environment inputs.</span>
+<span class="sd">            values, shapes, dtypes, or devices violate the direct contract,</span>
+<span class="sd">            including an invalid charged field or combining ``environment``</span>
+<span class="sd">            with direct environment inputs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">validated_config</span> <span class="o">=</span> <span class="n">_validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-    <span class="n">n_boxes</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="n">_validate_particles</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
+    <span class="n">n_boxes</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="n">_validate_particle_schema</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
+    <span class="n">_validate_charged_rectangular_field</span><span class="p">(</span><span class="n">validated_config</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+    <span class="n">_validate_particle_values</span><span class="p">(</span><span class="n">particles</span><span class="p">)</span>
     <span class="n">validated_time_step</span> <span class="o">=</span> <span class="n">_validate_time_step</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span>
     <span class="n">validate_environment_inputs</span><span class="p">(</span>
         <span class="n">temperature</span><span class="p">,</span>
@@ -15087,60 +15183,91 @@ including combining <code>environment</code> with direct environment inputs.</p>
     <span class="n">pressure_array</span> <span class="o">=</span> <span class="n">_normalize_execution_environment_array</span><span class="p">(</span>
         <span class="n">pressure_array</span><span class="p">,</span> <span class="n">n_boxes</span>
     <span class="p">)</span>
+    <span class="n">n_particles</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">n_species</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">execution_rng_states</span> <span class="o">=</span> <span class="n">rng_states</span>
     <span class="k">if</span> <span class="n">execution_rng_states</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">execution_rng_states</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
         <span class="n">initialize_rng</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">if</span> <span class="n">initialize_rng</span><span class="p">:</span>
-        <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-            <span class="n">_initialize_rng_states</span><span class="p">,</span>
-            <span class="n">dim</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">rng_seed</span><span class="p">),</span> <span class="n">execution_rng_states</span><span class="p">],</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="n">n_particles</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">n_species</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">removal_mask</span> <span class="o">=</span> <span class="n">wp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-        <span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">wp</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-    <span class="p">)</span>
     <span class="n">geometry_mode</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">&quot;spherical&quot;</span> <span class="k">else</span> <span class="mi">1</span>
     <span class="n">chamber_radius</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">validated_config</span><span class="o">.</span><span class="n">chamber_radius</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">)</span>
     <span class="n">dimensions</span> <span class="o">=</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">chamber_dimensions</span> <span class="ow">or</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_wall_loss_removal_mask</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
-            <span class="n">temperature_array</span><span class="p">,</span>
-            <span class="n">pressure_array</span><span class="p">,</span>
-            <span class="n">validated_time_step</span><span class="p">,</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">validated_config</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span><span class="p">),</span>
-            <span class="n">chamber_radius</span><span class="p">,</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
-            <span class="n">geometry_mode</span><span class="p">,</span>
-            <span class="n">n_particles</span><span class="p">,</span>
-            <span class="n">n_species</span><span class="p">,</span>
-            <span class="n">execution_rng_states</span><span class="p">,</span>
-            <span class="n">removal_mask</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">_apply_wall_loss_mask</span><span class="p">,</span>
-        <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">n_particles</span><span class="p">),</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
-            <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
-            <span class="n">removal_mask</span><span class="p">,</span>
-            <span class="n">n_species</span><span class="p">,</span>
-        <span class="p">],</span>
-        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;neutral&quot;</span><span class="p">:</span>
+        <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+            <span class="n">_wall_loss_remove</span><span class="p">,</span>
+            <span class="n">dim</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+                <span class="n">temperature_array</span><span class="p">,</span>
+                <span class="n">pressure_array</span><span class="p">,</span>
+                <span class="n">validated_time_step</span><span class="p">,</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">validated_config</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span><span class="p">),</span>
+                <span class="n">chamber_radius</span><span class="p">,</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+                <span class="n">geometry_mode</span><span class="p">,</span>
+                <span class="n">n_particles</span><span class="p">,</span>
+                <span class="n">n_species</span><span class="p">,</span>
+                <span class="n">execution_rng_states</span><span class="p">,</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">rng_seed</span><span class="p">),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">initialize_rng</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">validated_config</span><span class="o">.</span><span class="n">geometry</span> <span class="o">==</span> <span class="s2">&quot;spherical&quot;</span><span class="p">:</span>
+        <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+            <span class="n">_charged_spherical_wall_loss_remove</span><span class="p">,</span>
+            <span class="n">dim</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+                <span class="n">temperature_array</span><span class="p">,</span>
+                <span class="n">pressure_array</span><span class="p">,</span>
+                <span class="n">validated_time_step</span><span class="p">,</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">validated_config</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span><span class="p">),</span>
+                <span class="n">chamber_radius</span><span class="p">,</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">validated_config</span><span class="o">.</span><span class="n">wall_potential</span><span class="p">),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">validated_config</span><span class="o">.</span><span class="n">wall_electric_field</span><span class="p">),</span>
+                <span class="n">n_particles</span><span class="p">,</span>
+                <span class="n">n_species</span><span class="p">,</span>
+                <span class="n">execution_rng_states</span><span class="p">,</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">rng_seed</span><span class="p">),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">initialize_rng</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+            <span class="n">_charged_rectangular_wall_loss_remove</span><span class="p">,</span>
+            <span class="n">dim</span><span class="o">=</span><span class="n">n_boxes</span><span class="p">,</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+                <span class="n">particles</span><span class="o">.</span><span class="n">density</span><span class="p">,</span>
+                <span class="n">temperature_array</span><span class="p">,</span>
+                <span class="n">pressure_array</span><span class="p">,</span>
+                <span class="n">validated_time_step</span><span class="p">,</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">validated_config</span><span class="o">.</span><span class="n">wall_eddy_diffusivity</span><span class="p">),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">validated_config</span><span class="o">.</span><span class="n">wall_potential</span><span class="p">),</span>
+                <span class="n">validated_config</span><span class="o">.</span><span class="n">wall_electric_field</span><span class="p">,</span>
+                <span class="n">n_particles</span><span class="p">,</span>
+                <span class="n">n_species</span><span class="p">,</span>
+                <span class="n">execution_rng_states</span><span class="p">,</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">rng_seed</span><span class="p">),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">initialize_rng</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="n">particles</span>
 </code></pre></div></td></tr></table></div>
             </details>
