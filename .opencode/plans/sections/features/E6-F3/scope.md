@@ -37,9 +37,6 @@ removed fixed slot, and supports persistent per-box RNG state.
 
 ## Out of Scope
 
-- Coefficient/removal kernels and RNG lifecycle remain later E6-F3 phases. P3
-  supplies only the validated input boundary and does not invoke its existing
-  internal coefficient helpers.
 - Charged, image-charge, wall-potential, or electric-field physics (E6-F4).
 - Discrete or continuous-PDF GPU wall loss, gas wall loss, multi-box transport,
   or changes to CPU strategy behavior.
@@ -50,12 +47,14 @@ removed fixed slot, and supports persistent per-box RNG state.
 - Exact CPU/NumPy and Warp RNG-stream matching; only distributional parity is
   required for stochastic outcomes.
 
-## P4 Delivered Scope (#1404)
+## P4-P5 Delivered Scope (#1404, #1405)
 
-P4 is now in scope and shipped: after frozen P3 preflight, positive-time neutral
-particle-resolved calls normalize environment inputs, calculate spherical or
-rectangular coefficients for usable active slots, perform deterministic local
-seed/slot survival draws, and clear all species masses, concentration, and
-charge for lost slots. Zero time is write-free after preflight. Persistent
-caller-owned `rng_states` initialization, reset, and advancement remain excluded
-from P4 and deferred to P5.
+After frozen P3 preflight, positive-time neutral particle-resolved calls
+normalize environment inputs, calculate spherical or rectangular coefficients
+for usable active slots, and clear all species masses, concentration, and charge
+for lost slots. P5 supplies the persistent RNG contract: omitted state is private
+and initialized per successful call; supplied `(n_boxes,)` `wp.uint32` state is
+caller-owned, advances sequentially by box for eligible slots only, and resets
+only with `initialize_rng=True`. Zero time and rejected preflight leave supplied
+state unchanged. The serial per-box RNG loop is bounded correctness scope, not a
+performance claim.

@@ -209,8 +209,10 @@ Known GPU physics gaps remain:
   CUDA rows are optional and skip cleanly when unavailable. This is
   tolerance-based evidence, not bitwise equality.
 - GPU runnable and process orchestration, backend selection/fallback policy,
-  scheduling, GPU-resident timestep integration, wall loss, nucleation,
-  resizing, graph capture, autodiff, and performance work remain future scope.
+  scheduling, GPU-resident timestep integration, high-level/runnable or broader
+  wall-loss integration, nucleation, resizing, graph capture, autodiff, and
+  performance work remain future scope. The bounded direct neutral wall-loss
+  P5 kernel is shipped; it is not that deferred high-level integration.
   Those items are needed before a full simulation can remain GPU-resident for
   every timestep.
 - Direct GPU condensation supports ideal/kappa water activity and

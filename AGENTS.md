@@ -485,8 +485,10 @@ pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
   for each eligible fixed slot before clearing selected slots' mass lanes,
   concentration, and charge. Omitted state is private and seeded per call;
   supplied same-device `(n_boxes,)` `wp.uint32` state mutates in place and resets
-  only with `initialize_rng=True`. Zero time remains write-free. The call returns
-  the identical particle container.
+  only with `initialize_rng=True`; reusing `rng_seed` alone does not reset it.
+  Zero time remains write-free and preserves supplied state. The call returns the
+  identical particle container. Sequential per-box RNG advancement limits
+  parallelism and makes no performance claim.
 - Rejected pre-launch calls preserve caller-owned particle and RNG-sidecar state.
   Rollback is not promised after a mutation kernel launches.
 - CPU/Warp stochastic trajectory parity, charged wall loss, a runnable API,

@@ -206,14 +206,16 @@ print(result)
      charge in place; zero time is a post-preflight write-free no-op. P5 advances
      one sequential per-box RNG owner for eligible slots. Omitted `rng_states`
      are private and seeded per call, while supplied sidecars mutate in place and
-     reset only with `initialize_rng=True`. Callers retain
-     ownership of Warp transfers, device placement, synchronization, particle
-     data, and any RNG sidecar. Preflight may run device validation scans and
-     synchronize to read back scalar status, but it does not transfer or replace
-     caller-owned buffers. Pre-launch failures preserve caller-owned state;
-     rollback is not promised after a mutation kernel launches. Charged wall
-      loss, a runnable API, hidden transfers or fallback, CPU/Warp stochastic
-      parity, and P6 behavior remain deferred.
+     reset only with `initialize_rng=True`; repeating `rng_seed` does not reset a
+     supplied sidecar. Zero time and pre-launch failures preserve supplied state.
+     Callers retain ownership of Warp transfers, device placement,
+     synchronization, particle data, and any RNG sidecar. Preflight may run
+     device validation scans and synchronize to read back scalar status, but it
+     does not transfer or replace caller-owned buffers. Rollback is not promised
+     after a mutation kernel launches. Sequential per-box RNG advancement limits
+     parallelism and makes no performance claim. Charged wall loss, a runnable
+     API, hidden transfers or fallback, CPU/Warp stochastic parity, and P6
+     behavior remain deferred.
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the

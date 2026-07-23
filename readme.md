@@ -85,9 +85,11 @@ preflight, positive-time calls evaluate neutral coefficients and sequentially
 advance one per-box RNG state for each eligible slot before stochastically
 clearing its mass lanes, concentration, and charge. Omitted state is private and
 seeded per call; supplied same-device `rng_states` mutates in place and resets
-only with `initialize_rng=True`. Zero time is write-free. Charged wall loss, a
-runnable, hidden transfers/fallback, and CPU/Warp stochastic trajectory parity
-are out of scope.
+only with `initialize_rng=True`; reusing `rng_seed` alone does not reset it.
+Zero time and preflight failure preserve supplied state. Sequential per-box RNG
+advancement limits parallelism and makes no performance claim. Charged wall
+loss, a runnable, hidden transfers/fallback, and CPU/Warp stochastic trajectory
+parity are out of scope.
 
 The direct GPU dilution P1–P4 entry point is imported with
 `from particula.gpu.kernels import dilution_step_gpu`. It applies
