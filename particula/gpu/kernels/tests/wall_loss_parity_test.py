@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import numpy.testing as npt
@@ -92,6 +92,45 @@ def _particles(device: str, n_boxes: int = 2):
     return particles
 
 
+def _one_species_particles(device: str, n_boxes: int = 2):
+    """Build one-species fp64 complete, inactive, and unusable slots."""
+    runtime_wp = _warp()
+    from particula.gpu import WarpParticleData
+
+    masses = np.zeros((n_boxes, 4, 1), dtype=np.float64)
+    for box in range(n_boxes):
+        masses[box, 0, 0] = _masses_for_radius(20.0e-9).sum()
+        masses[box, 1, 0] = _masses_for_radius(2.0e-6).sum()
+        masses[box, 3, 0] = np.nextafter(0.0, 1.0)
+    particles = WarpParticleData()
+    particles.masses = runtime_wp.array(
+        masses, dtype=runtime_wp.float64, device=device
+    )
+    particles.concentration = runtime_wp.array(
+        np.tile(np.array([1.0, 1.0, 0.0, 1.0]), (n_boxes, 1)),
+        dtype=runtime_wp.float64,
+        device=device,
+    )
+    particles.charge = runtime_wp.array(
+        np.tile(np.array([1.0, -2.0, 3.0, 4.0]), (n_boxes, 1)),
+        dtype=runtime_wp.float64,
+        device=device,
+    )
+    particles.density = runtime_wp.array(
+        [1000.0], dtype=runtime_wp.float64, device=device
+    )
+    particles.volume = runtime_wp.array(
+        np.ones(n_boxes), dtype=runtime_wp.float64, device=device
+    )
+    return particles
+
+
+@pytest.fixture(params=[_particles, _one_species_particles])
+def particle_factory(request: pytest.FixtureRequest) -> Any:
+    """Provide multi- and one-species complete-slot parity fixtures."""
+    return request.param
+
+
 def _environment(device: str, n_boxes: int) -> tuple[Any, Any]:
     """Return explicit per-box float64 temperature and pressure arrays."""
     runtime_wp = _warp()
@@ -146,18 +185,18 @@ def _cpu_oracle(
                 config.wall_eddy_diffusivity,
                 radius,
                 effective_density,
-                temperature[box],
-                pressure[box],
-                config.chamber_radius,
+                float(temperature[box]),
+                float(pressure[box]),
+                float(config.chamber_radius),
             )
         else:
             coefficient = get_rectangle_wall_loss_coefficient_via_system_state(
                 config.wall_eddy_diffusivity,
                 radius,
                 effective_density,
-                temperature[box],
-                pressure[box],
-                config.chamber_dimensions,
+                float(temperature[box]),
+                float(pressure[box]),
+                cast(tuple[float, float, float], config.chamber_dimensions),
             )
         if coefficient > 0 and not np.isnan(coefficient):
             eligible[box, particle] = True
@@ -192,11 +231,11 @@ if wp is not None:
 
     @wp.kernel
     def _wall_loss_rate_diagnostic(
-        masses: wp.array3d(dtype=wp.float64),
-        concentration: wp.array2d(dtype=wp.float64),
-        density: wp.array(dtype=wp.float64),
-        temperature: wp.array(dtype=wp.float64),
-        pressure: wp.array(dtype=wp.float64),
+        masses: wp.array3d[wp.float64],
+        concentration: wp.array2d[wp.float64],
+        density: wp.array[wp.float64],
+        temperature: wp.array[wp.float64],
+        pressure: wp.array[wp.float64],
         eddy: wp.float64,
         radius: wp.float64,
         length: wp.float64,
@@ -204,8 +243,8 @@ if wp is not None:
         height: wp.float64,
         geometry: wp.int32,
         n_species: wp.int32,
-        rates: wp.array2d(dtype=wp.float64),
-        eligible: wp.array2d(dtype=wp.int32),
+        rates: wp.array2d[wp.float64],
+        eligible: wp.array2d[wp.int32],
     ) -> None:
         """Record production-equivalent coefficients without RNG or mutation."""
         box, particle = wp.tid()
@@ -270,11 +309,11 @@ if wp is not None:
 @pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
 @pytest.mark.parametrize("n_boxes", [1, 2])
 def test_complete_slot_rates_match_independent_cpu_oracle(
-    device: str, geometry: str, n_boxes: int
+    device: str, geometry: str, n_boxes: int, particle_factory: Any
 ) -> None:
     """Compare non-mutating Warp complete-slot rates against CPU equations."""
     runtime_wp = _warp()
-    particles = _particles(device, n_boxes)
+    particles = particle_factory(device, n_boxes)
     temperature, pressure = _environment(device, n_boxes)
     config = _config(geometry)
     expected_mask, expected_rates = _cpu_oracle(
@@ -383,8 +422,8 @@ def test_fresh_seed_survival_matches_binomial_expectation(
         wall_loss_step_gpu(
             particles, 298.15, 101325.0, time_step, config=config, rng_seed=seed
         )
-        observed += np.count_nonzero(
-            particles.concentration.numpy()[0, :active]
+        observed += int(
+            np.count_nonzero(particles.concentration.numpy()[0, :active])
         )
         npt.assert_array_equal(
             particles.masses.numpy()[0, active:], inactive[0]
@@ -437,8 +476,8 @@ def test_persistent_sidecar_survival_and_lifecycle(
                 assert not np.array_equal(states.numpy(), before)
             else:
                 npt.assert_array_equal(states.numpy(), before)
-        observed += np.count_nonzero(
-            particles.concentration.numpy()[0, :active]
+        observed += int(
+            np.count_nonzero(particles.concentration.numpy()[0, :active])
         )
     total_trials = active * 100
     probability = 0.5**n_steps
@@ -461,12 +500,18 @@ def test_zero_time_and_all_inactive_are_exact_noops(device: str) -> None:
                 (1, 4), dtype=runtime_wp.float64, device=device
             )
         states = runtime_wp.array([17], dtype=runtime_wp.uint32, device=device)
-        snapshot = [
-            getattr(particles, name).numpy().copy()
-            for name in ("masses", "concentration", "charge")
-        ]
+        particle_owner = particles
+        field_names = ("masses", "concentration", "charge", "density", "volume")
+        snapshot = {
+            name: (
+                getattr(particles, name),
+                getattr(particles, name).numpy().copy(),
+            )
+            for name in field_names
+        }
+        state_owner = states
         state_snapshot = states.numpy().copy()
-        wall_loss_step_gpu(
+        returned = wall_loss_step_gpu(
             particles,
             298.15,
             101325.0,
@@ -474,9 +519,11 @@ def test_zero_time_and_all_inactive_are_exact_noops(device: str) -> None:
             config=_config("spherical"),
             rng_states=states,
         )
-        for name, expected in zip(
-            ("masses", "concentration", "charge"), snapshot, strict=True
-        ):
+        assert returned is particle_owner
+        assert states is state_owner
+        for name in field_names:
+            field_owner, expected = snapshot[name]
+            assert getattr(particles, name) is field_owner
             npt.assert_array_equal(getattr(particles, name).numpy(), expected)
         npt.assert_array_equal(states.numpy(), state_snapshot)
 

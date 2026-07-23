@@ -265,9 +265,11 @@ coefficient identity and values, and use exact equality for no-op checks. This
 is direct-kernel test evidence only; it does not establish CPU-runnable parity.
 
 Direct neutral GPU wall-loss parity coverage belongs in
-`particula/gpu/kernels/tests/wall_loss_parity_test.py`. Keep its non-mutating
-coefficient diagnostic independent of GPU property helpers and compare complete
-particle-resolved slots with the CPU system-state wall-loss functions. Cover
+`particula/gpu/kernels/tests/wall_loss_parity_test.py`. Keep the NumPy
+CPU/system-state oracle independent of GPU helpers and compare complete
+particle-resolved slots with the CPU system-state wall-loss functions. The Warp
+diagnostic intentionally uses approved production GPU property helpers to mirror
+the supported GPU calculation path; it is not independently derived. Cover
 spherical and rectangular geometries, one- and multi-box inputs, per-box
 environment state, particle scales, and inactive or unusable slots. Keep
 deterministic coefficient agreement separate from stochastic evidence. For
