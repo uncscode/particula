@@ -1,7 +1,9 @@
-"""Warp GPU implementations of particle property functions.
+"""Device-native fp64 particle transport and thermodynamic properties.
 
-These functions mirror the NumPy implementations in
-``particula.particles.properties`` for use inside Warp kernels.
+The ``@wp.func`` helpers provide scalar SI-unit property calculations for Warp
+kernels. Alongside GPU counterparts of CPU particle properties, this module
+owns the reusable neutral transport primitives and dimensionless wall-loss
+geometry factors used by GPU dynamics.
 """
 
 import warp as wp
@@ -44,17 +46,23 @@ def knudsen_number_wp(
 def cunningham_slip_correction_wp(
     knudsen_number: wp.float64,
 ) -> wp.float64:
-    """Calculate the Cunningham slip correction factor from Knudsen number.
+    """Calculate the Cunningham slip correction from Knudsen number.
 
-    Port of
-    ``particula.particles.properties.slip_correction_module.get_cunningham_slip_correction``.
+    Evaluates ``C_c = 1 + Kn * (1.257 + 0.4 * exp(-1.1 / Kn))``. The
+    continuum limit at ``Kn = 0`` is exactly ``1.0``; exponential underflow
+    for small positive ``Kn`` is an intended path. Negative and non-finite
+    inputs return exact ``0.0`` before division.
 
     Args:
-        knudsen_number: Knudsen number (dimensionless).
+        knudsen_number: Particle Knudsen number ``Kn`` (dimensionless).
 
     Returns:
-        Cunningham slip correction factor (dimensionless). Exact zero returns
-        ``1.0``; negative or non-finite inputs return exact ``0.0``.
+        Dimensionless slip correction, or the documented exact limit or
+        invalid-input sentinel.
+
+    References:
+        Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry and
+        Physics* (3rd ed.). John Wiley & Sons.
     """
     if knudsen_number == wp.float64(0.0):
         return wp.float64(1.0)
@@ -71,10 +79,17 @@ def cunningham_slip_correction_wp(
 
 @wp.func
 def particle_radius_from_volume_wp(total_volume: wp.float64) -> wp.float64:
-    """Calculate radius from positive finite spherical volume in SI units.
+    """Calculate a spherical particle radius from total volume.
 
-    Computes ``(3 V / (4 pi))**(1/3)`` for volume ``V`` [m³]. Non-finite or
+    Evaluates ``r = (3 V / (4 pi))**(1/3)`` for volume ``V``. Non-finite and
     non-positive volumes return exact ``0.0`` before the cube root.
+
+    Args:
+        total_volume: Total spherical-equivalent particle volume ``V`` [m³].
+
+    Returns:
+        Spherical-equivalent particle radius [m], or exact ``0.0`` for an
+        invalid volume.
     """
     if not wp.isfinite(total_volume) or total_volume <= wp.float64(0.0):
         return wp.float64(0.0)
@@ -90,7 +105,19 @@ def diffusion_coefficient_wp(
     aerodynamic_mobility: wp.float64,
     boltzmann_constant: wp.float64,
 ) -> wp.float64:
-    """Calculate Stokes-Einstein diffusion ``D = k_B T B`` [m²/s]."""
+    """Calculate Stokes-Einstein diffusion from mobility.
+
+    Evaluates ``D = k_B T B``. This low-level device primitive intentionally
+    performs no domain checks; callers must provide physically valid SI inputs.
+
+    Args:
+        temperature: Gas temperature ``T`` [K].
+        aerodynamic_mobility: Particle mobility ``B`` [s/kg].
+        boltzmann_constant: Boltzmann constant ``k_B`` [J/K].
+
+    Returns:
+        Particle diffusion coefficient ``D`` [m²/s].
+    """
     return boltzmann_constant * temperature * aerodynamic_mobility
 
 
@@ -99,15 +126,19 @@ def effective_density_wp(
     total_mass: wp.float64,
     total_volume: wp.float64,
 ) -> wp.float64:
-    """Calculate safe finite-positive mixture density from SI mass and volume.
+    """Calculate a safe spherical-equivalent mixture density.
+
+    Evaluates ``rho_eff = m / V`` from total mass and volume. Non-finite,
+    non-positive, subnormal, or overflowed inputs and results return exact
+    ``0.0``.
 
     Args:
         total_mass: Total particle mass [kg].
         total_volume: Total particle volume [m³].
 
     Returns:
-        Effective mixture density [kg/m³], or exact ``0.0`` when an input or
-        result is non-finite, non-positive, or subnormal.
+        Effective mixture density [kg/m³], or exact ``0.0`` for an invalid or
+        non-normal calculation.
     """
     zero = wp.float64(0.0)
     if (
@@ -134,10 +165,11 @@ def settling_velocity_stokes_from_transport_wp(
     dynamic_viscosity: wp.float64,
     mean_free_path: wp.float64,
 ) -> wp.float64:
-    """Calculate safe Stokes settling velocity from precomputed transport.
+    """Calculate safe slip-corrected Stokes settling velocity.
 
-    Applies ``v = 2 r² rho C_c g / (9 mu)`` using SI quantities and standard
-    gravity.
+    Evaluates ``v_s = 2 r² rho_eff C_c g / (9 mu)`` from precomputed gas
+    transport properties and standard gravity. Invalid, non-positive,
+    subnormal, or non-finite intermediates and results return exact ``0.0``.
 
     Args:
         particle_radius: Particle radius [m].
@@ -146,8 +178,8 @@ def settling_velocity_stokes_from_transport_wp(
         mean_free_path: Molecular mean free path [m].
 
     Returns:
-        Settling velocity [m/s], or exact ``0.0`` for invalid, non-finite,
-        non-positive, or subnormal calculations.
+        Downward settling velocity [m/s], or exact ``0.0`` for an invalid or
+        non-normal calculation.
 
     References:
         Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry and
@@ -205,10 +237,12 @@ def settling_velocity_stokes_wp(
     ref_temperature: wp.float64,
     sutherland_constant: wp.float64,
 ) -> wp.float64:
-    """Calculate safe Cunningham-corrected Stokes settling velocity [m/s].
+    """Calculate safe slip-corrected Stokes settling velocity from gas state.
 
-    Derives viscosity, mean free path, Knudsen number, and slip correction
-    from the supplied SI gas state before applying the Stokes equation.
+    Derives viscosity, molecular mean free path, Knudsen number, and slip
+    correction from the supplied SI gas state before evaluating
+    ``v_s = 2 r² rho_eff C_c g / (9 mu)``. Invalid inputs or derived transport
+    return exact ``0.0``.
 
     Args:
         particle_radius: Particle radius [m].
@@ -222,7 +256,8 @@ def settling_velocity_stokes_wp(
         sutherland_constant: Sutherland temperature constant [K].
 
     Returns:
-        Settling velocity [m/s], or exact ``0.0`` for invalid calculations.
+        Downward settling velocity [m/s], or exact ``0.0`` for invalid input
+        or derived transport.
 
     References:
         Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry and
@@ -293,13 +328,25 @@ def _debye_gauss_pair_wp(
 
 @wp.func
 def debye_1_wp(x: wp.float64) -> wp.float64:
-    """Calculate dimensionless Debye function ``D_1(x)``.
+    """Calculate the dimensionless first Debye wall-loss geometry factor.
 
-    Computes ``integral(t / (exp(t) - 1), 0, x) / x``. The zero limit is
-    exactly ``1.0``; negative and non-finite inputs return exact ``0.0``.
-    A Bernoulli series, 32-node Gauss--Legendre quadrature, and large-x
-    asymptote are used over ``x <= 1``, ``1 < x < 20``, and ``x >= 20``.
-    This factor follows Crump, Flagan, and Seinfeld wall-loss formulations.
+    Evaluates ``D_1(x) = integral_0^x[t / (exp(t) - 1)] dt / x``. Its zero
+    limit is exactly ``1.0``; negative and non-finite inputs return exact
+    ``0.0``. The implementation uses a Bernoulli series for ``x <= 1``,
+    32-node Gauss--Legendre quadrature for ``1 < x < 20``, and the
+    ``pi² / (6 x)`` asymptote at larger ``x``.
+
+    Args:
+        x: Dimensionless spherical wall-loss geometry argument.
+
+    Returns:
+        Dimensionless ``D_1(x)`` value, or the documented exact limit or
+        invalid-input sentinel.
+
+    References:
+        Crump, J. G., Flagan, R. C., & Seinfeld, J. H. (1982). Particle wall
+        loss rates in vessels. *Aerosol Science and Technology*, 2(3), 303-309.
+        https://doi.org/10.1080/02786828308958636
     """
     zero = wp.float64(0.0)
     if x == zero:
@@ -438,11 +485,24 @@ def debye_1_wp(x: wp.float64) -> wp.float64:
 
 @wp.func
 def x_coth_x_wp(x: wp.float64) -> wp.float64:
-    """Calculate dimensionless ``x / tanh(x)`` with its zero limit.
+    """Calculate the rectangular wall-loss factor ``x / tanh(x)``.
 
     The zero limit is exactly ``1.0``; negative and non-finite inputs return
-    exact ``0.0``. A small-x series avoids cancellation. This is the Crump,
-    Flagan, and Seinfeld rectangular wall-loss geometry factor.
+    exact ``0.0``. A series through ``x**6`` for ``0 < x <= 1e-3`` avoids
+    cancellation. The factor supports the rearranged rectangular term
+    ``(4 * sqrt(K * D) / pi) * x_coth_x_wp(x)``.
+
+    Args:
+        x: Dimensionless rectangular wall-loss geometry argument.
+
+    Returns:
+        Dimensionless ``x / tanh(x)`` value, or the documented exact limit or
+        invalid-input sentinel.
+
+    References:
+        Crump, J. G., Flagan, R. C., & Seinfeld, J. H. (1982). Particle wall
+        loss rates in vessels. *Aerosol Science and Technology*, 2(3), 303-309.
+        https://doi.org/10.1080/02786828308958636
     """
     zero = wp.float64(0.0)
     if x == zero:

@@ -1,4 +1,9 @@
-"""Warp GPU property functions."""
+"""Public Warp fp64 gas and particle property helpers.
+
+This package exports device-only scalar property functions for use inside Warp
+kernels. Neutral transport and wall-loss geometry helpers are canonically owned
+by :mod:`particula.gpu.properties.particle_properties`.
+"""
 
 from particula.gpu.properties.gas_properties import (
     dynamic_viscosity_wp,

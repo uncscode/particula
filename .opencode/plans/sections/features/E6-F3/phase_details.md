@@ -5,11 +5,19 @@
 Complete P1 through P5 in order before P6 validates the complete step; P7
 documents only the validated direct-process contract and evidence.
 
-- [ ] **E6-F3-P1:** Port and validate neutral wall-loss transport primitives with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Inventory reusable Warp physics and implement only missing fp64 device functions needed by both geometries.
-  - Files: `particula/gpu/properties/`, `particula/gpu/dynamics/`, co-located `tests/`
-  - Tests: CPU parity for viscosity/slip/diffusion/settling/Debye or coth over representative particle scales and edge domains.
+- [x] **E6-F3-P1:** Port and validate neutral wall-loss transport primitives with unit tests
+  - Issue: #1401 | Size: S | Status: Shipped
+  - Delivered: Consolidated neutral fp64 particle-transport helpers into
+    `particula.gpu.properties`; removed legacy GPU-dynamics definitions and
+    re-exports; migrated consumers; defined Cunningham slip zero/invalid
+    behavior; and added device-only `debye_1_wp` and `x_coth_x_wp`.
+  - Evidence: `particula/gpu/properties/tests/particle_properties_test.py`
+    exercises transport parity, sentinel/domain behavior, Debye branch
+    boundaries against an independent host oracle, and the `x_coth_x` numerical
+    switch. Existing migrated dynamics, kernel, support, and benchmark consumer
+    coverage verifies the new import surface.
+  - Boundary: No wall-loss coefficient assembly/API, charged physics, removal
+    or RNG logic, or CPU behavior change.
 
 - [ ] **E6-F3-P2:** Implement spherical and rectangular coefficient device functions with CPU parity tests
   - Issue: TBD | Size: S | Status: Not Started

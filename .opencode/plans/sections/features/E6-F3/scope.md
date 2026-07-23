@@ -7,8 +7,13 @@ removed fixed slot, and supports persistent per-box RNG state.
 
 ## In Scope
 
-- Validate or add the Warp device primitives needed for gas viscosity, slip,
-  diffusion, settling, Debye evaluation, and rectangular hyperbolic terms.
+- **Shipped in P1 / #1401:** Consolidate neutral fp64 particle-transport
+  helpers in `particula.gpu.properties`, migrate all consumers, and remove
+  legacy `particula.gpu.dynamics` definitions and re-exports. The shipped
+  property primitives include defined slip zero/invalid behavior plus
+  device-only Debye and rectangular `x_coth_x` geometry factors.
+- Validate or add the remaining Warp device primitives needed for coefficient
+  assembly, using the P1 property import surface.
 - Immutable host configuration for exactly `"spherical"` and `"rectangular"`
   geometry, with SI-unit chamber parameters and wall eddy diffusivity.
 - Scalar, same-device per-box, or explicit `WarpEnvironmentData` temperature and
@@ -24,6 +29,8 @@ removed fixed slot, and supports persistent per-box RNG state.
 
 ## Out of Scope
 
+- Wall-loss coefficient assembly, a direct wall-loss API/configuration,
+  removal kernels, and RNG lifecycle in P1; these remain later E6-F3 phases.
 - Charged, image-charge, wall-potential, or electric-field physics (E6-F4).
 - Discrete or continuous-PDF GPU wall loss, gas wall loss, multi-box transport,
   or changes to CPU strategy behavior.

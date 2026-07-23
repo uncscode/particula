@@ -2,6 +2,25 @@
 
 ## High-Level Design
 
+### Shipped P1 transport ownership
+
+P1 establishes `particula.gpu.properties` as the one-way canonical owner for
+neutral fp64 scalar transport. `particle_properties.py` owns the migrated
+particle radius, Cunningham slip, diffusion, effective-density, and settling
+helpers together with device-only `debye_1_wp` and `x_coth_x_wp`; the package
+`__init__.py` provides their supported property import surface. Gas viscosity
+and mean-free-path remain in `gas_properties.py`. `particula.gpu.dynamics` has
+no compatibility definitions or re-exports for moved helpers, so kernels,
+dynamics modules, support code, validation, tests, and benchmark collection
+import from properties directly.
+
+`cunningham_slip_correction_wp` returns `1.0` for exact zero, evaluates the
+standard expression for finite positive Knudsen values, and returns `0.0` for
+negative or non-finite values. The two new geometry factors are pure
+device-only functions with explicit zero limits and invalid-domain sentinels.
+They are foundations for later coefficient work; P1 adds neither coefficient
+assembly nor a wall-loss entry point.
+
 The feature is a low-level, particle-resolved Warp operation. Immutable host
 configuration selects one neutral geometry. The public step validates the
 configuration, particle schema and physical state, direct/environment inputs,
