@@ -212,7 +212,8 @@ Known GPU physics gaps remain:
   scheduling, GPU-resident timestep integration, high-level/runnable or broader
   wall-loss integration, nucleation, resizing, graph capture, autodiff, and
   performance work remain future scope. The bounded direct neutral wall-loss
-  P5 kernel is shipped; it is not that deferred high-level integration.
+  P1–P6 kernel contract is shipped; it is not that deferred high-level
+  integration.
   Those items are needed before a full simulation can remain GPU-resident for
   every timestep.
 - Direct GPU condensation supports ideal/kappa water activity and
@@ -1271,7 +1272,12 @@ Delivered bounded neutral wall-loss P1–P6 scope:
   `exp(-k * time_step)`; selected slots clear all mass lanes, concentration, and
   charge, while density, volume, dtype, device, capacity, and unselected storage
   are preserved. Inactive and unusable slots are neither sampled nor reactivated.
-  The source citations are https://doi.org/10.1016/0021-8502(81)90036-7 and
+  The source citations are Crump, J. G., & Seinfeld, J. H. (1981),
+  *Turbulent deposition and gravitational sedimentation of an aerosol in a
+  vessel of arbitrary shape*, *Journal of Aerosol Science*, 12(5),
+  https://doi.org/10.1016/0021-8502(81)90036-7; and Crump, J. G., Flagan,
+  R. C., & Seinfeld, J. H. (1982), *Particle wall loss rates in vessels*,
+  *Aerosol Science and Technology*, 2(3), 303--309,
   https://doi.org/10.1080/02786828308958636.
 - Preflight is read-only. Successful asynchronous calls mutate caller-owned,
   same-device state in place; callers own transfer, synchronization, and
