@@ -2411,6 +2411,16 @@ def coagulation_step_gpu(  # noqa: C901
             device,
         )
     time_step_value = _validate_time_step(time_step)
+    max_collisions_value = _resolve_collision_capacity(
+        max_collisions=max_collisions,
+        n_boxes=n_boxes,
+        n_particles=n_particles,
+    )
+    expected_counts_shape = (n_boxes,)
+    initialize_rng_states_for_call = rng_states is None
+    if rng_states is not None:
+        _validate_rng_states(rng_states, expected_counts_shape, device)
+        initialize_rng_states_for_call = initialize_rng
     temperature_array, pressure_array = _ensure_environment_arrays(
         temperature=temperature,
         pressure=pressure,
@@ -2423,12 +2433,6 @@ def coagulation_step_gpu(  # noqa: C901
     if volume is None:
         volume = particles.volume
     volume_array = _ensure_volume_array(volume, n_boxes, device)
-
-    max_collisions_value = _resolve_collision_capacity(
-        max_collisions=max_collisions,
-        n_boxes=n_boxes,
-        n_particles=n_particles,
-    )
 
     expected_pairs_shape = (n_boxes, max_collisions_value, 2)
     if collision_pairs is not None:
@@ -2445,14 +2449,8 @@ def coagulation_step_gpu(  # noqa: C901
             "collision_pairs buffer", collision_pairs, device
         )
 
-    expected_counts_shape = (n_boxes,)
     if n_collisions is not None:
         _validate_collision_counts(n_collisions, expected_counts_shape, device)
-
-    initialize_rng_states_for_call = rng_states is None
-    if rng_states is not None:
-        _validate_rng_states(rng_states, expected_counts_shape, device)
-        initialize_rng_states_for_call = initialize_rng
 
     if collision_pairs is None:
         collision_pairs = wp.zeros(
