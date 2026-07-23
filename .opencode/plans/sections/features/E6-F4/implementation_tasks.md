@@ -3,8 +3,9 @@
 ## GPU Physics
 
 - [ ] Inventory E6-F3 symbols and extend only its concrete wall-loss modules.
-- [ ] Add fp64 image-charge factor helper matching CPU diagonal extraction,
-  absolute value, clipping, exponentiation, and zero-charge identity.
+- [x] Add private fp64 Coulomb self-potential-ratio and image-charge helpers in
+  `particula/gpu/dynamics/wall_loss_funcs.py`, matching the CPU self-pair
+  ratio floor, absolute value, exponent clipping, and zero-charge identity.
 - [ ] Add geometry-scale and resolved-field helpers matching scalar/vector and
   wall-potential semantics.
 - [ ] Add signed electric mobility/drift helper with radius and scale guards.
@@ -29,8 +30,10 @@
 
 ## Tooling / Tests
 
-- [ ] Add primitive parity cases to
-  `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`.
+- [x] Add independent NumPy/Warp primitive parity and clipping cases in
+  `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`, including direct
+  ratio-floor coverage, zero charge, signed equal-magnitude charge, and both
+  clipping domains.
 - [x] Add P1 configuration, preflight, ordering, ownership, atomicity, and
   zero-charge neutral-equivalence cases to
   `particula/gpu/kernels/tests/wall_loss_test.py`.

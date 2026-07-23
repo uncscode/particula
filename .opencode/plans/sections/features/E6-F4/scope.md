@@ -1,8 +1,9 @@
 # Scope
 
 Extend E6-F3's low-level particle-resolved Warp wall-loss operation in staged
-phases. P1 is shipped and freezes charged-mode configuration validation and
-preflight ordering while retaining the existing neutral execution path.
+phases. P1/P2 are shipped: configuration/preflight semantics are frozen and
+private fp64 image-charge primitives are available, while the existing neutral
+execution path remains unchanged.
 
 ## In Scope
 
@@ -20,9 +21,13 @@ preflight ordering while retaining the existing neutral execution path.
   coefficient/removal kernel and RNG path; rectangular field buffers retain
   identity and values. Zero-charge configurations therefore exactly retain the
   existing neutral behavior.
-- **Deferred P2-P5:** image-charge enhancement, electric-field drift,
-  charged-coefficient composition, CPU coefficient parity, and stochastic
-  charged-physics validation.
+- **Shipped P2:** private `@wp.func` helpers implement the fp64 Coulomb
+  self-potential ratio and image enhancement with CPU-equivalent clipping and
+  exact zero-charge identity. Independent NumPy/Warp parity and clipping tests
+  live in `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`.
+- **Deferred P3-P5:** electric-field drift, charged-coefficient composition,
+  direct-kernel use of the P2 helpers, integrated CPU coefficient parity, and
+  stochastic charged-physics validation.
 - Integration with E6-F3's active predicate, fixed-shape removal clearing,
   environment normalization, preflight ordering, and caller-owned RNG lifecycle.
 - **Deferred P5:** Warp CPU deterministic coefficient parity, predeclared
@@ -32,6 +37,8 @@ preflight ordering while retaining the existing neutral execution path.
 ## Out of Scope
 
 - Changes to the CPU charged or neutral wall-loss equations or public strategy.
+- Public exports/API, direct-kernel integration, configuration/preflight
+  changes, potential/field composition, or RNG changes for P2.
 - Discrete/continuous distributions, a GPU `Runnable`, backend selection,
   scheduling, adaptive stepping, multi-box transport, or process composition.
 - Dynamic particle allocation, resizing, compaction, activation, resampling, or

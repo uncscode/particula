@@ -16,12 +16,15 @@ scientific tolerance, or E6-F3 invariant may be weakened. Test modules use the
   preflight atomicity. Valid charged rectangular and zero-time cases preserve
   field ownership. Matched zero-charge neutral/charged cases assert exact
   particle and RNG equality because P1 leaves execution neutral.
-- **P2 image charge:** In
-  `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`, compare the fp64 device
-  factor to the independent CPU `ChargedWallLossStrategy` array oracle for zero,
-  positive, and negative charges over particle radii and temperatures. Require
-  exact factor one for zero charge, nonzero enhancement at zero potential,
-  finite behavior near clipping limits, and documented `rtol`/`atol`.
+- **P2 image charge (shipped):** In
+  `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`, independent test-local
+  NumPy oracles compare fp64 Warp ratio and enhancement kernels at
+  `rtol=1e-12, atol=0`. Coverage separately observes the `-200` ratio floor;
+  covers signed, zero, ordinary, and strongly charged lanes; asserts exact
+  zero-charge identity and sign symmetry; and covers exponent-only and
+  ratio-floor-plus-exponent clipping. Warp CPU is required when installed and
+  CUDA rows remain optional. This is primitive evidence only, not direct-step
+  or CPU-strategy integration parity.
 - **P3 field/composition:** In the same module, compare scalar spherical and
   vector rectangular field magnitudes, potential-derived fields, geometry
   scales, charge signs, zero-field drift, and final nonnegative clipping. Verify
