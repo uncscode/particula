@@ -202,15 +202,17 @@ print(result)
     `particula.gpu`. It validates spherical or rectangular SI geometry, fixed
     `WarpParticleData` schema and domains, environment inputs, and optional RNG
     metadata. Successful nonzero calls evaluate bounded neutral coefficients
-    and stochastically remove eligible fixed slots in place; zero time is a
-    post-preflight write-free no-op. P4 derives one local draw from the seed and
-    slot and does not initialize, advance, or otherwise mutate `rng_states`;
-    P5 owns lifecycle semantics. Callers retain ownership of Warp transfers,
-    device placement, synchronization, particle data, and any RNG sidecar.
-    Preflight may run device validation scans and synchronize to read back scalar
-    status, but it does not transfer or replace caller-owned buffers. Charged
-    wall loss, a runnable API, hidden transfers or fallback, CPU/Warp stochastic
-    parity, and P5/P6 behavior remain deferred.
+     and stochastically clear eligible slots' mass lanes, concentration, and
+     charge in place; zero time is a post-preflight write-free no-op. P4 derives
+     one local seed-plus-flattened-slot draw and does not initialize, advance, or
+     otherwise mutate `rng_states`; P5 owns lifecycle semantics. Callers retain
+     ownership of Warp transfers, device placement, synchronization, particle
+     data, and any RNG sidecar. Preflight may run device validation scans and
+     synchronize to read back scalar status, but it does not transfer or replace
+     caller-owned buffers. Pre-launch failures preserve caller-owned state;
+     rollback is not promised after a mutation kernel launches. Charged wall
+     loss, a runnable API, hidden transfers or fallback, CPU/Warp stochastic
+     parity, and P5/P6 behavior remain deferred.
 - [Data containers and GPU foundations](Features/data-containers-and-gpu-foundations.md)
   — canonical reference for `ParticleData`, `GasData`, `EnvironmentData`,
    explicit CPU↔GPU transfer helpers, leading-axis shape conventions, the

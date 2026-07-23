@@ -49,3 +49,13 @@ removed fixed slot, and supports persistent per-box RNG state.
   resampling, graph capture, differentiability, and performance claims.
 - Exact CPU/NumPy and Warp RNG-stream matching; only distributional parity is
   required for stochastic outcomes.
+
+## P4 Delivered Scope (#1404)
+
+P4 is now in scope and shipped: after frozen P3 preflight, positive-time neutral
+particle-resolved calls normalize environment inputs, calculate spherical or
+rectangular coefficients for usable active slots, perform deterministic local
+seed/slot survival draws, and clear all species masses, concentration, and
+charge for lost slots. Zero time is write-free after preflight. Persistent
+caller-owned `rng_states` initialization, reset, and advancement remain excluded
+from P4 and deferred to P5.

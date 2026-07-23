@@ -1229,28 +1229,39 @@ Delivered dilution scope:
   scans may still allocate or launch.
   Particle and gas parity evidence uses independent Warp CPU float64 checks at
   `rtol=1e-12, atol=0`; CUDA is optional and skips cleanly when unavailable.
-  It is not bitwise parity. E6-F9 is the future integrated direct-call
-  consumer.
+   It is not bitwise parity. E6-F9 is the future integrated direct-call
+   consumer.
+
+Delivered bounded neutral wall-loss scope:
+
+- E6-F3-P4 provides `from particula.gpu.kernels import wall_loss_step_gpu` for
+  direct neutral, particle-resolved wall loss with fixed slots. After read-only
+  P3 preflight, positive-time calls stochastically remove eligible slots in
+  place. Zero time is a post-preflight, write-free no-op. Each eligible slot
+  uses a local seed-plus-slot-derived draw; optional `rng_states` is validated
+  but neither initialized nor mutated.
+- This bounded P4 path does not provide charged wall loss, persistent RNG
+  lifecycle behavior (P5), a runnable API, hidden transfers or fallbacks, or
+  cross-device or CPU stochastic trajectory parity.
 
 Future features:
 
 1. GPU process orchestration, backend selection/fallback policy, scheduling,
-   and GPU-resident timestep integration for the delivered direct kernel.
-2. GPU neutral wall loss (spherical/rectangular) with parity tests.
-3. GPU charged wall loss, after neutral wall loss and the core condensation
-   and coagulation GPU paths are stable.
-4. Nucleation/particle-source CPU reference process following the
+   and GPU-resident timestep integration for the delivered direct kernels.
+2. GPU charged wall loss, after the bounded neutral path and the core
+   condensation and coagulation GPU paths are stable.
+3. Nucleation/particle-source CPU reference process following the
    [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md)
    (no nucleation code exists in particula today).
-5. GPU nucleation via slot activation (see
+4. GPU nucleation via slot activation (see
    [Particle Slot Management](#particle-slot-management)).
-6. Particle slot management: inactive zero-mass slots, activation,
+5. Particle slot management: inactive zero-mass slots, activation,
    per-box active-count diagnostics, and an exhaustion policy (resampling or
    volume scaling).
-7. Slot and conservation validation: tests for inactive slots, activation,
+6. Slot and conservation validation: tests for inactive slots, activation,
    slot exhaustion handling, and conservation across resampling or volume
    scaling.
-8. Fixed-shape GPU workflow extensions: resizing policy, graph capture,
+7. Fixed-shape GPU workflow extensions: resizing policy, graph capture,
    autodiff, and performance evidence.
 
 ### Particle Slot Management

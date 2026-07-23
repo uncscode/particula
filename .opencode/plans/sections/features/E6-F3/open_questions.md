@@ -36,3 +36,14 @@ reference and existing direct-Warp process contracts.
 - [x] Does E6-F3 include charged loss, slot management, a high-level GPU
   runnable, or backend selection?
   - Decision: no. Those remain owned by E6-F4, E6-F5/F6, and Epic G.
+
+## P4 Resolutions (#1404)
+
+- [x] Does a valid positive-time P4 call mutate slots?
+  - Decision: yes. Following frozen P3 preflight it evaluates neutral
+    coefficients for usable slots and clears all mass lanes, concentration, and
+    charge for stochastic removals. Zero time is the only execution no-op.
+- [x] Does P4 own caller RNG lifecycle?
+  - Decision: no. P4 uses deterministic call-local seed-plus-slot draws and
+    intentionally does not initialize or advance supplied `rng_states`; P5 owns
+    persistent lifecycle behavior.

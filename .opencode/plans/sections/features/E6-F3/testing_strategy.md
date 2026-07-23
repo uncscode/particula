@@ -66,5 +66,17 @@ scientific tolerance may be weakened. Test modules use the `*_test.py` suffix.
   `pytest particula/gpu/kernels/tests/wall_loss_test.py -q -Werror`.
   Add the parity module to this command when P6 ships.
 - Deterministic coefficient acceptance uses documented float64 tolerances.
-  Stochastic acceptance uses expected distributions, never exact CPU/GPU draw
-  order. Zero-time and inactive-slot no-ops remain exact.
+   Stochastic acceptance uses expected distributions, never exact CPU/GPU draw
+   order. Zero-time and inactive-slot no-ops remain exact.
+
+## Shipped P4 Evidence (#1404)
+
+`particula/gpu/kernels/tests/wall_loss_test.py` now exercises P4 in the focused
+Warp-guarded suite. It covers both geometry paths, deterministic private-mask
+application, exact zero-time no-op behavior, sparse fixed slots across
+one-/multi-box and one-/multi-species layouts, complete removal clearing,
+controlled survivor/removal paths, seeded same-device results, and aggregate
+interior-probability stochastic behavior. Snapshots assert preserved identities,
+shapes, dtypes, devices, density, volume, survivors, inactive gaps, and supplied
+`rng_states`; invalid pre-launch calls remain atomic. P4 sidecars are unchanged
+because RNG initialization/advancement is deferred to P5.

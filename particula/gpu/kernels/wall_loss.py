@@ -57,10 +57,10 @@ _SUTHERLAND_CONSTANT = wp.constant(wp.float64(SUTHERLAND_CONSTANT))
 class NeutralWallLossConfig:
     """Define immutable neutral wall-loss geometry and representation inputs.
 
-    This concrete-module-only configuration is accepted only by the direct P3
-    preflight boundary. ``geometry`` selects spherical or rectangular SI
-    dimensions, while ``distribution_type`` must remain ``"particle_resolved"``.
-    It contains no charged-wall-loss settings.
+    This concrete-module-only configuration is accepted by the direct P4
+    boundary, which retains frozen P3 preflight. ``geometry`` selects spherical
+    or rectangular SI dimensions, while ``distribution_type`` must remain
+    ``"particle_resolved"``. It contains no charged-wall-loss settings.
 
     Attributes:
         geometry: Exact chamber geometry, ``"spherical"`` or ``"rectangular"``.

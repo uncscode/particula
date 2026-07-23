@@ -52,3 +52,15 @@
   and exact fields cleared on removal.
 - [ ] Publish focused Warp CPU commands and supported/deferred tables; link
   E6-F3 to parent E6, downstream E6-F4, and closeout E6-F9.
+
+## P4 Completed Tasks (#1404)
+
+- [x] Implement usable-slot neutral coefficient/mask and separate clearing
+  kernels in `particula/gpu/kernels/wall_loss.py` after frozen P3 preflight.
+- [x] Use deterministic local seed/slot survival draws and preserve optional
+  `rng_states` without initialization or advancement.
+- [x] Extend `particula/gpu/kernels/tests/wall_loss_test.py` for both geometries,
+  masks, sparse slots, zero time, controlled removal/survival, aggregate
+  stochastic behavior, and pre-launch atomicity.
+- [x] Update bounded P4 contract documentation in the index and architecture
+  guides without broadening exports or API boundaries.

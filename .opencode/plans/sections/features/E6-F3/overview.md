@@ -74,3 +74,13 @@ RNG initialization/advancement, output allocation, or particle mutation.
 - As a workflow integrator, I want persistent caller-owned RNG and complete slot
   clearing so repeated direct steps preserve reproducibility and fixed-slot
   invariants.
+
+## Delivered Phase: E6-F3-P4 (#1404)
+
+P4 now executes bounded neutral particle-resolved wall loss through
+`wall_loss_step_gpu`. After frozen P3 preflight, positive-time calls normalize
+the environment, evaluate the spherical or rectangular coefficient for usable
+slots, make one deterministic call-local seed-plus-slot draw per eligible slot,
+and clear every mass lane, concentration, and charge on removal. Zero-time calls
+complete preflight but make no writes. Optional `rng_states` is intentionally
+neither initialized nor advanced; persistent lifecycle remains P5 work.
