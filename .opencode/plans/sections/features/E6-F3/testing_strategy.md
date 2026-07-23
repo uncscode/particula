@@ -59,6 +59,19 @@ scientific tolerance may be weakened. Test modules use the `*_test.py` suffix.
 - **P7 documentation:** Validate links, import snippets, SI units,
   support/deferred tables, and focused commands.
 
+### P7 Shipped Documentation Evidence (#1407)
+
+P7 smoke-checks the published imports and non-executed Python snippet, local
+links, DOI URLs, SI units, environment exclusivity, slot/RNG wording, and the
+supported/deferred table. Existing focused Warp evidence remains
+`pytest particula/gpu/dynamics/tests/wall_loss_funcs_test.py -q -Werror` and
+`pytest particula/gpu/kernels/tests/wall_loss_test.py
+particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror`. Warp CPU is
+the baseline; CUDA is optional guarded evidence. P7 adds no test module or
+runtime-matrix behavior. Related records are parent [E6](../../../epics/E6.json),
+future [E6-F4](../../../features/E6-F4.json), and future
+[E6-F9](../../../features/E6-F9.json).
+
 ## Regression and Focused Commands
 
 - Keep CPU tests in `particula/dynamics/wall_loss/**/` and

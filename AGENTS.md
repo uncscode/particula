@@ -465,42 +465,53 @@ Focused P1–P4 contract run:
 pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
 ```
 
-### GPU neutral wall-loss P5
+### GPU neutral wall-loss P1–P6
 
 - Import the direct low-level boundary with
   `from particula.gpu.kernels import wall_loss_step_gpu`.
 - Construct `NeutralWallLossConfig` only from
   `particula.gpu.kernels.wall_loss`; it is deliberately not re-exported by
   `particula.gpu.kernels` or `particula.gpu`.
-- P5 accepts only neutral, `particle_resolved` configurations and validates
-  spherical or rectangular geometry. Wall eddy diffusivity is in m²/s and
-  chamber radius/dimensions are in m.
+- The direct boundary supports only neutral, `particle_resolved` configurations.
+  Wall eddy diffusivity is in m²/s; radius and dimensions are in m; temperature
+  is in K; pressure is in Pa; and time is in s. A spherical configuration needs
+  a positive radius and no dimensions. A rectangular configuration needs no
+  radius and exactly three positive dimensions.
 - P3-frozen preflight validates fixed-shape, same-device `wp.float64` particle
   fields, finite domain values, a finite nonnegative `time_step` [s],
   temperature [K], pressure [Pa], and optional `wp.uint32` per-box RNG
   metadata. Particle charge is finite signed metadata and does not enable
   charged-wall physics.
-- After successful preflight, a positive-time call normalizes environment state,
-  evaluates neutral coefficients, and sequentially advances one per-box RNG word
-  for each eligible fixed slot before clearing selected slots' mass lanes,
-  concentration, and charge. Omitted state is private and seeded per call;
-  supplied same-device `(n_boxes,)` `wp.uint32` state mutates in place and resets
-  only with `initialize_rng=True`; reusing `rng_seed` alone does not reset it.
-  Zero time remains write-free and preserves supplied state. The call returns the
-  identical particle container. Sequential per-box RNG advancement limits
-  parallelism and makes no performance claim.
+- After successful preflight, eligible finite-rate fixed slots survive with
+  `exp(-k * time_step)`. Selected slots have every mass lane, concentration,
+  and charge cleared; density, volume, dtype, device, capacity, and unselected
+  storage are preserved. Inactive or unusable slots are neither sampled nor
+  reactivated. The asynchronous call mutates caller-owned same-device state in
+  place; callers own explicit CPU↔Warp transfer, device placement, and
+  synchronization. Omitted RNG state is private for each successful nonzero
+  call. Supplied same-device `(n_boxes,)` `wp.uint32` state mutates in place;
+  `initialize_rng=True` is the only reset, and repeating `rng_seed` does not
+  reset persistent state. RNG consumption is sequential per box over eligible
+  slots and does not promise exact CPU/Warp replay. Zero time remains write-free
+  and preserves supplied state. The call returns the identical particle
+  container.
 - Rejected pre-launch calls preserve caller-owned particle and RNG-sidecar state.
   Rollback is not promised after a mutation kernel launches.
-- CPU/Warp stochastic trajectory parity, charged wall loss, a runnable API,
-  hidden transfers or fallback, and P6 behavior remain deferred. Callers own
-  transfers, device placement, and synchronization. Device validation scans and
-  scalar status synchronization/readback are permitted; they do not transfer or
-  replace caller-owned buffers.
+- Deterministic geometry-specific coefficient tolerances and 100-seed,
+  3-sigma aggregate survival checks provide bounded P6 evidence. Warp CPU is
+  the baseline when available; CUDA is optional and skips cleanly when absent.
+  This is not CPU-strategy parity or per-seed trajectory replay. Charged,
+  image-charge, and electric-field physics; a high-level runnable, scheduler,
+  or backend integration; hidden transfer or CPU fallback; resizing, compaction,
+  activation, graph capture, differentiability, and performance claims remain
+  deferred. Device validation scans and scalar status synchronization/readback
+  are permitted; they do not transfer or replace caller-owned buffers.
 
-Focused P5 contract run:
+Focused P1–P6 contract runs:
 
 ```bash
-pytest particula/gpu/kernels/tests/wall_loss_test.py -q -Werror
+pytest particula/gpu/dynamics/tests/wall_loss_funcs_test.py -q -Werror
+pytest particula/gpu/kernels/tests/wall_loss_test.py particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror
 ```
 
 ### GPU coagulation RNG state ownership

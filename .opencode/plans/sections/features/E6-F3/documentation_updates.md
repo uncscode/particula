@@ -78,3 +78,16 @@ documentation remain unchanged. The suite records the independent CPU-oracle
 coefficient matrix, 100-seed fresh/persistent RNG statistical checks, exact
 no-op coverage, and lazy-export boundary smoke test. P7 remains responsible for
 any final documentation updates.
+
+## P7 / #1407 Status
+
+P7 shipped on 2026-07-23. `AGENTS.md`,
+`docs/Features/data-containers-and-gpu-foundations.md`, and
+`docs/Features/Roadmap/data-oriented-gpu.md` now publish the P1–P6 direct
+neutral wall-loss contract, including SI units, configuration and environment
+exclusivity, slot clearing/preservation, asynchronous caller ownership, RNG
+reset/reuse, focused commands, bounded evidence, and deferrals. The delivery is
+documentation-only: no production kernel, export, physics, or runtime test
+matrix changed. See parent [E6](../../../epics/E6.json), future charged
+[E6-F4](../../../features/E6-F4.json), and future closeout
+[E6-F9](../../../features/E6-F9.json).

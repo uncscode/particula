@@ -99,11 +99,21 @@ documents only the validated direct-process contract and evidence.
   - Boundary: No production physics, entry-point behavior, or public exports
     changed. CPU/Warp random-stream replay remains explicitly unsupported.
 
-- [ ] **E6-F3-P7:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document direct use, persistent RNG ownership, fixed-slot removal, support boundaries, and focused validation commands.
-  - Files: `AGENTS.md`, `docs/Features/`, `.opencode/guides/`, E6 plan sections as needed
-  - Tests: Markdown links, import snippets, support/deferred tables, and focused commands.
+- [x] **E6-F3-P7:** Update development documentation
+  - Issue: #1407 | Size: XS | Status: Shipped | Completed: 2026-07-23
+  - Delivered: Published the finalized P1–P6 direct-neutral contract: SI inputs,
+    explicit environment alternative, fixed-slot clearing/preservation,
+    asynchronous caller ownership, persistent RNG lifecycle, evidence, and
+    deferred boundaries.
+  - Files: `AGENTS.md`, `docs/Features/data-containers-and-gpu-foundations.md`,
+    and `docs/Features/Roadmap/data-oriented-gpu.md`.
+  - Evidence: `pytest particula/gpu/dynamics/tests/wall_loss_funcs_test.py -q
+    -Werror` and `pytest particula/gpu/kernels/tests/wall_loss_test.py
+    particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror`.
+  - Boundary: Documentation-only; no production kernel, export, physics, or
+    runtime test-matrix change. Parent [E6](../../../epics/E6.json), charged
+    successor [E6-F4](../../../features/E6-F4.json), and closeout
+    [E6-F9](../../../features/E6-F9.json) retain their recorded statuses.
 
 ## P4 Delivery Update (#1404)
 
