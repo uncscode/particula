@@ -116,17 +116,17 @@ if wp is not None:
         brownian_diffusivity_wp,
         brownian_kernel_pair_wp,
     )
-    from particula.gpu.dynamics.condensation_funcs import (
-        diffusion_coefficient_wp,
-        mass_transfer_rate_wp,
-        particle_radius_from_volume_wp,
-    )
+    from particula.gpu.dynamics.condensation_funcs import mass_transfer_rate_wp
     from particula.gpu.kernels.coagulation import (
         coagulation_step_gpu,
         initialize_coagulation_rng_states,
     )
     from particula.gpu.kernels.condensation import condensation_step_gpu
     from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
+    from particula.gpu.properties.particle_properties import (
+        diffusion_coefficient_wp,
+        particle_radius_from_volume_wp,
+    )
 
 pytestmark = [pytest.mark.slow, pytest.mark.performance, pytest.mark.benchmark]
 

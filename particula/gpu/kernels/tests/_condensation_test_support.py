@@ -77,9 +77,11 @@ if TYPE_CHECKING:
         _validate_mass_transfer_buffer,
         _validate_species_array,
         condensation_step_gpu,
-        particle_radius_from_volume_wp,
         validate_condensation_activity_surface_config,
         validate_condensation_scratch_buffers,
+    )
+    from particula.gpu.properties.particle_properties import (
+        particle_radius_from_volume_wp,
     )
     from particula.gpu.tests.cuda_availability import (
         cuda_available,

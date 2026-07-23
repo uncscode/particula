@@ -55,9 +55,6 @@ if wp is not None:
         sedimentation_sp2016_pair_rate_wp,
         turbulent_shear_st1956_pair_rate_wp,
     )
-    from particula.gpu.dynamics.condensation_funcs import (  # noqa: E402
-        particle_radius_from_volume_wp,
-    )
     from particula.gpu.kernels.coagulation import (  # noqa: E402
         BROWNIAN_MECHANISM,
         BROWNIAN_MECHANISM_FLAG,
@@ -113,6 +110,7 @@ if wp is not None:
         cunningham_slip_correction_wp,
         knudsen_number_wp,
         mean_thermal_speed_wp,
+        particle_radius_from_volume_wp,
     )
     from particula.gpu.tests.cuda_availability import (  # noqa: E402
         cuda_available,
