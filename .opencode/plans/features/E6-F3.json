@@ -97,11 +97,11 @@
     {
       "id": "E6-F3-P6",
       "title": "Add deterministic coefficient and statistical CPU-Warp parity matrix",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-23",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
