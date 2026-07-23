@@ -374,11 +374,11 @@ def _resolve_rectangular_electric_field_wp(
     wall_potential: wp.float64,
     geometry_scale: wp.float64,
 ) -> wp.float64:
-    """Resolve a rectangular electric-field magnitude in V/m.
+    """Resolve a signed rectangular electric field in V/m.
 
     Computes the Euclidean magnitude of the three supplied field components,
     then conditionally adds the potential-derived field. A signed potential
-    may therefore decrease the resolved magnitude.
+    may therefore decrease or reverse the resolved field.
 
     Args:
         field_x: X electric-field component in V/m.
@@ -388,7 +388,7 @@ def _resolve_rectangular_electric_field_wp(
         geometry_scale: Unguarded characteristic chamber scale in m.
 
     Returns:
-        Resolved electric field in V/m.
+        Signed resolved electric field in V/m.
     """
     resolved_field = wp.sqrt(
         field_x * field_x + field_y * field_y + field_z * field_z
@@ -413,8 +413,8 @@ def _electric_field_drift_wp(
     """Calculate signed electric-field drift contribution in s^-1.
 
     Uses Sutherland dynamic viscosity and charge mobility. Particle radius and
-    the drift denominator are lower-guarded at 1e-30; NaN drift is mapped to
-    zero while finite signed values and infinities are retained for final
+    the drift denominator are lower-guarded at 1e-30. NaN drift is mapped to
+    zero while finite signed values and infinities are preserved for final
     coefficient composition.
 
     Args:
