@@ -1267,19 +1267,19 @@ Delivered bounded wall-loss P1–P6 scope:
 
    This non-executed direct-call example uses caller-owned same-device Warp
    state. Later calls reuse `rng_states` and omit `initialize_rng=True`.
-- E6-F4 ships validation-only charged configuration semantics through the same
-  concrete-module-only `NeutralWallLossConfig`; it adds no entry point, export,
-  runnable, or transfer behavior. `mode` accepts `"neutral"` or `"charged"`.
-  Charged mode validates a finite signed scalar `wall_potential` in V. Its
-  spherical `wall_electric_field` is a finite signed scalar in V/m; its
+- E6-F4 ships charged particle-resolved direct-kernel wall loss through the
+  same concrete-module-only `NeutralWallLossConfig`; it adds no entry point,
+  export, runnable, or transfer behavior. `mode` accepts `"neutral"` or
+  `"charged"`. Charged mode accepts a finite signed scalar `wall_potential` in
+  V. Its spherical `wall_electric_field` is a finite signed scalar in V/m; its
   rectangular field is a caller-owned, same-device `wp.float64` Warp array of
   shape `(3,)` with finite signed V/m components. The boundary preserves the
   identity and values of that rectangular field array.
-- Charged configuration is validation and ownership scope only. Execution keeps
-  the neutral Crump--Seinfeld coefficient, removal kernel, and RNG path; no
-  image-charge or electric-field-drift physics is evaluated. Matched zero-charge
-  slots therefore retain the neutral coefficient and stochastic path even with
-  a nonzero charged configuration.
+- In charged mode, finite nonzero particle charge selects the private
+  image-charge and electric-field-drift coefficient composition. Image-charge
+  enhancement remains active when `wall_potential` is zero. Zero-charge slots
+  retain the exact neutral coefficient and RNG path, even with nonzero charged
+  configuration values.
 - The Crump--Seinfeld coefficient basis uses the 1981 spherical and 1982
   rectangular chamber relations. Eligible finite-rate slots survive with
   `exp(-k * time_step)`; selected slots clear all mass lanes, concentration, and
@@ -1305,35 +1305,33 @@ Delivered bounded wall-loss P1–P6 scope:
   eligible finite positive-rate slots; positive infinite-rate removal is
   deterministic and consumes no draw, so exact CPU/Warp or per-seed replay is
   not supported.
-- P6 evidence is geometry-specific deterministic coefficient tolerances plus
-  100-seed, 3-sigma aggregate survival checks. Warp CPU is the installed-Warp
-  baseline; CUDA is optional additive evidence and skips cleanly when absent.
-  This is not CPU-strategy parity or a performance claim.
-- Deferred scope includes image-charge enhancement and electric-field-drift
-  physics, CPU fallback or hidden transfers, runnable/scheduler/backend integration,
-  dynamic slots, compaction/activation, graph capture, differentiability,
-  performance guarantees, and exact RNG replay. E6-F9 remains the future
-  integration and closeout work.
+- P5 evidence is geometry-specific deterministic coefficient tolerances plus
+  eight geometry/radius strata of exact-binomial survival validation. Each
+  stratum uses 4,096 observations and inclusive exact-binomial bounds with
+  per-stratum alpha 1.25e-7. Warp CPU is the installed-Warp baseline; CUDA is
+  optional additive evidence and skips cleanly when absent. This is not
+  CPU-strategy parity, per-seed replay, or a performance claim.
+- Deferred scope includes CPU fallback or hidden transfers,
+  runnable/scheduler/backend integration, dynamic slots, compaction/activation,
+  graph capture, differentiability, performance guarantees, and exact RNG
+  replay. E6-F9 remains the future integration and closeout work.
 
 Future features:
 
 1. GPU process orchestration, backend selection/fallback policy, scheduling,
    and GPU-resident timestep integration for the delivered direct kernels.
-2. GPU image-charge and electric-field-drift wall-loss physics, after the
-   bounded neutral execution path and the core condensation and coagulation GPU
-   paths are stable.
-3. Nucleation/particle-source CPU reference process following the
+2. Nucleation/particle-source CPU reference process following the
    [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md)
    (no nucleation code exists in particula today).
-4. GPU nucleation via slot activation (see
+3. GPU nucleation via slot activation (see
    [Particle Slot Management](#particle-slot-management)).
-5. Particle slot management: inactive zero-mass slots, activation,
+4. Particle slot management: inactive zero-mass slots, activation,
    per-box active-count diagnostics, and an exhaustion policy (resampling or
    volume scaling).
-6. Slot and conservation validation: tests for inactive slots, activation,
+5. Slot and conservation validation: tests for inactive slots, activation,
    slot exhaustion handling, and conservation across resampling or volume
    scaling.
-7. Fixed-shape GPU workflow extensions: resizing policy, graph capture,
+6. Fixed-shape GPU workflow extensions: resizing policy, graph capture,
    autodiff, and performance evidence.
 
 ### Particle Slot Management

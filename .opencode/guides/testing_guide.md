@@ -1,7 +1,7 @@
 # Testing Guide
 
 **Project:** particula  
-**Last Updated:** 2026-07-14
+**Last Updated:** 2026-07-23
 
 particula uses pytest as its primary testing framework. Tests should be close to
 the code they validate and should exercise scientific correctness, edge cases,
@@ -264,21 +264,24 @@ Keep particle and gas parity assertions separate, preserve caller-owned per-box
 coefficient identity and values, and use exact equality for no-op checks. This
 is direct-kernel test evidence only; it does not establish CPU-runnable parity.
 
-Direct neutral GPU wall-loss parity coverage belongs in
+Direct GPU wall-loss parity coverage belongs in
 `particula/gpu/kernels/tests/wall_loss_parity_test.py`. Keep the NumPy
 CPU/system-state oracle independent of GPU helpers and compare complete
 particle-resolved slots with the CPU system-state wall-loss functions. The Warp
 diagnostic intentionally uses approved production GPU property helpers to mirror
 the supported GPU calculation path; it is not independently derived. Cover
 spherical and rectangular geometries, one- and multi-box inputs, per-box
-environment state, particle scales, and inactive or unusable slots. Keep
-deterministic coefficient agreement separate from stochastic evidence. For
-stochastic removal, use aggregate survival counts across repeated fresh seeds
-and a documented binomial bound; do not require CPU/Warp RNG-stream, per-seed,
-or trajectory replay. Include distinct exact no-op checks for zero time and
-all-inactive inputs, including caller-owned RNG state. This suite validates the
-existing direct-kernel boundary only and must not imply a new public API or
-physics capability.
+environment state, particle scales, and inactive or unusable slots. Charged
+coverage must use an independent charged CPU oracle, retain exact neutral
+fallback checks for zero-charge slots, and preserve caller-owned rectangular
+field storage. Keep deterministic coefficient agreement separate from
+stochastic evidence. For stochastic removal, use aggregate survival counts
+across repeated fresh seeds and a documented binomial bound; do not require
+CPU/Warp RNG-stream, per-seed, or trajectory replay. Include distinct exact
+no-op and invalid-preflight non-mutation checks for zero time and all-inactive
+inputs, including caller-owned RNG state. This suite validates the existing
+direct-kernel boundary only and must not imply a new public API or physics
+capability.
 
 ### Device-aware tolerance policy
 

@@ -40,11 +40,13 @@
    `particula/gpu/kernels/tests/wall_loss_test.py`.
 - [x] Add independent P3 NumPy/Warp field-resolution, signed-drift, guard, and
   defensive composition tests in `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`.
-- [ ] Extend `particula/gpu/kernels/tests/wall_loss_parity_test.py` with a
-  deterministic CPU/Warp geometry/charge/field matrix.
-- [ ] Compare survival counts with predeclared binomial confidence or sigma
-  bounds over enough samples/seeds; never compare NumPy and Warp draw order.
-- [ ] Require Warp CPU and use clean optional CUDA skips.
+- [x] Extend `particula/gpu/kernels/tests/wall_loss_parity_test.py` with an
+  independent deterministic charged CPU/Warp geometry/charge/field matrix,
+  including snapshots proving particle and caller-owned field non-mutation.
+- [x] Complete the frozen eight-stratum charged survival validation with
+  predeclared inclusive exact-binomial bounds (4,096 observations per stratum);
+  never compare NumPy and Warp draw order.
+- [x] Require Warp CPU and use clean optional CUDA skips.
 - [ ] Keep CPU wall-loss, E6-F3 neutral, coagulation RNG, and fixed-slot
   regression suites green without lowering coverage or tolerances.
 

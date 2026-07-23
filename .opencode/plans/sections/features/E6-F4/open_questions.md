@@ -2,8 +2,8 @@
 
 P1 configuration questions shipped for issue #1409, P2 private primitive
 questions shipped for issue #1410, and P3 field/drift/composition questions
-shipped for issue #1411 on 2026-07-23. Issue #1412 implemented P4 direct-step
-selection; P5 parity/statistical validation remains deferred.
+ shipped for issue #1411 on 2026-07-23. Issue #1412 implemented P4 direct-step
+ selection, and issue #1413 shipped P5 regression evidence only.
 
 - [x] What image-charge primitive contract is available before step integration?
   - Decision: P2 provides private fp64 Warp self-pair Coulomb-ratio and
@@ -48,10 +48,10 @@ selection; P5 parity/statistical validation remains deferred.
     the neutral positive-infinity no-draw shortcut. Invalid, zero-time, and
     all-inactive calls leave supplied sidecars untouched.
 - [x] Which deterministic and statistical bounds cover the charged matrix?
-  - Decision: test 2 nm, 50 nm, 1 micrometer, and 50 micrometer strata. Full
-    CPU/Warp coefficients use `rtol=1e-6`, `atol=0`; reused/component helpers
-    retain their tighter established tolerances and exact branches remain exact.
-    Each homogeneous survival stratum uses 4,096 observations. The eight charged
-    strata are four radii crossed with image-only spherical and
-    field-plus-potential rectangular cases. Use an exact binomial interval with
-    family-wise alpha `1e-6`, hence per-stratum alpha `1.25e-7`.
+  - Decision: #1413 tests 2 nm, 50 nm, 1 micrometer, and 50 micrometer strata.
+    Charged CPU/Warp parity uses spherical `rtol=1.002e-3, atol=1e-20` because
+    of the established Debye integration difference, and rectangular
+    `rtol=1e-6, atol=0`. Each homogeneous stratum uses 4,096 observations; the
+    eight strata cross four radii with image-only spherical and
+    field-plus-potential rectangular cases. Inclusive equal-tail exact-binomial
+    intervals use family-wise alpha `1e-6`, hence per-stratum alpha `1.25e-7`.

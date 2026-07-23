@@ -41,8 +41,18 @@ executes in the existing fixed-shape direct step without changing neutral mode.
   slots clear all mass lanes, concentration, and charge. Nonpositive composed
   rates consume no draw; saturated charged coefficients use the charged
   survival-draw path, unlike the neutral positive-infinity shortcut.
-- **Deferred P5:** Warp CPU deterministic coefficient parity, predeclared
-  statistical survival bounds, and optional CUDA execution with clean skips.
+- **Implemented P5 (#1413):**
+  `particula/gpu/kernels/tests/wall_loss_parity_test.py` adds independent CPU
+  strategy versus non-mutating Warp charged-coefficient parity for an explicit
+  spherical/rectangular matrix. It checks particle and caller-owned rectangular
+  field non-mutation, uses spherical `rtol=1.002e-3, atol=1e-20` and rectangular
+  `rtol=1e-6, atol=0`, and retains Warp CPU with optional clean CUDA skips.
+- **Implemented P5 (#1413):** exact zero-charge charged/neutral diagnostic,
+  survivor-state, RNG-sidecar, and rectangular-field ownership equality;
+  invalid/no-op non-mutation regressions; and four-radius by two-geometry
+  charged survival evidence. Each of the eight strata uses 16 fresh seeded
+  fixtures of 256 slots (4,096 observations) and an inclusive equal-tail exact
+  binomial interval at per-stratum alpha `1.25e-7`.
 - Focused support/deferred documentation and direct-kernel import coverage.
 
 ## Out of Scope

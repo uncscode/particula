@@ -12,7 +12,7 @@ must exactly follow the neutral coefficient and stochastic path.
 
 ## Value Proposition
 
-E6-F4-P1 through P4 are implemented. P1 freezes the charged-mode configuration without
+ E6-F4-P1 through P5 are implemented. P1 freezes the charged-mode configuration without
 changing the direct step's ownership, mutation, coefficient, or RNG contracts.
 P2 adds private fp64 Warp Coulomb self-potential-ratio and image-charge
 enhancement primitives, with independent NumPy/Warp parity and clipping tests.
@@ -24,7 +24,11 @@ type. P4 connects the private helpers inside geometry-specialized charged
 removal kernels: nonzero charge uses image enhancement and signed field drift,
 while charged zero-charge slots retain the exact E6-F3 neutral coefficient and
 RNG path. No public entry point, export, runnable, container field, transfer,
-or RNG stream was added.
+ or RNG stream was added. P5 adds regression evidence only in
+ `particula/gpu/kernels/tests/wall_loss_parity_test.py`: independent charged
+ CPU/Warp coefficient parity, exact zero-charge neutral fallback and ownership
+ checks, invalid-call/no-mutation regressions, and exact-binomial charged
+ survival validation. It makes no production API or kernel change.
 
 ## User Stories
 

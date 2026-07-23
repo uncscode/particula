@@ -221,9 +221,9 @@ not bitwise parity.
 
 ### Direct GPU wall loss
 
-The bounded direct wall-loss path is particle-resolved. It supports neutral
-execution and a validation-only charged configuration. Import the step and its
-concrete-module-only configuration separately; the configuration is not
+The bounded direct wall-loss path is particle-resolved. It supports neutral and
+charged execution. Import the step and its concrete-module-only configuration
+separately; the configuration is not
 re-exported by `particula.gpu.kernels` or `particula.gpu`:
 
 ```python
@@ -274,11 +274,11 @@ geometry, it is a caller-owned, same-device `wp.float64` Warp array of shape
 `(3,)`, with finite signed components in V/m. The boundary does not replace or
 mutate that rectangular field array.
 
-Charged mode currently freezes configuration validation and ownership only. It
-continues to use the neutral coefficient, removal kernel, and RNG path; it does
-not apply image-charge enhancement or electric-field drift. In particular,
-matching zero-charge slots follow the existing neutral coefficient and
-stochastic path even when a nonzero charged configuration is supplied.
+For charged mode, slots with finite nonzero charge use the private
+image-charge and electric-field-drift coefficient composition. Image-charge
+enhancement is active even when `wall_potential` is zero. Zero-charge slots
+retain the exact neutral coefficient and RNG path, including when the charged
+configuration supplies nonzero potential or electric field.
 
 After read-only preflight, eligible finite positive-rate fixed slots survive with
 `exp(-k * time_step)`. A selected slot has every mass lane, concentration, and
@@ -299,11 +299,11 @@ consumes no draw. Exact CPU/Warp or per-seed RNG replay is not promised.
 
 | Scope | Status |
 | --- | --- |
-| Neutral particle-resolved spherical/rectangular direct execution | Supported |
-| Charged configuration validation and rectangular field ownership semantics | Supported; neutral execution retained |
-| Geometry-specific deterministic coefficient tolerances and 100-seed, 3-sigma aggregate survival evidence | Supported bounded evidence |
+| Neutral and charged particle-resolved spherical/rectangular direct execution | Supported |
+| Charged nonzero-charge image/electric-field composition; zero-charge neutral fallback | Supported |
+| Charged configuration and rectangular field ownership semantics | Supported |
+| Geometry-specific deterministic coefficient tolerances and P5 eight-stratum exact-binomial survival evidence (4,096 observations per stratum; inclusive bounds with per-stratum alpha 1.25e-7) | Supported bounded evidence |
 | CUDA validation | Optional additive evidence; guarded skips are expected when unavailable |
-| Image-charge enhancement and electric-field drift physics | Deferred |
 | CPU fallback or hidden transfer; high-level runnable, scheduler, or backend integration | Deferred (E6-F9 covers integration/closeout) |
 | Dynamic slots, compaction/activation, graph capture, differentiability, performance guarantees, or exact RNG replay | Deferred |
 

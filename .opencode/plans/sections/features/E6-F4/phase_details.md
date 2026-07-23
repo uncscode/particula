@@ -39,17 +39,28 @@ terms in P4 before P5 validation and P6 documentation.
     preflight change, CPU change, caller-state mutation, or RNG change; P4 owns
     direct-step integration.
 
-- [ ] **E6-F4-P4:** Integrate charged mode into the neutral fixed-shape wall-loss step with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Select neutral or charged coefficient calculation inside the E6-F3 step without changing active-slot, removal-clearing, environment, identity, or persistent-RNG contracts.
+- [x] **E6-F4-P4:** Integrate charged mode into the neutral fixed-shape wall-loss step with unit tests
+  - Issue: #1412 | Size: S | Status: Shipped
+  - Goal: Delivered geometry-specialized charged selection in the existing
+    fixed-shape direct step without changing neutral execution, fixed-slot
+    clearing, environment, identity, or persistent-RNG contracts.
   - Files: `particula/gpu/kernels/wall_loss.py`, `particula/gpu/kernels/tests/wall_loss_test.py`, `particula/gpu/kernels/__init__.py`
-  - Tests: Mixed charged/neutral sparse slots, all-survive/all-remove controls, exact zero-time no-op, complete removed-slot clearing, survivor preservation, supplied RNG reuse, and invalid-call non-advancement.
+  - Tests: Mixed charged/neutral sparse slots, image-only and field/drift
+    controls, exact zero-charge fallback, selected-slot clearing, survivor and
+    caller-owned field preservation, supplied RNG reuse, and exact invalid/zero-
+    time/all-inactive non-advancement.
 
-- [ ] **E6-F4-P5:** Add deterministic parity and stochastic neutral-fallback validation
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Demonstrate charged and fallback coefficients match CPU behavior and survival outcomes match their expected distributions on Warp CPU, with optional CUDA evidence.
-  - Files: `particula/gpu/kernels/tests/wall_loss_parity_test.py`, `particula/gpu/kernels/tests/wall_loss_test.py`
-  - Tests: Geometry/charge/field matrix, zero-potential image charge, exact deterministic neutral fallback, repeated-step RNG lifecycle, binomial confidence bounds, sparse and multi-box fixtures, CUDA clean skips.
+- [x] **E6-F4-P5:** Add deterministic parity and stochastic neutral-fallback validation
+  - Issue: #1413 | Size: S | Status: Shipped
+  - Goal: Delivered regression evidence for the existing charged direct boundary;
+    no production kernel, API, CPU strategy, or documentation change.
+  - Files: `particula/gpu/kernels/tests/wall_loss_parity_test.py`
+  - Tests: Independent charged CPU/Warp deterministic coefficient matrix with
+    non-mutation/rectangular-field ownership checks; exact zero-charge neutral
+    coefficient, survivor-state, and RNG fallback; invalid/no-op regressions;
+    and the frozen eight-stratum, 4,096-observation exact-binomial charged
+    survival validation plus a persistent-sidecar lifecycle case. Warp CPU is
+    baseline; CUDA is optional.
 
 - [ ] **E6-F4-P6:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started
