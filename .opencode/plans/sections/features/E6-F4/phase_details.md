@@ -11,11 +11,18 @@ terms in P4 before P5 validation and P6 documentation.
   - Files: `particula/gpu/kernels/wall_loss.py`, `particula/gpu/kernels/tests/wall_loss_test.py`
   - Tests: Accepted geometry-specific forms; finite potential/field validation; wrong rank, length, dtype, or device; unsupported mode; field-before-charge ordering; field/particle/RNG immutability on failure; charged/neutral zero-charge equivalence.
 
-- [ ] **E6-F4-P2:** Implement image-charge enhancement device primitives with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Port the CPU image-charge factor in fp64, including zero-potential enhancement, clipping, and exact per-slot factor one for zero charge.
+- [x] **E6-F4-P2:** Implement image-charge enhancement device primitives with unit tests
+  - Issue: #1410 | Size: S | Status: Shipped
+  - Goal: Delivered private fp64 Warp self-pair Coulomb-ratio and image-charge
+    enhancement helpers, including the `-200` raw-ratio floor, absolute value,
+    `[-50, 50]` exponent clipping, and exact factor one for zero charge.
   - Files: `particula/gpu/dynamics/wall_loss_funcs.py`, `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`
-  - Tests: Positive/negative/zero charge, representative radii and temperatures, clip-domain extremes, finite output, and CPU array-oracle parity.
+  - Tests: Independent NumPy/Warp parity covers direct-ratio ordinary and
+    saturated lanes, signed/zero charges, finite positive radii and
+    temperatures, equal-magnitude charge symmetry, nonzero enhancement, and
+    both clipping domains on Warp CPU with optional CUDA rows.
+  - Boundary: No public export/API, kernel integration, configuration or
+    preflight change, potential/field composition, CPU change, or RNG change.
 
 - [ ] **E6-F4-P3:** Implement electric-field drift and charged coefficient composition with unit tests
   - Issue: TBD | Size: S | Status: Not Started

@@ -1,7 +1,15 @@
 # Open Questions
 
-P1 configuration questions were resolved and shipped for issue #1409 on
-2026-07-23. Charged-physics questions remain deferred to P2-P5.
+P1 configuration questions shipped for issue #1409 and P2 private primitive
+questions shipped for issue #1410 on 2026-07-23. Integrated charged-physics
+questions remain deferred to P3-P5.
+
+- [x] What image-charge primitive contract is available before step integration?
+  - Decision: P2 provides private fp64 Warp self-pair Coulomb-ratio and
+    enhancement helpers. The ratio lower-clips at `-200`; enhancement uses the
+    absolute ratio, `[-50, 50]` exponent clamp, and exact zero-charge identity.
+    Independent NumPy/Warp parity and clipping tests cover it. No helper is
+    exported or called by the direct wall-loss kernel.
 
 - [x] Does nonzero charge retain image enhancement at zero wall potential?
   - Decision: yes. Wall potential does not gate the self-image factor.

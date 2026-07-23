@@ -12,13 +12,15 @@ must exactly follow the neutral coefficient and stochastic path.
 
 ## Value Proposition
 
-E6-F4-P1 is shipped: the existing direct, particle-resolved Warp step now has
-a frozen charged-mode configuration contract without changing its ownership,
-mutation, coefficient, or RNG contracts. `NeutralWallLossConfig` remains the
-sole concrete-module-only configuration type; it validates neutral/charged
-modes, signed finite potential, and geometry-specific electric-field payloads.
-Charged execution deliberately remains the E6-F3 neutral coefficient and RNG
-path. Image-charge and electric-field drift physics remain deferred.
+E6-F4-P1 and P2 are shipped. P1 freezes the charged-mode configuration without
+changing the direct step's ownership, mutation, coefficient, or RNG contracts.
+P2 adds private fp64 Warp Coulomb self-potential-ratio and image-charge
+enhancement primitives, with independent NumPy/Warp parity and clipping tests.
+`NeutralWallLossConfig` remains the sole concrete-module-only configuration
+type. The primitives are not public exports and are not composed into the
+direct wall-loss kernel; charged execution therefore remains the E6-F3 neutral
+coefficient and RNG path. Electric-field drift and charged composition remain
+deferred.
 
 ## User Stories
 

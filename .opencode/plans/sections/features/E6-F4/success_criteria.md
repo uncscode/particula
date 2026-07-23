@@ -10,8 +10,10 @@
   field errors precede coexisting charge errors.
 - [x] P1 valid charged calls preserve rectangular field identity and bytes and
   execute the existing neutral coefficient/removal/RNG path.
-- [ ] Nonzero particle charge receives CPU-equivalent image-charge enhancement
-  even when wall potential is exactly zero.
+- [x] Private fp64 primitives calculate the CPU-equivalent self-pair Coulomb
+  ratio and image-charge enhancement for nonzero charge, independent of wall
+  potential; the ratio floor, exponent clipping, and exact zero-charge identity
+  are independently tested. They are not yet used by the direct step.
 - [ ] Explicit field magnitude and potential-derived field preserve CPU
   geometry scaling and signed charge drift semantics.
 - [ ] Every zero-charge active slot reproduces the E6-F3 neutral coefficient and

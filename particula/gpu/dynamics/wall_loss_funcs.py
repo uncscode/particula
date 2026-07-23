@@ -1,9 +1,13 @@
-"""fp64 Warp wall-loss coefficient and image-charge device helpers.
+"""Provide fp64 Warp wall-loss coefficient and private image-charge helpers.
 
 The helpers calculate Crump-Seinfeld spherical and rectangular chamber
-wall-loss coefficients in SI units [s^-1], plus concrete image-charge
-enhancement primitives. They are device helpers only and intentionally exclude
-public validation and direct-step composition.
+wall-loss coefficients in SI units [s^-1], plus private image-charge
+enhancement primitives with dimensionless outputs. Coulomb self-potential
+ratios are lower-clipped at -200, while image-charge exponents use the CPU
+diagonal/self-pair absolute-value calculation and clip to [-50, 50]. The
+helpers are device-only, have no public validation contract, and are not
+integrated into a direct wall-loss step; future step preflight owns input
+validation.
 
 Crump, J. G., & Seinfeld, J. H. (1981). Turbulent deposition and
 gravitational sedimentation of an aerosol in a vessel of arbitrary shape.
@@ -224,6 +228,11 @@ def coulomb_self_potential_ratio_wp(
 ) -> wp.float64:
     """Calculate the dimensionless Coulomb self-potential ratio.
 
+    Calculates the particle self-pair ratio and lower-clips it at -200. This
+    private device helper expects finite physical constants and positive,
+    finite radius and temperature. It performs no validation; a future direct
+    wall-loss-step preflight owns validation.
+
     Args:
         particle_radius: Particle radius in m.
         particle_charge: Particle charge in elementary-charge units.
@@ -233,7 +242,7 @@ def coulomb_self_potential_ratio_wp(
         boltzmann_constant: Boltzmann constant in J/K.
 
     Returns:
-        Dimensionless, lower-clipped Coulomb self-potential ratio.
+        Dimensionless self-potential ratio, lower-clipped at -200.
     """
     raw_ratio = -(
         particle_charge
@@ -262,6 +271,13 @@ def image_charge_enhancement_wp(
 ) -> wp.float64:
     """Calculate the dimensionless image-charge wall-loss enhancement.
 
+    Returns exactly 1.0 for zero charge. Otherwise, lower-clips the Coulomb
+    self-potential ratio at -200, takes its absolute value to match CPU
+    diagonal/self-pair physics, clips the exponent to [-50, 50], and
+    exponentiates it. This private device helper expects finite physical
+    constants and positive, finite radius and temperature. It performs no
+    validation; a future direct wall-loss-step preflight owns validation.
+
     Args:
         particle_radius: Particle radius in m.
         particle_charge: Particle charge in elementary-charge units.
@@ -271,7 +287,7 @@ def image_charge_enhancement_wp(
         boltzmann_constant: Boltzmann constant in J/K.
 
     Returns:
-        Dimensionless image-charge enhancement factor.
+        Dimensionless image-charge enhancement factor with a clipped exponent.
     """
     if particle_charge == wp.float64(0.0):
         return wp.float64(1.0)
