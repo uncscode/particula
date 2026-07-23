@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from numbers import Integral, Real
-from typing import Any
+from typing import Any, no_type_check
 
 import numpy as np
 
@@ -344,6 +344,7 @@ def _validate_rng(
         raise ValueError("rng_states device must match particle device.")
 
 
+@no_type_check
 @wp.kernel
 def _wall_loss_removal_mask(
     masses: wp.array3d(dtype=wp.float64),
