@@ -346,6 +346,40 @@ def _validate_rng(
 
 @no_type_check
 @wp.kernel
+def _cast_float32_to_float64(
+    source: wp.array(dtype=wp.float32),
+    destination: wp.array(dtype=wp.float64),
+) -> None:
+    """Copy a private execution environment buffer into float64."""
+    index = wp.tid()
+    destination[index] = wp.float64(source[index])
+
+
+def _normalize_execution_environment_array(values: Any, n_boxes: int) -> Any:
+    """Return a float64 execution buffer without replacing caller input."""
+    if values.dtype == wp.float64:
+        return values
+    normalized = wp.empty(n_boxes, dtype=wp.float64, device=values.device)
+    wp.launch(
+        _cast_float32_to_float64,
+        dim=n_boxes,
+        inputs=[values, normalized],
+        device=values.device,
+    )
+    return normalized
+
+
+@wp.func
+def _should_remove_for_survival_draw(
+    draw: Any,
+    survival_probability: wp.float64,
+) -> bool:
+    """Return whether one eligible slot's survival draw selects removal."""
+    return wp.float64(draw) >= survival_probability
+
+
+@no_type_check
+@wp.kernel
 def _wall_loss_removal_mask(
     masses: wp.array3d(dtype=wp.float64),
     concentration: wp.array2d(dtype=wp.float64),
@@ -429,7 +463,9 @@ def _wall_loss_removal_mask(
     state = wp.rand_init(
         wp.int32(rng_seed), wp.int32(box * n_particles + particle)
     )
-    if wp.randf(state) > wp.exp(-coefficient * time_step):
+    if _should_remove_for_survival_draw(
+        wp.randf(state), wp.exp(-coefficient * time_step)
+    ):
         removal_mask[box, particle] = wp.int32(1)
 
 
@@ -472,7 +508,9 @@ def wall_loss_step_gpu(
     mass lane, concentration, and charge for removed slots. Zero time is a
     post-preflight write-free no-op.
 
-    Supplied ``rng_states`` remains uninitialized and unchanged. P4 uses one
+    Supplied ``rng_states`` is neither initialized nor mutated. Eligible slots
+    have positive concentration, positive usable mass and derived transport
+    properties, and a finite positive wall-loss coefficient. P4 uses one
     call-local seed-plus-slot draw per eligible slot; P5 owns persistent RNG
     lifecycle semantics. Pre-launch validation errors are atomic, while rollback
     is not promised after a mutation kernel has launched.
@@ -519,6 +557,12 @@ def wall_loss_step_gpu(
         n_boxes,
         device,
         caller_name="wall_loss_step_gpu",
+    )
+    temperature_array = _normalize_execution_environment_array(
+        temperature_array, n_boxes
+    )
+    pressure_array = _normalize_execution_environment_array(
+        pressure_array, n_boxes
     )
     n_particles = particles.masses.shape[1]
     n_species = particles.masses.shape[2]
