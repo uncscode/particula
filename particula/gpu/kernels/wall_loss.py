@@ -1,8 +1,10 @@
-"""Apply bounded neutral direct GPU wall loss to fixed particle slots.
+"""Apply bounded direct GPU wall loss to fixed particle slots.
 
-This concrete direct-kernel boundary supports only neutral,
-particle-resolved wall loss. It retains P3's read-only preflight ordering and
-uses sequential per-box random-number generation for eligible fixed slots.
+This concrete direct-kernel boundary supports particle-resolved neutral wall
+loss and P1 charged-configuration validation. Charged mode deliberately retains
+the neutral coefficient and random-number path until charged physics is added.
+It retains P3's read-only preflight ordering and uses sequential per-box random
+number generation for eligible fixed slots.
 An omitted RNG sidecar is private and seeded for each successful positive-time
 call. A supplied ``uint32`` Warp sidecar remains caller-owned, advances in
 place only for eligible slots, and resets only when explicitly requested.
@@ -58,12 +60,16 @@ _SUTHERLAND_CONSTANT = wp.constant(wp.float64(SUTHERLAND_CONSTANT))
 
 @dataclass(frozen=True)
 class NeutralWallLossConfig:
-    """Define immutable neutral wall-loss geometry and representation inputs.
+    """Define immutable direct wall-loss geometry and P1 charged inputs.
 
     This concrete-module-only configuration is accepted by the direct P5
     boundary, which retains frozen P3 preflight. ``geometry`` selects spherical
     or rectangular SI dimensions, while ``distribution_type`` must remain
-    ``"particle_resolved"``. It contains no charged-wall-loss settings.
+    ``"particle_resolved"``. ``mode`` is ``"neutral"`` or ``"charged"``.
+    Charged P1 values are validation-only: execution retains neutral P5
+    coefficients and stochastic behavior. Import this concrete configuration
+    from ``particula.gpu.kernels.wall_loss``. A charged rectangular electric
+    field is caller-owned device storage and is never replaced or mutated.
 
     Attributes:
         geometry: Exact chamber geometry, ``"spherical"`` or ``"rectangular"``.
@@ -74,6 +80,10 @@ class NeutralWallLossConfig:
             dimensions [m]; required only for rectangular geometry.
         distribution_type: Required ``"particle_resolved"`` representation
             selector.
+        mode: ``"neutral"`` or validation-only ``"charged"`` mode.
+        wall_potential: Finite signed wall potential [V].
+        wall_electric_field: Finite signed spherical scalar field [V m^-1], or
+            caller-owned charged rectangular ``wp.float64`` vector [V m^-1].
     """
 
     geometry: str
@@ -81,6 +91,9 @@ class NeutralWallLossConfig:
     chamber_radius: float | None = None
     chamber_dimensions: tuple[float, float, float] | None = None
     distribution_type: str = "particle_resolved"
+    mode: str = "neutral"
+    wall_potential: float = 0.0
+    wall_electric_field: Any = 0.0
 
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
@@ -113,6 +126,17 @@ def _scan_finite_2d(
     """Record non-finite entries in two-dimensional metadata."""
     row, column = wp.tid()
     if not wp.isfinite(values[row, column]):
+        wp.atomic_add(invalid, 0, 1)
+
+
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+def _scan_finite_1d(
+    values: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Record non-finite entries in one-dimensional signed metadata."""
+    index = wp.tid()
+    if not wp.isfinite(values[index]):
         wp.atomic_add(invalid, 0, 1)
 
 
@@ -153,23 +177,24 @@ def _require_positive_real(value: Any, name: str) -> float:
     return scalar
 
 
-def _validate_config(config: Any) -> NeutralWallLossConfig:
-    """Validate immutable neutral geometry payload without coercing it."""
-    if type(config) is not NeutralWallLossConfig:
-        raise TypeError("config must be a NeutralWallLossConfig.")
+def _require_finite_real(value: Any, name: str) -> float:
+    """Validate an exact scalar finite signed configuration value."""
+    if isinstance(value, (bool, np.bool_, np.ndarray)) or not isinstance(
+        value, Real
+    ):
+        raise TypeError(f"{name} must be a finite real scalar.")
+    scalar = float(value)
+    if not np.isfinite(scalar):
+        raise ValueError(f"{name} must be finite.")
+    return scalar
+
+
+def _validate_geometry(config: NeutralWallLossConfig) -> None:
+    """Validate geometry and its scalar payload without particle access."""
     if config.geometry not in ("spherical", "rectangular"):
         raise ValueError(
             "config.geometry must be 'spherical' or 'rectangular'."
         )
-    if config.distribution_type != "particle_resolved":
-        raise ValueError(
-            "config.distribution_type must be 'particle_resolved'."
-        )
-    _require_positive_real(
-        config.wall_eddy_diffusivity,
-        "config.wall_eddy_diffusivity",
-    )
-
     if config.geometry == "spherical":
         if config.chamber_dimensions is not None:
             raise ValueError(
@@ -178,18 +203,51 @@ def _validate_config(config: Any) -> NeutralWallLossConfig:
         if config.chamber_radius is None:
             raise ValueError("spherical config.chamber_radius is required.")
         _require_positive_real(config.chamber_radius, "config.chamber_radius")
-        return config
-
-    if config.chamber_radius is not None:
+    elif config.chamber_radius is not None:
         raise ValueError("rectangular config.chamber_radius must be None.")
-    dimensions = config.chamber_dimensions
-    if type(dimensions) is not tuple or len(dimensions) != 3:
+    else:
+        dimensions = config.chamber_dimensions
+        if type(dimensions) is not tuple or len(dimensions) != 3:
+            raise ValueError(
+                "rectangular config.chamber_dimensions must be a tuple of "
+                "three "
+                "positive real scalars."
+            )
+        for index, dimension in enumerate(dimensions):
+            _require_positive_real(
+                dimension, f"config.chamber_dimensions[{index}]"
+            )
+
+
+def _validate_charged_field_form(config: NeutralWallLossConfig) -> None:
+    """Validate scalar-versus-vector field form without reading Warp fields."""
+    _require_finite_real(config.wall_potential, "config.wall_potential")
+    field = config.wall_electric_field
+    if config.geometry == "spherical" or config.mode == "neutral":
+        _require_finite_real(field, "config.wall_electric_field")
+    elif not _is_warp_array_like(field):
         raise ValueError(
-            "rectangular config.chamber_dimensions must be a tuple of three "
-            "positive real scalars."
+            "charged rectangular config.wall_electric_field must be a Warp "
+            "array."
         )
-    for index, dimension in enumerate(dimensions):
-        _require_positive_real(dimension, f"config.chamber_dimensions[{index}]")
+
+
+def _validate_config(config: Any) -> NeutralWallLossConfig:
+    """Validate configuration without reading Warp fields or particles."""
+    if type(config) is not NeutralWallLossConfig:
+        raise TypeError("config must be a NeutralWallLossConfig.")
+    if config.distribution_type != "particle_resolved":
+        raise ValueError(
+            "config.distribution_type must be 'particle_resolved'."
+        )
+    if config.mode not in ("neutral", "charged"):
+        raise ValueError("config.mode must be 'neutral' or 'charged'.")
+    _require_positive_real(
+        config.wall_eddy_diffusivity,
+        "config.wall_eddy_diffusivity",
+    )
+    _validate_geometry(config)
+    _validate_charged_field_form(config)
     return config
 
 
@@ -231,7 +289,7 @@ def _validate_values(
     """Run a device-resident finite-domain scan without host materialization."""
     invalid = wp.zeros(1, dtype=wp.int32, device=values.device)
     if finite_only:
-        kernel = _scan_finite_2d
+        kernel = _scan_finite_1d if values.ndim == 1 else _scan_finite_2d
     elif positive:
         kernel = _scan_positive_finite_1d
     elif values.ndim == 1:
@@ -257,49 +315,76 @@ def _validate_values(
         raise ValueError(f"{name} must be {domain}.")
 
 
-def _validate_particles(particles: Any) -> tuple[int, Any]:
-    """Validate fixed particle metadata and fields in P3 preflight order."""
+def _validate_particle_schema(particles: Any) -> tuple[int, Any]:
+    """Validate fixed particle schema and return its box count and device."""
     masses = _validate_array_schema(
         _get_required_field(particles, "masses"), "particles.masses", 3
     )
     n_boxes, n_particles, n_species = masses.shape
     device = masses.device
-    concentration = _validate_array_schema(
+    _validate_array_schema(
         _get_required_field(particles, "concentration"),
         "particles.concentration",
         2,
         (n_boxes, n_particles),
         device,
     )
-    charge = _validate_array_schema(
+    _validate_array_schema(
         _get_required_field(particles, "charge"),
         "particles.charge",
         2,
         (n_boxes, n_particles),
         device,
     )
-    density = _validate_array_schema(
+    _validate_array_schema(
         _get_required_field(particles, "density"),
         "particles.density",
         1,
         (n_species,),
         device,
     )
-    volume = _validate_array_schema(
+    _validate_array_schema(
         _get_required_field(particles, "volume"),
         "particles.volume",
         1,
         (n_boxes,),
         device,
     )
+    return n_boxes, device
+
+
+def _validate_charged_rectangular_field(
+    config: NeutralWallLossConfig, device: Any
+) -> None:
+    """Validate and scan the caller-owned charged rectangular field."""
+    if config.mode != "charged" or config.geometry != "rectangular":
+        return
+    field = _validate_array_schema(
+        config.wall_electric_field,
+        "config.wall_electric_field",
+        1,
+        (3,),
+        device,
+    )
+    _validate_values(field, "config.wall_electric_field", finite_only=True)
+
+
+def _validate_particle_values(particles: Any) -> None:
+    """Validate particle values after configuration-dependent schema checks."""
     for values, name, positive, finite_only in (
-        (masses, "particles.masses", False, False),
-        (concentration, "particles.concentration", False, False),
-        (charge, "particles.charge", False, True),
-        (density, "particles.density", True, False),
-        (volume, "particles.volume", True, False),
+        (particles.masses, "particles.masses", False, False),
+        (particles.concentration, "particles.concentration", False, False),
+        (particles.charge, "particles.charge", False, True),
+        (particles.density, "particles.density", True, False),
+        (particles.volume, "particles.volume", True, False),
     ):
         _validate_values(values, name, positive, finite_only)
+
+
+def _validate_particles(particles: Any) -> tuple[int, Any]:
+    """Validate fixed particle metadata and values in legacy P3 order."""
+    n_boxes, device = _validate_particle_schema(particles)
+    _validate_particle_values(particles)
     return n_boxes, device
 
 
@@ -512,13 +597,16 @@ def wall_loss_step_gpu(
 ) -> Any:
     """Apply P5 neutral wall loss to eligible particle-resolved slots.
 
-    The configuration supports only particle-resolved neutral wall loss. SI
-    inputs are wall eddy diffusivity [m^2 s^-1], geometry dimensions [m],
-    temperature [K], pressure [Pa], and ``time_step`` [s]. After frozen P3
-    preflight, positive-time calls evaluate neutral coefficients for usable
-    slots, apply survival probability ``exp(-k * time_step)``, and clear every
-    mass lane, concentration, and charge for removed slots. Zero time is a
-    post-preflight write-free no-op.
+    The configuration supports particle-resolved neutral wall loss and charged
+    P1 validation only. SI inputs are wall eddy diffusivity [m^2 s^-1],
+    geometry dimensions [m], potential [V], electric field [V m^-1],
+    temperature [K], pressure [Pa], and ``time_step`` [s]. Charged mode does
+    not yet alter coefficients, drift, or random-number consumption: zero-charge
+    slots follow the exact existing neutral coefficient and stochastic path.
+    After frozen P3 preflight, positive-time calls evaluate neutral coefficients
+    for usable slots, apply survival probability ``exp(-k * time_step)``, and
+    clear every mass lane, concentration, and charge for removed slots. Zero
+    time is a post-preflight write-free no-op.
 
     Omitted ``rng_states`` uses a private per-call sidecar initialized from
     ``rng_seed`` after successful positive-time preflight. A supplied
@@ -536,7 +624,7 @@ def wall_loss_step_gpu(
         temperature: Scalar or per-box Warp temperature [K].
         pressure: Scalar or per-box Warp pressure [Pa].
         time_step: Finite nonnegative duration [s].
-        config: Exact neutral geometry and representation configuration.
+        config: Exact geometry, representation, and P1 charged configuration.
         rng_seed: Unsigned 32-bit seed for private state or an explicit reset.
         rng_states: Optional caller-owned same-device ``uint32`` Warp array
             with shape ``(n_boxes,)``. The array is mutated in place only by
@@ -553,11 +641,13 @@ def wall_loss_step_gpu(
         TypeError: If the configuration, time step, or RNG metadata uses an
             unsupported type.
         ValueError: If configuration, particle, time-step, environment, or RNG
-            values, shapes, dtypes, or devices violate the P3/P5 contract,
+            values, shapes, dtypes, or devices violate the P1/P3/P5 contract,
             including combining ``environment`` with direct environment inputs.
     """
     validated_config = _validate_config(config)
-    n_boxes, device = _validate_particles(particles)
+    n_boxes, device = _validate_particle_schema(particles)
+    _validate_charged_rectangular_field(validated_config, device)
+    _validate_particle_values(particles)
     validated_time_step = _validate_time_step(time_step)
     validate_environment_inputs(
         temperature,

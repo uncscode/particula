@@ -55,6 +55,32 @@ def _config(geometry: str = "spherical"):
     )
 
 
+def _charged_config(geometry: str = "spherical", device: str = "cpu"):
+    """Build one valid P1 charged configuration without adding charged physics."""
+    wp = _warp()
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    if geometry == "spherical":
+        return NeutralWallLossConfig(
+            "spherical",
+            0.01,
+            chamber_radius=1.0,
+            mode="charged",
+            wall_potential=-12.0,
+            wall_electric_field=3.0,
+        )
+    return NeutralWallLossConfig(
+        "rectangular",
+        0.01,
+        chamber_dimensions=(1.0, 2.0, 3.0),
+        mode="charged",
+        wall_potential=-12.0,
+        wall_electric_field=wp.array(
+            [-1.0, 2.0, 3.0], dtype=wp.float64, device=device
+        ),
+    )
+
+
 def _snapshot(particles, rng_states=None):
     """Snapshot all mutable particle and optional sidecar values."""
     snapshot = {
@@ -126,6 +152,320 @@ def test_public_step_is_lazy_and_config_is_concrete_only() -> None:
     with pytest.raises(FrozenInstanceError):
         config.geometry = "rectangular"
     assert isinstance(config, NeutralWallLossConfig)
+
+
+def test_charged_configuration_defaults_and_fields_are_frozen() -> None:
+    """P1 appends immutable charged fields without changing legacy defaults."""
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    config = _config()
+    assert config.mode == "neutral"
+    assert config.wall_potential == 0.0
+    assert config.wall_electric_field == 0.0
+    for field, value in (
+        ("mode", "charged"),
+        ("wall_potential", 2.0),
+        ("wall_electric_field", 1.0),
+    ):
+        with pytest.raises(FrozenInstanceError):
+            setattr(config, field, value)
+    assert _charged_config().mode == "charged"
+    assert isinstance(config, NeutralWallLossConfig)
+
+
+@pytest.mark.parametrize(
+    ("updates", "error", "match"),
+    [
+        ({"mode": "other"}, ValueError, "config.mode"),
+        ({"wall_potential": True}, TypeError, "config.wall_potential"),
+        ({"wall_potential": np.array(1.0)}, TypeError, "config.wall_potential"),
+        ({"wall_potential": "1"}, TypeError, "config.wall_potential"),
+        ({"wall_potential": 1j}, TypeError, "config.wall_potential"),
+        ({"wall_potential": np.nan}, ValueError, "config.wall_potential"),
+        ({"wall_potential": np.inf}, ValueError, "config.wall_potential"),
+        ({"wall_potential": -np.inf}, ValueError, "config.wall_potential"),
+        (
+            {"wall_electric_field": True},
+            TypeError,
+            "config.wall_electric_field",
+        ),
+        (
+            {"wall_electric_field": np.array(1.0)},
+            TypeError,
+            "config.wall_electric_field",
+        ),
+        ({"wall_electric_field": "1"}, TypeError, "config.wall_electric_field"),
+        ({"wall_electric_field": 1j}, TypeError, "config.wall_electric_field"),
+        (
+            {"wall_electric_field": np.nan},
+            ValueError,
+            "config.wall_electric_field",
+        ),
+        (
+            {"wall_electric_field": -np.inf},
+            ValueError,
+            "config.wall_electric_field",
+        ),
+    ],
+)
+def test_charged_scalar_configuration_rejects_before_particles(
+    updates, error, match
+) -> None:
+    """Configuration scalar contracts fail before any particle-field access."""
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    arguments = {"mode": "charged", **updates}
+    config = NeutralWallLossConfig(
+        "spherical", 0.01, chamber_radius=1.0, **arguments
+    )
+    with pytest.raises(error, match=match):
+        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+
+
+@pytest.mark.parametrize(
+    ("field_factory", "match"),
+    [
+        (lambda wp: 3.0, "Warp array"),
+        (lambda wp: np.array([1.0, 2.0, 3.0]), "Warp array"),
+        (lambda wp: wp.zeros((1, 3), dtype=wp.float64, device="cpu"), "rank 1"),
+        (lambda wp: wp.zeros(2, dtype=wp.float64, device="cpu"), "shape"),
+        (
+            lambda wp: wp.zeros(3, dtype=wp.float32, device="cpu"),
+            "dtype float64",
+        ),
+    ],
+)
+def test_charged_rectangular_field_schema_rejection_is_atomic(
+    field_factory, match
+) -> None:
+    """Invalid P1 rectangular fields reject before particle scans or RNG reset."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    particles = _particles()
+    field = field_factory(wp)
+    field_before = field.numpy().copy() if hasattr(field, "numpy") else None
+    states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, states)
+    config = NeutralWallLossConfig(
+        "rectangular",
+        0.01,
+        chamber_dimensions=(1.0, 2.0, 3.0),
+        mode="charged",
+        wall_electric_field=field,
+    )
+    with pytest.raises(ValueError, match=f"wall_electric_field.*{match}"):
+        wall_loss_step_gpu(
+            particles,
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+            rng_states=states,
+            initialize_rng=True,
+        )
+    _assert_snapshot_unchanged(particles, snapshot, states)
+    if field_before is not None:
+        npt.assert_array_equal(field.numpy(), field_before)
+
+
+def test_charged_rectangular_nonfinite_field_rejection_is_atomic() -> None:
+    """A nonfinite charged field fails before charge scans or caller writes."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    field = wp.array([1.0, np.nan, 3.0], dtype=wp.float64, device="cpu")
+    states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, states)
+    field_before = field.numpy().copy()
+    config = _charged_config("rectangular")
+    object.__setattr__(config, "wall_electric_field", field)
+
+    with pytest.raises(
+        ValueError, match="config.wall_electric_field must be finite"
+    ):
+        wall_loss_step_gpu(
+            particles,
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+            rng_states=states,
+            initialize_rng=True,
+        )
+
+    _assert_snapshot_unchanged(particles, snapshot, states)
+    assert config.wall_electric_field is field
+    npt.assert_array_equal(field.numpy(), field_before)
+
+
+@pytest.mark.cuda
+def test_charged_rectangular_wrong_device_field_rejection_is_atomic() -> None:
+    """A CUDA charged field cannot accompany CPU particle storage."""
+    wp = _warp()
+    if not wp.is_cuda_available():
+        pytest.skip("CUDA is unavailable")
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    config = _charged_config("rectangular", device="cuda:0")
+    field = config.wall_electric_field
+    field_before = field.numpy().copy()
+    states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, states)
+
+    with pytest.raises(ValueError, match="wall_electric_field device"):
+        wall_loss_step_gpu(
+            particles,
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+            rng_states=states,
+            initialize_rng=True,
+        )
+
+    _assert_snapshot_unchanged(particles, snapshot, states)
+    assert config.wall_electric_field is field
+    npt.assert_array_equal(field.numpy(), field_before)
+
+
+def test_charged_rectangular_field_value_error_precedes_charge_error() -> None:
+    """P1 scans the charged field before scanning signed particle charge."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    charges = particles.charge.numpy()
+    charges[0, 0] = np.nan
+    particles.charge = wp.array(charges, dtype=wp.float64, device="cpu")
+    config = _charged_config("rectangular")
+    bad_field = config.wall_electric_field.numpy()
+    bad_field[0] = np.nan
+    object.__setattr__(
+        config,
+        "wall_electric_field",
+        wp.array(bad_field, dtype=wp.float64, device="cpu"),
+    )
+    with pytest.raises(
+        ValueError, match="config.wall_electric_field must be finite"
+    ):
+        wall_loss_step_gpu(particles, 298.15, 101325.0, 1.0, config=config)
+
+
+def test_neutral_mode_rejects_rectangular_warp_field_before_particles() -> None:
+    """Neutral mode accepts only its legacy scalar electric-field value."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    config = NeutralWallLossConfig(
+        "rectangular",
+        0.01,
+        chamber_dimensions=(1.0, 2.0, 3.0),
+        wall_electric_field=wp.zeros(3, dtype=wp.float64, device="cpu"),
+    )
+
+    with pytest.raises(TypeError, match="config.wall_electric_field"):
+        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+
+
+@pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
+def test_charged_mode_zero_charge_matches_neutral_execution(
+    geometry: str,
+) -> None:
+    """P1 charged mode keeps zero-charge slots on the neutral path exactly."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    neutral_particles = _particles()
+    charged_particles = _particles()
+    zeros = np.zeros((2, 2), dtype=np.float64)
+    neutral_particles.charge = wp.array(zeros, dtype=wp.float64, device="cpu")
+    charged_particles.charge = wp.array(zeros, dtype=wp.float64, device="cpu")
+    neutral_rng = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    charged_rng = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    wall_loss_step_gpu(
+        neutral_particles,
+        298.15,
+        101325.0,
+        1.0,
+        config=_config(geometry),
+        rng_states=neutral_rng,
+    )
+    wall_loss_step_gpu(
+        charged_particles,
+        298.15,
+        101325.0,
+        1.0,
+        config=_charged_config(geometry),
+        rng_states=charged_rng,
+    )
+    for field in ("masses", "concentration", "charge", "density", "volume"):
+        npt.assert_array_equal(
+            getattr(charged_particles, field).numpy(),
+            getattr(neutral_particles, field).numpy(),
+        )
+    npt.assert_array_equal(charged_rng.numpy(), neutral_rng.numpy())
+
+
+def test_charged_rectangular_zero_time_preserves_field_and_rng() -> None:
+    """Charged rectangular zero time fully preflights without caller writes."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    config = _charged_config("rectangular")
+    field = config.wall_electric_field
+    field_before = field.numpy().copy()
+    states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, states)
+    assert (
+        wall_loss_step_gpu(
+            particles,
+            298.15,
+            101325.0,
+            0.0,
+            config=config,
+            rng_states=states,
+            initialize_rng=True,
+        )
+        is particles
+    )
+    _assert_snapshot_unchanged(particles, snapshot, states)
+    assert config.wall_electric_field is field
+    npt.assert_array_equal(field.numpy(), field_before)
+
+
+def test_charged_rectangular_execution_preserves_field_identity_and_values() -> (
+    None
+):
+    """Charged P1 execution never replaces or mutates the field sidecar."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    config = _charged_config("rectangular")
+    field = config.wall_electric_field
+    field_before = field.numpy().copy()
+    rng_states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+
+    assert (
+        wall_loss_step_gpu(
+            particles,
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+            rng_states=rng_states,
+        )
+        is particles
+    )
+    assert config.wall_electric_field is field
+    npt.assert_array_equal(field.numpy(), field_before)
 
 
 @pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
