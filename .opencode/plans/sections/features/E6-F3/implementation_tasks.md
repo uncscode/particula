@@ -4,9 +4,10 @@
 
 - [ ] Inventory existing Warp viscosity, mean-free-path, slip, diffusion, radius,
   effective-density, and settling functions; document exact CPU-reference gaps.
-- [ ] Add missing neutral device functions under `particula/gpu/properties/` or
-  `particula/gpu/dynamics/wall_loss_funcs.py` with fp64-safe zero-limit handling.
-- [ ] Implement spherical and rectangular coefficient functions matching
+- [x] Add the required internal neutral fp64 coefficient helpers in
+  `particula/gpu/dynamics/wall_loss_funcs.py`, reusing P1 zero-limit-safe
+  geometry primitives.
+- [x] Implement spherical and rectangular coefficient functions matching
   `particula/dynamics/properties/wall_loss_coefficient.py` term by term.
 - [ ] Define immutable neutral geometry configuration in
   `particula/gpu/kernels/wall_loss.py` without charged fields or container state.
@@ -28,8 +29,9 @@
 
 - [ ] Add device-primitive tests in co-located `particula/gpu/**/tests/` modules
   against independent NumPy/CPU property functions.
-- [ ] Add `particula/gpu/dynamics/tests/wall_loss_funcs_test.py` for deterministic
-  spherical/rectangular coefficient parity over nanometer-to-micrometer radii.
+- [x] Add `particula/gpu/dynamics/tests/wall_loss_funcs_test.py` for guarded
+  deterministic spherical/rectangular CPU/Warp parity and smoke launches over
+  scalar diffusion/gravity and vector nanometer-to-micrometer states.
 - [ ] Add `particula/gpu/kernels/tests/wall_loss_test.py` for configuration,
   preflight ordering, inactive gaps, exact no-ops, complete slot clearing,
   unchanged survivor/container state, and RNG lifecycle.

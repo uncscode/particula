@@ -33,8 +33,9 @@
 
 ## Phase Ordering
 
-P1 establishes device transport primitives before P2 coefficients. P3 freezes
-the public/configuration and atomic preflight contract before P4 mutation. P5
+P1 established device transport primitives and P2 shipped the internal neutral
+coefficient helpers before P3 freezes the public/configuration and atomic
+preflight contract ahead of P4 mutation. P5
 adds the reusable persistent-RNG lifecycle after the core step exists. P6 runs
 the complete deterministic/statistical parity matrix and export smoke tests.
 P7 is the required final development-documentation phase. Every implementation

@@ -18,11 +18,14 @@ scientific tolerance may be weakened. Test modules use the `*_test.py` suffix.
   import-surface regression confirms property exports and the absence of moved
   names from `particula.gpu.dynamics`. Warp tests use guarded device execution;
   CUDA remains optional.
-- **P2 coefficient functions:** In
-  `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`, compare spherical and
-  rectangular fp64 coefficients against
-  `get_*_wall_loss_coefficient_via_system_state`. Cover vectors, gravity/
-  diffusion dominance, chamber dimensions, and recorded `rtol`/`atol`.
+- **P2 coefficient functions (shipped, #1402):**
+  `particula/gpu/dynamics/tests/wall_loss_funcs_test.py` guarded-imports Warp,
+  requires Warp CPU when installed, and marks optional CUDA runs for clean
+  availability-based skips. It compares scalar diffusion/gravity regimes and
+  vector state/geometry lanes against the CPU system-state oracles, checks
+  finite fp64 outputs, and separately smoke-launches both helpers. Rectangular
+  parity uses `rtol=1e-10, atol=1e-20`; spherical parity records
+  `rtol=1.002e-3` due to the measured CPU Debye endpoint quadrature difference.
 - **P3 contract/preflight:** In
   `particula/gpu/kernels/tests/wall_loss_test.py`, assert public signature,
   geometry exclusivity, scalar/per-box/environment forms, units, and import
