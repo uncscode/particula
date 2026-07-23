@@ -1,11 +1,11 @@
 # Documentation Updates
 
-- Update `AGENTS.md` with the charged direct-wall-loss contract, focused test
-  commands, image-charge-at-zero-potential rule, field semantics, exact neutral
-  fallback, and caller-owned RNG/charge guidance.
-- Update the relevant `docs/Features/` GPU/wall-loss page with supported
-  spherical/rectangular charged configuration, SI units, coefficient equation,
-  fixed-slot clearing, Warp CPU baseline, and optional CUDA evidence.
+- [x] `AGENTS.md` records the P1 direct-wall-loss contract: charged inputs are
+  validation-only, rectangular field ownership/schema is explicit, and neutral
+  execution remains unchanged.
+- [ ] Defer charged coefficient equations and CPU-parity claims until P2-P5;
+  future documentation must distinguish P1 validation-only support from
+  charged physics.
 - Update `.opencode/guides/` testing or architecture references if E6-F3's
   direct-kernel conventions gain charged-specific validation guidance.
 - Add or extend a `docs/Examples/` low-level example only if it can preserve

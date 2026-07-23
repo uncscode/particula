@@ -3,6 +3,9 @@
 This concrete direct-kernel boundary supports particle-resolved neutral wall
 loss and P1 charged-configuration validation. Charged mode deliberately retains
 the neutral coefficient and random-number path until charged physics is added.
+Its potential and electric-field inputs are validated only; a charged
+rectangular field is caller-owned same-device ``wp.float64`` storage with shape
+``(3,)`` and is never read by the removal kernel or mutated.
 It retains P3's read-only preflight ordering and uses sequential per-box random
 number generation for eligible fixed slots.
 An omitted RNG sidecar is private and seeded for each successful positive-time
@@ -80,10 +83,13 @@ class NeutralWallLossConfig:
             dimensions [m]; required only for rectangular geometry.
         distribution_type: Required ``"particle_resolved"`` representation
             selector.
-        mode: ``"neutral"`` or validation-only ``"charged"`` mode.
+        mode: ``"neutral"`` or validation-only ``"charged"`` mode. Charged
+            mode still executes the neutral P5 coefficient and RNG path.
         wall_potential: Finite signed wall potential [V].
         wall_electric_field: Finite signed spherical scalar field [V m^-1], or
-            caller-owned charged rectangular ``wp.float64`` vector [V m^-1].
+            caller-owned same-device charged rectangular ``wp.float64`` vector
+            with shape ``(3,)`` [V m^-1]. A rectangular vector is invalid in
+            neutral mode and is neither replaced nor mutated in charged mode.
     """
 
     geometry: str
@@ -624,7 +630,9 @@ def wall_loss_step_gpu(
         temperature: Scalar or per-box Warp temperature [K].
         pressure: Scalar or per-box Warp pressure [Pa].
         time_step: Finite nonnegative duration [s].
-        config: Exact geometry, representation, and P1 charged configuration.
+        config: Exact concrete geometry, representation, and P1 charged
+            configuration. Charged potential and field inputs are validated but
+            do not change the neutral coefficient or RNG path.
         rng_seed: Unsigned 32-bit seed for private state or an explicit reset.
         rng_states: Optional caller-owned same-device ``uint32`` Warp array
             with shape ``(n_boxes,)``. The array is mutated in place only by
@@ -638,11 +646,12 @@ def wall_loss_step_gpu(
         The identical ``particles`` object. Private RNG state is not returned.
 
     Raises:
-        TypeError: If the configuration, time step, or RNG metadata uses an
-            unsupported type.
+        TypeError: If the configuration, scalar charged input, time step, or
+            RNG metadata uses an unsupported type.
         ValueError: If configuration, particle, time-step, environment, or RNG
             values, shapes, dtypes, or devices violate the P1/P3/P5 contract,
-            including combining ``environment`` with direct environment inputs.
+            including an invalid charged field or combining ``environment``
+            with direct environment inputs.
     """
     validated_config = _validate_config(config)
     n_boxes, device = _validate_particle_schema(particles)

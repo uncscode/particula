@@ -5,11 +5,11 @@
 E6-F3 must ship first. Complete P1 before P2/P3, then integrate both physics
 terms in P4 before P5 validation and P6 documentation.
 
-- [ ] **E6-F4-P1:** Freeze charged wall-loss configuration and semantics with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Extend the E6-F3 contract with wall potential and scalar/vector field inputs while explicitly freezing neutral fallback, units, support, and atomic preflight behavior.
+- [x] **E6-F4-P1:** Freeze charged wall-loss configuration and semantics with unit tests
+  - Issue: #1409 | Size: S | Status: Shipped
+  - Goal: Delivered neutral/charged configuration validation, potential/field schema and ownership checks, rectangular-field ordering and preflight atomicity while deliberately retaining neutral execution.
   - Files: `particula/gpu/kernels/wall_loss.py`, `particula/gpu/kernels/tests/wall_loss_test.py`
-  - Tests: Accepted geometry-specific forms; finite potential/field validation; wrong rank, length, dtype, or device; unsupported mode; complete particle/RNG immutability on failure.
+  - Tests: Accepted geometry-specific forms; finite potential/field validation; wrong rank, length, dtype, or device; unsupported mode; field-before-charge ordering; field/particle/RNG immutability on failure; charged/neutral zero-charge equivalence.
 
 - [ ] **E6-F4-P2:** Implement image-charge enhancement device primitives with unit tests
   - Issue: TBD | Size: S | Status: Not Started

@@ -219,11 +219,12 @@ gas concentrations run on Warp CPU with float64 `rtol=1e-12, atol=0`; CUDA is
 optional and skips cleanly when unavailable. This tolerance-based evidence is
 not bitwise parity.
 
-### Direct neutral GPU wall loss
+### Direct GPU wall loss
 
-The bounded direct wall-loss path is neutral and particle-resolved only. Import
-the step and its concrete-module-only configuration separately; the
-configuration is not re-exported by `particula.gpu.kernels` or `particula.gpu`:
+The bounded direct wall-loss path is particle-resolved. It supports neutral
+execution and a validation-only charged configuration. Import the step and its
+concrete-module-only configuration separately; the configuration is not
+re-exported by `particula.gpu.kernels` or `particula.gpu`:
 
 ```python
 from particula.gpu.kernels import wall_loss_step_gpu
@@ -262,8 +263,22 @@ deposition and gravitational settling:
 - Crump, J. G., & Seinfeld, J. H. (1981), *Journal of Aerosol Science*, 12(5).
   https://doi.org/10.1016/0021-8502(81)90036-7
 - Crump, J. G., Flagan, R. C., & Seinfeld, J. H. (1982), *Aerosol Science and
-  Technology*, 2(3), 303--309.
-  https://doi.org/10.1080/02786828308958636
+   Technology*, 2(3), 303--309.
+   https://doi.org/10.1080/02786828308958636
+
+`NeutralWallLossConfig` remains the sole concrete configuration type. Its
+`mode` is either `"neutral"` or `"charged"`. Charged mode validates a finite,
+signed scalar `wall_potential` in V. For spherical geometry,
+`wall_electric_field` is a finite, signed scalar in V/m. For rectangular
+geometry, it is a caller-owned, same-device `wp.float64` Warp array of shape
+`(3,)`, with finite signed components in V/m. The boundary does not replace or
+mutate that rectangular field array.
+
+Charged mode currently freezes configuration validation and ownership only. It
+continues to use the neutral coefficient, removal kernel, and RNG path; it does
+not apply image-charge enhancement or electric-field drift. In particular,
+matching zero-charge slots follow the existing neutral coefficient and
+stochastic path even when a nonzero charged configuration is supplied.
 
 After read-only preflight, eligible finite positive-rate fixed slots survive with
 `exp(-k * time_step)`. A selected slot has every mass lane, concentration, and
@@ -285,9 +300,10 @@ consumes no draw. Exact CPU/Warp or per-seed RNG replay is not promised.
 | Scope | Status |
 | --- | --- |
 | Neutral particle-resolved spherical/rectangular direct execution | Supported |
+| Charged configuration validation and rectangular field ownership semantics | Supported; neutral execution retained |
 | Geometry-specific deterministic coefficient tolerances and 100-seed, 3-sigma aggregate survival evidence | Supported bounded evidence |
 | CUDA validation | Optional additive evidence; guarded skips are expected when unavailable |
-| Charged, image-charge, or electric-field physics; E6-F4 charged wall loss | Deferred |
+| Image-charge enhancement and electric-field drift physics | Deferred |
 | CPU fallback or hidden transfer; high-level runnable, scheduler, or backend integration | Deferred (E6-F9 covers integration/closeout) |
 | Dynamic slots, compaction/activation, graph capture, differentiability, performance guarantees, or exact RNG replay | Deferred |
 

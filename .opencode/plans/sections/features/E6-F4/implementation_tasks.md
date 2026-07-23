@@ -13,11 +13,13 @@
 
 ## Kernel Contract
 
-- [ ] Extend the E6-F3 immutable configuration in
+- [x] Extend the E6-F3 immutable configuration in
   `particula/gpu/kernels/wall_loss.py` without adding a second step API.
-- [ ] Validate charged capability, field form, finite charge, particle schema,
-  environment, time, and RNG sidecar before allocation or mutation.
-- [ ] Preserve exact E6-F3 neutral computation for each zero-charge slot.
+- [x] Validate neutral/charged capability, potential/field form and ownership,
+  particle schema, field-before-charge ordering, environment, time, and RNG
+  sidecar before allocation or mutation.
+- [x] Preserve the exact E6-F3 neutral computation and RNG path in P1; charged
+  physics is not yet executed.
 - [ ] Read charge without copying caller arrays or changing device ownership.
 - [ ] Reuse active-slot, stochastic survival, removal-clearing, and persistent-
   RNG kernels; ensure removed slots clear every species mass, concentration,
@@ -29,8 +31,9 @@
 
 - [ ] Add primitive parity cases to
   `particula/gpu/dynamics/tests/wall_loss_funcs_test.py`.
-- [ ] Add configuration, preflight, mixed-charge, identity, clearing, and RNG
-  lifecycle cases to `particula/gpu/kernels/tests/wall_loss_test.py`.
+- [x] Add P1 configuration, preflight, ordering, ownership, atomicity, and
+  zero-charge neutral-equivalence cases to
+  `particula/gpu/kernels/tests/wall_loss_test.py`.
 - [ ] Extend `particula/gpu/kernels/tests/wall_loss_parity_test.py` with a
   deterministic CPU/Warp geometry/charge/field matrix.
 - [ ] Compare survival counts with predeclared binomial confidence or sigma

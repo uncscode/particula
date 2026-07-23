@@ -1,7 +1,7 @@
 # Open Questions
 
-All E6-F4 planning questions were resolved on 2026-07-21 against the current
-CPU charged-wall-loss semantics and direct-kernel testing conventions.
+P1 configuration questions were resolved and shipped for issue #1409 on
+2026-07-23. Charged-physics questions remain deferred to P2-P5.
 
 - [x] Does nonzero charge retain image enhancement at zero wall potential?
   - Decision: yes. Wall potential does not gate the self-image factor.
@@ -11,14 +11,14 @@ CPU charged-wall-loss semantics and direct-kernel testing conventions.
   - Decision: no. It extends E6-F3 configuration and reuses its direct step,
     active predicate, clearing, and caller-owned RNG sidecar.
 - [x] Which rectangular electric-field forms are accepted?
-  - Decision: accept only the public CPU builder's finite three-component vector
-    form and resolve it by Euclidean norm. Scalar fields remain spherical-only;
-    their finite signed value preserves current CPU strategy behavior.
-    Permissive rectangular scalar behavior does not expand the GPU contract.
+  - Decision: P1 accepts only a caller-owned, same-device finite `wp.float64`
+    `(3,)` Warp vector in charged rectangular mode. Scalar fields are
+    charged-spherical-only. P1 validates but does not resolve either form for
+    execution.
 - [x] How strong is zero-charge fallback parity?
-  - Decision: require bitwise-identical same-device neutral coefficients,
-    survivor state, and final RNG state when streams begin identically. Branch
-    directly to E6-F3 before charged arithmetic.
+  - Decision: P1 leaves all execution neutral, so matched zero-charge charged
+    and neutral calls have exact particle and final-RNG equality. Future
+    charged arithmetic must preserve this fallback.
 - [x] Which deterministic and statistical bounds cover the charged matrix?
   - Decision: test 2 nm, 50 nm, 1 micrometer, and 50 micrometer strata. Full
     CPU/Warp coefficients use `rtol=1e-6`, `atol=0`; reused/component helpers
