@@ -96,6 +96,30 @@ def spherical_wall_loss_coefficient_wp(
         dynamic_viscosity,
         gas_constant,
     )
+    return spherical_wall_loss_coefficient_from_transport_wp(
+        wall_eddy_diffusivity,
+        particle_radius,
+        particle_density,
+        temperature,
+        chamber_radius,
+        dynamic_viscosity,
+        mean_free_path,
+        boltzmann_constant,
+    )
+
+
+@wp.func
+def spherical_wall_loss_coefficient_from_transport_wp(
+    wall_eddy_diffusivity: wp.float64,
+    particle_radius: wp.float64,
+    particle_density: wp.float64,
+    temperature: wp.float64,
+    chamber_radius: wp.float64,
+    dynamic_viscosity: wp.float64,
+    mean_free_path: wp.float64,
+    boltzmann_constant: wp.float64,
+) -> wp.float64:
+    """Calculate a spherical coefficient from precomputed gas transport."""
     knudsen_number = knudsen_number_wp(mean_free_path, particle_radius)
     slip_correction = cunningham_slip_correction_wp(knudsen_number)
     aerodynamic_mobility = aerodynamic_mobility_wp(
@@ -183,6 +207,34 @@ def rectangle_wall_loss_coefficient_wp(
         dynamic_viscosity,
         gas_constant,
     )
+    return rectangle_wall_loss_coefficient_from_transport_wp(
+        wall_eddy_diffusivity,
+        particle_radius,
+        particle_density,
+        temperature,
+        chamber_length,
+        chamber_width,
+        chamber_height,
+        dynamic_viscosity,
+        mean_free_path,
+        boltzmann_constant,
+    )
+
+
+@wp.func
+def rectangle_wall_loss_coefficient_from_transport_wp(
+    wall_eddy_diffusivity: wp.float64,
+    particle_radius: wp.float64,
+    particle_density: wp.float64,
+    temperature: wp.float64,
+    chamber_length: wp.float64,
+    chamber_width: wp.float64,
+    chamber_height: wp.float64,
+    dynamic_viscosity: wp.float64,
+    mean_free_path: wp.float64,
+    boltzmann_constant: wp.float64,
+) -> wp.float64:
+    """Calculate a rectangular coefficient from precomputed gas transport."""
     knudsen_number = knudsen_number_wp(mean_free_path, particle_radius)
     slip_correction = cunningham_slip_correction_wp(knudsen_number)
     aerodynamic_mobility = aerodynamic_mobility_wp(
@@ -447,6 +499,30 @@ def _electric_field_drift_wp(
         ref_temperature,
         sutherland_constant,
     )
+    return _electric_field_drift_from_viscosity_wp(
+        particle_radius,
+        particle_charge,
+        resolved_electric_field,
+        geometry_scale,
+        elementary_charge_value,
+        viscosity,
+    )
+
+
+@wp.func
+def _electric_field_drift_from_viscosity_wp(
+    particle_radius: wp.float64,
+    particle_charge: wp.float64,
+    resolved_electric_field: wp.float64,
+    geometry_scale: wp.float64,
+    elementary_charge_value: wp.float64,
+    viscosity: wp.float64,
+) -> wp.float64:
+    """Calculate signed electric-field drift from precomputed viscosity."""
+    if particle_charge == wp.float64(
+        0.0
+    ) or resolved_electric_field == wp.float64(0.0):
+        return wp.float64(0.0)
     diameter = wp.float64(2.0) * wp.max(
         particle_radius,
         _CHARGED_DRIFT_LOWER_GUARD,

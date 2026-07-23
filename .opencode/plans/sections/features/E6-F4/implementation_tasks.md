@@ -2,7 +2,7 @@
 
 ## GPU Physics
 
-- [ ] Inventory E6-F3 symbols and extend only its concrete wall-loss modules.
+- [x] Inventory E6-F3 symbols and extend only its concrete wall-loss modules.
 - [x] Add private fp64 Coulomb self-potential-ratio and image-charge helpers in
   `particula/gpu/dynamics/wall_loss_funcs.py`, matching the CPU self-pair
   ratio floor, absolute value, exponent clipping, and zero-charge identity.
@@ -20,13 +20,13 @@
 - [x] Validate neutral/charged capability, potential/field form and ownership,
   particle schema, field-before-charge ordering, environment, time, and RNG
   sidecar before allocation or mutation.
-- [x] Preserve the exact E6-F3 neutral computation and RNG path in P1; charged
-  physics is not yet executed.
-- [ ] Read charge without copying caller arrays or changing device ownership.
-- [ ] Reuse active-slot, stochastic survival, removal-clearing, and persistent-
+- [x] Preserve the exact E6-F3 neutral computation and RNG path while executing
+  charged physics only for nonzero-charge slots.
+- [x] Read charge without copying caller arrays or changing device ownership.
+- [x] Reuse active-slot, stochastic survival, removal-clearing, and persistent-
   RNG kernels; ensure removed slots clear every species mass, concentration,
   and charge while survivor fields retain identity and value.
-- [ ] Preserve exact zero-time and all-inactive no-op behavior, including no RNG
+- [x] Preserve exact zero-time and all-inactive no-op behavior, including no RNG
   advancement.
 
 ## Tooling / Tests
@@ -47,12 +47,12 @@
   predeclared inclusive exact-binomial bounds (4,096 observations per stratum);
   never compare NumPy and Warp draw order.
 - [x] Require Warp CPU and use clean optional CUDA skips.
-- [ ] Keep CPU wall-loss, E6-F3 neutral, coagulation RNG, and fixed-slot
+- [x] Keep CPU wall-loss, E6-F3 neutral, coagulation RNG, and fixed-slot
   regression suites green without lowering coverage or tolerances.
 
 ## Documentation
 
-- [ ] Document direct charged configuration, SI units, image-charge at zero
+- [x] Document direct charged configuration, SI units, image-charge at zero
   potential, field semantics, and neutral fallback.
-- [ ] Document caller-owned charge/RNG state and failure-before-mutation limits.
-- [ ] Publish focused validation commands and explicit supported/deferred scope.
+- [x] Document caller-owned charge/RNG state and failure-before-mutation limits.
+- [x] Publish focused validation commands and explicit supported/deferred scope.
