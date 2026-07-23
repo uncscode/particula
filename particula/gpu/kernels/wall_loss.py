@@ -468,7 +468,10 @@ def _wall_loss_removal_mask(
                 _REF_TEMPERATURE_STP,
                 _SUTHERLAND_CONSTANT,
             )
-        if not wp.isfinite(coefficient) or coefficient <= wp.float64(0.0):
+        if wp.isnan(coefficient) or coefficient <= wp.float64(0.0):
+            continue
+        if wp.isinf(coefficient):
+            removal_mask[box, particle] = wp.int32(1)
             continue
 
         if _should_remove_for_survival_draw(
@@ -522,10 +525,11 @@ def wall_loss_step_gpu(
     same-device ``uint32`` sidecar with shape ``(n_boxes,)`` remains
     caller-owned, advances in place only for eligible slots, and resets only
     when ``initialize_rng=True``. Eligible slots have positive concentration,
-    usable positive mass and derived transport properties, and a finite
-    positive wall-loss coefficient. Zero time and pre-launch validation
-    failures leave supplied state unchanged. Rollback is not promised after a
-    mutation kernel has launched.
+    usable positive mass and derived transport properties, and a positive
+    non-NaN wall-loss coefficient. An infinite positive coefficient causes a
+    deterministic removal without consuming RNG state. Zero time and
+    pre-launch validation failures leave supplied state unchanged. Rollback is
+    not promised after a mutation kernel has launched.
 
     Args:
         particles: Caller-owned fixed-shape ``WarpParticleData``-like object.

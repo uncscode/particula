@@ -669,6 +669,48 @@ def test_large_time_step_removes_only_eligible_slots(geometry: str) -> None:
     npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
 
 
+@pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
+def test_positive_infinite_coefficient_removes_without_advancing_rng(
+    geometry: str,
+) -> None:
+    """An overflowing valid coefficient selects removal without an RNG draw."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    tiny_dimension = np.nextafter(0.0, 1.0)
+    config = (
+        NeutralWallLossConfig("spherical", 0.01, chamber_radius=tiny_dimension)
+        if geometry == "spherical"
+        else NeutralWallLossConfig(
+            "rectangular",
+            0.01,
+            chamber_dimensions=(tiny_dimension, 1.0, 1.0),
+        )
+    )
+    particles = _particles()
+    states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, states)
+
+    returned = wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        1.0,
+        config=config,
+        rng_states=states,
+    )
+
+    assert returned is particles
+    for box, particle in np.argwhere(snapshot["concentration"][1] > 0.0):
+        npt.assert_array_equal(particles.masses.numpy()[box, particle], 0.0)
+        assert particles.concentration.numpy()[box, particle] == 0.0
+        assert particles.charge.numpy()[box, particle] == 0.0
+    npt.assert_array_equal(states.numpy(), snapshot["rng_states"][1])
+    npt.assert_array_equal(particles.density.numpy(), snapshot["density"][1])
+    npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
+
+
 def test_zero_survival_removes_an_exact_zero_draw() -> None:
     """An exact-zero draw selects removal when survival probability is zero."""
     wp = _warp()
@@ -1026,6 +1068,41 @@ def test_all_ineligible_positive_time_preserves_rng_state() -> None:
     )
     assert returned is particles
     _assert_snapshot_unchanged(particles, snapshot, states)
+
+
+@pytest.mark.stochastic
+def test_all_ineligible_positive_time_explicitly_resets_rng_state() -> None:
+    """An explicit reset initializes state without changing ineligible slots."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import _initialize_rng_states
+
+    particles = _particles()
+    particles.concentration = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
+    states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    particle_snapshot = _snapshot(particles)
+    expected_states = wp.empty(2, dtype=wp.uint32, device="cpu")
+    wp.launch(
+        _initialize_rng_states,
+        dim=2,
+        inputs=[41, expected_states],
+        device="cpu",
+    )
+
+    returned = wall_loss_step_gpu(
+        particles,
+        298.15,
+        101325.0,
+        1.0,
+        config=_config(),
+        rng_seed=41,
+        rng_states=states,
+        initialize_rng=True,
+    )
+
+    assert returned is particles
+    _assert_snapshot_unchanged(particles, particle_snapshot)
+    npt.assert_array_equal(states.numpy(), expected_states.numpy())
 
 
 @pytest.mark.stochastic
