@@ -17,13 +17,19 @@ wp = pytest.importorskip("warp")
 from particula.gpu.properties.particle_properties import (  # noqa: E402
     aerodynamic_mobility_wp,
     cunningham_slip_correction_wp,
+    debye_1_wp,
+    diffusion_coefficient_wp,
+    effective_density_wp,
     friction_factor_wp,
     kelvin_radius_wp,
     kelvin_term_wp,
     knudsen_number_wp,
     mean_thermal_speed_wp,
     partial_pressure_delta_wp,
+    particle_radius_from_volume_wp,
+    settling_velocity_stokes_from_transport_wp,
     vapor_transition_correction_wp,
+    x_coth_x_wp,
 )
 from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
 from particula.particles.properties.aerodynamic_mobility_module import (  # noqa: E402
@@ -55,6 +61,7 @@ from particula.particles.properties.vapor_correction_module import (  # noqa: E4
 from particula.util.constants import (  # noqa: E402
     BOLTZMANN_CONSTANT,
     GAS_CONSTANT,
+    STANDARD_GRAVITY,
 )
 
 
@@ -245,6 +252,61 @@ def _partial_pressure_delta_kernel(
         partial_pressures_gas[tid],
         partial_pressures_particle[tid],
         kelvin_terms[tid],
+    )
+
+
+@wp.kernel
+def _debye_kernel(values: Any, result: Any) -> None:
+    """Evaluate the Debye geometry factor for each dimensionless input."""
+    tid = wp.tid()
+    result[tid] = debye_1_wp(values[tid])
+
+
+@wp.kernel
+def _x_coth_x_kernel(values: Any, result: Any) -> None:
+    """Evaluate the rectangular wall-loss geometry factor for each input."""
+    tid = wp.tid()
+    result[tid] = x_coth_x_wp(values[tid])
+
+
+@wp.kernel
+def _radius_kernel(values: Any, result: Any) -> None:
+    """Evaluate radii from particle volumes."""
+    tid = wp.tid()
+    result[tid] = particle_radius_from_volume_wp(values[tid])
+
+
+@wp.kernel
+def _diffusion_kernel(temperatures: Any, mobilities: Any, result: Any) -> None:
+    """Evaluate Stokes-Einstein diffusion coefficients."""
+    tid = wp.tid()
+    result[tid] = diffusion_coefficient_wp(
+        temperatures[tid], mobilities[tid], wp.float64(BOLTZMANN_CONSTANT)
+    )
+
+
+@wp.kernel
+def _effective_density_kernel(masses: Any, volumes: Any, result: Any) -> None:
+    """Evaluate effective mixture densities from scalar total lanes."""
+    tid = wp.tid()
+    result[tid] = effective_density_wp(masses[tid], volumes[tid])
+
+
+@wp.kernel
+def _settling_from_transport_kernel(
+    radii: Any,
+    densities: Any,
+    viscosities: Any,
+    mean_free_paths: Any,
+    result: Any,
+) -> None:
+    """Evaluate Stokes settling velocity from supplied transport lanes."""
+    tid = wp.tid()
+    result[tid] = settling_velocity_stokes_from_transport_wp(
+        radii[tid],
+        densities[tid],
+        viscosities[tid],
+        mean_free_paths[tid],
     )
 
 
@@ -676,3 +738,229 @@ def test_partial_pressure_delta_matches_numpy(device: str) -> None:
         rtol=1e-10,
         atol=1e-12,
     )
+
+
+def _evaluate_scalar_kernel(
+    kernel: Any, values: np.ndarray, device: str
+) -> np.ndarray:
+    """Evaluate a scalar Warp property kernel and synchronize before readback."""
+    values_wp = wp.array(values, dtype=wp.float64, device=device)
+    result_wp = wp.zeros(len(values), dtype=wp.float64, device=device)
+    wp.launch(
+        kernel,
+        dim=len(values),
+        inputs=[values_wp],
+        outputs=[result_wp],
+        device=device,
+    )
+    wp.synchronize()
+    return result_wp.numpy()
+
+
+def test_debye_1_matches_independent_quadrature(device: str) -> None:
+    """Ensure Debye geometry factor is accurate across branch boundaries."""
+    from scipy.integrate import quad
+
+    values = np.array(
+        [
+            0.0,
+            1.0e-12,
+            np.nextafter(1.0, 0.0),
+            1.0,
+            np.nextafter(1.0, np.inf),
+            5.0,
+            np.nextafter(20.0, 0.0),
+            20.0,
+            np.nextafter(20.0, np.inf),
+        ],
+        dtype=np.float64,
+    )
+
+    def integrand(value: float) -> float:
+        return 1.0 if value == 0.0 else value / np.expm1(value)
+
+    expected = np.array(
+        [
+            1.0
+            if value == 0.0
+            else (
+                np.pi**2 / (6.0 * value)
+                if value >= 20.0
+                else quad(integrand, 0.0, value)[0] / value
+            )
+            for value in values
+        ],
+        dtype=np.float64,
+    )
+    result = _evaluate_scalar_kernel(_debye_kernel, values, device)
+    assert np.all(np.isfinite(result))
+    npt.assert_allclose(result, expected, rtol=1e-9, atol=1e-12)
+
+
+def test_debye_1_invalid_inputs_return_exact_zero(device: str) -> None:
+    """Ensure Debye invalid-domain inputs take the safe sentinel branch."""
+    values = np.array([-1.0, np.nan, np.inf, -np.inf], dtype=np.float64)
+    npt.assert_array_equal(
+        _evaluate_scalar_kernel(_debye_kernel, values, device), 0.0
+    )
+
+
+def test_slip_correction_safe_domain_contract(device: str) -> None:
+    """Ensure Cunningham slip has its specified exact safe-domain limits."""
+    values = np.array(
+        [0.0, 1.0e-300, 1.0, 1.0e300, -1.0, np.nan, np.inf, -np.inf],
+        dtype=np.float64,
+    )
+    result = _evaluate_scalar_kernel(_slip_correction_kernel, values, device)
+    assert result[0] == 1.0
+    assert np.all(np.isfinite(result[:4]))
+    npt.assert_array_equal(result[4:], 0.0)
+
+
+def test_x_coth_x_matches_series_and_direct_reference(device: str) -> None:
+    """Ensure rectangular geometry factor preserves limits and switch accuracy."""
+    threshold = 1.0e-3
+    values = np.array(
+        [
+            0.0,
+            1.0e-15,
+            np.nextafter(threshold, 0.0),
+            threshold,
+            np.nextafter(threshold, np.inf),
+            0.1,
+            10.0,
+        ],
+        dtype=np.float64,
+    )
+    expected = np.ones_like(values)
+    nonzero = values != 0.0
+    expected[nonzero] = values[nonzero] / np.tanh(values[nonzero])
+    result = _evaluate_scalar_kernel(_x_coth_x_kernel, values, device)
+    npt.assert_allclose(result, expected, rtol=1e-12, atol=0.0)
+    invalid = np.array([-1.0, np.nan, np.inf, -np.inf], dtype=np.float64)
+    npt.assert_array_equal(
+        _evaluate_scalar_kernel(_x_coth_x_kernel, invalid, device), 0.0
+    )
+
+
+def test_radius_and_diffusion_safe_contracts(device: str) -> None:
+    """Ensure relocated radius and diffusion primitives retain their contracts."""
+    volumes = np.array(
+        [0.0, 1.0e-30, 1.0e-18, -1.0, np.nan, np.inf], dtype=np.float64
+    )
+    radii = _evaluate_scalar_kernel(_radius_kernel, volumes, device)
+    expected_radii = np.array(
+        [
+            0.0,
+            (3e-30 / (4 * np.pi)) ** (1 / 3),
+            (3e-18 / (4 * np.pi)) ** (1 / 3),
+            0.0,
+            0.0,
+            0.0,
+        ],
+        dtype=np.float64,
+    )
+    npt.assert_allclose(radii, expected_radii, rtol=1e-12, atol=0.0)
+
+    temperatures = np.array([250.0, 298.15, 350.0], dtype=np.float64)
+    mobilities = np.array([1.0e8, 2.0e8, 3.0e8], dtype=np.float64)
+    temperature_wp = wp.array(temperatures, dtype=wp.float64, device=device)
+    mobility_wp = wp.array(mobilities, dtype=wp.float64, device=device)
+    result_wp = wp.zeros(3, dtype=wp.float64, device=device)
+    wp.launch(
+        _diffusion_kernel,
+        dim=3,
+        inputs=[temperature_wp, mobility_wp],
+        outputs=[result_wp],
+        device=device,
+    )
+    wp.synchronize()
+    npt.assert_allclose(
+        result_wp.numpy(),
+        BOLTZMANN_CONSTANT * temperatures * mobilities,
+        rtol=1e-12,
+        atol=0.0,
+    )
+
+
+def test_effective_density_safe_contract(device: str) -> None:
+    """Ensure moved effective density preserves finite and safe-zero behavior."""
+    masses = np.array(
+        [1.0e-18, 1.0e-308, 0.0, -1.0, np.nan, np.inf],
+        dtype=np.float64,
+    )
+    volumes = np.array(
+        [1.0e-21, 1.0e10, 1.0e-21, 1.0e-21, 1.0e-21, 1.0e-21],
+        dtype=np.float64,
+    )
+    expected = np.array([1000.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    result_wp = wp.zeros(len(masses), dtype=wp.float64, device=device)
+    wp.launch(
+        _effective_density_kernel,
+        dim=len(masses),
+        inputs=[
+            wp.array(masses, dtype=wp.float64, device=device),
+            wp.array(volumes, dtype=wp.float64, device=device),
+        ],
+        outputs=[result_wp],
+        device=device,
+    )
+    wp.synchronize()
+
+    npt.assert_allclose(result_wp.numpy(), expected, rtol=1e-12, atol=0.0)
+
+
+def test_settling_velocity_from_transport_matches_reference_and_safe_zero(
+    device: str,
+) -> None:
+    """Ensure moved transport-form settling velocity handles edge inputs."""
+    radii = np.array([1.0e-7, 2.0e-7, 0.0, -1.0, np.nan], dtype=np.float64)
+    densities = np.full(5, 1000.0, dtype=np.float64)
+    viscosities = np.full(5, 1.8e-5, dtype=np.float64)
+    mean_free_paths = np.full(5, 6.5e-8, dtype=np.float64)
+    knudsen = mean_free_paths[:2] / radii[:2]
+    slip = 1.0 + knudsen * (1.257 + 0.4 * np.exp(-1.1 / knudsen))
+    expected = np.zeros(5, dtype=np.float64)
+    expected[:2] = (
+        2.0
+        * radii[:2] ** 2
+        * densities[:2]
+        * slip
+        * STANDARD_GRAVITY
+        / (9.0 * viscosities[:2])
+    )
+    result_wp = wp.zeros(len(radii), dtype=wp.float64, device=device)
+    wp.launch(
+        _settling_from_transport_kernel,
+        dim=len(radii),
+        inputs=[
+            wp.array(radii, dtype=wp.float64, device=device),
+            wp.array(densities, dtype=wp.float64, device=device),
+            wp.array(viscosities, dtype=wp.float64, device=device),
+            wp.array(mean_free_paths, dtype=wp.float64, device=device),
+        ],
+        outputs=[result_wp],
+        device=device,
+    )
+    wp.synchronize()
+
+    observed = result_wp.numpy()
+    npt.assert_allclose(observed[:2], expected[:2], rtol=1e-12, atol=0.0)
+    npt.assert_array_equal(observed[2:], 0.0)
+
+
+def test_moved_helpers_have_properties_only_export_surface() -> None:
+    """Ensure neutral transport ownership is properties-only, not dynamics."""
+    import particula.gpu.dynamics as dynamics
+    import particula.gpu.properties as properties
+
+    names = (
+        "particle_radius_from_volume_wp",
+        "diffusion_coefficient_wp",
+        "effective_density_wp",
+        "settling_velocity_stokes_wp",
+        "settling_velocity_stokes_from_transport_wp",
+    )
+    for name in names:
+        assert hasattr(properties, name)
+        assert not hasattr(dynamics, name)

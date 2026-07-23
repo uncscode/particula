@@ -6,10 +6,19 @@ These functions mirror the NumPy implementations in
 
 import warp as wp
 
+from particula.gpu.properties.gas_properties import (
+    dynamic_viscosity_wp,
+    molecule_mean_free_path_wp,
+)
+from particula.util.constants import STANDARD_GRAVITY
+
 _PI = wp.constant(wp.float64(3.141592653589793))
 _CUNNINGHAM_CONSTANT = wp.constant(wp.float64(1.257))
 _CUNNINGHAM_EXPONENTIAL_SCALE = wp.constant(wp.float64(0.4))
 _CUNNINGHAM_EXPONENTIAL_RATE = wp.constant(wp.float64(1.1))
+_STANDARD_GRAVITY = wp.constant(wp.float64(STANDARD_GRAVITY))
+_MIN_NORMAL_FLOAT64 = wp.constant(wp.float64(2.2250738585072014e-308))
+_PI_SQUARED_OVER_SIX = wp.constant(wp.float64(1.6449340668482264))
 
 
 @wp.func
@@ -35,7 +44,7 @@ def knudsen_number_wp(
 def cunningham_slip_correction_wp(
     knudsen_number: wp.float64,
 ) -> wp.float64:
-    """Calculate the Cunningham slip correction factor.
+    """Calculate the Cunningham slip correction factor from Knudsen number.
 
     Port of
     ``particula.particles.properties.slip_correction_module.get_cunningham_slip_correction``.
@@ -44,8 +53,13 @@ def cunningham_slip_correction_wp(
         knudsen_number: Knudsen number (dimensionless).
 
     Returns:
-        Cunningham slip correction factor (dimensionless).
+        Cunningham slip correction factor (dimensionless). Exact zero returns
+        ``1.0``; negative or non-finite inputs return exact ``0.0``.
     """
+    if knudsen_number == wp.float64(0.0):
+        return wp.float64(1.0)
+    if not wp.isfinite(knudsen_number) or knudsen_number < wp.float64(0.0):
+        return wp.float64(0.0)
     return wp.float64(1.0) + knudsen_number * (
         _CUNNINGHAM_CONSTANT
         + _CUNNINGHAM_EXPONENTIAL_SCALE
@@ -53,6 +67,397 @@ def cunningham_slip_correction_wp(
             wp.float64(-1.0) * _CUNNINGHAM_EXPONENTIAL_RATE / knudsen_number
         )
     )
+
+
+@wp.func
+def particle_radius_from_volume_wp(total_volume: wp.float64) -> wp.float64:
+    """Calculate radius from positive finite spherical volume in SI units.
+
+    Computes ``(3 V / (4 pi))**(1/3)`` for volume ``V`` [m³]. Non-finite or
+    non-positive volumes return exact ``0.0`` before the cube root.
+    """
+    if not wp.isfinite(total_volume) or total_volume <= wp.float64(0.0):
+        return wp.float64(0.0)
+    return wp.pow(
+        wp.float64(3.0) * total_volume / (wp.float64(4.0) * _PI),
+        wp.float64(1.0) / wp.float64(3.0),
+    )
+
+
+@wp.func
+def diffusion_coefficient_wp(
+    temperature: wp.float64,
+    aerodynamic_mobility: wp.float64,
+    boltzmann_constant: wp.float64,
+) -> wp.float64:
+    """Calculate Stokes-Einstein diffusion ``D = k_B T B`` [m²/s]."""
+    return boltzmann_constant * temperature * aerodynamic_mobility
+
+
+@wp.func
+def effective_density_wp(
+    total_mass: wp.float64,
+    total_volume: wp.float64,
+) -> wp.float64:
+    """Calculate safe finite-positive mixture density from SI mass and volume.
+
+    Args:
+        total_mass: Total particle mass [kg].
+        total_volume: Total particle volume [m³].
+
+    Returns:
+        Effective mixture density [kg/m³], or exact ``0.0`` when an input or
+        result is non-finite, non-positive, or subnormal.
+    """
+    zero = wp.float64(0.0)
+    if (
+        not wp.isfinite(total_mass)
+        or total_mass <= zero
+        or not wp.isfinite(total_volume)
+        or total_volume <= zero
+    ):
+        return zero
+    density = total_mass / total_volume
+    if (
+        not wp.isfinite(density)
+        or density <= zero
+        or density < _MIN_NORMAL_FLOAT64
+    ):
+        return zero
+    return density
+
+
+@wp.func
+def settling_velocity_stokes_from_transport_wp(
+    particle_radius: wp.float64,
+    effective_density: wp.float64,
+    dynamic_viscosity: wp.float64,
+    mean_free_path: wp.float64,
+) -> wp.float64:
+    """Calculate safe Stokes settling velocity from precomputed transport.
+
+    Applies ``v = 2 r² rho C_c g / (9 mu)`` using SI quantities and standard
+    gravity.
+
+    Args:
+        particle_radius: Particle radius [m].
+        effective_density: Effective particle density [kg/m³].
+        dynamic_viscosity: Dynamic gas viscosity [Pa s].
+        mean_free_path: Molecular mean free path [m].
+
+    Returns:
+        Settling velocity [m/s], or exact ``0.0`` for invalid, non-finite,
+        non-positive, or subnormal calculations.
+
+    References:
+        Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry and
+        Physics* (3rd ed.). John Wiley & Sons.
+    """
+    zero = wp.float64(0.0)
+    if (
+        not wp.isfinite(particle_radius)
+        or particle_radius <= zero
+        or not wp.isfinite(effective_density)
+        or effective_density <= zero
+        or not wp.isfinite(dynamic_viscosity)
+        or dynamic_viscosity <= zero
+        or not wp.isfinite(mean_free_path)
+        or mean_free_path <= zero
+    ):
+        return zero
+    knudsen_number = knudsen_number_wp(mean_free_path, particle_radius)
+    if not wp.isfinite(knudsen_number) or knudsen_number <= zero:
+        return zero
+    slip_correction = cunningham_slip_correction_wp(knudsen_number)
+    radius_squared = particle_radius * particle_radius
+    numerator = (
+        wp.float64(2.0)
+        * radius_squared
+        * effective_density
+        * slip_correction
+        * _STANDARD_GRAVITY
+    )
+    velocity = numerator / (wp.float64(9.0) * dynamic_viscosity)
+    if (
+        not wp.isfinite(slip_correction)
+        or slip_correction <= zero
+        or not wp.isfinite(radius_squared)
+        or radius_squared <= zero
+        or not wp.isfinite(numerator)
+        or numerator <= zero
+        or not wp.isfinite(velocity)
+        or velocity <= zero
+        or velocity < _MIN_NORMAL_FLOAT64
+    ):
+        return zero
+    return velocity
+
+
+@wp.func
+def settling_velocity_stokes_wp(
+    particle_radius: wp.float64,
+    effective_density: wp.float64,
+    temperature: wp.float64,
+    pressure: wp.float64,
+    gas_constant: wp.float64,
+    molecular_weight_air: wp.float64,
+    ref_viscosity: wp.float64,
+    ref_temperature: wp.float64,
+    sutherland_constant: wp.float64,
+) -> wp.float64:
+    """Calculate safe Cunningham-corrected Stokes settling velocity [m/s].
+
+    Derives viscosity, mean free path, Knudsen number, and slip correction
+    from the supplied SI gas state before applying the Stokes equation.
+
+    Args:
+        particle_radius: Particle radius [m].
+        effective_density: Effective particle density [kg/m³].
+        temperature: Gas temperature [K].
+        pressure: Gas pressure [Pa].
+        gas_constant: Universal gas constant [J/(mol K)].
+        molecular_weight_air: Air molar mass [kg/mol].
+        ref_viscosity: Reference dynamic viscosity [Pa s].
+        ref_temperature: Reference temperature [K].
+        sutherland_constant: Sutherland temperature constant [K].
+
+    Returns:
+        Settling velocity [m/s], or exact ``0.0`` for invalid calculations.
+
+    References:
+        Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry and
+        Physics* (3rd ed.). John Wiley & Sons.
+    """
+    zero = wp.float64(0.0)
+    if (
+        not wp.isfinite(particle_radius)
+        or particle_radius <= zero
+        or not wp.isfinite(effective_density)
+        or effective_density <= zero
+        or not wp.isfinite(temperature)
+        or temperature <= zero
+        or not wp.isfinite(pressure)
+        or pressure <= zero
+        or not wp.isfinite(gas_constant)
+        or gas_constant <= zero
+        or not wp.isfinite(molecular_weight_air)
+        or molecular_weight_air <= zero
+        or not wp.isfinite(ref_viscosity)
+        or ref_viscosity <= zero
+        or not wp.isfinite(ref_temperature)
+        or ref_temperature <= zero
+        or not wp.isfinite(sutherland_constant)
+        or sutherland_constant <= zero
+    ):
+        return zero
+    dynamic_viscosity = dynamic_viscosity_wp(
+        temperature, ref_viscosity, ref_temperature, sutherland_constant
+    )
+    mean_free_path = molecule_mean_free_path_wp(
+        molecular_weight_air,
+        temperature,
+        pressure,
+        dynamic_viscosity,
+        gas_constant,
+    )
+    if not wp.isfinite(dynamic_viscosity) or dynamic_viscosity <= zero:
+        return zero
+    if not wp.isfinite(mean_free_path) or mean_free_path <= zero:
+        return zero
+    return settling_velocity_stokes_from_transport_wp(
+        particle_radius, effective_density, dynamic_viscosity, mean_free_path
+    )
+
+
+@wp.func
+def _debye_integrand_wp(value: wp.float64) -> wp.float64:
+    """Evaluate the removable Debye integrand ``t / (exp(t) - 1)``."""
+    if value == wp.float64(0.0):
+        return wp.float64(1.0)
+    return value / (wp.exp(value) - wp.float64(1.0))
+
+
+@wp.func
+def _debye_gauss_pair_wp(
+    half_x: wp.float64,
+    midpoint: wp.float64,
+    node: wp.float64,
+    weight: wp.float64,
+) -> wp.float64:
+    """Return one symmetric Gauss--Legendre pair contribution."""
+    return weight * (
+        _debye_integrand_wp(midpoint - half_x * node)
+        + _debye_integrand_wp(midpoint + half_x * node)
+    )
+
+
+@wp.func
+def debye_1_wp(x: wp.float64) -> wp.float64:
+    """Calculate dimensionless Debye function ``D_1(x)``.
+
+    Computes ``integral(t / (exp(t) - 1), 0, x) / x``. The zero limit is
+    exactly ``1.0``; negative and non-finite inputs return exact ``0.0``.
+    A Bernoulli series, 32-node Gauss--Legendre quadrature, and large-x
+    asymptote are used over ``x <= 1``, ``1 < x < 20``, and ``x >= 20``.
+    This factor follows Crump, Flagan, and Seinfeld wall-loss formulations.
+    """
+    zero = wp.float64(0.0)
+    if x == zero:
+        return wp.float64(1.0)
+    if not wp.isfinite(x) or x < zero:
+        return zero
+    if x <= wp.float64(1.0):
+        x2 = x * x
+        return (
+            wp.float64(1.0)
+            - x / wp.float64(4.0)
+            + x2 / wp.float64(36.0)
+            - x2 * x2 / wp.float64(3600.0)
+            + x2 * x2 * x2 / wp.float64(211680.0)
+            - x2 * x2 * x2 * x2 / wp.float64(10886400.0)
+            + x2 * x2 * x2 * x2 * x2 / wp.float64(526901760.0)
+            - wp.float64(691.0)
+            * x2
+            * x2
+            * x2
+            * x2
+            * x2
+            * x2
+            / wp.float64(1699976678400.0)
+            + wp.float64(7.0)
+            * x2
+            * x2
+            * x2
+            * x2
+            * x2
+            * x2
+            * x2
+            / wp.float64(7846048170000.0)
+        )
+    if x >= wp.float64(20.0):
+        return _PI_SQUARED_OVER_SIX / x
+    half_x = x / wp.float64(2.0)
+    integral = _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.0483076656877383),
+        wp.float64(0.0965400885147278),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.1444719615827965),
+        wp.float64(0.0956387200792749),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.2392873622521371),
+        wp.float64(0.0938443990808046),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.3318686022821277),
+        wp.float64(0.0911738786957639),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.4213512761306353),
+        wp.float64(0.0876520930044038),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.5068999089322294),
+        wp.float64(0.0833119242269468),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.5877157572407623),
+        wp.float64(0.0781938957870703),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.6630442669302152),
+        wp.float64(0.0723457941088485),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.7321821187402897),
+        wp.float64(0.0658222227763618),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.7944837959679424),
+        wp.float64(0.0586840934785355),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.84936761373257),
+        wp.float64(0.0509980592623762),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.8963211557660521),
+        wp.float64(0.0428358980222267),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.9349060759377397),
+        wp.float64(0.0342738629130214),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.9647622555875064),
+        wp.float64(0.0253920653092621),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.9856115115452684),
+        wp.float64(0.0162743947309057),
+    )
+    integral += _debye_gauss_pair_wp(
+        half_x,
+        half_x,
+        wp.float64(0.9972638618494816),
+        wp.float64(0.0070186100094701),
+    )
+    return half_x * integral / x
+
+
+@wp.func
+def x_coth_x_wp(x: wp.float64) -> wp.float64:
+    """Calculate dimensionless ``x / tanh(x)`` with its zero limit.
+
+    The zero limit is exactly ``1.0``; negative and non-finite inputs return
+    exact ``0.0``. A small-x series avoids cancellation. This is the Crump,
+    Flagan, and Seinfeld rectangular wall-loss geometry factor.
+    """
+    zero = wp.float64(0.0)
+    if x == zero:
+        return wp.float64(1.0)
+    if not wp.isfinite(x) or x < zero:
+        return zero
+    if x <= wp.float64(1.0e-3):
+        x2 = x * x
+        return (
+            wp.float64(1.0)
+            + x2 / wp.float64(3.0)
+            - x2 * x2 / wp.float64(45.0)
+            + wp.float64(2.0) * x2 * x2 * x2 / wp.float64(945.0)
+        )
+    return x / wp.tanh(x)
 
 
 @wp.func

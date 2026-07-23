@@ -49,11 +49,9 @@ except ImportError as exc:  # pragma: no cover - handled via import guards
 from particula.gpu.dynamics.condensation_funcs import (
     _mass_transfer_rate_latent_heat_wp,
     _thermal_conductivity_wp,
-    diffusion_coefficient_wp,
     effective_surface_tension_wp,
     first_order_mass_transport_k_wp,
     mass_transfer_rate_wp,
-    particle_radius_from_volume_wp,
     water_activity_ideal_wp,
     water_activity_kappa_wp,
 )
@@ -76,9 +74,11 @@ from particula.gpu.properties.gas_properties import (
 from particula.gpu.properties.particle_properties import (
     aerodynamic_mobility_wp,
     cunningham_slip_correction_wp,
+    diffusion_coefficient_wp,
     kelvin_radius_wp,
     kelvin_term_wp,
     knudsen_number_wp,
+    particle_radius_from_volume_wp,
     vapor_transition_correction_wp,
 )
 

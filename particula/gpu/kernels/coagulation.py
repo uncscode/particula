@@ -76,16 +76,11 @@ from particula.gpu.dynamics.coagulation_funcs import (
     brownian_diffusivity_wp,
     brownian_kernel_pair_wp,
     charged_hard_sphere_wp,
-    effective_density_wp,
     g_collection_term_wp,
     kinematic_viscosity_wp,
     particle_mean_free_path_wp,
     sedimentation_sp2016_pair_rate_wp,
-    settling_velocity_stokes_from_transport_wp,
     turbulent_shear_st1956_pair_rate_wp,
-)
-from particula.gpu.dynamics.condensation_funcs import (
-    particle_radius_from_volume_wp,
 )
 from particula.gpu.kernels._coagulation_config import (
     _COAGULATION_MECHANISM_FLAGS,  # noqa: F401
@@ -117,8 +112,11 @@ from particula.gpu.properties.gas_properties import (
 from particula.gpu.properties.particle_properties import (
     aerodynamic_mobility_wp,
     cunningham_slip_correction_wp,
+    effective_density_wp,
     knudsen_number_wp,
     mean_thermal_speed_wp,
+    particle_radius_from_volume_wp,
+    settling_velocity_stokes_from_transport_wp,
 )
 
 # These configuration APIs remain publicly owned by this concrete module even

@@ -17,27 +17,6 @@ _THERMAL_CONDUCTIVITY_GRADIENT = wp.constant(wp.float64(0.071))
 
 
 @wp.func
-def diffusion_coefficient_wp(
-    temperature: wp.float64,
-    aerodynamic_mobility: wp.float64,
-    boltzmann_constant: wp.float64,
-) -> wp.float64:
-    """Calculate the diffusion coefficient via Stokes-Einstein.
-
-    Port of ``particula.particles.properties.diffusion_coefficient``.
-
-    Args:
-        temperature: Gas temperature [K].
-        aerodynamic_mobility: Aerodynamic mobility [m²/s].
-        boltzmann_constant: Boltzmann constant [J/K].
-
-    Returns:
-        Diffusion coefficient [m²/s].
-    """
-    return boltzmann_constant * temperature * aerodynamic_mobility
-
-
-@wp.func
 def first_order_mass_transport_k_wp(
     particle_radius: wp.float64,
     vapor_transition: wp.float64,
@@ -231,22 +210,6 @@ def _mass_transfer_rate_latent_heat_wp(
     if not wp.isfinite(corrected_rate):
         return isothermal_rate
     return corrected_rate
-
-
-@wp.func
-def particle_radius_from_volume_wp(total_volume: wp.float64) -> wp.float64:
-    """Compute particle radius from total volume.
-
-    Args:
-        total_volume: Particle total volume [m^3].
-
-    Returns:
-        Particle radius [m].
-    """
-    pi_value = wp.float64(3.141592653589793)
-    numerator = wp.float64(3.0) * total_volume
-    denominator = wp.float64(4.0) * pi_value
-    return wp.pow(numerator / denominator, wp.float64(1.0) / wp.float64(3.0))
 
 
 @wp.func

@@ -53,7 +53,6 @@ def _probe_factory() -> Any:  # noqa: C901
         g_collection_term_wp,
         kinematic_viscosity_wp,
         particle_mean_free_path_wp,
-        settling_velocity_stokes_from_transport_wp,
     )
     from particula.gpu.kernels.coagulation import (
         _total_pair_rate,
@@ -68,6 +67,7 @@ def _probe_factory() -> Any:  # noqa: C901
         cunningham_slip_correction_wp,
         knudsen_number_wp,
         mean_thermal_speed_wp,
+        settling_velocity_stokes_from_transport_wp,
     )
     from particula.util import constants
 

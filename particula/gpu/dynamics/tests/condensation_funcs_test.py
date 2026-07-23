@@ -41,7 +41,6 @@ if wp is not None:
         _mass_transfer_rate_latent_heat_wp,
         _thermal_conductivity_wp,
         _thermal_resistance_factor_wp,
-        diffusion_coefficient_wp,
         effective_surface_tension_wp,
         first_order_mass_transport_k_wp,
         mass_transfer_rate_wp,
@@ -56,6 +55,7 @@ if wp is not None:
     from particula.gpu.properties.particle_properties import (  # noqa: E402
         aerodynamic_mobility_wp,
         cunningham_slip_correction_wp,
+        diffusion_coefficient_wp,
         kelvin_radius_wp,
         kelvin_term_wp,
         knudsen_number_wp,

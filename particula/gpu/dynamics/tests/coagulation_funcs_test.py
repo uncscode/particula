@@ -36,13 +36,11 @@ if wp is not None:
         coulomb_kinetic_limit_wp,
         coulomb_potential_ratio_wp,
         diffusive_knudsen_number_wp,
-        effective_density_wp,
         g_collection_term_wp,
         kinematic_viscosity_wp,
         particle_mean_free_path_wp,
         reduced_value_wp,
         sedimentation_sp2016_pair_rate_wp,
-        settling_velocity_stokes_wp,
         turbulent_shear_st1956_pair_rate_wp,
     )
     from particula.gpu.properties.gas_properties import (  # noqa: E402
@@ -52,8 +50,10 @@ if wp is not None:
     from particula.gpu.properties.particle_properties import (  # noqa: E402
         aerodynamic_mobility_wp,
         cunningham_slip_correction_wp,
+        effective_density_wp,
         knudsen_number_wp,
         mean_thermal_speed_wp,
+        settling_velocity_stokes_wp,
     )
     from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
     from particula.util.constants import (  # noqa: E402
