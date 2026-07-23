@@ -18,6 +18,7 @@ SUPPORTED_STEP_SYMBOLS = (
     "coagulation_step_gpu",
     "condensation_step_gpu",
     "dilution_step_gpu",
+    "wall_loss_step_gpu",
 )
 
 INTERNAL_HELPER_SYMBOLS = (
@@ -49,11 +50,13 @@ def test_public_kernels_package_exports_supported_step_function(
     from particula.gpu.kernels.coagulation import coagulation_step_gpu
     from particula.gpu.kernels.condensation import condensation_step_gpu
     from particula.gpu.kernels.dilution import dilution_step_gpu
+    from particula.gpu.kernels.wall_loss import wall_loss_step_gpu
 
     concrete_symbol_map = {
         "coagulation_step_gpu": coagulation_step_gpu,
         "condensation_step_gpu": condensation_step_gpu,
         "dilution_step_gpu": dilution_step_gpu,
+        "wall_loss_step_gpu": wall_loss_step_gpu,
     }
 
     assert getattr(kernels, symbol_name) is concrete_symbol_map[symbol_name]
@@ -69,6 +72,7 @@ def test_kernels_package_all_is_exact_supported_surface() -> None:
         "coagulation_step_gpu",
         "condensation_step_gpu",
         "dilution_step_gpu",
+        "wall_loss_step_gpu",
     ]
 
 
