@@ -1,0 +1,336 @@
+"""CPU parity tests for Warp neutral wall-loss coefficient helpers."""
+
+from typing import Any
+
+import numpy as np
+import numpy.testing as npt
+import pytest
+
+wp: Any = None
+try:
+    import warp as wp
+except ImportError:
+    pass
+
+pytestmark = (
+    [pytest.mark.warp, pytest.mark.skip(reason="Warp not installed")]
+    if wp is None
+    else pytest.mark.warp
+)
+
+if wp is not None:
+    from particula.dynamics.properties.wall_loss_coefficient import (  # noqa: E402
+        get_rectangle_wall_loss_coefficient_via_system_state,
+        get_spherical_wall_loss_coefficient_via_system_state,
+    )
+    from particula.gpu.dynamics.wall_loss_funcs import (  # noqa: E402
+        rectangle_wall_loss_coefficient_wp,
+        spherical_wall_loss_coefficient_wp,
+    )
+    from particula.gpu.tests.cuda_availability import warp_devices  # noqa: E402
+    from particula.util.constants import (  # noqa: E402
+        BOLTZMANN_CONSTANT,
+        GAS_CONSTANT,
+        MOLECULAR_WEIGHT_AIR,
+        REF_TEMPERATURE_STP,
+        REF_VISCOSITY_AIR_STP,
+        SUTHERLAND_CONSTANT,
+    )
+
+
+def _warp_kernel(function):
+    """Decorate kernels only when Warp is available."""
+    if wp is None:
+        return function
+    return wp.kernel(function)
+
+
+def _available_warp_devices() -> list[Any]:
+    """Return collection-safe Warp device parameters."""
+    if wp is None:
+        return ["cpu"]
+    return [
+        pytest.param(candidate, marks=pytest.mark.cuda)
+        if candidate == "cuda"
+        else candidate
+        for candidate in warp_devices(wp)
+    ]
+
+
+@_warp_kernel
+def _spherical_wall_loss_kernel(
+    eddy_diffusivities: Any,
+    particle_radii: Any,
+    particle_densities: Any,
+    temperatures: Any,
+    pressures: Any,
+    chamber_radii: Any,
+    boltzmann_constant: wp.float64,
+    gas_constant: wp.float64,
+    molecular_weight_air: wp.float64,
+    ref_viscosity: wp.float64,
+    ref_temperature: wp.float64,
+    sutherland_constant: wp.float64,
+    result: Any,
+) -> None:
+    """Calculate one spherical wall-loss coefficient per lane."""
+    tid = wp.tid()
+    result[tid] = spherical_wall_loss_coefficient_wp(
+        eddy_diffusivities[tid],
+        particle_radii[tid],
+        particle_densities[tid],
+        temperatures[tid],
+        pressures[tid],
+        chamber_radii[tid],
+        boltzmann_constant,
+        gas_constant,
+        molecular_weight_air,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+    )
+
+
+@_warp_kernel
+def _rectangle_wall_loss_kernel(
+    eddy_diffusivities: Any,
+    particle_radii: Any,
+    particle_densities: Any,
+    temperatures: Any,
+    pressures: Any,
+    chamber_lengths: Any,
+    chamber_widths: Any,
+    chamber_heights: Any,
+    boltzmann_constant: wp.float64,
+    gas_constant: wp.float64,
+    molecular_weight_air: wp.float64,
+    ref_viscosity: wp.float64,
+    ref_temperature: wp.float64,
+    sutherland_constant: wp.float64,
+    result: Any,
+) -> None:
+    """Calculate one rectangular wall-loss coefficient per lane."""
+    tid = wp.tid()
+    result[tid] = rectangle_wall_loss_coefficient_wp(
+        eddy_diffusivities[tid],
+        particle_radii[tid],
+        particle_densities[tid],
+        temperatures[tid],
+        pressures[tid],
+        chamber_lengths[tid],
+        chamber_widths[tid],
+        chamber_heights[tid],
+        boltzmann_constant,
+        gas_constant,
+        molecular_weight_air,
+        ref_viscosity,
+        ref_temperature,
+        sutherland_constant,
+    )
+
+
+@pytest.fixture(params=_available_warp_devices())
+def device(request) -> str:
+    """Provide each available Warp device."""
+    return request.param
+
+
+def _state_lanes() -> tuple[np.ndarray, ...]:
+    """Return diffusion- and gravity-dominated fp64 state lanes."""
+    return (
+        np.array([1.0e-3, 2.5e-3, 8.0e-4], dtype=np.float64),
+        np.array([5.0e-9, 1.0e-7, 3.0e-6], dtype=np.float64),
+        np.array([950.0, 1200.0, 1800.0], dtype=np.float64),
+        np.array([285.0, 298.15, 315.0], dtype=np.float64),
+        np.array([95000.0, 101325.0, 85000.0], dtype=np.float64),
+    )
+
+
+def _constants() -> list[Any]:
+    """Return exact CPU-default constants as Warp fp64 scalars."""
+    return [
+        wp.float64(BOLTZMANN_CONSTANT),
+        wp.float64(GAS_CONSTANT),
+        wp.float64(MOLECULAR_WEIGHT_AIR),
+        wp.float64(REF_VISCOSITY_AIR_STP),
+        wp.float64(REF_TEMPERATURE_STP),
+        wp.float64(SUTHERLAND_CONSTANT),
+    ]
+
+
+def _warp_arrays(values: tuple[np.ndarray, ...], device: str) -> list[Any]:
+    """Copy float64 lane inputs to one Warp device."""
+    return [
+        wp.array(value, dtype=wp.float64, device=device) for value in values
+    ]
+
+
+@pytest.mark.gpu_parity
+def test_spherical_wall_loss_matches_cpu_vector_states(device: str) -> None:
+    """Ensure spherical helper matches CPU state equations per lane."""
+    state = _state_lanes()
+    chamber_radii = np.array([0.35, 0.75, 1.20], dtype=np.float64)
+    expected = np.array(
+        [
+            get_spherical_wall_loss_coefficient_via_system_state(
+                eddy, radius, density, temperature, pressure, chamber_radius
+            )
+            for eddy, radius, density, temperature, pressure, chamber_radius in zip(
+                *state, chamber_radii, strict=True
+            )
+        ],
+        dtype=np.float64,
+    )
+    result = wp.zeros(len(expected), dtype=wp.float64, device=device)
+    wp.launch(
+        _spherical_wall_loss_kernel,
+        dim=len(expected),
+        inputs=[*_warp_arrays((*state, chamber_radii), device), *_constants()],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    actual = result.numpy()
+    assert actual.shape == (len(expected),)
+    assert np.all(np.isfinite(actual))
+    # CPU get_debye_function omits the zero-endpoint trapezoid interval. Its
+    # measured geometry-factor discrepancy for these lanes is 0.001001995.
+    npt.assert_allclose(actual, expected, rtol=1.002e-3, atol=1e-20)
+
+
+@pytest.mark.gpu_parity
+def test_rectangle_wall_loss_matches_cpu_vector_states(device: str) -> None:
+    """Ensure rectangular helper matches CPU state equations per lane."""
+    state = _state_lanes()
+    lengths = np.array([1.1, 2.0, 0.8], dtype=np.float64)
+    widths = np.array([0.7, 0.9, 1.4], dtype=np.float64)
+    heights = np.array([0.5, 1.3, 0.6], dtype=np.float64)
+    expected = np.array(
+        [
+            get_rectangle_wall_loss_coefficient_via_system_state(
+                eddy,
+                radius,
+                density,
+                temperature,
+                pressure,
+                (length, width, height),
+            )
+            for eddy, radius, density, temperature, pressure, length, width, height in zip(
+                *state, lengths, widths, heights, strict=True
+            )
+        ],
+        dtype=np.float64,
+    )
+    result = wp.zeros(len(expected), dtype=wp.float64, device=device)
+    wp.launch(
+        _rectangle_wall_loss_kernel,
+        dim=len(expected),
+        inputs=[
+            *_warp_arrays((*state, lengths, widths, heights), device),
+            *_constants(),
+        ],
+        outputs=[result],
+        device=device,
+    )
+    wp.synchronize()
+    actual = result.numpy()
+    assert actual.shape == (len(expected),)
+    assert np.all(np.isfinite(actual))
+    npt.assert_allclose(actual, expected, rtol=1e-10, atol=1e-20)
+
+
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize("lane", [0, 2], ids=["diffusion", "gravity"])
+def test_wall_loss_helpers_match_cpu_scalar_regimes(
+    device: str,
+    lane: int,
+) -> None:
+    """Ensure scalar diffusion and gravity regimes match CPU state equations."""
+    state = tuple(value[lane : lane + 1] for value in _state_lanes())
+    sphere_radius = np.array([0.35 if lane == 0 else 1.2], dtype=np.float64)
+    dimensions = (
+        np.array([1.1 if lane == 0 else 0.8], dtype=np.float64),
+        np.array([0.7 if lane == 0 else 1.4], dtype=np.float64),
+        np.array([0.5 if lane == 0 else 0.6], dtype=np.float64),
+    )
+    sphere_expected = get_spherical_wall_loss_coefficient_via_system_state(
+        wall_eddy_diffusivity=state[0][0],
+        particle_radius=state[1][0],
+        particle_density=state[2][0],
+        temperature=state[3][0],
+        pressure=state[4][0],
+        chamber_radius=sphere_radius[0],
+    )
+    rectangle_expected = get_rectangle_wall_loss_coefficient_via_system_state(
+        wall_eddy_diffusivity=state[0][0],
+        particle_radius=state[1][0],
+        particle_density=state[2][0],
+        temperature=state[3][0],
+        pressure=state[4][0],
+        chamber_dimensions=tuple(value[0] for value in dimensions),
+    )
+    sphere_result = wp.zeros(1, dtype=wp.float64, device=device)
+    rectangle_result = wp.zeros(1, dtype=wp.float64, device=device)
+    wp.launch(
+        _spherical_wall_loss_kernel,
+        dim=1,
+        inputs=[*_warp_arrays((*state, sphere_radius), device), *_constants()],
+        outputs=[sphere_result],
+        device=device,
+    )
+    wp.launch(
+        _rectangle_wall_loss_kernel,
+        dim=1,
+        inputs=[*_warp_arrays((*state, *dimensions), device), *_constants()],
+        outputs=[rectangle_result],
+        device=device,
+    )
+    wp.synchronize()
+    sphere_actual = sphere_result.numpy()
+    rectangle_actual = rectangle_result.numpy()
+    assert sphere_actual.shape == (1,)
+    assert rectangle_actual.shape == (1,)
+    assert np.all(np.isfinite(sphere_actual))
+    assert np.all(np.isfinite(rectangle_actual))
+    # CPU get_debye_function omits the zero-endpoint trapezoid interval. Its
+    # measured geometry-factor discrepancy for these lanes is 0.001001995.
+    npt.assert_allclose(sphere_actual[0], sphere_expected, rtol=1.002e-3)
+    npt.assert_allclose(rectangle_actual[0], rectangle_expected, rtol=1e-10)
+
+
+def test_wall_loss_helper_smoke_launches(device: str) -> None:
+    """Ensure both supported helpers compile, launch, and return finite rates."""
+    state = tuple(value[:1] for value in _state_lanes())
+    sphere_result = wp.zeros(1, dtype=wp.float64, device=device)
+    rectangle_result = wp.zeros(1, dtype=wp.float64, device=device)
+    wp.launch(
+        _spherical_wall_loss_kernel,
+        dim=1,
+        inputs=[
+            *_warp_arrays((*state, np.array([0.5], dtype=np.float64)), device),
+            *_constants(),
+        ],
+        outputs=[sphere_result],
+        device=device,
+    )
+    wp.launch(
+        _rectangle_wall_loss_kernel,
+        dim=1,
+        inputs=[
+            *_warp_arrays(
+                (
+                    *state,
+                    np.array([1.0], dtype=np.float64),
+                    np.array([0.8], dtype=np.float64),
+                    np.array([0.6], dtype=np.float64),
+                ),
+                device,
+            ),
+            *_constants(),
+        ],
+        outputs=[rectangle_result],
+        device=device,
+    )
+    wp.synchronize()
+    assert np.isfinite(sphere_result.numpy()[0])
+    assert np.isfinite(rectangle_result.numpy()[0])
