@@ -148,9 +148,9 @@ def _load_warp_runtime() -> SimpleNamespace:
             runtime.condensation_module.validate_condensation_scratch_buffers
         ),
         _condensation_step_gpu=runtime.condensation_module.condensation_step_gpu,
-        particle_radius_from_volume_wp=(
-            runtime.condensation_module.particle_radius_from_volume_wp
-        ),
+        particle_radius_from_volume_wp=importlib.import_module(
+            "particula.gpu.properties.particle_properties"
+        ).particle_radius_from_volume_wp,
         THERMODYNAMICS_MODE_BUCK=thermodynamics.THERMODYNAMICS_MODE_BUCK,
         THERMODYNAMICS_MODE_CONSTANT=thermodynamics.THERMODYNAMICS_MODE_CONSTANT,
         ThermodynamicsConfig=thermodynamics.ThermodynamicsConfig,
