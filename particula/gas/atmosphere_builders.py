@@ -67,7 +67,7 @@ class AtmosphereBuilder(
         ```
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the Atmosphere builder.
 
         Sets up the builder with required parameters for creating an

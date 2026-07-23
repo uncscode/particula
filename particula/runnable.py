@@ -153,14 +153,14 @@ class RunnableSequence:
         ```
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the RunnableSequence.
 
         Sets up an empty list to hold the sequence of Runnable processes.
         """
         self.processes: list[RunnableABC] = []
 
-    def add_process(self, process: RunnableABC):
+    def add_process(self, process: RunnableABC) -> None:
         """Add a Runnable to the sequence.
 
         Args:

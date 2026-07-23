@@ -560,7 +560,6 @@ def _wall_loss_remove(  # noqa: C901
             has_usable_slot = wp.int32(1)
             if initialize_rng != wp.int32(0):
                 state = wp.rand_init(rng_seed, box)
-
         coefficient = wp.float64(0.0)
         if geometry_mode == wp.int32(0):
             coefficient = spherical_wall_loss_coefficient_wp(
@@ -668,6 +667,13 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
             or particle_density <= wp.float64(0.0)
         ):
             continue
+        particle_charge = charge[box, particle]
+        if particle_charge == wp.float64(
+            0.0
+        ) and has_draw_eligible_slot == wp.int32(0):
+            has_draw_eligible_slot = wp.int32(1)
+            if initialize_rng != wp.int32(0):
+                state = wp.rand_init(rng_seed, box)
         neutral_coefficient = spherical_wall_loss_coefficient_wp(
             wall_eddy_diffusivity,
             particle_radius,
@@ -683,7 +689,6 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
             _SUTHERLAND_CONSTANT,
         )
         coefficient = neutral_coefficient
-        particle_charge = charge[box, particle]
         if particle_charge != wp.float64(0.0):
             enhancement = _image_charge_enhancement_wp(
                 particle_radius,
@@ -709,16 +714,16 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
             )
         if wp.isnan(coefficient) or coefficient <= wp.float64(0.0):
             continue
+        if has_draw_eligible_slot == wp.int32(0):
+            has_draw_eligible_slot = wp.int32(1)
+            if initialize_rng != wp.int32(0):
+                state = wp.rand_init(rng_seed, box)
         if wp.isinf(coefficient):
             for species in range(n_species):
                 masses[box, particle, species] = wp.float64(0.0)
             concentration[box, particle] = wp.float64(0.0)
             charge[box, particle] = wp.float64(0.0)
             continue
-        if has_draw_eligible_slot == wp.int32(0):
-            has_draw_eligible_slot = wp.int32(1)
-            if initialize_rng != wp.int32(0):
-                state = wp.rand_init(rng_seed, box)
         if _should_remove_for_survival_draw(
             wp.randf(state), wp.exp(-coefficient * time_step)
         ):
@@ -790,6 +795,13 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
             or particle_density <= wp.float64(0.0)
         ):
             continue
+        particle_charge = charge[box, particle]
+        if particle_charge == wp.float64(
+            0.0
+        ) and has_draw_eligible_slot == wp.int32(0):
+            has_draw_eligible_slot = wp.int32(1)
+            if initialize_rng != wp.int32(0):
+                state = wp.rand_init(rng_seed, box)
         neutral_coefficient = rectangle_wall_loss_coefficient_wp(
             wall_eddy_diffusivity,
             particle_radius,
@@ -807,7 +819,6 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
             _SUTHERLAND_CONSTANT,
         )
         coefficient = neutral_coefficient
-        particle_charge = charge[box, particle]
         if particle_charge != wp.float64(0.0):
             enhancement = _image_charge_enhancement_wp(
                 particle_radius,
@@ -833,16 +844,16 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
             )
         if wp.isnan(coefficient) or coefficient <= wp.float64(0.0):
             continue
+        if has_draw_eligible_slot == wp.int32(0):
+            has_draw_eligible_slot = wp.int32(1)
+            if initialize_rng != wp.int32(0):
+                state = wp.rand_init(rng_seed, box)
         if wp.isinf(coefficient):
             for species in range(n_species):
                 masses[box, particle, species] = wp.float64(0.0)
             concentration[box, particle] = wp.float64(0.0)
             charge[box, particle] = wp.float64(0.0)
             continue
-        if has_draw_eligible_slot == wp.int32(0):
-            has_draw_eligible_slot = wp.int32(1)
-            if initialize_rng != wp.int32(0):
-                state = wp.rand_init(rng_seed, box)
         if _should_remove_for_survival_draw(
             wp.randf(state), wp.exp(-coefficient * time_step)
         ):

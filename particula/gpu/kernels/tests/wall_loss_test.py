@@ -1852,6 +1852,103 @@ def test_charged_saturated_coefficient_consumes_rng_before_removal(
 
 
 @pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
+def test_zero_charge_charged_rng_reset_matches_neutral_for_infinite_coefficient(
+    geometry: str,
+) -> None:
+    """Zero-charge charged fallback resets RNG before infinite coefficients."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    tiny_dimension = np.nextafter(0.0, 1.0)
+    neutral_config = (
+        NeutralWallLossConfig("spherical", 0.01, chamber_radius=tiny_dimension)
+        if geometry == "spherical"
+        else NeutralWallLossConfig(
+            "rectangular",
+            0.01,
+            chamber_dimensions=(tiny_dimension, 1.0, 1.0),
+        )
+    )
+    charged_config = (
+        NeutralWallLossConfig(
+            "spherical",
+            0.01,
+            chamber_radius=tiny_dimension,
+            mode="charged",
+            wall_electric_field=0.0,
+        )
+        if geometry == "spherical"
+        else NeutralWallLossConfig(
+            "rectangular",
+            0.01,
+            chamber_dimensions=(tiny_dimension, 1.0, 1.0),
+            mode="charged",
+            wall_electric_field=wp.zeros(3, dtype=wp.float64, device="cpu"),
+        )
+    )
+    neutral = _nanoparticle(charge=0.0)
+    charged = _nanoparticle(charge=0.0)
+    neutral_states = wp.array([37], dtype=wp.uint32, device="cpu")
+    charged_states = wp.array([41], dtype=wp.uint32, device="cpu")
+
+    wall_loss_step_gpu(
+        neutral,
+        298.15,
+        101325.0,
+        1.0,
+        config=neutral_config,
+        rng_seed=99,
+        rng_states=neutral_states,
+        initialize_rng=True,
+    )
+    wall_loss_step_gpu(
+        charged,
+        298.15,
+        101325.0,
+        1.0,
+        config=charged_config,
+        rng_seed=99,
+        rng_states=charged_states,
+        initialize_rng=True,
+    )
+
+    for field in ("masses", "concentration", "charge"):
+        npt.assert_array_equal(
+            getattr(charged, field).numpy(), getattr(neutral, field).numpy()
+        )
+    npt.assert_array_equal(charged_states.numpy(), neutral_states.numpy())
+
+
+@pytest.mark.parametrize("attribute", ["wall_potential", "wall_electric_field"])
+def test_nonfinite_charged_spherical_scalars_reject_atomically(
+    attribute: str,
+) -> None:
+    """Nonfinite charged scalar inputs preserve valid particle and RNG state."""
+    wp = _warp()
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    particles = _particles()
+    states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
+    snapshot = _snapshot(particles, states)
+    config = _charged_config("spherical")
+    object.__setattr__(config, attribute, np.nan)
+
+    with pytest.raises(ValueError, match=f"config.{attribute} must be finite"):
+        wall_loss_step_gpu(
+            particles,
+            298.15,
+            101325.0,
+            1.0,
+            config=config,
+            rng_states=states,
+            initialize_rng=True,
+        )
+
+    _assert_snapshot_unchanged(particles, snapshot, states)
+
+
+@pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
 def test_charged_all_inactive_positive_time_preserves_requested_rng_reset(
     geometry: str,
 ) -> None:
