@@ -265,7 +265,7 @@ deposition and gravitational settling:
   Technology*, 2(3), 303--309.
   https://doi.org/10.1080/02786828308958636
 
-After read-only preflight, eligible finite-rate fixed slots survive with
+After read-only preflight, eligible finite positive-rate fixed slots survive with
 `exp(-k * time_step)`. A selected slot has every mass lane, concentration, and
 charge cleared. Density, volume, dtype, device, capacity, and unselected
 storage are preserved; inactive or unusable slots are neither sampled nor
@@ -278,8 +278,9 @@ mutation kernel launches. Zero time completes preflight but is write-free.
 Omitted RNG state is private to each successful nonzero call. Supplied
 same-device `(n_boxes,)` `wp.uint32` state mutates in place;
 `initialize_rng=True` is the only reset, so repeating `rng_seed` alone does not
-reset persistent state. Consumption is sequential per box over eligible slots;
-exact CPU/Warp or per-seed RNG replay is not promised.
+reset persistent state. Consumption is sequential per box over eligible finite
+positive-rate slots; positive infinite-rate removal is deterministic and
+consumes no draw. Exact CPU/Warp or per-seed RNG replay is not promised.
 
 | Scope | Status |
 | --- | --- |
