@@ -374,18 +374,20 @@ def test_neutral_mode_rejects_rectangular_warp_field_before_particles() -> None:
 
 
 @pytest.mark.parametrize("geometry", ["spherical", "rectangular"])
-def test_charged_mode_zero_charge_matches_neutral_execution(
+@pytest.mark.parametrize("charge", [0.0, 2.0, -3.0])
+def test_charged_mode_matches_neutral_execution_for_finite_charge(
     geometry: str,
+    charge: float,
 ) -> None:
-    """P1 charged mode keeps zero-charge slots on the neutral path exactly."""
+    """P1 charged mode keeps every finite charge on the neutral path exactly."""
     wp = _warp()
     from particula.gpu.kernels import wall_loss_step_gpu
 
     neutral_particles = _particles()
     charged_particles = _particles()
-    zeros = np.zeros((2, 2), dtype=np.float64)
-    neutral_particles.charge = wp.array(zeros, dtype=wp.float64, device="cpu")
-    charged_particles.charge = wp.array(zeros, dtype=wp.float64, device="cpu")
+    charges = np.full((2, 2), charge, dtype=np.float64)
+    neutral_particles.charge = wp.array(charges, dtype=wp.float64, device="cpu")
+    charged_particles.charge = wp.array(charges, dtype=wp.float64, device="cpu")
     neutral_rng = wp.array([7, 11], dtype=wp.uint32, device="cpu")
     charged_rng = wp.array([7, 11], dtype=wp.uint32, device="cpu")
     wall_loss_step_gpu(
@@ -514,6 +516,121 @@ def test_distribution_fails_before_particle_access() -> None:
     )
     with pytest.raises(ValueError, match="distribution_type"):
         wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "expected"),
+    [
+        (
+            "geometry",
+            "cylindrical",
+            "config.geometry must be 'spherical' or 'rectangular'.",
+        ),
+        (
+            "distribution_type",
+            "discrete",
+            "config.distribution_type must be 'particle_resolved'.",
+        ),
+        (
+            "mode",
+            "other",
+            "config.mode must be 'neutral' or 'charged'.",
+        ),
+    ],
+)
+def test_selector_rejections_use_stable_exact_messages(
+    field: str,
+    value: str,
+    expected: str,
+) -> None:
+    """Reject unsupported selectors with the documented exact messages."""
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    config = _config()
+    object.__setattr__(config, field, value)
+
+    with pytest.raises(ValueError) as error:
+        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+
+    assert str(error.value) == expected
+
+
+class _EqualToString:
+    """Provide equality-compatible non-string selector test input."""
+
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+    def __eq__(self, other: object) -> bool:
+        return other == self.value
+
+
+@pytest.mark.parametrize(
+    "field, value, match",
+    [
+        ("geometry", _EqualToString("spherical"), "geometry"),
+        (
+            "distribution_type",
+            _EqualToString("particle_resolved"),
+            "distribution_type",
+        ),
+        ("mode", _EqualToString("neutral"), "mode"),
+    ],
+)
+def test_selector_requires_exact_string_before_particle_access(
+    field: str,
+    value: object,
+    match: str,
+) -> None:
+    """Reject equality-compatible non-string selectors during config preflight."""
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    config = _config()
+    object.__setattr__(config, field, value)
+
+    with pytest.raises(ValueError, match=match):
+        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+
+
+@pytest.mark.parametrize(
+    "field, value, match",
+    [
+        ("wall_eddy_diffusivity", 10**10000, "wall_eddy_diffusivity"),
+        ("chamber_radius", 10**10000, "chamber_radius"),
+        ("wall_potential", 10**10000, "wall_potential"),
+        ("wall_electric_field", 10**10000, "wall_electric_field"),
+    ],
+    ids=["eddy_diffusivity", "radius", "potential", "electric_field"],
+)
+def test_huge_integer_config_scalar_raises_value_error(
+    field: str,
+    value: int,
+    match: str,
+) -> None:
+    """Normalize overflowing integer configuration values to ValueError."""
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    config = _config()
+    object.__setattr__(config, field, value)
+
+    with pytest.raises(ValueError, match=match):
+        wall_loss_step_gpu(object(), 298.15, 101325.0, 1.0, config=config)
+
+
+def test_huge_integer_time_step_raises_value_error() -> None:
+    """Normalize an overflowing integer duration to the stable value error."""
+    from particula.gpu.kernels import wall_loss_step_gpu
+
+    with pytest.raises(ValueError) as error:
+        wall_loss_step_gpu(
+            _particles(),
+            298.15,
+            101325.0,
+            10**10000,
+            config=_config(),
+        )
+
+    assert str(error.value) == "time_step must be finite and nonnegative."
 
 
 @pytest.mark.parametrize(
