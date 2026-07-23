@@ -6,6 +6,7 @@ Import direct low-level step functions from this package:
         coagulation_step_gpu,
         condensation_step_gpu,
         dilution_step_gpu,
+        wall_loss_step_gpu,
     )
 
 Lower-level helper kernels remain importable from their concrete modules.
@@ -20,12 +21,14 @@ __all__ = [
     "coagulation_step_gpu",
     "condensation_step_gpu",
     "dilution_step_gpu",
+    "wall_loss_step_gpu",
 ]
 
 _SYMBOL_TO_MODULE = {
     "coagulation_step_gpu": "particula.gpu.kernels.coagulation",
     "condensation_step_gpu": "particula.gpu.kernels.condensation",
     "dilution_step_gpu": "particula.gpu.kernels.dilution",
+    "wall_loss_step_gpu": "particula.gpu.kernels.wall_loss",
 }
 
 
