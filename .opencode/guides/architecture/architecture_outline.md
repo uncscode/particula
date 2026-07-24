@@ -1,5 +1,22 @@
 # Architecture Outline
 
+## Particle Package
+
+`particula/particles/` contains particle-data representations, distribution
+strategies, and focused particle-domain helpers.
+
+### particula/particles/
+
+**Key Components:**
+- `particle_data.py` - Fixed-shape CPU particle-data container and conversion
+  helpers
+- `slot_management.py` - CPU-only, read-only fixed-slot classification and
+  discovery; exports `get_slot_diagnostics` through `particula.particles`
+- `distribution_strategies/` - Particle distribution representations and
+  update strategies
+- `properties/` - Particle property calculations
+- `tests/` - Test coverage
+
 ## GPU Package
 
 `particula/gpu/` contains Warp-backed data containers, explicit CPU↔GPU

@@ -28,6 +28,10 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 - **Providing a Python-based API** for reproducible and modular simulations.
 - **Building gas-phase properties** with builder/factory patterns (vapor
   pressure and latent heat) that support unit-aware setters and exports.
+- **Inspecting fixed particle-resolved slots** with the read-only CPU
+  [`get_slot_diagnostics()`](Features/data-containers-and-gpu-foundations.md#cpu-slot-diagnostics)
+  API, which reports deterministic free-slot indices and per-box active/free
+  counts without changing `ParticleData`.
 - **Supporting CPU latent-heat-corrected condensation diagnostics** with
   thermal resistance, latent-heat mass transfer rate utilities,
   latent-heat energy-density bookkeeping, and the

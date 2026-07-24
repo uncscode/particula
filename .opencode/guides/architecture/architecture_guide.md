@@ -1,5 +1,18 @@
 # Architecture Guide
 
+## CPU Particle Slot Discovery Boundary
+
+- `particula.particles.slot_management` is the CPU-only, read-only fixed-slot
+  classification and discovery boundary for `ParticleData`.
+- `get_slot_diagnostics` is its sole package-level export through
+  `particula.particles`; classification predicates and validation helpers remain
+  module-private.
+- The API preserves all `ParticleData` array identities and values, returning
+  newly allocated fixed-shape `int32` free-index and count sidecars instead.
+- Activation, compaction, resizing, CPU↔GPU transfer, and GPU execution remain
+  outside this boundary. Its fixed-shape diagnostics provide a deterministic
+  CPU reference for later parity work.
+
 ## GPU Module Boundaries
 
 The GPU package keeps a strict separation between transfer, schema, and

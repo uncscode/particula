@@ -1,8 +1,8 @@
 """Discover fixed particle slots without modifying particle data.
 
-This module defines the CPU reference classification for active and free
-particle-resolved slots. It deliberately exposes only fixed-shape discovery
-diagnostics so callers can preserve stable particle storage.
+This module provides the CPU reference classification for active and free
+particle-resolved slots. Its public discovery API returns fixed-shape,
+newly allocated diagnostics while preserving the input particle storage.
 """
 
 import numpy as np
@@ -14,22 +14,26 @@ from particula.particles.particle_data import ParticleData
 def get_slot_diagnostics(
     data: ParticleData,
 ) -> tuple[NDArray[np.int32], NDArray[np.int32], NDArray[np.int32]]:
-    """Return fixed-shape diagnostics for active and free particle slots.
+    """Return read-only fixed-shape diagnostics for particle slots.
 
     A slot is active when its concentration is positive and finite, each mass
     lane is finite and nonnegative, and its total mass is positive and finite.
     A slot is free when its concentration, all mass lanes, and its charge are
-    exactly zero. All other slot states are invalid.
+    exactly zero. All other slot states are invalid. This function does not
+    modify ``data`` and allocates fresh output arrays for every call.
 
     Args:
         data: Fixed-shape particle data to inspect without mutation.
 
     Returns:
-        A tuple containing free indices with ``-1`` tails, active counts, and
-        free counts. All arrays are newly allocated ``np.int32`` arrays.
+        A tuple ``(free_indices, active_counts, free_counts)`` of newly
+        allocated ``np.int32`` arrays. ``free_indices`` has shape
+        ``(n_boxes, n_particles)``; each row contains ascending free-slot
+        indices followed by ``-1``. The count arrays have shape ``(n_boxes,)``.
 
     Raises:
-        ValueError: If any particle slot has an invalid state.
+        ValueError: If any particle slot is neither active nor free. The error
+            message is ``"Invalid particle slot state."``.
     """
     masses = data.masses
     concentration = data.concentration

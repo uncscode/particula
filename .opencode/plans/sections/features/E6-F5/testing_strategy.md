@@ -5,8 +5,12 @@ in module-level `tests/` directories using the `*_test.py` suffix.
 
 ## Per-Phase Coverage
 
-- **P1:** CPU predicate truth table for active, free, and every contradictory
-  state; exact sparse multi-box counts and ascending indices; no mutation.
+- **P1 (shipped, issue #1416):**
+  `particula/particles/tests/slot_management_test.py` covers active/free and
+  contradictory truth-table states, exact invalid-state errors, zero-species
+  and zero-slot cases, sparse multi-box ascending indices with `-1` tails,
+  `np.int32` counts, package export identity, and success/error-path source
+  non-mutation with fresh-output allocation.
 - **P2:** CPU zero/partial/exact-capacity activation, multi-species requests,
   deterministic mapping, identity preservation, and full preflight atomicity.
 - **P3:** Warp CPU discovery parity, fixed-shape `-1` index tails, exact `int32`
