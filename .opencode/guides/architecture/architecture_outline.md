@@ -54,6 +54,11 @@ private helpers for cross-kernel setup.
   zero-charge slots retain the neutral path. The sidecar is not added to Warp
   particle schemas or package exports, and sequential per-box ownership
   advances it only for eligible slots.
+- `slot_management.py` - Concrete-module-only, read-only direct-Warp
+  fixed-slot diagnostics. It classifies particle mass, concentration, and
+  charge into caller-owned `int32` diagnostic sidecars without accessing
+  density or volume; it is deliberately not exported by
+  `particula.gpu.kernels`.
 - `environment.py` - Shared private normalization and validation for kernel
   environment inputs
 - `tests/` - Test coverage

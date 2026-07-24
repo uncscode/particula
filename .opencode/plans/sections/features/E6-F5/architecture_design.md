@@ -43,14 +43,19 @@ floating-point reduction.
   the valid prefix per box.
 - **API Surface:** Add CPU inspection/activation helpers under
   `particula.particles.slot_management` and low-level GPU entry points under
-  `particula.gpu.kernels.slot_management`. Expose only the intended step helper
-  through lazy package exports; keep kernels and scratch helpers private.
+  `particula.gpu.kernels.slot_management`. P3 shipped the concrete-module-only
+  `get_slot_diagnostics_gpu`; it is deliberately not exported through
+  `particula.gpu.kernels` or a package-level API. Keep kernels and scratch
+  helpers private.
   P1 delivered the read-only CPU API
   `get_slot_diagnostics(data)`, re-exported from `particula.particles`.
   P2 delivered the CPU-only direct-import
   `activate_slots(data, request_masses, request_concentration, request_charge,
   requested_counts)` API; it is intentionally not re-exported from
-  `particula.particles`. Warp APIs remain deferred to later phases.
+  `particula.particles`. P3 returns the supplied same-device `wp.int32`
+  `free_indices`, `active_counts`, and `free_counts` sidecars by identity after
+  read-only classification of mass, concentration, and charge; density and
+  volume are neither read nor validated. GPU activation remains deferred.
 - **Mutation Contract:** Activation mutates only selected slot mass,
   concentration, and charge cells. Density, volume, requests, unselected slots,
   shapes, dtypes, devices, array objects, and container identity are unchanged.
@@ -66,7 +71,10 @@ floating-point reduction.
   schema and writability, request schema and non-aliasing, selected prefixes,
   and free capacity globally before its first assignment; it then uses P1's
   ascending free-index ordering and returns a fresh per-box `np.int32`
-  activated-count array.
+  activated-count array. P3 schema and state rejection occur before a writer
+  launch, preserving all supplied diagnostic sidecars. Its single device status
+  readback is limited to the private invalid-state flag; successful diagnostics
+  remain device-resident.
 
 ## Security & Compliance
 

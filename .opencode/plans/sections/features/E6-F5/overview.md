@@ -10,11 +10,13 @@ and nucleation disagree about whether a slot participates in physics.
 
 ## Value Proposition
 
-E6-F5 establishes matching CPU and GPU primitives that preserve every array
-shape and identity, enumerate free slots in ascending index order, activate
-validated source records, and populate exact caller-owned per-box diagnostics.
-The contract becomes the stable foundation for E6-F6 exhaustion handling,
-E6-F7 CPU nucleation, E6-F8 GPU nucleation, and E6-F9 integration.
+E6-F5 establishes matching CPU and GPU discovery primitives that preserve every
+array shape and identity, enumerate free slots in ascending index order, and
+populate exact per-box diagnostics. P3 ships this GPU read-only boundary as the
+unexported concrete-module function `get_slot_diagnostics_gpu`; GPU activation
+remains deferred. The contract becomes the stable foundation for E6-F6
+exhaustion handling, E6-F7 CPU nucleation, E6-F8 GPU nucleation, and E6-F9
+integration.
 
 ## User Stories
 

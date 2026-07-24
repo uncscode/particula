@@ -17,8 +17,14 @@ in module-level `tests/` directories using the `*_test.py` suffix.
   mappings; fresh `np.int32` counts; request/destination identity and untouched
   storage; and atomic failures for malformed data/schema, selected-prefix
   values, aliasing, invalid existing state, and later-box capacity exhaustion.
-- **P3:** Warp CPU discovery parity, fixed-shape `-1` index tails, exact `int32`
-  counts, caller-owned identity, dtype/device/shape rejection, optional CUDA.
+- **P3 (shipped, issue #1418):**
+  `particula/gpu/kernels/tests/slot_management_test.py` covers direct-Warp
+  CPU-oracle discovery parity for sparse multi-box/multi-species, all-free,
+  all-active, zero-box, zero-particle, and zero-species states; ascending
+  `-1`-tailed indices; exact `int32` counts and sidecar identity; stale-output
+  overwrite; malformed dtype/rank/shape/device and invalid-state rejection
+  before output writes; density/volume non-access; and Warp CPU plus clean
+  optional CUDA execution.
 - **P4:** CPU/Warp activation parity, post-operation diagnostics, repeated
   activation, untouched sentinels, insufficient capacity, malformed state and
   requests, alias checks, and failure-before-mutation snapshots.
