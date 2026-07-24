@@ -12,6 +12,9 @@
   counts.
 - [x] Contradictory state, malformed requests/sidecars, and insufficient
   capacity fail before any particle or caller-owned diagnostic mutation.
+- [x] Development documentation records the authoritative CPU/direct-Warp
+  contract, focused commands, and downstream ownership without adding a user
+  example.
 - [ ] E6-F6/F7/F8 can consume the documented discovery and activation contract
   without dynamic allocation or hidden transfer.
 - [ ] Focused tests, full regressions, lint, type checking, and documentation

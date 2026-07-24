@@ -273,11 +273,19 @@ concrete-module-only P3 test helper. Compare deterministic float64 copies and
 all caller-owned int32 sidecars exactly against independent CPU activation and
 post-call diagnostics. Cover ascending-free-slot mapping, selected-prefix-only
 validation, zero prefixes, zero boxes, zero capacity, exact capacity, repeated
-activation, and sparse capacity. For each schema, state, count, selected-record,
-capacity, and alias preflight failure, snapshot accessible arrays and prove
-non-mutation. Warp CPU is the baseline; CUDA parity is optional and must skip
-cleanly when unavailable. This tests the bounded direct-Warp boundary only, not
-a runnable, implicit transfer, storage resizing, or rollback after writer launch.
+activation, and sparse capacity. Reusable fixed-slot coverage should keep an
+independent CPU oracle and separately assert exact values, shapes, dtypes,
+devices, and sidecar identity. Include selected-prefix coverage and snapshot
+accessible particle, request, and output arrays for preflight rejection.
+Warp CPU is the baseline; CUDA parity is optional and must skip cleanly when
+unavailable. The complementary CPU contract evidence is:
+
+```bash
+pytest particula/particles/tests/slot_management_test.py -q -Werror
+```
+
+This tests the bounded direct-Warp boundary only, not a runnable, implicit
+transfer, storage resizing, or rollback after writer launch.
 
 Direct GPU wall-loss parity coverage belongs in
 `particula/gpu/kernels/tests/wall_loss_parity_test.py`. Keep the NumPy
