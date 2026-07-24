@@ -30,7 +30,7 @@ _CATEGORY_INVALID = wp.int32(3)
 _INVALID_SLOT_MESSAGE = "Invalid particle slot state."
 
 
-@wp.kernel
+@wp.kernel  # pragma: no cover
 def _classify_slots(
     masses: wp.array3d(dtype=wp.float64),
     concentration: wp.array2d(dtype=wp.float64),
@@ -81,7 +81,7 @@ def _classify_slots(
         wp.atomic_max(invalid, 0, 1)
 
 
-@wp.kernel
+@wp.kernel  # pragma: no cover
 def _write_diagnostics(
     categories: wp.array2d(dtype=wp.int32),
     free_indices: wp.array2d(dtype=wp.int32),
@@ -109,7 +109,7 @@ def _write_diagnostics(
     free_counts[box] = free_count
 
 
-@wp.kernel
+@wp.kernel  # pragma: no cover
 def _write_empty_diagnostics(
     active_counts: wp.array(dtype=wp.int32),
     free_counts: wp.array(dtype=wp.int32),
@@ -239,7 +239,9 @@ def get_slot_diagnostics_gpu(
     Notes:
         Valid calls overwrite every diagnostic entry. Free indices are
         ascending and unused positions are ``-1``. Schema and state rejection
-        occurs before caller-owned diagnostics are written.
+        occurs before caller-owned diagnostics are written. Callers own device
+        placement and synchronization before reading device-resident diagnostics
+        on the host.
     """
     masses, concentration, charge, n_boxes, n_particles, device = (
         _validate_particles(particles)
