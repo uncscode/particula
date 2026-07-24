@@ -438,7 +438,9 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
   other state raises `ValueError("Invalid particle slot state.")`.
 - Selected request rank maps to the matching ascending free slot; free-index
   rows have `-1` tails. Storage is fixed capacity: no resize or compaction.
-  Activation reads and writes only `masses`, `concentration`, and `charge`.
+  Both activation APIs mutate only `masses`, `concentration`, and `charge`.
+  CPU preflight also reads `density` and `volume` to reject protected-field
+  storage aliasing; direct-Warp activation does not observe those fields.
 - CPU diagnostics and activation-count results are fresh `np.int32` arrays.
   GPU count/diagnostic sidecars are caller-owned same-device `wp.int32` and
   return by identity as `(activated_counts, free_indices, active_counts,

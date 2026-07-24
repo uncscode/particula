@@ -148,20 +148,24 @@ resize, compact, or replace caller buffers. The CPU and GPU schemas are:
 | Diagnostics | Fresh `np.int32`: indices `(n_boxes, n_particles)`, counts `(n_boxes,)` | Caller-owned, same-device `wp.int32` sidecars with those shapes |
 | Activation result | Fresh `np.int32` activated counts, `(n_boxes,)` | Identical supplied `(activated_counts, free_indices, active_counts, free_counts)` |
 
-Both implementations emit ascending `free_indices` rows with `-1` tails. On
-success, activated counts equal requested counts, and the other diagnostics
-describe post-activation state. Only records within each requested prefix are
-validated or read. Both preserve `density`, `volume`, unselected slots, and
-request arrays; they read and write only `masses`, `concentration`, and
-`charge` in particle storage.
+Diagnostic APIs emit ascending `free_indices` rows with `-1` tails. CPU
+`activate_slots()` returns only a fresh activated-count array, while direct-Warp
+activation returns its caller-owned diagnostic sidecars in the documented
+order. On success, activated counts equal requested counts, and the other
+diagnostics describe post-activation state. Only records within each requested
+prefix are validated or read. Both preserve `density`, `volume`, unselected
+slots, and request arrays, and mutate only `masses`, `concentration`, and
+`charge` in particle storage. CPU preflight additionally reads `density` and
+`volume` to reject protected-field storage aliasing; direct-Warp activation
+does not observe those fields.
 
 #### Ownership and failure boundary
 
 This is a low-level direct-kernel operation. Callers own CPU↔Warp transfer,
 device placement, synchronization, and all particle, request, and output
-buffers; there is no hidden transfer, CPU fallback, or storage resizing. It
-reads and writes only `masses`, `concentration`, and `charge`; `density` and
-`volume` are unobserved and preserved.
+buffers; there is no hidden transfer, CPU fallback, or storage resizing.
+Direct-Warp activation reads and writes only `masses`, `concentration`, and
+`charge`; `density` and `volume` are unobserved and preserved.
 
 Before its writer launches, GPU activation validates metadata/schema/device,
 sidecar ownership and aliasing, existing slot state, requested counts, free
