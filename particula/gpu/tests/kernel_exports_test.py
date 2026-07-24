@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[3]
 
 SUPPORTED_STEP_SYMBOLS = (
     "coagulation_step_gpu",
+    "activate_slots_gpu",
     "condensation_step_gpu",
     "dilution_step_gpu",
     "wall_loss_step_gpu",
@@ -50,10 +51,12 @@ def test_public_kernels_package_exports_supported_step_function(
     from particula.gpu.kernels.coagulation import coagulation_step_gpu
     from particula.gpu.kernels.condensation import condensation_step_gpu
     from particula.gpu.kernels.dilution import dilution_step_gpu
+    from particula.gpu.kernels.slot_management import activate_slots_gpu
     from particula.gpu.kernels.wall_loss import wall_loss_step_gpu
 
     concrete_symbol_map = {
         "coagulation_step_gpu": coagulation_step_gpu,
+        "activate_slots_gpu": activate_slots_gpu,
         "condensation_step_gpu": condensation_step_gpu,
         "dilution_step_gpu": dilution_step_gpu,
         "wall_loss_step_gpu": wall_loss_step_gpu,
@@ -70,6 +73,7 @@ def test_kernels_package_all_is_exact_supported_surface() -> None:
 
     assert kernels.__all__ == [
         "coagulation_step_gpu",
+        "activate_slots_gpu",
         "condensation_step_gpu",
         "dilution_step_gpu",
         "wall_loss_step_gpu",
