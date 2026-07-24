@@ -5,11 +5,19 @@
 Complete the CPU predicate and activation phases P1/P2 before GPU discovery in
 P3 and GPU activation/parity in P4; P5 documents the completed contract.
 
-- [ ] **E6-F5-P1:** Define CPU slot predicates and exact diagnostics with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Freeze active, free, and invalid-state semantics and return exact per-box counts plus ascending free indices without mutation.
-  - Files: `particula/particles/slot_management.py`, `particula/particles/tests/slot_management_test.py`, `particula/particles/__init__.py`
-  - Tests: Active/free truth table, contradictory states, sparse multi-box ordering, zero slots, exact integer counts, and source immutability.
+- [x] **E6-F5-P1:** Define CPU slot predicates and exact diagnostics with unit tests
+  - Issue: #1416 | Size: S | Status: Shipped
+  - Delivered: `get_slot_diagnostics(data)` freezes the read-only CPU active,
+    free, and invalid-state contract. It returns fresh fixed-shape `np.int32`
+    free-index, active-count, and free-count sidecars; free rows are ascending
+    with `-1` tails. Invalid state raises exactly
+    `ValueError("Invalid particle slot state.")`.
+  - Files: `particula/particles/slot_management.py`,
+    `particula/particles/tests/slot_management_test.py`,
+    `particula/particles/__init__.py`
+  - Tests: Truth-table and contradictory-state coverage, zero-species/zero-slot
+    cases, sparse multi-box ordering, exact integer diagnostics, public export,
+    and success/error-path source non-mutation plus fresh-allocation checks.
 
 - [ ] **E6-F5-P2:** Implement deterministic CPU slot activation with unit tests
   - Issue: TBD | Size: S | Status: Not Started

@@ -61,6 +61,10 @@ performance claim.
 For migration details and updated API mappings, see the
 [ParticleData and GasData Migration Guide](./docs/Features/particle-data-migration.md).
 Legacy facades remain available, with deprecation planned for v0.3.0.
+For fixed particle-resolved storage, the read-only public
+`particula.particles.get_slot_diagnostics(data)` API reports free-slot indices
+and active/free counts without modifying `ParticleData`. See the
+[slot diagnostics contract](./docs/Features/data-containers-and-gpu-foundations.md#cpu-slot-diagnostics).
 `EnvironmentData` now also participates in the public Warp CPU↔GPU helpers via
 `particula.gpu.{to_warp_environment_data, from_warp_environment_data}` for
 single-box and multi-box round trips.

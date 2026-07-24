@@ -2,12 +2,12 @@
 
 ## CPU Core
 
-- [ ] Add a shared documented active/free/invalid truth table in
+- [x] Add a shared documented active/free/invalid truth table in
   `particula/particles/slot_management.py`.
-- [ ] Validate all particle fields as finite and nonnegative where required;
+- [x] Validate all particle fields as finite and nonnegative where required;
   reject positive mass with zero concentration, positive concentration with
   zero total mass, and nonzero charge in a free slot.
-- [ ] Return ascending free indices and exact `np.int32` active/free counts.
+- [x] Return ascending free indices and exact `np.int32` active/free counts.
 - [ ] Define fixed-shape mass/concentration/charge request arrays with per-box
   valid-prefix counts and validate the complete request before writing.
 - [ ] Activate request rank `r` into free rank `r`, preserving every shape,
@@ -28,11 +28,12 @@
 
 ## Tooling / Tests
 
-- [ ] Add CPU truth-table, ordering, activation, identity, and atomic-failure
-  tests in `particula/particles/tests/slot_management_test.py`.
+- [x] Add CPU truth-table, ordering, identity, and invalid-state non-mutation
+  tests in `particula/particles/tests/slot_management_test.py`; CPU activation
+  coverage remains P2 work.
 - [ ] Add Warp CPU discovery, activation, parity, sidecar, and preflight tests in
   `particula/gpu/kernels/tests/slot_management_test.py`.
-- [ ] Snapshot every caller-owned array for invalid-call tests and assert exact
+- [x] Snapshot every caller-owned array for P1 invalid-call tests and assert exact
   equality plus object identity afterward.
 - [ ] Cover zero boxes/slots as supported by container conventions or document
   a preflight rejection consistently on CPU and GPU.

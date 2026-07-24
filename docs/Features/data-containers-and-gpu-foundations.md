@@ -66,7 +66,31 @@ if WARP_AVAILABLE:
         WarpGasData,
         WarpParticleData,
     )
+ ```
+
+## CPU slot diagnostics
+
+`get_slot_diagnostics()` is the public CPU-only, read-only discovery API for
+fixed particle-resolved `ParticleData` storage:
+
+```python
+from particula.particles import get_slot_diagnostics
+
+free_indices, active_counts, free_counts = get_slot_diagnostics(particle_data)
 ```
+
+It returns freshly allocated NumPy `int32` arrays in the order shown above.
+`free_indices` has shape `(n_boxes, n_particles)`. In each row, free-slot
+indices appear in ascending order and unused trailing entries are `-1`.
+`active_counts` and `free_counts` each have shape `(n_boxes,)`.
+
+A slot is active only when its concentration is finite and positive, every
+species mass is finite and nonnegative, the total mass is finite and positive,
+and its charge is finite. A slot is free only when its concentration, all mass
+lanes, and charge are exactly zero. Any other state raises
+`ValueError("Invalid particle slot state.")`; diagnostics are not partially
+returned. The function neither mutates nor aliases particle storage, and it
+does not activate, resize, compact, or transfer slots to Warp.
 
 ## Canonical container schemas
 

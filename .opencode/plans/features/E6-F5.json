@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-21",
+  "last_updated": "2026-07-24",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E6-F5/architecture_design.md",
@@ -32,11 +32,11 @@
     {
       "id": "E6-F5-P1",
       "title": "Define CPU slot predicates and exact diagnostics with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
-      "issue_number": null,
+      "issue_number": 1416,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-24",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
