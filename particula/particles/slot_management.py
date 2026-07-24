@@ -39,10 +39,18 @@ def get_slot_diagnostics(
     concentration = data.concentration
     charge = data.charge
 
+    expected_shape = masses.shape[:2] if masses.ndim == 3 else None
+    if (
+        expected_shape is None
+        or concentration.shape != expected_shape
+        or charge.shape != expected_shape
+    ):
+        raise ValueError("Invalid particle slot state.")
+
     mass_valid = np.all(np.isfinite(masses) & (masses >= 0.0), axis=-1)
     mass_zero = np.all(masses == 0.0, axis=-1)
     with np.errstate(over="ignore", invalid="ignore"):
-        total_mass = np.sum(masses, axis=-1)
+        total_mass = np.sum(masses, axis=-1, dtype=np.float64)
 
     active = (
         np.isfinite(concentration)

@@ -98,6 +98,65 @@ def test_get_slot_diagnostics_handles_zero_species_slots() -> None:
         get_slot_diagnostics(invalid_data)
 
 
+def test_get_slot_diagnostics_accumulates_integer_masses_as_float64() -> None:
+    """Avoid source-integer overflow when classifying active slots."""
+    maximum = np.iinfo(np.int64).max
+    data = ParticleData(
+        masses=np.array([[[maximum, maximum]]], dtype=np.int64),
+        concentration=np.array([[1.0]]),
+        charge=np.array([[0.0]]),
+        density=np.ones(2),
+        volume=np.ones(1),
+    )
+
+    free_indices, active_counts, free_counts = get_slot_diagnostics(data)
+
+    npt.assert_array_equal(free_indices, [[-1]])
+    npt.assert_array_equal(active_counts, [1])
+    npt.assert_array_equal(free_counts, [0])
+
+
+def test_get_slot_diagnostics_rejects_finite_mass_lanes_with_infinite_total() -> (
+    None
+):
+    """Reject finite mass lanes whose float64 aggregate overflows."""
+    largest_finite = np.finfo(np.float64).max
+    data = _make_data(
+        np.array([[[largest_finite, largest_finite]]]),
+        np.array([[1.0]]),
+        np.array([[0.0]]),
+    )
+    sources = (data.masses, data.concentration, data.charge)
+    snapshots = tuple(source.copy() for source in sources)
+
+    with pytest.raises(ValueError, match="^Invalid particle slot state[.]$"):
+        get_slot_diagnostics(data)
+
+    for source, snapshot in zip(sources, snapshots, strict=True):
+        npt.assert_array_equal(source, snapshot)
+
+
+@pytest.mark.parametrize("field", ["concentration", "charge"])
+def test_get_slot_diagnostics_rejects_mutated_field_shape_mismatches(
+    field: str,
+) -> None:
+    """Fail closed when post-construction fields no longer match masses."""
+    data = _make_data(
+        np.array([[[1.0], [0.0]]]),
+        np.array([[1.0, 0.0]]),
+        np.array([[0.0, 0.0]]),
+    )
+    setattr(data, field, np.zeros((1, 1)))
+    sources = (data.masses, data.concentration, data.charge)
+    snapshots = tuple(source.copy() for source in sources)
+
+    with pytest.raises(ValueError, match="^Invalid particle slot state[.]$"):
+        get_slot_diagnostics(data)
+
+    for source, snapshot in zip(sources, snapshots, strict=True):
+        npt.assert_array_equal(source, snapshot)
+
+
 def test_get_slot_diagnostics_returns_ordered_fixed_shape_sidecars() -> None:
     """Return ascending free prefixes, tails, and exact per-box diagnostics."""
     data = _make_data(
