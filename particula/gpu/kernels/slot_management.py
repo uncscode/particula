@@ -335,6 +335,8 @@ def _validate_activation_inputs(
     Any,
     Any,
     Any,
+    Any,
+    Any,
     int,
     int,
     int,
