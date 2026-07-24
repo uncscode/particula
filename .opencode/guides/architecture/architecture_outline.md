@@ -57,10 +57,12 @@ private helpers for cross-kernel setup.
 - `slot_management.py` - Concrete-only P3 read-only direct-Warp diagnostics
   classify particle mass, concentration, and charge into caller-owned `int32`
   sidecars without accessing density or volume. Package-exported P4
-  `activate_slots_gpu` atomically maps selected request prefixes to ascending
-  fixed-capacity free slots, writes caller-owned `int32` outputs, performs
-  preflight without hidden transfers, and does not promise rollback after its
-  writer launches.
+  `activate_slots_gpu` maps selected request prefixes to ascending
+  fixed-capacity free slots. It reads and writes only caller-owned mass,
+  concentration, and charge storage; its activation and diagnostics sidecars
+  are caller-owned device `int32` arrays. P4 completes preflight before its
+  writer launches, makes no hidden transfers, and does not promise rollback
+  after a launched writer.
 - `environment.py` - Shared private normalization and validation for kernel
   environment inputs
 - `tests/` - Test coverage

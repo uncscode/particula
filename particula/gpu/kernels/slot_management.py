@@ -1,11 +1,12 @@
-"""Classify fixed particle slots into active and free Warp-device states.
+"""Classify and activate fixed-capacity particle slots on a Warp device.
 
-This module provides concrete-module-only P3 diagnostics and the package-
-exported P4 activation boundary. The diagnostics mirror CPU slot
-classification without transferring particle fields to the host. They read
-only particle masses, concentration, and charge; density and volume are
-intentionally not accessed. After complete schema and state preflight, they
-overwrite caller-owned diagnostic sidecars.
+This module provides concrete-module-only P3 diagnostics and the
+package-exported P4 ``activate_slots_gpu`` boundary. Both APIs read only
+particle masses, concentration, and charge; density and volume are
+intentionally unobserved. P4 validates all metadata, ownership, current slot
+state, counts, capacity, and selected request prefixes before launching its
+writer, then writes caller-owned activation and diagnostic sidecars without
+hidden host-device transfers.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -494,42 +495,49 @@ def activate_slots_gpu(
     active_counts: Any,
     free_counts: Any,
 ) -> tuple[Any, Any, Any, Any]:
-    """Atomically activate ascending free slots from Warp request prefixes.
+    """Copy selected Warp request prefixes into ascending free slots.
 
-    Requests are same-device float64 arrays shaped ``(n_boxes,
-    request_capacity, n_species)``, ``(n_boxes, request_capacity)``, and
-    ``(n_boxes, request_capacity)``. ``requested_counts``,
-    ``activated_counts``, ``active_counts``, and ``free_counts`` are int32
-    vectors shaped ``(n_boxes,)``; ``free_indices`` is int32 with shape
-    ``(n_boxes, n_particles)``. Request rank ``r`` is copied to the ``r``-th
-    ascending free slot in its box. The returned objects are exactly the
-    supplied ``(activated_counts, free_indices, active_counts, free_counts)``.
+    For each box, request rank ``r`` is copied into the ``r``-th ascending
+    free fixed-capacity slot. Complete preflight validates metadata, storage
+    ownership, existing slot state, counts, capacity, and only selected
+    request-prefix records before the mutation writer launches. Valid calls
+    write the supplied sidecars; ``activated_counts`` equals
+    ``requested_counts``, and diagnostics describe the post-activation state.
 
-    Metadata, ownership, existing state, counts, capacity, and only selected
-    request prefixes are validated before a writer launches. This direct API
-    performs no hidden host/device transfer and reads particle masses,
-    concentration, and charge only. All outputs are caller-owned. Rejected
-    calls do not mutate accessible inputs or outputs; rollback is not promised
-    after the writer launches.
+    This direct boundary performs no hidden host-device transfers and accesses
+    only particle masses, concentration, and charge. Rejected calls leave
+    accessible caller-owned inputs and outputs unchanged. Rollback is not
+    guaranteed after the mutation writer launches.
 
     Args:
-        particles: Fixed-capacity particle storage with float64 masses,
-            concentration, and charge on one Warp device.
-        request_masses: Float64 request masses with one record per rank.
-        request_concentration: Float64 positive request concentrations.
-        request_charge: Float64 finite request charges.
-        requested_counts: Int32 selected prefix length for each box.
-        activated_counts: Caller-owned int32 activation-count output.
-        free_indices: Caller-owned int32 post-activation free-slot output.
-        active_counts: Caller-owned int32 post-activation active-count output.
-        free_counts: Caller-owned int32 post-activation free-count output.
+        particles: Same-device fixed-capacity storage with float64 ``masses``
+            shaped ``(n_boxes, n_particles, n_species)`` and ``concentration``
+            and ``charge`` shaped ``(n_boxes, n_particles)``.
+        request_masses: Same-device float64 request masses shaped
+            ``(n_boxes, request_capacity, n_species)``.
+        request_concentration: Same-device float64 request concentrations
+            shaped ``(n_boxes, request_capacity)``.
+        request_charge: Same-device float64 request charges shaped
+            ``(n_boxes, request_capacity)``.
+        requested_counts: Same-device int32 selected-prefix lengths shaped
+            ``(n_boxes,)``.
+        activated_counts: Caller-owned same-device int32 output shaped
+            ``(n_boxes,)``.
+        free_indices: Caller-owned same-device int32 output shaped
+            ``(n_boxes, n_particles)``; free slots are ascending and its unused
+            entries are ``-1``.
+        active_counts: Caller-owned same-device int32 output shaped
+            ``(n_boxes,)``.
+        free_counts: Caller-owned same-device int32 output shaped
+            ``(n_boxes,)``.
 
     Returns:
-        The exact supplied activation and diagnostic sidecars.
+        The exact supplied ``(activated_counts, free_indices, active_counts,
+        free_counts)`` sidecars.
 
     Raises:
-        ValueError: If schemas, storage ownership, slot state, selected
-            requests, or capacity are invalid.
+        ValueError: If schemas, device or storage ownership, slot state,
+            selected request records, counts, or capacity are invalid.
     """
     masses, concentration, charge, n_boxes, n_particles, device = (
         _validate_particles(particles)

@@ -10,13 +10,14 @@ and nucleation disagree about whether a slot participates in physics.
 
 ## Value Proposition
 
-E6-F5 establishes matching CPU and GPU discovery primitives that preserve every
-array shape and identity, enumerate free slots in ascending index order, and
-populate exact per-box diagnostics. P3 ships this GPU read-only boundary as the
-unexported concrete-module function `get_slot_diagnostics_gpu`; GPU activation
-remains deferred. The contract becomes the stable foundation for E6-F6
-exhaustion handling, E6-F7 CPU nucleation, E6-F8 GPU nucleation, and E6-F9
-integration.
+E6-F5 establishes matching CPU and GPU discovery and activation primitives that
+preserve every array shape and identity, enumerate free slots in ascending
+index order, and populate exact per-box diagnostics. P4 ships the supported
+package-exported direct-Warp `activate_slots_gpu` boundary with complete
+preflight and caller-owned `int32` sidecars; P3 diagnostics remain the
+concrete-module-only `get_slot_diagnostics_gpu` helper. The contract becomes
+the stable foundation for E6-F6 exhaustion handling, E6-F7 CPU nucleation,
+E6-F8 GPU nucleation, and E6-F9 integration.
 
 ## User Stories
 

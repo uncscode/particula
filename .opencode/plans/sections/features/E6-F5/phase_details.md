@@ -48,11 +48,22 @@ P3 and GPU activation/parity in P4; P5 documents the completed contract.
     state and malformed-schema atomicity; density/volume non-access; and
     optional CUDA execution with clean skips.
 
-- [ ] **E6-F5-P4:** Implement atomic GPU slot activation and CPU parity tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Validate state, requests, capacity, and sidecars before launching deterministic activation and exact diagnostic updates.
-  - Files: `particula/gpu/kernels/slot_management.py`, `particula/gpu/kernels/tests/slot_management_test.py`, `particula/gpu/kernels/__init__.py`
-  - Tests: CPU/Warp mapping and value parity, zero/exact-capacity cases, fixed identities/shapes, diagnostic equality, no mutation on every invalid input, and CUDA clean skips.
+- [x] **E6-F5-P4:** Implement atomic GPU slot activation and CPU parity tests
+  - Issue: #1419 | Size: S | Status: Shipped
+  - Delivered: package-exported `activate_slots_gpu` validates same-device
+    schemas, ownership/aliasing, canonical slot state, selected counts,
+    capacity, and selected request records before writes. It maps each selected
+    request-prefix rank to the ascending free fixed slot, mutates only mass,
+    concentration, and charge, and returns caller-owned `wp.int32`
+    `(activated_counts, free_indices, active_counts, free_counts)` sidecars by
+    identity. P3 `get_slot_diagnostics_gpu` remains concrete-module-only.
+  - Files: `particula/gpu/kernels/slot_management.py`,
+    `particula/gpu/kernels/tests/slot_management_test.py`,
+    `particula/gpu/kernels/__init__.py`
+  - Tests: independent CPU-oracle particle/output parity; ascending mapping;
+    zero-prefix, zero-box, zero-capacity, exact-capacity, repeated, and sparse
+    capacity cases; schema/state/count/request/capacity/alias rejection
+    atomicity; package exports; and optional CUDA clean skips.
 
 - [ ] **E6-F5-P5:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

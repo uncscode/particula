@@ -37,7 +37,16 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
   each declared request prefix into ascending free slots, performs all
   validation before mutating mass, concentration, or charge, and returns fresh
   per-box `np.int32` activation counts. It is not exported through
-  `particula.particles`, does not resize storage, and has no GPU equivalent.
+  `particula.particles` and does not resize storage. For caller-managed Warp
+  storage, import `activate_slots_gpu` from `particula.gpu.kernels`. This P4
+  boundary maps selected request-prefix records to ascending free slots in
+  place and returns supplied `wp.int32` activation/diagnostic sidecars.
+  Particle/request storage must be same-device `wp.float64`; it performs no
+  implicit transfer. Preflight validates metadata, aliasing, state, counts,
+  capacity, and selected records before its writer launches, so rejected calls
+  preserve accessible caller-owned arrays. Rollback is not promised after a
+  writer launch, and concrete-module-only `get_slot_diagnostics_gpu` remains
+  outside the package exports.
 - **Supporting CPU latent-heat-corrected condensation diagnostics** with
   thermal resistance, latent-heat mass transfer rate utilities,
   latent-heat energy-density bookkeeping, and the

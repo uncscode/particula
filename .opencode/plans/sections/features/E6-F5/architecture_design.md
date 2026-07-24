@@ -53,9 +53,14 @@ floating-point reduction.
   `activate_slots(data, request_masses, request_concentration, request_charge,
   requested_counts)` API; it is intentionally not re-exported from
   `particula.particles`. P3 returns the supplied same-device `wp.int32`
-  `free_indices`, `active_counts`, and `free_counts` sidecars by identity after
-  read-only classification of mass, concentration, and charge; density and
-  volume are neither read nor validated. GPU activation remains deferred.
+   `free_indices`, `active_counts`, and `free_counts` sidecars by identity after
+   read-only classification of mass, concentration, and charge; density and
+   volume are neither read nor validated. P4 ships package-exported
+   `activate_slots_gpu`, which returns supplied `activated_counts`,
+   `free_indices`, `active_counts`, and `free_counts` sidecars by identity.
+   It validates same-device schemas, ownership and aliasing, existing state,
+   selected request prefixes, and per-box capacity before mapping each prefix
+   rank to an ascending free slot.
 - **Mutation Contract:** Activation mutates only selected slot mass,
   concentration, and charge cells. Density, volume, requests, unselected slots,
   shapes, dtypes, devices, array objects, and container identity are unchanged.
@@ -74,7 +79,8 @@ floating-point reduction.
   activated-count array. P3 schema and state rejection occur before a writer
   launch, preserving all supplied diagnostic sidecars. Its single device status
   readback is limited to the private invalid-state flag; successful diagnostics
-  remain device-resident.
+   remain device-resident. P4 similarly rejects before any caller mutation and
+   does not promise rollback after its activation writer launches.
 
 ## Security & Compliance
 

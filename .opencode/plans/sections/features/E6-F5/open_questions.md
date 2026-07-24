@@ -17,8 +17,9 @@ caller-owned-buffer conventions.
 - [x] How are zero-box and zero-slot containers handled?
   - Decision: CPU and Warp discovery handle zero boxes without diagnostic
     writes. P3 Warp discovery handles zero particles by overwriting per-box
-    counts with zero and has no index entries; activation boundary behavior
-    remains P4 work.
+    counts with zero and has no index entries. P4 activation returns the
+    supplied empty sidecars for zero boxes; zero particle capacity is valid
+    only with zero requested prefixes and still defines output diagnostics.
 - [x] Which diagnostic-buffer aliases are accepted?
   - Decision: none. Reject every writable overlap with particle state, request
     arrays, scratch, or another diagnostic before clearing outputs. Dtype
