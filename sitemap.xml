@@ -509,6 +509,10 @@
          <lastmod>2026-07-24</lastmod>
     </url>
     <url>
+         <loc>https://uncscode.github.io/particula/API/particula/gpu/kernels/exhaustion/</loc>
+         <lastmod>2026-07-24</lastmod>
+    </url>
+    <url>
          <loc>https://uncscode.github.io/particula/API/particula/gpu/kernels/slot_management/</loc>
          <lastmod>2026-07-24</lastmod>
     </url>
@@ -554,6 +558,10 @@
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/API/particula/particles/distribution_strategies/</loc>
+         <lastmod>2026-07-24</lastmod>
+    </url>
+    <url>
+         <loc>https://uncscode.github.io/particula/API/particula/particles/exhaustion/</loc>
          <lastmod>2026-07-24</lastmod>
     </url>
     <url>
@@ -1070,6 +1078,10 @@
     </url>
     <url>
          <loc>https://uncscode.github.io/particula/Features/particle-data-migration/</loc>
+         <lastmod>2026-07-24</lastmod>
+    </url>
+    <url>
+         <loc>https://uncscode.github.io/particula/Features/slot_exhaustion_policies/</loc>
          <lastmod>2026-07-24</lastmod>
     </url>
     <url>
