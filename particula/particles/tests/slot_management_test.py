@@ -1,5 +1,7 @@
 """Tests for fixed-shape particle slot discovery."""
 
+from typing import Any
+
 import numpy as np
 import numpy.testing as npt
 import pytest
@@ -658,9 +660,9 @@ def test_activate_slots_rejects_invalid_request_schema_atomically() -> None:
     ],
 )
 def test_activate_slots_rejects_non_array_or_wrong_rank_requests_atomically(
-    request_masses: object,
-    request_concentration: object,
-    request_charge: object,
+    request_masses: Any,
+    request_concentration: Any,
+    request_charge: Any,
 ) -> None:
     """Reject malformed request fields before a destination write."""
     data = _make_data(np.zeros((1, 1, 1)), np.zeros((1, 1)), np.zeros((1, 1)))

@@ -5,6 +5,8 @@ particle-resolved slots. Its public discovery API returns fixed-shape,
 newly allocated diagnostics while preserving the input particle storage.
 """
 
+from typing import cast
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -99,6 +101,9 @@ def _validate_destinations(
         raise ValueError(
             "Particle destination fields must be writable float64 arrays."
         )
+    masses = cast(NDArray[np.float64], masses)
+    concentration = cast(NDArray[np.float64], concentration)
+    charge = cast(NDArray[np.float64], charge)
     if (
         masses.ndim != 3
         or concentration.shape != masses.shape[:2]
