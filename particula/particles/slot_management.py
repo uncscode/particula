@@ -80,3 +80,180 @@ def get_slot_diagnostics(
         free_indices[box_index, :count] = particle_indices[free[box_index]]
 
     return free_indices, active_counts, free_counts
+
+
+def _validate_destinations(
+    data: ParticleData,
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    """Return validated writable activation destination arrays."""
+    masses = getattr(data, "masses", None)
+    concentration = getattr(data, "concentration", None)
+    charge = getattr(data, "charge", None)
+    fields = (masses, concentration, charge)
+    if any(
+        not isinstance(field, np.ndarray)
+        or field.dtype != np.float64
+        or not field.flags.writeable
+        for field in fields
+    ):
+        raise ValueError(
+            "Particle destination fields must be writable float64 arrays."
+        )
+    if (
+        masses.ndim != 3
+        or concentration.shape != masses.shape[:2]
+        or charge.shape != masses.shape[:2]
+    ):
+        raise ValueError("Particle destination fields have invalid shapes.")
+    return masses, concentration, charge
+
+
+def _validate_requests(
+    request_masses: NDArray[np.float64],
+    request_concentration: NDArray[np.float64],
+    request_charge: NDArray[np.float64],
+    requested_counts: NDArray[np.integer],
+    n_boxes: int,
+    n_species: int,
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    """Validate request schemas and return their fields."""
+    fields = (request_masses, request_concentration, request_charge)
+    if any(
+        not isinstance(field, np.ndarray) or field.dtype != np.float64
+        for field in fields
+    ):
+        raise ValueError("Request fields must be float64 NumPy arrays.")
+    if (
+        request_masses.ndim != 3
+        or request_concentration.ndim != 2
+        or request_charge.ndim != 2
+        or request_masses.shape[0] != n_boxes
+        or request_masses.shape[2] != n_species
+        or request_concentration.shape != request_masses.shape[:2]
+        or request_charge.shape != request_masses.shape[:2]
+    ):
+        raise ValueError("Request fields have invalid shapes.")
+    if (
+        not isinstance(requested_counts, np.ndarray)
+        or requested_counts.dtype.kind not in "iu"
+        or requested_counts.ndim != 1
+        or requested_counts.shape != (n_boxes,)
+    ):
+        raise ValueError(
+            "requested_counts must be a one-dimensional integer array."
+        )
+    request_capacity = request_masses.shape[1]
+    if np.any(requested_counts < 0) or np.any(
+        requested_counts > request_capacity
+    ):
+        raise ValueError("requested_counts exceeds request capacity.")
+    return fields
+
+
+def _validate_preflight(
+    request_fields: tuple[
+        NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]
+    ],
+    destination_fields: tuple[
+        NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]
+    ],
+    requested_counts: NDArray[np.integer],
+    free_counts: NDArray[np.int32],
+) -> None:
+    """Validate storage isolation, capacity, and selected request records."""
+    for request in request_fields:
+        if any(
+            np.shares_memory(request, destination)
+            for destination in destination_fields
+        ):
+            raise ValueError(
+                "Request fields must not share destination storage."
+            )
+    request_masses, request_concentration, request_charge = request_fields
+    for box_index, count in enumerate(requested_counts):
+        count_as_int = int(count)
+        if count_as_int > int(free_counts[box_index]):
+            raise ValueError("Requested activation exceeds free slot capacity.")
+        masses = request_masses[box_index, :count_as_int]
+        concentration = request_concentration[box_index, :count_as_int]
+        charge = request_charge[box_index, :count_as_int]
+        if (
+            not np.all(np.isfinite(masses) & (masses >= 0.0))
+            or not np.all(np.isfinite(concentration) & (concentration > 0.0))
+            or not np.all(np.isfinite(charge))
+        ):
+            raise ValueError("Requested activation record is invalid.")
+        with np.errstate(over="ignore", invalid="ignore"):
+            total_mass = np.sum(masses, axis=-1, dtype=np.float64)
+        if not np.all(np.isfinite(total_mass) & (total_mass > 0.0)):
+            raise ValueError("Requested activation record is invalid.")
+
+
+def activate_slots(
+    data: ParticleData,
+    request_masses: NDArray[np.float64],
+    request_concentration: NDArray[np.float64],
+    request_charge: NDArray[np.float64],
+    requested_counts: NDArray[np.integer],
+) -> NDArray[np.int32]:
+    """Activate ascending free slots from per-box request prefixes.
+
+    Request rank ``r`` in each box is copied into that box's ``r``-th
+    ascending free slot. Only records below the corresponding requested count
+    are validated or read. The destination fields mutate in place after a
+    complete global preflight, and a newly allocated ``np.int32`` count array
+    is returned.
+
+    Args:
+        data: Particle storage with writable float64 mass, concentration, and
+            charge arrays.
+        request_masses: Requested per-species masses with shape
+            ``(n_boxes, request_capacity, n_species)``.
+        request_concentration: Requested concentrations with shape
+            ``(n_boxes, request_capacity)``.
+        request_charge: Requested charges with shape
+            ``(n_boxes, request_capacity)``.
+        requested_counts: Integer prefix counts with shape ``(n_boxes,)``.
+
+    Returns:
+        A fresh ``np.int32`` array containing the activated count per box.
+
+    Raises:
+        ValueError: If an input schema, destination, slot state, requested
+            prefix, or available free capacity is invalid.
+    """
+    if not isinstance(data, ParticleData):
+        raise ValueError("data must be a ParticleData instance.")
+
+    masses, concentration, charge = _validate_destinations(data)
+    destination_fields = (masses, concentration, charge)
+
+    n_boxes, _, n_species = masses.shape
+    free_indices, _, free_counts = get_slot_diagnostics(data)
+    request_fields = _validate_requests(
+        request_masses,
+        request_concentration,
+        request_charge,
+        requested_counts,
+        n_boxes,
+        n_species,
+    )
+    _validate_preflight(
+        request_fields,
+        destination_fields,
+        requested_counts,
+        free_counts,
+    )
+
+    for box_index, count in enumerate(requested_counts):
+        count_as_int = int(count)
+        if count_as_int == 0:
+            continue
+        slots = free_indices[box_index, :count_as_int]
+        masses[box_index, slots] = request_masses[box_index, :count_as_int]
+        concentration[box_index, slots] = request_concentration[
+            box_index, :count_as_int
+        ]
+        charge[box_index, slots] = request_charge[box_index, :count_as_int]
+
+    return requested_counts.astype(np.int32, copy=True)
