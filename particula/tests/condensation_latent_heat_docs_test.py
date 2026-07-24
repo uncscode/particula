@@ -499,7 +499,7 @@ def test_p3_command_matrix_has_exact_commands_and_existing_targets() -> None:
         assert command in commands
     assert '-m "warp and cuda"' in commands
     assert all("-q" in command for command in P3_BASELINE_COMMANDS[1:])
-    assert commands.count("-Werror") == 10
+    assert commands.count("-Werror") == 11
     for target in P3_COMMAND_TARGETS:
         assert target.exists()
 
