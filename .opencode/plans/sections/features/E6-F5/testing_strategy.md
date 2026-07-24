@@ -11,8 +11,12 @@ in module-level `tests/` directories using the `*_test.py` suffix.
   and zero-slot cases, sparse multi-box ascending indices with `-1` tails,
   `np.int32` counts, package export identity, and success/error-path source
   non-mutation with fresh-output allocation.
-- **P2:** CPU zero/partial/exact-capacity activation, multi-species requests,
-  deterministic mapping, identity preservation, and full preflight atomicity.
+- **P2 (shipped, issue #1417):**
+  `particula/particles/tests/slot_management_test.py` covers zero, empty, and
+  zero-slot no-op boundaries; sparse multi-box/multi-species and exact-capacity
+  mappings; fresh `np.int32` counts; request/destination identity and untouched
+  storage; and atomic failures for malformed data/schema, selected-prefix
+  values, aliasing, invalid existing state, and later-box capacity exhaustion.
 - **P3:** Warp CPU discovery parity, fixed-shape `-1` index tails, exact `int32`
   counts, caller-owned identity, dtype/device/shape rejection, optional CUDA.
 - **P4:** CPU/Warp activation parity, post-operation diagnostics, repeated

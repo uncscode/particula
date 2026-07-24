@@ -32,6 +32,12 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
   [`get_slot_diagnostics()`](Features/data-containers-and-gpu-foundations.md#cpu-slot-diagnostics)
   API, which reports deterministic free-slot indices and per-box active/free
   counts without changing `ParticleData`.
+- **Activating fixed particle-resolved slots** with the CPU-only direct import
+  `from particula.particles.slot_management import activate_slots`. It maps
+  each declared request prefix into ascending free slots, performs all
+  validation before mutating mass, concentration, or charge, and returns fresh
+  per-box `np.int32` activation counts. It is not exported through
+  `particula.particles`, does not resize storage, and has no GPU equivalent.
 - **Supporting CPU latent-heat-corrected condensation diagnostics** with
   thermal resistance, latent-heat mass transfer rate utilities,
   latent-heat energy-density bookkeeping, and the

@@ -46,8 +46,11 @@ floating-point reduction.
   `particula.gpu.kernels.slot_management`. Expose only the intended step helper
   through lazy package exports; keep kernels and scratch helpers private.
   P1 delivered the read-only CPU API
-  `get_slot_diagnostics(data)`, re-exported from `particula.particles`; CPU
-  activation and all Warp APIs remain deferred to later phases.
+  `get_slot_diagnostics(data)`, re-exported from `particula.particles`.
+  P2 delivered the CPU-only direct-import
+  `activate_slots(data, request_masses, request_concentration, request_charge,
+  requested_counts)` API; it is intentionally not re-exported from
+  `particula.particles`. Warp APIs remain deferred to later phases.
 - **Mutation Contract:** Activation mutates only selected slot mass,
   concentration, and charge cells. Density, volume, requests, unselected slots,
   shapes, dtypes, devices, array objects, and container identity are unchanged.
@@ -59,7 +62,11 @@ floating-point reduction.
   runtime device failure after successful preflight has no rollback guarantee.
   The shipped P1 discovery path raises exactly
   `ValueError("Invalid particle slot state.")` before allocating or returning
-  diagnostics when any slot is neither active nor free.
+  diagnostics when any slot is neither active nor free. P2 validates destination
+  schema and writability, request schema and non-aliasing, selected prefixes,
+  and free capacity globally before its first assignment; it then uses P1's
+  ascending free-index ordering and returns a fresh per-box `np.int32`
+  activated-count array.
 
 ## Security & Compliance
 

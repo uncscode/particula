@@ -65,6 +65,13 @@ For fixed particle-resolved storage, the read-only public
 `particula.particles.get_slot_diagnostics(data)` API reports free-slot indices
 and active/free counts without modifying `ParticleData`. See the
 [slot diagnostics contract](./docs/Features/data-containers-and-gpu-foundations.md#cpu-slot-diagnostics).
+To fill declared request prefixes into fixed storage, import the CPU-only
+`activate_slots` boundary directly from `particula.particles.slot_management`;
+it is intentionally not exported through `particula.particles`. It copies each
+request rank into the matching ascending free slot, mutates mass,
+concentration, and charge only after complete preflight succeeds, and returns
+fresh per-box `np.int32` activation counts. There is no GPU equivalent or
+storage resizing.
 `EnvironmentData` now also participates in the public Warp CPU↔GPU helpers via
 `particula.gpu.{to_warp_environment_data, from_warp_environment_data}` for
 single-box and multi-box round trips.
