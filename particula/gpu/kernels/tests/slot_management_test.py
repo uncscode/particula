@@ -242,6 +242,22 @@ def test_slot_diagnostics_rejects_schema_before_output_mutation():
     assert free_counts.numpy()[0] == 77
 
 
+def test_slot_diagnostics_rejects_aliased_outputs_without_writes():
+    """Reject writable diagnostic overlap before empty-path or writer launch."""
+    particles = _particles(
+        np.empty((1, 0, 1)), np.empty((1, 0)), np.empty((1, 0))
+    )
+    free_indices, active_counts, _ = _sidecars(1, 0)
+    original = active_counts.numpy().copy()
+
+    with pytest.raises(
+        ValueError, match="^Activation arrays must not share storage[.]$"
+    ):
+        _diagnostics(particles, free_indices, active_counts, active_counts)
+
+    npt.assert_array_equal(active_counts.numpy(), original)
+
+
 @pytest.mark.parametrize(
     "name, replacement",
     [
@@ -919,7 +935,7 @@ def test_activation_zero_boxes_returns_all_sidecars_without_writes():
 @pytest.mark.parametrize(
     ("request_capacity", "requested_count", "message"),
     [
-        (0, 1, "Requested activation exceeds free slot capacity"),
+        (0, 1, "requested_counts exceeds request capacity"),
         (1, 1, "Requested activation exceeds free slot capacity"),
     ],
 )
@@ -945,6 +961,38 @@ def test_activation_rejects_empty_slot_capacity_requests_without_writes(
 
     for array, expected in zip(sidecars, snapshot, strict=True):
         npt.assert_array_equal(array.numpy(), expected)
+
+
+@pytest.mark.parametrize(
+    ("n_particles", "request_capacity", "requested_count", "message"),
+    [
+        (1, 1, 2, "requested_counts exceeds request capacity"),
+        (0, 0, 1, "requested_counts exceeds request capacity"),
+        (0, 1, 2, "requested_counts exceeds request capacity"),
+    ],
+)
+def test_activation_preserves_count_precedence_for_zero_capacity(
+    n_particles, request_capacity, requested_count, message
+):
+    """Report invalid counts before state or destination-capacity failures."""
+    masses = np.zeros((1, n_particles, 1))
+    concentration = np.zeros((1, n_particles))
+    charge = np.zeros((1, n_particles))
+    if n_particles:
+        masses[0, 0, 0] = -1.0
+    particles = _particles(masses, concentration, charge)
+    wp = _warp()
+    requests = (
+        wp.ones((1, request_capacity, 1), dtype=wp.float64, device="cpu"),
+        wp.ones((1, request_capacity), dtype=wp.float64, device="cpu"),
+        wp.zeros((1, request_capacity), dtype=wp.float64, device="cpu"),
+        wp.array([requested_count], dtype=wp.int32, device="cpu"),
+    )
+    sidecars = _activation_sidecars(1, n_particles)
+
+    expected = "Invalid particle slot state" if n_particles else message
+    with pytest.raises(ValueError, match=rf"^{expected}[.]$"):
+        _activate(particles, *requests, *sidecars)
 
 
 def test_activation_rejects_request_arrays_aliasing_particle_storage():
