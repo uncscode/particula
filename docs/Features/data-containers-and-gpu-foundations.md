@@ -92,6 +92,25 @@ lanes, and charge are exactly zero. Any other state raises
 returned. The function neither mutates nor aliases particle storage, and it
 does not activate, resize, compact, or transfer slots to Warp.
 
+### CPU slot activation
+
+`activate_slots` is a CPU-only direct import, not a `particula.particles`
+package export:
+
+```python
+from particula.particles.slot_management import activate_slots
+```
+
+For each box, request rank `r` is copied to the `r`-th ascending free slot from
+`get_slot_diagnostics()`. The function completes schema, storage-isolation,
+slot-state, capacity, and selected-record preflight for every box before any
+write. A rejected call therefore leaves particle and request storage unchanged.
+Successful calls mutate only caller-owned `masses`, `concentration`, and
+`charge` in place; `density`, `volume`, unselected slots, and request arrays
+are preserved. It returns a fresh `np.int32` array containing activated counts
+per box. The boundary does not resize or compact storage, change `ParticleData`,
+or provide GPU support.
+
 ## Canonical container schemas
 
 ### `ParticleData`

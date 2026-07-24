@@ -100,7 +100,8 @@ def _validate_destinations(
 
     Raises:
         ValueError: If a mutable destination is not a writable ``float64``
-            NumPy array or the destination shapes are incompatible.
+            NumPy array, storage overlaps another mutable or protected field,
+            or the destination shapes are incompatible.
     """
     masses = getattr(data, "masses", None)
     concentration = getattr(data, "concentration", None)
@@ -124,6 +125,17 @@ def _validate_destinations(
         or charge.shape != masses.shape[:2]
     ):
         raise ValueError("Particle destination fields have invalid shapes.")
+    protected_fields = (data.density, data.volume)
+    if any(
+        np.shares_memory(first, second)
+        for index, first in enumerate((masses, concentration, charge))
+        for second in (masses, concentration, charge)[index + 1 :]
+    ) or any(
+        np.shares_memory(destination, protected)
+        for destination in (masses, concentration, charge)
+        for protected in protected_fields
+    ):
+        raise ValueError("Particle destination fields must not share storage.")
     return masses, concentration, charge
 
 
