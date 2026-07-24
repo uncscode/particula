@@ -38,8 +38,8 @@ def _classify_slots(
     """Classify one particle slot and record an invalid-state flag."""
     box, particle = wp.tid()
     species_count = masses.shape[2]
-    mass_valid = wp.bool(True)
-    mass_zero = wp.bool(True)
+    mass_valid = bool(True)
+    mass_zero = bool(True)
     total_mass = wp.float64(0.0)
     for species in range(species_count):
         mass = masses[box, particle, species]
