@@ -111,6 +111,77 @@ are preserved. It returns a fresh `np.int32` array containing activated counts
 per box. The boundary does not resize or compact storage, change `ParticleData`,
 or provide GPU support.
 
+### Direct GPU slot activation
+
+Use the package-exported direct boundary when a caller-managed
+`WarpParticleData` must fill fixed-capacity free slots without moving state to
+the CPU:
+
+```python
+from particula.gpu.kernels import activate_slots_gpu
+
+activated_counts, free_indices, active_counts, free_counts = (
+    activate_slots_gpu(
+        particles,
+        request_masses,
+        request_concentration,
+        request_charge,
+        requested_counts,
+        activated_counts,
+        free_indices,
+        active_counts,
+        free_counts,
+    )
+)
+```
+
+For each box, selected request-prefix rank `r` is copied to the `r`-th
+ascending free slot. This deterministic, fixed-capacity boundary does not
+resize, compact, or replace caller buffers.
+
+All particle fields used by this operation and the three request fields are
+caller-owned, same-device `wp.float64` Warp arrays:
+
+| Input | Required shape |
+| --- | --- |
+| `particles.masses` / `request_masses` | `(n_boxes, n_particles, n_species)` / `(n_boxes, request_capacity, n_species)` |
+| `particles.concentration` / `request_concentration` | `(n_boxes, n_particles)` / `(n_boxes, request_capacity)` |
+| `particles.charge` / `request_charge` | `(n_boxes, n_particles)` / `(n_boxes, request_capacity)` |
+
+`requested_counts`, `activated_counts`, `active_counts`, and `free_counts` are
+caller-owned, same-device `wp.int32` sidecars with shape `(n_boxes,)`.
+`free_indices` is a caller-owned, same-device `wp.int32` sidecar with shape
+`(n_boxes, n_particles)`. The return order is exactly
+`(activated_counts, free_indices, active_counts, free_counts)`, and each result
+is the same supplied sidecar. On success, `activated_counts` equals
+`requested_counts`; the remaining outputs describe post-activation state with
+ascending free indices and a `-1` unused tail.
+
+#### Ownership and failure boundary
+
+This is a low-level direct-kernel operation. Callers own CPU↔Warp transfer,
+device placement, synchronization, and all particle, request, and output
+buffers; there is no hidden transfer, CPU fallback, or storage resizing. It
+reads and writes only `masses`, `concentration`, and `charge`; `density` and
+`volume` are unobserved and preserved.
+
+Before its writer launches, it validates metadata, sidecar ownership and
+aliasing, existing slot state, requested counts, free capacity, and selected
+request records. Request records outside each declared prefix are ignored. A
+rejected preflight preserves every accessible caller-owned particle, request,
+count, and output buffer. Once the writer launches, a later failure does not
+promise rollback.
+
+`get_slot_diagnostics_gpu` remains a concrete-module-only P3 helper at
+`particula.gpu.kernels.slot_management`; do not import it from
+`particula.gpu.kernels` or `particula.gpu`.
+
+Validate this bounded direct-kernel contract with:
+
+```bash
+pytest particula/gpu/kernels/tests/slot_management_test.py -q -Werror
+```
+
 ## Canonical container schemas
 
 ### `ParticleData`
@@ -783,6 +854,7 @@ than storage support.
 | CPU coagulation with data containers | `n_boxes == 1` only | Multi-box CPU execution is not yet a built-in runtime path. |
 | CPU↔GPU transfer | Explicit helper calls only | No hidden container movement or hidden environment synchronization. |
 | Warp/CUDA support | Optional | Warp `device="cpu"` is the baseline when Warp is installed; CUDA is additive local evidence and unavailable devices skip cleanly. |
+| Low-level GPU slot activation | Shipped fixed-capacity direct-kernel contract | `activate_slots_gpu` maps selected request prefixes to ascending free slots with caller-owned same-device sidecars; no hidden transfer, resizing, or high-level runnable is provided. |
 | Low-level GPU condensation direct-kernel path | Shipped bounded direct-kernel contract | Executes four fixed coupled substeps with active-device P2 inventory and gas coupling. This is direct-kernel evidence, not broad GPU-condensation support. |
 | Low-level GPU coagulation direct-kernel path | Direct, particle-resolved direct-kernel contract | Exact mask and rejection boundaries follow below. This path establishes no Runnable support, CPU parity, or performance claim. |
 | Fixed-shape GPU/runtime roadmap work | Not current runtime behavior | Graph-capture-oriented and fixed-shape runtime constraints remain roadmap handoff material, not shipped behavior. |
@@ -929,6 +1001,7 @@ the other evidence classes.
 | `pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q` | Quick-start regression. |
 | `pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror` | Primary direct CPU-oracle particle-mass/gas-concentration parity matrix. |
 | `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py -q -Werror` | Bounded direct-step stiffness coverage. |
+| `pytest particula/gpu/kernels/tests/slot_management_test.py -q -Werror` | Fixed-slot activation mapping, caller-owned sidecars, and preflight state-safety coverage. |
 | `pytest particula/gpu/dynamics/tests/coagulation_funcs_test.py -q -Werror` | Deterministic GPU coagulation pair-helper parity. |
 | `pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror` | Direct coagulation coverage, including singleton sedimentation and ST1956 configurations, direct/environment inputs, caller-owned output/RNG behavior, conservation, and rejected-call state safety. |
 | `pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror` | Fixed-mask deterministic/ownership evidence. |

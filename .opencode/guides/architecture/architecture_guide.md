@@ -61,6 +61,21 @@ kernel-entry responsibilities.
 - The preflight guarantee ends at launch: post-launch rollback is not
   provided. This direct entry point does not imply CPU fallback or runnable
   support.
+- Import the supported fixed-slot activation boundary with
+  `from particula.gpu.kernels import activate_slots_gpu`. Its P3
+  `get_slot_diagnostics_gpu` helper remains concrete-module-only at
+  `particula.gpu.kernels.slot_management` and must not be re-exported.
+- `activate_slots_gpu` maps selected request-prefix ranks to ascending free
+  slots in caller-owned, fixed-capacity Warp storage. It reads and writes only
+  particle mass, concentration, and charge; density and volume are
+  intentionally unobserved. Requests and all activation/diagnostic `int32`
+  sidecars are caller-owned, same-device inputs and outputs.
+- P4 validates schema, ownership, current slot state, selected requests, and
+  capacity before launching its writer. Rejected calls make no caller mutation
+  or hidden CPU↔GPU transfer; after a writer launches, rollback is not
+  promised. This direct boundary does not establish resizing, compaction,
+  hidden fallback, or a higher-level runnable API. See
+  [ADR-002](decisions/ADR-002-gpu-fixed-slot-activation-boundary.md).
 - Import the supported fixed-slot wall-loss boundary with
   `from particula.gpu.kernels import wall_loss_step_gpu`. Its
   `NeutralWallLossConfig` is deliberately concrete-module-only at

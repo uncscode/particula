@@ -70,15 +70,25 @@ To fill declared request prefixes into fixed storage, import the CPU-only
 it is intentionally not exported through `particula.particles`. It copies each
 request rank into the matching ascending free slot, mutates mass,
 concentration, and charge only after complete preflight succeeds, and returns
-fresh per-box `np.int32` activation counts. There is no GPU equivalent or
-storage resizing.
+fresh per-box `np.int32` activation counts and does not resize storage.
+For fixed-capacity Warp storage, import the direct P4 boundary with
+`from particula.gpu.kernels import activate_slots_gpu`. It maps each selected
+request-prefix record to the corresponding ascending free slot and returns the
+caller-owned `(activated_counts, free_indices, active_counts, free_counts)`
+`wp.int32` sidecars. Particle and request arrays must be same-device
+`wp.float64` storage; callers own transfers, placement, and synchronization.
+Complete preflight validates metadata, aliasing, existing state, counts,
+capacity, and selected records only before the writer launches. Rejected calls
+do not mutate accessible inputs or outputs, while rollback is not guaranteed
+after a writer launch. `get_slot_diagnostics_gpu` remains a concrete-module-only
+P3 helper at `particula.gpu.kernels.slot_management`.
 `EnvironmentData` now also participates in the public Warp CPU↔GPU helpers via
 `particula.gpu.{to_warp_environment_data, from_warp_environment_data}` for
 single-box and multi-box round trips.
 Import GPU kernel entry points `condensation_step_gpu`, `coagulation_step_gpu`,
 and `wall_loss_step_gpu` from `particula.gpu.kernels`. Top-level
 `particula.gpu` remains the transfer/context-helper surface and does not
-re-export those direct kernel step functions. The kernel entry points accept
+re-export those direct kernel functions. The step entry points accept
 scalar `temperature` / `pressure` inputs, per-box Warp arrays with shape
 `(n_boxes,)`, hybrid scalar-plus-Warp-array direct inputs when `environment`
 is omitted, or a `WarpEnvironmentData` via the keyword-only `environment=`

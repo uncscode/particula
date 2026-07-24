@@ -425,6 +425,34 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
   transfer. Call it directly only when vapor pressure must be refreshed outside
   a condensation step.
 
+### GPU fixed-slot activation P4 contract
+
+- Import the supported boundary with
+  `from particula.gpu.kernels import activate_slots_gpu`.
+- It maps each selected request-prefix rank to the corresponding ascending free
+  slot in fixed-capacity `WarpParticleData` storage. It reads and writes only
+  `masses`, `concentration`, and `charge`; `density` and `volume` are
+  unobserved.
+- Particle/request arrays are caller-owned, same-device `wp.float64` storage.
+  `requested_counts` and all returned sidecars are caller-owned, same-device
+  `wp.int32`; the return order is
+  `(activated_counts, free_indices, active_counts, free_counts)`.
+- There are no hidden CPU↔Warp transfers, allocations that replace caller
+  buffers, or storage resizing. Callers own placement and synchronization.
+- Before writer launch, preflight validates metadata, ownership/aliasing,
+  existing slot state, selected counts, free capacity, and selected records
+  only. Rejected calls preserve accessible inputs and outputs; rollback is not
+  promised once a writer launches.
+- `get_slot_diagnostics_gpu` is a concrete-module-only P3 helper at
+  `particula.gpu.kernels.slot_management`; do not re-export it through
+  `particula.gpu.kernels` or `particula.gpu`.
+
+Focused P4 contract run:
+
+```bash
+pytest particula/gpu/kernels/tests/slot_management_test.py -q -Werror
+```
+
 ### GPU dilution P1–P4 contract
 
 - Import the supported direct low-level entry point with

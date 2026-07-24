@@ -183,6 +183,7 @@ pytest particula/gpu/tests/cuda_availability_test.py -q
 pytest particula/gpu/kernels/tests/environment_test.py -q
 pytest particula/gpu/kernels/tests/thermodynamics_test.py -q -Werror
 pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
+pytest particula/gpu/kernels/tests/slot_management_test.py -q -Werror
 pytest particula/gpu/kernels/tests/wall_loss_test.py particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror
@@ -263,6 +264,20 @@ oracle on Warp CPU, with matching CUDA rows that skip cleanly when unavailable.
 Keep particle and gas parity assertions separate, preserve caller-owned per-box
 coefficient identity and values, and use exact equality for no-op checks. This
 is direct-kernel test evidence only; it does not establish CPU-runnable parity.
+
+GPU slot activation P4 coverage belongs in
+`particula/gpu/kernels/tests/slot_management_test.py`. Defer Warp imports so
+missing Warp skips cleanly, import only `activate_slots_gpu` from
+`particula.gpu.kernels`, and retain `get_slot_diagnostics_gpu` as a
+concrete-module-only P3 test helper. Compare deterministic float64 copies and
+all caller-owned int32 sidecars exactly against independent CPU activation and
+post-call diagnostics. Cover ascending-free-slot mapping, selected-prefix-only
+validation, zero prefixes, zero boxes, zero capacity, exact capacity, repeated
+activation, and sparse capacity. For each schema, state, count, selected-record,
+capacity, and alias preflight failure, snapshot accessible arrays and prove
+non-mutation. Warp CPU is the baseline; CUDA parity is optional and must skip
+cleanly when unavailable. This tests the bounded direct-Warp boundary only, not
+a runnable, implicit transfer, storage resizing, or rollback after writer launch.
 
 Direct GPU wall-loss parity coverage belongs in
 `particula/gpu/kernels/tests/wall_loss_parity_test.py`. Keep the NumPy

@@ -25,9 +25,14 @@ in module-level `tests/` directories using the `*_test.py` suffix.
   overwrite; malformed dtype/rank/shape/device and invalid-state rejection
   before output writes; density/volume non-access; and Warp CPU plus clean
   optional CUDA execution.
-- **P4:** CPU/Warp activation parity, post-operation diagnostics, repeated
-  activation, untouched sentinels, insufficient capacity, malformed state and
-  requests, alias checks, and failure-before-mutation snapshots.
+- **P4 (shipped, issue #1419):**
+  `particula/gpu/kernels/tests/slot_management_test.py` compares particles and
+  all four caller-owned `int32` sidecars exactly with independent CPU activation
+  and post-call diagnostics. It covers ascending mapping, selected-prefix-only
+  validation, zero prefixes/boxes/capacity, exact and sparse capacity, repeated
+  activation, package export identity, and optional CUDA clean skips. Snapshot
+  tests prove non-mutation for schema, state, count, selected-record, capacity,
+  and direct/partial alias rejection.
 - **P5:** Documentation link/import/shape-table validation and focused command
   review.
 
