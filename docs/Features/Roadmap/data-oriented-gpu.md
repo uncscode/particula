@@ -1328,9 +1328,10 @@ Delivered bounded wall-loss P1–P6 scope:
   compaction.
 - CPU/Warp transfers, placement, and synchronization remain explicit caller
   responsibilities. The direct boundary has no hidden transfer, CPU fallback,
-  runnable, or performance claim. CPU preflight is globally read-only; GPU
-  preflight is read-only before launch and does not promise rollback after a
-  writer has launched.
+  runnable, or performance claim. CPU preflight is globally read-only. GPU
+  preflight may launch read-only validation, classification, or workspace
+  kernels, but does not mutate caller-owned state before its writer launches;
+  it does not promise rollback after a writer has launched.
 - E6-F6 owns exhaustion, resampling, and volume-scaling policy. E6-F7 owns CPU
   particle-source physics, E6-F8 owns direct-Warp consumption, and E6-F9 owns
   integration and the direct-step example. These later features do not alter
@@ -1338,17 +1339,13 @@ Delivered bounded wall-loss P1–P6 scope:
 
 Future features:
 
-1. GPU process orchestration, backend selection/fallback policy, scheduling,
-   and GPU-resident timestep integration for the delivered direct kernels.
-2. E6-F6 exhaustion, resampling, and volume-scaling policy for fixed slots.
-3. E6-F7 CPU nucleation/particle-source physics following the
+1. E6-F6 exhaustion, resampling, and volume-scaling policy for fixed slots.
+2. E6-F7 CPU nucleation/particle-source physics following the
    [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md)
    (no nucleation code exists in particula today).
-4. E6-F8 direct-Warp consumption of the source contract (see
+3. E6-F8 direct-Warp consumption of the source contract (see
    [Particle Slot Management](#particle-slot-management)).
-5. E6-F9 integration, closeout validation, and a direct-step example.
-6. Fixed-shape GPU workflow extensions: graph capture,
-   autodiff, and performance evidence.
+4. E6-F9 integration, closeout validation, and a direct-step example.
 
 ### Particle Slot Management
 
@@ -1360,11 +1357,13 @@ Future features:
   volume scaling before a box runs out of free slots. It does not add resize or
   hidden-transfer behavior to E6-F5.
 - E6-F7 owns CPU source physics; E6-F8 owns its direct-Warp consumer. E6-F9
-  owns integrated orchestration and a runnable example. No direct runnable or
-  user example is shipped by E6-F5.
-- Graph capture, autodiff, and performance evidence remain deferred. Fixed
-  slots avoid dynamic allocation and preserve stable shapes; compaction is not
-  part of the shipped contract.
+  owns integrated orchestration and the direct-step example. No direct runnable
+  or user example is shipped by E6-F5.
+- Graph capture, autodiff, and performance evidence belong to later epic work.
+  Fixed slots preserve stable shapes without resizing or allocating caller-owned
+  particle storage; primitives may privately allocate temporary categories,
+  workspace, count, and status buffers. Compaction is not part of the shipped
+  contract.
 
 **Exit bar:** A complete GPU-resident timestep can run condensation,
 coagulation, wall loss, and dilution together with persistent RNG state, and
