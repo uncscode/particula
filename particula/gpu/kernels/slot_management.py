@@ -5,8 +5,9 @@ package-exported P4 ``activate_slots_gpu`` boundary. Both APIs read only
 particle masses, concentration, and charge; density and volume are
 intentionally unobserved. P4 validates all metadata, ownership, current slot
 state, counts, capacity, and selected request prefixes before launching its
-writer, then writes caller-owned activation and diagnostic sidecars without
-hidden host-device transfers.
+writer, then writes caller-owned activation and diagnostic sidecars. Caller-
+owned simulation arrays are never implicitly transferred; validation may
+synchronize and read back private scalar status buffers.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -151,20 +152,18 @@ def _validate_activation_preflight(
     request_concentration: wp.array2d(dtype=wp.float64),
     request_charge: wp.array2d(dtype=wp.float64),
     requested_counts: wp.array(dtype=wp.int32),
-    status: wp.array(dtype=wp.int32),
+    invalid_count: wp.array(dtype=wp.int32),
+    insufficient_capacity: wp.array(dtype=wp.int32),
+    invalid_request: wp.array(dtype=wp.int32),
 ) -> None:
     """Validate state, counts, capacity, and selected request records."""
     box, request = wp.tid()
     count = requested_counts[box]
     if request == 0:
         if count < 0 or count > request_masses.shape[1]:
-            wp.atomic_max(status, 0, 2)
+            wp.atomic_max(invalid_count, 0, 1)
         elif count > free_counts[box]:
-            wp.atomic_max(status, 0, 3)
-    if categories[box, 0] == _CATEGORY_INVALID:
-        # Classification separately flags all invalid slots; this branch only
-        # ensures the activation preflight owns a single status readback.
-        wp.atomic_max(status, 0, 1)
+            wp.atomic_max(insufficient_capacity, 0, 1)
     if request >= count or count < 0 or count > request_masses.shape[1]:
         return
     total_mass = wp.float64(0.0)
@@ -179,17 +178,7 @@ def _validate_activation_preflight(
             valid = False
         total_mass = total_mass + mass
     if not valid or not wp.isfinite(total_mass) or total_mass <= 0.0:
-        wp.atomic_max(status, 0, 4)
-
-
-@wp.kernel  # pragma: no cover
-def _validate_categories(
-    categories: wp.array2d(dtype=wp.int32), status: wp.array(dtype=wp.int32)
-) -> None:
-    """Flag invalid categories without reading caller-owned sidecars."""
-    box, particle = wp.tid()
-    if categories[box, particle] == _CATEGORY_INVALID:
-        wp.atomic_max(status, 0, 1)
+        wp.atomic_max(invalid_request, 0, 1)
 
 
 @wp.kernel  # pragma: no cover
@@ -230,17 +219,17 @@ def _write_activated_counts(
 @wp.kernel  # pragma: no cover
 def _validate_empty_activation_extent(
     requested_counts: wp.array(dtype=wp.int32),
-    status: wp.array(dtype=wp.int32),
+    invalid_count: wp.array(dtype=wp.int32),
+    insufficient_capacity: wp.array(dtype=wp.int32),
     request_capacity: wp.int32,
-    capacity_status: wp.int32,
 ) -> None:
     """Reject nonzero counts when no request or destination extent exists."""
     box = wp.tid()
     count = requested_counts[box]
-    if count < 0 or (count > request_capacity and request_capacity != 0):
-        wp.atomic_max(status, 0, 2)
+    if count < 0 or count > request_capacity:
+        wp.atomic_max(invalid_count, 0, 1)
     elif count != 0:
-        wp.atomic_max(status, 0, capacity_status)
+        wp.atomic_max(insufficient_capacity, 0, 1)
 
 
 def _get_required_field(particles: Any, name: str) -> Any:
@@ -324,6 +313,269 @@ def _validate_particles(particles: Any) -> tuple[Any, Any, Any, int, int, Any]:
         device,
     )
     return masses, concentration, charge, n_boxes, n_particles, device
+
+
+def _validate_activation_inputs(
+    particles: Any,
+    request_masses: Any,
+    request_concentration: Any,
+    request_charge: Any,
+    requested_counts: Any,
+    activated_counts: Any,
+    free_indices: Any,
+    active_counts: Any,
+    free_counts: Any,
+) -> tuple[
+    Any,
+    Any,
+    Any,
+    Any,
+    Any,
+    Any,
+    Any,
+    Any,
+    Any,
+    int,
+    int,
+    int,
+    Any,
+]:
+    """Validate schemas and storage ownership for activation inputs."""
+    masses, concentration, charge, n_boxes, n_particles, device = (
+        _validate_particles(particles)
+    )
+    n_species = masses.shape[2]
+    request_masses = _validate_array_schema(
+        request_masses, "request_masses", wp.float64, 3, device=device
+    )
+    try:
+        request_capacity = request_masses.shape[1]
+        if (
+            request_masses.shape[0] != n_boxes
+            or request_masses.shape[2] != n_species
+        ):
+            raise ValueError
+    except Exception as exc:
+        raise ValueError(
+            "request_masses shape must match particle masses."
+        ) from exc
+    request_shape = (n_boxes, request_capacity)
+    request_concentration = _validate_array_schema(
+        request_concentration,
+        "request_concentration",
+        wp.float64,
+        2,
+        request_shape,
+        device,
+    )
+    request_charge = _validate_array_schema(
+        request_charge, "request_charge", wp.float64, 2, request_shape, device
+    )
+    requested_counts = _validate_array_schema(
+        requested_counts, "requested_counts", wp.int32, 1, (n_boxes,), device
+    )
+    activated_counts = _validate_array_schema(
+        activated_counts, "activated_counts", wp.int32, 1, (n_boxes,), device
+    )
+    free_indices = _validate_array_schema(
+        free_indices,
+        "free_indices",
+        wp.int32,
+        2,
+        (n_boxes, n_particles),
+        device,
+    )
+    active_counts = _validate_array_schema(
+        active_counts, "active_counts", wp.int32, 1, (n_boxes,), device
+    )
+    free_counts = _validate_array_schema(
+        free_counts, "free_counts", wp.int32, 1, (n_boxes,), device
+    )
+    _validate_activation_ownership(
+        (
+            request_masses,
+            request_concentration,
+            request_charge,
+            requested_counts,
+        ),
+        (
+            masses,
+            concentration,
+            charge,
+            activated_counts,
+            free_indices,
+            active_counts,
+            free_counts,
+        ),
+    )
+    return (
+        masses,
+        concentration,
+        charge,
+        request_masses,
+        request_concentration,
+        request_charge,
+        requested_counts,
+        activated_counts,
+        free_indices,
+        active_counts,
+        free_counts,
+        n_boxes,
+        n_particles,
+        request_capacity,
+        device,
+    )
+
+
+def _validate_zero_capacity_activation(
+    requested_counts: Any,
+    request_capacity: int,
+    active_counts: Any,
+    free_counts: Any,
+    device: Any,
+) -> tuple[Any, Any]:
+    """Validate count and capacity constraints when no particle slots exist."""
+    invalid_count = wp.zeros(1, dtype=wp.int32, device=device)
+    insufficient_capacity = wp.zeros(1, dtype=wp.int32, device=device)
+    wp.launch(
+        _validate_empty_activation_extent,
+        dim=int(requested_counts.shape[0]),
+        inputs=[
+            requested_counts,
+            invalid_count,
+            insufficient_capacity,
+            request_capacity,
+        ],
+        device=device,
+    )
+    if int(invalid_count.numpy()[0]):
+        raise ValueError(_INVALID_COUNT_MESSAGE)
+    if int(insufficient_capacity.numpy()[0]):
+        raise ValueError(_CAPACITY_MESSAGE)
+    wp.launch(
+        _write_empty_diagnostics,
+        dim=int(requested_counts.shape[0]),
+        inputs=[active_counts, free_counts],
+        device=device,
+    )
+    return active_counts, free_counts
+
+
+def _activate_nonempty_requests(
+    masses: Any,
+    concentration: Any,
+    charge: Any,
+    request_masses: Any,
+    request_concentration: Any,
+    request_charge: Any,
+    requested_counts: Any,
+    activated_counts: Any,
+    free_indices: Any,
+    active_counts: Any,
+    free_counts: Any,
+    n_boxes: int,
+    n_particles: int,
+    request_capacity: int,
+    device: Any,
+) -> tuple[Any, Any, Any, Any]:
+    """Validate and apply activation requests for nonempty slot capacity."""
+    categories = wp.empty((n_boxes, n_particles), dtype=wp.int32, device=device)
+    free_workspace = wp.empty(
+        (n_boxes, n_particles), dtype=wp.int32, device=device
+    )
+    workspace_counts = wp.empty(n_boxes, dtype=wp.int32, device=device)
+    invalid_state = wp.zeros(1, dtype=wp.int32, device=device)
+    invalid_count = wp.zeros(1, dtype=wp.int32, device=device)
+    insufficient_capacity = wp.zeros(1, dtype=wp.int32, device=device)
+    invalid_request = wp.zeros(1, dtype=wp.int32, device=device)
+    wp.launch(
+        _classify_slots,
+        dim=(n_boxes, n_particles),
+        inputs=[masses, concentration, charge, categories, invalid_state],
+        device=device,
+    )
+    wp.launch(
+        _build_free_workspace,
+        dim=n_boxes,
+        inputs=[categories, free_workspace, workspace_counts],
+        device=device,
+    )
+    if request_capacity:
+        wp.launch(
+            _validate_activation_preflight,
+            dim=(n_boxes, request_capacity),
+            inputs=[
+                categories,
+                workspace_counts,
+                request_masses,
+                request_concentration,
+                request_charge,
+                requested_counts,
+                invalid_count,
+                insufficient_capacity,
+                invalid_request,
+            ],
+            device=device,
+        )
+    else:
+        # A zero request extent still needs count/capacity validation.
+        wp.launch(
+            _validate_empty_activation_extent,
+            dim=n_boxes,
+            inputs=[
+                requested_counts,
+                invalid_count,
+                insufficient_capacity,
+                request_capacity,
+            ],
+            device=device,
+        )
+    if int(invalid_state.numpy()[0]):
+        raise ValueError(_INVALID_SLOT_MESSAGE)
+    if int(invalid_count.numpy()[0]):
+        raise ValueError(_INVALID_COUNT_MESSAGE)
+    if int(insufficient_capacity.numpy()[0]):
+        raise ValueError(_CAPACITY_MESSAGE)
+    if int(invalid_request.numpy()[0]):
+        raise ValueError(_INVALID_REQUEST_MESSAGE)
+
+    if request_capacity:
+        wp.launch(
+            _activate_requests,
+            dim=(n_boxes, request_capacity),
+            inputs=[
+                masses,
+                concentration,
+                charge,
+                request_masses,
+                request_concentration,
+                request_charge,
+                requested_counts,
+                free_workspace,
+                activated_counts,
+            ],
+            device=device,
+        )
+    else:
+        wp.launch(
+            _write_activated_counts,
+            dim=n_boxes,
+            inputs=[requested_counts, activated_counts],
+            device=device,
+        )
+    wp.launch(
+        _classify_slots,
+        dim=(n_boxes, n_particles),
+        inputs=[masses, concentration, charge, categories, invalid_state],
+        device=device,
+    )
+    wp.launch(
+        _write_diagnostics,
+        dim=n_boxes,
+        inputs=[categories, free_indices, active_counts, free_counts],
+        device=device,
+    )
+    return activated_counts, free_indices, active_counts, free_counts
 
 
 def _warp_array_memory_range(array: Any) -> tuple[int, int] | None:
@@ -452,6 +704,10 @@ def get_slot_diagnostics_gpu(
         (n_boxes,),
         device,
     )
+    _validate_activation_ownership(
+        (masses, concentration, charge),
+        (free_indices, active_counts, free_counts),
+    )
 
     if n_boxes == 0:
         return free_indices, active_counts, free_counts
@@ -504,10 +760,11 @@ def activate_slots_gpu(
     write the supplied sidecars; ``activated_counts`` equals
     ``requested_counts``, and diagnostics describe the post-activation state.
 
-    This direct boundary performs no hidden host-device transfers and accesses
-    only particle masses, concentration, and charge. Rejected calls leave
-    accessible caller-owned inputs and outputs unchanged. Rollback is not
-    guaranteed after the mutation writer launches.
+    This direct boundary never implicitly transfers caller-owned simulation
+    arrays and accesses only particle masses, concentration, and charge.
+    Validation may synchronize and read back private scalar status buffers.
+    Rejected calls leave accessible caller-owned inputs and outputs unchanged.
+    Rollback is not guaranteed after the mutation writer launches.
 
     Args:
         particles: Same-device fixed-capacity storage with float64 ``masses``
@@ -539,191 +796,66 @@ def activate_slots_gpu(
         ValueError: If schemas, device or storage ownership, slot state,
             selected request records, counts, or capacity are invalid.
     """
-    masses, concentration, charge, n_boxes, n_particles, device = (
-        _validate_particles(particles)
-    )
-    n_species = masses.shape[2]
-    request_masses = _validate_array_schema(
-        request_masses, "request_masses", wp.float64, 3, device=device
-    )
-    try:
-        request_capacity = request_masses.shape[1]
-        if (
-            request_masses.shape[0] != n_boxes
-            or request_masses.shape[2] != n_species
-        ):
-            raise ValueError
-    except Exception as exc:
-        raise ValueError(
-            "request_masses shape must match particle masses."
-        ) from exc
-    request_shape = (n_boxes, request_capacity)
-    request_concentration = _validate_array_schema(
+    (
+        masses,
+        concentration,
+        charge,
+        request_masses,
         request_concentration,
-        "request_concentration",
-        wp.float64,
-        2,
-        request_shape,
-        device,
-    )
-    request_charge = _validate_array_schema(
-        request_charge, "request_charge", wp.float64, 2, request_shape, device
-    )
-    requested_counts = _validate_array_schema(
-        requested_counts, "requested_counts", wp.int32, 1, (n_boxes,), device
-    )
-    activated_counts = _validate_array_schema(
-        activated_counts, "activated_counts", wp.int32, 1, (n_boxes,), device
-    )
-    free_indices = _validate_array_schema(
+        request_charge,
+        requested_counts,
+        activated_counts,
         free_indices,
-        "free_indices",
-        wp.int32,
-        2,
-        (n_boxes, n_particles),
+        active_counts,
+        free_counts,
+        n_boxes,
+        n_particles,
+        request_capacity,
         device,
-    )
-    active_counts = _validate_array_schema(
-        active_counts, "active_counts", wp.int32, 1, (n_boxes,), device
-    )
-    free_counts = _validate_array_schema(
-        free_counts, "free_counts", wp.int32, 1, (n_boxes,), device
-    )
-    _validate_activation_ownership(
-        (
-            request_masses,
-            request_concentration,
-            request_charge,
-            requested_counts,
-        ),
-        (
-            masses,
-            concentration,
-            charge,
-            activated_counts,
-            free_indices,
-            active_counts,
-            free_counts,
-        ),
+    ) = _validate_activation_inputs(
+        particles,
+        request_masses,
+        request_concentration,
+        request_charge,
+        requested_counts,
+        activated_counts,
+        free_indices,
+        active_counts,
+        free_counts,
     )
     if n_boxes == 0:
         return activated_counts, free_indices, active_counts, free_counts
 
     if n_particles == 0:
-        status = wp.zeros(1, dtype=wp.int32, device=device)
-        wp.launch(
-            _validate_empty_activation_extent,
-            dim=n_boxes,
-            inputs=[requested_counts, status, request_capacity, 3],
-            device=device,
+        _validate_zero_capacity_activation(
+            requested_counts,
+            request_capacity,
+            active_counts,
+            free_counts,
+            device,
         )
-        if int(status.numpy()[0]):
-            raise ValueError(_CAPACITY_MESSAGE)
         wp.launch(
             _write_activated_counts,
             dim=n_boxes,
             inputs=[requested_counts, activated_counts],
-            device=device,
-        )
-        wp.launch(
-            _write_empty_diagnostics,
-            dim=n_boxes,
-            inputs=[active_counts, free_counts],
             device=device,
         )
         return activated_counts, free_indices, active_counts, free_counts
 
-    categories = wp.empty((n_boxes, n_particles), dtype=wp.int32, device=device)
-    free_workspace = wp.empty(
-        (n_boxes, n_particles), dtype=wp.int32, device=device
+    return _activate_nonempty_requests(
+        masses,
+        concentration,
+        charge,
+        request_masses,
+        request_concentration,
+        request_charge,
+        requested_counts,
+        activated_counts,
+        free_indices,
+        active_counts,
+        free_counts,
+        n_boxes,
+        n_particles,
+        request_capacity,
+        device,
     )
-    workspace_counts = wp.empty(n_boxes, dtype=wp.int32, device=device)
-    status = wp.zeros(1, dtype=wp.int32, device=device)
-    wp.launch(
-        _classify_slots,
-        dim=(n_boxes, n_particles),
-        inputs=[masses, concentration, charge, categories, status],
-        device=device,
-    )
-    wp.launch(
-        _build_free_workspace,
-        dim=n_boxes,
-        inputs=[categories, free_workspace, workspace_counts],
-        device=device,
-    )
-    wp.launch(
-        _validate_categories,
-        dim=(n_boxes, n_particles),
-        inputs=[categories, status],
-        device=device,
-    )
-    if request_capacity:
-        wp.launch(
-            _validate_activation_preflight,
-            dim=(n_boxes, request_capacity),
-            inputs=[
-                categories,
-                workspace_counts,
-                request_masses,
-                request_concentration,
-                request_charge,
-                requested_counts,
-                status,
-            ],
-            device=device,
-        )
-    else:
-        # A zero request extent still needs count/capacity validation.
-        wp.launch(
-            _validate_empty_activation_extent,
-            dim=n_boxes,
-            inputs=[requested_counts, status, request_capacity, 2],
-            device=device,
-        )
-    status_code = int(status.numpy()[0])
-    messages = {
-        1: _INVALID_SLOT_MESSAGE,
-        2: _INVALID_COUNT_MESSAGE,
-        3: _CAPACITY_MESSAGE,
-        4: _INVALID_REQUEST_MESSAGE,
-    }
-    if status_code:
-        raise ValueError(messages[status_code])
-
-    if request_capacity:
-        wp.launch(
-            _activate_requests,
-            dim=(n_boxes, request_capacity),
-            inputs=[
-                masses,
-                concentration,
-                charge,
-                request_masses,
-                request_concentration,
-                request_charge,
-                requested_counts,
-                free_workspace,
-                activated_counts,
-            ],
-            device=device,
-        )
-    else:
-        wp.launch(
-            _write_activated_counts,
-            dim=n_boxes,
-            inputs=[requested_counts, activated_counts],
-            device=device,
-        )
-    wp.launch(
-        _classify_slots,
-        dim=(n_boxes, n_particles),
-        inputs=[masses, concentration, charge, categories, status],
-        device=device,
-    )
-    wp.launch(
-        _write_diagnostics,
-        dim=n_boxes,
-        inputs=[categories, free_indices, active_counts, free_counts],
-        device=device,
-    )
-    return activated_counts, free_indices, active_counts, free_counts
