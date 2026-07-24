@@ -5319,6 +5319,8 @@
       
         
       
+        
+      
     
     
     
@@ -5491,6 +5493,34 @@
     
   
     particula.gpu.kernels.environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="slot_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.slot_management
   
 
     
@@ -5706,6 +5736,8 @@
   
     
     
+      
+        
       
         
       
@@ -6159,6 +6191,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../particles/slot_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.particles.slot_management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../particles/surface_builders/" class="md-nav__link">
         
   
@@ -6268,10 +6328,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_18" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_20_17" id="__nav_2_3_20_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_20_18" id="__nav_2_3_20_18_label" tabindex="0">
             
   
   
@@ -6289,8 +6349,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_20_17">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_20_18">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6524,10 +6584,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_19" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_20_18" id="__nav_2_3_20_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_20_19" id="__nav_2_3_20_19_label" tabindex="0">
             
   
   
@@ -6545,8 +6605,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_20_18">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_20_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -14545,6 +14605,7 @@
 <p>Import direct low-level step functions from this package:</p>
 <div class="highlight"><pre><span></span><code>from particula.gpu.kernels import (
     coagulation_step_gpu,
+    activate_slots_gpu,
     condensation_step_gpu,
     dilution_step_gpu,
     wall_loss_step_gpu,
@@ -14627,10 +14688,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/__init__.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
@@ -14646,7 +14704,10 @@
 <span class="normal">51</span>
 <span class="normal">52</span>
 <span class="normal">53</span>
-<span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Lazily resolve a supported public direct-kernel entry point.</span>
 
 <span class="sd">    Args:</span>

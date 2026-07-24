@@ -5226,6 +5226,8 @@
       
         
       
+        
+      
     
     
     
@@ -5398,6 +5400,34 @@
     
   
     particula.gpu.kernels.environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API/particula/gpu/kernels/slot_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.slot_management
   
 
     
@@ -5613,6 +5643,8 @@
   
     
     
+      
+        
       
         
       
@@ -6066,6 +6098,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../API/particula/particles/slot_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.particles.slot_management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../API/particula/particles/surface_builders/" class="md-nav__link">
         
   
@@ -6175,10 +6235,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_18" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_20_17" id="__nav_2_3_20_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_20_18" id="__nav_2_3_20_18_label" tabindex="0">
             
   
   
@@ -6196,8 +6256,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_20_17">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_20_18">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6431,10 +6491,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_19" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_20_18" id="__nav_2_3_20_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_20_19" id="__nav_2_3_20_19_label" tabindex="0">
             
   
   
@@ -6452,8 +6512,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_20_18">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_20_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12073,6 +12133,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#shipped-e6-f5-fixed-slot-primitives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shipped E6-F5 fixed-slot primitives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particle-slot-management" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -15264,6 +15335,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#shipped-e6-f5-fixed-slot-primitives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shipped E6-F5 fixed-slot primitives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#particle-slot-management" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -17330,38 +17412,54 @@ depend on.</p>
   runnable/scheduler/backend integration, dynamic slots, compaction/activation,
   graph capture, differentiability, performance guarantees, and exact RNG
   replay. E6-F9 remains the future integration and closeout work.</p>
+<h3 id="shipped-e6-f5-fixed-slot-primitives">Shipped E6-F5 fixed-slot primitives<a class="headerlink" href="#shipped-e6-f5-fixed-slot-primitives" title="Permanent link">&para;</a></h3>
+<ul>
+<li>E6-F5 ships matching CPU and direct-Warp fixed-shape slot diagnostics and
+  activation. The authoritative active/free/invalid classification and schema
+  table is in <a href="../../data-containers-and-gpu-foundations/">Data Containers and GPU Foundations</a>.</li>
+<li>CPU diagnostics and activation use fresh <code>np.int32</code> outputs. Direct-Warp
+  activation maps selected request-prefix ranks to ascending free slots and
+  returns caller-owned, same-device <code>wp.int32</code> sidecars by identity. Free-index
+  rows have <code>-1</code> tails, and both paths preserve fixed capacity without resize or
+  compaction.</li>
+<li>CPU/Warp transfers, placement, and synchronization remain explicit caller
+  responsibilities. The direct boundary has no hidden transfer, CPU fallback,
+  runnable, or performance claim. CPU preflight is globally read-only. GPU
+  preflight may launch read-only validation, classification, or workspace
+  kernels, but does not mutate caller-owned state before its writer launches;
+  it does not promise rollback after a writer has launched.</li>
+<li>E6-F6 owns exhaustion, resampling, and volume-scaling policy. E6-F7 owns CPU
+  particle-source physics, E6-F8 owns direct-Warp consumption, and E6-F9 owns
+  integration and the direct-step example. These later features do not alter
+  the shipped E6-F5 storage contract.</li>
+</ul>
 <p>Future features:</p>
 <ol>
-<li>GPU process orchestration, backend selection/fallback policy, scheduling,
-   and GPU-resident timestep integration for the delivered direct kernels.</li>
-<li>Nucleation/particle-source CPU reference process following the
+<li>E6-F6 exhaustion, resampling, and volume-scaling policy for fixed slots.</li>
+<li>E6-F7 CPU nucleation/particle-source physics following the
    <a href="../../../Theory/Technical/Dynamics/Nucleation_Equations/">nucleation equations</a>
    (no nucleation code exists in particula today).</li>
-<li>GPU nucleation via slot activation (see
+<li>E6-F8 direct-Warp consumption of the source contract (see
    <a href="#particle-slot-management">Particle Slot Management</a>).</li>
-<li>Particle slot management: inactive zero-mass slots, activation,
-   per-box active-count diagnostics, and an exhaustion policy (resampling or
-   volume scaling).</li>
-<li>Slot and conservation validation: tests for inactive slots, activation,
-   slot exhaustion handling, and conservation across resampling or volume
-   scaling.</li>
-<li>Fixed-shape GPU workflow extensions: resizing policy, graph capture,
-   autodiff, and performance evidence.</li>
+<li>E6-F9 integration, closeout validation, and a direct-step example.</li>
 </ol>
 <h3 id="particle-slot-management">Particle Slot Management<a class="headerlink" href="#particle-slot-management" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Use fixed particle slot counts per box for GPU-resident simulations.</li>
-<li>Represent inactive particle slots as particles with zero mass, zero radius,
-  and zero concentration or count.</li>
-<li>Avoid dynamic allocation inside timestep kernels. Processes that create new
-  particles, including the planned nucleation process, should activate
-  inactive slots when available.</li>
-<li>Add a resampling or volume-scaling policy for cases that would exceed the
-  available particle slots in a box.</li>
-<li>Track per-box active particle counts as diagnostics, but keep the underlying
-  arrays fixed-shape for GPU kernels and graph capture.</li>
-<li>Define compaction rules only if needed; inactive zero-mass slots are simpler
-  and graph-friendly.</li>
+<li>E6-F5 has shipped CPU and direct-Warp fixed-slot diagnostics and activation;
+  see <a href="../../data-containers-and-gpu-foundations/">Data Containers and GPU Foundations</a>.
+  Its active/free classification, ascending mapping, and fixed-shape storage
+  are complete.</li>
+<li>E6-F6 remains responsible for exhaustion policy, including any resampling or
+  volume scaling before a box runs out of free slots. It does not add resize or
+  hidden-transfer behavior to E6-F5.</li>
+<li>E6-F7 owns CPU source physics; E6-F8 owns its direct-Warp consumer. E6-F9
+  owns integrated orchestration and the direct-step example. No direct runnable
+  or user example is shipped by E6-F5.</li>
+<li>Graph capture, autodiff, and performance evidence belong to later epic work.
+  Fixed slots preserve stable shapes without resizing or allocating caller-owned
+  particle storage; primitives may privately allocate temporary categories,
+  workspace, count, and status buffers. Compaction is not part of the shipped
+  contract.</li>
 </ul>
 <p><strong>Exit bar:</strong> A complete GPU-resident timestep can run condensation,
 coagulation, wall loss, and dilution together with persistent RNG state, and
@@ -17558,8 +17656,8 @@ scaling numbers across box counts plus a recorded memory-budget model.</p>
   a new setup/capture step.</li>
 <li>Handle changing active particle counts through inactive slots rather than
   resizing arrays.</li>
-<li>Use resampling, merging, or volume scaling before a box exhausts inactive
-  particle slots.</li>
+<li>E6-F6 will define any resampling, merging, or volume-scaling capacity policy
+  before a box exhausts inactive particle slots.</li>
 <li>Keep graph-captured loops focused on repeated timesteps with stable process
   order, stable buffer shapes, and stable communication maps.</li>
 </ul>
@@ -17571,8 +17669,8 @@ convenience allocation or when <code>initialize_rng=True</code> is requested bef
 captured loop or repeated-step run.</p>
 <p>For graph capture, particle count changes should be represented as changes in
 active slots, not changes in array shape. If a simulation would create more
-particles than the fixed slots allow, the GPU loop should trigger a documented
-resampling or volume-scaling policy before slot exhaustion.</p>
+particles than the fixed slots allow, the deferred E6-F6 capacity policy must
+handle exhaustion before a graph-captured loop proceeds.</p>
 <h3 id="performance-and-memory">Performance and Memory<a class="headerlink" href="#performance-and-memory" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Establish benchmark targets with box count as the primary axis (for example

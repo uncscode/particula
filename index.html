@@ -5540,6 +5540,8 @@
       
         
       
+        
+      
     
     
     
@@ -5712,6 +5714,34 @@
     
   
     particula.gpu.kernels.environment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="API/particula/gpu/kernels/slot_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.slot_management
   
 
     
@@ -5927,6 +5957,8 @@
   
     
     
+      
+        
       
         
       
@@ -6380,6 +6412,34 @@
   
   
     <li class="md-nav__item">
+      <a href="API/particula/particles/slot_management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.particles.slot_management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="API/particula/particles/surface_builders/" class="md-nav__link">
         
   
@@ -6489,10 +6549,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_18" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_20_17" id="__nav_2_3_20_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_20_18" id="__nav_2_3_20_18_label" tabindex="0">
             
   
   
@@ -6510,8 +6570,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_20_17">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_20_18">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6745,10 +6805,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_20_19" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_20_18" id="__nav_2_3_20_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_20_19" id="__nav_2_3_20_19_label" tabindex="0">
             
   
   
@@ -6766,8 +6826,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_20_18">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_20_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_20_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -14855,6 +14915,25 @@
 <li><strong>Providing a Python-based API</strong> for reproducible and modular simulations.</li>
 <li><strong>Building gas-phase properties</strong> with builder/factory patterns (vapor
   pressure and latent heat) that support unit-aware setters and exports.</li>
+<li><strong>Inspecting fixed particle-resolved slots</strong> with the read-only CPU
+  <a href="Features/data-containers-and-gpu-foundations/#cpu-slot-diagnostics"><code>get_slot_diagnostics()</code></a>
+  API, which reports deterministic free-slot indices and per-box active/free
+  counts without changing <code>ParticleData</code>.</li>
+<li><strong>Activating fixed particle-resolved slots</strong> with the CPU-only direct import
+  <code>from particula.particles.slot_management import activate_slots</code>. It maps
+  each declared request prefix into ascending free slots, performs all
+  validation before mutating mass, concentration, or charge, and returns fresh
+  per-box <code>np.int32</code> activation counts. It is not exported through
+  <code>particula.particles</code> and does not resize storage. For caller-managed Warp
+  storage, import <code>activate_slots_gpu</code> from <code>particula.gpu.kernels</code>. This P4
+  boundary maps selected request-prefix records to ascending free slots in
+  place and returns supplied <code>wp.int32</code> activation/diagnostic sidecars.
+  Particle/request storage must be same-device <code>wp.float64</code>; it performs no
+  implicit transfer. Preflight validates metadata, aliasing, state, counts,
+  capacity, and selected records before its writer launches, so rejected calls
+  preserve accessible caller-owned arrays. Rollback is not promised after a
+  writer launch, and concrete-module-only <code>get_slot_diagnostics_gpu</code> remains
+  outside the package exports.</li>
 <li><strong>Supporting CPU latent-heat-corrected condensation diagnostics</strong> with
   thermal resistance, latent-heat mass transfer rate utilities,
   latent-heat energy-density bookkeeping, and the
