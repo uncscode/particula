@@ -28,6 +28,18 @@ def _make_data(
     )
 
 
+def _assert_arrays_unchanged(
+    fields: tuple[np.ndarray, ...],
+    snapshots: tuple[np.ndarray, ...],
+) -> None:
+    """Assert caller-owned arrays retain values, schema, and identity."""
+    for field, snapshot in zip(fields, snapshots, strict=True):
+        assert field is not None
+        assert field.shape == snapshot.shape
+        assert field.dtype == snapshot.dtype
+        npt.assert_array_equal(field, snapshot)
+
+
 @pytest.mark.parametrize(
     ("masses", "concentration", "charge", "expected_active"),
     [
@@ -370,31 +382,66 @@ def test_activate_slots_accepts_empty_request_capacity_without_writes() -> None:
     request_masses = np.zeros((1, 0, 1), dtype=np.float64)
     request_concentration = np.zeros((1, 0), dtype=np.float64)
     request_charge = np.zeros((1, 0), dtype=np.float64)
+    requested_counts = np.zeros(1, dtype=np.int64)
+    fields = (
+        data.masses,
+        data.concentration,
+        data.charge,
+        data.density,
+        data.volume,
+        request_masses,
+        request_concentration,
+        request_charge,
+        requested_counts,
+    )
+    identities = tuple(id(field) for field in fields)
+    snapshots = tuple(field.copy() for field in fields)
     result = activate_slots(
         data,
         request_masses,
         request_concentration,
         request_charge,
-        np.zeros(1, dtype=np.int64),
+        requested_counts,
     )
 
     npt.assert_array_equal(result, [0])
     assert result.dtype == np.int32
+    assert tuple(id(field) for field in fields) == identities
+    _assert_arrays_unchanged(fields, snapshots)
 
 
 def test_activate_slots_accepts_zero_particle_capacity_without_writes() -> None:
     """Accept zero particle capacity when every requested prefix is empty."""
     data = _make_data(np.zeros((1, 0, 1)), np.zeros((1, 0)), np.zeros((1, 0)))
+    request_masses = np.zeros((1, 0, 1), dtype=np.float64)
+    request_concentration = np.zeros((1, 0), dtype=np.float64)
+    request_charge = np.zeros((1, 0), dtype=np.float64)
+    requested_counts = np.zeros(1, dtype=np.int64)
+    fields = (
+        data.masses,
+        data.concentration,
+        data.charge,
+        data.density,
+        data.volume,
+        request_masses,
+        request_concentration,
+        request_charge,
+        requested_counts,
+    )
+    identities = tuple(id(field) for field in fields)
+    snapshots = tuple(field.copy() for field in fields)
     result = activate_slots(
         data,
-        np.zeros((1, 0, 1), dtype=np.float64),
-        np.zeros((1, 0), dtype=np.float64),
-        np.zeros((1, 0), dtype=np.float64),
-        np.zeros(1, dtype=np.int64),
+        request_masses,
+        request_concentration,
+        request_charge,
+        requested_counts,
     )
 
     npt.assert_array_equal(result, [0])
     assert result.dtype == np.int32
+    assert tuple(id(field) for field in fields) == identities
+    _assert_arrays_unchanged(fields, snapshots)
 
 
 @pytest.mark.parametrize("invalid_data", [None, object()])
@@ -418,8 +465,18 @@ def test_activate_slots_preflight_is_atomic_for_later_box_failure() -> None:
     request_masses = np.array([[[1.0]], [[-1.0]]])
     request_concentration = np.ones((2, 1))
     request_charge = np.zeros((2, 1))
-    destinations = (data.masses, data.concentration, data.charge)
-    snapshots = tuple(field.copy() for field in destinations)
+    fields = (
+        data.masses,
+        data.concentration,
+        data.charge,
+        data.density,
+        data.volume,
+        request_masses,
+        request_concentration,
+        request_charge,
+    )
+    identities = tuple(id(field) for field in fields)
+    snapshots = tuple(field.copy() for field in fields)
 
     with pytest.raises(ValueError):
         activate_slots(
@@ -430,8 +487,109 @@ def test_activate_slots_preflight_is_atomic_for_later_box_failure() -> None:
             np.ones(2, dtype=np.int64),
         )
 
-    for destination, snapshot in zip(destinations, snapshots, strict=True):
-        npt.assert_array_equal(destination, snapshot)
+    assert tuple(id(field) for field in fields) == identities
+    _assert_arrays_unchanged(fields, snapshots)
+
+
+@pytest.mark.parametrize(
+    ("first_field", "second_field"),
+    [
+        ("masses", "concentration"),
+        ("masses", "charge"),
+        ("concentration", "charge"),
+    ],
+)
+def test_activate_slots_rejects_overlapping_mutable_destinations_atomically(
+    first_field: str,
+    second_field: str,
+) -> None:
+    """Reject every mutable destination alias before observable writes."""
+    data = _make_data(np.zeros((1, 1, 1)), np.zeros((1, 1)), np.zeros((1, 1)))
+    setattr(data, second_field, getattr(data, first_field).reshape(1, 1))
+    request_masses = np.ones((1, 1, 1))
+    request_concentration = np.ones((1, 1))
+    request_charge = np.zeros((1, 1))
+    requested_counts = np.ones(1, dtype=np.int64)
+    fields = (
+        data.masses,
+        data.concentration,
+        data.charge,
+        data.density,
+        data.volume,
+        request_masses,
+        request_concentration,
+        request_charge,
+        requested_counts,
+    )
+    identities = tuple(id(field) for field in fields)
+    snapshots = tuple(field.copy() for field in fields)
+
+    with pytest.raises(
+        ValueError,
+        match="^Particle destination fields must not share storage[.]$",
+    ):
+        activate_slots(
+            data,
+            request_masses,
+            request_concentration,
+            request_charge,
+            requested_counts,
+        )
+
+    assert tuple(id(field) for field in fields) == identities
+    _assert_arrays_unchanged(fields, snapshots)
+
+
+@pytest.mark.parametrize(
+    ("destination_field", "protected_field"),
+    [
+        ("masses", "density"),
+        ("masses", "volume"),
+        ("concentration", "density"),
+        ("concentration", "volume"),
+        ("charge", "density"),
+        ("charge", "volume"),
+    ],
+)
+def test_activate_slots_rejects_overlapping_protected_storage_atomically(
+    destination_field: str,
+    protected_field: str,
+) -> None:
+    """Reject destination views into density or volume before writes."""
+    data = _make_data(np.zeros((1, 1, 1)), np.zeros((1, 1)), np.zeros((1, 1)))
+    setattr(data, protected_field, getattr(data, destination_field).reshape(1))
+    request_masses = np.ones((1, 1, 1))
+    request_concentration = np.ones((1, 1))
+    request_charge = np.zeros((1, 1))
+    requested_counts = np.ones(1, dtype=np.int64)
+    fields = (
+        data.masses,
+        data.concentration,
+        data.charge,
+        data.density,
+        data.volume,
+        request_masses,
+        request_concentration,
+        request_charge,
+        requested_counts,
+    )
+    identities = tuple(id(field) for field in fields)
+    snapshots = tuple(field.copy() for field in fields)
+
+    with pytest.raises(
+        ValueError,
+        match="^Particle destination fields must not share storage[.]$",
+    ):
+        activate_slots(
+            data,
+            request_masses,
+            request_concentration,
+            request_charge,
+            requested_counts,
+        )
+
+    assert tuple(id(field) for field in fields) == identities
+    _assert_arrays_unchanged(fields, snapshots)
 
 
 def test_activate_slots_ignores_invalid_request_tail() -> None:

@@ -1,17 +1,21 @@
 # Architecture Guide
 
-## CPU Particle Slot Discovery Boundary
+## CPU Particle Slot Management Boundary
 
-- `particula.particles.slot_management` is the CPU-only, read-only fixed-slot
-  classification and discovery boundary for `ParticleData`.
+- `particula.particles.slot_management` owns CPU-only fixed-slot classification,
+  discovery, and direct-import activation for `ParticleData`.
 - `get_slot_diagnostics` is its sole package-level export through
-  `particula.particles`; classification predicates and validation helpers remain
+  `particula.particles`; `activate_slots` remains a direct import from
+  `particula.particles.slot_management`, and validation helpers remain
   module-private.
-- The API preserves all `ParticleData` array identities and values, returning
-  newly allocated fixed-shape `int32` free-index and count sidecars instead.
-- Activation, compaction, resizing, CPU↔GPU transfer, and GPU execution remain
-  outside this boundary. Its fixed-shape diagnostics provide a deterministic
-  CPU reference for later parity work.
+- Discovery preserves all `ParticleData` storage and returns newly allocated
+  fixed-shape `int32` free-index and count sidecars. Activation maps request
+  prefixes to ascending free slots after complete read-only preflight, then
+  mutates only mass, concentration, and charge storage in place.
+- Storage resize or compaction, `ParticleData` mutation API changes, CPU↔GPU
+  transfer, GPU execution, and a top-level particles activation export remain
+  outside this boundary. Its fixed-shape behavior provides a deterministic CPU
+  reference for later parity work.
 
 ## GPU Module Boundaries
 

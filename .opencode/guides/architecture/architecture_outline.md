@@ -10,8 +10,10 @@ strategies, and focused particle-domain helpers.
 **Key Components:**
 - `particle_data.py` - Fixed-shape CPU particle-data container and conversion
   helpers
-- `slot_management.py` - CPU-only, read-only fixed-slot classification and
-  discovery; exports `get_slot_diagnostics` through `particula.particles`
+- `slot_management.py` - CPU-only fixed-slot classification, discovery, and
+  direct-import activation; exports only `get_slot_diagnostics` through
+  `particula.particles`. Activation preserves fixed capacity and excludes
+  `ParticleData` API changes, GPU support, and a top-level particles export
 - `distribution_strategies/` - Particle distribution representations and
   update strategies
 - `properties/` - Particle property calculations
