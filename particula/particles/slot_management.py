@@ -1,8 +1,10 @@
-"""Discover fixed particle slots without modifying particle data.
+"""Discover and activate fixed particle slots in CPU particle data.
 
 This module provides the CPU reference classification for active and free
-particle-resolved slots. Its public discovery API returns fixed-shape,
-newly allocated diagnostics while preserving the input particle storage.
+particle-resolved slots. Its discovery API returns fixed-shape, newly
+allocated diagnostics without changing particle storage. Its activation API
+maps validated request prefixes into the ascending free slots after complete
+read-only preflight.
 """
 
 from typing import cast
@@ -87,7 +89,19 @@ def get_slot_diagnostics(
 def _validate_destinations(
     data: ParticleData,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """Return validated writable activation destination arrays."""
+    """Validate and return writable activation destination arrays.
+
+    Args:
+        data: Particle data whose mutable mass, concentration, and charge
+            storage is validated.
+
+    Returns:
+        The validated mass, concentration, and charge arrays, in that order.
+
+    Raises:
+        ValueError: If a mutable destination is not a writable ``float64``
+            NumPy array or the destination shapes are incompatible.
+    """
     masses = getattr(data, "masses", None)
     concentration = getattr(data, "concentration", None)
     charge = getattr(data, "charge", None)
@@ -121,7 +135,25 @@ def _validate_requests(
     n_boxes: int,
     n_species: int,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """Validate request schemas and return their fields."""
+    """Validate request schemas and return their fields.
+
+    Args:
+        request_masses: Requested per-species mass records.
+        request_concentration: Requested concentration records.
+        request_charge: Requested charge records.
+        requested_counts: Per-box prefix lengths to activate.
+        n_boxes: Required number of request boxes.
+        n_species: Required number of mass lanes in each request record.
+
+    Returns:
+        The validated request mass, concentration, and charge arrays, in that
+        order.
+
+    Raises:
+        ValueError: If request fields are not shaped ``float64`` NumPy arrays,
+            counts are not a valid integer vector, or a count exceeds request
+            capacity.
+    """
     fields = (request_masses, request_concentration, request_charge)
     if any(
         not isinstance(field, np.ndarray) or field.dtype != np.float64
@@ -165,7 +197,24 @@ def _validate_preflight(
     requested_counts: NDArray[np.integer],
     free_counts: NDArray[np.int32],
 ) -> None:
-    """Validate storage isolation, capacity, and selected request records."""
+    """Validate storage isolation, capacity, and selected request records.
+
+    Only request records within each box's declared prefix are inspected.
+    This validation performs no writes so that activation remains atomic when
+    a later box or record is invalid.
+
+    Args:
+        request_fields: Validated request mass, concentration, and charge
+            arrays.
+        destination_fields: Validated mutable mass, concentration, and charge
+            destination arrays.
+        requested_counts: Per-box request prefix lengths.
+        free_counts: Number of currently free slots in each box.
+
+    Raises:
+        ValueError: If request storage aliases a destination, a requested
+            prefix exceeds free capacity, or a selected record is invalid.
+    """
     for request in request_fields:
         if any(
             np.shares_memory(request, destination)

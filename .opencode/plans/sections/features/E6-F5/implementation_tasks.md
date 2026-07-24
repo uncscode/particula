@@ -8,9 +8,9 @@
   reject positive mass with zero concentration, positive concentration with
   zero total mass, and nonzero charge in a free slot.
 - [x] Return ascending free indices and exact `np.int32` active/free counts.
-- [ ] Define fixed-shape mass/concentration/charge request arrays with per-box
+- [x] Define fixed-shape mass/concentration/charge request arrays with per-box
   valid-prefix counts and validate the complete request before writing.
-- [ ] Activate request rank `r` into free rank `r`, preserving every shape,
+- [x] Activate request rank `r` into free rank `r`, preserving every shape,
   object identity, and unselected value.
 
 ## GPU Core
@@ -28,15 +28,14 @@
 
 ## Tooling / Tests
 
-- [x] Add CPU truth-table, ordering, identity, and invalid-state non-mutation
-  tests in `particula/particles/tests/slot_management_test.py`; CPU activation
-  coverage remains P2 work.
+- [x] Add CPU truth-table, ordering, identity, invalid-state non-mutation, and
+  activation tests in `particula/particles/tests/slot_management_test.py`.
 - [ ] Add Warp CPU discovery, activation, parity, sidecar, and preflight tests in
   `particula/gpu/kernels/tests/slot_management_test.py`.
 - [x] Snapshot every caller-owned array for P1 invalid-call tests and assert exact
   equality plus object identity afterward.
-- [ ] Cover zero boxes/slots as supported by container conventions or document
-  a preflight rejection consistently on CPU and GPU.
+- [x] Cover CPU zero-slot activation: zero counts are exact no-ops and positive
+  requests fail atomically; GPU coverage remains deferred.
 - [ ] Run optional CUDA tests with clean skips and retain existing coagulation,
   condensation, conversion, and particle-data regressions.
 

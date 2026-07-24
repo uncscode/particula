@@ -19,11 +19,19 @@ P3 and GPU activation/parity in P4; P5 documents the completed contract.
     cases, sparse multi-box ordering, exact integer diagnostics, public export,
     and success/error-path source non-mutation plus fresh-allocation checks.
 
-- [ ] **E6-F5-P2:** Implement deterministic CPU slot activation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Copy fixed-shape request records into ascending free slots only after full validation and preserve container shapes and identities.
+- [x] **E6-F5-P2:** Implement deterministic CPU slot activation with unit tests
+  - Issue: #1417 | Size: S | Status: Shipped
+  - Delivered: direct-import `activate_slots` maps each declared request prefix
+    to ascending free slots from `get_slot_diagnostics`, mutates only selected
+    mass/concentration/charge records, and returns fresh per-box `np.int32`
+    activated counts. Complete read-only preflight validates `ParticleData`,
+    writable destination schema, request schema and overlap, selected values,
+    canonical existing slot state, and capacity before any write.
   - Files: `particula/particles/slot_management.py`, `particula/particles/tests/slot_management_test.py`
-  - Tests: Zero, partial, and exact-capacity requests; multi-species/box mapping; activated counts; untouched slots; capacity and malformed-request failure atomicity.
+  - Tests: Zero/empty/zero-slot, sparse multi-box multi-species, and exact-free
+    capacity success cases; identity and untouched-storage checks; and atomic
+    rejection of malformed data/requests, invalid selected prefixes, aliases,
+    invalid existing slots, and later-box capacity failures.
 
 - [ ] **E6-F5-P3:** Implement GPU slot discovery and diagnostics with unit tests
   - Issue: TBD | Size: S | Status: Not Started
