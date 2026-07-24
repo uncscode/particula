@@ -65,8 +65,11 @@ P3 and GPU activation/parity in P4; P5 documents the completed contract.
     capacity cases; schema/state/count/request/capacity/alias rejection
     atomicity; package exports; and optional CUDA clean skips.
 
-- [ ] **E6-F5-P5:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document predicates, fixed-shape request/diagnostic contracts, validation order, direct imports, downstream boundaries, and focused test commands.
-  - Files: `AGENTS.md`, `docs/Features/`, `.opencode/guides/`, E6 plan sections as needed
-  - Tests: Markdown links, import snippets, shape tables, terminology, and supported/deferred boundary review.
+- [x] **E6-F5-P5:** Update development documentation
+  - Issue: #1420 | Size: XS | Status: Shipped
+  - Delivered: documented the shared predicate, fixed-shape CPU/direct-Warp
+    schemas, imports, return ownership, preflight boundaries, focused commands,
+    and E6-F6/F7/F8/F9 ownership without adding a user example.
+  - Files: `AGENTS.md`, `docs/Features/`, `.opencode/guides/`, E6 plan sections
+  - Tests: Markdown links, import snippets, shape tables, terminology, and
+    supported/deferred boundary review.

@@ -12,3 +12,11 @@
 
 No user example is required until a physical particle-source process consumes
 activation; E6-F9 owns the integrated direct-step example.
+
+- P5 shipped in issue #1420. `docs/Features/data-containers-and-gpu-foundations.md`
+  is the authoritative CPU/direct-Warp active/free/invalid table, schema,
+  ownership, failure-boundary, and focused-command record. `AGENTS.md`, the
+  Epic F roadmap, and testing guidance cross-reference the same contract.
+- The published commands cover CPU and direct-Warp slot management. E6-F6 owns
+  exhaustion policy, E6-F7/E6-F8 own source policy and physics, and E6-F9 owns
+  the integrated direct-step example; no user example was added here.

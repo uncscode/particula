@@ -1316,38 +1316,55 @@ Delivered bounded wall-loss P1–P6 scope:
   graph capture, differentiability, performance guarantees, and exact RNG
   replay. E6-F9 remains the future integration and closeout work.
 
+### Shipped E6-F5 fixed-slot primitives
+
+- E6-F5 ships matching CPU and direct-Warp fixed-shape slot diagnostics and
+  activation. The authoritative active/free/invalid classification and schema
+  table is in [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md).
+- CPU diagnostics and activation use fresh `np.int32` outputs. Direct-Warp
+  activation maps selected request-prefix ranks to ascending free slots and
+  returns caller-owned, same-device `wp.int32` sidecars by identity. Free-index
+  rows have `-1` tails, and both paths preserve fixed capacity without resize or
+  compaction.
+- CPU/Warp transfers, placement, and synchronization remain explicit caller
+  responsibilities. The direct boundary has no hidden transfer, CPU fallback,
+  runnable, or performance claim. CPU preflight is globally read-only; GPU
+  preflight is read-only before launch and does not promise rollback after a
+  writer has launched.
+- E6-F6 owns exhaustion, resampling, and volume-scaling policy. E6-F7 owns CPU
+  particle-source physics, E6-F8 owns direct-Warp consumption, and E6-F9 owns
+  integration and the direct-step example. These later features do not alter
+  the shipped E6-F5 storage contract.
+
 Future features:
 
 1. GPU process orchestration, backend selection/fallback policy, scheduling,
    and GPU-resident timestep integration for the delivered direct kernels.
-2. Nucleation/particle-source CPU reference process following the
+2. E6-F6 exhaustion, resampling, and volume-scaling policy for fixed slots.
+3. E6-F7 CPU nucleation/particle-source physics following the
    [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md)
    (no nucleation code exists in particula today).
-3. GPU nucleation via slot activation (see
+4. E6-F8 direct-Warp consumption of the source contract (see
    [Particle Slot Management](#particle-slot-management)).
-4. Particle slot management: inactive zero-mass slots, activation,
-   per-box active-count diagnostics, and an exhaustion policy (resampling or
-   volume scaling).
-5. Slot and conservation validation: tests for inactive slots, activation,
-   slot exhaustion handling, and conservation across resampling or volume
-   scaling.
-6. Fixed-shape GPU workflow extensions: resizing policy, graph capture,
+5. E6-F9 integration, closeout validation, and a direct-step example.
+6. Fixed-shape GPU workflow extensions: graph capture,
    autodiff, and performance evidence.
 
 ### Particle Slot Management
 
-- Use fixed particle slot counts per box for GPU-resident simulations.
-- Represent inactive particle slots as particles with zero mass, zero radius,
-  and zero concentration or count.
-- Avoid dynamic allocation inside timestep kernels. Processes that create new
-  particles, including the planned nucleation process, should activate
-  inactive slots when available.
-- Add a resampling or volume-scaling policy for cases that would exceed the
-  available particle slots in a box.
-- Track per-box active particle counts as diagnostics, but keep the underlying
-  arrays fixed-shape for GPU kernels and graph capture.
-- Define compaction rules only if needed; inactive zero-mass slots are simpler
-  and graph-friendly.
+- E6-F5 has shipped CPU and direct-Warp fixed-slot diagnostics and activation;
+  see [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md).
+  Its active/free classification, ascending mapping, and fixed-shape storage
+  are complete.
+- E6-F6 remains responsible for exhaustion policy, including any resampling or
+  volume scaling before a box runs out of free slots. It does not add resize or
+  hidden-transfer behavior to E6-F5.
+- E6-F7 owns CPU source physics; E6-F8 owns its direct-Warp consumer. E6-F9
+  owns integrated orchestration and a runnable example. No direct runnable or
+  user example is shipped by E6-F5.
+- Graph capture, autodiff, and performance evidence remain deferred. Fixed
+  slots avoid dynamic allocation and preserve stable shapes; compaction is not
+  part of the shipped contract.
 
 **Exit bar:** A complete GPU-resident timestep can run condensation,
 coagulation, wall loss, and dilution together with persistent RNG state, and
@@ -1546,8 +1563,8 @@ scaling numbers across box counts plus a recorded memory-budget model.
   a new setup/capture step.
 - Handle changing active particle counts through inactive slots rather than
   resizing arrays.
-- Use resampling, merging, or volume scaling before a box exhausts inactive
-  particle slots.
+- E6-F6 will define any resampling, merging, or volume-scaling capacity policy
+  before a box exhausts inactive particle slots.
 - Keep graph-captured loops focused on repeated timesteps with stable process
   order, stable buffer shapes, and stable communication maps.
 
@@ -1560,8 +1577,8 @@ captured loop or repeated-step run.
 
 For graph capture, particle count changes should be represented as changes in
 active slots, not changes in array shape. If a simulation would create more
-particles than the fixed slots allow, the GPU loop should trigger a documented
-resampling or volume-scaling policy before slot exhaustion.
+particles than the fixed slots allow, the deferred E6-F6 capacity policy must
+handle exhaustion before a graph-captured loop proceeds.
 
 ### Performance and Memory
 

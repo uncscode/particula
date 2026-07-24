@@ -79,18 +79,21 @@ from particula.particles import get_slot_diagnostics
 free_indices, active_counts, free_counts = get_slot_diagnostics(particle_data)
 ```
 
-It returns freshly allocated NumPy `int32` arrays in the order shown above.
-`free_indices` has shape `(n_boxes, n_particles)`. In each row, free-slot
-indices appear in ascending order and unused trailing entries are `-1`.
-`active_counts` and `free_counts` each have shape `(n_boxes,)`.
+CPU and direct-Warp primitives classify slots identically before diagnostics or
+activation:
 
-A slot is active only when its concentration is finite and positive, every
-species mass is finite and nonnegative, the total mass is finite and positive,
-and its charge is finite. A slot is free only when its concentration, all mass
-lanes, and charge are exactly zero. Any other state raises
-`ValueError("Invalid particle slot state.")`; diagnostics are not partially
-returned. The function neither mutates nor aliases particle storage, and it
-does not activate, resize, compact, or transfer slots to Warp.
+| Classification | Concentration | Mass lanes and total | Charge |
+| --- | --- | --- | --- |
+| Active | Finite and positive | Every lane finite and nonnegative; finite, positive total | Finite |
+| Free | Exactly zero | Every lane exactly zero | Exactly zero |
+| Invalid | Any other state | Any other state | Any other state |
+
+Invalid state raises `ValueError("Invalid particle slot state.")`; diagnostics
+are not partially returned. `get_slot_diagnostics` neither mutates nor aliases
+particle storage, and it does not activate, resize, compact, or transfer slots
+to Warp. It returns freshly allocated NumPy `int32` arrays in the order shown:
+`free_indices` has shape `(n_boxes, n_particles)` with ascending free indices
+and `-1` tails; `active_counts` and `free_counts` have shape `(n_boxes,)`.
 
 ### CPU slot activation
 
@@ -102,14 +105,12 @@ from particula.particles.slot_management import activate_slots
 ```
 
 For each box, request rank `r` is copied to the `r`-th ascending free slot from
-`get_slot_diagnostics()`. The function completes schema, storage-isolation,
-slot-state, capacity, and selected-record preflight for every box before any
-write. A rejected call therefore leaves particle and request storage unchanged.
-Successful calls mutate only caller-owned `masses`, `concentration`, and
-`charge` in place; `density`, `volume`, unselected slots, and request arrays
-are preserved. It returns a fresh `np.int32` array containing activated counts
-per box. The boundary does not resize or compact storage, change `ParticleData`,
-or provide GPU support.
+`get_slot_diagnostics()`. The function performs global read-only schema,
+storage-isolation, slot-state, capacity, and selected-record preflight before
+any write. A rejected call therefore leaves particle and request storage
+unchanged. Successful calls mutate only caller-owned `masses`, `concentration`,
+and `charge`; `density`, `volume`, unselected slots, and request arrays are
+preserved. It returns a fresh `np.int32` activated-count vector per box.
 
 ### Direct GPU slot activation
 
@@ -136,26 +137,23 @@ activated_counts, free_indices, active_counts, free_counts = (
 ```
 
 For each box, selected request-prefix rank `r` is copied to the `r`-th
-ascending free slot. This deterministic, fixed-capacity boundary does not
-resize, compact, or replace caller buffers.
+ascending free slot. This deterministic fixed-capacity boundary does not
+resize, compact, or replace caller buffers. The CPU and GPU schemas are:
 
-All particle fields used by this operation and the three request fields are
-caller-owned, same-device `wp.float64` Warp arrays:
+| Contract item | CPU | Direct Warp |
+| --- | --- | --- |
+| Request masses | NumPy `float64`, `(n_boxes, request_capacity, n_species)` | Caller-owned, same-device `wp.float64`, same shape |
+| Request concentration / charge | NumPy `float64`, `(n_boxes, request_capacity)` | Caller-owned, same-device `wp.float64`, same shape |
+| Requested counts | Any one-dimensional NumPy integer dtype, `(n_boxes,)` | Caller-owned, same-device `wp.int32`, `(n_boxes,)` |
+| Diagnostics | Fresh `np.int32`: indices `(n_boxes, n_particles)`, counts `(n_boxes,)` | Caller-owned, same-device `wp.int32` sidecars with those shapes |
+| Activation result | Fresh `np.int32` activated counts, `(n_boxes,)` | Identical supplied `(activated_counts, free_indices, active_counts, free_counts)` |
 
-| Input | Required shape |
-| --- | --- |
-| `particles.masses` / `request_masses` | `(n_boxes, n_particles, n_species)` / `(n_boxes, request_capacity, n_species)` |
-| `particles.concentration` / `request_concentration` | `(n_boxes, n_particles)` / `(n_boxes, request_capacity)` |
-| `particles.charge` / `request_charge` | `(n_boxes, n_particles)` / `(n_boxes, request_capacity)` |
-
-`requested_counts`, `activated_counts`, `active_counts`, and `free_counts` are
-caller-owned, same-device `wp.int32` sidecars with shape `(n_boxes,)`.
-`free_indices` is a caller-owned, same-device `wp.int32` sidecar with shape
-`(n_boxes, n_particles)`. The return order is exactly
-`(activated_counts, free_indices, active_counts, free_counts)`, and each result
-is the same supplied sidecar. On success, `activated_counts` equals
-`requested_counts`; the remaining outputs describe post-activation state with
-ascending free indices and a `-1` unused tail.
+Both implementations emit ascending `free_indices` rows with `-1` tails. On
+success, activated counts equal requested counts, and the other diagnostics
+describe post-activation state. Only records within each requested prefix are
+validated or read. Both preserve `density`, `volume`, unselected slots, and
+request arrays; they read and write only `masses`, `concentration`, and
+`charge` in particle storage.
 
 #### Ownership and failure boundary
 
@@ -165,22 +163,31 @@ buffers; there is no hidden transfer, CPU fallback, or storage resizing. It
 reads and writes only `masses`, `concentration`, and `charge`; `density` and
 `volume` are unobserved and preserved.
 
-Before its writer launches, it validates metadata, sidecar ownership and
-aliasing, existing slot state, requested counts, free capacity, and selected
-request records. Request records outside each declared prefix are ignored. A
-rejected preflight preserves every accessible caller-owned particle, request,
-count, and output buffer. Once the writer launches, a later failure does not
-promise rollback.
+Before its writer launches, GPU activation validates metadata/schema/device,
+sidecar ownership and aliasing, existing slot state, requested counts, free
+capacity, and selected request records. Request records outside each declared
+prefix are ignored. A rejected preflight preserves every accessible
+caller-owned particle, request, count, and output buffer. Once the writer
+launches, a later failure does not promise rollback.
 
-`get_slot_diagnostics_gpu` remains a concrete-module-only P3 helper at
-`particula.gpu.kernels.slot_management`; do not import it from
-`particula.gpu.kernels` or `particula.gpu`.
+`get_slot_diagnostics_gpu` remains a concrete-module-only P3 helper. Import it
+only from its implementation module:
 
-Validate this bounded direct-kernel contract with:
+```python
+from particula.gpu.kernels.slot_management import get_slot_diagnostics_gpu
+```
+
+Do not import it from `particula.gpu.kernels` or `particula.gpu`.
+
+Validate the bounded CPU and direct-kernel contracts with:
 
 ```bash
+pytest particula/particles/tests/slot_management_test.py -q -Werror
 pytest particula/gpu/kernels/tests/slot_management_test.py -q -Werror
 ```
+
+Warp CPU is the baseline when Warp is installed. CUDA is optional evidence and
+the focused Warp suite skips cleanly when CUDA is unavailable.
 
 ## Canonical container schemas
 
