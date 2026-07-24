@@ -15,9 +15,10 @@ caller-owned-buffer conventions.
   - Decision: in result values or optional caller-owned sidecars, never as new
     particle-container fields.
 - [x] How are zero-box and zero-slot containers handled?
-  - Decision: reject `n_boxes == 0` on CPU and Warp. Accept zero slots as an
-    exact no-op only when every request count is zero; any positive request is a
-    capacity error before writes.
+  - Decision: CPU and Warp discovery handle zero boxes without diagnostic
+    writes. P3 Warp discovery handles zero particles by overwriting per-box
+    counts with zero and has no index entries; activation boundary behavior
+    remains P4 work.
 - [x] Which diagnostic-buffer aliases are accepted?
   - Decision: none. Reject every writable overlap with particle state, request
     arrays, scratch, or another diagnostic before clearing outputs. Dtype

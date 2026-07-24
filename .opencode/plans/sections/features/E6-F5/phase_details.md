@@ -33,11 +33,20 @@ P3 and GPU activation/parity in P4; P5 documents the completed contract.
     rejection of malformed data/requests, invalid selected prefixes, aliases,
     invalid existing slots, and later-box capacity failures.
 
-- [ ] **E6-F5-P3:** Implement GPU slot discovery and diagnostics with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Populate caller-owned active/free counts and fixed-shape ascending free indices on the active device with no particle mutation.
+- [x] **E6-F5-P3:** Implement GPU slot discovery and diagnostics with unit tests
+  - Issue: #1418 | Size: S | Status: Shipped
+  - Delivered: concrete, direct-import-only `get_slot_diagnostics_gpu` performs
+    read-only Warp classification from mass, concentration, and charge; it
+    returns supplied same-device `wp.int32` free-index, active-count, and
+    free-count sidecars by identity. Free indices are ascending with `-1` tails.
+    Invalid schema or slot state raises before a writer launch, so particle
+    fields and stale output sidecars remain unchanged. Density and volume are
+    not read or validated, and the function has no package export.
   - Files: `particula/gpu/kernels/slot_management.py`, `particula/gpu/kernels/tests/slot_management_test.py`
-  - Tests: Warp CPU predicate/count/index parity, sidecar shape/dtype/device checks, sentinel contents, supplied identity, invalid-state rejection, and optional CUDA execution.
+  - Tests: direct-Warp CPU-oracle predicate/count/index parity; sidecar
+    shape/dtype/device and identity checks; stale-output overwrite; invalid
+    state and malformed-schema atomicity; density/volume non-access; and
+    optional CUDA execution with clean skips.
 
 - [ ] **E6-F5-P4:** Implement atomic GPU slot activation and CPU parity tests
   - Issue: TBD | Size: S | Status: Not Started

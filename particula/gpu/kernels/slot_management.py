@@ -1,8 +1,11 @@
-"""Discover active and free fixed particle slots on a Warp device.
+"""Classify fixed particle slots into active and free Warp-device states.
 
-This concrete-module-only helper mirrors the CPU slot classification without
-transferring particle fields to the host. It writes caller-owned diagnostic
-sidecars only after the complete particle schema and state preflight succeeds.
+This concrete-module-only primitive mirrors CPU slot classification without
+transferring particle fields to the host. It reads only particle masses,
+concentration, and charge; density and volume are intentionally not accessed.
+After complete schema and state preflight, it overwrites caller-owned
+diagnostic sidecars. The primitive is intentionally not exported by the
+``particula.gpu.kernels`` package.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -35,7 +38,11 @@ def _classify_slots(
     categories: wp.array2d(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Classify one particle slot and record an invalid-state flag."""
+    """Classify one slot and atomically flag an invalid slot state.
+
+    The kernel writes a category for every slot but does not write any
+    caller-provided diagnostic sidecar.
+    """
     box, particle = wp.tid()
     species_count = masses.shape[2]
     mass_valid = bool(True)
@@ -81,7 +88,10 @@ def _write_diagnostics(
     active_counts: wp.array(dtype=wp.int32),
     free_counts: wp.array(dtype=wp.int32),
 ) -> None:
-    """Write ascending free indices and counts from completed categories."""
+    """Write per-box counts and ascending free indices from slot categories.
+
+    Unused free-index entries are overwritten with ``-1``.
+    """
     box = wp.tid()
     particle_count = categories.shape[1]
     active_count = wp.int32(0)
@@ -104,14 +114,18 @@ def _write_empty_diagnostics(
     active_counts: wp.array(dtype=wp.int32),
     free_counts: wp.array(dtype=wp.int32),
 ) -> None:
-    """Overwrite counts for a box whose particle capacity is zero."""
+    """Set both diagnostic counts to zero for a zero-capacity box."""
     box = wp.tid()
     active_counts[box] = 0
     free_counts[box] = 0
 
 
 def _get_required_field(particles: Any, name: str) -> Any:
-    """Return a particle classification field or raise a stable error."""
+    """Return a required classification field or raise a stable error.
+
+    Field access is isolated so malformed particle containers consistently
+    produce ``ValueError`` rather than leaking attribute-access exceptions.
+    """
     try:
         return getattr(particles, name)
     except Exception as exc:
@@ -126,7 +140,11 @@ def _validate_array_schema(
     shape: tuple[int, ...] | None = None,
     device: Any | None = None,
 ) -> Any:
-    """Validate one Warp diagnostic or particle array schema."""
+    """Validate one Warp particle-field or diagnostic-sidecar schema.
+
+    This performs metadata validation only. It neither scans field values nor
+    mutates the supplied array.
+    """
     try:
         is_warp_array = _is_warp_array_like(values)
     except Exception:
@@ -148,7 +166,11 @@ def _validate_array_schema(
 
 
 def _validate_particles(particles: Any) -> tuple[Any, Any, Any, int, int, Any]:
-    """Validate classification fields and derive mass-authoritative schema."""
+    """Validate classification fields and derive the mass-authoritative schema.
+
+    Only masses, concentration, and charge participate in classification;
+    density and volume remain unobserved.
+    """
     masses = _validate_array_schema(
         _get_required_field(particles, "masses"),
         "particles.masses",
@@ -190,11 +212,13 @@ def get_slot_diagnostics_gpu(
     """Write read-only slot diagnostics into supplied Warp ``int32`` sidecars.
 
     Import this concrete direct-Warp primitive from
-    ``particula.gpu.kernels.slot_management``. A slot is active iff its
-    concentration is finite and positive, all mass lanes are finite and
-    nonnegative, its float64 total mass is finite and positive, and its charge
-    is finite. A slot is free iff concentration, all masses, and charge are
-    exactly zero. Any other state raises ``ValueError`` before output writes.
+    ``particula.gpu.kernels.slot_management``; it is not package-exported. A
+    slot is active iff concentration is finite and positive, all mass lanes
+    are finite and nonnegative, float64 total mass is finite and positive, and
+    charge is finite. A slot is free iff concentration, all masses, and charge
+    are exactly zero. Any other state raises ``ValueError`` before diagnostic
+    writes. The primitive reads only those classification fields, leaving all
+    particle storage, including density and volume, unchanged.
 
     Args:
         particles: Container with same-device float64 ``masses`` shaped
@@ -213,8 +237,9 @@ def get_slot_diagnostics_gpu(
             free.
 
     Notes:
-        Particle fields are read only. Valid calls overwrite all diagnostics;
-        free indices are ascending and unused positions are ``-1``.
+        Valid calls overwrite every diagnostic entry. Free indices are
+        ascending and unused positions are ``-1``. Schema and state rejection
+        occurs before caller-owned diagnostics are written.
     """
     masses, concentration, charge, n_boxes, n_particles, device = (
         _validate_particles(particles)

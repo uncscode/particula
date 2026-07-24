@@ -1,9 +1,9 @@
 # Success Criteria
 
-- [ ] CPU and Warp use the same active/free/invalid truth table.
-- [ ] Free indices are ascending per box and unused fixed-shape entries are
+- [x] CPU and Warp discovery use the same active/free/invalid truth table.
+- [x] Discovery free indices are ascending per box and unused fixed-shape entries are
   exactly `-1`.
-- [ ] Active, free, and activated diagnostics equal independent NumPy oracle
+- [x] Discovery active and free diagnostics equal independent NumPy oracle
   counts exactly for every tested box.
 - [ ] Request rank maps to the same slot on CPU, Warp CPU, and optional CUDA.
 - [ ] Activation preserves container and array identities, shapes, dtypes,
