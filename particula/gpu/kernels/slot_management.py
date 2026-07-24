@@ -1,11 +1,11 @@
 """Classify fixed particle slots into active and free Warp-device states.
 
-This concrete-module-only primitive mirrors CPU slot classification without
-transferring particle fields to the host. It reads only particle masses,
-concentration, and charge; density and volume are intentionally not accessed.
-After complete schema and state preflight, it overwrites caller-owned
-diagnostic sidecars. The primitive is intentionally not exported by the
-``particula.gpu.kernels`` package.
+This module provides concrete-module-only P3 diagnostics and the package-
+exported P4 activation boundary. The diagnostics mirror CPU slot
+classification without transferring particle fields to the host. They read
+only particle masses, concentration, and charge; density and volume are
+intentionally not accessed. After complete schema and state preflight, they
+overwrite caller-owned diagnostic sidecars.
 """
 
 # mypy: disable-error-code="valid-type, misc"
