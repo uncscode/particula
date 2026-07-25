@@ -322,8 +322,7 @@ else:
         labels = [r["label"] for r in cpu_rows]
         speedups = [r["speedup"] for r in cpu_rows]
         colors = [
-            "tab:blue" if r["n_boxes"] == 1 else "tab:orange"
-            for r in cpu_rows
+            "tab:blue" if r["n_boxes"] == 1 else "tab:orange" for r in cpu_rows
         ]
         bars = ax2.barh(labels, speedups, color=colors)
         ax2.set_xlabel("GPU speedup vs CPU (x)")
