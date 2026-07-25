@@ -61,11 +61,11 @@
     {
       "id": "E6-F7-P3",
       "title": "Integrate slot activation and exhaustion transaction with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-25",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
