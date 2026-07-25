@@ -9,9 +9,10 @@
   equations, caller-supplied survival factor, closed concentration/temperature
   domains, asymmetric saturation gating, formation/injection metadata, and the
   explicit no-source/no-inventory-mutation boundary.
-- No examples or public exports were added. Future phases should extend the
-  theory page with source finalization equations and implementation status when
-  those capabilities ship.
+- P2 added concrete-module docstrings in
+  `particula/dynamics/nucleation/particle_source.py`; it added no user-facing
+  documentation, examples, or public exports. P7 should extend the theory page
+  with the shipped source-finalization equations and implementation status.
 - Retain citations to Seinfeld & Pandis (2016), Kulmala et al. (2006, DOI
   `10.5194/acp-6-787-2006`), and Kerminen & Kulmala (2002, DOI
   `10.1016/S0021-8502(01)00194-X`). State that Vehkamäki et al. (2002, DOI

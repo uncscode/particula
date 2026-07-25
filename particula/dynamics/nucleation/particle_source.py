@@ -1,8 +1,9 @@
-"""Finalize gas-admitted particle-source demand without mutating state.
+"""Plan gas-admitted particle-source demand without mutating simulation state.
 
-This CPU-only P2 boundary converts survival-adjusted potential event rates into
-immutable gas mass-demand records.  It does not activate particle slots, plan
-capacity exhaustion, or mutate :class:`~particula.gas.gas_data.GasData`.
+This concrete-module-only, CPU P2 boundary converts survival-adjusted potential
+event rates [#/m³/s] and a duration [s] into immutable gas mass-demand records.
+It neither activates particle slots nor plans capacity exhaustion, and it does
+not mutate :class:`~particula.gas.gas_data.GasData` or caller-owned inputs.
 """
 
 from dataclasses import dataclass
@@ -25,7 +26,10 @@ def _readonly_copy(
     name: str,
     ndim: int | None = None,
 ) -> NDArray[np.generic]:
-    """Copy an array payload and make its owned copy read-only.
+    """Copy an array payload into owned, read-only storage.
+
+    This helper ensures that frozen record attributes cannot be changed through
+    an aliased caller-owned NumPy array.
 
     Args:
         values: Array-compatible payload.
@@ -34,7 +38,7 @@ def _readonly_copy(
         ndim: Optional required number of dimensions.
 
     Returns:
-        A fresh, read-only NumPy array.
+        A fresh, owned, read-only NumPy array with the requested dtype.
 
     Raises:
         TypeError: If the value cannot be converted to the requested dtype.
@@ -61,7 +65,20 @@ def _readonly_vector(
     dtype: type[np.generic],
     name: str,
 ) -> NDArray[np.generic]:
-    """Copy a rank-one record payload into immutable owned storage."""
+    """Copy a rank-one record payload into owned, read-only storage.
+
+    Args:
+        values: Array-compatible rank-one payload.
+        dtype: Required output NumPy dtype.
+        name: Field name for validation errors.
+
+    Returns:
+        A fresh, owned, read-only rank-one NumPy array.
+
+    Raises:
+        TypeError: If ``values`` cannot be converted to ``dtype``.
+        ValueError: If ``values`` is not rank one.
+    """
     return _readonly_copy(values, dtype, name, ndim=1)
 
 
@@ -79,9 +96,9 @@ class PotentialEventData:
     """Potential particle-formation rate and source duration.
 
     Attributes:
-        potential_rate: Survival-adjusted event rate [#/m³/s], shape
-            ``(n_boxes,)``. The record owns a read-only float64 copy.
-        duration: Source duration [s].
+        potential_rate: Survival-adjusted event rate [#/m³/s] with shape
+            ``(n_boxes,)``. The record owns a fresh read-only float64 copy.
+        duration: Finite nonnegative source duration [s].
     """
 
     potential_rate: NDArray[np.float64]
@@ -121,10 +138,11 @@ class SourceDemandData:
     """Immutable P2 gas mass demand for one common event count per box.
 
     Attributes:
-        per_event_mass: Species mass per formed event [kg/event], shape
-            ``(n_species,)``.
+        per_event_mass: Species mass per formed event [kg/event] with shape
+            ``(n_species,)``. The record owns a fresh read-only float64 copy.
         gas_mass_removed: Provisional gas demand [kg/m³], shape
-            ``(n_boxes, n_species)``. P2 does not apply this demand to gas.
+            ``(n_boxes, n_species)``. The record owns a fresh read-only
+            float64 copy. P2 does not apply this demand to gas.
     """
 
     per_event_mass: NDArray[np.float64]
@@ -153,8 +171,19 @@ class SourceDemandData:
 class SourceDiagnostics:
     """Immutable source counts and limiting-species diagnostics.
 
-    A limiting-species index of ``-1`` means gas did not reduce a positive
+    All payloads are fresh, read-only arrays owned by this record. A
+    limiting-species index of ``-1`` means gas did not reduce a positive
     potential count, including zero-potential and zero-admitted rows.
+
+    Attributes:
+        potential_event_count: Potential events [#/m³] with shape
+            ``(n_boxes,)``.
+        gas_admitted_event_count: Inventory-admitted events [#/m³] with shape
+            ``(n_boxes,)``.
+        gas_limited_event_count: Potential events not admitted by gas [#/m³]
+            with shape ``(n_boxes,)``.
+        limiting_species_index: Participating gas species that limits each box,
+            with shape ``(n_boxes,)`` and ``-1`` as the no-limiting sentinel.
     """
 
     potential_event_count: NDArray[np.float64]
@@ -180,7 +209,21 @@ class SourceDiagnostics:
 def _validate_gas(
     gas: GasData, n_boxes: int, n_species: int
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    """Validate gas schemas and physical inputs without mutating gas."""
+    """Validate gas schema and physical inventory inputs without mutation.
+
+    Args:
+        gas: Gas inventory whose molar masses are [kg/mol] and concentrations
+            are [kg/m³].
+        n_boxes: Required number of gas concentration rows.
+        n_species: Required number of gas species columns.
+
+    Returns:
+        Float64 views or conversions of validated molar masses [kg/mol] and
+        concentrations [kg/m³]. Neither result is written by this module.
+
+    Raises:
+        ValueError: If gas schemas, dtypes, or physical values are invalid.
+    """
     if len(gas.name) != n_species:
         raise ValueError("composition width must match gas species")
     if not isinstance(gas.molar_mass, np.ndarray) or gas.molar_mass.shape != (
@@ -222,16 +265,21 @@ def finalize_particle_source(  # noqa: C901
     """Finalize immutable, inventory-limited source demand records.
 
     Every box receives one common admitted event count constrained by its
-    tightest participating gas inventory. Inputs and ``gas`` are read-only from
-    this boundary; particle slots and exhaustion state are intentionally absent.
+    tightest participating gas inventory. The returned records own fresh,
+    read-only arrays. This concrete P2 boundary only plans demand: it neither
+    mutates inputs or ``gas`` nor accesses particle slots or exhaustion state.
 
     Args:
-        potential_events: Survival-adjusted potential source rate and duration.
-        composition: Molecule counts by gas species for each formed event.
-        gas: Read-only source inventory data.
+        potential_events: Survival-adjusted potential source rate [#/m³/s] and
+            source duration [s]. Survival is not applied again.
+        composition: Nonnegative molecule counts by gas species for each
+            formed event.
+        gas: Read-only source inventory with molar masses [kg/mol] and
+            concentrations [kg/m³].
 
     Returns:
-        Immutable provisional gas demand and source diagnostics.
+        Immutable per-event mass [kg/event] and provisional gas demand [kg/m³],
+        followed by event-count diagnostics [#/m³] and limiting species indices.
 
     Raises:
         TypeError: If a top-level input has an invalid type.

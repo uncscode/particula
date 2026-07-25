@@ -6,8 +6,9 @@
   validity-domain, injection-composition, and formation-metadata APIs.
 - [x] Implement overflow-safe SI conversion and activation/kinetic potential
   rates without hidden clipping or out-of-range extrapolation.
-- [ ] Implement a pure finalizer for event demand, per-event species mass,
-  shared gas admission, and fixed-shape E6-F5 requests without mutation.
+- [x] Implement a pure P2 finalizer for event demand, per-event species mass,
+  shared gas admission, deterministic limiting diagnostics, and bounded
+  rounding correction without mutation. E6-F5 requests remain future work.
 - [ ] Integrate E6-F5 activation and E6-F6 plan/commit; require a complete plan
   for every box before gas or particle writes.
 - [ ] Ensure source packaging changes computational weight only, never
@@ -22,8 +23,10 @@
 
 - [x] Add isolated equation/domain/order/validation tests in
   `nucleation_strategies_test.py`.
-- [ ] Add source, capacity, atomicity, and conservation tests in
-  `particle_source_test.py`.
+- [x] Add source-record tests in `particle_source_test.py` for inventory
+  admission, diagnostics, immutable ownership, validation, and nonmutation.
+- [ ] Add capacity, atomicity, and conservation tests in
+  `particle_source_test.py` as P3/P6 work.
 - [ ] Add builder/factory tests for units, required fields, and invalid aliases.
 - [ ] Add runnable tests in `nucleation_runnable_test.py`.
 - [ ] Add an independent multi-box/species oracle under

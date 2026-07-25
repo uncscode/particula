@@ -13,9 +13,13 @@ NumPy oracle rather than production helpers.
   bounds, exact zero and saturation gates, strict scalar and record validation,
   overflow ordering, frozen records, abstract-interface behavior, and the
   intentional absence of dynamics exports.
-- **P2:** `particle_source_test.py` covers one/many boxes and species, each
-  limiting species, exact inventory exhaustion, zero inputs, survival factors,
-  provisional gas-admitted demand, diagnostics, and input immutability.
+- **P2 (shipped):**
+  `particula/dynamics/nucleation/tests/particle_source_test.py` covers
+  one/multi-box and multi-species shared admission, per-box limiting species,
+  deterministic equal-ratio ties, exact depletion, zero rate/duration/
+  inventory and zero-box inputs, provisional demand, diagnostics, record
+  immutability/nonaliasing, package-export absence, schema/physical/overflow
+  rejections, bounded-correction failure, and gas nonmutation.
 - **P3:** Source interaction tests cover free/exact/sparse/full slots,
   resampling precedence, scaling fallback, both-off/unsatisfiable failures,
   deterministic order, no residual truncation, and all-box snapshots.

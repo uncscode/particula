@@ -2,9 +2,10 @@
 
 ## High-Level Design
 
-The shipped P1 strategy computes a scalar potential event rate only. Immutable
-configuration records carry a closed scientific domain, future composition
-metadata, and formation metadata; no finalizer, process, or state write exists.
+The shipped P1 strategy computes a scalar potential event rate. Shipped P2
+consumes that already survival-adjusted rate with a duration and immutable
+injection composition, then produces gas-admitted source records without any
+state write.
 
 ```text
 mass concentration + molar mass + T + optional saturation + strategy
@@ -19,7 +20,15 @@ closed C/T checks; below-lower saturation -> exact 0.0
           |
 evaluate J = A*C or K*C^2 [events m^-3 s^-1]
           |
-finite potential rate [#/m^3/s]
+ finite potential rate [#/m^3/s]
+          |
+          + P2: potential count = rate * duration
+          |
+          + per-event mass = molecule count * molar mass / N_A
+          |
+          + per-box min(participating gas / per-event mass)
+          |
+          + one admitted count, provisional demand, diagnostics
 ```
 
 `C = mass_concentration / molar_mass * N_A` is calculated with representation-
@@ -48,12 +57,17 @@ bound is an exact zero gate, while above its upper bound raises `ValueError`.
 
 - **Data Model:** No `ParticleData` or `GasData` schema change. Frozen records
   are `ClosedInterval`, `NucleationValidityDomain`, `InjectionComposition`,
-  and `FormationMetadata`.
+  `FormationMetadata`, `PotentialEventData`, `SourceDemandData`, and
+  `SourceDiagnostics`. P2 record arrays are fresh, owned, and read-only.
 - **API Surface:** Concrete symbols live only in
-  `particula.dynamics.nucleation.nucleation_strategies`; the package and
+  `particula.dynamics.nucleation.nucleation_strategies` and
+  `particula.dynamics.nucleation.particle_source`; the package and
   `particula.dynamics` do not re-export them.
-- **Mutation Contract:** Evaluation returns a `float` potential rate and does
-  not mutate caller state.
+- **Mutation Contract:** P1 returns a `float` potential rate. P2 returns only
+  provisional demand and diagnostics; it validates gas read-only and does not
+  mutate caller state. A participating species limits each box by the minimum
+  inventory ratio; ties use the lowest original species index. P2 applies no
+  slot, exhaustion, particle, or gas commit.
 - **Workflow Hooks:** E6-F5/E6-F6 consumption, E6-F8 parity, and E6-F9
   integration are future work.
 

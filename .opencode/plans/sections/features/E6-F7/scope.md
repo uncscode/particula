@@ -1,8 +1,9 @@
 # Scope
 
-P1 delivers a CPU-only, concrete-module-only boundary that computes bounded
-empirical potential event rates. It neither creates source records nor mutates
-gas, particles, slots, or inventories.
+P1/P2 deliver CPU-only, concrete-module-only boundaries that compute bounded
+empirical potential event rates, then finalize immutable inventory-limited
+source-demand records. P2 reads gas inventory without mutation and does not
+touch particles, slots, or exhaustion state.
 
 ## In Scope
 
@@ -20,6 +21,16 @@ gas, particles, slots, or inventories.
 - Exact zero-rate paths and optional saturation-gate semantics, with isolated
   tests for equations, boundaries, ordering, invalid inputs, immutability, and
   absent `particula.dynamics` exports.
+- `PotentialEventData`, `SourceDemandData`, and `SourceDiagnostics` in
+  `particula/dynamics/nucleation/particle_source.py`, with fresh read-only
+  `float64` payloads and a read-only `int32` limiting-species diagnostic.
+- Shared per-box gas-inventory admission from survival-adjusted P1 rate and
+  duration, deterministic lowest-index tie selection, `-1` no-limiting
+  sentinel handling, and bounded vectorized ULP correction for rounding-only
+  inventory overshoot.
+- Read-only validation of all gas concentration lanes and participating molar
+  masses, plus co-located source-record tests for success, zero, validation,
+  ownership, nonaliasing, and no-mutation behavior.
 
 ## Out of Scope
 
@@ -33,6 +44,5 @@ gas, particles, slots, or inventories.
   performance claims.
 - Silent clipping of unsupported environmental inputs, partial multi-box
   commits, or silent loss of slot-exhausted source demand.
-- Source construction, inventory limitation, particle-slot admission or
-  activation, gas/particle mutation, diagnostics, builders, factories,
-  runnables, and all dynamics/top-level exports.
+- Particle-slot admission or activation, exhaustion planning, gas/particle
+  mutation, builders, factories, runnables, and all dynamics/top-level exports.

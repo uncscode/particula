@@ -11,11 +11,11 @@ P4/P5, then run P6 conservation validation before P7 documentation.
   - Files: `particula/dynamics/nucleation/nucleation_strategies.py`, `particula/dynamics/nucleation/tests/nucleation_strategies_test.py`
   - Tests: Equation fixtures, unit conversion, linear/quadratic scaling, zero/gate ordering, boundaries, scalar/record validation, overflow rejection, immutability, and no-export regression.
 
-- [ ] **E6-F7-P2:** Compute inventory-limited provisional source demand with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Convert potential events to immutable gas-admitted demand records and jointly cap all species by gas availability before representation planning or mutation.
+- [x] **E6-F7-P2:** Compute inventory-limited provisional source demand with unit tests
+  - Issue: #1431 | Size: S | Status: Shipped
+  - Goal: Shipped immutable CPU records that convert survival-adjusted potential events into one shared, gas-admitted count per box and provisional per-species demand before representation planning or mutation.
   - Files: `particula/dynamics/nucleation/particle_source.py`, `particula/dynamics/nucleation/tests/particle_source_test.py`
-  - Tests: Limiting species, exact depletion, zero inventory/time/rate, represented weight, diagnostics, and input snapshots.
+  - Tests: Per-box limiting species and deterministic ties, exact depletion, zero inventory/time/rate and zero boxes, read-only ownership/nonaliasing, validation/overflow/rounding-correction failures, diagnostics, and input snapshots.
 
 - [ ] **E6-F7-P3:** Integrate slot activation and exhaustion transaction with unit tests
   - Issue: TBD | Size: S | Status: Not Started
