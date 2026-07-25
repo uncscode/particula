@@ -78,6 +78,33 @@ def _sidecars(boxes: int, particles: int, species: int):
     )
 
 
+def _snapshot_arrays(*owners):
+    """Capture caller-owned Warp array identity, schema, and exact contents."""
+    snapshot = []
+    for owner in owners:
+        for value in owner.__dict__.values():
+            if hasattr(value, "numpy"):
+                snapshot.append(
+                    (
+                        value,
+                        tuple(value.shape),
+                        value.dtype,
+                        str(value.device),
+                        value.numpy().copy(),
+                    )
+                )
+    return snapshot
+
+
+def _assert_snapshot_unchanged(snapshot):
+    """Assert a complete caller-owned array snapshot remains unchanged."""
+    for value, shape, dtype, device, contents in snapshot:
+        assert tuple(value.shape) == shape
+        assert value.dtype == dtype
+        assert str(value.device) == device
+        np.testing.assert_array_equal(value.numpy(), contents, strict=True)
+
+
 def test_config_is_frozen_but_retains_arrays_by_identity():
     """Frozen records reject rebinding without copying caller array sidecars."""
     config = _config()
@@ -151,20 +178,27 @@ def test_preflight_is_read_only_for_valid_inputs():
     """Valid P1 preflight retains state and returns normalized metadata."""
     particles, gas = _state()
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
-    before = scratch.potential_rate.numpy().copy()
+    environment = SimpleNamespace(
+        temperature=wp.full(
+            1, wp.float64(300.0), dtype=wp.float64, device="cpu"
+        ),
+    )
+    before = _snapshot_arrays(
+        particles, gas, environment, scratch, finalized, diagnostics
+    )
     result = _preflight_nucleation(
         particles,
         gas,
         _config(),
         1.0,
-        temperature=300.0,
+        environment=environment,
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
     )
     assert result.n_boxes == 1
     assert result.n_particles == 2
-    np.testing.assert_array_equal(scratch.potential_rate.numpy(), before)
+    _assert_snapshot_unchanged(before)
 
 
 def test_preflight_accepts_finite_signed_particle_charge():
@@ -307,29 +341,45 @@ def test_zero_gates_leave_stale_sidecars_untouched(time_step, changes, reason):
     """All-box scalar gates return zero metadata without clearing sidecars."""
     particles, gas = _state()
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
-    before = scratch.potential_demand.numpy().copy()
+    temperature = wp.full(1, wp.float64(300.0), dtype=wp.float64, device="cpu")
+    before = _snapshot_arrays(
+        particles, gas, temperature, scratch, finalized, diagnostics
+    )
     result = _preflight_nucleation(
         particles,
         gas,
         _config(**changes),
         time_step,
-        temperature=300.0,
+        temperature=temperature,
         scratch=scratch,
         finalized_demand=finalized,
         diagnostics=diagnostics,
     )
     assert result.gate_reason == reason
     assert result.potential_rate == 0.0
-    np.testing.assert_array_equal(scratch.potential_demand.numpy(), before)
+    _assert_snapshot_unchanged(before)
 
 
 def test_rejection_does_not_write_state():
     """Schema/science rejection occurs before caller state is modified."""
     particles, gas = _state()
-    before = particles.concentration.numpy().copy()
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    temperature = wp.full(1, wp.float64(100.0), dtype=wp.float64, device="cpu")
+    before = _snapshot_arrays(
+        particles, gas, temperature, scratch, finalized, diagnostics
+    )
     with pytest.raises(ValueError, match="temperature"):
-        _preflight_nucleation(particles, gas, _config(), 1.0, temperature=100.0)
-    np.testing.assert_array_equal(particles.concentration.numpy(), before)
+        _preflight_nucleation(
+            particles,
+            gas,
+            _config(),
+            1.0,
+            temperature=temperature,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+        )
+    _assert_snapshot_unchanged(before)
 
 
 @pytest.mark.parametrize(
@@ -413,3 +463,140 @@ def test_preflight_rejects_sidecar_overlap_without_mutating_state():
             scratch=scratch,
         )
     np.testing.assert_array_equal(particles.concentration.numpy(), before)
+
+
+def test_real_rejects_oversized_scalars_as_value_errors():
+    """Scalar conversion overflow follows the finite-domain error contract."""
+    with pytest.raises(ValueError, match="finite and nonnegative"):
+        _real(10**1000, "value")
+
+
+def test_config_and_time_step_reject_oversized_scalars_as_value_errors():
+    """Configuration and direct scalar overflow do not leak OverflowError."""
+    with pytest.raises(ValueError, match="finite and nonnegative"):
+        _config(coefficient=10**1000)
+    particles, gas = _state()
+    with pytest.raises(ValueError, match="finite and nonnegative"):
+        _preflight_nucleation(
+            particles, gas, _config(), 10**1000, temperature=300.0
+        )
+
+
+def test_preflight_rejects_lookalike_and_mutated_config_without_writes():
+    """Runtime config validation rejects untrusted indices before kernel use."""
+    particles, gas = _state()
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)
+    lookalike = SimpleNamespace(**_config().__dict__)
+    with pytest.raises(ValueError, match="NucleationConfig"):
+        _preflight_nucleation(
+            particles,
+            gas,
+            lookalike,
+            1.0,
+            temperature=300.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+        )
+    config = _config()
+    object.__setattr__(config, "precursor_index", -1)
+    with pytest.raises(ValueError, match="config scalar values"):
+        _preflight_nucleation(
+            particles,
+            gas,
+            config,
+            1.0,
+            temperature=300.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+        )
+    _assert_snapshot_unchanged(before)
+
+
+@pytest.mark.parametrize("temperature", [100.0, 500.0])
+@pytest.mark.parametrize(
+    "changes", [{"coefficient": 0.0}, {"survival_factor": 0.0}]
+)
+def test_scalar_zero_config_gates_before_temperature_interval(
+    temperature, changes
+):
+    """Valid zero rate inputs short-circuit configured scalar temperature bounds."""
+    particles, gas = _state()
+    result = _preflight_nucleation(
+        particles, gas, _config(**changes), 1.0, temperature=temperature
+    )
+    assert result.gate_reason in ("zero_coefficient", "zero_survival")
+
+
+@pytest.mark.parametrize("temperature", [100.0, 500.0])
+@pytest.mark.parametrize(
+    "changes", [{"coefficient": 0.0}, {"survival_factor": 0.0}]
+)
+def test_device_zero_config_gates_before_temperature_interval(
+    temperature, changes
+):
+    """Valid zero rate inputs short-circuit device temperature range checks."""
+    particles, gas = _state()
+    temperature_data = wp.full(
+        1, wp.float64(temperature), dtype=wp.float64, device="cpu"
+    )
+    result = _preflight_nucleation(
+        particles,
+        gas,
+        _config(**changes),
+        1.0,
+        temperature=temperature_data,
+    )
+    assert result.gate_reason in ("zero_coefficient", "zero_survival")
+
+
+def test_disjoint_precursor_and_saturation_gates_are_all_box_union():
+    """Disjoint per-box gates do not incorrectly leave an eligible box."""
+    particles, gas = _state(boxes=2)
+    gas.concentration = wp.array(
+        np.array([[0.0], [1.0]], dtype=np.float64),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    saturation = wp.array(
+        np.array([[1.0], [0.4]], dtype=np.float64),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    result = _preflight_nucleation(
+        particles,
+        gas,
+        _config(saturation_lower=0.5, saturation_upper=1.5),
+        1.0,
+        temperature=wp.full(
+            2, wp.float64(300.0), dtype=wp.float64, device="cpu"
+        ),
+        saturation=saturation,
+    )
+    assert not result.has_eligible_boxes
+    assert result.has_gated_boxes
+
+
+def test_mixed_gate_union_retains_eligible_box():
+    """A gate union smaller than box count retains eligible work metadata."""
+    particles, gas = _state(boxes=2)
+    gas.concentration = wp.array(
+        np.array([[0.0], [1.0]], dtype=np.float64),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    saturation = wp.ones((2, 1), dtype=wp.float64, device="cpu")
+    result = _preflight_nucleation(
+        particles,
+        gas,
+        _config(saturation_lower=0.5, saturation_upper=1.5),
+        1.0,
+        temperature=wp.full(
+            2, wp.float64(300.0), dtype=wp.float64, device="cpu"
+        ),
+        saturation=saturation,
+    )
+    assert result.has_eligible_boxes
+    assert result.has_gated_boxes

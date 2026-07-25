@@ -53,7 +53,11 @@ def _real(value: object, name: str, *, positive: bool = False) -> float:
         value, (Real, np.integer, np.floating)
     ):
         raise TypeError(f"{name} must be a real scalar.")
-    result = float(value)
+    try:
+        result = float(value)
+    except OverflowError as exc:
+        qualifier = "positive" if positive else "finite and nonnegative"
+        raise ValueError(f"{name} must be {qualifier}.") from exc
     if (
         not np.isfinite(result)
         or (positive and result <= 0.0)
@@ -566,6 +570,7 @@ def _precursor_status(
     lower: wp.float64,
     upper: wp.float64,
     status: wp.array(dtype=wp.int32),
+    gated: wp.array(dtype=wp.int32),
 ) -> None:
     """Count zero and out-of-interval precursor concentrations by box.
 
@@ -585,6 +590,7 @@ def _precursor_status(
     )
     if number_concentration == 0.0:
         wp.atomic_add(status, 1, 1)
+        gated[box] = 1
     elif number_concentration < lower or number_concentration > upper:
         wp.atomic_add(status, 0, 1)
 
@@ -596,6 +602,7 @@ def _saturation_status(
     lower: wp.float64,
     upper: wp.float64,
     status: wp.array(dtype=wp.int32),
+    gated: wp.array(dtype=wp.int32),
 ) -> None:
     """Count saturation lower gates and upper-domain failures by box.
 
@@ -610,8 +617,21 @@ def _saturation_status(
     value = saturation[box, precursor_index]
     if value < lower:
         wp.atomic_add(status, 1, 1)
+        gated[box] = 1
     elif value > upper:
         wp.atomic_add(status, 0, 1)
+
+
+@wp.kernel
+def _gate_union_count(
+    first: wp.array(dtype=wp.int32),
+    second: wp.array(dtype=wp.int32),
+    count: wp.array(dtype=wp.int32),
+) -> None:
+    """Count boxes gated by either of two per-box read-only gate masks."""
+    box = wp.tid()
+    if first[box] != 0 or second[box] != 0:
+        wp.atomic_add(count, 0, 1)
 
 
 def _scan(values: Any, name: str, *, positive: bool = False) -> None:
@@ -836,6 +856,12 @@ def _preflight_nucleation(  # noqa: C901
         ValueError: If schemas, ownership, physical values, or species settings
             violate the P1 contract.
     """
+    if not isinstance(config, NucleationConfig):
+        raise ValueError("config must be NucleationConfig.")
+    try:
+        config.__post_init__()
+    except (TypeError, ValueError) as exc:
+        raise ValueError("config scalar values are invalid.") from exc
     masses = _field(particles, "masses")
     if (
         not _is_warp_array_like(masses)
@@ -925,6 +951,15 @@ def _preflight_nucleation(  # noqa: C901
     )
     _no_overlap(particle_arrays + gas_arrays + tuple(external) + sidecars)
     normalized_time_step = _real(time_step, "time_step")
+    if (
+        config.precursor_index >= n_species
+        or len(config.molecule_counts) != n_species
+    ):
+        raise ValueError(
+            "precursor index and molecule_counts must match species."
+        )
+    if any(count > np.iinfo(np.int32).max for count in config.molecule_counts):
+        raise ValueError("molecule_counts must fit int32.")
     for value, name, positive in zip(
         (particle_arrays[0], particle_arrays[1], *particle_arrays[3:]),
         (
@@ -945,6 +980,38 @@ def _preflight_nucleation(  # noqa: C901
         strict=True,
     ):
         _scan(value, name, positive=positive)
+    if not isinstance(temperature_value, float):
+        _scan(temperature_value, "temperature", positive=True)
+    if float(config.coefficient) == 0.0:
+        return _NucleationPreflight(
+            particles,
+            gas,
+            config,
+            n_boxes,
+            n_particles,
+            n_species,
+            device,
+            temperature_value,
+            saturation_value,
+            False,
+            True,
+            "zero_coefficient",
+        )
+    if float(config.survival_factor) == 0.0:
+        return _NucleationPreflight(
+            particles,
+            gas,
+            config,
+            n_boxes,
+            n_particles,
+            n_species,
+            device,
+            temperature_value,
+            saturation_value,
+            False,
+            True,
+            "zero_survival",
+        )
     if isinstance(temperature_value, float):
         if (
             not config.temperature_lower
@@ -953,7 +1020,6 @@ def _preflight_nucleation(  # noqa: C901
         ):
             raise ValueError("temperature is outside configured bounds.")
     else:
-        _scan(temperature_value, "temperature", positive=True)
         _scan_interval(
             temperature_value,
             "temperature",
@@ -962,15 +1028,6 @@ def _preflight_nucleation(  # noqa: C901
         )
     if saturation_value is not None:
         _scan(saturation_value, "saturation")
-    if (
-        config.precursor_index >= n_species
-        or len(config.molecule_counts) != n_species
-    ):
-        raise ValueError(
-            "precursor index and molecule_counts must match species."
-        )
-    if any(count > np.iinfo(np.int32).max for count in config.molecule_counts):
-        raise ValueError("molecule_counts must fit int32.")
     partitioning = gas_arrays[2]
     _scan_binary(partitioning)
     precursor_enabled = wp.zeros(1, dtype=wp.int32, device=device)
@@ -1002,10 +1059,6 @@ def _preflight_nucleation(  # noqa: C901
     reason = None
     if normalized_time_step == 0.0:
         reason = "zero_time"
-    elif float(config.coefficient) == 0.0:
-        reason = "zero_coefficient"
-    elif float(config.survival_factor) == 0.0:
-        reason = "zero_survival"
     if reason is not None:
         return _NucleationPreflight(
             particles,
@@ -1022,6 +1075,7 @@ def _preflight_nucleation(  # noqa: C901
             reason,
         )
     precursor_status = wp.zeros(2, dtype=wp.int32, device=device)
+    precursor_gates = wp.zeros(n_boxes, dtype=wp.int32, device=device)
     wp.launch(
         _precursor_status,
         dim=n_boxes,
@@ -1032,6 +1086,7 @@ def _preflight_nucleation(  # noqa: C901
             config.precursor_number_concentration_lower,
             config.precursor_number_concentration_upper,
             precursor_status,
+            precursor_gates,
         ],
         device=device,
     )
@@ -1041,7 +1096,7 @@ def _preflight_nucleation(  # noqa: C901
             "precursor_number_concentration is outside configured bounds."
         )
     zero_precursor_boxes = int(precursor_values[1])
-    low_saturation_boxes = 0
+    saturation_gates = wp.zeros(n_boxes, dtype=wp.int32, device=device)
     if saturation_value is not None:
         saturation_status = wp.zeros(2, dtype=wp.int32, device=device)
         wp.launch(
@@ -1053,14 +1108,21 @@ def _preflight_nucleation(  # noqa: C901
                 config.saturation_lower,
                 config.saturation_upper,
                 saturation_status,
+                saturation_gates,
             ],
             device=device,
         )
         saturation_values = saturation_status.numpy()
         if int(saturation_values[0]):
             raise ValueError("saturation is outside configured bounds.")
-        low_saturation_boxes = int(saturation_values[1])
-    gated_boxes = max(zero_precursor_boxes, low_saturation_boxes)
+    gate_count = wp.zeros(1, dtype=wp.int32, device=device)
+    wp.launch(
+        _gate_union_count,
+        dim=n_boxes,
+        inputs=[precursor_gates, saturation_gates, gate_count],
+        device=device,
+    )
+    gated_boxes = int(gate_count.numpy()[0])
     if gated_boxes == n_boxes:
         gate_reason = (
             "zero_precursor" if zero_precursor_boxes else "low_saturation"
