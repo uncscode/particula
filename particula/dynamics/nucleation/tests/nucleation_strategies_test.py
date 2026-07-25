@@ -580,7 +580,67 @@ def test_records_are_frozen_and_abstract_interface_cannot_instantiate(
         domain.saturation = None  # type: ignore[misc]
 
 
-def test_strategies_are_concrete_module_only() -> None:
-    """P1 strategy symbols remain intentionally absent from dynamics exports."""
-    assert not hasattr(particula.dynamics, "ActivationNucleationStrategy")
-    assert not hasattr(particula.dynamics, "KineticNucleationStrategy")
+def test_p4_strategy_symbols_are_exported() -> None:
+    """Approved P4 strategy symbols are available from dynamics."""
+    assert (
+        particula.dynamics.ActivationNucleationStrategy
+        is ActivationNucleationStrategy
+    )
+    assert (
+        particula.dynamics.KineticNucleationStrategy
+        is KineticNucleationStrategy
+    )
+
+
+def test_only_approved_p4_construction_symbols_are_exported() -> None:
+    """Both public namespaces expose P4 construction, not P2/P3 helpers."""
+    import particula.dynamics.nucleation as nucleation
+
+    approved = (
+        "NucleationSourceConfig",
+        "ActivationNucleationBuilder",
+        "KineticNucleationBuilder",
+        "NucleationSourceConfigBuilder",
+        "NucleationFactory",
+    )
+    concrete_only = (
+        "PotentialEventData",
+        "SourceDemandData",
+        "SourceDiagnostics",
+        "ParticleSourceCommitConfig",
+        "FinalizedSourceDiagnostics",
+        "finalize_particle_source",
+        "commit_particle_source",
+    )
+
+    for name in approved:
+        assert hasattr(nucleation, name)
+        assert hasattr(particula.dynamics, name)
+    for name in concrete_only:
+        assert not hasattr(nucleation, name)
+        assert not hasattr(particula.dynamics, name)
+
+
+@pytest.mark.parametrize("provenance", ["", "   ", 1])
+@pytest.mark.parametrize(
+    "strategy_type",
+    [ActivationNucleationStrategy, KineticNucleationStrategy],
+)
+def test_strategies_reject_invalid_coefficient_provenance(
+    provenance: object,
+    strategy_type: type[
+        ActivationNucleationStrategy | KineticNucleationStrategy
+    ],
+    domain: NucleationValidityDomain,
+    composition: InjectionComposition,
+    metadata: FormationMetadata,
+) -> None:
+    """Direct P1 construction validates optional provenance when supplied."""
+    with pytest.raises(ValueError, match="coefficient_provenance"):
+        strategy_type(
+            1.0,
+            domain,
+            composition,
+            metadata,
+            coefficient_provenance=provenance,  # type: ignore[arg-type]
+        )

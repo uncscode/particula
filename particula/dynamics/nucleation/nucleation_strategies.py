@@ -3,8 +3,8 @@
 Activation and kinetic parameterizations accept precursor mass concentration
 [kg/m³], convert it to number concentration [#/m³], and return potential rates
 [#/m³/s]. They do not create particles or mutate gas, particle, or slot state.
-This concrete module is intentionally not re-exported through
-``particula.dynamics``.
+Direct P1 construction remains supported. The deliberately bounded P4
+construction API is exported through ``particula.dynamics.nucleation``.
 
 Kulmala, M., et al. (2006). Toward direct measurement of atmospheric
 nucleation. *Science*, 318, 89--92.
@@ -270,6 +270,7 @@ def _validate_strategy_configuration(
     injection_composition: object,
     formation_metadata: object,
     survival_factor: object,
+    coefficient_provenance: object,
 ) -> None:
     """Validate shared immutable potential-rate strategy configuration.
 
@@ -279,6 +280,7 @@ def _validate_strategy_configuration(
         injection_composition: Metadata for a future formed particle.
         formation_metadata: Metadata for potential-rate formation size.
         survival_factor: Nonnegative caller-supplied dimensionless factor.
+        coefficient_provenance: Optional nonempty origin description.
 
     Raises:
         TypeError: If a scalar configuration value is not a scalar real value.
@@ -286,6 +288,13 @@ def _validate_strategy_configuration(
     """
     _nonnegative_scalar(coefficient, "coefficient")
     _nonnegative_scalar(survival_factor, "survival_factor")
+    if coefficient_provenance is not None and (
+        not isinstance(coefficient_provenance, str)
+        or not coefficient_provenance.strip()
+    ):
+        raise ValueError(
+            "coefficient_provenance must be a nonempty string or None"
+        )
     if not isinstance(validity_domain, NucleationValidityDomain):
         raise ValueError("validity_domain must be NucleationValidityDomain")
     if not isinstance(injection_composition, InjectionComposition):
@@ -515,6 +524,7 @@ class ActivationNucleationStrategy(NucleationStrategy):
         injection_composition: Metadata for a future formed particle.
         formation_metadata: Potential-rate formation-size metadata.
         survival_factor: Caller-supplied nonnegative dimensionless factor.
+        coefficient_provenance: Optional description of coefficient origin.
     """
 
     coefficient: float
@@ -522,6 +532,7 @@ class ActivationNucleationStrategy(NucleationStrategy):
     injection_composition: InjectionComposition
     formation_metadata: FormationMetadata
     survival_factor: float = 1.0
+    coefficient_provenance: str | None = None
 
     def __post_init__(self) -> None:
         """Validate immutable activation-strategy configuration.
@@ -536,6 +547,7 @@ class ActivationNucleationStrategy(NucleationStrategy):
             self.injection_composition,
             self.formation_metadata,
             self.survival_factor,
+            self.coefficient_provenance,
         )
 
     def potential_rate(
@@ -611,6 +623,7 @@ class KineticNucleationStrategy(NucleationStrategy):
         injection_composition: Metadata for a future formed particle.
         formation_metadata: Potential-rate formation-size metadata.
         survival_factor: Caller-supplied nonnegative dimensionless factor.
+        coefficient_provenance: Optional description of coefficient origin.
     """
 
     coefficient: float
@@ -618,6 +631,7 @@ class KineticNucleationStrategy(NucleationStrategy):
     injection_composition: InjectionComposition
     formation_metadata: FormationMetadata
     survival_factor: float = 1.0
+    coefficient_provenance: str | None = None
 
     def __post_init__(self) -> None:
         """Validate immutable kinetic-strategy configuration.
@@ -632,6 +646,7 @@ class KineticNucleationStrategy(NucleationStrategy):
             self.injection_composition,
             self.formation_metadata,
             self.survival_factor,
+            self.coefficient_provenance,
         )
 
     def potential_rate(

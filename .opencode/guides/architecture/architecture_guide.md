@@ -2,17 +2,16 @@
 
 ## CPU Nucleation Potential-Rate Boundary
 
-- `particula.dynamics.nucleation.nucleation_strategies` is a CPU-only,
-  concrete-module implementation boundary. It supplies immutable scalar
-  configuration records and activation/kinetic algorithms that calculate
-  potential formation-event rates only.
-- The package and its strategy symbols are deliberately not re-exported through
-  `particula.dynamics` or the top-level package; consumers import from the
-  concrete strategy module when this bounded implementation is appropriate.
-- This boundary does not create particle sources, admit inventory or slots,
-  mutate gas or particle state, infer survival, or provide builders, factories,
-  runnables, or GPU integration. Those responsibilities require an explicit
-  future integration boundary.
+- `particula.dynamics.nucleation` provides the bounded CPU-only P4 construction
+  API: immutable activation/kinetic potential-rate strategies, validated
+  source-selection metadata, strict builders, and a fresh-builder factory.
+  These names are deliberately re-exported through `particula.dynamics`.
+- P4 strategies calculate potential formation-event rates only. They do not
+  create particles, admit inventory or slots, mutate gas or particle state,
+  provide a runnable, or provide GPU integration.
+- P2 source-demand and P3 transaction records/helpers remain deliberately
+  concrete-only in `particula.dynamics.nucleation.particle_source`; they are
+  not package exports and P4 construction types do not import them.
 
 ## CPU Particle Slot Management Boundary
 

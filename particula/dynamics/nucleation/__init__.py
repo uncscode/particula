@@ -1,6 +1,35 @@
-"""CPU-only nucleation potential-rate strategy implementations.
+"""Bounded P4 construction APIs for CPU nucleation potential-rate strategies."""
 
-The concrete strategy module is intentionally not re-exported through
-``particula.dynamics``. Its strategies calculate potential formation rates;
-they do not create particles or mutate gas, particle, or slot state.
-"""
+from particula.dynamics.nucleation.nucleation_builders import (
+    ActivationNucleationBuilder,
+    KineticNucleationBuilder,
+    NucleationSourceConfigBuilder,
+)
+from particula.dynamics.nucleation.nucleation_configuration import (
+    NucleationSourceConfig,
+)
+from particula.dynamics.nucleation.nucleation_factories import NucleationFactory
+from particula.dynamics.nucleation.nucleation_strategies import (
+    ActivationNucleationStrategy,
+    ClosedInterval,
+    FormationMetadata,
+    InjectionComposition,
+    KineticNucleationStrategy,
+    NucleationStrategy,
+    NucleationValidityDomain,
+)
+
+__all__ = [
+    "ActivationNucleationBuilder",
+    "ActivationNucleationStrategy",
+    "ClosedInterval",
+    "FormationMetadata",
+    "InjectionComposition",
+    "KineticNucleationBuilder",
+    "KineticNucleationStrategy",
+    "NucleationFactory",
+    "NucleationSourceConfig",
+    "NucleationSourceConfigBuilder",
+    "NucleationStrategy",
+    "NucleationValidityDomain",
+]

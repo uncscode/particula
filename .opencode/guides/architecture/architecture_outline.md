@@ -33,15 +33,20 @@ implementation boundaries.
 
 ### particula/dynamics/nucleation/
 
-CPU-only, deliberately unexported potential-rate implementation boundary for
-nucleation parameterizations.
+CPU-only P4 construction boundary for nucleation potential-rate
+parameterizations. P2 source-demand planning and P3 transaction helpers remain
+concrete-module-only.
 
 **Key Components:**
 - `nucleation_strategies.py` - Immutable scalar configuration records and
-  activation/kinetic potential-rate algorithms. The strategies return rates
-  only; they own no sources, inventory or slot admission, state mutation,
-  builders, factories, runnables, or GPU integration, and are not exported
-  through `particula.dynamics` or the top-level package.
+  activation/kinetic potential-rate algorithms. The P4 records, builders, and
+  factory are deliberately exported through `particula.dynamics.nucleation`
+  and `particula.dynamics`; strategies still return rates only and own no
+  source admission, state mutation, runnable, or GPU integration.
+- `nucleation_configuration.py`, `nucleation_builders.py`, and
+  `nucleation_factories.py` - Strict P4 source-selection metadata and fresh,
+  unit-normalizing construction APIs. They do not import or expose P2/P3
+  particle-source records or transaction helpers.
 - `tests/` - Test coverage
 
 ## GPU Package

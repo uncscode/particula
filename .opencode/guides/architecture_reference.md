@@ -43,6 +43,15 @@ Key concepts:
 - Supported distribution types are `"discrete"`, `"continuous_pdf"`, and
   `"particle_resolved"`.
 
+## Nucleation
+
+The CPU-only P4 construction API is exported from
+`particula.dynamics.nucleation` and `particula.dynamics`. It provides immutable
+activation/kinetic potential-rate strategies, source-selection metadata,
+builders, and a factory. P2 source-demand planning and P3 particle-source
+transactions remain concrete-only in `nucleation.particle_source`; P4 does not
+mutate gas or particles or provide a runnable or GPU path.
+
 ## Scientific Utilities
 
 - Physical constants belong in `particula.util.constants`.

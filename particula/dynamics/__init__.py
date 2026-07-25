@@ -24,6 +24,21 @@ from particula.dynamics.dilution import (
     get_volume_dilution_coefficient,
 )
 
+from particula.dynamics.nucleation import (
+    ActivationNucleationBuilder,
+    ActivationNucleationStrategy,
+    ClosedInterval,
+    FormationMetadata,
+    InjectionComposition,
+    KineticNucleationBuilder,
+    KineticNucleationStrategy,
+    NucleationFactory,
+    NucleationSourceConfig,
+    NucleationSourceConfigBuilder,
+    NucleationStrategy,
+    NucleationValidityDomain,
+)
+
 from particula.dynamics.wall_loss import (
     get_charged_wall_loss_rate,
     get_rectangle_wall_loss_rate,
