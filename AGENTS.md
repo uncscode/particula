@@ -818,8 +818,11 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   helpers remain concrete-only in `nucleation.particle_source`.
 - P5 preserves `Aerosol` and backing-data identity, uses equal current-gas
   substeps, and is atomic per attempted substep only. E6-F5 activation and
-  E6-F6 resampling-first/scaling-fallback are dependencies. E6-F8 direct Warp
-  and E6-F9 integration remain deferred.
+  E6-F6 resampling-first/scaling-fallback are dependencies. E6-F8 has only an
+  unexported direct-Warp P2 planner: it uses survival-included `J` to plan
+  inventory-safe shared demand in sidecars and does not activate slots or
+  mutate particle/gas state. A direct public Warp path and E6-F9 integration
+  remain deferred.
 - Check concentration-weighted particle-plus-gas conservation at
   `rtol=1e-12, atol=1e-30`. Run `python docs/Examples/Nucleation/cpu_nucleation.py`,
   `pytest particula/tests/nucleation_docs_test.py -q -Werror`, and

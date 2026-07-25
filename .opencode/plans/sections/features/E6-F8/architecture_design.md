@@ -30,28 +30,31 @@ WarpParticleData + WarpGasData + config + dt + fixed-shape sidecars
         particle source added == participating gas removed
 ```
 
-For each box, the port preserves E6-F7's `E_pot = J*dt`, where survival is
-already included in `J`, and
-`m_event,s = n_s*M_s/N_A`. It computes one `alpha` across participating species
-so `E_admit = alpha*E_pot`; therefore no species becomes negative and source
-composition is not skewed. Admitted demand reaches capacity planning. If E6-F6
-chooses representative scale `s`, it finalizes `V_new=s*V` and
-`E_new=s*E_admit` together before slot packaging and commit. No demand is
-discarded within the final represented domain.
+For each box, shipped P2 preserves E6-F7's `E_pot = J*dt`, where survival is
+already included in `J`, and `m_event,s = n_s*M_s/N_A`. It computes one common
+inventory limit across participating species, so `E_admit <= E_pot` and
+`removal_s = E_admit*m_event,s`; therefore no species becomes negative and
+source composition is not skewed. Gas-limited diagnostics encode the first
+lowest-index limiting participating species. P2 commits only its demand,
+removal, and gate-code sidecars. Capacity planning, representative scaling,
+slot packaging, and the particle/gas commit remain P3--P5 work.
 
 ## Data / API / Workflow Changes
 
-### P1 implementation status (#1438)
+### P1/P2 implementation status (#1438, #1439)
 
-P1 and private P2 have implemented the initial stages in
+P1 and private P2 implement the initial stages in
 `particula/gpu/kernels/nucleation.py`: frozen `NucleationConfig` and the three
 caller-owned sidecar records, plus private `_preflight_nucleation`. Preflight
 validates fixed-shape Warp metadata, sidecars, aliasing, physical state,
 species/count constraints, input-source rules, and gates without writes,
-fallback allocation, or transfer. P2 calculates device-resident rates and
-inventory-limited demand, then writes only its sidecars; it does not mutate
-particles or gas. No symbol is exported from `particula.gpu.kernels`; the
-staged particle transaction and writer stages remain P3--P5 work.
+fallback allocation, or transfer. P2 calculates device-resident
+survival-included rates, potential demand, common inventory-limited admission,
+planned precursor removal, and gate diagnostics, then commits only its
+designated sidecars. It preserves P3 `accepted_counts` and selected-slot
+indices, and does not mutate particles or gas. No symbol is exported from
+`particula.gpu.kernels`; the staged particle transaction and writer stages
+remain P3--P5 work.
 
 - **Data Model:** No required container fields. Add concrete-module
   `NucleationConfig`, `NucleationScratchBuffers`,

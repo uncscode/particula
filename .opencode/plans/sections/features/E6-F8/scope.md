@@ -11,6 +11,11 @@ capacity rather than creating a second slot or exhaustion model.
   and private read-only Warp preflight in
   `particula/gpu/kernels/nucleation.py`, with co-located Warp tests.
 
+- **Delivered P2 (#1439):** concrete-only `_plan_nucleation_demand(...)` in
+  `particula/gpu/kernels/nucleation.py`. It computes survival-included rates,
+  potential demand, common inventory-limited admission, planned precursor
+  removals, and gate diagnostics, then commits only P2-owned sidecars.
+
 - Device evaluation of E6-F7 activation `J=A*C` and kinetic `J=K*C^2` models,
   including the same SI conversions, closed validity domains, composition,
   gates, and no-op semantics.
@@ -27,9 +32,9 @@ capacity rather than creating a second slot or exhaustion model.
 
 ## Out of Scope
 
-- **Still deferred after P1:** a direct execution entry point or export, device
-  rate calculation, demand/finalization writes, slot activation, exhaustion
-  planning, caller mutation, and any fallback allocation.
+- **Still deferred after P2:** a direct execution entry point or export, slot
+  request packaging/activation, exhaustion planning, particle or gas mutation,
+  and any fallback allocation. P2 remains a private sidecar-only planner.
 
 - New nucleation equations, chemistry, extrapolation, or a full Vehkamaki/CNT,
   ion-induced, heterogeneous, or cluster-dynamics implementation.

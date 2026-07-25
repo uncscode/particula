@@ -1,15 +1,18 @@
 """Define concrete-only P1 validation and P2 demand planning for GPU nucleation.
 
 This unexported module validates fixed-capacity particle, gas, environment,
-and caller-owned sidecar schemas for a GPU nucleation path. P1 is read-only;
-private P2 calculates and commits demand sidecars only.
-It also performs no hidden host transfer, CPU fallback, fallback work-buffer
-allocation, slot activation, or exhaustion handling. Later P2--P7 phases own
-particle mutation, public API, and user-facing documentation.
+and caller-owned sidecar schemas for a direct-Warp nucleation path. P1 is
+read-only. Private P2 calculates source demand [#/m³], admits one shared
+inventory-safe demand per box, and commits only its designated sidecars. P2
+does not select or activate slots, resolve exhaustion, resize storage, mutate
+particle fields or ``gas.concentration``, transfer data to the host, or use a
+CPU physics fallback. P3 retains ownership of accepted counts and selected-slot
+diagnostics, as well as the later particle/gas transaction.
 
 The preflight accepts only same-device, contiguous Warp arrays with fixed
 shapes. Frozen records prevent rebinding their fields but do not copy, freeze,
-or otherwise transfer their caller-owned arrays.
+or otherwise transfer their caller-owned arrays. Nothing in this module is
+exported through ``particula.gpu.kernels`` or ``particula.gpu``.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -227,10 +230,11 @@ class NucleationScratchBuffers:
     """Reference caller-owned P2 planning sidecars without taking ownership.
 
     Attributes:
-        precursor_number_concentration: Same-device contiguous ``wp.float64``
-            array shaped ``(B,)`` for precursor number concentration [#/m³].
+        precursor_number_concentration: P2-owned, same-device contiguous
+            ``wp.float64`` array shaped ``(B,)`` for selected precursor number
+            concentration [#/m³].
         potential_rate: Same-device contiguous ``wp.float64`` array shaped
-            ``(B,)`` for potential formation rate [#/m³/s].
+            ``(B,)`` for P2 potential formation rate [#/m³/s].
         potential_demand: Same-device contiguous ``wp.float64`` array shaped
             ``(B,)`` for P2 potential source demand [#/m³]. P3 does not write
             this field.
@@ -246,8 +250,9 @@ class NucleationFinalizedDemandBuffers:
     """Reference caller-owned P2/P3 finalized demand and transfer sidecars.
 
     Attributes:
-        accepted_counts: Same-device contiguous ``wp.int32`` array shaped
-            ``(B,)`` for P3 finalized accepted source counts. P2 preserves it.
+        accepted_counts: P3-owned, same-device contiguous ``wp.int32`` array
+            shaped ``(B,)`` for finalized accepted source counts. P2 leaves it
+            byte-for-byte unchanged.
         accepted_demand: Same-device contiguous ``wp.float64`` array shaped
             ``(B,)`` for P2 inventory-admitted source demand [#/m³].
         precursor_mass_change: Same-device contiguous ``wp.float64`` array
@@ -264,12 +269,14 @@ class NucleationDiagnosticBuffers:
     """Reference caller-owned P2/P3 diagnostic sidecars.
 
     Attributes:
-        gate_codes: Same-device contiguous ``wp.int32`` array shaped ``(B,)``
-            for P2 gate and limiting-species diagnostics.
+        gate_codes: P2-owned, same-device contiguous ``wp.int32`` array shaped
+            ``(B,)`` for gate diagnostics. Zero denotes eligible; codes 1--6
+            denote the documented zero/low gates; and ``7 + s`` records an
+            inventory-limited box whose limiting species index is ``s``.
         selected_slot_indices: Same-device contiguous ``wp.int32`` array
-            shaped ``(B, N)`` for P3 selected slots. That phase
-            reserves ``-1`` for unused tails; P1 does not inspect, initialize,
-            or otherwise alter stale output values.
+            shaped ``(B, N)`` for P3 selected slots. P2 leaves it byte-for-byte
+            unchanged. P3 reserves ``-1`` for unused tails; P1 does not inspect,
+            initialize, or otherwise alter stale output values.
     """
 
     gate_codes: Any
@@ -1195,7 +1202,44 @@ def _plan_demand_work(  # noqa: C901
     gate_codes: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Plan one box of P2 demand in private device-resident work storage."""
+    """Plan one box of P2 demand in private device-resident work storage.
+
+    Calculates ``C`` [#/m³], ``J`` [#/m³/s], and ``E_pot = J × dt`` [#/m³],
+    then limits one common admitted demand by participating precursor
+    inventories. The result preserves per-event precursor composition; planned
+    removal is ``E_admit × m_event`` [kg/m³]. This kernel never writes
+    caller-owned sidecars, particles, or gas inventory.
+
+    Args:
+        concentration: Gas concentration [kg/m³], shaped ``(B, S)``.
+        molar_mass: Species molar masses [kg/mol], shaped ``(S,)``.
+        saturation: Dimensionless saturation ratios shaped ``(B, S)``.
+        molecule_counts: Dimensionless molecules per formed event, shaped
+            ``(S,)``.
+        species_count: Fixed number of species ``S``.
+        precursor_index: Selected precursor species index.
+        has_saturation: Nonzero when saturation gating is configured.
+        saturation_lower: Inclusive saturation gate threshold.
+        coefficient: Nonnegative activation [1/s] or kinetic [m³/s]
+            coefficient.
+        survival_factor: Nonnegative dimensionless survival factor.
+        time_step: Validated nonnegative step duration [s].
+        kinetic: Nonzero when the kinetic rate law is selected.
+        number_concentration: Private output for selected precursor ``C``
+            [#/m³], shaped ``(B,)``.
+        rate: Private output for gated formation rate ``J`` [#/m³/s], shaped
+            ``(B,)``.
+        potential: Private output for potential demand ``E_pot`` [#/m³], shaped
+            ``(B,)``.
+        admitted: Private output for inventory-admitted demand [#/m³], shaped
+            ``(B,)``.
+        removal: Private output for planned species removal [kg/m³], shaped
+            ``(B, S)``.
+        gate_codes: Private output for P2 gate and limiter codes, shaped
+            ``(B,)``.
+        invalid: Private two-lane counters for derived-domain and
+            inventory-safety failures.
+    """
     box = wp.tid()
     precursor = (
         concentration[box, precursor_index]
@@ -1311,7 +1355,23 @@ def _commit_demand_plan(
     finalized_removal: wp.array2d(dtype=wp.float64),
     diagnostics: wp.array(dtype=wp.int32),
 ) -> None:
-    """Commit exactly the P2-owned sidecar fields for one box."""
+    """Commit exactly the P2-owned sidecar fields for one box.
+
+    Args:
+        number_concentration: Validated private precursor concentration [#/m³].
+        rate: Validated private formation rate [#/m³/s].
+        potential: Validated private potential demand [#/m³].
+        admitted: Validated private inventory-admitted demand [#/m³].
+        removal: Validated private planned species removal [kg/m³].
+        gate_codes: Validated private P2 gate and limiter codes.
+        species_count: Fixed number of species ``S``.
+        scratch_number_concentration: P2-owned precursor-concentration sidecar.
+        scratch_rate: P2-owned potential-rate sidecar.
+        scratch_demand: P2-owned potential-demand sidecar.
+        finalized_demand: P2-owned admitted-demand sidecar.
+        finalized_removal: P2-owned planned-removal sidecar.
+        diagnostics: P2-owned gate-code sidecar.
+    """
     box = wp.tid()
     scratch_number_concentration[box] = number_concentration[box]
     scratch_rate[box] = rate[box]
@@ -1337,9 +1397,45 @@ def _plan_nucleation_demand(
 ) -> None:
     """Privately plan inventory-safe nucleation demand without state mutation.
 
-    P2 writes only its defined planning/finalized-demand/diagnostic sidecars.
-    Particle state, gas inventory, P3 counts, and P3 slot-index diagnostics are
-    never read for planning ownership and are never changed.
+    This concrete-only direct-Warp P2 seam calculates selected precursor number
+    concentration ``C`` [#/m³], formation rate ``J`` [#/m³/s], and potential
+    demand ``E_pot = J × dt`` [#/m³]. It admits one common demand per box from
+    participating gas inventories, so every planned removal is
+    ``E_admit × m_event`` [kg/m³]. Survival is already included in ``J`` and is
+    not applied again. It is intentionally not exported through
+    ``particula.gpu.kernels`` or ``particula.gpu``.
+
+    After read-only P1 and derived-state validation, P2 commits only
+    ``scratch.precursor_number_concentration``, ``scratch.potential_rate``,
+    ``scratch.potential_demand``, ``finalized_demand.accepted_demand``,
+    ``finalized_demand.precursor_mass_change``, and ``diagnostics.gate_codes``.
+    It reads gas state for planning but never mutates particle state,
+    ``gas.concentration``, P3 ``accepted_counts``, or P3 selected-slot indices.
+    It neither selects/activates slots nor resolves exhaustion; P3 owns those
+    actions and its later particle/gas transaction.
+
+    Args:
+        particles: Caller-owned Warp particle container used only for P1 schema
+            and physical-state validation.
+        gas: Caller-owned Warp gas container; its concentration [kg/m³] and
+            molar mass [kg/mol] determine P2 rates and inventory admission.
+        config: Immutable rate-law controls, event composition, and bounds.
+        time_step: Finite nonnegative source-planning interval [s].
+        scratch: Exact caller-owned P2 planning-sidecar record.
+        finalized_demand: Exact caller-owned P2/P3 demand-sidecar record; P2
+            writes only admitted demand and planned precursor removal.
+        diagnostics: Exact caller-owned P2/P3 diagnostic-sidecar record; P2
+            writes only gate codes.
+        temperature: Positive scalar [K] or same-device ``wp.float64`` array
+            shaped ``(B,)`` for P1 validation.
+        saturation: Configured same-device dimensionless ``wp.float64`` array
+            shaped ``(B, S)`` for P1 validation and P2 gating.
+        environment: Optional owner of temperature and configured saturation.
+
+    Raises:
+        TypeError: If a direct scalar has an unsupported type.
+        ValueError: If P1 schemas, ownership, physical inputs, sidecars, or
+            derived P2 demand are invalid, or inventory cannot be made safe.
     """
     if not isinstance(scratch, NucleationScratchBuffers):
         raise ValueError("scratch must be NucleationScratchBuffers.")

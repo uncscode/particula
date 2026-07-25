@@ -14,9 +14,12 @@ independent E6-F7 float64 oracle, never the production GPU helper itself.
    verifies that valid preflight, gates, and rejections do not mutate caller
    state or stale sidecars. P1 has no rate or output-write assertions because
    those operations are deferred.
-- **P2:** Unit fixtures compare `J=A*C`, `J=K*C^2`, potential/admitted events,
-  each limiting species, gas removal, and diagnostics against independent
-  equations for one/many boxes and species.
+- **P2:** Shipped co-located fixtures compare survival-included `J=A*C` and
+   `J=K*C^2`, potential/accepted demand, each limiting species and lowest-index
+   ties, planned removal, and diagnostics with an independent float64 oracle.
+   They cover one/many boxes and species, gate precedence, zero capacity and
+   empty boxes, ULP-safe admission correction, and snapshots proving that P2
+   leaves particle/gas state and P3-owned sidecars unchanged.
 - **P3:** Slot interaction cases cover empty, sparse, exact-capacity, and mixed
   boxes; ascending indices, `-1` tails, exact integer counts, selected writes,
   and all preserved fields are asserted.

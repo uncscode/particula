@@ -55,9 +55,11 @@ uses equal, gas-coupled substeps and is atomic per attempted substep, not across
 the complete call. P2 source-demand planning and P3 particle-source
 transactions remain concrete-only in `nucleation.particle_source`. E6-F8 P1
 provides an unexported, read-only Warp preflight and P2 privately plans
-`E_pot=J*dt` demand after survival is included in `J`. P2 commits only
-caller-owned demand sidecars; particle activation, gas mutation, and E6-F9
-integration remain deferred.
+`E_pot=J*dt` demand after survival is included in `J`. It admits one shared
+per-box demand against precursor inventory so planned removal is inventory-safe.
+P2 commits only caller-owned planning, finalized-demand, and gate-diagnostic
+sidecars; it neither activates slots nor mutates particle or gas state.
+Particle activation, gas mutation, and E6-F9 integration remain deferred.
 
 ## Scientific Utilities
 

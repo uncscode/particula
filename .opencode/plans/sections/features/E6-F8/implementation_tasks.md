@@ -8,10 +8,13 @@
 - [x] Implement metadata, alias, same-device, scientific-domain, count, and
   read-only device-value preflight before clearing or allocating outputs (P1,
   #1438). P1 performs no output clearing or allocation.
-- [ ] Port E6-F7 activation/kinetic rate equations and SI conversions to Warp
-  kernels without broadening their validity domain or model aliases.
-- [ ] Implement potential-event and shared per-box gas admission; store
-  gas-admitted demand, limiting species, and provisional gas removal explicitly.
+- [x] Port E6-F7 activation/kinetic rate equations and SI conversions to private
+  Warp P2 work storage without broadening their validity domain or model aliases
+  (#1439). Survival is included once in `J`; P2 writes no particle or gas state.
+- [x] Implement potential events and common per-box inventory admission, storing
+  accepted demand, species-encoded limiter/gate diagnostics, and planned
+  precursor removal in P2-owned sidecars (#1439). Nonparticipants retain exact
+  zero removal and P3 request buffers remain untouched.
 - [ ] Adapt provisional demand to E6-F5 fixed-shape requests and exact
   diagnostics rather than reimplementing active/free predicates.
 - [ ] Invoke E6-F6 exhaustion planning with resampling-first precedence; finalize
@@ -28,6 +31,9 @@
 - [x] Add P1 fast config/preflight validation, identity, no-op, and
   failure-immutability tests in `particula/gpu/kernels/tests/nucleation_test.py`
   (#1438). Rate, finalization, capacity, and commit coverage remain deferred.
+- [x] Add P2 co-located independent float64-oracle coverage for rates, common
+  admission, limiter ties, gates, inventory safety, and sidecar-only mutation
+  in `particula/gpu/kernels/tests/nucleation_test.py` (#1439).
 - [ ] Add `nucleation_parity_test.py` with an independent float64 E6-F7 oracle,
   one/many boxes and species, sparse/full slots, and repeated calls.
 - [ ] Assert per-box/species represented particle-plus-gas conservation rather

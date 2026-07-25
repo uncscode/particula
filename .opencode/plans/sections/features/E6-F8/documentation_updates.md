@@ -1,10 +1,12 @@
 # Documentation Updates
 
-## P1 delivered (#1438)
+## P1/P2 delivered (#1438, #1439)
 
 - `particula/gpu/kernels/nucleation.py` documents the concrete-only read-only
-  boundary, frozen record ownership, fixed-shape sidecars, and P2--P7
-  deferrals. No user-facing documentation or API export was added for P1.
+  P1 boundary, frozen record ownership, fixed-shape sidecars, and later-phase
+  deferrals. Its P2 documentation records survival-included rates, common
+  inventory-limited admission, P2/P3 sidecar ownership, and the sidecar-only
+  mutation boundary. No user-facing documentation or API export was added.
 
 ## Deferred P7 work
 

@@ -184,6 +184,7 @@ pytest particula/gpu/kernels/tests/environment_test.py -q
 pytest particula/gpu/kernels/tests/thermodynamics_test.py -q -Werror
 pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
 pytest particula/gpu/kernels/tests/exhaustion_test.py -q -Werror
+pytest particula/gpu/kernels/tests/nucleation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/slot_management_test.py -q -Werror
 pytest particula/gpu/kernels/tests/wall_loss_test.py particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror
 pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
@@ -280,6 +281,19 @@ baseline and CUDA is optional with clean skips. Keep scaling evidence marked
 `slow`, `performance`, and `benchmark`, behind `--benchmark`; it must not imply
 a CPU fallback, resizing, policy-resolution, runnable, or broad performance
 claim.
+
+Private GPU nucleation P2 coverage belongs in
+`particula/gpu/kernels/tests/nucleation_test.py`. Test the concrete module seam
+only; do not add a package export, runnable, or user-facing example. Use an
+independent NumPy float64 oracle for survival-included activation or kinetic
+rate, `E_pot = J * dt`, common inventory admission, removal, and gate-code
+precedence. Assert that successful planning changes only its documented
+caller-owned planning, finalized-demand, and diagnostic sidecars; particle and
+gas fields, plus P3-owned sidecar lanes, must remain unchanged. Exercise Warp
+CPU when installed and optional CUDA with clean skips. Keep invalid-preflight
+and derived-demand failures non-mutating, and keep this evidence separate from
+future activation or transaction behavior.
+
 GPU slot activation P4 coverage belongs in
 `particula/gpu/kernels/tests/slot_management_test.py`. Defer Warp imports so
 missing Warp skips cleanly, import only `activate_slots_gpu` from

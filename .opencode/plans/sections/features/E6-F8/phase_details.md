@@ -14,11 +14,18 @@ run P6 parity and conservation checks before P7 documents the direct step.
   - Files: `particula/gpu/kernels/nucleation.py`, `particula/gpu/kernels/tests/nucleation_test.py`
   - Tests: Shape/dtype/device/alias validation, scientific-domain rejection, exact no-ops, and snapshots proving no state or sidecar mutation.
 
-- [ ] **E6-F8-P2:** Implement device nucleation rate and gas admission with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Compute potential events and one shared gas-feasible admission factor per box before any source or gas write.
+- [x] **E6-F8-P2:** Implement device nucleation rate and gas admission with unit tests
+  - Issue: #1439 | Size: S | Status: Complete (2026-07-25)
+  - Delivered: private `_plan_nucleation_demand(...)` reuses P1 preflight to
+    compute survival-included activation/kinetic `J`, `E_pot = J * dt`, and a
+    shared per-box inventory-limited accepted demand. Its single commit writes
+    only P2 demand/removal/gate sidecars, preserving P3 request buffers,
+    particles, and gas concentration.
   - Files: `particula/gpu/kernels/nucleation.py`, `particula/gpu/kernels/tests/nucleation_test.py`
-  - Tests: Activation/kinetic parity, each limiting species, zero inventory/rate/time, nonnegative gas, and provisional-demand diagnostics.
+  - Tests: Activation/kinetic oracle comparisons; limiting species and
+    lowest-index ties; gate precedence; multi-box admission; nonparticipant
+    zero removal; ULP-safe inventory correction; zero-capacity/empty-box cases;
+    and identity/immutability snapshots.
 
 - [ ] **E6-F8-P3:** Build provisional fixed-shape slot requests with unit tests
   - Issue: TBD | Size: S | Status: Not Started

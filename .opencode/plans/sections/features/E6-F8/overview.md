@@ -17,12 +17,19 @@
   - As a library maintainer, I want fixed-shape sidecars and fail-before-write
    validation so invalid calls cannot partially mutate simulation state.
 
-## Delivered: P1 (#1438)
+## Delivered: P1 (#1438) and P2 (#1439)
 
 `particula/gpu/kernels/nucleation.py` now provides the concrete-only, read-only
 P1 boundary with frozen configuration and caller-owned sidecar dataclasses plus
 private validation/preflight. Co-located Warp tests cover its ownership,
 schema, validation-order, and no-write gate/rejection contract. It deliberately
-does not expose or execute a GPU nucleation step, calculate rates, allocate
-fallback storage, transfer state, or mutate caller data; P2--P7 retain those
-responsibilities.
+does not expose or execute a GPU nucleation step, allocate fallback storage,
+transfer state, or mutate caller particle or gas data.
+
+Private `_plan_nucleation_demand(...)` now implements P2. It reuses P1
+preflight to calculate survival-included activation or kinetic `J`,
+`E_pot = J * dt`, and one inventory-limited accepted demand per box. Its sole
+commit writes P2-owned demand, removal, and gate-diagnostic sidecars; it leaves
+P3 request buffers, particles, and `gas.concentration` unchanged. P3--P7 retain
+slot packaging, exhaustion handling, the particle/gas transaction, public API,
+and user documentation responsibilities.
