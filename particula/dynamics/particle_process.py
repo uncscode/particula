@@ -24,10 +24,16 @@ from particula.dynamics.nucleation.nucleation_strategies import (
     KineticNucleationStrategy,
 )
 from particula.dynamics.nucleation.particle_source import (
-    ParticleSourceCommitConfig,
-    PotentialEventData,
-    commit_particle_source,
-    finalize_particle_source,
+    ParticleSourceCommitConfig as _ParticleSourceCommitConfig,
+)
+from particula.dynamics.nucleation.particle_source import (
+    PotentialEventData as _PotentialEventData,
+)
+from particula.dynamics.nucleation.particle_source import (
+    commit_particle_source as _commit_particle_source,
+)
+from particula.dynamics.nucleation.particle_source import (
+    finalize_particle_source as _finalize_particle_source,
 )
 from particula.gas.environment_data import EnvironmentData
 from particula.gas.gas_data import GasData
@@ -46,6 +52,8 @@ from .condensation.condensation_strategies import (
     CondensationStrategy,
 )
 from .wall_loss.wall_loss_strategies import WallLossStrategy
+
+_MAX_NUCLEATION_SUB_STEPS = 10_000
 
 
 class DilutionStrategyProtocol(Protocol):
@@ -111,8 +119,10 @@ class NucleationCommitConfig:
     create a transaction spanning a complete ``Nucleation.execute`` call.
 
     Args:
-        maximum_slot_weight: Positive maximum represented events per slot.
-        source_charge: Finite charge assigned to activated source slots.
+        maximum_slot_weight: Positive, dimensionless maximum represented events
+            per activated slot.
+        source_charge: Finite dimensionless elementary-charge count assigned to
+            activated source slots.
         exhaustion_controls: Immutable fixed-capacity policy controls.
         requested_scale: Requested representative-volume scale per box.
         minimum_scale: Minimum allowed representative-volume scale per box.
@@ -287,9 +297,9 @@ class Nucleation(RunnableABC):
             raise ValueError("precursor_index is out of range for gas species")
         return particles, gas
 
-    def _commit_config(self) -> ParticleSourceCommitConfig:
+    def _commit_config(self) -> _ParticleSourceCommitConfig:
         """Create a private P3 configuration for one attempted substep."""
-        return ParticleSourceCommitConfig(
+        return _ParticleSourceCommitConfig(
             maximum_slot_weight=self.commit_config.maximum_slot_weight,
             source_charge=self.commit_config.source_charge,
             exhaustion_controls=self.commit_config.exhaustion_controls,
@@ -336,7 +346,8 @@ class Nucleation(RunnableABC):
             TypeError: If the aerosol, backing containers, or environment have
                 unsupported types.
             ValueError: If the supported data are not single-box, have
-                incompatible shapes, or select an invalid precursor.
+                incompatible shapes, select an invalid precursor, or violate
+                the selected source strategy's physical validity domain.
         """
         _, gas = self._topology(aerosol)
         return self._rate_from_gas(gas)
@@ -360,7 +371,8 @@ class Nucleation(RunnableABC):
         Args:
             aerosol: Legacy aerosol whose backing containers are mutated.
             time_step: Finite nonnegative total duration [s].
-            sub_steps: Positive number of equal sequential source transactions.
+            sub_steps: Positive number of equal sequential source transactions,
+                limited to 10,000.
 
         Returns:
             The identical aerosol instance.
@@ -380,6 +392,10 @@ class Nucleation(RunnableABC):
             or sub_steps <= 0
         ):
             raise ValueError("sub_steps must be a positive integer.")
+        if sub_steps > _MAX_NUCLEATION_SUB_STEPS:
+            raise ValueError(
+                f"sub_steps must not exceed {_MAX_NUCLEATION_SUB_STEPS}."
+            )
         validated_time_step = _validate_nonnegative_scalar(
             time_step, "time_step"
         )
@@ -395,16 +411,16 @@ class Nucleation(RunnableABC):
             rate = self._rate_from_gas(gas)
             if rate == 0.0:
                 continue
-            potential_events = PotentialEventData(
+            potential_events = _PotentialEventData(
                 potential_rate=np.array([rate], dtype=np.float64),
                 duration=duration,
             )
-            demand, diagnostics = finalize_particle_source(
+            demand, diagnostics = _finalize_particle_source(
                 potential_events,
                 strategy.injection_composition,
                 gas,
             )
-            commit_particle_source(
+            _commit_particle_source(
                 demand,
                 diagnostics,
                 particles,

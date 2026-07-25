@@ -126,6 +126,10 @@ def test_public_surface_exports_only_supported_p5_types():
     assert particula.dynamics.NucleationCommitConfig is NucleationCommitConfig
     assert not hasattr(particula.dynamics, "ParticleSourceCommitConfig")
     assert not hasattr(particula.dynamics.nucleation, "commit_particle_source")
+    assert not hasattr(particle_process, "ParticleSourceCommitConfig")
+    assert not hasattr(particle_process, "PotentialEventData")
+    assert not hasattr(particle_process, "commit_particle_source")
+    assert not hasattr(particle_process, "finalize_particle_source")
 
 
 def test_commit_config_owns_immutable_float64_sidecars():
@@ -252,8 +256,8 @@ def test_execute_commits_each_positive_substep_and_preserves_identities(
     def commit(demand, diagnostics, source_particles, source_gas, config):
         calls.append((config.maximum_slot_weight, source_particles, source_gas))
 
-    monkeypatch.setattr(particle_process, "finalize_particle_source", finalize)
-    monkeypatch.setattr(particle_process, "commit_particle_source", commit)
+    monkeypatch.setattr(particle_process, "_finalize_particle_source", finalize)
+    monkeypatch.setattr(particle_process, "_commit_particle_source", commit)
     assert runnable.execute(aerosol, 2.0, sub_steps=2) is aerosol
     assert len(calls) == 2
     assert all(entry[1] is particles and entry[2] is gas for entry in calls)
@@ -283,6 +287,133 @@ def test_invalid_substeps_fail_before_facade_access(sub_steps):
         _runnable().execute(object(), 1.0, sub_steps=sub_steps)
 
 
+def test_excessive_substeps_fail_before_facade_access_or_source_work():
+    """The bounded substep count rejects before topology or P1 evaluation."""
+    with pytest.raises(ValueError, match="must not exceed"):
+        _runnable().execute(
+            object(),
+            1.0,
+            sub_steps=particle_process._MAX_NUCLEATION_SUB_STEPS + 1,
+        )
+
+
+def test_maximum_substeps_are_accepted(monkeypatch: pytest.MonkeyPatch):
+    """The documented maximum executes valid zero-rate substeps."""
+    aerosol, _, _, _ = _aerosol()
+    runnable = _runnable()
+    calls = 0
+
+    def zero_rate(_: GasData) -> float:
+        nonlocal calls
+        calls += 1
+        return 0.0
+
+    monkeypatch.setattr(runnable, "_rate_from_gas", zero_rate)
+
+    assert (
+        runnable.execute(
+            aerosol, 1.0, particle_process._MAX_NUCLEATION_SUB_STEPS
+        )
+        is aerosol
+    )
+    assert calls == particle_process._MAX_NUCLEATION_SUB_STEPS
+
+
+def test_malformed_facade_fails_before_source_work(monkeypatch):
+    """Missing legacy facades reject before any P1 source evaluation."""
+    runnable = _runnable()
+    monkeypatch.setattr(
+        runnable,
+        "_rate_from_gas",
+        lambda _: pytest.fail("P1 must not run for malformed facades"),
+    )
+
+    with pytest.raises(TypeError, match="facades"):
+        runnable.execute(object(), 1.0)
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda particles, gas, runnable: setattr(
+            particles, "masses", np.zeros((2, 3, 1), dtype=np.float64)
+        ),
+        lambda particles, gas, runnable: setattr(
+            gas, "concentration", np.zeros((2, 1), dtype=np.float64)
+        ),
+        lambda particles, gas, runnable: setattr(
+            gas, "molar_mass", np.ones((1, 1), dtype=np.float64)
+        ),
+        lambda particles, gas, runnable: setattr(
+            particles, "masses", np.zeros((1, 3, 2), dtype=np.float64)
+        ),
+        lambda particles, gas, runnable: setattr(
+            runnable.environment,
+            "temperature",
+            np.array([298.15, 298.15], dtype=np.float64),
+        ),
+        lambda particles, gas, runnable: setattr(
+            runnable.environment,
+            "saturation_ratio",
+            np.ones((1, 2), dtype=np.float64),
+        ),
+        lambda particles, gas, runnable: setattr(
+            runnable,
+            "source_config",
+            NucleationSourceConfig(
+                strategy=runnable.source_config.strategy,
+                precursor_index=1,
+            ),
+        ),
+    ],
+)
+def test_invalid_topology_is_write_free_and_skips_source_work(
+    monkeypatch: pytest.MonkeyPatch,
+    mutate,
+):
+    """Unsupported facade topology is rejected before P1, P2, or P3 work."""
+    aerosol, particles, gas, gas_only = _aerosol()
+    runnable = _runnable()
+    mutate(particles, gas, runnable)
+    snapshots = (
+        particles.masses.copy(),
+        particles.concentration.copy(),
+        gas.concentration.copy(),
+        gas.partitioning.copy(),
+        gas_only.concentration.copy(),
+    )
+    monkeypatch.setattr(
+        runnable,
+        "_rate_from_gas",
+        lambda _: pytest.fail("P1 must not run for invalid topology"),
+    )
+    monkeypatch.setattr(
+        particle_process,
+        "_finalize_particle_source",
+        lambda *args: pytest.fail("P2 must not run for invalid topology"),
+    )
+    monkeypatch.setattr(
+        particle_process,
+        "_commit_particle_source",
+        lambda *args: pytest.fail("P3 must not run for invalid topology"),
+    )
+
+    with pytest.raises((TypeError, ValueError)):
+        runnable.execute(aerosol, 1.0)
+    for actual, expected in zip(
+        (
+            particles.masses,
+            particles.concentration,
+            gas.concentration,
+            gas.partitioning,
+            gas_only.concentration,
+        ),
+        snapshots,
+        strict=True,
+    ):
+        npt.assert_array_equal(actual, expected)
+
+
 def test_zero_duration_validates_topology_without_source_work(monkeypatch):
     """A valid zero duration is a structural, exact write-free no-op."""
     aerosol, particles, gas, gas_only = _aerosol()
@@ -291,7 +422,7 @@ def test_zero_duration_validates_topology_without_source_work(monkeypatch):
     gas_only_before = gas_only.concentration.copy()
     monkeypatch.setattr(
         particle_process,
-        "finalize_particle_source",
+        "_finalize_particle_source",
         lambda *args: pytest.fail("P2 must not run for zero duration"),
     )
 
@@ -365,12 +496,12 @@ def test_execute_skips_transactions_for_zero_rate(monkeypatch):
     monkeypatch.setattr(runnable, "_rate_from_gas", lambda _: 0.0)
     monkeypatch.setattr(
         particle_process,
-        "finalize_particle_source",
+        "_finalize_particle_source",
         lambda *args: pytest.fail("P2 must not run for a zero rate"),
     )
     monkeypatch.setattr(
         particle_process,
-        "commit_particle_source",
+        "_commit_particle_source",
         lambda *args: pytest.fail("P3 must not run for a zero rate"),
     )
 
@@ -411,13 +542,45 @@ def test_execute_uses_equal_duration_and_fresh_config_per_positive_substep(
         assert source_gas is gas
         configs.append(config)
 
-    monkeypatch.setattr(particle_process, "finalize_particle_source", finalize)
-    monkeypatch.setattr(particle_process, "commit_particle_source", commit)
+    monkeypatch.setattr(particle_process, "_finalize_particle_source", finalize)
+    monkeypatch.setattr(particle_process, "_commit_particle_source", commit)
 
     assert runnable.execute(aerosol, 4.0, sub_steps=2) is aerosol
     assert durations == [2.0, 2.0]
     assert len(configs) == 2
     assert configs[0] is not configs[1]
+
+
+def test_later_substep_rate_uses_gas_depleted_by_prior_commit(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    """Each P1 rate observes the live precursor gas after the preceding P3."""
+    aerosol, _, gas, _ = _aerosol()
+    runnable = _runnable()
+    observed_rates: list[float] = []
+    rate_from_gas = runnable._rate_from_gas
+
+    def record_rate(source_gas: GasData) -> float:
+        rate = rate_from_gas(source_gas)
+        observed_rates.append(rate)
+        return rate
+
+    def commit(*args) -> None:
+        if len(observed_rates) == 1:
+            gas.concentration[0, 0] *= 0.5
+
+    monkeypatch.setattr(runnable, "_rate_from_gas", record_rate)
+    monkeypatch.setattr(
+        particle_process,
+        "_finalize_particle_source",
+        lambda *args: (object(), object()),
+    )
+    monkeypatch.setattr(particle_process, "_commit_particle_source", commit)
+
+    assert runnable.execute(aerosol, 2.0, sub_steps=2) is aerosol
+    assert len(observed_rates) == 2
+    assert observed_rates[1] == observed_rates[0] * 0.5
+    npt.assert_array_equal(gas.concentration, [[0.5e-12]])
 
 
 def test_source_errors_propagate_and_stop_later_stages(monkeypatch):
@@ -437,12 +600,12 @@ def test_source_errors_propagate_and_stop_later_stages(monkeypatch):
     p2_error = RuntimeError("p2")
     monkeypatch.setattr(
         particle_process,
-        "finalize_particle_source",
+        "_finalize_particle_source",
         lambda *args: (_ for _ in ()).throw(p2_error),
     )
     monkeypatch.setattr(
         particle_process,
-        "commit_particle_source",
+        "_commit_particle_source",
         lambda *args: pytest.fail("P3 must not follow a P2 error"),
     )
     gas_before = gas.concentration.copy()
@@ -481,7 +644,7 @@ def test_later_commit_failure_preserves_prior_substep(
     monkeypatch.setattr(runnable, "_rate_from_gas", lambda _: 1.0)
     monkeypatch.setattr(
         particle_process,
-        "finalize_particle_source",
+        "_finalize_particle_source",
         lambda *args: (object(), object()),
     )
 
@@ -493,7 +656,7 @@ def test_later_commit_failure_preserves_prior_substep(
             return
         raise RuntimeError("second P3 transaction")
 
-    monkeypatch.setattr(particle_process, "commit_particle_source", commit)
+    monkeypatch.setattr(particle_process, "_commit_particle_source", commit)
 
     with pytest.raises(RuntimeError, match="second P3 transaction"):
         runnable.execute(aerosol, 2.0, sub_steps=2)
