@@ -848,9 +848,9 @@ def _preflight_nucleation(  # noqa: C901
 
     This private, concrete-only seam performs ordered schema, ownership,
     physical-domain, and species checks. It accepts caller-owned same-device
-    fixed-shape Warp arrays, performs no hidden transfer or CPU fallback, and
-    leaves particles, gas, environment, and stale sidecars unchanged on success
-    and rejection. A scalar status readback is used solely for validation.
+    fixed-shape Warp arrays, performs no caller-state transfer or CPU physics
+    fallback, and leaves particles, gas, environment, and stale sidecars
+    unchanged. A private scalar status readback is used solely for validation.
 
     Args:
         particles: Warp particle container with fixed ``(B, N, S)`` mass data.
@@ -1058,7 +1058,7 @@ def _preflight_nucleation(  # noqa: C901
     )
     if int(precursor_enabled.numpy()[0]):
         raise ValueError("precursor partitioning must be enabled.")
-    if n_boxes == 0 or n_particles == 0:
+    if n_boxes == 0:
         return _NucleationPreflight(
             particles,
             gas,
@@ -1136,6 +1136,22 @@ def _preflight_nucleation(  # noqa: C901
         saturation_values = saturation_status.numpy()
         if int(saturation_values[0]):
             raise ValueError("saturation is outside configured bounds.")
+    if n_particles == 0:
+        return _NucleationPreflight(
+            particles,
+            gas,
+            config,
+            n_boxes,
+            n_particles,
+            n_species,
+            device,
+            temperature_value,
+            saturation_value,
+            False,
+            False,
+            None,
+            normalized_time_step,
+        )
     gate_count = wp.zeros(1, dtype=wp.int32, device=device)
     wp.launch(
         _gate_union_count,
@@ -1178,6 +1194,33 @@ def _preflight_nucleation(  # noqa: C901
         None,
         normalized_time_step,
     )
+
+
+@wp.func
+def _float64_predecessor(value: wp.float64) -> wp.float64:
+    """Return the exact finite float64 predecessor of a positive value.
+
+    Warp 1.11 exposes neither ``bitcast`` nor ``nextafter``/``frexp`` to
+    device code. Powers of two and multiplication/division by two are exact in
+    binary64, so determine the binade with supported scalar arithmetic and
+    subtract its exact ULP. Subnormals retain the minimum binary64 spacing.
+    """
+    minimum_normal = wp.float64(2.2250738585072014e-308)
+    minimum_subnormal = wp.float64(4.9406564584124654e-324)
+    if value < minimum_normal:
+        return value - minimum_subnormal
+
+    binade = minimum_normal
+    for _exponent in range(2046):
+        doubled = binade * wp.float64(2.0)
+        if value >= doubled:
+            binade = doubled
+    ulp = binade
+    for _fraction_bit in range(52):
+        ulp = ulp * wp.float64(0.5)
+    if value == binade and binade > minimum_normal:
+        ulp = ulp * wp.float64(0.5)
+    return value - ulp
 
 
 @wp.kernel
@@ -1294,6 +1337,8 @@ def _plan_demand_work(  # noqa: C901
         elif minimum_ratio < demand:
             demand = minimum_ratio
             code = wp.int32(_P2_GATE_GAS_LIMITED_OFFSET) + limiting_species
+        # Warp has no device-side nextafter primitive. Use the exact directed
+        # float64 predecessor after each unsafe inventory check.
         for _correction in range(4):
             safe = wp.int32(1)
             for species in range(species_count):
@@ -1306,7 +1351,8 @@ def _plan_demand_work(  # noqa: C901
                     if demand * event_mass > concentration[box, species]:
                         safe = wp.int32(0)
             if safe == 0:
-                demand = demand * wp.float64(0.9999999999999999)
+                demand = _float64_predecessor(demand)
+                code = wp.int32(_P2_GATE_GAS_LIMITED_OFFSET) + limiting_species
         for species in range(species_count):
             if molecule_counts[species] > 0:
                 event_mass = (
@@ -1405,7 +1451,9 @@ def _plan_nucleation_demand(
     not applied again. It is intentionally not exported through
     ``particula.gpu.kernels`` or ``particula.gpu``.
 
-    After read-only P1 and derived-state validation, P2 commits only
+    Private scalar status readback is permitted for validation; no caller-state
+    transfer or CPU physics fallback occurs. After read-only P1 and
+    derived-state validation, P2 commits only
     ``scratch.precursor_number_concentration``, ``scratch.potential_rate``,
     ``scratch.potential_demand``, ``finalized_demand.accepted_demand``,
     ``finalized_demand.precursor_mass_change``, and ``diagnostics.gate_codes``.

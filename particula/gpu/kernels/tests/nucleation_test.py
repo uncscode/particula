@@ -1,4 +1,4 @@
-"""Focused read-only contract tests for direct GPU nucleation P1."""
+"""Focused P1 validation and sidecar-only P2 contract tests."""
 
 from dataclasses import FrozenInstanceError
 from types import SimpleNamespace
@@ -9,8 +9,8 @@ import pytest
 pytestmark = pytest.mark.warp
 wp = pytest.importorskip("warp")
 
+import particula.gpu.kernels.nucleation as nucleation_module  # noqa: E402
 from particula.gpu.kernels.nucleation import (  # noqa: E402
-    _P2_GATE_ELIGIBLE,
     _P2_GATE_GAS_LIMITED_OFFSET,
     _P2_GATE_LOW_SATURATION,
     _P2_GATE_ZERO_COEFFICIENT,
@@ -28,26 +28,39 @@ from particula.gpu.kernels.nucleation import (  # noqa: E402
 )
 from particula.util.constants import AVOGADRO_NUMBER  # noqa: E402
 
+_DEVICE_CASES = [pytest.param("cpu", id="cpu")]
+if wp.is_cuda_available():
+    _DEVICE_CASES.append(
+        pytest.param("cuda:0", marks=pytest.mark.cuda, id="cuda")
+    )
 
-def _state(boxes: int = 1, particles: int = 2, species: int = 1):
-    """Build valid caller-owned fixed-capacity state on Warp CPU."""
+
+def _state(
+    boxes: int = 1,
+    particles: int = 2,
+    species: int = 1,
+    device: str = "cpu",
+):
+    """Build valid caller-owned fixed-capacity state on the requested device."""
     particle_data = SimpleNamespace(
         masses=wp.zeros(
-            (boxes, particles, species), dtype=wp.float64, device="cpu"
+            (boxes, particles, species), dtype=wp.float64, device=device
         ),
         concentration=wp.ones(
-            (boxes, particles), dtype=wp.float64, device="cpu"
+            (boxes, particles), dtype=wp.float64, device=device
         ),
-        charge=wp.zeros((boxes, particles), dtype=wp.float64, device="cpu"),
-        density=wp.ones(species, dtype=wp.float64, device="cpu")
+        charge=wp.zeros((boxes, particles), dtype=wp.float64, device=device),
+        density=wp.ones(species, dtype=wp.float64, device=device)
         * wp.float64(1000.0),
-        volume=wp.ones(boxes, dtype=wp.float64, device="cpu"),
+        volume=wp.ones(boxes, dtype=wp.float64, device=device),
     )
     gas_data = SimpleNamespace(
-        molar_mass=wp.ones(species, dtype=wp.float64, device="cpu")
+        molar_mass=wp.ones(species, dtype=wp.float64, device=device)
         * wp.float64(0.1),
-        concentration=wp.ones((boxes, species), dtype=wp.float64, device="cpu"),
-        partitioning=wp.ones((boxes, species), dtype=wp.int32, device="cpu"),
+        concentration=wp.ones(
+            (boxes, species), dtype=wp.float64, device=device
+        ),
+        partitioning=wp.ones((boxes, species), dtype=wp.int32, device=device),
     )
     return particle_data, gas_data
 
@@ -70,20 +83,20 @@ def _config(**changes):
     return NucleationConfig(**values)
 
 
-def _sidecars(boxes: int, particles: int, species: int):
+def _sidecars(boxes: int, particles: int, species: int, device: str = "cpu"):
     """Build all future caller-owned sidecars with deliberately stale values."""
     return (
         NucleationScratchBuffers(
-            *[wp.ones(boxes, dtype=wp.float64, device="cpu") for _ in range(3)]
+            *[wp.ones(boxes, dtype=wp.float64, device=device) for _ in range(3)]
         ),
         NucleationFinalizedDemandBuffers(
-            wp.ones(boxes, dtype=wp.int32, device="cpu"),
-            wp.ones(boxes, dtype=wp.float64, device="cpu"),
-            wp.ones((boxes, species), dtype=wp.float64, device="cpu"),
+            wp.ones(boxes, dtype=wp.int32, device=device),
+            wp.ones(boxes, dtype=wp.float64, device=device),
+            wp.ones((boxes, species), dtype=wp.float64, device=device),
         ),
         NucleationDiagnosticBuffers(
-            wp.ones(boxes, dtype=wp.int32, device="cpu"),
-            wp.ones((boxes, particles), dtype=wp.int32, device="cpu"),
+            wp.ones(boxes, dtype=wp.int32, device=device),
+            wp.ones((boxes, particles), dtype=wp.int32, device=device),
         ),
     )
 
@@ -113,6 +126,32 @@ def _assert_snapshot_unchanged(snapshot):
         assert value.dtype == dtype
         assert str(value.device) == device
         np.testing.assert_array_equal(value.numpy(), contents, strict=True)
+
+
+def _oracle_plan(concentration, molar_mass, config, time_step):
+    """Compute a NumPy reference for the private P2 demand planner."""
+    precursor = (
+        concentration[:, config.precursor_index]
+        * AVOGADRO_NUMBER
+        / molar_mass[config.precursor_index]
+    )
+    rate = config.survival_factor * config.coefficient * precursor
+    if config.rate_law == "kinetic":
+        rate = rate * precursor
+    potential = rate * time_step
+    event_mass = np.zeros_like(molar_mass)
+    mask = np.asarray(config.molecule_counts, dtype=np.int32) > 0
+    event_mass[mask] = (
+        np.asarray(config.molecule_counts, dtype=np.float64)[mask]
+        * molar_mass[mask]
+        / AVOGADRO_NUMBER
+    )
+    admitted = np.minimum(
+        potential,
+        np.min(concentration[:, mask] / event_mass[mask], axis=1),
+    )
+    removal = admitted[:, None] * event_mass
+    return precursor, rate, potential, admitted, removal
 
 
 def test_config_is_frozen_but_retains_arrays_by_identity():
@@ -264,6 +303,74 @@ def test_preflight_empty_capacity_returns_no_eligible_boxes():
     assert result.n_particles == 0
     assert not result.has_eligible_boxes
     assert not result.has_gated_boxes
+
+
+@pytest.mark.parametrize(
+    ("config", "saturation", "message"),
+    [
+        (
+            _config(precursor_number_concentration_upper=1.0),
+            None,
+            "precursor_number_concentration",
+        ),
+        (
+            _config(saturation_lower=0.5, saturation_upper=1.5),
+            1.6,
+            "saturation",
+        ),
+    ],
+)
+def test_p2_empty_capacity_validates_before_writing_sidecars(
+    config, saturation, message
+):
+    """Invalid nonempty-box inputs reject before P2 writes any sidecar."""
+    particles, gas = _state(particles=0)
+    scratch, finalized, diagnostics = _sidecars(1, 0, 1)
+    saturation_data = None
+    if saturation is not None:
+        saturation_data = wp.full(
+            (1, 1), wp.float64(saturation), dtype=wp.float64, device="cpu"
+        )
+    owners = (particles, gas, scratch, finalized, diagnostics)
+    if saturation_data is not None:
+        owners += (SimpleNamespace(saturation=saturation_data),)
+    before = _snapshot_arrays(*owners)
+
+    with pytest.raises(ValueError, match=message):
+        _plan_nucleation_demand(
+            particles,
+            gas,
+            config,
+            1.0,
+            temperature=300.0,
+            saturation=saturation_data,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+        )
+
+    _assert_snapshot_unchanged(before)
+
+
+def test_p2_derived_invalid_demand_preserves_all_caller_state():
+    """A derived overflow rejects before P2 commits its owned sidecars."""
+    particles, gas = _state()
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)
+
+    with pytest.raises(ValueError, match="Derived nucleation demand"):
+        _plan_nucleation_demand(
+            particles,
+            gas,
+            _config(coefficient=np.finfo(np.float64).max),
+            1.0,
+            temperature=300.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+        )
+
+    _assert_snapshot_unchanged(before)
 
 
 @pytest.mark.parametrize(
@@ -627,7 +734,7 @@ def test_p2_plans_activation_demand_and_preserves_p3_sidecars():
     source_before = _snapshot_arrays(particles, gas)
     selected_before = diagnostics.selected_slot_indices.numpy().copy()
     counts_before = finalized.accepted_counts.numpy().copy()
-    config = _config(molecule_counts=(1, 1), coefficient=1.0e-10)
+    config = _config(molecule_counts=(1, 1), coefficient=1.0)
 
     _plan_nucleation_demand(
         particles,
@@ -641,7 +748,7 @@ def test_p2_plans_activation_demand_and_preserves_p3_sidecars():
     )
 
     precursor = gas.concentration.numpy()[:, 0] * 6.02214076e23 / 0.1
-    potential = 1.0e-10 * precursor
+    potential = config.coefficient * precursor
     event_mass = np.array([0.1, 0.2]) / 6.02214076e23
     expected = np.minimum(
         potential,
@@ -664,10 +771,9 @@ def test_p2_plans_activation_demand_and_preserves_p3_sidecars():
         expected[:, None] * event_mass,
         rtol=1e-12,
     )
-    assert diagnostics.gate_codes.numpy()[0] in (
-        _P2_GATE_ELIGIBLE,
-        _P2_GATE_GAS_LIMITED_OFFSET,
-        _P2_GATE_GAS_LIMITED_OFFSET + 1,
+    np.testing.assert_array_equal(
+        diagnostics.gate_codes.numpy(),
+        [_P2_GATE_GAS_LIMITED_OFFSET + 1] * 2,
     )
     np.testing.assert_array_equal(
         finalized.accepted_counts.numpy(), counts_before
@@ -676,6 +782,85 @@ def test_p2_plans_activation_demand_and_preserves_p3_sidecars():
         diagnostics.selected_slot_indices.numpy(), selected_before
     )
     _assert_snapshot_unchanged(source_before)
+
+
+@pytest.mark.parametrize("device", _DEVICE_CASES)
+@pytest.mark.parametrize(
+    ("boxes", "species", "rate_law"),
+    [(1, 1, "activation"), (2, 3, "kinetic")],
+)
+def test_p2_matches_numpy_oracle_across_devices_and_scales(
+    device, boxes, species, rate_law
+):
+    """P2 rate, demand, and removal match a NumPy float64 oracle."""
+    if device.startswith("cuda") and not wp.is_cuda_available():
+        pytest.skip("CUDA is unavailable")
+    particles, gas = _state(
+        boxes=boxes, particles=0, species=species, device=device
+    )
+    gas.molar_mass = wp.array(
+        np.linspace(0.1, 0.1 + 0.1 * (species - 1), species, dtype=np.float64),
+        dtype=wp.float64,
+        device=device,
+    )
+    gas.concentration = wp.array(
+        np.arange(1, boxes * species + 1, dtype=np.float64).reshape(
+            boxes, species
+        )
+        * 1.0e-12,
+        dtype=wp.float64,
+        device=device,
+    )
+    config = _config(
+        rate_law=rate_law,
+        coefficient=1.0e-30,
+        survival_factor=0.75,
+        molecule_counts=tuple(range(1, species + 1)),
+        precursor_number_concentration_upper=1.0e40,
+    )
+    scratch, finalized, diagnostics = _sidecars(
+        boxes, 0, species, device=device
+    )
+    before = _snapshot_arrays(particles, gas)
+
+    _plan_nucleation_demand(
+        particles,
+        gas,
+        config,
+        2.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+
+    concentration = gas.concentration.numpy()
+    molar_mass = gas.molar_mass.numpy()
+    precursor, rate, potential, admitted, removal = _oracle_plan(
+        concentration, molar_mass, config, 2.0
+    )
+    np.testing.assert_allclose(
+        scratch.precursor_number_concentration.numpy(), precursor, rtol=1e-12
+    )
+    np.testing.assert_allclose(scratch.potential_rate.numpy(), rate, rtol=1e-12)
+    np.testing.assert_allclose(
+        scratch.potential_demand.numpy(), potential, rtol=1e-12
+    )
+    np.testing.assert_allclose(finalized.accepted_demand.numpy(), admitted)
+    np.testing.assert_allclose(
+        finalized.precursor_mass_change.numpy(), removal, rtol=1e-12
+    )
+    np.testing.assert_array_equal(
+        diagnostics.gate_codes.numpy(), np.zeros(boxes, dtype=np.int32)
+    )
+    np.testing.assert_array_equal(
+        finalized.accepted_counts.numpy(), np.ones(boxes, dtype=np.int32)
+    )
+    np.testing.assert_array_equal(
+        diagnostics.selected_slot_indices.numpy(),
+        np.full((boxes, 0), -1, dtype=np.int32),
+    )
+    _assert_snapshot_unchanged(before)
 
 
 def test_p2_zero_time_writes_zero_outputs_and_gate_code():
@@ -935,6 +1120,48 @@ def test_p2_empty_boxes_are_an_exact_write_free_noop():
     _assert_snapshot_unchanged(before)
 
 
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("scratch", None, "scratch must be NucleationScratchBuffers"),
+        ("scratch", object(), "scratch must be NucleationScratchBuffers"),
+        (
+            "finalized_demand",
+            None,
+            "finalized_demand must be NucleationFinalizedDemandBuffers",
+        ),
+        (
+            "diagnostics",
+            object(),
+            "diagnostics must be NucleationDiagnosticBuffers",
+        ),
+    ],
+)
+def test_p2_rejects_missing_or_wrong_sidecar_records(field, value, message):
+    """P2 refuses missing or wrong records before any caller-owned writes."""
+    particles, gas = _state()
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)
+    sidecars = {
+        "scratch": scratch,
+        "finalized_demand": finalized,
+        "diagnostics": diagnostics,
+    }
+    sidecars[field] = value
+
+    with pytest.raises(ValueError, match=message):
+        _plan_nucleation_demand(
+            particles,
+            gas,
+            _config(),
+            1.0,
+            temperature=300.0,
+            **sidecars,
+        )
+
+    _assert_snapshot_unchanged(before)
+
+
 def test_p2_inventory_rounding_uses_bounded_nextafter_correction():
     """P2 corrects an unsafe division-product ULP without a coarse scale loss."""
     event_mass = np.float64(0.1 / AVOGADRO_NUMBER)
@@ -984,3 +1211,49 @@ def test_p2_inventory_rounding_uses_bounded_nextafter_correction():
         finalized.accepted_demand.numpy(), [expected_demand], rtol=0.0, atol=0.0
     )
     assert finalized.precursor_mass_change.numpy()[0, 0] <= inventory
+    np.testing.assert_array_equal(
+        diagnostics.gate_codes.numpy(), [_P2_GATE_GAS_LIMITED_OFFSET]
+    )
+
+
+def test_p2_inventory_rounding_raises_exact_failure_after_four_corrections(
+    monkeypatch,
+):
+    """P2 surfaces the exact inventory-safety failure when correction stalls."""
+    particles, gas = _state(particles=0)
+    gas.molar_mass = wp.array([0.1], dtype=wp.float64, device="cpu")
+    gas.concentration = wp.array(
+        np.array([[1.0]], dtype=np.float64),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    scratch, finalized, diagnostics = _sidecars(1, 0, 1)
+
+    original_launch = nucleation_module.wp.launch
+
+    def _launch(kernel, dim=None, inputs=None, device=None):
+        if kernel is nucleation_module._plan_demand_work:
+            monkeypatch.setattr(
+                inputs[-1],
+                "numpy",
+                lambda: np.array([0, 1], dtype=np.int32),
+                raising=False,
+            )
+            return None
+        return original_launch(kernel, dim=dim, inputs=inputs, device=device)
+
+    monkeypatch.setattr(nucleation_module.wp, "launch", _launch)
+
+    with pytest.raises(
+        ValueError, match="Nucleation demand cannot be made inventory-safe."
+    ):
+        _plan_nucleation_demand(
+            particles,
+            gas,
+            _config(coefficient=1.0),
+            1.0,
+            temperature=300.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+        )
