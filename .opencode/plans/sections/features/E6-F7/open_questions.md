@@ -4,10 +4,10 @@ All E6-F7 planning questions were resolved on 2026-07-21. The selected CPU
 reference is a bounded empirical particle source, not a predictive
 critical-cluster model.
 
-P1 implementation clarification (issue #1430): only the unexported,
-potential-rate strategy boundary shipped. Source construction, inventory and
-slot policies, mutation, builders/factories/runnables, and GPU work remain
-deferred to later phases.
+P4 implementation clarification (issue #1433): builders, a factory, immutable
+source-selection metadata, and deliberately constrained package exports now
+ship. P2/P3 finalization and mutation remain concrete-module-only; the runnable
+and GPU work remain deferred.
 
 - [x] Which coefficient units and validity intervals do builders accept?
   - Decision: activation coefficients accept `s^-1`; kinetic coefficients accept

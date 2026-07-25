@@ -14,8 +14,9 @@
   scaled rows use `particle_post + gas_post = s * pre_total`.
 - [x] P3 invalid calls preserve caller particle and gas arrays; capacity, no-op,
   scaling, and atomic-rejection tests cover the transaction boundary.
-- [ ] Builders, factory, imports, and `Nucleation` runnable have fast tests and
-  current documentation.
+- [x] Strict builders, factory, immutable source-selection metadata, and approved
+   P4 imports have regression coverage; P2/P3 exports remain absent.
+- [ ] `Nucleation` runnable has fast tests and current user-facing documentation.
 - [ ] E6-F8 has an independent deterministic CPU oracle and frozen source and
   diagnostics contracts.
 - [ ] Fast tests, Ruff, and mypy pass without lowering coverage thresholds.

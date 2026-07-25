@@ -44,9 +44,14 @@ concrete-module-only.
   and `particula.dynamics`; strategies still return rates only and own no
   source admission, state mutation, runnable, or GPU integration.
 - `nucleation_configuration.py`, `nucleation_builders.py`, and
-  `nucleation_factories.py` - Strict P4 source-selection metadata and fresh,
-  unit-normalizing construction APIs. They do not import or expose P2/P3
+  `nucleation_factories.py` - `NucleationSourceConfig`, its builder, and the
+  activation/kinetic builders and factory form the strict, fresh,
+  unit-normalizing P4 construction API. They do not import or expose P2/P3
   particle-source records or transaction helpers.
+- `particle_source.py` - Concrete-module-only P2 source-demand planning and P3
+  atomic particle-source transaction records and helpers. It is intentionally
+  absent from both `particula.dynamics.nucleation` and `particula.dynamics`
+  exports.
 - `tests/` - Test coverage
 
 ## GPU Package

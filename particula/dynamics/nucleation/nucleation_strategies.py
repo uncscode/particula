@@ -4,7 +4,8 @@ Activation and kinetic parameterizations accept precursor mass concentration
 [kg/m³], convert it to number concentration [#/m³], and return potential rates
 [#/m³/s]. They do not create particles or mutate gas, particle, or slot state.
 Direct P1 construction remains supported. The deliberately bounded P4
-construction API is exported through ``particula.dynamics.nucleation``.
+construction API is exported through ``particula.dynamics.nucleation``;
+concrete P2/P3 ``particle_source`` finalization and state mutation are not.
 
 Kulmala, M., et al. (2006). Toward direct measurement of atmospheric
 nucleation. *Science*, 318, 89--92.

@@ -1,4 +1,9 @@
-"""Fresh-builder factory for bounded P4 nucleation strategies."""
+"""Create bounded P4 nucleation strategies with fresh strict builders.
+
+The factory dispatches only activation and kinetic potential-rate strategies.
+It does not construct source-selection metadata or expose concrete P2/P3
+``particle_source`` finalization and mutation helpers.
+"""
 
 from particula.abc_factory import StrategyFactoryABC
 from particula.dynamics.nucleation.nucleation_builders import (
@@ -17,12 +22,22 @@ class NucleationFactory(
         ActivationNucleationStrategy | KineticNucleationStrategy,
     ]
 ):
-    """Build activation or kinetic P4 potential-rate strategies by name."""
+    """Build activation or kinetic P4 potential-rate strategies by name.
+
+    Each request gets a new builder, so failed or successful requests cannot
+    retain configuration into subsequent calls. Identifiers are case-insensitive
+    but are limited to ``"activation"`` and ``"kinetic"``.
+    """
 
     def get_builders(
         self,
     ) -> dict[str, ActivationNucleationBuilder | KineticNucleationBuilder]:
-        """Return new builders for the two supported identifiers."""
+        """Return fresh builders for the two supported identifiers.
+
+        Returns:
+            New activation and kinetic builders under their canonical lowercase
+            identifiers.
+        """
         return {
             "activation": ActivationNucleationBuilder(),
             "kinetic": KineticNucleationBuilder(),
@@ -33,7 +48,20 @@ class NucleationFactory(
         strategy_type: str,
         parameters: dict[str, object] | None = None,
     ) -> ActivationNucleationStrategy | KineticNucleationStrategy:
-        """Build a validated strategy from a copied strict-schema payload."""
+        """Build a validated strategy from a copied strict-schema payload.
+
+        Args:
+            strategy_type: Case-insensitive ``"activation"`` or ``"kinetic"``
+                identifier.
+            parameters: Required dictionary accepted by the selected builder.
+
+        Returns:
+            Newly built immutable activation or kinetic potential-rate strategy.
+
+        Raises:
+            ValueError: If the identifier or payload is invalid, unsupported, or
+                fails the selected builder's schema validation.
+        """
         if not isinstance(strategy_type, str):
             raise ValueError("strategy_type must be a string")
         if not isinstance(parameters, dict):

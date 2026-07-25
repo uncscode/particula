@@ -17,7 +17,15 @@
   `commit_particle_source` transaction in
   `particula/dynamics/nucleation/particle_source.py`. No user-facing docs,
   examples, or package exports were added; P7 remains responsible for those
-  documentation decisions.
+   documentation decisions.
+- P4 added module/API docstrings for strict builders, `NucleationFactory`, and
+  immutable `NucleationSourceConfig`, plus architecture-boundary corrections in
+  `.opencode/guides/architecture/architecture_outline.md`,
+  `.opencode/guides/architecture_reference.md`, and
+  `.opencode/guides/architecture/architecture_guide.md`. These describe the
+  bounded public construction surface and preserve P2/P3 as concrete-only.
+  No user-facing feature documentation, examples, or runnable was added; P7
+  remains responsible for those decisions.
 - Retain citations to Seinfeld & Pandis (2016), Kulmala et al. (2006, DOI
   `10.5194/acp-6-787-2006`), and Kerminen & Kulmala (2002, DOI
   `10.1016/S0021-8502(01)00194-X`). State that Vehkamäki et al. (2002, DOI

@@ -1,4 +1,4 @@
-"""Dynamics public API.
+"""Provide public dynamics strategies, construction APIs, and runnables.
 
 Re-exports wall loss, dilution, condensation, and coagulation utilities,
 strategies, builders, factories, and runnable processes for access through
@@ -11,6 +11,11 @@ electric-field drift. Also provides ``MassCondensation``, ``Coagulation``,
 ``Dilution`` are the supported dilution construction APIs; low-level aerosol
 mutation and finite-step helpers remain available only from the concrete
 ``particula.dynamics.dilution`` module.
+
+Nucleation exports provide the bounded P4 construction surface for immutable
+activation and kinetic potential-rate strategies. ``NucleationSourceConfig``
+selects one of those strategies and a precursor index, but P2/P3
+``particle_source`` finalization and mutation helpers remain concrete-only.
 """
 
 

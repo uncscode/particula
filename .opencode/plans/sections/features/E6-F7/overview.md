@@ -10,13 +10,15 @@ atomically after capacity policy resolution.
 
 ## Value Proposition
 
-E6-F7 P1-P3 now provide CPU-only, concrete-module-only potential-rate,
+E6-F7 P1-P3 provide CPU-only, concrete-module-only potential-rate,
 inventory-admission, and source-commit boundaries. P3 consumes immutable P2
 records, stages E6-F5 activation plus E6-F6 resampling/scaling on a private
 `ParticleData` copy, scales pre-existing gas for representative-volume rows,
 validates per-box/species scaled-domain conservation, then writes validated
-particle and gas arrays atomically. The transaction remains unexported and
-does not add a runnable, GPU parity, or a public API.
+particle and gas arrays atomically. The transaction remains unexported. P4 adds
+a bounded public construction surface: immutable activation/kinetic strategies
+and source-selection metadata, strict atomic builders, and a fresh-builder
+factory. P2/P3 helpers remain unexported; no runnable or GPU parity is added.
 
 ## User Stories
 
@@ -30,5 +32,5 @@ does not add a runnable, GPU parity, or a public API.
   partial writes or silent source truncation.
 
 Parent epic: **E6**. Track: **T7**. P1 shipped for issue #1430, P2 for #1431,
-and P3 for #1432. Builders/runnable work, direct GPU parity (E6-F8), and an
-integrated consumer (E6-F9) remain deferred.
+P3 for #1432, and P4 for #1433. The runnable, direct GPU parity (E6-F8), and
+an integrated consumer (E6-F9) remain deferred.

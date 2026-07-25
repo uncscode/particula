@@ -1,4 +1,10 @@
-"""Strict builders for immutable P4 nucleation configuration."""
+"""Build immutable, normalized P4 nucleation configurations.
+
+The builders accept only the documented physical units and make configuration
+from mappings atomic. They construct potential-rate metadata only; P2/P3
+source-demand finalization and particle or gas mutation remain in the concrete
+``particle_source`` module.
+"""
 
 from abc import ABC
 from typing import Self, cast
@@ -49,7 +55,12 @@ _STAGED_ATTRIBUTES = (
 
 
 class _NucleationStrategyBuilder(BuilderABC, ABC):
-    """Shared strict, normalized builder for potential-rate strategies."""
+    """Provide shared strict normalization for potential-rate builders.
+
+    Subclasses define their accepted coefficient units and construct the
+    matching immutable strategy. Required scalar fields are normalized to SI
+    units before they are retained on the builder.
+    """
 
     coefficient_units: set[str]
 
@@ -88,14 +99,36 @@ class _NucleationStrategyBuilder(BuilderABC, ABC):
         return normalized * factors.get(normalized_unit, 1.0)
 
     def set_coefficient(self, value: object, units: object) -> Self:
-        """Set the normalized strategy coefficient."""
+        """Set the strategy coefficient after unit normalization.
+
+        Args:
+            value: Nonnegative scalar coefficient.
+            units: Unit accepted by the concrete strategy builder.
+
+        Returns:
+            This builder for fluent configuration.
+
+        Raises:
+            TypeError: If ``value`` is not a scalar real value.
+            ValueError: If ``value`` is invalid or ``units`` is unsupported.
+        """
         self.coefficient = self._converted(
             value, units, self.coefficient_units, "coefficient"
         )
         return self
 
     def set_coefficient_provenance(self, value: object) -> Self:
-        """Set required nonempty coefficient provenance."""
+        """Set the required nonempty coefficient-origin description.
+
+        Args:
+            value: Nonempty, non-whitespace provenance string.
+
+        Returns:
+            This builder for fluent configuration.
+
+        Raises:
+            ValueError: If ``value`` is not a nonempty string.
+        """
         if not isinstance(value, str) or not value.strip():
             raise ValueError("coefficient_provenance must be a nonempty string")
         self.coefficient_provenance = value
@@ -104,7 +137,15 @@ class _NucleationStrategyBuilder(BuilderABC, ABC):
     def set_precursor_number_concentration_lower(
         self, value: object, units: object
     ) -> Self:
-        """Set normalized precursor concentration lower endpoint."""
+        """Set the lower precursor-number-concentration endpoint in #/m³.
+
+        Args:
+            value: Nonnegative endpoint value.
+            units: ``"1/m^3"`` or ``"1/cm^3"``.
+
+        Returns:
+            This builder for fluent configuration.
+        """
         self.precursor_number_concentration_lower = self._converted(
             value,
             units,
@@ -116,7 +157,15 @@ class _NucleationStrategyBuilder(BuilderABC, ABC):
     def set_precursor_number_concentration_upper(
         self, value: object, units: object
     ) -> Self:
-        """Set normalized precursor concentration upper endpoint."""
+        """Set the upper precursor-number-concentration endpoint in #/m³.
+
+        Args:
+            value: Nonnegative endpoint value.
+            units: ``"1/m^3"`` or ``"1/cm^3"``.
+
+        Returns:
+            This builder for fluent configuration.
+        """
         self.precursor_number_concentration_upper = self._converted(
             value,
             units,
@@ -139,49 +188,109 @@ class _NucleationStrategyBuilder(BuilderABC, ABC):
         return normalized
 
     def set_temperature_lower(self, value: object, units: object) -> Self:
-        """Set temperature lower endpoint in K."""
+        """Set the positive lower temperature endpoint in K.
+
+        Args:
+            value: Positive temperature endpoint.
+            units: Required ``"K"`` unit.
+
+        Returns:
+            This builder for fluent configuration.
+        """
         self.temperature_lower = self._set_positive(
             "temperature_lower", value, units, {"K"}
         )
         return self
 
     def set_temperature_upper(self, value: object, units: object) -> Self:
-        """Set temperature upper endpoint in K."""
+        """Set the positive upper temperature endpoint in K.
+
+        Args:
+            value: Positive temperature endpoint.
+            units: Required ``"K"`` unit.
+
+        Returns:
+            This builder for fluent configuration.
+        """
         self.temperature_upper = self._set_positive(
             "temperature_upper", value, units, {"K"}
         )
         return self
 
     def set_formation_diameter(self, value: object, units: object) -> Self:
-        """Set formation diameter in m."""
+        """Set the positive formation mobility diameter in m.
+
+        Args:
+            value: Positive formation diameter.
+            units: ``"m"`` or ``"nm"``.
+
+        Returns:
+            This builder for fluent configuration.
+        """
         self.formation_diameter = self._set_positive(
             "formation_diameter", value, units, {"m", "nm"}
         )
         return self
 
     def set_saturation_lower(self, value: object, units: object) -> Self:
-        """Set nonnegative dimensionless saturation lower endpoint."""
+        """Set the nonnegative lower dimensionless saturation endpoint.
+
+        Args:
+            value: Nonnegative saturation endpoint.
+            units: Required ``"dimensionless"`` unit.
+
+        Returns:
+            This builder for fluent configuration.
+        """
         self.saturation_lower = self._converted(
             value, units, {"dimensionless"}, "saturation_lower"
         )
         return self
 
     def set_saturation_upper(self, value: object, units: object) -> Self:
-        """Set nonnegative dimensionless saturation upper endpoint."""
+        """Set the nonnegative upper dimensionless saturation endpoint.
+
+        Args:
+            value: Nonnegative saturation endpoint.
+            units: Required ``"dimensionless"`` unit.
+
+        Returns:
+            This builder for fluent configuration.
+        """
         self.saturation_upper = self._converted(
             value, units, {"dimensionless"}, "saturation_upper"
         )
         return self
 
     def set_survival_factor(self, value: object, units: object) -> Self:
-        """Set nonnegative dimensionless survival factor."""
+        """Set the nonnegative dimensionless survival factor.
+
+        Args:
+            value: Nonnegative survival factor.
+            units: Required ``"dimensionless"`` unit.
+
+        Returns:
+            This builder for fluent configuration.
+        """
         self.survival_factor = self._converted(
             value, units, {"dimensionless"}, "survival_factor"
         )
         return self
 
     def set_injection_composition(self, value: object) -> Self:
-        """Copy and validate formation composition metadata."""
+        """Copy and validate future formed-particle composition metadata.
+
+        Args:
+            value: Iterable nonnegative molecule counts with at least one
+                positive count.
+
+        Returns:
+            This builder for fluent configuration.
+
+        Raises:
+            TypeError: If ``value`` is not an iterable accepted by the record.
+            ValueError: If the copied composition is invalid.
+        """
         try:
             counts: tuple[object, ...] = tuple(value)  # type: ignore[arg-type]
         except TypeError as error:
@@ -192,7 +301,17 @@ class _NucleationStrategyBuilder(BuilderABC, ABC):
         return self
 
     def set_diameter_convention(self, value: object) -> Self:
-        """Set the required formation-diameter convention."""
+        """Set the required ``"mobility_diameter"`` convention.
+
+        Args:
+            value: Required convention identifier.
+
+        Returns:
+            This builder for fluent configuration.
+
+        Raises:
+            ValueError: If ``value`` is not ``"mobility_diameter"``.
+        """
         if value != "mobility_diameter":
             raise ValueError("diameter_convention must be mobility_diameter")
         self.diameter_convention = "mobility_diameter"
@@ -247,7 +366,24 @@ class _NucleationStrategyBuilder(BuilderABC, ABC):
         setters[key](value, units)
 
     def set_parameters(self, parameters: object) -> Self:
-        """Atomically configure this builder from the exact mapping schema."""
+        """Atomically configure this builder from its exact mapping schema.
+
+        Scalar physical values require matching ``*_units`` entries. Required
+        values, paired saturation bounds, and all units are validated on a
+        staging builder before this builder is changed.
+
+        Args:
+            parameters: Dictionary containing exactly supported configuration
+                keys and required unit metadata.
+
+        Returns:
+            This builder after successful replacement of its configuration.
+
+        Raises:
+            TypeError: If ``parameters`` is not a dictionary.
+            ValueError: If keys, units, required values, or paired bounds are
+                invalid.
+        """
         if not isinstance(parameters, dict):
             raise TypeError("parameters must be a dict")
         self._validate_schema(parameters)
@@ -323,12 +459,25 @@ class _NucleationStrategyBuilder(BuilderABC, ABC):
 
 
 class ActivationNucleationBuilder(_NucleationStrategyBuilder):
-    """Build immutable activation nucleation strategies."""
+    """Build immutable activation potential-rate strategies.
+
+    The activation coefficient must use ``"s^-1"`` and all retained physical
+    values are normalized to SI units before construction.
+    """
 
     coefficient_units = {"s^-1"}
 
     def build(self) -> ActivationNucleationStrategy:
-        """Build an activation strategy after complete validation."""
+        """Build a fully validated immutable activation strategy.
+
+        Returns:
+            Activation strategy with normalized metadata and a survival default
+            of ``1.0`` when no survival factor was supplied.
+
+        Raises:
+            ValueError: If required builder fields or paired saturation bounds
+                are missing or invalid.
+        """
         domain, composition, metadata, survival = self._configuration()
         return ActivationNucleationStrategy(
             cast(float, self.coefficient),
@@ -341,12 +490,25 @@ class ActivationNucleationBuilder(_NucleationStrategyBuilder):
 
 
 class KineticNucleationBuilder(_NucleationStrategyBuilder):
-    """Build immutable kinetic nucleation strategies."""
+    """Build immutable kinetic potential-rate strategies.
+
+    The kinetic coefficient accepts ``"m^3/s"`` or ``"cm^3/s"`` and is
+    normalized to m³/s before construction.
+    """
 
     coefficient_units = {"m^3/s", "cm^3/s"}
 
     def build(self) -> KineticNucleationStrategy:
-        """Build a kinetic strategy after complete validation."""
+        """Build a fully validated immutable kinetic strategy.
+
+        Returns:
+            Kinetic strategy with normalized metadata and a survival default of
+            ``1.0`` when no survival factor was supplied.
+
+        Raises:
+            ValueError: If required builder fields or paired saturation bounds
+                are missing or invalid.
+        """
         domain, composition, metadata, survival = self._configuration()
         return KineticNucleationStrategy(
             cast(float, self.coefficient),
@@ -359,7 +521,12 @@ class KineticNucleationBuilder(_NucleationStrategyBuilder):
 
 
 class NucleationSourceConfigBuilder(BuilderABC):
-    """Build immutable P4 source-selection metadata."""
+    """Build immutable P4 source-selection metadata.
+
+    This builder selects a supported potential-rate strategy and precursor
+    index only. It does not expose P2/P3 particle-source finalization or
+    mutation behavior.
+    """
 
     def __init__(self) -> None:
         """Initialize an unconfigured P4 source-selection builder."""
@@ -368,17 +535,43 @@ class NucleationSourceConfigBuilder(BuilderABC):
         self.precursor_index: int | None = None
 
     def set_strategy(self, strategy: object) -> Self:
-        """Set the selected supported nucleation strategy."""
+        """Set the candidate supported nucleation strategy.
+
+        Args:
+            strategy: Activation or kinetic strategy to select.
+
+        Returns:
+            This builder for fluent configuration.
+        """
         self.strategy = strategy  # type: ignore[assignment]
         return self
 
     def set_precursor_index(self, precursor_index: object) -> Self:
-        """Set the selected precursor species index."""
+        """Set the candidate nonnegative precursor species index.
+
+        Args:
+            precursor_index: Index validated when the configuration is built.
+
+        Returns:
+            This builder for fluent configuration.
+        """
         self.precursor_index = precursor_index  # type: ignore[assignment]
         return self
 
     def set_parameters(self, parameters: object) -> Self:
-        """Atomically configure the exact two-key source metadata schema."""
+        """Atomically configure the exact two-key source metadata schema.
+
+        Args:
+            parameters: Dictionary containing only ``strategy`` and
+                ``precursor_index``.
+
+        Returns:
+            This builder after a valid configuration is staged and copied.
+
+        Raises:
+            TypeError: If ``parameters`` is not a dictionary.
+            ValueError: If keys or source-selection values are invalid.
+        """
         if not isinstance(parameters, dict):
             raise TypeError("parameters must be a dict")
         if set(parameters) != {"strategy", "precursor_index"}:
@@ -394,7 +587,15 @@ class NucleationSourceConfigBuilder(BuilderABC):
         return self
 
     def build(self) -> NucleationSourceConfig:
-        """Build validated P4 source-selection metadata."""
+        """Build validated immutable P4 source-selection metadata.
+
+        Returns:
+            Metadata selecting a supported strategy and precursor index.
+
+        Raises:
+            ValueError: If required builder fields are missing or invalid.
+            TypeError: If the precursor index is not an accepted integer.
+        """
         self.pre_build_check()
         return NucleationSourceConfig(
             cast(NucleationStrategy, self.strategy),

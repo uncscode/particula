@@ -62,15 +62,19 @@ bound is an exact zero gate, while above its upper bound raises `ValueError`.
 
 ## Data / API / Workflow Changes
 
-- **Data Model:** No `ParticleData` or `GasData` schema change. Frozen records
-   are `ClosedInterval`, `NucleationValidityDomain`, `InjectionComposition`,
-   `FormationMetadata`, `PotentialEventData`, `SourceDemandData`,
-   `SourceDiagnostics`, `ParticleSourceCommitConfig`, and
-   `FinalizedSourceDiagnostics`. Record arrays are fresh, owned, and read-only.
-- **API Surface:** Concrete symbols live only in
-  `particula.dynamics.nucleation.nucleation_strategies` and
-  `particula.dynamics.nucleation.particle_source`; the package and
-  `particula.dynamics` do not re-export them.
+- **Data Model:** No `ParticleData` or `GasData` schema change. P4 adds frozen
+   `NucleationSourceConfig`, which selects an already-built activation or
+   kinetic strategy and a nonnegative precursor index only. It has no P2/P3
+   finalization or mutation behavior. Strategy provenance is retained as
+   validated immutable metadata; record arrays remain fresh, owned, and
+   read-only.
+- **API Surface:** P4 exports only strategy/domain metadata, activation and
+   kinetic strategies, their three builders, `NucleationSourceConfig`, and
+   `NucleationFactory` from `particula.dynamics.nucleation` and
+   `particula.dynamics`. The factory accepts only case-insensitive
+   `"activation"` and `"kinetic"` identifiers and uses a fresh builder with a
+   copied strict-schema mapping per call. P2/P3 `particle_source` records and
+   helpers remain concrete-module-only.
 - **Mutation Contract:** P1 returns a `float` potential rate. P2 returns only
   provisional demand and diagnostics; it validates gas read-only and does not
   mutate caller state. A participating species limits each box by the minimum

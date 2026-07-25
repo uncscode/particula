@@ -11,8 +11,8 @@ NumPy oracle rather than production helpers.
   `particula/dynamics/nucleation/tests/nucleation_strategies_test.py` verifies
   `J=A*C` and `J=K*C^2`, SI conversion, linear/quadratic scaling, inclusive
   bounds, exact zero and saturation gates, strict scalar and record validation,
-  overflow ordering, frozen records, abstract-interface behavior, and the
-  intentional absence of dynamics exports.
+  overflow ordering, frozen records, abstract-interface behavior, and P4
+  export-boundary compatibility.
 - **P2 (shipped):**
   `particula/dynamics/nucleation/tests/particle_source_test.py` covers
   one/multi-box and multi-species shared admission, per-box limiting species,
@@ -25,8 +25,12 @@ NumPy oracle rather than production helpers.
   finalized records, and absent package exports. It verifies private staging,
   fixed-slot activation/exhaustion behavior, scaled gas treatment, and
   per-box/species conservation without exposing a new public transaction API.
-- **P4:** Builder/factory tests cover defaults, units, required domain and
-  composition, dispatch, public imports, and unsupported model aliases.
+- **P4 (shipped):**
+  `nucleation_builders_test.py`, `nucleation_factories_test.py`, and export/
+  provenance cases in `nucleation_strategies_test.py` cover exact conversions,
+  defaults, provenance, immutable input ownership, strict mapping schemas,
+  atomic failed-configuration recovery, source-config validation, fresh factory
+  isolation, approved imports, and absent P2/P3 exports.
 - **P5:** `nucleation_runnable_test.py` verifies delegation,
   `time_step/sub_steps`, current-gas recomputation, exact no-ops, invalid
   substeps, returned identity, and composability.

@@ -1,4 +1,10 @@
-"""Bounded P4 construction APIs for CPU nucleation potential-rate strategies."""
+"""Expose bounded P4 construction APIs for CPU nucleation potential rates.
+
+This namespace exports immutable activation and kinetic potential-rate
+strategies, their strict builders, ``NucleationFactory``, and source-selection
+metadata. P2/P3 helpers in ``particle_source`` finalize source demand or mutate
+particle and gas state; they intentionally remain concrete-module-only.
+"""
 
 from particula.dynamics.nucleation.nucleation_builders import (
     ActivationNucleationBuilder,

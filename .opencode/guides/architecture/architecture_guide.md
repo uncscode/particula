@@ -3,15 +3,17 @@
 ## CPU Nucleation Potential-Rate Boundary
 
 - `particula.dynamics.nucleation` provides the bounded CPU-only P4 construction
-  API: immutable activation/kinetic potential-rate strategies, validated
-  source-selection metadata, strict builders, and a fresh-builder factory.
-  These names are deliberately re-exported through `particula.dynamics`.
+  API: immutable activation/kinetic potential-rate strategies,
+  `NucleationSourceConfig`, their builders, and `NucleationFactory`. These
+  names are deliberately re-exported through `particula.dynamics`.
 - P4 strategies calculate potential formation-event rates only. They do not
   create particles, admit inventory or slots, mutate gas or particle state,
   provide a runnable, or provide GPU integration.
 - P2 source-demand and P3 transaction records/helpers remain deliberately
   concrete-only in `particula.dynamics.nucleation.particle_source`; they are
-  not package exports and P4 construction types do not import them.
+  not package exports and P4 construction types do not import them. In
+  particular, public construction does not expose particle-source
+  finalization or commit helpers.
 
 ## CPU Particle Slot Management Boundary
 

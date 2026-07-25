@@ -13,11 +13,12 @@
   staging; require complete all-box validation before particle or gas writes.
 - [x] Package final represented demand into equal-weight slots without residual
   truncation; preserve final represented per-species mass.
-- [ ] Add builders/factory with explicit units, domain, precursor index,
-  composition, formation size, and survival factor.
+- [x] Add strict atomic builders/factory with explicit units, domain, precursor
+   index, composition, formation size, survival factor, and provenance.
 - [ ] Add `Nucleation` to `particle_process.py`; recompute current gas rate and
   inventory on every substep.
-- [ ] Export only intended APIs through nucleation and dynamics initializers.
+- [x] Export only intended P4 construction APIs through nucleation and dynamics
+   initializers; retain P2/P3 names as concrete-module-only.
 
 ## Tooling and Tests
 
@@ -27,7 +28,8 @@
   admission, diagnostics, immutable ownership, validation, and nonmutation.
 - [x] Add P3 capacity, no-op, scaling, atomic-rejection, immutable-record, and
   export-boundary tests in `particle_source_test.py`.
-- [ ] Add builder/factory tests for units, required fields, and invalid aliases.
+- [x] Add builder/factory tests for units, required fields, strict schemas,
+   atomic recovery, factory isolation, and invalid aliases.
 - [ ] Add runnable tests in `nucleation_runnable_test.py`.
 - [ ] Add an independent multi-box/species oracle under
   `particula/integration_tests/`; do not derive expected values with production.

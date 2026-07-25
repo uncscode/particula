@@ -20,7 +20,7 @@ consumes P2 records and stages particle-slot/exhaustion work privately.
   mass-to-number conversion.
 - Exact zero-rate paths and optional saturation-gate semantics, with isolated
   tests for equations, boundaries, ordering, invalid inputs, immutability, and
-  absent `particula.dynamics` exports.
+  the constrained P4 export boundary.
 - `PotentialEventData`, `SourceDemandData`, and `SourceDiagnostics` in
   `particula/dynamics/nucleation/particle_source.py`, with fresh read-only
   `float64` payloads and a read-only `int32` limiting-species diagnostic.
@@ -38,6 +38,12 @@ consumes P2 records and stages particle-slot/exhaustion work privately.
   arrays are written only after all-box validation.
 - Equal-weight final slot packaging, scaled pre-existing particle/gas state for
   representative-volume rows, and finite per-box/species conservation checks.
+- P4 strict activation/kinetic builders, `NucleationSourceConfigBuilder`, and
+  `NucleationFactory`; accepted units normalize into SI and mappings are staged
+  atomically before replacing a builder configuration.
+- Immutable `NucleationSourceConfig` metadata and constrained P4 exports from
+  both dynamics namespaces. P2/P3 records and transaction helpers remain
+  concrete-module-only.
 
 ## Out of Scope
 
@@ -51,4 +57,4 @@ consumes P2 records and stages particle-slot/exhaustion work privately.
   performance claims.
 - Silent clipping of unsupported environmental inputs, partial multi-box
   commits, or silent loss of slot-exhausted source demand.
-- Builders, factories, runnables, and all dynamics/top-level exports.
+- A runnable, broad top-level exports, or exports of P2/P3 records/helpers.

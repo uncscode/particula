@@ -23,11 +23,17 @@ P4/P5, then run P6 conservation validation before P7 documentation.
   - Files: `particula/dynamics/nucleation/particle_source.py`, `particula/dynamics/nucleation/tests/particle_source_test.py`
   - Tests: Capacity, no-op, scaling, atomic rejection, record immutability, and package-export boundaries.
 
-- [ ] **E6-F7-P4:** Add nucleation builders factory and public strategy APIs with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Construct validated strategies/source configuration through repository-standard builders, factory, and stable exports.
-  - Files: `particula/dynamics/nucleation/nucleation_builders.py`, `nucleation_factories.py`, package `__init__.py` files
-  - Tests: Units/defaults, missing/invalid parameters, factory selection, imports, and unsupported aliases.
+- [x] **E6-F7-P4:** Add nucleation builders factory and public strategy APIs with unit tests
+  - Issue: #1433 | Size: S | Status: Shipped
+  - Goal: Shipped strict atomic builders and fresh-builder factory construction
+    for immutable activation/kinetic strategies and source-selection metadata,
+    with deliberately constrained P4 exports.
+  - Files: `particula/dynamics/nucleation/nucleation_builders.py`,
+    `nucleation_configuration.py`, `nucleation_factories.py`, strategy and
+    package `__init__.py` files, and three architecture guides.
+  - Tests: Exact units/defaults, required provenance and metadata, strict schema,
+    failed-configuration recovery, fresh factory isolation, public imports, P2/P3
+    export absence, and unsupported aliases.
 
 - [ ] **E6-F7-P5:** Add CPU nucleation runnable and substep behavior with unit tests
   - Issue: TBD | Size: S | Status: Not Started
