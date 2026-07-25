@@ -2,17 +2,12 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.1
     hooks:
-      - id: ruff
+      - id: ruff-check
+        name: Ruff fix
+        args: [--fix]
+        files: '^(particula/|docs/Examples/).*\.py$'
       - id: ruff-format
-  - repo: local
-    hooks:
-      - id: jupytext-sync-execute
-        name: Sync and execute changed notebooks
-        entry: .opencode/hooks/sync-execute-notebooks.sh
-        language: script
-        files: ^docs/Examples/.*\.py$
-        exclude: |
-          (?x)^( 
-            docs/Examples/Simulations/.*  # Slow notebooks - CI only
-          )$
-        pass_filenames: true
+        files: '^(particula/|docs/Examples/).*\.py$'
+      - id: ruff-check
+        name: Ruff check
+        files: '^(particula/|docs/Examples/).*\.py$'

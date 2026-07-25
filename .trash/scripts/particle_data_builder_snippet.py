@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import numpy as np
-
 from particula.particles.particle_data_builder import ParticleDataBuilder
 
 
 def test_particle_data_builder_snippet() -> None:
     """Instantiate the builder and print derived arrays."""
-
     builder = (
         ParticleDataBuilder()
         .set_masses(np.array([[[1e-18, 2e-18], [1.5e-18, 2.5e-18]]]))

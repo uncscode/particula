@@ -40,7 +40,9 @@ RATE_LIMIT_MESSAGE = (
 )
 FALLBACK_FEEDBACK_CATEGORIES = ["bug", "feature", "friction", "performance"]
 FALLBACK_FEEDBACK_SEVERITIES = ["low", "medium", "high", "critical"]
-FALLBACK_RATE_LIMIT_MESSAGE = "Rate limited — please wait before submitting more feedback."
+FALLBACK_RATE_LIMIT_MESSAGE = (
+    "Rate limited — please wait before submitting more feedback."
+)
 FALLBACK_RATE_LIMIT_WINDOW = timedelta(seconds=60)
 LOCK_ACQUIRE_TIMEOUT_SECONDS = 2.0
 LOCK_ACQUIRE_RETRY_INTERVAL_SECONDS = 0.05
@@ -133,7 +135,9 @@ class _FallbackFeedbackEntry:
 _fallback_last_entries: dict[tuple[str, str], _FallbackFeedbackEntry] = {}
 
 
-def _truncate_description(description: str, limit: int = MAX_DESCRIPTION_LENGTH) -> str:
+def _truncate_description(
+    description: str, limit: int = MAX_DESCRIPTION_LENGTH
+) -> str:
     """Truncate a description for output messages.
 
     Args:
@@ -244,13 +248,17 @@ def _exclusive_lock(lock_path: Path):
     try:
         descriptor_stat = os.fstat(lock_fd)
         if not stat.S_ISREG(descriptor_stat.st_mode):
-            raise OSError(f"feedback lock path must be a regular file: {lock_path}")
+            raise OSError(
+                f"feedback lock path must be a regular file: {lock_path}"
+            )
         with os.fdopen(lock_fd, "a", encoding="utf-8") as lock_handle:
             lock_fd = -1
             deadline = time.monotonic() + LOCK_ACQUIRE_TIMEOUT_SECONDS
             while True:
                 try:
-                    fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    fcntl.flock(
+                        lock_handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB
+                    )
                     break
                 except BlockingIOError:
                     if time.monotonic() >= deadline:
@@ -268,7 +276,9 @@ def _exclusive_lock(lock_path: Path):
             os.close(lock_fd)
 
 
-def _read_tail_lines_bytes(log_path: Path, max_bytes: int = 64 * 1024) -> list[bytes]:
+def _read_tail_lines_bytes(
+    log_path: Path, max_bytes: int = 64 * 1024
+) -> list[bytes]:
     """Read trailing log lines using byte offsets for robust tail parsing.
 
     Args:
@@ -316,7 +326,9 @@ def _atomic_append_json_line(log_path: Path, payload_line: str) -> None:
     try:
         descriptor_stat = os.fstat(fd)
         if not stat.S_ISREG(descriptor_stat.st_mode):
-            raise OSError(f"feedback log append target must be a regular file: {log_path}")
+            raise OSError(
+                f"feedback log append target must be a regular file: {log_path}"
+            )
         os.write(fd, encoded_line)
         os.fsync(fd)
     finally:
@@ -543,9 +555,13 @@ def _fallback_log_feedback(
         with _exclusive_lock(lock_path):
             last_entry = _latest_entry_for_key(
                 _fallback_last_entries.get(key),
-                _load_last_log_entry_for_key(log_path, adw_id=key[0], agent_type=key[1]),
+                _load_last_log_entry_for_key(
+                    log_path, adw_id=key[0], agent_type=key[1]
+                ),
             )
-            if _is_rate_limited(last_entry, entry_obj, FALLBACK_RATE_LIMIT_WINDOW):
+            if _is_rate_limited(
+                last_entry, entry_obj, FALLBACK_RATE_LIMIT_WINDOW
+            ):
                 return FeedbackLogResult(False, FALLBACK_RATE_LIMIT_MESSAGE)
             _append_json_line(log_path, json.dumps(payload))
             _verify_appended_payload(log_path, json.dumps(payload))
@@ -607,7 +623,9 @@ def _load_feedback_backend() -> FeedbackBackend:
             categories=FALLBACK_FEEDBACK_CATEGORIES,
             severities=FALLBACK_FEEDBACK_SEVERITIES,
             entry_type=_FallbackFeedbackEntry,
-            log_feedback=lambda entry: _fallback_log_feedback(entry, log_dir=log_dir),
+            log_feedback=lambda entry: _fallback_log_feedback(
+                entry, log_dir=log_dir
+            ),
             source="fallback",
         )
 
@@ -631,18 +649,29 @@ def _build_parser() -> argparse.ArgumentParser:
     Returns:
         Configured ArgumentParser instance.
     """
-    parser = argparse.ArgumentParser(description="Log feedback for an ADW agent run.")
+    parser = argparse.ArgumentParser(
+        description="Log feedback for an ADW agent run."
+    )
     parser.add_argument("--command", choices=["write", "read"], default="write")
     parser.add_argument("--category", help="Feedback category")
     parser.add_argument("--severity", help="Feedback severity")
     parser.add_argument("--description", help="Issue description")
     parser.add_argument("--suggested-fix", default="", help="Suggested fix")
-    parser.add_argument("--tool-name", default="", help="Tool that triggered feedback")
-    parser.add_argument("--workflow-step", default="", help="Workflow step name")
+    parser.add_argument(
+        "--tool-name", default="", help="Tool that triggered feedback"
+    )
+    parser.add_argument(
+        "--workflow-step", default="", help="Workflow step name"
+    )
     parser.add_argument("--agent-type", default="", help="Agent type")
     parser.add_argument("--adw-id", default="", help="ADW workflow ID")
     parser.add_argument("--context", default="", help="Additional context")
-    parser.add_argument("--page", type=int, default=READ_DEFAULT_PAGE, help="Read mode page number")
+    parser.add_argument(
+        "--page",
+        type=int,
+        default=READ_DEFAULT_PAGE,
+        help="Read mode page number",
+    )
     parser.add_argument(
         "--page-size",
         type=int,
@@ -688,7 +717,13 @@ def _resolve_feedback_log_path() -> Path:
 
         return get_adforge_local_agents_dir() / "feedback" / "feedback.log"
     except Exception:
-        return _resolve_project_root() / "adforge_local" / "agents" / "feedback" / "feedback.log"
+        return (
+            _resolve_project_root()
+            / "adforge_local"
+            / "agents"
+            / "feedback"
+            / "feedback.log"
+        )
 
 
 def _normalize_and_validate_log_path(log_path: Path) -> Path:
@@ -717,14 +752,18 @@ def _normalize_and_validate_log_path(log_path: Path) -> Path:
     for part in parts:
         cursor = cursor / part
         if cursor.is_symlink():
-            raise OSError(f"feedback log path component must not be symlinked: {cursor}")
+            raise OSError(
+                f"feedback log path component must not be symlinked: {cursor}"
+            )
 
     candidate = candidate_raw.resolve()
 
     try:
         candidate.relative_to(root)
     except ValueError as exc:
-        raise OSError(f"feedback log path resolves outside repository root: {candidate}") from exc
+        raise OSError(
+            f"feedback log path resolves outside repository root: {candidate}"
+        ) from exc
 
     return candidate
 
@@ -745,7 +784,9 @@ def _validate_existing_log_file(log_path: Path) -> Path:
     if normalized.exists():
         path_stat = normalized.stat()
         if not stat.S_ISREG(path_stat.st_mode):
-            raise OSError(f"feedback log path must be a regular file: {normalized}")
+            raise OSError(
+                f"feedback log path must be a regular file: {normalized}"
+            )
     return normalized
 
 
@@ -762,14 +803,18 @@ def _rotate_feedback_logs(log_path: Path) -> None:
             validated = _validate_existing_log_file(rotated)
             candidates.append((int(suffix), validated))
 
-    for index, rotated in sorted(candidates, key=lambda item: item[0], reverse=True):
+    for index, rotated in sorted(
+        candidates, key=lambda item: item[0], reverse=True
+    ):
         os.replace(rotated, log_path.parent / f"{log_path.name}.{index + 1}")
 
     os.replace(log_path, log_path.parent / f"{log_path.name}.1")
     _prune_rotated_backups(log_path)
 
 
-def _prune_rotated_backups(log_path: Path, *, max_backups: int | None = None) -> None:
+def _prune_rotated_backups(
+    log_path: Path, *, max_backups: int | None = None
+) -> None:
     """Prune rotated backups beyond the configured retention count.
 
     Args:
@@ -812,7 +857,10 @@ def _append_json_line(log_path: Path, payload_line: str) -> None:
         )
 
     existing_size = normalized.stat().st_size if normalized.exists() else 0
-    if existing_size + new_line_size > FALLBACK_MAX_LOG_BYTES and normalized.exists():
+    if (
+        existing_size + new_line_size > FALLBACK_MAX_LOG_BYTES
+        and normalized.exists()
+    ):
         _rotate_feedback_logs(normalized)
 
     _atomic_append_json_line(normalized, payload_line)
@@ -853,7 +901,12 @@ def _iter_feedback_log_files(log_path: Path) -> list[Path]:
             validated = _validate_existing_log_file(rotated)
             candidates.append((int(suffix), validated))
 
-    ordered = [path for _idx, path in sorted(candidates, key=lambda item: item[0], reverse=True)]
+    ordered = [
+        path
+        for _idx, path in sorted(
+            candidates, key=lambda item: item[0], reverse=True
+        )
+    ]
     if base.exists():
         ordered.append(_validate_existing_log_file(base))
     else:
@@ -924,14 +977,19 @@ def _read_feedback_page(
     normalized_filter = severity_filter.lower() if severity_filter else None
 
     for entry in _iter_feedback_entries(log_path):
-        if normalized_filter and str(entry.get("severity", "")).lower() != normalized_filter:
+        if (
+            normalized_filter
+            and str(entry.get("severity", "")).lower() != normalized_filter
+        ):
             continue
 
         if start_offset <= total_entries < end_offset:
             page_entries.append(entry)
         total_entries += 1
 
-    total_pages = (total_entries + page_size - 1) // page_size if total_entries > 0 else 0
+    total_pages = (
+        (total_entries + page_size - 1) // page_size if total_entries > 0 else 0
+    )
     returned = len(page_entries)
     start_index = start_offset + 1 if returned > 0 else 0
     end_index = start_offset + returned if returned > 0 else 0
@@ -967,10 +1025,14 @@ def _build_read_response(
         Paginated response envelope for read-mode callers.
     """
     total_entries = len(entries)
-    total_pages = (total_entries + page_size - 1) // page_size if total_entries > 0 else 0
+    total_pages = (
+        (total_entries + page_size - 1) // page_size if total_entries > 0 else 0
+    )
     start_offset = (page - 1) * page_size
     page_entries = (
-        entries[start_offset : start_offset + page_size] if start_offset < total_entries else []
+        entries[start_offset : start_offset + page_size]
+        if start_offset < total_entries
+        else []
     )
     returned = len(page_entries)
 
@@ -1018,7 +1080,9 @@ def _print_read_error(exc: BaseException) -> int:
     return 2
 
 
-def _build_feedback_entry(backend: FeedbackBackend, args: argparse.Namespace) -> Any:
+def _build_feedback_entry(
+    backend: FeedbackBackend, args: argparse.Namespace
+) -> Any:
     """Build a backend feedback entry from normalized CLI arguments.
 
     Args:
@@ -1055,8 +1119,12 @@ def _build_feedback_entry(backend: FeedbackBackend, args: argparse.Namespace) ->
     if not adw_id:
         missing_args.append("adw_id")
     if missing_args:
-        missing_flags = ", ".join(f"--{item.replace('_', '-')}" for item in missing_args)
-        raise ValueError(f"Missing required arguments for write command: {missing_flags}")
+        missing_flags = ", ".join(
+            f"--{item.replace('_', '-')}" for item in missing_args
+        )
+        raise ValueError(
+            f"Missing required arguments for write command: {missing_flags}"
+        )
 
     if category not in backend.categories:
         raise ValueError(
@@ -1166,7 +1234,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     if result.success:
         truncated = _truncate_description(description)
-        print(f"Feedback logged, thank you. [{category}/{severity}] {truncated}")
+        print(
+            f"Feedback logged, thank you. [{category}/{severity}] {truncated}"
+        )
         return 0
 
     if result.message.startswith(RATE_LIMIT_PREFIX):

@@ -45,12 +45,18 @@ ASAN_ENV = "ASAN_OPTIONS"
 TSAN_ENV = "TSAN_OPTIONS"
 UBSAN_ENV = "UBSAN_OPTIONS"
 
-ASAN_HEADER_PATTERN = re.compile(r"AddressSanitizer:\s*(?P<type>[^\n]+)", re.IGNORECASE)
+ASAN_HEADER_PATTERN = re.compile(
+    r"AddressSanitizer:\s*(?P<type>[^\n]+)", re.IGNORECASE
+)
 ASAN_ACCESS_PATTERN = re.compile(r"\b(?:READ|WRITE)[^\n]*", re.IGNORECASE)
 STACK_FRAME_PATTERN = re.compile(r"#\d+\s+.*")
 LOCATION_PATTERN = re.compile(r"(?P<location>[^\s:]+:\d+(?::\d+)?)")
-TSAN_HEADER_PATTERN = re.compile(r"ThreadSanitizer:\s*(?P<type>[^\n]+)", re.IGNORECASE)
-TSAN_ACCESS_PATTERN = re.compile(r"\b(?:Read|Write) of size [^\n]+", re.IGNORECASE)
+TSAN_HEADER_PATTERN = re.compile(
+    r"ThreadSanitizer:\s*(?P<type>[^\n]+)", re.IGNORECASE
+)
+TSAN_ACCESS_PATTERN = re.compile(
+    r"\b(?:Read|Write) of size [^\n]+", re.IGNORECASE
+)
 TSAN_BLOCK_SEPARATOR = re.compile(r"^=+")
 UBSAN_PATTERN = re.compile(
     r"^(?P<location>.+?:\d+(?::\d+)?):\s*runtime error:\s*(?P<type>.+)$",
@@ -85,7 +91,6 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
         Tuple containing the bounded output, whether truncation occurred, and
         a human-readable truncation notice (empty string when untouched).
     """
-
     lines = output.splitlines()
     truncated = False
     notice_parts: List[str] = []
@@ -100,7 +105,9 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
         encoded = joined.encode("utf-8")[:OUTPUT_BYTE_LIMIT]
         joined = encoded.decode("utf-8", errors="ignore")
         truncated = True
-        notice_parts.append(f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB")
+        notice_parts.append(
+            f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB"
+        )
 
     notice = "; ".join(notice_parts) if truncated else ""
     if truncated:
@@ -117,7 +124,6 @@ def _extract_location(text: str) -> str:
     Returns:
         Location string when present, otherwise an empty string.
     """
-
     match = LOCATION_PATTERN.search(text)
     return match.group("location") if match else ""
 
@@ -132,7 +138,6 @@ def _load_suppressions(path: Optional[Path]) -> List[str]:
         List of non-empty, non-comment tokens. Missing files yield an empty
         list without raising.
     """
-
     if not path:
         return []
     tokens: List[str] = []
@@ -159,7 +164,6 @@ def _apply_suppressions(
     Returns:
         Tuple of filtered errors and the suppressed count.
     """
-
     if not suppressions:
         return errors, 0
 
@@ -183,7 +187,6 @@ def parse_asan_output(output: str) -> List[SanitizerError]:
     Returns:
         List of ``SanitizerError`` entries extracted from the output.
     """
-
     errors: List[SanitizerError] = []
     if "AddressSanitizer" not in output:
         return errors
@@ -247,7 +250,6 @@ def parse_tsan_output(output: str) -> List[SanitizerError]:
     Returns:
         List of SanitizerError entries extracted from the output.
     """
-
     errors: List[SanitizerError] = []
     if "ThreadSanitizer" not in output:
         return errors
@@ -307,7 +309,6 @@ def parse_ubsan_output(output: str) -> List[SanitizerError]:
     Returns:
         List of SanitizerError entries extracted from the output.
     """
-
     errors: List[SanitizerError] = []
     if "runtime error" not in output:
         return errors
@@ -342,7 +343,9 @@ def parse_ubsan_output(output: str) -> List[SanitizerError]:
     return errors
 
 
-def _select_parser(sanitizer: str) -> Optional[Callable[[str], List[SanitizerError]]]:
+def _select_parser(
+    sanitizer: str,
+) -> Optional[Callable[[str], List[SanitizerError]]]:
     """Return the parser implementation for a sanitizer type.
 
     Args:
@@ -351,7 +354,6 @@ def _select_parser(sanitizer: str) -> Optional[Callable[[str], List[SanitizerErr
     Returns:
         Parser function for the sanitizer type, or None if unsupported.
     """
-
     return {
         "asan": parse_asan_output,
         "tsan": parse_tsan_output,
@@ -390,7 +392,6 @@ def format_summary(
     Returns:
         Summary string limited to key details for CLI presentation.
     """
-
     lines: List[str] = []
     lines.append("=" * 60)
     lines.append(f"{sanitizer.upper()} SANITIZER SUMMARY")
@@ -490,7 +491,6 @@ def run_sanitizer(
     Returns:
         Tuple of (exit_code, rendered_output) following the selected mode.
     """
-
     parser = _select_parser(sanitizer)
     if parser is None:
         return 1, f"Unsupported sanitizer: {sanitizer}"
@@ -531,18 +531,24 @@ def run_sanitizer(
                     parts.append(str(part))
         combined_output = "".join(parts)
         if not combined_output:
-            combined_output = f"ERROR: Execution timed out after {timeout} seconds"
+            combined_output = (
+                f"ERROR: Execution timed out after {timeout} seconds"
+            )
         exit_code = 1
     except FileNotFoundError:
         combined_output = f"ERROR: Executable not found: {executable}"
         exit_code = 1
 
     duration = time.monotonic() - start
-    truncated_output, truncated, truncation_notice = _truncate_output(combined_output)
+    truncated_output, truncated, truncation_notice = _truncate_output(
+        combined_output
+    )
 
     parsed_errors = parser(truncated_output)
     suppressions_tokens = _load_suppressions(suppressions)
-    filtered_errors, suppressed_count = _apply_suppressions(parsed_errors, suppressions_tokens)
+    filtered_errors, suppressed_count = _apply_suppressions(
+        parsed_errors, suppressions_tokens
+    )
 
     error_cap = False
     if len(filtered_errors) > ERROR_LIMIT:
@@ -600,7 +606,6 @@ def run_sanitizer(
 
 def _parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     """Parse CLI arguments for the sanitizer runner."""
-
     parser = argparse.ArgumentParser(
         description="Run a sanitizer-enabled binary with ADW parsing and formatting",
         epilog=(
@@ -673,7 +678,6 @@ def _parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """CLI entrypoint for the sanitizer runner."""
-
     args = _parse_args(argv)
     passthrough = [arg for arg in (args.extra_args or []) if arg != "--"]
     exit_code, output = run_sanitizer(

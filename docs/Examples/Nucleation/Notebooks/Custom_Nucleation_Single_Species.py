@@ -42,6 +42,11 @@ import numpy as np
 
 # particula
 import particula as par
+from IPython import get_ipython
+
+ipython = get_ipython()
+if ipython is not None:
+    ipython.run_line_magic("matplotlib", "inline")
 
 # %% [markdown]
 # ## Aerosol Setup
@@ -405,7 +410,7 @@ print(aerosol)
 
 
 # Set up time and sub-steps for the coagulation process
-total_time = 200
+total_time = 5
 time_step = 1
 sub_steps = 2
 
@@ -573,7 +578,7 @@ ax.set_yscale("log")  # Log scale for particle radius on y-axis
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Particle radius (m)")
 fig.tight_layout()
-plt.show()
+plt.show(block=False)
 
 # %%
 # plot the total mass and water saturation on twin y-axis
@@ -590,7 +595,7 @@ ax2.set_ylabel("Saturation Ratio", color="red")
 ax2.tick_params(axis="y", labelcolor="red")
 
 fig.tight_layout()
-plt.show()
+plt.show(block=False)
 
 # %% [markdown]
 # ## Conclusion

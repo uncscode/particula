@@ -14,54 +14,78 @@ get_version_tool = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(get_version_tool)
 
 
-def test_resolve_target_path_prefers_pyproject_then_package_json(tmp_path: Path):
+def test_resolve_target_path_prefers_pyproject_then_package_json(
+    tmp_path: Path,
+):
     pyproject = tmp_path / "pyproject.toml"
     pyproject.write_text('[project]\nversion = "1.2.3"\n', encoding="utf-8")
-    (tmp_path / "package.json").write_text('{"version":"9.9.9"}\n', encoding="utf-8")
+    (tmp_path / "package.json").write_text(
+        '{"version":"9.9.9"}\n', encoding="utf-8"
+    )
 
-    assert get_version_tool.resolve_target_path(None, cwd=tmp_path) == pyproject.resolve()
+    assert (
+        get_version_tool.resolve_target_path(None, cwd=tmp_path)
+        == pyproject.resolve()
+    )
 
 
 def test_get_version_reads_dynamic_hatch_version_from_pyproject(tmp_path: Path):
     package_dir = tmp_path / "sample"
     package_dir.mkdir()
-    (package_dir / "__init__.py").write_text('__version__ = "2.3.4"\n', encoding="utf-8")
+    (package_dir / "__init__.py").write_text(
+        '__version__ = "2.3.4"\n', encoding="utf-8"
+    )
     pyproject = tmp_path / "pyproject.toml"
     pyproject.write_text(
         '[tool.hatch.version]\npath = "sample/__init__.py"\n\n[project]\ndynamic = ["version"]\n',
         encoding="utf-8",
     )
 
-    assert get_version_tool.get_version(pyproject, allowed_root=tmp_path) == "2.3.4"
+    assert (
+        get_version_tool.get_version(pyproject, allowed_root=tmp_path)
+        == "2.3.4"
+    )
 
 
 def test_get_version_reads_package_json_version(tmp_path: Path):
     package_json = tmp_path / "package.json"
     package_json.write_text(json.dumps({"version": "4.5.6"}), encoding="utf-8")
 
-    assert get_version_tool.get_version(package_json, allowed_root=tmp_path) == "4.5.6"
+    assert (
+        get_version_tool.get_version(package_json, allowed_root=tmp_path)
+        == "4.5.6"
+    )
 
 
 def test_get_version_reads_poetry_version_from_pyproject(tmp_path: Path):
     pyproject = tmp_path / "pyproject.toml"
     pyproject.write_text('[tool.poetry]\nversion = "6.7.8"\n', encoding="utf-8")
 
-    assert get_version_tool.get_version(pyproject, allowed_root=tmp_path) == "6.7.8"
+    assert (
+        get_version_tool.get_version(pyproject, allowed_root=tmp_path)
+        == "6.7.8"
+    )
 
 
-def test_resolve_target_path_rejects_explicit_path_outside_allowed_root(tmp_path: Path):
+def test_resolve_target_path_rejects_explicit_path_outside_allowed_root(
+    tmp_path: Path,
+):
     outside = tmp_path.parent / "outside-package.json"
     outside.write_text('{"version":"1.2.3"}\n', encoding="utf-8")
 
     try:
-        get_version_tool.resolve_target_path(str(Path("..") / outside.name), cwd=tmp_path)
+        get_version_tool.resolve_target_path(
+            str(Path("..") / outside.name), cwd=tmp_path
+        )
     except ValueError as exc:
         assert "outside allowed root" in str(exc)
     else:  # pragma: no cover
         raise AssertionError("Expected explicit outside-root path rejection")
 
 
-def test_get_version_rejects_dynamic_hatch_target_outside_allowed_root(tmp_path: Path):
+def test_get_version_rejects_dynamic_hatch_target_outside_allowed_root(
+    tmp_path: Path,
+):
     escaped = tmp_path.parent / "escaped_version.py"
     escaped.write_text('__version__ = "9.9.9"\n', encoding="utf-8")
     pyproject = tmp_path / "pyproject.toml"
@@ -137,7 +161,10 @@ def test_main_reports_runtime_error_to_stderr(tmp_path: Path):
 
     assert result.returncode == 1
     assert result.stdout == ""
-    assert f"File not found: {(tmp_path / missing_file).resolve()}" in result.stderr
+    assert (
+        f"File not found: {(tmp_path / missing_file).resolve()}"
+        in result.stderr
+    )
 
 
 def test_get_version_rejects_unsupported_file_type(tmp_path: Path):
@@ -152,7 +179,9 @@ def test_get_version_rejects_unsupported_file_type(tmp_path: Path):
         raise AssertionError("Expected unsupported file type failure")
 
 
-def test_resolve_target_path_raises_when_no_supported_files_exist(tmp_path: Path):
+def test_resolve_target_path_raises_when_no_supported_files_exist(
+    tmp_path: Path,
+):
     try:
         get_version_tool.resolve_target_path(None, cwd=tmp_path)
     except FileNotFoundError as exc:

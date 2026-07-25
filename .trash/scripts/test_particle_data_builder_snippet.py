@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import numpy as np
-
 from particula.particles.particle_data_builder import ParticleDataBuilder
 
 

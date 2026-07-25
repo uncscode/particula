@@ -71,7 +71,9 @@ DURATIONS_HEADER_PATTERN = re.compile(
 )
 FAILURES_HEADER_PATTERN = re.compile(r"^=+\s*FAILURES\s*=+\s*$", re.IGNORECASE)
 
-COVERAGE_ADDOPT_PATTERN = re.compile(r"^(--cov(?:=|\b)|--cov-report=|--cov-fail-under=)")
+COVERAGE_ADDOPT_PATTERN = re.compile(
+    r"^(--cov(?:=|\b)|--cov-report=|--cov-fail-under=)"
+)
 COVERAGE_PYTEST_ARG_PATTERN = re.compile(
     r"^(--cov(?:=|\b)|--cov-report(?:=|\b)|--cov-fail-under(?:=|\b)|"
     r"--cov-config(?:=|\b)|--cov-context(?:=|\b))"
@@ -91,7 +93,6 @@ UNUSABLE_COVERAGE_FRAGMENTS = (
 
 def _candidate_tool_dirs(cwd: Optional[str]) -> List[Path]:
     """Return likely executable directories that may be absent from tool PATH."""
-
     dirs: List[Path] = []
     if cwd:
         current = Path(cwd).resolve(strict=False)
@@ -105,9 +106,10 @@ def _candidate_tool_dirs(cwd: Optional[str]) -> List[Path]:
     return dirs
 
 
-def _resolve_python_tool_command(tool_name: str, module_name: str, cwd: Optional[str]) -> List[str]:
+def _resolve_python_tool_command(
+    tool_name: str, module_name: str, cwd: Optional[str]
+) -> List[str]:
     """Resolve a Python CLI robustly for non-login tool subprocess environments."""
-
     resolved = shutil.which(tool_name)
     if resolved:
         return [resolved]
@@ -164,7 +166,6 @@ class PytestSubprocessResult:
 
 def _format_timeout_number(value: float) -> str:
     """Format timeout-related numeric values deterministically."""
-
     if float(value).is_integer():
         return str(int(value))
     return f"{value:.3f}".rstrip("0").rstrip(".")
@@ -183,7 +184,6 @@ def _validate_timeout_seconds(timeout: object) -> float:
         PytestTimeoutValidationError: The timeout is not numeric, is not finite,
             is non-positive, or exceeds the shared 3600-second cap.
     """
-
     if isinstance(timeout, bool) or not isinstance(timeout, (int, float)):
         raise PytestTimeoutValidationError(
             "timeout must be a positive finite number in seconds and must not exceed "
@@ -212,7 +212,6 @@ def _format_timeout_error(details: PytestTimeoutDetails) -> str:
         Wrapper-safe ``ERROR:`` string with stable timeout, process, and command
         fields for downstream tooling and regression tests.
     """
-
     return (
         "ERROR: pytest timed out; "
         f"timeout_seconds={_format_timeout_number(details.timeout_seconds)}; "
@@ -227,14 +226,12 @@ def _format_timeout_error(details: PytestTimeoutDetails) -> str:
 
 def _redact_timeout_cwd(cwd: str) -> str:
     """Return a stable, non-absolute cwd token for timeout diagnostics."""
-
     cwd_name = Path(cwd).name
     return cwd_name or "."
 
 
 def _redact_timeout_command(command: List[str]) -> str:
     """Return a stable, argument-redacted command summary."""
-
     if not command:
         return "<unknown>"
     executable = Path(command[0]).name or command[0]
@@ -246,7 +243,6 @@ def _redact_timeout_command(command: List[str]) -> str:
 
 def _process_group_exists(process_group_id: int) -> bool:
     """Return whether the process group still exists."""
-
     try:
         os.killpg(process_group_id, 0)
     except ProcessLookupError:
@@ -256,7 +252,9 @@ def _process_group_exists(process_group_id: int) -> bool:
     return True
 
 
-def _terminate_process_group(process: subprocess.Popen[str], process_group_id: int) -> bool:
+def _terminate_process_group(
+    process: subprocess.Popen[str], process_group_id: int
+) -> bool:
     """Terminate a timed-out pytest process group.
 
     Sends ``SIGTERM`` to the full process group first, waits briefly for a
@@ -271,7 +269,6 @@ def _terminate_process_group(process: subprocess.Popen[str], process_group_id: i
         ``True`` when cleanup required ``SIGKILL`` escalation, otherwise
         ``False``.
     """
-
     sigkill_escalated = False
     try:
         os.killpg(process_group_id, signal.SIGTERM)
@@ -302,7 +299,11 @@ def _terminate_process_group(process: subprocess.Popen[str], process_group_id: i
 
 def _filter_non_coverage_addopts(addopts: str) -> List[str]:
     """Return non-coverage addopts from a PYTEST_ADDOPTS string."""
-    return [arg for arg in addopts.split() if arg and not COVERAGE_ADDOPT_PATTERN.match(arg)]
+    return [
+        arg
+        for arg in addopts.split()
+        if arg and not COVERAGE_ADDOPT_PATTERN.match(arg)
+    ]
 
 
 def _normalize_coverage_source(coverage_source: Optional[object]) -> List[str]:
@@ -363,7 +364,6 @@ def _normalize_coverage_source(coverage_source: Optional[object]) -> List[str]:
 
 def _resolve_repo_root_for_coverage(cwd: Optional[str]) -> Path:
     """Resolve the trusted repository/worktree root used for coverage paths."""
-
     if cwd:
         return Path(cwd).resolve()
 
@@ -377,7 +377,6 @@ def _resolve_repo_root_for_coverage(cwd: Optional[str]) -> Path:
 
 def _validate_coverage_source_scope(source: str, repo_root: Path) -> None:
     """Reject path-like coverage sources that resolve outside the repo/worktree."""
-
     if (
         "/" not in source
         and "\\" not in source
@@ -397,11 +396,12 @@ def _validate_coverage_source_scope(source: str, repo_root: Path) -> None:
 
 def _contains_coverage_pytest_args(args: List[str]) -> bool:
     """Return True when passthrough pytest args request coverage behavior."""
-
     return any(COVERAGE_PYTEST_ARG_PATTERN.match(arg) for arg in args)
 
 
-def _coverage_source_to_rcfile(sources: List[str], cwd: Optional[str] = None) -> Optional[str]:
+def _coverage_source_to_rcfile(
+    sources: List[str], cwd: Optional[str] = None
+) -> Optional[str]:
     """Create a temporary coveragerc file for explicit coverage sources.
 
     Args:
@@ -414,7 +414,6 @@ def _coverage_source_to_rcfile(sources: List[str], cwd: Optional[str] = None) ->
         Absolute path to the generated temporary coveragerc file when sources
         are provided, otherwise ``None``.
     """
-
     if not sources:
         return None
     resolved_sources: List[str] = []
@@ -425,7 +424,9 @@ def _coverage_source_to_rcfile(sources: List[str], cwd: Optional[str] = None) ->
             resolved_sources.append(str((base_dir / path).resolve()))
         else:
             resolved_sources.append(source)
-    temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".coveragerc")
+    temp_file = tempfile.NamedTemporaryFile(
+        mode="w", delete=False, suffix=".coveragerc"
+    )
     temp_file.write("[run]\n")
     temp_file.write("source =\n")
     for source in resolved_sources:
@@ -444,7 +445,6 @@ def _load_pyproject_addopts(root_dir: Path) -> List[str]:
         List of addopts parsed from the configuration file. Returns an empty
         list when the file is missing, unreadable, or does not define addopts.
     """
-
     pyproject_path = root_dir / "pyproject.toml"
     if not pyproject_path.exists():
         return []
@@ -452,7 +452,12 @@ def _load_pyproject_addopts(root_dir: Path) -> List[str]:
         data = tomllib.loads(pyproject_path.read_text())
     except tomllib.TOMLDecodeError:
         return []
-    addopts = data.get("tool", {}).get("pytest", {}).get("ini_options", {}).get("addopts", "")
+    addopts = (
+        data.get("tool", {})
+        .get("pytest", {})
+        .get("ini_options", {})
+        .get("addopts", "")
+    )
     if not isinstance(addopts, str) or not addopts:
         return []
     try:
@@ -462,7 +467,10 @@ def _load_pyproject_addopts(root_dir: Path) -> List[str]:
 
 
 def _should_apply_coverage_threshold(
-    *, coverage_threshold: Optional[int], cov_args: List[str], pytest_args: List[str]
+    *,
+    coverage_threshold: Optional[int],
+    cov_args: List[str],
+    pytest_args: List[str],
 ) -> bool:
     """Determine if coverage threshold enforcement should run.
 
@@ -476,7 +484,6 @@ def _should_apply_coverage_threshold(
         True when validation should enforce the coverage threshold, False
         otherwise.
     """
-
     if coverage_threshold is None:
         return False
     for arg in cov_args + pytest_args:
@@ -488,7 +495,6 @@ def _should_apply_coverage_threshold(
 
 def _coverage_request_has_file_target(sources: List[str]) -> bool:
     """Return True when coverage sources include a repo-relative file target."""
-
     return any(Path(source).suffix == ".py" for source in sources)
 
 
@@ -502,7 +508,6 @@ def _detect_unusable_coverage_diagnostics(output: str) -> Optional[str]:
         A reviewer-actionable validation message when pytest-cov reports known
         unusable coverage diagnostics, otherwise ``None``.
     """
-
     lowered_output = output.lower()
     for fragment in UNUSABLE_COVERAGE_FRAGMENTS:
         if fragment in lowered_output:
@@ -532,7 +537,11 @@ def _extract_section(
         List of lines including the header. Returns an empty list if the header is not found.
     """
     start_index = next(
-        (index for index, line in enumerate(lines) if header_pattern.match(line)),
+        (
+            index
+            for index, line in enumerate(lines)
+            if header_pattern.match(line)
+        ),
         None,
     )
     if start_index is None:
@@ -544,7 +553,9 @@ def _extract_section(
         if index != start_index:
             if stop_on_blank and not line.strip():
                 break
-            if SECTION_HEADER_PATTERN.match(line) and not header_pattern.match(line):
+            if SECTION_HEADER_PATTERN.match(line) and not header_pattern.match(
+                line
+            ):
                 break
         collected.append(line)
         if max_lines is not None and len(collected) >= max_lines:
@@ -658,14 +669,18 @@ def parse_pytest_output(output: str) -> Dict:
             return int(value)
         return 0
 
-    coverage_file_pattern = re.compile(r"^(\S+)\s+(\d+)\s+(\d+)\s+(\d+)%\s*(?:\|\s*)?(.+)?$")
+    coverage_file_pattern = re.compile(
+        r"^(\S+)\s+(\d+)\s+(\d+)\s+(\d+)%\s*(?:\|\s*)?(.+)?$"
+    )
     for line in output.splitlines():
         stripped = line.strip()
         if not stripped or stripped.startswith("-"):
             continue
         if stripped.startswith("Name") or stripped.startswith("Stmts"):
             continue
-        if stripped.startswith("TOTAL") or COVERAGE_HEADER_PATTERN.match(stripped):
+        if stripped.startswith("TOTAL") or COVERAGE_HEADER_PATTERN.match(
+            stripped
+        ):
             continue
         match = coverage_file_pattern.match(stripped)
         if match:
@@ -683,19 +698,25 @@ def parse_pytest_output(output: str) -> Dict:
         coverage_files_sorted = sorted(coverage_files, key=_coverage_sort_key)
         if len(coverage_files_sorted) > MAX_COVERAGE_FILES:
             result["coverage_files_total"] = len(coverage_files_sorted)
-            result["coverage_files_truncated"] = len(coverage_files_sorted) - MAX_COVERAGE_FILES
+            result["coverage_files_truncated"] = (
+                len(coverage_files_sorted) - MAX_COVERAGE_FILES
+            )
             coverage_files_sorted = coverage_files_sorted[:MAX_COVERAGE_FILES]
         result["coverage_files"] = coverage_files_sorted
 
     lines = output.splitlines()
-    durations_section = _extract_section(lines, DURATIONS_HEADER_PATTERN, stop_on_blank=True)
+    durations_section = _extract_section(
+        lines, DURATIONS_HEADER_PATTERN, stop_on_blank=True
+    )
     if durations_section:
         entry_pattern = re.compile(r"^([\d.]+)s\s+(\w+)\s+(.+)$")
         durations_entries: List[Dict[str, object]] = []
         for line in durations_section[1:]:
             stripped = line.strip()
             if not stripped or (
-                stripped.startswith("(") and "hidden" in stripped and "durations" in stripped
+                stripped.startswith("(")
+                and "hidden" in stripped
+                and "durations" in stripped
             ):
                 continue
             match = entry_pattern.match(stripped)
@@ -713,7 +734,9 @@ def parse_pytest_output(output: str) -> Dict:
 
 
 def format_summary(
-    metrics: Dict, validation_errors: List[str], coverage_threshold: Optional[int] = None
+    metrics: Dict,
+    validation_errors: List[str],
+    coverage_threshold: Optional[int] = None,
 ) -> str:
     """Format a human-readable summary of test results.
 
@@ -775,17 +798,27 @@ def format_summary(
         lines.append("\nCoverage by File:")
         threshold = coverage_threshold
         if threshold is not None:
-            below = [entry for entry in coverage_files if coverage_entry_pct(entry) < threshold]
-            remaining = [entry for entry in coverage_files if entry not in below]
+            below = [
+                entry
+                for entry in coverage_files
+                if coverage_entry_pct(entry) < threshold
+            ]
+            remaining = [
+                entry for entry in coverage_files if entry not in below
+            ]
             remaining_sorted = sorted(remaining, key=coverage_entry_pct)
             ordered = below + remaining_sorted
         else:
             ordered = sorted(coverage_files, key=coverage_entry_pct)
         for entry in ordered[:15]:
             missing_lines = entry.get("missing_lines") or ""
-            missing_info = f" (missing: {missing_lines})" if missing_lines else ""
+            missing_info = (
+                f" (missing: {missing_lines})" if missing_lines else ""
+            )
             coverage_pct = coverage_entry_pct(entry)
-            lines.append(f"  {entry.get('file', '')} — {coverage_pct}%{missing_info}")
+            lines.append(
+                f"  {entry.get('file', '')} — {coverage_pct}%{missing_info}"
+            )
         if len(ordered) > 15:
             lines.append(f"  ... and {len(ordered) - 15} more files")
 
@@ -901,7 +934,6 @@ def _resolve_normalized_sources(
         Normalized list of coverage sources that preserves module names,
         repo-relative directories, and repo-relative file targets.
     """
-
     normalized_sources = _normalize_coverage_source(coverage_source)
     repo_root = _resolve_repo_root_for_coverage(cwd)
     for source in normalized_sources:
@@ -911,7 +943,6 @@ def _resolve_normalized_sources(
 
 def _recover_stale_coverage_lock(lock_path: Path) -> bool:
     """Recover a stale same-worktree coverage lock when safe to do so."""
-
     try:
         contents = lock_path.read_text(encoding="utf-8").strip()
     except OSError as exc:
@@ -959,7 +990,6 @@ def _get_coverage_lock_path(cwd: str) -> Path:
     Returns:
         Absolute path to the deterministic lock file under ``adforge_local/state``.
     """
-
     worktree_root = Path(cwd).resolve()
     runtime_state_dir = worktree_root / "adforge_local" / "state"
     runtime_state_dir.mkdir(parents=True, exist_ok=True)
@@ -980,7 +1010,6 @@ def _acquire_coverage_lock(cwd: str) -> str:
         CoverageLockError: Another coverage-enabled pytest run is already active
             in the same worktree.
     """
-
     lock_path = _get_coverage_lock_path(cwd)
     for _ in range(2):
         try:
@@ -1004,7 +1033,11 @@ def _acquire_coverage_lock(cwd: str) -> str:
 
 
 def _run_pytest_subprocess(
-    cmd: List[str], *, cwd: str, requested_cwd: Optional[str], timeout: float | int
+    cmd: List[str],
+    *,
+    cwd: str,
+    requested_cwd: Optional[str],
+    timeout: float | int,
 ) -> PytestSubprocessResult:
     """Execute pytest with worktree-aware PYTHONPATH and timeout cleanup.
 
@@ -1028,7 +1061,6 @@ def _run_pytest_subprocess(
         PytestTimedOutError: Pytest exceeded ``timeout`` and the process group
             was terminated.
     """
-
     env = os.environ.copy()
     if requested_cwd:
         existing_pythonpath = env.get("PYTHONPATH") or ""
@@ -1088,7 +1120,6 @@ def _build_pytest_command(
     override_ini: Optional[List[str]],
 ) -> tuple[List[str], List[str], List[str], str]:
     """Build the pytest command and related derived coverage/ini state."""
-
     cmd = ["pytest", "-v", "--tb=short"]
 
     if fail_fast:
@@ -1100,12 +1131,16 @@ def _build_pytest_command(
             cmd.append(f"--durations-min={durations_min}")
 
     effective_override_ini = list(override_ini or [])
-    if not any(entry.startswith("addopts=") for entry in effective_override_ini):
+    if not any(
+        entry.startswith("addopts=") for entry in effective_override_ini
+    ):
         if not coverage or normalized_sources:
             effective_override_ini.append("addopts=")
 
     if effective_override_ini:
-        cmd.extend([f"--override-ini={entry}" for entry in effective_override_ini])
+        cmd.extend(
+            [f"--override-ini={entry}" for entry in effective_override_ini]
+        )
 
     cov_args: List[str] = []
     effective_cov_report = cov_report
@@ -1118,7 +1153,11 @@ def _build_pytest_command(
             else:
                 cov_args.append("--cov-config=/dev/null")
             cov_args.append("--cov-context=test")
-            cov_args.extend(_filter_non_coverage_addopts(os.environ.get("PYTEST_ADDOPTS", "")))
+            cov_args.extend(
+                _filter_non_coverage_addopts(
+                    os.environ.get("PYTEST_ADDOPTS", "")
+                )
+            )
             if effective_cov_report.strip() == "term-missing":
                 cov_args.append("--cov-report=term-missing")
                 effective_cov_report = ""
@@ -1205,7 +1244,9 @@ def run_pytest(
         # Try to find project root
         current = Path.cwd()
         while current != current.parent:
-            if (current / "pyproject.toml").exists() or (current / ".git").exists():
+            if (current / "pyproject.toml").exists() or (
+                current / ".git"
+            ).exists():
                 cwd = str(current)
                 break
             current = current.parent
@@ -1218,8 +1259,14 @@ def run_pytest(
     try:
         _validate_timeout_seconds(timeout)
         normalized_sources = _resolve_normalized_sources(cwd, coverage_source)
-        file_scoped_coverage = _coverage_request_has_file_target(normalized_sources)
-        coverage_rcfile = _coverage_source_to_rcfile(normalized_sources, cwd) if coverage else None
+        file_scoped_coverage = _coverage_request_has_file_target(
+            normalized_sources
+        )
+        coverage_rcfile = (
+            _coverage_source_to_rcfile(normalized_sources, cwd)
+            if coverage
+            else None
+        )
 
         if not coverage and _contains_coverage_pytest_args(args):
             raise CoverageSourceValidationError(
@@ -1275,7 +1322,9 @@ def run_pytest(
                 f"{result.returncode}; inspect failed tests and stderr output"
             )
         if coverage:
-            unusable_coverage_error = _detect_unusable_coverage_diagnostics(full_output)
+            unusable_coverage_error = _detect_unusable_coverage_diagnostics(
+                full_output
+            )
             if unusable_coverage_error:
                 validation_errors.append(unusable_coverage_error)
             elif metrics["coverage_pct"] is None:
@@ -1292,7 +1341,9 @@ def run_pytest(
 
         # Format output based on mode
         if output_mode == "summary":
-            output = format_summary(metrics, validation_errors, coverage_threshold)
+            output = format_summary(
+                metrics, validation_errors, coverage_threshold
+            )
         elif output_mode == "json":
             output = json.dumps(
                 {
@@ -1306,7 +1357,9 @@ def run_pytest(
             )
         else:  # full
             # Include summary at the end of full output
-            summary = format_summary(metrics, validation_errors, coverage_threshold)
+            summary = format_summary(
+                metrics, validation_errors, coverage_threshold
+            )
             output = f"{full_output}\n\n{summary}"
 
             # Fall back to smart truncation if full output is too long (>500 lines)
@@ -1315,13 +1368,22 @@ def run_pytest(
             if line_count > max_lines:
                 lines = full_output.splitlines()
                 failures_section = _extract_section(
-                    lines, FAILURES_HEADER_PATTERN, stop_on_blank=False, max_lines=200
+                    lines,
+                    FAILURES_HEADER_PATTERN,
+                    stop_on_blank=False,
+                    max_lines=200,
                 )
                 durations_section = _extract_section(
-                    lines, DURATIONS_HEADER_PATTERN, stop_on_blank=True, max_lines=200
+                    lines,
+                    DURATIONS_HEADER_PATTERN,
+                    stop_on_blank=True,
+                    max_lines=200,
                 )
                 coverage_section = _extract_section(
-                    lines, COVERAGE_HEADER_PATTERN, stop_on_blank=True, max_lines=200
+                    lines,
+                    COVERAGE_HEADER_PATTERN,
+                    stop_on_blank=True,
+                    max_lines=200,
                 )
                 truncated_lines = [
                     f"[Output truncated: {line_count} lines exceeded {max_lines} line limit. "
