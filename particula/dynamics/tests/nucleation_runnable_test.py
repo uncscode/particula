@@ -36,6 +36,9 @@ from particula.particles.surface_strategies import SurfaceStrategyVolume
 from particula.runnable import RunnableABC
 from particula.util.constants import AVOGADRO_NUMBER
 
+CONSERVATION_RTOL = 1e-12
+CONSERVATION_ATOL = 1e-30
+
 
 def _source_config(coefficient: float = 1.0e-2) -> NucleationSourceConfig:
     """Build a source configuration spanning the deterministic fixture."""
@@ -65,12 +68,14 @@ def _commit_config() -> NucleationCommitConfig:
     )
 
 
-def _aerosol() -> tuple[Aerosol, ParticleData, GasData, GasData]:
+def _aerosol(
+    capacity: int = 3,
+) -> tuple[Aerosol, ParticleData, GasData, GasData]:
     """Build facades over deterministic writable backing containers."""
     particles = ParticleData(
-        masses=np.zeros((1, 3, 1), dtype=np.float64),
-        concentration=np.zeros((1, 3), dtype=np.float64),
-        charge=np.zeros((1, 3), dtype=np.float64),
+        masses=np.zeros((1, capacity, 1), dtype=np.float64),
+        concentration=np.zeros((1, capacity), dtype=np.float64),
+        charge=np.zeros((1, capacity), dtype=np.float64),
         density=np.array([1000.0], dtype=np.float64),
         volume=np.array([1.0], dtype=np.float64),
     )
@@ -91,7 +96,7 @@ def _aerosol() -> tuple[Aerosol, ParticleData, GasData, GasData]:
         strategy=MassBasedMovingBin(),
         activity=ActivityIdealMass(),
         surface=SurfaceStrategyVolume(),
-        distribution=np.zeros(3, dtype=np.float64),
+        distribution=np.zeros(capacity, dtype=np.float64),
     )
     atmosphere = Atmosphere(
         temperature=298.15,
@@ -640,12 +645,24 @@ def test_real_substeps_read_current_gas_and_match_independent_transfer_math(
         expected_gas -= admitted * per_event_mass
 
     assert runnable.execute(aerosol, 1.0, sub_steps=2) is aerosol
-    npt.assert_allclose(observed_gas[0], initial_gas)
+    npt.assert_allclose(
+        observed_gas[0],
+        initial_gas,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
     assert observed_gas[1] < observed_gas[0]
-    npt.assert_allclose(gas.concentration, [[expected_gas]])
+    npt.assert_allclose(
+        gas.concentration,
+        [[expected_gas]],
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
     npt.assert_allclose(
         np.einsum("bn,bns->bs", particles.concentration, particles.masses),
         [[initial_gas - expected_gas]],
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
     )
     assert aerosol.particles.data is particles
     assert aerosol.atmosphere.partitioning_species.data is gas
@@ -730,6 +747,56 @@ def test_later_commit_failure_preserves_prior_substep(
         runnable.execute(aerosol, 2.0, sub_steps=2)
     assert commits == 2
     npt.assert_array_equal(gas.concentration, [[0.5e-12]])
+
+
+def test_real_later_commit_failure_preserves_prior_substep() -> None:
+    """A real failed P3 commit preserves the prior runnable substep state."""
+    expected_aerosol, expected_particles, expected_gas, _ = _aerosol(capacity=1)
+    runnable = _runnable()
+    assert runnable.execute(expected_aerosol, 0.5) is expected_aerosol
+    expected_masses = expected_particles.masses.copy()
+    expected_concentration = expected_particles.concentration.copy()
+    expected_charge = expected_particles.charge.copy()
+    expected_volume = expected_particles.volume.copy()
+    expected_gas_concentration = expected_gas.concentration.copy()
+
+    aerosol, particles, gas, _ = _aerosol(capacity=1)
+    with pytest.raises(
+        ValueError,
+        match="exhaustion policy cannot represent requested capacity",
+    ):
+        runnable.execute(aerosol, 1.0, sub_steps=2)
+
+    npt.assert_allclose(
+        particles.masses,
+        expected_masses,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
+    npt.assert_allclose(
+        particles.concentration,
+        expected_concentration,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
+    npt.assert_allclose(
+        particles.charge,
+        expected_charge,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
+    npt.assert_allclose(
+        particles.volume,
+        expected_volume,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
+    npt.assert_allclose(
+        gas.concentration,
+        expected_gas_concentration,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
 
 
 def test_runnable_sequence_preserves_process_order(

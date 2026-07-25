@@ -1437,11 +1437,36 @@ def test_finalization_matches_independent_oracle_for_every_limiting_lane(
     per_event_expected, potential, admitted, limited, limiting, removal = (
         expected
     )
-    npt.assert_allclose(demand.per_event_mass, per_event_expected)
-    npt.assert_allclose(demand.gas_mass_removed, removal)
-    npt.assert_allclose(diagnostics.potential_event_count, potential)
-    npt.assert_allclose(diagnostics.gas_admitted_event_count, admitted)
-    npt.assert_allclose(diagnostics.gas_limited_event_count, limited)
+    npt.assert_allclose(
+        demand.per_event_mass,
+        per_event_expected,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
+    npt.assert_allclose(
+        demand.gas_mass_removed,
+        removal,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
+    npt.assert_allclose(
+        diagnostics.potential_event_count,
+        potential,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
+    npt.assert_allclose(
+        diagnostics.gas_admitted_event_count,
+        admitted,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
+    npt.assert_allclose(
+        diagnostics.gas_limited_event_count,
+        limited,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
     npt.assert_array_equal(diagnostics.limiting_species_index, limiting)
 
 
@@ -1497,7 +1522,12 @@ def test_commit_multibox_oracle_proves_per_species_source_transfer() -> None:
         demand, diagnostics, particles, gas, _commit_config(boxes=2)
     )
 
-    npt.assert_allclose(result.gas_mass_removed, expected[-1])
+    npt.assert_allclose(
+        result.gas_mass_removed,
+        expected[-1],
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
     npt.assert_array_equal(result.limiting_species_index, expected[4])
     particle_gain = _inventory(particles) - particle_before
     gas_removal = gas_before - gas.concentration
