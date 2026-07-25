@@ -6,8 +6,9 @@ primitives. The concrete CPU-only P3
 transaction is a shipped consumer that composes slot discovery, policy
 resolution, and activation, but is not package-exported or a public API.
 E6-F5 owns the authoritative discovery, free-index classification, and
-activation boundary. High-level/public nucleation loops, scheduler integration,
-and broader policy orchestration remain deferred.
+activation boundary. The shipped public, CPU-only one-box
+`particula.dynamics.Nucleation` runnable consumes these primitives; scheduler
+integration and broader policy orchestration remain deferred.
 
 For the supported one-box CPU consumer and its public construction boundary,
 see the [CPU Nucleation Strategy System](nucleation_strategy_system.md).

@@ -652,11 +652,6 @@ def test_finalization_recomputes_demand_after_final_ulp_correction(
             lambda gas: None,
             "molecule_counts must be representable",
         ),
-        (
-            InjectionComposition((2**53, 0, 0)),
-            lambda gas: gas.molar_mass.__setitem__(0, np.finfo(float).max),
-            "per_event_mass must be finite",
-        ),
     ],
 )
 def test_finalization_rejects_unrepresentable_composition_without_writing(
@@ -674,6 +669,32 @@ def test_finalization_rejects_unrepresentable_composition_without_writing(
             PotentialEventData(np.array([1.0]), 1.0), composition, gas
         )
     npt.assert_array_equal(gas.concentration, concentration)
+
+
+def test_finalization_avoids_intermediate_per_event_mass_overflow() -> None:
+    """A finite scaled per-event mass is accepted despite a large numerator."""
+    gas = _gas(np.array([[np.finfo(float).max, 1.0, 1.0]]))
+
+    demand, _ = finalize_particle_source(
+        PotentialEventData(np.array([1.0]), 1.0),
+        InjectionComposition((2**53, 0, 0)),
+        gas,
+    )
+
+    assert np.isfinite(demand.per_event_mass[0])
+
+
+def test_finalization_accepts_positive_infinite_inventory_ratio() -> None:
+    """Nonlimiting overflowing inventory ratios do not reject P2 planning."""
+    gas = _gas(np.array([[np.finfo(float).max, 1.0, 1.0]]))
+
+    _, diagnostics = finalize_particle_source(
+        PotentialEventData(np.array([1.0]), 1.0),
+        InjectionComposition((1, 0, 0)),
+        gas,
+    )
+
+    npt.assert_array_equal(diagnostics.gas_admitted_event_count, [1.0])
 
 
 def test_concrete_p2_names_are_not_package_exports() -> None:
@@ -1215,6 +1236,34 @@ def test_commit_scaling_reduces_oversized_provisional_request() -> None:
     npt.assert_array_equal(result.requested_slot_count, [3])
 
 
+def test_commit_scaling_reduces_int32_oversized_provisional_request() -> None:
+    """Scaling resolves a provisional request above the int32 count range."""
+    particles = _source_particles(capacity=3)
+    gas = GasData(
+        name=["a"],
+        molar_mass=np.array([0.1]),
+        concentration=np.array([[1.0e20]]),
+        partitioning=np.array([True]),
+    )
+    events = np.array([2.0 * np.iinfo(np.int32).max])
+    demand, diagnostics = _p2_records(events)
+    config = ParticleSourceCommitConfig(
+        maximum_slot_weight=1.0,
+        source_charge=1.0,
+        exhaustion_controls=ExhaustionControls(False, True),
+        requested_scale=np.array([1.0e-10]),
+        minimum_scale=np.array([1.0e-10]),
+        minimum_volume=np.array([1.0e-12]),
+    )
+
+    result = commit_particle_source(demand, diagnostics, particles, gas, config)
+
+    npt.assert_array_equal(
+        result.exhaustion_policy_code, [POLICY_SCALE_DEFERRED]
+    )
+    npt.assert_array_equal(result.requested_slot_count, [1])
+
+
 def test_commit_scaling_cannot_activate_a_full_store_atomically() -> None:
     """Scaling source demand does not create a free slot in a full store."""
     particles = _source_particles(capacity=3)
@@ -1404,6 +1453,30 @@ def test_commit_rejects_overlapping_mutable_storage_atomically(
         particles.concentration, particle_snapshot.concentration
     )
     npt.assert_array_equal(gas.concentration, gas_snapshot)
+
+
+@pytest.mark.parametrize("metadata", ["molar_mass", "partitioning"])
+def test_commit_rejects_gas_metadata_aliasing_atomically(metadata: str) -> None:
+    """Gas concentration cannot overlap immutable gas metadata storage."""
+    particles = _source_particles()
+    shared = np.array([5.0], dtype=np.float64)
+    gas = GasData(
+        name=["a"],
+        molar_mass=shared,
+        concentration=shared.reshape(1, 1),
+        partitioning=np.array([True]),
+    )
+    if metadata == "partitioning":
+        gas.partitioning = gas.concentration.view(np.bool_).reshape(-1)[:1]
+    demand, diagnostics = _p2_records(np.array([1.0]))
+    snapshots = _snapshot_arrays(*_all_mutable_arrays(particles, gas))
+
+    with pytest.raises(ValueError, match="gas metadata"):
+        commit_particle_source(
+            demand, diagnostics, particles, gas, _commit_config()
+        )
+
+    _assert_snapshot(_all_mutable_arrays(particles, gas), snapshots)
 
 
 @pytest.mark.parametrize("limiting_lane", [0, 1, 2])

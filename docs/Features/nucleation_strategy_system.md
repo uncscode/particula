@@ -106,7 +106,7 @@ represent the requested demand, the attempt raises rather than silently
 discarding it. Selected scaling scales pre-existing particle and gas state
 before source removal. Therefore an unscaled run conserves against its direct
 pre-step particle-plus-gas total, while a scaled row conserves against the
-selected scale times that pre-step total plus its finalized source.
+selected scale times that pre-step total.
 
 ## Scope, dependencies, and example
 

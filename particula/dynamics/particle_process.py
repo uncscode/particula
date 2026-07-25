@@ -30,6 +30,9 @@ from particula.dynamics.nucleation.particle_source import (
     PotentialEventData as _PotentialEventData,
 )
 from particula.dynamics.nucleation.particle_source import (
+    SourceDiagnostics as _SourceDiagnostics,
+)
+from particula.dynamics.nucleation.particle_source import (
     commit_particle_source as _commit_particle_source,
 )
 from particula.dynamics.nucleation.particle_source import (
@@ -38,6 +41,7 @@ from particula.dynamics.nucleation.particle_source import (
 from particula.gas.environment_data import EnvironmentData
 from particula.gas.gas_data import GasData
 from particula.gas.species import GasSpecies
+from particula.particles.distribution_strategies import MassBasedMovingBin
 from particula.particles.exhaustion import ExhaustionControls
 from particula.particles.particle_data import ParticleData
 from particula.particles.representation import ParticleRepresentation
@@ -119,8 +123,8 @@ class NucleationCommitConfig:
     create a transaction spanning a complete ``Nucleation.execute`` call.
 
     Args:
-        maximum_slot_weight: Positive, dimensionless maximum represented events
-            per activated slot.
+        maximum_slot_weight: Positive maximum represented event concentration
+            per activated slot [#/m³].
         source_charge: Finite dimensionless elementary-charge count assigned to
             activated source slots.
         exhaustion_controls: Immutable fixed-capacity policy controls.
@@ -231,7 +235,7 @@ class Nucleation(RunnableABC):
 
     def _topology(  # noqa: C901
         self, aerosol: Aerosol
-    ) -> tuple[ParticleData, GasData]:
+    ) -> tuple[ParticleRepresentation, ParticleData, GasData]:
         """Validate and return the supported facade backing containers."""
         try:
             particle_facade = aerosol.particles
@@ -242,6 +246,10 @@ class Nucleation(RunnableABC):
             ) from error
         if not isinstance(particle_facade, ParticleRepresentation):
             raise TypeError("aerosol particles must be ParticleRepresentation")
+        if not isinstance(particle_facade.strategy, MassBasedMovingBin):
+            raise ValueError(
+                "nucleation supports only MassBasedMovingBin particle facades"
+            )
         if not isinstance(gas_facade, GasSpecies):
             raise TypeError("partitioning_species must be GasSpecies")
         try:
@@ -295,7 +303,19 @@ class Nucleation(RunnableABC):
             )
         if self.source_config.precursor_index >= gas.n_species:
             raise ValueError("precursor_index is out of range for gas species")
-        return particles, gas
+        return particle_facade, particles, gas
+
+    @staticmethod
+    def _synchronize_particle_facade(
+        particle_facade: ParticleRepresentation,
+        particles: ParticleData,
+    ) -> None:
+        """Synchronize supported legacy cache fields after a P3 commit."""
+        particle_facade._distribution = particles.masses[0, :, 0].copy()
+        particle_facade._species_mass_is_1d = True
+        if not particle_facade._charge_is_none:
+            particle_facade._charge_array = particles.charge[0].copy()
+            particle_facade._charge_value = particle_facade._charge_array
 
     def _commit_config(self) -> _ParticleSourceCommitConfig:
         """Create a private P3 configuration for one attempted substep."""
@@ -349,7 +369,7 @@ class Nucleation(RunnableABC):
                 incompatible shapes, select an invalid precursor, or violate
                 the selected source strategy's physical validity domain.
         """
-        _, gas = self._topology(aerosol)
+        _, _, gas = self._topology(aerosol)
         return self._rate_from_gas(gas)
 
     def execute(
@@ -399,7 +419,7 @@ class Nucleation(RunnableABC):
         validated_time_step = _validate_nonnegative_scalar(
             time_step, "time_step"
         )
-        particles, gas = self._topology(aerosol)
+        particle_facade, particles, gas = self._topology(aerosol)
         if validated_time_step == 0.0:
             return aerosol
         duration = validated_time_step / sub_steps
@@ -420,6 +440,10 @@ class Nucleation(RunnableABC):
                 strategy.injection_composition,
                 gas,
             )
+            if isinstance(diagnostics, _SourceDiagnostics) and np.all(
+                diagnostics.gas_admitted_event_count == 0.0
+            ):
+                break
             _commit_particle_source(
                 demand,
                 diagnostics,
@@ -427,6 +451,7 @@ class Nucleation(RunnableABC):
                 gas,
                 self._commit_config(),
             )
+            self._synchronize_particle_facade(particle_facade, particles)
         return aerosol
 
 

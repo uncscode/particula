@@ -346,7 +346,7 @@ def finalize_particle_source(  # noqa: C901
 
     with np.errstate(over="raise", invalid="raise", under="ignore"):
         try:
-            per_event_mass = counts * molar_mass / AVOGADRO_NUMBER
+            per_event_mass = (counts / AVOGADRO_NUMBER) * molar_mass
         except FloatingPointError as error:
             raise ValueError("per_event_mass must be finite") from error
     if not np.all(np.isfinite(per_event_mass)):
@@ -363,7 +363,7 @@ def finalize_particle_source(  # noqa: C901
         admitted = potential_count.copy()
         limiting_indices = np.full(n_boxes, -1, dtype=np.intp)
     else:
-        with np.errstate(over="raise", divide="raise", invalid="raise"):
+        with np.errstate(over="ignore", divide="ignore", invalid="raise"):
             try:
                 ratios = (
                     concentration[:, participating]
@@ -373,8 +373,8 @@ def finalize_particle_source(  # noqa: C901
                 raise ValueError(
                     "gas inventory ratio must be finite"
                 ) from error
-        if not np.all(np.isfinite(ratios)):
-            raise ValueError("gas inventory ratio must be finite")
+        if np.any(np.isnan(ratios)) or np.any(ratios < 0.0):
+            raise ValueError("gas inventory ratio must be nonnegative")
         minimum_ratio = np.min(ratios, axis=1)
         limiting_indices = participating[np.argmin(ratios, axis=1)]
         admitted = np.minimum(potential_count, minimum_ratio)
@@ -720,6 +720,16 @@ def _validate_commit_inputs(  # noqa: C901
         )
     ):
         raise ValueError("gas concentration must not share particle storage")
+    if any(
+        np.shares_memory(gas.concentration, field)
+        for field in (
+            gas.molar_mass,
+            gas.partitioning,
+        )
+    ):
+        raise ValueError(
+            "gas concentration must not share gas metadata storage"
+        )
     arrays = (
         demand.per_event_mass,
         demand.gas_mass_removed,
@@ -835,13 +845,15 @@ def _request_counts(
             requested = np.ceil(event_count / maximum_slot_weight)
         except FloatingPointError as error:
             raise ValueError("requested slot count must be finite") from error
-    if (
-        not np.all(np.isfinite(requested))
-        or np.any(requested < 0.0)
-        or np.any(requested > np.iinfo(np.int32).max)
-        or (enforce_capacity and np.any(requested > capacity))
+    if not np.all(np.isfinite(requested)) or np.any(requested < 0.0):
+        raise ValueError("requested slot count exceeds particle capacity")
+    maximum_int32 = np.iinfo(np.int32).max
+    if enforce_capacity and (
+        np.any(requested > maximum_int32) or np.any(requested > capacity)
     ):
         raise ValueError("requested slot count exceeds particle capacity")
+    if not enforce_capacity:
+        requested = np.minimum(requested, maximum_int32)
     return requested.astype(np.int32)
 
 
@@ -1024,13 +1036,11 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
             "final gas concentration must be finite and nonnegative"
         )
     particle_post = _weighted_particle_mass(staged_particles)
-    residual = (
-        particle_post
-        + staged_gas
-        - resolved_scale[:, None] * (particle_pre + gas_pre)
-    )
+    expected_total = resolved_scale[:, None] * (particle_pre + gas_pre)
+    post_total = particle_post + staged_gas
+    residual = post_total - expected_total
     if not np.all(np.isfinite(residual)) or not np.allclose(
-        residual, 0.0, rtol=1e-12, atol=1e-30
+        post_total, expected_total, rtol=1e-12, atol=1e-30
     ):
         raise ValueError(
             "particle and gas source transaction must conserve mass"

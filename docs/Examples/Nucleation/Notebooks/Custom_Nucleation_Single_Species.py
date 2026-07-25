@@ -597,4 +597,7 @@ plt.show()
 #
 # In this guide, we demonstrated how to integrate custom nucleation processes into the aerosol simulation. This shows the flexibility of the aerosol model, allowing for the addition of new processes before they are fully integrated into the core framework.
 #
-# *Note*: Custom nucleation, particularly at high rates, can significantly increase the number of particles simulated, potentially slowing down the computation. A rescaling mechanism to adjust the simulation volume and control the number of resolved particles is planned for future enhancements to address this issue.
+# *Note*: Custom nucleation, particularly at high rates, can significantly
+# increase the number of particles simulated and slow computation. The supported
+# CPU-only `Nucleation` runnable uses its configured fixed-capacity exhaustion
+# policy to handle source-slot pressure.

@@ -284,6 +284,25 @@ def test_real_execution_depletes_gas_and_never_touches_gas_only():
     npt.assert_array_equal(gas_only.concentration, initial_gas_only)
 
 
+def test_real_execution_synchronizes_supported_particle_facade_caches() -> None:
+    """A successful P3 commit leaves MassBasedMovingBin facade caches current."""
+    aerosol, particles, _, _ = _aerosol()
+    aerosol.particles._charge_is_none = False
+    aerosol.particles._charge_array = particles.charge[0].copy()
+    aerosol.particles._charge_value = aerosol.particles._charge_array
+
+    _runnable().execute(aerosol, 1.0)
+
+    npt.assert_array_equal(
+        aerosol.particles.distribution, particles.masses[0, :, 0]
+    )
+    npt.assert_array_equal(aerosol.particles.charge, particles.charge[0])
+    aerosol.particles.concentration = aerosol.particles.concentration
+    npt.assert_array_equal(
+        aerosol.particles.data.concentration, particles.concentration
+    )
+
+
 @pytest.mark.parametrize("sub_steps", [0, -1, True, 1.0, "1", None])
 def test_invalid_substeps_fail_before_facade_access(sub_steps):
     """Invalid substep counts reject before inspecting the aerosol facade."""
@@ -552,6 +571,36 @@ def test_execute_skips_transactions_for_zero_rate(monkeypatch):
         strict=True,
     ):
         npt.assert_array_equal(actual, expected)
+
+
+def test_execute_stops_after_deterministic_zero_admission(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A zero P2 admission avoids repeated no-op substep transactions."""
+    aerosol, _, _, _ = _aerosol()
+    runnable = _runnable()
+    finalizations = 0
+
+    def finalize(*_):
+        nonlocal finalizations
+        finalizations += 1
+        return object(), particle_process._SourceDiagnostics(
+            np.array([1.0]),
+            np.array([0.0]),
+            np.array([1.0]),
+            np.array([-1], dtype=np.int32),
+        )
+
+    monkeypatch.setattr(runnable, "_rate_from_gas", lambda _: 1.0)
+    monkeypatch.setattr(particle_process, "_finalize_particle_source", finalize)
+    monkeypatch.setattr(
+        particle_process,
+        "_commit_particle_source",
+        lambda *args: pytest.fail("P3 must not run for zero admission"),
+    )
+
+    assert runnable.execute(aerosol, 1.0, sub_steps=10) is aerosol
+    assert finalizations == 1
 
 
 def test_execute_uses_equal_duration_and_fresh_config_per_positive_substep(
