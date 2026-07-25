@@ -1243,7 +1243,7 @@ def _plan_demand_work(  # noqa: C901
                 if has_participant == 0 or ratio < minimum_ratio:
                     minimum_ratio = ratio
                     limiting_species = wp.int32(species)
-                has_participant = 1
+                has_participant = wp.int32(1)
         if minimum_ratio == 0.0:
             code = wp.int32(_P2_GATE_ZERO_INVENTORY)
             demand = wp.float64(0.0)
@@ -1260,7 +1260,7 @@ def _plan_demand_work(  # noqa: C901
                         / wp.float64(AVOGADRO_NUMBER)
                     )
                     if demand * event_mass > concentration[box, species]:
-                        safe = 0
+                        safe = wp.int32(0)
             if safe == 0:
                 demand = demand * wp.float64(0.9999999999999999)
         for species in range(species_count):
@@ -1377,7 +1377,7 @@ def _plan_nucleation_demand(
         saturation_work = wp.zeros(
             (boxes, species), dtype=wp.float64, device=device
         )
-    molecule_counts = wp.array(
+    molecule_counts: Any = wp.array(
         np.asarray(config.molecule_counts, dtype=np.int32),
         dtype=wp.int32,
         device=device,
