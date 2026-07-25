@@ -18,6 +18,10 @@ from particula.dynamics.dilution import (
 from particula.dynamics.nucleation.nucleation_configuration import (
     NucleationSourceConfig,
 )
+from particula.dynamics.nucleation.nucleation_strategies import (
+    ActivationNucleationStrategy,
+    KineticNucleationStrategy,
+)
 from particula.dynamics.nucleation.particle_source import (
     ParticleSourceCommitConfig,
     PotentialEventData,
@@ -283,7 +287,10 @@ class Nucleation(RunnableABC):
     def _rate_from_gas(self, gas: GasData) -> float:
         """Calculate a potential rate from validated gas backing data."""
         precursor = self.source_config.precursor_index
-        strategy = self.source_config.strategy
+        strategy = cast(
+            ActivationNucleationStrategy | KineticNucleationStrategy,
+            self.source_config.strategy,
+        )
         saturation = None
         if strategy.validity_domain.saturation is not None:
             saturation = float(self.environment.saturation_ratio[0, precursor])
@@ -328,7 +335,10 @@ class Nucleation(RunnableABC):
         if validated_time_step == 0.0:
             return aerosol
         duration = validated_time_step / sub_steps
-        strategy = self.source_config.strategy
+        strategy = cast(
+            ActivationNucleationStrategy | KineticNucleationStrategy,
+            self.source_config.strategy,
+        )
         for _ in range(sub_steps):
             rate = self._rate_from_gas(gas)
             if rate == 0.0:
