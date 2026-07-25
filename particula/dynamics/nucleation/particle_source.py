@@ -22,6 +22,7 @@ from particula.dynamics.nucleation.nucleation_strategies import (
 )
 from particula.gas.gas_data import GasData
 from particula.particles.exhaustion import (
+    POLICY_RESAMPLE_DEFERRED,
     POLICY_SCALE_DEFERRED,
     ExhaustionControls,
     ExhaustionInputs,
@@ -615,6 +616,8 @@ def _validate_commit_particle_schema(  # noqa: C901
             raise ValueError(f"{name} must have rank {rank}")
         if not value.flags.writeable:
             raise ValueError(f"{name} must be writable")
+        if not value.flags.c_contiguous:
+            raise ValueError(f"{name} must be contiguous")
     boxes, capacity, species = particles.masses.shape
     if capacity == 0 or species == 0:
         raise ValueError(
@@ -771,12 +774,10 @@ def _validate_commit_inputs(  # noqa: C901
         diagnostics.potential_event_count,
         rtol=1e-12,
         atol=1e-30,
-    ) or not np.allclose(
+    ) or not np.array_equal(
         demand.gas_mass_removed,
         diagnostics.gas_admitted_event_count[:, None]
         * demand.per_event_mass[None, :],
-        rtol=1e-12,
-        atol=1e-30,
     ):
         raise ValueError("P2 records are mutually inconsistent")
     if np.any(
@@ -802,7 +803,11 @@ def _validate_commit_inputs(  # noqa: C901
 
 
 def _request_counts(
-    event_count: NDArray[np.float64], maximum_slot_weight: float, capacity: int
+    event_count: NDArray[np.float64],
+    maximum_slot_weight: float,
+    capacity: int,
+    *,
+    enforce_capacity: bool = True,
 ) -> NDArray[np.int32]:
     """Calculate checked equal-weight source-slot requests per box.
 
@@ -814,13 +819,16 @@ def _request_counts(
         maximum_slot_weight: Positive maximum represented events per slot
             [#/m³].
         capacity: Fixed particle-slot capacity available in each box.
+        enforce_capacity: Whether to reject requests above ``capacity``. Policy
+            resolution uses unchecked provisional requests before scaling;
+            activation always enforces capacity.
 
     Returns:
         Int32 source-slot request count for each box.
 
     Raises:
         ValueError: If the derived request count is nonfinite, negative, or
-            exceeds fixed particle capacity.
+            exceeds fixed particle capacity when ``enforce_capacity`` is true.
     """
     with np.errstate(over="raise", invalid="raise"):
         try:
@@ -830,7 +838,8 @@ def _request_counts(
     if (
         not np.all(np.isfinite(requested))
         or np.any(requested < 0.0)
-        or np.any(requested > capacity)
+        or np.any(requested > np.iinfo(np.int32).max)
+        or (enforce_capacity and np.any(requested > capacity))
     ):
         raise ValueError("requested slot count exceeds particle capacity")
     return requested.astype(np.int32)
@@ -865,10 +874,11 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
 ) -> FinalizedSourceDiagnostics:
     """Commit a gas-admitted source into staged fixed-capacity particle storage.
 
-    P2 demand and event counts are [#/m³], mass concentrations are [kg/m³],
-    per-event particle masses are [kg/event], and ``source_charge`` is in
-    elementary-charge counts. Policy resolution, resampling, representative-
-    volume scaling, and activation operate on a private ``ParticleData.copy()``.
+    P2 event counts and represented event counts are [#/m³]. P2 demand and
+    final gas removal are mass concentrations [kg/m³], while per-event particle
+    mass is [kg/event] and ``source_charge`` is in elementary-charge counts.
+    Policy resolution, resampling, representative-volume scaling, and
+    activation operate on a private ``ParticleData.copy()``.
     A selected representative-volume row scales pre-existing particle and gas
     concentrations before final source mass is subtracted. Returned diagnostics
     own read-only arrays. Only caller ``masses``, ``concentration``, ``charge``,
@@ -902,6 +912,7 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
         diagnostics.gas_admitted_event_count,
         config.maximum_slot_weight,
         capacity,
+        enforce_capacity=False,
     )
     free_indices, active_counts, free_counts = get_slot_diagnostics(
         staged_particles
@@ -915,22 +926,30 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
             free_indices,
         ),
         config.exhaustion_controls,
+        allow_oversized_requests=True,
     )
-    resampling_plan = plan_resampling(
-        staged_particles,
-        exhaustion_plan,
-        radius_cubed_relative_error=config.radius_cubed_relative_error,
-        mean_radius_relative_error=config.mean_radius_relative_error,
-        surface_relative_error=config.surface_relative_error,
-        diversity_absolute_error=config.diversity_absolute_error,
+    selected_resampling = any(
+        plan.policy_code == POLICY_RESAMPLE_DEFERRED
+        for plan in exhaustion_plan.box_plans
     )
-    apply_resampling(staged_particles, resampling_plan)
+    if selected_resampling:
+        resampling_plan = plan_resampling(
+            staged_particles,
+            exhaustion_plan,
+            radius_cubed_relative_error=config.radius_cubed_relative_error,
+            mean_radius_relative_error=config.mean_radius_relative_error,
+            surface_relative_error=config.surface_relative_error,
+            diversity_absolute_error=config.diversity_absolute_error,
+        )
+        apply_resampling(staged_particles, resampling_plan)
+        released_counts = np.asarray(
+            [len(plan.released_indices) for plan in resampling_plan.box_plans],
+            dtype=np.int32,
+        )
+    else:
+        released_counts = np.zeros(boxes, dtype=np.int32)
     policy_codes = np.asarray(
         [plan.policy_code for plan in exhaustion_plan.box_plans], dtype=np.int32
-    )
-    released_counts = np.asarray(
-        [len(plan.released_indices) for plan in resampling_plan.box_plans],
-        dtype=np.int32,
     )
 
     provisional_demand = np.ascontiguousarray(

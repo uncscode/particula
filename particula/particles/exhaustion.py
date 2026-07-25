@@ -246,16 +246,19 @@ def _validate_sidecar_shapes(inputs: ExhaustionInputs) -> tuple[int, int]:
 def _validate_capacity_counts(
     inputs: ExhaustionInputs,
     particle_count: int,
+    *,
+    allow_oversized_requests: bool = False,
 ) -> None:
     """Validate count ranges against fixed particle capacity."""
-    arrays = (
+    for name, values in (
         ("requested_count", inputs.requested_count),
         ("free_count", inputs.free_count),
         ("resampling_releasable_count", inputs.resampling_releasable_count),
-    )
-    for name, values in arrays:
+    ):
         if np.any(values < 0):
             raise ValueError(f"{name} must be nonnegative")
+        if name == "requested_count" and allow_oversized_requests:
+            continue
         if np.any(values > particle_count):
             raise ValueError(f"{name} exceeds particle capacity")
     maximum_releasable = np.maximum(particle_count - inputs.free_count - 1, 0)
@@ -285,11 +288,19 @@ def _validate_free_indices(
             raise ValueError("free_indices unused suffix must contain -1")
 
 
-def _validate_sidecars(inputs: ExhaustionInputs) -> tuple[int, int]:
+def _validate_sidecars(
+    inputs: ExhaustionInputs,
+    *,
+    allow_oversized_requests: bool = False,
+) -> tuple[int, int]:
     """Validate all sidecars without coercion, sorting, copying, or mutation."""
     _validate_sidecar_schema(inputs)
     box_count, particle_count = _validate_sidecar_shapes(inputs)
-    _validate_capacity_counts(inputs, particle_count)
+    _validate_capacity_counts(
+        inputs,
+        particle_count,
+        allow_oversized_requests=allow_oversized_requests,
+    )
     _validate_free_indices(inputs, particle_count)
     return box_count, particle_count
 
@@ -297,6 +308,8 @@ def _validate_sidecars(inputs: ExhaustionInputs) -> tuple[int, int]:
 def resolve_exhaustion(
     inputs: ExhaustionInputs,
     controls: ExhaustionControls,
+    *,
+    allow_oversized_requests: bool = False,
 ) -> ExhaustionPlan:
     """Resolve immutable capacity decisions after complete sidecar validation.
 
@@ -308,6 +321,9 @@ def resolve_exhaustion(
     Args:
         inputs: Fixed-shape, int32 capacity sidecars.
         controls: Strict policy enablement controls.
+        allow_oversized_requests: Permit provisional requests above physical
+            capacity so a later scaling policy can reduce them. The default
+            preserves strict fixed-capacity validation.
 
     Returns:
         A tuple-backed plan with activation-prefix identity or deferred policy.
@@ -322,7 +338,10 @@ def resolve_exhaustion(
     if not isinstance(inputs, ExhaustionInputs):
         raise TypeError("inputs must be an ExhaustionInputs")
 
-    box_count, _ = _validate_sidecars(inputs)
+    box_count, _ = _validate_sidecars(
+        inputs,
+        allow_oversized_requests=allow_oversized_requests,
+    )
     box_plans: list[ExhaustionBoxPlan] = []
     for box_index in range(box_count):
         requested = int(inputs.requested_count[box_index])

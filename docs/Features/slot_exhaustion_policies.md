@@ -1,13 +1,13 @@
 # Fixed-Capacity Slot Exhaustion Primitives
 
 This guide documents shipped fixed-capacity CPU primitives and direct Warp
-primitives. It is not a high-level nucleation process or a shipped
-slot-discovery, activation, or policy-composition loop. E6-F5 owns the
-authoritative discovery, free-index classification, and activation boundary;
-E6-F6-P5 will compose that boundary and remains blocked. The concrete CPU-only
-P3 `particula.dynamics.nucleation.particle_source.commit_particle_source`
-transaction is shipped, but is not package-exported or a public API.
-High-level/public nucleation integration remains deferred.
+primitives. The concrete CPU-only P3
+`particula.dynamics.nucleation.particle_source.commit_particle_source`
+transaction is a shipped consumer that composes slot discovery, policy
+resolution, and activation, but is not package-exported or a public API.
+E6-F5 owns the authoritative discovery, free-index classification, and
+activation boundary. High-level/public nucleation loops, scheduler integration,
+and broader policy orchestration remain deferred.
 
 ## CPU planning contract
 

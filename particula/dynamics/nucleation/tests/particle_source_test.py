@@ -802,6 +802,11 @@ def test_commit_particle_source_scales_gas_and_particle_inventory() -> None:
     )
     npt.assert_allclose(result.representative_volume_scale, [0.5])
     npt.assert_allclose(result.represented_event_count, [1.5])
+    npt.assert_allclose(result.representation_reduction_event_count, [1.5])
+    npt.assert_array_equal(result.requested_slot_count, [1])
+    npt.assert_array_equal(result.activated_slot_count, [1])
+    npt.assert_allclose(particles.volume, [0.5])
+    npt.assert_allclose(particles.concentration, [[2.0, 1.5]])
     npt.assert_allclose(gas.concentration, [[2.125]])
     particle_mass = np.einsum(
         "bn,bns->bs", particles.concentration, particles.masses
@@ -1070,3 +1075,222 @@ def test_commit_resampling_precedes_scaling_for_full_capacity() -> None:
     npt.assert_array_equal(result.representative_volume_scale, [1.0])
     npt.assert_array_equal(result.released_slot_count, [1])
     npt.assert_array_equal(result.activated_slot_count, [1])
+
+
+def test_commit_scaling_reduces_oversized_provisional_request() -> None:
+    """Scale fallback occurs before final fixed-capacity request validation."""
+    particles = _source_particles(capacity=3)
+    gas = GasData(
+        name=["a"],
+        molar_mass=np.array([0.1]),
+        concentration=np.array([[10.0]]),
+        partitioning=np.array([True]),
+    )
+    demand, diagnostics = _p2_records(np.array([10.0]))
+    config = ParticleSourceCommitConfig(
+        maximum_slot_weight=2.0,
+        source_charge=1.0,
+        exhaustion_controls=ExhaustionControls(False, True),
+        requested_scale=np.array([0.5]),
+        minimum_scale=np.array([0.5]),
+        minimum_volume=np.array([0.1]),
+    )
+
+    result = commit_particle_source(demand, diagnostics, particles, gas, config)
+
+    npt.assert_array_equal(
+        result.exhaustion_policy_code, [POLICY_SCALE_DEFERRED]
+    )
+    npt.assert_allclose(result.represented_event_count, [5.0])
+    npt.assert_array_equal(result.requested_slot_count, [3])
+
+
+def test_commit_scaling_cannot_activate_a_full_store_atomically() -> None:
+    """Scaling source demand does not create a free slot in a full store."""
+    particles = _source_particles(capacity=3)
+    particles.masses[:, :, 0] = 0.25
+    particles.concentration[:] = 1.0
+    gas = GasData(
+        name=["a"],
+        molar_mass=np.array([0.1]),
+        concentration=np.array([[5.0]]),
+        partitioning=np.array([True]),
+    )
+    demand, diagnostics = _p2_records(np.array([3.0]))
+    config = ParticleSourceCommitConfig(
+        maximum_slot_weight=2.0,
+        source_charge=1.0,
+        exhaustion_controls=ExhaustionControls(False, True),
+        requested_scale=np.array([0.5]),
+        minimum_scale=np.array([0.5]),
+        minimum_volume=np.array([0.1]),
+    )
+    particle_snapshot = particles.copy()
+    gas_snapshot = gas.concentration.copy()
+
+    with pytest.raises(ValueError, match="free slot capacity"):
+        commit_particle_source(demand, diagnostics, particles, gas, config)
+
+    for name in ("masses", "concentration", "charge", "density", "volume"):
+        npt.assert_array_equal(
+            getattr(particles, name), getattr(particle_snapshot, name)
+        )
+    npt.assert_array_equal(gas.concentration, gas_snapshot)
+
+
+def test_commit_full_capacity_with_policies_off_preserves_all_storage() -> None:
+    """Policies-disabled capacity rejection preserves every mutable field."""
+    particles = _source_particles(capacity=2)
+    particles.masses[:, :, 0] = 0.25
+    particles.concentration[:] = 1.0
+    gas = GasData(
+        name=["a"],
+        molar_mass=np.array([0.1]),
+        concentration=np.array([[5.0]]),
+        partitioning=np.array([True]),
+    )
+    demand, diagnostics = _p2_records(np.array([1.0]))
+    config = ParticleSourceCommitConfig(
+        maximum_slot_weight=2.0,
+        source_charge=1.0,
+        exhaustion_controls=ExhaustionControls(False, False),
+        requested_scale=np.array([1.0]),
+        minimum_scale=np.array([1.0]),
+        minimum_volume=np.array([0.1]),
+    )
+    fields = (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        gas.concentration,
+    )
+    snapshots = tuple(field.copy() for field in fields)
+    metadata = tuple(
+        (
+            id(field),
+            field.shape,
+            field.dtype,
+            field.flags.c_contiguous,
+            field.flags.writeable,
+        )
+        for field in fields
+    )
+
+    with pytest.raises(ValueError, match="cannot represent"):
+        commit_particle_source(demand, diagnostics, particles, gas, config)
+
+    for field, snapshot, expected in zip(
+        fields, snapshots, metadata, strict=True
+    ):
+        assert (
+            id(field),
+            field.shape,
+            field.dtype,
+            field.flags.c_contiguous,
+            field.flags.writeable,
+        ) == expected
+        npt.assert_array_equal(field, snapshot)
+
+
+def test_commit_multibox_multispecies_conserves_each_box_and_species() -> None:
+    """P3 places independent requests and removes matching multi-species gas."""
+    particles = ParticleData(
+        masses=np.zeros((2, 3, 2)),
+        concentration=np.zeros((2, 3)),
+        charge=np.zeros((2, 3)),
+        density=np.array([1000.0, 1200.0]),
+        volume=np.ones(2),
+    )
+    gas = GasData(
+        name=["a", "b"],
+        molar_mass=np.array([0.1, 0.2]),
+        concentration=np.array([[5.0, 6.0], [7.0, 8.0]]),
+        partitioning=np.array([True, True]),
+    )
+    events = np.array([2.0, 3.0])
+    per_event = np.array([0.25, 0.5])
+    demand = SourceDemandData(per_event, events[:, None] * per_event)
+    diagnostics = SourceDiagnostics(
+        events, events, np.zeros(2), np.full(2, -1, dtype=np.int32)
+    )
+    initial_gas = gas.concentration.copy()
+
+    result = commit_particle_source(
+        demand, diagnostics, particles, gas, _commit_config(boxes=2)
+    )
+
+    npt.assert_array_equal(result.requested_slot_count, [1, 2])
+    npt.assert_allclose(
+        gas.concentration, initial_gas - events[:, None] * per_event
+    )
+    npt.assert_allclose(
+        np.einsum("bn,bns->bs", particles.concentration, particles.masses)
+        + gas.concentration,
+        initial_gas,
+    )
+
+
+def test_commit_rejects_tiny_forged_gas_demand_atomically() -> None:
+    """A tolerance-sized forged P2 mass demand cannot activate a source slot."""
+    particles = _source_particles()
+    gas = GasData(
+        name=["a"],
+        molar_mass=np.array([0.1]),
+        concentration=np.array([[5.0]]),
+        partitioning=np.array([True]),
+    )
+    demand, diagnostics = _p2_records(np.array([0.0]))
+    object.__setattr__(
+        diagnostics, "gas_admitted_event_count", _readonly(np.array([1e-31]))
+    )
+    particle_snapshot = particles.copy()
+    gas_snapshot = gas.concentration.copy()
+
+    with pytest.raises(ValueError, match="mutually inconsistent"):
+        commit_particle_source(
+            demand, diagnostics, particles, gas, _commit_config()
+        )
+
+    npt.assert_array_equal(particles.masses, particle_snapshot.masses)
+    npt.assert_array_equal(
+        particles.concentration, particle_snapshot.concentration
+    )
+    npt.assert_array_equal(gas.concentration, gas_snapshot)
+
+
+@pytest.mark.parametrize("target", ["particle", "gas"])
+def test_commit_rejects_overlapping_mutable_storage_atomically(
+    target: str,
+) -> None:
+    """Zero-stride mutable views reject before the transaction stages writes."""
+    particles = _source_particles(boxes=2)
+    gas = GasData(
+        name=["a"],
+        molar_mass=np.array([0.1]),
+        concentration=np.array([[5.0], [5.0]]),
+        partitioning=np.array([True]),
+    )
+    if target == "particle":
+        particles.concentration = np.lib.stride_tricks.as_strided(
+            np.zeros(1), shape=(2, 3), strides=(0, 0)
+        )
+    else:
+        gas.concentration = np.lib.stride_tricks.as_strided(
+            np.full(1, 5.0), shape=(2, 1), strides=(0, 0)
+        )
+    demand, diagnostics = _p2_records(np.array([1.0, 1.0]))
+    particle_snapshot = particles.copy()
+    gas_snapshot = gas.concentration.copy()
+
+    with pytest.raises(ValueError, match="contiguous"):
+        commit_particle_source(
+            demand, diagnostics, particles, gas, _commit_config(boxes=2)
+        )
+
+    npt.assert_array_equal(particles.masses, particle_snapshot.masses)
+    npt.assert_array_equal(
+        particles.concentration, particle_snapshot.concentration
+    )
+    npt.assert_array_equal(gas.concentration, gas_snapshot)
