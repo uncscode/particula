@@ -259,11 +259,11 @@ planning, and mutation boundaries are documented in the
 [Fixed-Capacity Slot Exhaustion Primitives](../../../Features/slot_exhaustion_policies.md).
 
 These are slot-management primitives, not a nucleation process: they do not
-discover free slots, activate slots, construct a particle source, or deplete
-gas. E6-F5 owns authoritative slot discovery and activation, and the blocked
-E6-F6-P5 work will compose that boundary with policy selection. High-level
-nucleation and timestep orchestration remain deferred; see the
-[Data-Oriented Design and GPU Roadmap](../../../Features/Roadmap/data-oriented-gpu.md).
+construct a particle source or deplete gas. The supported process boundary is
+the CPU-only, single-box `particula.dynamics.Nucleation` runnable, configured
+with `NucleationCommitConfig`. It adapts the legacy `Aerosol` backing
+containers and mutates the backing particle and partitioning-gas data by
+identity; it does not provide GPU execution.
 
 **Implementation boundary:**
 
@@ -271,13 +271,15 @@ nucleation and timestep orchestration remain deferred; see the
   source-selection metadata, and factory are supported public construction APIs.
   They remain immutable configuration and rate-evaluation boundaries only.
 - The concrete CPU P2 particle-source planner and P3 finalization transaction
-  remain in `particula.dynamics.nucleation.particle_source`. They are not
-  re-exported through `particula.dynamics.nucleation` or `particula.dynamics`.
-  P2 returns inventory-limited source demand and diagnostics without mutation;
-  P3 owns the bounded particle/gas transaction.
-- Runnable orchestration and GPU support remain deferred. The source-term
-  discussion in this section remains conceptual guidance for a future
-  composition of those responsibilities.
+   remain in `particula.dynamics.nucleation.particle_source`. They are not
+   re-exported through `particula.dynamics.nucleation` or `particula.dynamics`.
+   P2 returns inventory-limited source demand and diagnostics without mutation;
+   P3 owns the bounded particle/gas transaction.
+- `Nucleation` applies equal sequential substeps and re-reads the current gas
+  state before each rate calculation, so completed substeps can change later
+  rates. Atomicity is per attempted P3 substep only: a completed earlier
+  substep is not rolled back if a later substep fails. P2/P3 helpers remain
+  concrete-only, and GPU support remains deferred.
 
 ## Variable Descriptions
 

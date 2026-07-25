@@ -16,7 +16,9 @@
   scaling, and atomic-rejection tests cover the transaction boundary.
 - [x] Strict builders, factory, immutable source-selection metadata, and approved
    P4 imports have regression coverage; P2/P3 exports remain absent.
-- [ ] `Nucleation` runnable has fast tests and current user-facing documentation.
+- [x] CPU-only single-box `Nucleation` and immutable `NucleationCommitConfig`
+  have fast topology, validation, identity, sequencing, and failure-boundary
+  tests; P2/P3 remain concrete-only. User-facing documentation remains P7 scope.
 - [ ] E6-F8 has an independent deterministic CPU oracle and frozen source and
   diagnostics contracts.
 - [ ] Fast tests, Ruff, and mypy pass without lowering coverage thresholds.

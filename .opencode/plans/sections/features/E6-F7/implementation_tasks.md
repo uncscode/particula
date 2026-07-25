@@ -15,8 +15,9 @@
   truncation; preserve final represented per-species mass.
 - [x] Add strict atomic builders/factory with explicit units, domain, precursor
    index, composition, formation size, survival factor, and provenance.
-- [ ] Add `Nucleation` to `particle_process.py`; recompute current gas rate and
-  inventory on every substep.
+- [x] Add public CPU-only single-box `Nucleation` and immutable
+  `NucleationCommitConfig` to `particle_process.py`; recompute current gas rate
+  and inventory on every equal substep while retaining backing-container identity.
 - [x] Export only intended P4 construction APIs through nucleation and dynamics
    initializers; retain P2/P3 names as concrete-module-only.
 
@@ -30,7 +31,9 @@
   export-boundary tests in `particle_source_test.py`.
 - [x] Add builder/factory tests for units, required fields, strict schemas,
    atomic recovery, factory isolation, and invalid aliases.
-- [ ] Add runnable tests in `nucleation_runnable_test.py`.
+- [x] Add runnable tests in `nucleation_runnable_test.py` for topology,
+  validation, identity, sequencing, no-ops, composability, and failure
+  boundaries.
 - [ ] Add an independent multi-box/species oracle under
   `particula/integration_tests/`; do not derive expected values with production.
 - [ ] Run focused tests, full fast pytest, Ruff, and mypy without reducing

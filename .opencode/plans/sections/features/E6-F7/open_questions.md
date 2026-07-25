@@ -4,10 +4,10 @@ All E6-F7 planning questions were resolved on 2026-07-21. The selected CPU
 reference is a bounded empirical particle source, not a predictive
 critical-cluster model.
 
-P4 implementation clarification (issue #1433): builders, a factory, immutable
-source-selection metadata, and deliberately constrained package exports now
-ship. P2/P3 finalization and mutation remain concrete-module-only; the runnable
-and GPU work remain deferred.
+P5 implementation clarification (issue #1434): the public CPU-only single-box
+`Nucleation` runnable and immutable `NucleationCommitConfig` now ship from
+`particula.dynamics`. P2/P3 finalization and mutation remain concrete-only; GPU
+work remains deferred.
 
 - [x] Which coefficient units and validity intervals do builders accept?
   - Decision: activation coefficients accept `s^-1`; kinetic coefficients accept

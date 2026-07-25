@@ -35,11 +35,17 @@ P4/P5, then run P6 conservation validation before P7 documentation.
     failed-configuration recovery, fresh factory isolation, public imports, P2/P3
     export absence, and unsupported aliases.
 
-- [ ] **E6-F7-P5:** Add CPU nucleation runnable and substep behavior with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add `Nucleation`; each substep recomputes rate from current gas and commits one complete source transaction.
-  - Files: `particula/dynamics/particle_process.py`, `particula/dynamics/tests/nucleation_runnable_test.py`, `particula/dynamics/__init__.py`
-  - Tests: Delegation, substep duration, state coupling, identity, composition, zero-time no-op, and invalid substeps.
+- [x] **E6-F7-P5:** Add CPU nucleation runnable and substep behavior with unit tests
+  - Issue: #1434 | Size: S | Status: Shipped
+  - Goal: Shipped public CPU-only, single-box `Nucleation` and immutable
+    `NucleationCommitConfig`; equal sequential substeps recompute from current
+    gas and commit one complete source transaction by backing-container identity.
+  - Files: `particula/dynamics/particle_process.py`,
+    `particula/dynamics/tests/nucleation_runnable_test.py`,
+    `particula/dynamics/__init__.py`
+  - Tests: Public topology, config/constructor and duration/substep validation,
+    identity, gas feedback/sequencing, no-op paths, composability, and P1/P2/P3
+    failure boundaries including per-substep-only atomicity.
 
 - [ ] **E6-F7-P6:** Validate multi-box multi-species conservation and failure atomicity
   - Issue: TBD | Size: S | Status: Not Started

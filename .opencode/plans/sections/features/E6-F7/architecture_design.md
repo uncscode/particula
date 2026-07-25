@@ -75,6 +75,14 @@ bound is an exact zero gate, while above its upper bound raises `ValueError`.
    `"activation"` and `"kinetic"` identifiers and uses a fresh builder with a
    copied strict-schema mapping per call. P2/P3 `particle_source` records and
    helpers remain concrete-module-only.
+- **P5 Process Boundary:** `particula.dynamics.Nucleation` accepts an
+   `Aerosol`, `NucleationSourceConfig`, `NucleationCommitConfig`, and one-box
+   `EnvironmentData`. It unwraps only the legacy backing `ParticleData` and
+   partitioning `GasData` by identity; gas-only facade state is neither read nor
+   mutated. Each equal substep recomputes P1 from current gas, finalizes P2, and
+   creates a fresh private P3 configuration immediately before commit. A zero
+   rate writes nothing. A failed P3 attempt retains P3's per-substep atomicity;
+   earlier successful substeps are not rolled back.
 - **Mutation Contract:** P1 returns a `float` potential rate. P2 returns only
   provisional demand and diagnostics; it validates gas read-only and does not
   mutate caller state. A participating species limits each box by the minimum

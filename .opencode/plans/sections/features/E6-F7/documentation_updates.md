@@ -25,7 +25,11 @@
   `.opencode/guides/architecture/architecture_guide.md`. These describe the
   bounded public construction surface and preserve P2/P3 as concrete-only.
   No user-facing feature documentation, examples, or runnable was added; P7
-  remains responsible for those decisions.
+   remains responsible for those decisions.
+- P5 added public Google-style code docstrings for CPU-only single-box
+  `Nucleation` and immutable `NucleationCommitConfig` in
+  `particula/dynamics/particle_process.py`. Broader user and architecture
+  documentation remains deferred to P7; no P2/P3 transaction API was exposed.
 - Retain citations to Seinfeld & Pandis (2016), Kulmala et al. (2006, DOI
   `10.5194/acp-6-787-2006`), and Kerminen & Kulmala (2002, DOI
   `10.1016/S0021-8502(01)00194-X`). State that Vehkamäki et al. (2002, DOI

@@ -1,19 +1,32 @@
 # Architecture Guide
 
-## CPU Nucleation Potential-Rate Boundary
+## CPU Nucleation Boundaries
 
 - `particula.dynamics.nucleation` provides the bounded CPU-only P4 construction
   API: immutable activation/kinetic potential-rate strategies,
   `NucleationSourceConfig`, their builders, and `NucleationFactory`. These
   names are deliberately re-exported through `particula.dynamics`.
 - P4 strategies calculate potential formation-event rates only. They do not
-  create particles, admit inventory or slots, mutate gas or particle state,
-  provide a runnable, or provide GPU integration.
+  create particles, admit inventory or slots, mutate gas or particle state, or
+  provide GPU integration.
+- `particula.dynamics.Nucleation` and `NucleationCommitConfig` are the
+  supported CPU-only, single-box P5 process boundary. The runnable takes public
+  P4 source configuration and `EnvironmentData`, adapts the legacy `Aerosol`'s
+  existing particle and partitioning-gas backing data by identity, and returns
+  that same aerosol.
+- P5 splits a positive duration into equal sequential substeps. Every substep
+  reads the gas state produced by prior successful substeps before evaluating
+  the potential rate, then delegates source-demand finalization and commit to
+  the concrete P2/P3 boundary. Atomicity is per attempted P3 substep, not for
+  the complete `Nucleation.execute` call; successful earlier substeps persist
+  if a later substep fails.
 - P2 source-demand and P3 transaction records/helpers remain deliberately
   concrete-only in `particula.dynamics.nucleation.particle_source`; they are
   not package exports and P4 construction types do not import them. In
   particular, public construction does not expose particle-source
   finalization or commit helpers.
+- P5 does not introduce GPU execution, hidden data transfer, or additional
+  runnable/scheduler orchestration.
 
 ## CPU Particle Slot Management Boundary
 

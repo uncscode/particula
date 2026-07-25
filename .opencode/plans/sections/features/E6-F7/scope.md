@@ -44,6 +44,13 @@ consumes P2 records and stages particle-slot/exhaustion work privately.
 - Immutable `NucleationSourceConfig` metadata and constrained P4 exports from
   both dynamics namespaces. P2/P3 records and transaction helpers remain
   concrete-module-only.
+- Public CPU-only, single-box `Nucleation` and immutable
+  `NucleationCommitConfig` exports from `particula.dynamics`.
+- Legacy `Aerosol` adaptation that retains `ParticleData` and partitioning
+  `GasData` identity, validates one-box topology, and leaves gas-only facade
+  state untouched.
+- Equal sequential substeps that re-read current gas and perform one P2/P3
+  transaction per positive-rate substep; P3 atomicity is per substep only.
 
 ## Out of Scope
 
@@ -57,4 +64,4 @@ consumes P2 records and stages particle-slot/exhaustion work privately.
   performance claims.
 - Silent clipping of unsupported environmental inputs, partial multi-box
   commits, or silent loss of slot-exhausted source demand.
-- A runnable, broad top-level exports, or exports of P2/P3 records/helpers.
+- Broad top-level exports or exports of P2/P3 records/helpers.

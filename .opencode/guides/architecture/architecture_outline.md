@@ -31,18 +31,31 @@ strategies, and focused particle-domain helpers.
 `particula/dynamics/` contains physics-domain calculations and narrowly scoped
 implementation boundaries.
 
+### particula/dynamics/
+
+**Key Components:**
+- `particle_process.py` - Public CPU-only, single-box `Nucleation` runnable
+  boundary and immutable `NucleationCommitConfig`. `Nucleation` adapts legacy
+  `Aerosol` particle and partitioning-gas backing data by identity, accepts P4
+  source configuration plus `EnvironmentData`, and runs equal, gas-coupled
+  substeps. Each attempted substep has P3 transaction atomicity; prior
+  successful substeps remain applied if a later substep fails. This boundary
+  introduces no GPU or broader runnable orchestration.
+
 ### particula/dynamics/nucleation/
 
 CPU-only P4 construction boundary for nucleation potential-rate
-parameterizations. P2 source-demand planning and P3 transaction helpers remain
-concrete-module-only.
+parameterizations, consumed by the supported P5 `Nucleation` process boundary
+in `particula.dynamics`. P2 source-demand planning and P3 transaction helpers
+remain concrete-module-only.
 
 **Key Components:**
 - `nucleation_strategies.py` - Immutable scalar configuration records and
   activation/kinetic potential-rate algorithms. The P4 records, builders, and
   factory are deliberately exported through `particula.dynamics.nucleation`
   and `particula.dynamics`; strategies still return rates only and own no
-  source admission, state mutation, runnable, or GPU integration.
+  source admission, state mutation, runnable, or GPU integration. The P5
+  runnable composes them without changing their ownership.
 - `nucleation_configuration.py`, `nucleation_builders.py`, and
   `nucleation_factories.py` - `NucleationSourceConfig`, its builder, and the
   activation/kinetic builders and factory form the strict, fresh,

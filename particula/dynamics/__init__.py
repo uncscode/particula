@@ -17,7 +17,10 @@ Nucleation exports provide the bounded P4 construction surface for immutable
 activation and kinetic potential-rate strategies. ``NucleationSourceConfig``
 selects one of those strategies and a precursor index. The CPU-only single-box
 ``Nucleation`` runnable and its immutable ``NucleationCommitConfig`` provide
-the P5 process boundary; P2/P3 ``particle_source`` helpers remain concrete-only.
+the P5 process boundary. Nucleation uses equal sequential substeps, preserves
+the aerosol and backing-container identities, and provides atomicity per
+attempted substep rather than for the whole call. P2/P3 ``particle_source``
+helpers remain concrete-only.
 """
 
 

@@ -31,9 +31,12 @@ NumPy oracle rather than production helpers.
   defaults, provenance, immutable input ownership, strict mapping schemas,
   atomic failed-configuration recovery, source-config validation, fresh factory
   isolation, approved imports, and absent P2/P3 exports.
-- **P5:** `nucleation_runnable_test.py` verifies delegation,
-  `time_step/sub_steps`, current-gas recomputation, exact no-ops, invalid
-  substeps, returned identity, and composability.
+- **P5 (shipped):** `particula/dynamics/tests/nucleation_runnable_test.py`
+  verifies public exports and construction, immutable commit controls, topology
+  and duration/substep validation, backing-container identity, gas-only
+  nonmutation, equal sequential current-gas feedback, zero-write paths,
+  runnable sequencing, and P1/P2/P3 failure boundaries including per-substep
+  (not whole-call) atomicity.
 - **P6:** `particula/integration_tests/nucleation_process_test.py` compares
   potential, gas-admitted, represented, and residual events plus per-species
   total inventory with independent `float64` equations over repeated calls.

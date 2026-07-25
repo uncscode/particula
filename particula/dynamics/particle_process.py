@@ -1,6 +1,7 @@
 """Runnable particle-centric aerosol processes.
 
-Includes condensation and evaporation, coagulation, wall loss, and dilution.
+Includes condensation and evaporation, coagulation, wall loss, dilution, and
+the CPU-only single-box nucleation process.
 """
 
 from dataclasses import dataclass
@@ -105,7 +106,9 @@ class NucleationCommitConfig:
 
     The record mirrors the P3 transaction controls while retaining public P5
     ownership. Its rank-one sidecars are copied into read-only float64 arrays;
-    their required one-box length is checked immediately before each commit.
+    their required one-box length is checked immediately before every nonzero
+    substep commit. The configuration is not a P3 configuration and does not
+    create a transaction spanning a complete ``Nucleation.execute`` call.
 
     Args:
         maximum_slot_weight: Positive maximum represented events per slot.
@@ -118,6 +121,12 @@ class NucleationCommitConfig:
         mean_radius_relative_error: Allowed resampling mean-radius error.
         surface_relative_error: Allowed resampling surface-area error.
         diversity_absolute_error: Allowed resampling diversity error.
+
+    Raises:
+        TypeError: If a scalar control, tolerance, exhaustion control, or
+            sidecar type is invalid.
+        ValueError: If a scalar or tolerance is outside its allowed domain, or
+            a sidecar is not rank one.
     """
 
     maximum_slot_weight: float
@@ -170,9 +179,12 @@ class Nucleation(RunnableABC):
     """Apply CPU-only single-box nucleation as equal sequential substeps.
 
     The runnable adapts the legacy aerosol facades to their existing backing
-    containers and returns the identical aerosol. Each successful substep is a
+    containers without copying or replacing them and returns the identical
+    aerosol. Each substep reads the current backing gas state, then performs
+    potential-rate evaluation, demand finalization, and one P3 commit for an
+    equal fraction of the requested duration. Each successful substep is a
     separate P3 transaction, so prior substeps persist when a later one fails;
-    the full call has no rollback boundary.
+    atomicity is per attempted substep, not for the whole call.
 
     Args:
         source_config: P4 potential-rate strategy and precursor selection.
@@ -186,7 +198,17 @@ class Nucleation(RunnableABC):
         commit_config: NucleationCommitConfig,
         environment: EnvironmentData,
     ) -> None:
-        """Initialize a validated CPU nucleation runnable."""
+        """Initialize a CPU-only single-box nucleation runnable.
+
+        Args:
+            source_config: Potential-rate strategy and precursor selection.
+            commit_config: Immutable source-commit controls.
+            environment: Single-box thermodynamic state.
+
+        Raises:
+            TypeError: If a supplied configuration or environment has the
+                unsupported type.
+        """
         if not isinstance(source_config, NucleationSourceConfig):
             raise TypeError("source_config must be NucleationSourceConfig")
         if not isinstance(commit_config, NucleationCommitConfig):
@@ -302,7 +324,20 @@ class Nucleation(RunnableABC):
         )
 
     def rate(self, aerosol: Aerosol) -> float:
-        """Calculate the current single-box potential event rate [#/m³/s]."""
+        """Calculate the current single-box potential event rate [#/m³/s].
+
+        Args:
+            aerosol: Legacy aerosol that provides supported backing containers.
+
+        Returns:
+            Current potential event rate [#/m³/s].
+
+        Raises:
+            TypeError: If the aerosol, backing containers, or environment have
+                unsupported types.
+            ValueError: If the supported data are not single-box, have
+                incompatible shapes, or select an invalid precursor.
+        """
         _, gas = self._topology(aerosol)
         return self._rate_from_gas(gas)
 
@@ -314,13 +349,30 @@ class Nucleation(RunnableABC):
     ) -> Aerosol:
         """Apply nucleation in equal sequential substeps.
 
+        Each substep reads the gas concentration left by preceding successful
+        substeps, so gas depletion can change later potential rates. The
+        runnable mutates the existing particle and partitioning-gas backing
+        containers and returns the identical aerosol instance. A P3 commit is
+        atomic only for its attempted substep: earlier successful commits
+        remain applied if a later substep fails, and no whole-call rollback is
+        performed.
+
         Args:
             aerosol: Legacy aerosol whose backing containers are mutated.
             time_step: Finite nonnegative total duration [s].
-            sub_steps: Positive number of equal source transactions.
+            sub_steps: Positive number of equal sequential source transactions.
 
         Returns:
             The identical aerosol instance.
+
+        Raises:
+            ValueError: If ``sub_steps`` or ``time_step`` is invalid, or the
+                supported single-box topology or precursor selection is
+                invalid.
+            TypeError: If ``time_step``, the aerosol backing containers, or
+                environment have unsupported types.
+            Exception: Propagates potential-rate, finalization, and commit
+                errors without whole-call rollback.
         """
         if (
             isinstance(sub_steps, bool)

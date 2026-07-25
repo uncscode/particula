@@ -579,6 +579,14 @@ pytest particula/gpu/tests/kernel_exports_test.py -q -Werror
   they are intentionally absent from `particula.dynamics`,
   `particula.dynamics.nucleation`, and the top-level package. It is not a
   high-level nucleation loop or a public user API.
+- The supported CPU-only, single-box process boundary is
+  `particula.dynamics.Nucleation`, constructed with
+  `NucleationSourceConfig`, `NucleationCommitConfig`, and `EnvironmentData`.
+  It operates on legacy `Aerosol` backing `ParticleData` and partitioning
+  `GasData` by identity, using equal sequential substeps that re-read gas after
+  each commit. Atomicity is per attempted P3 substep only; successful earlier
+  substeps remain applied if a later one fails. P2/P3 records, helpers, and
+  `ParticleSourceCommitConfig` remain concrete-only.
 - Direct Warp P2 and P4 primitives consume caller-owned same-device state;
   callers synchronize successful asynchronous P4 work before reading results.
   See [Fixed-Capacity Slot Exhaustion Primitives](docs/Features/slot_exhaustion_policies.md)
