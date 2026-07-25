@@ -828,15 +828,20 @@ def test_commit_config_and_finalized_diagnostics_own_payloads() -> None:
         minimum_volume=minimum_volume,
     )
     record = FinalizedSourceDiagnostics(
-        *([np.array([1.0])] * 6),
-        np.array([-1], dtype=np.int32),
-        np.array([[1.0]]),
-        np.array([1], dtype=np.int32),
-        np.array([1], dtype=np.int32),
-        np.array([0], dtype=np.int32),
-        np.array([0], dtype=np.int32),
-        requested,
-        np.array([[0.0]]),
+        potential_event_count=np.array([1.0]),
+        gas_admitted_event_count=np.array([1.0]),
+        represented_event_count=np.array([1.0]),
+        gas_limited_event_count=np.array([1.0]),
+        representation_reduction_event_count=np.array([1.0]),
+        residual_event_count=np.array([1.0]),
+        limiting_species_index=np.array([-1], dtype=np.int32),
+        gas_mass_removed=np.array([[1.0]]),
+        requested_slot_count=np.array([1], dtype=np.int32),
+        activated_slot_count=np.array([1], dtype=np.int32),
+        released_slot_count=np.array([0], dtype=np.int32),
+        exhaustion_policy_code=np.array([0], dtype=np.int32),
+        representative_volume_scale=requested,
+        conservation_residual=np.array([[0.0]]),
     )
     requested[0] = 0.5
     minimum[0] = 0.5
