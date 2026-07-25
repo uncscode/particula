@@ -17,6 +17,20 @@ from particula.dynamics.nucleation.nucleation_strategies import (
     InjectionComposition,
 )
 from particula.gas.gas_data import GasData
+from particula.particles.exhaustion import (
+    POLICY_SCALE_DEFERRED,
+    ExhaustionControls,
+    ExhaustionInputs,
+    apply_representative_volume_scaling,
+    apply_resampling,
+    plan_resampling,
+    resolve_exhaustion,
+)
+from particula.particles.particle_data import ParticleData
+from particula.particles.slot_management import (
+    activate_slots,
+    get_slot_diagnostics,
+)
 from particula.util.constants import AVOGADRO_NUMBER
 
 
@@ -395,3 +409,508 @@ def finalize_particle_source(  # noqa: C901
         SourceDemandData(per_event_mass, demand),
         SourceDiagnostics(potential_count, admitted, gas_limited, limiting),
     )
+
+
+@dataclass(frozen=True)
+class ParticleSourceCommitConfig:
+    """Immutable controls and P4 sidecars for a P3 source transaction."""
+
+    maximum_slot_weight: float
+    source_charge: float
+    exhaustion_controls: ExhaustionControls
+    requested_scale: NDArray[np.float64]
+    minimum_scale: NDArray[np.float64]
+    minimum_volume: NDArray[np.float64]
+    radius_cubed_relative_error: float = 1.0
+    mean_radius_relative_error: float = 1.0
+    surface_relative_error: float = 1.0
+    diversity_absolute_error: float = 1.0
+
+    def __post_init__(self) -> None:
+        """Validate scalar controls and defensively own P4 inputs."""
+        for name, positive in (
+            ("maximum_slot_weight", True),
+            ("source_charge", False),
+        ):
+            value = getattr(self, name)
+            if not _is_real_scalar(value):
+                raise TypeError(f"{name} must be a real scalar")
+            value = float(value)
+            if not np.isfinite(value) or (positive and value <= 0.0):
+                qualifier = "positive" if positive else "finite"
+                raise ValueError(f"{name} must be finite and {qualifier}")
+            object.__setattr__(self, name, value)
+        if not isinstance(self.exhaustion_controls, ExhaustionControls):
+            raise TypeError("exhaustion_controls must be ExhaustionControls")
+        for name in (
+            "radius_cubed_relative_error",
+            "mean_radius_relative_error",
+            "surface_relative_error",
+            "diversity_absolute_error",
+        ):
+            value = getattr(self, name)
+            if type(value) is not float:
+                raise TypeError(f"{name} must be an exact Python float")
+            if not np.isfinite(value) or value < 0.0:
+                raise ValueError(f"{name} must be finite and nonnegative")
+        for name in ("requested_scale", "minimum_scale", "minimum_volume"):
+            object.__setattr__(
+                self,
+                name,
+                _readonly_vector(getattr(self, name), np.float64, name),
+            )
+
+
+@dataclass(frozen=True)
+class FinalizedSourceDiagnostics:
+    """Immutable diagnostics from a committed P3 particle source transaction."""
+
+    potential_event_count: NDArray[np.float64]
+    gas_admitted_event_count: NDArray[np.float64]
+    represented_event_count: NDArray[np.float64]
+    gas_limited_event_count: NDArray[np.float64]
+    representation_reduction_event_count: NDArray[np.float64]
+    residual_event_count: NDArray[np.float64]
+    limiting_species_index: NDArray[np.int32]
+    gas_mass_removed: NDArray[np.float64]
+    requested_slot_count: NDArray[np.int32]
+    activated_slot_count: NDArray[np.int32]
+    released_slot_count: NDArray[np.int32]
+    exhaustion_policy_code: NDArray[np.int32]
+    representative_volume_scale: NDArray[np.float64]
+    conservation_residual: NDArray[np.float64]
+
+    def __post_init__(self) -> None:
+        """Defensively own all finalized diagnostic arrays."""
+        vectors = (
+            "potential_event_count",
+            "gas_admitted_event_count",
+            "represented_event_count",
+            "gas_limited_event_count",
+            "representation_reduction_event_count",
+            "residual_event_count",
+            "limiting_species_index",
+            "requested_slot_count",
+            "activated_slot_count",
+            "released_slot_count",
+            "exhaustion_policy_code",
+            "representative_volume_scale",
+        )
+        int_names = {
+            "limiting_species_index",
+            "requested_slot_count",
+            "activated_slot_count",
+            "released_slot_count",
+            "exhaustion_policy_code",
+        }
+        for name in vectors:
+            dtype = np.int32 if name in int_names else np.float64
+            object.__setattr__(
+                self, name, _readonly_vector(getattr(self, name), dtype, name)
+            )
+        for name in ("gas_mass_removed", "conservation_residual"):
+            object.__setattr__(
+                self,
+                name,
+                _readonly_copy(getattr(self, name), np.float64, name, ndim=2),
+            )
+
+
+def _validate_commit_particle_schema(  # noqa: C901
+    particles: object,
+) -> ParticleData:
+    """Validate P3's writable, non-overlapping particle storage boundary."""
+    if not isinstance(particles, ParticleData):
+        raise TypeError("particles must be a ParticleData")
+    fields = (
+        ("masses", particles.masses, 3),
+        ("concentration", particles.concentration, 2),
+        ("charge", particles.charge, 2),
+        ("density", particles.density, 1),
+        ("volume", particles.volume, 1),
+    )
+    for name, value, rank in fields:
+        if not isinstance(value, np.ndarray):
+            raise TypeError(f"{name} must be a numpy array")
+        if value.dtype != np.float64:
+            raise ValueError(f"{name} must have dtype float64")
+        if value.ndim != rank:
+            raise ValueError(f"{name} must have rank {rank}")
+        if not value.flags.writeable:
+            raise ValueError(f"{name} must be writable")
+    boxes, capacity, species = particles.masses.shape
+    if capacity == 0 or species == 0:
+        raise ValueError(
+            "particle capacity and species capacity must be positive"
+        )
+    if (
+        particles.concentration.shape != (boxes, capacity)
+        or particles.charge.shape != (boxes, capacity)
+        or particles.density.shape != (species,)
+        or particles.volume.shape != (boxes,)
+    ):
+        raise ValueError("particle fields have incompatible shapes")
+    arrays = tuple(value for _, value, _ in fields)
+    if any(
+        np.shares_memory(left, right)
+        for index, left in enumerate(arrays)
+        for right in arrays[index + 1 :]
+    ):
+        raise ValueError("particle fields must not share storage")
+    if (
+        not np.all(np.isfinite(particles.masses))
+        or np.any(particles.masses < 0.0)
+        or not np.all(np.isfinite(particles.concentration))
+        or np.any(particles.concentration < 0.0)
+        or not np.all(np.isfinite(particles.charge))
+        or not np.all(np.isfinite(particles.density))
+        or np.any(particles.density <= 0.0)
+        or not np.all(np.isfinite(particles.volume))
+        or np.any(particles.volume <= 0.0)
+    ):
+        raise ValueError("particle fields must contain finite physical values")
+    return particles
+
+
+def _validate_commit_inputs(  # noqa: C901
+    demand: object,
+    diagnostics: object,
+    particles: object,
+    gas: object,
+    config: object,
+) -> tuple[
+    SourceDemandData,
+    SourceDiagnostics,
+    ParticleData,
+    GasData,
+    ParticleSourceCommitConfig,
+]:
+    """Validate P2 records and mutable P3 boundary state before staging."""
+    if not isinstance(demand, SourceDemandData):
+        raise TypeError("demand must be SourceDemandData")
+    if not isinstance(diagnostics, SourceDiagnostics):
+        raise TypeError("diagnostics must be SourceDiagnostics")
+    particles = _validate_commit_particle_schema(particles)
+    if not isinstance(gas, GasData):
+        raise TypeError("gas must be GasData")
+    if not isinstance(config, ParticleSourceCommitConfig):
+        raise TypeError("config must be ParticleSourceCommitConfig")
+    boxes, _, species = particles.masses.shape
+    if gas.concentration.shape != (boxes, species):
+        raise ValueError("gas concentration shape must match particles")
+    _validate_gas(gas, boxes, species)
+    if (
+        gas.concentration.dtype != np.float64
+        or not gas.concentration.flags.writeable
+        or not gas.concentration.flags.c_contiguous
+    ):
+        raise ValueError(
+            "gas concentration must be writable contiguous float64"
+        )
+    if any(
+        np.shares_memory(gas.concentration, field)
+        for field in (
+            particles.masses,
+            particles.concentration,
+            particles.charge,
+            particles.density,
+            particles.volume,
+        )
+    ):
+        raise ValueError("gas concentration must not share particle storage")
+    arrays = (
+        demand.per_event_mass,
+        demand.gas_mass_removed,
+        diagnostics.potential_event_count,
+        diagnostics.gas_admitted_event_count,
+        diagnostics.gas_limited_event_count,
+        diagnostics.limiting_species_index,
+    )
+    if any(array.flags.writeable for array in arrays):
+        raise ValueError("P2 records must have read-only arrays")
+    if (
+        demand.per_event_mass.dtype != np.float64
+        or demand.gas_mass_removed.dtype != np.float64
+        or diagnostics.potential_event_count.dtype != np.float64
+        or diagnostics.gas_admitted_event_count.dtype != np.float64
+        or diagnostics.gas_limited_event_count.dtype != np.float64
+        or diagnostics.limiting_species_index.dtype != np.int32
+    ):
+        raise ValueError("P2 records must have documented dtypes")
+    if (
+        demand.per_event_mass.shape != (species,)
+        or demand.gas_mass_removed.shape != (boxes, species)
+        or any(
+            array.shape != (boxes,)
+            for array in (
+                diagnostics.potential_event_count,
+                diagnostics.gas_admitted_event_count,
+                diagnostics.gas_limited_event_count,
+                diagnostics.limiting_species_index,
+            )
+        )
+    ):
+        raise ValueError("P2 record shapes are inconsistent")
+    if (
+        not np.all(np.isfinite(demand.per_event_mass))
+        or np.any(demand.per_event_mass < 0.0)
+        or not np.all(np.isfinite(demand.gas_mass_removed))
+        or np.any(demand.gas_mass_removed < 0.0)
+        or any(
+            not np.all(np.isfinite(array)) or np.any(array < 0.0)
+            for array in (
+                diagnostics.potential_event_count,
+                diagnostics.gas_admitted_event_count,
+                diagnostics.gas_limited_event_count,
+            )
+        )
+    ):
+        raise ValueError("P2 records must be finite and nonnegative")
+    if not np.allclose(
+        diagnostics.gas_admitted_event_count
+        + diagnostics.gas_limited_event_count,
+        diagnostics.potential_event_count,
+        rtol=1e-12,
+        atol=1e-30,
+    ) or not np.allclose(
+        demand.gas_mass_removed,
+        diagnostics.gas_admitted_event_count[:, None]
+        * demand.per_event_mass[None, :],
+        rtol=1e-12,
+        atol=1e-30,
+    ):
+        raise ValueError("P2 records are mutually inconsistent")
+    if np.any(
+        (diagnostics.limiting_species_index < -1)
+        | (diagnostics.limiting_species_index >= species)
+    ):
+        raise ValueError("P2 limiting species indices are invalid")
+    for name in ("requested_scale", "minimum_scale", "minimum_volume"):
+        values = getattr(config, name)
+        if values.shape != (boxes,):
+            raise ValueError(f"{name} must have shape (B,)")
+    if (
+        not np.all(np.isfinite(config.requested_scale))
+        or not np.all(np.isfinite(config.minimum_scale))
+        or not np.all(np.isfinite(config.minimum_volume))
+        or np.any(config.minimum_scale <= 0.0)
+        or np.any(config.minimum_scale > config.requested_scale)
+        or np.any(config.requested_scale > 1.0)
+        or np.any(config.minimum_volume <= 0.0)
+    ):
+        raise ValueError("invalid representative-volume scaling configuration")
+    return demand, diagnostics, particles, gas, config
+
+
+def _request_counts(
+    event_count: NDArray[np.float64], maximum_slot_weight: float, capacity: int
+) -> NDArray[np.int32]:
+    """Return checked equal-weight request counts for each source row."""
+    with np.errstate(over="raise", invalid="raise"):
+        try:
+            requested = np.ceil(event_count / maximum_slot_weight)
+        except FloatingPointError as error:
+            raise ValueError("requested slot count must be finite") from error
+    if (
+        not np.all(np.isfinite(requested))
+        or np.any(requested < 0.0)
+        or np.any(requested > capacity)
+    ):
+        raise ValueError("requested slot count exceeds particle capacity")
+    return requested.astype(np.int32)
+
+
+def _weighted_particle_mass(particles: ParticleData) -> NDArray[np.float64]:
+    """Calculate concentration-weighted particle mass without a 3-D product."""
+    return np.einsum(
+        "bn,bns->bs",
+        particles.concentration,
+        particles.masses,
+        dtype=np.float64,
+        optimize=True,
+    )
+
+
+def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
+    demand: SourceDemandData,
+    diagnostics: SourceDiagnostics,
+    particles: ParticleData,
+    gas: GasData,
+    config: ParticleSourceCommitConfig,
+) -> FinalizedSourceDiagnostics:
+    """Commit a gas-admitted source into staged fixed-capacity particle storage.
+
+    P2 demand and event counts are in #/m³ and mass concentrations are kg/m³;
+    per-event particle masses are kg/event and ``source_charge`` is in
+    elementary-charge counts. All policy, resampling, scaling, and activation
+    work occurs on a private ``ParticleData.copy()``. Selected representative
+    volume rows scale pre-existing particle *and gas* concentration before the
+    final source mass is subtracted. Returned diagnostics own read-only arrays.
+    Only caller ``masses``, ``concentration``, ``charge``, ``volume``, and gas
+    concentration arrays are mutated, and only after complete validation.
+
+    Args:
+        demand: Immutable P2 per-event mass and provisional gas-demand record.
+        diagnostics: Immutable P2 event-count diagnostics.
+        particles: Writable fixed-capacity particle data.
+        gas: Writable gas concentration inventory.
+        config: Immutable capacity, resampling, and P4 scaling controls.
+
+    Returns:
+        Immutable final event, slot, policy, gas-transfer, and conservation
+        diagnostics.
+
+    Raises:
+        TypeError: If a boundary object has the wrong type.
+        ValueError: If schemas, physical values, P2 records, capacity policy,
+            scaling, activation, gas inventory, or conservation are invalid.
+    """
+    demand, diagnostics, particles, gas, config = _validate_commit_inputs(
+        demand, diagnostics, particles, gas, config
+    )
+    particle_pre = _weighted_particle_mass(particles)
+    gas_pre = gas.concentration.copy()
+    staged_particles = particles.copy()
+    boxes, capacity, species = staged_particles.masses.shape
+
+    provisional_counts = _request_counts(
+        diagnostics.gas_admitted_event_count,
+        config.maximum_slot_weight,
+        capacity,
+    )
+    free_indices, active_counts, free_counts = get_slot_diagnostics(
+        staged_particles
+    )
+    releasable = np.maximum(active_counts - 1, 0).astype(np.int32)
+    exhaustion_plan = resolve_exhaustion(
+        ExhaustionInputs(
+            provisional_counts,
+            free_counts,
+            releasable,
+            free_indices,
+        ),
+        config.exhaustion_controls,
+    )
+    resampling_plan = plan_resampling(
+        staged_particles,
+        exhaustion_plan,
+        radius_cubed_relative_error=config.radius_cubed_relative_error,
+        mean_radius_relative_error=config.mean_radius_relative_error,
+        surface_relative_error=config.surface_relative_error,
+        diversity_absolute_error=config.diversity_absolute_error,
+    )
+    apply_resampling(staged_particles, resampling_plan)
+    policy_codes = np.asarray(
+        [plan.policy_code for plan in exhaustion_plan.box_plans], dtype=np.int32
+    )
+    released_counts = np.asarray(
+        [len(plan.released_indices) for plan in resampling_plan.box_plans],
+        dtype=np.int32,
+    )
+
+    provisional_demand = np.ascontiguousarray(
+        diagnostics.gas_admitted_event_count.copy(), dtype=np.float64
+    )
+    scaling_required = np.ascontiguousarray(
+        policy_codes == POLICY_SCALE_DEFERRED, dtype=np.bool_
+    )
+    requested_scale = np.array(
+        config.requested_scale, dtype=np.float64, copy=True
+    )
+    minimum_scale = np.array(config.minimum_scale, dtype=np.float64, copy=True)
+    minimum_volume = np.array(
+        config.minimum_volume, dtype=np.float64, copy=True
+    )
+    resolved_scale = np.zeros(boxes, dtype=np.float64)
+    _, represented_events, resolved_scale = apply_representative_volume_scaling(
+        staged_particles,
+        provisional_demand,
+        scaling_required,
+        requested_scale,
+        minimum_scale,
+        minimum_volume,
+        resolved_scale,
+    )
+    reduction = diagnostics.gas_admitted_event_count - represented_events
+    if (
+        not np.all(np.isfinite(represented_events))
+        or np.any(represented_events < 0.0)
+        or not np.all(np.isfinite(reduction))
+        or np.any(reduction < 0.0)
+    ):
+        raise ValueError(
+            "represented source demand must be finite and nonnegative"
+        )
+    requested_counts = _request_counts(
+        represented_events, config.maximum_slot_weight, capacity
+    )
+    request_capacity = max(1, int(np.max(requested_counts, initial=0)))
+    request_masses = np.zeros(
+        (boxes, request_capacity, species), dtype=np.float64
+    )
+    request_concentration = np.zeros(
+        (boxes, request_capacity), dtype=np.float64
+    )
+    request_charge = np.zeros((boxes, request_capacity), dtype=np.float64)
+    for box_index, count in enumerate(requested_counts):
+        prefix = int(count)
+        if prefix:
+            request_masses[box_index, :prefix] = demand.per_event_mass
+            request_concentration[box_index, :prefix] = (
+                represented_events[box_index] / prefix
+            )
+            request_charge[box_index, :prefix] = config.source_charge
+    activated_counts = activate_slots(
+        staged_particles,
+        request_masses,
+        request_concentration,
+        request_charge,
+        requested_counts,
+    )
+    gas_mass_removed = (
+        represented_events[:, None] * demand.per_event_mass[None, :]
+    )
+    staged_gas = resolved_scale[:, None] * gas_pre - gas_mass_removed
+    if (
+        not np.all(np.isfinite(staged_gas))
+        or np.any(staged_gas < 0.0)
+        or not np.all(np.isfinite(gas_mass_removed))
+    ):
+        raise ValueError(
+            "final gas concentration must be finite and nonnegative"
+        )
+    particle_post = _weighted_particle_mass(staged_particles)
+    residual = (
+        particle_post
+        + staged_gas
+        - resolved_scale[:, None] * (particle_pre + gas_pre)
+    )
+    if not np.all(np.isfinite(residual)) or not np.allclose(
+        residual, 0.0, rtol=1e-12, atol=1e-30
+    ):
+        raise ValueError(
+            "particle and gas source transaction must conserve mass"
+        )
+    residual_events = np.zeros(boxes, dtype=np.float64)
+    finalized = FinalizedSourceDiagnostics(
+        potential_event_count=diagnostics.potential_event_count,
+        gas_admitted_event_count=diagnostics.gas_admitted_event_count,
+        represented_event_count=represented_events,
+        gas_limited_event_count=diagnostics.gas_limited_event_count,
+        representation_reduction_event_count=reduction,
+        residual_event_count=residual_events,
+        limiting_species_index=diagnostics.limiting_species_index,
+        gas_mass_removed=gas_mass_removed,
+        requested_slot_count=requested_counts,
+        activated_slot_count=activated_counts,
+        released_slot_count=released_counts,
+        exhaustion_policy_code=policy_codes,
+        representative_volume_scale=resolved_scale,
+        conservation_residual=residual,
+    )
+    particles.masses[:] = staged_particles.masses
+    particles.concentration[:] = staged_particles.concentration
+    particles.charge[:] = staged_particles.charge
+    particles.volume[:] = staged_particles.volume
+    gas.concentration[:] = staged_gas
+    return finalized
