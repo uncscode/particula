@@ -166,12 +166,13 @@ formation size and another size of interest.
 
 ```mermaid
 flowchart TD
-    M[Precursor mass concentration c_m kg/m³] --> C[Convert with M and N_A to C #/m³]
-    T[Temperature and concentration validity intervals] --> G{Inside inclusive intervals?}
-    C --> G
-    S[Optional saturation interval] --> SG{Saturation gate}
+    I[Validate basic mass, molar-mass, temperature, and saturation inputs] --> C[Convert c_m with M and N_A to C #/m³]
+    C --> ZC{Zero coefficient, C, or survival?}
+    ZC -->|yes| Z[Return zero potential rate]
+    ZC -->|no| G{C and T inside inclusive intervals?}
+    S[Configured saturation interval] --> SG{Saturation gate}
     G -->|yes| SG
-    SG -->|below lower bound| Z[Return zero potential rate]
+    SG -->|below lower bound| Z
     SG -->|within interval| R[Evaluate A C or K C²]
     F[Configured survival factor] --> R
     R --> P[Potential event rate J #/m³/s]
@@ -180,12 +181,15 @@ flowchart TD
     P --> B[No particle source or inventory mutation]
 ```
 
-Validity intervals are closed: their lower and upper endpoints are accepted.
-The concentration and temperature must lie in their configured intervals for a
-nonzero calculation. Saturation is optional; when it is configured, saturation
-below its lower bound is a deliberate zero-rate gate, while saturation above
-its upper bound is rejected. This asymmetric behavior prevents an unsupported
-high-saturation extrapolation from being silently treated as a valid rate.
+Basic input validation, including saturation presence and form, and mass-to-
+number conversion occur before every zero return. A valid zero coefficient,
+concentration, or survival factor then returns exactly zero before closed-domain
+membership is checked. Validity intervals are closed: their lower and upper
+endpoints are accepted for nonzero calculations. Saturation is optional; when
+it is configured, saturation below its lower bound is a deliberate zero-rate
+gate, while saturation above its upper bound is rejected. This asymmetric
+behavior prevents an unsupported high-saturation extrapolation from being
+silently treated as a valid rate.
 
 Formation-size metadata and injection composition may accompany the rate
 configuration so that a later source process can state its intended physical

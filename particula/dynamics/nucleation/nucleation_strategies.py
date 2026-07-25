@@ -1,9 +1,10 @@
 """Validated CPU-only potential-rate strategies for particle nucleation.
 
-Activation and kinetic parameterizations return potential rates [#/m³/s] from
-precursor number concentration [#/m³]. They do not create particles or mutate
-gas, particle, or slot state. This concrete module is intentionally not
-re-exported through ``particula.dynamics``.
+Activation and kinetic parameterizations accept precursor mass concentration
+[kg/m³], convert it to number concentration [#/m³], and return potential rates
+[#/m³/s]. They do not create particles or mutate gas, particle, or slot state.
+This concrete module is intentionally not re-exported through
+``particula.dynamics``.
 
 Kulmala, M., et al. (2006). Toward direct measurement of atmospheric
 nucleation. *Science*, 318, 89--92.
@@ -11,8 +12,8 @@ https://doi.org/10.1126/science.1144124
 
 Seinfeld, J. H., & Pandis, S. N. (2016). *Atmospheric Chemistry and Physics*.
 Kerminen, V.-M., & Kulmala, M. (2002). Analytical formulae connecting the
-"real" and the "apparent" nucleation rate. *JGR*, 107(D22), 4627.
-https://doi.org/10.1029/2002JD002184
+"real" and the "apparent" nucleation rate. *Journal of Aerosol Science*, 33,
+609--622. https://doi.org/10.1016/S0021-8502(01)00194-X
 """
 
 from abc import ABC, abstractmethod
@@ -308,22 +309,56 @@ def _convert_number_concentration(
         Finite precursor molecule number concentration [#/m³].
 
     Raises:
-        ValueError: If float64 conversion or multiplication is nonfinite.
+        ValueError: If the final float64 conversion is nonfinite.
     """
+    if precursor_mass_concentration == 0:
+        return 0.0
     try:
-        with np.errstate(over="raise", divide="raise", invalid="raise"):
-            concentration = (
-                np.float64(precursor_mass_concentration)
-                / np.float64(precursor_molar_mass)
-                * np.float64(AVOGADRO_NUMBER)
-            )
-    except (FloatingPointError, OverflowError) as error:
+        concentration = _scaled_product(
+            precursor_mass_concentration,
+            AVOGADRO_NUMBER,
+            divisor=precursor_molar_mass,
+        )
+    except FloatingPointError as error:
         raise ValueError(
             "precursor_number_concentration must be finite"
         ) from error
     if not np.isfinite(concentration):
         raise ValueError("precursor_number_concentration must be finite")
     return float(concentration)
+
+
+def _scaled_product(
+    *factors: float,
+    divisor: float | None = None,
+) -> np.float64:
+    """Return a float64 product without intermediate range loss.
+
+    Mantissas remain near one while powers of two are accumulated separately,
+    so only the final ``ldexp`` can underflow or overflow.
+
+    Args:
+        *factors: Positive finite factors to multiply.
+        divisor: Optional positive finite divisor.
+
+    Returns:
+        Float64 product, including a representable subnormal final value.
+
+    Raises:
+        FloatingPointError: If the final result overflows or is invalid.
+    """
+    mantissa = np.float64(1.0)
+    exponent = 0
+    for factor in factors:
+        factor_mantissa, factor_exponent = np.frexp(np.float64(factor))
+        mantissa *= factor_mantissa
+        exponent += int(factor_exponent)
+    if divisor is not None:
+        divisor_mantissa, divisor_exponent = np.frexp(np.float64(divisor))
+        mantissa /= divisor_mantissa
+        exponent -= int(divisor_exponent)
+    with np.errstate(over="raise", invalid="raise", under="ignore"):
+        return np.ldexp(mantissa, exponent)
 
 
 def _preflight_rate_inputs(
@@ -442,15 +477,22 @@ def _calculate_rate(
         Finite potential formation-event rate [#/m³/s].
 
     Raises:
-        ValueError: If float64 rate evaluation overflows or is nonfinite.
+        ValueError: If the final float64 rate is nonfinite.
     """
     try:
-        with np.errstate(over="raise", divide="raise", invalid="raise"):
-            rate = np.float64(coefficient) * np.float64(survival_factor)
-            if kinetic:
-                rate *= np.float64(concentration) * np.float64(concentration)
-            else:
-                rate *= np.float64(concentration)
+        if kinetic:
+            rate = _scaled_product(
+                coefficient,
+                survival_factor,
+                concentration,
+                concentration,
+            )
+        else:
+            rate = _scaled_product(
+                coefficient,
+                survival_factor,
+                concentration,
+            )
     except FloatingPointError as error:
         raise ValueError("potential_rate must be finite") from error
     if not np.isfinite(rate):

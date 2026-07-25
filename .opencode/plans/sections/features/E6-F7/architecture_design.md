@@ -11,19 +11,19 @@ mass concentration + molar mass + T + optional saturation + strategy
           |
 validate scalar physical inputs and saturation presence/form
           |
-J = A*C or K*C^2 [events m^-3 s^-1]
-          |
 validate float64 C conversion
           |
 zero coefficient/C/survival? -> exact 0.0
           |
 closed C/T checks; below-lower saturation -> exact 0.0
           |
+evaluate J = A*C or K*C^2 [events m^-3 s^-1]
+          |
 finite potential rate [#/m^3/s]
 ```
 
-`C = mass_concentration / molar_mass * N_A` is calculated in `np.float64`
-under floating-point error checks. Basic input validation and this conversion
+`C = mass_concentration / molar_mass * N_A` is calculated with representation-
+safe `np.float64` evaluation. Basic input validation and this conversion
 precede zero paths; zero paths bypass only domain membership. Concentration and
 temperature intervals are inclusive. A configured saturation below its lower
 bound is an exact zero gate, while above its upper bound raises `ValueError`.

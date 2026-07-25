@@ -125,6 +125,73 @@ def test_inclusive_domain_endpoints_accept_numpy_scalars(
     )
 
 
+def test_number_concentration_preserves_representable_final_subnormal(
+    composition: InjectionComposition,
+    metadata: FormationMetadata,
+) -> None:
+    """Mass conversion avoids underflow before Avogadro-number scaling."""
+    domain = NucleationValidityDomain(
+        ClosedInterval(0.0, 1.0e30), ClosedInterval(250.0, 320.0)
+    )
+    strategy = ActivationNucleationStrategy(1.0, domain, composition, metadata)
+    mass_concentration = 1.0e-40
+    molar_mass = 1.0e300
+    expected_concentration = mass_concentration * AVOGADRO_NUMBER / molar_mass
+
+    rate = strategy.potential_rate(mass_concentration, molar_mass, 298.15)
+
+    assert rate > 0.0
+    npt.assert_allclose(rate, expected_concentration, rtol=1.0e-12)
+
+
+@pytest.mark.parametrize(
+    "strategy_type,coefficient,survival,concentration,expected",
+    [
+        (
+            ActivationNucleationStrategy,
+            1.0e-300,
+            1.0e-300,
+            1.0e300,
+            1.0e-300,
+        ),
+        (
+            KineticNucleationStrategy,
+            1.0e-300,
+            1.0e-300,
+            1.0e200,
+            1.0e-200,
+        ),
+    ],
+)
+def test_rate_products_preserve_representable_final_values(
+    strategy_type: type[
+        ActivationNucleationStrategy | KineticNucleationStrategy
+    ],
+    coefficient: float,
+    survival: float,
+    concentration: float,
+    expected: float,
+    composition: InjectionComposition,
+    metadata: FormationMetadata,
+) -> None:
+    """Rate scaling avoids overflow or underflow in sequential products."""
+    domain = NucleationValidityDomain(
+        ClosedInterval(0.0, 1.0e301), ClosedInterval(250.0, 320.0)
+    )
+    strategy = strategy_type(
+        coefficient,
+        domain,
+        composition,
+        metadata,
+        survival,
+    )
+    molar_mass = AVOGADRO_NUMBER / concentration
+
+    rate = strategy.potential_rate(1.0, molar_mass, 298.15)
+
+    npt.assert_allclose(rate, expected, rtol=1.0e-12)
+
+
 @pytest.mark.parametrize("kind", ["activation", "kinetic"])
 def test_zero_paths_and_below_saturation_gate_return_exact_zero(
     kind: str,
@@ -283,6 +350,68 @@ def test_conversion_overflow_precedes_zero_configuration_return(
     )
     with pytest.raises(ValueError, match="precursor_number_concentration"):
         strategy.potential_rate(1.0e308, 1.0e-308, 298.15, 1.5)
+
+
+@pytest.mark.parametrize(
+    "strategy_type",
+    [ActivationNucleationStrategy, KineticNucleationStrategy],
+)
+@pytest.mark.parametrize(
+    "coefficient,survival,mass",
+    [(0.0, 1.0, 1.0e-12), (1.0, 0.0, 1.0e-12), (1.0, 1.0, 0.0)],
+)
+def test_zero_paths_bypass_only_domain_membership_for_both_strategies(
+    strategy_type: type[
+        ActivationNucleationStrategy | KineticNucleationStrategy
+    ],
+    coefficient: float,
+    survival: float,
+    mass: float,
+    domain: NucleationValidityDomain,
+    composition: InjectionComposition,
+    metadata: FormationMetadata,
+) -> None:
+    """Valid zero paths bypass only membership checks for either strategy."""
+    strategy = strategy_type(
+        coefficient,
+        domain,
+        composition,
+        metadata,
+        survival,
+    )
+
+    assert strategy.potential_rate(mass, 0.1, 400.0, 3.0) == 0.0
+
+
+@pytest.mark.parametrize(
+    "strategy_type",
+    [ActivationNucleationStrategy, KineticNucleationStrategy],
+)
+@pytest.mark.parametrize(
+    "mass,molar_mass,temperature,fragment",
+    [
+        (-1.0, 0.1, 298.15, "precursor_mass_concentration"),
+        (1.0e-12, 0.0, 298.15, "precursor_molar_mass"),
+        (1.0e-12, 0.1, 0.0, "temperature"),
+    ],
+)
+def test_zero_paths_reject_invalid_basic_inputs_for_both_strategies(
+    strategy_type: type[
+        ActivationNucleationStrategy | KineticNucleationStrategy
+    ],
+    mass: float,
+    molar_mass: float,
+    temperature: float,
+    fragment: str,
+    domain: NucleationValidityDomain,
+    composition: InjectionComposition,
+    metadata: FormationMetadata,
+) -> None:
+    """Zero configuration cannot bypass either strategy's basic preflight."""
+    strategy = strategy_type(0.0, domain, composition, metadata)
+
+    with pytest.raises(ValueError, match=fragment):
+        strategy.potential_rate(mass, molar_mass, temperature, 1.5)
 
 
 @pytest.mark.parametrize(
