@@ -1,5 +1,6 @@
 """Regression tests for strict P4 nucleation builders."""
 
+import sys
 from dataclasses import FrozenInstanceError
 
 import numpy as np
@@ -46,6 +47,9 @@ def test_activation_mapping_normalizes_and_defaults_survival() -> None:
     assert strategy.validity_domain.precursor_number_concentration.lower == 3e6
     assert strategy.validity_domain.precursor_number_concentration.upper == 4e6
     assert strategy.formation_metadata.formation_diameter == 2e-9
+    assert (
+        strategy.formation_metadata.diameter_convention == "mobility_diameter"
+    )
     assert strategy.survival_factor == 1.0
     with pytest.raises(FrozenInstanceError):
         strategy.coefficient = 1.0  # type: ignore[misc]
@@ -141,20 +145,80 @@ def test_mapping_rejects_units_schema_and_unpaired_saturation(
         ActivationNucleationBuilder().set_parameters(parameters)
 
 
-def test_failed_mapping_is_atomic_and_builder_recovers() -> None:
-    """A malformed staged mapping cannot alter previous builder configuration."""
-    builder = ActivationNucleationBuilder().set_parameters(_parameters())
+@pytest.mark.parametrize(
+    "builder_type, coefficient_units",
+    [
+        (ActivationNucleationBuilder, "s^-1"),
+        (KineticNucleationBuilder, "m^3/s"),
+    ],
+)
+def test_failed_mapping_is_atomic_and_builder_recovers(
+    builder_type: type[ActivationNucleationBuilder | KineticNucleationBuilder],
+    coefficient_units: str,
+) -> None:
+    """Invalid staged domains cannot alter a valid builder configuration."""
+    parameters = _parameters()
+    parameters["coefficient_units"] = coefficient_units
+    builder = builder_type().set_parameters(parameters)
     baseline = builder.build()
-    malformed = _parameters()
-    malformed["temperature_upper_units"] = "C"
+    malformed = parameters.copy()
+    malformed["temperature_lower"] = 301.0
 
-    with pytest.raises(ValueError, match="temperature_upper_units"):
+    with pytest.raises(ValueError, match="less than or equal"):
         builder.set_parameters(malformed)
 
     assert builder.build() == baseline
-    corrected = _parameters()
+    corrected = parameters.copy()
     corrected["coefficient"] = 3.0
     assert builder.set_parameters(corrected).build().coefficient == 3.0
+
+
+@pytest.mark.parametrize(
+    "setter, value, units, message",
+    [
+        (
+            "set_precursor_number_concentration_lower",
+            sys.float_info.max,
+            "1/cm^3",
+            "finite",
+        ),
+        ("set_formation_diameter", 5e-324, "nm", "remain positive"),
+    ],
+)
+def test_unit_conversion_rejects_invalid_normalized_values(
+    setter: str,
+    value: float,
+    units: str,
+    message: str,
+) -> None:
+    """Conversion rejects overflow and positivity-destroying underflow."""
+    with pytest.raises(ValueError, match=message):
+        getattr(ActivationNucleationBuilder(), setter)(value, units)
+
+
+@pytest.mark.parametrize("composition", [[1, 2], (1, 2)])
+def test_injection_composition_accepts_ordered_sequences(
+    composition: list[int] | tuple[int, int],
+) -> None:
+    """Ordered, bounded composition sequences are copied into the strategy."""
+    strategy = (
+        ActivationNucleationBuilder()
+        .set_parameters({**_parameters(), "injection_composition": composition})
+        .build()
+    )
+
+    assert strategy.injection_composition.molecule_counts == (1, 2)
+
+
+@pytest.mark.parametrize(
+    "composition", [(item for item in [1, 2]), {1: 2}, {1, 2}]
+)
+def test_injection_composition_rejects_unbounded_or_unordered_inputs(
+    composition: object,
+) -> None:
+    """Composition cannot consume generators or accept unordered containers."""
+    with pytest.raises(TypeError, match="sequence"):
+        ActivationNucleationBuilder().set_injection_composition(composition)
 
 
 def test_fluent_builder_requires_configuration_and_copies_composition() -> None:
@@ -265,18 +329,55 @@ def test_source_configuration_rejects_abstract_strategy_subclass() -> None:
         NucleationSourceConfig(UnsupportedStrategy(), 0)
 
 
-@pytest.mark.parametrize("index", [True, -1, 1.5])
+@pytest.mark.parametrize(
+    "index, exception_type",
+    [
+        (True, TypeError),
+        (np.bool_(True), TypeError),
+        (-1, ValueError),
+        (np.int32(-1), ValueError),
+        (1.5, TypeError),
+        (np.float64(1.5), TypeError),
+    ],
+)
 def test_source_configuration_builder_rejects_invalid_index(
     index: object,
+    exception_type: type[Exception],
 ) -> None:
     """Source configuration validates its index through the immutable record."""
     strategy = (
         ActivationNucleationBuilder().set_parameters(_parameters()).build()
     )
-    with pytest.raises((TypeError, ValueError), match="precursor_index"):
+    with pytest.raises(exception_type, match="precursor_index"):
         NucleationSourceConfigBuilder().set_parameters(
             {"strategy": strategy, "precursor_index": index}
         )
+
+
+@pytest.mark.parametrize(
+    "index, exception_type, message",
+    [
+        (True, TypeError, "precursor_index must be an integer"),
+        (-1, ValueError, "precursor_index must be nonnegative"),
+    ],
+)
+def test_source_builder_invalid_index_is_atomic_with_exact_error(
+    index: object,
+    exception_type: type[Exception],
+    message: str,
+) -> None:
+    """Invalid indexes preserve staged metadata and retain exact errors."""
+    strategy = (
+        ActivationNucleationBuilder().set_parameters(_parameters()).build()
+    )
+    builder = NucleationSourceConfigBuilder().set_parameters(
+        {"strategy": strategy, "precursor_index": 1}
+    )
+
+    with pytest.raises(exception_type, match=f"^{message}$"):
+        builder.set_parameters({"strategy": strategy, "precursor_index": index})
+
+    assert builder.build().precursor_index == 1
 
 
 @pytest.mark.parametrize(
@@ -313,6 +414,32 @@ def test_source_builder_rejects_extra_keys_atomically() -> None:
                 "duration": 1.0,
             }
         )
+
+    assert builder.build().precursor_index == 1
+
+
+@pytest.mark.parametrize(
+    "invalid_parameters, exception_type",
+    [
+        ({"strategy": None, "precursor_index": 1}, ValueError),
+        ({"strategy": None, "precursor_index": -1}, ValueError),
+        ({"strategy": None, "precursor_index": True}, ValueError),
+    ],
+)
+def test_source_builder_invalid_mapping_retains_prior_configuration(
+    invalid_parameters: dict[str, object],
+    exception_type: type[Exception],
+) -> None:
+    """Schema-valid invalid source mappings leave prior metadata buildable."""
+    strategy = (
+        ActivationNucleationBuilder().set_parameters(_parameters()).build()
+    )
+    builder = NucleationSourceConfigBuilder().set_parameters(
+        {"strategy": strategy, "precursor_index": 1}
+    )
+
+    with pytest.raises(exception_type):
+        builder.set_parameters(invalid_parameters)
 
     assert builder.build().precursor_index == 1
 

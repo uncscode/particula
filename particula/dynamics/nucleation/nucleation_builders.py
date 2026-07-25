@@ -6,7 +6,9 @@ source-demand finalization and particle or gas mutation remain in the concrete
 ``particle_source`` module.
 """
 
+import math
 from abc import ABC
+from collections.abc import Sequence
 from typing import Self, cast
 
 from particula.abc_builder import BuilderABC
@@ -96,7 +98,10 @@ class _NucleationStrategyBuilder(BuilderABC, ABC):
         normalized = _nonnegative_scalar(value, name)
         normalized_unit = _NucleationStrategyBuilder._unit(unit, accepted, name)
         factors = {"cm^3/s": 1e-6, "1/cm^3": 1e6, "nm": 1e-9}
-        return normalized * factors.get(normalized_unit, 1.0)
+        converted = normalized * factors.get(normalized_unit, 1.0)
+        if not math.isfinite(converted):
+            raise ValueError(f"{name} must be finite")
+        return converted
 
     def set_coefficient(self, value: object, units: object) -> Self:
         """Set the strategy coefficient after unit normalization.
@@ -184,7 +189,11 @@ class _NucleationStrategyBuilder(BuilderABC, ABC):
         normalized_unit = self._unit(units, accepted, name)
         normalized = _positive_scalar(value, name)
         if normalized_unit == "nm":
-            return normalized * 1e-9
+            normalized *= 1e-9
+        if not math.isfinite(normalized):
+            raise ValueError(f"{name} must be finite")
+        if normalized == 0:
+            raise ValueError(f"{name} must remain positive after conversion")
         return normalized
 
     def set_temperature_lower(self, value: object, units: object) -> Self:
@@ -281,22 +290,19 @@ class _NucleationStrategyBuilder(BuilderABC, ABC):
         """Copy and validate future formed-particle composition metadata.
 
         Args:
-            value: Iterable nonnegative molecule counts with at least one
-                positive count.
+            value: Ordered bounded sequence of nonnegative molecule counts with
+                at least one positive count.
 
         Returns:
             This builder for fluent configuration.
 
         Raises:
-            TypeError: If ``value`` is not an iterable accepted by the record.
+            TypeError: If ``value`` is not an ordered bounded sequence.
             ValueError: If the copied composition is invalid.
         """
-        try:
-            counts: tuple[object, ...] = tuple(value)  # type: ignore[arg-type]
-        except TypeError as error:
-            raise TypeError(
-                "injection_composition must be a sequence"
-            ) from error
+        if not isinstance(value, Sequence):
+            raise TypeError("injection_composition must be a sequence")
+        counts: tuple[object, ...] = tuple(value)
         self.injection_composition = InjectionComposition(counts)  # type: ignore[arg-type]
         return self
 
@@ -400,6 +406,7 @@ class _NucleationStrategyBuilder(BuilderABC, ABC):
         staged.set_diameter_convention(
             parameters.get("diameter_convention", "mobility_diameter")
         )
+        staged.build()
         for name in _STAGED_ATTRIBUTES:
             setattr(self, name, getattr(staged, name))
         return self

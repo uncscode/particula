@@ -196,7 +196,9 @@ configuration so that a later source process can state its intended physical
 representation. They do not alter either equation in P1. In particular, this
 boundary neither creates particles nor gas/particle inventories, chooses
 slots, depletes precursor vapor, or applies a timestep. It is not a public
-strategy API, runnable, or GPU capability.
+runtime, runnable, or GPU capability. The bounded CPU-only P4 construction
+API exports immutable activation and kinetic strategies, their builders, and a
+factory through `particula.dynamics.nucleation` and `particula.dynamics`.
 
 ## Survival to Detectable and Model-Resolved Sizes
 
@@ -265,14 +267,15 @@ nucleation and timestep orchestration remain deferred; see the
 
 **Implementation boundary:**
 
-- A deliberately unexported CPU-only scalar potential-rate implementation
-  exists for the activation and kinetic equations described above. It is not a
-  supported public strategy interface.
-- The concrete CPU P2 particle-source planner computes gas-inventory-limited
-  source demand from a shared admitted event count per box. It returns immutable
-  demand and limiting-species diagnostics without mutating gas inventory.
-- Particle activation, gas depletion, slot-exhaustion policy, timestep coupling,
-  runnable orchestration, and GPU support remain deferred. The source-term
+- The CPU-only P4 activation and kinetic potential-rate strategies, builders,
+  source-selection metadata, and factory are supported public construction APIs.
+  They remain immutable configuration and rate-evaluation boundaries only.
+- The concrete CPU P2 particle-source planner and P3 finalization transaction
+  remain in `particula.dynamics.nucleation.particle_source`. They are not
+  re-exported through `particula.dynamics.nucleation` or `particula.dynamics`.
+  P2 returns inventory-limited source demand and diagnostics without mutation;
+  P3 owns the bounded particle/gas transaction.
+- Runnable orchestration and GPU support remain deferred. The source-term
   discussion in this section remains conceptual guidance for a future
   composition of those responsibilities.
 
