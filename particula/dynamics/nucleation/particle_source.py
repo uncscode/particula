@@ -1,9 +1,13 @@
-"""Plan gas-admitted particle-source demand without mutating simulation state.
+"""Plan and atomically commit CPU particle-source transactions.
 
-This concrete-module-only, CPU P2 boundary converts survival-adjusted potential
-event rates [#/m³/s] and a duration [s] into immutable gas mass-demand records.
-It neither activates particle slots nor plans capacity exhaustion, and it does
-not mutate :class:`~particula.gas.gas_data.GasData` or caller-owned inputs.
+The concrete-module-only P2 boundary converts survival-adjusted potential event
+rates [#/m³/s] and a duration [s] into immutable, gas-admitted source-demand
+records without accessing particle capacity or mutating caller state. The P3
+boundary consumes those records, stages slot activation and exhaustion policy on
+a private ``ParticleData`` copy, and writes validated particle and gas arrays
+atomically. P3 scales pre-existing particle and gas concentrations for
+selected representative-volume rows before removing finalized source mass.
+Neither P2 nor P3 is exported through public package namespaces.
 """
 
 from dataclasses import dataclass
@@ -413,7 +417,33 @@ def finalize_particle_source(  # noqa: C901
 
 @dataclass(frozen=True)
 class ParticleSourceCommitConfig:
-    """Immutable controls and P4 sidecars for a P3 source transaction."""
+    """Own controls and representative-volume inputs for a P3 transaction.
+
+    The configuration owns read-only float64 P4 sidecars. Their length is
+    checked against the P2 box count by ``commit_particle_source``. The four
+    resampling bounds intentionally require exact Python ``float`` values to
+    match the exhaustion-policy boundary.
+
+    Attributes:
+        maximum_slot_weight: Positive maximum represented events per activated
+            slot [#/m³].
+        source_charge: Finite charge assigned to each activated source slot
+            [elementary-charge counts].
+        exhaustion_controls: Immutable controls selecting exhaustion policies.
+        requested_scale: Requested representative-volume scale per box,
+            shape ``(n_boxes,)``. This record owns a read-only float64 copy.
+        minimum_scale: Minimum permitted representative-volume scale per box,
+            shape ``(n_boxes,)``. This record owns a read-only float64 copy.
+        minimum_volume: Minimum particle representative volume per box [m³],
+            shape ``(n_boxes,)``. This record owns a read-only float64 copy.
+        radius_cubed_relative_error: Permitted resampling relative error for
+            radius cubed.
+        mean_radius_relative_error: Permitted resampling relative error for
+            mean radius.
+        surface_relative_error: Permitted resampling relative error for surface
+            area.
+        diversity_absolute_error: Permitted resampling absolute diversity error.
+    """
 
     maximum_slot_weight: float
     source_charge: float
@@ -463,7 +493,42 @@ class ParticleSourceCommitConfig:
 
 @dataclass(frozen=True)
 class FinalizedSourceDiagnostics:
-    """Immutable diagnostics from a committed P3 particle source transaction."""
+    """Own immutable diagnostics from a committed P3 source transaction.
+
+    All arrays are fresh read-only copies. Event counts are [#/m³], gas mass
+    fields are [kg/m³], and slot counts and policy codes are ``int32``. The
+    conservation residual is ``particle_post + gas_post - scale *
+    (particle_pre + gas_pre)`` for every box and species.
+
+    Attributes:
+        potential_event_count: P2 potential event count, shape ``(n_boxes,)``.
+        gas_admitted_event_count: P2 gas-admitted event count, shape
+            ``(n_boxes,)``.
+        represented_event_count: Final event count represented in particle
+            storage, shape ``(n_boxes,)``.
+        gas_limited_event_count: P2 event count excluded by gas inventory,
+            shape ``(n_boxes,)``.
+        representation_reduction_event_count: Event count removed by
+            representative-volume scaling, shape ``(n_boxes,)``.
+        residual_event_count: Unpackaged final source demand, shape
+            ``(n_boxes,)``; successful transactions report zero.
+        limiting_species_index: P2 limiting gas-species index or ``-1``, shape
+            ``(n_boxes,)``.
+        gas_mass_removed: Final source mass removed from gas, shape
+            ``(n_boxes, n_species)``.
+        requested_slot_count: Final equal-weight source-slot request count,
+            shape ``(n_boxes,)``.
+        activated_slot_count: Number of source slots activated, shape
+            ``(n_boxes,)``.
+        released_slot_count: Number of slots released by resampling, shape
+            ``(n_boxes,)``.
+        exhaustion_policy_code: Resolved exhaustion-policy code, shape
+            ``(n_boxes,)``.
+        representative_volume_scale: Applied representative-volume scale,
+            shape ``(n_boxes,)``.
+        conservation_residual: Final particle-plus-gas scaled-domain mass
+            residual, shape ``(n_boxes, n_species)``.
+    """
 
     potential_event_count: NDArray[np.float64]
     gas_admitted_event_count: NDArray[np.float64]
@@ -519,7 +584,19 @@ class FinalizedSourceDiagnostics:
 def _validate_commit_particle_schema(  # noqa: C901
     particles: object,
 ) -> ParticleData:
-    """Validate P3's writable, non-overlapping particle storage boundary."""
+    """Validate writable, physically valid, non-overlapping P3 particle storage.
+
+    Args:
+        particles: Candidate fixed-capacity particle container.
+
+    Returns:
+        The validated particle container without modifying its arrays.
+
+    Raises:
+        TypeError: If ``particles`` or a required field has an invalid type.
+        ValueError: If field schemas, mutability, aliasing, or physical values
+            violate the P3 transaction boundary.
+    """
     if not isinstance(particles, ParticleData):
         raise TypeError("particles must be a ParticleData")
     fields = (
@@ -585,7 +662,29 @@ def _validate_commit_inputs(  # noqa: C901
     GasData,
     ParticleSourceCommitConfig,
 ]:
-    """Validate P2 records and mutable P3 boundary state before staging."""
+    """Validate immutable P2 records and mutable P3 state before staging.
+
+    This read-only preflight verifies record consistency, writable particle and
+    gas schemas, nonaliasing, and representative-volume sidecars. It performs
+    no caller-visible mutation, preserving the transaction's all-or-nothing
+    boundary if validation fails.
+
+    Args:
+        demand: Candidate P2 per-event mass and provisional gas-demand record.
+        diagnostics: Candidate P2 event-count diagnostic record.
+        particles: Candidate writable fixed-capacity particle container.
+        gas: Candidate writable gas inventory.
+        config: Candidate P3 capacity and scaling configuration.
+
+    Returns:
+        Validated, type-narrowed P2 records, particle data, gas data, and
+        transaction configuration.
+
+    Raises:
+        TypeError: If a top-level boundary object has an invalid type.
+        ValueError: If records, schemas, aliasing, physical values, or scaling
+            controls violate the P3 transaction boundary.
+    """
     if not isinstance(demand, SourceDemandData):
         raise TypeError("demand must be SourceDemandData")
     if not isinstance(diagnostics, SourceDiagnostics):
@@ -705,7 +804,24 @@ def _validate_commit_inputs(  # noqa: C901
 def _request_counts(
     event_count: NDArray[np.float64], maximum_slot_weight: float, capacity: int
 ) -> NDArray[np.int32]:
-    """Return checked equal-weight request counts for each source row."""
+    """Calculate checked equal-weight source-slot requests per box.
+
+    A positive event count requests ``ceil(event_count / maximum_slot_weight)``
+    slots; zero count requests zero slots.
+
+    Args:
+        event_count: Final or provisional represented event count [#/m³].
+        maximum_slot_weight: Positive maximum represented events per slot
+            [#/m³].
+        capacity: Fixed particle-slot capacity available in each box.
+
+    Returns:
+        Int32 source-slot request count for each box.
+
+    Raises:
+        ValueError: If the derived request count is nonfinite, negative, or
+            exceeds fixed particle capacity.
+    """
     with np.errstate(over="raise", invalid="raise"):
         try:
             requested = np.ceil(event_count / maximum_slot_weight)
@@ -721,7 +837,16 @@ def _request_counts(
 
 
 def _weighted_particle_mass(particles: ParticleData) -> NDArray[np.float64]:
-    """Calculate concentration-weighted particle mass without a 3-D product."""
+    """Calculate per-box, per-species concentration-weighted particle mass.
+
+    Args:
+        particles: Particle data with masses [kg/event] and concentrations
+            [#/m³].
+
+    Returns:
+        Particle mass concentration [kg/m³] with shape
+        ``(n_boxes, n_species)``.
+    """
     return np.einsum(
         "bn,bns->bs",
         particles.concentration,
@@ -740,14 +865,14 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
 ) -> FinalizedSourceDiagnostics:
     """Commit a gas-admitted source into staged fixed-capacity particle storage.
 
-    P2 demand and event counts are in #/m³ and mass concentrations are kg/m³;
-    per-event particle masses are kg/event and ``source_charge`` is in
-    elementary-charge counts. All policy, resampling, scaling, and activation
-    work occurs on a private ``ParticleData.copy()``. Selected representative
-    volume rows scale pre-existing particle *and gas* concentration before the
-    final source mass is subtracted. Returned diagnostics own read-only arrays.
-    Only caller ``masses``, ``concentration``, ``charge``, ``volume``, and gas
-    concentration arrays are mutated, and only after complete validation.
+    P2 demand and event counts are [#/m³], mass concentrations are [kg/m³],
+    per-event particle masses are [kg/event], and ``source_charge`` is in
+    elementary-charge counts. Policy resolution, resampling, representative-
+    volume scaling, and activation operate on a private ``ParticleData.copy()``.
+    A selected representative-volume row scales pre-existing particle and gas
+    concentrations before final source mass is subtracted. Returned diagnostics
+    own read-only arrays. Only caller ``masses``, ``concentration``, ``charge``,
+    ``volume``, and gas concentration arrays are mutated, after all validation.
 
     Args:
         demand: Immutable P2 per-event mass and provisional gas-demand record.
