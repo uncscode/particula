@@ -172,8 +172,8 @@ class SourceDiagnostics:
     """Immutable source counts and limiting-species diagnostics.
 
     All payloads are fresh, read-only arrays owned by this record. A
-    limiting-species index of ``-1`` means gas did not reduce a positive
-    potential count, including zero-potential and zero-admitted rows.
+    limiting-species index of ``-1`` means no limiter is reported, including
+    zero-potential and zero-admitted rows.
 
     Attributes:
         potential_event_count: Potential events [#/m³] with shape
@@ -206,7 +206,7 @@ class SourceDiagnostics:
             )
 
 
-def _validate_gas(
+def _validate_gas(  # noqa: C901
     gas: GasData, n_boxes: int, n_species: int
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Validate gas schema and physical inventory inputs without mutation.
@@ -224,8 +224,12 @@ def _validate_gas(
     Raises:
         ValueError: If gas schemas, dtypes, or physical values are invalid.
     """
-    if len(gas.name) != n_species:
-        raise ValueError("composition width must match gas species")
+    if (
+        not isinstance(gas.name, list)
+        or len(gas.name) != n_species
+        or not all(isinstance(name, str) for name in gas.name)
+    ):
+        raise ValueError("gas name must be a list of n_species strings")
     if not isinstance(gas.molar_mass, np.ndarray) or gas.molar_mass.shape != (
         n_species,
     ):
@@ -238,6 +242,8 @@ def _validate_gas(
         gas.partitioning, np.ndarray
     ) or gas.partitioning.shape != (n_species,):
         raise ValueError("gas partitioning must have shape (n_species,)")
+    if gas.partitioning.dtype != np.bool_:
+        raise ValueError("gas partitioning must be a boolean array")
     if (
         gas.molar_mass.dtype.kind in "bOSUc"
         or gas.concentration.dtype.kind in "bOSUc"
@@ -305,7 +311,16 @@ def finalize_particle_source(  # noqa: C901
     n_boxes = potential_count.size
     n_species = len(composition.molecule_counts)
     molar_mass, concentration = _validate_gas(gas, n_boxes, n_species)
-    counts = np.asarray(composition.molecule_counts, dtype=np.float64)
+    if any(count > 2**53 for count in composition.molecule_counts):
+        raise ValueError("molecule_counts must be representable as float64")
+    try:
+        counts = np.asarray(composition.molecule_counts, dtype=np.float64)
+    except (TypeError, ValueError, OverflowError) as error:
+        raise ValueError(
+            "molecule_counts must be representable as float64"
+        ) from error
+    if not np.all(np.isfinite(counts)):
+        raise ValueError("molecule_counts must be representable as float64")
     participating = np.flatnonzero(counts > 0.0)
     if np.any(molar_mass[participating] <= 0.0):
         raise ValueError("participating gas molar_mass must be positive")
@@ -359,6 +374,11 @@ def finalize_particle_source(  # noqa: C901
         if not np.any(overshot):
             break
         admitted[overshot] = np.nextafter(admitted[overshot], -np.inf)
+    with np.errstate(over="raise", invalid="raise"):
+        try:
+            demand = admitted[:, None] * per_event_mass[None, :]
+        except FloatingPointError as error:
+            raise ValueError("gas_mass_removed must be finite") from error
     if np.any(demand[:, participating] > concentration[:, participating]):
         raise ValueError("gas demand remains out of inventory after correction")
     if not np.all(np.isfinite(demand)) or np.any(demand < 0.0):

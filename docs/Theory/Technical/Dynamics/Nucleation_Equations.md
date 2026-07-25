@@ -268,10 +268,13 @@ nucleation and timestep orchestration remain deferred; see the
 - A deliberately unexported CPU-only scalar potential-rate implementation
   exists for the activation and kinetic equations described above. It is not a
   supported public strategy interface.
-- Particle-source construction, gas depletion, inventory or slot admission,
-  timestep coupling, runnable orchestration, and GPU support are outside this
-  bounded implementation. The source-term discussion in this section remains
-  conceptual guidance for any future composition of those responsibilities.
+- The concrete CPU P2 particle-source planner computes gas-inventory-limited
+  source demand from a shared admitted event count per box. It returns immutable
+  demand and limiting-species diagnostics without mutating gas inventory.
+- Particle activation, gas depletion, slot-exhaustion policy, timestep coupling,
+  runnable orchestration, and GPU support remain deferred. The source-term
+  discussion in this section remains conceptual guidance for a future
+  composition of those responsibilities.
 
 ## Variable Descriptions
 

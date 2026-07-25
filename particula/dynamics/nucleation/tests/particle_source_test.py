@@ -82,6 +82,26 @@ def test_inventory_limit_ties_and_exact_depletion_are_deterministic() -> None:
     )
 
 
+def test_inventory_tie_uses_original_noncontiguous_species_index() -> None:
+    """Tie diagnostics retain the original gas-species index."""
+    composition = InjectionComposition((0, 1, 0, 2))
+    per_event = np.array([0.0, 0.2, 0.0, 0.8]) / AVOGADRO_NUMBER
+    gas = GasData(
+        name=["unused_0", "a", "unused_2", "b"],
+        molar_mass=np.array([0.1, 0.2, 0.3, 0.4]),
+        concentration=np.array(
+            [[1.0, 3.0 * per_event[1], 1.0, 3.0 * per_event[3]]]
+        ),
+        partitioning=np.array([False, True, False, True]),
+    )
+
+    _, diagnostics = finalize_particle_source(
+        PotentialEventData(np.array([7.0]), 1.0), composition, gas
+    )
+
+    npt.assert_array_equal(diagnostics.limiting_species_index, [1])
+
+
 def test_inventory_limits_each_box_by_its_tightest_participating_species() -> (
     None
 ):
@@ -319,7 +339,7 @@ def test_finalization_rejects_invalid_gas_without_mutation() -> None:
 @pytest.mark.parametrize(
     "mutate,match",
     [
-        (lambda gas: setattr(gas, "name", ["a"]), "composition width"),
+        (lambda gas: setattr(gas, "name", ["a"]), "gas name"),
         (
             lambda gas: setattr(gas, "molar_mass", np.array([[0.1, 0.2]])),
             "molar_mass must have shape",
@@ -339,6 +359,35 @@ def test_finalization_rejects_mutated_gas_schemas_without_writing(
     match: str,
 ) -> None:
     """P2 revalidates mutable gas schemas before any source calculation."""
+    gas = _gas(np.array([[1.0, 1.0, 1.0]]))
+    mutate(gas)  # type: ignore[operator]
+    concentration = gas.concentration.copy()
+
+    with pytest.raises(ValueError, match=match):
+        finalize_particle_source(
+            PotentialEventData(np.array([1.0]), 1.0),
+            InjectionComposition((1, 1, 0)),
+            gas,
+        )
+    npt.assert_array_equal(gas.concentration, concentration)
+
+
+@pytest.mark.parametrize(
+    "mutate,match",
+    [
+        (lambda gas: setattr(gas, "name", None), "gas name"),
+        (lambda gas: setattr(gas, "name", ["a", 1, "unused"]), "gas name"),
+        (
+            lambda gas: setattr(gas, "partitioning", np.array([1, 1, 0])),
+            "boolean array",
+        ),
+    ],
+)
+def test_finalization_rejects_malformed_gas_metadata_without_writing(
+    mutate: object,
+    match: str,
+) -> None:
+    """Malformed name and partitioning metadata fail deterministically."""
     gas = _gas(np.array([[1.0, 1.0, 1.0]]))
     mutate(gas)  # type: ignore[operator]
     concentration = gas.concentration.copy()
@@ -438,6 +487,75 @@ def test_finalization_rejects_rounding_correction_that_cannot_reduce_demand(
     with pytest.raises(ValueError, match="remains out of inventory"):
         finalize_particle_source(events, composition, gas)
     npt.assert_array_equal(gas.concentration, snapshot)
+
+
+def test_finalization_recomputes_demand_after_final_ulp_correction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The fourth bounded correction returns demand from its final admission."""
+    composition = InjectionComposition((1, 0, 0))
+    per_event = 0.1 / AVOGADRO_NUMBER
+    gas = _gas(np.array([[10.0 * per_event, 1.0, 1.0]]))
+    original_minimum = particle_source.np.minimum
+
+    def four_ulps_above(
+        potential: np.ndarray, inventory: np.ndarray
+    ) -> np.ndarray:
+        """Force the inventory correction to consume all four ULP steps."""
+        del potential
+        corrected = inventory.copy()
+        for _ in range(4):
+            corrected = np.nextafter(corrected, np.inf)
+        return corrected
+
+    four_ulps_above.reduce = original_minimum.reduce  # type: ignore[attr-defined]
+    monkeypatch.setattr(particle_source.np, "minimum", four_ulps_above)
+
+    demand, diagnostics = finalize_particle_source(
+        PotentialEventData(np.array([20.0]), 1.0), composition, gas
+    )
+
+    npt.assert_allclose(
+        diagnostics.gas_admitted_event_count, [10.0], rtol=1e-15
+    )
+    npt.assert_array_equal(
+        demand.gas_mass_removed,
+        diagnostics.gas_admitted_event_count[:, None]
+        * demand.per_event_mass[None, :],
+    )
+    assert np.all(demand.gas_mass_removed <= gas.concentration)
+
+
+@pytest.mark.parametrize(
+    "composition,mutate,match",
+    [
+        (
+            InjectionComposition((2**53 + 1, 0, 0)),
+            lambda gas: None,
+            "molecule_counts must be representable",
+        ),
+        (
+            InjectionComposition((2**53, 0, 0)),
+            lambda gas: gas.molar_mass.__setitem__(0, np.finfo(float).max),
+            "per_event_mass must be finite",
+        ),
+    ],
+)
+def test_finalization_rejects_unrepresentable_composition_without_writing(
+    composition: InjectionComposition,
+    mutate: object,
+    match: str,
+) -> None:
+    """Numeric composition failures are normalized and preserve gas state."""
+    gas = _gas(np.array([[1.0, 1.0, 1.0]]))
+    mutate(gas)  # type: ignore[operator]
+    concentration = gas.concentration.copy()
+
+    with pytest.raises(ValueError, match=match):
+        finalize_particle_source(
+            PotentialEventData(np.array([1.0]), 1.0), composition, gas
+        )
+    npt.assert_array_equal(gas.concentration, concentration)
 
 
 def test_concrete_p2_names_are_not_package_exports() -> None:
