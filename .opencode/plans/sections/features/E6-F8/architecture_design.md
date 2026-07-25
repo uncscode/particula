@@ -30,7 +30,8 @@ WarpParticleData + WarpGasData + config + dt + fixed-shape sidecars
         particle source added == participating gas removed
 ```
 
-For each box, the port preserves E6-F7's `E_pot = J*dt*V*f_survival` and
+For each box, the port preserves E6-F7's `E_pot = J*dt`, where survival is
+already included in `J`, and
 `m_event,s = n_s*M_s/N_A`. It computes one `alpha` across participating species
 so `E_admit = alpha*E_pot`; therefore no species becomes negative and source
 composition is not skewed. Admitted demand reaches capacity planning. If E6-F6
@@ -42,14 +43,15 @@ discarded within the final represented domain.
 
 ### P1 implementation status (#1438)
 
-P1 has implemented the first read-only stage only in
+P1 and private P2 have implemented the initial stages in
 `particula/gpu/kernels/nucleation.py`: frozen `NucleationConfig` and the three
 caller-owned sidecar records, plus private `_preflight_nucleation`. Preflight
 validates fixed-shape Warp metadata, sidecars, aliasing, physical state,
 species/count constraints, input-source rules, and gates without writes,
-fallback allocation, transfer, or rate evaluation. No symbol is exported from
-`particula.gpu.kernels`; the staged transaction and its writer stages remain
-P2--P5 work.
+fallback allocation, or transfer. P2 calculates device-resident rates and
+inventory-limited demand, then writes only its sidecars; it does not mutate
+particles or gas. No symbol is exported from `particula.gpu.kernels`; the
+staged particle transaction and writer stages remain P3--P5 work.
 
 - **Data Model:** No required container fields. Add concrete-module
   `NucleationConfig`, `NucleationScratchBuffers`,

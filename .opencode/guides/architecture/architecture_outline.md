@@ -105,10 +105,12 @@ private helpers for cross-kernel setup.
   codes, and kernels remain concrete-module-only. Neither boundary provides a
   runnable, policy resolution, CPU fallback or transfer, or resizing.
 - `nucleation.py` - Concrete-only E6-F8 P1 read-only preflight/configuration
-  boundary for fixed-capacity GPU nucleation inputs and caller-owned sidecars.
-  It is intentionally unexported, performs no rate calculation or writes, and
-  provides no hidden transfer, fallback allocation, slot activation, exhaustion
-  handling, or execution; P2--P7 remain deferred.
+  and P2 demand-planning boundary for fixed-capacity GPU nucleation inputs and
+  caller-owned sidecars. P2 calculates `E_pot=J*dt`, with survival already in
+  `J`, and commits only planning, admitted-demand, removal, and gate sidecars.
+  It is intentionally unexported and provides no hidden transfer, fallback,
+  slot activation, exhaustion handling, particle/gas mutation, or execution;
+  P3--P7 remain deferred.
 - `wall_loss.py` - Concrete fixed-slot neutral/charged GPU wall-loss boundary;
   owns immutable host configuration, frozen preflight, bounded fixed-slot
   removal, and the external caller-owned per-box RNG sidecar lifecycle. Charged

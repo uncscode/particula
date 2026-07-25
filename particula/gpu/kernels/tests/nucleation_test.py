@@ -10,13 +10,23 @@ pytestmark = pytest.mark.warp
 wp = pytest.importorskip("warp")
 
 from particula.gpu.kernels.nucleation import (  # noqa: E402
+    _P2_GATE_ELIGIBLE,
+    _P2_GATE_GAS_LIMITED_OFFSET,
+    _P2_GATE_LOW_SATURATION,
+    _P2_GATE_ZERO_COEFFICIENT,
+    _P2_GATE_ZERO_INVENTORY,
+    _P2_GATE_ZERO_PRECURSOR,
+    _P2_GATE_ZERO_SURVIVAL,
+    _P2_GATE_ZERO_TIME,
     NucleationConfig,
     NucleationDiagnosticBuffers,
     NucleationFinalizedDemandBuffers,
     NucleationScratchBuffers,
+    _plan_nucleation_demand,
     _preflight_nucleation,
     _real,
 )
+from particula.util.constants import AVOGADRO_NUMBER  # noqa: E402
 
 
 def _state(boxes: int = 1, particles: int = 2, species: int = 1):
@@ -600,3 +610,377 @@ def test_mixed_gate_union_retains_eligible_box():
     )
     assert result.has_eligible_boxes
     assert result.has_gated_boxes
+
+
+def test_p2_plans_activation_demand_and_preserves_p3_sidecars():
+    """P2 commits only demand diagnostics using shared inventory admission."""
+    particles, gas = _state(boxes=2, particles=0, species=2)
+    gas.molar_mass = wp.array(
+        np.array([0.1, 0.2], dtype=np.float64), dtype=wp.float64, device="cpu"
+    )
+    gas.concentration = wp.array(
+        np.array([[1.0, 0.1], [2.0, 2.0]], dtype=np.float64),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    scratch, finalized, diagnostics = _sidecars(2, 0, 2)
+    source_before = _snapshot_arrays(particles, gas)
+    selected_before = diagnostics.selected_slot_indices.numpy().copy()
+    counts_before = finalized.accepted_counts.numpy().copy()
+    config = _config(molecule_counts=(1, 1), coefficient=1.0e-10)
+
+    _plan_nucleation_demand(
+        particles,
+        gas,
+        config,
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+
+    precursor = gas.concentration.numpy()[:, 0] * 6.02214076e23 / 0.1
+    potential = 1.0e-10 * precursor
+    event_mass = np.array([0.1, 0.2]) / 6.02214076e23
+    expected = np.minimum(
+        potential,
+        np.min(gas.concentration.numpy() / event_mass, axis=1),
+    )
+    np.testing.assert_allclose(
+        scratch.precursor_number_concentration.numpy(), precursor, rtol=1e-12
+    )
+    np.testing.assert_allclose(
+        scratch.potential_rate.numpy(), potential, rtol=1e-12
+    )
+    np.testing.assert_allclose(
+        scratch.potential_demand.numpy(), potential, rtol=1e-12
+    )
+    np.testing.assert_allclose(
+        finalized.accepted_demand.numpy(), expected, rtol=1e-12
+    )
+    np.testing.assert_allclose(
+        finalized.precursor_mass_change.numpy(),
+        expected[:, None] * event_mass,
+        rtol=1e-12,
+    )
+    assert diagnostics.gate_codes.numpy()[0] in (
+        _P2_GATE_ELIGIBLE,
+        _P2_GATE_GAS_LIMITED_OFFSET,
+        _P2_GATE_GAS_LIMITED_OFFSET + 1,
+    )
+    np.testing.assert_array_equal(
+        finalized.accepted_counts.numpy(), counts_before
+    )
+    np.testing.assert_array_equal(
+        diagnostics.selected_slot_indices.numpy(), selected_before
+    )
+    _assert_snapshot_unchanged(source_before)
+
+
+def test_p2_zero_time_writes_zero_outputs_and_gate_code():
+    """P2 scalar gates commit their defined zero diagnostics."""
+    particles, gas = _state()
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+
+    _plan_nucleation_demand(
+        particles,
+        gas,
+        _config(),
+        0.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+
+    np.testing.assert_array_equal(scratch.potential_rate.numpy(), [0.0])
+    np.testing.assert_array_equal(scratch.potential_demand.numpy(), [0.0])
+    np.testing.assert_array_equal(finalized.accepted_demand.numpy(), [0.0])
+    np.testing.assert_array_equal(
+        finalized.precursor_mass_change.numpy(), [[0.0]]
+    )
+    np.testing.assert_array_equal(
+        diagnostics.gate_codes.numpy(), [_P2_GATE_ZERO_TIME]
+    )
+
+
+@pytest.mark.parametrize(
+    ("changes", "concentration", "saturation_value", "expected_code"),
+    [
+        ({"coefficient": 0.0}, 1.0, 1.0, _P2_GATE_ZERO_COEFFICIENT),
+        ({"survival_factor": 0.0}, 1.0, 1.0, _P2_GATE_ZERO_SURVIVAL),
+        ({}, 0.0, 1.0, _P2_GATE_ZERO_PRECURSOR),
+        ({}, 1.0, 0.4, _P2_GATE_LOW_SATURATION),
+        ({}, 1.0, 1.0, _P2_GATE_ZERO_INVENTORY),
+    ],
+)
+def test_p2_writes_all_non_time_gate_codes(
+    changes, concentration, saturation_value, expected_code
+):
+    """P2 commits zero demand for each valid gate with defined precedence."""
+    particles, gas = _state()
+    gas.concentration = wp.full(
+        (1, 1), wp.float64(concentration), dtype=wp.float64, device="cpu"
+    )
+    if expected_code == _P2_GATE_ZERO_INVENTORY:
+        gas.concentration = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+        changes = {"molecule_counts": (0, 1)}
+        particles, gas = _state(species=2)
+        gas.concentration = wp.array(
+            np.array([[1.0, 0.0]], dtype=np.float64),
+            dtype=wp.float64,
+            device="cpu",
+        )
+    boxes, particle_count, species = 1, 2, gas.molar_mass.shape[0]
+    scratch, finalized, diagnostics = _sidecars(boxes, particle_count, species)
+    config = _config(
+        **changes,
+        saturation_lower=0.5,
+        saturation_upper=1.5,
+    )
+    saturation = wp.full(
+        (1, species),
+        wp.float64(saturation_value),
+        dtype=wp.float64,
+        device="cpu",
+    )
+
+    _plan_nucleation_demand(
+        particles,
+        gas,
+        config,
+        1.0,
+        temperature=300.0,
+        saturation=saturation,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+
+    np.testing.assert_array_equal(
+        diagnostics.gate_codes.numpy(), [expected_code]
+    )
+    if expected_code == _P2_GATE_ZERO_INVENTORY:
+        assert scratch.potential_rate.numpy()[0] > 0.0
+    else:
+        np.testing.assert_array_equal(scratch.potential_rate.numpy(), [0.0])
+    np.testing.assert_array_equal(finalized.accepted_demand.numpy(), [0.0])
+    np.testing.assert_array_equal(
+        finalized.precursor_mass_change.numpy(), np.zeros((1, species))
+    )
+
+
+def test_p2_kinetic_tied_inventory_uses_lowest_limiting_species():
+    """Kinetic P2 demand uses its squared rate law and stable limiter tie."""
+    particles, gas = _state(species=2)
+    gas.molar_mass = wp.array(
+        np.array([0.1, 0.2], dtype=np.float64), dtype=wp.float64, device="cpu"
+    )
+    event_mass = np.array([0.1, 0.2], dtype=np.float64) / 6.02214076e23
+    gas.concentration = wp.array(
+        np.array([event_mass * 5.0], dtype=np.float64),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    scratch, finalized, diagnostics = _sidecars(1, 2, 2)
+    config = _config(
+        rate_law="kinetic",
+        coefficient=1.0,
+        molecule_counts=(1, 1),
+        precursor_number_concentration_upper=1e40,
+    )
+
+    _plan_nucleation_demand(
+        particles,
+        gas,
+        config,
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+
+    precursor = gas.concentration.numpy()[0, 0] * 6.02214076e23 / 0.1
+    np.testing.assert_allclose(scratch.potential_rate.numpy(), [precursor**2])
+    np.testing.assert_allclose(finalized.accepted_demand.numpy(), [5.0])
+    np.testing.assert_array_equal(
+        diagnostics.gate_codes.numpy(), [_P2_GATE_GAS_LIMITED_OFFSET]
+    )
+
+
+def test_p2_gate_precedence_is_scalar_then_precursor_then_saturation():
+    """P2 emits the documented deterministic gate precedence per box."""
+    particles, gas = _state(boxes=2)
+    gas.concentration = wp.array(
+        np.array([[0.0], [1.0]], dtype=np.float64),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    saturation = wp.array(
+        np.array([[0.4], [0.4]], dtype=np.float64),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    scratch, finalized, diagnostics = _sidecars(2, 2, 1)
+
+    _plan_nucleation_demand(
+        particles,
+        gas,
+        _config(saturation_lower=0.5, saturation_upper=1.5),
+        0.0,
+        temperature=300.0,
+        saturation=saturation,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+
+    np.testing.assert_array_equal(
+        diagnostics.gate_codes.numpy(),
+        [_P2_GATE_ZERO_TIME, _P2_GATE_ZERO_TIME],
+    )
+
+    _plan_nucleation_demand(
+        particles,
+        gas,
+        _config(saturation_lower=0.5, saturation_upper=1.5),
+        1.0,
+        temperature=300.0,
+        saturation=saturation,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+
+    np.testing.assert_array_equal(
+        diagnostics.gate_codes.numpy(),
+        [_P2_GATE_ZERO_PRECURSOR, _P2_GATE_LOW_SATURATION],
+    )
+
+
+def test_p2_shared_admission_preserves_nonparticipant_zero_removal():
+    """P2 limits each box independently and never removes nonparticipants."""
+    particles, gas = _state(boxes=2, particles=0, species=3)
+    molar_mass = np.array([0.1, 0.3, 0.2], dtype=np.float64)
+    event_mass = np.array([0.1, 0.0, 0.4], dtype=np.float64) / AVOGADRO_NUMBER
+    gas.molar_mass = wp.array(molar_mass, dtype=wp.float64, device="cpu")
+    gas.concentration = wp.array(
+        np.array(
+            [
+                [1.0, 9.0, event_mass[2] * 2.0],
+                [0.5, 8.0, event_mass[2] * 7.0],
+            ],
+            dtype=np.float64,
+        ),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    scratch, finalized, diagnostics = _sidecars(2, 0, 3)
+    before = _snapshot_arrays(particles, gas)
+
+    _plan_nucleation_demand(
+        particles,
+        gas,
+        _config(
+            coefficient=1.0e-10,
+            molecule_counts=(1, 0, 2),
+            precursor_number_concentration_upper=1.0e30,
+        ),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+
+    potential = (
+        1.0e-10 * gas.concentration.numpy()[:, 0] * AVOGADRO_NUMBER / 0.1
+    )
+    expected_demand = np.minimum(potential, [2.0, 7.0])
+    expected_removal = expected_demand[:, None] * event_mass
+    np.testing.assert_allclose(
+        finalized.accepted_demand.numpy(), expected_demand, rtol=1e-12, atol=0.0
+    )
+    np.testing.assert_allclose(
+        finalized.precursor_mass_change.numpy(),
+        expected_removal,
+        rtol=1e-12,
+        atol=0.0,
+    )
+    np.testing.assert_array_equal(
+        finalized.precursor_mass_change.numpy()[:, 1], [0.0, 0.0]
+    )
+    _assert_snapshot_unchanged(before)
+
+
+def test_p2_empty_boxes_are_an_exact_write_free_noop():
+    """Valid empty-box planning preserves every supplied sidecar byte-for-byte."""
+    particles, gas = _state(boxes=0)
+    scratch, finalized, diagnostics = _sidecars(0, 2, 1)
+    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)
+
+    _plan_nucleation_demand(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+
+    _assert_snapshot_unchanged(before)
+
+
+def test_p2_inventory_rounding_uses_bounded_nextafter_correction():
+    """P2 corrects an unsafe division-product ULP without a coarse scale loss."""
+    event_mass = np.float64(0.1 / AVOGADRO_NUMBER)
+    inventory = None
+    expected_demand = None
+    for events in range(1, 4097):
+        for direction in (np.inf, -np.inf):
+            candidate_inventory = np.nextafter(
+                event_mass * np.float64(events), direction
+            )
+            candidate_demand = candidate_inventory / event_mass
+            if candidate_demand * event_mass > candidate_inventory:
+                inventory = candidate_inventory
+                expected_demand = candidate_demand
+                break
+        if inventory is not None:
+            break
+    assert inventory is not None
+    assert expected_demand is not None
+
+    for _ in range(4):
+        if expected_demand * event_mass <= inventory:
+            break
+        expected_demand = np.nextafter(expected_demand, -np.inf)
+    assert expected_demand * event_mass <= inventory
+
+    particles, gas = _state(particles=0)
+    gas.concentration = wp.array(
+        np.array([[inventory]], dtype=np.float64),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    scratch, finalized, diagnostics = _sidecars(1, 0, 1)
+
+    _plan_nucleation_demand(
+        particles,
+        gas,
+        _config(coefficient=1.0e10),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+
+    np.testing.assert_allclose(
+        finalized.accepted_demand.numpy(), [expected_demand], rtol=0.0, atol=0.0
+    )
+    assert finalized.precursor_mass_change.numpy()[0, 0] <= inventory

@@ -54,8 +54,10 @@ source-selection metadata, builders, and a factory. P5 provides the one-box
 uses equal, gas-coupled substeps and is atomic per attempted substep, not across
 the complete call. P2 source-demand planning and P3 particle-source
 transactions remain concrete-only in `nucleation.particle_source`. E6-F8 P1
-provides an unexported, read-only Warp preflight only; its direct runtime step
-and E6-F9 integration remain deferred.
+provides an unexported, read-only Warp preflight and P2 privately plans
+`E_pot=J*dt` demand after survival is included in `J`. P2 commits only
+caller-owned demand sidecars; particle activation, gas mutation, and E6-F9
+integration remain deferred.
 
 ## Scientific Utilities
 

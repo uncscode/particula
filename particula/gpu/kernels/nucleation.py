@@ -1,11 +1,11 @@
-"""Define the concrete, read-only direct-Warp nucleation P1 boundary.
+"""Define concrete-only P1 validation and P2 demand planning for GPU nucleation.
 
 This unexported module validates fixed-capacity particle, gas, environment,
-and caller-owned sidecar schemas for a deferred GPU nucleation path. It neither
-calculates rates nor writes requests, diagnostics, particles, gas, or sidecars.
+and caller-owned sidecar schemas for a GPU nucleation path. P1 is read-only;
+private P2 calculates and commits demand sidecars only.
 It also performs no hidden host transfer, CPU fallback, fallback work-buffer
 allocation, slot activation, or exhaustion handling. Later P2--P7 phases own
-all computation, mutation, public API, and user-facing documentation.
+particle mutation, public API, and user-facing documentation.
 
 The preflight accepts only same-device, contiguous Warp arrays with fixed
 shapes. Frozen records prevent rebinding their fields but do not copy, freeze,
@@ -32,6 +32,15 @@ except ImportError as exc:  # pragma: no cover - import guard
 
 from particula.gpu.kernels.environment import _is_warp_array_like
 from particula.util.constants import AVOGADRO_NUMBER
+
+_P2_GATE_ELIGIBLE = 0
+_P2_GATE_ZERO_TIME = 1
+_P2_GATE_ZERO_COEFFICIENT = 2
+_P2_GATE_ZERO_SURVIVAL = 3
+_P2_GATE_ZERO_PRECURSOR = 4
+_P2_GATE_LOW_SATURATION = 5
+_P2_GATE_ZERO_INVENTORY = 6
+_P2_GATE_GAS_LIMITED_OFFSET = 7
 
 
 def _real(value: object, name: str, *, positive: bool = False) -> float:
@@ -215,7 +224,7 @@ class NucleationConfig:
 
 @dataclass(frozen=True)
 class NucleationScratchBuffers:
-    """Reference caller-owned future planning sidecars without taking ownership.
+    """Reference caller-owned P2 planning sidecars without taking ownership.
 
     Attributes:
         precursor_number_concentration: Same-device contiguous ``wp.float64``
@@ -223,8 +232,8 @@ class NucleationScratchBuffers:
         potential_rate: Same-device contiguous ``wp.float64`` array shaped
             ``(B,)`` for potential formation rate [#/m³/s].
         potential_demand: Same-device contiguous ``wp.float64`` array shaped
-            ``(B,)`` for a later phase's potential source demand. Its final
-            units are owned by that phase.
+            ``(B,)`` for P2 potential source demand [#/m³]. P3 does not write
+            this field.
     """
 
     precursor_number_concentration: Any
@@ -234,15 +243,15 @@ class NucleationScratchBuffers:
 
 @dataclass(frozen=True)
 class NucleationFinalizedDemandBuffers:
-    """Reference caller-owned future finalized demand and transfer sidecars.
+    """Reference caller-owned P2/P3 finalized demand and transfer sidecars.
 
     Attributes:
         accepted_counts: Same-device contiguous ``wp.int32`` array shaped
-            ``(B,)`` for finalized accepted source counts.
+            ``(B,)`` for P3 finalized accepted source counts. P2 preserves it.
         accepted_demand: Same-device contiguous ``wp.float64`` array shaped
-            ``(B,)`` for later finalized source demand.
+            ``(B,)`` for P2 inventory-admitted source demand [#/m³].
         precursor_mass_change: Same-device contiguous ``wp.float64`` array
-            shaped ``(B, S)`` for later species mass changes [kg/m³].
+            shaped ``(B, S)`` for P2 planned positive species removal [kg/m³].
     """
 
     accepted_counts: Any
@@ -252,13 +261,13 @@ class NucleationFinalizedDemandBuffers:
 
 @dataclass(frozen=True)
 class NucleationDiagnosticBuffers:
-    """Reference caller-owned future diagnostic sidecars.
+    """Reference caller-owned P2/P3 diagnostic sidecars.
 
     Attributes:
         gate_codes: Same-device contiguous ``wp.int32`` array shaped ``(B,)``
-            for a later phase's gate diagnostics.
+            for P2 gate and limiting-species diagnostics.
         selected_slot_indices: Same-device contiguous ``wp.int32`` array
-            shaped ``(B, N)`` for a later phase's selected slots. That phase
+            shaped ``(B, N)`` for P3 selected slots. That phase
             reserves ``-1`` for unused tails; P1 does not inspect, initialize,
             or otherwise alter stale output values.
     """
@@ -307,6 +316,7 @@ class _NucleationPreflight:
     has_eligible_boxes: bool
     has_gated_boxes: bool
     gate_reason: str | None
+    normalized_time_step: float
     potential_rate: float = 0.0
     potential_demand: float = 0.0
     accepted_count: int = 0
@@ -996,6 +1006,7 @@ def _preflight_nucleation(  # noqa: C901
             False,
             True,
             "zero_coefficient",
+            normalized_time_step,
         )
     if float(config.survival_factor) == 0.0:
         return _NucleationPreflight(
@@ -1011,6 +1022,7 @@ def _preflight_nucleation(  # noqa: C901
             False,
             True,
             "zero_survival",
+            normalized_time_step,
         )
     if isinstance(temperature_value, float):
         if (
@@ -1053,6 +1065,7 @@ def _preflight_nucleation(  # noqa: C901
             False,
             False,
             None,
+            normalized_time_step,
         )
     # P1 has no rate work.  These conservative aggregate gates preserve the
     # required all-box zero diagnostics while later phases own mixed-box work.
@@ -1073,6 +1086,7 @@ def _preflight_nucleation(  # noqa: C901
             False,
             True,
             reason,
+            normalized_time_step,
         )
     precursor_status = wp.zeros(2, dtype=wp.int32, device=device)
     precursor_gates = wp.zeros(n_boxes, dtype=wp.int32, device=device)
@@ -1140,6 +1154,7 @@ def _preflight_nucleation(  # noqa: C901
             False,
             True,
             gate_reason,
+            normalized_time_step,
         )
     return _NucleationPreflight(
         particles,
@@ -1154,4 +1169,273 @@ def _preflight_nucleation(  # noqa: C901
         True,
         bool(gated_boxes),
         None,
+        normalized_time_step,
+    )
+
+
+@wp.kernel
+def _plan_demand_work(  # noqa: C901
+    concentration: wp.array2d(dtype=wp.float64),
+    molar_mass: wp.array(dtype=wp.float64),
+    saturation: wp.array2d(dtype=wp.float64),
+    molecule_counts: wp.array(dtype=wp.int32),
+    species_count: wp.int32,
+    precursor_index: wp.int32,
+    has_saturation: wp.int32,
+    saturation_lower: wp.float64,
+    coefficient: wp.float64,
+    survival_factor: wp.float64,
+    time_step: wp.float64,
+    kinetic: wp.int32,
+    number_concentration: wp.array(dtype=wp.float64),
+    rate: wp.array(dtype=wp.float64),
+    potential: wp.array(dtype=wp.float64),
+    admitted: wp.array(dtype=wp.float64),
+    removal: wp.array2d(dtype=wp.float64),
+    gate_codes: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Plan one box of P2 demand in private device-resident work storage."""
+    box = wp.tid()
+    precursor = (
+        concentration[box, precursor_index]
+        * wp.float64(AVOGADRO_NUMBER)
+        / molar_mass[precursor_index]
+    )
+    number_concentration[box] = precursor
+    for species in range(species_count):
+        removal[box, species] = wp.float64(0.0)
+
+    code = wp.int32(_P2_GATE_ELIGIBLE)
+    demand = wp.float64(0.0)
+    formation_rate = wp.float64(0.0)
+    if time_step == 0.0:
+        code = wp.int32(_P2_GATE_ZERO_TIME)
+    elif coefficient == 0.0:
+        code = wp.int32(_P2_GATE_ZERO_COEFFICIENT)
+    elif survival_factor == 0.0:
+        code = wp.int32(_P2_GATE_ZERO_SURVIVAL)
+    elif precursor == 0.0:
+        code = wp.int32(_P2_GATE_ZERO_PRECURSOR)
+    elif (
+        has_saturation != 0
+        and saturation[box, precursor_index] < saturation_lower
+    ):
+        code = wp.int32(_P2_GATE_LOW_SATURATION)
+    else:
+        formation_rate = survival_factor * coefficient * precursor
+        if kinetic != 0:
+            formation_rate = formation_rate * precursor
+        demand = formation_rate * time_step
+        minimum_ratio = wp.float64(0.0)
+        limiting_species = wp.int32(-1)
+        has_participant = wp.int32(0)
+        for species in range(species_count):
+            if molecule_counts[species] > 0:
+                event_mass = (
+                    wp.float64(molecule_counts[species])
+                    * molar_mass[species]
+                    / wp.float64(AVOGADRO_NUMBER)
+                )
+                if not wp.isfinite(event_mass) or event_mass <= 0.0:
+                    wp.atomic_add(invalid, 0, 1)
+                ratio = concentration[box, species] / event_mass
+                if has_participant == 0 or ratio < minimum_ratio:
+                    minimum_ratio = ratio
+                    limiting_species = wp.int32(species)
+                has_participant = 1
+        if minimum_ratio == 0.0:
+            code = wp.int32(_P2_GATE_ZERO_INVENTORY)
+            demand = wp.float64(0.0)
+        elif minimum_ratio < demand:
+            demand = minimum_ratio
+            code = wp.int32(_P2_GATE_GAS_LIMITED_OFFSET) + limiting_species
+        for _correction in range(4):
+            safe = wp.int32(1)
+            for species in range(species_count):
+                if molecule_counts[species] > 0:
+                    event_mass = (
+                        wp.float64(molecule_counts[species])
+                        * molar_mass[species]
+                        / wp.float64(AVOGADRO_NUMBER)
+                    )
+                    if demand * event_mass > concentration[box, species]:
+                        safe = 0
+            if safe == 0:
+                demand = demand * wp.float64(0.9999999999999999)
+        for species in range(species_count):
+            if molecule_counts[species] > 0:
+                event_mass = (
+                    wp.float64(molecule_counts[species])
+                    * molar_mass[species]
+                    / wp.float64(AVOGADRO_NUMBER)
+                )
+                removal[box, species] = demand * event_mass
+                if (
+                    not wp.isfinite(removal[box, species])
+                    or removal[box, species] < 0.0
+                ):
+                    wp.atomic_add(invalid, 0, 1)
+                elif removal[box, species] > concentration[box, species]:
+                    wp.atomic_add(invalid, 1, 1)
+    rate[box] = formation_rate
+    potential[box] = formation_rate * time_step
+    admitted[box] = demand
+    gate_codes[box] = code
+    if (
+        not wp.isfinite(precursor)
+        or precursor < 0.0
+        or not wp.isfinite(formation_rate)
+        or formation_rate < 0.0
+        or not wp.isfinite(potential[box])
+        or potential[box] < 0.0
+        or not wp.isfinite(demand)
+        or demand < 0.0
+    ):
+        wp.atomic_add(invalid, 0, 1)
+
+
+@wp.kernel
+def _commit_demand_plan(
+    number_concentration: wp.array(dtype=wp.float64),
+    rate: wp.array(dtype=wp.float64),
+    potential: wp.array(dtype=wp.float64),
+    admitted: wp.array(dtype=wp.float64),
+    removal: wp.array2d(dtype=wp.float64),
+    gate_codes: wp.array(dtype=wp.int32),
+    species_count: wp.int32,
+    scratch_number_concentration: wp.array(dtype=wp.float64),
+    scratch_rate: wp.array(dtype=wp.float64),
+    scratch_demand: wp.array(dtype=wp.float64),
+    finalized_demand: wp.array(dtype=wp.float64),
+    finalized_removal: wp.array2d(dtype=wp.float64),
+    diagnostics: wp.array(dtype=wp.int32),
+) -> None:
+    """Commit exactly the P2-owned sidecar fields for one box."""
+    box = wp.tid()
+    scratch_number_concentration[box] = number_concentration[box]
+    scratch_rate[box] = rate[box]
+    scratch_demand[box] = potential[box]
+    finalized_demand[box] = admitted[box]
+    diagnostics[box] = gate_codes[box]
+    for species in range(species_count):
+        finalized_removal[box, species] = removal[box, species]
+
+
+def _plan_nucleation_demand(
+    particles: Any,
+    gas: Any,
+    config: NucleationConfig,
+    time_step: Any,
+    *,
+    scratch: NucleationScratchBuffers,
+    finalized_demand: NucleationFinalizedDemandBuffers,
+    diagnostics: NucleationDiagnosticBuffers,
+    temperature: Any | None = None,
+    saturation: Any | None = None,
+    environment: Any | None = None,
+) -> None:
+    """Privately plan inventory-safe nucleation demand without state mutation.
+
+    P2 writes only its defined planning/finalized-demand/diagnostic sidecars.
+    Particle state, gas inventory, P3 counts, and P3 slot-index diagnostics are
+    never read for planning ownership and are never changed.
+    """
+    if not isinstance(scratch, NucleationScratchBuffers):
+        raise ValueError("scratch must be NucleationScratchBuffers.")
+    if not isinstance(finalized_demand, NucleationFinalizedDemandBuffers):
+        raise ValueError(
+            "finalized_demand must be NucleationFinalizedDemandBuffers."
+        )
+    if not isinstance(diagnostics, NucleationDiagnosticBuffers):
+        raise ValueError("diagnostics must be NucleationDiagnosticBuffers.")
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        config,
+        time_step,
+        temperature=temperature,
+        saturation=saturation,
+        environment=environment,
+        scratch=scratch,
+        finalized_demand=finalized_demand,
+        diagnostics=diagnostics,
+    )
+    if preflight.n_boxes == 0:
+        return
+    device = preflight.device
+    boxes, species = preflight.n_boxes, preflight.n_species
+    number_concentration = wp.zeros(boxes, dtype=wp.float64, device=device)
+    rate = wp.zeros(boxes, dtype=wp.float64, device=device)
+    potential = wp.zeros(boxes, dtype=wp.float64, device=device)
+    admitted = wp.zeros(boxes, dtype=wp.float64, device=device)
+    removal = wp.zeros((boxes, species), dtype=wp.float64, device=device)
+    gate_codes = wp.zeros(boxes, dtype=wp.int32, device=device)
+    invalid = wp.zeros(2, dtype=wp.int32, device=device)
+    saturation_work = preflight.saturation
+    if saturation_work is None:
+        saturation_work = wp.zeros(
+            (boxes, species), dtype=wp.float64, device=device
+        )
+    molecule_counts = wp.array(
+        np.asarray(config.molecule_counts, dtype=np.int32),
+        dtype=wp.int32,
+        device=device,
+    )
+    wp.launch(
+        _plan_demand_work,
+        dim=boxes,
+        inputs=[
+            gas.concentration,
+            gas.molar_mass,
+            saturation_work,
+            molecule_counts,
+            species,
+            config.precursor_index,
+            int(preflight.saturation is not None),
+            (
+                config.saturation_lower
+                if config.saturation_lower is not None
+                else 0.0
+            ),
+            config.coefficient,
+            config.survival_factor,
+            preflight.normalized_time_step,
+            int(config.rate_law == "kinetic"),
+            number_concentration,
+            rate,
+            potential,
+            admitted,
+            removal,
+            gate_codes,
+            invalid,
+        ],
+        device=device,
+    )
+    status = invalid.numpy()
+    if int(status[0]):
+        raise ValueError(
+            "Derived nucleation demand must be finite and nonnegative."
+        )
+    if int(status[1]):
+        raise ValueError("Nucleation demand cannot be made inventory-safe.")
+    wp.launch(
+        _commit_demand_plan,
+        dim=boxes,
+        inputs=[
+            number_concentration,
+            rate,
+            potential,
+            admitted,
+            removal,
+            gate_codes,
+            species,
+            scratch.precursor_number_concentration,
+            scratch.potential_rate,
+            scratch.potential_demand,
+            finalized_demand.accepted_demand,
+            finalized_demand.precursor_mass_change,
+            diagnostics.gate_codes,
+        ],
+        device=device,
     )
