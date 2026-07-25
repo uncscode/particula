@@ -20,9 +20,11 @@ NumPy oracle rather than production helpers.
   inventory and zero-box inputs, provisional demand, diagnostics, record
   immutability/nonaliasing, package-export absence, schema/physical/overflow
   rejections, bounded-correction failure, and gas nonmutation.
-- **P3:** Source interaction tests cover free/exact/sparse/full slots,
-  resampling precedence, scaling fallback, both-off/unsatisfiable failures,
-  deterministic order, no residual truncation, and all-box snapshots.
+- **P3 (shipped):** `particula/dynamics/nucleation/tests/particle_source_test.py`
+  covers capacity, zero/no-op rows, scaling, atomic rejection, immutable P2 and
+  finalized records, and absent package exports. It verifies private staging,
+  fixed-slot activation/exhaustion behavior, scaled gas treatment, and
+  per-box/species conservation without exposing a new public transaction API.
 - **P4:** Builder/factory tests cover defaults, units, required domain and
   composition, dispatch, public imports, and unsupported model aliases.
 - **P5:** `nucleation_runnable_test.py` verifies delegation,

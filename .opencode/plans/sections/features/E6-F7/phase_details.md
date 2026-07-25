@@ -17,11 +17,11 @@ P4/P5, then run P6 conservation validation before P7 documentation.
   - Files: `particula/dynamics/nucleation/particle_source.py`, `particula/dynamics/nucleation/tests/particle_source_test.py`
   - Tests: Per-box limiting species and deterministic ties, exact depletion, zero inventory/time/rate and zero boxes, read-only ownership/nonaliasing, validation/overflow/rounding-correction failures, diagnostics, and input snapshots.
 
-- [ ] **E6-F7-P3:** Integrate slot activation and exhaustion transaction with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Plan E6-F5 activation and E6-F6 exhaustion, finalize any scaled demand, then atomically commit particle source and matching gas depletion.
+- [x] **E6-F7-P3:** Integrate slot activation and exhaustion transaction with unit tests
+  - Issue: #1432 | Size: S | Status: Shipped
+  - Goal: Shipped unexported CPU `commit_particle_source`, which consumes immutable P2 records, stages E6-F5/E6-F6 work on a private particle copy, applies representative-volume scaling to existing particle and gas state, validates conservation, and atomically writes validated arrays.
   - Files: `particula/dynamics/nucleation/particle_source.py`, `particula/dynamics/nucleation/tests/particle_source_test.py`
-  - Tests: Free/full/sparse slots, resampling-first and scaling fallback, provisional-to-represented demand diagnostics, policies-off failure, no final-domain residual, and failure atomicity.
+  - Tests: Capacity, no-op, scaling, atomic rejection, record immutability, and package-export boundaries.
 
 - [ ] **E6-F7-P4:** Add nucleation builders factory and public strategy APIs with unit tests
   - Issue: TBD | Size: S | Status: Not Started

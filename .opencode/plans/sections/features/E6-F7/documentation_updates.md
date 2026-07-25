@@ -12,7 +12,12 @@
 - P2 added concrete-module docstrings in
   `particula/dynamics/nucleation/particle_source.py`; it added no user-facing
   documentation, examples, or public exports. P7 should extend the theory page
-  with the shipped source-finalization equations and implementation status.
+   with the shipped source-finalization equations and implementation status.
+- P3 added concrete-module documentation for the unexported
+  `commit_particle_source` transaction in
+  `particula/dynamics/nucleation/particle_source.py`. No user-facing docs,
+  examples, or package exports were added; P7 remains responsible for those
+  documentation decisions.
 - Retain citations to Seinfeld & Pandis (2016), Kulmala et al. (2006, DOI
   `10.5194/acp-6-787-2006`), and Kerminen & Kulmala (2002, DOI
   `10.1016/S0021-8502(01)00194-X`). State that Vehkamäki et al. (2002, DOI

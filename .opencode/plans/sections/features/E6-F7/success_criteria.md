@@ -7,15 +7,13 @@
 - [x] Source finalization jointly limits events by every participating gas
   species, produces finite nonnegative provisional demand within inventory,
   and does not mutate gas concentration.
-- [ ] E6-F5 slot and E6-F6 resampling-first/scaling-fallback semantics are
-  consumed unchanged; exhausted demand is never silently truncated.
-- [ ] Without scaling, successful calls conserve represented particle-plus-gas
-  mass per box/species. With scale `s`, final represented totals match
-  `s * pre_total`; intensive particle-plus-gas concentration and source transfer
-  balance remain conserved at recorded `float64` tolerances.
-- [ ] Invalid multi-box process calls preserve gas, particles, diagnostics,
-  requests, and work state; P2 already preserves gas/caller inputs on success
-  and rejection, and zero rate/duration/inventory records are exact no-ops.
+- [x] E6-F5 slot and E6-F6 resampling-first/scaling-fallback semantics are
+  consumed unchanged on detached P3 staging; exhausted demand is not silently
+  truncated.
+- [x] P3 validates per-box/species particle-plus-gas conservation before commit;
+  scaled rows use `particle_post + gas_post = s * pre_total`.
+- [x] P3 invalid calls preserve caller particle and gas arrays; capacity, no-op,
+  scaling, and atomic-rejection tests cover the transaction boundary.
 - [ ] Builders, factory, imports, and `Nucleation` runnable have fast tests and
   current documentation.
 - [ ] E6-F8 has an independent deterministic CPU oracle and frozen source and

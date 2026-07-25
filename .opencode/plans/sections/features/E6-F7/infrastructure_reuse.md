@@ -11,10 +11,10 @@
   compatibility only where current dynamics APIs require it.
 - `particula/particles/particle_data.py` -- preserve array shapes, identities,
   density, charge, and volume except for explicit E6-F6 scaling.
-- Planned `particula/particles/slot_management.py` from E6-F5 -- consume its
+- `particula/particles/slot_management.py` from E6-F5 -- P3 consumes its
   predicates, ascending free indices, request shape, exact counts, and atomic
   activation rather than implementing a second slot model.
-- Planned `particula/particles/exhaustion.py` from E6-F6 -- consume its
+- `particula/particles/exhaustion.py` from E6-F6 -- P3 consumes its
   resampling-first transaction, optional scaling fallback, admitted demand, and
   conservation diagnostics rather than truncating source demand.
 - `particula/abc_builder.py`, `particula/abc_factory.py`, and existing

@@ -5,7 +5,8 @@
 The shipped P1 strategy computes a scalar potential event rate. Shipped P2
 consumes that already survival-adjusted rate with a duration and immutable
 injection composition, then produces gas-admitted source records without any
-state write.
+state write. Shipped P3 consumes those immutable records in a detached,
+all-box transaction before one validated caller write phase.
 
 ```text
 mass concentration + molar mass + T + optional saturation + strategy
@@ -28,7 +29,13 @@ evaluate J = A*C or K*C^2 [events m^-3 s^-1]
           |
           + per-box min(participating gas / per-event mass)
           |
-          + one admitted count, provisional demand, diagnostics
+           + one admitted count, provisional demand, diagnostics
+           |
+           + P3: private ParticleData copy + E6-F6 policy resolution
+           |
+           + final equal-weight slots, scaled gas, conservation validation
+           |
+           + atomic particle/gas array write
 ```
 
 `C = mass_concentration / molar_mass * N_A` is calculated with representation-
@@ -56,9 +63,10 @@ bound is an exact zero gate, while above its upper bound raises `ValueError`.
 ## Data / API / Workflow Changes
 
 - **Data Model:** No `ParticleData` or `GasData` schema change. Frozen records
-  are `ClosedInterval`, `NucleationValidityDomain`, `InjectionComposition`,
-  `FormationMetadata`, `PotentialEventData`, `SourceDemandData`, and
-  `SourceDiagnostics`. P2 record arrays are fresh, owned, and read-only.
+   are `ClosedInterval`, `NucleationValidityDomain`, `InjectionComposition`,
+   `FormationMetadata`, `PotentialEventData`, `SourceDemandData`,
+   `SourceDiagnostics`, `ParticleSourceCommitConfig`, and
+   `FinalizedSourceDiagnostics`. Record arrays are fresh, owned, and read-only.
 - **API Surface:** Concrete symbols live only in
   `particula.dynamics.nucleation.nucleation_strategies` and
   `particula.dynamics.nucleation.particle_source`; the package and
@@ -67,9 +75,13 @@ bound is an exact zero gate, while above its upper bound raises `ValueError`.
   provisional demand and diagnostics; it validates gas read-only and does not
   mutate caller state. A participating species limits each box by the minimum
   inventory ratio; ties use the lowest original species index. P2 applies no
-  slot, exhaustion, particle, or gas commit.
-- **Workflow Hooks:** E6-F5/E6-F6 consumption, E6-F8 parity, and E6-F9
-  integration are future work.
+   slot, exhaustion, particle, or gas commit. P3 performs E6-F5/E6-F6 work
+   only on a private particle copy; on success it writes existing caller
+   `masses`, `concentration`, `charge`, `volume`, and gas concentration arrays.
+   Representative-volume rows scale pre-existing particle and gas state before
+   source removal, enforcing `particle_post + gas_post = scale * pre_total`.
+- **Workflow Hooks:** P3 has shipped E6-F5/E6-F6 consumption. E6-F8 parity and
+  E6-F9 integration remain future work.
 
 ## Security & Compliance
 

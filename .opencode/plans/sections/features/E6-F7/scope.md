@@ -1,9 +1,9 @@
 # Scope
 
-P1/P2 deliver CPU-only, concrete-module-only boundaries that compute bounded
-empirical potential event rates, then finalize immutable inventory-limited
-source-demand records. P2 reads gas inventory without mutation and does not
-touch particles, slots, or exhaustion state.
+P1-P3 deliver CPU-only, concrete-module-only boundaries that compute bounded
+empirical potential rates, finalize immutable inventory-limited source demand,
+and atomically commit its final represented form. P2 remains read-only; P3
+consumes P2 records and stages particle-slot/exhaustion work privately.
 
 ## In Scope
 
@@ -31,6 +31,13 @@ touch particles, slots, or exhaustion state.
 - Read-only validation of all gas concentration lanes and participating molar
   masses, plus co-located source-record tests for success, zero, validation,
   ownership, nonaliasing, and no-mutation behavior.
+- `commit_particle_source` and frozen commit configuration/final diagnostics in
+  `particula/dynamics/nucleation/particle_source.py`, without package exports.
+- Private `ParticleData.copy()` staging that consumes E6-F5 activation and
+  E6-F6 resampling-first/scaling-fallback policy; caller particle and gas
+  arrays are written only after all-box validation.
+- Equal-weight final slot packaging, scaled pre-existing particle/gas state for
+  representative-volume rows, and finite per-box/species conservation checks.
 
 ## Out of Scope
 
@@ -44,5 +51,4 @@ touch particles, slots, or exhaustion state.
   performance claims.
 - Silent clipping of unsupported environmental inputs, partial multi-box
   commits, or silent loss of slot-exhausted source demand.
-- Particle-slot admission or activation, exhaustion planning, gas/particle
-  mutation, builders, factories, runnables, and all dynamics/top-level exports.
+- Builders, factories, runnables, and all dynamics/top-level exports.

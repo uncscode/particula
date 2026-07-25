@@ -570,8 +570,15 @@ pytest particula/gpu/tests/kernel_exports_test.py -q -Werror
 - E6-F5 ships authoritative slot discovery, free-index classification, and
   activation on the CPU and direct-Warp boundaries. E6-F6 ships read-only
   exhaustion resolution plus CPU/Warp resampling and representative-volume
-  scaling primitives. No shipped process composes those primitives with source
-  construction, gas depletion, or a high-level nucleation loop.
+  scaling primitives. The concrete CPU-only P3 transaction at
+  `particula.dynamics.nucleation.particle_source` consumes immutable P2 source
+  demand, stages these primitives on a private `ParticleData` copy, and commits
+  particle and gas arrays only after all-box validation. It applies selected
+  representative-volume scales to pre-existing particle and gas state before
+  finalized source-mass removal. Import P3 names only from that concrete module:
+  they are intentionally absent from `particula.dynamics`,
+  `particula.dynamics.nucleation`, and the top-level package. It is not a
+  high-level nucleation loop or a public user API.
 - Direct Warp P2 and P4 primitives consume caller-owned same-device state;
   callers synchronize successful asynchronous P4 work before reading results.
   See [Fixed-Capacity Slot Exhaustion Primitives](docs/Features/slot_exhaustion_policies.md)
@@ -585,6 +592,7 @@ Focused contract runs:
 ```bash
 pytest particula/particles/tests/exhaustion_test.py \
   particula/gpu/kernels/tests/exhaustion_test.py -q -Werror
+pytest particula/dynamics/nucleation/tests/particle_source_test.py -q -Werror
 mkdocs build --strict
 ```
 

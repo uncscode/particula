@@ -9,10 +9,10 @@
 - [x] Implement a pure P2 finalizer for event demand, per-event species mass,
   shared gas admission, deterministic limiting diagnostics, and bounded
   rounding correction without mutation. E6-F5 requests remain future work.
-- [ ] Integrate E6-F5 activation and E6-F6 plan/commit; require a complete plan
-  for every box before gas or particle writes.
-- [ ] Ensure source packaging changes computational weight only, never
-  represented event count or per-species mass.
+- [x] Integrate E6-F5 activation and E6-F6 resampling/scaling on private P3
+  staging; require complete all-box validation before particle or gas writes.
+- [x] Package final represented demand into equal-weight slots without residual
+  truncation; preserve final represented per-species mass.
 - [ ] Add builders/factory with explicit units, domain, precursor index,
   composition, formation size, and survival factor.
 - [ ] Add `Nucleation` to `particle_process.py`; recompute current gas rate and
@@ -25,8 +25,8 @@
   `nucleation_strategies_test.py`.
 - [x] Add source-record tests in `particle_source_test.py` for inventory
   admission, diagnostics, immutable ownership, validation, and nonmutation.
-- [ ] Add capacity, atomicity, and conservation tests in
-  `particle_source_test.py` as P3/P6 work.
+- [x] Add P3 capacity, no-op, scaling, atomic-rejection, immutable-record, and
+  export-boundary tests in `particle_source_test.py`.
 - [ ] Add builder/factory tests for units, required fields, and invalid aliases.
 - [ ] Add runnable tests in `nucleation_runnable_test.py`.
 - [ ] Add an independent multi-box/species oracle under
