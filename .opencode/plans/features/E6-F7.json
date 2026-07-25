@@ -2,7 +2,7 @@
   "id": "E6-F7",
   "type": "feature",
   "title": "CPU Nucleation and Particle-Source Process",
-  "status": "In Progress",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -113,11 +113,11 @@
     {
       "id": "E6-F7-P7",
       "title": "Update development documentation for CPU nucleation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-25",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -125,5 +125,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
