@@ -97,7 +97,8 @@ Jump in by selecting any card below and follow along in your browser or local en
 
     ---
 
-    How to simulate aerosol nucleation by adding particles during simulations. Showing how to add a nucleation event.
+    Run the supported CPU single-box nucleation runnable, or review an
+    illustrative custom workflow.
 
     [:octicons-arrow-right-24: Tutorial](Nucleation/index.md)
 

@@ -9,6 +9,9 @@ E6-F5 owns the authoritative discovery, free-index classification, and
 activation boundary. High-level/public nucleation loops, scheduler integration,
 and broader policy orchestration remain deferred.
 
+For the supported one-box CPU consumer and its public construction boundary,
+see the [CPU Nucleation Strategy System](nucleation_strategy_system.md).
+
 ## CPU planning contract
 
 The CPU resolver exposes planning records only:

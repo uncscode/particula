@@ -807,6 +807,25 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   case names, supported-vs-unsupported candidate scope, thresholds,
   memory-footprint examples, and focused reproduction.
 
+### CPU nucleation
+
+- The public CPU-only, single-box runnable imports from `particula.dynamics`:
+  `Nucleation`, `NucleationCommitConfig`, strategies/builders, and
+  `NucleationSourceConfig`; import `EnvironmentData` from `particula.gas` and
+  `ExhaustionControls` from `particula.particles.exhaustion`.
+- Activation and kinetic rates use SI `J=A*C` and `J=K*C^2`; survival is an
+  explicit dimensionless caller factor. P2/P3 source records and transaction
+  helpers remain concrete-only in `nucleation.particle_source`.
+- P5 preserves `Aerosol` and backing-data identity, uses equal current-gas
+  substeps, and is atomic per attempted substep only. E6-F5 activation and
+  E6-F6 resampling-first/scaling-fallback are dependencies. E6-F8 direct Warp
+  and E6-F9 integration remain deferred.
+- Check concentration-weighted particle-plus-gas conservation at
+  `rtol=1e-12, atol=1e-30`. Run `python docs/Examples/Nucleation/cpu_nucleation.py`,
+  `pytest particula/tests/nucleation_docs_test.py -q -Werror`, and
+  `mkdocs build --strict`. If changing the paired custom notebook source, sync
+  and execute it with the prescribed Jupytext tools.
+
 ## ADW Workflows
 
 **Available workflows:**

@@ -47,8 +47,10 @@ NumPy oracle rather than production helpers.
   unit-test helpers. `particula/dynamics/tests/nucleation_runnable_test.py`
   adds single-box P5 live-gas progression and backing-identity regressions;
   it makes no multi-box runnable claim.
-- **P7:** Validate links, citations, imports, equations, snippets, and execute
-  the supported example/notebook where applicable.
+- **P7 (shipped):** `particula/tests/nucleation_docs_test.py` validates public
+  imports, example identity/transfer/conservation, navigation, theory and
+  deferred-scope statements without hardware. Run the published script, focused
+  nucleation suites, and `mkdocs build --strict`.
 
 ## Required Invariants
 

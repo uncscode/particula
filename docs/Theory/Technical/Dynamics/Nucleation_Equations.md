@@ -220,9 +220,10 @@ J_d = J_d* × exp( γ × (1/d − 1/d*) × CS' / GR )
 
 The exponential expresses the competition between growth (**GR**, escape to safety at larger sizes) and coagulational loss to the existing aerosol surface (**CS'**). High pre-existing surface area suppresses observable NPF even when the nucleation rate itself is large. In a simulation, this relation is a consistency check: if the model injects particles at a size larger than the true cluster size, the injection rate should be the survival-corrected **J_d**, not the raw **J_d***. P1 does not evaluate this relation; its survival factor is an externally selected value whose scientific justification remains the caller's responsibility.
 
-For a manually constructed particle-source workflow, distinct from this bounded
-rate calculation, see the
-[custom single-species nucleation example](../../../Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb).
+For supported execution, see the [CPU nucleation example](../../../Examples/Nucleation/cpu_nucleation.py)
+and [CPU Nucleation Strategy System](../../../Features/nucleation_strategy_system.md).
+The hand-built [custom single-species notebook](../../../Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb)
+is illustrative only and is not the supported API.
 
 ## Nucleation as a Source Term in Aerosol Dynamics
 
@@ -279,7 +280,26 @@ identity; it does not provide GPU execution.
   state before each rate calculation, so completed substeps can change later
   rates. Atomicity is per attempted P3 substep only: a completed earlier
   substep is not rolled back if a later substep fails. P2/P3 helpers remain
-  concrete-only, and GPU support remains deferred.
+   concrete-only, and GPU support remains deferred.
+
+### Shipped CPU source transaction
+
+For each P5 substep, the current potential rate is converted to a potential
+event count. P2 admits a shared, inventory-limited count across species before
+any mutation. P3 then activates fixed-capacity slots and transfers each event's
+species mass from partitioning gas into particle mass. Its bookkeeping uses
+concentration-weighted particle inventory, so every box/species ledger is
+checked as particle plus gas with `rtol=1e-12` and `atol=1e-30`.
+
+Diagnostics distinguish potential, admitted, gas-limited, represented, and
+reduced events, identify limiting species, and report requested/activated/
+released slots and selected exhaustion policy and scale. Resampling is the
+first exhausted-capacity policy; representative-volume scaling is its fallback.
+For scaled rows the reference total is `scale * pre_total`; the supported
+unscaled example uses `requested_scale == minimum_scale == 1.0` and directly
+asserts total-mass conservation. P2 is nonmutating, P3 preflight rejection is
+atomic, and P5 rollback scope is one attempted substep rather than a complete
+call.
 
 ## Variable Descriptions
 
@@ -345,9 +365,9 @@ identity; it does not provide GPU execution.
   potential rate is not evidence that nucleation is physically absent outside
   a parameterization's domain.
 
-- **No Conservation Step:** A potential rate is not yet a particle source.
-  Without a separately designed event-to-particle and gas-depletion step, it
-  must not be interpreted as having conserved mass or changed inventories.
+- **Bounded conservation step:** The shipped P5 source transaction conserves
+  supported partitioning-gas and particle inventory, but it is CPU-only,
+  single-box, fixed-capacity work rather than a general multiphysics source.
 
 - **Injection-Size Convention:** Models inject particles at a chosen formation size, not at the true critical size. The nucleation rate must be survival-corrected (Equation 10) to be consistent with that choice.
 
@@ -363,7 +383,13 @@ identity; it does not provide GPU execution.
 
 ## Conclusion
 
-Nucleation converts supersaturated vapor into new particles through a barrier-crossing process whose rate is exponentially sensitive to saturation ratio and surface tension. The bounded P1 calculation is narrower: it converts a scalar precursor mass concentration to C [#/m³] and evaluates an activation or kinetic **potential** event rate in [#/m³/s] only within declared validity limits. Its configured survival factor provides no independently calculated growth or scavenging physics. A mass-conserving source term, particle injection, and any fixed-slot policy remain separate responsibilities.
+Nucleation converts supersaturated vapor into new particles through a
+barrier-crossing process whose rate is exponentially sensitive to saturation
+ratio and surface tension. The bounded P4/P5 CPU implementation is narrower:
+it evaluates configured empirical potential rates and commits a one-box,
+fixed-capacity, gas-conserving source transaction. Its configured survival
+factor provides no independently calculated growth or scavenging physics.
+Vehkamäki et al. (2002) is scientific context only, not implemented physics.
 
 ---
 

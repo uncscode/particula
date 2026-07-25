@@ -26,7 +26,11 @@ Examples:
 # %% [markdown]
 # # Custom Nucleation: Single Species
 #
-# In this *How-to Guide*, we will demonstrate how to create a custom nucleation model for a single-species aerosol system. We will use fixed nucleation rates for demonstration purposes. This approach highlights the flexibility of adding new processes to your aerosol simulation before full integration into the main codebase.
+# In this *How-to Guide*, we demonstrate an illustrative custom single-species
+# workflow with fixed nucleation rates. Its direct facade mutation and
+# saturation-based mass source are not the supported E6-F7 public API. Use the
+# supported `cpu_nucleation.py` script and CPU Nucleation Strategy System guide
+# for public `Nucleation` runnable usage.
 #
 # This guide is based on the **Dynamics Customization** tutorial.
 #

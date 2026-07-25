@@ -25,6 +25,8 @@
 - [x] P6 snapshot coverage proves P2/P3 preflight and no-viable-policy failures
   preserve accessible particle, gas, input, record, and configuration state;
   P5 regressions retain single-box gas-coupling and backing-identity coverage.
+- [x] CPU feature/theory/example documentation defines public and concrete-only
+  boundaries, supported CPU scope, conservation, and deferred GPU work.
 - [ ] Fast tests, Ruff, and mypy pass without lowering coverage thresholds.
 
 ## Metrics

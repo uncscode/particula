@@ -51,3 +51,11 @@
 Documentation must not market empirical forms as universal predictions or
 imply hidden survival correction, full Vehkamäki physics, GPU support, dynamic
 slots, automatic scheduling, or performance proof.
+
+## P7 closeout (#1436)
+
+P7 shipped `docs/Features/nucleation_strategy_system.md`, the supported
+`docs/Examples/Nucleation/cpu_nucleation.py` runnable, navigation, and a theory
+reconciliation. The CPU P5 boundary is single-box and per-substep atomic only;
+P2/P3 remain concrete-only. E6-F8 direct-Warp and E6-F9 integration remain
+deferred. The custom notebook is explicitly illustrative rather than supported.

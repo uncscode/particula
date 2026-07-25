@@ -66,10 +66,11 @@ decisions in
 [Numerical Precision and Mass Resolution](#numerical-precision-and-mass-resolution)
 and the time-integration decisions in
 [Time-Scale Stiffness](#time-scale-stiffness). New particle formation is both
-a size-range driver and a planned process: a nucleation/particle-source
-process does not exist in particula today and is added as an
-[Epic F](#epic-f-gpu-process-completeness) work item so freshly formed
-particles can enter GPU-resident simulations through slot activation.
+a size-range driver. E6-F7 ships a bounded CPU-only, single-box nucleation
+process; its public runnable adapts legacy `Aerosol` backing data and is not a
+GPU path. [Epic F](#epic-f-gpu-process-completeness) retains direct-Warp
+E6-F8 and integration/example E6-F9 work so freshly formed particles can enter
+GPU-resident simulations through slot activation.
 
 ## Non-Goals
 
@@ -229,7 +230,8 @@ Known GPU physics gaps remain:
   see the [data containers and GPU foundations
   guide](../data-containers-and-gpu-foundations.md) for the supported
   constant/Buck scope and refresh contract.
-- No nucleation/particle-source process exists on CPU or GPU.
+- E6-F7 ships a CPU-only, single-box nucleation/particle-source runnable.
+  Direct-Warp E6-F8 and GPU integration/example E6-F9 remain deferred.
 
 Known GPU kernel defects and design limits (see
 [Known Kernel Issues](#known-kernel-issues)):

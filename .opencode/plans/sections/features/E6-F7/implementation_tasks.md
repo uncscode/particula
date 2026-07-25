@@ -47,8 +47,8 @@
 
 ## Documentation
 
-- [ ] Update theory with the shipped API, units, domains, citations, and model
+- [x] Update theory with the shipped API, units, domains, citations, and model
   boundary.
-- [ ] Add a supported CPU example and cross-link E6-F5/F6 and E6-F8/F9.
-- [ ] Record focused commands and conservation tolerances in `AGENTS.md` and
+- [x] Add a supported CPU example and cross-link E6-F5/F6 and E6-F8/F9.
+- [x] Record focused commands and conservation tolerances in `AGENTS.md` and
   the user-facing feature document.

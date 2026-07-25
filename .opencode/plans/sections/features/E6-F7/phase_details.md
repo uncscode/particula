@@ -61,8 +61,8 @@ P4/P5, then run P6 conservation validation before P7 documentation.
     concrete P2/P3 integration matrix. No production or documentation files
     changed.
 
-- [ ] **E6-F7-P7:** Update development documentation for CPU nucleation
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E6-F7-P7:** Update development documentation for CPU nucleation
+  - Issue: #1436 | Size: XS | Status: Shipped
   - Goal: Publish equations, citations, domains, APIs, conservation contract, dependencies, and deferred physics.
   - Files: `AGENTS.md`, `docs/Features/`, `docs/Theory/Technical/Dynamics/Nucleation_Equations.md`, `docs/Examples/Nucleation/`, E6 sections
-  - Tests: Links, snippets, equation/unit review, citations, applicable example execution, and focused commands.
+  - Tests: Publication regression, example execution, strict MkDocs build, and focused commands.
