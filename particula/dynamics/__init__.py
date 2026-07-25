@@ -7,15 +7,17 @@ helpers such as the thermal resistance factor. Includes neutral and charged
 wall loss for spherical and rectangular chambers. Charged wall loss adds
 image-charge enhancement even when wall potential is zero and optional
 electric-field drift. Also provides ``MassCondensation``, ``Coagulation``,
-``WallLoss``, and ``Dilution`` runnables. ``DilutionStrategy`` and
+``WallLoss``, ``Dilution``, and ``Nucleation`` runnables. ``DilutionStrategy``
+and
 ``Dilution`` are the supported dilution construction APIs; low-level aerosol
 mutation and finite-step helpers remain available only from the concrete
 ``particula.dynamics.dilution`` module.
 
 Nucleation exports provide the bounded P4 construction surface for immutable
 activation and kinetic potential-rate strategies. ``NucleationSourceConfig``
-selects one of those strategies and a precursor index, but P2/P3
-``particle_source`` finalization and mutation helpers remain concrete-only.
+selects one of those strategies and a precursor index. The CPU-only single-box
+``Nucleation`` runnable and its immutable ``NucleationCommitConfig`` provide
+the P5 process boundary; P2/P3 ``particle_source`` helpers remain concrete-only.
 """
 
 
@@ -62,6 +64,8 @@ from particula.dynamics.particle_process import (
     MassCondensation,
     Coagulation,
     Dilution,
+    Nucleation,
+    NucleationCommitConfig,
     WallLoss,
 )
 

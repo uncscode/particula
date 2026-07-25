@@ -3,6 +3,8 @@
 Includes condensation and evaporation, coagulation, wall loss, and dilution.
 """
 
+from dataclasses import dataclass
+from numbers import Real
 from typing import Any, Protocol, cast
 
 import numpy as np
@@ -13,7 +15,20 @@ from particula.dynamics.dilution import (
     DilutionStrategy,
     _validate_nonnegative_scalar,
 )
+from particula.dynamics.nucleation.nucleation_configuration import (
+    NucleationSourceConfig,
+)
+from particula.dynamics.nucleation.particle_source import (
+    ParticleSourceCommitConfig,
+    PotentialEventData,
+    commit_particle_source,
+    finalize_particle_source,
+)
+from particula.gas.environment_data import EnvironmentData
+from particula.gas.gas_data import GasData
 from particula.gas.species import GasSpecies
+from particula.particles.exhaustion import ExhaustionControls
+from particula.particles.particle_data import ParticleData
 from particula.particles.representation import ParticleRepresentation
 
 # Particula imports
@@ -36,6 +51,305 @@ class DilutionStrategyProtocol(Protocol):
 
     def step(self, aerosol: Aerosol, time_step: float) -> Aerosol:
         """Apply one dilution step to an aerosol."""
+
+
+def _readonly_float64_vector(
+    values: object,
+    name: str,
+) -> NDArray[np.float64]:
+    """Return an owned, read-only, rank-one float64 array.
+
+    Args:
+        values: Array-compatible sidecar values.
+        name: Field name used in validation errors.
+
+    Returns:
+        Fresh immutable float64 vector.
+
+    Raises:
+        TypeError: If the values cannot be converted to float64.
+        ValueError: If the converted values are not rank one.
+    """
+    try:
+        raw = np.asarray(values)
+    except (TypeError, ValueError) as error:
+        raise TypeError(f"{name} must be float64-compatible") from error
+    if raw.dtype.kind in "bOSUc":
+        raise TypeError(f"{name} must be float64-compatible")
+    try:
+        result = np.array(values, dtype=np.float64, copy=True)
+    except (TypeError, ValueError, OverflowError) as error:
+        raise TypeError(f"{name} must be float64-compatible") from error
+    if result.ndim != 1:
+        raise ValueError(f"{name} must be rank 1")
+    result.setflags(write=False)
+    return result
+
+
+def _is_real_scalar(value: object) -> bool:
+    """Return whether ``value`` is a non-Boolean real scalar."""
+    return (
+        isinstance(value, (Real, np.integer, np.floating))
+        and not isinstance(value, (bool, np.bool_))
+        and not isinstance(value, np.ndarray)
+    )
+
+
+@dataclass(frozen=True)
+class NucleationCommitConfig:
+    """Immutable one-box controls for CPU nucleation source commits.
+
+    The record mirrors the P3 transaction controls while retaining public P5
+    ownership. Its rank-one sidecars are copied into read-only float64 arrays;
+    their required one-box length is checked immediately before each commit.
+
+    Args:
+        maximum_slot_weight: Positive maximum represented events per slot.
+        source_charge: Finite charge assigned to activated source slots.
+        exhaustion_controls: Immutable fixed-capacity policy controls.
+        requested_scale: Requested representative-volume scale per box.
+        minimum_scale: Minimum allowed representative-volume scale per box.
+        minimum_volume: Minimum representative volume per box [m³].
+        radius_cubed_relative_error: Allowed resampling radius-cubed error.
+        mean_radius_relative_error: Allowed resampling mean-radius error.
+        surface_relative_error: Allowed resampling surface-area error.
+        diversity_absolute_error: Allowed resampling diversity error.
+    """
+
+    maximum_slot_weight: float
+    source_charge: float
+    exhaustion_controls: ExhaustionControls
+    requested_scale: NDArray[np.float64]
+    minimum_scale: NDArray[np.float64]
+    minimum_volume: NDArray[np.float64]
+    radius_cubed_relative_error: float = 1.0
+    mean_radius_relative_error: float = 1.0
+    surface_relative_error: float = 1.0
+    diversity_absolute_error: float = 1.0
+
+    def __post_init__(self) -> None:
+        """Validate scalar controls and defensively own sidecars."""
+        for name, positive in (
+            ("maximum_slot_weight", True),
+            ("source_charge", False),
+        ):
+            value = getattr(self, name)
+            if not _is_real_scalar(value):
+                raise TypeError(f"{name} must be a real scalar")
+            normalized = float(value)
+            if not np.isfinite(normalized) or (positive and normalized <= 0.0):
+                qualifier = "positive" if positive else "finite"
+                raise ValueError(f"{name} must be finite and {qualifier}")
+            object.__setattr__(self, name, normalized)
+        if not isinstance(self.exhaustion_controls, ExhaustionControls):
+            raise TypeError("exhaustion_controls must be ExhaustionControls")
+        for name in (
+            "radius_cubed_relative_error",
+            "mean_radius_relative_error",
+            "surface_relative_error",
+            "diversity_absolute_error",
+        ):
+            value = getattr(self, name)
+            if type(value) is not float:
+                raise TypeError(f"{name} must be an exact Python float")
+            if not np.isfinite(value) or value < 0.0:
+                raise ValueError(f"{name} must be finite and nonnegative")
+        for name in ("requested_scale", "minimum_scale", "minimum_volume"):
+            object.__setattr__(
+                self,
+                name,
+                _readonly_float64_vector(getattr(self, name), name),
+            )
+
+
+class Nucleation(RunnableABC):
+    """Apply CPU-only single-box nucleation as equal sequential substeps.
+
+    The runnable adapts the legacy aerosol facades to their existing backing
+    containers and returns the identical aerosol. Each successful substep is a
+    separate P3 transaction, so prior substeps persist when a later one fails;
+    the full call has no rollback boundary.
+
+    Args:
+        source_config: P4 potential-rate strategy and precursor selection.
+        commit_config: Immutable P5 source-commit controls.
+        environment: Single-box thermodynamic state used for every substep.
+    """
+
+    def __init__(
+        self,
+        source_config: NucleationSourceConfig,
+        commit_config: NucleationCommitConfig,
+        environment: EnvironmentData,
+    ) -> None:
+        """Initialize a validated CPU nucleation runnable."""
+        if not isinstance(source_config, NucleationSourceConfig):
+            raise TypeError("source_config must be NucleationSourceConfig")
+        if not isinstance(commit_config, NucleationCommitConfig):
+            raise TypeError("commit_config must be NucleationCommitConfig")
+        if not isinstance(environment, EnvironmentData):
+            raise TypeError("environment must be EnvironmentData")
+        self.source_config = source_config
+        self.commit_config = commit_config
+        self.environment = environment
+
+    def _topology(  # noqa: C901
+        self, aerosol: Aerosol
+    ) -> tuple[ParticleData, GasData]:
+        """Validate and return the supported facade backing containers."""
+        try:
+            particle_facade = aerosol.particles
+            gas_facade = aerosol.atmosphere.partitioning_species
+        except AttributeError as error:
+            raise TypeError(
+                "aerosol must provide particle and gas facades"
+            ) from error
+        if not isinstance(particle_facade, ParticleRepresentation):
+            raise TypeError("aerosol particles must be ParticleRepresentation")
+        if not isinstance(gas_facade, GasSpecies):
+            raise TypeError("partitioning_species must be GasSpecies")
+        try:
+            particles = particle_facade.data
+            gas = gas_facade.data
+        except AttributeError as error:
+            raise TypeError(
+                "aerosol facades must provide backing data"
+            ) from error
+        if not isinstance(particles, ParticleData):
+            raise TypeError("particle backing data must be ParticleData")
+        if not isinstance(gas, GasData):
+            raise TypeError("gas backing data must be GasData")
+        if not isinstance(particles.masses, np.ndarray):
+            raise TypeError("particle masses must be a numpy array")
+        if not isinstance(gas.concentration, np.ndarray):
+            raise TypeError("gas concentration must be a numpy array")
+        if not isinstance(gas.molar_mass, np.ndarray):
+            raise TypeError("gas molar_mass must be a numpy array")
+        if particles.masses.ndim != 3 or particles.masses.shape[0] != 1:
+            raise ValueError("particle data must have exactly one box")
+        if gas.concentration.shape != (1, gas.n_species):
+            raise ValueError("gas data must have exactly one box")
+        if gas.molar_mass.shape != (gas.n_species,):
+            raise ValueError("gas molar_mass shape must match gas species")
+        if particles.masses.shape[2] != gas.n_species:
+            raise ValueError("particle and gas species widths must match")
+        try:
+            temperature = self.environment.temperature
+            pressure = self.environment.pressure
+            saturation_ratio = self.environment.saturation_ratio
+        except AttributeError as error:
+            raise TypeError(
+                "environment must provide thermodynamic arrays"
+            ) from error
+        if not isinstance(temperature, np.ndarray):
+            raise TypeError("environment temperature must be a numpy array")
+        if not isinstance(pressure, np.ndarray):
+            raise TypeError("environment pressure must be a numpy array")
+        if not isinstance(saturation_ratio, np.ndarray):
+            raise TypeError(
+                "environment saturation_ratio must be a numpy array"
+            )
+        if temperature.shape != (1,):
+            raise ValueError("environment must have exactly one box")
+        if pressure.shape != (1,):
+            raise ValueError("environment must have exactly one box")
+        if saturation_ratio.shape != (1, gas.n_species):
+            raise ValueError(
+                "environment saturation_ratio shape must match gas"
+            )
+        if self.source_config.precursor_index >= gas.n_species:
+            raise ValueError("precursor_index is out of range for gas species")
+        return particles, gas
+
+    def _commit_config(self) -> ParticleSourceCommitConfig:
+        """Create a private P3 configuration for one attempted substep."""
+        return ParticleSourceCommitConfig(
+            maximum_slot_weight=self.commit_config.maximum_slot_weight,
+            source_charge=self.commit_config.source_charge,
+            exhaustion_controls=self.commit_config.exhaustion_controls,
+            requested_scale=self.commit_config.requested_scale,
+            minimum_scale=self.commit_config.minimum_scale,
+            minimum_volume=self.commit_config.minimum_volume,
+            radius_cubed_relative_error=(
+                self.commit_config.radius_cubed_relative_error
+            ),
+            mean_radius_relative_error=(
+                self.commit_config.mean_radius_relative_error
+            ),
+            surface_relative_error=self.commit_config.surface_relative_error,
+            diversity_absolute_error=self.commit_config.diversity_absolute_error,
+        )
+
+    def _rate_from_gas(self, gas: GasData) -> float:
+        """Calculate a potential rate from validated gas backing data."""
+        precursor = self.source_config.precursor_index
+        strategy = self.source_config.strategy
+        saturation = None
+        if strategy.validity_domain.saturation is not None:
+            saturation = float(self.environment.saturation_ratio[0, precursor])
+        return strategy.potential_rate(
+            precursor_mass_concentration=float(gas.concentration[0, precursor]),
+            precursor_molar_mass=float(gas.molar_mass[precursor]),
+            temperature=float(self.environment.temperature[0]),
+            saturation=saturation,
+        )
+
+    def rate(self, aerosol: Aerosol) -> float:
+        """Calculate the current single-box potential event rate [#/m³/s]."""
+        _, gas = self._topology(aerosol)
+        return self._rate_from_gas(gas)
+
+    def execute(
+        self,
+        aerosol: Aerosol,
+        time_step: float | np.number,
+        sub_steps: int | np.integer = 1,
+    ) -> Aerosol:
+        """Apply nucleation in equal sequential substeps.
+
+        Args:
+            aerosol: Legacy aerosol whose backing containers are mutated.
+            time_step: Finite nonnegative total duration [s].
+            sub_steps: Positive number of equal source transactions.
+
+        Returns:
+            The identical aerosol instance.
+        """
+        if (
+            isinstance(sub_steps, bool)
+            or not isinstance(sub_steps, (int, np.integer))
+            or sub_steps <= 0
+        ):
+            raise ValueError("sub_steps must be a positive integer.")
+        validated_time_step = _validate_nonnegative_scalar(
+            time_step, "time_step"
+        )
+        particles, gas = self._topology(aerosol)
+        if validated_time_step == 0.0:
+            return aerosol
+        duration = validated_time_step / sub_steps
+        strategy = self.source_config.strategy
+        for _ in range(sub_steps):
+            rate = self._rate_from_gas(gas)
+            if rate == 0.0:
+                continue
+            potential_events = PotentialEventData(
+                potential_rate=np.array([rate], dtype=np.float64),
+                duration=duration,
+            )
+            demand, diagnostics = finalize_particle_source(
+                potential_events,
+                strategy.injection_composition,
+                gas,
+            )
+            commit_particle_source(
+                demand,
+                diagnostics,
+                particles,
+                gas,
+                self._commit_config(),
+            )
+        return aerosol
 
 
 class MassCondensation(RunnableABC):
