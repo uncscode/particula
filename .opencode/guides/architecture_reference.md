@@ -58,8 +58,13 @@ provides an unexported, read-only Warp preflight and P2 privately plans
 `E_pot=J*dt` demand after survival is included in `J`. It admits one shared
 per-box demand against precursor inventory so planned removal is inventory-safe.
 P2 commits only caller-owned planning, finalized-demand, and gate-diagnostic
-sidecars; it neither activates slots nor mutates particle or gas state.
-Particle activation, gas mutation, and E6-F9 integration remain deferred.
+sidecars. Private P3 then converts admitted demand times particle-box volume to
+exact finite nonnegative `int32` provisional counts, reuses E6-F5 diagnostics,
+and retains demand beyond free capacity while writing count and selected-slot
+sidecars only. It has no package export. Conversion rejection occurs before
+sidecar writes; rollback is not promised after a successful asynchronous
+diagnostic or P3 commit launch. E6-F6 capacity policy, activation,
+particle/gas mutation, and E6-F9 integration remain deferred.
 
 ## Scientific Utilities
 

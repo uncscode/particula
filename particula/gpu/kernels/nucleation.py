@@ -1,4 +1,4 @@
-"""Define concrete-only P1 validation and P2 demand planning for GPU nucleation.
+"""Define concrete-only P1--P3 GPU nucleation planning seams.
 
 This unexported module validates fixed-capacity particle, gas, environment,
 and caller-owned sidecar schemas for a direct-Warp nucleation path. P1 is
@@ -6,8 +6,9 @@ read-only. Private P2 calculates source demand [#/m³], admits one shared
 inventory-safe demand per box, and commits only its designated sidecars. P2
 does not select or activate slots, resolve exhaustion, resize storage, mutate
 particle fields or ``gas.concentration``, transfer data to the host, or use a
-CPU physics fallback. P3 retains ownership of accepted counts and selected-slot
-diagnostics, as well as the later particle/gas transaction.
+CPU physics fallback. Private P3 converts admitted demand to representable
+provisional event counts and reuses slot diagnostics, without activation or a
+particle/gas transaction.
 
 The preflight accepts only same-device, contiguous Warp arrays with fixed
 shapes. Frozen records prevent rebinding their fields but do not copy, freeze,
@@ -34,6 +35,7 @@ except ImportError as exc:  # pragma: no cover - import guard
     ) from exc
 
 from particula.gpu.kernels.environment import _is_warp_array_like
+from particula.gpu.kernels.slot_management import get_slot_diagnostics_gpu
 from particula.util.constants import AVOGADRO_NUMBER
 
 _P2_GATE_ELIGIBLE = 0
@@ -251,7 +253,7 @@ class NucleationFinalizedDemandBuffers:
 
     Attributes:
         accepted_counts: P3-owned, same-device contiguous ``wp.int32`` array
-            shaped ``(B,)`` for finalized accepted source counts. P2 leaves it
+            shaped ``(B,)`` for full provisional event counts. P2 leaves it
             byte-for-byte unchanged.
         accepted_demand: Same-device contiguous ``wp.float64`` array shaped
             ``(B,)`` for P2 inventory-admitted source demand [#/m³].
@@ -274,13 +276,24 @@ class NucleationDiagnosticBuffers:
             denote the documented zero/low gates; and ``7 + s`` records an
             inventory-limited box whose limiting species index is ``s``.
         selected_slot_indices: Same-device contiguous ``wp.int32`` array
-            shaped ``(B, N)`` for P3 selected slots. P2 leaves it byte-for-byte
-            unchanged. P3 reserves ``-1`` for unused tails; P1 does not inspect,
-            initialize, or otherwise alter stale output values.
+            shaped ``(B, N)`` for P3's deterministic selectable free-slot
+            prefix. P2 leaves it byte-for-byte unchanged. P3 reserves ``-1``
+            for unused tails; P1 does not inspect, initialize, or otherwise
+            alter stale output values.
+        free_slot_indices: P3/E6-F5-owned, same-device contiguous ``wp.int32``
+            array shaped ``(B, N)`` for ascending free slot indices with ``-1``
+            tails.
+        active_slot_counts: P3/E6-F5-owned, same-device contiguous ``wp.int32``
+            array shaped ``(B,)`` for active slot counts.
+        free_slot_counts: P3/E6-F5-owned, same-device contiguous ``wp.int32``
+            array shaped ``(B,)`` for free slot counts.
     """
 
     gate_codes: Any
     selected_slot_indices: Any
+    free_slot_indices: Any
+    active_slot_counts: Any
+    free_slot_counts: Any
 
 
 @dataclass(frozen=True)
@@ -825,6 +838,27 @@ def _validate_sidecars(
                     "selected_slot_indices",
                     wp.int32,
                     (n_boxes, n_particles),
+                    device,
+                ),
+                _array(
+                    diagnostics,
+                    "free_slot_indices",
+                    wp.int32,
+                    (n_boxes, n_particles),
+                    device,
+                ),
+                _array(
+                    diagnostics,
+                    "active_slot_counts",
+                    wp.int32,
+                    (n_boxes,),
+                    device,
+                ),
+                _array(
+                    diagnostics,
+                    "free_slot_counts",
+                    wp.int32,
+                    (n_boxes,),
                     device,
                 ),
             )
@@ -1459,8 +1493,8 @@ def _plan_nucleation_demand(
     ``finalized_demand.precursor_mass_change``, and ``diagnostics.gate_codes``.
     It reads gas state for planning but never mutates particle state,
     ``gas.concentration``, P3 ``accepted_counts``, or P3 selected-slot indices.
-    It neither selects/activates slots nor resolves exhaustion; P3 owns those
-    actions and its later particle/gas transaction.
+    It neither selects/activates slots nor resolves exhaustion; P3 only stages
+    metadata for a later capacity-policy and activation phase.
 
     Args:
         particles: Caller-owned Warp particle container used only for P1 schema
@@ -1582,4 +1616,122 @@ def _plan_nucleation_demand(
             diagnostics.gate_codes,
         ],
         device=device,
+    )
+
+
+@wp.kernel
+def _convert_admitted_demand_to_counts(
+    accepted_demand: wp.array(dtype=wp.float64),
+    volume: wp.array(dtype=wp.float64),
+    maximum_count: wp.float64,
+    counts: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Convert per-volume admitted demand to integral provisional counts."""
+    box = wp.tid()
+    events = accepted_demand[box] * volume[box]
+    if (
+        not wp.isfinite(events)
+        or events < 0.0
+        or events != wp.floor(events)
+        or events > maximum_count
+    ):
+        wp.atomic_add(invalid, 0, 1)
+    else:
+        counts[box] = wp.int32(events)
+
+
+@wp.kernel
+def _commit_staged_nucleation_slots(
+    counts: wp.array(dtype=wp.int32),
+    free_slot_indices: wp.array2d(dtype=wp.int32),
+    free_slot_counts: wp.array(dtype=wp.int32),
+    accepted_counts: wp.array(dtype=wp.int32),
+    selected_slot_indices: wp.array2d(dtype=wp.int32),
+    n_particles: int,
+) -> None:
+    """Commit P3 counts and the selectable prefix of E6-F5 free slots."""
+    box = wp.tid()
+    count = counts[box]
+    accepted_counts[box] = count
+    selectable = wp.min(count, free_slot_counts[box])
+    for rank in range(n_particles):
+        if rank < selectable:
+            selected_slot_indices[box, rank] = free_slot_indices[box, rank]
+        else:
+            selected_slot_indices[box, rank] = -1
+
+
+def _stage_nucleation_slots(
+    preflight: _NucleationPreflight,
+    finalized_demand: NucleationFinalizedDemandBuffers,
+    diagnostics: NucleationDiagnosticBuffers,
+) -> None:
+    """Privately stage P3 event counts and selectable free-slot metadata.
+
+    P3 consumes P2's inventory-admitted demand and validated particle volume.
+    It writes only the supplied count and slot-diagnostic sidecars. Conversion
+    errors occur before E6-F5 diagnostics or any P3 sidecar write. After a
+    successful E6-F5 or P3 writer launch, callers must synchronize before
+    consuming outputs; asynchronous writer failures do not promise rollback.
+
+    Args:
+        preflight: Exact private P1 result reused without repeated validation.
+        finalized_demand: Exact P2/P3 sidecar record containing admitted demand.
+        diagnostics: Exact P2/P3 diagnostic record used for E6-F5 and P3 output.
+
+    Raises:
+        ValueError: If private handoff records are invalid or event conversion
+            does not produce finite, nonnegative, integral ``int32`` counts.
+    """
+    if not isinstance(preflight, _NucleationPreflight):
+        raise ValueError("preflight must be _NucleationPreflight.")
+    if not isinstance(finalized_demand, NucleationFinalizedDemandBuffers):
+        raise ValueError(
+            "finalized_demand must be NucleationFinalizedDemandBuffers."
+        )
+    if not isinstance(diagnostics, NucleationDiagnosticBuffers):
+        raise ValueError("diagnostics must be NucleationDiagnosticBuffers.")
+    if preflight.n_boxes == 0:
+        return
+
+    counts = wp.zeros(
+        preflight.n_boxes, dtype=wp.int32, device=preflight.device
+    )
+    invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
+    wp.launch(
+        _convert_admitted_demand_to_counts,
+        dim=preflight.n_boxes,
+        inputs=[
+            finalized_demand.accepted_demand,
+            preflight.particles.volume,
+            float(np.iinfo(np.int32).max),
+            counts,
+            invalid,
+        ],
+        device=preflight.device,
+    )
+    if int(invalid.numpy()[0]):
+        raise ValueError(
+            "accepted_demand times particle volume must be a finite, "
+            "nonnegative integral int32 count."
+        )
+    get_slot_diagnostics_gpu(
+        preflight.particles,
+        diagnostics.free_slot_indices,
+        diagnostics.active_slot_counts,
+        diagnostics.free_slot_counts,
+    )
+    wp.launch(
+        _commit_staged_nucleation_slots,
+        dim=preflight.n_boxes,
+        inputs=[
+            counts,
+            diagnostics.free_slot_indices,
+            diagnostics.free_slot_counts,
+            finalized_demand.accepted_counts,
+            diagnostics.selected_slot_indices,
+            preflight.n_particles,
+        ],
+        device=preflight.device,
     )

@@ -25,6 +25,7 @@ from particula.gpu.kernels.nucleation import (  # noqa: E402
     _plan_nucleation_demand,
     _preflight_nucleation,
     _real,
+    _stage_nucleation_slots,
 )
 from particula.util.constants import AVOGADRO_NUMBER  # noqa: E402
 
@@ -97,6 +98,9 @@ def _sidecars(boxes: int, particles: int, species: int, device: str = "cpu"):
         NucleationDiagnosticBuffers(
             wp.ones(boxes, dtype=wp.int32, device=device),
             wp.ones((boxes, particles), dtype=wp.int32, device=device),
+            wp.ones((boxes, particles), dtype=wp.int32, device=device),
+            wp.ones(boxes, dtype=wp.int32, device=device),
+            wp.ones(boxes, dtype=wp.int32, device=device),
         ),
     )
 
@@ -152,6 +156,336 @@ def _oracle_plan(concentration, molar_mass, config, time_step):
     )
     removal = admitted[:, None] * event_mass
     return precursor, rate, potential, admitted, removal
+
+
+def _stage_slots(counts, particle_slots, device="cpu"):
+    """Stage explicit integral P3 counts against a fixed particle-slot layout."""
+    boxes, particles = particle_slots.shape
+    particle_data, gas_data = _state(boxes, particles, 1, device)
+    particle_data.concentration = wp.array(
+        np.where(particle_slots, 1.0, 0.0), dtype=wp.float64, device=device
+    )
+    particle_data.masses = wp.array(
+        np.where(particle_slots[:, :, None], 1.0, 0.0),
+        dtype=wp.float64,
+        device=device,
+    )
+    scratch, finalized, diagnostics = _sidecars(boxes, particles, 1, device)
+    finalized = NucleationFinalizedDemandBuffers(
+        finalized.accepted_counts,
+        wp.array(
+            np.asarray(counts, dtype=np.float64),
+            dtype=wp.float64,
+            device=device,
+        ),
+        finalized.precursor_mass_change,
+    )
+    preflight = _preflight_nucleation(
+        particle_data,
+        gas_data,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    _stage_nucleation_slots(preflight, finalized, diagnostics)
+    return particle_data, gas_data, scratch, finalized, diagnostics
+
+
+@pytest.mark.parametrize(
+    ("counts", "slots", "expected_selected"),
+    [
+        ([2.0], np.array([[False, False]]), [[0, 1]]),
+        ([2.0], np.array([[True, False, True, False]]), [[1, 3, -1, -1]]),
+        ([4.0], np.array([[False, False]]), [[0, 1]]),
+    ],
+)
+@pytest.mark.parametrize("device", _DEVICE_CASES)
+def test_stage_nucleation_slots_writes_expected_layout(
+    counts, slots, expected_selected, device
+):
+    """P3 retains full counts and selects the ascending free-slot prefix."""
+    particles, gas, scratch, finalized, diagnostics = _stage_slots(
+        counts, slots, device
+    )
+    particle_snapshot = _snapshot_arrays(particles)
+    gas_snapshot = _snapshot_arrays(gas)
+    scratch_snapshot = _snapshot_arrays(scratch)
+    np.testing.assert_array_equal(
+        finalized.accepted_counts.numpy(), np.asarray(counts, dtype=np.int32)
+    )
+    expected_free = np.where(~slots[0])[0].astype(np.int32)
+    expected_free = np.pad(
+        expected_free,
+        (0, slots.shape[1] - len(expected_free)),
+        constant_values=-1,
+    )
+    np.testing.assert_array_equal(
+        diagnostics.free_slot_indices.numpy(), [expected_free]
+    )
+    np.testing.assert_array_equal(
+        diagnostics.selected_slot_indices.numpy(), expected_selected
+    )
+    assert diagnostics.active_slot_counts.numpy()[0] == np.count_nonzero(slots)
+    assert diagnostics.free_slot_counts.numpy()[0] == np.count_nonzero(~slots)
+    np.testing.assert_array_equal(
+        finalized.accepted_demand.numpy(), np.asarray(counts, dtype=np.float64)
+    )
+    np.testing.assert_array_equal(
+        finalized.precursor_mass_change.numpy(), np.ones((1, 1))
+    )
+    np.testing.assert_array_equal(diagnostics.gate_codes.numpy(), [1])
+    _assert_snapshot_unchanged(particle_snapshot)
+    _assert_snapshot_unchanged(gas_snapshot)
+    _assert_snapshot_unchanged(scratch_snapshot)
+
+
+def test_stage_nucleation_slots_passes_exact_diagnostics_to_e6_f5(monkeypatch):
+    """P3 delegates classification to E6-F5 using caller-owned sidecars."""
+    captured = []
+    original = nucleation_module.get_slot_diagnostics_gpu
+
+    def capture_diagnostics(
+        particles, free_indices, active_counts, free_counts
+    ):
+        """Capture the P3-owned E6-F5 output sidecars before delegation."""
+        captured.append((free_indices, active_counts, free_counts))
+        return original(particles, free_indices, active_counts, free_counts)
+
+    monkeypatch.setattr(
+        nucleation_module, "get_slot_diagnostics_gpu", capture_diagnostics
+    )
+    _, _, _, finalized, diagnostics = _stage_slots(
+        [1.0], np.array([[False, True]])
+    )
+
+    assert captured == [
+        (
+            diagnostics.free_slot_indices,
+            diagnostics.active_slot_counts,
+            diagnostics.free_slot_counts,
+        )
+    ]
+    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [1])
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["free_slot_indices", "active_slot_counts", "free_slot_counts"],
+)
+def test_p3_diagnostic_sidecars_require_int32_nonoverlapping_storage(field):
+    """P1 rejects malformed or aliased P3 diagnostic sidecars unchanged."""
+    particles, gas = _state()
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    values = dict(diagnostics.__dict__)
+    values[field] = wp.ones(
+        tuple(getattr(diagnostics, field).shape),
+        dtype=wp.float64,
+        device="cpu",
+    )
+    malformed = NucleationDiagnosticBuffers(**values)
+    before = _snapshot_arrays(particles, gas, scratch, finalized, malformed)
+
+    with pytest.raises(ValueError, match="required dtype"):
+        _preflight_nucleation(
+            particles,
+            gas,
+            _config(),
+            1.0,
+            temperature=300.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=malformed,
+        )
+    _assert_snapshot_unchanged(before)
+
+    aliased = NucleationDiagnosticBuffers(
+        diagnostics.gate_codes,
+        diagnostics.selected_slot_indices,
+        diagnostics.free_slot_indices,
+        finalized.accepted_counts,
+        diagnostics.free_slot_counts,
+    )
+    before = _snapshot_arrays(particles, gas, scratch, finalized, aliased)
+    with pytest.raises(ValueError, match="must not overlap"):
+        _preflight_nucleation(
+            particles,
+            gas,
+            _config(),
+            1.0,
+            temperature=300.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=aliased,
+        )
+    _assert_snapshot_unchanged(before)
+
+
+@pytest.mark.parametrize(
+    "accepted_demand",
+    [
+        np.nan,
+        -1.0,
+        1.5,
+        float(np.iinfo(np.int32).max) + 1.0,
+    ],
+    ids=["nonfinite", "negative", "nonintegral", "above_int32_maximum"],
+)
+def test_stage_nucleation_slots_rejects_invalid_event_conversion_without_writes(
+    accepted_demand,
+):
+    """Invalid P3 conversions preserve every caller-owned P3 output."""
+    particle_data, gas_data = _state(1, 2, 1)
+    particle_data.concentration = wp.zeros(
+        (1, 2), dtype=wp.float64, device="cpu"
+    )
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    finalized = NucleationFinalizedDemandBuffers(
+        finalized.accepted_counts,
+        wp.array([accepted_demand], dtype=wp.float64, device="cpu"),
+        finalized.precursor_mass_change,
+    )
+    before = _snapshot_arrays(finalized, diagnostics)
+    preflight = _preflight_nucleation(
+        particle_data,
+        gas_data,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    with pytest.raises(ValueError, match="integral int32"):
+        _stage_nucleation_slots(preflight, finalized, diagnostics)
+    _assert_snapshot_unchanged(before)
+
+
+def test_stage_nucleation_slots_handles_zero_capacity():
+    """P3 retains a count and produces empty diagnostics at zero capacity."""
+    _, _, _, finalized, diagnostics = _stage_slots(
+        [3.0], np.zeros((1, 0), dtype=bool)
+    )
+    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [3])
+    assert diagnostics.selected_slot_indices.shape == (1, 0)
+    np.testing.assert_array_equal(diagnostics.active_slot_counts.numpy(), [0])
+    np.testing.assert_array_equal(diagnostics.free_slot_counts.numpy(), [0])
+
+
+def test_stage_nucleation_slots_accepts_int32_maximum_event_count():
+    """The inclusive int32 event-count boundary is accepted independently."""
+    _, _, _, finalized, _ = _stage_slots(
+        [float(np.iinfo(np.int32).max)], np.array([[False]])
+    )
+    np.testing.assert_array_equal(
+        finalized.accepted_counts.numpy(), [np.iinfo(np.int32).max]
+    )
+
+
+def test_stage_nucleation_slots_e6_f5_failure_preserves_p3_sidecars():
+    """E6-F5 slot-state rejection occurs before P3 count or selection writes."""
+    particles, gas = _state()
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    finalized = NucleationFinalizedDemandBuffers(
+        finalized.accepted_counts,
+        wp.array([1.0], dtype=wp.float64, device="cpu"),
+        finalized.precursor_mass_change,
+    )
+    before = _snapshot_arrays(finalized, diagnostics)
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    with pytest.raises(ValueError, match="Invalid particle slot state"):
+        _stage_nucleation_slots(preflight, finalized, diagnostics)
+    _assert_snapshot_unchanged(before)
+
+
+def test_stage_nucleation_slots_zero_boxes_is_write_free():
+    """P3 returns without sidecar writes after valid empty-shape preflight."""
+    particles, gas = _state(boxes=0)
+    scratch, finalized, diagnostics = _sidecars(0, 2, 1)
+    before = _snapshot_arrays(finalized, diagnostics)
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    _stage_nucleation_slots(preflight, finalized, diagnostics)
+    _assert_snapshot_unchanged(before)
+
+
+def test_p2_to_p3_zero_demand_seam_preserves_p2_outputs():
+    """P3 stages zero P2 demand without changing P2-owned sidecars or state."""
+    particles, gas = _state()
+    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    source_before = _snapshot_arrays(particles, gas)
+
+    _plan_nucleation_demand(
+        particles,
+        gas,
+        _config(),
+        0.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    p2_before = _snapshot_arrays(scratch)
+    accepted_demand_before = finalized.accepted_demand.numpy().copy()
+    removal_before = finalized.precursor_mass_change.numpy().copy()
+    gate_codes_before = diagnostics.gate_codes.numpy().copy()
+    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [1])
+    np.testing.assert_array_equal(
+        diagnostics.selected_slot_indices.numpy(), [[1, 1]]
+    )
+
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        0.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    _stage_nucleation_slots(preflight, finalized, diagnostics)
+
+    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [0])
+    np.testing.assert_array_equal(
+        diagnostics.free_slot_indices.numpy(), [[0, 1]]
+    )
+    np.testing.assert_array_equal(diagnostics.active_slot_counts.numpy(), [0])
+    np.testing.assert_array_equal(diagnostics.free_slot_counts.numpy(), [2])
+    np.testing.assert_array_equal(
+        diagnostics.selected_slot_indices.numpy(), [[-1, -1]]
+    )
+    np.testing.assert_array_equal(
+        finalized.accepted_demand.numpy(), accepted_demand_before
+    )
+    np.testing.assert_array_equal(
+        finalized.precursor_mass_change.numpy(), removal_before
+    )
+    np.testing.assert_array_equal(
+        diagnostics.gate_codes.numpy(), gate_codes_before
+    )
+    _assert_snapshot_unchanged(source_before)
+    _assert_snapshot_unchanged(p2_before)
 
 
 def test_config_is_frozen_but_retains_arrays_by_identity():
