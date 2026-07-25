@@ -104,6 +104,11 @@ private helpers for cross-kernel setup.
   `resampling_step_gpu` is exported; `ResamplingBuffers`, P4 sidecars, status
   codes, and kernels remain concrete-module-only. Neither boundary provides a
   runnable, policy resolution, CPU fallback or transfer, or resizing.
+- `nucleation.py` - Concrete-only E6-F8 P1 read-only preflight/configuration
+  boundary for fixed-capacity GPU nucleation inputs and caller-owned sidecars.
+  It is intentionally unexported, performs no rate calculation or writes, and
+  provides no hidden transfer, fallback allocation, slot activation, exhaustion
+  handling, or execution; P2--P7 remain deferred.
 - `wall_loss.py` - Concrete fixed-slot neutral/charged GPU wall-loss boundary;
   owns immutable host configuration, frozen preflight, bounded fixed-slot
   removal, and the external caller-owned per-box RNG sidecar lifecycle. Charged

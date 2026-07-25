@@ -1,5 +1,13 @@
 # Documentation Updates
 
+## P1 delivered (#1438)
+
+- `particula/gpu/kernels/nucleation.py` documents the concrete-only read-only
+  boundary, frozen record ownership, fixed-shape sidecars, and P2--P7
+  deferrals. No user-facing documentation or API export was added for P1.
+
+## Deferred P7 work
+
 - Update `docs/Theory/Technical/Dynamics/Nucleation_Equations.md` with the exact
   CPU-to-Warp correspondence, SI units, validity bounds, admission equation,
   represented-mass accounting, and unsupported physics.

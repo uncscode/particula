@@ -40,6 +40,17 @@ discarded within the final represented domain.
 
 ## Data / API / Workflow Changes
 
+### P1 implementation status (#1438)
+
+P1 has implemented the first read-only stage only in
+`particula/gpu/kernels/nucleation.py`: frozen `NucleationConfig` and the three
+caller-owned sidecar records, plus private `_preflight_nucleation`. Preflight
+validates fixed-shape Warp metadata, sidecars, aliasing, physical state,
+species/count constraints, input-source rules, and gates without writes,
+fallback allocation, transfer, or rate evaluation. No symbol is exported from
+`particula.gpu.kernels`; the staged transaction and its writer stages remain
+P2--P5 work.
+
 - **Data Model:** No required container fields. Add concrete-module
   `NucleationConfig`, `NucleationScratchBuffers`,
   `NucleationFinalizedDemandBuffers`, and `NucleationDiagnosticBuffers`
@@ -47,7 +58,7 @@ discarded within the final represented domain.
   `(n_boxes,)`; species diagnostics use `(n_boxes, n_species)`; request fields
   use `(n_boxes, n_particles[, n_species])` with `wp.int32` valid-prefix counts.
   Supplied arrays retain identity and unrequested index tails use `-1`.
-- **API Surface:** Add keyword-oriented
+- **API Surface (deferred beyond P1):** Add keyword-oriented
   `nucleation_step_gpu(particles, gas, ..., config=..., scratch=...)` under
   `particula.gpu.kernels.nucleation`; lazily expose only the intended step from
   `particula.gpu.kernels`. Keep config and sidecars concrete-module APIs.

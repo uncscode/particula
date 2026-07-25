@@ -2,10 +2,12 @@
 
 ## GPU Backend
 
-- [ ] Define the bounded config, scratch, diagnostic, and request sidecars in
-  `particula/gpu/kernels/nucleation.py`, documenting every dtype and shape.
-- [ ] Implement metadata, alias, same-device, scientific-domain, count, and
-  read-only device-value preflight before clearing or allocating outputs.
+- [x] Define the bounded config, scratch, diagnostic, and request sidecars in
+  `particula/gpu/kernels/nucleation.py`, documenting every dtype and shape
+  (P1, #1438). The frozen records retain caller-owned arrays by identity.
+- [x] Implement metadata, alias, same-device, scientific-domain, count, and
+  read-only device-value preflight before clearing or allocating outputs (P1,
+  #1438). P1 performs no output clearing or allocation.
 - [ ] Port E6-F7 activation/kinetic rate equations and SI conversions to Warp
   kernels without broadening their validity domain or model aliases.
 - [ ] Implement potential-event and shared per-box gas admission; store
@@ -23,8 +25,9 @@
 
 ## Tooling / Tests
 
-- [ ] Add fast validation, rate, finalization, capacity, identity, no-op, and
-  failure-atomicity tests in `particula/gpu/kernels/tests/nucleation_test.py`.
+- [x] Add P1 fast config/preflight validation, identity, no-op, and
+  failure-immutability tests in `particula/gpu/kernels/tests/nucleation_test.py`
+  (#1438). Rate, finalization, capacity, and commit coverage remain deferred.
 - [ ] Add `nucleation_parity_test.py` with an independent float64 E6-F7 oracle,
   one/many boxes and species, sparse/full slots, and repeated calls.
 - [ ] Assert per-box/species represented particle-plus-gas conservation rather

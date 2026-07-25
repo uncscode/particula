@@ -7,6 +7,10 @@ capacity rather than creating a second slot or exhaustion model.
 
 ## In Scope
 
+- **Delivered P1 (#1438):** concrete-only frozen configuration/sidecar records
+  and private read-only Warp preflight in
+  `particula/gpu/kernels/nucleation.py`, with co-located Warp tests.
+
 - Device evaluation of E6-F7 activation `J=A*C` and kinetic `J=K*C^2` models,
   including the same SI conversions, closed validity domains, composition,
   gates, and no-op semantics.
@@ -22,6 +26,10 @@ capacity rather than creating a second slot or exhaustion model.
   CUDA evidence that skips cleanly when unavailable.
 
 ## Out of Scope
+
+- **Still deferred after P1:** a direct execution entry point or export, device
+  rate calculation, demand/finalization writes, slot activation, exhaustion
+  planning, caller mutation, and any fallback allocation.
 
 - New nucleation equations, chemistry, extrapolation, or a full Vehkamaki/CNT,
   ion-induced, heterogeneous, or cluster-dynamics implementation.

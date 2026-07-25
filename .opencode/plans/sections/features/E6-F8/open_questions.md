@@ -7,8 +7,8 @@ E6-F7 source model and existing concrete direct-kernel conventions.
   - Decision: use `NucleationConfig`, `NucleationScratchBuffers`,
     `NucleationFinalizedDemandBuffers`, and `NucleationDiagnosticBuffers` under
     `particula.gpu.kernels.nucleation`. Bindings are frozen while contained Warp
-    arrays remain mutable and caller-owned. Re-export only `nucleation_step_gpu`
-    through `particula.gpu.kernels`.
+    arrays remain mutable and caller-owned. P1 remains unexported; only the
+    eventual P5 `nucleation_step_gpu` is a candidate kernel-package export.
 - [x] Which environmental inputs are required and in what forms?
   - Decision: pressure is not required. Temperature is required for the model's
     declared validity interval; saturation ratio is required only when its gate

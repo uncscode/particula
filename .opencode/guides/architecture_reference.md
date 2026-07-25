@@ -53,8 +53,9 @@ source-selection metadata, builders, and a factory. P5 provides the one-box
 `Nucleation` preserves the legacy `Aerosol` and backing-data identities. It
 uses equal, gas-coupled substeps and is atomic per attempted substep, not across
 the complete call. P2 source-demand planning and P3 particle-source
-transactions remain concrete-only in `nucleation.particle_source`. Direct-Warp
-E6-F8 work and E6-F9 integration remain deferred.
+transactions remain concrete-only in `nucleation.particle_source`. E6-F8 P1
+provides an unexported, read-only Warp preflight only; its direct runtime step
+and E6-F9 integration remain deferred.
 
 ## Scientific Utilities
 

@@ -5,9 +5,12 @@
 E6-F5, E6-F6, and E6-F7 are required. Complete P1/P2 before P3, P4, and P5;
 run P6 parity and conservation checks before P7 documents the direct step.
 
-- [ ] **E6-F8-P1:** Define direct GPU nucleation configuration and preflight with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Freeze device configuration, fixed-shape sidecars, validation order, ownership, and failure-before-write contract matching E6-F7.
+- [x] **E6-F8-P1:** Define direct GPU nucleation configuration and preflight with unit tests
+  - Issue: #1438 | Size: S | Status: Complete (2026-07-25)
+  - Delivered: frozen configuration and sidecar dataclasses plus private,
+    read-only Warp preflight matching the P1 ownership and failure-before-write
+    boundary. It has no export, direct step, rate computation, mutation,
+    hidden transfer, or fallback allocation.
   - Files: `particula/gpu/kernels/nucleation.py`, `particula/gpu/kernels/tests/nucleation_test.py`
   - Tests: Shape/dtype/device/alias validation, scientific-domain rejection, exact no-ops, and snapshots proving no state or sidecar mutation.
 

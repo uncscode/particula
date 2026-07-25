@@ -15,4 +15,14 @@
   - As a scientific user, I want the direct step to match the E6-F7 CPU oracle
     and conserve every box/species inventory so GPU results remain trustworthy.
   - As a library maintainer, I want fixed-shape sidecars and fail-before-write
-    validation so invalid calls cannot partially mutate simulation state.
+   validation so invalid calls cannot partially mutate simulation state.
+
+## Delivered: P1 (#1438)
+
+`particula/gpu/kernels/nucleation.py` now provides the concrete-only, read-only
+P1 boundary with frozen configuration and caller-owned sidecar dataclasses plus
+private validation/preflight. Co-located Warp tests cover its ownership,
+schema, validation-order, and no-write gate/rejection contract. It deliberately
+does not expose or execute a GPU nucleation step, calculate rates, allocate
+fallback storage, transfer state, or mutate caller data; P2--P7 retain those
+responsibilities.

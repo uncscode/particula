@@ -1,9 +1,15 @@
-"""Read-only direct-Warp nucleation configuration and preflight.
+"""Define the concrete, read-only direct-Warp nucleation P1 boundary.
 
-This concrete-only P1 boundary owns fixed-capacity schema, ownership, and
-scientific-domain validation for the deferred direct GPU nucleation path.  It
-does not calculate rates, allocate fallback work storage, transfer state to the
-host, activate slots, or mutate caller-owned data.  P2--P7 own those actions.
+This unexported module validates fixed-capacity particle, gas, environment,
+and caller-owned sidecar schemas for a deferred GPU nucleation path. It neither
+calculates rates nor writes requests, diagnostics, particles, gas, or sidecars.
+It also performs no hidden host transfer, CPU fallback, fallback work-buffer
+allocation, slot activation, or exhaustion handling. Later P2--P7 phases own
+all computation, mutation, public API, and user-facing documentation.
+
+The preflight accepts only same-device, contiguous Warp arrays with fixed
+shapes. Frozen records prevent rebinding their fields but do not copy, freeze,
+or otherwise transfer their caller-owned arrays.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -29,7 +35,20 @@ from particula.util.constants import AVOGADRO_NUMBER
 
 
 def _real(value: object, name: str, *, positive: bool = False) -> float:
-    """Normalize a finite non-Boolean real scalar."""
+    """Normalize a finite, non-Boolean real scalar.
+
+    Args:
+        value: Scalar to validate.
+        name: Value name used in validation errors.
+        positive: Require a strictly positive rather than nonnegative value.
+
+    Returns:
+        Validated Python floating-point scalar.
+
+    Raises:
+        TypeError: If ``value`` is not a supported real scalar.
+        ValueError: If ``value`` is nonfinite or outside the required domain.
+    """
     if isinstance(value, (bool, np.bool_)) or not isinstance(
         value, (Real, np.integer, np.floating)
     ):
@@ -46,7 +65,19 @@ def _real(value: object, name: str, *, positive: bool = False) -> float:
 
 
 def _floating_scalar(value: object, name: str) -> float:
-    """Normalize one finite positive Python or NumPy floating scalar."""
+    """Normalize a finite positive Python or NumPy floating scalar.
+
+    Args:
+        value: Scalar to validate.
+        name: Value name used in validation errors.
+
+    Returns:
+        Validated positive scalar.
+
+    Raises:
+        TypeError: If ``value`` is not a Python or NumPy floating scalar.
+        ValueError: If ``value`` is nonfinite or not positive.
+    """
     if isinstance(value, (bool, np.bool_)) or not isinstance(
         value, (float, np.floating)
     ):
@@ -56,12 +87,34 @@ def _floating_scalar(value: object, name: str) -> float:
 
 @dataclass(frozen=True)
 class NucleationConfig:
-    """Immutable potential-nucleation configuration.
+    """Store immutable scalar controls for a potential nucleation calculation.
 
-    Coefficient units are ``m^-3 s^-1`` for ``activation`` and the
-    corresponding kinetic coefficient units for ``kinetic``.  Formation
-    diameter is in m; temperature is in K; number concentration is in
-    ``#/m^3``.  The optional saturation bounds are dimensionless.
+    The activation law is ``J = survival_factor * coefficient * C`` and the
+    kinetic law is ``J = survival_factor * coefficient * C²``, where ``J`` is
+    formation rate [#/m³/s] and ``C`` is precursor number concentration
+    [#/m³]. Therefore, activation ``coefficient`` has units [1/s] and kinetic
+    ``coefficient`` has units [m³/s]. This record performs scalar consistency
+    checks only; array-dependent species and physical-state validation belongs
+    to :func:`_preflight_nucleation`.
+
+    Attributes:
+        rate_law: Either ``"activation"`` or ``"kinetic"``.
+        coefficient: Nonnegative rate-law coefficient, in [1/s] or [m³/s].
+        survival_factor: Nonnegative, dimensionless formation survival factor.
+        precursor_index: Zero-based precursor species index.
+        molecule_counts: Nonnegative, dimensionless molecule counts per
+            species, with at least one positive count.
+        formation_diameter: Positive formation diameter [m].
+        precursor_number_concentration_lower: Inclusive lower bound for ``C``
+            [#/m³].
+        precursor_number_concentration_upper: Inclusive upper bound for ``C``
+            [#/m³].
+        temperature_lower: Inclusive temperature lower bound [K].
+        temperature_upper: Inclusive temperature upper bound [K].
+        saturation_lower: Optional inclusive, dimensionless saturation lower
+            bound. Must be paired with ``saturation_upper``.
+        saturation_upper: Optional inclusive, dimensionless saturation upper
+            bound. Must be paired with ``saturation_lower``.
     """
 
     rate_law: str
@@ -78,7 +131,12 @@ class NucleationConfig:
     saturation_upper: float | None = None
 
     def __post_init__(self) -> None:
-        """Validate scalar-only configuration consistency."""
+        """Validate scalar-only configuration consistency.
+
+        Raises:
+            TypeError: If a scalar or molecule count has an unsupported type.
+            ValueError: If a value is nonfinite, out of range, or inconsistent.
+        """
         if self.rate_law not in ("activation", "kinetic"):
             raise ValueError("rate_law must be activation or kinetic.")
         _real(self.coefficient, "coefficient")
@@ -133,6 +191,18 @@ class NucleationConfig:
     def _interval(
         lower: object, upper: object, name: str, *, positive: bool
     ) -> None:
+        """Validate an ordered scalar interval.
+
+        Args:
+            lower: Proposed inclusive lower endpoint.
+            upper: Proposed inclusive upper endpoint.
+            name: Name used in validation errors.
+            positive: Whether both endpoints must be strictly positive.
+
+        Raises:
+            TypeError: If either endpoint is not a real scalar.
+            ValueError: If an endpoint is invalid or the interval is reversed.
+        """
         if _real(lower, f"{name}_lower", positive=positive) > _real(
             upper, f"{name}_upper", positive=positive
         ):
@@ -141,10 +211,16 @@ class NucleationConfig:
 
 @dataclass(frozen=True)
 class NucleationScratchBuffers:
-    """Caller-owned future ``float64 (B,)`` planning sidecars.
+    """Reference caller-owned future planning sidecars without taking ownership.
 
-    ``precursor_number_concentration`` [#/m^3], ``potential_rate`` [#/m^3/s],
-    and ``potential_demand`` are stable same-device contiguous buffers.
+    Attributes:
+        precursor_number_concentration: Same-device contiguous ``wp.float64``
+            array shaped ``(B,)`` for precursor number concentration [#/m³].
+        potential_rate: Same-device contiguous ``wp.float64`` array shaped
+            ``(B,)`` for potential formation rate [#/m³/s].
+        potential_demand: Same-device contiguous ``wp.float64`` array shaped
+            ``(B,)`` for a later phase's potential source demand. Its final
+            units are owned by that phase.
     """
 
     precursor_number_concentration: Any
@@ -154,7 +230,16 @@ class NucleationScratchBuffers:
 
 @dataclass(frozen=True)
 class NucleationFinalizedDemandBuffers:
-    """Caller-owned future finalized count, demand, and mass-change buffers."""
+    """Reference caller-owned future finalized demand and transfer sidecars.
+
+    Attributes:
+        accepted_counts: Same-device contiguous ``wp.int32`` array shaped
+            ``(B,)`` for finalized accepted source counts.
+        accepted_demand: Same-device contiguous ``wp.float64`` array shaped
+            ``(B,)`` for later finalized source demand.
+        precursor_mass_change: Same-device contiguous ``wp.float64`` array
+            shaped ``(B, S)`` for later species mass changes [kg/m³].
+    """
 
     accepted_counts: Any
     accepted_demand: Any
@@ -163,10 +248,15 @@ class NucleationFinalizedDemandBuffers:
 
 @dataclass(frozen=True)
 class NucleationDiagnosticBuffers:
-    """Caller-owned future diagnostic sidecars.
+    """Reference caller-owned future diagnostic sidecars.
 
-    ``selected_slot_indices`` has shape ``(B, N)``.  Its future unused tail
-    convention is ``-1``; P1 deliberately does not inspect or initialize it.
+    Attributes:
+        gate_codes: Same-device contiguous ``wp.int32`` array shaped ``(B,)``
+            for a later phase's gate diagnostics.
+        selected_slot_indices: Same-device contiguous ``wp.int32`` array
+            shaped ``(B, N)`` for a later phase's selected slots. That phase
+            reserves ``-1`` for unused tails; P1 does not inspect, initialize,
+            or otherwise alter stale output values.
     """
 
     gate_codes: Any
@@ -175,7 +265,31 @@ class NucleationDiagnosticBuffers:
 
 @dataclass(frozen=True)
 class _NucleationPreflight:
-    """Private normalized P1 metadata; not a supported public API."""
+    """Retain normalized read-only P1 metadata for private phase handoff.
+
+    This private test seam is not a supported API. Its references preserve
+    caller identity and never authorize mutation. Zero-valued diagnostic
+    fields describe all-box gates without clearing supplied stale sidecars.
+
+    Attributes:
+        particles: Validated caller-owned Warp particle container.
+        gas: Validated caller-owned Warp gas container.
+        config: Validated nucleation configuration.
+        n_boxes: Fixed number of boxes ``B``.
+        n_particles: Fixed particle capacity ``N`` per box.
+        n_species: Fixed species count ``S``.
+        device: Shared Warp device for all retained arrays.
+        temperature: Validated scalar or same-device ``(B,)`` temperature [K].
+        saturation: Validated same-device ``(B, S)`` saturation, if configured.
+        has_eligible_boxes: Whether at least one box can proceed past P1.
+        has_gated_boxes: Whether at least one valid box is currently gated.
+        gate_reason: All-box gate reason, or ``None`` for mixed/no gates.
+        potential_rate: All-box gate diagnostic potential rate [#/m³/s].
+        potential_demand: All-box gate diagnostic potential demand.
+        accepted_count: All-box gate diagnostic accepted count.
+        accepted_demand: All-box gate diagnostic accepted demand.
+        precursor_mass_change: All-box gate diagnostic precursor change [kg/m³].
+    """
 
     particles: Any
     gas: Any
@@ -197,7 +311,18 @@ class _NucleationPreflight:
 
 
 def _field(container: Any, name: str) -> Any:
-    """Get a required field without accepting host substitutes."""
+    """Get a required container field without accepting host substitutes.
+
+    Args:
+        container: Object expected to carry a Warp-backed field.
+        name: Required field name.
+
+    Returns:
+        Field value, before its Warp-array schema is validated.
+
+    Raises:
+        ValueError: If ``container`` does not provide ``name``.
+    """
     try:
         return getattr(container, name)
     except AttributeError as exc:
@@ -207,7 +332,21 @@ def _field(container: Any, name: str) -> Any:
 def _array(
     container: Any, name: str, dtype: Any, shape: tuple[int, ...], device: Any
 ) -> Any:
-    """Validate one same-device contiguous Warp array schema."""
+    """Validate one same-device contiguous Warp-array schema.
+
+    Args:
+        container: Object that owns the required field.
+        name: Required field name.
+        dtype: Required Warp dtype.
+        shape: Required fixed array shape.
+        device: Required Warp device.
+
+    Returns:
+        The validated array, retaining caller identity.
+
+    Raises:
+        ValueError: If the field is missing or has an invalid schema.
+    """
     value = _field(container, name)
     if not _is_warp_array_like(value):
         raise ValueError(f"{name} must be a Warp array.")
@@ -222,7 +361,17 @@ def _array(
 
 
 def _memory_range(array: Any) -> tuple[int, int] | None:
-    """Return byte bounds after rejecting unsafe noncontiguous views."""
+    """Return byte bounds after rejecting unsafe noncontiguous views.
+
+    Args:
+        array: Warp array with a supported overlap-check dtype.
+
+    Returns:
+        Half-open byte range, or ``None`` for an empty array.
+
+    Raises:
+        ValueError: If the dtype is unsupported or the array is noncontiguous.
+    """
     sizes = {wp.float64: 8, wp.int32: 4}
     size = sizes.get(array.dtype)
     if size is None:
@@ -243,7 +392,14 @@ def _memory_range(array: Any) -> tuple[int, int] | None:
 
 
 def _no_overlap(arrays: tuple[Any, ...]) -> None:
-    """Reject any identity or byte-range alias among future mutable state."""
+    """Reject identity and byte-range aliases among future mutable state.
+
+    Args:
+        arrays: Validated arrays that later phases could mutate.
+
+    Raises:
+        ValueError: If two arrays are identical or overlap in byte storage.
+    """
     for index, first in enumerate(arrays):
         first_range = _memory_range(first)
         for second in arrays[index + 1 :]:
@@ -265,6 +421,13 @@ def _invalid_float(
     positive: wp.int32,
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
+    """Count invalid one-dimensional floats without changing input values.
+
+    Args:
+        values: Device-resident values to scan.
+        positive: Nonzero to require positive rather than nonnegative values.
+        invalid: Device-resident one-element invalid-value counter.
+    """
     index = wp.tid()
     if (
         not wp.isfinite(values[index])
@@ -280,7 +443,13 @@ def _invalid_float_2d(
     positive: wp.int32,
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Record invalid two-dimensional float values without modifying them."""
+    """Count invalid two-dimensional floats without changing input values.
+
+    Args:
+        values: Device-resident values to scan.
+        positive: Nonzero to require positive rather than nonnegative values.
+        invalid: Device-resident one-element invalid-value counter.
+    """
     row, column = wp.tid()
     value = values[row, column]
     if (
@@ -297,7 +466,13 @@ def _invalid_float_3d(
     positive: wp.int32,
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Record invalid three-dimensional float values without modifying them."""
+    """Count invalid three-dimensional floats without changing input values.
+
+    Args:
+        values: Device-resident values to scan.
+        positive: Nonzero to require positive rather than nonnegative values.
+        invalid: Device-resident one-element invalid-value counter.
+    """
     row, column, lane = wp.tid()
     value = values[row, column, lane]
     if (
@@ -315,7 +490,14 @@ def _invalid_interval_1d(
     upper: wp.float64,
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Record one-dimensional values outside their configured interval."""
+    """Count one-dimensional values outside an inclusive interval.
+
+    Args:
+        values: Device-resident values to scan.
+        lower: Inclusive lower endpoint.
+        upper: Inclusive upper endpoint.
+        invalid: Device-resident one-element invalid-value counter.
+    """
     index = wp.tid()
     if values[index] < lower or values[index] > upper:
         wp.atomic_add(invalid, 0, 1)
@@ -328,7 +510,14 @@ def _invalid_interval_2d(
     upper: wp.float64,
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Record two-dimensional values outside their configured interval."""
+    """Count two-dimensional values outside an inclusive interval.
+
+    Args:
+        values: Device-resident values to scan.
+        lower: Inclusive lower endpoint.
+        upper: Inclusive upper endpoint.
+        invalid: Device-resident one-element invalid-value counter.
+    """
     row, column = wp.tid()
     if values[row, column] < lower or values[row, column] > upper:
         wp.atomic_add(invalid, 0, 1)
@@ -339,7 +528,12 @@ def _invalid_binary(
     values: wp.array2d(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Record partitioning values outside the binary representation."""
+    """Count partitioning values other than zero or one.
+
+    Args:
+        values: Device-resident partitioning flags to scan.
+        invalid: Device-resident one-element invalid-value counter.
+    """
     row, column = wp.tid()
     value = values[row, column]
     if value != 0 and value != 1:
@@ -352,7 +546,13 @@ def _disabled_precursor(
     index: wp.int32,
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Record disabled precursor species by box."""
+    """Count boxes whose selected precursor partitioning is disabled.
+
+    Args:
+        values: Device-resident binary partitioning flags.
+        index: Selected precursor species index.
+        invalid: Device-resident one-element invalid-value counter.
+    """
     box = wp.tid()
     if values[box, index] != 1:
         wp.atomic_add(invalid, 0, 1)
@@ -367,7 +567,16 @@ def _precursor_status(
     upper: wp.float64,
     status: wp.array(dtype=wp.int32),
 ) -> None:
-    """Record zero and out-of-domain precursor concentration by box."""
+    """Count zero and out-of-interval precursor concentrations by box.
+
+    Args:
+        concentration: Gas concentration [kg/m³], shaped ``(B, S)``.
+        molar_mass: Gas molar mass [kg/mol], shaped ``(S,)``.
+        precursor_index: Selected precursor species index.
+        lower: Inclusive number-concentration lower endpoint [#/m³].
+        upper: Inclusive number-concentration upper endpoint [#/m³].
+        status: Device counters for invalid and zero concentrations.
+    """
     box = wp.tid()
     number_concentration = (
         concentration[box, precursor_index]
@@ -388,7 +597,15 @@ def _saturation_status(
     upper: wp.float64,
     status: wp.array(dtype=wp.int32),
 ) -> None:
-    """Record lower gates and upper saturation-domain failures by box."""
+    """Count saturation lower gates and upper-domain failures by box.
+
+    Args:
+        saturation: Dimensionless saturation ratios shaped ``(B, S)``.
+        precursor_index: Selected precursor species index.
+        lower: Inclusive saturation lower endpoint.
+        upper: Inclusive saturation upper endpoint.
+        status: Device counters for invalid and lower-gated values.
+    """
     box = wp.tid()
     value = saturation[box, precursor_index]
     if value < lower:
@@ -398,7 +615,16 @@ def _saturation_status(
 
 
 def _scan(values: Any, name: str, *, positive: bool = False) -> None:
-    """Perform a read-only finite-domain scan with scalar status readback."""
+    """Perform a read-only finite-domain scan with scalar status readback.
+
+    Args:
+        values: One-, two-, or three-dimensional ``wp.float64`` array.
+        name: Input name used in validation errors.
+        positive: Require positive rather than nonnegative values.
+
+    Raises:
+        ValueError: If any value is nonfinite or outside the requested domain.
+    """
     invalid = wp.zeros(1, dtype=wp.int32, device=values.device)
     kernels = {1: _invalid_float, 2: _invalid_float_2d, 3: _invalid_float_3d}
     wp.launch(
@@ -417,14 +643,27 @@ def _invalid_nonfinite_2d(
     values: wp.array2d(dtype=wp.float64),
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Record nonfinite two-dimensional values without modifying them."""
+    """Count nonfinite two-dimensional values without changing input values.
+
+    Args:
+        values: Device-resident values to scan.
+        invalid: Device-resident one-element invalid-value counter.
+    """
     row, column = wp.tid()
     if not wp.isfinite(values[row, column]):
         wp.atomic_add(invalid, 0, 1)
 
 
 def _scan_finite_2d(values: Any, name: str) -> None:
-    """Perform a read-only scan that permits finite signed values."""
+    """Perform a read-only scan that permits finite signed values.
+
+    Args:
+        values: Two-dimensional ``wp.float64`` array to scan.
+        name: Input name used in validation errors.
+
+    Raises:
+        ValueError: If any value is nonfinite.
+    """
     invalid = wp.zeros(1, dtype=wp.int32, device=values.device)
     wp.launch(
         _invalid_nonfinite_2d,
@@ -437,7 +676,17 @@ def _scan_finite_2d(values: Any, name: str) -> None:
 
 
 def _scan_interval(values: Any, name: str, lower: float, upper: float) -> None:
-    """Perform a read-only configured-interval scan with status readback."""
+    """Perform a read-only inclusive-interval scan with status readback.
+
+    Args:
+        values: One- or two-dimensional ``wp.float64`` array to scan.
+        name: Input name used in validation errors.
+        lower: Inclusive lower endpoint.
+        upper: Inclusive upper endpoint.
+
+    Raises:
+        ValueError: If any value falls outside the configured interval.
+    """
     invalid = wp.zeros(1, dtype=wp.int32, device=values.device)
     kernels = {1: _invalid_interval_1d, 2: _invalid_interval_2d}
     wp.launch(
@@ -451,7 +700,14 @@ def _scan_interval(values: Any, name: str, lower: float, upper: float) -> None:
 
 
 def _scan_binary(values: Any) -> None:
-    """Validate binary partitioning with a device-resident read-only scan."""
+    """Validate binary partitioning with a device-resident read-only scan.
+
+    Args:
+        values: ``wp.int32`` partitioning flags shaped ``(B, S)``.
+
+    Raises:
+        ValueError: If any partitioning value is not zero or one.
+    """
     invalid = wp.zeros(1, dtype=wp.int32, device=values.device)
     wp.launch(
         _invalid_binary,
@@ -472,7 +728,23 @@ def _validate_sidecars(
     n_species: int,
     device: Any,
 ) -> tuple[Any, ...]:
-    """Validate supplied sidecar schemas only; stale contents are untouched."""
+    """Validate supplied sidecar schemas without reading stale contents.
+
+    Args:
+        scratch: Optional caller-owned planning sidecars.
+        finalized: Optional caller-owned finalized-demand sidecars.
+        diagnostics: Optional caller-owned diagnostic sidecars.
+        n_boxes: Fixed box count ``B``.
+        n_particles: Fixed particle capacity ``N``.
+        n_species: Fixed species count ``S``.
+        device: Required shared Warp device.
+
+    Returns:
+        Validated sidecar arrays retaining caller identity.
+
+    Raises:
+        ValueError: If a supplied record or sidecar schema is invalid.
+    """
     arrays: list[Any] = []
     if scratch is not None:
         if not isinstance(scratch, NucleationScratchBuffers):
@@ -535,7 +807,35 @@ def _preflight_nucleation(  # noqa: C901
     finalized_demand: NucleationFinalizedDemandBuffers | None = None,
     diagnostics: NucleationDiagnosticBuffers | None = None,
 ) -> _NucleationPreflight:
-    """Validate the deferred P1 boundary without writing caller-owned arrays."""
+    """Validate the deferred P1 boundary without writing caller-owned arrays.
+
+    This private, concrete-only seam performs ordered schema, ownership,
+    physical-domain, and species checks. It accepts caller-owned same-device
+    fixed-shape Warp arrays, performs no hidden transfer or CPU fallback, and
+    leaves particles, gas, environment, and stale sidecars unchanged on success
+    and rejection. A scalar status readback is used solely for validation.
+
+    Args:
+        particles: Warp particle container with fixed ``(B, N, S)`` mass data.
+        gas: Warp gas container with fixed ``(B, S)`` species data.
+        config: Scalar nucleation controls and scientific bounds.
+        time_step: Finite nonnegative step duration [s].
+        temperature: Positive scalar [K] or same-device ``wp.float64 (B,)``.
+        saturation: Configured same-device dimensionless ``wp.float64 (B, S)``.
+        environment: Optional owner of temperature and configured saturation.
+        scratch: Optional caller-owned planning sidecars.
+        finalized_demand: Optional caller-owned finalized-demand sidecars.
+        diagnostics: Optional caller-owned diagnostic sidecars.
+
+    Returns:
+        Private normalized metadata, including eligibility and all-box gate
+        diagnostics. Returned zero diagnostics never clear supplied sidecars.
+
+    Raises:
+        TypeError: If a direct scalar has an unsupported type.
+        ValueError: If schemas, ownership, physical values, or species settings
+            violate the P1 contract.
+    """
     masses = _field(particles, "masses")
     if (
         not _is_warp_array_like(masses)

@@ -8,8 +8,12 @@ independent E6-F7 float64 oracle, never the production GPU helper itself.
 ## Per-Phase Approach
 
 - **P1:** `particula/gpu/kernels/tests/nucleation_test.py` covers config and
-  sidecar shape/dtype/device/overlap rules, scientific validation order,
-  invalid counts, no-op gates, and byte-for-byte preflight snapshots.
+   sidecar shape/dtype/device/overlap rules, scientific validation order,
+   invalid counts, no-op gates, and byte-for-byte preflight snapshots. This
+   suite shipped with #1438; it is Warp-guarded, uses Warp CPU fixtures, and
+   verifies that valid preflight, gates, and rejections do not mutate caller
+   state or stale sidecars. P1 has no rate or output-write assertions because
+   those operations are deferred.
 - **P2:** Unit fixtures compare `J=A*C`, `J=K*C^2`, potential/admitted events,
   each limiting species, gas removal, and diagnostics against independent
   equations for one/many boxes and species.

@@ -1,5 +1,15 @@
 # Success Criteria
 
+## P1 completion (#1438)
+
+- [x] Concrete-only frozen configuration and sidecar records retain
+  caller-owned arrays without copies or rebinding.
+- [x] Private P1 preflight validates schema, device, alias, physical, and
+  species/count constraints before any caller write; gates and rejections leave
+  supplied state untouched.
+- [x] P1 remains unexported and performs no step execution, rate computation,
+  transfer, fallback allocation, or mutation.
+
 - [ ] Plan metadata and implementation preserve mandatory E6-F5, E6-F6, and
   E6-F7 dependencies; E6-F9 can consume the intended low-level entry point.
 - [ ] Direct Warp activation and kinetic rates, potential events, admission,
