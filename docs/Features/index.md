@@ -80,14 +80,14 @@ Welcome to the Particula Features documentation! This section provides comprehen
 
     [:octicons-arrow-right-24: Learn more](slot_exhaustion_policies.md)
 
--   __[Particle & Gas Data Migration](particle-data-migration.md)__
+-   __[Particle & Gas Data Migration](particle-data-migration/index.md)__
 
     ---
 
     Migration guide from legacy APIs to the new data containers; use the
     foundation guide for the canonical container and transfer contract.
 
-    [:octicons-arrow-right-24: Learn more](particle-data-migration.md)
+    [:octicons-arrow-right-24: Learn more](particle-data-migration/index.md)
 
 -   __[Roadmap](Roadmap/index.md)__
 

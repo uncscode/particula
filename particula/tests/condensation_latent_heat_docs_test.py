@@ -18,21 +18,19 @@ DOCS_INDEX_PATH = ROOT / "docs/index.md"
 ROADMAP_PATH = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
 ROADMAP_INDEX_PATH = ROOT / "docs/Features/Roadmap/index.md"
 FOUNDATIONS_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
-MIGRATION_PATH = ROOT / "docs/Features/particle-data-migration.md"
-README_PATH = ROOT / "readme.md"
+MIGRATION_PATH = (
+    ROOT / "docs/Features/particle-data-migration/troubleshooting.md"
+)
+MIGRATION_DYNAMICS_PATH = (
+    ROOT / "docs/Features/particle-data-migration/dynamics.md"
+)
 EXAMPLES_INDEX_PATH = ROOT / "docs/Examples/index.md"
 CANONICAL_CONTRACT_LABEL = "Canonical low-level direct-condensation contract"
 EXAMPLES_CONTRACT_DESTINATION = (
     "../Features/data-containers-and-gpu-foundations.md"
 )
-README_CONTRACT_DESTINATION = (
-    "./docs/Features/data-containers-and-gpu-foundations.md"
-)
 EXAMPLES_CONTRACT_LINK = (
     f"[{CANONICAL_CONTRACT_LABEL}]({EXAMPLES_CONTRACT_DESTINATION})"
-)
-README_CONTRACT_LINK = (
-    f"[{CANONICAL_CONTRACT_LABEL}]({README_CONTRACT_DESTINATION})"
 )
 P2_QUICK_START_SOURCE = "Direct GPU kernels quick-start source"
 P2_QUICK_START_SOURCE_LINK = (
@@ -41,9 +39,7 @@ P2_QUICK_START_SOURCE_LINK = (
     "gpu_direct_kernels_quick_start.py)"
 )
 FOUNDATIONS_P3_HEADING = "### Focused reproduction commands"
-MIGRATION_P3_HEADING = (
-    "### Direct-condensation troubleshooting and reproduction"
-)
+MIGRATION_P3_HEADING = "## Direct-condensation troubleshooting and reproduction"
 P3_BASELINE_COMMANDS = (
     "python docs/Examples/gpu_direct_kernels_quick_start.py",
     "pytest particula/gpu/tests/gpu_direct_kernels_example_test.py -q",
@@ -116,10 +112,6 @@ P3_MIGRATION_SNIPPETS = (
     "skips cleanly when CUDA is unavailable",
     "valid water-species index",
     "caller-owned energy output",
-)
-P3_ANCHOR_LINK = (
-    "./docs/Features/data-containers-and-gpu-foundations.md"
-    "#focused-reproduction-commands"
 )
 EPIC_D_COMPLETED_PUBLICATION = "E4-F1--E4-F7 recorded evidence is complete"
 EPIC_D_DECISION_RECORD_LINK = (
@@ -437,14 +429,15 @@ def test_foundations_page_publishes_validation_and_shipped_boundaries() -> None:
 
 def test_migration_page_links_to_canonical_gpu_condensation_contract() -> None:
     """Migration guidance summarizes, rather than forks, the GPU contract."""
-    content = MIGRATION_PATH.read_text(encoding="utf-8")
-    section = content.split(
-        "### `condensation_step_gpu` environment inputs", 1
-    )[1].split("## Conversion helpers", 1)[0]
+    content = MIGRATION_DYNAMICS_PATH.read_text(encoding="utf-8")
+    section = _normalized_section(
+        content,
+        "## `condensation_step_gpu` environment inputs",
+    )
     normalized = " ".join(section.split())
 
     for snippet in (
-        "[Data Containers and GPU Foundations](data-containers-and-gpu-foundations.md)",
+        "[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)",
         "from particula.gpu.kernels import condensation_step_gpu",
         "thermodynamics=thermodynamics",
         "particles_out, mass_transfer = condensation_step_gpu(...,",
@@ -504,15 +497,13 @@ def test_p3_command_matrix_has_exact_commands_and_existing_targets() -> None:
         assert target.exists()
 
 
-def test_p3_cross_links_keep_one_canonical_command_matrix() -> None:
-    """README and migration page discover the one canonical command matrix."""
-    readme = README_PATH.read_text(encoding="utf-8")
+def test_p3_cross_link_keeps_one_canonical_command_matrix() -> None:
+    """Migration page discovers the one canonical command matrix."""
     migration = _normalized_section(
         MIGRATION_PATH.read_text(encoding="utf-8"),
         MIGRATION_P3_HEADING,
     )
 
-    assert readme.count(P3_ANCHOR_LINK) == 1
     assert migration.count("#focused-reproduction-commands") == 1
     assert "pytest " not in migration
     assert (
@@ -545,21 +536,6 @@ def test_p3_command_evidence_and_scope_remain_bounded() -> None:
     ):
         assert prohibited_claim not in foundations
         assert prohibited_claim not in migration
-
-
-def test_readme_describes_the_two_call_direct_condensation_quick_start() -> (
-    None
-):
-    """README describes current quick-start sidecars without stale RNG claims."""
-    quick_start = " ".join(README_PATH.read_text(encoding="utf-8").split())
-
-    assert (
-        "two direct condensation calls with reused scratch buffers,"
-        in quick_start
-    )
-    assert "latent-heat, and energy sidecars" in quick_start
-    assert "one condensation step, one coagulation step" not in quick_start
-    assert "caller-owned `rng_states`" not in quick_start
 
 
 def test_p3_matrix_labels_cpu_integration_commands_as_cpu_evidence() -> None:
@@ -613,21 +589,6 @@ def test_example_index_links_canonical_low_level_condensation_contract() -> (
     ).resolve() == FOUNDATIONS_PATH
     assert P2_QUICK_START_SOURCE_LINK in content
     assert P2_QUICK_START_SOURCE != CANONICAL_CONTRACT_LABEL
-
-
-def test_readme_links_canonical_low_level_condensation_contract() -> None:
-    """README keeps distinct canonical-contract and P3 troubleshooting links."""
-    content = README_PATH.read_text(encoding="utf-8")
-
-    assert content.count(README_CONTRACT_LINK) == 1
-    assert content.count(P3_ANCHOR_LINK) == 1
-    assert README_CONTRACT_LINK != P3_ANCHOR_LINK
-    assert _canonical_contract_destinations(content) == [
-        README_CONTRACT_DESTINATION
-    ]
-    assert (README_PATH.parent / README_CONTRACT_DESTINATION).resolve() == (
-        FOUNDATIONS_PATH
-    )
 
 
 def test_roadmap_marks_e4_low_level_condensation_publication_shipped() -> None:

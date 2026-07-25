@@ -105,14 +105,14 @@ The core data-oriented model is implemented.
   addition to legacy facades, but that compatibility is a container-boundary
   statement and not proof of shipped CPU multi-box execution across every box.
 - Migration documentation exists in
-  [ParticleData and GasData Migration](../particle-data-migration.md).
+  [ParticleData and GasData Migration](../particle-data-migration/index.md).
 
 For the canonical user-facing CPU support boundary, including the current
 `n_boxes == 1` limitation for audited CPU condensation and CPU coagulation
 container workflows, refer to
 [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md).
 Use
-[ParticleData and GasData Migration](../particle-data-migration.md)
+[ParticleData and GasData Migration](../particle-data-migration/index.md)
 as the implementation walkthrough companion.
 
 The work is still a migration, not a full replacement. `ParticleRepresentation`
@@ -512,7 +512,7 @@ Shared-across-box fields:
     `n_boxes == 1` only. For the canonical user-facing support contract, see
     [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md).
     Use
-    [ParticleData and GasData Migration](../particle-data-migration.md)
+    [ParticleData and GasData Migration](../particle-data-migration/index.md)
     as the implementation walkthrough companion.
 
 #### Rationale for issue-critical ownership decisions

@@ -32,7 +32,7 @@ Use this guide when you need the current contract for:
 - current shipped limitations for CPU and GPU workflows
 
 For migration walkthroughs and before/after examples, see
-[Particle & Gas Data Migration](particle-data-migration.md). For future work
+[Particle & Gas Data Migration](particle-data-migration/index.md). For future work
 and planned expansions, see the
 [Data-Oriented Design and GPU Roadmap](Roadmap/data-oriented-gpu.md).
 
@@ -1056,6 +1056,6 @@ and
 `pytest particula/tests/condensation_parity_walkthrough_docs_test.py -q -Werror`.
 
 - [Data Containers example](../Examples/Data_Containers/index.md)
-- [Particle & Gas Data Migration](particle-data-migration.md)
+- [Particle & Gas Data Migration](particle-data-migration/index.md)
 - [Data-Oriented Design and GPU Roadmap](Roadmap/data-oriented-gpu.md)
 - [Mass Precision Recommendation Report](Roadmap/mass-precision-study.md)

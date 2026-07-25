@@ -22,7 +22,7 @@ logger = logging.getLogger("particula")
 
 _DEPRECATION_MESSAGE = (
     "GasSpecies is deprecated. Use GasData instead. "
-    "See migration guide: docs/Features/particle-data-migration.md"
+    "See migration guide: docs/Features/particle-data-migration/index.md"
 )
 
 

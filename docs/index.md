@@ -298,7 +298,7 @@ print(result)
    by default, then restores a CPU checkpoint. When Warp is unavailable or
    disabled, it runs no conversion or kernel and provides no CPU fallback.
    It makes no `Runnable`, CUDA, or performance claim.
-- [ParticleData and GasData migration guide](Features/particle-data-migration.md)
+- [ParticleData and GasData migration guide](Features/particle-data-migration/index.md)
   — migration workflow and before/after examples for moving from legacy facades
   to the canonical data-container contract documented in the foundation guide.
 - [Data-oriented design and GPU roadmap](Features/Roadmap/data-oriented-gpu.md)
