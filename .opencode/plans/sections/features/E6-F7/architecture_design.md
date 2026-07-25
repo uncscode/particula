@@ -2,44 +2,31 @@
 
 ## High-Level Design
 
-The strategy computes a potential event rate only. A pure finalizer turns that
-rate into a gas-feasible source record. The process then asks E6-F5 and E6-F6
-whether the complete record is representable. Gas and particle writes occur
-only after every box passes validation and planning.
+The shipped P1 strategy computes a scalar potential event rate only. Immutable
+configuration records carry a closed scientific domain, future composition
+metadata, and formation metadata; no finalizer, process, or state write exists.
 
 ```text
-GasData + T + strategy + dt
+mass concentration + molar mass + T + optional saturation + strategy
           |
-validate closed scientific domain
+validate scalar physical inputs and saturation presence/form
           |
 J = A*C or K*C^2 [events m^-3 s^-1]
           |
-potential events = J * dt * volume * survival
+validate float64 C conversion
           |
-injection molecules/event * molar mass / N_A
+zero coefficient/C/survival? -> exact 0.0
           |
-joint per-box/species gas-inventory limiter
+closed C/T checks; below-lower saturation -> exact 0.0
           |
-provisional source demand + diagnostics
-          |
-E6-F5 discover slots -> E6-F6 exhaustion plan if needed
-          |
-scale demand with representative volume when configured
-          |
-all boxes feasible? no -> no writes | yes -> commit once
-          |
-particle activation + exactly matching gas depletion
+finite potential rate [#/m^3/s]
 ```
 
-For species `s`, `m_event,s = n_s*M_s/N_A`. Potential represented events are
-`E_pot = J*dt*V*f_survival`. Define available gas mass in the representative box
-as `G_s=c_g,s*V`; the shared admission factor is
-`alpha=min(1,min_s(G_s/(E_pot*m_event,s)))` over participating species, and
-`E_admit=alpha*E_pot`. Zero denominators are excluded. If E6-F6 scales the
-representative domain by `s`, final represented demand is `s*E_admit` and final
-volume is `s*V`, preserving source concentration. Particle represented mass
-added for each species equals gas mass removed in the final domain. One
-computational particle may represent many events through its raw count/weight.
+`C = mass_concentration / molar_mass * N_A` is calculated in `np.float64`
+under floating-point error checks. Basic input validation and this conversion
+precede zero paths; zero paths bypass only domain membership. Concentration and
+temperature intervals are inclusive. A configured saturation below its lower
+bound is an exact zero gate, while above its upper bound raises `ValueError`.
 
 ## Scientific Contract
 
@@ -47,7 +34,7 @@ computational particle may represent many events through its raw count/weight.
   concentration explicitly converted from `kg/m^3` using molar mass and
   Avogadro's constant. Coefficient units are explicit and normalized to SI.
 - Inputs are finite/nonnegative and configured validity intervals are closed.
-  Out-of-domain calls raise rather than extrapolate. Zero time, coefficient,
+  Out-of-domain calls raise rather than extrapolate. Zero coefficient,
   precursor, survival, or an unsatisfied configured saturation gate is a no-op.
 - Injection composition is nonnegative with at least one positive molecule
   count. Formation diameter is metadata checked against the documented
@@ -59,30 +46,22 @@ computational particle may represent many events through its raw count/weight.
 
 ## Data / API / Workflow Changes
 
-- **Data Model:** No required `ParticleData` or `GasData` schema change.
-  Typed immutable CPU sidecars hold config, source records, and diagnostics:
-  potential, gas-admitted, represented, gas-limited, representation-reduction,
-  and residual events; limiting species; gas removed; slot counts; exhaustion
-  policy; and scale.
-- **API Surface:** Add `NucleationStrategy`, activation/kinetic strategies,
-  builders, `NucleationFactory`, source finalizer, and `Nucleation` runnable
-  under `particula.dynamics.nucleation` and intended package exports. The
-  single-box runnable receives an `EnvironmentData` provider at construction;
-  multi-box source/finalization APIs remain container-level.
-- **Mutation Contract:** Success mutates participating gas concentrations and
-  selected particle mass/concentration/charge; only configured E6-F6 scaling
-  may change volume. Density, metadata, shapes, identities, requests, and
-  unselected state remain unchanged.
-- **Workflow Hooks:** E6-F5 supplies discovery/activation; E6-F6 supplies
-  complete-demand exhaustion; E6-F8 ports the CPU contract; E6-F9 integrates it.
-- **Failure Boundary:** Scientific, shape, capacity, policy, and conservation
-  errors occur before any caller state is written. No partial box succeeds.
+- **Data Model:** No `ParticleData` or `GasData` schema change. Frozen records
+  are `ClosedInterval`, `NucleationValidityDomain`, `InjectionComposition`,
+  and `FormationMetadata`.
+- **API Surface:** Concrete symbols live only in
+  `particula.dynamics.nucleation.nucleation_strategies`; the package and
+  `particula.dynamics` do not re-export them.
+- **Mutation Contract:** Evaluation returns a `float` potential rate and does
+  not mutate caller state.
+- **Workflow Hooks:** E6-F5/E6-F6 consumption, E6-F8 parity, and E6-F9
+  integration are future work.
 
 ## Security & Compliance
 
-There are no network, permission, or persistence changes. Scientific safety
-requires citations, units, explicit validity domains, finite validation,
-inventory limitation, deterministic packaging, conservation, and
-failure-before-mutation tests. Documentation must not claim general atmospheric
-predictiveness, unimplemented Vehkamäki/CNT physics, GPU parity, dynamic
-capacity, hidden transport, or performance evidence.
+There are no network, permission, or persistence changes. P1 scientific safety
+uses citations, units, explicit validity domains, finite validation, and
+failure-before-mutation behavior. Documentation must not claim general
+atmospheric predictiveness, inventory/conservation support, unimplemented
+Vehkamäki/CNT physics, GPU parity, dynamic capacity, hidden transport, or
+performance evidence.

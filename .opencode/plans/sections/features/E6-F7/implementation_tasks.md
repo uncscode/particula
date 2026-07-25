@@ -2,10 +2,10 @@
 
 ## Scientific Model and Backend
 
-- [ ] Create `particula/dynamics/nucleation/` and typed strategy,
-  validity-domain, injection-composition, source-record, and diagnostics APIs.
-- [ ] Implement SI conversion and activation/kinetic rates without hidden
-  clipping or out-of-range extrapolation.
+- [x] Create `particula/dynamics/nucleation/` with typed immutable strategy,
+  validity-domain, injection-composition, and formation-metadata APIs.
+- [x] Implement overflow-safe SI conversion and activation/kinetic potential
+  rates without hidden clipping or out-of-range extrapolation.
 - [ ] Implement a pure finalizer for event demand, per-event species mass,
   shared gas admission, and fixed-shape E6-F5 requests without mutation.
 - [ ] Integrate E6-F5 activation and E6-F6 plan/commit; require a complete plan
@@ -20,7 +20,8 @@
 
 ## Tooling and Tests
 
-- [ ] Add equation/domain tests in `nucleation_strategies_test.py`.
+- [x] Add isolated equation/domain/order/validation tests in
+  `nucleation_strategies_test.py`.
 - [ ] Add source, capacity, atomicity, and conservation tests in
   `particle_source_test.py`.
 - [ ] Add builder/factory tests for units, required fields, and invalid aliases.

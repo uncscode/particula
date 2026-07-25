@@ -7,9 +7,12 @@ NumPy oracle rather than production helpers.
 
 ## Per-Phase Approach
 
-- **P1:** `nucleation_strategies_test.py` verifies `J=A*C`, `J=K*C^2`, SI
-  conversion, coefficient dimensions, exact boundaries, no-op gates,
-  NaN/Inf/negative rejection, and cited fixtures.
+- **P1 (shipped):**
+  `particula/dynamics/nucleation/tests/nucleation_strategies_test.py` verifies
+  `J=A*C` and `J=K*C^2`, SI conversion, linear/quadratic scaling, inclusive
+  bounds, exact zero and saturation gates, strict scalar and record validation,
+  overflow ordering, frozen records, abstract-interface behavior, and the
+  intentional absence of dynamics exports.
 - **P2:** `particle_source_test.py` covers one/many boxes and species, each
   limiting species, exact inventory exhaustion, zero inputs, survival factors,
   provisional gas-admitted demand, diagnostics, and input immutability.

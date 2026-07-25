@@ -1,8 +1,17 @@
 # Documentation Updates
 
-- Update `docs/Theory/Technical/Dynamics/Nucleation_Equations.md` with the exact
-  strategy APIs, SI conversions, closed validity domains, source finalization
-  equations, and implementation status.
+- P1 shipped module and API docstrings in
+  `particula/dynamics/nucleation/nucleation_strategies.py` and updated the
+  user-facing theory page
+  `docs/Theory/Technical/Dynamics/Nucleation_Equations.md`.
+- The theory page now documents the bounded scalar potential-rate contract:
+  mass-to-number concentration conversion, activation and kinetic SI
+  equations, caller-supplied survival factor, closed concentration/temperature
+  domains, asymmetric saturation gating, formation/injection metadata, and the
+  explicit no-source/no-inventory-mutation boundary.
+- No examples or public exports were added. Future phases should extend the
+  theory page with source finalization equations and implementation status when
+  those capabilities ship.
 - Retain citations to Seinfeld & Pandis (2016), Kulmala et al. (2006, DOI
   `10.5194/acp-6-787-2006`), and Kerminen & Kulmala (2002, DOI
   `10.1016/S0021-8502(01)00194-X`). State that Vehkamäki et al. (2002, DOI

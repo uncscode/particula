@@ -2,29 +2,26 @@
 
 ## Problem Statement
 
-Particula has theory and custom examples for nucleation but no supported CPU
-process that converts a cited nucleation rate into fixed-shape particle source
-records while depleting participating gas. Computing number production
-independently from gas depletion can create mass, drive gas negative, or
-silently discard demand when no particle slot is available.
+Particula had no validated, concrete CPU boundary for evaluating bounded
+nucleation potential-rate laws. The shipped P1 boundary establishes the
+scientific rate contract before any future source, inventory, or slot work.
 
 ## Value Proposition
 
-E6-F7 provides the bounded NumPy reference for Epic E6: strategy-based
-activation and kinetic sulfuric-acid rate laws, explicit validity domains and
-injection composition, inventory-limited source finalization, and a
-transactional CPU process built on E6-F5 slot activation and E6-F6 exhaustion.
-It gives E6-F8 a deterministic scientific and conservation oracle without
-promising general nucleation chemistry.
+E6-F7 P1 now provides CPU-only, unexported activation and kinetic potential
+rate strategies with immutable validated domains, composition, and formation
+metadata. It establishes strict scalar validation, overflow-safe SI conversion,
+and exact zero/saturation-gate ordering without claiming source construction,
+conservation, or GPU parity.
 
 ## User Stories
 
-- As an aerosol modeler, I want a cited strategy with explicit units and bounds
-  so that I do not accidentally extrapolate an empirical rate law.
-- As a process author, I want gas depletion and particle activation committed
-  together so that every box and species conserves represented mass.
-- As a GPU developer, I want a deterministic CPU source-record oracle so that
-  E6-F8 can validate direct Warp behavior independently.
+- As an aerosol modeler, I want cited scalar rate strategies with explicit
+  units and closed bounds so that I do not accidentally extrapolate an
+  empirical rate law.
+- As a future process author, I want potential rates isolated from source and
+  mutation behavior so that subsequent phases can add those contracts explicitly.
 
-Parent epic: **E6**. Track: **T7**. Required predecessors: **E6-F5** and
-**E6-F6**. Direct downstream parity: **E6-F8**; integrated consumer: **E6-F9**.
+Parent epic: **E6**. Track: **T7**. P1 shipped for issue #1430; E6-F5/E6-F6
+integration, direct GPU parity (E6-F8), and an integrated consumer (E6-F9)
+remain deferred.

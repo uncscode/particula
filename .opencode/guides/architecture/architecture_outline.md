@@ -26,6 +26,24 @@ strategies, and focused particle-domain helpers.
 - `properties/` - Particle property calculations
 - `tests/` - Test coverage
 
+## Dynamics Package
+
+`particula/dynamics/` contains physics-domain calculations and narrowly scoped
+implementation boundaries.
+
+### particula/dynamics/nucleation/
+
+CPU-only, deliberately unexported potential-rate implementation boundary for
+nucleation parameterizations.
+
+**Key Components:**
+- `nucleation_strategies.py` - Immutable scalar configuration records and
+  activation/kinetic potential-rate algorithms. The strategies return rates
+  only; they own no sources, inventory or slot admission, state mutation,
+  builders, factories, runnables, or GPU integration, and are not exported
+  through `particula.dynamics` or the top-level package.
+- `tests/` - Test coverage
+
 ## GPU Package
 
 `particula/gpu/` contains Warp-backed data containers, explicit CPU↔GPU

@@ -1,5 +1,19 @@
 # Architecture Guide
 
+## CPU Nucleation Potential-Rate Boundary
+
+- `particula.dynamics.nucleation.nucleation_strategies` is a CPU-only,
+  concrete-module implementation boundary. It supplies immutable scalar
+  configuration records and activation/kinetic algorithms that calculate
+  potential formation-event rates only.
+- The package and its strategy symbols are deliberately not re-exported through
+  `particula.dynamics` or the top-level package; consumers import from the
+  concrete strategy module when this bounded implementation is appropriate.
+- This boundary does not create particle sources, admit inventory or slots,
+  mutate gas or particle state, infer survival, or provide builders, factories,
+  runnables, or GPU integration. Those responsibilities require an explicit
+  future integration boundary.
+
 ## CPU Particle Slot Management Boundary
 
 - `particula.particles.slot_management` owns CPU-only fixed-slot classification,

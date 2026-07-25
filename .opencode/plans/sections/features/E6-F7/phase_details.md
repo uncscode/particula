@@ -5,11 +5,11 @@
 E6-F5 and E6-F6 must ship first. Complete P1 through P3 before public APIs in
 P4/P5, then run P6 conservation validation before P7 documentation.
 
-- [ ] **E6-F7-P1:** Freeze bounded nucleation strategy and scientific contract with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Define activation/kinetic equations, SI units, validity gates, injection composition, citations, and fail-closed behavior.
+- [x] **E6-F7-P1:** Freeze bounded nucleation strategy and scientific contract with unit tests
+  - Issue: #1430 | Size: S | Status: Shipped
+  - Goal: Shipped activation/kinetic potential-rate equations, SI units, validity gates, immutable injection/formation metadata, and fail-closed scalar behavior.
   - Files: `particula/dynamics/nucleation/nucleation_strategies.py`, `particula/dynamics/nucleation/tests/nucleation_strategies_test.py`
-  - Tests: Equation fixtures, unit conversion, linear/quadratic scaling, no-op gates, boundaries, and out-of-domain rejection.
+  - Tests: Equation fixtures, unit conversion, linear/quadratic scaling, zero/gate ordering, boundaries, scalar/record validation, overflow rejection, immutability, and no-export regression.
 
 - [ ] **E6-F7-P2:** Compute inventory-limited provisional source demand with unit tests
   - Issue: TBD | Size: S | Status: Not Started

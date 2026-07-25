@@ -126,19 +126,79 @@ J = K × [H₂SO₄]²
 
 **Where:**
 
-- **[H₂SO₄]**: Gas-phase sulfuric acid number concentration.
-- **A**: Activation coefficient (typically ~10⁻⁷ to 10⁻⁵ s⁻¹, site- and condition-dependent).
-- **K**: Kinetic coefficient (typically ~10⁻¹⁴ to 10⁻¹² cm³ s⁻¹, site- and condition-dependent).
+- **C** (or **[H₂SO₄]**): precursor gas number concentration [#/m³].
+- **A**: Activation coefficient [s⁻¹], fitted for a site and set of
+  conditions.
+- **K**: Kinetic coefficient [m³/s], fitted for a site and set of conditions.
+- **J**: Potential formation-event rate [#/m³/s].
 
 **Description:**
 
-The activation form assumes existing thermodynamically stable clusters are activated by a single sulfuric acid molecule; the kinetic form assumes the rate-limiting step is a collision between two sulfuric-acid-containing molecules or clusters. Both are convenient source terms for aerosol dynamics models: they convert a modeled gas concentration directly into a particle number production rate at a prescribed formation size (typically ~1-2 nm diameter).
+The activation form assumes existing thermodynamically stable clusters are activated by a single sulfuric acid molecule; the kinetic form assumes the rate-limiting step is a collision between two sulfuric-acid-containing molecules or clusters. The activation interpretation follows the cluster-activation context of Kulmala, Lehtinen, and Laaksonen (2006); both forms are empirical parameterizations, rather than replacements for CNT or a general multicomponent mechanism. Their coefficients must use units consistent with the chosen concentration units: a value reported in cm³/s must be converted before use with C in #/m³. The broader nucleation framework and CNT limitations follow Seinfeld and Pandis (2016).
+
+### Scalar Potential-Rate Boundary
+
+The bounded P1 model evaluates only the two empirical equations as **potential
+event rates**. It first converts precursor mass concentration to number
+concentration:
+
+**Equation 9: Precursor Number Concentration**
+
+$$
+C = \frac{c_m}{M} N_A
+$$
+
+where $c_m$ is precursor mass concentration [kg/m³], $M$ is precursor molar
+mass [kg/mol], and $N_A$ is Avogadro's constant [#/mol]. Thus $C$ has units
+[#/m³]. The resulting P1 equations, including a configured dimensionless
+survival factor $f_{\mathrm{surv}}$, are
+
+$$
+J_{\mathrm{activation}} = f_{\mathrm{surv}} A C
+\qquad\text{and}\qquad
+J_{\mathrm{kinetic}} = f_{\mathrm{surv}} K C^2.
+$$
+
+The unit check is intentional: $A C$ and $K C^2$ both yield [#/m³/s]. The
+survival factor is supplied configuration, not a quantity inferred from the
+state. It represents a modelling choice about the relation between the
+formation size and another size of interest.
+
+```mermaid
+flowchart TD
+    M[Precursor mass concentration c_m kg/m³] --> C[Convert with M and N_A to C #/m³]
+    T[Temperature and concentration validity intervals] --> G{Inside inclusive intervals?}
+    C --> G
+    S[Optional saturation interval] --> SG{Saturation gate}
+    G -->|yes| SG
+    SG -->|below lower bound| Z[Return zero potential rate]
+    SG -->|within interval| R[Evaluate A C or K C²]
+    F[Configured survival factor] --> R
+    R --> P[Potential event rate J #/m³/s]
+    G -->|no| X[Reject evaluation]
+    SG -->|above upper bound| X
+    P --> B[No particle source or inventory mutation]
+```
+
+Validity intervals are closed: their lower and upper endpoints are accepted.
+The concentration and temperature must lie in their configured intervals for a
+nonzero calculation. Saturation is optional; when it is configured, saturation
+below its lower bound is a deliberate zero-rate gate, while saturation above
+its upper bound is rejected. This asymmetric behavior prevents an unsupported
+high-saturation extrapolation from being silently treated as a valid rate.
+
+Formation-size metadata and injection composition may accompany the rate
+configuration so that a later source process can state its intended physical
+representation. They do not alter either equation in P1. In particular, this
+boundary neither creates particles nor gas/particle inventories, chooses
+slots, depletes precursor vapor, or applies a timestep. It is not a public
+strategy API, runnable, or GPU capability.
 
 ## Survival to Detectable and Model-Resolved Sizes
 
 Freshly nucleated clusters must grow through the smallest sizes, where coagulational scavenging by pre-existing particles is fastest, before they matter for the resolved aerosol population. The apparent formation rate at a larger diameter **d** is related to the "true" nucleation rate at diameter **d*** by a survival probability.
 
-**Equation 9: Kerminen-Kulmala Survival Relation**
+**Equation 10: Kerminen-Kulmala Survival Relation**
 
 J_d = J_d* × exp( γ × (1/d − 1/d*) × CS' / GR )
 
@@ -152,17 +212,21 @@ J_d = J_d* × exp( γ × (1/d − 1/d*) × CS' / GR )
 
 **Description:**
 
-The exponential expresses the competition between growth (**GR**, escape to safety at larger sizes) and coagulational loss to the existing aerosol surface (**CS'**). High pre-existing surface area suppresses observable NPF even when the nucleation rate itself is large. In a simulation, this relation is a consistency check: if the model injects particles at a size larger than the true cluster size, the injection rate should be the survival-corrected **J_d**, not the raw **J_d***.
+The exponential expresses the competition between growth (**GR**, escape to safety at larger sizes) and coagulational loss to the existing aerosol surface (**CS'**). High pre-existing surface area suppresses observable NPF even when the nucleation rate itself is large. In a simulation, this relation is a consistency check: if the model injects particles at a size larger than the true cluster size, the injection rate should be the survival-corrected **J_d**, not the raw **J_d***. P1 does not evaluate this relation; its survival factor is an externally selected value whose scientific justification remains the caller's responsibility.
+
+For a manually constructed particle-source workflow, distinct from this bounded
+rate calculation, see the
+[custom single-species nucleation example](../../../Examples/Nucleation/Notebooks/Custom_Nucleation_Single_Species.ipynb).
 
 ## Nucleation as a Source Term in Aerosol Dynamics
 
 In an aerosol dynamics model, nucleation enters the population balance as a source of new particles at the smallest resolved size:
 
-**Equation 10: Number Source Term**
+**Equation 11: Number Source Term**
 
 dN/dt |_nucleation = J
 
-**Equation 11: Coupled Gas Depletion**
+**Equation 12: Coupled Gas Depletion**
 
 dCᵢ/dt |_nucleation = − J × n*ᵢ × (molar massᵢ / N_A)
 
@@ -195,15 +259,15 @@ E6-F6-P5 work will compose that boundary with policy selection. High-level
 nucleation and timestep orchestration remain deferred; see the
 [Data-Oriented Design and GPU Roadmap](../../../Features/Roadmap/data-oriented-gpu.md).
 
-**Implementation status:**
+**Implementation boundary:**
 
-- No nucleation implementation exists in particula yet (CPU or GPU). This
-  document is the theory reference for the planned nucleation/particle-source
-  process.
-- The planned design is a CPU reference process first, followed by a GPU
-  version that activates inactive particle slots in fixed-shape arrays. Track
-  this work in the
-  [Data-Oriented Design and GPU Roadmap](../../../Features/Roadmap/data-oriented-gpu.md).
+- A deliberately unexported CPU-only scalar potential-rate implementation
+  exists for the activation and kinetic equations described above. It is not a
+  supported public strategy interface.
+- Particle-source construction, gas depletion, inventory or slot admission,
+  timestep coupling, runnable orchestration, and GPU support are outside this
+  bounded implementation. The source-term discussion in this section remains
+  conceptual guidance for any future composition of those responsibilities.
 
 ## Variable Descriptions
 
@@ -262,7 +326,18 @@ nucleation and timestep orchestration remain deferred; see the
 
 - **Parameterization Validity Ranges:** Empirical forms (Equations 7-8) and fitted parameterizations (for example Vehkamäki et al., 2002) are only valid within the temperature, humidity, and concentration ranges of the underlying data; extrapolation can produce unphysical rates.
 
-- **Injection-Size Convention:** Models inject particles at a chosen formation size, not at the true critical size. The nucleation rate must be survival-corrected (Equation 9) to be consistent with that choice.
+- **Bounded Scalar Evaluation:** The P1 equations accept scalar precursor
+  state only and enforce configured, inclusive concentration and temperature
+  intervals. Optional saturation below the lower interval is treated as no
+  event; saturation above its upper interval is not extrapolated. A zero
+  potential rate is not evidence that nucleation is physically absent outside
+  a parameterization's domain.
+
+- **No Conservation Step:** A potential rate is not yet a particle source.
+  Without a separately designed event-to-particle and gas-depletion step, it
+  must not be interpreted as having conserved mass or changed inventories.
+
+- **Injection-Size Convention:** Models inject particles at a chosen formation size, not at the true critical size. The nucleation rate must be survival-corrected (Equation 10) to be consistent with that choice.
 
 **Further Considerations:**
 
@@ -276,7 +351,7 @@ nucleation and timestep orchestration remain deferred; see the
 
 ## Conclusion
 
-Nucleation converts supersaturated vapor into new particles through a barrier-crossing process whose rate is exponentially sensitive to saturation ratio and surface tension. For aerosol dynamics modeling, the practical requirements are: an accurate temperature-dependent vapor pressure, a nucleation rate expression (CNT-based or empirical) valid for the target conditions, a survival correction to the model's injection size, and a mass-conserving numerical source term that adds particles to the resolved population. In particle-resolved simulations with fixed slot counts, that source term becomes slot activation, which ties nucleation directly to slot management, resampling policy, and time-integration stiffness at the smallest sizes.
+Nucleation converts supersaturated vapor into new particles through a barrier-crossing process whose rate is exponentially sensitive to saturation ratio and surface tension. The bounded P1 calculation is narrower: it converts a scalar precursor mass concentration to C [#/m³] and evaluates an activation or kinetic **potential** event rate in [#/m³/s] only within declared validity limits. Its configured survival factor provides no independently calculated growth or scavenging physics. A mass-conserving source term, particle injection, and any fixed-slot policy remain separate responsibilities.
 
 ---
 

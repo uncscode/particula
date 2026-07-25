@@ -1,8 +1,8 @@
 # Success Criteria
 
-- [ ] Activation and kinetic strategies reproduce `J=A*C` and `J=K*C^2`
+- [x] Activation and kinetic strategies reproduce `J=A*C` and `J=K*C^2`
   references after documented SI conversion.
-- [ ] Every strategy documents units, citations, injection convention, and a
+- [x] Every strategy documents units, citations, injection convention, and a
   closed validity domain; unsupported extrapolation raises before mutation.
 - [ ] Source finalization jointly limits events by every participating gas
   species and never produces negative gas concentration.
@@ -24,7 +24,7 @@
 
 | Metric | Baseline | Target | Source |
 |---|---:|---:|---|
-| Supported bounded CPU rate laws | 0 | 2 | Strategy tests |
+| Supported bounded CPU rate laws | 0 | 2 shipped | Strategy tests |
 | Negative gas outcomes | Not prevented | 0 | Integration matrix |
 | Silent residual demand | Undefined | 0 | Full-slot tests |
 | Per-box/species conservation relative error | No implementation | `<=1e-12` for standard fixtures | Independent oracle |
