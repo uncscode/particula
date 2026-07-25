@@ -34,6 +34,7 @@ from particula.particles.particle_data import ParticleData
 from particula.particles.representation import ParticleRepresentation
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 from particula.runnable import RunnableABC
+from particula.util.constants import AVOGADRO_NUMBER
 
 
 def _source_config(coefficient: float = 1.0e-2) -> NucleationSourceConfig:
@@ -375,12 +376,36 @@ def test_invalid_topology_is_write_free_and_skips_source_work(
     aerosol, particles, gas, gas_only = _aerosol()
     runnable = _runnable()
     mutate(particles, gas, runnable)
-    snapshots = (
-        particles.masses.copy(),
-        particles.concentration.copy(),
-        gas.concentration.copy(),
-        gas.partitioning.copy(),
-        gas_only.concentration.copy(),
+    arrays = (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        gas.molar_mass,
+        gas.concentration,
+        gas.partitioning,
+        gas_only.molar_mass,
+        gas_only.concentration,
+        gas_only.partitioning,
+    )
+    snapshots = tuple(
+        (
+            array.copy(),
+            id(array),
+            array.shape,
+            array.dtype,
+            array.flags.c_contiguous,
+            array.flags.writeable,
+        )
+        for array in arrays
+    )
+    facade_identities = (
+        id(aerosol),
+        id(aerosol.particles),
+        id(aerosol.particles.data),
+        id(aerosol.atmosphere.partitioning_species),
+        id(aerosol.atmosphere.partitioning_species.data),
     )
     monkeypatch.setattr(
         runnable,
@@ -400,18 +425,23 @@ def test_invalid_topology_is_write_free_and_skips_source_work(
 
     with pytest.raises((TypeError, ValueError)):
         runnable.execute(aerosol, 1.0)
-    for actual, expected in zip(
-        (
-            particles.masses,
-            particles.concentration,
-            gas.concentration,
-            gas.partitioning,
-            gas_only.concentration,
-        ),
-        snapshots,
-        strict=True,
-    ):
-        npt.assert_array_equal(actual, expected)
+    for array, snapshot in zip(arrays, snapshots, strict=True):
+        values, identity, shape, dtype, contiguous, writable = snapshot
+        npt.assert_array_equal(array, values)
+        assert (
+            id(array),
+            array.shape,
+            array.dtype,
+            array.flags.c_contiguous,
+            array.flags.writeable,
+        ) == (identity, shape, dtype, contiguous, writable)
+    assert facade_identities == (
+        id(aerosol),
+        id(aerosol.particles),
+        id(aerosol.particles.data),
+        id(aerosol.atmosphere.partitioning_species),
+        id(aerosol.atmosphere.partitioning_species.data),
+    )
 
 
 def test_zero_duration_validates_topology_without_source_work(monkeypatch):
@@ -581,6 +611,44 @@ def test_later_substep_rate_uses_gas_depleted_by_prior_commit(
     assert len(observed_rates) == 2
     assert observed_rates[1] == observed_rates[0] * 0.5
     npt.assert_array_equal(gas.concentration, [[0.5e-12]])
+
+
+def test_real_substeps_read_current_gas_and_match_independent_transfer_math(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The single-box P5 path recomputes deterministic source demand per step."""
+    aerosol, particles, gas, _ = _aerosol()
+    runnable = _runnable()
+    observed_gas: list[float] = []
+    real_rate = runnable._rate_from_gas
+
+    def spy_rate(source_gas: GasData) -> float:
+        observed_gas.append(float(source_gas.concentration[0, 0]))
+        return real_rate(source_gas)
+
+    monkeypatch.setattr(runnable, "_rate_from_gas", spy_rate)
+    initial_gas = float(gas.concentration[0, 0])
+    molar_mass = float(gas.molar_mass[0])
+    coefficient = 1.0e-2
+    duration = 0.5
+    per_event_mass = molar_mass / AVOGADRO_NUMBER
+    expected_gas = initial_gas
+    for _ in range(2):
+        rate = coefficient * expected_gas * AVOGADRO_NUMBER / molar_mass
+        potential = rate * duration
+        admitted = min(potential, expected_gas / per_event_mass)
+        expected_gas -= admitted * per_event_mass
+
+    assert runnable.execute(aerosol, 1.0, sub_steps=2) is aerosol
+    npt.assert_allclose(observed_gas[0], initial_gas)
+    assert observed_gas[1] < observed_gas[0]
+    npt.assert_allclose(gas.concentration, [[expected_gas]])
+    npt.assert_allclose(
+        np.einsum("bn,bns->bs", particles.concentration, particles.masses),
+        [[initial_gas - expected_gas]],
+    )
+    assert aerosol.particles.data is particles
+    assert aerosol.atmosphere.partitioning_species.data is gas
 
 
 def test_source_errors_propagate_and_stop_later_stages(monkeypatch):

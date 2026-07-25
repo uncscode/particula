@@ -28,6 +28,116 @@ from particula.particles.exhaustion import (
 from particula.particles.particle_data import ParticleData
 from particula.util.constants import AVOGADRO_NUMBER
 
+CONSERVATION_RTOL = 1e-12
+CONSERVATION_ATOL = 1e-30
+
+
+def _inventory(particles: ParticleData) -> np.ndarray:
+    """Return concentration-weighted particle inventory by box and species."""
+    return np.einsum(
+        "bn,bns->bs",
+        particles.concentration,
+        particles.masses,
+        dtype=np.float64,
+        optimize=True,
+    )
+
+
+def _oracle_finalize(
+    rate: np.ndarray,
+    duration: float,
+    molecule_counts: tuple[int, ...],
+    molar_mass: np.ndarray,
+    concentration: np.ndarray,
+) -> tuple[
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+]:
+    """Independently calculate the documented P2 float64 admission result."""
+    counts = np.asarray(molecule_counts, dtype=np.float64)
+    per_event = (
+        counts * np.asarray(molar_mass, dtype=np.float64) / AVOGADRO_NUMBER
+    )
+    potential = np.asarray(rate, dtype=np.float64) * duration
+    participating = np.flatnonzero(counts > 0.0)
+    admitted = potential.copy()
+    limiting = np.full(potential.shape, -1, dtype=np.int32)
+    if participating.size:
+        ratios = concentration[:, participating] / per_event[participating]
+        candidate = np.min(ratios, axis=1)
+        admitted = np.minimum(potential, candidate)
+        limited = potential > admitted
+        limiting[limited & (admitted > 0.0)] = participating[
+            np.argmin(ratios, axis=1)[limited & (admitted > 0.0)]
+        ]
+        for _ in range(4):
+            removal = admitted[:, None] * per_event[None, :]
+            overshot = np.any(
+                removal[:, participating] > concentration[:, participating],
+                axis=1,
+            )
+            if not np.any(overshot):
+                break
+            admitted[overshot] = np.nextafter(admitted[overshot], -np.inf)
+    removal = admitted[:, None] * per_event[None, :]
+    return (
+        per_event,
+        potential,
+        admitted,
+        potential - admitted,
+        limiting,
+        removal,
+    )
+
+
+def _snapshot_arrays(*arrays: np.ndarray) -> tuple[tuple[object, ...], ...]:
+    """Capture values and caller-visible array identity and metadata."""
+    return tuple(
+        (
+            array.copy(),
+            id(array),
+            array.shape,
+            array.dtype,
+            array.flags.c_contiguous,
+            array.flags.writeable,
+        )
+        for array in arrays
+    )
+
+
+def _assert_snapshot(
+    arrays: tuple[np.ndarray, ...], snapshots: tuple[tuple[object, ...], ...]
+) -> None:
+    """Assert arrays retain exact values, identity, and storage metadata."""
+    for array, snapshot in zip(arrays, snapshots, strict=True):
+        values, identity, shape, dtype, contiguous, writable = snapshot
+        npt.assert_array_equal(array, values)
+        assert (
+            id(array),
+            array.shape,
+            array.dtype,
+            array.flags.c_contiguous,
+            array.flags.writeable,
+        ) == (identity, shape, dtype, contiguous, writable)
+
+
+def _all_mutable_arrays(
+    particles: ParticleData, gas: GasData
+) -> tuple[np.ndarray, ...]:
+    """Return every caller-owned mutable P3 particle and gas array."""
+    return (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        gas.concentration,
+    )
+
 
 def _gas(concentration: np.ndarray) -> GasData:
     """Build three-species gas data with supplied mass concentrations."""
@@ -1294,3 +1404,141 @@ def test_commit_rejects_overlapping_mutable_storage_atomically(
         particles.concentration, particle_snapshot.concentration
     )
     npt.assert_array_equal(gas.concentration, gas_snapshot)
+
+
+@pytest.mark.parametrize("limiting_lane", [0, 1, 2])
+def test_finalization_matches_independent_oracle_for_every_limiting_lane(
+    limiting_lane: int,
+) -> None:
+    """P2 admission selects each participating multi-species lane in turn."""
+    molecule_counts = (1, 2, 3, 0)
+    molar_mass = np.array([0.1, 0.2, 0.3, 0.4], dtype=np.float64)
+    per_event = np.asarray(molecule_counts, dtype=np.float64) * molar_mass
+    per_event /= AVOGADRO_NUMBER
+    concentration = np.full((1, 4), 100.0 * per_event, dtype=np.float64)
+    concentration[0, limiting_lane] = 3.0 * per_event[limiting_lane]
+    concentration[0, 3] = 7.0
+    gas = GasData(
+        name=["a", "b", "c", "inert"],
+        molar_mass=molar_mass,
+        concentration=concentration.copy(),
+        partitioning=np.array([True, True, True, False]),
+    )
+    expected = _oracle_finalize(
+        np.array([10.0]), 1.0, molecule_counts, molar_mass, concentration
+    )
+
+    demand, diagnostics = finalize_particle_source(
+        PotentialEventData(np.array([10.0]), 1.0),
+        InjectionComposition(molecule_counts),
+        gas,
+    )
+
+    per_event_expected, potential, admitted, limited, limiting, removal = (
+        expected
+    )
+    npt.assert_allclose(demand.per_event_mass, per_event_expected)
+    npt.assert_allclose(demand.gas_mass_removed, removal)
+    npt.assert_allclose(diagnostics.potential_event_count, potential)
+    npt.assert_allclose(diagnostics.gas_admitted_event_count, admitted)
+    npt.assert_allclose(diagnostics.gas_limited_event_count, limited)
+    npt.assert_array_equal(diagnostics.limiting_species_index, limiting)
+
+
+def test_finalization_oracle_covers_inert_and_no_participating_rows() -> None:
+    """The standalone oracle retains potential when no lane participates."""
+    concentration = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float64)
+    expected = _oracle_finalize(
+        np.array([2.0, 3.0]), 2.0, (0, 0), np.array([0.1, 0.2]), concentration
+    )
+    npt.assert_allclose(expected[0], [0.0, 0.0])
+    npt.assert_allclose(expected[-1], 0.0)
+    npt.assert_allclose(expected[2], expected[1])
+    npt.assert_array_equal(expected[4], [-1, -1])
+
+
+def test_commit_multibox_oracle_proves_per_species_source_transfer() -> None:
+    """P2-to-P3 coupling conserves each box/species source transfer separately."""
+    particles = ParticleData(
+        masses=np.zeros((2, 4, 2), dtype=np.float64),
+        concentration=np.zeros((2, 4), dtype=np.float64),
+        charge=np.zeros((2, 4), dtype=np.float64),
+        density=np.array([1000.0, 1200.0]),
+        volume=np.ones(2),
+    )
+    counts = (1, 2)
+    molar_mass = np.array([0.1, 0.2])
+    per_event = np.asarray(counts) * molar_mass / AVOGADRO_NUMBER
+    concentration = np.array(
+        [
+            [4.0 * per_event[0], 9.0 * per_event[1]],
+            [8.0 * per_event[0], 3.0 * per_event[1]],
+        ],
+        dtype=np.float64,
+    )
+    gas = GasData(
+        name=["a", "b"],
+        molar_mass=molar_mass,
+        concentration=concentration.copy(),
+        partitioning=np.array([True, True]),
+    )
+    expected = _oracle_finalize(
+        np.array([10.0, 10.0]), 1.0, counts, molar_mass, concentration
+    )
+    demand, diagnostics = finalize_particle_source(
+        PotentialEventData(np.array([10.0, 10.0]), 1.0),
+        InjectionComposition(counts),
+        gas,
+    )
+    particle_before = _inventory(particles)
+    gas_before = gas.concentration.copy()
+
+    result = commit_particle_source(
+        demand, diagnostics, particles, gas, _commit_config(boxes=2)
+    )
+
+    npt.assert_allclose(result.gas_mass_removed, expected[-1])
+    npt.assert_array_equal(result.limiting_species_index, expected[4])
+    particle_gain = _inventory(particles) - particle_before
+    gas_removal = gas_before - gas.concentration
+    npt.assert_allclose(
+        particle_gain,
+        gas_removal,
+        rtol=CONSERVATION_RTOL,
+        atol=CONSERVATION_ATOL,
+    )
+    npt.assert_allclose(
+        result.conservation_residual, 0.0, atol=CONSERVATION_ATOL
+    )
+
+
+def test_p2_and_p3_rejections_preserve_all_accessible_metadata() -> None:
+    """Invalid P2/P3 input is read-only; P3 has no caller diagnostic buffer."""
+    gas = _gas(np.array([[1.0, 1.0, 1.0]], dtype=np.float64))
+    rate = np.array([1.0])
+    rate_snapshot = _snapshot_arrays(rate)
+    gas.concentration[0, 2] = np.nan
+    with pytest.raises(ValueError, match="finite"):
+        finalize_particle_source(
+            PotentialEventData(rate, 1.0), InjectionComposition((1, 2, 0)), gas
+        )
+    _assert_snapshot((rate,), rate_snapshot)
+    assert not hasattr(commit_particle_source, "diagnostic_buffer")
+    gas.concentration[0, 2] = 1.0
+    particles = _source_particles()
+    gas = GasData(
+        name=["a"],
+        molar_mass=np.array([0.1]),
+        concentration=np.array([[1.0]]),
+        partitioning=np.array([True]),
+    )
+    snapshots = _snapshot_arrays(*_all_mutable_arrays(particles, gas))
+    demand, diagnostics = _p2_records(np.array([1.0]))
+    object.__setattr__(
+        config := _commit_config(),
+        "requested_scale",
+        _readonly(np.array([1.1])),
+    )
+    with pytest.raises(ValueError, match="invalid representative"):
+        commit_particle_source(demand, diagnostics, particles, gas, config)
+    _assert_snapshot(_all_mutable_arrays(particles, gas), snapshots)
