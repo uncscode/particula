@@ -48,8 +48,13 @@ NumPy oracle rather than production helpers.
   adds single-box P5 live-gas progression and backing-identity regressions;
   it makes no multi-box runnable claim.
 - **P7 (shipped):** `particula/tests/nucleation_docs_test.py` validates public
-  imports, example identity/transfer/conservation, navigation, theory and
-  deferred-scope statements without hardware. Run the published script, focused
+  P4/P5 imports and absence of concrete P2/P3 references; example identity,
+  one-box float64 schemas, gas-to-particle transfer, gas-only preservation, and
+  concentration-weighted conservation at `rtol=1e-12`, `atol=1e-30`; and
+  feature/theory/example navigation, illustrative-notebook labeling,
+  CPU-only/per-substep scope, and E6-F8/E6-F9 deferral without hardware. Run
+  `python docs/Examples/Nucleation/cpu_nucleation.py`,
+  `pytest particula/tests/nucleation_docs_test.py -q -Werror`, the focused
   nucleation suites, and `mkdocs build --strict`.
 
 ## Required Invariants

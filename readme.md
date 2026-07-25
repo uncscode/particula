@@ -44,6 +44,18 @@ Use the public `particula.dynamics.DilutionStrategy` and `Dilution` APIs; the
 concrete `dilute_aerosol` and `get_dilution_step` helpers remain module-only.
 Run the hardware-free example with `python docs/Examples/cpu_dilution.py`.
 
+For bounded CPU-only, one-box nucleation, use public strategies,
+`NucleationSourceConfig`, `NucleationCommitConfig`, and `Nucleation` from
+`particula.dynamics`, with `EnvironmentData` from `particula.gas`.
+`nucleation.particle_source` P2/P3 records and transaction helpers are
+concrete-only. The runnable preserves `Aerosol` identity, re-reads gas across
+equal substeps, and is atomic per attempted substep rather than for the whole
+call. Verify concentration-weighted particle-plus-gas conservation with
+`rtol=1e-12, atol=1e-30`; direct-Warp E6-F8 and integration E6-F9 remain
+deferred. See the [nucleation guide](./docs/Features/nucleation_strategy_system.md)
+and run
+`python docs/Examples/Nucleation/cpu_nucleation.py`.
+
 For the [Canonical low-level direct-condensation contract](./docs/Features/data-containers-and-gpu-foundations.md),
 see the container, shape, and CPU↔GPU transfer boundaries.
 For a runnable low-level walkthrough, run `python

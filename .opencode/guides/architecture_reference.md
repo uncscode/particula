@@ -1,7 +1,7 @@
 # Architecture Reference
 
 **Project:** particula  
-**Last Updated:** 2026-06-06
+**Last Updated:** 2026-07-25
 
 This reference summarizes the particula package structure and key architectural
 conventions migrated from the legacy guide set.
@@ -45,12 +45,16 @@ Key concepts:
 
 ## Nucleation
 
-The CPU-only P4 construction API is exported from
-`particula.dynamics.nucleation` and `particula.dynamics`. It provides immutable
-activation/kinetic potential-rate strategies, source-selection metadata,
-builders, and a factory. P2 source-demand planning and P3 particle-source
-transactions remain concrete-only in `nucleation.particle_source`; P4 does not
-mutate gas or particles or provide a runnable or GPU path.
+The public CPU-only nucleation API is exported through `particula.dynamics`.
+P4 provides immutable activation/kinetic potential-rate strategies,
+source-selection metadata, builders, and a factory. P5 provides the one-box
+`Nucleation` runnable and `NucleationCommitConfig`.
+
+`Nucleation` preserves the legacy `Aerosol` and backing-data identities. It
+uses equal, gas-coupled substeps and is atomic per attempted substep, not across
+the complete call. P2 source-demand planning and P3 particle-source
+transactions remain concrete-only in `nucleation.particle_source`. Direct-Warp
+E6-F8 work and E6-F9 integration remain deferred.
 
 ## Scientific Utilities
 

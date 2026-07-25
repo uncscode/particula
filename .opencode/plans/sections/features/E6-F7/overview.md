@@ -25,7 +25,12 @@ equal sequential substeps, and relies on P3 atomicity per substep only. P2/P3
 helpers remain unexported; GPU parity is not added. P6 adds test-only
 independent NumPy `float64` validation of concrete P2/P3 multi-box,
 multi-species conservation and rejection atomicity, plus single-box P5
-gas-coupling and identity regressions; it changes no production behavior.
+gas-coupling and identity regressions; it changes no production behavior. P7
+closes the public documentation: the feature contract, theory, supported
+runnable, navigation, agent guidance, and hardware-free publication regression
+now describe the shipped bounded CPU-only path. The hand-built custom notebook
+is explicitly illustrative, not a supported P4/P5 API example. E6-F8 direct
+Warp and E6-F9 integration/orchestration remain deferred.
 
 ## User Stories
 

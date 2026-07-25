@@ -6,37 +6,56 @@ zero duration or zero rate paths are no-ops.
 """
 
 import numpy as np
-from particula.aerosol import Aerosol
+from particula import Aerosol
 from particula.dynamics import (
     ActivationNucleationBuilder,
     Nucleation,
     NucleationCommitConfig,
     NucleationSourceConfig,
 )
-from particula.gas import EnvironmentData
-from particula.gas.atmosphere import Atmosphere
-from particula.gas.gas_data import GasData
-from particula.gas.species import GasSpecies
-from particula.gas.vapor_pressure_strategies import (
+from particula.gas import (
+    Atmosphere,
     ConstantVaporPressureStrategy,
+    EnvironmentData,
+    GasData,
+    GasSpecies,
 )
-from particula.particles.activity_strategies import ActivityIdealMass
-from particula.particles.distribution_strategies import MassBasedMovingBin
+from particula.particles import (
+    ActivityIdealMass,
+    MassBasedMovingBin,
+    ParticleData,
+    ParticleRepresentation,
+    SurfaceStrategyVolume,
+)
 from particula.particles.exhaustion import ExhaustionControls
-from particula.particles.particle_data import ParticleData
-from particula.particles.representation import ParticleRepresentation
-from particula.particles.surface_strategies import SurfaceStrategyVolume
 
 
 def _total_mass(particles: ParticleData, gas: GasData) -> np.ndarray:
-    """Return concentration-weighted particle plus gas mass by species."""
+    """Calculate concentration-weighted particle and gas mass by species.
+
+    Args:
+        particles: One-box particle data with masses in kg and concentrations
+            in 1/m³.
+        gas: One-box gas data with concentrations in kg/m³.
+
+    Returns:
+        Total mass concentration in kg/m³ for each species.
+    """
     return np.sum(
         particles.masses * particles.concentration[..., None], axis=1
     ) + (gas.concentration)
 
 
 def run_example() -> Aerosol:
-    """Create a one-box aerosol and apply a public CPU nucleation step."""
+    """Run a supported one-box CPU nucleation step through public APIs.
+
+    The example uses fixed particle capacity and transfers partitioning gas to
+    particles in place. It asserts the runnable preserves the input
+    ``Aerosol`` identity and conserves the unscaled particle-plus-gas mass.
+
+    Returns:
+        The same ``Aerosol`` instance after two equal nucleation substeps.
+    """
     particles = ParticleData(
         masses=np.zeros((1, 3, 1), dtype=np.float64),
         concentration=np.zeros((1, 3), dtype=np.float64),
@@ -80,7 +99,9 @@ def run_example() -> Aerosol:
             {
                 "coefficient": 1.0e-2,
                 "coefficient_units": "s^-1",
-                "coefficient_provenance": "deterministic documentation example",
+                "coefficient_provenance": (
+                    "deterministic documentation example"
+                ),
                 "precursor_number_concentration_lower": 1.0,
                 "precursor_number_concentration_lower_units": "1/m^3",
                 "precursor_number_concentration_upper": 1.0e30,

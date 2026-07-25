@@ -138,8 +138,9 @@ The activation form assumes existing thermodynamically stable clusters are activ
 
 ### Scalar Potential-Rate Boundary
 
-The bounded P1 model evaluates only the two empirical equations as **potential
-event rates**. It first converts precursor mass concentration to number
+The bounded rate evaluator computes only **potential event rates**. It is used
+by the immutable P4 construction boundary; it is not itself a particle-source
+transaction. It first converts precursor mass concentration to number
 concentration:
 
 **Equation 9: Precursor Number Concentration**
@@ -150,7 +151,7 @@ $$
 
 where $c_m$ is precursor mass concentration [kg/m³], $M$ is precursor molar
 mass [kg/mol], and $N_A$ is Avogadro's constant [#/mol]. Thus $C$ has units
-[#/m³]. The resulting P1 equations, including a configured dimensionless
+[#/m³]. The resulting configured rate equations, including a dimensionless
 survival factor $f_{\mathrm{surv}}$, are
 
 $$
@@ -159,10 +160,17 @@ J_{\mathrm{activation}} = f_{\mathrm{surv}} A C
 J_{\mathrm{kinetic}} = f_{\mathrm{surv}} K C^2.
 $$
 
-The unit check is intentional: $A C$ and $K C^2$ both yield [#/m³/s]. The
-survival factor is supplied configuration, not a quantity inferred from the
-state. It represents a modelling choice about the relation between the
-formation size and another size of interest.
+The unit check is intentional: $A C$ and $K C^2$ both yield [#/m³/s]. If a
+published kinetic coefficient is expressed in cm³/s, convert it before use
+with concentration in #/m³:
+
+$$
+K_{\mathrm{m^3/s}} = 10^{-6} K_{\mathrm{cm^3/s}}.
+$$
+
+The survival factor is supplied configuration, not a quantity inferred from
+the state. It is dimensionless and represents a caller's modelling choice
+about the relation between the formation size and another size of interest.
 
 ```mermaid
 flowchart TD
@@ -193,12 +201,13 @@ silently treated as a valid rate.
 
 Formation-size metadata and injection composition may accompany the rate
 configuration so that a later source process can state its intended physical
-representation. They do not alter either equation in P1. In particular, this
-boundary neither creates particles nor gas/particle inventories, chooses
-slots, depletes precursor vapor, or applies a timestep. It is not a public
-runtime, runnable, or GPU capability. The bounded CPU-only P4 construction
-API exports immutable activation and kinetic strategies, their builders, and a
-factory through `particula.dynamics.nucleation` and `particula.dynamics`.
+representation. They do not alter either equation. In particular, rate
+evaluation neither creates particles nor gas/particle inventories, chooses
+slots, depletes precursor vapor, or applies a timestep. P4 is the bounded,
+CPU-only public construction API for immutable activation and kinetic
+strategies, their builders, factory, and source-selection configuration through
+`particula.dynamics.nucleation` and `particula.dynamics`; it is not a runnable
+or GPU capability.
 
 ## Survival to Detectable and Model-Resolved Sizes
 
@@ -212,13 +221,19 @@ J_d = J_d* × exp( γ × (1/d − 1/d*) × CS' / GR )
 
 - **J_d**: Apparent particle formation rate at diameter **d**.
 - **J_d***: Nucleation rate at the initial cluster diameter **d***.
-- **γ**: Proportionality constant (~0.23 nm² m² h⁻¹ in the original formulation's units).
-- **CS'**: Condensation sink of the pre-existing particle population (scavenging strength).
-- **GR**: Growth rate of the freshly formed particles.
+- **γ**: Proportionality constant expressed in units compatible with the
+  selected diameter, condensation-sink, and growth-rate units. For SI
+  substitution, use meters for **d** and **d*** and choose **γ** so that
+  `γ × CS' / GR` has units of meters; do not mix the original fitted-unit
+  coefficient with SI inputs without converting it.
+- **CS'**: Condensation sink of the pre-existing particle population
+  (scavenging strength), in the units used by the selected **γ**.
+- **GR**: Growth rate of the freshly formed particles, in units compatible with
+  **γ** and **CS'**.
 
 **Description:**
 
-The exponential expresses the competition between growth (**GR**, escape to safety at larger sizes) and coagulational loss to the existing aerosol surface (**CS'**). High pre-existing surface area suppresses observable NPF even when the nucleation rate itself is large. In a simulation, this relation is a consistency check: if the model injects particles at a size larger than the true cluster size, the injection rate should be the survival-corrected **J_d**, not the raw **J_d***. P1 does not evaluate this relation; its survival factor is an externally selected value whose scientific justification remains the caller's responsibility.
+The exponential expresses the competition between growth (**GR**, escape to safety at larger sizes) and coagulational loss to the existing aerosol surface (**CS'**). High pre-existing surface area suppresses observable NPF even when the nucleation rate itself is large. In a simulation, this relation is a consistency check: if the model injects particles at a size larger than the true cluster size, the injection rate should be the survival-corrected **J_d**, not the raw **J_d***. P4 does not evaluate this relation; its survival factor is an externally selected value whose scientific justification remains the caller's responsibility.
 
 For supported execution, see the [CPU nucleation example](../../../Examples/Nucleation/cpu_nucleation.py)
 and [CPU Nucleation Strategy System](../../../Features/nucleation_strategy_system.md).
@@ -284,12 +299,41 @@ identity; it does not provide GPU execution.
 
 ### Shipped CPU source transaction
 
-For each P5 substep, the current potential rate is converted to a potential
-event count. P2 admits a shared, inventory-limited count across species before
-any mutation. P3 then activates fixed-capacity slots and transfers each event's
-species mass from partitioning gas into particle mass. Its bookkeeping uses
-concentration-weighted particle inventory, so every box/species ledger is
-checked as particle plus gas with `rtol=1e-12` and `atol=1e-30`.
+The layers deliberately separate rate selection from irreversible state
+updates:
+
+```mermaid
+flowchart LR
+    P4[P4: immutable strategy and source selection] --> R[Potential rate J in #/m³/s]
+    R --> P2[P2: nonmutating demand finalization]
+    P2 --> A[Shared inventory-admitted events and limiting-species diagnostics]
+    A --> P3[P3: staged fixed-capacity commit]
+    P3 --> T[Particle/gas transaction and finalized diagnostics]
+    T --> P5[P5: CPU-only one-box runnable]
+    P5 --> G[Re-read current gas for the next equal substep]
+```
+
+For each P5 substep, the current potential rate is multiplied by the equal
+substep duration to obtain a potential event count [#/m³]. Concrete-only P2
+uses the per-event species mass
+
+$$
+m_{\mathrm{event},i}=n_i\frac{M_i}{N_A}\quad[\mathrm{kg/event}]
+$$
+
+and admits one shared count across participating species, limited by the
+tightest gas inventory, before any mutation. Concrete-only P3 stages slot
+activation, resampling, and representative-volume scaling on private particle
+state, then transfers each represented event's species mass from partitioning
+gas to particle mass in one commit. Its bookkeeping uses concentration-weighted
+particle inventory,
+
+$$
+I_{p,i}=\sum_j c_j m_{j,i}\quad[\mathrm{kg/m^3}],
+$$
+
+so every box/species ledger is checked as particle plus gas with
+`rtol=1e-12` and `atol=1e-30`.
 
 Diagnostics distinguish potential, admitted, gas-limited, represented, and
 reduced events, identify limiting species, and report requested/activated/
@@ -300,6 +344,18 @@ unscaled example uses `requested_scale == minimum_scale == 1.0` and directly
 asserts total-mass conservation. P2 is nonmutating, P3 preflight rejection is
 atomic, and P5 rollback scope is one attempted substep rather than a complete
 call.
+
+P5 is the supported public `Nucleation` runnable. It is CPU-only and accepts
+exactly one legacy `Aerosol` box, retaining its backing particle and
+partitioning-gas containers by identity. It performs equal sequential
+substeps, recomputing the rate from the gas left by each successful commit. A
+successful earlier substep therefore remains visible if a later P2/P3 attempt
+fails; P5 deliberately offers no whole-call rollback.
+
+E6-F8 direct-Warp nucleation and E6-F9 integrated GPU/example orchestration
+remain deferred. This CPU transaction does not imply a GPU fallback, dynamic
+slot allocation, automatic scheduling, or a general multiphysics nucleation
+solver.
 
 ## Variable Descriptions
 
@@ -358,16 +414,20 @@ call.
 
 - **Parameterization Validity Ranges:** Empirical forms (Equations 7-8) and fitted parameterizations (for example Vehkamäki et al., 2002) are only valid within the temperature, humidity, and concentration ranges of the underlying data; extrapolation can produce unphysical rates.
 
-- **Bounded Scalar Evaluation:** The P1 equations accept scalar precursor
+- **Bounded Scalar Evaluation:** The P4 rate strategies accept scalar precursor
   state only and enforce configured, inclusive concentration and temperature
   intervals. Optional saturation below the lower interval is treated as no
   event; saturation above its upper interval is not extrapolated. A zero
   potential rate is not evidence that nucleation is physically absent outside
   a parameterization's domain.
 
-- **Bounded conservation step:** The shipped P5 source transaction conserves
-  supported partitioning-gas and particle inventory, but it is CPU-only,
-  single-box, fixed-capacity work rather than a general multiphysics source.
+- **Bounded conservation step:** Without representative-volume scaling, the
+  shipped P5 source transaction conserves supported partitioning-gas and
+  particle inventory directly. For a row selected for representative-volume
+  scaling, accounting instead compares the post-step inventory to the selected
+  scale times its pre-step inventory, with the finalized source-mass transfer
+  included in that transaction reference. This CPU-only, single-box,
+  fixed-capacity work is not a general multiphysics source.
 
 - **Injection-Size Convention:** Models inject particles at a chosen formation size, not at the true critical size. The nucleation rate must be survival-corrected (Equation 10) to be consistent with that choice.
 

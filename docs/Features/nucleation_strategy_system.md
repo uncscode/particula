@@ -1,5 +1,8 @@
 # CPU Nucleation Strategy System
 
+> Convert partitioning precursor gas into fixed-capacity particle slots with a
+> public, conservation-accounted CPU runnable.
+
 The shipped CPU-only nucleation boundary is a deliberately bounded, single-box
 process. It combines immutable potential-rate construction (P4) with the public
 `Nucleation` runnable (P5). It is not a GPU process, scheduler, or general
@@ -29,7 +32,8 @@ and $S$ is a caller-provided dimensionless survival factor. Input precursor
 mass concentration [kg/m³] is converted with $C=cN_A/M$. These strategies
 return a potential rate [#/m³/s]; they do not mutate state.
 
-`NucleationSourceConfig`, the strategy/builders/factory, `Nucleation`, and
+`NucleationSourceConfig`, `NucleationSourceConfigBuilder`, the activation and
+kinetic strategies/builders, `NucleationFactory`, `Nucleation`, and
 `NucleationCommitConfig` are exported by `particula.dynamics`. P2/P3 records
 and `finalize_particle_source`, `commit_particle_source`, and
 `ParticleSourceCommitConfig` are concrete-only implementation details in
@@ -60,13 +64,23 @@ strategy = ActivationNucleationBuilder().set_parameters(
 source = NucleationSourceConfig(strategy=strategy, precursor_index=0)
 ```
 
-## Execution, validation, and accounting
+## Getting started
+
+Use the [supported CPU example](../Examples/Nucleation/cpu_nucleation.py) as
+the runnable starting point. It constructs the one-box legacy `Aerosol`, a
+partitioning `GasData` lane, fixed particle capacity, `EnvironmentData`, and
+the public `NucleationCommitConfig`. Its commit controls use
+`ExhaustionControls()` and one-element `float64` `requested_scale`,
+`minimum_scale`, and `minimum_volume` sidecars. Do not replace that setup with
+imports from `nucleation.particle_source`.
+
+## Execution, fixed capacity, and accounting
 
 The runnable adapts a legacy `Aerosol` backing `ParticleData` and partitioning
 `GasData` by identity. It supports exactly one box, fixed-capacity slots, and
-partitioning gas with matching particle/gas species widths. It divides the
-duration into equal sequential substeps and re-reads current gas after each
-successful substep:
+partitioning gas with matching particle/gas species widths. It does not resize
+or compact slots. It divides the duration into equal sequential substeps and
+re-reads current gas after each successful substep:
 
 ```python
 result = nucleation.execute(aerosol, time_step=1.0, sub_steps=2)
@@ -75,7 +89,10 @@ assert result is aerosol
 
 P2 planning is nonmutating. P3 rejects invalid preflight atomically. P5 makes
 each attempted substep a transaction, but is not whole-call atomic: earlier
-successful substeps remain if a later substep fails. Diagnostics include
+successful substeps remain if a later substep fails. Zero-duration and
+zero-admitted-demand paths are no-ops after their applicable validation.
+`Nucleation.execute()` returns the mutated `Aerosol`; it does not return P2/P3
+diagnostic records. The concrete-only P2/P3 transaction diagnostics include
 potential, admitted, gas-limited, represented, and reduced events; limiting
 species; requested, activated, and released slots; policy/scale; gas mass
 removed; and conservation residual. Particle inventory is
@@ -84,8 +101,12 @@ concentration-weighted. Per-box/per-species particle-plus-gas conservation uses
 
 The source relies on E6-F5 slot activation and E6-F6 policy resolution. Demand
 is never silently truncated. On exhaustion, enabled resampling is considered
-first and representative-volume scaling is its fallback. Selected scaling
-scales pre-existing particle and gas state before source removal.
+first and representative-volume scaling is its fallback; if neither can
+represent the requested demand, the attempt raises rather than silently
+discarding it. Selected scaling scales pre-existing particle and gas state
+before source removal. Therefore an unscaled run conserves against its direct
+pre-step particle-plus-gas total, while a scaled row conserves against the
+selected scale times that pre-step total plus its finalized source.
 
 ## Scope, dependencies, and example
 
@@ -98,8 +119,8 @@ Kerminen--Kulmala calculation.
 See [Fixed-Capacity Slot Exhaustion Primitives](slot_exhaustion_policies.md),
 the [equations](../Theory/Technical/Dynamics/Nucleation_Equations.md), and the
 [supported CPU example](../Examples/Nucleation/cpu_nucleation.py). E6-F8 direct
-Warp work and E6-F9 integration/example orchestration remain deferred; see the
-[GPU roadmap](Roadmap/data-oriented-gpu.md).
+Warp nucleation and E6-F9 GPU integration/example orchestration remain
+deferred; see the [GPU roadmap](Roadmap/data-oriented-gpu.md).
 
 Focused validation:
 

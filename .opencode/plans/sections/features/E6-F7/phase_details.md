@@ -63,6 +63,15 @@ P4/P5, then run P6 conservation validation before P7 documentation.
 
 - [x] **E6-F7-P7:** Update development documentation for CPU nucleation
   - Issue: #1436 | Size: XS | Status: Shipped
-  - Goal: Publish equations, citations, domains, APIs, conservation contract, dependencies, and deferred physics.
-  - Files: `AGENTS.md`, `docs/Features/`, `docs/Theory/Technical/Dynamics/Nucleation_Equations.md`, `docs/Examples/Nucleation/`, E6 sections
-  - Tests: Publication regression, example execution, strict MkDocs build, and focused commands.
+  - Goal: Close out the bounded public CPU-only/single-box P5 contract without
+    exposing concrete P2/P3 helpers or promoting downstream GPU work.
+  - Files: `docs/Features/nucleation_strategy_system.md`, Feature/Example
+    navigation, `docs/Theory/Technical/Dynamics/Nucleation_Equations.md`,
+    `docs/Examples/Nucleation/cpu_nucleation.py`, the illustrative custom
+    notebook introduction, `AGENTS.md`,
+    `particula/tests/nucleation_docs_test.py`, and E6-F7 records.
+  - Tests: Hardware-free publication regression verifies public imports,
+    runnable identity, gas-to-particle transfer, concentration-weighted
+    conservation, navigation, public/concrete boundaries, and E6-F8/E6-F9
+    deferral; the published example and strict MkDocs build are focused
+    validation commands.

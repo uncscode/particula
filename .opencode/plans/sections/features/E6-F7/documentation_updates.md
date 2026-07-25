@@ -54,8 +54,20 @@ slots, automatic scheduling, or performance proof.
 
 ## P7 closeout (#1436)
 
-P7 shipped `docs/Features/nucleation_strategy_system.md`, the supported
-`docs/Examples/Nucleation/cpu_nucleation.py` runnable, navigation, and a theory
-reconciliation. The CPU P5 boundary is single-box and per-substep atomic only;
-P2/P3 remain concrete-only. E6-F8 direct-Warp and E6-F9 integration remain
-deferred. The custom notebook is explicitly illustrative rather than supported.
+P7 shipped the public feature contract at
+`docs/Features/nucleation_strategy_system.md`, Feature/Example navigation, the
+supported `docs/Examples/Nucleation/cpu_nucleation.py` runnable, and a theory
+reconciliation in `docs/Theory/Technical/Dynamics/Nucleation_Equations.md`.
+They record SI equations and citations; inventory-limited gas-to-particle
+transfer; diagnostics and concentration-weighted conservation; E6-F5/F6
+activation/exhaustion dependencies; and the public P4/P5 versus concrete P2/P3
+boundary. The CPU P5 boundary remains one-box and atomic only per attempted
+substep. `AGENTS.md` records the supported imports and focused validation.
+
+`particula/tests/nucleation_docs_test.py` provides hardware-free publication
+regression coverage for the runnable's public API, identity, transfer, and
+conservation behavior and for documentation/navigation/scope claims. The custom
+single-species notebook is explicitly illustrative rather than supported API
+usage. E6-F8 direct-Warp and E6-F9 integrated orchestration remain deferred;
+the closeout does not claim GPU execution, dynamic slots, hidden transfer, or
+general predictive physics.

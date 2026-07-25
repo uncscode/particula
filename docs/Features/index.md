@@ -55,8 +55,9 @@ Welcome to the Particula Features documentation! This section provides comprehen
 
     ---
 
-    Bounded single-box CPU nucleation through public potential-rate strategies
-    and an identity-preserving runnable.
+    Bounded single-box CPU nucleation through public potential-rate strategies,
+    fixed-capacity recovery controls, and a conservation-accounted,
+    identity-preserving runnable.
 
     [:octicons-arrow-right-24: Learn more](nucleation_strategy_system.md)
 

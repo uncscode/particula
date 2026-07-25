@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 import numpy.testing as npt
+import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 EXAMPLE = ROOT / "docs/Examples/Nucleation/cpu_nucleation.py"
@@ -15,6 +16,7 @@ FEATURE = ROOT / "docs/Features/nucleation_strategy_system.md"
 THEORY = ROOT / "docs/Theory/Technical/Dynamics/Nucleation_Equations.md"
 EXAMPLE_INDEX = ROOT / "docs/Examples/Nucleation/index.md"
 ROADMAP = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
+EXAMPLE_TIMEOUT_SECONDS = 30
 
 
 def _assert_local_links_resolve(document: Path) -> None:
@@ -57,17 +59,50 @@ def test_cpu_nucleation_example_uses_public_api_and_conserves_mass() -> None:
     )
 
 
+def _run_cpu_nucleation_example() -> subprocess.CompletedProcess[str]:
+    """Run the published example with a finite execution limit."""
+    command = [sys.executable, "-Werror", str(EXAMPLE)]
+    try:
+        return subprocess.run(  # noqa: S603 - fixed repository-local script
+            command,
+            check=False,
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=EXAMPLE_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired as error:
+        joined_command = " ".join(command)
+        raise AssertionError(
+            "CPU nucleation example timed out after "
+            f"{EXAMPLE_TIMEOUT_SECONDS} seconds: {joined_command}"
+        ) from error
+
+
 def test_cpu_nucleation_example_main_is_warning_clean() -> None:
     """The documented command executes successfully with warnings as errors."""
-    completed = subprocess.run(  # noqa: S603 - fixed repository-local script
-        [sys.executable, "-Werror", str(EXAMPLE)],
-        check=False,
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
+    completed = _run_cpu_nucleation_example()
     assert completed.returncode == 0, completed.stderr
     assert "CPU nucleation example completed." in completed.stdout
+
+
+def test_cpu_nucleation_example_timeout_is_actionable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A stalled documented command reports its command and timeout."""
+    command = [sys.executable, "-Werror", str(EXAMPLE)]
+
+    def raise_timeout(*_args: object, **_kwargs: object) -> None:
+        raise subprocess.TimeoutExpired(command, EXAMPLE_TIMEOUT_SECONDS)
+
+    monkeypatch.setattr(subprocess, "run", raise_timeout)
+
+    with pytest.raises(
+        AssertionError, match="timed out after 30 seconds"
+    ) as error:
+        _run_cpu_nucleation_example()
+
+    assert " ".join(command) in str(error.value)
 
 
 def test_example_ast_does_not_reference_concrete_source_helpers() -> None:

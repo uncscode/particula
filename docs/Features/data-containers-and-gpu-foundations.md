@@ -438,7 +438,9 @@ trajectory replay.
 
 GPU process orchestration, backend selection and scheduling, GPU-resident
 timestep integration, resizing, graph capture, autodiff, performance claims,
-and nucleation remain deferred.
+and GPU nucleation remain deferred. The separate CPU-only, one-box
+`Nucleation` runnable is documented in the
+[CPU Nucleation Strategy System](nucleation_strategy_system.md).
 
 ### Particle transfer boundary
 

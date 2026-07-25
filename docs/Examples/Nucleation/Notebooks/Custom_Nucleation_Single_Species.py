@@ -13,14 +13,12 @@
 # ---
 
 # %%
-"""Demonstrate a custom single-species nucleation workflow with particula.
+"""Demonstrate an illustrative custom single-species nucleation workflow.
 
-The guide builds an aerosol with ammonium sulfate vapor, applies fixed nucleation
-rates, and couples condensation and coagulation runnables while maintaining mass
-conservation and user-defined particle shapes.
-
-Examples:
-    >>> custom_nucleation = CustomNucleationSingleSpecies()
+The notebook builds an ammonium-sulfate aerosol, applies a hand-built
+saturation-based mass source, and couples condensation and coagulation
+runnables. Its direct facade mutation is illustrative only; use
+``../cpu_nucleation.py`` for the supported bounded CPU-only nucleation API.
 """
 
 # %% [markdown]
@@ -87,7 +85,7 @@ particle_mass_sample = (
 
 def squeeze_single_species_arrays(
     particles: par.particles.ParticleRepresentation,
-):
+) -> None:
     """Clamp single-species arrays to 1-D while preserving charge shape.
 
     Args:
@@ -112,7 +110,7 @@ def squeeze_single_species_arrays(
 
 def ensure_single_species_shapes(
     particles: par.particles.ParticleRepresentation,
-):
+) -> None:
     """Enforce 1-D shapes and patch mutators for single-species aerosols.
 
     Args:
@@ -139,6 +137,9 @@ def ensure_single_species_shapes(
             density: Density value used for the mass calculation.
             added_mass: Mass to add; will be squeezed to 1-D before calling
                 the original method.
+
+        Returns:
+            Updated distribution returned by the wrapped strategy.
         """
         added_mass = np.atleast_1d(np.squeeze(added_mass))
         result = original_add_mass(
@@ -164,6 +165,9 @@ def ensure_single_species_shapes(
             added_concentration: Concentration array for the incoming mass.
             charge: Optional charge array for the existing particles.
             added_charge: Optional charge array for the incoming particles.
+
+        Returns:
+            Updated particle state returned by the wrapped strategy.
         """
         added_distribution = np.atleast_1d(np.squeeze(added_distribution))
         added_concentration = np.atleast_1d(np.squeeze(added_concentration))

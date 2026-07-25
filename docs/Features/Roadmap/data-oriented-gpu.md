@@ -1346,15 +1346,18 @@ runtime policy.
   and E6-F9 owns integration and the direct-step example. These later features
   do not alter the shipped fixed-slot storage contract.
 
-Deferred orchestration and physics:
+Delivered CPU nucleation and deferred GPU scope:
 
-1. E6-F7 CPU nucleation/particle-source physics following the
-    [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md)
-    (no nucleation code exists in particula today).
-2. GPU nucleation via slot activation (see
+1. E6-F7 ships bounded CPU-only, one-box nucleation/particle-source physics
+    following the
+    [nucleation equations](../../Theory/Technical/Dynamics/Nucleation_Equations.md).
+    Its public `Nucleation` runnable preserves legacy `Aerosol` identity and
+    uses fixed-capacity slots, partitioning gas, and per-substep transactions.
+    See the [CPU Nucleation Strategy System](../nucleation_strategy_system.md).
+2. E6-F8 direct-Warp nucleation via slot activation remains deferred (see
     [Fixed-Capacity Slot Boundary](#fixed-capacity-slot-boundary)).
-3. Source/gas inventory handling and complete-sequence slot-exhaustion
-   validation.
+3. E6-F9 GPU integration/example orchestration, source/gas inventory handling,
+    and complete-sequence slot-exhaustion validation remain deferred.
 4. Fixed-shape workflow extensions and the deferred capabilities: dynamic
    allocation/resizing/compaction, hidden transfers/CPU fallback, high-level
    runnable/scheduler/backend orchestration, graph capture, autodiff,
@@ -1365,8 +1368,8 @@ Deferred orchestration and physics:
 - Use fixed particle slot counts per box for GPU-resident simulations.
 - Represent inactive particle slots as particles with zero mass, zero radius,
   and zero concentration or count.
-- Avoid dynamic allocation inside timestep kernels. Processes that create new
-  particles, including the planned nucleation process, should activate
+- Avoid dynamic allocation inside timestep kernels. The shipped CPU nucleation
+  runnable and future GPU nucleation processes create particles by activating
   inactive slots when available.
 - Shipped exhaustion primitives resolve fixed-slot capacity and provide
   resampling or volume-scaling operations; their caller owns source, gas, and

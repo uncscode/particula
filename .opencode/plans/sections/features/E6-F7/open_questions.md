@@ -9,6 +9,11 @@ P5 implementation clarification (issue #1434): the public CPU-only single-box
 `particula.dynamics`. P2/P3 finalization and mutation remain concrete-only; GPU
 work remains deferred.
 
+P7 documentation clarification (issue #1436): user-facing material now points
+to the supported public runnable and labels the hand-built single-species
+notebook illustrative. Documentation and publication regression retain E6-F8
+direct-Warp execution and E6-F9 integration/orchestration as deferred.
+
 - [x] Which coefficient units and validity intervals do builders accept?
   - Decision: activation coefficients accept `s^-1`; kinetic coefficients accept
     `m^3/s` and `cm^3/s`; concentration bounds accept `1/m^3` and `1/cm^3`;

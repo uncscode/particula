@@ -48,7 +48,13 @@
 ## Documentation
 
 - [x] Update theory with the shipped API, units, domains, citations, and model
-  boundary.
-- [x] Add a supported CPU example and cross-link E6-F5/F6 and E6-F8/F9.
-- [x] Record focused commands and conservation tolerances in `AGENTS.md` and
-  the user-facing feature document.
+  boundary, including P2/P3/P5 transaction, conservation, and per-substep
+  atomicity scopes.
+- [x] Publish the supported public-P4/P5 CPU single-box example and feature/
+  example navigation; label the manual single-species notebook illustrative.
+- [x] Record public versus concrete-only imports, focused commands,
+  conservation tolerances, E6-F5/F6 dependencies, and E6-F8/E6-F9 deferral in
+  `AGENTS.md` and the user-facing feature document.
+- [x] Add hardware-free publication regression coverage for the runnable,
+  conservation, documentation navigation, scope boundaries, and deferred
+  direct-Warp/integration work.
