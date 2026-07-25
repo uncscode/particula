@@ -29,7 +29,10 @@
 - P5 added public Google-style code docstrings for CPU-only single-box
   `Nucleation` and immutable `NucleationCommitConfig` in
   `particula/dynamics/particle_process.py`. Broader user and architecture
-  documentation remains deferred to P7; no P2/P3 transaction API was exposed.
+   documentation remains deferred to P7; no P2/P3 transaction API was exposed.
+- P6 (issue #1435) changed only the three nucleation test modules. It added no
+  production docstrings, user-facing documentation, examples, exports, or
+  public API documentation; P7 remains responsible for documentation updates.
 - Retain citations to Seinfeld & Pandis (2016), Kulmala et al. (2006, DOI
   `10.5194/acp-6-787-2006`), and Kerminen & Kulmala (2002, DOI
   `10.1016/S0021-8502(01)00194-X`). State that Vehkamäki et al. (2002, DOI

@@ -37,9 +37,16 @@ NumPy oracle rather than production helpers.
   nonmutation, equal sequential current-gas feedback, zero-write paths,
   runnable sequencing, and P1/P2/P3 failure boundaries including per-substep
   (not whole-call) atomicity.
-- **P6:** `particula/integration_tests/nucleation_process_test.py` compares
-  potential, gas-admitted, represented, and residual events plus per-species
-  total inventory with independent `float64` equations over repeated calls.
+- **P6 (shipped):** Test-local independent NumPy `float64` P2/P3 oracles and
+  snapshots in `particula/dynamics/nucleation/tests/particle_source_test.py`
+  cover multi-box/multi-species potential, admission, representation, limiting
+  lanes, exact depletion, repeated current-gas coupling, capacity policies,
+  and P2/P3/no-viable-policy failure atomicity. The self-contained
+  `particula/integration_tests/nucleation_process_test.py` exercises the same
+  concrete P2/P3 boundary over a bounded integration matrix without importing
+  unit-test helpers. `particula/dynamics/tests/nucleation_runnable_test.py`
+  adds single-box P5 live-gas progression and backing-identity regressions;
+  it makes no multi-box runnable claim.
 - **P7:** Validate links, citations, imports, equations, snippets, and execute
   the supported example/notebook where applicable.
 

@@ -51,6 +51,10 @@ consumes P2 records and stages particle-slot/exhaustion work privately.
   state untouched.
 - Equal sequential substeps that re-read current gas and perform one P2/P3
   transaction per positive-rate substep; P3 atomicity is per substep only.
+- Test-only independent NumPy `float64` P2/P3 expected-value and snapshot
+  coverage across multi-box/multi-species conservation, capacity policies,
+  repeated current-state coupling, and rejection atomicity; P5 regressions
+  remain single-box and integration tests directly exercise concrete P2/P3.
 
 ## Out of Scope
 

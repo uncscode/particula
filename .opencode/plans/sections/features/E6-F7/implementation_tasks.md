@@ -34,8 +34,14 @@
 - [x] Add runnable tests in `nucleation_runnable_test.py` for topology,
   validation, identity, sequencing, no-ops, composability, and failure
   boundaries.
-- [ ] Add an independent multi-box/species oracle under
-  `particula/integration_tests/`; do not derive expected values with production.
+- [x] Add independent, test-local NumPy `float64` P2/P3 oracles and snapshots
+  in `particle_source_test.py` and
+  `particula/integration_tests/nucleation_process_test.py`; do not derive
+  expected values with production helpers.
+- [x] Add multi-box/multi-species conservation, capacity-policy,
+  failure-atomicity, repeated-current-gas, and limiting-species coverage, plus
+  self-contained single-box P5 gas-coupling and identity regressions in
+  `nucleation_runnable_test.py`.
 - [ ] Run focused tests, full fast pytest, Ruff, and mypy without reducing
   coverage thresholds.
 

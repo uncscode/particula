@@ -19,8 +19,12 @@
 - [x] CPU-only single-box `Nucleation` and immutable `NucleationCommitConfig`
   have fast topology, validation, identity, sequencing, and failure-boundary
   tests; P2/P3 remain concrete-only. User-facing documentation remains P7 scope.
-- [ ] E6-F8 has an independent deterministic CPU oracle and frozen source and
-  diagnostics contracts.
+- [x] P6 has an independent deterministic NumPy `float64` P2/P3 oracle and
+  self-contained integration matrix covering multi-box/multi-species source and
+  diagnostics contracts without production expected-value helpers.
+- [x] P6 snapshot coverage proves P2/P3 preflight and no-viable-policy failures
+  preserve accessible particle, gas, input, record, and configuration state;
+  P5 regressions retain single-box gas-coupling and backing-identity coverage.
 - [ ] Fast tests, Ruff, and mypy pass without lowering coverage thresholds.
 
 ## Metrics

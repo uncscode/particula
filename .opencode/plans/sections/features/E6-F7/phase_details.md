@@ -47,11 +47,19 @@ P4/P5, then run P6 conservation validation before P7 documentation.
     identity, gas feedback/sequencing, no-op paths, composability, and P1/P2/P3
     failure boundaries including per-substep-only atomicity.
 
-- [ ] **E6-F7-P6:** Validate multi-box multi-species conservation and failure atomicity
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Prove represented particle-plus-gas conservation and prepare the independent CPU oracle for E6-F8.
-  - Files: nucleation tests and `particula/integration_tests/nucleation_process_test.py`
-  - Tests: Independent oracle, limiting-species matrix, repeated calls, capacity cases, diagnostics, and preflight snapshots.
+- [x] **E6-F7-P6:** Validate multi-box multi-species conservation and failure atomicity
+  - Issue: #1435 | Size: S | Status: Shipped
+  - Goal: Shipped test-only independent NumPy `float64` P2/P3 oracle and
+    snapshots proving per-box/per-species conservation, current-state coupling,
+    and rejected-call atomicity without production expected-value helpers.
+  - Files: `particula/dynamics/nucleation/tests/particle_source_test.py`,
+    `particula/dynamics/tests/nucleation_runnable_test.py`,
+    `particula/integration_tests/nucleation_process_test.py`
+  - Tests: Multi-box/multi-species limiting-species and capacity-policy matrix,
+    exact depletion, repeated calls, P2/P3 and no-viable-policy snapshots,
+    single-box P5 gas-coupling/identity regressions, and a self-contained
+    concrete P2/P3 integration matrix. No production or documentation files
+    changed.
 
 - [ ] **E6-F7-P7:** Update development documentation for CPU nucleation
   - Issue: TBD | Size: XS | Status: Not Started
