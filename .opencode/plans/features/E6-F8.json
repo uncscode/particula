@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-21",
+  "last_updated": "2026-07-25",
   "dependencies": [
     "E6-F5",
     "E6-F6",
@@ -36,11 +36,11 @@
     {
       "id": "E6-F8-P1",
       "title": "Define direct GPU nucleation configuration and preflight with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-25",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
