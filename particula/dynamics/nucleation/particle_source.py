@@ -277,6 +277,9 @@ def finalize_particle_source(  # noqa: C901
     if n_boxes == 0:
         admitted = np.empty(0, dtype=np.float64)
         limiting_indices = np.empty(0, dtype=np.intp)
+    elif participating.size == 0:
+        admitted = potential_count.copy()
+        limiting_indices = np.full(n_boxes, -1, dtype=np.intp)
     else:
         with np.errstate(over="raise", divide="raise", invalid="raise"):
             try:
@@ -314,14 +317,11 @@ def finalize_particle_source(  # noqa: C901
         raise ValueError("gas_mass_removed must be finite and nonnegative")
 
     gas_limited = potential_count - admitted
-    reduced = (
-        (potential_count > 0.0)
-        & (admitted > 0.0)
-        & (admitted < potential_count)
-    )
+    reduced = potential_count > admitted
     limiting = np.full(n_boxes, -1, dtype=np.int32)
-    limiting[reduced] = limiting_indices[reduced]
-    gas_limited[~reduced] = 0.0
+    limiting[reduced & (admitted > 0.0)] = limiting_indices[
+        reduced & (admitted > 0.0)
+    ]
 
     return (
         SourceDemandData(per_event_mass, demand),

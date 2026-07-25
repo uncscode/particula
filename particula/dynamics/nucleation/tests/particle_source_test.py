@@ -144,6 +144,27 @@ def test_zero_paths_preserve_shapes_and_sentinel(
     npt.assert_array_equal(diagnostics.limiting_species_index, [-1])
 
 
+def test_zero_participating_inventory_preserves_potential_count() -> None:
+    """Zero inventory in every participating lane admits no events."""
+    gas = _gas(np.array([[0.0, 0.0, 2.0], [0.0, 0.0, 5.0]]))
+
+    demand, diagnostics = finalize_particle_source(
+        PotentialEventData(np.array([1.5, 0.0]), 2.0),
+        InjectionComposition((1, 2, 0)),
+        gas,
+    )
+
+    npt.assert_allclose(diagnostics.potential_event_count, [3.0, 0.0])
+    npt.assert_allclose(diagnostics.gas_admitted_event_count, [0.0, 0.0])
+    npt.assert_array_equal(diagnostics.gas_limited_event_count, [3.0, 0.0])
+    npt.assert_array_equal(diagnostics.limiting_species_index, [-1, -1])
+    npt.assert_allclose(
+        demand.per_event_mass,
+        np.array([0.1, 0.4, 0.0]) / AVOGADRO_NUMBER,
+    )
+    npt.assert_array_equal(demand.gas_mass_removed, np.zeros((2, 3)))
+
+
 def test_zero_box_input_returns_typed_readonly_empty_records() -> None:
     """The pure planning boundary supports the canonical empty batch shape."""
     demand, diagnostics = finalize_particle_source(
@@ -339,7 +360,7 @@ def test_finalization_rejects_invalid_types_mass_and_derived_count() -> None:
 
     with pytest.raises(TypeError, match="potential_events"):
         finalize_particle_source(
-            None,
+            None,  # type: ignore[arg-type]
             composition,
             gas,  # type: ignore[arg-type]
         )
