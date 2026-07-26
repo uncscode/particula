@@ -31,9 +31,13 @@ test.
   Parameterized loader, conversion, direct-step, synchronization, restore, and
   invalid-direct-input failures assert visible propagation with no fallback or
   premature checkpoint.
-- **P4:** Documentation tests validate links, imports, focused commands, E6 and
-  E6-F1-F9 inventories, exit-bar wording, and explicit Epic G boundaries. Run
-  `adw plans validate` for plan consistency.
+- **P4 (complete, #1449):** The hardware-free
+  `particula/tests/gpu_complete_process_sequence_docs_test.py` validates links,
+  imports, focused commands, E6 and E6-F1-F9 inventories, the fail-closed
+  closeout projection, exit-bar wording, and explicit Epic G boundaries. It
+  passed without Warp/CUDA, alongside `adw plans validate`; it confirms P4
+  evidence without closing E6 while E6-F2, E6-F5, E6-F6, and E6-F8 remain
+  incomplete.
 
 ## Required Invariants
 
@@ -55,6 +59,7 @@ test.
 ```bash
 pytest particula/gpu/tests/process_sequence_test.py -q -Werror
 pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror
+pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q -Werror
 pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror \
   --cov=docs.Examples.gpu_complete_process_sequence --cov-report=term-missing \
   --cov-fail-under=80

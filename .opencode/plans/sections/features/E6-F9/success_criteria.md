@@ -1,6 +1,6 @@
 # Success Criteria
 
-- [ ] Plan metadata retains mandatory dependencies on E6-F1 through E6-F8.
+- [x] Plan metadata retains mandatory dependencies on E6-F1 through E6-F8.
 - [x] P1 private fixture evidence exists at
   `particula/gpu/tests/process_sequence_test.py` with deterministic fp64
   one-/multi-box fixtures, independent invariants, ownership snapshots, and an
@@ -26,8 +26,10 @@
   bar is verified; E6-F2, E6-F5, E6-F6, and E6-F8 currently prevent closeout.
 - [x] Documentation states that backend selection, high-level GPU runnables,
   process scheduling, and resident multi-step simulation remain Epic G scope.
-- [x] Documentation checks and plan validation pass for #1449; this
-  documentation-only change adds hardware-free regression coverage.
+- [x] `pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q
+  -Werror` and plan validation pass for #1449; this documentation-only change
+  adds hardware-free regression coverage without changing the blocked E6/Epic G
+  projection.
 
 ## Metrics
 

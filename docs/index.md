@@ -64,7 +64,8 @@ Whether you’re a researcher, educator, or industry expert, Particula is design
 - **Interrogating your experimental data** to validate and expand your impact.
 - **Documenting explicit direct-GPU process calls** with the
   [complete-process source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py).
-  It performs one explicit conversion per CPU container and one final restore;
+   It performs one explicit conversion per CPU container and one final
+   synchronization/restore;
   it is illustrative rather than a backend selector, scheduler, resident loop,
   `Runnable`, or CPU fallback.
 - **Fostering open-source collaboration** to share ideas and build on each other’s work.
