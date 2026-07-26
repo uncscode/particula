@@ -105,34 +105,33 @@ kernel-entry responsibilities.
   hidden fallback, or a higher-level runnable API. See
   [ADR-002](decisions/ADR-002-gpu-fixed-slot-activation-boundary.md).
 
-### GPU nucleation staging boundary
+### Direct GPU nucleation boundary
 
-- `particula.gpu.kernels.nucleation` is an unexported E6-F8 P1--P4 seam, not a
-  direct GPU step or runnable. P1 performs read-only validation; P2 plans and
-  inventory-admits source demand; P3 stages provisional counts and free-slot
-  metadata; and private P4 resolves capacity policy without activation.
-- P3 converts P2-admitted demand times particle-box volume only when the
-  binary64 result is finite, nonnegative, integral, and within the inclusive
-  `int32` range. It retains the full provisional count even when it exceeds
-  current free capacity.
-- P3 delegates active/free classification and ascending free-index ordering to
-  concrete-only E6-F5 `get_slot_diagnostics_gpu`. It writes only its supplied
-  count, selected-index, and E6-F5 diagnostic sidecars; the selected prefix is
-  limited by free capacity and unused index lanes are `-1`.
-- P4 consumes immutable P2/P3 records and caller-owned same-device sidecars.
-  It selects resampling only when it can fully cover a row's deficit, then uses
-  representative-volume scaling only for other exhausted rows. It writes final
-  demand, count, and ascending free-slot-prefix diagnostics without mutating
-  source demand or gas. Selected E6-F6 primitives may mutate their documented
-  particle fields; P4 itself never activates slots.
-- Expected P4 all-box rejections complete before workspace writes or entry to
-  either E6-F6 primitive, preserving all supplied state. After an E6-F6
-  primitive is entered, its documented planning/commit failure semantics apply;
-  P4 does not promise cross-primitive rollback. Callers synchronize before
-  reading successful asynchronous outputs.
-- This seam has no package export, hidden transfer, CPU fallback, direct slot
-  activation, gas/source mutation, resizing, or integrated E6-F9 direct-GPU
-  execution. Activation remains P5 work; those responsibilities are deferred.
+- `particula.gpu.kernels.nucleation` concretely implements the supported
+  low-level import `from particula.gpu.kernels import nucleation_step_gpu`.
+  P1 preflights fixed-capacity state and caller-owned sidecars; P2 admits shared
+  inventory-safe source demand; P3 stages fixed slots; P4 resolves exhaustion
+  with resampling before scaling fallback; and fused P5 activates selected slots
+  and commits the matching gas transfer.
+- Only `nucleation_step_gpu` is package-exported. `NucleationConfig`, P2/P3
+  records, exhaustion controls, sidecars, and helpers are concrete-only in
+  `particula.gpu.kernels.nucleation`; they are not promoted through either GPU
+  package namespace.
+- The direct caller owns CPU↔Warp conversion, same-device contiguous fixed-shape
+  sidecars, device placement, and synchronization before inspecting successful
+  asynchronous results. The step returns the identical particle and gas
+  containers and provides no hidden transfer or CPU fallback.
+- P3 retains demand beyond free capacity and uses ascending free-slot prefixes
+  with `-1` tails. P4 selects resampling only when it fully covers a deficit,
+  then uses representative-volume scaling as the configured fallback. P5 owns
+  the selected-slot activation and matching gas mutation.
+- Public rejection before P4 primitive entry preserves particle and gas state;
+  P2--P4 may have written their documented sidecars before a later rejection.
+  No rollback is promised after an E6-F6 primitive has been entered or a P5
+  writer has launched.
+- This boundary has no resize/compaction, GPU `Runnable`, scheduler/backend
+  integration, or E6-F9 integration. E6-F9 remains a downstream
+  explicit-transfer consumer.
 - Import the supported fixed-slot wall-loss boundary with
   `from particula.gpu.kernels import wall_loss_step_gpu`. Its
   `NeutralWallLossConfig` is deliberately concrete-module-only at

@@ -58,5 +58,17 @@
 - [x] Require Warp CPU when Warp is installed and make CUDA parametrization skip
   cleanly when unavailable; retain at least 80% changed-code coverage (#1443).
 - [x] Add regression assertions for exact write-free paths, explicit transfer
-  boundaries, stable shapes/dtypes/devices/identities, and no mutation after
-  direct-entry preflight rejection (#1443).
+   boundaries, stable shapes/dtypes/devices/identities, and no mutation after
+   direct-entry preflight rejection (#1443).
+
+## Documentation / Publication
+
+- [x] Publish the direct-Warp P1--P5 contract in feature, roadmap, theory,
+  architecture, and `AGENTS.md` documentation; retain E6-F9 as the downstream
+  explicit-transfer integration boundary (#1444).
+- [x] Add the explicit CPU-to-Warp transfer and synchronization example at
+  `docs/Examples/Nucleation/gpu_direct_nucleation.py`, without a CPU fallback
+  or concrete-record package export (#1444).
+- [x] Add documentation assertions and a Warp-guarded in-process/subprocess
+  example regression in `particula/tests/nucleation_docs_test.py` and
+  `particula/gpu/tests/gpu_direct_nucleation_example_test.py` (#1444).

@@ -52,8 +52,13 @@ independent E6-F7 float64 oracle, never the production GPU helper itself.
   scaling, exact no-ops, repeated current-gas calls, preflight preservation, and
   zero-box/zero-capacity boundaries. CUDA is optional and skips cleanly when
   unavailable.
-- **P7:** Validate documentation links, citations, imports, equations, focused
-  commands, and any explicit-transfer example.
+- **P7 (#1444):** `particula/tests/nucleation_docs_test.py` keeps publication,
+  links, import-boundary, equation, exclusion, and command assertions free of
+  Warp execution. `particula/gpu/tests/gpu_direct_nucleation_example_test.py`
+  defers Warp imports, cleanly skips without Warp, executes the direct example
+  in process for identity/schema/one-slot/gas-depletion and unscaled inventory
+  checks, and separately validates its documented `python -Werror` subprocess
+  command. The existing kernel and parity suites remain the physics evidence.
 
 ## Required Invariants
 
@@ -74,6 +79,7 @@ independent E6-F7 float64 oracle, never the production GPU helper itself.
 
 ## P7 validation
 
-Run publication assertions, the Warp-guarded direct example regression and
-subprocess command, focused nucleation kernel/parity tests, and `mkdocs build
---strict`. Warp CPU is the baseline and CUDA remains an optional clean-skip row.
+Run `pytest particula/tests/nucleation_docs_test.py -q -Werror`,
+`pytest particula/gpu/tests/gpu_direct_nucleation_example_test.py -q -Werror`,
+the focused nucleation kernel/parity suites, and `mkdocs build --strict`. Warp
+CPU is the baseline and CUDA remains an optional clean-skip row.

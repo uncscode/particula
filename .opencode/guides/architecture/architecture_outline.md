@@ -114,22 +114,18 @@ private helpers for cross-kernel setup.
   codes, and kernels remain concrete-module-only. Neither boundary provides a
   runnable, policy resolution, CPU fallback or transfer, or resizing.
 - `nucleation.py` - Concrete E6-F8 implementation of package-exported
-   `nucleation_step_gpu` for fixed-capacity GPU nucleation. P1 preflights and P2
-   calculates `E_pot=J*dt`, with survival already in `J`,
-  and commits planning, admitted-demand, removal, and gate sidecars. P3
-  converts admitted demand times box volume only when it is an exact
-  representable nonnegative `int32` count, reuses E6-F5 slot diagnostics,
-  retains counts beyond free capacity, and writes only the fixed-shape P3 count
-  and diagnostic sidecars. Private P4 preserves immutable P2/P3 handoffs,
-  chooses fully viable resampling before representative-volume-scaling fallback
-  for exhausted rows, and writes caller-owned final demand/count/free-slot
-   diagnostics. Fused P5 commits selected slots and matching gas transfer.
-   Expected all-box P4 preflight rejections preserve all supplied
-  state before workspace or E6-F6 primitive writes; an entered E6-F6 primitive
-  retains its separate no-cross-primitive-rollback boundary. The module remains
-   Concrete-only configuration, records, sidecars, and helpers remain
-   unexported. The step provides no hidden transfer, CPU fallback, resizing, or
-   E6-F9 integration.
+  `nucleation_step_gpu` for fixed-capacity GPU nucleation. P1 preflights; P2
+  calculates and inventory-admits `E_pot=J*dt`, with survival already in `J`;
+  P3 stages demand and fixed slots; P4 uses resampling before
+  representative-volume-scaling fallback; and fused P5 commits selected slots
+  and matching gas transfer. P3 retains counts beyond free capacity and emits
+  ascending free-slot prefixes with `-1` tails. Only the step is exported;
+  configuration, records, sidecars, and helpers remain concrete-only. Public
+  rejection before P4 primitive entry preserves particle and gas state, though
+  P2--P4 may have written documented sidecars before a later rejection. No
+  rollback is promised after an E6-F6 primitive entry or P5 writer launch. The
+  step provides no hidden transfer, CPU fallback, resize/compaction, GPU
+  `Runnable`, or E6-F9 integration.
 - `wall_loss.py` - Concrete fixed-slot neutral/charged GPU wall-loss boundary;
   owns immutable host configuration, frozen preflight, bounded fixed-slot
   removal, and the external caller-owned per-box RNG sidecar lifecycle. Charged

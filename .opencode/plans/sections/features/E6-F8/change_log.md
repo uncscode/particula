@@ -14,3 +14,9 @@
 
 Published direct GPU nucleation documentation, example, and regressions without
 changing production kernels, exports, physics, capacity policy, or oracle code.
+
+Focused validation covers publication/link/import assertions, the Warp-guarded
+explicit-transfer example in process and through its `python -Werror` command,
+focused kernel/parity tests, and strict MkDocs. The documented unscaled
+per-box/species inventory tolerance is `rtol=1e-12, atol=1e-30`; E6-F9 remains
+the downstream integration consumer.

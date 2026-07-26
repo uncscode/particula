@@ -86,8 +86,14 @@ run P6 parity and conservation checks before P7 documents the direct step.
 - [x] **E6-F8-P7:** Update development documentation for direct GPU nucleation
   - Issue: #1444 | Size: XS | Status: Complete (2026-07-26)
   - Goal: Publish the bounded API, ownership, transfer, sidecar, conservation, dependency, and no-fallback contracts.
-  - Files: `AGENTS.md`, `docs/Features/`, `docs/Theory/Technical/Dynamics/Nucleation_Equations.md`, `docs/Examples/Nucleation/`, E6 sections
-  - Tests: Link/import validation, equation review, focused commands, and explicit-transfer example execution where applicable.
+  - Files: `AGENTS.md`, feature/roadmap/theory/architecture documentation,
+    `docs/Examples/Nucleation/gpu_direct_nucleation.py`, E6 sections, and
+    publication/example regressions.
+  - Tests: `particula/tests/nucleation_docs_test.py` validates publication
+    content without Warp execution; Warp-guarded
+    `particula/gpu/tests/gpu_direct_nucleation_example_test.py` validates the
+    in-process example and its documented subprocess command. Focused kernel
+    parity and strict MkDocs remain validation evidence.
 
 ## P7: Documentation and example — Shipped (#1444)
 

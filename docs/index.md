@@ -194,6 +194,16 @@ print(result)
    not `particula.dynamics` public APIs. Run the
    [public API source example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py)
    with `python docs/Examples/cpu_dilution.py`.
+- **Direct GPU nucleation** is a bounded low-level step imported with
+  `from particula.gpu.kernels import nucleation_step_gpu`. The CPU-only public
+  `particula.dynamics.Nucleation` runnable is separate and is not a GPU
+  fallback. Configuration, records, and caller-owned sidecars remain
+  concrete-only under `particula.gpu.kernels.nucleation`; callers explicitly
+  transfer state, select a Warp device, and synchronize before host inspection.
+  The step has no hidden transfer, CPU fallback, resize/compaction, GPU
+  `Runnable`, scheduler/backend integration, or performance guarantee. See the
+  [nucleation contract](Features/nucleation_strategy_system.md#direct-warp-low-level-step)
+  and [direct-Warp example](Examples/Nucleation/gpu_direct_nucleation.py).
 - GPU dilution P1–P4 is a direct, low-level operation imported with
    `from particula.gpu.kernels import dilution_step_gpu`. It applies
    `c_new = c * exp(-alpha * time_step)` in place to particle and gas

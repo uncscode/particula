@@ -82,6 +82,11 @@ particula/
   — CPU-only walkthrough showing diagnostic latent-heat bookkeeping from real
   condensation mass transfer with no temperature feedback.
 
+- [**Direct-Warp GPU Nucleation**](./docs/Examples/Nucleation/gpu_direct_nucleation.py)
+  — Explicit-transfer, fixed-capacity low-level example using the package-
+  exported `nucleation_step_gpu`. It requires Warp and is separate from the
+  CPU-only `Nucleation` runnable; it provides no CPU fallback.
+
 - [**Organic Partitioning & Coagulation**](./docs/Examples/Simulations/Notebooks/Organic_Partitioning_and_Coagulation.ipynb) — Full simulation of secondary organic aerosol (SOA) formation from 10 organic vapors, followed by Brownian coagulation over 10 minutes.
 
 - [**Cloud Chamber Cycles**](./docs/Examples/Simulations/Notebooks/Cloud_Chamber_Multi_Cycle.ipynb)

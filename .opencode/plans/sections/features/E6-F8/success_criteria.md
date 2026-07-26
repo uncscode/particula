@@ -67,24 +67,27 @@
   particle inventory, unchanged pre-P5 gas, and P5 source/gas-transfer balance.
 - [x] P6 is coverage-only: it adds no public API or runtime behavior change.
 
-- [ ] Plan metadata and implementation preserve mandatory E6-F5, E6-F6, and
-  E6-F7 dependencies; E6-F9 can consume the intended low-level entry point.
+- [x] Implementation and published contract preserve mandatory E6-F5, E6-F6,
+   and E6-F7 dependencies; E6-F9 can consume the intended low-level entry
+   point.
 - [x] Direct Warp activation and kinetic rates, potential events, admission,
   gas removal, and source diagnostics match the independent CPU oracle at
   recorded float64 tolerances.
 - [x] Every successful unscaled case conserves represented particle-plus-gas
   mass per box/species. Scaling verifies `s * initial_particle + initial_gas`,
   plus source-transfer balance; gas never becomes negative.
-- [ ] Slot activation and exhaustion consume E6-F5/E6-F6 contracts, preserve
-  fixed shapes/identities, and never resize, compact, or truncate demand.
-- [ ] Invalid or unsatisfiable calls fail before any particle, gas, volume,
-  request, diagnostic, scratch/work, or RNG write.
-- [ ] The implementation performs no hidden CPU/Warp transfer, `.numpy()`
-  physics evaluation, CPU fallback, or implicit high-level backend selection.
+- [x] Slot activation and exhaustion consume E6-F5/E6-F6 contracts, preserve
+   fixed shapes/identities, and never resize, compact, or truncate demand.
+- [x] Invalid public rejection before E6-F6 primitive entry preserves
+   particle/gas state; P2--P4 sidecars and entered primitives retain their
+   documented phase-specific mutation and no-rollback boundaries.
+- [x] The direct implementation and P7 regressions prohibit hidden CPU/Warp
+   transfer, `.numpy()` physics evaluation, CPU fallback, and implicit
+   high-level backend selection.
 - [x] Warp CPU parity tests pass; CUDA tests pass when available and otherwise
   skip cleanly. Changed-code coverage remains at least 80%.
-- [ ] Documentation states the bounded physics, ownership, transfer, parity,
-  conservation, no-fallback, and deferred-feature contracts accurately.
+- [x] Documentation states the bounded physics, ownership, transfer, parity,
+   conservation, no-fallback, and deferred-feature contracts accurately.
 
 ## Metrics
 

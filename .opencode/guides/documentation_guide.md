@@ -71,7 +71,11 @@ Concrete modules that are intentionally unexported are implementation-boundary
 APIs, not user-facing features. Document their bounded contract in module
 docstrings and colocated tests when needed, but do not add them to public API
 references, homepage navigation, or user-facing examples unless they become a
-supported public interface.
+supported public interface. A public direct-kernel entry point may require
+concrete-only configuration or caller-owned sidecars. In that case, document
+the package-exported step as the supported boundary and identify the concrete
+imports only as required setup; do not promote those records or helpers as
+package APIs or imply hidden transfer, fallback, or high-level integration.
 
 ## Link Hygiene
 

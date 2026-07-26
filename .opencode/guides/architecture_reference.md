@@ -53,36 +53,21 @@ source-selection metadata, builders, and a factory. P5 provides the one-box
 `Nucleation` preserves the legacy `Aerosol` and backing-data identities. It
 uses equal, gas-coupled substeps and is atomic per attempted substep, not across
 the complete call. P2 source-demand planning and P3 particle-source
-transactions remain concrete-only in `nucleation.particle_source`. E6-F8 P1
-provides an unexported, read-only Warp preflight and P2 privately plans
-`E_pot=J*dt` demand after survival is included in `J`. It admits one shared
-per-box demand against precursor inventory so planned removal is inventory-safe.
-P2 commits only caller-owned planning, finalized-demand, and gate-diagnostic
-sidecars. Private P3 then converts admitted demand times particle-box volume to
-exact finite nonnegative `int32` provisional counts, reuses E6-F5 slot
-diagnostics, and retains demand beyond free capacity while writing only the
-count and fixed-shape diagnostic sidecars. It stages the selectable free-slot
-prefix without activation or exhaustion policy and has no package export.
-Conversion rejection occurs before sidecar writes; rollback is not promised
-after a successful asynchronous diagnostic or P3 commit launch. Private P4
-consumes immutable P2/P3 handoffs and caller-owned, same-device P4 and nested
-E6-F6 sidecars. It selects resampling only when it can resolve a row's entire
-deficit, then uses representative-volume scaling for remaining exhausted rows.
-It derives finalized demand and counts from its mutable demand workspace and
-current box volume, and emits finalized ascending free-slot prefixes with `-1`
-tails. Expected all-box P4 rejections occur before workspace or primitive
-writes, preserving particles, gas, P2/P3/P4 diagnostics, and nested scratch.
-Once an E6-F6 primitive begins, its own planning/commit failure contract
-applies; P4 intentionally provides no cross-primitive rollback. Activation,
-source-mass or gas mutation, resizing, transfer, fallback, and E6-F9
-integration remain deferred.
+transactions remain concrete-only in `nucleation.particle_source`.
 
 The concrete `particula.gpu.kernels.nucleation` module implements the
 package-exported direct `nucleation_step_gpu`: P1 preflight, P2 admission, P3
 fixed-slot staging, P4 resampling-first/scaling-fallback, and fused P5
 selected-slot/gas-transfer commit. Only the step is exported; configuration,
-records, sidecars, and helpers remain concrete-only. It has no hidden transfer,
-CPU fallback, resize/compaction, GPU Runnable, or E6-F9 integration.
+records, sidecars, and helpers remain concrete-only. Callers own conversion,
+same-device fixed-shape sidecars, device placement, and synchronization; a
+successful call returns the identical particle and gas containers. P3 retains
+demand beyond free capacity and reports ascending free-slot prefixes with `-1`
+tails. Public rejection before P4 primitive entry preserves particle and gas
+state, while documented P2--P4 sidecars may already have been written; no
+rollback is promised after E6-F6 primitive entry or P5 writer launch. The direct
+step has no hidden transfer, CPU fallback, resize/compaction, GPU `Runnable`, or
+E6-F9 integration.
 
 ## Scientific Utilities
 

@@ -1,6 +1,8 @@
 """Run the bounded direct-Warp nucleation step with explicit transfers.
 
-Warp is required. This example intentionally has no CPU-physics fallback.
+The package-exported ``nucleation_step_gpu`` is used for execution, while
+configuration and sidecar records are imported from their concrete modules.
+Warp is required; this example intentionally has no CPU-physics fallback.
 """
 
 import numpy as np
@@ -37,18 +39,47 @@ def _buffers(
     NucleationDiagnosticBuffers,
     NucleationExhaustionBuffers,
 ]:
-    """Allocate all caller-owned sidecars for B=1, N=2, S=1."""
+    """Allocate caller-owned sidecars for the B=1, N=2, S=1 fixture.
+
+    Args:
+        device: Warp device that owns every allocated sidecar.
+
+    Returns:
+        Scratch, finalized-demand, diagnostic, and exhaustion sidecars on
+        ``device``.
+    """
 
     def f64(shape: tuple[int, ...]) -> object:
-        """Allocate a float64 sidecar on the selected Warp device."""
+        """Allocate a float64 sidecar on the selected Warp device.
+
+        Args:
+            shape: Dimensions of the sidecar.
+
+        Returns:
+            A zero-initialized Warp float64 array.
+        """
         return wp.zeros(shape, dtype=wp.float64, device=device)
 
     def ones(shape: tuple[int, ...]) -> object:
-        """Allocate a float64 sidecar initialized to one."""
+        """Allocate a float64 sidecar initialized to one.
+
+        Args:
+            shape: Dimensions of the sidecar.
+
+        Returns:
+            A one-initialized Warp float64 array.
+        """
         return wp.ones(shape, dtype=wp.float64, device=device)
 
     def i32(shape: tuple[int, ...]) -> object:
-        """Allocate an int32 sidecar on the selected Warp device."""
+        """Allocate an int32 sidecar on the selected Warp device.
+
+        Args:
+            shape: Dimensions of the sidecar.
+
+        Returns:
+            A zero-initialized Warp int32 array.
+        """
         return wp.zeros(shape, dtype=wp.int32, device=device)
 
     resampling = ResamplingBuffers(
@@ -91,7 +122,11 @@ def _buffers(
 
 
 def run_example() -> tuple[ParticleData, GasData, EnvironmentData]:
-    """Run one deterministic direct-Warp nucleation event on Warp CPU."""
+    """Run one deterministic direct-Warp nucleation event on Warp CPU.
+
+    Returns:
+        Restored CPU particle, gas, and environment data after synchronization.
+    """
     device = "cpu"
     particles = ParticleData(
         masses=np.zeros((1, 2, 1), dtype=np.float64),

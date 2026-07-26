@@ -358,7 +358,9 @@ The bounded direct-Warp step is distinct from the CPU runnable. It computes
 `C = c N_A / M` [#/m³], activation `J = S * A * C` with `A` [s⁻¹], or kinetic
 `J = S * K * C²` with `K` [m³/s]. Its potential demand is
 `E_pot = J * dt` [#/m³]. P2 admits one shared inventory-limited event demand
-before the P5 particle/gas transfer.
+before the P5 particle/gas transfer. In these rate laws, `S` is the configured,
+dimensionless survival factor (not the saturation ratio); `c` is [kg/m³] and
+`M` is [kg/mol].
 
 Direct P1 accepts finite nonnegative duration, coefficient, and survival;
 inclusive configured precursor bounds; positive temperature; optional configured
@@ -367,12 +369,19 @@ molecule counts with at least one positive entry. Temperature is either a
 positive scalar or same-device `wp.float64` `(B,)`; configured saturation is
 same-device `wp.float64` `(B, S)` or comes from a validated environment.
 
-Ordering is P1 read-only domains/schema preflight, a valid configured
-no-admission/no-op outcome, P2--P4 sidecar and staging phases, then P5 commit.
-Invalid read-only rejection preserves particles and gas. A valid zero-work result
-is not an error. P2--P4 may have changed documented sidecars before a later
-rejection, and rollback is not promised after entered exhaustion primitives or a
-P5 launch.
+The bounded public ordering is P1 read-only domain/schema preflight, read-only
+validation of the public P4 controls and buffers, P2 inventory admission, P3
+fixed-slot staging, participating-molecule eligibility validation, P4
+resampling-first/scaling-fallback resolution, and P5 handoff validation followed
+by the fused commit when final counts are nonzero. An empty box dimension returns
+after the public P4 validation. A configured zero-work or no-admission result
+still has its applicable planning, staging, and P4 diagnostic phases, but P5
+observes zero final counts and launches no particle/gas writer; it is a
+successful no-op, not an error.
+
+Invalid rejection during the read-only public checks preserves particles and gas.
+P2--P4 may have changed documented sidecars before a later rejection, and
+rollback is not promised after an entered exhaustion primitive or a P5 launch.
 
 For an unscaled P5 row, concentration-weighted particle plus gas inventory is
 conserved per box/species at `rtol=1e-12, atol=1e-30`. A scaled row compares

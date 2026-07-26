@@ -51,13 +51,12 @@ Welcome to the Particula Features documentation! This section provides comprehen
 
     [:octicons-arrow-right-24: Learn more](dilution_strategy_system.md)
 
--   __[CPU Nucleation Strategy System](nucleation_strategy_system.md)__
+-   __[Nucleation Strategy System](nucleation_strategy_system.md)__
 
     ---
 
-    Bounded single-box CPU nucleation through public potential-rate strategies,
-    fixed-capacity recovery controls, and a conservation-accounted,
-    identity-preserving runnable.
+    Bounded single-box CPU nucleation through a public runnable, plus a separate
+    direct-Warp fixed-capacity step with explicit transfer and synchronization.
 
     [:octicons-arrow-right-24: Learn more](nucleation_strategy_system.md)
 
