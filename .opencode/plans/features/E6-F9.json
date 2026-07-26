@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-21",
+  "last_updated": "2026-07-26",
   "dependencies": [
     "E6-F1",
     "E6-F2",
@@ -41,11 +41,11 @@
     {
       "id": "E6-F9-P1",
       "title": "Build integrated fixed-shape validation fixtures and invariants with tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-26",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
