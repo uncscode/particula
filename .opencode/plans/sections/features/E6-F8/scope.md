@@ -49,14 +49,14 @@ capacity rather than creating a second slot or exhaustion model.
 - A low-level `nucleation_step_gpu(...)`, intended lazy kernel export, complete
   preflight, atomic all-box planning, and no-op/failure immutability.
 - Independent float64 CPU parity, Warp CPU conservation evidence, and optional
-  CUDA evidence that skips cleanly when unavailable.
+  CUDA evidence that skips cleanly when unavailable, delivered by #1443 in
+  `particula/gpu/kernels/tests/nucleation_parity_test.py`.
 
 ## Out of Scope
 
-- **Still deferred after P5:** CPU parity/integration evidence and P7
-  documentation closeout; E6-F9 integration remains separate. The direct step
-  has no fallback allocation, high-level orchestration, or public concrete
-  sidecar/configuration export.
+- **Still deferred after P6:** P7 documentation closeout; E6-F9 integration
+  remains separate. The direct step has no fallback allocation, high-level
+  orchestration, or public concrete sidecar/configuration export.
 
 - New nucleation equations, chemistry, extrapolation, or a full Vehkamaki/CNT,
   ion-induced, heterogeneous, or cluster-dynamics implementation.

@@ -72,11 +72,16 @@ run P6 parity and conservation checks before P7 documents the direct step.
     malformed/rebound P5 handoffs, precommit atomicity, caller-sidecar identity,
     and lazy-export/no-hidden-transfer guards.
 
-- [ ] **E6-F8-P6:** Validate CPU parity and per-species conservation with integration tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Compare the direct Warp step with an independent E6-F7 float64 oracle over representative multi-box/multi-species capacity cases.
-  - Files: `particula/gpu/kernels/tests/nucleation_parity_test.py`, test support fixtures
-  - Tests: Warp CPU required, optional CUDA, rate/admission parity, repeated calls, and per-box/species particle-plus-gas conservation.
+- [x] **E6-F8-P6:** Validate CPU parity and per-species conservation with integration tests
+  - Issue: #1443 | Size: S | Status: Complete (2026-07-26)
+  - Delivered: 718-line independent NumPy float64 direct-Warp parity and
+    conservation suite. This is coverage-only and does not change the public API
+    or runtime behavior.
+  - Files: `particula/gpu/kernels/tests/nucleation_parity_test.py`
+  - Tests: Warp CPU with optional clean CUDA skips; activation/kinetic P2/P3/P5
+    parity; exact write-free gates; per-box/species matrix inventory; separate
+    scaling inventory accounting; resampling precedence; repeated current-gas
+    calls; preflight non-mutation; and zero-box/zero-capacity boundaries.
 
 - [ ] **E6-F8-P7:** Update development documentation for direct GPU nucleation
   - Issue: TBD | Size: XS | Status: Not Started

@@ -52,21 +52,36 @@
 - [x] The direct boundary adds no hidden transfer, CPU fallback, resize,
   compaction, Runnable, or E6-F9 integration.
 
+## P6 completion (#1443)
+
+- [x] A 718-line independent NumPy float64 suite in
+  `particula/gpu/kernels/tests/nucleation_parity_test.py` validates the direct
+  Warp boundary without calling production planning or orchestration helpers for
+  expected state.
+- [x] Activation/kinetic parity, inventory limits, sparse/full capacity,
+  resampling precedence, scaling fallback, no-ops, repeated current-gas calls,
+  rejection preservation, and zero-size boundaries are covered on Warp CPU;
+  CUDA rows skip cleanly when unavailable.
+- [x] Unscaled per-box/species particle-plus-gas inventory uses
+  `rtol=1e-12`, `atol=1e-30`. Scaling separately verifies scaled existing
+  particle inventory, unchanged pre-P5 gas, and P5 source/gas-transfer balance.
+- [x] P6 is coverage-only: it adds no public API or runtime behavior change.
+
 - [ ] Plan metadata and implementation preserve mandatory E6-F5, E6-F6, and
   E6-F7 dependencies; E6-F9 can consume the intended low-level entry point.
-- [ ] Direct Warp activation and kinetic rates, potential events, admission,
+- [x] Direct Warp activation and kinetic rates, potential events, admission,
   gas removal, and source diagnostics match the independent CPU oracle at
   recorded float64 tolerances.
-- [ ] Every successful unscaled case conserves represented particle-plus-gas
-  mass per box/species. Scaled cases match `s * pre_total` and conserve intensive
-  concentration plus source transfer balance; gas never becomes negative.
+- [x] Every successful unscaled case conserves represented particle-plus-gas
+  mass per box/species. Scaling verifies `s * initial_particle + initial_gas`,
+  plus source-transfer balance; gas never becomes negative.
 - [ ] Slot activation and exhaustion consume E6-F5/E6-F6 contracts, preserve
   fixed shapes/identities, and never resize, compact, or truncate demand.
 - [ ] Invalid or unsatisfiable calls fail before any particle, gas, volume,
   request, diagnostic, scratch/work, or RNG write.
 - [ ] The implementation performs no hidden CPU/Warp transfer, `.numpy()`
   physics evaluation, CPU fallback, or implicit high-level backend selection.
-- [ ] Warp CPU parity tests pass; CUDA tests pass when available and otherwise
+- [x] Warp CPU parity tests pass; CUDA tests pass when available and otherwise
   skip cleanly. Changed-code coverage remains at least 80%.
 - [ ] Documentation states the bounded physics, ownership, transfer, parity,
   conservation, no-fallback, and deferred-feature contracts accurately.

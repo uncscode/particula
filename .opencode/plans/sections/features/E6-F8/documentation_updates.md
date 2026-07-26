@@ -1,6 +1,6 @@
 # Documentation Updates
 
-## P1--P5 delivered (#1438, #1439, #1440, #1441, #1442)
+## P1--P6 delivered (#1438, #1439, #1440, #1441, #1442, #1443)
 
 - `particula/gpu/kernels/nucleation.py` documents the concrete-only read-only
   P1 boundary, frozen record ownership, fixed-shape sidecars, and later-phase
@@ -22,7 +22,9 @@
     contract. Issue #1442 adds the public-boundary docstring for the lazily
     exported direct step and export regression coverage; configurations,
     sidecars, and helpers remain concrete-only. No feature documentation or
-    example closeout was performed.
+    example closeout was performed. Issue #1443 adds only the test-module and
+    test-local helper docstrings for independent direct-Warp parity/conservation
+    evidence; it makes no general documentation or API-contract change.
 
 ## Deferred P7 work
 

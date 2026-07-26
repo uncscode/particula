@@ -49,11 +49,14 @@
 - [x] Add P5 co-located commit, handoff-validation, atomicity, direct-input,
   sidecar-identity, and no-hidden-transfer coverage, plus lazy-export tests
   (#1442).
-- [ ] Add `nucleation_parity_test.py` with an independent float64 E6-F7 oracle,
-  one/many boxes and species, sparse/full slots, and repeated calls.
-- [ ] Assert per-box/species represented particle-plus-gas conservation rather
-  than aggregate conservation alone.
-- [ ] Require Warp CPU when Warp is installed and make CUDA parametrization skip
-  cleanly when unavailable; retain at least 80% changed-code coverage.
-- [ ] Add regression assertions for explicit transfer boundaries, stable shapes,
-  dtypes/devices/identities, and no mutation after every rejected call.
+- [x] Add 718-line `nucleation_parity_test.py` with independent NumPy float64
+  P2/P3/P4/P5 expectations, one/many boxes and species, sparse/full slots,
+  scaling/resampling, and repeated current-gas calls (#1443).
+- [x] Assert per-box/species represented particle-plus-gas conservation rather
+  than aggregate conservation alone; separately account for scaling's particle
+  inventory and P5 gas transfer (#1443).
+- [x] Require Warp CPU when Warp is installed and make CUDA parametrization skip
+  cleanly when unavailable; retain at least 80% changed-code coverage (#1443).
+- [x] Add regression assertions for exact write-free paths, explicit transfer
+  boundaries, stable shapes/dtypes/devices/identities, and no mutation after
+  direct-entry preflight rejection (#1443).

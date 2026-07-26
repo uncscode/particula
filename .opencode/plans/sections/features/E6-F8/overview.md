@@ -17,7 +17,7 @@
   - As a library maintainer, I want fixed-shape sidecars and fail-before-write
    validation so invalid calls cannot partially mutate simulation state.
 
-## Delivered: P1 (#1438), P2 (#1439), P3 (#1440), P4 (#1441), and P5 (#1442)
+## Delivered: P1 (#1438), P2 (#1439), P3 (#1440), P4 (#1441), P5 (#1442), and P6 (#1443)
 
 `particula/gpu/kernels/nucleation.py` now provides the concrete-only, read-only
 P1 boundary with frozen configuration and caller-owned sidecar dataclasses plus
@@ -58,7 +58,12 @@ Issue #1442 delivers P5 as the supported, lazily exported
 validates the finalized P4 handoff, and launches one fused device commit that
 initializes only selected fixed-capacity slots and removes the corresponding
 finalized gas inventory. It returns the identical particle and gas containers.
-Precommit rejections preserve particle/gas state; P2--P4 sidecars retain their
-phase-owned mutation boundaries, and entered E6-F6 primitive limits still
-apply. The direct same-device path adds no transfer, CPU fallback, resize,
-compaction, Runnable, or E6-F9 integration.
+ Precommit rejections preserve particle/gas state; P2--P4 sidecars retain their
+ phase-owned mutation boundaries, and entered E6-F6 primitive limits still
+ apply. The direct same-device path adds no transfer, CPU fallback, resize,
+ compaction, Runnable, or E6-F9 integration.
+
+Issue #1443 delivers P6 coverage only: the new 718-line
+`particula/gpu/kernels/tests/nucleation_parity_test.py` supplies independent
+NumPy float64 direct-Warp parity and conservation evidence. It introduces no
+public API or runtime-behavior change.

@@ -44,19 +44,25 @@ independent E6-F7 float64 oracle, never the production GPU helper itself.
   malformed or rebound P5 handoffs, and all-box precommit atomicity. Export
   tests verify lazy resolution, while boundary guards cover no hidden host
   conversion or CPU fallback.
-- **P6:** `nucleation_parity_test.py` runs Warp CPU parity over activation and
-  kinetic modes, multiple species/boxes, inventory limits, sparse/full slots,
-  resampling/scaling cases, no-ops, and repeated calls. CUDA is optional and
-  skips cleanly when unavailable.
+- **P6 (#1443):** Shipped 718-line
+  `particula/gpu/kernels/tests/nucleation_parity_test.py` uses independent
+  NumPy float64 P2/P3/P4/P5 expectations (without production planning or
+  orchestration helpers). Warp CPU coverage includes activation/kinetic modes,
+  multiple species/boxes, inventory limits, sparse/full slots, resampling,
+  scaling, exact no-ops, repeated current-gas calls, preflight preservation, and
+  zero-box/zero-capacity boundaries. CUDA is optional and skips cleanly when
+  unavailable.
 - **P7:** Validate documentation links, citations, imports, equations, focused
   commands, and any explicit-transfer example.
 
 ## Required Invariants
 
 - Without scaling, per-box/species represented particle plus gas mass is
-  conserved. With scale `s`, final represented totals match `s * pre_total` and
-  intensive concentration plus source transfer balance remain conserved at
-  target `rtol=1e-12`, `atol=1e-30`. Aggregate-only checks are insufficient.
+  conserved. Scaling separately verifies that existing particle inventory is
+  multiplied by `s`, gas is unchanged by P4, and P5 represented source inventory
+  equals its gas removal; final inventory is `s * initial_particle + initial_gas`.
+  Aggregate-only checks are insufficient; mass/gas checks use
+  `rtol=1e-12`, `atol=1e-30`.
 - Potential/admitted events and deterministic outputs match the CPU oracle at
   recorded float64 tolerances; gas remains finite and nonnegative.
 - Zero time, coefficient, precursor, survival, and unsatisfied configured gates
