@@ -139,10 +139,31 @@ meets its exit bar, the next pending epic in the sequence becomes active.
 ### Active
 
 - [Epic F: GPU Process Completeness](data-oriented-gpu.md#epic-f-gpu-process-completeness)
-  is the next and currently active epic. It has shipped CPU nucleation alongside
-  CPU/GPU dilution, GPU wall loss, and fixed-capacity slot activation and
-  exhaustion handling; direct-Warp nucleation and GPU integration remain needed
-  for complete GPU-resident timesteps.
+  remains Draft and blocked. Its remaining canonical blockers are `E6-F2`,
+  `E6-F5`, `E6-F6`, and `E6-F8`; E6-F9 P4 documentation is pending its own
+  validation evidence.
+
+### E6 roadmap inventory
+
+| ID | Title | Status text |
+| --- | --- | --- |
+| [`E6`](../../../.opencode/plans/epics/E6.json) | GPU Process Completeness | Draft |
+| [`E6-F1`](../../../.opencode/plans/features/E6-F1.json) | CPU Dilution Strategy and Runnable Reference | Shipped |
+| [`E6-F2`](../../../.opencode/plans/features/E6-F2.json) | Direct GPU Dilution with CPU Parity | Draft |
+| [`E6-F3`](../../../.opencode/plans/features/E6-F3.json) | Neutral Spherical and Rectangular GPU Wall Loss | Shipped |
+| [`E6-F4`](../../../.opencode/plans/features/E6-F4.json) | Charged GPU Wall Loss with Neutral Fallback | Shipped |
+| [`E6-F5`](../../../.opencode/plans/features/E6-F5.json) | CPU and GPU Fixed-Slot Activation and Diagnostics | Draft |
+| [`E6-F6`](../../../.opencode/plans/features/E6-F6.json) | CPU and GPU Slot Exhaustion Policies | Draft |
+| [`E6-F7`](../../../.opencode/plans/features/E6-F7.json) | CPU Nucleation and Particle-Source Process | Shipped |
+| [`E6-F8`](../../../.opencode/plans/features/E6-F8.json) | Direct GPU Nucleation Process | Draft |
+| [`E6-F9`](../../../.opencode/plans/features/E6-F9.json) | Integrated Validation Documentation and Epic Closeout | Draft |
+
+The private [P2 sequence evidence](../../../particula/gpu/tests/process_sequence_test.py),
+[P3 source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py),
+and [P3 regression](../../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py)
+document an explicit five-call sequence. Its `condensation_step_gpu`,
+`coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, and
+`nucleation_step_gpu` order is illustrative, not a production coordinator.
 
 ### E5 roadmap inventory
 

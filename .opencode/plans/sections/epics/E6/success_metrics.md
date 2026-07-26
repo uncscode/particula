@@ -21,3 +21,6 @@
   co-located with each feature implementation.
 - [ ] Generated epic/child plan IDs are cross-linked in both roadmap documents,
   and Epic G boundaries remain explicit.
+
+P4 documentation evidence is complete, but this metric remains blocked until
+the canonical records for E6-F2, E6-F5, E6-F6, and E6-F8 meet the exit gate.

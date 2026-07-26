@@ -199,6 +199,8 @@ pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror
 pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror
 # Validate documentation links and the closeout projection without Warp or CUDA.
 pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror
+# Validate the E6 complete-process publication and blocked closeout projection.
+pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q -Werror
 ```
 
 Use CUDA-targeted runs only for optional local/manual validation when a

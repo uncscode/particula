@@ -11,8 +11,10 @@
 
 ## Outbound
 
-- Epic G remains blocked until E6 proves complete direct-process coverage and
-  owns backend selection, process scheduling, and resident-loop APIs.
+- Epic G remains pending until E6-F1 through E6-F8 are Shipped/completed with
+  dated phases and E6-F9 P1-P4 command evidence passes. E6-F2, E6-F5, E6-F6,
+  and E6-F8 currently block it; Epic G owns backend selection, scheduling,
+  resident-loop APIs, and transport.
 - Future performance, graph-capture, and differentiability work consumes these
   low-level contracts but is not part of E6.
 

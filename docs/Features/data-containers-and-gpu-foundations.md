@@ -53,6 +53,24 @@ from particula.gpu import (
 from particula.particles import ParticleData
 ```
 
+### Complete direct-process illustration
+
+The [complete direct-process source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py)
+is illustrative, not a production coordinator. It imports the five direct
+boundaries from `particula.gpu.kernels` in order: `condensation_step_gpu`,
+`coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, then
+`nucleation_step_gpu`. CPU↔Warp conversion helpers remain under
+`particula.gpu`: use `to_warp_particle_data`, `to_warp_gas_data`, and
+`to_warp_environment_data` once for each CPU container, select the device
+explicitly, then synchronize and restore once at the final checkpoint.
+Configuration and scratch sidecars remain concrete-module imports.
+Caller-owned sidecars have stable fixed shapes; persistent coagulation and
+wall-loss RNG is also caller-owned. There is no hidden transfer or CPU fallback,
+high-level `Runnable`, backend selector, scheduler, resident production loop, or
+transport API. See the [private P2 evidence](../../particula/gpu/tests/process_sequence_test.py),
+[P3 regression](../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py),
+and [E6 inventory](Roadmap/data-oriented-gpu.md#e6-roadmap-inventory).
+
 `WarpParticleData`, `WarpEnvironmentData`, and `WarpGasData` are exported from
 `particula.gpu` only when Warp is available, so import them only behind an
 optional Warp guard:

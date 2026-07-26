@@ -24,7 +24,7 @@ documentation conventions.
 | 3 | [Epic C: GPU Kernel Correctness and Low-Level API Hardening](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening) | Shipped | E3 |
 | 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | Shipped | E4 |
 | 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Shipped | E5 |
-| 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Active | not scheduled |
+| 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Active | E6 |
 | 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Pending | not scheduled |
 | 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Pending | not scheduled |
 | 9 | [Epic I: Differentiability and Global Optimization](#epic-i-differentiability-and-global-optimization) | Pending | not scheduled |
@@ -1216,6 +1216,29 @@ parity or statistically bounded tests, combined-mechanism kernels are
 validated, unsupported distribution types are documented as CPU-only, and the
 Epic D carry-forward walkthrough and ownership record are published.
 
+### E6 roadmap inventory
+
+| ID | Title | Status text |
+| --- | --- | --- |
+| [`E6`](../../../.opencode/plans/epics/E6.json) | GPU Process Completeness | Draft |
+| [`E6-F1`](../../../.opencode/plans/features/E6-F1.json) | CPU Dilution Strategy and Runnable Reference | Shipped |
+| [`E6-F2`](../../../.opencode/plans/features/E6-F2.json) | Direct GPU Dilution with CPU Parity | Draft |
+| [`E6-F3`](../../../.opencode/plans/features/E6-F3.json) | Neutral Spherical and Rectangular GPU Wall Loss | Shipped |
+| [`E6-F4`](../../../.opencode/plans/features/E6-F4.json) | Charged GPU Wall Loss with Neutral Fallback | Shipped |
+| [`E6-F5`](../../../.opencode/plans/features/E6-F5.json) | CPU and GPU Fixed-Slot Activation and Diagnostics | Draft |
+| [`E6-F6`](../../../.opencode/plans/features/E6-F6.json) | CPU and GPU Slot Exhaustion Policies | Draft |
+| [`E6-F7`](../../../.opencode/plans/features/E6-F7.json) | CPU Nucleation and Particle-Source Process | Shipped |
+| [`E6-F8`](../../../.opencode/plans/features/E6-F8.json) | Direct GPU Nucleation Process | Draft |
+| [`E6-F9`](../../../.opencode/plans/features/E6-F9.json) | Integrated Validation Documentation and Epic Closeout | Draft |
+
+The private [P2 sequence evidence](../../../particula/gpu/tests/process_sequence_test.py)
+and [P3 published source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py)
+cover the fixed illustrative order: `condensation_step_gpu`,
+`coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, then
+`nucleation_step_gpu`. This is illustrative, not a production coordinator;
+the P3 [regression](../../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py)
+keeps explicit transfers visible.
+
 ## Epic F: GPU Process Completeness
 
 Add the remaining processes a complete aerosol simulation needs to stay
@@ -1236,9 +1259,9 @@ Delivered dilution scope:
   fully preflighted write-free, no-update-kernel no-ops, though validation
   scans may still allocate or launch.
   Particle and gas parity evidence uses independent Warp CPU float64 checks at
-  `rtol=1e-12, atol=0`; CUDA is optional and skips cleanly when unavailable.
-   It is not bitwise parity. E6-F9 is the future integrated direct-call
-   consumer.
+   `rtol=1e-12, atol=0`; CUDA is optional and skips cleanly when unavailable.
+    It is not bitwise parity. E6-F9 P1--P3 now publish private validation and
+    an explicit-transfer example; P4 documents the blocked closeout gate.
 
 Delivered bounded wall-loss P1–P6 scope:
 
@@ -1319,7 +1342,7 @@ Delivered bounded wall-loss P1–P6 scope:
 - Deferred scope includes CPU fallback or hidden transfers,
   runnable/scheduler/backend integration, dynamic slots, compaction/activation,
   graph capture, differentiability, performance guarantees, and exact RNG
-  replay. E6-F9 remains the future integration and closeout work.
+  replay. E6-F9 P1--P3 are delivered; P4 is documentation and closeout only.
 
 Delivered bounded slot-exhaustion primitives are documented in the
 [Fixed-Capacity Slot Exhaustion Primitives](../slot_exhaustion_policies.md): CPU P1
@@ -1346,7 +1369,8 @@ runtime policy.
   it does not promise rollback after a writer has launched.
 - E6-F6 ships exhaustion resolution, resampling, and volume-scaling primitives.
   E6-F7 owns CPU particle-source physics and E6-F8 ships the direct-Warp step
-  and explicit-transfer example. E6-F9 remains downstream integration only.
+   and explicit-transfer example. E6-F9 P1--P3 publish validation and the
+   illustrative sequence, not an integration API.
   These later features do not alter the shipped fixed-slot storage contract.
 
 Delivered nucleation boundaries and deferred GPU scope:
@@ -1383,8 +1407,9 @@ Delivered nucleation boundaries and deferred GPU scope:
    scheduler/backend selection, expanded physics, graph capture, autodiff, and
    performance guarantees. See the [Nucleation Strategy System](../nucleation_strategy_system.md)
    and its [direct example](../../Examples/Nucleation/gpu_direct_nucleation.py).
-3. E6-F9 remains downstream explicit-transfer/integration work. It does not own
-   the shipped E6-F8 direct step or its example.
+3. E6-F9 P1--P3 provide private sequence evidence and a direct-transfer
+    illustration. They do not own the shipped E6-F8 direct step or create a
+    production coordinator.
 4. Fixed-shape workflow extensions and the deferred capabilities: dynamic
    allocation/resizing/compaction, hidden transfers/CPU fallback, high-level
    runnable/scheduler/backend orchestration, graph capture, autodiff,
@@ -1426,10 +1451,12 @@ Delivered nucleation boundaries and deferred GPU scope:
   workspace, count, and status buffers. Compaction is not part of the shipped
   contract.
 
-**Exit bar:** A complete GPU-resident timestep can run condensation,
-coagulation, wall loss, and dilution together with persistent RNG state, and
-new-particle creation works through validated, conservation-checked slot
-activation.
+**Exit bar:** E6-F1--E6-F8 canonical records must each be Shipped and completed
+with dated shipped phases, and E6-F9 P1--P4 must have dated command evidence,
+before E6 ships or Epic G activates. Current blockers are `E6-F2`, `E6-F5`,
+`E6-F6`, `E6-F8`, and P4 until its validation completes. Warp CPU remains the
+baseline and CUDA optional. Backend selection, high-level GPU runnables,
+deterministic scheduling, resident loops, and transport remain Epic G work.
 
 ## Epic G: Backend Selection and GPU-Resident Simulation
 

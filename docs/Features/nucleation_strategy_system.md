@@ -1,5 +1,9 @@
 # Nucleation Strategy System
 
+## Complete direct-process context
+
+The direct nucleation boundary is shown last in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). Its [private P2 evidence](../../particula/gpu/tests/process_sequence_test.py) and [P3 regression](../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py) do not turn the example into a public coordinator, GPU `Runnable`, backend selector, resident loop, or CPU fallback.
+
 > Convert partitioning precursor gas into fixed-capacity particle slots with a
 > public, conservation-accounted CPU runnable.
 

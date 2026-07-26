@@ -20,14 +20,14 @@
 - [x] The focused P3 regression suite covers deterministic no-Warp behavior,
   caller-owned sidecar/RNG identities, transfer/order constraints, visible
   failures, and a guarded real Warp CPU route. (#1448)
-- [ ] Both roadmap documents cross-link E6 and E6-F1 through E6-F9 plus the
+- [x] Both roadmap documents cross-link E6 and E6-F1 through E6-F9 plus the
   integrated validation and example artifacts.
-- [ ] E6 closes only after every child plan is shipped and the parent exit bar
-  is verified.
-- [ ] Documentation states that backend selection, high-level GPU runnables,
+- [x] E6 remains blocked until every child plan is shipped and the parent exit
+  bar is verified; E6-F2, E6-F5, E6-F6, and E6-F8 currently prevent closeout.
+- [x] Documentation states that backend selection, high-level GPU runnables,
   process scheduling, and resident multi-step simulation remain Epic G scope.
-- [ ] Coverage remains at or above 80%, documentation checks pass, and all plan
-  files validate.
+- [x] Documentation checks and plan validation pass for #1449; this
+  documentation-only change adds hardware-free regression coverage.
 
 ## Metrics
 

@@ -283,6 +283,20 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
 
 ### GPU environment round trips
 
+### Complete direct GPU process illustration
+
+- `docs/Examples/gpu_complete_process_sequence.py` is an illustrative,
+  explicit-transfer five-call sequence: condensation, coagulation, dilution,
+  wall loss, then nucleation. It uses one conversion of each CPU container and
+  one final synchronization/restore.
+- Import steps from `particula.gpu.kernels`; keep conversion helpers under
+  `particula.gpu` and configuration/scratch sidecars concrete-only. Device
+  placement, stable-shape sidecars, and persistent coagulation/wall-loss RNG
+  remain caller-owned. No hidden transfer, CPU fallback, scheduler, backend
+  selector, high-level runnable, resident loop, or transport is provided.
+- Validate publication with
+  `pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q -Werror`.
+
 ```python
 from particula.gpu import (
     from_warp_environment_data,

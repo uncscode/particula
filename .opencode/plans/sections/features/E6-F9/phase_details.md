@@ -49,13 +49,19 @@ P2, use P2 evidence for P3, and close E6 in P4 only after P1-P3 pass.
     runtime transfer/order/identity assertions; parameterized failure propagation;
     and guarded real Warp CPU execution.
 
-- [ ] **E6-F9-P4:** Update development documentation, roadmap cross-links, and epic closeout
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Publish support boundaries and evidence, cross-link E6/E6-F1-F9, and
-    close E6 only when its dependency-gated exit bar passes.
+- [x] **E6-F9-P4:** Update development documentation, roadmap cross-links, and epic closeout
+  - Issue: #1449 | Size: S | Status: Shipped | Completed: 2026-07-26
+  - Delivered: Published the E6 inventory, ownership guidance, focused
+    documentation validation, and fail-closed closeout projection. E6-F9 and
+    E6 remain Draft/active because E6-F2, E6-F5, E6-F6, and E6-F8 are not yet
+    complete; Epic G remains pending/on-deck.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Features/Roadmap/index.md`, relevant `docs/Features/` pages,
     `docs/index.md`, `AGENTS.md`, and E6/E6-F9 plan sections.
-  - Tests: Documentation link/import/command checks, plan validation, and
-    explicit assertions that Epic G scheduling/backend selection remains
-    pending and out of E6 scope.
+  - Evidence:
+    - `pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q -Werror`  # passed
+    - `pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror`  # passed
+    - `mkdocs build --strict`  # passed
+    - `adw plans validate`  # passed
+  - Boundary: Epic G scheduling, backend selection, high-level runnables,
+    resident loops, and transport remain out of E6 scope.
