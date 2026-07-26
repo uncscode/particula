@@ -31,5 +31,7 @@ target files exist.
   - Decision: publish a per-process table, not one combined tolerance. Use exact
     equality for discrete/no-op/fallback fields; `rtol=1e-12`, `atol=1e-30`
     for mass and conservation; each process's measured parity tolerance; and
-    exact-binomial wall survival bounds. P2 records the actual focused test and
-    example commands after E6-F1 through E6-F8 create and pass those targets.
+    exact-binomial wall survival bounds. P2 records focused `-Werror` process
+    sequence commands for the full module, non-CUDA Warp parity, non-CUDA Warp
+    stochastic, and optional CUDA selections. The example command remains P3
+    work.

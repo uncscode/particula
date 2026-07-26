@@ -14,10 +14,14 @@ test.
   wall-loss, slot, and exhaustion expectations, local malformed/alias rejection,
   and optional runtime Warp container/sidecar mirrors. It does not execute a
   direct process step or a process sequence.
-- **P2:** The same module executes all direct processes on shared device state.
-  Warp CPU is the required installed-Warp baseline; CUDA is optional and skips
-  cleanly. Cases cover no-ops, activation, exhaustion-policy outcomes, repeated
-  calls, persistent RNG, and invalid preflight immutability.
+- **P2 (complete, #1447):** The same module executes the five existing direct
+  processes on shared test-local device state derived with all-enabled
+  partitioning. Warp CPU is the required installed-Warp baseline; CUDA is
+  optional and skips cleanly. Coverage includes final-only conversion guarding,
+  condensation/nucleation inventory accounting, coagulation charge/mass and
+  collision bounds, dilution and wall-loss budgets, no-ops, preflight
+  immutability, exhaustion policy behavior, and persistent sidecar/RNG identity.
+  Neutral wall-loss evidence is a separate stochastic aggregate test.
 - **P3:**
   `particula/gpu/tests/gpu_complete_process_sequence_example_test.py` validates
   lazy imports, forced-no-Warp behavior, subprocess output, one initial
@@ -47,6 +51,7 @@ test.
 ```bash
 pytest particula/gpu/tests/process_sequence_test.py -q -Werror
 pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror
-pytest particula/gpu/tests/process_sequence_test.py -q -m "warp and gpu_parity and not cuda"
-pytest particula/gpu/tests/process_sequence_test.py -q -m "warp and cuda"
+pytest particula/gpu/tests/process_sequence_test.py -q -m "warp and gpu_parity and not cuda" -Werror
+pytest particula/gpu/tests/process_sequence_test.py -q -m "warp and stochastic and not cuda" -Werror
+pytest particula/gpu/tests/process_sequence_test.py -q -m "warp and cuda" -Werror
 ```

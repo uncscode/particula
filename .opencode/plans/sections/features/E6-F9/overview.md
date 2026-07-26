@@ -23,6 +23,12 @@ independent accounting and exhaustion expectations, and optional runtime Warp
 mirror checks. It deliberately does not execute the integrated process sequence
 or change production or public API behavior; those remain later E6-F9 phases.
 
+P2 is now complete for private test-only resident composition in the same
+module. It exercises the five existing direct GPU boundaries on stable
+same-device containers and persistent sidecars/RNGs, with final-inspection-only
+conversion. It adds neither a production coordinator nor an export, hidden
+transfer/fallback, runnable, or public API.
+
 ## User Stories
 
 - As a GPU contributor, I want an integrated Warp CPU regression so that an

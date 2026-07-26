@@ -191,6 +191,8 @@ pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
 pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror
 pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
+# Validate private resident composition of shipped direct GPU boundaries.
+pytest particula/gpu/tests/process_sequence_test.py -q -Werror
 # Validate the published direct-GPU coagulation example and documentation.
 pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror
 # Validate documentation links and the closeout projection without Warp or CUDA.
@@ -225,6 +227,21 @@ These commands match the shipped marker and helper contract:
   particular, deterministic P2 public-step checks enumerate available Warp
   devices, so they exercise CUDA when it is available as well as the Warp CPU
   baseline.
+
+`particula/gpu/tests/process_sequence_test.py` provides private, test-only
+resident composition coverage for the existing exported direct condensation,
+coagulation, dilution, wall-loss, and nucleation boundaries. It keeps the same
+caller-owned Warp containers and sidecars resident between calls, checks
+identity, accounting, no-op/preflight, and RNG-sidecar contracts, and guards
+against intermediate CPU restoration. This is contributor test evidence only:
+it does not create a production coordinator, public integration API, hidden
+transfer, CPU fallback, or runnable. Run its CUDA-marked row separately when
+available:
+
+```bash
+pytest particula/gpu/tests/process_sequence_test.py -q \
+  -m "warp and cuda" -Werror
+```
 
 The coagulation validation matrix supports exactly the singleton masks `1`,
 `2`, `4`, and `8`; two-way masks `3`, `5`, `6`, `9`, `10`, and `12`; and

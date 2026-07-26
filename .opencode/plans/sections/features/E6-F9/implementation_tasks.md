@@ -10,8 +10,10 @@
   and RNG state; test local invalid fixture/alias rejection before mutation.
 - [x] Add an optional runtime Warp CPU/CUDA mirror that verifies fixture-backed
   container and stale-sidecar identity/schema without executing a process step.
-- [ ] Exercise persistent RNG across coagulation and stochastic wall loss
-  without requiring identical CPU/Warp random streams. (P2)
+- [x] Exercise all five existing direct GPU boundaries consecutively on private
+  resident test state, with persistent same-device sidecars/RNGs, stable
+  identities, final-only conversion, accounting/no-op/preflight/exhaustion
+  checks, required Warp CPU coverage, and optional CUDA coverage. (P2, #1447)
 
 ### Example
 

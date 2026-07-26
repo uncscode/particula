@@ -12,17 +12,23 @@ oracles before P2 composes any direct kernel calls. Its optional Warp mirror
 test only verifies fresh container/sidecar schema, identity, and unchanged
 values; it does not invoke a process step.
 
+P2 extends that module with a private resident path. It derives all-enabled
+partitioning variants from the P1 fixtures, constructs fixed-shape Warp state
+and caller-owned sidecars directly, and retains those objects across all five
+existing entry points. Intermediate accounting uses synchronized raw device
+snapshots; guarded `from_warp_*` conversion is permitted only for final
+inspection. This validates composition without creating a production workflow.
+
 ```text
-CPU ParticleData/GasData/EnvironmentData fixtures
-  -> explicit to_warp_* conversion (once)
+test-local all-enabled fixture
   -> caller-owned Warp containers, RNG, scratch, and diagnostics
      -> condensation_step_gpu
      -> coagulation_step_gpu
      -> dilution_step_gpu          [E6-F2]
      -> wall_loss_step_gpu         [E6-F3/E6-F4]
      -> nucleation_step_gpu        [E6-F5/E6-F6/E6-F8]
-  -> synchronize at documented checkpoint
-  -> explicit from_warp_* restore (once)
+  -> synchronized raw-device checkpoints
+  -> guarded explicit from_warp_* final inspection
   -> process-specific parity, accounting, and diagnostics assertions
 ```
 

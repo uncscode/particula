@@ -19,14 +19,20 @@ P2, use P2 evidence for P3, and close E6 in P4 only after P1-P3 pass.
     particle-plus-gas and coagulation mass/charge accounting; dilution/wall-loss
     budgets; slot/exhaustion outcomes; and fixed shapes, identities, diagnostics.
 
-- [ ] **E6-F9-P2:** Validate the complete direct GPU process sequence on Warp CPU
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Execute condensation, coagulation, dilution, wall loss, and nucleation
-    consecutively on the same Warp-resident containers and caller-owned state.
-  - Files: `particula/gpu/tests/process_sequence_test.py`.
-  - Tests: Required Warp CPU run; optional CUDA run; persistent RNG; no
-    intermediate conversion; per-process parity and budgets; invalid-input
-    snapshots; repeated-call stability.
+- [x] **E6-F9-P2:** Validate the complete direct GPU process sequence on Warp CPU
+  - Issue: #1447 | Size: S | Status: Complete
+  - Delivered: expanded `particula/gpu/tests/process_sequence_test.py` with
+    private P2 resident composition coverage across condensation, coagulation,
+    dilution, charged wall loss, and nucleation.
+  - Test design: test-local all-enabled fixture variants retain original sparse
+    disabled-condensation coverage; stable same-device containers and persistent
+    sidecars/RNGs span calls; conversion is guarded until final inspection.
+  - Evidence: accounting and no-op assertions, preflight immutability,
+    exhaustion-policy behavior, RNG reuse/advancement, required Warp CPU rows,
+    and optional CUDA rows. Neutral wall loss is separately tested with a
+    stochastic aggregate assertion.
+  - Boundary: no production coordinator, export, hidden transfer/fallback,
+    runnable, or public API was added.
 
 - [ ] **E6-F9-P3:** Publish the explicit-transfer complete-process example with regression tests
   - Issue: TBD | Size: S | Status: Not Started

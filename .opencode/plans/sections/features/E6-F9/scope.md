@@ -11,6 +11,13 @@ physics or a runtime scheduler.
   schema/repeatability, snapshots and ownership mutation helpers, independent
   inventory/dilution/wall-loss/slot/exhaustion expectations, and optional
   runtime Warp mirrors without executing a process sequence.
+- **Shipped P2:** private test-only resident composition in
+  `particula/gpu/tests/process_sequence_test.py`. All-enabled derived fixtures
+  exercise the existing condensation, coagulation, dilution, charged wall-loss,
+  and nucleation boundaries consecutively while retaining stable container,
+  sidecar, and RNG identities. Original sparse fixtures retain disabled
+  condensation-lane coverage; neutral wall loss has separate stochastic
+  aggregate coverage.
 - Multi-process fixed-shape fixtures for condensation, coagulation, dilution,
   neutral and charged wall loss, slot management, and nucleation. Neutral wall
   loss owns the integrated statistical fixture; charged mode receives a
@@ -30,8 +37,8 @@ physics or a runtime scheduler.
 
 ## Out of Scope
 
-- Production-code or public-API changes from P1, and any direct-process call or
-  integrated resident sequence; P2 owns composition of the process steps.
+- Production-code or public-API changes. P2's direct-process composition is
+  private test coverage only; it does not introduce a coordinator or user path.
 - User-facing backend selection, a high-level GPU `Runnable`, automatic process
   ordering, resident-loop scheduling, or multi-box transport; these belong to
   Epic G.
