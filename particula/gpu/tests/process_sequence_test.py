@@ -576,10 +576,11 @@ def _particle_plus_gas_inventory(
 def _active_slot_mass_and_charge(
     masses: np.ndarray, concentration: np.ndarray, charge: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Return unweighted active-slot mass and signed charge."""
+    """Return concentration-weighted active-slot mass and signed charge."""
     active = concentration > 0.0
-    return np.sum(masses * active[..., None], axis=1), np.sum(
-        charge * active, axis=1
+    weighted_concentration = concentration * active
+    return np.sum(masses * weighted_concentration[..., None], axis=1), np.sum(
+        charge * weighted_concentration, axis=1
     )
 
 
@@ -741,6 +742,25 @@ def _assert_restored_cpu_conversion_matches(
     restored_environment: Any,
 ) -> None:
     """Compare restored CPU containers with explicit raw Warp snapshots."""
+    assert restored_particles.masses.shape == fixture.masses.shape
+    assert (
+        restored_particles.concentration.shape
+        == fixture.particle_concentration.shape
+    )
+    assert restored_particles.charge.shape == fixture.charge.shape
+    assert restored_particles.density.shape == fixture.density.shape
+    assert restored_particles.volume.shape == fixture.volume.shape
+    assert restored_gas.molar_mass.shape == fixture.molar_mass.shape
+    assert restored_gas.concentration.shape == fixture.gas_concentration.shape
+    assert (
+        restored_gas.partitioning.shape == fixture.gas_concentration.shape[1:]
+    )
+    assert restored_environment.temperature.shape == fixture.temperature.shape
+    assert restored_environment.pressure.shape == fixture.pressure.shape
+    assert (
+        restored_environment.saturation_ratio.shape
+        == fixture.gas_concentration.shape
+    )
     npt.assert_array_equal(
         restored_particles.masses, state.particles.masses.numpy()
     )
@@ -780,6 +800,48 @@ def _assert_restored_cpu_conversion_matches(
     npt.assert_array_equal(
         restored_environment.saturation_ratio,
         state.environment.saturation_ratio.numpy(),
+    )
+
+
+@pytest.mark.warp
+def test_conversion_guard_blocks_intermediate_restore_and_allows_final_restore(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The conversion guard fails fast before the final restore phase."""
+    pytest.importorskip("warp")
+    import particula.gpu as gpu_module
+
+    fixture = _resident_sequence_fixture(_build_process_fixtures()[0])
+    state = _resident_state(fixture, "cpu")
+    guard = _install_conversion_guard(monkeypatch)
+
+    with pytest.raises(
+        AssertionError, match="intermediate from_warp_\\* restore blocked"
+    ):
+        gpu_module.from_warp_particle_data(state.particles, sync=False)
+
+    assert guard.particle_calls == 1
+    assert guard.gas_calls == 0
+    assert guard.environment_calls == 0
+
+    guard.allow_final = True
+    restored_particles = gpu_module.from_warp_particle_data(
+        state.particles, sync=False
+    )
+    restored_gas = gpu_module.from_warp_gas_data(state.gas, sync=False)
+    restored_environment = gpu_module.from_warp_environment_data(
+        state.environment, sync=False
+    )
+
+    assert guard.particle_calls == 2
+    assert guard.gas_calls == 1
+    assert guard.environment_calls == 1
+    _assert_restored_cpu_conversion_matches(
+        fixture,
+        state,
+        restored_particles,
+        restored_gas,
+        restored_environment,
     )
 
 
@@ -1336,7 +1398,7 @@ def _run_resident_sequence_on_device(
         state.particles,
         None,
         None,
-        0.0,
+        1.0,
         max_collisions=state.collision_pairs.shape[1],
         collision_pairs=state.collision_pairs,
         n_collisions=state.collision_counts,
@@ -1353,14 +1415,33 @@ def _run_resident_sequence_on_device(
         state.particles.concentration.numpy(),
         state.particles.charge.numpy(),
     )
-    assert np.all(np.isfinite(mass_charge_after[0]))
-    assert np.all(np.isfinite(mass_charge_after[1]))
+    npt.assert_allclose(mass_charge_after[0], mass_charge_before[0])
+    npt.assert_allclose(mass_charge_after[1], mass_charge_before[1])
     collision_counts = state.collision_counts.numpy()
     collision_pairs = state.collision_pairs.numpy()
     assert np.all((collision_counts >= 0) & (collision_counts <= 4))
     for box, count in enumerate(collision_counts):
         pairs = collision_pairs[box, :count]
         assert np.all((pairs >= 0) & (pairs < fixture.masses.shape[1]))
+        assert np.all(state.particles.concentration.numpy()[box, pairs] >= 0.0)
+
+    rng_after_first_call = state.coagulation_rng.numpy().copy()
+    repeat = coagulation_step_gpu(
+        state.particles,
+        None,
+        None,
+        1.0,
+        max_collisions=state.collision_pairs.shape[1],
+        collision_pairs=state.collision_pairs,
+        n_collisions=state.collision_counts,
+        rng_states=state.coagulation_rng,
+        initialize_rng=False,
+        environment=state.environment,
+    )
+    assert repeat[1] is state.collision_pairs
+    assert repeat[2] is state.collision_counts
+    wp.synchronize()
+    assert np.any(state.coagulation_rng.numpy() != rng_after_first_call)
 
     concentration_before = state.particles.concentration.numpy().copy()
     gas_before = state.gas.concentration.numpy().copy()
@@ -1395,7 +1476,7 @@ def _run_resident_sequence_on_device(
             state.particles,
             None,
             None,
-            0.0,
+            1.0,
             config=wall_config,
             rng_states=state.wall_rng,
             initialize_rng=True,
@@ -1491,6 +1572,9 @@ def _run_resident_sequence_on_device(
     raw_temperature = state.environment.temperature.numpy().copy()
     raw_pressure = state.environment.pressure.numpy().copy()
     raw_saturation_ratio = state.environment.saturation_ratio.numpy().copy()
+    assert guard.particle_calls == 0
+    assert guard.gas_calls == 0
+    assert guard.environment_calls == 0
     guard.allow_final = True
     restored_particles = gpu_module.from_warp_particle_data(
         state.particles, sync=False
@@ -1526,6 +1610,9 @@ def _run_resident_sequence_on_device(
         restored_environment.saturation_ratio,
         raw_saturation_ratio,
     )
+    assert guard.particle_calls == 1
+    assert guard.gas_calls == 1
+    assert guard.environment_calls == 1
     return state, guard
 
 
@@ -1608,7 +1695,7 @@ def test_condensation_preserves_disabled_original_fixture_lanes(
 def test_zero_time_direct_calls_are_byte_exact_no_op(
     fixture: ProcessFixture,
 ) -> None:
-    """Zero-time direct calls leave all resident caller-owned arrays unchanged."""
+    """Zero-time calls preserve process fields but refresh vapor pressure."""
     pytest.importorskip("warp")
     from particula.gpu.kernels import (
         coagulation_step_gpu,
@@ -2164,29 +2251,30 @@ def test_neutral_wall_loss_aggregate_removal_stays_within_binomial_band() -> (
         chamber_radius=chamber_radius,
         mode="neutral",
     )
-    removed = 0
-    for seed in range(trials):
-        particles = SimpleNamespace(
-            masses=wp.array(
-                [[[4.0 * np.pi * particle_radius**3 * particle_density / 3.0]]],
-                dtype=wp.float64,
-                device="cpu",
-            ),
-            concentration=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
-            charge=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
-            density=wp.array(
-                [particle_density], dtype=wp.float64, device="cpu"
-            ),
-            volume=wp.array([1.0], dtype=wp.float64, device="cpu"),
-        )
-        wall_loss_step_gpu(
-            particles,
-            temperature,
-            pressure,
-            time_step,
-            config=config,
-            rng_seed=seed,
-        )
-        removed += int(particles.concentration.numpy()[0, 0] == 0.0)
+    particles = SimpleNamespace(
+        masses=wp.full(
+            (trials, 1, 1),
+            4.0 * np.pi * particle_radius**3 * particle_density / 3.0,
+            dtype=wp.float64,
+            device="cpu",
+        ),
+        concentration=wp.ones((trials, 1), dtype=wp.float64, device="cpu"),
+        charge=wp.ones((trials, 1), dtype=wp.float64, device="cpu"),
+        density=wp.array([particle_density], dtype=wp.float64, device="cpu"),
+        volume=wp.ones(trials, dtype=wp.float64, device="cpu"),
+    )
+    wall_loss_step_gpu(
+        particles,
+        temperature,
+        pressure,
+        time_step,
+        config=config,
+        rng_states=wp.array(
+            np.arange(1, trials + 1, dtype=np.uint32),
+            dtype=wp.uint32,
+            device="cpu",
+        ),
+    )
+    removed = int(np.sum(particles.concentration.numpy() == 0.0))
 
     assert abs(removed - expected_mean) <= bound
