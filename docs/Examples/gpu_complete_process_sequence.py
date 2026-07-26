@@ -1,9 +1,16 @@
-"""Compose five direct Warp steps with one explicit checkpoint boundary.
+"""Run five direct Warp steps with explicit setup and checkpoint transfers.
 
-This example keeps conversion, device selection, sidecars, RNG state,
-synchronization, and the final CPU restore under caller control. It is not a
-scheduler, backend selector, resident loop, high-level Runnable, or CPU
-fallback.
+The enabled path converts CPU particle, gas, and environment containers once,
+then calls condensation, coagulation, dilution, wall loss, and nucleation in
+that order. It synchronizes once and restores each CPU container once after
+all five calls succeed. Device selection, conversion, sidecars, RNG state,
+synchronization, and restoration remain caller-owned.
+
+Warp imports are lazy. A forced or naturally unavailable Warp runtime returns
+deterministic no-kernel metadata without allocating, converting, synchronizing,
+restoring, or selecting a CPU substitute. Direct-boundary errors propagate;
+this example is not a scheduler, backend selector, resident loop, high-level
+Runnable, or CPU fallback.
 """
 
 from __future__ import annotations
@@ -23,9 +30,28 @@ _FORCE_NO_WARP_ENV = "PARTICULA_EXAMPLE_FORCE_NO_WARP"
 
 @dataclass
 class ExampleRun:
-    """Store deterministic output and optional final CPU/GPU-owned state.
+    """Store deterministic output and optional CPU and caller-owned GPU state.
 
     Every optional field is ``None`` when Warp is unavailable or disabled.
+
+    Attributes:
+        output: Deterministic, address-free status lines.
+        particle_data: Particle data restored after the final synchronization.
+        gas_data: Gas data restored with its original ordered names.
+        environment_data: Environment data restored after the final
+            synchronization.
+        mass_transfer: Caller-owned condensation transfer sidecar.
+        collision_pairs: Caller-owned coagulation collision-pair sidecar.
+        n_collisions: Caller-owned coagulation count sidecar.
+        coagulation_rng: Persistent caller-owned coagulation RNG sidecar.
+        wall_rng: Persistent caller-owned wall-loss RNG sidecar.
+        nucleation_diagnostics: Caller-owned nucleation diagnostic sidecars.
+        dilution_particles: Resident particle container returned by dilution.
+        dilution_gas: Resident gas container returned by dilution.
+        wall_particles: Resident particle container returned by wall loss.
+        nucleation_particles: Resident particle container returned by
+            nucleation.
+        nucleation_gas: Resident gas container returned by nucleation.
     """
 
     output: list[str]
@@ -48,7 +74,10 @@ class ExampleRun:
 def _build_cpu_state() -> tuple[
     ParticleData, GasData, EnvironmentData, list[str]
 ]:
-    """Create the deterministic one-box direct-process CPU fixture.
+    """Create a deterministic one-box CPU fixture for the direct process path.
+
+    The particle storage has two active and two exactly-free fixed slots. Gas
+    names are copied before conversion because Warp gas data does not own them.
 
     Returns:
         CPU particle, gas, and environment containers plus copied gas names.
@@ -78,7 +107,15 @@ def _build_cpu_state() -> tuple[
 
 
 def _warp_enabled() -> bool:
-    """Return whether optional Warp execution can be loaded safely."""
+    """Check whether Warp can be probed without loading GPU helper modules.
+
+    The force-disable environment variable short-circuits before the probe.
+    An unavailable Warp import returns ``False`` without conversion, allocation,
+    synchronization, restoration, or a CPU fallback.
+
+    Returns:
+        ``True`` when the Warp module imports; otherwise, ``False``.
+    """
     if os.getenv(_FORCE_NO_WARP_ENV) == "1":
         return False
     try:
@@ -89,7 +126,16 @@ def _warp_enabled() -> bool:
 
 
 def _load_enabled_runtime() -> SimpleNamespace | None:
-    """Lazily load Warp, direct steps, transfers, and concrete records."""
+    """Lazily load enabled-only direct boundaries and their concrete records.
+
+    This loader is reached only after the standalone Warp probe succeeds. It
+    binds the five public direct calls and keeps concrete configuration and
+    sidecar records at their owning modules.
+
+    Returns:
+        The enabled Warp runtime namespace, or ``None`` when the GPU package
+        reports that Warp is unavailable.
+    """
     wp = importlib.import_module("warp")
     gpu = importlib.import_module("particula.gpu")
     if not gpu.WARP_AVAILABLE:
@@ -124,7 +170,9 @@ def _load_enabled_runtime() -> SimpleNamespace | None:
         ResamplingBuffers=exhaustion.ResamplingBuffers,
         NucleationConfig=nucleation.NucleationConfig,
         NucleationScratchBuffers=nucleation.NucleationScratchBuffers,
-        NucleationFinalizedDemandBuffers=nucleation.NucleationFinalizedDemandBuffers,
+        NucleationFinalizedDemandBuffers=(
+            nucleation.NucleationFinalizedDemandBuffers
+        ),
         NucleationDiagnosticBuffers=nucleation.NucleationDiagnosticBuffers,
         NucleationExhaustionBuffers=nucleation.NucleationExhaustionBuffers,
         NucleationExhaustionControls=nucleation.NucleationExhaustionControls,
@@ -137,7 +185,7 @@ def _allocate_sidecars(
     dimensions: tuple[int, int, int],
     molar_mass: np.ndarray,
 ) -> SimpleNamespace:
-    """Allocate all caller-owned direct-process sidecars once.
+    """Allocate all caller-owned direct-process sidecars exactly once.
 
     Args:
         runtime: Lazily loaded Warp, helper, and concrete-record namespace.
@@ -147,6 +195,7 @@ def _allocate_sidecars(
 
     Returns:
         Namespace holding every sidecar and immutable direct-step metadata.
+        Every Warp array uses ``device`` and the fixed process dimensions.
     """
     boxes, particles, species = dimensions
     wp = runtime.wp
@@ -253,7 +302,16 @@ def _output_prefix(
     gas_data: GasData,
     environment_data: EnvironmentData,
 ) -> list[str]:
-    """Build stable, address-free documentation output for the fixture."""
+    """Build stable, address-free contract output for the CPU fixture.
+
+    Args:
+        particle_data: CPU particle fixture used to report capacity shape.
+        gas_data: CPU gas fixture used to report concentration shape.
+        environment_data: CPU environment fixture used to report box shape.
+
+    Returns:
+        User-facing lines describing ordering, ownership, and exclusions.
+    """
     return [
         "Canonical path: docs/Examples/gpu_complete_process_sequence.py",
         (
@@ -279,17 +337,25 @@ def _output_prefix(
 
 
 def run_example(device: str = "cpu") -> ExampleRun:
-    """Run the five direct boundaries with one setup and checkpoint transfer.
+    """Run five direct boundaries with one setup transfer and checkpoint.
 
-    A zero nucleation time demonstrates its direct boundary only; it is not a
-    calibrated process schedule. Errors deliberately propagate without CPU
-    fallback or an intermediate checkpoint.
+    The enabled path makes exactly five direct calls in this order:
+    condensation, coagulation, dilution, wall loss, and nucleation. It retains
+    the same resident containers and caller-owned sidecars across those calls,
+    then synchronizes and restores only once. A zero nucleation time
+    demonstrates its direct boundary only; it is not a calibrated schedule.
+    Errors deliberately propagate without fallback or an intermediate restore.
 
     Args:
         device: Warp device for the explicit direct path; defaults to Warp CPU.
 
     Returns:
-        Disabled metadata only, or final CPU data and owned sidecars.
+        Deterministic no-kernel metadata when Warp is disabled or unavailable;
+        otherwise, final restored CPU data and caller-owned sidecars.
+
+    Raises:
+        ImportError: If enabled-only runtime loading cannot import a dependency.
+        ValueError: If a direct boundary rejects the supplied process state.
     """
     particle_data, gas_data, environment_data, gas_names = _build_cpu_state()
     output = _output_prefix(particle_data, gas_data, environment_data)
@@ -409,8 +475,11 @@ def run_example(device: str = "cpu") -> ExampleRun:
     )
     output.extend(
         [
-            f"Enabled path: device={device}, one setup transfer, one sync, and one final checkpoint.",
-            "Direct outputs remain caller-owned: condensation transfer, coagulation buffers, dilution containers, wall particles, nucleation containers, and diagnostic/RNG sidecars.",
+            f"Enabled path: device={device}, one setup transfer, one sync, "
+            "and one final checkpoint.",
+            "Direct outputs remain caller-owned: condensation transfer, "
+            "coagulation buffers, dilution containers, wall particles, "
+            "nucleation containers, and diagnostic/RNG sidecars.",
         ]
     )
     return ExampleRun(
@@ -433,7 +502,11 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 def main() -> None:
-    """Run the example and print output only after a successful result."""
+    """Run the example and print only its completed-result output.
+
+    Exceptions are intentionally not caught, so an enabled-path failure cannot
+    print a misleading success message or select a CPU fallback.
+    """
     for line in run_example().output:
         print(line)
 

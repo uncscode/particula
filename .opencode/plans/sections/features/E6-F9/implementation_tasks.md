@@ -17,14 +17,16 @@
 
 ### Example
 
-- [ ] Add `docs/Examples/gpu_complete_process_sequence.py` with lazy Warp-only
-  imports and a deterministic CPU-only no-kernel branch.
-- [ ] Convert CPU containers once, allocate/reuse caller-owned sidecars, call
-  all five direct processes, and restore only at the final checkpoint.
-- [ ] Print stable process order, shape, diagnostic, transfer-boundary, and
+- [x] Add `docs/Examples/gpu_complete_process_sequence.py` with lazy Warp-only
+  imports and a deterministic CPU-only no-kernel branch. (#1448)
+- [x] Convert each CPU container once, allocate/reuse caller-owned sidecars, call
+  condensation, coagulation, dilution, wall loss, and nucleation in order, then
+  synchronize and restore only at the final checkpoint.
+- [x] Print stable process order, shape, diagnostic, transfer-boundary, and
   support-boundary summaries without claiming a general scheduler.
-- [ ] Add `gpu_complete_process_sequence_example_test.py` for imports,
-  subprocess output, identities, process order, explicit transfers, and errors.
+- [x] Add `gpu_complete_process_sequence_example_test.py` for imports,
+  subprocess output, identities, process order, explicit transfers, real Warp
+  CPU execution, and visible errors without fallback.
 
 ### Documentation and Planning
 

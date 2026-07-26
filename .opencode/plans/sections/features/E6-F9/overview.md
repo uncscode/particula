@@ -29,6 +29,14 @@ same-device containers and persistent sidecars/RNGs, with final-inspection-only
 conversion. It adds neither a production coordinator nor an export, hidden
 transfer/fallback, runnable, or public API.
 
+P3 is now complete for the public illustrative boundary. The runnable
+`docs/Examples/gpu_complete_process_sequence.py` converts each CPU container
+once, invokes condensation, coagulation, dilution, wall loss, and nucleation in
+that order, synchronizes once, and restores each container once. Its focused
+regression suite verifies lazy deterministic no-Warp behavior, caller-owned
+sidecars/RNG, identities, transfer ordering, and visible error propagation with
+no CPU fallback.
+
 ## User Stories
 
 - As a GPU contributor, I want an integrated Warp CPU regression so that an

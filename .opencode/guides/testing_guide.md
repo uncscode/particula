@@ -1,7 +1,7 @@
 # Testing Guide
 
 **Project:** particula  
-**Last Updated:** 2026-07-24
+**Last Updated:** 2026-07-26
 
 particula uses pytest as its primary testing framework. Tests should be close to
 the code they validate and should exercise scientific correctness, edge cases,
@@ -195,6 +195,8 @@ pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
 pytest particula/gpu/tests/process_sequence_test.py -q -Werror
 # Validate the published direct-GPU coagulation example and documentation.
 pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror
+# Validate the explicit-transfer complete-process example.
+pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror
 # Validate documentation links and the closeout projection without Warp or CUDA.
 pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror
 ```
@@ -242,6 +244,16 @@ available:
 pytest particula/gpu/tests/process_sequence_test.py -q \
   -m "warp and cuda" -Werror
 ```
+
+`docs/Examples/gpu_complete_process_sequence.py` is a standalone, direct-Warp
+example with a focused regression suite in
+`particula/gpu/tests/gpu_complete_process_sequence_example_test.py`. The suite
+checks the deterministic no-Warp path without requiring Warp, then checks the
+enabled path's one explicit conversion of each CPU container, five-call order,
+one synchronization, and one final restore. It also verifies that direct errors
+propagate without an intermediate restore or CPU fallback. This example is
+documentation for explicit caller-owned transfers and sidecars; it does not
+create a scheduler, high-level runnable, backend selector, or integration API.
 
 The coagulation validation matrix supports exactly the singleton masks `1`,
 `2`, `4`, and `8`; two-way masks `3`, `5`, `6`, `9`, `10`, and `12`; and

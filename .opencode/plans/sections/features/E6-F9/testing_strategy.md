@@ -22,11 +22,15 @@ test.
   collision bounds, dilution and wall-loss budgets, no-ops, preflight
   immutability, exhaustion policy behavior, and persistent sidecar/RNG identity.
   Neutral wall-loss evidence is a separate stochastic aggregate test.
-- **P3:**
+- **P3 (complete, #1448):**
   `particula/gpu/tests/gpu_complete_process_sequence_example_test.py` validates
-  lazy imports, forced-no-Warp behavior, subprocess output, one initial
-  conversion boundary, no intermediate host restore, one final checkpoint,
-  direct-call order, and sidecar identity.
+  fixture schemas; forced and natural no-Warp paths; lazy loading; subprocess
+  output; exactly one conversion per CPU container; the five-call order;
+  caller-owned sidecar/RNG and resident-container identities; one synchronization
+  followed by one `sync=False` restore per container; and real Warp CPU output.
+  Parameterized loader, conversion, direct-step, synchronization, restore, and
+  invalid-direct-input failures assert visible propagation with no fallback or
+  premature checkpoint.
 - **P4:** Documentation tests validate links, imports, focused commands, E6 and
   E6-F1-F9 inventories, exit-bar wording, and explicit Epic G boundaries. Run
   `adw plans validate` for plan consistency.
@@ -51,6 +55,9 @@ test.
 ```bash
 pytest particula/gpu/tests/process_sequence_test.py -q -Werror
 pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror
+pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror \
+  --cov=docs.Examples.gpu_complete_process_sequence --cov-report=term-missing \
+  --cov-fail-under=80
 pytest particula/gpu/tests/process_sequence_test.py -q -m "warp and gpu_parity and not cuda" -Werror
 pytest particula/gpu/tests/process_sequence_test.py -q -m "warp and stochastic and not cuda" -Werror
 pytest particula/gpu/tests/process_sequence_test.py -q -m "warp and cuda" -Werror

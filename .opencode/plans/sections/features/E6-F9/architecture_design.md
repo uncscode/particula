@@ -36,6 +36,14 @@ The order is a fixed example/test scenario, not a general scheduler contract.
 Tests take snapshots at device-resident boundaries where needed, but do not
 round-trip process state through the host between calls.
 
+P3 publishes this boundary in `docs/Examples/gpu_complete_process_sequence.py`.
+Its enabled path performs exactly one conversion of particle, gas, and
+environment containers; retains caller-owned scratch, diagnostics, and RNG
+sidecars across the five calls; synchronizes once; then makes one `sync=False`
+restore of each container. Its forced or naturally unavailable Warp path exits
+before GPU loading, allocation, conversion, synchronization, restoration, or a
+direct call. Errors propagate rather than selecting a CPU substitute.
+
 ### Data / API / Workflow Changes
 
 - **Data Model:** No production container fields or shapes change. Existing

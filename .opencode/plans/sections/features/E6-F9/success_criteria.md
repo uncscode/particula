@@ -14,8 +14,12 @@
   mutation contracts pass at recorded tolerances.
 - [ ] Persistent RNG is reused without hidden reseeding, and caller-owned
   sidecars retain identity.
-- [ ] The runnable example performs explicit initial conversions and explicit
-  final checkpoint restores, with no hidden transfer or CPU fallback.
+- [x] The runnable example performs exactly one conversion of each CPU container,
+  five direct calls in fixed illustrative order, one synchronization, and one
+  final restore of each container, with no hidden transfer or CPU fallback.
+- [x] The focused P3 regression suite covers deterministic no-Warp behavior,
+  caller-owned sidecar/RNG identities, transfer/order constraints, visible
+  failures, and a guarded real Warp CPU route. (#1448)
 - [ ] Both roadmap documents cross-link E6 and E6-F1 through E6-F9 plus the
   integrated validation and example artifacts.
 - [ ] E6 closes only after every child plan is shipped and the parent exit bar
@@ -32,6 +36,7 @@
 | E6 upstream dependencies recorded | 0 in initial E6-F9 metadata | 8 of 8 | `adw plans show E6-F9` |
 | Direct processes in integrated Warp sequence | 0 | 5 | `process_sequence_test.py` |
 | Intermediate host state restores | No integrated sequence | 0 | Example/test transfer instrumentation |
+| CPU-to-Warp conversions per example container | No public example | 1 | `gpu_complete_process_sequence_example_test.py` |
 | Required installed-Warp backend coverage | Separate process tests | Warp CPU passes | Pytest marker results |
 | Per-box/species accounting failures | Not measured together | 0 | Integrated assertions |
 | Roadmap plan IDs cross-linked | E6 unscheduled | E6 plus E6-F1-F9 | Roadmap link validation |

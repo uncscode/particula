@@ -13,8 +13,8 @@ target files exist.
     a separate integrated case.
 - [x] Does the canonical example use one box while integration tests use broader
   shapes?
-  - Decision: yes. Keep the example one box and one species for readability;
-    use multi-box/multi-species tests for shape, isolation, and conservation.
+  - Decision: yes. The shipped example uses one box, four fixed slots, and two
+    species; broader P2 fixtures retain multi-box/multi-species coverage.
 - [x] Which exhaustion diagnostics does the example print?
   - Decision: print stable scalar summaries only: active/free counts before and
     after, requested/activated/released slots, policy code and label, scale
@@ -25,8 +25,15 @@ target files exist.
   - Decision: no. Those remain owned by Epic G; E6-F9 calls direct entry points
     in one fixed validation sequence.
 - [x] May the example transfer state to the host between processes?
-  - Decision: no. CPU/Warp conversion occurs only at setup and final checkpoint
-    boundaries.
+  - Decision: no. The shipped path converts each CPU container once, invokes the
+    five direct steps in order on resident state, synchronizes once, then restores
+    each container once with `sync=False`.
+- [x] How does the example behave without Warp or after a direct-boundary error?
+  - Decision: `PARTICULA_EXAMPLE_FORCE_NO_WARP="1"` exits before any Warp probe;
+    natural unavailable-Warp probing imports only `warp`. Both return stable
+    no-kernel metadata. Enabled loader, conversion, direct-call, synchronization,
+    and restore errors propagate unchanged; no CPU fallback or partial checkpoint
+    is attempted.
 - [x] Which tolerances and focused commands are published?
   - Decision: publish a per-process table, not one combined tolerance. Use exact
     equality for discrete/no-op/fallback fields; `rtol=1e-12`, `atol=1e-30`

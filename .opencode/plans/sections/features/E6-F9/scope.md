@@ -28,7 +28,12 @@ physics or a runtime scheduler.
   device, dtype, identity, RNG persistence, and failure-before-mutation checks.
 - A runnable explicit CPU-to-Warp setup, direct-call sequence with no
   intermediate host transfer, and explicit final CPU checkpoint restore.
-- Regression tests for the example's CPU-only guard and Warp-enabled path.
+- **Shipped P3:** `docs/Examples/gpu_complete_process_sequence.py` and
+  `particula/gpu/tests/gpu_complete_process_sequence_example_test.py`. The
+  example performs one conversion of each CPU container, five ordered direct
+  calls, one synchronization, and one final restore of each container; tests
+  cover forced/natural no-Warp behavior, enabled identities and sidecars, real
+  Warp CPU execution, and failures without fallback.
 - Cross-links for E6 and E6-F1 through E6-F9 in
   `docs/Features/Roadmap/data-oriented-gpu.md` and
   `docs/Features/Roadmap/index.md`.
@@ -37,8 +42,8 @@ physics or a runtime scheduler.
 
 ## Out of Scope
 
-- Production-code or public-API changes. P2's direct-process composition is
-  private test coverage only; it does not introduce a coordinator or user path.
+- Production-code or public-API changes. P2 is private test coverage and P3 is
+  an illustrative script; neither introduces a coordinator or user API.
 - User-facing backend selection, a high-level GPU `Runnable`, automatic process
   ordering, resident-loop scheduling, or multi-box transport; these belong to
   Epic G.

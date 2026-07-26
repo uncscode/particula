@@ -34,14 +34,20 @@ P2, use P2 evidence for P3, and close E6 in P4 only after P1-P3 pass.
   - Boundary: no production coordinator, export, hidden transfer/fallback,
     runnable, or public API was added.
 
-- [ ] **E6-F9-P3:** Publish the explicit-transfer complete-process example with regression tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Publish a runnable low-level example with explicit setup/checkpoint
-    transfers and no scheduler or backend-selection abstraction.
+- [x] **E6-F9-P3:** Publish the explicit-transfer complete-process example with regression tests
+  - Issue: #1448 | Size: S | Status: Complete
+  - Delivered: `docs/Examples/gpu_complete_process_sequence.py` and
+    `particula/gpu/tests/gpu_complete_process_sequence_example_test.py`.
+  - Contract: exactly one conversion of each CPU container; condensation,
+    coagulation, dilution, wall loss, then nucleation; one synchronization; and
+    exactly one final restore of each container. Sidecars and RNG remain
+    caller-owned, no-Warp execution is deterministic, and errors never select a
+    CPU fallback.
   - Files: `docs/Examples/gpu_complete_process_sequence.py`,
     `particula/gpu/tests/gpu_complete_process_sequence_example_test.py`.
-  - Tests: CPU-only import/run path, lazy Warp imports, stable output, direct
-    entry-point order, sidecar identity, one setup conversion, and one restore.
+  - Tests: CPU-only forced/natural-unavailable runs and subprocess output; fake
+    runtime transfer/order/identity assertions; parameterized failure propagation;
+    and guarded real Warp CPU execution.
 
 - [ ] **E6-F9-P4:** Update development documentation, roadmap cross-links, and epic closeout
   - Issue: TBD | Size: S | Status: Not Started
