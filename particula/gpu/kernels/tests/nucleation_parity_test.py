@@ -416,7 +416,7 @@ def test_public_nucleation_step_conserves_tiny_matrix_transfer(device) -> None:
 def test_public_nucleation_step_scaling_fallback_has_separate_inventory(
     device,
 ) -> None:
-    """Scaling halves old particle inventory without scaling gas inventory."""
+    """Scaling halves pre-existing particle and gas inventory before P5."""
     wp = _warp()
     api = _api()
     particles, gas = _state(device, particles=4, active=True)
@@ -475,7 +475,7 @@ def test_public_nucleation_step_scaling_fallback_has_separate_inventory(
     )
     np.testing.assert_allclose(
         gas.concentration.numpy(),
-        initial_gas - source_removal,
+        0.5 * initial_gas - source_removal,
         rtol=1e-12,
         atol=1e-30,
     )
