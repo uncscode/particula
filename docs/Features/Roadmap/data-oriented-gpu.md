@@ -1260,8 +1260,9 @@ Delivered dilution scope:
   scans may still allocate or launch.
   Particle and gas parity evidence uses independent Warp CPU float64 checks at
    `rtol=1e-12, atol=0`; CUDA is optional and skips cleanly when unavailable.
-    It is not bitwise parity. E6-F9 P1--P3 now publish private validation and
-    an explicit-transfer example; P4 documents the blocked closeout gate.
+    It is not bitwise parity. E6-F9 P1--P3 publish private validation and an
+    explicit-transfer example; P4 remains Draft pending validation evidence and
+    the blocked closeout gate.
 
 Delivered bounded wall-loss P1–P6 scope:
 
@@ -1342,7 +1343,8 @@ Delivered bounded wall-loss P1–P6 scope:
 - Deferred scope includes CPU fallback or hidden transfers,
   runnable/scheduler/backend integration, dynamic slots, compaction/activation,
   graph capture, differentiability, performance guarantees, and exact RNG
-  replay. E6-F9 P1--P3 are delivered; P4 is documentation and closeout only.
+  replay. E6-F9 P1--P3 are shipped; P4 remains Draft documentation and closeout
+  work.
 
 Delivered bounded slot-exhaustion primitives are documented in the
 [Fixed-Capacity Slot Exhaustion Primitives](../slot_exhaustion_policies.md): CPU P1

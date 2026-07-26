@@ -6,7 +6,7 @@ All E6-F1 through E6-F8 plans must ship before integration. Complete P1 before
 P2, use P2 evidence for P3, and close E6 in P4 only after P1-P3 pass.
 
 - [x] **E6-F9-P1:** Build integrated fixed-shape validation fixtures and invariants with tests
-  - Issue: #1446 | Size: S | Status: Complete
+  - Issue: #1446 | Size: S | Status: Shipped
   - Delivered: `particula/gpu/tests/process_sequence_test.py`, a private,
     deterministic fp64 fixture/invariant module with one-/multi-box sparse
     fixtures, snapshot/ownership helpers, independent inventory, dilution,
@@ -20,7 +20,7 @@ P2, use P2 evidence for P3, and close E6 in P4 only after P1-P3 pass.
     budgets; slot/exhaustion outcomes; and fixed shapes, identities, diagnostics.
 
 - [x] **E6-F9-P2:** Validate the complete direct GPU process sequence on Warp CPU
-  - Issue: #1447 | Size: S | Status: Complete
+  - Issue: #1447 | Size: S | Status: Shipped
   - Delivered: expanded `particula/gpu/tests/process_sequence_test.py` with
     private P2 resident composition coverage across condensation, coagulation,
     dilution, charged wall loss, and nucleation.
@@ -35,7 +35,7 @@ P2, use P2 evidence for P3, and close E6 in P4 only after P1-P3 pass.
     runnable, or public API was added.
 
 - [x] **E6-F9-P3:** Publish the explicit-transfer complete-process example with regression tests
-  - Issue: #1448 | Size: S | Status: Complete
+  - Issue: #1448 | Size: S | Status: Shipped
   - Delivered: `docs/Examples/gpu_complete_process_sequence.py` and
     `particula/gpu/tests/gpu_complete_process_sequence_example_test.py`.
   - Contract: exactly one conversion of each CPU container; condensation,
@@ -49,19 +49,19 @@ P2, use P2 evidence for P3, and close E6 in P4 only after P1-P3 pass.
     runtime transfer/order/identity assertions; parameterized failure propagation;
     and guarded real Warp CPU execution.
 
-- [x] **E6-F9-P4:** Update development documentation, roadmap cross-links, and epic closeout
-  - Issue: #1449 | Size: S | Status: Shipped | Completed: 2026-07-26
-  - Delivered: Published the E6 inventory, ownership guidance, focused
-    documentation validation, and fail-closed closeout projection. E6-F9 and
-    E6 remain Draft/active because E6-F2, E6-F5, E6-F6, and E6-F8 are not yet
-    complete; Epic G remains pending/on-deck.
+- [ ] **E6-F9-P4:** Update development documentation, roadmap cross-links, and epic closeout
+  - Issue: #1449 | Size: S | Status: Draft
+  - Scope: Publish the E6 inventory, ownership guidance, focused documentation
+    validation, and fail-closed closeout projection. E6-F9 and E6 remain
+    Draft/active because E6-F2, E6-F5, E6-F6, and E6-F8 are not yet complete;
+    Epic G remains pending/on-deck.
   - Files: `docs/Features/Roadmap/data-oriented-gpu.md`,
     `docs/Features/Roadmap/index.md`, relevant `docs/Features/` pages,
     `docs/index.md`, `AGENTS.md`, and E6/E6-F9 plan sections.
-  - Evidence:
-    - `pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q -Werror`  # passed
-    - `pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror`  # passed
-    - `mkdocs build --strict`  # passed
-    - `adw plans validate`  # passed
+  - Required validation before shipment:
+    - `pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q -Werror`
+    - `pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror`
+    - `mkdocs build --strict`
+    - `adw plans validate`
   - Boundary: Epic G scheduling, backend selection, high-level runnables,
     resident loops, and transport remain out of E6 scope.

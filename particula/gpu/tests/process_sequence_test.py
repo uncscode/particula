@@ -151,6 +151,11 @@ def _resident_sequence_fixture(fixture: ProcessFixture) -> ProcessFixture:
     coverage. Nucleation requires its selected precursor to participate in every
     box, so resident sequencing deliberately uses this test-local derivative.
     """
+    gas_concentration = fixture.gas_concentration.copy()
+    # The scalar nucleation rate below admits exactly one particle in the
+    # first box. Keep later boxes at zero precursor so their count is exactly
+    # zero rather than a nonintegral fixed-slot request.
+    gas_concentration[1:, 0] = 0.0
     return replace(
         fixture,
         masses=fixture.masses.copy(),
@@ -158,7 +163,7 @@ def _resident_sequence_fixture(fixture: ProcessFixture) -> ProcessFixture:
         charge=fixture.charge.copy(),
         density=fixture.density.copy(),
         volume=fixture.volume.copy(),
-        gas_concentration=fixture.gas_concentration.copy(),
+        gas_concentration=gas_concentration,
         molar_mass=fixture.molar_mass.copy(),
         partitioning=np.ones(fixture.gas_concentration.shape, dtype=np.bool_),
         temperature=fixture.temperature.copy(),
@@ -576,11 +581,10 @@ def _particle_plus_gas_inventory(
 def _active_slot_mass_and_charge(
     masses: np.ndarray, concentration: np.ndarray, charge: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Return concentration-weighted active-slot mass and signed charge."""
+    """Return unweighted active-slot mass and signed charge."""
     active = concentration > 0.0
-    weighted_concentration = concentration * active
-    return np.sum(masses * weighted_concentration[..., None], axis=1), np.sum(
-        charge * weighted_concentration, axis=1
+    return np.sum(masses * active[..., None], axis=1), np.sum(
+        charge * active, axis=1
     )
 
 
@@ -1351,6 +1355,7 @@ def _run_resident_sequence_on_device(
         NucleationExhaustionControls,
     )
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+    from particula.util.constants import AVOGADRO_NUMBER
 
     state = _resident_state(_resident_sequence_fixture(fixture), device)
     guard = _install_conversion_guard(monkeypatch)
@@ -1386,6 +1391,7 @@ def _run_resident_sequence_on_device(
         rtol=1e-12,
         atol=1e-30,
     )
+    assert np.any(np.abs(transfer.numpy()) > 0.0)
 
     mass_charge_before = _active_slot_mass_and_charge(
         state.particles.masses.numpy(),
@@ -1398,7 +1404,7 @@ def _run_resident_sequence_on_device(
         state.particles,
         None,
         None,
-        1.0,
+        1.0e12,
         max_collisions=state.collision_pairs.shape[1],
         collision_pairs=state.collision_pairs,
         n_collisions=state.collision_counts,
@@ -1415,11 +1421,15 @@ def _run_resident_sequence_on_device(
         state.particles.concentration.numpy(),
         state.particles.charge.numpy(),
     )
-    npt.assert_allclose(mass_charge_after[0], mass_charge_before[0])
-    npt.assert_allclose(mass_charge_after[1], mass_charge_before[1])
+    npt.assert_allclose(
+        mass_charge_after[0], mass_charge_before[0], rtol=1e-12, atol=1e-30
+    )
+    npt.assert_allclose(
+        mass_charge_after[1], mass_charge_before[1], rtol=1e-12, atol=1e-30
+    )
     collision_counts = state.collision_counts.numpy()
     collision_pairs = state.collision_pairs.numpy()
-    assert np.all((collision_counts >= 0) & (collision_counts <= 4))
+    assert np.all((collision_counts > 0) & (collision_counts <= 4))
     for box, count in enumerate(collision_counts):
         pairs = collision_pairs[box, :count]
         assert np.all((pairs >= 0) & (pairs < fixture.masses.shape[1]))
@@ -1441,7 +1451,10 @@ def _run_resident_sequence_on_device(
     assert repeat[1] is state.collision_pairs
     assert repeat[2] is state.collision_counts
     wp.synchronize()
-    assert np.any(state.coagulation_rng.numpy() != rng_after_first_call)
+    # The first call leaves fewer than two active slots in every box, so this
+    # valid repeat performs no pair selection and must not consume RNG state.
+    npt.assert_array_equal(state.coagulation_rng.numpy(), rng_after_first_call)
+    npt.assert_array_equal(state.collision_counts.numpy(), 0)
 
     concentration_before = state.particles.concentration.numpy().copy()
     gas_before = state.gas.concentration.numpy().copy()
@@ -1502,9 +1515,15 @@ def _run_resident_sequence_on_device(
         state.particles.charge.numpy()[removed_mask],
         np.zeros(np.sum(removed_mask)),
     )
+    assert np.any(removed > 0.0)
     npt.assert_allclose(
-        retained + removed,
-        _particle_inventory(wall_masses_before, wall_concentration_before),
+        _particle_inventory(
+            state.particles.masses.numpy(),
+            state.particles.concentration.numpy(),
+        ),
+        retained,
+        rtol=1e-12,
+        atol=1e-30,
     )
     assert np.all(np.isfinite(state.gas.concentration.numpy()))
     assert np.all(state.gas.concentration.numpy() >= 0.0)
@@ -1514,6 +1533,13 @@ def _run_resident_sequence_on_device(
         state.particles.charge.numpy(),
     )
 
+    gas_for_nucleation = state.gas.concentration.numpy()
+    gas_for_nucleation[1:, 0] = 0.0
+    wp.copy(
+        state.gas.concentration,
+        wp.array(gas_for_nucleation, dtype=wp.float64, device=device),
+    )
+    wp.synchronize()
     inventory_before_nucleation = _particle_plus_gas_inventory(
         state.particles.masses.numpy(),
         state.particles.concentration.numpy(),
@@ -1521,7 +1547,14 @@ def _run_resident_sequence_on_device(
     )
     config = NucleationConfig(
         rate_law="activation",
-        coefficient=1.0e-12,
+        coefficient=(
+            fixture.molar_mass[0]
+            / (
+                AVOGADRO_NUMBER
+                * fixture.volume[0]
+                * state.gas.concentration.numpy()[0, 0]
+            )
+        ),
         survival_factor=1.0,
         precursor_index=0,
         molecule_counts=(1, 0),
@@ -1535,7 +1568,7 @@ def _run_resident_sequence_on_device(
         state.particles,
         state.gas,
         config,
-        0.0,
+        1.0,
         scratch=state.nucleation_scratch,
         finalized_demand=state.finalized,
         diagnostics=state.diagnostics,
@@ -1556,6 +1589,7 @@ def _run_resident_sequence_on_device(
         rtol=1e-12,
         atol=1e-30,
     )
+    assert np.any(state.finalized.accepted_counts.numpy() > 0)
     assert np.all(
         state.diagnostics.free_slot_counts.numpy() <= fixture.masses.shape[1]
     )

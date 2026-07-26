@@ -142,6 +142,17 @@ def _inventory_rows(content: str) -> list[tuple[str, str, str]]:
     return rows
 
 
+def _inventory_links(content: str) -> dict[str, str]:
+    """Return each E6 inventory identifier and its linked plan path."""
+    section = _section(content, "### E6 roadmap inventory")
+    return {
+        identifier: target
+        for identifier, target in re.findall(
+            r"\|\s*\[`(E6(?:-F[1-9])?)`\]\(([^)]+)\)", section
+        )
+    }
+
+
 def test_closeout_gate_is_fail_closed_for_actual_and_synthetic_records() -> (
     None
 ):
@@ -197,6 +208,10 @@ def test_closeout_gate_is_fail_closed_for_actual_and_synthetic_records() -> (
     for phase in synthetic["E6-F9"]["phases"][:3]:
         phase["completion_date"] = "2026-07-25"
     synthetic["E6-F2"]["lifecycle"] = "completed"
+    p4 = synthetic["E6-F9"]["phases"][3]
+    p4["status"] = "Shipped"
+    p4["issue_number"] = 1449
+    p4["completion_date"] = "2026-07-26"
     passed_evidence = "\n".join(
         f"`{command}`  # passed"
         for command in (
@@ -213,22 +228,22 @@ def test_closeout_gate_is_fail_closed_for_actual_and_synthetic_records() -> (
     )
 
 
-def test_p4_metadata_records_only_completed_work_evidence() -> None:
-    """P4 records its own evidence while the incomplete parent remains blocked."""
+def test_p4_metadata_remains_draft_until_validation_is_complete() -> None:
+    """P4 remains pending while its parent feature and epic are blocked."""
     records = _records()
     p4 = records["E6-F9"]["phases"][3]
     evidence = P4_SECTIONS["phase_details"].read_text(encoding="utf-8")
-    assert p4["status"] == "Shipped"
+    assert p4["status"] == "Draft"
     assert p4["issue_number"] == 1449
-    assert p4["completion_date"]
+    assert p4["completion_date"] is None
     for command in (
         DOCS_TEST_COMMAND,
         "pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror",
         "mkdocs build --strict",
         "adw plans validate",
     ):
-        assert f"`{command}`  # passed" in evidence
-    assert "tolerance" not in _section(evidence, "- [x] **E6-F9-P4:").lower()
+        assert f"`{command}`" in evidence
+    assert "# passed" not in _section(evidence, "- [ ] **E6-F9-P4:")
     assert records["E6"]["status"] == "Draft"
     assert records["E6-F9"]["status"] == "Draft"
 
@@ -240,12 +255,21 @@ def test_inventory_matches_canonical_records_and_resolves_links() -> None:
         (identifier, record["title"], record["status"])
         for identifier, record in records.items()
     ]
+    expected_links = {
+        identifier: (
+            "../../../.opencode/plans/epics/E6.json"
+            if identifier == "E6"
+            else f"../../../.opencode/plans/features/{identifier}.json"
+        )
+        for identifier in records
+    }
     inventories = []
     for path in ROADMAPS:
         content = path.read_text(encoding="utf-8")
         assert content.count("### E6 roadmap inventory") == 1
         rows = _inventory_rows(content)
         assert rows == expected
+        assert _inventory_links(content) == expected_links
         for identifier in records:
             assert "](../../../.opencode/plans/" in _section(
                 content, "### E6 roadmap inventory"
@@ -261,6 +285,22 @@ def test_inventory_matches_canonical_records_and_resolves_links() -> None:
             ).exists()
         inventories.append(rows)
     assert inventories[0] == inventories[1]
+
+
+def test_inventory_links_reject_a_link_attached_to_the_wrong_identifier() -> (
+    None
+):
+    """The link map fails when required links are present but swapped."""
+    content = """### E6 roadmap inventory
+| ID | Title | Status text |
+| --- | --- | --- |
+| [`E6`](../../../.opencode/plans/features/E6-F1.json) | Epic | Draft |
+| [`E6-F1`](../../../.opencode/plans/epics/E6.json) | Feature | Shipped |
+"""
+    assert _inventory_links(content) != {
+        "E6": "../../../.opencode/plans/epics/E6.json",
+        "E6-F1": "../../../.opencode/plans/features/E6-F1.json",
+    }
 
 
 def test_direct_process_documentation_preserves_explicit_ownership() -> None:
