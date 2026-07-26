@@ -54,9 +54,9 @@ capacity rather than creating a second slot or exhaustion model.
 
 ## Out of Scope
 
-- **Still deferred after P6:** P7 documentation closeout; E6-F9 integration
-  remains separate. The direct step has no fallback allocation, high-level
-  orchestration, or public concrete sidecar/configuration export.
+- **Shipped P7 (#1444):** documentation closeout is complete; E6-F9
+  integration remains separate. The direct step has no fallback allocation,
+  high-level orchestration, or public concrete sidecar/configuration export.
 
 - New nucleation equations, chemistry, extrapolation, or a full Vehkamaki/CNT,
   ion-induced, heterogeneous, or cluster-dynamics implementation.

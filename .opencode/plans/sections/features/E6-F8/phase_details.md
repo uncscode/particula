@@ -83,8 +83,8 @@ run P6 parity and conservation checks before P7 documents the direct step.
     scaling inventory accounting; resampling precedence; repeated current-gas
     calls; preflight non-mutation; and zero-box/zero-capacity boundaries.
 
-- [ ] **E6-F8-P7:** Update development documentation for direct GPU nucleation
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E6-F8-P7:** Update development documentation for direct GPU nucleation
+  - Issue: #1444 | Size: XS | Status: Complete (2026-07-26)
   - Goal: Publish the bounded API, ownership, transfer, sidecar, conservation, dependency, and no-fallback contracts.
   - Files: `AGENTS.md`, `docs/Features/`, `docs/Theory/Technical/Dynamics/Nucleation_Equations.md`, `docs/Examples/Nucleation/`, E6 sections
   - Tests: Link/import validation, equation review, focused commands, and explicit-transfer example execution where applicable.
