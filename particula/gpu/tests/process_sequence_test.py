@@ -82,7 +82,6 @@ class _ArraySnapshot:
         shape: Captured array shape.
         dtype: Captured array data type.
         device: Captured Warp device, or ``None`` for NumPy arrays.
-        values: Copy of the captured values for NaN-safe comparisons.
         bytes_value: Byte representation used by exact-value assertions.
     """
 
@@ -90,16 +89,13 @@ class _ArraySnapshot:
     shape: tuple[int, ...]
     dtype: Any
     device: Any
-    values: np.ndarray
     bytes_value: bytes
 
 
 def _build_process_fixtures() -> tuple[ProcessFixture, ...]:
     """Build fresh deterministic one- and multi-box sparse fixtures."""
-    common = dict(
-        density=np.array([1000.0, 1500.0], dtype=np.float64),
-        molar_mass=np.array([0.018, 0.098], dtype=np.float64),
-    )
+    density = np.array([1000.0, 1500.0], dtype=np.float64)
+    molar_mass = np.array([0.018, 0.098], dtype=np.float64)
     one = ProcessFixture(
         name="one_box_sparse",
         masses=np.array(
@@ -115,7 +111,8 @@ def _build_process_fixtures() -> tuple[ProcessFixture, ...]:
         partitioning=np.array([[True, False]], dtype=np.bool_),
         temperature=np.array([298.15], dtype=np.float64),
         pressure=np.array([101325.0], dtype=np.float64),
-        **common,
+        density=density.copy(),
+        molar_mass=molar_mass.copy(),
     )
     multi = ProcessFixture(
         name="multi_box_sparse",
@@ -141,7 +138,8 @@ def _build_process_fixtures() -> tuple[ProcessFixture, ...]:
         partitioning=np.array([[True, False], [False, True]], dtype=np.bool_),
         temperature=np.array([280.0, 310.0], dtype=np.float64),
         pressure=np.array([90000.0, 110000.0], dtype=np.float64),
-        **common,
+        density=density.copy(),
+        molar_mass=molar_mass.copy(),
     )
     return one, multi
 
@@ -237,13 +235,13 @@ def _assert_fixture_values(fixture: ProcessFixture) -> None:
 
 
 def _snapshot_array(value: Any) -> _ArraySnapshot:
-    """Capture NumPy- or Warp-like array metadata and copied values.
+    """Capture NumPy- or Warp-like array metadata and exact bytes.
 
     Args:
         value: Array-like value exposing either NumPy conversion or array data.
 
     Returns:
-        Snapshot retaining identity, metadata, copied values, and raw bytes.
+        Snapshot retaining identity, metadata, and raw bytes.
     """
     values = value.numpy() if hasattr(value, "numpy") else np.asarray(value)
     copied = np.array(values, copy=True)
@@ -252,7 +250,6 @@ def _snapshot_array(value: Any) -> _ArraySnapshot:
         shape=tuple(value.shape),
         dtype=value.dtype,
         device=getattr(value, "device", None),
-        values=copied,
         bytes_value=copied.tobytes(),
     )
 
@@ -282,7 +279,7 @@ def _snapshot_owners(**owners: Any) -> dict[str, dict[str, _ArraySnapshot]]:
 def _assert_snapshot_unchanged(
     snapshot: dict[str, dict[str, _ArraySnapshot]], **owners: Any
 ) -> None:
-    """Assert captured fields retain identity, metadata, and values.
+    """Assert captured fields retain identity, metadata, and exact bytes.
 
     Args:
         snapshot: Previously captured owner and field snapshots.
@@ -310,9 +307,9 @@ def _assert_snapshot_unchanged(
             assert after.device == before.device, (
                 f"{owner_name}.{field_name} device changed"
             )
-            assert np.array_equal(
-                after.values, before.values, equal_nan=True
-            ), f"{owner_name}.{field_name} changed"
+            assert after.bytes_value == before.bytes_value, (
+                f"{owner_name}.{field_name} changed"
+            )
 
 
 def _assert_only_fields_changed(
@@ -343,9 +340,7 @@ def _assert_only_fields_changed(
                 or after.shape != prior.shape
                 or after.dtype != prior.dtype
                 or after.device != prior.device
-                or not np.array_equal(
-                    after.values, prior.values, equal_nan=True
-                )
+                or after.bytes_value != prior.bytes_value
             )
             assert not changed or key in allowed_fields, f"{key} changed"
 
@@ -516,6 +511,22 @@ def test_process_fixtures_have_repeatable_valid_schema(
             assert first is not second
 
 
+def test_process_fixture_species_arrays_are_independently_owned() -> None:
+    """Canonical fixtures never share mutable density or molar-mass arrays."""
+    one, multi = _build_process_fixtures()
+    rebuilt_one, _ = _build_process_fixtures()
+    original_density = multi.density.copy()
+    original_molar_mass = multi.molar_mass.copy()
+
+    one.density[0] = 999.0
+    one.molar_mass[1] = 999.0
+
+    npt.assert_array_equal(multi.density, original_density)
+    npt.assert_array_equal(multi.molar_mass, original_molar_mass)
+    npt.assert_array_equal(rebuilt_one.density, original_density)
+    npt.assert_array_equal(rebuilt_one.molar_mass, original_molar_mass)
+
+
 @pytest.mark.parametrize("shape", [(0, 3, 2), (2, 0, 2)])
 def test_fixture_schema_accepts_zero_box_and_zero_capacity(
     shape: tuple[int, int, int],
@@ -545,7 +556,7 @@ def test_fixture_schema_accepts_zero_box_and_zero_capacity(
 
 
 def test_snapshot_helpers_detect_replacement_mutation_and_nan_safely() -> None:
-    """Snapshots preserve stale sidecars and intentionally compare NaNs safely."""
+    """Snapshots preserve stale sidecars and unchanged NaN representations."""
     owner = SimpleNamespace(
         diagnostic=np.array([7], dtype=np.int32),
         work=np.array([np.nan]),
@@ -564,6 +575,26 @@ def test_snapshot_helpers_detect_replacement_mutation_and_nan_safely() -> None:
         _assert_only_fields_changed(
             before, {"particle.diagnostic"}, particle=owner
         )
+
+
+def test_snapshot_helpers_detect_representation_level_mutations() -> None:
+    """Byte-exact snapshots reject signed-zero and NaN-payload changes."""
+    signed_zero = SimpleNamespace(data=np.array([0.0], dtype=np.float64))
+    signed_zero_before = _snapshot_owners(array=signed_zero)
+    signed_zero.data[0] = -0.0
+    with pytest.raises(AssertionError, match="array.data changed"):
+        _assert_snapshot_unchanged(signed_zero_before, array=signed_zero)
+
+    nan_payload = SimpleNamespace(
+        data=np.array([0x7FF8000000000001], dtype=np.uint64).view(np.float64)
+    )
+    nan_before = _snapshot_owners(array=nan_payload)
+    _assert_snapshot_unchanged(nan_before, array=nan_payload)
+    nan_payload.data[:] = np.array([0x7FF8000000000002], dtype=np.uint64).view(
+        np.float64
+    )
+    with pytest.raises(AssertionError, match="array.data changed"):
+        _assert_snapshot_unchanged(nan_before, array=nan_payload)
 
 
 def test_rejected_local_alias_validation_preserves_all_named_owners() -> None:
@@ -627,18 +658,29 @@ def test_inventory_transfers_conserve_per_box_and_species(
         rtol=1e-12,
         atol=1e-30,
     )
-    disabled_transfer = np.where(
-        fixture.partitioning,
-        np.float64(0.0),
-        np.float64(1.0e-20),
-    )
     disabled_mass = fixture.masses.copy()
     disabled_gas = fixture.gas_concentration.copy()
-    npt.assert_array_equal(disabled_mass, fixture.masses)
-    npt.assert_array_equal(
-        disabled_gas + disabled_transfer * ~fixture.partitioning,
-        fixture.gas_concentration + disabled_transfer * ~fixture.partitioning,
-    )
+    disabled_transfer = np.full(before.shape, 1.0e-20, dtype=np.float64)
+    disabled_transfer[~fixture.partitioning] = 0.0
+    for box in range(fixture.masses.shape[0]):
+        particle = np.flatnonzero(fixture.particle_concentration[box] > 0.0)[0]
+        disabled_mass[box, particle, :] += (
+            disabled_transfer[box]
+            / fixture.particle_concentration[box, particle]
+        )
+    disabled_gas -= disabled_transfer
+    disabled_lanes = ~fixture.partitioning
+    npt.assert_array_equal(disabled_transfer[disabled_lanes], 0.0)
+    for box in range(fixture.masses.shape[0]):
+        disabled_species = ~fixture.partitioning[box]
+        npt.assert_array_equal(
+            disabled_mass[box, :, disabled_species],
+            fixture.masses[box, :, disabled_species],
+        )
+        npt.assert_array_equal(
+            disabled_gas[box, disabled_species],
+            fixture.gas_concentration[box, disabled_species],
+        )
 
 
 @pytest.mark.parametrize(
