@@ -110,12 +110,13 @@ private helpers for cross-kernel setup.
   commits planning, admitted-demand, removal, and gate sidecars. P3 converts
   admitted demand times box volume only when it is an exact representable
   nonnegative `int32` count, reuses E6-F5 slot diagnostics, retains counts
-  beyond free capacity, and writes only count/diagnostic sidecars. It is
-  intentionally unexported: conversion failures preserve outputs before writer
-  launch, while rollback is not promised after asynchronous diagnostic or
-  commit launches. It provides no hidden transfer, fallback, activation,
-  exhaustion policy, particle/gas mutation, or execution; P4--P7 remain
-  deferred.
+  beyond free capacity, and writes only the fixed-shape P3 count and
+  diagnostic sidecars. It stages the deterministic selectable free-slot prefix
+  without activation or exhaustion policy, and keeps the module unexported.
+  Conversion failures preserve outputs before any writer launch, while
+  rollback is not promised after asynchronous diagnostic or commit launches.
+  It provides no hidden transfer, fallback, activation, particle/gas mutation,
+  or execution; E6-F6 policy and later phases remain deferred.
 - `wall_loss.py` - Concrete fixed-slot neutral/charged GPU wall-loss boundary;
   owns immutable host configuration, frozen preflight, bounded fixed-slot
   removal, and the external caller-owned per-box RNG sidecar lifecycle. Charged

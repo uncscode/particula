@@ -37,7 +37,11 @@ except ImportError as exc:  # pragma: no cover - import guard
     ) from exc
 
 from particula.gpu.kernels.environment import _is_warp_array_like
-from particula.gpu.kernels.slot_management import get_slot_diagnostics_gpu
+from particula.gpu.kernels.slot_management import (
+    _classify_slots,
+    _write_diagnostics,
+    _write_empty_diagnostics,
+)
 from particula.util.constants import AVOGADRO_NUMBER
 
 _P2_GATE_ELIGIBLE = 0
@@ -346,6 +350,9 @@ class _NucleationPreflight:
     accepted_count: int = 0
     accepted_demand: float = 0.0
     precursor_mass_change: float = 0.0
+    finalized_demand: NucleationFinalizedDemandBuffers | None = None
+    diagnostics: NucleationDiagnosticBuffers | None = None
+    p3_sidecars: tuple[Any, ...] = ()
 
 
 def _field(container: Any, name: str) -> Any:
@@ -1004,6 +1011,18 @@ def _preflight_nucleation(  # noqa: C901
         n_species,
         device,
     )
+    p3_sidecars: tuple[Any, ...] = ()
+    if finalized_demand is not None and diagnostics is not None:
+        p3_sidecars = (
+            finalized_demand.accepted_counts,
+            finalized_demand.accepted_demand,
+            finalized_demand.precursor_mass_change,
+            diagnostics.gate_codes,
+            diagnostics.selected_slot_indices,
+            diagnostics.free_slot_indices,
+            diagnostics.active_slot_counts,
+            diagnostics.free_slot_counts,
+        )
     _no_overlap(particle_arrays + gas_arrays + tuple(external) + sidecars)
     normalized_time_step = _real(time_step, "time_step")
     if (
@@ -1052,6 +1071,9 @@ def _preflight_nucleation(  # noqa: C901
             True,
             "zero_coefficient",
             normalized_time_step,
+            finalized_demand=finalized_demand,
+            diagnostics=diagnostics,
+            p3_sidecars=p3_sidecars,
         )
     if float(config.survival_factor) == 0.0:
         return _NucleationPreflight(
@@ -1068,6 +1090,9 @@ def _preflight_nucleation(  # noqa: C901
             True,
             "zero_survival",
             normalized_time_step,
+            finalized_demand=finalized_demand,
+            diagnostics=diagnostics,
+            p3_sidecars=p3_sidecars,
         )
     if isinstance(temperature_value, float):
         if (
@@ -1111,6 +1136,9 @@ def _preflight_nucleation(  # noqa: C901
             False,
             None,
             normalized_time_step,
+            finalized_demand=finalized_demand,
+            diagnostics=diagnostics,
+            p3_sidecars=p3_sidecars,
         )
     # P1 has no rate work.  These conservative aggregate gates preserve the
     # required all-box zero diagnostics while later phases own mixed-box work.
@@ -1132,6 +1160,9 @@ def _preflight_nucleation(  # noqa: C901
             True,
             reason,
             normalized_time_step,
+            finalized_demand=finalized_demand,
+            diagnostics=diagnostics,
+            p3_sidecars=p3_sidecars,
         )
     precursor_status = wp.zeros(2, dtype=wp.int32, device=device)
     precursor_gates = wp.zeros(n_boxes, dtype=wp.int32, device=device)
@@ -1189,6 +1220,9 @@ def _preflight_nucleation(  # noqa: C901
             False,
             None,
             normalized_time_step,
+            finalized_demand=finalized_demand,
+            diagnostics=diagnostics,
+            p3_sidecars=p3_sidecars,
         )
     gate_count = wp.zeros(1, dtype=wp.int32, device=device)
     wp.launch(
@@ -1216,6 +1250,9 @@ def _preflight_nucleation(  # noqa: C901
             True,
             gate_reason,
             normalized_time_step,
+            finalized_demand=finalized_demand,
+            diagnostics=diagnostics,
+            p3_sidecars=p3_sidecars,
         )
     return _NucleationPreflight(
         particles,
@@ -1231,6 +1268,9 @@ def _preflight_nucleation(  # noqa: C901
         bool(gated_boxes),
         None,
         normalized_time_step,
+        finalized_demand=finalized_demand,
+        diagnostics=diagnostics,
+        p3_sidecars=p3_sidecars,
     )
 
 
@@ -1636,6 +1676,7 @@ def _convert_admitted_demand_to_counts(
     maximum_count: wp.float64,
     counts: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
+    invalid_index: wp.int32,
 ) -> None:
     """Convert per-volume admitted demand to integral provisional counts.
 
@@ -1648,7 +1689,8 @@ def _convert_admitted_demand_to_counts(
         volume: Validated particle-box volume [m³], shaped ``(B,)``.
         maximum_count: Largest representable provisional ``int32`` count.
         counts: Private output for provisional counts, shaped ``(B,)``.
-        invalid: Private one-element counter for invalid conversions.
+        invalid: Private status counters shared with slot classification.
+        invalid_index: Status lane reserved for invalid conversions.
     """
     box = wp.tid()
     events = accepted_demand[box] * volume[box]
@@ -1658,7 +1700,7 @@ def _convert_admitted_demand_to_counts(
         or events != wp.floor(events)
         or events > maximum_count
     ):
-        wp.atomic_add(invalid, 0, 1)
+        wp.atomic_add(invalid, invalid_index, 1)
     else:
         counts[box] = wp.int32(events)
 
@@ -1698,6 +1740,91 @@ def _commit_staged_nucleation_slots(
             selected_slot_indices[box, rank] = -1
 
 
+def _validate_staged_nucleation_sidecars(
+    preflight: _NucleationPreflight,
+    finalized_demand: NucleationFinalizedDemandBuffers,
+    diagnostics: NucleationDiagnosticBuffers,
+) -> None:
+    """Validate exact P3 handoff records before staging writes."""
+    if preflight.finalized_demand is not finalized_demand:
+        raise ValueError(
+            "finalized_demand must be the preflight-validated record."
+        )
+    if preflight.diagnostics is not diagnostics:
+        raise ValueError("diagnostics must be the preflight-validated record.")
+    supplied_sidecars = (
+        finalized_demand.accepted_counts,
+        finalized_demand.accepted_demand,
+        finalized_demand.precursor_mass_change,
+        diagnostics.gate_codes,
+        diagnostics.selected_slot_indices,
+        diagnostics.free_slot_indices,
+        diagnostics.active_slot_counts,
+        diagnostics.free_slot_counts,
+    )
+    if len(preflight.p3_sidecars) != len(supplied_sidecars) or any(
+        expected is not supplied
+        for expected, supplied in zip(
+            preflight.p3_sidecars, supplied_sidecars, strict=True
+        )
+    ):
+        raise ValueError("P3 sidecars must be the preflight-validated storage.")
+
+
+def _convert_staged_nucleation_counts(
+    accepted_demand: Any,
+    volume: Any,
+    device: Any,
+) -> tuple[Any, Any]:
+    """Convert admitted demand to private counts and a shared invalid flag."""
+    counts = wp.zeros(accepted_demand.shape[0], dtype=wp.int32, device=device)
+    invalid = wp.zeros(2, dtype=wp.int32, device=device)
+    wp.launch(
+        _convert_admitted_demand_to_counts,
+        dim=accepted_demand.shape[0],
+        inputs=[
+            accepted_demand,
+            volume,
+            float(np.iinfo(np.int32).max),
+            counts,
+            invalid,
+            1,
+        ],
+        device=device,
+    )
+    return counts, invalid
+
+
+def _write_staged_nucleation_diagnostics(
+    preflight: _NucleationPreflight,
+    categories: Any,
+    diagnostics: NucleationDiagnosticBuffers,
+) -> None:
+    """Write E6-F5 classification outputs to the supplied diagnostics."""
+    if preflight.n_particles:
+        wp.launch(
+            _write_diagnostics,
+            dim=preflight.n_boxes,
+            inputs=[
+                categories,
+                diagnostics.free_slot_indices,
+                diagnostics.active_slot_counts,
+                diagnostics.free_slot_counts,
+            ],
+            device=preflight.device,
+        )
+    else:
+        wp.launch(
+            _write_empty_diagnostics,
+            dim=preflight.n_boxes,
+            inputs=[
+                diagnostics.active_slot_counts,
+                diagnostics.free_slot_counts,
+            ],
+            device=preflight.device,
+        )
+
+
 def _stage_nucleation_slots(
     preflight: _NucleationPreflight,
     finalized_demand: NucleationFinalizedDemandBuffers,
@@ -1712,7 +1839,8 @@ def _stage_nucleation_slots(
     count and slot-diagnostic sidecars. It does not activate slots, resolve
     exhaustion, resize storage, or mutate particles or gas.
 
-    Conversion errors occur before E6-F5 diagnostics or any P3 sidecar write.
+    P3 shares one private scalar status readback between its conversion and the
+    E6-F5 slot-state classification before either output writer launches.
     After a successful E6-F5 or P3 writer launch, callers must synchronize
     before consuming outputs; asynchronous writer failures do not promise
     rollback.
@@ -1725,8 +1853,9 @@ def _stage_nucleation_slots(
             P3's capacity-limited selectable prefix.
 
     Raises:
-        ValueError: If private handoff records are invalid or event conversion
-            does not produce finite, nonnegative, integral ``int32`` counts.
+        ValueError: If private handoff records are invalid, slots are invalid,
+            or event conversion does not produce finite, nonnegative, integral
+            ``int32`` counts.
     """
     if not isinstance(preflight, _NucleationPreflight):
         raise ValueError("preflight must be _NucleationPreflight.")
@@ -1736,36 +1865,44 @@ def _stage_nucleation_slots(
         )
     if not isinstance(diagnostics, NucleationDiagnosticBuffers):
         raise ValueError("diagnostics must be NucleationDiagnosticBuffers.")
+    _validate_staged_nucleation_sidecars(
+        preflight, finalized_demand, diagnostics
+    )
     if preflight.n_boxes == 0:
         return
 
-    counts = wp.zeros(
-        preflight.n_boxes, dtype=wp.int32, device=preflight.device
+    counts, invalid = _convert_staged_nucleation_counts(
+        finalized_demand.accepted_demand,
+        preflight.particles.volume,
+        preflight.device,
     )
-    invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
-    wp.launch(
-        _convert_admitted_demand_to_counts,
-        dim=preflight.n_boxes,
-        inputs=[
-            finalized_demand.accepted_demand,
-            preflight.particles.volume,
-            float(np.iinfo(np.int32).max),
-            counts,
-            invalid,
-        ],
+    categories = wp.empty(
+        (preflight.n_boxes, preflight.n_particles),
+        dtype=wp.int32,
         device=preflight.device,
     )
-    if int(invalid.numpy()[0]):
+    if preflight.n_particles:
+        wp.launch(
+            _classify_slots,
+            dim=(preflight.n_boxes, preflight.n_particles),
+            inputs=[
+                preflight.particles.masses,
+                preflight.particles.concentration,
+                preflight.particles.charge,
+                categories,
+                invalid,
+            ],
+            device=preflight.device,
+        )
+    status = invalid.numpy()
+    if int(status[0]):
+        raise ValueError("Invalid particle slot state.")
+    if int(status[1]):
         raise ValueError(
             "accepted_demand times particle volume must be a finite, "
             "nonnegative integral int32 count."
         )
-    get_slot_diagnostics_gpu(
-        preflight.particles,
-        diagnostics.free_slot_indices,
-        diagnostics.active_slot_counts,
-        diagnostics.free_slot_counts,
-    )
+    _write_staged_nucleation_diagnostics(preflight, categories, diagnostics)
     wp.launch(
         _commit_staged_nucleation_slots,
         dim=preflight.n_boxes,

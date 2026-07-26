@@ -1,4 +1,4 @@
-"""Focused P1 validation and sidecar-only P2 contract tests."""
+"""Focused P1 validation plus sidecar-only P2 and P3 staging tests."""
 
 from dataclasses import FrozenInstanceError
 from types import SimpleNamespace
@@ -242,33 +242,125 @@ def test_stage_nucleation_slots_writes_expected_layout(
     _assert_snapshot_unchanged(scratch_snapshot)
 
 
-def test_stage_nucleation_slots_passes_exact_diagnostics_to_e6_f5(monkeypatch):
-    """P3 delegates classification to E6-F5 using caller-owned sidecars."""
-    captured = []
-    original = nucleation_module.get_slot_diagnostics_gpu
-
-    def capture_diagnostics(
-        particles, free_indices, active_counts, free_counts
-    ):
-        """Capture the P3-owned E6-F5 output sidecars before delegation."""
-        captured.append((free_indices, active_counts, free_counts))
-        return original(particles, free_indices, active_counts, free_counts)
-
-    monkeypatch.setattr(
-        nucleation_module, "get_slot_diagnostics_gpu", capture_diagnostics
+def test_stage_nucleation_slots_rejects_replacement_records_without_writes():
+    """P3 accepts only the exact P2/P3 sidecar records validated by P1."""
+    particles, gas = _state()
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    finalized = NucleationFinalizedDemandBuffers(
+        finalized.accepted_counts,
+        wp.array([1.0], dtype=wp.float64, device="cpu"),
+        finalized.precursor_mass_change,
     )
-    _, _, _, finalized, diagnostics = _stage_slots(
-        [1.0], np.array([[False, True]])
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    replacement_finalized = NucleationFinalizedDemandBuffers(
+        wp.ones(1, dtype=wp.int32, device="cpu"),
+        wp.ones(1, dtype=wp.float64, device="cpu"),
+        wp.ones((1, 1), dtype=wp.float64, device="cpu"),
+    )
+    replacement_diagnostics = NucleationDiagnosticBuffers(
+        *[
+            wp.ones(tuple(value.shape), dtype=wp.int32, device="cpu")
+            for value in diagnostics.__dict__.values()
+        ]
+    )
+    before = _snapshot_arrays(
+        particles,
+        gas,
+        scratch,
+        finalized,
+        diagnostics,
+        replacement_finalized,
+        replacement_diagnostics,
     )
 
-    assert captured == [
-        (
-            diagnostics.free_slot_indices,
-            diagnostics.active_slot_counts,
-            diagnostics.free_slot_counts,
+    with pytest.raises(ValueError, match="preflight-validated record"):
+        _stage_nucleation_slots(preflight, replacement_finalized, diagnostics)
+    with pytest.raises(ValueError, match="preflight-validated record"):
+        _stage_nucleation_slots(preflight, finalized, replacement_diagnostics)
+
+    _assert_snapshot_unchanged(before)
+
+
+def test_stage_nucleation_slots_rejects_replaced_record_buffer_without_writes():
+    """P3 rejects a record whose validated storage was substituted after P1."""
+    particles, gas = _state()
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    finalized = NucleationFinalizedDemandBuffers(
+        finalized.accepted_counts,
+        wp.array([1.0], dtype=wp.float64, device="cpu"),
+        finalized.precursor_mass_change,
+    )
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    replacement = wp.ones(1, dtype=wp.int32, device="cpu")
+    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)
+    object.__setattr__(finalized, "accepted_counts", replacement)
+
+    with pytest.raises(ValueError, match="preflight-validated storage"):
+        _stage_nucleation_slots(preflight, finalized, diagnostics)
+
+    _assert_snapshot_unchanged(before)
+    np.testing.assert_array_equal(replacement.numpy(), [1])
+
+
+def test_stage_nucleation_slots_preserves_nonzero_particle_gas_and_p2_state():
+    """Successful P3 modifies only its count and slot-diagnostic outputs."""
+    particles, gas = _state()
+    particles.masses = wp.ones((1, 2, 1), dtype=wp.float64, device="cpu")
+    particles.charge = wp.array([[-2.0, 3.0]], dtype=wp.float64, device="cpu")
+    gas.concentration = wp.array([[7.0]], dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    finalized = NucleationFinalizedDemandBuffers(
+        finalized.accepted_counts,
+        wp.array([1.0], dtype=wp.float64, device="cpu"),
+        finalized.precursor_mass_change,
+    )
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    preserved = _snapshot_arrays(particles, gas, scratch)
+    p2_preserved = _snapshot_arrays(
+        SimpleNamespace(
+            accepted_demand=finalized.accepted_demand,
+            precursor_mass_change=finalized.precursor_mass_change,
+            gate_codes=diagnostics.gate_codes,
         )
-    ]
+    )
+
+    _stage_nucleation_slots(preflight, finalized, diagnostics)
+
+    _assert_snapshot_unchanged(preserved)
+    _assert_snapshot_unchanged(p2_preserved)
     np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [1])
+    np.testing.assert_array_equal(diagnostics.active_slot_counts.numpy(), [2])
+    np.testing.assert_array_equal(diagnostics.free_slot_counts.numpy(), [0])
+    np.testing.assert_array_equal(
+        diagnostics.selected_slot_indices.numpy(), [[-1, -1]]
+    )
 
 
 @pytest.mark.parametrize(
