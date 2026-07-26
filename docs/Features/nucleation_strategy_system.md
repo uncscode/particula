@@ -118,15 +118,32 @@ Kerminen--Kulmala calculation.
 
 See [Fixed-Capacity Slot Exhaustion Primitives](slot_exhaustion_policies.md),
 the [equations](../Theory/Technical/Dynamics/Nucleation_Equations.md), and the
-[supported CPU example](../Examples/Nucleation/cpu_nucleation.py). E6-F8 has a
-private direct-Warp P4 staging seam: immutable P2/P3 demand/count handoffs use
-caller-owned sidecars to select fully viable resampling before optional
-representative-volume scaling and to emit finalized demand/count/free-slot
-diagnostics. It neither activates slots nor mutates source mass or gas. Expected
-all-box rejection preserves every supplied sidecar; an entered exhaustion
-primitive retains its own no-cross-primitive-rollback boundary. E6-F9 GPU
-integration/example orchestration remains deferred; see the
-[GPU roadmap](Roadmap/data-oriented-gpu.md).
+[supported CPU example](../Examples/Nucleation/cpu_nucleation.py).
+
+### Private direct-Warp staging boundary
+
+E6-F8 also ships an **unexported** direct-Warp P4 staging seam. This is an
+implementation boundary, not public GPU nucleation: it consumes immutable P2
+admitted-demand and P3 provisional-count handoffs, while retaining those
+historical records unchanged. Its caller owns the P4 sidecars and the nested
+resampling/scaling primitive sidecars.
+
+For each exhausted row, P4 selects resampling only when it can release the
+entire deficit. It considers representative-volume scaling only for exhausted
+rows not selected for resampling. It then reports finalized demand, count, and
+ascending free-slot diagnostics; demand is never silently truncated.
+
+Expected rejected all-box plans complete before a P4 or nested-primitive writer:
+particle and gas state, P2/P3 records, P4 diagnostics, and all supplied nested
+sidecars remain unchanged. Once an exhaustion primitive has been entered, its
+own planning/commit failure rules apply. P4 provides no rollback across that
+primitive boundary and does not classify such a failure as the all-box rejection
+guarantee.
+
+This seam does not activate slots, mutate source mass or gas, resize or compact
+storage, transfer data, fall back to CPU, or provide a runnable, public export,
+or example. E6-F9 GPU integration/example orchestration remains deferred; see
+the [GPU roadmap](Roadmap/data-oriented-gpu.md).
 
 Focused validation:
 

@@ -111,19 +111,20 @@ private helpers for cross-kernel setup.
   `resampling_step_gpu` is exported; `ResamplingBuffers`, P4 sidecars, status
   codes, and kernels remain concrete-module-only. Neither boundary provides a
   runnable, policy resolution, CPU fallback or transfer, or resizing.
-- `nucleation.py` - Concrete-only E6-F8 P1 read-only preflight, P2
-  demand-planning, and private P3 staging boundary for fixed-capacity GPU
-  nucleation. P2 calculates `E_pot=J*dt`, with survival already in `J`, and
-  commits planning, admitted-demand, removal, and gate sidecars. P3 converts
-  admitted demand times box volume only when it is an exact representable
-  nonnegative `int32` count, reuses E6-F5 slot diagnostics, retains counts
-  beyond free capacity, and writes only the fixed-shape P3 count and
-  diagnostic sidecars. It stages the deterministic selectable free-slot prefix
-  without activation or exhaustion policy, and keeps the module unexported.
-  Conversion failures preserve outputs before any writer launch, while
-  rollback is not promised after asynchronous diagnostic or commit launches.
-  It provides no hidden transfer, fallback, activation, particle/gas mutation,
-  or execution; E6-F6 policy and later phases remain deferred.
+- `nucleation.py` - Concrete-only E6-F8 P1--P4 staging seam for fixed-capacity
+  GPU nucleation. P2 calculates `E_pot=J*dt`, with survival already in `J`,
+  and commits planning, admitted-demand, removal, and gate sidecars. P3
+  converts admitted demand times box volume only when it is an exact
+  representable nonnegative `int32` count, reuses E6-F5 slot diagnostics,
+  retains counts beyond free capacity, and writes only the fixed-shape P3 count
+  and diagnostic sidecars. Private P4 preserves immutable P2/P3 handoffs,
+  chooses fully viable resampling before representative-volume-scaling fallback
+  for exhausted rows, and writes caller-owned final demand/count/free-slot
+  diagnostics. Expected all-box P4 preflight rejections preserve all supplied
+  state before workspace or E6-F6 primitive writes; an entered E6-F6 primitive
+  retains its separate no-cross-primitive-rollback boundary. The module remains
+  unexported and provides no hidden transfer, CPU fallback, activation,
+  particle/gas or source mutation, resizing, or E6-F9 integration.
 - `wall_loss.py` - Concrete fixed-slot neutral/charged GPU wall-loss boundary;
   owns immutable host configuration, frozen preflight, bounded fixed-slot
   removal, and the external caller-owned per-box RNG sidecar lifecycle. Charged

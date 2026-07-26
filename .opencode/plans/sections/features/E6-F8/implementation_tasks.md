@@ -19,8 +19,13 @@
   reimplementing active/free predicates (#1440). P3 performs private exact
   demand-volume int32 conversion, retains full counts, and writes the bounded
   selected free-slot prefix without activation or capacity resolution.
-- [ ] Invoke E6-F6 exhaustion planning with resampling-first precedence; finalize
-  represented demand from its scale and reject any final-domain residual.
+- [x] Privately orchestrate E6-F6 exhaustion with fully viable resampling-first
+  precedence and scaling fallback (#1441). P4 preserves immutable P2/P3
+  handoffs, finalizes demand/count/free-prefix diagnostics from separate
+  workspace, and rejects invalid residual/final domains without truncation.
+- [x] Preflight P4/nested sidecars and expected plan failures before P4 writes or
+  primitive entry (#1441), preserving complete caller snapshots; document that
+  entered E6-F6 primitives retain their own no-rollback boundary.
 - [ ] Implement commit kernels that add represented particle source and subtract
   the exact finalized gas mass only after every box is feasible.
 - [ ] Add `nucleation_step_gpu(...)` with stable return/identity behavior and
@@ -38,6 +43,9 @@
   in `particula/gpu/kernels/tests/nucleation_test.py` (#1439).
 - [x] Add P3 co-located layout, conversion, sidecar ownership, and preservation
   coverage in `particula/gpu/kernels/tests/nucleation_test.py` (#1440).
+- [x] Add P4 co-located policy-oracle, final diagnostic, identity, failure
+  snapshot, and entered-primitive-boundary coverage in
+  `particula/gpu/kernels/tests/nucleation_test.py` (#1441).
 - [ ] Add `nucleation_parity_test.py` with an independent float64 E6-F7 oracle,
   one/many boxes and species, sparse/full slots, and repeated calls.
 - [ ] Assert per-box/species represented particle-plus-gas conservation rather

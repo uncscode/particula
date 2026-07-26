@@ -22,8 +22,8 @@ WarpParticleData + WarpGasData + config + dt + fixed-shape sidecars
                                |
               retained full counts + free-slot selectable prefix
                                |
-                    E6-F6 complete exhaustion plan (deferred)
-             resampling first; scaling transforms demand
+          P4 E6-F6 orchestration: fully viable resampling first,
+                    then scaling fallback for remaining rows
                               |
              every box feasible and conservative?
                   no -> error, no caller writes
@@ -43,12 +43,19 @@ lowest-index limiting participating species. P2 commits only its demand,
  inclusive int32 range, reads one conversion status, then calls E6-F5
  `get_slot_diagnostics_gpu` with supplied diagnostics. Its sole writer retains
  the full count and clears/fills selected indices with the deterministic prefix
- limited by count, free count, and capacity. Capacity planning, representative
- scaling, activation, and the particle/gas commit remain P4--P5 work.
+limited by count, free count, and capacity. P4 keeps P2 accepted demand and P3
+counts/diagnostics immutable, copies demand to a distinct workspace, and
+computes `required_release = max(p3_count - free_count, 0)`. It invokes
+resampling only for enabled rows whose releasable capacity covers the whole
+deficit, then invokes scaling only for remaining exhausted rows. It derives
+final counts from post-policy workspace demand and current volume, writes final
+demand/count/ascending-free-prefix diagnostics, and rejects residual or
+unrepresentable/capacity-exceeding plans without truncation. Activation and the
+particle/gas commit remain P5 work.
 
 ## Data / API / Workflow Changes
 
-### P1/P2 implementation status (#1438, #1439)
+### P1--P4 implementation status (#1438, #1439, #1440, #1441)
 
 P1 and private P2 implement the initial stages in
 `particula/gpu/kernels/nucleation.py`: frozen `NucleationConfig` and the three
@@ -61,9 +68,14 @@ planned precursor removal, and gate diagnostics, then commits only its
   designated sidecars. P3 adds `free_slot_indices (B, N)`,
   `active_slot_counts (B,)`, and `free_slot_counts (B,)` to
   `NucleationDiagnosticBuffers`; all five P3 arrays are same-device contiguous
-  `wp.int32` storage covered by overlap checks. P3 does not mutate particles or
-  gas and no symbol is exported from `particula.gpu.kernels`; the staged
-  particle transaction and later writer stages remain P4--P5 work.
+  `wp.int32` storage covered by overlap checks. P4 adds frozen concrete-only
+  `NucleationExhaustionControls` and `NucleationExhaustionBuffers`, including
+  nested E6-F6 `ResamplingBuffers`, mutable demand workspace, scale inputs and
+  outputs, final counts, and final selected-index prefixes. Exact Python bool
+  controls, identities, schemas, device/contiguity, and non-overlap are
+  preflighted. Neither P3 nor P4 mutates particle/gas state and no symbol is
+  exported from `particula.gpu.kernels`; the staged particle transaction and
+  later writer stages remain P5 work.
 
 - **Data Model:** No required container fields. Add concrete-module
   `NucleationConfig`, `NucleationScratchBuffers`,
@@ -83,11 +95,13 @@ planned precursor removal, and gate diagnostics, then commits only its
 - **Workflow Hooks:** E6-F5 and E6-F6 are mandatory capacity dependencies;
   E6-F7 is the scientific and numerical oracle; E6-F9 consumes this low-level
   step in an explicit-transfer integrated sequence.
-- **Failure Boundary:** P3 conversion rejection occurs before P3/E6-F5 output
-  writes; E6-F5 retains its preflight-before-diagnostic-write contract. Its
-  commit starts only after both stages succeed. No rollback is promised after a
-  launched E6-F5 or P3 writer kernel; callers synchronize before consuming
-  outputs and may rebuild sidecars from unchanged particle/gas/P2 state.
+- **Failure Boundary:** P4 completes handoff, slot, E6-F6-prerequisite, and
+  final-domain validation before its workspace writes or either primitive.
+  Expected all-box rejection therefore preserves particle/gas data and every
+  P2/P3/P4/nested-scratch sidecar. After an E6-F6 primitive is entered, its
+  documented planning mutation and post-commit no-rollback boundary applies;
+  P4 intentionally makes no cross-primitive rollback claim. Callers
+  synchronize before consuming successful outputs.
 
 ## Security & Compliance
 

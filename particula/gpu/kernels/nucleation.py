@@ -319,6 +319,11 @@ class NucleationExhaustionControls:
     entire P3 deficit. ``representative_volume_scaling`` is then considered for
     any remaining exhausted row. Exact Python booleans deliberately prevent
     integer or NumPy scalar substitutes at this concrete-only seam.
+
+    Attributes:
+        resampling: Enable fully viable resampling before scaling fallback.
+        representative_volume_scaling: Enable representative-volume scaling for
+            exhausted rows not selected for resampling.
     """
 
     resampling: bool
@@ -341,9 +346,33 @@ class NucleationExhaustionBuffers:
     P2 admitted demand and P3 provisional counts are historical immutable
     handoffs. P4 copies admitted demand into ``demand_workspace`` and derives
     ``final_counts`` from its post-policy demand and current box volume.
-    Successful resampling/scaling may mutate particle state and the documented
-    nested primitive scratch lanes. Expected P4 preflight rejections occur
-    before either primitive and preserve every supplied sidecar.
+    Expected P4 all-box preflight rejections occur before workspace writes or
+    either primitive and preserve every supplied sidecar. Once a selected
+    primitive begins, its own planning and commit failure contract applies;
+    P4 does not provide cross-primitive rollback. This concrete-only record is
+    not exported through ``particula.gpu.kernels`` or ``particula.gpu``.
+
+    Attributes:
+        resampling_buffers: Caller-owned E6-F6 resampling scratch and
+            diagnostic storage.
+        demand_workspace: Mutable ``wp.float64`` ``(B,)`` copy of P2 admitted
+            demand [#/m³].
+        final_demand: ``wp.float64`` ``(B,)`` P4-finalized demand [#/m³].
+        requested_scale: ``wp.float64`` ``(B,)`` requested volume scales.
+        minimum_scale: ``wp.float64`` ``(B,)`` lower bounds for volume scales.
+        minimum_volume: ``wp.float64`` ``(B,)`` minimum allowed box volumes
+            [m³].
+        resolved_scale: ``wp.float64`` ``(B,)`` scale selected by P4; unscaled
+            rows receive ``1.0``.
+        resampling_releasable_counts: ``wp.int32`` ``(B,)`` maximum counts
+            resampling may release.
+        required_release_counts: ``wp.int32`` ``(B,)`` P4 output deficits
+            before policy application.
+        scaling_required: ``wp.int32`` ``(B,)`` P4 output flags for rows
+            selected for scaling.
+        final_counts: ``wp.int32`` ``(B,)`` P4-finalized event counts.
+        final_selected_slot_indices: ``wp.int32`` ``(B, N)`` P4-finalized
+            ascending free-slot prefixes with ``-1`` tails.
     """
 
     resampling_buffers: ResamplingBuffers
@@ -2259,11 +2288,34 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
 ) -> None:
     """Privately apply P4 capacity policy and write finalized diagnostics.
 
+    P4 validates immutable P2/P3 handoffs, then selects resampling only when it
+    can release a row's complete deficit. It selects representative-volume
+    scaling only for remaining exhausted rows, invokes each selected E6-F6
+    primitive once, and derives final demand/count/free-slot diagnostics from
+    the resulting device state. P2/P3 handoffs remain unchanged.
+
     All expected P4 rejections are detected before P4 workspace writes or an
-    E6-F6 primitive call. Once a selected primitive begins, its independent
+    E6-F6 primitive call, preserving particle, gas, P2/P3/P4, and nested
+    sidecar state. Once a selected primitive begins, its independent
     planning/commit failure contract applies; P4 intentionally provides no
-    cross-primitive rollback. This concrete-only seam neither activates slots
-    nor mutates gas.
+    cross-primitive rollback. This concrete-only, unexported seam does not
+    activate slots, mutate gas or source mass, resize storage, transfer data to
+    the host, use a CPU fallback, or provide E6-F9 integration.
+
+    Args:
+        preflight: Exact private P1 metadata with validated particle and gas
+            containers.
+        finalized_demand: Exact immutable P2/P3 record containing admitted
+            demand and provisional counts.
+        diagnostics: Exact immutable P2/P3 record containing slot diagnostics
+            and the provisional selected prefix.
+        controls: Exact-Boolean resampling-first/scaling-fallback controls.
+        buffers: Exact caller-owned P4 and nested E6-F6 workspace/diagnostic
+            record.
+
+    Raises:
+        ValueError: If handoffs, policy inputs, sidecars, slot state, or final
+            demand capacity are invalid.
     """
     if not isinstance(preflight, _NucleationPreflight):
         raise ValueError("preflight must be _NucleationPreflight.")

@@ -28,9 +28,16 @@ independent E6-F7 float64 oracle, never the production GPU helper itself.
   invalid conversion products without writes, and cover the inclusive int32
   maximum plus E6-F5 slot-validation preservation. Warp CPU is the baseline;
   CUDA rows skip cleanly when unavailable.
-- **P4:** Exhaustion cases cover policy defaults and all combinations,
-  resampling precedence, scaling fallback, insufficient scratch, impossible
-  demand, residual rejection, and all-box failure snapshots.
+- **P4 (#1441):** Shipped co-located Warp tests use an independent NumPy policy
+  oracle for required release, resampling precedence, scaling fallback, final
+  demand/counts, and ascending `-1`-tailed prefixes. They cover free/zero-demand,
+  resampling-only, scaling-only, mixed-box, boundary, and no-policy cases;
+  exact-bool and P4/nested schema/identity/alias validation; stale P2/P3
+  handoffs; insufficient scratch; and invalid final demand products. Expected
+  all-box rejections snapshot particles, gas, P2/P3/P4, and nested scratch;
+  separate coverage documents the entered-primitive failure boundary without
+  claiming cross-primitive rollback. Warp CPU is the baseline and CUDA skips
+  cleanly when unavailable.
 - **P5:** Entry-point tests cover supplied-buffer and container identity,
   repeated calls, current-gas coupling, complete transaction ordering, lazy
   imports, explicit device inputs, and absence of CPU fallback/transfer.

@@ -1,6 +1,6 @@
 # Documentation Updates
 
-## P1/P3 delivered (#1438, #1439, #1440)
+## P1--P4 delivered (#1438, #1439, #1440, #1441)
 
 - `particula/gpu/kernels/nucleation.py` documents the concrete-only read-only
   P1 boundary, frozen record ownership, fixed-shape sidecars, and later-phase
@@ -8,12 +8,18 @@
   inventory-limited admission, P2/P3 sidecar ownership, and the sidecar-only
   mutation boundary. P3 documentation records private exact count conversion,
   E6-F5 diagnostic reuse, retained over-capacity counts, caller-owned sidecars,
-  and the pre-launch preservation/post-launch rollback boundary.
+   and the pre-launch preservation/post-launch rollback boundary. P4
+   documentation adds immutable P2/P3 handoffs, caller-owned exhaustion
+   controls/buffers, resampling-first/scaling-fallback selection, final P4
+   diagnostics, expected-rejection snapshots, and the entered-primitive
+   no-cross-primitive-rollback boundary.
 - `.opencode/guides/architecture/architecture_outline.md` and
   `.opencode/guides/architecture_reference.md` now describe the shipped private
-  P3 staging seam and continue to defer E6-F6 policy, activation, particle/gas
-  mutation, and an integrated GPU step. No user-facing documentation or API
-  export was added.
+   P4 orchestration seam, its ownership/failure boundaries, and its continued
+   deferral of activation, particle/gas mutation, and an integrated GPU step.
+   `docs/Features/Roadmap/data-oriented-gpu.md` and
+   `docs/Features/nucleation_strategy_system.md` record the same private P4
+   contract. No user-facing API export was added.
 
 ## Deferred P7 work
 

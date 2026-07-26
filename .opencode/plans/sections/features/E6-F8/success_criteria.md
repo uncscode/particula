@@ -22,6 +22,20 @@
 - [x] P3 has no activation, E6-F6 policy, particle/gas mutation, export, host
   fallback, resize, or hidden transfer.
 
+## P4 completion (#1441)
+
+- [x] P4 preserves P2 accepted demand and P3 full counts/diagnostics as immutable
+  handoffs, selects fully viable resampling before scaling fallback, and never
+  truncates unmet demand.
+- [x] P4 derives final counts from post-policy demand-volume products and writes
+  caller-owned final demand/count/ascending-free-prefix diagnostics by identity.
+- [x] Expected all-box failures reject before P4 writes or E6-F6 primitive entry
+  and preserve particle/gas data plus every P2/P3/P4/nested sidecar.
+- [x] The distinct entered-primitive planning/commit failure boundary is
+  documented and tested without claiming cross-primitive rollback.
+- [x] P4 remains concrete-only and adds no activation, particle/gas mutation,
+  public export, E6-F9 integration, fallback, resize, or hidden transfer.
+
 - [ ] Plan metadata and implementation preserve mandatory E6-F5, E6-F6, and
   E6-F7 dependencies; E6-F9 can consume the intended low-level entry point.
 - [ ] Direct Warp activation and kinetic rates, potential events, admission,

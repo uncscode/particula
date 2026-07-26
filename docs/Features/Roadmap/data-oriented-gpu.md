@@ -68,8 +68,9 @@ and the time-integration decisions in
 [Time-Scale Stiffness](#time-scale-stiffness). New particle formation is both
 a size-range driver. E6-F7 ships a bounded CPU-only, single-box nucleation
 process; its public runnable adapts legacy `Aerosol` backing data and is not a
-GPU path. [Epic F](#epic-f-gpu-process-completeness) retains direct-Warp
-E6-F8 and integration/example E6-F9 work so freshly formed particles can enter
+GPU path. E6-F8 ships a private, unexported direct-Warp staging seam only;
+it is not GPU nucleation. [Epic F](#epic-f-gpu-process-completeness) retains
+E6-F9 integration/example work before freshly formed particles can enter
 GPU-resident simulations through slot activation.
 
 ## Non-Goals
@@ -231,7 +232,8 @@ Known GPU physics gaps remain:
   guide](../data-containers-and-gpu-foundations.md) for the supported
   constant/Buck scope and refresh contract.
 - E6-F7 ships a CPU-only, single-box nucleation/particle-source runnable.
-  Direct-Warp E6-F8 and GPU integration/example E6-F9 remain deferred.
+  E6-F8 ships private direct-Warp staging only; public GPU nucleation and
+  E6-F9 GPU integration/examples remain deferred.
 
 Known GPU kernel defects and design limits (see
 [Known Kernel Issues](#known-kernel-issues)):
@@ -1354,12 +1356,24 @@ Delivered CPU nucleation and deferred GPU scope:
     Its public `Nucleation` runnable preserves legacy `Aerosol` identity and
     uses fixed-capacity slots, partitioning gas, and per-substep transactions.
     See the [CPU Nucleation Strategy System](../nucleation_strategy_system.md).
-2. E6-F8 provides private direct-Warp P1--P4 staging. P4 uses immutable P2/P3
-     handoffs and caller-owned fixed-shape sidecars to select resampling first,
-     then representative-volume scaling fallback, before writing finalized
-     demand/count/free-slot diagnostics. Expected all-box preflight rejection
-     snapshots every caller-owned sidecar; successful primitives retain their
-     independent rollback boundary. Slot activation remains deferred (see
+2. E6-F8 provides private, unexported direct-Warp P1--P4 staging, not a public
+     GPU nucleation API. P4 consumes immutable P2 admitted-demand and P3
+     provisional-count handoffs without changing them. The caller owns its
+     fixed-shape P4 sidecars and the nested resampling/scaling primitive
+     sidecars. For each exhausted row, it selects resampling only when that
+     primitive can satisfy the full release deficit; representative-volume
+     scaling is considered only for remaining exhausted rows. It writes
+     finalized demand, count, and ascending free-slot diagnostics without
+     silently truncating demand.
+
+     Every expected rejected all-box plan is rejected before P4 or nested
+     primitive writers: particle/gas state, P2/P3 records, P4 diagnostics, and
+     every supplied nested sidecar remain unchanged. After a primitive is
+     entered, that primitive's own planning/commit guarantees apply; P4 makes
+     no cross-primitive rollback claim and does not recast such a failure as an
+     all-box rejection. P4 does not activate slots, mutate source mass or gas,
+     resize or compact storage, transfer data, or fall back to CPU. Slot
+     activation remains deferred (see
      [Fixed-Capacity Slot Boundary](#fixed-capacity-slot-boundary)).
 3. E6-F9 GPU integration/example orchestration, source/gas inventory handling,
     and complete-sequence slot-exhaustion validation remain deferred.

@@ -17,7 +17,7 @@
   - As a library maintainer, I want fixed-shape sidecars and fail-before-write
    validation so invalid calls cannot partially mutate simulation state.
 
-## Delivered: P1 (#1438), P2 (#1439), and P3 (#1440)
+## Delivered: P1 (#1438), P2 (#1439), P3 (#1440), and P4 (#1441)
 
 `particula/gpu/kernels/nucleation.py` now provides the concrete-only, read-only
 P1 boundary with frozen configuration and caller-owned sidecar dataclasses plus
@@ -40,5 +40,14 @@ only caller-owned P3 sidecars: full accepted counts, E6-F5 diagnostics, and the
 free-slot selectable prefix with `-1` tails. Counts may exceed free capacity;
 P4 alone resolves that capacity policy and activates slots. Conversion and E6-F5
 preflight failures preserve those sidecars; rollback is not promised after an
-asynchronous diagnostic or P3 commit launch. P4--P7 retain exhaustion handling,
-the particle/gas transaction, public API, and user documentation responsibilities.
+asynchronous diagnostic or P3 commit launch.
+
+Private `_orchestrate_nucleation_exhaustion(...)` now implements P4 (#1441).
+It preserves P2 accepted demand and P3 count/diagnostic records as immutable
+handoffs, chooses fully viable E6-F6 resampling before scaling fallback, and
+writes P4 final demand/count/free-prefix diagnostics. Expected all-box
+rejections occur before P4 workspace writes or primitive entry and preserve
+particle, gas, P2, P3, P4, and nested scratch state. Once a primitive is
+entered, its documented no-rollback boundary applies; P4 claims no
+cross-primitive rollback. P4 adds no public API, E6-F9 integration, activation,
+or particle/gas mutation.

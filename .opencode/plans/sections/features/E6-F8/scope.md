@@ -21,7 +21,15 @@ capacity rather than creating a second slot or exhaustion model.
   representable `accepted_demand * volume` values to full `wp.int32` counts,
   reuses E6-F5 diagnostics, and commits only the five caller-owned P3/E6-F5
   sidecars. Counts beyond free capacity are retained; selected indices contain
-  only the deterministic free-slot prefix and `-1` tails.
+   only the deterministic free-slot prefix and `-1` tails.
+
+- **Delivered P4 (#1441):** concrete-only
+  `_orchestrate_nucleation_exhaustion(...)` in
+  `particula/gpu/kernels/nucleation.py`, with co-located Warp tests. It retains
+  P2/P3 handoffs as immutable history, uses separate P4 workspace/output
+  sidecars, selects fully viable resampling before scaling fallback, and writes
+  final demand/count/free-prefix diagnostics. Expected all-box rejection
+  preserves every caller-owned state and sidecar before E6-F6 primitive entry.
 
 - Device evaluation of E6-F7 activation `J=A*C` and kinetic `J=K*C^2` models,
   including the same SI conversions, closed validity domains, composition,
@@ -39,9 +47,9 @@ capacity rather than creating a second slot or exhaustion model.
 
 ## Out of Scope
 
-- **Still deferred after P3:** a direct execution entry point or export, E6-F6
-  capacity policy, slot activation, particle or gas mutation, and any fallback
-  allocation. P3 remains a private sidecar-only staging seam.
+- **Still deferred after P4:** a direct execution entry point or export, slot
+  activation, particle or gas mutation, and any fallback allocation. P4 remains
+  a private device-policy seam with no E6-F9 integration.
 
 - New nucleation equations, chemistry, extrapolation, or a full Vehkamaki/CNT,
   ion-induced, heterogeneous, or cluster-dynamics implementation.

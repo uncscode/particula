@@ -40,3 +40,15 @@ E6-F7 source model and existing concrete direct-kernel conventions.
   - Decision (#1440): conversion rejection precedes caller-output writes and
     E6-F5 rejection preserves its diagnostics. A launched E6-F5 or P3 writer
     has no rollback guarantee; callers synchronize before reading outputs.
+- [x] How does P4 select and finalize an exhaustion policy?
+  - Decision (#1441): preserve P2 accepted demand and P3 staging sidecars as
+    immutable handoffs; use separate P4 workspace. Select resampling only when
+    it releases the complete deficit, then select optional scaling for remaining
+    exhausted rows. Derive final counts from post-policy demand-volume products
+    and write final demand/count/free-prefix diagnostics without truncation.
+- [x] What is P4's all-box failure boundary?
+  - Decision (#1441): malformed/stale handoffs, invalid P4/nested buffers,
+    insufficient scratch, impossible policies, and invalid final products reject
+    before P4 writes or primitive entry, preserving all caller state. An entered
+    E6-F6 primitive retains its documented mutation contract; P4 provides no
+    cross-primitive rollback.

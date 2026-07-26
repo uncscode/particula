@@ -452,8 +452,9 @@ restored = from_warp_gas_data(gpu_gas, name=gas_data.name)
   not promised after a GPU writer launches.
 - `get_slot_diagnostics_gpu` is concrete-only at
   `particula.gpu.kernels.slot_management`, not package-exported.
-- E6-F6 owns exhaustion policy, E6-F7/E6-F8 own source policy and physics, and
-  E6-F9 owns the integrated direct-step example; none is claimed here.
+- E6-F6 owns exhaustion primitives. The unexported E6-F8 P4 seam privately
+  selects fully viable resampling first and representative-volume scaling as a
+  fallback; E6-F9 owns integrated direct-step execution.
 
 Focused contract runs use Warp CPU as the installed-Warp baseline; CUDA is
 optional and skips cleanly when unavailable:
@@ -818,12 +819,17 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   helpers remain concrete-only in `nucleation.particle_source`.
 - P5 preserves `Aerosol` and backing-data identity, uses equal current-gas
   substeps, and is atomic per attempted substep only. E6-F5 activation and
-  E6-F6 resampling-first/scaling-fallback are dependencies. E6-F8 remains an
-  unexported direct-Warp seam: P2 plans survival-included, inventory-safe
-  shared demand, and private P3 stages exact provisional counts plus E6-F5
-  slot diagnostics in caller-owned sidecars. It neither activates slots nor
-  resolves exhaustion, and it does not mutate particle/gas state. A direct
-  public Warp path and E6-F9 integration remain deferred.
+  E6-F6 exhaustion primitives are dependencies. E6-F8 remains an unexported
+  direct-Warp seam: P2 plans survival-included, inventory-safe shared demand;
+  P3 stages exact provisional counts and E6-F5 slot diagnostics; and private
+  P4 consumes immutable P2/P3 handoffs to select fully viable resampling first
+  and representative-volume scaling for other exhausted rows. P4 uses
+  caller-owned same-device workspace, final diagnostics, and nested E6-F6
+  scratch. Expected all-box P4 rejection preserves particles, gas, P2/P3/P4
+  sidecars, and nested scratch before a primitive starts; no cross-primitive
+  rollback is promised after entry. The seam does not activate slots or mutate
+  source mass/gas. A direct public Warp path and E6-F9 integration remain
+  deferred.
 - Check concentration-weighted particle-plus-gas conservation at
   `rtol=1e-12, atol=1e-30`. Run `python docs/Examples/Nucleation/cpu_nucleation.py`,
   `pytest particula/tests/nucleation_docs_test.py -q -Werror`, and
@@ -944,6 +950,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2026-07-24  
+**Last Updated:** 2026-07-25  
 **For questions about ADW:** See `.opencode/guides/README.md`  
 **For questions about particula:** See main `readme.md`

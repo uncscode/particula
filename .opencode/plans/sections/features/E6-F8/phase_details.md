@@ -40,11 +40,22 @@ run P6 parity and conservation checks before P7 documents the direct step.
     int32 upper bound; malformed, alias, conversion, and E6-F5 failures with
     snapshots; ownership, identity, and Warp CPU/optional-CUDA coverage.
 
-- [ ] **E6-F8-P4:** Integrate device exhaustion planning without fallback with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Consume E6-F6 resampling-first/scaling plans, finalize scaled demand and requests, and reject unsatisfied plans before writes.
-  - Files: `particula/gpu/kernels/nucleation.py`, E6-F6 exhaustion module, GPU kernel tests
-  - Tests: Full slots, policy combinations, precedence, insufficient scratch, scaled-demand diagnostics, unsatisfiable demand, no final-domain residual, and conservation snapshots.
+- [x] **E6-F8-P4:** Integrate private device exhaustion policy without fallback with unit tests
+  - Issue: #1441 | Size: S | Status: Complete (2026-07-25)
+  - Delivered: private `_orchestrate_nucleation_exhaustion(...)` consumes
+    immutable P2/P3 handoffs, chooses fully viable resampling first and scaling
+    fallback second, and writes P4 final demand/count/free-prefix diagnostics.
+    Expected all-box rejections precede P4 writes and primitive entry; entered
+    primitive failures retain their documented no-cross-primitive-rollback
+    boundary. No activation, particle/gas mutation, public API, or E6-F9
+    integration was added.
+  - Files: `particula/gpu/kernels/nucleation.py`,
+    `particula/gpu/kernels/tests/nucleation_test.py`, architecture and feature
+    documentation.
+  - Tests: Independent policy-oracle, precedence/fallback/mixed-box and boundary
+    cases; final diagnostics/identities; complete expected-rejection snapshots;
+    and separate entered-primitive boundary coverage on Warp CPU with optional
+    CUDA skips.
 
 - [ ] **E6-F8-P5:** Add atomic direct GPU nucleation step with unit tests
   - Issue: TBD | Size: S | Status: Not Started
