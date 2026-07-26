@@ -14,6 +14,7 @@ representation.
 
 from __future__ import annotations
 
+import warnings
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, Generator
 
@@ -64,7 +65,15 @@ def _validate_device(wp, device: str):
         RuntimeError: If device is not found.
     """
     try:
-        return wp.get_device(device)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message=(
+                    "Due to '_pack_', the 'APICLaunchParamRecord' Structure.*"
+                ),
+                category=DeprecationWarning,
+            )
+            return wp.get_device(device)
     except (RuntimeError, ValueError) as e:
         raise RuntimeError(
             f"Device '{device}' not found. Available devices: "

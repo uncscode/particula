@@ -8,6 +8,7 @@ device selection, multi-box scenarios, and error handling.
 import builtins
 import importlib
 import sys
+import warnings
 from typing import Any
 
 import numpy as np
@@ -1047,6 +1048,50 @@ class TestValidateDevice:
         result = _validate_device(fake_wp, "cpu")
 
         assert result is sentinel_device
+
+    def test_validate_device_ignores_warp_pack_warning(self) -> None:
+        """Known Warp ctypes deprecation stays clean under warning errors."""
+        import types
+
+        sentinel_device = object()
+
+        def warning_lookup(_device):
+            warnings.warn(
+                "Due to '_pack_', the 'APICLaunchParamRecord' Structure will "
+                "use memory layout compatible with MSVC (Windows).",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return sentinel_device
+
+        fake_wp = types.SimpleNamespace(get_device=warning_lookup)
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", DeprecationWarning)
+            result = _validate_device(fake_wp, "cpu")
+
+        assert result is sentinel_device
+
+    def test_validate_device_preserves_unrelated_deprecations(self) -> None:
+        """Unrelated dependency deprecations remain errors under -Werror."""
+        import types
+
+        def warning_lookup(_device):
+            warnings.warn(
+                "unexpected dependency deprecation",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
+        fake_wp = types.SimpleNamespace(get_device=warning_lookup)
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", DeprecationWarning)
+            with pytest.raises(
+                DeprecationWarning,
+                match="unexpected dependency deprecation",
+            ):
+                _validate_device(fake_wp, "cpu")
 
     @pytest.mark.parametrize("error_type", [RuntimeError, ValueError])
     def test_validate_device_wraps_lookup_errors(self, error_type) -> None:
