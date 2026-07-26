@@ -13,6 +13,18 @@ from typing import Any
 import numpy as np
 import pytest
 
+_BOUNDARY_STEPS = (
+    "condensation",
+    "coagulation",
+    "dilution",
+    "wall_loss",
+    "nucleation",
+    "synchronize",
+    "restore_particles",
+    "restore_gas",
+    "restore_environment",
+)
+
 
 @pytest.fixture
 def example_module(monkeypatch: pytest.MonkeyPatch) -> Any:
@@ -412,6 +424,73 @@ def _fake_step_result(
     return particles, gas
 
 
+def _boundary_step_factory(
+    name: str,
+    failure_boundary: str,
+    events: list[str],
+    particles: Any,
+    gas: Any,
+    environment: Any,
+) -> Any:
+    """Return a direct-step stand-in that can fail at its boundary."""
+
+    def call(*args: Any, **kwargs: Any) -> Any:
+        events.append(name)
+        if name == failure_boundary:
+            raise RuntimeError(f"forced {name} failure")
+        return _fake_step_result(
+            name, args, kwargs, particles, gas, environment
+        )
+
+    return call
+
+
+def _boundary_convert_factory(
+    name: str,
+    events: list[str],
+    value: Any,
+) -> Any:
+    """Return a conversion stand-in that records one explicit transfer."""
+
+    def convert(*args: Any, **kwargs: Any) -> Any:
+        del args, kwargs
+        events.append(name)
+        return value
+
+    return convert
+
+
+def _boundary_restore_factory(
+    name: str,
+    failure_boundary: str,
+    events: list[str],
+) -> Any:
+    """Return a restore stand-in that can fail at a restore boundary."""
+
+    def restore(*args: Any, **kwargs: Any) -> Any:
+        del args, kwargs
+        events.append(name)
+        if failure_boundary == name:
+            raise RuntimeError(f"forced {name} failure")
+        return name
+
+    return restore
+
+
+def _boundary_synchronize_factory(
+    failure_boundary: str,
+    events: list[str],
+) -> Any:
+    """Return a synchronization stand-in that can fail before restores."""
+
+    def synchronize() -> None:
+        events.append("synchronize")
+        if failure_boundary == "synchronize":
+            raise RuntimeError("forced synchronize failure")
+
+    return synchronize
+
+
 def test_enabled_path_converts_once_orders_steps_and_restores_once(
     example_module: Any,
     monkeypatch: pytest.MonkeyPatch,
@@ -545,7 +624,8 @@ def test_enabled_path_converts_once_orders_steps_and_restores_once(
     ]
     assert result.output[-4:] == [
         (
-            "Enabled path: device=cpu, one setup transfer, one explicit final "
+            "Enabled path: device=cpu, one conversion per CPU container, one "
+            "explicit final "
             "synchronization, and one final checkpoint. Direct-boundary "
             "validation may synchronize internally."
         ),
@@ -565,41 +645,121 @@ def test_enabled_path_converts_once_orders_steps_and_restores_once(
     ]
 
 
-def test_direct_failure_propagates_without_sync_or_restore(
+@pytest.mark.parametrize(
+    "failure_boundary",
+    (
+        "condensation",
+        "coagulation",
+        "dilution",
+        "wall_loss",
+        "nucleation",
+        "synchronize",
+        "restore_particles",
+        "restore_gas",
+        "restore_environment",
+    ),
+)
+def test_boundary_failure_propagates_stops_later_calls_and_prevents_early_restore(
     example_module: Any,
     monkeypatch: pytest.MonkeyPatch,
+    failure_boundary: str,
 ) -> None:
-    """A direct-boundary validation error remains visible and has no fallback."""
+    """Each boundary failure propagates without later calls or a fallback."""
     events: list[str] = []
     particles = SimpleNamespace()
     gas = SimpleNamespace()
     environment = SimpleNamespace()
-
-    def fail_condensation(*args: Any, **kwargs: Any) -> Any:
-        """Raise the documented invalid direct-input error at the first step."""
-        assert args[:2] == (particles, gas)
-        assert kwargs["environment"] is environment
-        events.append("condensation")
-        raise ValueError("time_step must be finite and nonnegative")
-
-    def unexpected_restore(*args: Any, **kwargs: Any) -> Any:
-        """Fail if an error path attempts an intermediate CPU checkpoint."""
-        del args, kwargs
-        pytest.fail("direct failure must not restore CPU state")
+    fake_warp = _FakeWarp(events)
+    fake_warp.synchronize = _boundary_synchronize_factory(  # type: ignore[method-assign]
+        failure_boundary,
+        events,
+    )
 
     runtime = SimpleNamespace(
+        wp=fake_warp,
         gpu=SimpleNamespace(
-            to_warp_particle_data=lambda *args, **kwargs: particles,
-            to_warp_gas_data=lambda *args, **kwargs: gas,
-            to_warp_environment_data=lambda *args, **kwargs: environment,
-            from_warp_particle_data=unexpected_restore,
-            from_warp_gas_data=unexpected_restore,
-            from_warp_environment_data=unexpected_restore,
+            to_warp_particle_data=_boundary_convert_factory(
+                "convert_particles",
+                events,
+                particles,
+            ),
+            to_warp_gas_data=_boundary_convert_factory(
+                "convert_gas",
+                events,
+                gas,
+            ),
+            to_warp_environment_data=_boundary_convert_factory(
+                "convert_environment",
+                events,
+                environment,
+            ),
+            from_warp_particle_data=_boundary_restore_factory(
+                "restore_particles",
+                failure_boundary,
+                events,
+            ),
+            from_warp_gas_data=_boundary_restore_factory(
+                "restore_gas",
+                failure_boundary,
+                events,
+            ),
+            from_warp_environment_data=_boundary_restore_factory(
+                "restore_environment",
+                failure_boundary,
+                events,
+            ),
         ),
-        condensation_step_gpu=fail_condensation,
+        condensation_step_gpu=_boundary_step_factory(
+            "condensation",
+            failure_boundary,
+            events,
+            particles,
+            gas,
+            environment,
+        ),
+        coagulation_step_gpu=_boundary_step_factory(
+            "coagulation",
+            failure_boundary,
+            events,
+            particles,
+            gas,
+            environment,
+        ),
+        dilution_step_gpu=_boundary_step_factory(
+            "dilution",
+            failure_boundary,
+            events,
+            particles,
+            gas,
+            environment,
+        ),
+        wall_loss_step_gpu=_boundary_step_factory(
+            "wall_loss",
+            failure_boundary,
+            events,
+            particles,
+            gas,
+            environment,
+        ),
+        nucleation_step_gpu=_boundary_step_factory(
+            "nucleation",
+            failure_boundary,
+            events,
+            particles,
+            gas,
+            environment,
+        ),
+        CondensationScratchBuffers=_Record,
+        ThermodynamicsConfig=_Record,
         NeutralWallLossConfig=_Record,
         NucleationConfig=_Record,
         CoagulationMechanismConfig=_Record,
+        ResamplingBuffers=_Record,
+        NucleationScratchBuffers=_Record,
+        NucleationFinalizedDemandBuffers=_Record,
+        NucleationDiagnosticBuffers=_Record,
+        NucleationExhaustionBuffers=_Record,
+        NucleationExhaustionControls=_Record,
     )
     monkeypatch.setattr(example_module, "_warp_enabled", lambda: True)
     monkeypatch.setattr(
@@ -607,20 +767,36 @@ def test_direct_failure_propagates_without_sync_or_restore(
         "_load_enabled_runtime",
         lambda: runtime,
     )
-    monkeypatch.setattr(
-        example_module,
-        "_allocate_sidecars",
-        lambda *args, **kwargs: SimpleNamespace(
-            mass_transfer=object(),
-            thermodynamics=object(),
-            condensation_scratch=object(),
-        ),
-    )
-
-    with pytest.raises(ValueError, match="time_step must be finite"):
+    with pytest.raises(
+        RuntimeError, match=f"forced {failure_boundary} failure"
+    ):
         example_module.run_example()
 
-    assert events == ["condensation"]
+    expected_events = _expected_boundary_events(failure_boundary)
+    assert events == expected_events
+    _assert_restore_order(events, failure_boundary)
+
+
+def _expected_boundary_events(failure_boundary: str) -> list[str]:
+    """Return the expected event prefix for a forced boundary failure."""
+    return [
+        "convert_particles",
+        "convert_gas",
+        "convert_environment",
+        *_BOUNDARY_STEPS[: _BOUNDARY_STEPS.index(failure_boundary) + 1],
+    ]
+
+
+def _assert_restore_order(events: list[str], failure_boundary: str) -> None:
+    """Assert restore calls happen only after synchronization."""
+    restore_events = tuple(
+        event for event in events if event.startswith("restore_")
+    )
+    if restore_events:
+        assert events.index("synchronize") < events.index(restore_events[0])
+        return
+
+    assert failure_boundary in _BOUNDARY_STEPS[:6]
 
 
 def test_main_prints_only_example_output(

@@ -16,11 +16,9 @@ target files exist.
   - Decision: yes. The shipped example uses one box, four fixed slots, and two
     species; broader P2 fixtures retain multi-box/multi-species coverage.
 - [x] Which exhaustion diagnostics does the example print?
-  - Decision: print stable scalar summaries only: active/free counts before and
-    after, requested/activated/released slots, policy code and label, scale
-    factor, gas-limited events, representation-reduction events, and final-domain
-    residual events (zero on success). Do not print device arrays or object
-    representations.
+  - Decision: print stable scalar summaries only: condensation transfer sum,
+    coagulation collision count, nucleation activated count, and nucleation
+    finalized demand. Do not print device arrays or object representations.
 - [x] Does E6-F9 implement backend selection or a scheduler?
   - Decision: no. Those remain owned by Epic G; E6-F9 calls direct entry points
     in one fixed validation sequence.

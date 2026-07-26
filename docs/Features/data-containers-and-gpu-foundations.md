@@ -61,8 +61,8 @@ boundaries from `particula.gpu.kernels` in order: `condensation_step_gpu`,
 `coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, then
 `nucleation_step_gpu`. CPU↔Warp conversion helpers remain under
 `particula.gpu`: use `to_warp_particle_data`, `to_warp_gas_data`, and
-`to_warp_environment_data` once for each CPU container, select the device
-explicitly, then synchronize and restore once at the final checkpoint.
+`to_warp_environment_data` for one conversion per CPU container, select the
+device explicitly, then synchronize and restore once at the final checkpoint.
 Configuration and scratch sidecars remain concrete-module imports.
 Caller-owned sidecars have stable fixed shapes; persistent coagulation and
 wall-loss RNG is also caller-owned. There is no hidden transfer or CPU fallback,

@@ -1842,6 +1842,93 @@ def test_zero_time_direct_calls_are_byte_exact_no_op(
 
 @pytest.mark.warp
 @pytest.mark.gpu_parity
+def test_positive_time_nucleation_admits_slots_removes_gas_and_conserves() -> (
+    None
+):
+    """A viable resident nucleation call activates a slot and conserves mass."""
+    wp = pytest.importorskip("warp")
+    from particula.gpu.kernels import nucleation_step_gpu
+    from particula.gpu.kernels.nucleation import (
+        NucleationConfig,
+        NucleationExhaustionControls,
+    )
+    from particula.util.constants import AVOGADRO_NUMBER
+
+    fixture = _resident_sequence_fixture(_build_process_fixtures()[0])
+    state = _resident_state(fixture, "cpu")
+    precursor_concentration = 1.0e-12
+    state.gas.concentration = wp.array(
+        [[precursor_concentration, 0.0]],
+        dtype=wp.float64,
+        device="cpu",
+    )
+    state.particles.masses = wp.zeros(
+        state.particles.masses.shape, dtype=wp.float64, device="cpu"
+    )
+    state.particles.concentration = wp.zeros(
+        state.particles.concentration.shape, dtype=wp.float64, device="cpu"
+    )
+    state.particles.charge = wp.zeros(
+        state.particles.charge.shape, dtype=wp.float64, device="cpu"
+    )
+    inventory_before = _particle_plus_gas_inventory(
+        state.particles.masses.numpy(),
+        state.particles.concentration.numpy(),
+        state.gas.concentration.numpy(),
+    )
+    gas_before = state.gas.concentration.numpy().copy()
+    config = NucleationConfig(
+        rate_law="activation",
+        coefficient=(
+            fixture.molar_mass[0]
+            / (AVOGADRO_NUMBER * fixture.volume[0] * precursor_concentration)
+        ),
+        survival_factor=1.0,
+        precursor_index=0,
+        molecule_counts=(1, 0),
+        formation_diameter=1.0e-9,
+        precursor_number_concentration_lower=0.0,
+        precursor_number_concentration_upper=1.0e30,
+        temperature_lower=200.0,
+        temperature_upper=400.0,
+    )
+
+    particles, gas = nucleation_step_gpu(
+        state.particles,
+        state.gas,
+        config,
+        1.0,
+        scratch=state.nucleation_scratch,
+        finalized_demand=state.finalized,
+        diagnostics=state.diagnostics,
+        exhaustion_controls=NucleationExhaustionControls(False, False),
+        exhaustion_buffers=state.exhaustion,
+        environment=state.environment,
+    )
+
+    assert particles is state.particles
+    assert gas is state.gas
+    wp.synchronize()
+    npt.assert_array_equal(state.finalized.accepted_counts.numpy(), [1])
+    npt.assert_array_equal(
+        state.particles.concentration.numpy() > 0.0,
+        [[True, False, False, False]],
+    )
+    assert state.gas.concentration.numpy()[0, 0] < gas_before[0, 0]
+    npt.assert_allclose(
+        _particle_plus_gas_inventory(
+            state.particles.masses.numpy(),
+            state.particles.concentration.numpy(),
+            state.gas.concentration.numpy(),
+        ),
+        inventory_before,
+        rtol=1e-12,
+        atol=1e-30,
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
 @pytest.mark.parametrize(
     "fixture", _build_process_fixtures(), ids=lambda item: item.name
 )

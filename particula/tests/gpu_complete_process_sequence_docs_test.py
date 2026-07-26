@@ -303,6 +303,8 @@ def test_direct_process_documentation_preserves_explicit_ownership() -> None:
         "transport API",
     ):
         assert excluded in content
+    assert "one conversion per CPU container" in content
+    assert "synchronize and restore once at the final checkpoint" in content
 
 
 def test_evidence_and_commands_are_real_and_hardware_free() -> None:

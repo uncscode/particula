@@ -1,4 +1,4 @@
-"""Run five direct Warp steps with explicit setup and checkpoint transfers.
+"""Run five direct Warp steps with explicit container conversions and restore.
 
 The enabled path converts CPU particle, gas, and environment containers once,
 then calls condensation, coagulation, dilution, wall loss, and nucleation in
@@ -358,7 +358,7 @@ def _sidecar_sum(values: Any) -> float:
 
 
 def run_example(device: str = "cpu") -> ExampleRun:
-    """Run five direct boundaries with one setup transfer and checkpoint.
+    """Run five direct boundaries with one conversion per CPU container.
 
     The enabled path makes exactly five direct calls in this order:
     condensation, coagulation, dilution, wall loss, and nucleation. It retains
@@ -500,8 +500,9 @@ def run_example(device: str = "cpu") -> ExampleRun:
     finalized_demand = _sidecar_sum(sidecars.finalized_demand.accepted_demand)
     output.extend(
         [
-            f"Enabled path: device={device}, one setup transfer, one explicit "
-            "final synchronization, and one final checkpoint. Direct-boundary "
+            f"Enabled path: device={device}, one conversion per CPU container, "
+            "one explicit final synchronization, and one final checkpoint. "
+            "Direct-boundary "
             "validation may synchronize internally.",
             "Direct outputs remain caller-owned: condensation transfer, "
             "coagulation buffers, dilution containers, wall particles, "
