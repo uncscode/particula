@@ -2,9 +2,9 @@
 
 The enabled path converts CPU particle, gas, and environment containers once,
 then calls condensation, coagulation, dilution, wall loss, and nucleation in
-that order. It synchronizes once and restores each CPU container once after
-all five calls succeed. Device selection, conversion, sidecars, RNG state,
-synchronization, and restoration remain caller-owned.
+that order. It performs one explicit final synchronization and restores each
+CPU container once after all five calls succeed. Device selection, conversion,
+sidecars, RNG state, synchronization, and restoration remain caller-owned.
 
 Warp imports are lazy. A forced or naturally unavailable Warp runtime returns
 deterministic no-kernel metadata without allocating, converting, synchronizing,
@@ -227,10 +227,9 @@ def _allocate_sidecars(
         planning_status=i32((boxes,)),
     )
     return SimpleNamespace(
-        mass_transfer=f64(transfer_shape),
         condensation_scratch=runtime.CondensationScratchBuffers(
-            work_mass_transfer=None,
-            total_mass_transfer=None,
+            work_mass_transfer=f64(transfer_shape),
+            total_mass_transfer=f64(transfer_shape),
             dynamic_viscosity=f64((boxes,)),
             mean_free_path=f64((boxes,)),
             positive_mass_transfer_demand=f64((boxes, species)),
@@ -336,14 +335,37 @@ def _output_prefix(
     ]
 
 
+def _disabled_output() -> list[str]:
+    """Build stable output for a path that constructs no CPU fixture.
+
+    Returns:
+        User-facing lines describing the lazy no-Warp contract.
+    """
+    return [
+        "Canonical path: docs/Examples/gpu_complete_process_sequence.py",
+        "CPU fixture: not constructed because Warp is unavailable or disabled.",
+        (
+            "Exclusions: no scheduler, backend selection, resident loop, "
+            "Runnable, or CPU fallback."
+        ),
+        "Warp is unavailable or disabled; no kernel ran.",
+    ]
+
+
+def _sidecar_sum(values: Any) -> float:
+    """Return a synchronized sidecar's deterministic scalar sum."""
+    return float(np.sum(values.numpy(), dtype=np.float64))
+
+
 def run_example(device: str = "cpu") -> ExampleRun:
     """Run five direct boundaries with one setup transfer and checkpoint.
 
     The enabled path makes exactly five direct calls in this order:
     condensation, coagulation, dilution, wall loss, and nucleation. It retains
     the same resident containers and caller-owned sidecars across those calls,
-    then synchronizes and restores only once. A zero nucleation time
-    demonstrates its direct boundary only; it is not a calibrated schedule.
+    then performs one explicit final synchronization and restores only once.
+    Direct-boundary validation may synchronize internally. A zero nucleation
+    time demonstrates its direct boundary only; it is not a calibrated schedule.
     Errors deliberately propagate without fallback or an intermediate restore.
 
     Args:
@@ -357,15 +379,13 @@ def run_example(device: str = "cpu") -> ExampleRun:
         ImportError: If enabled-only runtime loading cannot import a dependency.
         ValueError: If a direct boundary rejects the supplied process state.
     """
-    particle_data, gas_data, environment_data, gas_names = _build_cpu_state()
-    output = _output_prefix(particle_data, gas_data, environment_data)
     if not _warp_enabled():
-        output.append("Warp is unavailable or disabled; no kernel ran.")
-        return ExampleRun(output=output)
+        return ExampleRun(output=_disabled_output())
     runtime = _load_enabled_runtime()
     if runtime is None:
-        output.append("Warp is unavailable or disabled; no kernel ran.")
-        return ExampleRun(output=output)
+        return ExampleRun(output=_disabled_output())
+    particle_data, gas_data, environment_data, gas_names = _build_cpu_state()
+    output = _output_prefix(particle_data, gas_data, environment_data)
 
     gpu_particles = runtime.gpu.to_warp_particle_data(
         particle_data, device=device
@@ -408,14 +428,13 @@ def run_example(device: str = "cpu") -> ExampleRun:
         None,
         None,
         0.01,
-        mass_transfer=sidecars.mass_transfer,
         environment=gpu_environment,
         thermodynamics=sidecars.thermodynamics,
         scratch_buffers=sidecars.condensation_scratch,
     )
     assert (
         returned_particles is gpu_particles
-        and transfer is sidecars.mass_transfer
+        and transfer is sidecars.condensation_scratch.total_mass_transfer
     )
     returned = runtime.coagulation_step_gpu(
         gpu_particles,
@@ -473,13 +492,30 @@ def run_example(device: str = "cpu") -> ExampleRun:
     restored_environment = runtime.gpu.from_warp_environment_data(
         gpu_environment, sync=False
     )
+    transfer_sum = _sidecar_sum(transfer)
+    collision_count = int(_sidecar_sum(sidecars.n_collisions))
+    activated_count = int(
+        _sidecar_sum(sidecars.finalized_demand.accepted_counts)
+    )
+    finalized_demand = _sidecar_sum(sidecars.finalized_demand.accepted_demand)
     output.extend(
         [
-            f"Enabled path: device={device}, one setup transfer, one sync, "
-            "and one final checkpoint.",
+            f"Enabled path: device={device}, one setup transfer, one explicit "
+            "final synchronization, and one final checkpoint. Direct-boundary "
+            "validation may synchronize internally.",
             "Direct outputs remain caller-owned: condensation transfer, "
             "coagulation buffers, dilution containers, wall particles, "
             "nucleation containers, and diagnostic/RNG sidecars.",
+            (
+                "Diagnostics after final synchronization: "
+                f"condensation_transfer_sum={transfer_sum:.6e}, "
+                f"collisions={collision_count}."
+            ),
+            (
+                "Nucleation diagnostics after final synchronization: "
+                f"activated={activated_count}, "
+                f"finalized_demand={finalized_demand:.6e}."
+            ),
         ]
     )
     return ExampleRun(

@@ -56,6 +56,11 @@ def test_forced_disabled_path_does_not_reach_enabled_loader(
         "_load_enabled_runtime",
         lambda: pytest.fail("enabled loader must not run"),
     )
+    monkeypatch.setattr(
+        example_module,
+        "_build_cpu_state",
+        lambda: pytest.fail("CPU fixture must not be constructed"),
+    )
 
     result = example_module.run_example()
 
@@ -308,11 +313,21 @@ class _FakeArray:
     """Minimal metadata-preserving stand-in for a caller-owned Warp array."""
 
     def __init__(
-        self, shape: tuple[int, ...], dtype: object, device: str
+        self,
+        shape: tuple[int, ...],
+        dtype: object,
+        device: str,
+        events: list[str],
     ) -> None:
         self.shape = shape
         self.dtype = dtype
         self.device = device
+        self._events = events
+
+    def numpy(self) -> np.ndarray:
+        """Return deterministic zero-valued host data for diagnostics."""
+        self._events.append("diagnostic_read")
+        return np.zeros(self.shape, dtype=np.float64)
 
 
 class _FakeWarp:
@@ -326,21 +341,21 @@ class _FakeWarp:
         self.events = events
 
     def zeros(self, shape: Any, *, dtype: object, device: str) -> _FakeArray:
-        return _FakeArray(_shape(shape), dtype, device)
+        return _FakeArray(_shape(shape), dtype, device, self.events)
 
     def ones(self, shape: Any, *, dtype: object, device: str) -> _FakeArray:
-        return _FakeArray(_shape(shape), dtype, device)
+        return _FakeArray(_shape(shape), dtype, device, self.events)
 
     def full(
         self, shape: Any, value: object, *, dtype: object, device: str
     ) -> _FakeArray:
         del value
-        return _FakeArray(_shape(shape), dtype, device)
+        return _FakeArray(_shape(shape), dtype, device, self.events)
 
     def array(
         self, values: np.ndarray, *, dtype: object, device: str
     ) -> _FakeArray:
-        return _FakeArray(values.shape, dtype, device)
+        return _FakeArray(values.shape, dtype, device, self.events)
 
     def synchronize(self) -> None:
         self.events.append("synchronize")
@@ -371,7 +386,19 @@ def _fake_step_result(
     assert args[0] is particles
     if name == "condensation":
         assert args[1] is gas and kwargs["environment"] is environment
-        return particles, kwargs["mass_transfer"]
+        scratch = kwargs["scratch_buffers"]
+        for sidecar in (
+            scratch.work_mass_transfer,
+            scratch.total_mass_transfer,
+            scratch.positive_mass_transfer_demand,
+            scratch.negative_mass_transfer_release,
+            scratch.positive_mass_transfer_scale,
+        ):
+            expected_shape = (1, 4, 2) if len(sidecar.shape) == 3 else (1, 2)
+            assert sidecar.shape == expected_shape
+            assert sidecar.dtype == "float64"
+            assert sidecar.device == "cpu"
+        return particles, scratch.total_mass_transfer
     if name == "coagulation":
         assert kwargs["environment"] is environment
         return particles, kwargs["collision_pairs"], kwargs["n_collisions"]
@@ -481,11 +508,16 @@ def test_enabled_path_converts_once_orders_steps_and_restores_once(
         "restore_particles",
         "restore_gas",
         "restore_environment",
+        "diagnostic_read",
+        "diagnostic_read",
+        "diagnostic_read",
+        "diagnostic_read",
     ]
     assert result.particle_data == "particles"
     assert result.gas_data == "gas"
     assert result.environment_data == "environment"
     assert result.mass_transfer.shape == (1, 4, 2)
+    assert result.mass_transfer is not None
     assert result.collision_pairs.shape == (1, 4, 2)
     assert result.coagulation_rng.shape == (1,)
     assert result.wall_rng.shape == (1,)
@@ -511,15 +543,24 @@ def test_enabled_path_converts_once_orders_steps_and_restores_once(
             "Runnable, or CPU fallback."
         ),
     ]
-    assert result.output[-2:] == [
+    assert result.output[-4:] == [
         (
-            "Enabled path: device=cpu, one setup transfer, one sync, and "
-            "one final checkpoint."
+            "Enabled path: device=cpu, one setup transfer, one explicit final "
+            "synchronization, and one final checkpoint. Direct-boundary "
+            "validation may synchronize internally."
         ),
         (
             "Direct outputs remain caller-owned: condensation transfer, "
             "coagulation buffers, dilution containers, wall particles, "
             "nucleation containers, and diagnostic/RNG sidecars."
+        ),
+        (
+            "Diagnostics after final synchronization: "
+            "condensation_transfer_sum=0.000000e+00, collisions=0."
+        ),
+        (
+            "Nucleation diagnostics after final synchronization: "
+            "activated=0, finalized_demand=0.000000e+00."
         ),
     ]
 
