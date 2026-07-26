@@ -2,7 +2,7 @@
   "id": "E6-F9",
   "type": "feature",
   "title": "Integrated Validation Documentation and Epic Closeout",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -92,5 +92,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
