@@ -252,7 +252,15 @@ def test_load_enabled_runtime_defers_and_collects_required_boundaries(
             NucleationExhaustionControls=object(),
         ),
     }
-    available_gpu = SimpleNamespace(WARP_AVAILABLE=True)
+    available_gpu = SimpleNamespace(
+        WARP_AVAILABLE=True,
+        to_warp_particle_data=object(),
+        to_warp_gas_data=object(),
+        to_warp_environment_data=object(),
+        from_warp_particle_data=object(),
+        from_warp_gas_data=object(),
+        from_warp_environment_data=object(),
+    )
     modules = {
         "warp": object(),
         "particula.gpu": available_gpu,
@@ -269,6 +277,20 @@ def test_load_enabled_runtime_defers_and_collects_required_boundaries(
 
     assert runtime is not None
     assert runtime.gpu is available_gpu
+    assert runtime.to_warp_particle_data is available_gpu.to_warp_particle_data
+    assert runtime.to_warp_gas_data is available_gpu.to_warp_gas_data
+    assert (
+        runtime.to_warp_environment_data
+        is available_gpu.to_warp_environment_data
+    )
+    assert (
+        runtime.from_warp_particle_data is available_gpu.from_warp_particle_data
+    )
+    assert runtime.from_warp_gas_data is available_gpu.from_warp_gas_data
+    assert (
+        runtime.from_warp_environment_data
+        is available_gpu.from_warp_environment_data
+    )
     assert runtime.condensation_step_gpu is kernels.condensation_step_gpu
     assert runtime.coagulation_step_gpu is kernels.coagulation_step_gpu
     assert runtime.dilution_step_gpu is kernels.dilution_step_gpu
@@ -467,6 +489,39 @@ def test_enabled_path_converts_once_orders_steps_and_restores_once(
     assert result.collision_pairs.shape == (1, 4, 2)
     assert result.coagulation_rng.shape == (1,)
     assert result.wall_rng.shape == (1,)
+    assert result.dilution_particles is particles
+    assert result.dilution_gas is gas
+    assert result.wall_particles is particles
+    assert result.nucleation_particles is particles
+    assert result.nucleation_gas is gas
+    assert result.output[:6] == [
+        "Canonical path: docs/Examples/gpu_complete_process_sequence.py",
+        "CPU fixture: particles=(1, 4, 2), gas=(1, 2), environment=(1,)",
+        (
+            "Process order: condensation -> coagulation -> dilution -> "
+            "wall loss -> nucleation."
+        ),
+        (
+            "Ownership: conversions, sidecars, RNG state, synchronization, "
+            "and the final restore stay caller-owned."
+        ),
+        "Runtime: Warp CPU is the default when installed; CUDA is optional.",
+        (
+            "Exclusions: no scheduler, backend selection, resident loop, "
+            "Runnable, or CPU fallback."
+        ),
+    ]
+    assert result.output[-2:] == [
+        (
+            "Enabled path: device=cpu, one setup transfer, one sync, and "
+            "one final checkpoint."
+        ),
+        (
+            "Direct outputs remain caller-owned: condensation transfer, "
+            "coagulation buffers, dilution containers, wall particles, "
+            "nucleation containers, and diagnostic/RNG sidecars."
+        ),
+    ]
 
 
 def test_direct_failure_propagates_without_sync_or_restore(

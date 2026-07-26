@@ -1,8 +1,8 @@
-"""Compose direct Warp process steps with one explicit transfer boundary.
+"""Compose five direct Warp steps with one explicit checkpoint boundary.
 
 This example keeps conversion, device selection, sidecars, RNG state,
-synchronization, and the final CPU checkpoint under caller control. It is not
-a scheduler, backend selector, resident loop, high-level Runnable, or CPU
+synchronization, and the final CPU restore under caller control. It is not a
+scheduler, backend selector, resident loop, high-level Runnable, or CPU
 fallback.
 """
 
@@ -38,12 +38,17 @@ class ExampleRun:
     coagulation_rng: Any | None = None
     wall_rng: Any | None = None
     nucleation_diagnostics: Any | None = None
+    dilution_particles: Any | None = None
+    dilution_gas: Any | None = None
+    wall_particles: Any | None = None
+    nucleation_particles: Any | None = None
+    nucleation_gas: Any | None = None
 
 
 def _build_cpu_state() -> tuple[
     ParticleData, GasData, EnvironmentData, list[str]
 ]:
-    """Create the deterministic B=1, N=4, S=2 direct-process fixture.
+    """Create the deterministic one-box direct-process CPU fixture.
 
     Returns:
         CPU particle, gas, and environment containers plus copied gas names.
@@ -73,7 +78,7 @@ def _build_cpu_state() -> tuple[
 
 
 def _warp_enabled() -> bool:
-    """Return whether optional Warp execution can be loaded without GPU imports."""
+    """Return whether optional Warp execution can be loaded safely."""
     if os.getenv(_FORCE_NO_WARP_ENV) == "1":
         return False
     try:
@@ -84,7 +89,7 @@ def _warp_enabled() -> bool:
 
 
 def _load_enabled_runtime() -> SimpleNamespace | None:
-    """Lazily load the optional GPU package, public steps, and concrete records."""
+    """Lazily load Warp, direct steps, transfers, and concrete records."""
     wp = importlib.import_module("warp")
     gpu = importlib.import_module("particula.gpu")
     if not gpu.WARP_AVAILABLE:
@@ -101,6 +106,12 @@ def _load_enabled_runtime() -> SimpleNamespace | None:
     return SimpleNamespace(
         wp=wp,
         gpu=gpu,
+        to_warp_particle_data=gpu.to_warp_particle_data,
+        to_warp_gas_data=gpu.to_warp_gas_data,
+        to_warp_environment_data=gpu.to_warp_environment_data,
+        from_warp_particle_data=gpu.from_warp_particle_data,
+        from_warp_gas_data=gpu.from_warp_gas_data,
+        from_warp_environment_data=gpu.from_warp_environment_data,
         condensation_step_gpu=kernels.condensation_step_gpu,
         coagulation_step_gpu=kernels.coagulation_step_gpu,
         dilution_step_gpu=kernels.dilution_step_gpu,
@@ -141,54 +152,42 @@ def _allocate_sidecars(
     wp = runtime.wp
 
     def f64(shape: tuple[int, ...]) -> Any:
-        """Allocate a float64 sidecar on the active device."""
         return wp.zeros(shape, dtype=wp.float64, device=device)
 
     def i32(shape: tuple[int, ...]) -> Any:
-        """Allocate an int32 sidecar on the active device."""
         return wp.zeros(shape, dtype=wp.int32, device=device)
 
+    def u32(shape: tuple[int, ...]) -> Any:
+        return wp.zeros(shape, dtype=wp.uint32, device=device)
+
     transfer_shape = (boxes, particles, species)
-    scratch = runtime.CondensationScratchBuffers(
-        dynamic_viscosity=f64((boxes,)),
-        mean_free_path=f64((boxes,)),
-        positive_mass_transfer_demand=f64((boxes, species)),
-        negative_mass_transfer_release=f64((boxes, species)),
-        positive_mass_transfer_scale=f64((boxes, species)),
-    )
     resampling = runtime.ResamplingBuffers(
-        i32((boxes,)),
-        i32((boxes,)),
-        i32((boxes, particles)),
-        i32((boxes, particles)),
-        i32((boxes, particles)),
-        f64(transfer_shape),
-        f64((boxes, particles)),
-        f64((boxes, particles)),
-        f64((boxes, particles)),
-        f64((boxes,)),
-        f64((boxes,)),
-        f64((boxes,)),
-        f64((boxes,)),
-        i32((boxes,)),
-    )
-    exhaustion = runtime.NucleationExhaustionBuffers(
-        resampling,
-        f64((boxes,)),
-        f64((boxes,)),
-        wp.ones((boxes,), dtype=wp.float64, device=device),
-        wp.ones((boxes,), dtype=wp.float64, device=device),
-        wp.full((boxes,), 1.0e-12, dtype=wp.float64, device=device),
-        f64((boxes,)),
-        i32((boxes,)),
-        i32((boxes,)),
-        i32((boxes,)),
-        i32((boxes,)),
-        i32((boxes, particles)),
+        retained_counts=i32((boxes,)),
+        released_counts=i32((boxes,)),
+        retained_indices=i32((boxes, particles)),
+        released_indices=i32((boxes, particles)),
+        sorted_indices=i32((boxes, particles)),
+        replacement_masses=f64(transfer_shape),
+        replacement_concentration=f64((boxes, particles)),
+        replacement_charge=f64((boxes, particles)),
+        source_radii=f64((boxes, particles)),
+        radius_cubed_relative_error=f64((boxes,)),
+        mean_radius_relative_error=f64((boxes,)),
+        surface_relative_error=f64((boxes,)),
+        diversity_absolute_error=f64((boxes,)),
+        planning_status=i32((boxes,)),
     )
     return SimpleNamespace(
         mass_transfer=f64(transfer_shape),
-        condensation_scratch=scratch,
+        condensation_scratch=runtime.CondensationScratchBuffers(
+            work_mass_transfer=None,
+            total_mass_transfer=None,
+            dynamic_viscosity=f64((boxes,)),
+            mean_free_path=f64((boxes,)),
+            positive_mass_transfer_demand=f64((boxes, species)),
+            negative_mass_transfer_release=f64((boxes, species)),
+            positive_mass_transfer_scale=f64((boxes, species)),
+        ),
         thermodynamics=runtime.ThermodynamicsConfig(
             modes=i32((species,)),
             parameters=wp.array(
@@ -206,22 +205,46 @@ def _allocate_sidecars(
             (boxes, particles, 2), -1, dtype=wp.int32, device=device
         ),
         n_collisions=i32((boxes,)),
-        coagulation_rng=wp.zeros((boxes,), dtype=wp.uint32, device=device),
-        wall_rng=wp.zeros((boxes,), dtype=wp.uint32, device=device),
+        coagulation_rng=u32((boxes,)),
+        wall_rng=u32((boxes,)),
+        resampling=resampling,
         nucleation_scratch=runtime.NucleationScratchBuffers(
-            f64((boxes,)), f64((boxes,)), f64((boxes,))
+            precursor_number_concentration=f64((boxes,)),
+            potential_rate=f64((boxes,)),
+            potential_demand=f64((boxes,)),
         ),
         finalized_demand=runtime.NucleationFinalizedDemandBuffers(
-            i32((boxes,)), f64((boxes,)), f64((boxes, species))
+            accepted_counts=i32((boxes,)),
+            accepted_demand=f64((boxes,)),
+            precursor_mass_change=f64((boxes, species)),
         ),
         diagnostics=runtime.NucleationDiagnosticBuffers(
-            i32((boxes,)),
-            wp.full((boxes, particles), -1, dtype=wp.int32, device=device),
-            wp.full((boxes, particles), -1, dtype=wp.int32, device=device),
-            i32((boxes,)),
-            i32((boxes,)),
+            gate_codes=i32((boxes,)),
+            selected_slot_indices=wp.full(
+                (boxes, particles), -1, dtype=wp.int32, device=device
+            ),
+            free_slot_indices=wp.full(
+                (boxes, particles), -1, dtype=wp.int32, device=device
+            ),
+            active_slot_counts=i32((boxes,)),
+            free_slot_counts=i32((boxes,)),
         ),
-        exhaustion=exhaustion,
+        exhaustion=runtime.NucleationExhaustionBuffers(
+            resampling_buffers=resampling,
+            demand_workspace=f64((boxes,)),
+            final_demand=f64((boxes,)),
+            requested_scale=wp.ones((boxes,), dtype=wp.float64, device=device),
+            minimum_scale=wp.ones((boxes,), dtype=wp.float64, device=device),
+            minimum_volume=wp.full(
+                (boxes,), 1.0e-12, dtype=wp.float64, device=device
+            ),
+            resolved_scale=f64((boxes,)),
+            resampling_releasable_counts=i32((boxes,)),
+            required_release_counts=i32((boxes,)),
+            scaling_required=i32((boxes,)),
+            final_counts=i32((boxes,)),
+            final_selected_slot_indices=i32((boxes, particles)),
+        ),
     )
 
 
@@ -233,11 +256,25 @@ def _output_prefix(
     """Build stable, address-free documentation output for the fixture."""
     return [
         "Canonical path: docs/Examples/gpu_complete_process_sequence.py",
-        f"CPU shapes: particles={particle_data.masses.shape}, "
-        f"gas={gas_data.concentration.shape}, "
-        f"environment={environment_data.temperature.shape}",
-        "Order: condensation -> coagulation -> dilution -> wall loss -> nucleation.",
-        "Sidecars and RNG state are caller-owned and remain device-resident.",
+        (
+            "CPU fixture: "
+            f"particles={particle_data.masses.shape}, "
+            f"gas={gas_data.concentration.shape}, "
+            f"environment={environment_data.temperature.shape}"
+        ),
+        (
+            "Process order: condensation -> coagulation -> dilution -> "
+            "wall loss -> nucleation."
+        ),
+        (
+            "Ownership: conversions, sidecars, RNG state, synchronization, "
+            "and the final restore stay caller-owned."
+        ),
+        ("Runtime: Warp CPU is the default when installed; CUDA is optional."),
+        (
+            "Exclusions: no scheduler, backend selection, resident loop, "
+            "Runnable, or CPU fallback."
+        ),
     ]
 
 
@@ -252,7 +289,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
         device: Warp device for the explicit direct path; defaults to Warp CPU.
 
     Returns:
-        Metadata-only disabled result, or final CPU data and owned sidecars.
+        Disabled metadata only, or final CPU data and owned sidecars.
     """
     particle_data, gas_data, environment_data, gas_names = _build_cpu_state()
     output = _output_prefix(particle_data, gas_data, environment_data)
@@ -263,6 +300,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
     if runtime is None:
         output.append("Warp is unavailable or disabled; no kernel ran.")
         return ExampleRun(output=output)
+
     gpu_particles = runtime.gpu.to_warp_particle_data(
         particle_data, device=device
     )
@@ -274,12 +312,13 @@ def run_example(device: str = "cpu") -> ExampleRun:
         runtime, device, particle_data.masses.shape, gas_data.molar_mass
     )
     wall_config = runtime.NeutralWallLossConfig(
-        "spherical",
-        0.01,
-        chamber_radius=np.nextafter(0.0, 1.0),
+        geometry="spherical",
+        wall_eddy_diffusivity=0.01,
+        chamber_radius=0.5,
+        distribution_type="particle_resolved",
         mode="charged",
-        wall_potential=-12.0,
-        wall_electric_field=3.0,
+        wall_potential=0.05,
+        wall_electric_field=0.0,
     )
     nucleation_config = runtime.NucleationConfig(
         rate_law="activation",
@@ -294,7 +333,8 @@ def run_example(device: str = "cpu") -> ExampleRun:
         temperature_upper=400.0,
     )
     mechanism_config = runtime.CoagulationMechanismConfig(
-        mechanisms=("brownian",), distribution_type="particle_resolved"
+        mechanisms=("brownian",),
+        distribution_type="particle_resolved",
     )
     returned_particles, transfer = runtime.condensation_step_gpu(
         gpu_particles,
@@ -327,24 +367,23 @@ def run_example(device: str = "cpu") -> ExampleRun:
     assert returned[0] is gpu_particles
     assert returned[1] is sidecars.collision_pairs
     assert returned[2] is sidecars.n_collisions
-    returned_particles, returned_gas = runtime.dilution_step_gpu(
+    dilution_particles, dilution_gas = runtime.dilution_step_gpu(
         gpu_particles, gpu_gas, 0.2, 0.1
     )
-    assert returned_particles is gpu_particles and returned_gas is gpu_gas
-    assert (
-        runtime.wall_loss_step_gpu(
-            gpu_particles,
-            None,
-            None,
-            1.0,
-            config=wall_config,
-            rng_states=sidecars.wall_rng,
-            initialize_rng=True,
-            environment=gpu_environment,
-        )
-        is gpu_particles
+    assert dilution_particles is gpu_particles
+    assert dilution_gas is gpu_gas
+    wall_particles = runtime.wall_loss_step_gpu(
+        gpu_particles,
+        None,
+        None,
+        1.0,
+        config=wall_config,
+        rng_states=sidecars.wall_rng,
+        initialize_rng=True,
+        environment=gpu_environment,
     )
-    returned_particles, returned_gas = runtime.nucleation_step_gpu(
+    assert wall_particles is gpu_particles
+    nucleation_particles, nucleation_gas = runtime.nucleation_step_gpu(
         gpu_particles,
         gpu_gas,
         nucleation_config,
@@ -356,7 +395,8 @@ def run_example(device: str = "cpu") -> ExampleRun:
         exhaustion_buffers=sidecars.exhaustion,
         environment=gpu_environment,
     )
-    assert returned_particles is gpu_particles and returned_gas is gpu_gas
+    assert nucleation_particles is gpu_particles
+    assert nucleation_gas is gpu_gas
     runtime.wp.synchronize()
     restored_particles = runtime.gpu.from_warp_particle_data(
         gpu_particles, sync=False
@@ -369,9 +409,8 @@ def run_example(device: str = "cpu") -> ExampleRun:
     )
     output.extend(
         [
-            f"Explicit setup transfer and one final checkpoint: device={device}.",
-            "Warp CPU is the default; CUDA is optional.",
-            "No scheduler, backend selection, resident loop, Runnable, or CPU fallback.",
+            f"Enabled path: device={device}, one setup transfer, one sync, and one final checkpoint.",
+            "Direct outputs remain caller-owned: condensation transfer, coagulation buffers, dilution containers, wall particles, nucleation containers, and diagnostic/RNG sidecars.",
         ]
     )
     return ExampleRun(
@@ -379,12 +418,17 @@ def run_example(device: str = "cpu") -> ExampleRun:
         particle_data=restored_particles,
         gas_data=restored_gas,
         environment_data=restored_environment,
-        mass_transfer=sidecars.mass_transfer,
-        collision_pairs=sidecars.collision_pairs,
-        n_collisions=sidecars.n_collisions,
+        mass_transfer=transfer,
+        collision_pairs=returned[1],
+        n_collisions=returned[2],
         coagulation_rng=sidecars.coagulation_rng,
         wall_rng=sidecars.wall_rng,
         nucleation_diagnostics=sidecars.diagnostics,
+        dilution_particles=dilution_particles,
+        dilution_gas=dilution_gas,
+        wall_particles=wall_particles,
+        nucleation_particles=nucleation_particles,
+        nucleation_gas=nucleation_gas,
     )
 
 
