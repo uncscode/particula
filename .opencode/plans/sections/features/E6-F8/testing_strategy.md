@@ -71,3 +71,9 @@ independent E6-F7 float64 oracle, never the production GPU helper itself.
   scratch/work buffers, shapes, dtypes, devices, and identities.
 - Fixed capacity never causes silent truncation. Supplied sidecars are returned
   or retained by identity, and no test permits a hidden host fallback.
+
+## P7 validation
+
+Run publication assertions, the Warp-guarded direct example regression and
+subprocess command, focused nucleation kernel/parity tests, and `mkdocs build
+--strict`. Warp CPU is the baseline and CUDA remains an optional clean-skip row.

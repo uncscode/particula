@@ -77,6 +77,13 @@ applies; P4 intentionally provides no cross-primitive rollback. Activation,
 source-mass or gas mutation, resizing, transfer, fallback, and E6-F9
 integration remain deferred.
 
+The concrete `particula.gpu.kernels.nucleation` module implements the
+package-exported direct `nucleation_step_gpu`: P1 preflight, P2 admission, P3
+fixed-slot staging, P4 resampling-first/scaling-fallback, and fused P5
+selected-slot/gas-transfer commit. Only the step is exported; configuration,
+records, sidecars, and helpers remain concrete-only. It has no hidden transfer,
+CPU fallback, resize/compaction, GPU Runnable, or E6-F9 integration.
+
 ## Scientific Utilities
 
 - Physical constants belong in `particula.util.constants`.

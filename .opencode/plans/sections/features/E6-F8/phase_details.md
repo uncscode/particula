@@ -88,3 +88,10 @@ run P6 parity and conservation checks before P7 documents the direct step.
   - Goal: Publish the bounded API, ownership, transfer, sidecar, conservation, dependency, and no-fallback contracts.
   - Files: `AGENTS.md`, `docs/Features/`, `docs/Theory/Technical/Dynamics/Nucleation_Equations.md`, `docs/Examples/Nucleation/`, E6 sections
   - Tests: Link/import validation, equation review, focused commands, and explicit-transfer example execution where applicable.
+
+## P7: Documentation and example — Shipped (#1444)
+
+Published the direct-Warp P1--P5 boundary, caller-owned sidecars, failure
+limits, Warp CPU baseline, optional CUDA skip expectations, and explicit
+transfer/synchronization example. Focused inventory tolerance is
+`rtol=1e-12, atol=1e-30`.

@@ -5,12 +5,14 @@
 `particula/particles/` contains particle-data representations, distribution
 strategies, and focused particle-domain helpers.
 
-## Private GPU Nucleation
+## Direct GPU Nucleation
 
-`particula/gpu/kernels/nucleation.py` contains unexported direct-Warp P1--P4
-staging seams. P4 owns policy orchestration only: immutable P2/P3 handoffs,
-resampling-first/scaling-fallback selection, and caller-owned final diagnostics.
-It does not activate slots, mutate gas, resize storage, or provide a public API.
+`particula/gpu/kernels/nucleation.py` implements package-exported direct-Warp
+`nucleation_step_gpu`: P1 preflight, P2 admission, P3 fixed-slot staging, P4
+resampling-first/scaling-fallback, and fused P5 selected-slot/gas transfer.
+Only the step is exported; configuration, records, sidecars, and helpers remain
+concrete-only. It has no hidden transfer, CPU fallback, resize/compaction, GPU
+Runnable, or E6-F9 integration.
 
 ### particula/particles/
 
@@ -111,8 +113,9 @@ private helpers for cross-kernel setup.
   `resampling_step_gpu` is exported; `ResamplingBuffers`, P4 sidecars, status
   codes, and kernels remain concrete-module-only. Neither boundary provides a
   runnable, policy resolution, CPU fallback or transfer, or resizing.
-- `nucleation.py` - Concrete-only E6-F8 P1--P4 staging seam for fixed-capacity
-  GPU nucleation. P2 calculates `E_pot=J*dt`, with survival already in `J`,
+- `nucleation.py` - Concrete E6-F8 implementation of package-exported
+   `nucleation_step_gpu` for fixed-capacity GPU nucleation. P1 preflights and P2
+   calculates `E_pot=J*dt`, with survival already in `J`,
   and commits planning, admitted-demand, removal, and gate sidecars. P3
   converts admitted demand times box volume only when it is an exact
   representable nonnegative `int32` count, reuses E6-F5 slot diagnostics,
@@ -120,11 +123,13 @@ private helpers for cross-kernel setup.
   and diagnostic sidecars. Private P4 preserves immutable P2/P3 handoffs,
   chooses fully viable resampling before representative-volume-scaling fallback
   for exhausted rows, and writes caller-owned final demand/count/free-slot
-  diagnostics. Expected all-box P4 preflight rejections preserve all supplied
+   diagnostics. Fused P5 commits selected slots and matching gas transfer.
+   Expected all-box P4 preflight rejections preserve all supplied
   state before workspace or E6-F6 primitive writes; an entered E6-F6 primitive
   retains its separate no-cross-primitive-rollback boundary. The module remains
-  unexported and provides no hidden transfer, CPU fallback, activation,
-  particle/gas or source mutation, resizing, or E6-F9 integration.
+   Concrete-only configuration, records, sidecars, and helpers remain
+   unexported. The step provides no hidden transfer, CPU fallback, resizing, or
+   E6-F9 integration.
 - `wall_loss.py` - Concrete fixed-slot neutral/charged GPU wall-loss boundary;
   owns immutable host configuration, frozen preflight, bounded fixed-slot
   removal, and the external caller-owned per-box RNG sidecar lifecycle. Charged

@@ -96,3 +96,8 @@
 | Silent truncated represented demand | Not applicable | 0 cases | Exhaustion tests |
 | Hidden transfer or CPU fallback paths | Not applicable | 0 | Source/API regression checks |
 | Required Warp CPU case pass rate | 0% | 100% | Focused pytest suite |
+
+## P7 status: Shipped (#1444)
+
+The public low-level import, concrete-only records, explicit ownership, no-op
+and rollback boundaries, example, and focused validation are recorded.

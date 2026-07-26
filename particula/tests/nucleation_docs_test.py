@@ -16,6 +16,11 @@ FEATURE = ROOT / "docs/Features/nucleation_strategy_system.md"
 THEORY = ROOT / "docs/Theory/Technical/Dynamics/Nucleation_Equations.md"
 EXAMPLE_INDEX = ROOT / "docs/Examples/Nucleation/index.md"
 ROADMAP = ROOT / "docs/Features/Roadmap/data-oriented-gpu.md"
+AGENTS = ROOT / "AGENTS.md"
+ARCHITECTURE = ROOT / ".opencode/guides/architecture_reference.md"
+ARCHITECTURE_OUTLINE = (
+    ROOT / ".opencode/guides/architecture/architecture_outline.md"
+)
 EXAMPLE_TIMEOUT_SECONDS = 30
 
 
@@ -135,6 +140,9 @@ def test_nucleation_documentation_exposes_supported_and_deferred_scope() -> (
     theory = THEORY.read_text(encoding="utf-8")
     index = EXAMPLE_INDEX.read_text(encoding="utf-8")
     roadmap = ROADMAP.read_text(encoding="utf-8")
+    agents = AGENTS.read_text(encoding="utf-8")
+    architecture = ARCHITECTURE.read_text(encoding="utf-8")
+    architecture_outline = ARCHITECTURE_OUTLINE.read_text(encoding="utf-8")
 
     assert "cpu_nucleation.py" in index
     assert "illustrative custom workflow" in index.lower()
@@ -144,6 +152,16 @@ def test_nucleation_documentation_exposes_supported_and_deferred_scope() -> (
     assert "rtol=1e-12, atol=1e-30" in feature
     assert "Vehkamäki" in theory and "not implemented physics" in theory
     assert "E6-F7 ships a CPU-only" in roadmap
-    assert "E6-F8" in roadmap and "remain deferred" in roadmap
-    for document in (FEATURE, THEORY, EXAMPLE_INDEX):
+    assert "nucleation_step_gpu" in feature
+    assert "concrete-only" in feature
+    assert "successful\nno-op" in feature
+    assert "Direct-Warp P1--P5 correspondence" in theory
+    assert "gpu_direct_nucleation.py" in index
+    assert "nucleation_step_gpu" in roadmap
+    assert "CPU-only runnable, never a\n  GPU fallback" in agents
+    assert "P1 preflights" in agents and "P5 commits" in agents
+    assert "fused P5" in architecture
+    assert "Direct GPU Nucleation" in architecture_outline
+    assert "no hidden transfer" in architecture_outline
+    for document in (FEATURE, THEORY, EXAMPLE_INDEX, ROADMAP):
         _assert_local_links_resolve(document)

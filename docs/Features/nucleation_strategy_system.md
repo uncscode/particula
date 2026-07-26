@@ -1,4 +1,4 @@
-# CPU Nucleation Strategy System
+# Nucleation Strategy System
 
 > Convert partitioning precursor gas into fixed-capacity particle slots with a
 > public, conservation-accounted CPU runnable.
@@ -120,36 +120,61 @@ See [Fixed-Capacity Slot Exhaustion Primitives](slot_exhaustion_policies.md),
 the [equations](../Theory/Technical/Dynamics/Nucleation_Equations.md), and the
 [supported CPU example](../Examples/Nucleation/cpu_nucleation.py).
 
-### Private direct-Warp staging boundary
+## Direct-Warp low-level step
 
-E6-F8 also ships an **unexported** direct-Warp P4 staging seam. This is an
-implementation boundary, not public GPU nucleation: it consumes immutable P2
-admitted-demand and P3 provisional-count handoffs, while retaining those
-historical records unchanged. Its caller owns the P4 sidecars and the nested
-resampling/scaling primitive sidecars.
+E6-F8 ships a bounded direct-Warp nucleation step. Import only its supported
+low-level entry point:
 
-For each exhausted row, P4 selects resampling only when it can release the
-entire deficit. It considers representative-volume scaling only for exhausted
-rows not selected for resampling. It then reports finalized demand, count, and
-ascending free-slot diagnostics; demand is never silently truncated.
+```python
+from particula.gpu.kernels import nucleation_step_gpu
+```
 
-Expected rejected all-box plans complete before a P4 or nested-primitive writer:
-particle and gas state, P2/P3 records, P4 diagnostics, and all supplied nested
-sidecars remain unchanged. Once an exhaustion primitive has been entered, its
-own planning/commit failure rules apply. P4 provides no rollback across that
-primitive boundary and does not classify such a failure as the all-box rejection
-guarantee.
+`NucleationConfig`, P2/P3 records, P4 controls,
+`NucleationScratchBuffers`, `NucleationFinalizedDemandBuffers`,
+`NucleationDiagnosticBuffers`, `NucleationExhaustionBuffers`, and helpers are
+concrete-only imports from `particula.gpu.kernels.nucleation`. Nested
+`ResamplingBuffers` is concrete-only in `particula.gpu.kernels.exhaustion`.
+They are deliberately not package exports. The CPU-only `Nucleation` runnable
+remains the supported high-level CPU process; it is not a GPU fallback.
 
-This seam does not activate slots, mutate source mass or gas, resize or compact
-storage, transfer data, fall back to CPU, or provide a runnable, public export,
-or example. E6-F9 GPU integration/example orchestration remains deferred; see
-the [GPU roadmap](Roadmap/data-oriented-gpu.md).
+Callers explicitly convert `ParticleData`, `GasData`, and `EnvironmentData`,
+place arrays on one Warp device, and call `wp.synchronize()` before host
+inspection. Fixed schemas use `B` boxes, `N` particle slots, and `S` species:
+particle masses are `(B, N, S)`, particle concentration/charge are `(B, N)`,
+gas concentration/partitioning are `(B, S)`, and temperature is `(B,)`.
+Sidecars are caller-owned, same-device, contiguous `wp.float64` or `wp.int32`
+arrays with documented `(B,)`, `(B, N)`, `(B, S)`, and `(B, N, S)` schemas.
+P4 owns nested E6-F6 resampling/scaling sidecars; see
+[fixed-slot exhaustion](slot_exhaustion_policies.md) for their fields.
+
+P1 performs read-only preflight, P2 plans and admits one inventory-limited
+demand, P3 stages counts/free-slot prefixes, and P4 uses fully viable resampling
+before representative-volume-scaling fallback. P5 fuses selected-slot activation
+and gas transfer. Free-index tails are `-1`; demand is never silently truncated.
+A valid configured gate, no-admission, or zero-work result is a successful
+no-op, not an error or hidden recovery.
+
+Invalid input rejected before P4 primitive entry preserves particle/gas state.
+P2--P4 can write documented sidecars before a later rejection. Once E6-F6 is
+entered, or a P5 writer launches, rollback is not promised. Success returns the
+identical particle and gas containers.
+
+This boundary excludes hidden CPU↔Warp transfer/synchronization, CPU fallback,
+resize/compaction, GPU `Runnable`, scheduler/backend selection, E6-F9
+orchestration, expanded physics, graph capture, autodiff, and performance
+guarantees. E6-F5 fixed-slot activation, E6-F6 exhaustion primitives, and E6-F7
+CPU nucleation are dependencies; E6-F9 is only a downstream explicit-transfer
+integration consumer. See the [equations](../Theory/Technical/Dynamics/Nucleation_Equations.md),
+[direct example](../Examples/Nucleation/gpu_direct_nucleation.py), and
+[GPU roadmap](Roadmap/data-oriented-gpu.md).
 
 Focused validation:
 
 ```bash
 python docs/Examples/Nucleation/cpu_nucleation.py
+python -Werror docs/Examples/Nucleation/gpu_direct_nucleation.py
 pytest particula/tests/nucleation_docs_test.py -q -Werror
+pytest particula/gpu/tests/gpu_direct_nucleation_example_test.py -q -Werror
 pytest particula/dynamics/nucleation/tests/ \
   particula/dynamics/tests/nucleation_runnable_test.py \
   particula/integration_tests/nucleation_process_test.py -q -Werror

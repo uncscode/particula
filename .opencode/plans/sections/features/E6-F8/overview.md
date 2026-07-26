@@ -67,3 +67,9 @@ Issue #1443 delivers P6 coverage only: the new 718-line
 `particula/gpu/kernels/tests/nucleation_parity_test.py` supplies independent
 NumPy float64 direct-Warp parity and conservation evidence. It introduces no
 public API or runtime-behavior change.
+
+## P7 closeout
+
+P7 is shipped by #1444. The package-exported direct `nucleation_step_gpu`, its
+explicit-transfer example, publication regressions, and bounded P1--P5 contract
+are documented. E6-F9 remains a downstream integration consumer.

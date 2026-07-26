@@ -66,12 +66,11 @@ decisions in
 [Numerical Precision and Mass Resolution](#numerical-precision-and-mass-resolution)
 and the time-integration decisions in
 [Time-Scale Stiffness](#time-scale-stiffness). New particle formation is both
-a size-range driver. E6-F7 ships a bounded CPU-only, single-box nucleation
-process; its public runnable adapts legacy `Aerosol` backing data and is not a
-GPU path. E6-F8 ships a private, unexported direct-Warp staging seam only;
-it is not GPU nucleation. [Epic F](#epic-f-gpu-process-completeness) retains
-E6-F9 integration/example work before freshly formed particles can enter
-GPU-resident simulations through slot activation.
+ a size-range driver. E6-F7 ships a bounded CPU-only, single-box nucleation
+ process; its public runnable adapts legacy `Aerosol` backing data and is not a
+ GPU path. E6-F8 ships package-exported direct-Warp `nucleation_step_gpu`; its
+ callers own explicit transfer, sidecars, and synchronization. [Epic F](#epic-f-gpu-process-completeness)
+ retains E6-F9 as downstream integration only, not the direct-step example owner.
 
 ## Non-Goals
 
@@ -232,8 +231,10 @@ Known GPU physics gaps remain:
   guide](../data-containers-and-gpu-foundations.md) for the supported
   constant/Buck scope and refresh contract.
 - E6-F7 ships a CPU-only, single-box nucleation/particle-source runnable.
-  E6-F8 ships private direct-Warp staging only; public GPU nucleation and
-  E6-F9 GPU integration/examples remain deferred.
+   E6-F8 ships bounded direct `nucleation_step_gpu` with an explicit-transfer
+   Warp CPU example. It is not a GPU Runnable, CPU fallback, scheduler/backend
+   selector, resize/compaction mechanism, graph-capture/autodiff API, expanded
+   physics claim, or performance guarantee. E6-F9 remains downstream integration.
 
 Known GPU kernel defects and design limits (see
 [Known Kernel Issues](#known-kernel-issues)):

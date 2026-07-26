@@ -43,3 +43,8 @@
   state that E6-F8 does not provide a high-level GPU runnable or scheduler.
 - Update E6 and E6-F8 plan sections with final issue numbers, measured
   tolerances, shipped status, and any resolved sidecar naming decisions.
+
+## P7 shipped
+
+Updated feature, roadmap, theory, architecture, AGENTS, example index, and the
+direct-Warp example. The implementation remains bounded and E6-F9 downstream.

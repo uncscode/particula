@@ -9,3 +9,8 @@
 | 2026-07-25 | #1441 completed P4: added private E6-F6 exhaustion-policy orchestration with immutable P2/P3 handoffs, fully viable resampling-first selection, scaling fallback, and P4 final demand/count/free-prefix diagnostics. Expected all-box rejections preserve all caller state before primitive entry; entered primitives retain their own no-cross-primitive-rollback boundary. No public API, particle/gas mutation, activation, or E6-F9 integration was added. | plan-update-full |
 | 2026-07-25 | #1442 completed P5: added lazily exported `particula.gpu.kernels.nucleation_step_gpu(...)`, which composes P1--P4 and performs P5 handoff validation before one fused selected-slot activation and finalized gas-removal commit. Precommit rejections preserve particle/gas state; caller-owned same-device and phase-owned sidecar contracts remain intact. | plan-update-full |
 | 2026-07-26 | #1443 completed P6: added the 718-line `particula/gpu/kernels/tests/nucleation_parity_test.py` independent NumPy float64 direct-Warp parity/conservation suite. It covers P2/P3/P4/P5 parity, matrix inventory, scaling/resampling, no-ops, repeated calls, preflight preservation, and zero-size boundaries; this is coverage-only with no public API or runtime behavior change. | plan-update-full |
+
+## #1444 — P7 documentation closeout
+
+Published direct GPU nucleation documentation, example, and regressions without
+changing production kernels, exports, physics, capacity policy, or oracle code.

@@ -352,10 +352,38 @@ substeps, recomputing the rate from the gas left by each successful commit. A
 successful earlier substep therefore remains visible if a later P2/P3 attempt
 fails; P5 deliberately offers no whole-call rollback.
 
-E6-F8 direct-Warp nucleation and E6-F9 integrated GPU/example orchestration
-remain deferred. This CPU transaction does not imply a GPU fallback, dynamic
-slot allocation, automatic scheduling, or a general multiphysics nucleation
-solver.
+### Direct-Warp P1--P5 correspondence
+
+The bounded direct-Warp step is distinct from the CPU runnable. It computes
+`C = c N_A / M` [#/m³], activation `J = S * A * C` with `A` [s⁻¹], or kinetic
+`J = S * K * C²` with `K` [m³/s]. Its potential demand is
+`E_pot = J * dt` [#/m³]. P2 admits one shared inventory-limited event demand
+before the P5 particle/gas transfer.
+
+Direct P1 accepts finite nonnegative duration, coefficient, and survival;
+inclusive configured precursor bounds; positive temperature; optional configured
+saturation bounds; positive formation diameter [m]; and nonnegative integer
+molecule counts with at least one positive entry. Temperature is either a
+positive scalar or same-device `wp.float64` `(B,)`; configured saturation is
+same-device `wp.float64` `(B, S)` or comes from a validated environment.
+
+Ordering is P1 read-only domains/schema preflight, a valid configured
+no-admission/no-op outcome, P2--P4 sidecar and staging phases, then P5 commit.
+Invalid read-only rejection preserves particles and gas. A valid zero-work result
+is not an error. P2--P4 may have changed documented sidecars before a later
+rejection, and rollback is not promised after entered exhaustion primitives or a
+P5 launch.
+
+For an unscaled P5 row, concentration-weighted particle plus gas inventory is
+conserved per box/species at `rtol=1e-12, atol=1e-30`. A scaled row compares
+against `s * initial_particle + initial_gas`; P5 source transfer still balances
+the gas removal. This is direct-kernel conservation evidence, not CPU parity.
+
+The direct step excludes hidden transfer/synchronization, CPU fallback,
+resize/compaction, GPU Runnable/scheduling/backend selection, E6-F9
+orchestration, expanded physics, graph capture, autodiff, and performance
+guarantees. See the [direct example](../../../Examples/Nucleation/gpu_direct_nucleation.py)
+and [feature contract](../../../Features/nucleation_strategy_system.md).
 
 ## Variable Descriptions
 

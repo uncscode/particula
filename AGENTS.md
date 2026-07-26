@@ -832,6 +832,29 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   `mkdocs build --strict`. If changing the paired custom notebook source, sync
   and execute it with the prescribed Jupytext tools.
 
+### Direct GPU nucleation
+
+- The only supported package import is
+  `from particula.gpu.kernels import nucleation_step_gpu`. Import
+  `NucleationConfig`, P2/P3 records, P4 controls, and scratch/finalized/
+  diagnostic/exhaustion sidecars only from `particula.gpu.kernels.nucleation`;
+  nested `ResamplingBuffers` is concrete-only in `kernels.exhaustion`.
+- CPU `particula.dynamics.Nucleation` is a separate CPU-only runnable, never a
+  GPU fallback. Callers explicitly convert particle, gas, and environment data,
+  allocate same-device contiguous `wp.float64`/`wp.int32` sidecars using `(B,)`,
+  `(B, N)`, `(B, S)`, and `(B, N, S)` schemas, and call `wp.synchronize()` before
+  host inspection.
+- P1 preflights, P2 admits shared inventory-limited demand, P3 stages slots,
+  P4 chooses resampling before scaling fallback, and P5 commits selected slots
+  plus gas transfer. Invalid public rejection before P4 preserves particles/gas;
+  documented sidecars may change in P2--P4, and no rollback is promised after
+  an E6-F6 primitive entry or P5 launch. Valid no-admission is a successful no-op.
+- E6-F5 fixed-slot activation, E6-F6 exhaustion primitives, and E6-F7 CPU
+  nucleation are dependencies. Warp CPU is the baseline; CUDA is optional and
+  must cleanly skip when unavailable. Run
+  `python -Werror docs/Examples/Nucleation/gpu_direct_nucleation.py` and
+  `pytest particula/gpu/tests/gpu_direct_nucleation_example_test.py -q -Werror`.
+
 ## ADW Workflows
 
 **Available workflows:**
