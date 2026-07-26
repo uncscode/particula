@@ -2,13 +2,13 @@
   "id": "E6-F5",
   "type": "feature",
   "title": "CPU and GPU Fixed-Slot Activation and Diagnostics",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
+  "completion_date": "2026-07-24",
   "last_updated": "2026-07-24",
   "dependencies": [],
   "section_files": {
@@ -84,11 +84,11 @@
     {
       "id": "E6-F5-P5",
       "title": "Update development documentation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-24",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -96,5 +96,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

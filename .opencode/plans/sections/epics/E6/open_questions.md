@@ -47,8 +47,8 @@ tolerance, but must not silently weaken these decisions.
 
 ## Scheduling and Metadata Decisions
 
-- [x] Calendar dates remain unassigned until execution planning. Dependency
-  gates, not fabricated dates, are authoritative while E6 is Draft.
+- [x] Calendar target dates remained unassigned during planning; dependency
+  gates and recorded completion dates are authoritative for shipped E6.
 - [x] Phase issue numbers remain `TBD`/`null` until each implementation phase is
   scheduled; each issue must be linked before that phase starts.
 - [x] Epic `child_plans` metadata is synchronized with E6-F1 through E6-F9.

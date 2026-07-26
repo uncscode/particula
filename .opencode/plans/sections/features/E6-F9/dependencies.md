@@ -32,8 +32,7 @@ installed; CUDA is optional evidence.
 
 ## Phase Ordering
 
-P1 establishes fixtures and accounting rules before P2 composes the direct
-sequence. P2 evidence defines the assertions and output published by P3. P4 has
-published documentation and its own validation evidence, but cannot close E6:
-E6-F2, E6-F5, E6-F6, and E6-F8 remain canonical blockers. Parent shipped status
-must not be asserted early.
+P1 established fixtures and accounting rules before P2 composed the direct
+sequence. P2 evidence defined the assertions and output published by P3. P4
+published documentation and validation evidence after all upstream plans
+shipped, closing E6 and activating Epic G.

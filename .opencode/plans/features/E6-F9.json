@@ -2,13 +2,13 @@
   "id": "E6-F9",
   "type": "feature",
   "title": "Integrated Validation Documentation and Epic Closeout",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
+  "completion_date": "2026-07-26",
   "last_updated": "2026-07-26",
   "dependencies": [
     "E6-F1",
@@ -80,11 +80,11 @@
     {
       "id": "E6-F9-P4",
       "title": "Update development documentation, roadmap cross-links, and epic closeout",
-      "status": "Draft",
+      "status": "Shipped",
       "size": "S",
       "issue_number": 1449,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-26",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -92,5 +92,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

@@ -2,13 +2,13 @@
   "id": "E6-F8",
   "type": "feature",
   "title": "Direct GPU Nucleation Process",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
+  "completion_date": "2026-07-26",
   "last_updated": "2026-07-26",
   "dependencies": [
     "E6-F5",
@@ -114,11 +114,11 @@
     {
       "id": "E6-F8-P7",
       "title": "Update development documentation for direct GPU nucleation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-26",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -126,5 +126,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

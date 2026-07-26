@@ -2,13 +2,13 @@
   "id": "E6-F2",
   "type": "feature",
   "title": "Direct GPU Dilution with CPU Parity",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
+  "completion_date": "2026-07-22",
   "last_updated": "2026-07-22",
   "dependencies": [
     "E6-F1"
@@ -47,11 +47,11 @@
     {
       "id": "E6-F2-P2",
       "title": "Implement fixed-shape particle and gas dilution kernels with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-22",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -98,5 +98,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

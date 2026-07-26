@@ -33,11 +33,10 @@ test.
   premature checkpoint.
 - **P4 (complete, #1449):** The hardware-free
   `particula/tests/gpu_complete_process_sequence_docs_test.py` validates links,
-  imports, focused commands, E6 and E6-F1-F9 inventories, the fail-closed
-  closeout projection, exit-bar wording, and explicit Epic G boundaries. It
-  passed without Warp/CUDA, alongside `adw plans validate`; it confirms P4
-  evidence without closing E6 while E6-F2, E6-F5, E6-F6, and E6-F8 remain
-  incomplete.
+  imports, focused commands, checked-in evidence, and explicit ownership and
+  Epic G boundaries. Mutable plan-status and duplicated roadmap-inventory
+  assertions are intentionally excluded. It passed without Warp/CUDA alongside
+  `adw plans validate`.
 
 ## Required Invariants
 

@@ -1,0 +1,29 @@
+INHERIT: mkdocs.yml
+
+# Full publication build. Local `mkdocs serve` intentionally uses the faster
+# base configuration without API generation or notebook rendering.
+plugins:
+  - search
+  - social
+  - gen-files:
+      scripts:
+        - docs/.assets/mk_generator.py
+  - mkdocs-jupyter:
+      include_source: true
+      execute: false
+      allow_errors: true
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [particula]
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            docstring_style: google
+            docstring_section_style: list
+            merge_init_into_class: true
+            separate_signature: true
+            show_signature_annotations: true

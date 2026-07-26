@@ -12,11 +12,11 @@ schedule.
   processes easier to compose in clear simulation pipelines.
 - **Particle and gas data containers**: Complete migration from legacy facades
   toward explicit `ParticleData` and `GasData` containers.
-- **GPU process completeness**: Complete GPU dilution, wall loss, nucleation,
-  and fixed-capacity slot management through
+- **GPU process completeness**: Maintain the shipped GPU dilution, wall loss,
+  nucleation, and fixed-capacity slot-management contracts from
   [Epic F](data-oriented-gpu.md#epic-f-gpu-process-completeness).
-- **GPU-resident user workflows**: Prepare backend selection and high-level
-  simulation integration for on-deck
+- **GPU-resident user workflows**: Advance backend selection and high-level
+  simulation integration through active
   [Epic G](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation).
 - **Documentation and examples**: Expand practical examples that connect feature
   guides, theory pages, and runnable notebooks.
@@ -147,16 +147,16 @@ meets its exit bar, the next pending epic in the sequence becomes active.
 
 | ID | Title | Status text |
 | --- | --- | --- |
-| [`E6`](../../../.opencode/plans/epics/E6.json) | GPU Process Completeness | Draft |
+| [`E6`](../../../.opencode/plans/epics/E6.json) | GPU Process Completeness | Shipped |
 | [`E6-F1`](../../../.opencode/plans/features/E6-F1.json) | CPU Dilution Strategy and Runnable Reference | Shipped |
-| [`E6-F2`](../../../.opencode/plans/features/E6-F2.json) | Direct GPU Dilution with CPU Parity | Draft |
+| [`E6-F2`](../../../.opencode/plans/features/E6-F2.json) | Direct GPU Dilution with CPU Parity | Shipped |
 | [`E6-F3`](../../../.opencode/plans/features/E6-F3.json) | Neutral Spherical and Rectangular GPU Wall Loss | Shipped |
 | [`E6-F4`](../../../.opencode/plans/features/E6-F4.json) | Charged GPU Wall Loss with Neutral Fallback | Shipped |
-| [`E6-F5`](../../../.opencode/plans/features/E6-F5.json) | CPU and GPU Fixed-Slot Activation and Diagnostics | Draft |
-| [`E6-F6`](../../../.opencode/plans/features/E6-F6.json) | CPU and GPU Slot Exhaustion Policies | Draft |
+| [`E6-F5`](../../../.opencode/plans/features/E6-F5.json) | CPU and GPU Fixed-Slot Activation and Diagnostics | Shipped |
+| [`E6-F6`](../../../.opencode/plans/features/E6-F6.json) | CPU and GPU Slot Exhaustion Policies | Shipped |
 | [`E6-F7`](../../../.opencode/plans/features/E6-F7.json) | CPU Nucleation and Particle-Source Process | Shipped |
-| [`E6-F8`](../../../.opencode/plans/features/E6-F8.json) | Direct GPU Nucleation Process | Draft |
-| [`E6-F9`](../../../.opencode/plans/features/E6-F9.json) | Integrated Validation Documentation and Epic Closeout | Draft |
+| [`E6-F8`](../../../.opencode/plans/features/E6-F8.json) | Direct GPU Nucleation Process | Shipped |
+| [`E6-F9`](../../../.opencode/plans/features/E6-F9.json) | Integrated Validation Documentation and Epic Closeout | Shipped |
 
 The private [P2 sequence evidence](../../../particula/gpu/tests/process_sequence_test.py),
 [P3 source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py),
@@ -193,9 +193,9 @@ All E5 features are shipped. The public E5 cross-links are:
   and
   [direct GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py).
 
-E5 and every E5 feature are shipped. Epic F is active next; Epic G is on deck.
+E5, E6, and all of their feature plans are shipped. Epic G is active next.
 
-### On Deck
+### Active
 
 - [Epic G: Backend Selection and GPU-Resident Simulation](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
   follows Epic F. It will expose backend selection through user-facing APIs and

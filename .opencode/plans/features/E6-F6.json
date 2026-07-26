@@ -2,13 +2,13 @@
   "id": "E6-F6",
   "type": "feature",
   "title": "CPU and GPU Slot Exhaustion Policies",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
+  "completion_date": "2026-07-24",
   "last_updated": "2026-07-24",
   "dependencies": [
     "E6-F5"
@@ -86,11 +86,11 @@
     {
       "id": "E6-F6-P5",
       "title": "Enforce independent controls, resampling-first precedence, and fail-closed validation",
-      "status": "Blocked",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-24",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -124,5 +124,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

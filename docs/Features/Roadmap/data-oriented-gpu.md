@@ -24,8 +24,8 @@ documentation conventions.
 | 3 | [Epic C: GPU Kernel Correctness and Low-Level API Hardening](#epic-c-gpu-kernel-correctness-and-low-level-api-hardening) | Shipped | E3 |
 | 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | Shipped | E4 |
 | 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Shipped | E5 |
-| 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Active | E6 |
-| 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Pending | not scheduled |
+| 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Shipped | E6 |
+| 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Active | not scheduled |
 | 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Pending | not scheduled |
 | 9 | [Epic I: Differentiability and Global Optimization](#epic-i-differentiability-and-global-optimization) | Pending | not scheduled |
 
@@ -1220,16 +1220,16 @@ Epic D carry-forward walkthrough and ownership record are published.
 
 | ID | Title | Status text |
 | --- | --- | --- |
-| [`E6`](../../../.opencode/plans/epics/E6.json) | GPU Process Completeness | Draft |
+| [`E6`](../../../.opencode/plans/epics/E6.json) | GPU Process Completeness | Shipped |
 | [`E6-F1`](../../../.opencode/plans/features/E6-F1.json) | CPU Dilution Strategy and Runnable Reference | Shipped |
-| [`E6-F2`](../../../.opencode/plans/features/E6-F2.json) | Direct GPU Dilution with CPU Parity | Draft |
+| [`E6-F2`](../../../.opencode/plans/features/E6-F2.json) | Direct GPU Dilution with CPU Parity | Shipped |
 | [`E6-F3`](../../../.opencode/plans/features/E6-F3.json) | Neutral Spherical and Rectangular GPU Wall Loss | Shipped |
 | [`E6-F4`](../../../.opencode/plans/features/E6-F4.json) | Charged GPU Wall Loss with Neutral Fallback | Shipped |
-| [`E6-F5`](../../../.opencode/plans/features/E6-F5.json) | CPU and GPU Fixed-Slot Activation and Diagnostics | Draft |
-| [`E6-F6`](../../../.opencode/plans/features/E6-F6.json) | CPU and GPU Slot Exhaustion Policies | Draft |
+| [`E6-F5`](../../../.opencode/plans/features/E6-F5.json) | CPU and GPU Fixed-Slot Activation and Diagnostics | Shipped |
+| [`E6-F6`](../../../.opencode/plans/features/E6-F6.json) | CPU and GPU Slot Exhaustion Policies | Shipped |
 | [`E6-F7`](../../../.opencode/plans/features/E6-F7.json) | CPU Nucleation and Particle-Source Process | Shipped |
-| [`E6-F8`](../../../.opencode/plans/features/E6-F8.json) | Direct GPU Nucleation Process | Draft |
-| [`E6-F9`](../../../.opencode/plans/features/E6-F9.json) | Integrated Validation Documentation and Epic Closeout | Draft |
+| [`E6-F8`](../../../.opencode/plans/features/E6-F8.json) | Direct GPU Nucleation Process | Shipped |
+| [`E6-F9`](../../../.opencode/plans/features/E6-F9.json) | Integrated Validation Documentation and Epic Closeout | Shipped |
 
 The private [P2 sequence evidence](../../../particula/gpu/tests/process_sequence_test.py)
 and [P3 published source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py)
@@ -1453,12 +1453,10 @@ Delivered nucleation boundaries and deferred GPU scope:
   workspace, count, and status buffers. Compaction is not part of the shipped
   contract.
 
-**Exit bar:** E6-F1--E6-F8 canonical records must each be Shipped and completed
-with dated shipped phases, and E6-F9 P1--P4 must have dated command evidence,
-before E6 ships or Epic G activates. Current blockers are `E6-F2`, `E6-F5`,
-`E6-F6`, `E6-F8`, and P4 until its validation completes. Warp CPU remains the
-baseline and CUDA optional. Backend selection, high-level GPU runnables,
-deterministic scheduling, resident loops, and transport remain Epic G work.
+**Exit bar:** E6-F1--E6-F8 and E6-F9 P1--P4 are shipped with dated completion
+evidence, so E6 is shipped and Epic G is active. Warp CPU remains the baseline
+and CUDA optional. Backend selection, high-level GPU runnables, deterministic
+scheduling, resident loops, and transport remain Epic G work.
 
 ## Epic G: Backend Selection and GPU-Resident Simulation
 

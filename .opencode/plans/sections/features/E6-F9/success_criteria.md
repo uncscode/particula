@@ -5,14 +5,14 @@
   `particula/gpu/tests/process_sequence_test.py` with deterministic fp64
   one-/multi-box fixtures, independent invariants, ownership snapshots, and an
   optional Warp mirror, without production or public API changes.
-- [ ] Required Warp CPU coverage executes condensation, coagulation, dilution,
+- [x] Required Warp CPU coverage executes condensation, coagulation, dilution,
   wall loss, and nucleation on shared fixed-shape device state without an
   intermediate CPU restore.
-- [ ] Optional CUDA coverage runs when available and otherwise skips cleanly.
-- [ ] Process-specific CPU/Warp parity, statistical bounds, conservation/loss
+- [x] Optional CUDA coverage runs when available and otherwise skips cleanly.
+- [x] Process-specific CPU/Warp parity, statistical bounds, conservation/loss
   budgets, diagnostics, shape/device/dtype, identity, and failure-before-
   mutation contracts pass at recorded tolerances.
-- [ ] Persistent RNG is reused without hidden reseeding, and caller-owned
+- [x] Persistent RNG is reused without hidden reseeding, and caller-owned
   sidecars retain identity.
 - [x] The runnable example performs exactly one conversion of each CPU container,
   five direct calls in fixed illustrative order, one synchronization, and one
@@ -22,14 +22,13 @@
   failures, and a guarded real Warp CPU route. (#1448)
 - [x] Both roadmap documents cross-link E6 and E6-F1 through E6-F9 plus the
   integrated validation and example artifacts.
-- [x] E6 remains blocked until every child plan is shipped and the parent exit
-  bar is verified; E6-F2, E6-F5, E6-F6, and E6-F8 currently prevent closeout.
+- [x] Every E6 child plan is shipped, the parent exit bar is verified, and E6
+  is Shipped/completed.
 - [x] Documentation states that backend selection, high-level GPU runnables,
   process scheduling, and resident multi-step simulation remain Epic G scope.
 - [x] `pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q
   -Werror` and plan validation pass for #1449; this documentation-only change
-  adds hardware-free regression coverage without changing the blocked E6/Epic G
-  projection.
+  adds hardware-free regression coverage without changing runtime behavior.
 
 ## Metrics
 
