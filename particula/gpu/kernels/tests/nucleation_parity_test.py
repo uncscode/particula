@@ -26,6 +26,7 @@ def _warp():
 
 def _api():
     """Import concrete nucleation records only after Warp is available."""
+    from particula.gpu.kernels import nucleation_step_gpu
     from particula.gpu.kernels.exhaustion import ResamplingBuffers
     from particula.gpu.kernels.nucleation import (
         NucleationConfig,
@@ -34,7 +35,6 @@ def _api():
         NucleationExhaustionControls,
         NucleationFinalizedDemandBuffers,
         NucleationScratchBuffers,
-        nucleation_step_gpu,
     )
 
     return SimpleNamespace(
@@ -84,19 +84,29 @@ def _state(device, boxes=1, particles=3, species=2, *, active=False):
     masses = np.zeros((boxes, particles, species), dtype=np.float64)
     concentration = np.zeros((boxes, particles), dtype=np.float64)
     if active and particles:
-        masses[:, 0, :] = np.array([2e-18, 3e-18], dtype=np.float64)
+        masses[:, 0, :] = 2e-18 + 1e-18 * np.arange(species)
         concentration[:, 0] = 2.0
+    box_scale = 0.5 ** np.arange(boxes, dtype=np.float64)
+    species_scale = 1.0 + 0.1 * np.arange(species, dtype=np.float64)
     particle_data = SimpleNamespace(
         masses=wp.array(masses, dtype=wp.float64, device=device),
         concentration=wp.array(concentration, dtype=wp.float64, device=device),
         charge=wp.zeros((boxes, particles), dtype=wp.float64, device=device),
-        density=wp.array([1000.0, 1200.0], dtype=wp.float64, device=device),
-        volume=wp.ones(boxes, dtype=wp.float64, device=device),
+        density=wp.array(
+            1000.0 + 200.0 * np.arange(species),
+            dtype=wp.float64,
+            device=device,
+        ),
+        volume=wp.array(1.0 / box_scale, dtype=wp.float64, device=device),
     )
     gas_data = SimpleNamespace(
-        molar_mass=wp.array([0.1, 0.2], dtype=wp.float64, device=device),
-        concentration=wp.ones(
-            (boxes, species), dtype=wp.float64, device=device
+        molar_mass=wp.array(
+            0.1 + 0.1 * np.arange(species), dtype=wp.float64, device=device
+        ),
+        concentration=wp.array(
+            box_scale[:, None] * species_scale[None, :],
+            dtype=wp.float64,
+            device=device,
         ),
         partitioning=wp.ones((boxes, species), dtype=wp.int32, device=device),
     )
@@ -225,6 +235,7 @@ def _snapshot(*owners):
                     tuple(value.shape),
                     value.dtype,
                     str(value.device),
+                    id(value),
                 )
             )
         elif hasattr(value, "__dict__"):
@@ -238,7 +249,8 @@ def _snapshot(*owners):
 
 def _assert_unchanged(snapshot):
     """Assert caller-owned arrays preserve identity, schema, and exact values."""
-    for value, contents, shape, dtype, device in snapshot:
+    for value, contents, shape, dtype, device, identity in snapshot:
+        assert id(value) == identity
         assert tuple(value.shape) == shape
         assert value.dtype == dtype
         assert str(value.device) == device
@@ -246,27 +258,34 @@ def _assert_unchanged(snapshot):
 
 
 @pytest.mark.parametrize("boxes", [1, 2])
+@pytest.mark.parametrize("species", [1, 2, 3])
 @pytest.mark.parametrize("rate_law", ["activation", "kinetic"])
 def test_public_nucleation_step_matches_independent_p2_p3_p5_oracle(
-    device, boxes, rate_law
+    device, boxes, species, rate_law
 ) -> None:
     """Direct steps match independent demand, slot insertion, and gas removal."""
     wp = _warp()
     api = _api()
-    particles, gas = _state(device, boxes=boxes)
+    particles, gas = _state(device, boxes=boxes, species=species)
     scratch, finalized, diagnostics, exhaustion = _sidecars(
-        api, device, boxes, 3, 2
+        api, device, boxes, 3, species
     )
     coefficient = 0.1 / AVOGADRO_NUMBER
     if rate_law == "kinetic":
-        event_mass = np.array([0.1, 0.4], dtype=np.float64) / AVOGADRO_NUMBER
+        counts = np.arange(1, species + 1, dtype=np.float64)
+        event_mass = counts * gas.molar_mass.numpy() / AVOGADRO_NUMBER
         gas.concentration = wp.array(
-            np.tile(event_mass, (boxes, 1)),
+            event_mass[None, :] / particles.volume.numpy()[:, None],
             dtype=wp.float64,
             device=device,
         )
         coefficient = 2.0
-    config = _config(api, rate_law=rate_law, coefficient=coefficient)
+    config = _config(
+        api,
+        rate_law=rate_law,
+        coefficient=coefficient,
+        molecule_counts=tuple(range(1, species + 1)),
+    )
     initial_gas = gas.concentration.numpy().copy()
     demand, removal, event_mass = _numpy_p2(
         initial_gas, gas.molar_mass.numpy(), config, 1.0
@@ -286,7 +305,7 @@ def test_public_nucleation_step_matches_independent_p2_p3_p5_oracle(
     wp.synchronize_device(device)
     assert result[0] is particles
     assert result[1] is gas
-    expected_masses = np.zeros((boxes, 3, 2), dtype=np.float64)
+    expected_masses = np.zeros((boxes, 3, species), dtype=np.float64)
     expected_concentration = np.zeros((boxes, 3), dtype=np.float64)
     expected_masses[:, 0, :] = event_mass
     expected_concentration[:, 0] = demand
@@ -306,7 +325,8 @@ def test_public_nucleation_step_matches_independent_p2_p3_p5_oracle(
         gas.concentration.numpy(), initial_gas - removal, rtol=1e-12, atol=1e-30
     )
     np.testing.assert_array_equal(
-        exhaustion.final_counts.numpy(), demand.astype(np.int32)
+        exhaustion.final_counts.numpy(),
+        (demand * particles.volume.numpy()).astype(np.int32),
     )
     np.testing.assert_array_equal(
         exhaustion.final_selected_slot_indices.numpy(),
@@ -359,8 +379,8 @@ def test_public_nucleation_step_gates_are_exact_write_free(
     _assert_unchanged(before)
 
 
-def test_public_nucleation_step_conserves_matrix_inventory(device) -> None:
-    """Unscaled commits conserve each box/species particle-plus-gas inventory."""
+def test_public_nucleation_step_conserves_tiny_matrix_transfer(device) -> None:
+    """Tiny unscaled transfers conserve each box/species by direct residual."""
     wp = _warp()
     api = _api()
     particles, gas = _state(device, boxes=2, active=True)
@@ -388,7 +408,7 @@ def test_public_nucleation_step_conserves_matrix_inventory(device) -> None:
         particles.masses.numpy(), particles.concentration.numpy()
     )
     final += gas.concentration.numpy()
-    np.testing.assert_allclose(final, initial, rtol=1e-12, atol=1e-30)
+    np.testing.assert_allclose(final - initial, 0.0, rtol=0.0, atol=1e-30)
     assert np.all(np.isfinite(gas.concentration.numpy()))
     assert np.all(gas.concentration.numpy() >= 0.0)
 
@@ -596,13 +616,15 @@ def test_public_nucleation_step_repeated_calls_use_current_gas(device) -> None:
 def test_public_nucleation_step_rejections_preserve_callers(
     device, time_step, temperature, message
 ) -> None:
-    """Public preflight rejection preserves particle, gas, and sidecar storage."""
+    """Public preflight rejection preserves all caller-owned storage."""
     api = _api()
     particles, gas = _state(device)
     scratch, finalized, diagnostics, exhaustion = _sidecars(
         api, device, 1, 3, 2
     )
-    before = _snapshot(particles, gas)
+    before = _snapshot(
+        particles, gas, scratch, finalized, diagnostics, exhaustion
+    )
     with pytest.raises(ValueError, match=message):
         api.nucleation_step_gpu(
             particles,
@@ -637,7 +659,13 @@ def test_public_nucleation_step_malformed_sidecar_preserves_callers(
         diagnostics.free_slot_counts,
     )
     before = _snapshot(
-        particles, gas, scratch, finalized, malformed, exhaustion
+        particles,
+        gas,
+        scratch,
+        finalized,
+        diagnostics,
+        malformed,
+        exhaustion,
     )
     with pytest.raises(ValueError, match="required dtype"):
         api.nucleation_step_gpu(
@@ -716,3 +744,33 @@ def test_public_nucleation_step_zero_capacity_zero_gate_is_write_free(
     _assert_unchanged(before)
     np.testing.assert_array_equal(exhaustion.final_counts.numpy(), [0])
     assert exhaustion.final_selected_slot_indices.numpy().shape == (1, 0)
+
+
+def test_public_nucleation_step_full_capacity_rejects_without_mutation(
+    device,
+) -> None:
+    """A full row without policy rejects before particle/gas writes."""
+    api = _api()
+    particles, gas = _state(device, particles=1, active=True)
+    scratch, finalized, diagnostics, exhaustion = _sidecars(
+        api, device, 1, 1, 2
+    )
+    before = _snapshot(particles, gas)
+
+    with pytest.raises(ValueError, match="capacity"):
+        api.nucleation_step_gpu(
+            particles,
+            gas,
+            _config(api),
+            1.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+            exhaustion_controls=api.NucleationExhaustionControls(False, False),
+            exhaustion_buffers=exhaustion,
+            temperature=300.0,
+        )
+
+    _assert_unchanged(before)
+    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [1])
+    np.testing.assert_array_equal(diagnostics.free_slot_counts.numpy(), [0])
