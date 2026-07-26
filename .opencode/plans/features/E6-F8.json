@@ -75,11 +75,11 @@
     {
       "id": "E6-F8-P4",
       "title": "Integrate device exhaustion planning without fallback with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-26",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
