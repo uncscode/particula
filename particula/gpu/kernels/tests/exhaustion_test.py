@@ -1165,11 +1165,16 @@ def _direct_particle_ledger(
     include_volume: bool,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Independently reduce per-box number, species mass, and charge."""
-    number = np.sum(concentration, axis=1, dtype=np.float64)
+    number = np.asarray(
+        np.sum(concentration, axis=1, dtype=np.float64), dtype=np.float64
+    )
     mass = np.einsum(
         "bn,bns->bs", concentration, masses, dtype=np.float64, optimize=True
     )
-    signed_charge = np.sum(concentration * charge, axis=1, dtype=np.float64)
+    signed_charge = np.asarray(
+        np.sum(concentration * charge, axis=1, dtype=np.float64),
+        dtype=np.float64,
+    )
     if include_volume:
         number *= volume
         mass *= volume[:, None]

@@ -675,11 +675,9 @@ def _slot_expectation(
     free_indices = np.full(concentration.shape, -1, dtype=np.int32)
     for box in range(concentration.shape[0]):
         free_indices[box, : np.sum(free[box])] = np.flatnonzero(free[box])
-    return SlotExpectation(
-        free_indices,
-        np.sum(active, axis=1, dtype=np.int32),
-        np.sum(free, axis=1, dtype=np.int32),
-    )
+    active_counts = np.asarray(np.sum(active, axis=1), dtype=np.int32)
+    free_counts = np.asarray(np.sum(free, axis=1), dtype=np.int32)
+    return SlotExpectation(free_indices, active_counts, free_counts)
 
 
 def _assert_no_alias(*arrays: np.ndarray) -> None:

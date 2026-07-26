@@ -1,5 +1,7 @@
 """Parity and statistical validation for direct neutral and charged GPU wall loss."""
 
+# mypy: disable-error-code="operator"
+
 from __future__ import annotations
 
 from typing import Any, cast

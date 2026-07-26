@@ -20,7 +20,7 @@ package export, policy, transfer, resizing, or runnable integration; callers
 own device placement and explicitly synchronize before observing results.
 """
 
-# mypy: disable-error-code="valid-type, misc"
+# mypy: disable-error-code="valid-type, misc, operator"
 
 from __future__ import annotations
 

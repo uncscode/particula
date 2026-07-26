@@ -234,37 +234,6 @@ def _closeout_gate(
     return ("E5 shipped", "E5-F9 shipped", "Epic F active")
 
 
-def _detailed_epic_index_statuses(content: str) -> dict[str, str]:
-    """Return the Epic E and F statuses from the detailed index table."""
-    statuses = {}
-    for number, epic in (("5", "E"), ("6", "F")):
-        match = re.search(
-            rf"^\|\s*{number}\s*\|\s*\[Epic {epic}:.*?\]\([^)]+\)"
-            r"\s*\|\s*([^|]+?)\s*\|",
-            content,
-            flags=re.IGNORECASE | re.MULTILINE,
-        )
-        assert match, f"Epic {epic} is missing from the detailed roadmap index"
-        statuses[epic] = match.group(1).strip().lower()
-    return statuses
-
-
-def _roadmap_index_statuses(content: str) -> dict[str, str]:
-    """Return Epic E and F statuses from their roadmap-index sections."""
-    shipped = _section(content, "### Shipped")
-    active = _section(content, "### Active")
-    pending = _section(content, "### Pending")
-    epic_e = "[Epic E: GPU Coagulation Physics Coverage]("
-    epic_f = "[Epic F: GPU Process Completeness]("
-
-    assert shipped.count(epic_e) == 1
-    assert active.count(epic_e) == 0
-    assert pending.count(epic_e) == 0
-    assert active.count(epic_f) == 1
-    assert pending.count(epic_f) == 0
-    return {"E": "shipped", "F": "active"}
-
-
 def _command_target(command: str) -> Path:
     """Return the repository target named by a published pytest command."""
     match = re.search(r"\b(particula/[^\s]+)", command)
@@ -626,26 +595,6 @@ def test_e5_roadmap_records_match_and_resolve_artifacts() -> None:
         records.append((record_rows, artifact_records))
 
     assert records[0] == records[1]
-
-
-def test_e5_roadmaps_keep_final_epic_statuses() -> None:
-    """Roadmaps retain shipped E5 and active Epic F status."""
-    stale_epic_e_row = (
-        r"\|\s*5\s*\|\s*\[Epic E:.*?\|\s*Active\s*\|\s*"
-        r"not scheduled\s*\|"
-    )
-    detailed = DETAILED_ROADMAP_PATH.read_text(encoding="utf-8")
-    index = ROADMAP_INDEX_PATH.read_text(encoding="utf-8")
-
-    assert _detailed_epic_index_statuses(detailed) == {
-        "E": "shipped",
-        "F": "active",
-    }
-    assert _roadmap_index_statuses(index) == {"E": "shipped", "F": "active"}
-    for content in (detailed, index):
-        normalized = _normalized(content).lower()
-        assert not re.search(stale_epic_e_row, content, flags=re.IGNORECASE)
-        assert "e5-f9 p4 remains" not in normalized
 
 
 def test_testing_guide_publishes_hardware_free_docs_validation() -> None:

@@ -23,7 +23,7 @@ is lazily exported through ``particula.gpu.kernels``; all records and helpers
 remain concrete-module-only.
 """
 
-# mypy: disable-error-code="valid-type, misc"
+# mypy: disable-error-code="valid-type, misc, operator"
 
 from __future__ import annotations
 

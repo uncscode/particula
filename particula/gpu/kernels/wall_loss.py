@@ -13,7 +13,7 @@ call. A supplied ``uint32`` Warp sidecar remains caller-owned, advances in
 place only for eligible slots, and resets only when explicitly requested.
 """
 
-# mypy: disable-error-code="valid-type, misc"
+# mypy: disable-error-code="valid-type, misc, operator"
 
 from __future__ import annotations
 

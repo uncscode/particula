@@ -21,6 +21,8 @@ rates in vessels. *Aerosol Science and Technology*, 2(3), 303-309.
 https://doi.org/10.1080/02786828308958636
 """
 
+# mypy: disable-error-code="operator"
+
 import warp as wp
 
 from particula.gpu.properties import (

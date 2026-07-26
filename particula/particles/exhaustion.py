@@ -443,7 +443,9 @@ def get_weighted_inventory(  # noqa: C901
         raise ValueError("weights must be nonnegative")
 
     with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
-        number = np.sum(weight_values, axis=1, dtype=np.float64)
+        number = np.asarray(
+            np.sum(weight_values, axis=1, dtype=np.float64), dtype=np.float64
+        )
         mass = np.einsum(
             "bn,bns->bs",
             weight_values,
@@ -451,8 +453,9 @@ def get_weighted_inventory(  # noqa: C901
             dtype=np.float64,
             optimize=True,
         )
-        total_charge = np.sum(
-            weight_values * charge_values, axis=1, dtype=np.float64
+        total_charge = np.asarray(
+            np.sum(weight_values * charge_values, axis=1, dtype=np.float64),
+            dtype=np.float64,
         )
         number_per_volume = number / volume_values
         mass_per_volume = mass / volume_values[:, None]
@@ -720,7 +723,9 @@ def _riemer_diversity(
     concentrations: NDArray[np.float64],
 ) -> np.float64:
     """Calculate particle mixing-state Riemer diversity using natural logs."""
-    particle_mass = np.sum(masses, axis=1, dtype=np.float64)
+    particle_mass = np.asarray(
+        np.sum(masses, axis=1, dtype=np.float64), dtype=np.float64
+    )
     represented_mass = concentrations * particle_mass
     total = np.sum(represented_mass, dtype=np.float64)
     if not np.isfinite(total) or total <= 0.0:
@@ -816,7 +821,9 @@ def _build_box_remap(  # noqa: C901
         int(index) for index in source.active_indices[retained_count:]
     )
 
-    totals = np.sum(source.masses, axis=1, dtype=np.float64)
+    totals = np.asarray(
+        np.sum(source.masses, axis=1, dtype=np.float64), dtype=np.float64
+    )
     fractions = source.masses / totals[:, None]
     order = np.array(
         sorted(

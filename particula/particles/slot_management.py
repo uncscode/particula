@@ -75,8 +75,8 @@ def get_slot_diagnostics(
         raise ValueError("Invalid particle slot state.")
 
     free_indices = np.full((data.n_boxes, data.n_particles), -1, dtype=np.int32)
-    free_counts = np.sum(free, axis=1, dtype=np.int32)
-    active_counts = np.sum(active, axis=1, dtype=np.int32)
+    free_counts = np.asarray(np.sum(free, axis=1), dtype=np.int32)
+    active_counts = np.asarray(np.sum(active, axis=1), dtype=np.int32)
     particle_indices = np.arange(data.n_particles, dtype=np.int32)
 
     for box_index in range(data.n_boxes):

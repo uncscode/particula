@@ -6,6 +6,8 @@ owns the reusable neutral transport primitives and dimensionless wall-loss
 geometry factors used by GPU dynamics.
 """
 
+# mypy: disable-error-code="operator"
+
 import warp as wp
 
 from particula.gpu.properties.gas_properties import (

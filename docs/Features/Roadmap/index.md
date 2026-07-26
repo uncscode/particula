@@ -135,13 +135,11 @@ meets its exit bar, the next pending epic in the sequence becomes active.
   additive masks; charge-conserving merges; deterministic and stochastic
   validation; explicit-transfer documentation and examples; and the ordered
   closeout gate. High-level `Runnable` integration remains deferred.
-
-### Active
-
 - [Epic F: GPU Process Completeness](data-oriented-gpu.md#epic-f-gpu-process-completeness)
-  remains Draft and blocked. Its remaining canonical blockers are `E6-F2`,
-  `E6-F5`, `E6-F6`, and `E6-F8`; E6-F9 P4 documentation is pending its own
-  validation evidence.
+  (ADW plan E6) and all nine feature plans E6-F1 through E6-F9 are shipped.
+  The release supplies the bounded direct dilution, wall-loss, fixed-slot,
+  exhaustion, and nucleation contracts plus explicit five-call sequence
+  evidence. High-level GPU orchestration remains deferred to Epic G.
 
 ### E6 roadmap inventory
 

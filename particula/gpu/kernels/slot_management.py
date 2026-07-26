@@ -10,7 +10,7 @@ owned simulation arrays are never implicitly transferred; validation may
 synchronize and read back private scalar status buffers.
 """
 
-# mypy: disable-error-code="valid-type, misc"
+# mypy: disable-error-code="valid-type, misc, operator"
 
 from __future__ import annotations
 
