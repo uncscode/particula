@@ -54,11 +54,11 @@
     {
       "id": "E6-F9-P2",
       "title": "Validate the complete direct GPU process sequence on Warp CPU",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-26",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
