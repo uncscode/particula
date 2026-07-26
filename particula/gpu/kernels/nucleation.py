@@ -441,6 +441,7 @@ class _NucleationPreflight:
     finalized_demand: NucleationFinalizedDemandBuffers | None = None
     diagnostics: NucleationDiagnosticBuffers | None = None
     p3_sidecars: tuple[Any, ...] = ()
+    protected_sidecars: tuple[Any, ...] = ()
     particle_arrays: tuple[Any, ...] = ()
     gas_arrays: tuple[Any, ...] = ()
     protected_inputs: tuple[Any, ...] = ()
@@ -475,7 +476,14 @@ class _NucleationPreflight:
                     self.gas.partitioning,
                 )
                 + external
-                + self.p3_sidecars,
+                + self.p3_sidecars
+                + tuple(
+                    value
+                    for value in self.protected_sidecars
+                    if not any(
+                        value is p3_sidecar for p3_sidecar in self.p3_sidecars
+                    )
+                ),
             )
         if not self.gas_arrays:
             object.__setattr__(
@@ -1145,9 +1153,11 @@ def _preflight_nucleation(  # noqa: C901
         n_species,
         device,
     )
+    # P3 receives only finalized-demand and diagnostic records. Scratch remains
+    # protected through ``sidecars`` but cannot be identity-validated by P3.
     p3_sidecars: tuple[Any, ...] = ()
     if finalized_demand is not None and diagnostics is not None:
-        p3_sidecars = (
+        p3_sidecars += (
             finalized_demand.accepted_counts,
             finalized_demand.accepted_demand,
             finalized_demand.precursor_mass_change,
@@ -1208,6 +1218,7 @@ def _preflight_nucleation(  # noqa: C901
             finalized_demand=finalized_demand,
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
+            protected_sidecars=sidecars,
         )
     if float(config.survival_factor) == 0.0:
         return _NucleationPreflight(
@@ -1227,6 +1238,7 @@ def _preflight_nucleation(  # noqa: C901
             finalized_demand=finalized_demand,
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
+            protected_sidecars=sidecars,
         )
     if isinstance(temperature_value, float):
         if (
@@ -1273,6 +1285,7 @@ def _preflight_nucleation(  # noqa: C901
             finalized_demand=finalized_demand,
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
+            protected_sidecars=sidecars,
         )
     # P1 has no rate work.  These conservative aggregate gates preserve the
     # required all-box zero diagnostics while later phases own mixed-box work.
@@ -1297,6 +1310,7 @@ def _preflight_nucleation(  # noqa: C901
             finalized_demand=finalized_demand,
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
+            protected_sidecars=sidecars,
         )
     precursor_status = wp.zeros(2, dtype=wp.int32, device=device)
     precursor_gates = wp.zeros(n_boxes, dtype=wp.int32, device=device)
@@ -1357,6 +1371,7 @@ def _preflight_nucleation(  # noqa: C901
             finalized_demand=finalized_demand,
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
+            protected_sidecars=sidecars,
         )
     gate_count = wp.zeros(1, dtype=wp.int32, device=device)
     wp.launch(
@@ -1387,6 +1402,7 @@ def _preflight_nucleation(  # noqa: C901
             finalized_demand=finalized_demand,
             diagnostics=diagnostics,
             p3_sidecars=p3_sidecars,
+            protected_sidecars=sidecars,
         )
     return _NucleationPreflight(
         particles,
@@ -1405,6 +1421,7 @@ def _preflight_nucleation(  # noqa: C901
         finalized_demand=finalized_demand,
         diagnostics=diagnostics,
         p3_sidecars=p3_sidecars,
+        protected_sidecars=sidecars,
         protected_inputs=particle_arrays
         + gas_arrays
         + tuple(external)
@@ -2744,6 +2761,7 @@ def _commit_nucleation_p5_kernel(
     final_demand: wp.array(dtype=wp.float64),
     final_counts: wp.array(dtype=wp.int32),
     selected_indices: wp.array2d(dtype=wp.int32),
+    resolved_scale: wp.array(dtype=wp.float64),
 ) -> None:
     """Fuse finalized free-slot activation and matching gas removal."""
     box = wp.tid()
@@ -2758,6 +2776,7 @@ def _commit_nucleation_p5_kernel(
         concentration[box, particle] = wp.float64(1.0) / volume[box]
         charge[box, particle] = wp.float64(0.0)
     for species in range(molecule_counts.shape[0]):
+        gas_concentration[box, species] *= resolved_scale[box]
         if molecule_counts[species] > 0:
             gas_concentration[box, species] -= final_demand[box] * (
                 wp.float64(molecule_counts[species])
@@ -2868,6 +2887,7 @@ def _commit_nucleation_p5(
             buffers.final_demand,
             buffers.final_counts,
             buffers.final_selected_slot_indices,
+            buffers.resolved_scale,
         ],
         device=preflight.device,
     )
@@ -2889,7 +2909,7 @@ def nucleation_step_gpu(
     saturation: Any | None = None,
     environment: Any | None = None,
 ) -> tuple[Any, Any]:
-    """Execute one atomic fixed-capacity direct-Warp nucleation step.
+    """Execute one fixed-capacity direct-Warp nucleation step.
 
     This direct-device boundary sequences P1 preflight, P2 inventory admission,
     P3 slot staging, and P4 resampling-first/scaling-fallback resolution before
@@ -2929,6 +2949,14 @@ def nucleation_step_gpu(
         ValueError: If P1--P5 validation, storage ownership, physical state, or
             finalized handoff validation fails.
     """
+    if not isinstance(scratch, NucleationScratchBuffers):
+        raise ValueError("scratch must be NucleationScratchBuffers.")
+    if not isinstance(finalized_demand, NucleationFinalizedDemandBuffers):
+        raise ValueError(
+            "finalized_demand must be NucleationFinalizedDemandBuffers."
+        )
+    if not isinstance(diagnostics, NucleationDiagnosticBuffers):
+        raise ValueError("diagnostics must be NucleationDiagnosticBuffers.")
     preflight = _preflight_nucleation(
         particles,
         gas,

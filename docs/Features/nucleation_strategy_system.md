@@ -146,6 +146,8 @@ Sidecars are caller-owned, same-device, contiguous `wp.float64` or `wp.int32`
 arrays with documented `(B,)`, `(B, N)`, `(B, S)`, and `(B, N, S)` schemas.
 P4 owns nested E6-F6 resampling/scaling sidecars; see
 [fixed-slot exhaustion](slot_exhaustion_policies.md) for their fields.
+Preflight and phase handoffs may perform bounded aggregate device-status
+readbacks for validation; these are not CPU state transfers or a fallback.
 
 P1 performs read-only preflight, P2 plans and admits one inventory-limited
 demand, P3 stages counts/free-slot prefixes, and P4 uses fully viable resampling
@@ -159,7 +161,7 @@ P2--P4 can write documented sidecars before a later rejection. Once E6-F6 is
 entered, or a P5 writer launches, rollback is not promised. Success returns the
 identical particle and gas containers.
 
-This boundary excludes hidden CPU↔Warp transfer/synchronization, CPU fallback,
+This boundary excludes hidden CPU↔Warp state transfer, CPU fallback,
 resize/compaction, GPU `Runnable`, scheduler/backend selection, E6-F9
 orchestration, expanded physics, graph capture, autodiff, and performance
 guarantees. E6-F5 fixed-slot activation, E6-F6 exhaustion primitives, and E6-F7

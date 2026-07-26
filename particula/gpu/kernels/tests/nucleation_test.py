@@ -324,6 +324,90 @@ def test_public_nucleation_step_zero_time_is_particle_gas_write_free() -> None:
     _assert_snapshot_unchanged(before)
 
 
+@pytest.mark.parametrize("boxes", [0, 1])
+@pytest.mark.parametrize(
+    ("field", "message"),
+    [
+        ("scratch", "scratch must be NucleationScratchBuffers"),
+        (
+            "finalized_demand",
+            "finalized_demand must be NucleationFinalizedDemandBuffers",
+        ),
+        ("diagnostics", "diagnostics must be NucleationDiagnosticBuffers"),
+    ],
+)
+def test_public_step_rejects_missing_required_sidecars(
+    boxes, field, message
+) -> None:
+    """Public calls reject missing required sidecars before any field access."""
+    particles, gas = _state(boxes=boxes)
+    scratch, finalized, diagnostics = _sidecars(boxes, 2, 1)
+    buffers = _exhaustion_buffers(boxes, 2, 1)
+    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)
+    sidecars = {
+        "scratch": scratch,
+        "finalized_demand": finalized,
+        "diagnostics": diagnostics,
+    }
+    sidecars[field] = None
+
+    with pytest.raises(ValueError, match=message):
+        nucleation_step_gpu(
+            particles,
+            gas,
+            _config(),
+            1.0,
+            **sidecars,
+            exhaustion_controls=NucleationExhaustionControls(False, False),
+            exhaustion_buffers=buffers,
+            temperature=300.0,
+        )
+
+    _assert_snapshot_unchanged(before)
+
+
+def test_p5_scales_gas_before_finalized_source_removal() -> None:
+    """Representative-volume scaling applies equally to pre-existing gas."""
+    particles, gas, scratch, finalized, diagnostics = _stage_slots(
+        [4.0], np.array([[True, True, False, False]])
+    )
+    buffers = _exhaustion_buffers(1, 4, 1)
+    for name in ("requested_scale", "minimum_scale", "minimum_volume"):
+        object.__setattr__(
+            buffers, name, wp.full(1, 0.5, dtype=wp.float64, device="cpu")
+        )
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    p4_storage = _orchestrate_nucleation_exhaustion(
+        preflight,
+        finalized,
+        diagnostics,
+        NucleationExhaustionControls(False, True),
+        buffers,
+    )
+    initial_gas = gas.concentration.numpy().copy()
+
+    assert nucleation_module._commit_nucleation_p5(
+        preflight, buffers, p4_storage
+    )
+
+    event_mass = 0.1 / AVOGADRO_NUMBER
+    np.testing.assert_allclose(
+        gas.concentration.numpy(),
+        0.5 * initial_gas - buffers.final_demand.numpy()[:, None] * event_mass,
+        rtol=1e-12,
+        atol=0.0,
+    )
+
+
 @pytest.mark.parametrize(
     ("exhaustion_controls", "exhaustion_buffers", "message"),
     [
@@ -1148,6 +1232,37 @@ def test_stage_nucleation_slots_rejects_replaced_record_buffer_without_writes():
 
     _assert_snapshot_unchanged(before)
     np.testing.assert_array_equal(replacement.numpy(), [1])
+
+
+def test_stage_nucleation_slots_excludes_scratch_from_identity_validation():
+    """P3 accepts scratch replacement because it does not receive scratch."""
+    particles, gas = _state()
+    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    finalized = NucleationFinalizedDemandBuffers(
+        finalized.accepted_counts,
+        wp.array([1.0], dtype=wp.float64, device="cpu"),
+        finalized.precursor_mass_change,
+    )
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    object.__setattr__(
+        scratch,
+        "potential_demand",
+        wp.ones(1, dtype=wp.float64, device="cpu"),
+    )
+
+    _stage_nucleation_slots(preflight, finalized, diagnostics)
+
+    np.testing.assert_array_equal(finalized.accepted_counts.numpy(), [1])
 
 
 def test_stage_nucleation_slots_preserves_nonzero_particle_gas_and_p2_state():
