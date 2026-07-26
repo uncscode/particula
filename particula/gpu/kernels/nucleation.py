@@ -438,6 +438,41 @@ class _NucleationPreflight:
     finalized_demand: NucleationFinalizedDemandBuffers | None = None
     diagnostics: NucleationDiagnosticBuffers | None = None
     p3_sidecars: tuple[Any, ...] = ()
+    particle_arrays: tuple[Any, ...] = ()
+    protected_inputs: tuple[Any, ...] = ()
+
+    def __post_init__(self) -> None:
+        """Capture P1 storage identities for later mutable P4 validation."""
+        if not self.particle_arrays:
+            object.__setattr__(
+                self,
+                "particle_arrays",
+                (
+                    self.particles.masses,
+                    self.particles.concentration,
+                    self.particles.charge,
+                    self.particles.density,
+                    self.particles.volume,
+                ),
+            )
+        if not self.protected_inputs:
+            external = tuple(
+                value
+                for value in (self.temperature, self.saturation)
+                if _is_warp_array_like(value)
+            )
+            object.__setattr__(
+                self,
+                "protected_inputs",
+                self.particle_arrays
+                + (
+                    self.gas.molar_mass,
+                    self.gas.concentration,
+                    self.gas.partitioning,
+                )
+                + external
+                + self.p3_sidecars,
+            )
 
 
 def _field(container: Any, name: str) -> Any:
@@ -1356,6 +1391,10 @@ def _preflight_nucleation(  # noqa: C901
         finalized_demand=finalized_demand,
         diagnostics=diagnostics,
         p3_sidecars=p3_sidecars,
+        protected_inputs=particle_arrays
+        + gas_arrays
+        + tuple(external)
+        + sidecars,
     )
 
 
@@ -1780,7 +1819,11 @@ def _convert_admitted_demand_to_counts(
     box = wp.tid()
     events = accepted_demand[box] * volume[box]
     if (
-        not wp.isfinite(events)
+        not wp.isfinite(accepted_demand[box])
+        or accepted_demand[box] < 0.0
+        or not wp.isfinite(volume[box])
+        or volume[box] <= 0.0
+        or not wp.isfinite(events)
         or events < 0.0
         or events != wp.floor(events)
         or events > maximum_count
@@ -2023,7 +2066,11 @@ def _validate_p4_handoff(  # noqa: C901
     box = wp.tid()
     events = accepted_demand[box] * volume[box]
     if (
-        not wp.isfinite(events)
+        not wp.isfinite(accepted_demand[box])
+        or accepted_demand[box] < 0.0
+        or not wp.isfinite(volume[box])
+        or volume[box] <= 0.0
+        or not wp.isfinite(events)
         or events < 0.0
         or events != wp.floor(events)
         or events > wp.float64(2147483647.0)
@@ -2062,6 +2109,7 @@ def _validate_p4_handoff(  # noqa: C901
 
 @wp.kernel
 def _select_p4_policy(
+    demand: wp.array(dtype=wp.float64),
     counts: wp.array(dtype=wp.int32),
     free_counts: wp.array(dtype=wp.int32),
     releasable: wp.array(dtype=wp.int32),
@@ -2084,8 +2132,8 @@ def _select_p4_policy(
             release[box] = deficit
         elif scaling_enabled != 0:
             scaling[box] = 1
-            scaled_events = (
-                wp.float64(counts[box]) * requested[box] * requested[box]
+            scaled_events = (demand[box] * requested[box]) * (
+                volume[box] * requested[box]
             )
             if (
                 not wp.isfinite(scaled_events)
@@ -2264,19 +2312,44 @@ def _validate_p4_buffers(
         _array(buffers.resampling_buffers, name, dtype, shape, device)
         for name, dtype, shape in nested_schema
     )
-    protected = (
-        preflight.particles.masses,
-        preflight.particles.concentration,
-        preflight.particles.charge,
-        preflight.particles.density,
-        preflight.particles.volume,
-        preflight.gas.molar_mass,
-        preflight.gas.concentration,
-        preflight.gas.partitioning,
-        *preflight.p3_sidecars,
-    )
+    protected = preflight.protected_inputs
     _no_overlap(protected + arrays + nested)
     return arrays + nested
+
+
+def _revalidate_p4_particle_state(preflight: _NucleationPreflight) -> None:
+    """Revalidate mutable P1 particle storage before P4 writes or primitives."""
+    b, n, s, device = (
+        preflight.n_boxes,
+        preflight.n_particles,
+        preflight.n_species,
+        preflight.device,
+    )
+    current = (
+        _array(preflight.particles, "masses", wp.float64, (b, n, s), device),
+        _array(
+            preflight.particles,
+            "concentration",
+            wp.float64,
+            (b, n),
+            device,
+        ),
+        _array(preflight.particles, "charge", wp.float64, (b, n), device),
+        _array(preflight.particles, "density", wp.float64, (s,), device),
+        _array(preflight.particles, "volume", wp.float64, (b,), device),
+    )
+    if any(
+        expected is not supplied
+        for expected, supplied in zip(
+            preflight.particle_arrays, current, strict=True
+        )
+    ):
+        raise ValueError("P4 particle fields must be the P1-validated storage.")
+    _scan(current[0], "particles.masses")
+    _scan(current[1], "particles.concentration")
+    _scan_finite_2d(current[2], "particles.charge")
+    _scan(current[3], "particles.density", positive=True)
+    _scan(current[4], "particles.volume", positive=True)
 
 
 def _orchestrate_nucleation_exhaustion(  # noqa: C901
@@ -2325,6 +2398,7 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
     _validate_staged_nucleation_sidecars(
         preflight, finalized_demand, diagnostics
     )
+    _revalidate_p4_particle_state(preflight)
     _validate_p4_buffers(preflight, buffers)
     if preflight.n_boxes == 0:
         return
@@ -2377,6 +2451,7 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
         _select_p4_policy,
         dim=preflight.n_boxes,
         inputs=[
+            finalized_demand.accepted_demand,
             finalized_demand.accepted_counts,
             diagnostics.free_slot_counts,
             buffers.resampling_releasable_counts,

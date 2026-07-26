@@ -471,6 +471,106 @@ def test_p4_expected_handoff_rejections_preserve_complete_snapshots(
     _assert_snapshot_unchanged(before)
 
 
+@pytest.mark.parametrize(
+    "corrupt",
+    [
+        lambda particles, finalized: wp.copy(
+            finalized.accepted_demand,
+            wp.array([-1.0], dtype=wp.float64, device="cpu"),
+        ),
+        lambda particles, finalized: wp.copy(
+            particles.volume,
+            wp.array([-1.0], dtype=wp.float64, device="cpu"),
+        ),
+        lambda particles, finalized: wp.copy(
+            particles.density,
+            wp.array([-1.0], dtype=wp.float64, device="cpu"),
+        ),
+    ],
+    ids=["stale_demand", "stale_volume", "stale_density"],
+)
+def test_p4_mutable_input_rejections_precede_all_writes(corrupt, monkeypatch):
+    """P4 revalidates mutable P1/P2 state before diagnostics or primitives."""
+    particles, gas, scratch, finalized, diagnostics = _stage_slots(
+        [1.0], np.array([[False, False]])
+    )
+    buffers = _exhaustion_buffers(1, 2, 1)
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    corrupt(particles, finalized)
+    before = _snapshot_arrays(
+        particles,
+        gas,
+        scratch,
+        finalized,
+        diagnostics,
+        buffers,
+        buffers.resampling_buffers,
+    )
+    monkeypatch.setattr(
+        nucleation_module,
+        "resampling_step_gpu",
+        lambda *_args, **_kwargs: pytest.fail("primitive must not run"),
+    )
+    monkeypatch.setattr(
+        nucleation_module,
+        "representative_volume_scaling_step_gpu",
+        lambda *_args, **_kwargs: pytest.fail("primitive must not run"),
+    )
+
+    with pytest.raises(ValueError):
+        _orchestrate_nucleation_exhaustion(
+            preflight,
+            finalized,
+            diagnostics,
+            NucleationExhaustionControls(False, False),
+            buffers,
+        )
+
+    _assert_snapshot_unchanged(before)
+
+
+def test_p4_protects_retained_p2_scratch_from_output_aliasing():
+    """P4 rejects output aliases to retained P2 scratch before any write."""
+    particles, gas, scratch, finalized, diagnostics = _stage_slots(
+        [1.0], np.array([[False, False]])
+    )
+    buffers = _exhaustion_buffers(1, 2, 1)
+    object.__setattr__(buffers, "demand_workspace", scratch.potential_demand)
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    before = _snapshot_arrays(
+        particles, gas, scratch, finalized, diagnostics, buffers
+    )
+
+    with pytest.raises(ValueError, match="must not overlap"):
+        _orchestrate_nucleation_exhaustion(
+            preflight,
+            finalized,
+            diagnostics,
+            NucleationExhaustionControls(False, False),
+            buffers,
+        )
+
+    _assert_snapshot_unchanged(before)
+
+
 def test_p4_scaling_records_full_deficit_and_finalized_count():
     """Scaling fallback retains the full deficit and derives scaled counts."""
     particles, gas, scratch, finalized, diagnostics = _stage_slots(
@@ -517,6 +617,47 @@ def test_p4_scaling_records_full_deficit_and_finalized_count():
     np.testing.assert_array_equal(buffers.final_counts.numpy(), [1])
     np.testing.assert_array_equal(
         buffers.final_selected_slot_indices.numpy(), [[2, -1, -1, -1]]
+    )
+    _assert_snapshot_unchanged(p2_p3_before)
+
+
+def test_p4_resampling_precedes_scaling_and_refreshes_final_free_slots():
+    """P4 resampling resolves a viable deficit before considering scaling."""
+    particles, gas, scratch, finalized, diagnostics = _stage_slots(
+        [2.0], np.array([[True, True, False]])
+    )
+    buffers = _exhaustion_buffers(1, 3, 1)
+    object.__setattr__(
+        buffers,
+        "resampling_releasable_counts",
+        wp.ones(1, dtype=wp.int32, device="cpu"),
+    )
+    p2_p3_before = _snapshot_arrays(finalized, diagnostics)
+
+    _orchestrate_nucleation_exhaustion(
+        _preflight_nucleation(
+            particles,
+            gas,
+            _config(),
+            1.0,
+            temperature=300.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+        ),
+        finalized,
+        diagnostics,
+        NucleationExhaustionControls(True, True),
+        buffers,
+    )
+
+    np.testing.assert_array_equal(buffers.required_release_counts.numpy(), [1])
+    np.testing.assert_array_equal(buffers.scaling_required.numpy(), [0])
+    np.testing.assert_array_equal(buffers.resolved_scale.numpy(), [1.0])
+    np.testing.assert_array_equal(buffers.final_demand.numpy(), [2.0])
+    np.testing.assert_array_equal(buffers.final_counts.numpy(), [2])
+    np.testing.assert_array_equal(
+        buffers.final_selected_slot_indices.numpy(), [[1, 2, -1]]
     )
     _assert_snapshot_unchanged(p2_p3_before)
 

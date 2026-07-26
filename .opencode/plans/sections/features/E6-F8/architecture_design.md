@@ -73,9 +73,11 @@ planned precursor removal, and gate diagnostics, then commits only its
   nested E6-F6 `ResamplingBuffers`, mutable demand workspace, scale inputs and
   outputs, final counts, and final selected-index prefixes. Exact Python bool
   controls, identities, schemas, device/contiguity, and non-overlap are
-  preflighted. Neither P3 nor P4 mutates particle/gas state and no symbol is
-  exported from `particula.gpu.kernels`; the staged particle transaction and
-  later writer stages remain P5 work.
+   preflighted. P3 does not mutate particle/gas state. P4 does not activate
+   slots or mutate gas/source mass, but selected E6-F6 primitives may mutate
+   their documented particle fields; no symbol is exported from
+   `particula.gpu.kernels`. Activation remains P5 work and P4 provides no
+   cross-primitive rollback after primitive entry.
 
 - **Data Model:** No required container fields. Add concrete-module
   `NucleationConfig`, `NucleationScratchBuffers`,

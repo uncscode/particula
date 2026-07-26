@@ -49,5 +49,6 @@ writes P4 final demand/count/free-prefix diagnostics. Expected all-box
 rejections occur before P4 workspace writes or primitive entry and preserve
 particle, gas, P2, P3, P4, and nested scratch state. Once a primitive is
 entered, its documented no-rollback boundary applies; P4 claims no
-cross-primitive rollback. P4 adds no public API, E6-F9 integration, activation,
-or particle/gas mutation.
+cross-primitive rollback. P4 adds no public API, E6-F9 integration, or direct
+activation; selected E6-F6 primitives may mutate documented particle fields,
+while P4 does not mutate gas or source mass.

@@ -123,15 +123,16 @@ kernel-entry responsibilities.
   It selects resampling only when it can fully cover a row's deficit, then uses
   representative-volume scaling only for other exhausted rows. It writes final
   demand, count, and ascending free-slot-prefix diagnostics without mutating
-  source demand, gas, or particle storage.
+  source demand or gas. Selected E6-F6 primitives may mutate their documented
+  particle fields; P4 itself never activates slots.
 - Expected P4 all-box rejections complete before workspace writes or entry to
   either E6-F6 primitive, preserving all supplied state. After an E6-F6
   primitive is entered, its documented planning/commit failure semantics apply;
   P4 does not promise cross-primitive rollback. Callers synchronize before
   reading successful asynchronous outputs.
-- This seam has no package export, hidden transfer, CPU fallback, activation,
-  particle/gas or source mutation, resizing, or integrated E6-F9 direct-GPU
-  execution. Those responsibilities remain deferred.
+- This seam has no package export, hidden transfer, CPU fallback, direct slot
+  activation, gas/source mutation, resizing, or integrated E6-F9 direct-GPU
+  execution. Activation remains P5 work; those responsibilities are deferred.
 - Import the supported fixed-slot wall-loss boundary with
   `from particula.gpu.kernels import wall_loss_step_gpu`. Its
   `NeutralWallLossConfig` is deliberately concrete-module-only at
