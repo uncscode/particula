@@ -20,9 +20,14 @@ independent E6-F7 float64 oracle, never the production GPU helper itself.
    They cover one/many boxes and species, gate precedence, zero capacity and
    empty boxes, ULP-safe admission correction, and snapshots proving that P2
    leaves particle/gas state and P3-owned sidecars unchanged.
-- **P3:** Slot interaction cases cover empty, sparse, exact-capacity, and mixed
-  boxes; ascending indices, `-1` tails, exact integer counts, selected writes,
-  and all preserved fields are asserted.
+- **P3 (#1440):** Shipped co-located tests cover all-free, sparse/mixed,
+  exact-capacity, and over-capacity layouts; zero boxes and zero capacity;
+  retained full integer counts; ascending E6-F5 free indices; selected prefixes;
+  and `-1` tails. They independently calculate layouts, verify the supplied
+  sidecars reach E6-F5, reject malformed/aliased/wrong-device sidecars and
+  invalid conversion products without writes, and cover the inclusive int32
+  maximum plus E6-F5 slot-validation preservation. Warp CPU is the baseline;
+  CUDA rows skip cleanly when unavailable.
 - **P4:** Exhaustion cases cover policy defaults and all combinations,
   resampling precedence, scaling fallback, insufficient scratch, impossible
   demand, residual rejection, and all-box failure snapshots.

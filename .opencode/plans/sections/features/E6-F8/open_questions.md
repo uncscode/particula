@@ -31,3 +31,12 @@ E6-F7 source model and existing concrete direct-kernel conventions.
   - Decision: no. It must use E6-F6 or fail before mutation.
 - [x] Is a high-level GPU runnable part of E6-F8?
   - Decision: no. Orchestration and backend selection remain in Epic G.
+- [x] How does P3 represent demand beyond available slots?
+  - Decision (#1440): retain the full exact, representable int32 provisional
+    count in `accepted_counts`; write only the ascending E6-F5 free-slot prefix
+    to `selected_slot_indices` and `-1` elsewhere. P4 owns capacity policy and
+    activation.
+- [x] What is P3's failure and synchronization boundary?
+  - Decision (#1440): conversion rejection precedes caller-output writes and
+    E6-F5 rejection preserves its diagnostics. A launched E6-F5 or P3 writer
+    has no rollback guarantee; callers synchronize before reading outputs.

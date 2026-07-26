@@ -10,6 +10,18 @@
 - [x] P1 remains unexported and performs no step execution, rate computation,
   transfer, fallback allocation, or mutation.
 
+## P3 completion (#1440)
+
+- [x] Private P3 accepts only finite, nonnegative, exactly integral
+  demand-volume products in the inclusive int32 range and uses bounded private
+  conversion workspace plus one scalar status readback.
+- [x] P3 reuses E6-F5 diagnostics, retains full provisional counts beyond free
+  capacity, and writes only caller-owned int32 P3/E6-F5 sidecars by identity.
+- [x] Conversion and E6-F5 preflight failures preserve P3/E6-F5 outputs; no
+  rollback is claimed after launched asynchronous diagnostic or commit writers.
+- [x] P3 has no activation, E6-F6 policy, particle/gas mutation, export, host
+  fallback, resize, or hidden transfer.
+
 - [ ] Plan metadata and implementation preserve mandatory E6-F5, E6-F6, and
   E6-F7 dependencies; E6-F9 can consume the intended low-level entry point.
 - [ ] Direct Warp activation and kinetic rates, potential events, admission,

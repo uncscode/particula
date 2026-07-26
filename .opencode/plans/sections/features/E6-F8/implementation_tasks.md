@@ -15,8 +15,10 @@
   accepted demand, species-encoded limiter/gate diagnostics, and planned
   precursor removal in P2-owned sidecars (#1439). Nonparticipants retain exact
   zero removal and P3 request buffers remain untouched.
-- [ ] Adapt provisional demand to E6-F5 fixed-shape requests and exact
-  diagnostics rather than reimplementing active/free predicates.
+- [x] Adapt provisional demand to E6-F5 fixed-shape diagnostics rather than
+  reimplementing active/free predicates (#1440). P3 performs private exact
+  demand-volume int32 conversion, retains full counts, and writes the bounded
+  selected free-slot prefix without activation or capacity resolution.
 - [ ] Invoke E6-F6 exhaustion planning with resampling-first precedence; finalize
   represented demand from its scale and reject any final-domain residual.
 - [ ] Implement commit kernels that add represented particle source and subtract
@@ -34,6 +36,8 @@
 - [x] Add P2 co-located independent float64-oracle coverage for rates, common
   admission, limiter ties, gates, inventory safety, and sidecar-only mutation
   in `particula/gpu/kernels/tests/nucleation_test.py` (#1439).
+- [x] Add P3 co-located layout, conversion, sidecar ownership, and preservation
+  coverage in `particula/gpu/kernels/tests/nucleation_test.py` (#1440).
 - [ ] Add `nucleation_parity_test.py` with an independent float64 E6-F7 oracle,
   one/many boxes and species, sparse/full slots, and repeated calls.
 - [ ] Assert per-box/species represented particle-plus-gas conservation rather

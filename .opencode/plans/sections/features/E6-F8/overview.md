@@ -17,7 +17,7 @@
   - As a library maintainer, I want fixed-shape sidecars and fail-before-write
    validation so invalid calls cannot partially mutate simulation state.
 
-## Delivered: P1 (#1438) and P2 (#1439)
+## Delivered: P1 (#1438), P2 (#1439), and P3 (#1440)
 
 `particula/gpu/kernels/nucleation.py` now provides the concrete-only, read-only
 P1 boundary with frozen configuration and caller-owned sidecar dataclasses plus
@@ -30,6 +30,15 @@ Private `_plan_nucleation_demand(...)` now implements P2. It reuses P1
 preflight to calculate survival-included activation or kinetic `J`,
 `E_pot = J * dt`, and one inventory-limited accepted demand per box. Its sole
 commit writes P2-owned demand, removal, and gate-diagnostic sidecars; it leaves
-P3 request buffers, particles, and `gas.concentration` unchanged. P3--P7 retain
-slot packaging, exhaustion handling, the particle/gas transaction, public API,
-and user documentation responsibilities.
+ P3 request buffers, particles, and `gas.concentration` unchanged.
+
+Private `_stage_nucleation_slots(...)` now implements P3 (#1440). After P2
+admission and reused P1 preflight, it converts exact finite nonnegative
+`accepted_demand * volume` products to retained `wp.int32` provisional counts,
+then reuses E6-F5 `get_slot_diagnostics_gpu` for active/free layouts. It writes
+only caller-owned P3 sidecars: full accepted counts, E6-F5 diagnostics, and the
+free-slot selectable prefix with `-1` tails. Counts may exceed free capacity;
+P4 alone resolves that capacity policy and activates slots. Conversion and E6-F5
+preflight failures preserve those sidecars; rollback is not promised after an
+asynchronous diagnostic or P3 commit launch. P4--P7 retain exhaustion handling,
+the particle/gas transaction, public API, and user documentation responsibilities.

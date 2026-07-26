@@ -6,9 +6,11 @@ read-only. Private P2 calculates source demand [#/m³], admits one shared
 inventory-safe demand per box, and commits only its designated sidecars. P2
 does not select or activate slots, resolve exhaustion, resize storage, mutate
 particle fields or ``gas.concentration``, transfer data to the host, or use a
-CPU physics fallback. Private P3 converts admitted demand to representable
-provisional event counts and reuses slot diagnostics, without activation or a
-particle/gas transaction.
+CPU physics fallback. Private P3 converts admitted demand times particle volume
+to representable ``int32`` provisional event counts, reuses E6-F5 slot
+diagnostics, and records only the deterministic free-slot prefix that is
+currently selectable. It retains counts beyond free capacity and performs no
+activation, exhaustion resolution, or particle/gas transaction.
 
 The preflight accepts only same-device, contiguous Warp arrays with fixed
 shapes. Frozen records prevent rebinding their fields but do not copy, freeze,
@@ -253,7 +255,8 @@ class NucleationFinalizedDemandBuffers:
 
     Attributes:
         accepted_counts: P3-owned, same-device contiguous ``wp.int32`` array
-            shaped ``(B,)`` for full provisional event counts. P2 leaves it
+            shaped ``(B,)`` for full provisional event counts. Counts retain
+            demand beyond current free capacity; P2 leaves this field
             byte-for-byte unchanged.
         accepted_demand: Same-device contiguous ``wp.float64`` array shaped
             ``(B,)`` for P2 inventory-admitted source demand [#/m³].
@@ -277,7 +280,8 @@ class NucleationDiagnosticBuffers:
             inventory-limited box whose limiting species index is ``s``.
         selected_slot_indices: Same-device contiguous ``wp.int32`` array
             shaped ``(B, N)`` for P3's deterministic selectable free-slot
-            prefix. P2 leaves it byte-for-byte unchanged. P3 reserves ``-1``
+            prefix, limited by current free capacity rather than provisional
+            demand. P2 leaves it byte-for-byte unchanged. P3 reserves ``-1``
             for unused tails; P1 does not inspect, initialize, or otherwise
             alter stale output values.
         free_slot_indices: P3/E6-F5-owned, same-device contiguous ``wp.int32``
@@ -1238,6 +1242,12 @@ def _float64_predecessor(value: wp.float64) -> wp.float64:
     device code. Powers of two and multiplication/division by two are exact in
     binary64, so determine the binade with supported scalar arithmetic and
     subtract its exact ULP. Subnormals retain the minimum binary64 spacing.
+
+    Args:
+        value: Finite positive binary64 value.
+
+    Returns:
+        Largest representable binary64 value strictly less than ``value``.
     """
     minimum_normal = wp.float64(2.2250738585072014e-308)
     minimum_subnormal = wp.float64(4.9406564584124654e-324)
@@ -1627,7 +1637,19 @@ def _convert_admitted_demand_to_counts(
     counts: wp.array(dtype=wp.int32),
     invalid: wp.array(dtype=wp.int32),
 ) -> None:
-    """Convert per-volume admitted demand to integral provisional counts."""
+    """Convert per-volume admitted demand to integral provisional counts.
+
+    This private P3 kernel writes only private workspace. It rejects derived
+    counts that are nonfinite, negative, nonintegral, or outside the inclusive
+    ``int32`` range before any caller-owned P3 or E6-F5 sidecar is written.
+
+    Args:
+        accepted_demand: P2-admitted demand [#/m³], shaped ``(B,)``.
+        volume: Validated particle-box volume [m³], shaped ``(B,)``.
+        maximum_count: Largest representable provisional ``int32`` count.
+        counts: Private output for provisional counts, shaped ``(B,)``.
+        invalid: Private one-element counter for invalid conversions.
+    """
     box = wp.tid()
     events = accepted_demand[box] * volume[box]
     if (
@@ -1650,7 +1672,21 @@ def _commit_staged_nucleation_slots(
     selected_slot_indices: wp.array2d(dtype=wp.int32),
     n_particles: int,
 ) -> None:
-    """Commit P3 counts and the selectable prefix of E6-F5 free slots."""
+    """Commit full P3 counts and the selectable E6-F5 free-slot prefix.
+
+    Full provisional counts are retained even when they exceed free capacity.
+    Every selected-index lane outside the deterministic selectable prefix is
+    overwritten with ``-1``.
+
+    Args:
+        counts: Validated private provisional event counts, shaped ``(B,)``.
+        free_slot_indices: E6-F5 ascending free-slot indices, shaped ``(B, N)``.
+        free_slot_counts: E6-F5 free-slot counts, shaped ``(B,)``.
+        accepted_counts: P3 output for full provisional counts, shaped ``(B,)``.
+        selected_slot_indices: P3 output for selectable free-slot indices,
+            shaped ``(B, N)``.
+        n_particles: Fixed particle capacity ``N`` per box.
+    """
     box = wp.tid()
     count = counts[box]
     accepted_counts[box] = count
@@ -1669,16 +1705,24 @@ def _stage_nucleation_slots(
 ) -> None:
     """Privately stage P3 event counts and selectable free-slot metadata.
 
-    P3 consumes P2's inventory-admitted demand and validated particle volume.
-    It writes only the supplied count and slot-diagnostic sidecars. Conversion
-    errors occur before E6-F5 diagnostics or any P3 sidecar write. After a
-    successful E6-F5 or P3 writer launch, callers must synchronize before
-    consuming outputs; asynchronous writer failures do not promise rollback.
+    P3 consumes P2's inventory-admitted demand [#/m³] and validated particle
+    volume [m³] to calculate full ``int32`` provisional event counts. It
+    delegates active/free classification and ascending free-slot ordering to
+    E6-F5, retains counts beyond free capacity, and writes only the supplied
+    count and slot-diagnostic sidecars. It does not activate slots, resolve
+    exhaustion, resize storage, or mutate particles or gas.
+
+    Conversion errors occur before E6-F5 diagnostics or any P3 sidecar write.
+    After a successful E6-F5 or P3 writer launch, callers must synchronize
+    before consuming outputs; asynchronous writer failures do not promise
+    rollback.
 
     Args:
         preflight: Exact private P1 result reused without repeated validation.
-        finalized_demand: Exact P2/P3 sidecar record containing admitted demand.
-        diagnostics: Exact P2/P3 diagnostic record used for E6-F5 and P3 output.
+        finalized_demand: Exact P2/P3 sidecar record containing admitted demand
+            and receiving full provisional counts.
+        diagnostics: Exact P2/P3 diagnostic record receiving E6-F5 layouts and
+            P3's capacity-limited selectable prefix.
 
     Raises:
         ValueError: If private handoff records are invalid or event conversion

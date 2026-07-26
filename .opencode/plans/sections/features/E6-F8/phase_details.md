@@ -27,11 +27,18 @@ run P6 parity and conservation checks before P7 documents the direct step.
     zero removal; ULP-safe inventory correction; zero-capacity/empty-box cases;
     and identity/immutability snapshots.
 
-- [ ] **E6-F8-P3:** Build provisional fixed-shape slot requests with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Package provisional gas-admitted demand into E6-F5 request/count sidecars without shape or identity changes.
-  - Files: `particula/gpu/kernels/nucleation.py`, E6-F5 slot module, GPU kernel tests
-  - Tests: Empty/sparse/exact-capacity boxes, deterministic indices, `-1` tails, exact counts, preserved unselected fields, and no duplicate slot model.
+- [x] **E6-F8-P3:** Integrate fixed-shape slot activation sidecars with unit tests
+  - Issue: #1440 | Size: S | Status: Complete (2026-07-25)
+  - Delivered: private `_stage_nucleation_slots(...)` converts exact finite
+    nonnegative P2 demand-volume products to full int32 provisional counts,
+    reuses E6-F5 diagnostics, and writes only caller-owned P3 sidecars. It
+    retains over-capacity counts and writes the bounded free-slot prefix with
+    `-1` tails; it neither invokes E6-F6 nor activates slots or mutates
+    particles/gas.
+  - Files: `particula/gpu/kernels/nucleation.py`, `particula/gpu/kernels/tests/nucleation_test.py`, `.opencode/guides/architecture/architecture_outline.md`, `.opencode/guides/architecture_reference.md`
+  - Tests: Normal/capacity-boundary/empty layouts; exact integer conversion and
+    int32 upper bound; malformed, alias, conversion, and E6-F5 failures with
+    snapshots; ownership, identity, and Warp CPU/optional-CUDA coverage.
 
 - [ ] **E6-F8-P4:** Integrate device exhaustion planning without fallback with unit tests
   - Issue: TBD | Size: S | Status: Not Started

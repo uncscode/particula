@@ -18,9 +18,11 @@ WarpParticleData + WarpGasData + config + dt + fixed-shape sidecars
                                |
                  provisional demand sidecars
                               |
-       E6-F5 slot discovery -> enough fixed slots?
-                              | no
-                   E6-F6 complete exhaustion plan
+        P3 exact int32 count conversion -> E6-F5 slot diagnostics
+                               |
+              retained full counts + free-slot selectable prefix
+                               |
+                    E6-F6 complete exhaustion plan (deferred)
              resampling first; scaling transforms demand
                               |
              every box feasible and conservative?
@@ -36,8 +38,13 @@ inventory limit across participating species, so `E_admit <= E_pot` and
 `removal_s = E_admit*m_event,s`; therefore no species becomes negative and
 source composition is not skewed. Gas-limited diagnostics encode the first
 lowest-index limiting participating species. P2 commits only its demand,
-removal, and gate-code sidecars. Capacity planning, representative scaling,
-slot packaging, and the particle/gas commit remain P3--P5 work.
+ removal, and gate-code sidecars. Shipped P3 privately converts each exact,
+ finite, nonnegative `accepted_demand * particles.volume` product in the
+ inclusive int32 range, reads one conversion status, then calls E6-F5
+ `get_slot_diagnostics_gpu` with supplied diagnostics. Its sole writer retains
+ the full count and clears/fills selected indices with the deterministic prefix
+ limited by count, free count, and capacity. Capacity planning, representative
+ scaling, activation, and the particle/gas commit remain P4--P5 work.
 
 ## Data / API / Workflow Changes
 
@@ -51,10 +58,12 @@ species/count constraints, input-source rules, and gates without writes,
 fallback allocation, or transfer. P2 calculates device-resident
 survival-included rates, potential demand, common inventory-limited admission,
 planned precursor removal, and gate diagnostics, then commits only its
-designated sidecars. It preserves P3 `accepted_counts` and selected-slot
-indices, and does not mutate particles or gas. No symbol is exported from
-`particula.gpu.kernels`; the staged particle transaction and writer stages
-remain P3--P5 work.
+  designated sidecars. P3 adds `free_slot_indices (B, N)`,
+  `active_slot_counts (B,)`, and `free_slot_counts (B,)` to
+  `NucleationDiagnosticBuffers`; all five P3 arrays are same-device contiguous
+  `wp.int32` storage covered by overlap checks. P3 does not mutate particles or
+  gas and no symbol is exported from `particula.gpu.kernels`; the staged
+  particle transaction and later writer stages remain P4--P5 work.
 
 - **Data Model:** No required container fields. Add concrete-module
   `NucleationConfig`, `NucleationScratchBuffers`,
@@ -74,10 +83,11 @@ remain P3--P5 work.
 - **Workflow Hooks:** E6-F5 and E6-F6 are mandatory capacity dependencies;
   E6-F7 is the scientific and numerical oracle; E6-F9 consumes this low-level
   step in an explicit-transfer integrated sequence.
-- **Failure Boundary:** Invalid scientific values, metadata, device data,
-  aliasing, scratch, capacity, policy, or conservation fail before particle,
-  gas, diagnostic, work-buffer, volume, or RNG mutation. Post-launch device
-  faults cannot promise rollback and must be documented separately.
+- **Failure Boundary:** P3 conversion rejection occurs before P3/E6-F5 output
+  writes; E6-F5 retains its preflight-before-diagnostic-write contract. Its
+  commit starts only after both stages succeed. No rollback is promised after a
+  launched E6-F5 or P3 writer kernel; callers synchronize before consuming
+  outputs and may rebuild sidecars from unchanged particle/gas/P2 state.
 
 ## Security & Compliance
 

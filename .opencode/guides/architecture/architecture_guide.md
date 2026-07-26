@@ -104,6 +104,29 @@ kernel-entry responsibilities.
   promised. This direct boundary does not establish resizing, compaction,
   hidden fallback, or a higher-level runnable API. See
   [ADR-002](decisions/ADR-002-gpu-fixed-slot-activation-boundary.md).
+
+### GPU nucleation staging boundary
+
+- `particula.gpu.kernels.nucleation` is an unexported E6-F8 P1/P2/P3 seam,
+  not a direct GPU step or runnable. P1 performs read-only validation; P2
+  plans and inventory-admits source demand; and private P3 stages metadata for
+  a later capacity-policy and activation phase.
+- P3 converts P2-admitted demand times particle-box volume only when the
+  binary64 result is finite, nonnegative, integral, and within the inclusive
+  `int32` range. It retains the full provisional count even when it exceeds
+  current free capacity.
+- P3 delegates active/free classification and ascending free-index ordering to
+  concrete-only E6-F5 `get_slot_diagnostics_gpu`. It writes only its supplied
+  count, selected-index, and E6-F5 diagnostic sidecars; the selected prefix is
+  limited by free capacity and unused index lanes are `-1`.
+- Conversion rejection occurs before any caller-owned P3 or E6-F5 sidecar
+  write. E6-F5 preserves its diagnostic outputs on pre-launch validation
+  failure. Following a successful asynchronous diagnostic or P3 commit launch,
+  rollback is not promised and callers must synchronize before reading outputs.
+- This seam has no package export, hidden transfer, CPU fallback, activation,
+  E6-F6 exhaustion-policy resolution, particle/gas mutation, resizing, or
+  integrated direct-GPU execution. Those responsibilities remain deferred to
+  later phases.
 - Import the supported fixed-slot wall-loss boundary with
   `from particula.gpu.kernels import wall_loss_step_gpu`. Its
   `NeutralWallLossConfig` is deliberately concrete-module-only at
