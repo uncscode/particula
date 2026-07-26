@@ -5474,6 +5474,8 @@
       
         
       
+        
+      
     
     
     
@@ -5674,6 +5676,34 @@
     
   
     particula.gpu.kernels.exhaustion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../API/particula/gpu/kernels/nucleation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.nucleation
   
 
     
@@ -11833,7 +11863,7 @@
   <span class="md-ellipsis">
     
   
-    CPU Nucleation Strategy System
+    Nucleation Strategy System
   
 
     
@@ -13611,6 +13641,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#direct-warp-p1-p5-correspondence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct-Warp P1--P5 correspondence
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -15373,6 +15414,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#direct-warp-p1-p5-correspondence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct-Warp P1--P5 correspondence
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -15699,10 +15751,46 @@ partitioning-gas containers by identity. It performs equal sequential
 substeps, recomputing the rate from the gas left by each successful commit. A
 successful earlier substep therefore remains visible if a later P2/P3 attempt
 fails; P5 deliberately offers no whole-call rollback.</p>
-<p>E6-F8 direct-Warp nucleation and E6-F9 integrated GPU/example orchestration
-remain deferred. This CPU transaction does not imply a GPU fallback, dynamic
-slot allocation, automatic scheduling, or a general multiphysics nucleation
-solver.</p>
+<h3 id="direct-warp-p1-p5-correspondence">Direct-Warp P1--P5 correspondence<a class="headerlink" href="#direct-warp-p1-p5-correspondence" title="Permanent link">&para;</a></h3>
+<p>The bounded direct-Warp step is distinct from the CPU runnable. It computes
+<code>C = c N_A / M</code> [#/m³], activation <code>J = S * A * C</code> with <code>A</code> [s⁻¹], or kinetic
+<code>J = S * K * C²</code> with <code>K</code> [m³/s]. Its potential demand is
+<code>E_pot = J * dt</code> [#/m³]. P2 admits one shared inventory-limited event demand
+before the P5 particle/gas transfer. In these rate laws, <code>S</code> is the configured,
+dimensionless survival factor (not the saturation ratio); <code>c</code> is [kg/m³] and
+<code>M</code> is [kg/mol].</p>
+<p>Before P3 stages discrete events, <code>accepted_demand * volume</code> must be finite,
+nonnegative, integral, and representable as an <code>int32</code> event count. This
+representability rejection can occur after P2 has written its documented
+sidecars; particle/gas preservation and the existing rollback limits are
+unchanged.</p>
+<p>Direct P1 accepts finite nonnegative duration, coefficient, and survival;
+inclusive configured precursor bounds; positive temperature; optional configured
+saturation bounds; positive formation diameter [m]; and nonnegative integer
+molecule counts with at least one positive entry. Temperature is either a
+positive scalar or same-device <code>wp.float64</code> <code>(B,)</code>; configured saturation is
+same-device <code>wp.float64</code> <code>(B, S)</code> or comes from a validated environment.</p>
+<p>The bounded public ordering is P1 read-only domain/schema preflight, read-only
+validation of the public P4 controls and buffers, P2 inventory admission, P3
+fixed-slot staging, participating-molecule eligibility validation, P4
+resampling-first/scaling-fallback resolution, and P5 handoff validation followed
+by the fused commit when final counts are nonzero. An empty box dimension returns
+after the public P4 validation. A configured zero-work or no-admission result
+still has its applicable planning, staging, and P4 diagnostic phases, but P5
+observes zero final counts and launches no particle/gas writer; it is a
+successful no-op, not an error.</p>
+<p>Invalid rejection during the read-only public checks preserves particles and gas.
+P2--P4 may have changed documented sidecars before a later rejection, and
+rollback is not promised after an entered exhaustion primitive or a P5 launch.</p>
+<p>For an unscaled P5 row, concentration-weighted particle plus gas inventory is
+conserved per box/species at <code>rtol=1e-12, atol=1e-30</code>. A scaled row compares
+against <code>s * initial_particle + initial_gas</code>; P5 source transfer still balances
+the gas removal. This is direct-kernel conservation evidence, not CPU parity.</p>
+<p>The direct step excludes hidden transfer/synchronization, CPU fallback,
+resize/compaction, GPU Runnable/scheduling/backend selection, E6-F9
+orchestration, expanded physics, graph capture, autodiff, and performance
+guarantees. See the <a href="../../../../Examples/Nucleation/gpu_direct_nucleation/">direct example</a>
+and <a href="../../../../Features/nucleation_strategy_system/">feature contract</a>.</p>
 <h2 id="variable-descriptions">Variable Descriptions<a class="headerlink" href="#variable-descriptions" title="Permanent link">&para;</a></h2>
 <p><strong>Understanding the Parameters:</strong></p>
 <ol>

@@ -5567,6 +5567,8 @@
       
         
       
+        
+      
     
     
     
@@ -5767,6 +5769,34 @@
     
   
     particula.gpu.kernels.exhaustion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="nucleation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.nucleation
   
 
     
@@ -11926,7 +11956,7 @@
   <span class="md-ellipsis">
     
   
-    CPU Nucleation Strategy System
+    Nucleation Strategy System
   
 
     
@@ -15109,6 +15139,7 @@
     activate_slots_gpu,
     condensation_step_gpu,
     dilution_step_gpu,
+    nucleation_step_gpu,
     resampling_step_gpu,
     wall_loss_step_gpu,
 )
@@ -15191,10 +15222,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/__init__.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
@@ -15210,7 +15238,10 @@
 <span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span>
-<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Lazily resolve a supported public direct-kernel entry point.</span>
 
 <span class="sd">    Args:</span>

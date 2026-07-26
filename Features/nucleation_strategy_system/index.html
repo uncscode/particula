@@ -25,7 +25,7 @@
     
     
       
-        <title>CPU Nucleation Strategy System - Particula</title>
+        <title>Nucleation Strategy System - Particula</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cpu-nucleation-strategy-system" class="md-skip">
+        <a href="#nucleation-strategy-system" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              CPU Nucleation Strategy System
+              Nucleation Strategy System
             
           </span>
         </div>
@@ -5474,6 +5474,8 @@
       
         
       
+        
+      
     
     
     
@@ -5674,6 +5676,34 @@
     
   
     particula.gpu.kernels.exhaustion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/gpu/kernels/nucleation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.nucleation
   
 
     
@@ -11847,7 +11877,7 @@
   <span class="md-ellipsis">
     
   
-    CPU Nucleation Strategy System
+    Nucleation Strategy System
   
 
     
@@ -11865,7 +11895,7 @@
   <span class="md-ellipsis">
     
   
-    CPU Nucleation Strategy System
+    Nucleation Strategy System
   
 
     
@@ -11931,6 +11961,17 @@
     <span class="md-ellipsis">
       
         Scope, dependencies, and example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#direct-warp-low-level-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct-Warp low-level step
       
     </span>
   </a>
@@ -15095,6 +15136,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#direct-warp-low-level-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct-Warp low-level step
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
 
     
@@ -15118,7 +15170,7 @@
   
 
 
-<h1 id="cpu-nucleation-strategy-system">CPU Nucleation Strategy System<a class="headerlink" href="#cpu-nucleation-strategy-system" title="Permanent link">&para;</a></h1>
+<h1 id="nucleation-strategy-system">Nucleation Strategy System<a class="headerlink" href="#nucleation-strategy-system" title="Permanent link">&para;</a></h1>
 <blockquote>
 <p>Convert partitioning precursor gas into fixed-capacity particle slots with a
 public, conservation-accounted CPU runnable.</p>
@@ -15218,12 +15270,53 @@ The survival relation is an explicit caller factor, not an implicit
 Kerminen--Kulmala calculation.</p>
 <p>See <a href="../slot_exhaustion_policies/">Fixed-Capacity Slot Exhaustion Primitives</a>,
 the <a href="../../Theory/Technical/Dynamics/Nucleation_Equations/">equations</a>, and the
-<a href="../../Examples/Nucleation/cpu_nucleation/">supported CPU example</a>. E6-F8 direct
-Warp nucleation and E6-F9 GPU integration/example orchestration remain
-deferred; see the <a href="../Roadmap/data-oriented-gpu/">GPU roadmap</a>.</p>
+<a href="../../Examples/Nucleation/cpu_nucleation/">supported CPU example</a>.</p>
+<h2 id="direct-warp-low-level-step">Direct-Warp low-level step<a class="headerlink" href="#direct-warp-low-level-step" title="Permanent link">&para;</a></h2>
+<p>E6-F8 ships a bounded direct-Warp nucleation step. Import only its supported
+low-level entry point:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">nucleation_step_gpu</span>
+</code></pre></div>
+<p><code>NucleationConfig</code>, P2/P3 records, P4 controls,
+<code>NucleationScratchBuffers</code>, <code>NucleationFinalizedDemandBuffers</code>,
+<code>NucleationDiagnosticBuffers</code>, <code>NucleationExhaustionBuffers</code>, and helpers are
+concrete-only imports from <code>particula.gpu.kernels.nucleation</code>. Nested
+<code>ResamplingBuffers</code> is concrete-only in <code>particula.gpu.kernels.exhaustion</code>.
+They are deliberately not package exports. The CPU-only <code>Nucleation</code> runnable
+remains the supported high-level CPU process; it is not a GPU fallback.</p>
+<p>Callers explicitly convert <code>ParticleData</code>, <code>GasData</code>, and <code>EnvironmentData</code>,
+place arrays on one Warp device, and call <code>wp.synchronize()</code> before host
+inspection. Fixed schemas use <code>B</code> boxes, <code>N</code> particle slots, and <code>S</code> species:
+particle masses are <code>(B, N, S)</code>, particle concentration/charge are <code>(B, N)</code>,
+gas concentration/partitioning are <code>(B, S)</code>, and temperature is <code>(B,)</code>.
+Sidecars are caller-owned, same-device, contiguous <code>wp.float64</code> or <code>wp.int32</code>
+arrays with documented <code>(B,)</code>, <code>(B, N)</code>, <code>(B, S)</code>, and <code>(B, N, S)</code> schemas.
+P4 owns nested E6-F6 resampling/scaling sidecars; see
+<a href="../slot_exhaustion_policies/">fixed-slot exhaustion</a> for their fields.
+Preflight and phase handoffs may perform bounded aggregate device-status
+readbacks for validation; these are not CPU state transfers or a fallback.</p>
+<p>P1 performs read-only preflight, P2 plans and admits one inventory-limited
+demand, P3 stages counts/free-slot prefixes, and P4 uses fully viable resampling
+before representative-volume-scaling fallback. P5 fuses selected-slot activation
+and gas transfer. Free-index tails are <code>-1</code>; demand is never silently truncated.
+A valid configured gate, no-admission, or zero-work result is a successful
+no-op, not an error or hidden recovery.</p>
+<p>Invalid input rejected before P4 primitive entry preserves particle/gas state.
+P2--P4 can write documented sidecars before a later rejection. Once E6-F6 is
+entered, or a P5 writer launches, rollback is not promised. Success returns the
+identical particle and gas containers.</p>
+<p>This boundary excludes hidden CPU↔Warp state transfer, CPU fallback,
+resize/compaction, GPU <code>Runnable</code>, scheduler/backend selection, E6-F9
+orchestration, expanded physics, graph capture, autodiff, and performance
+guarantees. E6-F5 fixed-slot activation, E6-F6 exhaustion primitives, and E6-F7
+CPU nucleation are dependencies; E6-F9 is only a downstream explicit-transfer
+integration consumer. See the <a href="../../Theory/Technical/Dynamics/Nucleation_Equations/">equations</a>,
+<a href="../../Examples/Nucleation/gpu_direct_nucleation/">direct example</a>, and
+<a href="../Roadmap/data-oriented-gpu/">GPU roadmap</a>.</p>
 <p>Focused validation:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>docs/Examples/Nucleation/cpu_nucleation.py
+python<span class="w"> </span>-Werror<span class="w"> </span>docs/Examples/Nucleation/gpu_direct_nucleation.py
 pytest<span class="w"> </span>particula/tests/nucleation_docs_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
+pytest<span class="w"> </span>particula/gpu/tests/gpu_direct_nucleation_example_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror
 pytest<span class="w"> </span>particula/dynamics/nucleation/tests/<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>particula/dynamics/tests/nucleation_runnable_test.py<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>particula/integration_tests/nucleation_process_test.py<span class="w"> </span>-q<span class="w"> </span>-Werror

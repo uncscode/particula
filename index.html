@@ -5788,6 +5788,8 @@
       
         
       
+        
+      
     
     
     
@@ -5988,6 +5990,34 @@
     
   
     particula.gpu.kernels.exhaustion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="API/particula/gpu/kernels/nucleation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.nucleation
   
 
     
@@ -12147,7 +12177,7 @@
   <span class="md-ellipsis">
     
   
-    CPU Nucleation Strategy System
+    Nucleation Strategy System
   
 
     
@@ -15560,6 +15590,16 @@
    not <code>particula.dynamics</code> public APIs. Run the
    <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/cpu_dilution.py">public API source example</a>
    with <code>python docs/Examples/cpu_dilution.py</code>.</li>
+<li><strong>Direct GPU nucleation</strong> is a bounded low-level step imported with
+  <code>from particula.gpu.kernels import nucleation_step_gpu</code>. The CPU-only public
+  <code>particula.dynamics.Nucleation</code> runnable is separate and is not a GPU
+  fallback. Configuration, records, and caller-owned sidecars remain
+  concrete-only under <code>particula.gpu.kernels.nucleation</code>; callers explicitly
+  transfer state, select a Warp device, and synchronize before host inspection.
+  The step has no hidden transfer, CPU fallback, resize/compaction, GPU
+  <code>Runnable</code>, scheduler/backend integration, or performance guarantee. See the
+  <a href="Features/nucleation_strategy_system/#direct-warp-low-level-step">nucleation contract</a>
+  and <a href="Examples/Nucleation/gpu_direct_nucleation/">direct-Warp example</a>.</li>
 <li>GPU dilution P1–P4 is a direct, low-level operation imported with
    <code>from particula.gpu.kernels import dilution_step_gpu</code>. It applies
    <code>c_new = c * exp(-alpha * time_step)</code> in place to particle and gas

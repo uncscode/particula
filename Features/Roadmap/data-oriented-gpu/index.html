@@ -5474,6 +5474,8 @@
       
         
       
+        
+      
     
     
     
@@ -5674,6 +5676,34 @@
     
   
     particula.gpu.kernels.exhaustion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API/particula/gpu/kernels/nucleation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.nucleation
   
 
     
@@ -11838,7 +11868,7 @@
   <span class="md-ellipsis">
     
   
-    CPU Nucleation Strategy System
+    Nucleation Strategy System
   
 
     
@@ -16180,11 +16210,11 @@ decisions in
 <a href="#numerical-precision-and-mass-resolution">Numerical Precision and Mass Resolution</a>
 and the time-integration decisions in
 <a href="#time-scale-stiffness">Time-Scale Stiffness</a>. New particle formation is both
-a size-range driver. E6-F7 ships a bounded CPU-only, single-box nucleation
-process; its public runnable adapts legacy <code>Aerosol</code> backing data and is not a
-GPU path. <a href="#epic-f-gpu-process-completeness">Epic F</a> retains direct-Warp
-E6-F8 and integration/example E6-F9 work so freshly formed particles can enter
-GPU-resident simulations through slot activation.</p>
+ a size-range driver. E6-F7 ships a bounded CPU-only, single-box nucleation
+ process; its public runnable adapts legacy <code>Aerosol</code> backing data and is not a
+ GPU path. E6-F8 ships package-exported direct-Warp <code>nucleation_step_gpu</code>; its
+ callers own explicit transfer, sidecars, and synchronization. <a href="#epic-f-gpu-process-completeness">Epic F</a>
+ retains E6-F9 as downstream integration only, not the direct-step example owner.</p>
 <h2 id="non-goals">Non-Goals<a class="headerlink" href="#non-goals" title="Permanent link">&para;</a></h2>
 <p>The following are explicitly out of near-term scope.</p>
 <ul>
@@ -16317,7 +16347,7 @@ high-level dynamics workflows.</p>
   tolerance-based evidence, not bitwise equality.</li>
 <li>GPU runnable and process orchestration, backend selection/fallback policy,
   scheduling, GPU-resident timestep integration, high-level/runnable or broader
-  wall-loss integration, nucleation, resizing, graph capture, autodiff, and
+  wall-loss integration, high-level GPU nucleation, resizing, graph capture, autodiff, and
   performance work remain future scope. The bounded direct neutral wall-loss
   P1–P6 kernel contract is shipped; it is not that deferred high-level
   integration.
@@ -16337,7 +16367,10 @@ high-level dynamics workflows.</p>
   guide</a> for the supported
   constant/Buck scope and refresh contract.</li>
 <li>E6-F7 ships a CPU-only, single-box nucleation/particle-source runnable.
-  Direct-Warp E6-F8 and GPU integration/example E6-F9 remain deferred.</li>
+   E6-F8 ships bounded direct <code>nucleation_step_gpu</code> with an explicit-transfer
+   Warp CPU example. It is not a GPU Runnable, CPU fallback, scheduler/backend
+   selector, resize/compaction mechanism, graph-capture/autodiff API, expanded
+   physics claim, or performance guarantee. E6-F9 remains downstream integration.</li>
 </ul>
 <p>Known GPU kernel defects and design limits (see
 <a href="#known-kernel-issues">Known Kernel Issues</a>):</p>
@@ -17964,11 +17997,11 @@ runtime policy.</p>
   kernels, but does not mutate caller-owned state before its writer launches;
   it does not promise rollback after a writer has launched.</li>
 <li>E6-F6 ships exhaustion resolution, resampling, and volume-scaling primitives.
-  E6-F7 owns CPU particle-source physics, E6-F8 owns direct-Warp consumption,
-  and E6-F9 owns integration and the direct-step example. These later features
-  do not alter the shipped fixed-slot storage contract.</li>
+  E6-F7 owns CPU particle-source physics and E6-F8 ships the direct-Warp step
+  and explicit-transfer example. E6-F9 remains downstream integration only.
+  These later features do not alter the shipped fixed-slot storage contract.</li>
 </ul>
-<p>Delivered CPU nucleation and deferred GPU scope:</p>
+<p>Delivered nucleation boundaries and deferred GPU scope:</p>
 <ol>
 <li>E6-F7 ships bounded CPU-only, one-box nucleation/particle-source physics
     following the
@@ -17976,23 +18009,44 @@ runtime policy.</p>
     Its public <code>Nucleation</code> runnable preserves legacy <code>Aerosol</code> identity and
     uses fixed-capacity slots, partitioning gas, and per-substep transactions.
     See the <a href="../../nucleation_strategy_system/">CPU Nucleation Strategy System</a>.</li>
-<li>E6-F8 direct-Warp nucleation via slot activation remains deferred (see
-    <a href="#fixed-capacity-slot-boundary">Fixed-Capacity Slot Boundary</a>).</li>
-<li>E6-F9 GPU integration/example orchestration, source/gas inventory handling,
-    and complete-sequence slot-exhaustion validation remain deferred.</li>
-<li>Fixed-shape workflow extensions and the deferred capabilities: dynamic
+<li>E6-F8 ships the bounded, package-exported direct-Warp step:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.gpu.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">nucleation_step_gpu</span>
+</code></pre></div>
+<p><code>NucleationConfig</code>, P2/P3 records, P4 controls, sidecars, and helpers remain
+   concrete-only in <code>particula.gpu.kernels.nucleation</code>; nested resampling buffers
+   remain concrete-only in <code>particula.gpu.kernels.exhaustion</code>. Callers own
+   same-device fixed-shape <code>wp.float64</code>/<code>wp.int32</code> sidecars, CPU↔Warp conversion,
+   and synchronization. The step performs P1 preflight, P2 admission, P3
+   fixed-slot staging, P4 resampling-first/scaling-fallback, and a fused P5
+   selected-slot/gas-transfer commit. It preserves fixed capacity, uses <code>-1</code>
+   free-index tails, and never silently truncates demand.</p>
+<p>Invalid public input rejected before P4 primitive entry preserves particle and
+   gas state, although P2--P4 may have written documented sidecars before a later
+   rejection. No rollback is promised after an E6-F6 primitive is entered or a
+   P5 writer launches. A valid configured no-admission/no-work result is a
+   successful no-op; successful work returns the identical particle and gas
+   containers. This direct boundary depends on E6-F5, E6-F6, and E6-F7. It is
+   distinct from the CPU-only <code>Nucleation</code> runnable and excludes hidden transfer
+   or synchronization, CPU fallback, resize/compaction, a GPU <code>Runnable</code>,
+   scheduler/backend selection, expanded physics, graph capture, autodiff, and
+   performance guarantees. See the <a href="../../nucleation_strategy_system/">Nucleation Strategy System</a>
+   and its <a href="../../../Examples/Nucleation/gpu_direct_nucleation/">direct example</a>.
+3. E6-F9 remains downstream explicit-transfer/integration work. It does not own
+   the shipped E6-F8 direct step or its example.
+4. Fixed-shape workflow extensions and the deferred capabilities: dynamic
    allocation/resizing/compaction, hidden transfers/CPU fallback, high-level
    runnable/scheduler/backend orchestration, graph capture, autodiff,
-   performance guarantees, and exact CPU/Warp/CUDA RNG replay.</li>
-</ol>
+   performance guarantees, and exact CPU/Warp/CUDA RNG replay.</p>
 <h3 id="fixed-capacity-slot-boundary">Fixed-Capacity Slot Boundary<a class="headerlink" href="#fixed-capacity-slot-boundary" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Use fixed particle slot counts per box for GPU-resident simulations.</li>
 <li>Represent inactive particle slots as particles with zero mass, zero radius,
   and zero concentration or count.</li>
 <li>Avoid dynamic allocation inside timestep kernels. The shipped CPU nucleation
-  runnable and future GPU nucleation processes create particles by activating
-  inactive slots when available.</li>
+  runnable and direct-Warp nucleation step create particles by activating
+  inactive slots when available; broader GPU process integration remains future
+  work.</li>
 <li>Shipped exhaustion primitives resolve fixed-slot capacity and provide
   resampling or volume-scaling operations; their caller owns source, gas, and
   process-level orchestration.</li>
@@ -18010,9 +18064,9 @@ runtime policy.</p>
 <li>E6-F6 remains responsible for exhaustion policy, including any resampling or
   volume scaling before a box runs out of free slots. It does not add resize or
   hidden-transfer behavior to E6-F5.</li>
-<li>E6-F7 owns CPU source physics; E6-F8 owns its direct-Warp consumer. E6-F9
-  owns integrated orchestration and the direct-step example. No direct runnable
-  or user example is shipped by E6-F5.</li>
+<li>E6-F7 owns CPU source physics; E6-F8 owns the shipped direct-Warp consumer and
+  explicit-transfer example. E6-F9 remains downstream integrated orchestration.
+  No direct runnable or user example is shipped by E6-F5.</li>
 <li>Graph capture, autodiff, and performance evidence belong to later epic work.
   Fixed slots preserve stable shapes without resizing or allocating caller-owned
   particle storage; primitives may privately allocate temporary categories,

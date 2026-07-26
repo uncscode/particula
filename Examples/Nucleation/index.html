@@ -5474,6 +5474,8 @@
       
         
       
+        
+      
     
     
     
@@ -5674,6 +5676,34 @@
     
   
     particula.gpu.kernels.exhaustion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/gpu/kernels/nucleation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.nucleation
   
 
     
@@ -11873,7 +11903,7 @@
   <span class="md-ellipsis">
     
   
-    CPU Nucleation Strategy System
+    Nucleation Strategy System
   
 
     
@@ -14995,6 +15025,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#direct-warp-low-level-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct-Warp low-level example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#illustrative-custom-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -15037,6 +15078,14 @@ using fixed-capacity slots and partitioning gas. It preserves the supplied
 <li><a href="cpu_nucleation/">Source/download: CPU nucleation</a></li>
 <li>Run: <code>python docs/Examples/Nucleation/cpu_nucleation.py</code></li>
 <li><a href="../../Features/nucleation_strategy_system/">Feature contract</a></li>
+</ul>
+<h2 id="direct-warp-low-level-example">Direct-Warp low-level example<a class="headerlink" href="#direct-warp-low-level-example" title="Permanent link">&para;</a></h2>
+<p>The <a href="gpu_direct_nucleation/">direct-Warp source/download</a> demonstrates the
+package-exported <code>nucleation_step_gpu</code> with caller-owned transfers, sidecars,
+and synchronization. It requires Warp and defaults to Warp CPU; it is not a
+replacement for the supported CPU runnable or a CPU fallback.</p>
+<ul>
+<li>Run: <code>python -Werror docs/Examples/Nucleation/gpu_direct_nucleation.py</code></li>
 </ul>
 <h2 id="illustrative-custom-workflow">Illustrative custom workflow<a class="headerlink" href="#illustrative-custom-workflow" title="Permanent link">&para;</a></h2>
 <p>The <a href="Notebooks/Custom_Nucleation_Single_Species/">single-species notebook</a>
