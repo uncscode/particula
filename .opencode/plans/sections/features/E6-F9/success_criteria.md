@@ -1,6 +1,10 @@
 # Success Criteria
 
 - [ ] Plan metadata retains mandatory dependencies on E6-F1 through E6-F8.
+- [x] P1 private fixture evidence exists at
+  `particula/gpu/tests/process_sequence_test.py` with deterministic fp64
+  one-/multi-box fixtures, independent invariants, ownership snapshots, and an
+  optional Warp mirror, without production or public API changes.
 - [ ] Required Warp CPU coverage executes condensation, coagulation, dilution,
   wall loss, and nucleation on shared fixed-shape device state without an
   intermediate CPU restore.

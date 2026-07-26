@@ -6,6 +6,11 @@ physics or a runtime scheduler.
 
 ## In Scope
 
+- **Shipped P1:** `particula/gpu/tests/process_sequence_test.py`, a private
+  deterministic fp64 fixture and invariant module. It covers fixture
+  schema/repeatability, snapshots and ownership mutation helpers, independent
+  inventory/dilution/wall-loss/slot/exhaustion expectations, and optional
+  runtime Warp mirrors without executing a process sequence.
 - Multi-process fixed-shape fixtures for condensation, coagulation, dilution,
   neutral and charged wall loss, slot management, and nucleation. Neutral wall
   loss owns the integrated statistical fixture; charged mode receives a
@@ -25,6 +30,8 @@ physics or a runtime scheduler.
 
 ## Out of Scope
 
+- Production-code or public-API changes from P1, and any direct-process call or
+  integrated resident sequence; P2 owns composition of the process steps.
 - User-facing backend selection, a high-level GPU `Runnable`, automatic process
   ordering, resident-loop scheduling, or multi-box transport; these belong to
   Epic G.

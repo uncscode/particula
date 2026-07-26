@@ -5,6 +5,13 @@
 E6-F9 is a validation and publication layer over existing direct entry points;
 it does not add a process coordinator to production code.
 
+The shipped P1 layer is NumPy-first and test-local. Its deterministic fp64
+fixtures, snapshot/ownership helpers, direct inventory/dilution/wall-loss/slot
+expectations, and CPU exhaustion-planner assertions establish independent
+oracles before P2 composes any direct kernel calls. Its optional Warp mirror
+test only verifies fresh container/sidecar schema, identity, and unchanged
+values; it does not invoke a process step.
+
 ```text
 CPU ParticleData/GasData/EnvironmentData fixtures
   -> explicit to_warp_* conversion (once)

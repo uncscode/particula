@@ -16,6 +16,13 @@ charged wall loss, and nucleation on fixed-shape device state; a runnable
 example shows exactly one setup transfer and one checkpoint restore; and public
 documentation links E6 and every E6 child plan to the resulting evidence.
 
+P1 is now complete as a private test-fixture foundation in
+`particula/gpu/tests/process_sequence_test.py`. It supplies deterministic fp64
+one- and multi-box sparse fixtures, snapshots and ownership assertions,
+independent accounting and exhaustion expectations, and optional runtime Warp
+mirror checks. It deliberately does not execute the integrated process sequence
+or change production or public API behavior; those remain later E6-F9 phases.
+
 ## User Stories
 
 - As a GPU contributor, I want an integrated Warp CPU regression so that an

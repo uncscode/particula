@@ -8,9 +8,12 @@ test.
 
 ## Per-Phase Approach
 
-- **P1:** `particula/gpu/tests/process_sequence_test.py` validates fixture
-  shapes/dtypes, independent per-process budgets, snapshots, and diagnostic
-  expectations for one and multiple boxes/species.
+- **P1 (complete, #1446):** `particula/gpu/tests/process_sequence_test.py`
+  validates deterministic fp64 fixture schemas/repeatability, snapshots and
+  allowed-field ownership mutation rules, independent inventory, dilution,
+  wall-loss, slot, and exhaustion expectations, local malformed/alias rejection,
+  and optional runtime Warp container/sidecar mirrors. It does not execute a
+  direct process step or a process sequence.
 - **P2:** The same module executes all direct processes on shared device state.
   Warp CPU is the required installed-Warp baseline; CUDA is optional and skips
   cleanly. Cases cover no-ops, activation, exhaustion-policy outcomes, repeated

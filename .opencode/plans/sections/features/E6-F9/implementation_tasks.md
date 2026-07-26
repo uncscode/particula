@@ -2,21 +2,16 @@
 
 ### Validation
 
-- [ ] Add deterministic one-box and multi-box fixtures to
+- [x] Add deterministic one-box and multi-box fixtures to
   `particula/gpu/tests/process_sequence_test.py` with explicit fp64 inputs.
-- [ ] Build independent expected budgets for dilution and wall loss and reuse
-  CPU references from E6-F1/E6-F3/E6-F4 rather than GPU production helpers.
-- [ ] Assert condensation and nucleation particle-plus-gas conservation per box
-  and species, and coagulation mass/charge conservation.
-- [ ] Assert slot activation/exhaustion counts and policy outcomes from E6-F5
-  and E6-F6 without accepting silent demand truncation.
+- [x] Build independent expected inventory, dilution, wall-loss, slot, and CPU
+  exhaustion-planner expectations without invoking GPU process physics helpers.
+- [x] Snapshot caller-owned particle, gas, sidecar, diagnostic, work-buffer,
+  and RNG state; test local invalid fixture/alias rejection before mutation.
+- [x] Add an optional runtime Warp CPU/CUDA mirror that verifies fixture-backed
+  container and stale-sidecar identity/schema without executing a process step.
 - [ ] Exercise persistent RNG across coagulation and stochastic wall loss
-  without requiring identical CPU/Warp random streams.
-- [ ] Snapshot all caller state for representative invalid calls and prove
-  failure before particle, gas, sidecar, diagnostic, work-buffer, or RNG
-  mutation.
-- [ ] Mark Warp CPU as required when Warp is installed; add optional CUDA
-  evidence with clean skip behavior.
+  without requiring identical CPU/Warp random streams. (P2)
 
 ### Example
 

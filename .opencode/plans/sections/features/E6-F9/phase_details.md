@@ -5,15 +5,19 @@
 All E6-F1 through E6-F8 plans must ship before integration. Complete P1 before
 P2, use P2 evidence for P3, and close E6 in P4 only after P1-P3 pass.
 
-- [ ] **E6-F9-P1:** Build integrated fixed-shape validation fixtures and invariants with tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Define deterministic multi-process fixtures, snapshots, and
-    process-specific accounting helpers without duplicating production physics.
+- [x] **E6-F9-P1:** Build integrated fixed-shape validation fixtures and invariants with tests
+  - Issue: #1446 | Size: S | Status: Complete
+  - Delivered: `particula/gpu/tests/process_sequence_test.py`, a private,
+    deterministic fp64 fixture/invariant module with one-/multi-box sparse
+    fixtures, snapshot/ownership helpers, independent inventory, dilution,
+    wall-loss, slot, and exhaustion expectations, plus optional Warp mirrors.
+  - Boundary: no production or public API change and no integrated resident
+    process-sequence execution.
   - Files: `particula/gpu/tests/process_sequence_test.py` and test-local fixture
     helpers.
-  - Tests: Fixture schemas; expected no-op and mutation fields; particle-plus-gas
-    conservation for condensation/nucleation; expected dilution/wall-loss
-    budgets; fixed shapes, identities, and diagnostics.
+  - Tests: Fixture schemas/repeatability; expected no-op and mutation fields;
+    particle-plus-gas and coagulation mass/charge accounting; dilution/wall-loss
+    budgets; slot/exhaustion outcomes; and fixed shapes, identities, diagnostics.
 
 - [ ] **E6-F9-P2:** Validate the complete direct GPU process sequence on Warp CPU
   - Issue: TBD | Size: S | Status: Not Started

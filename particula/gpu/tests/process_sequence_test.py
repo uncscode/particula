@@ -1,7 +1,8 @@
-"""P1 fixed-shape process-fixture and invariant evidence.
+"""Test P1 fixed-shape process fixtures and invariant helpers.
 
-This private test module supplies deterministic fixtures and independent
-accounting helpers.  It is not a resident process-sequence executor.
+This private module supplies deterministic fixtures and independent accounting
+helpers for process-sequence tests. It neither executes a resident process
+sequence nor defines production or user-facing APIs.
 """
 
 from __future__ import annotations
@@ -27,7 +28,22 @@ from particula.particles.exhaustion import (
 
 @dataclass(frozen=True)
 class ProcessFixture:
-    """Hold deterministic, fixed-shape process input state."""
+    """Store deterministic, fixed-shape process input state.
+
+    Attributes:
+        name: Stable identifier used for parametrized test cases.
+        masses: Particle mass storage with shape ``(boxes, particles, species)``.
+        particle_concentration: Particle concentrations with shape
+            ``(boxes, particles)``.
+        charge: Particle charge state with shape ``(boxes, particles)``.
+        density: Species densities in kg/m³.
+        volume: Per-box volumes in m³.
+        gas_concentration: Gas concentrations with shape ``(boxes, species)``.
+        molar_mass: Species molar masses in kg/mol.
+        partitioning: Per-box, per-species partitioning flags.
+        temperature: Per-box temperatures in K.
+        pressure: Per-box pressures in Pa.
+    """
 
     name: str
     masses: np.ndarray
@@ -44,7 +60,13 @@ class ProcessFixture:
 
 @dataclass(frozen=True)
 class SlotExpectation:
-    """Hold independent fixed-slot diagnostics."""
+    """Store independently calculated fixed-slot diagnostics.
+
+    Attributes:
+        free_indices: Ascending free-slot indices with ``-1`` tail padding.
+        active_counts: Number of active slots in each box.
+        free_counts: Number of free slots in each box.
+    """
 
     free_indices: np.ndarray
     active_counts: np.ndarray
@@ -53,7 +75,16 @@ class SlotExpectation:
 
 @dataclass(frozen=True)
 class _ArraySnapshot:
-    """Capture array identity, metadata, and values."""
+    """Store an array's identity, metadata, and copied values for assertions.
+
+    Attributes:
+        identity: Python object identity of the captured array.
+        shape: Captured array shape.
+        dtype: Captured array data type.
+        device: Captured Warp device, or ``None`` for NumPy arrays.
+        values: Copy of the captured values for NaN-safe comparisons.
+        bytes_value: Byte representation used by exact-value assertions.
+    """
 
     identity: int
     shape: tuple[int, ...]
@@ -116,7 +147,14 @@ def _build_process_fixtures() -> tuple[ProcessFixture, ...]:
 
 
 def _assert_fixture_schema(fixture: ProcessFixture) -> None:
-    """Validate fixture schema, dtypes, and physical values."""
+    """Validate a fixture's fixed-shape schema, dtypes, and physical values.
+
+    Args:
+        fixture: Test-local fixture to validate.
+
+    Raises:
+        ValueError: If a field has an invalid shape, dtype, or physical value.
+    """
     if fixture.masses.ndim != 3:
         raise ValueError("masses must have shape (B, N, S)")
     boxes, particles, species = fixture.masses.shape
@@ -131,7 +169,17 @@ def _assert_fixture_shapes(
     particles: int,
     species: int,
 ) -> None:
-    """Validate array shapes against fixed particle storage dimensions."""
+    """Validate fields against the supplied fixed particle-storage dimensions.
+
+    Args:
+        fixture: Test-local fixture whose fields are checked.
+        boxes: Expected number of boxes.
+        particles: Expected particle capacity per box.
+        species: Expected number of species.
+
+    Raises:
+        ValueError: If a fixture field does not have its expected shape.
+    """
     expected = {
         "particle_concentration": (boxes, particles),
         "charge": (boxes, particles),
@@ -149,7 +197,14 @@ def _assert_fixture_shapes(
 
 
 def _assert_fixture_dtypes(fixture: ProcessFixture) -> None:
-    """Validate exact float64 and bool fixture dtypes."""
+    """Validate required float64 and boolean fixture dtypes.
+
+    Args:
+        fixture: Test-local fixture whose array dtypes are checked.
+
+    Raises:
+        ValueError: If a floating field is not float64 or flags are not bool.
+    """
     for item in fields(fixture):
         if item.name not in {"name", "partitioning"}:
             value = getattr(fixture, item.name)
@@ -160,7 +215,14 @@ def _assert_fixture_dtypes(fixture: ProcessFixture) -> None:
 
 
 def _assert_fixture_values(fixture: ProcessFixture) -> None:
-    """Validate finite physical values in fixture arrays."""
+    """Validate finite, nonnegative or positive fixture physical values.
+
+    Args:
+        fixture: Test-local fixture whose numerical fields are checked.
+
+    Raises:
+        ValueError: If a field contains values outside its required domain.
+    """
     nonnegative = ("masses", "particle_concentration", "gas_concentration")
     for name in nonnegative:
         value = getattr(fixture, name)
@@ -175,7 +237,14 @@ def _assert_fixture_values(fixture: ProcessFixture) -> None:
 
 
 def _snapshot_array(value: Any) -> _ArraySnapshot:
-    """Capture NumPy- or Warp-like array metadata and copied values."""
+    """Capture NumPy- or Warp-like array metadata and copied values.
+
+    Args:
+        value: Array-like value exposing either NumPy conversion or array data.
+
+    Returns:
+        Snapshot retaining identity, metadata, copied values, and raw bytes.
+    """
     values = value.numpy() if hasattr(value, "numpy") else np.asarray(value)
     copied = np.array(values, copy=True)
     return _ArraySnapshot(
@@ -189,7 +258,14 @@ def _snapshot_array(value: Any) -> _ArraySnapshot:
 
 
 def _snapshot_owners(**owners: Any) -> dict[str, dict[str, _ArraySnapshot]]:
-    """Snapshot named arrays or each array field on named owners."""
+    """Snapshot named arrays or array fields owned by named objects.
+
+    Args:
+        **owners: Named arrays, fixture records, or namespaces to snapshot.
+
+    Returns:
+        Snapshots keyed by owner name and field name.
+    """
     result: dict[str, dict[str, _ArraySnapshot]] = {}
     for owner_name, owner in owners.items():
         if isinstance(owner, np.ndarray) or hasattr(owner, "numpy"):
@@ -206,7 +282,15 @@ def _snapshot_owners(**owners: Any) -> dict[str, dict[str, _ArraySnapshot]]:
 def _assert_snapshot_unchanged(
     snapshot: dict[str, dict[str, _ArraySnapshot]], **owners: Any
 ) -> None:
-    """Assert every captured owner field retains identity and exact values."""
+    """Assert captured fields retain identity, metadata, and values.
+
+    Args:
+        snapshot: Previously captured owner and field snapshots.
+        **owners: Current named owners corresponding to ``snapshot``.
+
+    Raises:
+        AssertionError: If a captured field was replaced or changed.
+    """
     for owner_name, captured_fields in snapshot.items():
         owner = owners[owner_name]
         for field_name, before in captured_fields.items():
@@ -236,7 +320,16 @@ def _assert_only_fields_changed(
     allowed_fields: set[str],
     **owners: Any,
 ) -> None:
-    """Assert changed fields are explicitly permitted as ``owner.field`` keys."""
+    """Assert that only explicitly permitted owner fields changed.
+
+    Args:
+        before: Previously captured owner and field snapshots.
+        allowed_fields: Permitted changes named as ``"owner.field"`` keys.
+        **owners: Current named owners corresponding to ``before``.
+
+    Raises:
+        AssertionError: If an unpermitted field was replaced or changed.
+    """
     for owner_name, captured in before.items():
         owner = owners[owner_name]
         for field_name, prior in captured.items():
@@ -260,14 +353,31 @@ def _assert_only_fields_changed(
 def _particle_inventory(
     masses: np.ndarray, concentration: np.ndarray
 ) -> np.ndarray:
-    """Return concentration-weighted particle mass by box and species."""
+    """Return concentration-weighted particle mass by box and species.
+
+    Args:
+        masses: Particle masses with shape ``(boxes, particles, species)``.
+        concentration: Particle concentrations with shape ``(boxes, particles)``.
+
+    Returns:
+        Particle inventory with shape ``(boxes, species)``.
+    """
     return np.sum(masses * concentration[..., None], axis=1)
 
 
 def _particle_plus_gas_inventory(
     masses: np.ndarray, concentration: np.ndarray, gas: np.ndarray
 ) -> np.ndarray:
-    """Return per-box, per-species particle-plus-gas inventory."""
+    """Return per-box, per-species particle-plus-gas inventory.
+
+    Args:
+        masses: Particle masses with shape ``(boxes, particles, species)``.
+        concentration: Particle concentrations with shape ``(boxes, particles)``.
+        gas: Gas concentrations with shape ``(boxes, species)``.
+
+    Returns:
+        Combined particle and gas inventory with shape ``(boxes, species)``.
+    """
     return _particle_inventory(masses, concentration) + gas
 
 
