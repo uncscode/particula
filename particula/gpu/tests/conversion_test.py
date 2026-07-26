@@ -1049,16 +1049,22 @@ class TestValidateDevice:
 
         assert result is sentinel_device
 
-    def test_validate_device_ignores_warp_pack_warning(self) -> None:
-        """Known Warp ctypes deprecation stays clean under warning errors."""
+    @pytest.mark.parametrize(
+        "structure_name",
+        ["APICLaunchParamRecord", "APICLaunchPtrLocation"],
+    )
+    def test_validate_device_ignores_warp_pack_warning(
+        self, structure_name: str
+    ) -> None:
+        """Known Warp ctypes deprecations stay clean under warning errors."""
         import types
 
         sentinel_device = object()
 
         def warning_lookup(_device):
             warnings.warn(
-                "Due to '_pack_', the 'APICLaunchParamRecord' Structure will "
-                "use memory layout compatible with MSVC (Windows).",
+                f"Due to '_pack_', the '{structure_name}' Structure will use "
+                "memory layout compatible with MSVC (Windows).",
                 DeprecationWarning,
                 stacklevel=2,
             )
