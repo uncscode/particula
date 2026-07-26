@@ -656,7 +656,12 @@ def test_malformed_local_fixtures_reject_without_mutation(
 ) -> None:
     """Malformed test-local fixture fields fail before caller state changes."""
     fixture = _build_process_fixtures()[0]
-    malformed = replace(fixture, **{field: value})
+    if field == "masses":
+        malformed = replace(fixture, masses=value)
+    elif field == "volume":
+        malformed = replace(fixture, volume=value)
+    else:
+        malformed = replace(fixture, gas_concentration=value)
     particle = SimpleNamespace(
         masses=fixture.masses,
         concentration=fixture.particle_concentration,
