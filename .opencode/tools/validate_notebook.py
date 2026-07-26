@@ -60,6 +60,7 @@ def _is_hidden(path: Path) -> bool:
     Returns:
         True when any segment starts with a dot, otherwise False.
     """
+
     return any(part.startswith(".") for part in path.parts)
 
 
@@ -69,6 +70,7 @@ def _collect_notebooks(target: Path, recursive: bool) -> List[Path]:
     Skips hidden paths and .ipynb_checkpoints, returns deterministically sorted list.
     Hidden paths are defined by any segment starting with a dot.
     """
+
     if target.is_file() and target.suffix == ".ipynb":
         return [target]
 
@@ -76,9 +78,7 @@ def _collect_notebooks(target: Path, recursive: bool) -> List[Path]:
         raise ValidationToolError(f"Path not found: {target}")
 
     if not target.is_dir():
-        raise ValidationToolError(
-            f"Path must be .ipynb file or directory: {target}"
-        )
+        raise ValidationToolError(f"Path must be .ipynb file or directory: {target}")
 
     candidates: Iterable[Path]
     if recursive:
@@ -86,11 +86,7 @@ def _collect_notebooks(target: Path, recursive: bool) -> List[Path]:
     else:
         candidates = target.glob("*.ipynb")
 
-    notebooks = [
-        p
-        for p in candidates
-        if ".ipynb_checkpoints" not in p.parts and not _is_hidden(p)
-    ]
+    notebooks = [p for p in candidates if ".ipynb_checkpoints" not in p.parts and not _is_hidden(p)]
 
     if not notebooks:
         raise ValidationToolError(f"No notebooks found under {target}")
@@ -104,6 +100,7 @@ def _collect_scripts(target: Path, recursive: bool) -> List[Path]:
     Skips hidden paths and returns deterministically sorted list.
     Hidden paths are defined by any segment starting with a dot.
     """
+
     if target.is_file() and target.suffix == ".py":
         return [target]
 
@@ -111,9 +108,7 @@ def _collect_scripts(target: Path, recursive: bool) -> List[Path]:
         raise ValidationToolError(f"Path not found: {target}")
 
     if not target.is_dir():
-        raise ValidationToolError(
-            f"Path must be .py file or directory: {target}"
-        )
+        raise ValidationToolError(f"Path must be .py file or directory: {target}")
 
     candidates: Iterable[Path]
     if recursive:
@@ -129,9 +124,7 @@ def _collect_scripts(target: Path, recursive: bool) -> List[Path]:
     return sorted(scripts)
 
 
-def _truncate(
-    text: str, limit: int = FULL_OUTPUT_CHAR_LIMIT
-) -> tuple[str, bool]:
+def _truncate(text: str, limit: int = FULL_OUTPUT_CHAR_LIMIT) -> tuple[str, bool]:
     """Truncate text to the limit, returning text and truncation flag.
 
     Args:
@@ -141,6 +134,7 @@ def _truncate(
     Returns:
         Tuple of truncated text and a boolean indicating whether truncation occurred.
     """
+
     if len(text) <= limit:
         return text, False
     return f"{text[:limit]}\n...\n[output truncated to {limit} chars]", True
@@ -155,6 +149,7 @@ def _format_summary(results: List[NotebookValidationResult]) -> str:
     Returns:
         Human-readable summary string with counts and failures.
     """
+
     checked = len(results)
     valid = sum(1 for r in results if r.valid)
     invalid = checked - valid
@@ -184,9 +179,7 @@ def _format_summary(results: List[NotebookValidationResult]) -> str:
     return "\n".join(lines)
 
 
-def _format_full(
-    results: List[NotebookValidationResult], truncated_notice: bool = True
-) -> str:
+def _format_full(results: List[NotebookValidationResult], truncated_notice: bool = True) -> str:
     """Return detailed text for each notebook, optionally noting truncation.
 
     Args:
@@ -196,6 +189,7 @@ def _format_full(
     Returns:
         String containing detailed notebook validation information.
     """
+
     lines: List[str] = []
     for result in results:
         lines.append("=" * 60)
@@ -224,9 +218,7 @@ def _format_full(
     return truncated_text
 
 
-def _format_json(
-    results: List[NotebookValidationResult], skip_syntax: bool
-) -> str:
+def _format_json(results: List[NotebookValidationResult], skip_syntax: bool) -> str:
     """Return JSON string with validation results and meta fields.
 
     Args:
@@ -236,6 +228,7 @@ def _format_json(
     Returns:
         JSON-formatted string describing validation outcomes.
     """
+
     payload = {
         "notebooks_checked": len(results),
         "notebooks_valid": sum(1 for r in results if r.valid),
@@ -278,6 +271,7 @@ def _validate_output_dir_usage(args: argparse.Namespace) -> None:
 
 def _resolve_output_dir(output_dir: Optional[str]) -> Optional[Path]:
     """Resolve and validate output directory stays within repository root."""
+
     if output_dir is None:
         return None
 
@@ -290,15 +284,14 @@ def _resolve_output_dir(output_dir: Optional[str]) -> Optional[Path]:
     try:
         output_path.relative_to(REPO_ROOT)
     except ValueError as exc:
-        raise ValidationToolError(
-            "--output-dir must resolve under the repository root"
-        ) from exc
+        raise ValidationToolError("--output-dir must resolve under the repository root") from exc
 
     return output_path
 
 
 def _resolve_skip_syntax(args: argparse.Namespace) -> bool:
     """Resolve validation-mode aliases and return effective skip-syntax behavior."""
+
     validation_mode = getattr(args, "validation_mode", None)
     fast = getattr(args, "fast", False)
     full = getattr(args, "full", False)
@@ -307,13 +300,9 @@ def _resolve_skip_syntax(args: argparse.Namespace) -> bool:
         raise ValidationToolError("--fast and --full cannot be used together")
 
     if validation_mode == "fast" and full:
-        raise ValidationToolError(
-            "--validation-mode fast cannot be combined with --full"
-        )
+        raise ValidationToolError("--validation-mode fast cannot be combined with --full")
     if validation_mode == "full" and fast:
-        raise ValidationToolError(
-            "--validation-mode full cannot be combined with --fast"
-        )
+        raise ValidationToolError("--validation-mode full cannot be combined with --fast")
 
     explicit_full_mode = validation_mode == "full" or full
     if explicit_full_mode and args.skip_syntax:
@@ -395,6 +384,7 @@ def _handle_convert_to_ipynb(args: argparse.Namespace) -> int:
     Raises:
         ValidationToolError: If the input path is invalid or no scripts are found.
     """
+
     from adw.utils.notebook_jupytext import SyncResult, script_to_notebook
 
     target = Path(args.notebook_path)
@@ -443,8 +433,7 @@ def _handle_sync(args: argparse.Namespace) -> int:
     signature = inspect.signature(sync_notebook_script)
     parameters = list(signature.parameters.values())
     supports_script_arg = any(
-        param.kind
-        in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+        param.kind in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
         for param in parameters
     )
     if not supports_script_arg:
@@ -466,9 +455,7 @@ def _handle_sync(args: argparse.Namespace) -> int:
         except TypeError:
             result = sync_notebook_script(notebook)
         status = "✓" if result.success else "✗"
-        message = (
-            f"{status} {notebook} -> {result.target_path} ({result.action})"
-        )
+        message = f"{status} {notebook} -> {result.target_path} ({result.action})"
         if result.error_message:
             message = f"{message}: {result.error_message}"
         print(message)
@@ -522,10 +509,9 @@ def _handle_check_sync(args: argparse.Namespace) -> int:
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """CLI entrypoint with validation, conversion, sync, and check-sync modes."""
+
     parser = argparse.ArgumentParser(
-        description=(
-            "Validate notebooks or perform Jupytext conversion/sync operations."
-        ),
+        description=("Validate notebooks or perform Jupytext conversion/sync operations."),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Examples:\n"
@@ -549,9 +535,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         ),
     )
 
-    parser.add_argument(
-        "notebook_path", help="Path to notebook file or directory"
-    )
+    parser.add_argument("notebook_path", help="Path to notebook file or directory")
     parser.add_argument(
         "--recursive",
         action="store_true",
@@ -567,9 +551,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument(
         "--skip-syntax",
         action="store_true",
-        help=(
-            "Skip Python syntax checking (validation only); syntax issues become warnings"
-        ),
+        help=("Skip Python syntax checking (validation only); syntax issues become warnings"),
     )
     parser.add_argument(
         "--validation-mode",
@@ -651,10 +633,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         target = Path(args.notebook_path)
         notebooks = _collect_notebooks(target, recursive=args.recursive)
         skip_syntax = _resolve_skip_syntax(args)
-        results = [
-            validate_notebook_json(nb, skip_syntax=skip_syntax)
-            for nb in notebooks
-        ]
+        results = [validate_notebook_json(nb, skip_syntax=skip_syntax) for nb in notebooks]
 
         if args.output == "json":
             output = _format_json(results, skip_syntax=skip_syntax)

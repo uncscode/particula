@@ -61,9 +61,7 @@ def _read_pyproject_version(path: Path, *, allowed_root: Path) -> str:
         dynamic = project.get("dynamic")
         if isinstance(dynamic, list) and "version" in dynamic:
             hatch = data.get("tool", {}).get("hatch", {}).get("version", {})
-            version_path = (
-                hatch.get("path") if isinstance(hatch, dict) else None
-            )
+            version_path = hatch.get("path") if isinstance(hatch, dict) else None
             if isinstance(version_path, str) and version_path.strip():
                 target = _ensure_confined_path(
                     path.parent / version_path.strip(),
@@ -195,9 +193,7 @@ def main(argv: list[str] | None = None) -> int:
         target_path = resolve_target_path(raw_path, cwd=cwd)
         print(get_version(target_path, allowed_root=cwd))
         return 0
-    except (
-        Exception
-    ) as exc:  # pragma: no cover - wrapper owns formatting precedence
+    except Exception as exc:  # pragma: no cover - wrapper owns formatting precedence
         print(str(exc), file=sys.stderr)
         return 1
 

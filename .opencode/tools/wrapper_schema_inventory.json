@@ -1123,6 +1123,7 @@
         "target",
         "no_ff",
         "abort_on_conflict",
+        "upstream",
         "branch",
         "onto",
         "remote",
@@ -1137,7 +1138,7 @@
       "exempt_fields": [
         "help"
       ],
-      "current_count": 15,
+      "current_count": 16,
       "diagnostic": null,
       "classification": "split-needed",
       "target_shape": "split-wrapper-family",

@@ -27,10 +27,10 @@ describe("git_merge wrapper", () => {
     assertContains(String(result), "requires 'source'");
   });
 
-  it("requires branch for rebase", async () => {
+  it("requires upstream for rebase", async () => {
     const execute = await loadToolExecute("../../git_merge.ts");
     const result = await execute({ command: "rebase" });
-    assertContains(String(result), "requires 'branch'");
+    assertContains(String(result), "requires 'upstream'");
   });
 
   it("assembles fetch", async () => {
@@ -71,13 +71,36 @@ describe("git_merge wrapper", () => {
     );
   });
 
-  it("assembles rebase with onto and explicit false abort handling", async () => {
+  it("assembles a current-branch rebase", async () => {
     const execute = await loadToolExecute("../../git_merge.ts");
-    await execute({ command: "rebase", branch: "feat-1", onto: "main", abort_on_conflict: false });
+    await execute({ command: "rebase", upstream: "main" });
 
     expect(getInvocations().at(-1)?.args.join(" ")).toContain(
-      "uv run --active adw git rebase feat-1 --onto main --no-abort-on-conflict",
+      "uv run --active adw git rebase main",
     );
+  });
+
+  it("assembles three-ref rebase with explicit false abort handling", async () => {
+    const execute = await loadToolExecute("../../git_merge.ts");
+    await execute({
+      command: "rebase",
+      upstream: "old-base",
+      branch: "feat-1",
+      onto: "main",
+      abort_on_conflict: false,
+    });
+
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain(
+      "uv run --active adw git rebase old-base --branch feat-1 --onto main --no-abort-on-conflict",
+    );
+  });
+
+  it("rejects onto without an explicit target branch", async () => {
+    const execute = await loadToolExecute("../../git_merge.ts");
+    const result = await execute({ command: "rebase", upstream: "old-base", onto: "main" });
+
+    assertContains(String(result), "requires 'branch' when 'onto' is provided");
+    expect(getInvocations()).toHaveLength(0);
   });
 
   it("assembles fetch default remote with prune", async () => {
@@ -120,8 +143,13 @@ describe("git_merge wrapper", () => {
     const cases = [
       {
         name: "rebase.onto",
-        args: { command: "rebase", branch: "feat-1", onto: "bad ref" },
+        args: { command: "rebase", upstream: "old-base", branch: "feat-1", onto: "bad ref" },
         message: "Invalid onto: bad ref.",
+      },
+      {
+        name: "rebase.upstream",
+        args: { command: "rebase", upstream: "bad ref" },
+        message: "Invalid upstream: bad ref.",
       },
       {
         name: "fetch.branch",

@@ -4,6 +4,9 @@ import * as path from "node:path";
 /** Default bounded result count for ripgrep-backed wrappers. */
 export const DEFAULT_MAX_RESULTS = 5000;
 
+/** Maximum time a ripgrep subprocess may run before it is terminated. */
+export const DEFAULT_RIPGREP_TIMEOUT_MS = 30_000;
+
 const MAX_STDOUT_CAPTURE_BYTES = 4 * 1024 * 1024;
 
 export interface SearchParams {
@@ -26,6 +29,8 @@ export interface SearchParams {
   beforeContext?: number;
   afterContext?: number;
   targetKind?: "file" | "directory";
+  /** Internal test override; wrapper callers use DEFAULT_RIPGREP_TIMEOUT_MS. */
+  timeoutMs?: number;
 }
 
 export interface SearchResult {
@@ -214,6 +219,7 @@ export async function executeRipgrepSearch(params: SearchParams): Promise<Search
     filesWithMatches,
     filesWithoutMatches,
     compactOutputBase,
+    timeoutMs = DEFAULT_RIPGREP_TIMEOUT_MS,
   } = params;
 
   const isContentSearch = contentPattern !== undefined;
@@ -352,7 +358,7 @@ export async function executeRipgrepSearch(params: SearchParams): Promise<Search
       return { text: Buffer.concat(chunks.map((chunk) => Buffer.from(chunk))).toString(), clipped, nonEmptyLines };
     };
 
-    const [stdoutResult, stderrResult, exitCodeRaw] = await Promise.all([
+    const execution = Promise.all([
       readBoundedStream(subprocess.stdout, {
         maxBytes: MAX_STDOUT_CAPTURE_BYTES,
         maxNonEmptyLines: lineLimit,
@@ -360,6 +366,36 @@ export async function executeRipgrepSearch(params: SearchParams): Promise<Search
       readBoundedStream(subprocess.stderr, {}),
       subprocess.exited,
     ]);
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+    const outcome = await Promise.race([
+      execution.then((value) => ({ kind: "completed" as const, value })),
+      new Promise<{ kind: "timed-out" }>((resolve) => {
+        timeoutHandle = setTimeout(() => {
+          try {
+            subprocess.kill();
+          } catch {
+            // The process may have exited between the race and the timeout callback.
+          }
+          resolve({ kind: "timed-out" });
+        }, timeoutMs);
+      }),
+    ]).finally(() => {
+      if (timeoutHandle !== undefined) clearTimeout(timeoutHandle);
+    });
+
+    if (outcome.kind === "timed-out") {
+      const timeoutDescription =
+        timeoutMs % 1000 === 0 ? `${timeoutMs / 1000} seconds` : `${timeoutMs}ms`;
+      return {
+        files: [],
+        exitCode: 2,
+        errorMessage:
+          `ERROR: Ripgrep search timed out after ${timeoutDescription}.\n\n` +
+          "Hint: Narrow the search path or pattern and try again.",
+      };
+    }
+
+    const [stdoutResult, stderrResult, exitCodeRaw] = outcome.value;
 
     const output = stdoutResult.text;
     const exitCode = stdoutResult.clipped ? 0 : Number(exitCodeRaw ?? 0);

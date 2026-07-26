@@ -41,10 +41,11 @@ def _resolve_within_repo_root(value: str, *, base_dir: Path) -> Path:
     Raises:
         ValueError: If the resolved path escapes the repository root.
     """
+
     candidate = Path(value)
-    resolved = (
-        candidate if candidate.is_absolute() else base_dir / candidate
-    ).resolve(strict=False)
+    resolved = (candidate if candidate.is_absolute() else base_dir / candidate).resolve(
+        strict=False
+    )
     try:
         resolved.relative_to(REPO_ROOT)
     except ValueError as exc:
@@ -64,6 +65,7 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
         Tuple of the possibly truncated output, whether truncation occurred,
         and a truncation notice string.
     """
+
     lines = output.splitlines()
     truncated = False
     notice_parts: List[str] = []
@@ -78,9 +80,7 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
         encoded = joined.encode("utf-8")[:OUTPUT_BYTE_LIMIT]
         joined = encoded.decode("utf-8", errors="ignore")
         truncated = True
-        notice_parts.append(
-            f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB"
-        )
+        notice_parts.append(f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB")
 
     notice = "; ".join(notice_parts) if truncated else ""
     if truncated:
@@ -99,6 +99,7 @@ def parse_bun_output(output: str) -> Dict[str, Any]:
         control flags, and placeholders for caller-set values such as
         ``exit_code``.
     """
+
     metrics: Dict[str, Any] = {
         "passed": 0,
         "failed": 0,
@@ -125,9 +126,7 @@ def parse_bun_output(output: str) -> Dict[str, Any]:
         metrics["skipped"] = int(skip_matches[-1])
 
     if pass_matches or fail_matches or skip_matches:
-        metrics["total"] = (
-            metrics["passed"] + metrics["failed"] + metrics["skipped"]
-        )
+        metrics["total"] = metrics["passed"] + metrics["failed"] + metrics["skipped"]
 
     duration_matches = re.findall(r"\[(\d+\.?\d*)ms\]", output)
     if duration_matches:
@@ -157,9 +156,7 @@ def parse_bun_output(output: str) -> Dict[str, Any]:
     return metrics
 
 
-def validate_results(
-    metrics: Dict[str, Any], min_test_count: int = 1
-) -> List[str]:
+def validate_results(metrics: Dict[str, Any], min_test_count: int = 1) -> List[str]:
     """Validate bun test results against expected criteria.
 
     Args:
@@ -170,6 +167,7 @@ def validate_results(
     Returns:
         List of validation error messages. Empty list indicates success.
     """
+
     errors: List[str] = []
 
     if metrics.get("failed", 0) > 0:
@@ -197,9 +195,7 @@ def validate_results(
     return errors
 
 
-def format_summary(
-    metrics: Dict[str, Any], validation_errors: List[str]
-) -> str:
+def format_summary(metrics: Dict[str, Any], validation_errors: List[str]) -> str:
     """Format a human-readable summary of bun test results.
 
     Args:
@@ -209,6 +205,7 @@ def format_summary(
     Returns:
         Multi-line summary string styled after the CTest runner output.
     """
+
     lines: List[str] = []
     lines.append("=" * 60)
     lines.append("BUN TEST SUMMARY")
@@ -271,6 +268,7 @@ def run_bun_test(
         1 on validation or execution failure. ``output_string`` is a summary,
         bounded full output, or JSON payload depending on ``output_mode``.
     """
+
     metrics = parse_bun_output("")
     metrics["timeout_seconds"] = timeout
     validation_errors: List[str] = []
@@ -278,21 +276,13 @@ def run_bun_test(
     default_cwd = Path(__file__).resolve().parent
     test_path_obj: Optional[Path] = None
     try:
-        cwd_path = (
-            _resolve_within_repo_root(cwd, base_dir=REPO_ROOT)
-            if cwd
-            else default_cwd
-        )
+        cwd_path = _resolve_within_repo_root(cwd, base_dir=REPO_ROOT) if cwd else default_cwd
 
         if test_path:
-            test_path_obj = _resolve_within_repo_root(
-                test_path, base_dir=cwd_path
-            )
+            test_path_obj = _resolve_within_repo_root(test_path, base_dir=cwd_path)
             if not test_path_obj.exists():
                 metrics["test_path_error"] = True
-                validation_errors = validate_results(
-                    metrics, min_test_count=min_test_count
-                )
+                validation_errors = validate_results(metrics, min_test_count=min_test_count)
                 summary = format_summary(metrics, validation_errors)
                 if output_mode == "json":
                     payload = {
@@ -322,11 +312,7 @@ def run_bun_test(
 
     cmd: List[str] = ["bun", "test"]
     if test_path:
-        test_arg = (
-            str(test_path_obj.relative_to(cwd_path))
-            if test_path_obj
-            else test_path
-        )
+        test_arg = str(test_path_obj.relative_to(cwd_path)) if test_path_obj else test_path
         if (
             not Path(test_arg).is_absolute()
             and not test_arg.startswith("./")
@@ -351,23 +337,17 @@ def run_bun_test(
         combined_output = "".join([process.stdout or "", process.stderr or ""])
         metrics.update(parse_bun_output(combined_output))
         metrics["exit_code"] = process.returncode
-        validation_errors = validate_results(
-            metrics, min_test_count=min_test_count
-        )
+        validation_errors = validate_results(metrics, min_test_count=min_test_count)
     except subprocess.TimeoutExpired:
         metrics["timeout"] = True
         metrics["exit_code"] = 1
         combined_output = f"ERROR: Bun test timed out after {timeout} seconds"
-        validation_errors = validate_results(
-            metrics, min_test_count=min_test_count
-        )
+        validation_errors = validate_results(metrics, min_test_count=min_test_count)
     except FileNotFoundError:
         metrics["bun_missing"] = True
         metrics["exit_code"] = 1
         combined_output = "ERROR: bun command not found"
-        validation_errors = validate_results(
-            metrics, min_test_count=min_test_count
-        )
+        validation_errors = validate_results(metrics, min_test_count=min_test_count)
 
     success = (
         metrics.get("failed", 0) == 0
@@ -405,6 +385,7 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     Returns:
         Parsed namespace containing the CLI options.
     """
+
     parser = argparse.ArgumentParser(
         description="Run bun test with ADW-style parsing and validation",
         epilog=(
@@ -415,23 +396,13 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    parser.add_argument("--test-path", help="Test file or directory path to run")
+    parser.add_argument("--filter", dest="filter", help="Test name pattern filter")
     parser.add_argument(
-        "--test-path", help="Test file or directory path to run"
+        "--timeout", type=int, default=DEFAULT_TIMEOUT, help="Timeout in seconds (default: 300)"
     )
     parser.add_argument(
-        "--filter", dest="filter", help="Test name pattern filter"
-    )
-    parser.add_argument(
-        "--timeout",
-        type=int,
-        default=DEFAULT_TIMEOUT,
-        help="Timeout in seconds (default: 300)",
-    )
-    parser.add_argument(
-        "--min-tests",
-        type=int,
-        default=1,
-        help="Minimum expected number of tests (default: 1)",
+        "--min-tests", type=int, default=1, help="Minimum expected number of tests (default: 1)"
     )
     parser.add_argument(
         "--output",
@@ -439,9 +410,7 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         default="summary",
         help="Output format",
     )
-    parser.add_argument(
-        "--bail", action="store_true", help="Stop after the first failure"
-    )
+    parser.add_argument("--bail", action="store_true", help="Stop after the first failure")
     parser.add_argument("--cwd", help="Working directory for bun test")
     return parser.parse_args(argv)
 
@@ -455,6 +424,7 @@ def main(argv: Optional[List[str]] = None) -> None:
     Raises:
         SystemExit: Always raised with the exit code returned by ``run_bun_test``.
     """
+
     args = _parse_args(argv)
     exit_code, output = run_bun_test(
         test_path=args.test_path,

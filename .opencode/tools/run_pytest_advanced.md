@@ -46,7 +46,7 @@ Keep advanced payload-bearing fields explicit.
 
 ## Notes
 
-- `timeout` is measured in seconds and must be greater than 0 and less than or equal to 3600 seconds (1 hour).
+- `timeout` is measured in seconds and must be greater than 0 and less than or equal to 1200 seconds (20 minutes).
 - `coverage: false` emits the no-coverage path.
 - `durations=0` is supported and means show all durations.
 - `durations-min=<n>` only takes effect when `durations=<n>` is also set.

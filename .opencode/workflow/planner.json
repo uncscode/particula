@@ -1,7 +1,7 @@
 {
   "name": "planner",
   "version": "1.0.0",
-  "description": "Planner workflow: scope analysis, plan drafting, phase splitting, review, ship, and question surfacing",
+  "description": "Planner workflow: scope analysis, plan drafting, phase splitting, review, question resolution, ship, and question surfacing",
   "workflow_type": "planner",
   "steps": [
     {
@@ -66,6 +66,14 @@
       "agent": "plan-review-completeness",
       "prompt": "$ARGUMENTS --adw-id ${adw_id}",
       "model": "base",
+      "timeout": 1800
+    },
+    {
+      "type": "agent",
+      "name": "Resolve Questions",
+      "agent": "plan-question-resolver",
+      "prompt": "$ARGUMENTS --adw-id ${adw_id}",
+      "model": "heavy",
       "timeout": 1800
     },
     {

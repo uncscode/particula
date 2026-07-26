@@ -199,6 +199,7 @@ const OPTIONAL_KEYS = [
   "target",
   "no_ff",
   "abort_on_conflict",
+  "upstream",
   "branch",
   "onto",
   "remote",
@@ -232,7 +233,9 @@ export default tool({
 SIMPLE EXAMPLES (copy these patterns):
 
 Merge:      { command: "merge", source: "main", target: "develop" }
-Rebase:     { command: "rebase", branch: "feature-123", onto: "main" }
+Rebase current: { command: "rebase", upstream: "main" }
+Rebase branch:  { command: "rebase", upstream: "main", branch: "feature-123" }
+Advanced onto:  { command: "rebase", upstream: "old-base", onto: "main", branch: "feature-123" }
 Fetch:      { command: "fetch", remote: "origin", branch: "main" }
 Sync:       { command: "sync", source: "upstream", target: "main" }
 Accumulate: { command: "accumulate", slice_branch: "issue-1", tracking_branch: "accumulate/F1" }
@@ -243,7 +246,9 @@ Reset:      { command: "reset", ref: "HEAD~1", hard: true }
 RULES:
 - Supports only merge lifecycle commands: merge, rebase, fetch, sync, accumulate, abort, continue, reset.
 - merge requires source unless help: true.
-- rebase requires branch unless help: true.
+- rebase requires upstream unless help: true.
+- rebase onto requires an explicit target branch.
+- continue reuses the existing merge/rebase message without opening an editor.
 - accumulate requires slice_branch and tracking_branch unless help: true.
 - reset requires ref unless help: true.
 - Set help: true to view CLI help for any command.`,
@@ -263,6 +268,7 @@ RULES:
     target: tool.schema.string().optional(),
     no_ff: tool.schema.boolean().optional(),
     abort_on_conflict: tool.schema.boolean().optional(),
+    upstream: tool.schema.string().optional(),
     branch: tool.schema.string().optional(),
     onto: tool.schema.string().optional(),
     remote: tool.schema.string().optional(),
@@ -287,6 +293,7 @@ RULES:
       target,
       no_ff,
       abort_on_conflict,
+      upstream,
       branch,
       onto,
       remote,
@@ -304,6 +311,7 @@ RULES:
       target?: string;
       no_ff?: boolean;
       abort_on_conflict?: boolean;
+      upstream?: string;
       branch?: string;
       onto?: string;
       remote?: string;
@@ -362,15 +370,25 @@ RULES:
 
         case "rebase": {
           cmdParts.push("rebase");
+          const normalizedUpstream = normalizeRef(upstream);
+          if (!skipRequiredChecks && !normalizedUpstream) {
+            return "ERROR: 'rebase' command requires 'upstream'.";
+          }
+          if (normalizedUpstream && !isValidRefToken(normalizedUpstream)) {
+            return `ERROR: Invalid upstream: ${upstream}.`;
+          }
+          if (normalizedUpstream) {
+            cmdParts.push(normalizedUpstream);
+          }
           const normalizedBranch = normalizeRef(branch);
-          if (!skipRequiredChecks && !normalizedBranch) {
-            return "ERROR: 'rebase' command requires 'branch'.";
+          if (!skipRequiredChecks && branch !== undefined && !normalizedBranch) {
+            return "ERROR: 'branch' must be non-empty when provided.";
           }
           if (normalizedBranch && !isValidRefToken(normalizedBranch)) {
             return `ERROR: Invalid branch: ${branch}.`;
           }
           if (normalizedBranch) {
-            cmdParts.push(normalizedBranch);
+            cmdParts.push("--branch", normalizedBranch);
           }
           const normalizedOnto = normalizeRef(onto);
           if (!skipRequiredChecks && onto !== undefined && !normalizedOnto) {
@@ -378,6 +396,9 @@ RULES:
           }
           if (normalizedOnto && !isValidRefToken(normalizedOnto)) {
             return `ERROR: Invalid onto: ${onto}.`;
+          }
+          if (!skipRequiredChecks && normalizedOnto && !normalizedBranch) {
+            return "ERROR: 'rebase' command requires 'branch' when 'onto' is provided.";
           }
           if (normalizedOnto) {
             cmdParts.push("--onto", normalizedOnto);

@@ -1,14 +1,13 @@
 ---
 description: >
   Subagent that marks plan phases as shipped and updates plan lifecycle/status
-  after workflow completion. Lightweight agent that reads adw_spec_read to find the
-  current issue, matches it to a plan phase via adw_plans_read, and mutates the
-  phase status to Shipped.
+  after workflow completion. It supports both issue-linked phase updates and
+  issue-less auto-mode manifest finalization.
 
   This subagent:
-  - Loads workflow context from adw_spec_read (issue number and worktree path)
-  - Uses adw_plans_read list to find plans with matching phase issue_number
-  - Uses adw_plans_mutate update-phase to mark the phase as Shipped
+  - Loads workflow context from adw_spec_read
+  - Resolves a plan by issue number or manifest finalization context
+  - Uses adw_plans_mutate update-phase to mark one or all phases Shipped
   - Uses adw_plans_mutate update to promote plan status if all phases are done
   - Runs during the shipping step of most workflows
 
@@ -23,6 +22,7 @@ permission:
   ripgrep_advanced: allow
   todowrite: allow
   adw_spec_read: allow
+  adw_spec_messages: allow
   adw_plans_read: allow
   adw_plans_mutate: allow
   feedback_log: allow
@@ -37,15 +37,17 @@ Mark plan phases as shipped and update plan lifecycle after workflow completion.
 # Core Mission
 
 After a workflow ships, find the matching plan phase by issue number and mark it
-as Shipped. If all phases in a plan are now Shipped, promote the plan status to
-Shipped and lifecycle to completed. This keeps structured plan tracking current
-with zero manual intervention.
+as Shipped. For issue-less auto-mode finalization, resolve exactly one owning
+plan and mark every phase Shipped. Promote the plan only after verifying every
+phase is Shipped.
 
 # Input Format
 
 ```
 Arguments: adw_id=<workflow-id>
 ```
+
+Manifest finalization adds `manifest_finalization=true`.
 
 **Invocation:**
 ```python
@@ -60,18 +62,54 @@ task({
 
 ## Step 1: Load Context
 
+First list state fields, then read the named fields required by the selected
+mode. Do not assume an issue-derived spec is present for normal compatibility
+paths; manifest finalization receives a runtime-generated general spec.
+
 ```python
+adw_spec_read({"command": "list", "adw_id": "{adw_id}"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "source_branch"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "auto_mode_plan_id"})
 adw_spec_read({
   "command": "read",
-  "adw_id": "{adw_id}"
+  "adw_id": "{adw_id}",
+  "field": "auto_mode_completed_issues"
 })
 ```
 
 Extract:
-- `issue_number` - The issue that just shipped
+- `issue_number` - The issue that just shipped, when present
 - `worktree_path` - ADW worktree root for all plan tool calls
+- `source_branch` - Accumulation branch for manifest finalization
+- `auto_mode_plan_id` - Runtime-derived plan ID when the branch encodes one
+- `auto_mode_completed_issues` - Completed manifest issue numbers
 
-## Step 2: Find Matching Plan Phase
+## Step 2: Resolve Update Mode
+
+For normal issue-linked runs, find the matching plan phase by `issue_number` as
+before.
+
+For `manifest_finalization=true`, resolve exactly one owning plan in this order:
+
+1. Use `auto_mode_plan_id` when present and verify that exact plan exists.
+2. Otherwise parse only a canonical trailing plan token from `source_branch`,
+   such as `accumulate/E37-M1` -> `E37-M1`, and verify it exists.
+3. If no canonical plan ID can be derived, fail closed. Completed issue coverage
+   may verify ownership but must never select a plan by itself.
+
+Before mutation, require every non-null phase issue number in the selected plan
+to be present in `auto_mode_completed_issues` or already Shipped. Ambiguous,
+partial, or unrepresented phase sets fail closed with `PLAN_UPDATE_SHORT_FAILED`;
+never update multiple unrelated plans or mark an unexecuted phase Shipped.
+Every unshipped phase must have a non-null issue number represented in
+`auto_mode_completed_issues`; an issue-less unshipped phase has no completion
+evidence and therefore fails closed.
+
+For epic plans, do not use the phase-only promotion rule. Require every declared
+child plan to already be Shipped/completed before promoting the epic; otherwise
+return `PLAN_UPDATE_SHORT_FAILED` without mutation.
+
+## Step 3: Find Matching Plan Phase
 
 List active plans and scan phases for a matching `issue_number`:
 
@@ -85,7 +123,7 @@ For each plan, check its `phases` array for an entry where
 If no active match, this issue may not be tracked in a plan. Report
 completion with no changes.
 
-## Step 3: Mark Phase Shipped
+## Step 4: Mark Phase Or Plan Phases Shipped
 
 ```python
 get_datetime({"format": "date"})
@@ -99,7 +137,11 @@ adw_plans_mutate({
 })
 ```
 
-## Step 4: Check Plan Promotion
+In manifest-finalization mode, invoke `update-phase` for every phase in the
+resolved plan that is not already Shipped. Re-read the plan after mutations and
+verify every phase is Shipped.
+
+## Step 5: Check Plan Promotion
 
 After marking the phase, re-read the plan to check if all phases are now
 Shipped:
@@ -121,7 +163,21 @@ adw_plans_mutate({
 
 If some phases remain, no plan-level promotion.
 
-## Step 5: Report Completion
+## Step 6: Report Completion
+
+In manifest-finalization mode, write the terminal result to the finalizer's
+message stream before returning:
+
+```python
+adw_spec_messages({
+  "command": "messages-write",
+  "adw_id": adw_id,
+  "agent": "plan-update-short",
+  "message": "PLAN_UPDATE_SHORT_COMPLETE plan=<plan_id> phases=<count> status=Shipped"
+})
+```
+
+Write the corresponding bounded `PLAN_UPDATE_SHORT_FAILED` message on failure.
 
 ### Phase Shipped:
 
@@ -144,6 +200,10 @@ PLAN_UPDATE_SHORT_COMPLETE
 Issue: #{issue_number}
 No matching plan phase found. No updates needed.
 ```
+
+Manifest finalization never treats a missing plan as a successful no-op. It
+returns `PLAN_UPDATE_SHORT_FAILED` because finalization explicitly owns plan
+closeout.
 
 ### Failure Case:
 

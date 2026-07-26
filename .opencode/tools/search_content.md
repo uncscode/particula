@@ -79,3 +79,4 @@ routed to `ripgrep_advanced` instead:
 - Wrapper execution and invalid-regex failures return deterministic `ERROR:` diagnostics.
 - `compact-output` rewrites file prefixes relative to the scoped file/directory base.
 - Output larger than `maxResults` appends deterministic truncation warning text.
+- Searches are terminated after 30 seconds and return a deterministic timeout error.

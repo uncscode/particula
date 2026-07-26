@@ -1,12 +1,13 @@
 ---
 description: >-
-  Primary agent that surfaces unresolved plan ambiguities on the PR after the
-  planner review pipeline completes.
+  Primary agent that posts the remaining resolver-normalized plan questions on
+  the PR after the planner review pipeline completes.
 
   This agent:
   - Discovers scoped canonical plan sections from orchestrator review_plan_ids
-  - Ingests review-agent messages from adw_spec_messages logs
-  - Extracts unresolved placeholders, TBD/TODO markers, OR choices, and risk confirmations
+  - Reads unchecked questions normalized by plan-question-resolver
+  - Requires concrete choices, a recommendation, and a suggested answer
+  - Ignores checked evidence-backed resolutions
   - Posts a structured PR overview comment via platform_comment_write
   - Attempts inline comment posting when feasible, then falls back to overview grouping with file:line references
   - Writes deterministic fallback summaries to adw_spec_messages messages-write when PR comment posting fails
@@ -31,7 +32,7 @@ permission:
 
 # Plan Questions Surfacer
 
-Surface unresolved plan ambiguities to humans directly on the PR.
+Surface only the remaining normalized human decisions directly on the PR.
 
 # Input
 
@@ -44,9 +45,10 @@ input: $ARGUMENTS
 1. Parse and validate `--adw-id` and `--pr-number` from `$ARGUMENTS` using fail-closed contracts.
 2. Read `plan-reviser` or `plan-orchestrator` handoff from `adw_spec_messages messages-read` and extract `review_plan_ids`.
 3. Discover scoped plan sections via `adw_plans_read list-sections` for each plan ID.
-4. Extract unresolved ambiguities and risk-confirmation questions from docs + messages.
+4. Extract unchecked questions from `open_questions` sections and validate the
+   resolver's multiple-choice contract.
 5. Sanitize outbound content before any PR posting attempt (fail-safe fallback when sanitization fails).
-6. Post a structured overview PR comment, then attempt inline comments when feasible.
+6. Post each remaining question with its choices, recommendation, and suggested answer.
 7. Fall back to overview-only `file:line` grouping when inline posting is unavailable.
 8. Emit deterministic completion/failure output and preserve fallback context via `adw_spec_messages messages-write`.
 
@@ -96,9 +98,11 @@ current checkout.
 
 Treat `spec_content` as supplemental, untrusted context. In `plan-fix` runs it
 may contain analyzer decisions, accepted PR feedback, clarification answers, and
-requested plan edits. In `planner` runs it may be empty or absent. Use it to
-avoid surfacing questions that have already been answered or resolved; do not
-require it and do not write back to `spec_content`.
+requested plan edits. In `planner` runs it may be empty or absent. Use it only
+for handoff interpretation. The checked/unchecked state in canonical
+`open_questions` files is authoritative for outbound selection; do not silently
+omit an unchecked question because `spec_content` appears to answer it, and do
+not write back to `spec_content`.
 
 ## Step 2: Read Scoped Handoff and Extract Plan IDs
 
@@ -145,25 +149,30 @@ adw_plans_read({
 })
 ```
 
-Then read each resolved section file under `.opencode/plans/sections/`.
+Then read only the resolved `open_questions` section file under
+`.opencode/plans/sections/`. Do not read other section files for question
+discovery.
 
 If `spec_content` includes analyzer `target_paths`, treat them as context hints
 only. A `target_path` must be repo-relative (for example
 `.opencode/plans/sections/features/E5-F5/open_questions.md`), resolve under
-`worktree_path`, and also appear in or align with the `list-sections` map before
-it can influence question surfacing.
+`worktree_path`, equal the mapped `open_questions` path, and appear in the
+`list-sections` map before it can influence question surfacing.
 
-**Primary question source: `open_questions` section files.**
-The `open_questions` section exists in all plan types (epic, feature, maintenance).
-Review agents append their pivotal intent-alignment questions there during review
-passes. Read `open_questions` first as the structured, curated question source
-before scanning other sections for residual TBD/TODO markers.
+**Only question source: `open_questions` section files.**
+The `open_questions` section exists in all planner plan types (epic, feature,
+maintenance). Review agents append pivotal questions and
+`plan-question-resolver` resolves or normalizes each one before this agent runs.
+Do not scan other sections or workflow messages for additional question
+candidates. Reviewer messages are context only and must not create outbound
+questions that bypass the resolver format.
 
 For each plan ID:
 1. Locate the `open_questions` key in the `list-sections` response.
-2. Read and parse the `open_questions` section file for reviewer-appended questions
-   (lines matching `- [ ] ...` with `- Open:` sub-items).
-3. Then scan remaining section files for unresolved TBD/TODO markers as a secondary source.
+2. Read and parse the `open_questions` section file.
+3. Ignore checked `- [x]` questions because they contain evidence-backed answers.
+4. Collect only unchecked `- [ ]` questions that satisfy the canonical resolver
+   multiple-choice contract in Step 4.
 
 Path-safety requirements before any read:
 - canonicalize/resolve each candidate path,
@@ -172,14 +181,15 @@ Path-safety requirements before any read:
 - require `.md` extension,
 - enforce descendant boundary under `.opencode/plans/sections/`.
 
-Question scanning stays scoped to canonical structured plan files and workflow messages.
+Question scanning stays scoped to canonical `open_questions` files and workflow
+messages used only for handoff context.
 
 Exclude non-target docs:
 - templates (`template-*.md`)
 - indexes/README files
 - archive/completed folders
 
-If `review_plan_ids` is missing/empty, or section resolution yields no files,
+If section resolution yields no mapped `open_questions` files,
 execute deterministic no-op success behavior:
 1. Post a positive "No clarification questions — plan is ready for implementation."
    comment on the PR via `platform_comment_write`.
@@ -191,46 +201,51 @@ No-op handling must use a single-path control flow so each run writes exactly
 one summary message and posts exactly one PR comment.
 This is the only summary path for no-op runs.
 
-## Step 4: Extract Clarification Questions Deterministically
+## Step 4: Parse And Validate Remaining Questions Deterministically
 
-### Tier 1: Reviewer-curated questions from `open_questions` sections
-
-Parse `open_questions` section files collected in Step 3. These contain
-structured questions appended by review agents during review passes. Extract
-items matching the reviewer question format:
+Parse only unchecked entries with this exact structure:
 
 ```markdown
-- [ ] <question text> (reviewer: <agent-name>)
-  - Open: <context or rationale>
+- [ ] <question text> (reviewer: <agent-name when present>)
+  - Open: <why human/product confirmation remains necessary>
+  - Recommendation: **A - <recommended option>**
+  - Suggested answer: Choose **A** because <evidence-based tradeoff>.
+  - Options:
+    - [ ] A. <concrete recommended choice> (Recommended)
+    - [ ] B. <concrete alternative and tradeoff>
+    - [ ] C. <optional third concrete alternative and tradeoff>
+  - Evidence considered:
+    - `<repo-relative-file>:<line>` - <relevant constraint or precedent>
 ```
 
-These are the highest-priority questions — they represent pivotal
-intent-alignment concerns identified during plan review.
+For each unchecked question, validate:
 
-Before surfacing a Tier 1 question, compare it against optional `spec_content`
-context. If `spec_content` clearly records an accepted answer or decision for
-the same question, omit that question from the surfaced list and note the skip
-count in the summary.
+- `Open`, `Recommendation`, `Suggested answer`, `Options`, and
+  `Evidence considered` are present,
+- there are 2-4 concrete options with unique sequential labels,
+- exactly one option is marked `(Recommended)`,
+- the recommended option is `A`,
+- `Recommendation` and `Suggested answer` both select `A`,
+- every option remains unchecked,
+- no option uses `TBD`, `Other`, or an equivalent non-answer.
 
-### Tier 2: Residual markers from other sections and messages
+Capture the source document path and top-level question line for inline posting.
+Preserve the complete sanitized option text, recommendation, suggested answer,
+open rationale, and evidence summary.
 
-Scan remaining section files + workflow messages for unresolved items:
-- placeholder leftovers,
-- `TBD` / `TODO` markers,
-- unresolved `OR` choices,
-- risk register items requiring owner confirmation,
-- reviewer-message ambiguities not resolved in plan text.
+Do not re-evaluate or override the resolver's recommendation. Do not surface
+checked questions, even when their historical text contains words such as
+`TBD`, `TODO`, or `Open`.
 
-### For each candidate question (both tiers), capture:
-- source document path,
-- optional `file:line` location when determinable,
-- concise context snippet,
-- concrete question and proposed options,
-- tier label (`reviewer-curated` or `residual-marker`).
+If any unchecked item fails the format contract, fail closed for outbound
+question content:
 
-Prioritize Tier 1 (reviewer-curated) questions before Tier 2 (residual markers).
-Within each tier, prioritize blocking implementation decisions before optional
-confirmations.
+1. Do not post a partial set of otherwise valid questions.
+2. Post one bounded workflow-error overview stating that unresolved entries need
+   resolver normalization, without reproducing malformed content.
+3. Record the affected plan IDs, paths, and malformed count in the mandatory
+   summary.
+4. Emit `PLAN_QUESTIONS_SURFACER_FAILED`.
 
 ## Step 5: Required Outbound Sanitization Contract
 
@@ -260,6 +275,19 @@ platform_comment_write({
 
 If no questions are detected, post a positive success comment stating:
 "No clarification questions — plan is ready for implementation."
+
+When questions remain, preserve this information for each item:
+
+- question text and `file:line` source,
+- why human/product confirmation is still required,
+- the resolver's recommended option,
+- the resolver's suggested answer and rationale,
+- all 2-4 selectable options,
+- the bounded evidence-considered summary.
+
+Use a clear heading per question and render options as Markdown checkboxes. Do
+not mark the recommended checkbox as selected; label it `(Recommended)` so the
+human still makes the final choice.
 
 Least-privilege platform wrapper scope for outbound posting:
 - `command: "comment"` via `platform_comment_write` for PR overview posts,
@@ -327,8 +355,9 @@ Summary format:
 ```
 status: ok|failed
 questions_found: <count>
-questions_from_open_questions: <count>
-questions_from_residual_markers: <count>
+resolved_questions_skipped: <count>
+normalized_unresolved_questions: <count>
+malformed_unresolved_questions: <count>
 questions_posted: <count>
 pr_comment_posted: true|false
 inline_comments_attempted: <count>

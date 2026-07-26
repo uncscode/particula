@@ -65,3 +65,4 @@ Example single-file advanced search:
 - Search paths stay repository-confined via lexical and canonical validation.
 - Scoped path misses never widen back to the repository root.
 - `compact-output` rewrites file prefixes relative to the scoped file/directory base.
+- Searches are terminated after 30 seconds and return a deterministic timeout error.

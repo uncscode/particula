@@ -14,14 +14,7 @@ SPEC.loader.exec_module(run_cmake_tool)
 
 
 def _make_repo_local_dir(name: str) -> Path:
-    base = (
-        run_cmake_tool.REPO_ROOT
-        / "adforge_local"
-        / "opencode"
-        / "tmp"
-        / "tool-tests"
-        / name
-    )
+    base = run_cmake_tool.REPO_ROOT / "adforge_local" / "opencode" / "tmp" / "tool-tests" / name
     if base.exists():
         shutil.rmtree(base)
     base.mkdir(parents=True, exist_ok=True)
@@ -31,16 +24,12 @@ def _make_repo_local_dir(name: str) -> Path:
 def test_resolve_preset_build_dir_confines_relative_escape():
     source_dir = _make_repo_local_dir("run-cmake-escape")
     preset_data = {
-        "configurePresets": [
-            {"name": "debug", "binaryDir": "../../../../../../outside-build"}
-        ],
+        "configurePresets": [{"name": "debug", "binaryDir": "../../../../../../outside-build"}],
         "buildPresets": [],
     }
 
     with pytest.raises(ValueError, match="outside repository root"):
-        run_cmake_tool._resolve_preset_build_dir(
-            "debug", preset_data, str(source_dir)
-        )
+        run_cmake_tool._resolve_preset_build_dir("debug", preset_data, str(source_dir))
 
 
 def test_resolve_preset_build_dir_accepts_in_repo_relative_path():
@@ -50,9 +39,7 @@ def test_resolve_preset_build_dir_accepts_in_repo_relative_path():
         "buildPresets": [],
     }
 
-    resolved = run_cmake_tool._resolve_preset_build_dir(
-        "debug", preset_data, str(source_dir)
-    )
+    resolved = run_cmake_tool._resolve_preset_build_dir("debug", preset_data, str(source_dir))
 
     assert resolved == str((source_dir / "build" / "debug").resolve())
 

@@ -65,3 +65,4 @@ Example single-file discovery:
 - Scoped path misses never widen back to the repository root.
 - No-match outcomes are non-error, deterministic text responses.
 - If results exceed `maxResults`, output appends a deterministic truncation warning.
+- Searches are terminated after 30 seconds and return a deterministic timeout error.

@@ -1,7 +1,7 @@
 {
   "name": "plan-fix",
   "version": "1.0.0",
-  "description": "Plan-fix workflow: analyze comments -> revise plans -> re-review -> ship -> generate issues",
+  "description": "Plan-fix workflow: analyze comments -> revise plans -> re-review -> ship -> generate auto-mode issues",
   "workflow_type": "plan-fix",
   "steps": [
     {

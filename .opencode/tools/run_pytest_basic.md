@@ -37,7 +37,7 @@ Keep routine targeting and path fields explicit.
 
 ## Notes
 
-- `timeout` is measured in seconds and must be greater than 0 and less than or equal to 3600 seconds (1 hour).
+- `timeout` is measured in seconds and must be greater than 0 and less than or equal to 1200 seconds (20 minutes).
 - `cwd` must resolve within the current repository root.
 - Removed legacy direct fields (`outputMode`, `failFast`, `testFilter`) now fail closed and must move through `options`.
 - Use `run_pytest_advanced` for coverage, durations, `overrideIni`, or passthrough `pytestArgs`.

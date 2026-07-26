@@ -1,6 +1,13 @@
-import { describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import * as fs from "node:fs";
 import path from "node:path";
+
+import {
+  getKillCount,
+  installSubprocessMocks,
+  restoreSubprocessMocks,
+  setSpawnResponse,
+} from "./helpers/mock-subprocess";
 
 const HELPER_MODULE_PATH = path.join(import.meta.dir, "../lib/ripgrep_shared.ts");
 let importCounter = 0;
@@ -11,6 +18,14 @@ const loadHelper = async () => {
 };
 
 describe("ripgrep_shared helper", () => {
+  beforeEach(() => {
+    installSubprocessMocks();
+  });
+
+  afterEach(() => {
+    restoreSubprocessMocks();
+  });
+
   it("normalizes numeric params and validates non-negative integers", async () => {
     const { normalizeNumericParam, validateNonNegativeInt } = await loadHelper();
 
@@ -78,5 +93,25 @@ describe("ripgrep_shared helper", () => {
     expect(buildTruncationWarning(10, 12, "lines", { approximateTotal: true })).toBe(
       '[WARNING: Results truncated to 10 lines (at least 12 total found). Use options: "max-results=<n>" to increase limit.]',
     );
+  });
+
+  it("kills a stalled ripgrep subprocess and returns a deterministic timeout", async () => {
+    setSpawnResponse({ hangs: true });
+    const { executeRipgrepSearch } = await loadHelper();
+
+    const result = await executeRipgrepSearch({
+      contentPattern: "needle",
+      searchPath: ".",
+      timeoutMs: 5,
+    });
+
+    expect(result).toEqual({
+      files: [],
+      exitCode: 2,
+      errorMessage:
+        "ERROR: Ripgrep search timed out after 5ms.\n\n" +
+        "Hint: Narrow the search path or pattern and try again.",
+    });
+    expect(getKillCount()).toBe(1);
   });
 });

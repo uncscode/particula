@@ -53,6 +53,7 @@ class ScriptExecutionResult:
 
 def _load_executor():
     """Import notebook executor, surfacing dependency errors clearly."""
+
     try:
         from adw.utils.notebook import NotebookExecutionResult, execute_notebook
     except ImportError as exc:  # pragma: no cover - exercised via CLI path
@@ -71,6 +72,7 @@ def pushd(path: Optional[Path]) -> Iterator[None]:
     Args:
         path: Target working directory. If None, no-op.
     """
+
     prev_cwd = Path.cwd()
     prev_pythonpath = os.environ.get("PYTHONPATH", "")
 
@@ -93,6 +95,7 @@ def pushd(path: Optional[Path]) -> Iterator[None]:
 @contextmanager
 def time_limit(seconds: int) -> Iterator[None]:
     """Enforce a wall-clock guard for the enclosed block."""
+
     start = time.time()
     try:
         yield
@@ -104,6 +107,7 @@ def time_limit(seconds: int) -> Iterator[None]:
 
 def _collect_notebooks(target: Path, recursive: bool) -> List[Path]:
     """Collect notebook paths from a file or directory."""
+
     if target.is_file() and target.suffix == ".ipynb":
         return [target]
 
@@ -111,9 +115,7 @@ def _collect_notebooks(target: Path, recursive: bool) -> List[Path]:
         raise NotebookToolError(f"Notebook path not found: {target}")
 
     if not target.is_dir():
-        raise NotebookToolError(
-            f"Notebook path must be a .ipynb file or directory: {target}"
-        )
+        raise NotebookToolError(f"Notebook path must be a .ipynb file or directory: {target}")
 
     notebooks: List[Path] = []
     if recursive:
@@ -132,6 +134,7 @@ def _collect_notebooks(target: Path, recursive: bool) -> List[Path]:
 
 def _collect_scripts(target: Path, recursive: bool) -> List[Path]:
     """Collect script paths from a file or directory."""
+
     if target.is_file() and target.suffix == ".py":
         return [target]
 
@@ -139,9 +142,7 @@ def _collect_scripts(target: Path, recursive: bool) -> List[Path]:
         raise NotebookToolError(f"Script path not found: {target}")
 
     if not target.is_dir():
-        raise NotebookToolError(
-            f"Script path must be a .py file or directory: {target}"
-        )
+        raise NotebookToolError(f"Script path must be a .py file or directory: {target}")
 
     scripts: List[Path] = []
     if recursive:
@@ -160,24 +161,20 @@ def _collect_scripts(target: Path, recursive: bool) -> List[Path]:
 
 def _validate_script_syntax(script_path: Path) -> str | None:
     """Validate Python script syntax and return error message when invalid."""
+
     try:
         source = script_path.read_text(encoding="utf-8")
         ast.parse(source, filename=str(script_path))
     except SyntaxError as exc:
-        location = (
-            f"line {exc.lineno}, column {exc.offset}"
-            if exc.lineno
-            else "unknown"
-        )
+        location = f"line {exc.lineno}, column {exc.offset}" if exc.lineno else "unknown"
         detail = exc.msg or "invalid syntax"
         return f"Syntax error ({location}): {detail}"
     return None
 
 
-def _execute_script(
-    script_path: Path, timeout: int, cwd: Optional[Path]
-) -> ScriptExecutionResult:
+def _execute_script(script_path: Path, timeout: int, cwd: Optional[Path]) -> ScriptExecutionResult:
     """Execute a Python script and capture the execution result."""
+
     start = time.time()
     try:
         completed = subprocess.run(
@@ -203,16 +200,8 @@ def _execute_script(
         )
     except subprocess.TimeoutExpired as exc:
         execution_time = time.time() - start
-        stdout = (
-            exc.stdout.decode()
-            if isinstance(exc.stdout, bytes)
-            else (exc.stdout or "")
-        )
-        stderr = (
-            exc.stderr.decode()
-            if isinstance(exc.stderr, bytes)
-            else (exc.stderr or "")
-        )
+        stdout = exc.stdout.decode() if isinstance(exc.stdout, bytes) else (exc.stdout or "")
+        stderr = exc.stderr.decode() if isinstance(exc.stderr, bytes) else (exc.stderr or "")
         return ScriptExecutionResult(
             success=False,
             script_path=str(script_path),
@@ -235,10 +224,9 @@ def _execute_script(
         )
 
 
-def _validate_output(
-    executed_path: Path, expected_strings: Sequence[str]
-) -> List[str]:
+def _validate_output(executed_path: Path, expected_strings: Sequence[str]) -> List[str]:
     """Validate expected substrings are present in executed notebook outputs."""
+
     import nbformat
 
     nb_json = nbformat.read(executed_path, as_version=4)
@@ -262,10 +250,9 @@ def _validate_output(
     return missing
 
 
-def _truncate(
-    text: str, limit: int = FULL_OUTPUT_CHAR_LIMIT
-) -> tuple[str, bool]:
+def _truncate(text: str, limit: int = FULL_OUTPUT_CHAR_LIMIT) -> tuple[str, bool]:
     """Truncate text with a notice when exceeding limit."""
+
     if len(text) <= limit:
         return text, False
     return f"{text[:limit]}\n...\n[output truncated to {limit} chars]", True
@@ -279,6 +266,7 @@ def _format_summary(
     validation_unavailable: bool = False,
 ) -> str:
     """Build human-readable summary output."""
+
     passed = sum(1 for r in results if r.success)
     failed = len(results) - passed
 
@@ -307,9 +295,7 @@ def _format_summary(
     if validation_errors:
         lines.append("\nValidation Errors:")
         for nb, missing in validation_errors.items():
-            lines.append(
-                f"  - {Path(nb).name}: missing expectations: {', '.join(missing)}"
-            )
+            lines.append(f"  - {Path(nb).name}: missing expectations: {', '.join(missing)}")
 
     if validation_failures:
         lines.append("\nValidation Failures:")
@@ -322,9 +308,7 @@ def _format_summary(
             lines.append(f"{prefix}: {detail}")
 
     if validation_unavailable:
-        lines.append(
-            "\nValidation module unavailable; executed without pre-validation."
-        )
+        lines.append("\nValidation module unavailable; executed without pre-validation.")
 
     lines.append("\n" + "=" * 60)
     lines.append(
@@ -342,6 +326,7 @@ def _format_script_summary(
     total_time: float,
 ) -> str:
     """Build human-readable summary output for scripts."""
+
     passed = sum(1 for r in results if r.success)
     failed = len(results) - passed
 
@@ -368,22 +353,17 @@ def _format_script_summary(
         lines.append("\nValidation Errors:")
         for script_path, missing in validation_errors.items():
             joined = ", ".join(missing)
-            lines.append(
-                f"  - {Path(script_path).name}: missing expectations: {joined}"
-            )
+            lines.append(f"  - {Path(script_path).name}: missing expectations: {joined}")
 
     lines.append("\n" + "=" * 60)
-    lines.append(
-        "VALIDATION: FAILED"
-        if (failures or validation_errors)
-        else "VALIDATION: PASSED"
-    )
+    lines.append("VALIDATION: FAILED" if (failures or validation_errors) else "VALIDATION: PASSED")
     lines.append("=" * 60)
     return "\n".join(lines)
 
 
 def _serialize_result(result: Any, include_output: bool) -> Dict[str, object]:
     """Serialize a single notebook result for JSON output."""
+
     payload: Dict[str, object] = {
         "notebook": result.notebook_path,
         "success": result.success,
@@ -393,19 +373,11 @@ def _serialize_result(result: Any, include_output: bool) -> Dict[str, object]:
         "output_path": result.output_path,
     }
 
-    if (
-        include_output
-        and result.output_path
-        and Path(result.output_path).exists()
-    ):
+    if include_output and result.output_path and Path(result.output_path).exists():
         try:
-            payload["output_contents"] = Path(result.output_path).read_text(
-                encoding="utf-8"
-            )
+            payload["output_contents"] = Path(result.output_path).read_text(encoding="utf-8")
         except Exception as exc:  # noqa: BLE001
-            payload["output_contents"] = (
-                f"[failed to read executed notebook: {exc}]"
-            )
+            payload["output_contents"] = f"[failed to read executed notebook: {exc}]"
 
     return payload
 
@@ -415,6 +387,7 @@ def _serialize_script_result(
     include_output: bool,
 ) -> Dict[str, object]:
     """Serialize a single script result for JSON output."""
+
     payload: Dict[str, object] = {
         "script": result.script_path,
         "success": result.success,
@@ -443,6 +416,7 @@ def _create_backup(nb_path: Path) -> Optional[Path]:
     Returns:
         The backup path or None when the copy fails.
     """
+
     backup_path = nb_path.with_suffix(".ipynb.bak")
     try:
         backup_path.parent.mkdir(parents=True, exist_ok=True)
@@ -469,6 +443,7 @@ def run_scripts(
     cwd: Optional[Path] = None,
 ) -> tuple[int, str]:
     """Execute Python scripts and format output for the requested mode."""
+
     results: List[ScriptExecutionResult] = []
     validation_errors: Dict[str, List[str]] = {}
     start = time.time()
@@ -494,11 +469,7 @@ def run_scripts(
         results.append(result)
 
         if result.success and expect_output:
-            missing = [
-                expected
-                for expected in expect_output
-                if expected not in result.stdout
-            ]
+            missing = [expected for expected in expect_output if expected not in result.stdout]
             if missing:
                 validation_errors[result.script_path] = missing
 
@@ -506,9 +477,7 @@ def run_scripts(
     overall_success = all(r.success for r in results) and not validation_errors
 
     if output_mode == "json":
-        serialized = [
-            _serialize_script_result(r, include_output=True) for r in results
-        ]
+        serialized = [_serialize_script_result(r, include_output=True) for r in results]
         truncated = any(r.get("output_truncated") for r in serialized)
         payload = {
             "scripts_executed": len(results),
@@ -568,6 +537,7 @@ def run_notebooks(
     no_backup: bool = False,
 ) -> tuple[int, str]:
     """Execute notebooks and format output for the requested mode."""
+
     notebook_execution_result_cls, execute_notebook = _load_executor()
 
     temp_dir: Optional[tempfile.TemporaryDirectory[str]] = None
@@ -590,9 +560,7 @@ def run_notebooks(
     validation_unavailable: bool = False
     if not skip_validation:
         try:
-            from adw.utils.notebook_validation import (
-                validate_notebook_json,  # type: ignore
-            )
+            from adw.utils.notebook_validation import validate_notebook_json  # type: ignore
 
             validation_function = validate_notebook_json
         except ImportError:
@@ -606,13 +574,9 @@ def run_notebooks(
                 if not validation_result.valid:
                     summarized_errors = []
                     for error in validation_result.errors[:3]:
-                        summarized_errors.append(
-                            f"{error.error_type}: {error.message}"
-                        )
+                        summarized_errors.append(f"{error.error_type}: {error.message}")
                     error_message = (
-                        "; ".join(summarized_errors)
-                        if summarized_errors
-                        else "Validation failed"
+                        "; ".join(summarized_errors) if summarized_errors else "Validation failed"
                     )
                     first_cell_index = (
                         validation_result.errors[0].cell_index
@@ -656,9 +620,7 @@ def run_notebooks(
             if execution_output_path is not None:
                 execution_output_path.parent.mkdir(parents=True, exist_ok=True)
 
-            result = execute_notebook(
-                nb_path, output_path=execution_output_path, timeout=timeout
-            )
+            result = execute_notebook(nb_path, output_path=execution_output_path, timeout=timeout)
             results.append(result)
 
             executed_for_validation: Optional[Path] = None
@@ -672,26 +634,14 @@ def run_notebooks(
             if result.success and secondary_copy is not None:
                 try:
                     secondary_copy.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(
-                        executed_for_validation or nb_path, secondary_copy
-                    )
-                except (
-                    OSError
-                ) as exc:  # pragma: no cover - exercised via I/O failure
+                    shutil.copy2(executed_for_validation or nb_path, secondary_copy)
+                except OSError as exc:  # pragma: no cover - exercised via I/O failure
                     logger.warning(
-                        "Failed to write executed notebook copy to %s (%s)",
-                        secondary_copy,
-                        exc,
+                        "Failed to write executed notebook copy to %s (%s)", secondary_copy, exc
                     )
 
-            if (
-                result.success
-                and expect_output
-                and executed_for_validation is not None
-            ):
-                missing = _validate_output(
-                    executed_for_validation, expect_output
-                )
+            if result.success and expect_output and executed_for_validation is not None:
+                missing = _validate_output(executed_for_validation, expect_output)
                 if missing:
                     validation_errors[result.notebook_path] = missing
     finally:
@@ -700,9 +650,7 @@ def run_notebooks(
 
     total_time = time.time() - start
     overall_success = (
-        all(r.success for r in results)
-        and not validation_errors
-        and not validation_failures
+        all(r.success for r in results) and not validation_errors and not validation_failures
     )
 
     if output_mode == "json":
@@ -711,9 +659,7 @@ def run_notebooks(
             "notebooks_passed": sum(1 for r in results if r.success),
             "notebooks_failed": sum(1 for r in results if not r.success),
             "total_execution_time": total_time,
-            "results": [
-                _serialize_result(r, include_output=False) for r in results
-            ],
+            "results": [_serialize_result(r, include_output=False) for r in results],
             "validation_errors": validation_errors,
             "validation_failures": validation_failures,
             "success": overall_success,
@@ -762,6 +708,7 @@ def run_notebooks(
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """CLI entrypoint for the notebook execution tool."""
+
     parser = argparse.ArgumentParser(
         description="Execute Jupyter notebooks with validation",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -781,9 +728,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             " notebook.ipynb --expect-output DataFrame plot\n"
         ),
     )
-    parser.add_argument(
-        "notebook_path", help="Path to notebook file or directory"
-    )
+    parser.add_argument("notebook_path", help="Path to notebook file or directory")
     parser.add_argument(
         "--output",
         choices=["summary", "full", "json"],
@@ -862,9 +807,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if cwd is not None and (not cwd.exists() or not cwd.is_dir()):
             raise NotebookToolError(f"cwd must be an existing directory: {cwd}")
 
-        script_mode = target.suffix == ".py" or (
-            script_flag and target.is_dir()
-        )
+        script_mode = target.suffix == ".py" or (script_flag and target.is_dir())
 
         if script_mode:
             if write_executed is not None:
@@ -893,9 +836,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if write_executed is not None:
                 write_executed.mkdir(parents=True, exist_ok=True)
                 if not write_executed.is_dir():
-                    raise NotebookToolError(
-                        f"write-executed must be a directory: {write_executed}"
-                    )
+                    raise NotebookToolError(f"write-executed must be a directory: {write_executed}")
 
             notebooks = _collect_notebooks(target, recursive=recursive)
             total_timeout = timeout * len(notebooks) + TOTAL_GUARD_PADDING

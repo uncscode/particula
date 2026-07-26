@@ -144,11 +144,16 @@ adw_spec_read({
 
 Extract:
 - `worktree_path` - Working directory
-- `issue_number` - For commit footer
+- `issue_number` - Optional commit footer context
 - `issue_title` - For commit context
 - `spec_content` - For understanding changes
 
 Navigate to worktree.
+
+If the ADW-backed state has no `issue_number`, treat it as an issue-less
+manifest workflow. Continue using its persisted `worktree_path` and
+`spec_content`, derive commit context from the diff/spec, and omit issue-closing
+or issue-reference footers. Never infer an issue from completed slice lists.
 
 ### If no adw_id is provided:
 

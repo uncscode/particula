@@ -37,6 +37,7 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
         Tuple of the possibly truncated output, whether truncation occurred,
         and a truncation notice string.
     """
+
     lines = output.splitlines()
     truncated = False
     notice_parts: List[str] = []
@@ -51,9 +52,7 @@ def _truncate_output(output: str) -> Tuple[str, bool, str]:
         encoded = joined.encode("utf-8")[:OUTPUT_BYTE_LIMIT]
         joined = encoded.decode("utf-8", errors="ignore")
         truncated = True
-        notice_parts.append(
-            f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB"
-        )
+        notice_parts.append(f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB")
 
     notice = "; ".join(notice_parts) if truncated else ""
     if truncated:
@@ -71,6 +70,7 @@ def resolve_cwd(cwd: Optional[str]) -> Path:
         Path to use as working directory, walking up to find mkdocs.yml or .git
         when cwd is not provided.
     """
+
     if cwd:
         return Path(cwd)
 
@@ -93,6 +93,7 @@ def resolve_config_path(config_file: str, cwd: Path) -> Path:
     Returns:
         Absolute path to the configuration file.
     """
+
     config_path = Path(config_file)
     if not config_path.is_absolute():
         config_path = cwd / config_path
@@ -122,6 +123,7 @@ def build_command(
     Raises:
         ValueError: If validate_only is True but site_dir is not provided.
     """
+
     cmd = ["mkdocs", "build"]
     if strict:
         cmd.append("--strict")
@@ -170,6 +172,7 @@ def format_summary(
     Returns:
         Multi-line summary string with status and output.
     """
+
     status = "PASSED" if exit_code == 0 else "FAILED"
     lines: List[str] = ["=" * 60, "MKDOCS BUILD SUMMARY", "=" * 60]
     lines.append(f"\nStatus: {status}")
@@ -206,6 +209,7 @@ def format_full_output(
     Returns:
         Full output string, truncated if it exceeds size limits.
     """
+
     combined = _combine_output(stdout, stderr)
     if error_message:
         if combined:
@@ -236,6 +240,7 @@ def _format_json_output(
     Returns:
         JSON string containing structured results.
     """
+
     combined = _combine_output(stdout, stderr)
     truncated_output, truncated, notice = _truncate_output(combined)
     payload: Dict[str, Any] = {
@@ -277,6 +282,7 @@ def run_mkdocs(
     Returns:
         Tuple of (exit_code, output_string).
     """
+
     resolved_cwd = resolve_cwd(cwd)
     resolved_config = resolve_config_path(config_file, resolved_cwd)
     if not resolved_config.exists():
@@ -405,6 +411,7 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     Returns:
         Parsed namespace containing the CLI options.
     """
+
     parser = argparse.ArgumentParser(
         description="Run mkdocs build with ADW-style output handling",
         epilog=(
@@ -430,9 +437,7 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         help=f"Timeout in seconds (default: {DEFAULT_TIMEOUT})",
     )
     parser.add_argument("--cwd", help="Working directory for mkdocs build")
-    parser.add_argument(
-        "--strict", action="store_true", help="Enable strict mode"
-    )
+    parser.add_argument("--strict", action="store_true", help="Enable strict mode")
     parser.add_argument(
         "--clean",
         action="store_true",
@@ -467,6 +472,7 @@ def main(argv: Optional[List[str]] = None) -> None:
     Raises:
         SystemExit: Always raised with the exit code returned by ``run_mkdocs``.
     """
+
     args = _parse_args(argv)
     exit_code, output = run_mkdocs(
         output_mode=args.output,

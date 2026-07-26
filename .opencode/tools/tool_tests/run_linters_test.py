@@ -13,9 +13,7 @@ run_linters_tool = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(run_linters_tool)
 
 
-def _completed_process(
-    args: list[str], returncode: int = 0, stdout: str = "", stderr: str = ""
-):
+def _completed_process(args: list[str], returncode: int = 0, stdout: str = "", stderr: str = ""):
     return subprocess.CompletedProcess(
         args=args,
         returncode=returncode,
@@ -43,9 +41,7 @@ def test_count_ruff_issues_returns_zero_when_summary_missing():
 
 
 def test_count_ruff_issues_returns_zero_when_found_summary_is_not_parseable():
-    assert (
-        run_linters_tool._count_ruff_issues("Found errors but no count\n") == 0
-    )
+    assert run_linters_tool._count_ruff_issues("Found errors but no count\n") == 0
 
 
 def test_apply_process_result_copies_process_fields_and_success_state():
@@ -84,9 +80,7 @@ def test_run_ruff_check_no_auto_fix_runs_only_validation_check(
     )
 
     assert result.success is True
-    assert [_tool_command(_call_args(call)) for call in calls] == [
-        ["ruff", "check", "adw/core/"]
-    ]
+    assert [_tool_command(_call_args(call)) for call in calls] == [["ruff", "check", "adw/core/"]]
     assert calls[0]["timeout"] == 33
     assert calls[0]["cwd"] == str(tmp_path)
 
@@ -102,9 +96,7 @@ def test_run_ruff_check_auto_fix_runs_fix_format_then_final_check(
 
     monkeypatch.setattr(run_linters_tool.subprocess, "run", fake_run)
 
-    result = run_linters_tool.run_ruff_check(
-        target_dir="adw/core", auto_fix=True
-    )
+    result = run_linters_tool.run_ruff_check(target_dir="adw/core", auto_fix=True)
 
     assert result.success is True
     assert [_tool_command(call) for call in calls] == [
@@ -186,15 +178,11 @@ def test_run_ruff_check_timeout_sets_error_without_followup_mutation(
 
     monkeypatch.setattr(run_linters_tool.subprocess, "run", fake_run)
 
-    result = run_linters_tool.run_ruff_check(
-        target_dir="adw/core", auto_fix=True, timeout=12
-    )
+    result = run_linters_tool.run_ruff_check(target_dir="adw/core", auto_fix=True, timeout=12)
 
     assert result.success is False
     assert result.error_message == "Timeout after 12 seconds"
-    assert [_tool_command(call) for call in calls] == [
-        ["ruff", "check", "--fix", "adw/core/"]
-    ]
+    assert [_tool_command(call) for call in calls] == [["ruff", "check", "--fix", "adw/core/"]]
 
 
 def test_run_ruff_check_fix_failure_continues_to_format_and_final_check(
@@ -214,9 +202,7 @@ def test_run_ruff_check_fix_failure_continues_to_format_and_final_check(
 
     monkeypatch.setattr(run_linters_tool.subprocess, "run", fake_run)
 
-    result = run_linters_tool.run_ruff_check(
-        target_dir="adw/core", auto_fix=True
-    )
+    result = run_linters_tool.run_ruff_check(target_dir="adw/core", auto_fix=True)
 
     assert result.success is True
     assert result.exit_code == 0
@@ -247,16 +233,12 @@ def test_run_ruff_check_format_failure_stops_before_final_check(
     def fake_run(args, **kwargs):
         calls.append(list(args))
         if _tool_command(list(args))[:2] == ["ruff", "format"]:
-            return _completed_process(
-                list(args), returncode=2, stderr="format failed"
-            )
+            return _completed_process(list(args), returncode=2, stderr="format failed")
         return _completed_process(list(args), stdout="All checks passed\n")
 
     monkeypatch.setattr(run_linters_tool.subprocess, "run", fake_run)
 
-    result = run_linters_tool.run_ruff_check(
-        target_dir="adw/core", auto_fix=True
-    )
+    result = run_linters_tool.run_ruff_check(target_dir="adw/core", auto_fix=True)
 
     assert result.success is False
     assert result.exit_code == 2
@@ -282,38 +264,28 @@ def test_run_ruff_check_missing_executable_reports_helpful_error(
 
 
 def test_run_ruff_check_rejects_option_like_target_dir():
-    result = run_linters_tool.run_ruff_check(
-        target_dir="--config", auto_fix=False
-    )
+    result = run_linters_tool.run_ruff_check(target_dir="--config", auto_fix=False)
 
     assert result.success is False
-    assert (
-        result.error_message == "target_dir must not start with '-': --config"
-    )
+    assert result.error_message == "target_dir must not start with '-': --config"
 
 
 def test_run_ruff_check_reports_invalid_cwd_before_spawn(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ):
     def fake_run(args, **kwargs):
-        raise AssertionError(
-            "subprocess.run should not be reached for invalid cwd"
-        )
+        raise AssertionError("subprocess.run should not be reached for invalid cwd")
 
     monkeypatch.setattr(run_linters_tool.subprocess, "run", fake_run)
 
     missing_cwd = tmp_path / "missing-dir"
-    result = run_linters_tool.run_ruff_check(
-        auto_fix=False, cwd=str(missing_cwd)
-    )
+    result = run_linters_tool.run_ruff_check(auto_fix=False, cwd=str(missing_cwd))
 
     assert result.success is False
     assert result.error_message == f"cwd does not exist: {missing_cwd}"
 
 
-def test_run_ruff_check_unexpected_exception_is_reported(
-    monkeypatch: pytest.MonkeyPatch,
-):
+def test_run_ruff_check_unexpected_exception_is_reported(monkeypatch: pytest.MonkeyPatch):
     def fake_run(args, **kwargs):
         raise RuntimeError("unexpected failure")
 
@@ -344,9 +316,7 @@ def test_run_linters_selected_linters_preserve_existing_orchestrator_behavior(
         cwd=str(tmp_path),
     )
     assert exit_code_ruff == 0
-    assert [_tool_command(call) for call in calls] == [
-        ["ruff", "check", "adw/core/"]
-    ]
+    assert [_tool_command(call) for call in calls] == [["ruff", "check", "adw/core/"]]
 
     calls.clear()
 
@@ -362,9 +332,7 @@ def test_run_linters_selected_linters_preserve_existing_orchestrator_behavior(
     ]
 
 
-def test_run_ruff_format_counts_reformatted_files(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-):
+def test_run_ruff_format_counts_reformatted_files(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     def fake_run(args, **kwargs):
         return _completed_process(list(args), stdout="2 files reformatted\n")
 
@@ -392,9 +360,7 @@ def test_run_ruff_format_timeout_reports_error(monkeypatch: pytest.MonkeyPatch):
     assert result.error_message == "Timeout after 9 seconds"
 
 
-def test_run_ruff_format_unexpected_exception_is_reported(
-    monkeypatch: pytest.MonkeyPatch,
-):
+def test_run_ruff_format_unexpected_exception_is_reported(monkeypatch: pytest.MonkeyPatch):
     def fake_run(args, **kwargs):
         raise RuntimeError("format boom")
 
@@ -406,9 +372,7 @@ def test_run_ruff_format_unexpected_exception_is_reported(
     assert result.error_message == "format boom"
 
 
-def test_run_mypy_counts_error_lines(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-):
+def test_run_mypy_counts_error_lines(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     def fake_run(args, **kwargs):
         return _completed_process(
             list(args),
@@ -418,18 +382,14 @@ def test_run_mypy_counts_error_lines(
 
     monkeypatch.setattr(run_linters_tool.subprocess, "run", fake_run)
 
-    result = run_linters_tool.run_mypy(
-        target_dir="adw/core", timeout=17, cwd=str(tmp_path)
-    )
+    result = run_linters_tool.run_mypy(target_dir="adw/core", timeout=17, cwd=str(tmp_path))
 
     assert result.success is False
     assert result.issues_found == 2
     assert result.exit_code == 1
 
 
-def test_run_mypy_missing_executable_reports_helpful_error(
-    monkeypatch: pytest.MonkeyPatch,
-):
+def test_run_mypy_missing_executable_reports_helpful_error(monkeypatch: pytest.MonkeyPatch):
     def fake_run(args, **kwargs):
         raise FileNotFoundError("mypy")
 
@@ -453,9 +413,7 @@ def test_run_mypy_timeout_reports_error(monkeypatch: pytest.MonkeyPatch):
     assert result.error_message == "Timeout after 14 seconds"
 
 
-def test_run_mypy_unexpected_exception_is_reported(
-    monkeypatch: pytest.MonkeyPatch,
-):
+def test_run_mypy_unexpected_exception_is_reported(monkeypatch: pytest.MonkeyPatch):
     def fake_run(args, **kwargs):
         raise RuntimeError("mypy boom")
 
@@ -478,9 +436,7 @@ def test_format_summary_reports_fixed_remaining_and_preview_lines():
     failing_result.issues_found = 1
     failing_result.stdout = "a.py:1: error: bad\nFound 1 error\n"
 
-    summary = run_linters_tool.format_summary(
-        [passing_result, failing_result], all_passed=False
-    )
+    summary = run_linters_tool.format_summary([passing_result, failing_result], all_passed=False)
 
     assert "Fixed: 2 issues" in summary
     assert "Remaining: 1 issues" in summary
@@ -527,9 +483,7 @@ def test_run_linters_supports_ruff_format_json_and_discovers_cwd(
         result.issues_fixed = 1
         return result
 
-    monkeypatch.setattr(
-        run_linters_tool, "run_ruff_format", fake_run_ruff_format
-    )
+    monkeypatch.setattr(run_linters_tool, "run_ruff_format", fake_run_ruff_format)
 
     exit_code, output = run_linters_tool.run_linters(
         target_dir="adw/core",
@@ -548,9 +502,7 @@ def test_run_linters_supports_ruff_format_json_and_discovers_cwd(
     assert captured["cwd"] == str(Path.cwd())
 
 
-def test_run_linters_full_output_uses_formatter(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-):
+def test_run_linters_full_output_uses_formatter(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     def fake_run_ruff_check(target_dir, auto_fix, timeout, cwd):
         result = run_linters_tool.LinterResult("ruff_check")
         result.success = True

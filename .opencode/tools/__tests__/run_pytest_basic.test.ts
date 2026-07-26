@@ -124,26 +124,26 @@ describe("run_pytest_basic wrapper", () => {
     expect(await execute({ timeout: -1 })).toContain("timeout must be a positive finite number");
   });
 
-  it("rejects timeout values above 3600 seconds before spawn", async () => {
+  it("rejects timeout values above 1200 seconds before spawn", async () => {
     const execute = await loadToolExecute("../../run_pytest_basic.ts");
 
     const result = await execute({ timeout: 120000 });
 
     expect(result).toBe(
-      "ERROR: timeout must be a positive finite number in seconds and must not exceed 3600 seconds (1 hour).",
+      "ERROR: timeout must be a positive finite number in seconds and must not exceed 1200 seconds (20 minutes).",
     );
     expect(getInvocations()).toHaveLength(0);
   });
 
-  it("accepts timeout=3600 at the boundary and forwards it to the helper", async () => {
+  it("accepts timeout=1200 at the boundary and forwards it to the helper", async () => {
     setDollarText(buildSuccessOutput("ok"));
     const execute = await loadToolExecute("../../run_pytest_basic.ts");
 
-    const result = await execute({ timeout: 3600, testPath: "adw/core/tests" });
+    const result = await execute({ timeout: 1200, testPath: "adw/core/tests" });
 
     expect(result).toBe("ok");
     const cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
-    expect(cmd).toContain("--timeout=3600");
+    expect(cmd).toContain("--timeout=1200");
     expect(cmd).toContain("adw/core/tests");
   });
 

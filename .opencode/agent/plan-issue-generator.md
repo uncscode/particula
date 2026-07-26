@@ -1,6 +1,6 @@
 ---
 description: >-
-  Primary agent that creates type:generate issues from finalized planner artifacts
+  Primary agent that creates type:generate-auto issues from finalized planner artifacts
   (messages + structured plan data) for epic, standalone feature, and standalone
   maintenance scenarios.
 
@@ -10,7 +10,7 @@ description: >-
     2. PR/issue body metadata with plan ID extraction (fallback)
   - Resolves canonical plan metadata and sections through adw_plans_read
   - Resolves targets deterministically for epic/feature/maintenance variants
-  - Creates type:generate issues via platform_issue_write create-issue
+  - Creates type:generate-auto issues via platform_issue_write create-issue
   - Enforces title and label contracts for generated issues
   - Writes bounded completion/failure summaries via adw_spec_messages messages-write
 mode: primary
@@ -33,7 +33,7 @@ permission:
 
 # Plan Issue Generator
 
-Create `type:generate` issues from finalized plan artifacts in a deterministic,
+Create `type:generate-auto` issues from finalized plan artifacts in a deterministic,
 bounded, and retry-safe way.
 
 # Input
@@ -157,7 +157,7 @@ If no usable messages exist and both sources fail:
 ### Epic Variant
 
 - Resolve child feature tracks from messages and/or epic plan references.
-- Create one `type:generate` issue per child feature track.
+- Create one `type:generate-auto` issue per child feature track.
 - If epic has zero usable tracks, perform deterministic no-op behavior:
   - no create-issue calls,
   - summary message explains "epic has zero child tracks".
@@ -165,12 +165,12 @@ If no usable messages exist and both sources fail:
 ### Standalone Feature Variant
 
 - Resolve one feature plan target.
-- Create exactly one `type:generate` issue.
+- Create exactly one `type:generate-auto` issue.
 
 ### Standalone Maintenance Variant
 
 - Resolve one maintenance plan target.
-- Create exactly one `type:generate` issue.
+- Create exactly one `type:generate-auto` issue.
 
 ## Step 4: Resolve Canonical Plan Data and Extract Issue Content
 
@@ -243,9 +243,9 @@ Use the canonical payload shape:
 ```python
 platform_issue_write({
   "command": "create-issue",
-  "title": "[{plan_id}] [type:generate] {Plan Title}",
+  "title": "[{plan_id}] [type:generate-auto] {Plan Title}",
   "body": issue_body,
-  "labels": "agent,blocked,type:generate,model:default"
+  "labels": "agent,blocked,type:generate-auto,model:default"
 })
 ```
 
@@ -253,7 +253,7 @@ platform_issue_write({
 
 Title format is exactly:
 
-`[{plan_id}] [type:generate] {Plan Title}`
+`[{plan_id}] [type:generate-auto] {Plan Title}`
 
 ### Title Prefix Contract
 
@@ -271,7 +271,7 @@ Title format is exactly:
 Labels must include:
 - `agent`
 - `blocked`
-- `type:generate`
+- `type:generate-auto`
 - `model:default`
 
 Registry-approved labels only:

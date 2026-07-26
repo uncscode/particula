@@ -84,6 +84,7 @@ class LinterResult:
 
 def _candidate_tool_dirs(cwd: Optional[str]) -> List[Path]:
     """Return likely executable directories that may be absent from tool PATH."""
+
     dirs: List[Path] = []
     if cwd:
         current = Path(cwd).resolve(strict=False)
@@ -97,10 +98,9 @@ def _candidate_tool_dirs(cwd: Optional[str]) -> List[Path]:
     return dirs
 
 
-def _resolve_python_tool_command(
-    tool_name: str, module_name: str, cwd: Optional[str]
-) -> List[str]:
+def _resolve_python_tool_command(tool_name: str, module_name: str, cwd: Optional[str]) -> List[str]:
     """Resolve a Python CLI robustly for non-login tool subprocess environments."""
+
     resolved = shutil.which(tool_name)
     if resolved:
         return [resolved]
@@ -131,9 +131,7 @@ def _count_ruff_issues(output: str) -> int:
     return 0
 
 
-def _apply_process_result(
-    result: LinterResult, proc: subprocess.CompletedProcess[str]
-) -> None:
+def _apply_process_result(result: LinterResult, proc: subprocess.CompletedProcess[str]) -> None:
     """Populate a linter result from a completed subprocess run.
 
     Args:
@@ -195,9 +193,7 @@ def _resolve_cwd(cwd: Optional[str]) -> str:
     if cwd is None:
         current = Path.cwd()
         while current != current.parent:
-            if (current / "pyproject.toml").exists() or (
-                current / ".git"
-            ).exists():
+            if (current / "pyproject.toml").exists() or (current / ".git").exists():
                 return str(current)
             current = current.parent
         return str(Path.cwd())
@@ -245,16 +241,10 @@ def run_ruff_check(
             # Step 1: Apply fixes. Match CI's `ruff check --fix || true` behavior:
             # keep diagnostics from a non-zero fix pass, but continue to format
             # and let the final validation check determine success/failure.
-            ruff_cmd = _resolve_python_tool_command(
-                "ruff", "ruff", resolved_cwd
-            )
+            ruff_cmd = _resolve_python_tool_command("ruff", "ruff", resolved_cwd)
             fix_cmd = [*ruff_cmd, "check", "--fix", target_arg]
             fix_proc = subprocess.run(
-                fix_cmd,
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-                cwd=resolved_cwd,
+                fix_cmd, capture_output=True, text=True, timeout=timeout, cwd=resolved_cwd
             )
             if fix_proc.returncode != 0:
                 result.stderr = fix_proc.stderr
@@ -264,11 +254,7 @@ def run_ruff_check(
             # Step 2: Format code
             format_cmd = [*ruff_cmd, "format", target_arg]
             format_proc = subprocess.run(
-                format_cmd,
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-                cwd=resolved_cwd,
+                format_cmd, capture_output=True, text=True, timeout=timeout, cwd=resolved_cwd
             )
             if format_proc.returncode != 0:
                 _apply_process_result(result, format_proc)
@@ -278,11 +264,7 @@ def run_ruff_check(
         ruff_cmd = _resolve_python_tool_command("ruff", "ruff", resolved_cwd)
         check_cmd = [*ruff_cmd, "check", target_arg]
         proc = subprocess.run(
-            check_cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            cwd=resolved_cwd,
+            check_cmd, capture_output=True, text=True, timeout=timeout, cwd=resolved_cwd
         )
 
         _apply_process_result(result, proc)
@@ -313,9 +295,7 @@ def run_ruff_check(
 
 
 def run_ruff_format(
-    target_dir: Optional[str] = None,
-    timeout: int = 120,
-    cwd: Optional[str] = None,
+    target_dir: Optional[str] = None, timeout: int = 120, cwd: Optional[str] = None
 ) -> LinterResult:
     """Run ``ruff format`` for explicit formatting-only execution.
 
@@ -337,17 +317,9 @@ def run_ruff_format(
     try:
         resolved_cwd = _resolve_cwd(cwd)
         target_arg = _resolve_target_arg(target_dir, resolved_cwd)
-        cmd = [
-            *_resolve_python_tool_command("ruff", "ruff", resolved_cwd),
-            "format",
-            target_arg,
-        ]
+        cmd = [*_resolve_python_tool_command("ruff", "ruff", resolved_cwd), "format", target_arg]
         proc = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            cwd=resolved_cwd,
+            cmd, capture_output=True, text=True, timeout=timeout, cwd=resolved_cwd
         )
 
         result.exit_code = proc.returncode
@@ -379,9 +351,7 @@ def run_ruff_format(
 
 
 def run_mypy(
-    target_dir: Optional[str] = None,
-    timeout: int = 180,
-    cwd: Optional[str] = None,
+    target_dir: Optional[str] = None, timeout: int = 180, cwd: Optional[str] = None
 ) -> LinterResult:
     """Run mypy in validation-only mode.
 
@@ -405,11 +375,7 @@ def run_mypy(
             "--ignore-missing-imports",
         ]
         proc = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            cwd=resolved_cwd,
+            cmd, capture_output=True, text=True, timeout=timeout, cwd=resolved_cwd
         )
 
         result.exit_code = proc.returncode
@@ -419,9 +385,7 @@ def run_mypy(
 
         # Count errors in output
         # Mypy outputs errors on individual lines
-        error_lines = [
-            line for line in result.stdout.split("\n") if ": error:" in line
-        ]
+        error_lines = [line for line in result.stdout.split("\n") if ": error:" in line]
         result.issues_found = len(error_lines)
 
     except subprocess.TimeoutExpired:
@@ -583,15 +547,11 @@ def run_linters(
 
     # Ruff check includes format when auto_fix=True (matching CI workflow)
     if "ruff" in linters or "ruff_check" in linters:
-        results.append(
-            run_ruff_check(target_dir, auto_fix, ruff_timeout, cwd=resolved_cwd)
-        )
+        results.append(run_ruff_check(target_dir, auto_fix, ruff_timeout, cwd=resolved_cwd))
 
     # Allow running format separately for testing
     elif "ruff_format" in linters:
-        results.append(
-            run_ruff_format(target_dir, ruff_timeout, cwd=resolved_cwd)
-        )
+        results.append(run_ruff_format(target_dir, ruff_timeout, cwd=resolved_cwd))
 
     if "mypy" in linters:
         results.append(run_mypy(target_dir, mypy_timeout, cwd=resolved_cwd))

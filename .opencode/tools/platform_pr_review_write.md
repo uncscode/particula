@@ -32,6 +32,13 @@ Subprocess failures return:
 
 ## Validation and Recovery Examples
 
+## Anchored review safety
+
+Inline review admission validates the provider-specific anchor before spawning
+one selected provider action. Verification or post-dispatch failure returns the
+bounded deterministic error envelope and never sends an overview fallback.
+This preserves validation-before-spawn and compatibility-only legacy routing.
+
 Pre-spawn validation example (relation checks):
 
 ```text

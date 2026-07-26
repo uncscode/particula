@@ -5,6 +5,7 @@ type SpawnResponse = {
   stderrChunks?: string[];
   exitCode?: number;
   timedOut?: boolean;
+  hangs?: boolean;
 };
 
 type SpawnError = {
@@ -35,6 +36,7 @@ let dollarText = "";
 let dollarError: BunDollarError | null = null;
 
 const invocations: Invocation[] = [];
+let killCount = 0;
 
 const ensureBun = (): typeof Bun => {
   if ((globalThis as { Bun?: typeof Bun }).Bun) {
@@ -115,14 +117,23 @@ export const installSubprocessMocks = (): void => {
       throw new Error(spawnError.message ?? "");
     }
     let killed = false;
+    let resolveExit: ((exitCode: number) => void) | undefined;
+    const exited = spawnResponse.hangs
+      ? new Promise<number>((resolve) => {
+          resolveExit = resolve;
+        })
+      : Promise.resolve(spawnResponse.exitCode ?? 0);
     return {
       stdout: createStreamFromChunks(spawnResponse.stdoutChunks ?? [spawnResponse.stdout ?? ""]),
       stderr: createStreamFromChunks(spawnResponse.stderrChunks ?? [spawnResponse.stderr ?? ""]),
       kill() {
+        if (killed) return;
         killed = true;
+        killCount += 1;
+        resolveExit?.(0);
       },
       get exited() {
-        return Promise.resolve(killed ? 0 : (spawnResponse.exitCode ?? 0));
+        return exited;
       },
     } as unknown as ReturnType<typeof bunRef.spawn>;
   }) as typeof bunRef.spawn;
@@ -187,6 +198,8 @@ export const setDollarError = (error: BunDollarError): void => {
 
 export const getInvocations = (): Invocation[] => [...invocations];
 
+export const getKillCount = (): number => killCount;
+
 /** Reset mock behavior/captured calls while keeping monkeypatches installed. */
 export const resetSubprocessMocks = (): void => {
   spawnResponse = { stdout: "", stderr: "", exitCode: 0 };
@@ -194,6 +207,7 @@ export const resetSubprocessMocks = (): void => {
   dollarText = "";
   dollarError = null;
   invocations.length = 0;
+  killCount = 0;
 };
 
 /** Restore Bun globals to original state; call from afterEach for isolation. */
