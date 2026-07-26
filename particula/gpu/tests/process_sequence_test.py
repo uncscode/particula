@@ -221,10 +221,8 @@ def _resident_state(fixture: ProcessFixture, device: str) -> SimpleNamespace:
     transfer_shape = (boxes, particles_count, species)
     mass_transfer = wp.zeros(transfer_shape, dtype=wp.float64, device=device)
     scratch = CondensationScratchBuffers(
-        work_mass_transfer=wp.zeros(
-            transfer_shape, dtype=wp.float64, device=device
-        ),
-        total_mass_transfer=mass_transfer,
+        work_mass_transfer=None,
+        total_mass_transfer=None,
         dynamic_viscosity=wp.zeros(boxes, dtype=wp.float64, device=device),
         mean_free_path=wp.zeros(boxes, dtype=wp.float64, device=device),
         positive_mass_transfer_demand=wp.zeros(
@@ -687,6 +685,125 @@ def _assert_no_alias(*arrays: np.ndarray) -> None:
         for second in arrays[index + 1 :]
     ):
         raise ValueError("caller-owned sidecars must not share storage")
+
+
+def _require_warp_device(wp: Any, device: str) -> str:
+    """Return a requested Warp test device or skip when unavailable."""
+    if device not in warp_devices(wp):
+        pytest.skip(f"{device} not available")
+    return device
+
+
+def _install_conversion_guard(
+    monkeypatch: pytest.MonkeyPatch,
+) -> SimpleNamespace:
+    """Patch GPU conversion helpers to block intermediate host restores."""
+    import particula.gpu as gpu_module
+    import particula.gpu.conversion as conversion_module
+
+    guard = SimpleNamespace(
+        allow_final=False,
+        particle_calls=0,
+        gas_calls=0,
+        environment_calls=0,
+    )
+    wrapper_names = (
+        "from_warp_particle_data",
+        "from_warp_gas_data",
+        "from_warp_environment_data",
+    )
+    counters = {
+        "from_warp_particle_data": "particle_calls",
+        "from_warp_gas_data": "gas_calls",
+        "from_warp_environment_data": "environment_calls",
+    }
+
+    for name in wrapper_names:
+        original = getattr(conversion_module, name)
+
+        def wrapper(*args: Any, _name=name, _original=original, **kwargs: Any):
+            setattr(guard, counters[_name], getattr(guard, counters[_name]) + 1)
+            if not guard.allow_final:
+                raise AssertionError("intermediate from_warp_* restore blocked")
+            return _original(*args, **kwargs)
+
+        monkeypatch.setattr(conversion_module, name, wrapper)
+        monkeypatch.setattr(gpu_module, name, wrapper)
+
+    return guard
+
+
+def _assert_restored_cpu_conversion_matches(
+    fixture: ProcessFixture,
+    state: SimpleNamespace,
+    restored_particles: Any,
+    restored_gas: Any,
+    restored_environment: Any,
+) -> None:
+    """Compare restored CPU containers with explicit raw Warp snapshots."""
+    npt.assert_array_equal(
+        restored_particles.masses, state.particles.masses.numpy()
+    )
+    npt.assert_array_equal(
+        restored_particles.concentration,
+        state.particles.concentration.numpy(),
+    )
+    npt.assert_array_equal(
+        restored_particles.charge, state.particles.charge.numpy()
+    )
+    npt.assert_array_equal(
+        restored_particles.density, state.particles.density.numpy()
+    )
+    npt.assert_array_equal(
+        restored_particles.volume, state.particles.volume.numpy()
+    )
+    npt.assert_array_equal(
+        restored_gas.molar_mass, state.gas.molar_mass.numpy()
+    )
+    npt.assert_array_equal(
+        restored_gas.concentration,
+        state.gas.concentration.numpy(),
+    )
+    npt.assert_array_equal(
+        restored_gas.partitioning,
+        state.gas.partitioning.numpy()[0].astype(bool),
+    )
+    assert restored_gas.partitioning.dtype == np.bool_
+    npt.assert_array_equal(
+        restored_environment.temperature,
+        state.environment.temperature.numpy(),
+    )
+    npt.assert_array_equal(
+        restored_environment.pressure,
+        state.environment.pressure.numpy(),
+    )
+    npt.assert_array_equal(
+        restored_environment.saturation_ratio,
+        state.environment.saturation_ratio.numpy(),
+    )
+
+
+def _resident_snapshot_owners(
+    state: SimpleNamespace,
+) -> dict[str, dict[str, _ArraySnapshot]]:
+    """Snapshot all resident caller-owned arrays and nested sidecars."""
+    return _snapshot_owners(
+        particles=state.particles,
+        gas=state.gas,
+        environment=state.environment,
+        scratch=state.scratch,
+        mass_transfer=state.mass_transfer,
+        thermodynamics=state.thermodynamics,
+        collision_pairs=state.collision_pairs,
+        collision_counts=state.collision_counts,
+        coagulation_rng=state.coagulation_rng,
+        wall_rng=state.wall_rng,
+        nucleation_scratch=state.nucleation_scratch,
+        finalized=state.finalized,
+        diagnostics=state.diagnostics,
+        exhaustion=state.exhaustion,
+        resampling_buffers=state.exhaustion.resampling_buffers,
+    )
 
 
 @pytest.mark.parametrize(
@@ -1152,16 +1269,14 @@ def test_warp_mirrors_fresh_fixture_and_preserves_stale_sidecars() -> None:
         )
 
 
-@pytest.mark.warp
-@pytest.mark.gpu_parity
-@pytest.mark.parametrize(
-    "fixture", _build_process_fixtures(), ids=lambda item: item.name
-)
-def test_resident_sequence_composes_five_direct_boundaries(
+def _run_resident_sequence_on_device(
     fixture: ProcessFixture,
-) -> None:
-    """Compose every shipped direct boundary without restoring host state."""
+    device: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[SimpleNamespace, SimpleNamespace]:
+    """Run the full direct-GPU resident sequence on one Warp device."""
     wp = pytest.importorskip("warp")
+    import particula.gpu as gpu_module
     from particula.gpu.kernels import (
         coagulation_step_gpu,
         condensation_step_gpu,
@@ -1175,19 +1290,22 @@ def test_resident_sequence_composes_five_direct_boundaries(
     )
     from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
 
-    state = _resident_state(_resident_sequence_fixture(fixture), "cpu")
+    state = _resident_state(_resident_sequence_fixture(fixture), device)
+    guard = _install_conversion_guard(monkeypatch)
     wp.synchronize()
     initial_inventory = _particle_plus_gas_inventory(
         state.particles.masses.numpy(),
         state.particles.concentration.numpy(),
         state.gas.concentration.numpy(),
     )
+
     condensed_particles, transfer = condensation_step_gpu(
         state.particles,
         state.gas,
         None,
         None,
         0.01,
+        mass_transfer=state.mass_transfer,
         environment=state.environment,
         thermodynamics=state.thermodynamics,
         scratch_buffers=state.scratch,
@@ -1267,7 +1385,7 @@ def test_resident_sequence_composes_five_direct_boundaries(
     wall_config = NeutralWallLossConfig(
         "spherical",
         0.01,
-        chamber_radius=1.0,
+        chamber_radius=np.nextafter(0.0, 1.0),
         mode="charged",
         wall_potential=-12.0,
         wall_electric_field=3.0,
@@ -1361,6 +1479,86 @@ def test_resident_sequence_composes_five_direct_boundaries(
         state.diagnostics.free_slot_counts.numpy() <= fixture.masses.shape[1]
     )
 
+    wp.synchronize()
+    raw_particle = state.particles.masses.numpy().copy()
+    raw_concentration = state.particles.concentration.numpy().copy()
+    raw_charge = state.particles.charge.numpy().copy()
+    raw_density = state.particles.density.numpy().copy()
+    raw_volume = state.particles.volume.numpy().copy()
+    raw_gas_molar_mass = state.gas.molar_mass.numpy().copy()
+    raw_gas_concentration = state.gas.concentration.numpy().copy()
+    raw_partitioning = state.gas.partitioning.numpy().copy()
+    raw_temperature = state.environment.temperature.numpy().copy()
+    raw_pressure = state.environment.pressure.numpy().copy()
+    raw_saturation_ratio = state.environment.saturation_ratio.numpy().copy()
+    guard.allow_final = True
+    restored_particles = gpu_module.from_warp_particle_data(
+        state.particles, sync=False
+    )
+    restored_gas = gpu_module.from_warp_gas_data(state.gas, sync=False)
+    restored_environment = gpu_module.from_warp_environment_data(
+        state.environment, sync=False
+    )
+    _assert_restored_cpu_conversion_matches(
+        fixture,
+        state,
+        restored_particles,
+        restored_gas,
+        restored_environment,
+    )
+    npt.assert_array_equal(restored_particles.masses, raw_particle)
+    npt.assert_array_equal(restored_particles.concentration, raw_concentration)
+    npt.assert_array_equal(restored_particles.charge, raw_charge)
+    npt.assert_array_equal(restored_particles.density, raw_density)
+    npt.assert_array_equal(restored_particles.volume, raw_volume)
+    npt.assert_array_equal(restored_gas.molar_mass, raw_gas_molar_mass)
+    npt.assert_array_equal(restored_gas.concentration, raw_gas_concentration)
+    npt.assert_array_equal(
+        restored_gas.partitioning,
+        raw_partitioning[0].astype(bool),
+    )
+    npt.assert_array_equal(
+        restored_environment.temperature,
+        raw_temperature,
+    )
+    npt.assert_array_equal(restored_environment.pressure, raw_pressure)
+    npt.assert_array_equal(
+        restored_environment.saturation_ratio,
+        raw_saturation_ratio,
+    )
+    return state, guard
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "fixture", _build_process_fixtures(), ids=lambda item: item.name
+)
+def test_resident_sequence_composes_five_direct_boundaries(
+    fixture: ProcessFixture,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Compose every shipped direct boundary without restoring host state."""
+    _run_resident_sequence_on_device(fixture, "cpu", monkeypatch)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.cuda
+@pytest.mark.parametrize(
+    "fixture",
+    [_build_process_fixtures()[1]],
+    ids=lambda item: item.name,
+)
+def test_resident_sequence_composes_five_direct_boundaries_cuda(
+    fixture: ProcessFixture,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Compose the resident direct sequence on the optional CUDA row."""
+    wp = pytest.importorskip("warp")
+    _require_warp_device(wp, "cuda")
+    _run_resident_sequence_on_device(fixture, "cuda", monkeypatch)
+
 
 @pytest.mark.warp
 @pytest.mark.gpu_parity
@@ -1385,6 +1583,7 @@ def test_condensation_preserves_disabled_original_fixture_lanes(
         None,
         None,
         0.01,
+        mass_transfer=state.mass_transfer,
         environment=state.environment,
         thermodynamics=state.thermodynamics,
         scratch_buffers=state.scratch,
@@ -1399,3 +1598,595 @@ def test_condensation_preserves_disabled_original_fixture_lanes(
             state.gas.concentration.numpy()[box, disabled[box]],
             gas_before[box, disabled[box]],
         )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "fixture", _build_process_fixtures(), ids=lambda item: item.name
+)
+def test_zero_time_direct_calls_are_byte_exact_no_op(
+    fixture: ProcessFixture,
+) -> None:
+    """Zero-time direct calls leave all resident caller-owned arrays unchanged."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels import (
+        coagulation_step_gpu,
+        condensation_step_gpu,
+        dilution_step_gpu,
+        nucleation_step_gpu,
+        wall_loss_step_gpu,
+    )
+    from particula.gpu.kernels.nucleation import (
+        NucleationConfig,
+        NucleationExhaustionControls,
+    )
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    state = _resident_state(_resident_sequence_fixture(fixture), "cpu")
+    particle_before = {
+        "masses": state.particles.masses.numpy().copy(),
+        "concentration": state.particles.concentration.numpy().copy(),
+        "charge": state.particles.charge.numpy().copy(),
+        "density": state.particles.density.numpy().copy(),
+        "volume": state.particles.volume.numpy().copy(),
+    }
+    gas_before = {
+        "concentration": state.gas.concentration.numpy().copy(),
+        "molar_mass": state.gas.molar_mass.numpy().copy(),
+        "partitioning": state.gas.partitioning.numpy().copy(),
+    }
+    environment_before = {
+        "temperature": state.environment.temperature.numpy().copy(),
+        "pressure": state.environment.pressure.numpy().copy(),
+        "saturation_ratio": state.environment.saturation_ratio.numpy().copy(),
+    }
+    coagulation_rng_before = state.coagulation_rng.numpy().copy()
+    wall_rng_before = state.wall_rng.numpy().copy()
+
+    condensation_step_gpu(
+        state.particles,
+        state.gas,
+        None,
+        None,
+        0.0,
+        mass_transfer=state.mass_transfer,
+        environment=state.environment,
+        thermodynamics=state.thermodynamics,
+        scratch_buffers=state.scratch,
+    )
+    npt.assert_allclose(
+        state.gas.vapor_pressure.numpy(),
+        np.full_like(state.gas.vapor_pressure.numpy(), 1.0e-12),
+    )
+    coagulation_step_gpu(
+        state.particles,
+        None,
+        None,
+        0.0,
+        max_collisions=state.collision_pairs.shape[1],
+        collision_pairs=state.collision_pairs,
+        n_collisions=state.collision_counts,
+        rng_states=state.coagulation_rng,
+        initialize_rng=False,
+        environment=state.environment,
+    )
+    dilution_step_gpu(state.particles, state.gas, 0.2, 0.0)
+    wall_loss_step_gpu(
+        state.particles,
+        None,
+        None,
+        0.0,
+        config=NeutralWallLossConfig(
+            "spherical",
+            0.01,
+            chamber_radius=np.nextafter(0.0, 1.0),
+            mode="charged",
+            wall_potential=-12.0,
+            wall_electric_field=3.0,
+        ),
+        rng_states=state.wall_rng,
+        initialize_rng=False,
+        environment=state.environment,
+    )
+    nucleation_step_gpu(
+        state.particles,
+        state.gas,
+        NucleationConfig(
+            rate_law="activation",
+            coefficient=1.0e-12,
+            survival_factor=1.0,
+            precursor_index=0,
+            molecule_counts=(1, 0),
+            formation_diameter=1.0e-9,
+            precursor_number_concentration_lower=0.0,
+            precursor_number_concentration_upper=1.0e30,
+            temperature_lower=200.0,
+            temperature_upper=400.0,
+        ),
+        0.0,
+        scratch=state.nucleation_scratch,
+        finalized_demand=state.finalized,
+        diagnostics=state.diagnostics,
+        exhaustion_controls=NucleationExhaustionControls(True, True),
+        exhaustion_buffers=state.exhaustion,
+        environment=state.environment,
+    )
+
+    npt.assert_array_equal(
+        state.particles.masses.numpy(), particle_before["masses"]
+    )
+    npt.assert_array_equal(
+        state.particles.concentration.numpy(), particle_before["concentration"]
+    )
+    npt.assert_array_equal(
+        state.particles.charge.numpy(), particle_before["charge"]
+    )
+    npt.assert_array_equal(
+        state.particles.density.numpy(), particle_before["density"]
+    )
+    npt.assert_array_equal(
+        state.particles.volume.numpy(), particle_before["volume"]
+    )
+    npt.assert_array_equal(
+        state.gas.concentration.numpy(), gas_before["concentration"]
+    )
+    npt.assert_array_equal(
+        state.gas.molar_mass.numpy(), gas_before["molar_mass"]
+    )
+    npt.assert_array_equal(
+        state.gas.partitioning.numpy(), gas_before["partitioning"]
+    )
+    npt.assert_array_equal(
+        state.environment.temperature.numpy(), environment_before["temperature"]
+    )
+    npt.assert_array_equal(
+        state.environment.pressure.numpy(), environment_before["pressure"]
+    )
+    npt.assert_array_equal(
+        state.environment.saturation_ratio.numpy(),
+        environment_before["saturation_ratio"],
+    )
+    npt.assert_array_equal(
+        state.coagulation_rng.numpy(), coagulation_rng_before
+    )
+    npt.assert_array_equal(state.wall_rng.numpy(), wall_rng_before)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "fixture", _build_process_fixtures(), ids=lambda item: item.name
+)
+def test_zero_dilution_coefficient_is_byte_exact_no_op(
+    fixture: ProcessFixture,
+) -> None:
+    """A zero dilution coefficient leaves resident state byte-for-byte exact."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels import dilution_step_gpu
+
+    state = _resident_state(_resident_sequence_fixture(fixture), "cpu")
+    before = _resident_snapshot_owners(state)
+    dilution_step_gpu(state.particles, state.gas, 0.0, 1.0)
+    _assert_snapshot_unchanged(
+        before,
+        particles=state.particles,
+        gas=state.gas,
+        environment=state.environment,
+        scratch=state.scratch,
+        mass_transfer=state.mass_transfer,
+        thermodynamics=state.thermodynamics,
+        collision_pairs=state.collision_pairs,
+        collision_counts=state.collision_counts,
+        coagulation_rng=state.coagulation_rng,
+        wall_rng=state.wall_rng,
+        nucleation_scratch=state.nucleation_scratch,
+        finalized=state.finalized,
+        diagnostics=state.diagnostics,
+        exhaustion=state.exhaustion,
+        resampling_buffers=state.exhaustion.resampling_buffers,
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        (
+            "scratch_buffers",
+            object(),
+            "scratch_buffers must be a CondensationScratchBuffers",
+        ),
+        (
+            "thermodynamics",
+            object(),
+            "thermodynamics must be a ThermodynamicsConfig",
+        ),
+    ],
+)
+def test_condensation_preflight_rejects_invalid_metadata_without_mutation(
+    field: str,
+    value: Any,
+    message: str,
+) -> None:
+    """Condensation rejects invalid metadata before any caller-owned mutation."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels import condensation_step_gpu
+
+    fixture = _build_process_fixtures()[0]
+    state = _resident_state(_resident_sequence_fixture(fixture), "cpu")
+    before = _resident_snapshot_owners(state)
+    kwargs: dict[str, Any] = {
+        "mass_transfer": state.mass_transfer,
+        "environment": state.environment,
+        "thermodynamics": state.thermodynamics,
+        "scratch_buffers": state.scratch,
+    }
+    kwargs[field] = value
+    with pytest.raises(ValueError, match=message):
+        condensation_step_gpu(
+            state.particles,
+            state.gas,
+            None,
+            None,
+            0.0,
+            **kwargs,
+        )
+    _assert_snapshot_unchanged(
+        before,
+        particles=state.particles,
+        gas=state.gas,
+        environment=state.environment,
+        scratch=state.scratch,
+        mass_transfer=state.mass_transfer,
+        thermodynamics=state.thermodynamics,
+        collision_pairs=state.collision_pairs,
+        collision_counts=state.collision_counts,
+        coagulation_rng=state.coagulation_rng,
+        wall_rng=state.wall_rng,
+        nucleation_scratch=state.nucleation_scratch,
+        finalized=state.finalized,
+        diagnostics=state.diagnostics,
+        exhaustion=state.exhaustion,
+        resampling_buffers=state.exhaustion.resampling_buffers,
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        (
+            "collision_pairs",
+            "warp_float64",
+            "collision_pairs buffer must use dtype int32",
+        ),
+        (
+            "rng_states",
+            "warp_float64",
+            "rng_states buffer must use dtype uint32",
+        ),
+    ],
+)
+def test_coagulation_preflight_rejects_invalid_output_schema_without_mutation(
+    field: str,
+    value: Any,
+    message: str,
+) -> None:
+    """Coagulation rejects malformed output buffers before setup."""
+    wp = pytest.importorskip("warp")
+    from particula.gpu.kernels import coagulation_step_gpu
+
+    fixture = _build_process_fixtures()[0]
+    state = _resident_state(_resident_sequence_fixture(fixture), "cpu")
+    before = _resident_snapshot_owners(state)
+    kwargs: dict[str, Any] = {
+        "max_collisions": state.collision_pairs.shape[1],
+        "collision_pairs": state.collision_pairs,
+        "n_collisions": state.collision_counts,
+        "rng_states": state.coagulation_rng,
+        "environment": state.environment,
+    }
+    if value == "warp_float64" and field == "collision_pairs":
+        value = wp.zeros((1, 4, 2), dtype=wp.float64, device="cpu")
+    elif value == "warp_float64":
+        value = wp.zeros(1, dtype=wp.float64, device="cpu")
+    kwargs[field] = value
+    with pytest.raises(ValueError, match=message):
+        coagulation_step_gpu(
+            state.particles,
+            None,
+            None,
+            0.0,
+            **kwargs,
+        )
+    _assert_snapshot_unchanged(
+        before,
+        particles=state.particles,
+        gas=state.gas,
+        environment=state.environment,
+        scratch=state.scratch,
+        mass_transfer=state.mass_transfer,
+        thermodynamics=state.thermodynamics,
+        collision_pairs=state.collision_pairs,
+        collision_counts=state.collision_counts,
+        coagulation_rng=state.coagulation_rng,
+        wall_rng=state.wall_rng,
+        nucleation_scratch=state.nucleation_scratch,
+        finalized=state.finalized,
+        diagnostics=state.diagnostics,
+        exhaustion=state.exhaustion,
+        resampling_buffers=state.exhaustion.resampling_buffers,
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("coefficient", "warp_int32", "coefficient must use"),
+        ("coefficient", -0.1, "coefficient must be finite and nonnegative"),
+        ("time_step", -1.0, "time_step"),
+    ],
+)
+def test_dilution_preflight_rejects_invalid_inputs_without_mutation(
+    field: str,
+    value: Any,
+    message: str,
+) -> None:
+    """Dilution rejects malformed coefficient or time-step inputs first."""
+    wp = pytest.importorskip("warp")
+    from particula.gpu.kernels import dilution_step_gpu
+
+    fixture = _build_process_fixtures()[0]
+    state = _resident_state(_resident_sequence_fixture(fixture), "cpu")
+    before = _resident_snapshot_owners(state)
+    args: dict[str, Any] = {
+        "coefficient": np.float64(0.0),
+        "time_step": 1.0,
+    }
+    if field == "coefficient" and value == "warp_int32":
+        value = wp.array([1], dtype=wp.int32, device="cpu")
+    args[field] = value
+    with pytest.raises((TypeError, ValueError), match=message):
+        dilution_step_gpu(state.particles, state.gas, **args)
+    _assert_snapshot_unchanged(
+        before,
+        particles=state.particles,
+        gas=state.gas,
+        environment=state.environment,
+        scratch=state.scratch,
+        mass_transfer=state.mass_transfer,
+        thermodynamics=state.thermodynamics,
+        collision_pairs=state.collision_pairs,
+        collision_counts=state.collision_counts,
+        coagulation_rng=state.coagulation_rng,
+        wall_rng=state.wall_rng,
+        nucleation_scratch=state.nucleation_scratch,
+        finalized=state.finalized,
+        diagnostics=state.diagnostics,
+        exhaustion=state.exhaustion,
+        resampling_buffers=state.exhaustion.resampling_buffers,
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        (
+            "config",
+            None,
+            "config must be a NeutralWallLossConfig",
+        ),
+        (
+            "rng_states",
+            "warp_float64",
+            "rng_states must use dtype uint32",
+        ),
+    ],
+)
+def test_wall_loss_preflight_rejects_invalid_configuration_without_mutation(
+    field: str,
+    value: Any,
+    message: str,
+) -> None:
+    """Wall loss rejects invalid configuration and RNG schema before launch."""
+    wp = pytest.importorskip("warp")
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    fixture = _build_process_fixtures()[0]
+    state = _resident_state(_resident_sequence_fixture(fixture), "cpu")
+    before = _resident_snapshot_owners(state)
+    config = NeutralWallLossConfig(
+        "spherical",
+        0.01,
+        chamber_radius=1.0,
+        mode="charged",
+        wall_potential=-12.0,
+        wall_electric_field=3.0,
+    )
+    kwargs: dict[str, Any] = {
+        "config": config,
+        "rng_states": state.wall_rng,
+        "initialize_rng": True,
+        "environment": state.environment,
+    }
+    if field == "rng_states" and value == "warp_float64":
+        kwargs[field] = wp.zeros(1, dtype=wp.float64, device="cpu")
+    else:
+        kwargs[field] = value
+    with pytest.raises((TypeError, ValueError), match=message):
+        wall_loss_step_gpu(
+            state.particles,
+            None,
+            None,
+            0.0,
+            **kwargs,
+        )
+    _assert_snapshot_unchanged(
+        before,
+        particles=state.particles,
+        gas=state.gas,
+        environment=state.environment,
+        scratch=state.scratch,
+        mass_transfer=state.mass_transfer,
+        thermodynamics=state.thermodynamics,
+        collision_pairs=state.collision_pairs,
+        collision_counts=state.collision_counts,
+        coagulation_rng=state.coagulation_rng,
+        wall_rng=state.wall_rng,
+        nucleation_scratch=state.nucleation_scratch,
+        finalized=state.finalized,
+        diagnostics=state.diagnostics,
+        exhaustion=state.exhaustion,
+        resampling_buffers=state.exhaustion.resampling_buffers,
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("scratch", object(), "scratch must be NucleationScratchBuffers"),
+        (
+            "exhaustion_controls",
+            object(),
+            "controls must be NucleationExhaustionControls",
+        ),
+    ],
+)
+def test_nucleation_preflight_rejects_invalid_inputs_without_mutation(
+    field: str,
+    value: Any,
+    message: str,
+) -> None:
+    """Nucleation rejects bad P1 or public-P4 inputs before any mutation."""
+    pytest.importorskip("warp")
+    from particula.gpu.kernels import nucleation_step_gpu
+    from particula.gpu.kernels.nucleation import (
+        NucleationConfig,
+        NucleationExhaustionControls,
+    )
+
+    fixture = _build_process_fixtures()[0]
+    state = _resident_state(_resident_sequence_fixture(fixture), "cpu")
+    before = _resident_snapshot_owners(state)
+    kwargs: dict[str, Any] = {
+        "scratch": state.nucleation_scratch,
+        "finalized_demand": state.finalized,
+        "diagnostics": state.diagnostics,
+        "exhaustion_controls": NucleationExhaustionControls(True, True),
+        "exhaustion_buffers": state.exhaustion,
+        "environment": state.environment,
+    }
+    kwargs[field] = value
+    with pytest.raises(ValueError, match=message):
+        nucleation_step_gpu(
+            state.particles,
+            state.gas,
+            NucleationConfig(
+                rate_law="activation",
+                coefficient=1.0e-12,
+                survival_factor=1.0,
+                precursor_index=0,
+                molecule_counts=(1, 0),
+                formation_diameter=1.0e-9,
+                precursor_number_concentration_lower=0.0,
+                precursor_number_concentration_upper=1.0e30,
+                temperature_lower=200.0,
+                temperature_upper=400.0,
+            ),
+            0.0,
+            **kwargs,
+        )
+    _assert_snapshot_unchanged(
+        before,
+        particles=state.particles,
+        gas=state.gas,
+        environment=state.environment,
+        scratch=state.scratch,
+        mass_transfer=state.mass_transfer,
+        thermodynamics=state.thermodynamics,
+        collision_pairs=state.collision_pairs,
+        collision_counts=state.collision_counts,
+        coagulation_rng=state.coagulation_rng,
+        wall_rng=state.wall_rng,
+        nucleation_scratch=state.nucleation_scratch,
+        finalized=state.finalized,
+        diagnostics=state.diagnostics,
+        exhaustion=state.exhaustion,
+        resampling_buffers=state.exhaustion.resampling_buffers,
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.stochastic
+def test_neutral_wall_loss_aggregate_removal_stays_within_binomial_band() -> (
+    None
+):
+    """Aggregate neutral wall-loss removals stay within a 3-sigma band."""
+    wp = pytest.importorskip("warp")
+    from particula.dynamics.properties.wall_loss_coefficient import (
+        get_spherical_wall_loss_coefficient_via_system_state,
+    )
+    from particula.gpu.kernels import wall_loss_step_gpu
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    trials = 100
+    time_step = 100.0
+    particle_radius = 1.0e-7
+    particle_density = 1000.0
+    temperature = 298.15
+    pressure = 101325.0
+    chamber_radius = 0.5
+    wall_eddy_diffusivity = 0.01
+    coefficient = get_spherical_wall_loss_coefficient_via_system_state(
+        wall_eddy_diffusivity=wall_eddy_diffusivity,
+        particle_radius=particle_radius,
+        particle_density=particle_density,
+        temperature=temperature,
+        pressure=pressure,
+        chamber_radius=chamber_radius,
+    )
+    expected_probability = 1.0 - np.exp(-float(coefficient) * time_step)
+    expected_mean = trials * expected_probability
+    bound = _binomial_three_sigma_bound(expected_probability, trials)
+    config = NeutralWallLossConfig(
+        "spherical",
+        wall_eddy_diffusivity,
+        chamber_radius=chamber_radius,
+        mode="neutral",
+    )
+    removed = 0
+    for seed in range(trials):
+        particles = SimpleNamespace(
+            masses=wp.array(
+                [[[4.0 * np.pi * particle_radius**3 * particle_density / 3.0]]],
+                dtype=wp.float64,
+                device="cpu",
+            ),
+            concentration=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
+            charge=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
+            density=wp.array(
+                [particle_density], dtype=wp.float64, device="cpu"
+            ),
+            volume=wp.array([1.0], dtype=wp.float64, device="cpu"),
+        )
+        wall_loss_step_gpu(
+            particles,
+            temperature,
+            pressure,
+            time_step,
+            config=config,
+            rng_seed=seed,
+        )
+        removed += int(particles.concentration.numpy()[0, 0] == 0.0)
+
+    assert abs(removed - expected_mean) <= bound
