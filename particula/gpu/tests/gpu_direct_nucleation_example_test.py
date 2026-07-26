@@ -82,6 +82,38 @@ def test_direct_example_source_uses_only_documented_boundaries() -> None:
     ):
         assert required in source
     assert "from particula.dynamics import Nucleation" not in source
+    assert source.count("wp.synchronize()") == 1
+
+    restore_calls = {
+        node.func.id: node
+        for node in ast.walk(tree)
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id
+            in {
+                "from_warp_particle_data",
+                "from_warp_gas_data",
+                "from_warp_environment_data",
+            }
+        )
+    }
+    assert set(restore_calls) == {
+        "from_warp_particle_data",
+        "from_warp_gas_data",
+        "from_warp_environment_data",
+    }
+    for restore_call in restore_calls.values():
+        sync_keyword = next(
+            (
+                keyword.value
+                for keyword in restore_call.keywords
+                if keyword.arg == "sync"
+            ),
+            None,
+        )
+        assert isinstance(sync_keyword, ast.Constant)
+        assert sync_keyword.value is False
 
 
 def test_documented_command_timeout_is_actionable(

@@ -362,6 +362,12 @@ before the P5 particle/gas transfer. In these rate laws, `S` is the configured,
 dimensionless survival factor (not the saturation ratio); `c` is [kg/m³] and
 `M` is [kg/mol].
 
+Before P3 stages discrete events, `accepted_demand * volume` must be finite,
+nonnegative, integral, and representable as an `int32` event count. This
+representability rejection can occur after P2 has written its documented
+sidecars; particle/gas preservation and the existing rollback limits are
+unchanged.
+
 Direct P1 accepts finite nonnegative duration, coefficient, and survival;
 inclusive configured precursor bounds; positive temperature; optional configured
 saturation bounds; positive formation diameter [m]; and nonnegative integer

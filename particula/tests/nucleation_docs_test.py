@@ -156,6 +156,9 @@ def test_nucleation_documentation_exposes_supported_and_deferred_scope() -> (
     assert "concrete-only" in feature
     assert "successful\nno-op" in feature
     assert "Direct-Warp P1--P5 correspondence" in theory
+    assert "accepted_demand * volume" in theory
+    assert "representable as an `int32` event count" in theory
+    assert "after P2 has written its documented\nsidecars" in theory
     assert "gpu_direct_nucleation.py" in index
     assert "nucleation_step_gpu" in roadmap
     assert "CPU-only runnable, never a\n  GPU fallback" in agents

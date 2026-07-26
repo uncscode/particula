@@ -177,9 +177,12 @@ def run_example() -> tuple[ParticleData, GasData, EnvironmentData]:
     )
     assert returned_particles is gpu_particles and returned_gas is gpu_gas
     wp.synchronize()
-    restored_particles = from_warp_particle_data(gpu_particles)
-    restored_gas = from_warp_gas_data(gpu_gas, name=gas.name)
-    restored_environment = from_warp_environment_data(gpu_environment)
+    restored_particles = from_warp_particle_data(gpu_particles, sync=False)
+    restored_gas = from_warp_gas_data(gpu_gas, name=gas.name, sync=False)
+    restored_environment = from_warp_environment_data(
+        gpu_environment,
+        sync=False,
+    )
     assert restored_particles.masses.shape == (1, 2, 1)
     assert restored_gas.concentration.shape == (1, 1)
     assert int(np.count_nonzero(restored_particles.concentration)) == 1
