@@ -11880,6 +11880,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#complete-direct-process-illustration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete direct-process illustration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#cpu-slot-activation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -15344,6 +15355,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#complete-direct-process-illustration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete direct-process illustration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#cpu-slot-activation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -15688,6 +15710,22 @@ and planned expansions, see the
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParticleData</span>
 </code></pre></div>
+<h3 id="complete-direct-process-illustration">Complete direct-process illustration<a class="headerlink" href="#complete-direct-process-illustration" title="Permanent link">&para;</a></h3>
+<p>The <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py">complete direct-process source</a>
+is illustrative, not a production coordinator. It imports the five direct
+boundaries from <code>particula.gpu.kernels</code> in order: <code>condensation_step_gpu</code>,
+<code>coagulation_step_gpu</code>, <code>dilution_step_gpu</code>, <code>wall_loss_step_gpu</code>, then
+<code>nucleation_step_gpu</code>. CPU↔Warp conversion helpers remain under
+<code>particula.gpu</code>: use <code>to_warp_particle_data</code>, <code>to_warp_gas_data</code>, and
+<code>to_warp_environment_data</code> for one conversion per CPU container, select the
+device explicitly, then synchronize and restore once at the final checkpoint.
+Configuration and scratch sidecars remain concrete-module imports.
+Caller-owned sidecars have stable fixed shapes; persistent coagulation and
+wall-loss RNG is also caller-owned. There is no hidden transfer or CPU fallback,
+high-level <code>Runnable</code>, backend selector, scheduler, resident production loop, or
+transport API. See the <a href="../../particula/gpu/tests/process_sequence_test.py">private P2 evidence</a>,
+<a href="../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py">P3 regression</a>,
+and <a href="../Roadmap/data-oriented-gpu/#e6-roadmap-inventory">E6 inventory</a>.</p>
 <p><code>WarpParticleData</code>, <code>WarpEnvironmentData</code>, and <code>WarpGasData</code> are exported from
 <code>particula.gpu</code> only when Warp is available, so import them only behind an
 optional Warp guard:</p>

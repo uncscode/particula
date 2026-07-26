@@ -15082,10 +15082,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#active" class="md-nav__link">
+  <a href="#e6-roadmap-inventory" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Active
+        E6 roadmap inventory
       
     </span>
   </a>
@@ -15104,10 +15104,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#on-deck" class="md-nav__link">
+  <a href="#active" class="md-nav__link">
     <span class="md-ellipsis">
       
-        On Deck
+        Active
       
     </span>
   </a>
@@ -15198,11 +15198,11 @@ schedule.</p>
   processes easier to compose in clear simulation pipelines.</li>
 <li><strong>Particle and gas data containers</strong>: Complete migration from legacy facades
   toward explicit <code>ParticleData</code> and <code>GasData</code> containers.</li>
-<li><strong>GPU process completeness</strong>: Complete GPU dilution, wall loss, nucleation,
-  and fixed-capacity slot management through
+<li><strong>GPU process completeness</strong>: Maintain the shipped GPU dilution, wall loss,
+  nucleation, and fixed-capacity slot-management contracts from
   <a href="data-oriented-gpu/#epic-f-gpu-process-completeness">Epic F</a>.</li>
-<li><strong>GPU-resident user workflows</strong>: Prepare backend selection and high-level
-  simulation integration for on-deck
+<li><strong>GPU-resident user workflows</strong>: Advance backend selection and high-level
+  simulation integration through active
   <a href="data-oriented-gpu/#epic-g-backend-selection-and-gpu-resident-simulation">Epic G</a>.</li>
 <li><strong>Documentation and examples</strong>: Expand practical examples that connect feature
   guides, theory pages, and runnable notebooks.</li>
@@ -15324,15 +15324,80 @@ meets its exit bar, the next pending epic in the sequence becomes active.</p>
   additive masks; charge-conserving merges; deterministic and stochastic
   validation; explicit-transfer documentation and examples; and the ordered
   closeout gate. High-level <code>Runnable</code> integration remains deferred.</li>
-</ul>
-<h3 id="active">Active<a class="headerlink" href="#active" title="Permanent link">&para;</a></h3>
-<ul>
 <li><a href="data-oriented-gpu/#epic-f-gpu-process-completeness">Epic F: GPU Process Completeness</a>
-  is the next and currently active epic. It has shipped CPU nucleation alongside
-  CPU/GPU dilution, GPU wall loss, and fixed-capacity slot activation and
-  exhaustion handling; direct-Warp nucleation and GPU integration remain needed
-  for complete GPU-resident timesteps.</li>
+  (ADW plan E6) and all nine feature plans E6-F1 through E6-F9 are shipped.
+  The release supplies the bounded direct dilution, wall-loss, fixed-slot,
+  exhaustion, and nucleation contracts plus explicit five-call sequence
+  evidence. High-level GPU orchestration remains deferred to Epic G.</li>
 </ul>
+<h3 id="e6-roadmap-inventory">E6 roadmap inventory<a class="headerlink" href="#e6-roadmap-inventory" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Status text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../../../.opencode/plans/epics/E6.json"><code>E6</code></a></td>
+<td>GPU Process Completeness</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><a href="../../../.opencode/plans/features/E6-F1.json"><code>E6-F1</code></a></td>
+<td>CPU Dilution Strategy and Runnable Reference</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><a href="../../../.opencode/plans/features/E6-F2.json"><code>E6-F2</code></a></td>
+<td>Direct GPU Dilution with CPU Parity</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><a href="../../../.opencode/plans/features/E6-F3.json"><code>E6-F3</code></a></td>
+<td>Neutral Spherical and Rectangular GPU Wall Loss</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><a href="../../../.opencode/plans/features/E6-F4.json"><code>E6-F4</code></a></td>
+<td>Charged GPU Wall Loss with Neutral Fallback</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><a href="../../../.opencode/plans/features/E6-F5.json"><code>E6-F5</code></a></td>
+<td>CPU and GPU Fixed-Slot Activation and Diagnostics</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><a href="../../../.opencode/plans/features/E6-F6.json"><code>E6-F6</code></a></td>
+<td>CPU and GPU Slot Exhaustion Policies</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><a href="../../../.opencode/plans/features/E6-F7.json"><code>E6-F7</code></a></td>
+<td>CPU Nucleation and Particle-Source Process</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><a href="../../../.opencode/plans/features/E6-F8.json"><code>E6-F8</code></a></td>
+<td>Direct GPU Nucleation Process</td>
+<td>Shipped</td>
+</tr>
+<tr>
+<td><a href="../../../.opencode/plans/features/E6-F9.json"><code>E6-F9</code></a></td>
+<td>Integrated Validation Documentation and Epic Closeout</td>
+<td>Shipped</td>
+</tr>
+</tbody>
+</table>
+<p>The private <a href="../../../particula/gpu/tests/process_sequence_test.py">P2 sequence evidence</a>,
+<a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py">P3 source</a>,
+and <a href="../../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py">P3 regression</a>
+document an explicit five-call sequence. Its <code>condensation_step_gpu</code>,
+<code>coagulation_step_gpu</code>, <code>dilution_step_gpu</code>, <code>wall_loss_step_gpu</code>, and
+<code>nucleation_step_gpu</code> order is illustrative, not a production coordinator.</p>
 <h3 id="e5-roadmap-inventory">E5 roadmap inventory<a class="headerlink" href="#e5-roadmap-inventory" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -15408,8 +15473,8 @@ meets its exit bar, the next pending epic in the sequence becomes active.</p>
   and
   <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py">direct GPU coagulation example</a>.</li>
 </ul>
-<p>E5 and every E5 feature are shipped. Epic F is active next; Epic G is on deck.</p>
-<h3 id="on-deck">On Deck<a class="headerlink" href="#on-deck" title="Permanent link">&para;</a></h3>
+<p>E5, E6, and all of their feature plans are shipped. Epic G is active next.</p>
+<h3 id="active">Active<a class="headerlink" href="#active" title="Permanent link">&para;</a></h3>
 <ul>
 <li><a href="data-oriented-gpu/#epic-g-backend-selection-and-gpu-resident-simulation">Epic G: Backend Selection and GPU-Resident Simulation</a>
   follows Epic F. It will expose backend selection through user-facing APIs and
