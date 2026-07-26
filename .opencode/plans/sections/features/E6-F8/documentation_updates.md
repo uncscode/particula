@@ -1,6 +1,6 @@
 # Documentation Updates
 
-## P1--P4 delivered (#1438, #1439, #1440, #1441)
+## P1--P5 delivered (#1438, #1439, #1440, #1441, #1442)
 
 - `particula/gpu/kernels/nucleation.py` documents the concrete-only read-only
   P1 boundary, frozen record ownership, fixed-shape sidecars, and later-phase
@@ -19,7 +19,10 @@
    deferral of activation, particle/gas mutation, and an integrated GPU step.
    `docs/Features/Roadmap/data-oriented-gpu.md` and
    `docs/Features/nucleation_strategy_system.md` record the same private P4
-   contract. No user-facing API export was added.
+    contract. Issue #1442 adds the public-boundary docstring for the lazily
+    exported direct step and export regression coverage; configurations,
+    sidecars, and helpers remain concrete-only. No feature documentation or
+    example closeout was performed.
 
 ## Deferred P7 work
 

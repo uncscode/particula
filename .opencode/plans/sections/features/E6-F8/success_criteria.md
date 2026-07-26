@@ -34,7 +34,23 @@
 - [x] The distinct entered-primitive planning/commit failure boundary is
   documented and tested without claiming cross-primitive rollback.
 - [x] P4 remains concrete-only and adds no activation, particle/gas mutation,
-  public export, E6-F9 integration, fallback, resize, or hidden transfer.
+   public export, E6-F9 integration, fallback, resize, or hidden transfer.
+
+## P5 completion (#1442)
+
+- [x] `nucleation_step_gpu` is lazily exported as the sole kernel-package
+  nucleation symbol; concrete configuration, records, sidecars, and helpers
+  remain unexported.
+- [x] P1--P4 complete before bounded P5 handoff validation and one fused commit
+  initializes only finalized selected slots and removes matching finalized gas.
+- [x] Successful calls return identical particle/gas containers; zero-demand
+  rows are write-free and fixed schemas, protected fields, and preexisting slots
+  are preserved.
+- [x] Malformed/rebound P5 handoffs and other precommit failures preserve
+  particle/gas state, while P2--P4 and entered-E6-F6 sidecars retain their
+  documented mutation limits.
+- [x] The direct boundary adds no hidden transfer, CPU fallback, resize,
+  compaction, Runnable, or E6-F9 integration.
 
 - [ ] Plan metadata and implementation preserve mandatory E6-F5, E6-F6, and
   E6-F7 dependencies; E6-F9 can consume the intended low-level entry point.

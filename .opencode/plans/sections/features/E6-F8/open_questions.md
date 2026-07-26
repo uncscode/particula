@@ -51,4 +51,10 @@ E6-F7 source model and existing concrete direct-kernel conventions.
     insufficient scratch, impossible policies, and invalid final products reject
     before P4 writes or primitive entry, preserving all caller state. An entered
     E6-F6 primitive retains its documented mutation contract; P4 provides no
-    cross-primitive rollback.
+     cross-primitive rollback.
+- [x] What is P5's commit and rejection boundary?
+  - Decision (#1442): `nucleation_step_gpu(...)` composes P1--P4, validates the
+    finalized handoff, then performs one fused device commit of selected slots
+    and matching finalized gas removal. Rejected precommit calls leave particle
+    and gas state unchanged; phase-owned sidecars and entered E6-F6 primitives
+    retain their existing documented mutation boundaries.

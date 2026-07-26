@@ -57,11 +57,20 @@ run P6 parity and conservation checks before P7 documents the direct step.
     and separate entered-primitive boundary coverage on Warp CPU with optional
     CUDA skips.
 
-- [ ] **E6-F8-P5:** Add atomic direct GPU nucleation step with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Expose one low-level step that preflights all boxes, plans capacity, then commits matching particle activation and gas depletion on device.
-  - Files: `particula/gpu/kernels/nucleation.py`, `particula/gpu/kernels/__init__.py`, GPU kernel tests
-  - Tests: Return and supplied-buffer identity, repeated calls, all-box atomicity, explicit inputs, no fallback/transfer, and mutation boundaries.
+- [x] **E6-F8-P5:** Add atomic direct GPU nucleation step with unit tests
+  - Issue: #1442 | Size: S | Status: Complete (2026-07-25)
+  - Delivered: supported lazily exported `nucleation_step_gpu(...)` composes
+    P1--P4 and performs P5 handoff validation followed by one fused device
+    commit. It initializes only finalized selected free slots and subtracts the
+    matching finalized gas mass, returning the identical containers.
+  - Files: `particula/gpu/kernels/nucleation.py`,
+    `particula/gpu/kernels/__init__.py`,
+    `particula/gpu/kernels/tests/nucleation_test.py`, and
+    `particula/gpu/tests/kernel_exports_test.py`.
+  - Tests: nominal/multi-box commits, explicit and environment inputs, repeated
+    current-gas calls, P4 resampling/scaling integration, no-work paths,
+    malformed/rebound P5 handoffs, precommit atomicity, caller-sidecar identity,
+    and lazy-export/no-hidden-transfer guards.
 
 - [ ] **E6-F8-P6:** Validate CPU parity and per-species conservation with integration tests
   - Issue: TBD | Size: S | Status: Not Started

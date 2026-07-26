@@ -26,12 +26,12 @@
 - [x] Preflight P4/nested sidecars and expected plan failures before P4 writes or
   primitive entry (#1441), preserving complete caller snapshots; document that
   entered E6-F6 primitives retain their own no-rollback boundary.
-- [ ] Implement commit kernels that add represented particle source and subtract
-  the exact finalized gas mass only after every box is feasible.
-- [ ] Add `nucleation_step_gpu(...)` with stable return/identity behavior and
-  the intended lazy export in `particula/gpu/kernels/__init__.py`.
-- [ ] Confirm the step contains no conversion-helper call, `.numpy()` physics
-  path, CPU fallback, dynamic resize, or implicit synchronization contract.
+- [x] Implement one fused P5 commit that initializes finalized selected slots and
+   subtracts exact finalized gas mass only after all boxes are feasible (#1442).
+- [x] Add `nucleation_step_gpu(...)` with stable return/identity behavior and a
+   lazy export in `particula/gpu/kernels/__init__.py` (#1442).
+- [x] Guard the direct step against conversion helpers, `.numpy()` physics,
+   CPU fallback, dynamic resize, and implicit synchronization (#1442).
 
 ## Tooling / Tests
 
@@ -45,7 +45,10 @@
   coverage in `particula/gpu/kernels/tests/nucleation_test.py` (#1440).
 - [x] Add P4 co-located policy-oracle, final diagnostic, identity, failure
   snapshot, and entered-primitive-boundary coverage in
-  `particula/gpu/kernels/tests/nucleation_test.py` (#1441).
+   `particula/gpu/kernels/tests/nucleation_test.py` (#1441).
+- [x] Add P5 co-located commit, handoff-validation, atomicity, direct-input,
+  sidecar-identity, and no-hidden-transfer coverage, plus lazy-export tests
+  (#1442).
 - [ ] Add `nucleation_parity_test.py` with an independent float64 E6-F7 oracle,
   one/many boxes and species, sparse/full slots, and repeated calls.
 - [ ] Assert per-box/species represented particle-plus-gas conservation rather

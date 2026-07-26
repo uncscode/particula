@@ -55,7 +55,7 @@ particle/gas commit remain P5 work.
 
 ## Data / API / Workflow Changes
 
-### P1--P4 implementation status (#1438, #1439, #1440, #1441)
+### P1--P5 implementation status (#1438, #1439, #1440, #1441, #1442)
 
 P1 and private P2 implement the initial stages in
 `particula/gpu/kernels/nucleation.py`: frozen `NucleationConfig` and the three
@@ -86,10 +86,16 @@ planned precursor removal, and gate diagnostics, then commits only its
   `(n_boxes,)`; species diagnostics use `(n_boxes, n_species)`; request fields
   use `(n_boxes, n_particles[, n_species])` with `wp.int32` valid-prefix counts.
   Supplied arrays retain identity and unrequested index tails use `-1`.
-- **API Surface (deferred beyond P1):** Add keyword-oriented
-  `nucleation_step_gpu(particles, gas, ..., config=..., scratch=...)` under
-  `particula.gpu.kernels.nucleation`; lazily expose only the intended step from
-  `particula.gpu.kernels`. Keep config and sidecars concrete-module APIs.
+- **API Surface (#1442):** Keyword-oriented
+  `nucleation_step_gpu(particles, gas, ..., config=..., scratch=...)` is
+  implemented in `particula.gpu.kernels.nucleation` and lazily exposed only
+  from `particula.gpu.kernels`. Configuration, records, sidecars, and helpers
+  remain concrete-module APIs.
+- **P5 Commit:** After P1--P4 and bounded P5 handoff validation succeed, one
+  fused device launch writes event-mass lanes, concentration, and zero charge
+  for finalized selected slots and decrements participating gas by finalized
+  demand times event mass. Zero-demand rows are write-free; malformed handoffs
+  and field rebinding reject before this particle/gas commit.
 - **Mutation Contract:** Success may change selected particle mass,
   concentration/weight and charge, matching gas concentration, and only the
   E6-F6-authorized volume/weights. Density, metadata, shapes, devices, dtypes,

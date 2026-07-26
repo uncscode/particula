@@ -29,7 +29,13 @@ capacity rather than creating a second slot or exhaustion model.
   P2/P3 handoffs as immutable history, uses separate P4 workspace/output
   sidecars, selects fully viable resampling before scaling fallback, and writes
   final demand/count/free-prefix diagnostics. Expected all-box rejection
-  preserves every caller-owned state and sidecar before E6-F6 primitive entry.
+   preserves every caller-owned state and sidecar before E6-F6 primitive entry.
+
+- **Delivered P5 (#1442):** supported lazily exported
+  `particula.gpu.kernels.nucleation_step_gpu(...)`. It composes P1--P4 and uses
+  one fused device commit for finalized selected-slot activation and matching
+  gas removal. Caller-owned fixed-capacity containers and sidecars retain their
+  identity; precommit rejection preserves particle/gas state.
 
 - Device evaluation of E6-F7 activation `J=A*C` and kinetic `J=K*C^2` models,
   including the same SI conversions, closed validity domains, composition,
@@ -47,9 +53,10 @@ capacity rather than creating a second slot or exhaustion model.
 
 ## Out of Scope
 
-- **Still deferred after P4:** a direct execution entry point or export, slot
-  activation, particle or gas mutation, and any fallback allocation. P4 remains
-  a private device-policy seam with no E6-F9 integration.
+- **Still deferred after P5:** CPU parity/integration evidence and P7
+  documentation closeout; E6-F9 integration remains separate. The direct step
+  has no fallback allocation, high-level orchestration, or public concrete
+  sidecar/configuration export.
 
 - New nucleation equations, chemistry, extrapolation, or a full Vehkamaki/CNT,
   ion-induced, heterogeneous, or cluster-dynamics implementation.

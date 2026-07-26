@@ -819,17 +819,13 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   helpers remain concrete-only in `nucleation.particle_source`.
 - P5 preserves `Aerosol` and backing-data identity, uses equal current-gas
   substeps, and is atomic per attempted substep only. E6-F5 activation and
-  E6-F6 exhaustion primitives are dependencies. E6-F8 remains an unexported
-  direct-Warp seam: P2 plans survival-included, inventory-safe shared demand;
-  P3 stages exact provisional counts and E6-F5 slot diagnostics; and private
-  P4 consumes immutable P2/P3 handoffs to select fully viable resampling first
-  and representative-volume scaling for other exhausted rows. P4 uses
-  caller-owned same-device workspace, final diagnostics, and nested E6-F6
-  scratch. Expected all-box P4 rejection preserves particles, gas, P2/P3/P4
-  sidecars, and nested scratch before a primitive starts; no cross-primitive
-  rollback is promised after entry. The seam does not activate slots or mutate
-  source mass/gas. A direct public Warp path and E6-F9 integration remain
-  deferred.
+  E6-F6 exhaustion primitives are dependencies. The direct, same-device Warp
+  boundary imports with
+  `from particula.gpu.kernels import nucleation_step_gpu`. It composes private
+  P1--P4 seams before its fused P5 particle/gas commit; its configuration,
+  records, sidecars, and helpers remain concrete-only. CPU fallback, hidden
+  transfer, resizing, compaction, runnable/backend integration, and E6-F9
+  integration remain deferred.
 - Check concentration-weighted particle-plus-gas conservation at
   `rtol=1e-12, atol=1e-30`. Run `python docs/Examples/Nucleation/cpu_nucleation.py`,
   `pytest particula/tests/nucleation_docs_test.py -q -Werror`, and

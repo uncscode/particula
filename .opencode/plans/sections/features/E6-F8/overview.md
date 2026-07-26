@@ -17,7 +17,7 @@
   - As a library maintainer, I want fixed-shape sidecars and fail-before-write
    validation so invalid calls cannot partially mutate simulation state.
 
-## Delivered: P1 (#1438), P2 (#1439), P3 (#1440), and P4 (#1441)
+## Delivered: P1 (#1438), P2 (#1439), P3 (#1440), P4 (#1441), and P5 (#1442)
 
 `particula/gpu/kernels/nucleation.py` now provides the concrete-only, read-only
 P1 boundary with frozen configuration and caller-owned sidecar dataclasses plus
@@ -50,5 +50,15 @@ rejections occur before P4 workspace writes or primitive entry and preserve
 particle, gas, P2, P3, P4, and nested scratch state. Once a primitive is
 entered, its documented no-rollback boundary applies; P4 claims no
 cross-primitive rollback. P4 adds no public API, E6-F9 integration, or direct
-activation; selected E6-F6 primitives may mutate documented particle fields,
-while P4 does not mutate gas or source mass.
+ activation; selected E6-F6 primitives may mutate documented particle fields,
+ while P4 does not mutate gas or source mass.
+
+Issue #1442 delivers P5 as the supported, lazily exported
+`particula.gpu.kernels.nucleation_step_gpu(...)` boundary. It composes P1--P4,
+validates the finalized P4 handoff, and launches one fused device commit that
+initializes only selected fixed-capacity slots and removes the corresponding
+finalized gas inventory. It returns the identical particle and gas containers.
+Precommit rejections preserve particle/gas state; P2--P4 sidecars retain their
+phase-owned mutation boundaries, and entered E6-F6 primitive limits still
+apply. The direct same-device path adds no transfer, CPU fallback, resize,
+compaction, Runnable, or E6-F9 integration.

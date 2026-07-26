@@ -1,4 +1,4 @@
-"""Define concrete-only P1--P4 GPU nucleation planning seams.
+"""Define direct-Warp GPU nucleation planning seams and one public step.
 
 This unexported module validates fixed-capacity particle, gas, environment,
 and caller-owned sidecar schemas for a direct-Warp nucleation path. P1 is
@@ -12,12 +12,15 @@ diagnostics, and records only the deterministic free-slot prefix that is
 currently selectable. It retains counts beyond free capacity and performs no
 activation or particle/gas transaction. Private P4 consumes immutable P2/P3
 handoffs, applies resampling before optional representative-volume scaling, and
-writes only its caller-owned finalized diagnostics. It remains unexported.
+writes only its caller-owned finalized diagnostics. The public
+``nucleation_step_gpu`` then validates P4's handoff and performs one fused P5
+particle/gas commit.
 
 The preflight accepts only same-device, contiguous Warp arrays with fixed
 shapes. Frozen records prevent rebinding their fields but do not copy, freeze,
-or otherwise transfer their caller-owned arrays. Nothing in this module is
-exported through ``particula.gpu.kernels`` or ``particula.gpu``.
+or otherwise transfer their caller-owned arrays. Only ``nucleation_step_gpu``
+is lazily exported through ``particula.gpu.kernels``; all records and helpers
+remain concrete-module-only.
 """
 
 # mypy: disable-error-code="valid-type, misc"
@@ -2838,12 +2841,42 @@ def nucleation_step_gpu(
 ) -> tuple[Any, Any]:
     """Execute one atomic fixed-capacity direct-Warp nucleation step.
 
-    The caller owns fixed-shape same-device particle, gas, and sidecar storage,
-    plus synchronization before observing the asynchronous result. P1--P4
-    complete before the one fused P5 particle/gas writer runs. Successful calls
-    return the identical ``(particles, gas)`` objects. CPU fallback, transfers,
-    resizing, a Runnable API, backend selection, graph capture, and autodiff are
-    deliberately deferred.
+    This direct-device boundary sequences P1 preflight, P2 inventory admission,
+    P3 slot staging, and P4 resampling-first/scaling-fallback resolution before
+    one fused P5 writer activates finalized free slots and removes matching gas
+    mass. The caller owns fixed-capacity, fixed-shape, contiguous same-device
+    Warp particle, gas, input, and sidecar storage, and must synchronize the
+    active Warp device before observing successful asynchronous writes.
+
+    Precommit rejections leave particle and gas state unchanged. P2--P4 may
+    write their documented caller-owned sidecars before a later phase rejects;
+    once a P4 primitive or P5 commit launches, its existing no-rollback contract
+    applies. Successful calls return the identical ``(particles, gas)``
+    objects. CPU fallback, host/device transfer helpers, resizing, compaction,
+    a Runnable API, backend selection, E6-F9 integration, graph capture,
+    autodiff, and performance guarantees are deliberately deferred.
+
+    Args:
+        particles: Caller-owned fixed-capacity Warp particle container.
+        gas: Caller-owned Warp gas container on the particle-data device.
+        config: Immutable scalar nucleation controls.
+        time_step: Finite nonnegative step duration [s].
+        scratch: Caller-owned P2 planning sidecars.
+        finalized_demand: Caller-owned P2/P3 finalized-demand sidecars.
+        diagnostics: Caller-owned P2/P3 slot and gate diagnostic sidecars.
+        exhaustion_controls: Concrete P4 resampling and scaling policy controls.
+        exhaustion_buffers: Caller-owned P4 workspace and finalized diagnostics.
+        temperature: Positive scalar [K] or same-device ``wp.float64 (B,)``.
+        saturation: Configured same-device dimensionless ``wp.float64 (B, S)``.
+        environment: Optional same-device owner of temperature and saturation.
+
+    Returns:
+        The identical caller-owned ``(particles, gas)`` containers.
+
+    Raises:
+        TypeError: If a direct scalar input has an unsupported type.
+        ValueError: If P1--P5 validation, storage ownership, physical state, or
+            finalized handoff validation fails.
     """
     preflight = _preflight_nucleation(
         particles,

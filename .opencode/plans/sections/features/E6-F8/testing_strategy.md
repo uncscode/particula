@@ -38,9 +38,12 @@ independent E6-F7 float64 oracle, never the production GPU helper itself.
   separate coverage documents the entered-primitive failure boundary without
   claiming cross-primitive rollback. Warp CPU is the baseline and CUDA skips
   cleanly when unavailable.
-- **P5:** Entry-point tests cover supplied-buffer and container identity,
-  repeated calls, current-gas coupling, complete transaction ordering, lazy
-  imports, explicit device inputs, and absence of CPU fallback/transfer.
+- **P5 (#1442):** Shipped entry-point tests cover supplied-buffer/container
+  identity, nominal and multi-box final commits, repeated current-gas calls,
+  direct/environment inputs, P4 resampling/scaling integration, no-work paths,
+  malformed or rebound P5 handoffs, and all-box precommit atomicity. Export
+  tests verify lazy resolution, while boundary guards cover no hidden host
+  conversion or CPU fallback.
 - **P6:** `nucleation_parity_test.py` runs Warp CPU parity over activation and
   kinetic modes, multiple species/boxes, inventory limits, sparse/full slots,
   resampling/scaling cases, no-ops, and repeated calls. CUDA is optional and
