@@ -2771,7 +2771,7 @@ def _commit_nucleation_p5(
         raise ValueError("P5 fields must be the P4-validated storage.")
     if preflight.n_boxes == 0:
         return False
-    molecule_counts = wp.array(
+    molecule_counts: Any = wp.array(
         np.asarray(preflight.config.molecule_counts, dtype=np.int32),
         dtype=wp.int32,
         device=preflight.device,
