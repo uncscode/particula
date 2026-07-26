@@ -19,6 +19,7 @@ SUPPORTED_STEP_SYMBOLS = (
     "activate_slots_gpu",
     "condensation_step_gpu",
     "dilution_step_gpu",
+    "nucleation_step_gpu",
     "resampling_step_gpu",
     "wall_loss_step_gpu",
 )
@@ -53,6 +54,7 @@ def test_public_kernels_package_exports_supported_step_function(
     from particula.gpu.kernels.condensation import condensation_step_gpu
     from particula.gpu.kernels.dilution import dilution_step_gpu
     from particula.gpu.kernels.exhaustion import resampling_step_gpu
+    from particula.gpu.kernels.nucleation import nucleation_step_gpu
     from particula.gpu.kernels.slot_management import activate_slots_gpu
     from particula.gpu.kernels.wall_loss import wall_loss_step_gpu
 
@@ -61,6 +63,7 @@ def test_public_kernels_package_exports_supported_step_function(
         "activate_slots_gpu": activate_slots_gpu,
         "condensation_step_gpu": condensation_step_gpu,
         "dilution_step_gpu": dilution_step_gpu,
+        "nucleation_step_gpu": nucleation_step_gpu,
         "resampling_step_gpu": resampling_step_gpu,
         "wall_loss_step_gpu": wall_loss_step_gpu,
     }
@@ -79,6 +82,7 @@ def test_kernels_package_all_is_exact_supported_surface() -> None:
         "activate_slots_gpu",
         "condensation_step_gpu",
         "dilution_step_gpu",
+        "nucleation_step_gpu",
         "resampling_step_gpu",
         "wall_loss_step_gpu",
     ]
@@ -139,6 +143,37 @@ def test_kernels_package_keeps_dilution_module_lazy_in_fresh_process() -> None:
         )
     }
 
+    result = subprocess.run(  # noqa: S603
+        [sys.executable, "-c", script],
+        cwd=ROOT,
+        env=environment,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+
+
+def test_kernels_package_keeps_nucleation_module_lazy_in_fresh_process() -> (
+    None
+):
+    """Resolving the public step, rather than package import, loads nucleation."""
+    script = "\n".join(
+        (
+            "import sys",
+            "import particula.gpu.kernels as kernels",
+            "assert 'nucleation_step_gpu' in kernels.__all__",
+            "assert 'particula.gpu.kernels.nucleation' not in sys.modules",
+            "assert callable(kernels.nucleation_step_gpu)",
+            "assert 'particula.gpu.kernels.nucleation' in sys.modules",
+        )
+    )
+    environment = os.environ | {
+        "PYTHONPATH": os.pathsep.join(
+            filter(None, (str(ROOT), os.environ.get("PYTHONPATH")))
+        )
+    }
     result = subprocess.run(  # noqa: S603
         [sys.executable, "-c", script],
         cwd=ROOT,

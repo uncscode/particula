@@ -30,6 +30,7 @@ from particula.gpu.kernels.nucleation import (  # noqa: E402
     _preflight_nucleation,
     _real,
     _stage_nucleation_slots,
+    nucleation_step_gpu,
 )
 from particula.util.constants import AVOGADRO_NUMBER  # noqa: E402
 
@@ -254,6 +255,328 @@ def _exhaustion_buffers(boxes, particles, species, device="cpu"):
             (boxes, particles), dtype=wp.int32, device=device
         ),
     )
+
+
+def test_public_nucleation_step_commits_selected_slots_and_gas() -> None:
+    """P5 activates the P4 prefix and removes the matching gas inventory."""
+    particles, gas = _state(particles=2)
+    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    buffers = _exhaustion_buffers(1, 2, 1)
+    config = _config(coefficient=0.1 / AVOGADRO_NUMBER)
+    original_gas = gas.concentration.numpy().copy()
+
+    result_particles, result_gas = nucleation_step_gpu(
+        particles,
+        gas,
+        config,
+        1.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+        exhaustion_controls=NucleationExhaustionControls(False, False),
+        exhaustion_buffers=buffers,
+        temperature=300.0,
+    )
+
+    assert result_particles is particles
+    assert result_gas is gas
+    event_mass = 0.1 / AVOGADRO_NUMBER
+    np.testing.assert_array_equal(buffers.final_counts.numpy(), [1])
+    np.testing.assert_array_equal(
+        buffers.final_selected_slot_indices.numpy(), [[0, -1]]
+    )
+    np.testing.assert_allclose(
+        particles.masses.numpy(), [[[event_mass], [0.0]]], rtol=1e-12, atol=0.0
+    )
+    np.testing.assert_allclose(
+        particles.concentration.numpy(), [[1.0, 0.0]], rtol=0.0, atol=0.0
+    )
+    np.testing.assert_allclose(
+        gas.concentration.numpy(),
+        original_gas - event_mass,
+        rtol=1e-12,
+        atol=0.0,
+    )
+
+
+def test_public_nucleation_step_zero_time_is_particle_gas_write_free() -> None:
+    """A valid all-box zero-time gate preserves particle and gas fields."""
+    particles, gas = _state(particles=2)
+    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    buffers = _exhaustion_buffers(1, 2, 1)
+    before = _snapshot_arrays(particles, gas)
+
+    nucleation_step_gpu(
+        particles,
+        gas,
+        _config(coefficient=0.1 / AVOGADRO_NUMBER),
+        0.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+        exhaustion_controls=NucleationExhaustionControls(False, False),
+        exhaustion_buffers=buffers,
+        temperature=300.0,
+    )
+
+    _assert_snapshot_unchanged(before)
+
+
+@pytest.mark.parametrize("input_mode", ["direct", "environment"])
+def test_public_nucleation_step_commits_multi_box_multispecies_state(
+    input_mode: str,
+) -> None:
+    """P5 commits each finalized box prefix using direct or environment inputs."""
+    particles, gas = _state(boxes=2, particles=2, species=2)
+    particles.concentration = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
+    gas.molar_mass = wp.array([0.1, 0.2], dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(2, 2, 2)
+    buffers = _exhaustion_buffers(2, 2, 2)
+    particles.volume = wp.array([1.0, 2.0], dtype=wp.float64, device="cpu")
+    config = _config(
+        coefficient=0.1 / AVOGADRO_NUMBER,
+        molecule_counts=(1, 0),
+    )
+    kwargs = {"temperature": wp.full(2, 300.0, dtype=wp.float64, device="cpu")}
+    if input_mode == "environment":
+        kwargs = {
+            "environment": SimpleNamespace(
+                temperature=wp.full(2, 300.0, dtype=wp.float64, device="cpu")
+            )
+        }
+    original_gas = gas.concentration.numpy().copy()
+
+    result_particles, result_gas = nucleation_step_gpu(
+        particles,
+        gas,
+        config,
+        1.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+        exhaustion_controls=NucleationExhaustionControls(False, False),
+        exhaustion_buffers=buffers,
+        **kwargs,
+    )
+
+    event_mass = np.array([0.1 / AVOGADRO_NUMBER, 0.0])
+    assert result_particles is particles
+    assert result_gas is gas
+    np.testing.assert_array_equal(buffers.final_counts.numpy(), [1, 2])
+    np.testing.assert_array_equal(
+        buffers.final_selected_slot_indices.numpy(), [[0, -1], [0, 1]]
+    )
+    np.testing.assert_allclose(
+        particles.masses.numpy(),
+        np.array(
+            [
+                [[event_mass[0], 0.0], [0.0, 0.0]],
+                [[event_mass[0], 0.0], [event_mass[0], 0.0]],
+            ]
+        ),
+        rtol=1e-12,
+        atol=0.0,
+    )
+    np.testing.assert_allclose(
+        particles.concentration.numpy(),
+        [[1.0, 0.0], [0.5, 0.5]],
+        rtol=0.0,
+        atol=0.0,
+    )
+    np.testing.assert_allclose(
+        gas.concentration.numpy(),
+        original_gas - event_mass,
+        rtol=1e-12,
+        atol=0.0,
+    )
+
+
+def test_public_nucleation_step_rejects_corrupt_p5_handoff_without_commit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A malformed finalized prefix prevents the public P5 particle/gas commit."""
+    particles, gas = _state(particles=2)
+    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    buffers = _exhaustion_buffers(1, 2, 1)
+    before = _snapshot_arrays(particles, gas)
+    original_orchestrate = nucleation_module._orchestrate_nucleation_exhaustion
+
+    def _corrupt_finalized_prefix(*args, **kwargs):
+        result = original_orchestrate(*args, **kwargs)
+        wp.copy(
+            buffers.final_selected_slot_indices,
+            wp.array([[1, 1]], dtype=wp.int32, device="cpu"),
+        )
+        return result
+
+    monkeypatch.setattr(
+        nucleation_module,
+        "_orchestrate_nucleation_exhaustion",
+        _corrupt_finalized_prefix,
+    )
+
+    with pytest.raises(ValueError, match="P5 finalized nucleation handoff"):
+        nucleation_step_gpu(
+            particles,
+            gas,
+            _config(coefficient=0.1 / AVOGADRO_NUMBER),
+            1.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+            exhaustion_controls=NucleationExhaustionControls(False, False),
+            exhaustion_buffers=buffers,
+            temperature=300.0,
+        )
+
+    _assert_snapshot_unchanged(before)
+
+
+@pytest.mark.parametrize(
+    "corrupt",
+    [
+        lambda buffers, gas: wp.copy(
+            buffers.final_demand,
+            wp.array([np.nan], dtype=wp.float64, device="cpu"),
+        ),
+        lambda buffers, gas: wp.copy(
+            buffers.final_demand,
+            wp.array([-1.0], dtype=wp.float64, device="cpu"),
+        ),
+        lambda buffers, gas: wp.copy(
+            buffers.final_demand,
+            wp.array([1.5], dtype=wp.float64, device="cpu"),
+        ),
+        lambda buffers, gas: (
+            wp.copy(
+                buffers.final_counts,
+                wp.array([2], dtype=wp.int32, device="cpu"),
+            ),
+            wp.copy(
+                buffers.final_selected_slot_indices,
+                wp.array([[0, 1]], dtype=wp.int32, device="cpu"),
+            ),
+        ),
+        lambda buffers, gas: wp.copy(
+            buffers.final_counts,
+            wp.array([3], dtype=wp.int32, device="cpu"),
+        ),
+        lambda buffers, gas: wp.copy(
+            buffers.final_selected_slot_indices,
+            wp.array([[1, 1]], dtype=wp.int32, device="cpu"),
+        ),
+        lambda buffers, gas: wp.copy(
+            buffers.final_selected_slot_indices,
+            wp.array([[2, -1]], dtype=wp.int32, device="cpu"),
+        ),
+        lambda buffers, gas: wp.copy(
+            buffers.final_selected_slot_indices,
+            wp.array([[0, 0]], dtype=wp.int32, device="cpu"),
+        ),
+        lambda buffers, gas: wp.copy(
+            gas.partitioning,
+            wp.zeros((1, 1), dtype=wp.int32, device="cpu"),
+        ),
+        lambda buffers, gas: wp.copy(
+            gas.concentration,
+            wp.array([[np.nan]], dtype=wp.float64, device="cpu"),
+        ),
+    ],
+    ids=[
+        "nonfinite_demand",
+        "negative_demand",
+        "fractional_demand",
+        "count_demand_mismatch",
+        "count_above_capacity",
+        "duplicate_prefix",
+        "out_of_range_prefix",
+        "nonnegative_tail",
+        "disabled_participating_species",
+        "nonfinite_participating_gas",
+    ],
+)
+def test_public_nucleation_step_rejects_invalid_p5_handoffs_without_commit(
+    corrupt, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Every malformed P5 handoff preserves particle and gas state."""
+    particles, gas = _state(particles=2)
+    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    buffers = _exhaustion_buffers(1, 2, 1)
+    handoff_snapshot = []
+    original_orchestrate = nucleation_module._orchestrate_nucleation_exhaustion
+
+    def _corrupt_p5_handoff(*args, **kwargs):
+        result = original_orchestrate(*args, **kwargs)
+        corrupt(buffers, gas)
+        handoff_snapshot.extend(_snapshot_arrays(particles, gas))
+        return result
+
+    monkeypatch.setattr(
+        nucleation_module,
+        "_orchestrate_nucleation_exhaustion",
+        _corrupt_p5_handoff,
+    )
+
+    with pytest.raises(ValueError, match="P5 finalized nucleation handoff"):
+        nucleation_step_gpu(
+            particles,
+            gas,
+            _config(coefficient=0.1 / AVOGADRO_NUMBER),
+            1.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+            exhaustion_controls=NucleationExhaustionControls(False, False),
+            exhaustion_buffers=buffers,
+            temperature=300.0,
+        )
+
+    _assert_snapshot_unchanged(handoff_snapshot)
+
+
+def test_public_nucleation_step_rejects_rebound_p4_storage_without_commit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """P5 rejects a finalized P4 buffer rebound after P4 validation."""
+    particles, gas = _state(particles=2)
+    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(1, 2, 1)
+    buffers = _exhaustion_buffers(1, 2, 1)
+    before = _snapshot_arrays(particles, gas)
+    original_orchestrate = nucleation_module._orchestrate_nucleation_exhaustion
+    replacement = wp.ones(1, dtype=wp.float64, device="cpu")
+
+    def _rebind_p4_storage(*args, **kwargs):
+        result = original_orchestrate(*args, **kwargs)
+        object.__setattr__(buffers, "final_demand", replacement)
+        return result
+
+    monkeypatch.setattr(
+        nucleation_module,
+        "_orchestrate_nucleation_exhaustion",
+        _rebind_p4_storage,
+    )
+
+    with pytest.raises(ValueError, match="P5 fields must be the P4-validated"):
+        nucleation_step_gpu(
+            particles,
+            gas,
+            _config(coefficient=0.1 / AVOGADRO_NUMBER),
+            1.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+            exhaustion_controls=NucleationExhaustionControls(False, False),
+            exhaustion_buffers=buffers,
+            temperature=300.0,
+        )
+
+    _assert_snapshot_unchanged(before)
+    np.testing.assert_array_equal(replacement.numpy(), [1.0])
 
 
 @pytest.mark.parametrize(

@@ -7,6 +7,7 @@ Import direct low-level step functions from this package:
         activate_slots_gpu,
         condensation_step_gpu,
         dilution_step_gpu,
+        nucleation_step_gpu,
         resampling_step_gpu,
         wall_loss_step_gpu,
     )
@@ -25,6 +26,7 @@ __all__ = [
     "activate_slots_gpu",
     "condensation_step_gpu",
     "dilution_step_gpu",
+    "nucleation_step_gpu",
     "resampling_step_gpu",
     "wall_loss_step_gpu",
 ]
@@ -34,6 +36,7 @@ _SYMBOL_TO_MODULE = {
     "activate_slots_gpu": "particula.gpu.kernels.slot_management",
     "condensation_step_gpu": "particula.gpu.kernels.condensation",
     "dilution_step_gpu": "particula.gpu.kernels.dilution",
+    "nucleation_step_gpu": "particula.gpu.kernels.nucleation",
     "resampling_step_gpu": "particula.gpu.kernels.exhaustion",
     "wall_loss_step_gpu": "particula.gpu.kernels.wall_loss",
 }
