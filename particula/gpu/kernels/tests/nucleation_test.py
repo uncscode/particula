@@ -324,6 +324,84 @@ def test_public_nucleation_step_zero_time_is_particle_gas_write_free() -> None:
     _assert_snapshot_unchanged(before)
 
 
+@pytest.mark.parametrize(
+    ("exhaustion_controls", "exhaustion_buffers", "message"),
+    [
+        (object(), None, "controls must be NucleationExhaustionControls"),
+        (None, object(), "buffers must be NucleationExhaustionBuffers"),
+    ],
+)
+def test_public_empty_step_validates_p4_inputs_before_noop(
+    exhaustion_controls, exhaustion_buffers, message
+) -> None:
+    """Empty public calls still validate P4 controls and buffers."""
+    particles, gas = _state(boxes=0)
+    scratch, finalized, diagnostics = _sidecars(0, 2, 1)
+    buffers = _exhaustion_buffers(0, 2, 1)
+    if exhaustion_controls is None:
+        exhaustion_controls = NucleationExhaustionControls(False, False)
+    if exhaustion_buffers is None:
+        exhaustion_buffers = buffers
+    before = _snapshot_arrays(particles, gas, scratch, finalized, diagnostics)
+
+    with pytest.raises(ValueError, match=message):
+        nucleation_step_gpu(
+            particles,
+            gas,
+            _config(),
+            1.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+            exhaustion_controls=exhaustion_controls,
+            exhaustion_buffers=exhaustion_buffers,
+            temperature=300.0,
+        )
+
+    _assert_snapshot_unchanged(before)
+
+
+def test_public_step_rejects_nonparticipating_demand_before_p4(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Positive non-participant demand rejects before P4 mutation or P5 launch."""
+    particles, gas = _state(boxes=2, particles=2, species=2)
+    particles.masses = wp.ones((2, 2, 2), dtype=wp.float64, device="cpu")
+    gas.partitioning = wp.array([[1, 0], [1, 0]], dtype=wp.int32, device="cpu")
+    scratch, finalized, diagnostics = _sidecars(2, 2, 2)
+    buffers = _exhaustion_buffers(2, 2, 2)
+    before = _snapshot_arrays(particles, gas)
+    original_launch = nucleation_module.wp.launch
+    p5_launches = 0
+
+    def _launch(kernel, dim=None, inputs=None, device=None):
+        nonlocal p5_launches
+        if kernel is nucleation_module._commit_nucleation_p5_kernel:
+            p5_launches += 1
+        return original_launch(kernel, dim=dim, inputs=inputs, device=device)
+
+    monkeypatch.setattr(nucleation_module.wp, "launch", _launch)
+    with pytest.raises(ValueError, match="require participating gas species"):
+        nucleation_step_gpu(
+            particles,
+            gas,
+            _config(
+                coefficient=0.1 / AVOGADRO_NUMBER,
+                molecule_counts=(1, 1),
+            ),
+            1.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+            exhaustion_controls=NucleationExhaustionControls(True, False),
+            exhaustion_buffers=buffers,
+            temperature=300.0,
+        )
+
+    assert p5_launches == 0
+    _assert_snapshot_unchanged(before)
+
+
 @pytest.mark.parametrize("input_mode", ["direct", "environment"])
 def test_public_nucleation_step_commits_multi_box_multispecies_state(
     input_mode: str,
@@ -450,6 +528,14 @@ def test_public_nucleation_step_rejects_corrupt_p5_handoff_without_commit(
             buffers.final_demand,
             wp.array([1.5], dtype=wp.float64, device="cpu"),
         ),
+        lambda buffers, gas: wp.copy(
+            buffers.final_demand,
+            wp.array(
+                [float(np.iinfo(np.int32).max) + 1.0],
+                dtype=wp.float64,
+                device="cpu",
+            ),
+        ),
         lambda buffers, gas: (
             wp.copy(
                 buffers.final_counts,
@@ -489,6 +575,7 @@ def test_public_nucleation_step_rejects_corrupt_p5_handoff_without_commit(
         "nonfinite_demand",
         "negative_demand",
         "fractional_demand",
+        "demand_above_int32_maximum",
         "count_demand_mismatch",
         "count_above_capacity",
         "duplicate_prefix",

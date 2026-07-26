@@ -2347,6 +2347,18 @@ def _validate_p4_buffers(
     return arrays + nested
 
 
+def _validate_public_p4_inputs(
+    preflight: _NucleationPreflight,
+    controls: NucleationExhaustionControls,
+    buffers: NucleationExhaustionBuffers,
+) -> None:
+    """Validate public P4 controls and storage before any no-work return."""
+    if not isinstance(controls, NucleationExhaustionControls):
+        raise ValueError("controls must be NucleationExhaustionControls.")
+    controls.__post_init__()
+    _validate_p4_buffers(preflight, buffers)
+
+
 def _revalidate_p4_particle_state(preflight: _NucleationPreflight) -> None:
     """Revalidate mutable P1 particle storage before P4 writes or primitives."""
     b, n, s, device = (
@@ -2613,6 +2625,43 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
 
 
 @wp.kernel
+def _validate_participating_molecule_counts(
+    partitioning: wp.array2d(dtype=wp.int32),
+    molecule_counts: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Reject positive molecule counts for non-participating gas lanes."""
+    box = wp.tid()
+    for species in range(molecule_counts.shape[0]):
+        if molecule_counts[species] > 0 and partitioning[box, species] != 1:
+            wp.atomic_or(invalid, 0, 1)
+
+
+def _validate_public_molecule_eligibility(
+    preflight: _NucleationPreflight,
+) -> None:
+    """Validate P5 gas-removal eligibility before P4 can mutate particles."""
+    if preflight.n_boxes == 0:
+        return
+    molecule_counts: Any = wp.array(
+        np.asarray(preflight.config.molecule_counts, dtype=np.int32),
+        dtype=wp.int32,
+        device=preflight.device,
+    )
+    invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
+    wp.launch(
+        _validate_participating_molecule_counts,
+        dim=preflight.n_boxes,
+        inputs=[preflight.gas.partitioning, molecule_counts, invalid],
+        device=preflight.device,
+    )
+    if int(invalid.numpy()[0]):
+        raise ValueError(
+            "Positive molecule counts require participating gas species."
+        )
+
+
+@wp.kernel
 def _validate_p5_handoff(  # noqa: C901
     masses: wp.array3d(dtype=wp.float64),
     concentration: wp.array2d(dtype=wp.float64),
@@ -2639,6 +2688,7 @@ def _validate_p5_handoff(  # noqa: C901
         or not wp.isfinite(events)
         or events < 0.0
         or events != wp.floor(events)
+        or events > wp.float64(2147483647)
         or count != wp.int32(events)
     )
     previous = wp.int32(-1)
@@ -2848,13 +2898,14 @@ def nucleation_step_gpu(
     Warp particle, gas, input, and sidecar storage, and must synchronize the
     active Warp device before observing successful asynchronous writes.
 
-    Precommit rejections leave particle and gas state unchanged. P2--P4 may
-    write their documented caller-owned sidecars before a later phase rejects;
-    once a P4 primitive or P5 commit launches, its existing no-rollback contract
-    applies. Successful calls return the identical ``(particles, gas)``
-    objects. CPU fallback, host/device transfer helpers, resizing, compaction,
-    a Runnable API, backend selection, E6-F9 integration, graph capture,
-    autodiff, and performance guarantees are deliberately deferred.
+    Public validation rejections before P4 primitive entry leave particle and
+    gas state unchanged. P2--P4 may write their documented caller-owned
+    sidecars before a later phase rejects. Once a P4 primitive begins, its
+    documented no-rollback boundary applies; P5 likewise has no rollback after
+    its writer launches. Successful calls return the identical ``(particles,
+    gas)`` objects. CPU fallback, host/device transfer helpers, resizing,
+    compaction, a Runnable API, backend selection, E6-F9 integration, graph
+    capture, autodiff, and performance guarantees are deliberately deferred.
 
     Args:
         particles: Caller-owned fixed-capacity Warp particle container.
@@ -2890,12 +2941,16 @@ def nucleation_step_gpu(
         finalized_demand=finalized_demand,
         diagnostics=diagnostics,
     )
+    _validate_public_p4_inputs(
+        preflight, exhaustion_controls, exhaustion_buffers
+    )
     if preflight.n_boxes == 0:
         return particles, gas
     _plan_nucleation_demand_from_preflight(
         preflight, scratch, finalized_demand, diagnostics
     )
     _stage_nucleation_slots(preflight, finalized_demand, diagnostics)
+    _validate_public_molecule_eligibility(preflight)
     p4_storage = _orchestrate_nucleation_exhaustion(
         preflight,
         finalized_demand,
