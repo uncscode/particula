@@ -10,6 +10,7 @@ pytestmark = pytest.mark.warp
 wp = pytest.importorskip("warp")
 
 import particula.gpu.kernels.nucleation as nucleation_module  # noqa: E402
+from particula.gpu.kernels.exhaustion import ResamplingBuffers  # noqa: E402
 from particula.gpu.kernels.nucleation import (  # noqa: E402
     _P2_GATE_GAS_LIMITED_OFFSET,
     _P2_GATE_LOW_SATURATION,
@@ -20,8 +21,11 @@ from particula.gpu.kernels.nucleation import (  # noqa: E402
     _P2_GATE_ZERO_TIME,
     NucleationConfig,
     NucleationDiagnosticBuffers,
+    NucleationExhaustionBuffers,
+    NucleationExhaustionControls,
     NucleationFinalizedDemandBuffers,
     NucleationScratchBuffers,
+    _orchestrate_nucleation_exhaustion,
     _plan_nucleation_demand,
     _preflight_nucleation,
     _real,
@@ -194,6 +198,64 @@ def _stage_slots(counts, particle_slots, device="cpu"):
     return particle_data, gas_data, scratch, finalized, diagnostics
 
 
+def _exhaustion_buffers(boxes, particles, species, device="cpu"):
+    """Build distinct P4 and nested resampling sidecars."""
+    resampling_buffers = ResamplingBuffers(
+        retained_counts=wp.zeros(boxes, dtype=wp.int32, device=device),
+        released_counts=wp.zeros(boxes, dtype=wp.int32, device=device),
+        retained_indices=wp.zeros(
+            (boxes, particles), dtype=wp.int32, device=device
+        ),
+        released_indices=wp.zeros(
+            (boxes, particles), dtype=wp.int32, device=device
+        ),
+        sorted_indices=wp.zeros(
+            (boxes, particles), dtype=wp.int32, device=device
+        ),
+        replacement_masses=wp.zeros(
+            (boxes, particles, species), dtype=wp.float64, device=device
+        ),
+        replacement_concentration=wp.zeros(
+            (boxes, particles), dtype=wp.float64, device=device
+        ),
+        replacement_charge=wp.zeros(
+            (boxes, particles), dtype=wp.float64, device=device
+        ),
+        source_radii=wp.zeros(
+            (boxes, particles), dtype=wp.float64, device=device
+        ),
+        radius_cubed_relative_error=wp.zeros(
+            boxes, dtype=wp.float64, device=device
+        ),
+        mean_radius_relative_error=wp.zeros(
+            boxes, dtype=wp.float64, device=device
+        ),
+        surface_relative_error=wp.zeros(boxes, dtype=wp.float64, device=device),
+        diversity_absolute_error=wp.zeros(
+            boxes, dtype=wp.float64, device=device
+        ),
+        planning_status=wp.zeros(boxes, dtype=wp.int32, device=device),
+    )
+    return NucleationExhaustionBuffers(
+        resampling_buffers=resampling_buffers,
+        demand_workspace=wp.zeros(boxes, dtype=wp.float64, device=device),
+        final_demand=wp.zeros(boxes, dtype=wp.float64, device=device),
+        requested_scale=wp.ones(boxes, dtype=wp.float64, device=device),
+        minimum_scale=wp.ones(boxes, dtype=wp.float64, device=device),
+        minimum_volume=wp.ones(boxes, dtype=wp.float64, device=device),
+        resolved_scale=wp.zeros(boxes, dtype=wp.float64, device=device),
+        resampling_releasable_counts=wp.zeros(
+            boxes, dtype=wp.int32, device=device
+        ),
+        required_release_counts=wp.zeros(boxes, dtype=wp.int32, device=device),
+        scaling_required=wp.zeros(boxes, dtype=wp.int32, device=device),
+        final_counts=wp.zeros(boxes, dtype=wp.int32, device=device),
+        final_selected_slot_indices=wp.zeros(
+            (boxes, particles), dtype=wp.int32, device=device
+        ),
+    )
+
+
 @pytest.mark.parametrize(
     ("counts", "slots", "expected_selected"),
     [
@@ -240,6 +302,223 @@ def test_stage_nucleation_slots_writes_expected_layout(
     _assert_snapshot_unchanged(particle_snapshot)
     _assert_snapshot_unchanged(gas_snapshot)
     _assert_snapshot_unchanged(scratch_snapshot)
+
+
+@pytest.mark.parametrize("value", [1, np.bool_(True)])
+def test_p4_controls_require_exact_python_booleans(value):
+    """Policy controls reject integer and NumPy Boolean substitutes."""
+    with pytest.raises(TypeError, match="exact Python bool"):
+        NucleationExhaustionControls(value, False)
+
+
+def test_p4_finalizes_free_capacity_without_mutating_p2_or_p3_handoffs():
+    """P4 copies immutable demand and writes the current free-slot prefix."""
+    particles, gas, scratch, finalized, diagnostics = _stage_slots(
+        [1.0], np.array([[False, False]])
+    )
+    buffers = _exhaustion_buffers(1, 2, 1)
+    object.__setattr__(
+        buffers,
+        "required_release_counts",
+        wp.full(1, wp.int32(9), dtype=wp.int32, device="cpu"),
+    )
+    object.__setattr__(
+        buffers,
+        "scaling_required",
+        wp.full(1, wp.int32(9), dtype=wp.int32, device="cpu"),
+    )
+    p2_p3_before = _snapshot_arrays(finalized, diagnostics)
+    source_before = _snapshot_arrays(particles, gas, scratch)
+
+    _orchestrate_nucleation_exhaustion(
+        _preflight_nucleation(
+            particles,
+            gas,
+            _config(),
+            1.0,
+            temperature=300.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+        ),
+        finalized,
+        diagnostics,
+        NucleationExhaustionControls(False, False),
+        buffers,
+    )
+
+    np.testing.assert_array_equal(buffers.demand_workspace.numpy(), [1.0])
+    np.testing.assert_array_equal(buffers.final_demand.numpy(), [1.0])
+    np.testing.assert_array_equal(buffers.final_counts.numpy(), [1])
+    np.testing.assert_array_equal(buffers.required_release_counts.numpy(), [0])
+    np.testing.assert_array_equal(buffers.scaling_required.numpy(), [0])
+    np.testing.assert_array_equal(
+        buffers.final_selected_slot_indices.numpy(), [[0, -1]]
+    )
+    np.testing.assert_array_equal(buffers.resolved_scale.numpy(), [1.0])
+    _assert_snapshot_unchanged(p2_p3_before)
+    _assert_snapshot_unchanged(source_before)
+
+
+def test_p4_rejects_unresolved_capacity_before_writing_any_sidecar():
+    """An exhausted row without a viable policy preserves all P4 state."""
+    particles, gas, scratch, finalized, diagnostics = _stage_slots(
+        [1.0], np.array([[True, True]])
+    )
+    buffers = _exhaustion_buffers(1, 2, 1)
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    before = _snapshot_arrays(
+        particles,
+        gas,
+        scratch,
+        finalized,
+        diagnostics,
+        buffers,
+        buffers.resampling_buffers,
+    )
+
+    with pytest.raises(
+        ValueError, match="P4 handoff, policy input, or capacity"
+    ):
+        _orchestrate_nucleation_exhaustion(
+            preflight,
+            finalized,
+            diagnostics,
+            NucleationExhaustionControls(False, False),
+            buffers,
+        )
+
+    _assert_snapshot_unchanged(before)
+
+
+@pytest.mark.parametrize(
+    "corrupt",
+    [
+        lambda finalized, buffers: object.__setattr__(
+            buffers,
+            "requested_scale",
+            wp.full(1, 0.5, dtype=wp.float64, device="cpu"),
+        ),
+        lambda finalized, buffers: object.__setattr__(
+            finalized,
+            "accepted_counts",
+            wp.full(1, 2, dtype=wp.int32, device="cpu"),
+        ),
+    ],
+    ids=["invalid_scale_bounds", "stale_p3_count"],
+)
+def test_p4_expected_handoff_rejections_preserve_complete_snapshots(
+    corrupt, monkeypatch
+):
+    """Expected P4 rejections precede primitive calls and every sidecar write."""
+    particles, gas, scratch, finalized, diagnostics = _stage_slots(
+        [1.0], np.array([[False, False]])
+    )
+    buffers = _exhaustion_buffers(1, 2, 1)
+    corrupt(finalized, buffers)
+    preflight = _preflight_nucleation(
+        particles,
+        gas,
+        _config(),
+        1.0,
+        temperature=300.0,
+        scratch=scratch,
+        finalized_demand=finalized,
+        diagnostics=diagnostics,
+    )
+    before = _snapshot_arrays(
+        particles,
+        gas,
+        scratch,
+        finalized,
+        diagnostics,
+        buffers,
+        buffers.resampling_buffers,
+    )
+
+    def _primitive_must_not_run(*_args, **_kwargs):
+        pytest.fail("P4 called an E6-F6 primitive after expected rejection.")
+
+    monkeypatch.setattr(
+        nucleation_module, "resampling_step_gpu", _primitive_must_not_run
+    )
+    monkeypatch.setattr(
+        nucleation_module,
+        "representative_volume_scaling_step_gpu",
+        _primitive_must_not_run,
+    )
+
+    with pytest.raises(
+        ValueError, match="P4 handoff, policy input, or capacity"
+    ):
+        _orchestrate_nucleation_exhaustion(
+            preflight,
+            finalized,
+            diagnostics,
+            NucleationExhaustionControls(False, False),
+            buffers,
+        )
+
+    _assert_snapshot_unchanged(before)
+
+
+def test_p4_scaling_records_full_deficit_and_finalized_count():
+    """Scaling fallback retains the full deficit and derives scaled counts."""
+    particles, gas, scratch, finalized, diagnostics = _stage_slots(
+        [4.0], np.array([[True, True, False, False]])
+    )
+    buffers = _exhaustion_buffers(1, 4, 1)
+    object.__setattr__(
+        buffers,
+        "requested_scale",
+        wp.full(1, 0.5, dtype=wp.float64, device="cpu"),
+    )
+    object.__setattr__(
+        buffers,
+        "minimum_scale",
+        wp.full(1, 0.5, dtype=wp.float64, device="cpu"),
+    )
+    object.__setattr__(
+        buffers,
+        "minimum_volume",
+        wp.full(1, 0.5, dtype=wp.float64, device="cpu"),
+    )
+    p2_p3_before = _snapshot_arrays(finalized, diagnostics)
+
+    _orchestrate_nucleation_exhaustion(
+        _preflight_nucleation(
+            particles,
+            gas,
+            _config(),
+            1.0,
+            temperature=300.0,
+            scratch=scratch,
+            finalized_demand=finalized,
+            diagnostics=diagnostics,
+        ),
+        finalized,
+        diagnostics,
+        NucleationExhaustionControls(False, True),
+        buffers,
+    )
+
+    np.testing.assert_array_equal(buffers.required_release_counts.numpy(), [2])
+    np.testing.assert_array_equal(buffers.scaling_required.numpy(), [1])
+    np.testing.assert_array_equal(buffers.final_demand.numpy(), [2.0])
+    np.testing.assert_array_equal(buffers.final_counts.numpy(), [1])
+    np.testing.assert_array_equal(
+        buffers.final_selected_slot_indices.numpy(), [[2, -1, -1, -1]]
+    )
+    _assert_snapshot_unchanged(p2_p3_before)
 
 
 def test_stage_nucleation_slots_rejects_replacement_records_without_writes():

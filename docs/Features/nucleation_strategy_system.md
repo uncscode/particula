@@ -118,9 +118,15 @@ Kerminen--Kulmala calculation.
 
 See [Fixed-Capacity Slot Exhaustion Primitives](slot_exhaustion_policies.md),
 the [equations](../Theory/Technical/Dynamics/Nucleation_Equations.md), and the
-[supported CPU example](../Examples/Nucleation/cpu_nucleation.py). E6-F8 direct
-Warp nucleation and E6-F9 GPU integration/example orchestration remain
-deferred; see the [GPU roadmap](Roadmap/data-oriented-gpu.md).
+[supported CPU example](../Examples/Nucleation/cpu_nucleation.py). E6-F8 has a
+private direct-Warp P4 staging seam: immutable P2/P3 demand/count handoffs use
+caller-owned sidecars to select fully viable resampling before optional
+representative-volume scaling and to emit finalized demand/count/free-slot
+diagnostics. It neither activates slots nor mutates source mass or gas. Expected
+all-box rejection preserves every supplied sidecar; an entered exhaustion
+primitive retains its own no-cross-primitive-rollback boundary. E6-F9 GPU
+integration/example orchestration remains deferred; see the
+[GPU roadmap](Roadmap/data-oriented-gpu.md).
 
 Focused validation:
 

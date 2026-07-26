@@ -1354,8 +1354,13 @@ Delivered CPU nucleation and deferred GPU scope:
     Its public `Nucleation` runnable preserves legacy `Aerosol` identity and
     uses fixed-capacity slots, partitioning gas, and per-substep transactions.
     See the [CPU Nucleation Strategy System](../nucleation_strategy_system.md).
-2. E6-F8 direct-Warp nucleation via slot activation remains deferred (see
-    [Fixed-Capacity Slot Boundary](#fixed-capacity-slot-boundary)).
+2. E6-F8 provides private direct-Warp P1--P4 staging. P4 uses immutable P2/P3
+     handoffs and caller-owned fixed-shape sidecars to select resampling first,
+     then representative-volume scaling fallback, before writing finalized
+     demand/count/free-slot diagnostics. Expected all-box preflight rejection
+     snapshots every caller-owned sidecar; successful primitives retain their
+     independent rollback boundary. Slot activation remains deferred (see
+     [Fixed-Capacity Slot Boundary](#fixed-capacity-slot-boundary)).
 3. E6-F9 GPU integration/example orchestration, source/gas inventory handling,
     and complete-sequence slot-exhaustion validation remain deferred.
 4. Fixed-shape workflow extensions and the deferred capabilities: dynamic

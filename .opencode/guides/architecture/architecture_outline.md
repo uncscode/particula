@@ -5,6 +5,13 @@
 `particula/particles/` contains particle-data representations, distribution
 strategies, and focused particle-domain helpers.
 
+## Private GPU Nucleation
+
+`particula/gpu/kernels/nucleation.py` contains unexported direct-Warp P1--P4
+staging seams. P4 owns policy orchestration only: immutable P2/P3 handoffs,
+resampling-first/scaling-fallback selection, and caller-owned final diagnostics.
+It does not activate slots, mutate gas, resize storage, or provide a public API.
+
 ### particula/particles/
 
 **Key Components:**

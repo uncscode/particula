@@ -1,4 +1,4 @@
-"""Define concrete-only P1--P3 GPU nucleation planning seams.
+"""Define concrete-only P1--P4 GPU nucleation planning seams.
 
 This unexported module validates fixed-capacity particle, gas, environment,
 and caller-owned sidecar schemas for a direct-Warp nucleation path. P1 is
@@ -10,7 +10,9 @@ CPU physics fallback. Private P3 converts admitted demand times particle volume
 to representable ``int32`` provisional event counts, reuses E6-F5 slot
 diagnostics, and records only the deterministic free-slot prefix that is
 currently selectable. It retains counts beyond free capacity and performs no
-activation, exhaustion resolution, or particle/gas transaction.
+activation or particle/gas transaction. Private P4 consumes immutable P2/P3
+handoffs, applies resampling before optional representative-volume scaling, and
+writes only its caller-owned finalized diagnostics. It remains unexported.
 
 The preflight accepts only same-device, contiguous Warp arrays with fixed
 shapes. Frozen records prevent rebinding their fields but do not copy, freeze,
@@ -37,6 +39,11 @@ except ImportError as exc:  # pragma: no cover - import guard
     ) from exc
 
 from particula.gpu.kernels.environment import _is_warp_array_like
+from particula.gpu.kernels.exhaustion import (
+    ResamplingBuffers,
+    representative_volume_scaling_step_gpu,
+    resampling_step_gpu,
+)
 from particula.gpu.kernels.slot_management import (
     _classify_slots,
     _write_diagnostics,
@@ -302,6 +309,55 @@ class NucleationDiagnosticBuffers:
     free_slot_indices: Any
     active_slot_counts: Any
     free_slot_counts: Any
+
+
+@dataclass(frozen=True)
+class NucleationExhaustionControls:
+    """Store exact-boolean private P4 capacity-policy controls.
+
+    ``resampling`` is considered first for a row only when it can release its
+    entire P3 deficit. ``representative_volume_scaling`` is then considered for
+    any remaining exhausted row. Exact Python booleans deliberately prevent
+    integer or NumPy scalar substitutes at this concrete-only seam.
+    """
+
+    resampling: bool
+    representative_volume_scaling: bool
+
+    def __post_init__(self) -> None:
+        """Reject non-exact Boolean policy controls."""
+        if type(self.resampling) is not bool:
+            raise TypeError("resampling must be an exact Python bool.")
+        if type(self.representative_volume_scaling) is not bool:
+            raise TypeError(
+                "representative_volume_scaling must be an exact Python bool."
+            )
+
+
+@dataclass(frozen=True)
+class NucleationExhaustionBuffers:
+    """Reference caller-owned P4 policy workspace and finalized diagnostics.
+
+    P2 admitted demand and P3 provisional counts are historical immutable
+    handoffs. P4 copies admitted demand into ``demand_workspace`` and derives
+    ``final_counts`` from its post-policy demand and current box volume.
+    Successful resampling/scaling may mutate particle state and the documented
+    nested primitive scratch lanes. Expected P4 preflight rejections occur
+    before either primitive and preserve every supplied sidecar.
+    """
+
+    resampling_buffers: ResamplingBuffers
+    demand_workspace: Any
+    final_demand: Any
+    requested_scale: Any
+    minimum_scale: Any
+    minimum_volume: Any
+    resolved_scale: Any
+    resampling_releasable_counts: Any
+    required_release_counts: Any
+    scaling_required: Any
+    final_counts: Any
+    final_selected_slot_indices: Any
 
 
 @dataclass(frozen=True)
@@ -1913,6 +1969,486 @@ def _stage_nucleation_slots(
             finalized_demand.accepted_counts,
             diagnostics.selected_slot_indices,
             preflight.n_particles,
+        ],
+        device=preflight.device,
+    )
+
+
+@wp.kernel
+def _validate_p4_handoff(  # noqa: C901
+    accepted_demand: wp.array(dtype=wp.float64),
+    accepted_counts: wp.array(dtype=wp.int32),
+    volume: wp.array(dtype=wp.float64),
+    categories: wp.array2d(dtype=wp.int32),
+    free_indices: wp.array2d(dtype=wp.int32),
+    active_counts: wp.array(dtype=wp.int32),
+    free_counts: wp.array(dtype=wp.int32),
+    selected_indices: wp.array2d(dtype=wp.int32),
+    releasable: wp.array(dtype=wp.int32),
+    requested: wp.array(dtype=wp.float64),
+    minimum: wp.array(dtype=wp.float64),
+    minimum_volume: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Validate immutable P2/P3 handoffs and P4 policy inputs per box."""
+    box = wp.tid()
+    events = accepted_demand[box] * volume[box]
+    if (
+        not wp.isfinite(events)
+        or events < 0.0
+        or events != wp.floor(events)
+        or events > wp.float64(2147483647.0)
+        or accepted_counts[box] != wp.int32(events)
+        or releasable[box] < 0
+        or releasable[box] > wp.max(active_counts[box] - 1, 0)
+        or not wp.isfinite(requested[box])
+        or not wp.isfinite(minimum[box])
+        or not wp.isfinite(minimum_volume[box])
+        or minimum[box] <= 0.0
+        or requested[box] < minimum[box]
+        or requested[box] > 1.0
+        or minimum_volume[box] <= 0.0
+    ):
+        wp.atomic_add(invalid, 0, 1)
+    active = wp.int32(0)
+    free = wp.int32(0)
+    selectable = wp.min(accepted_counts[box], free_counts[box])
+    for particle in range(categories.shape[1]):
+        if categories[box, particle] == 1:
+            active += 1
+        elif categories[box, particle] == 2:
+            if free_indices[box, free] != particle:
+                wp.atomic_add(invalid, 0, 1)
+            free += 1
+        elif categories[box, particle] != 3:
+            wp.atomic_add(invalid, 0, 1)
+        expected = -1
+        if particle < selectable:
+            expected = free_indices[box, particle]
+        if selected_indices[box, particle] != expected:
+            wp.atomic_add(invalid, 0, 1)
+    if active != active_counts[box] or free != free_counts[box]:
+        wp.atomic_add(invalid, 0, 1)
+
+
+@wp.kernel
+def _select_p4_policy(
+    counts: wp.array(dtype=wp.int32),
+    free_counts: wp.array(dtype=wp.int32),
+    releasable: wp.array(dtype=wp.int32),
+    requested: wp.array(dtype=wp.float64),
+    minimum_volume: wp.array(dtype=wp.float64),
+    volume: wp.array(dtype=wp.float64),
+    resampling_enabled: wp.int32,
+    scaling_enabled: wp.int32,
+    release: wp.array(dtype=wp.int32),
+    scaling: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Select all-or-nothing resampling before scaling for one box."""
+    box = wp.tid()
+    deficit = wp.max(counts[box] - free_counts[box], 0)
+    release[box] = 0
+    scaling[box] = 0
+    if deficit > 0:
+        if resampling_enabled != 0 and releasable[box] >= deficit:
+            release[box] = deficit
+        elif scaling_enabled != 0:
+            scaling[box] = 1
+            scaled_events = (
+                wp.float64(counts[box]) * requested[box] * requested[box]
+            )
+            if (
+                not wp.isfinite(scaled_events)
+                or scaled_events < 0.0
+                or scaled_events != wp.floor(scaled_events)
+                or scaled_events > wp.float64(2147483647.0)
+                or scaled_events > wp.float64(free_counts[box])
+                or volume[box] * requested[box] < minimum_volume[box]
+            ):
+                wp.atomic_add(invalid, 0, 1)
+        else:
+            wp.atomic_add(invalid, 0, 1)
+
+
+@wp.kernel
+def _copy_p4_workspace(
+    source: wp.array(dtype=wp.float64), destination: wp.array(dtype=wp.float64)
+) -> None:
+    """Copy immutable P2 admitted demand into private mutable P4 workspace."""
+    box = wp.tid()
+    destination[box] = source[box]
+
+
+@wp.kernel
+def _validate_p4_final(  # noqa: C901
+    demand: wp.array(dtype=wp.float64),
+    volume: wp.array(dtype=wp.float64),
+    free_counts: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Validate final P4 counts before finalized diagnostic writes."""
+    box = wp.tid()
+    events = demand[box] * volume[box]
+    if (
+        not wp.isfinite(demand[box])
+        or demand[box] < 0.0
+        or not wp.isfinite(events)
+        or events < 0.0
+        or events != wp.floor(events)
+        or events > wp.float64(2147483647.0)
+        or events > wp.float64(free_counts[box])
+    ):
+        wp.atomic_add(invalid, 0, 1)
+
+
+@wp.kernel
+def _write_p4_final(
+    demand: wp.array(dtype=wp.float64),
+    volume: wp.array(dtype=wp.float64),
+    free_indices: wp.array2d(dtype=wp.int32),
+    final_demand: wp.array(dtype=wp.float64),
+    final_counts: wp.array(dtype=wp.int32),
+    final_indices: wp.array2d(dtype=wp.int32),
+) -> None:
+    """Commit finalized P4 demand, counts, and ascending free-slot prefixes."""
+    box = wp.tid()
+    count = wp.int32(demand[box] * volume[box])
+    final_demand[box] = demand[box]
+    final_counts[box] = count
+    for rank in range(final_indices.shape[1]):
+        if rank < count:
+            final_indices[box, rank] = free_indices[box, rank]
+        else:
+            final_indices[box, rank] = -1
+
+
+@wp.kernel
+def _write_current_p4_diagnostics(
+    categories: wp.array2d(dtype=wp.int32),
+    free_indices: wp.array2d(dtype=wp.int32),
+    free_counts: wp.array(dtype=wp.int32),
+) -> None:
+    """Write private ascending current free-slot diagnostics for P4."""
+    box = wp.tid()
+    free = wp.int32(0)
+    for particle in range(categories.shape[1]):
+        if categories[box, particle] == 2:
+            free_indices[box, free] = particle
+            free += 1
+    for particle in range(free, categories.shape[1]):
+        free_indices[box, particle] = -1
+    free_counts[box] = free
+
+
+@wp.kernel
+def _write_unscaled_p4_resolution(
+    scaling: wp.array(dtype=wp.int32),
+    resolved_scale: wp.array(dtype=wp.float64),
+) -> None:
+    """Set the P4 resolved scale to one for unselected policy rows."""
+    box = wp.tid()
+    if scaling[box] == 0:
+        resolved_scale[box] = wp.float64(1.0)
+
+
+@wp.kernel
+def _write_p4_policy_diagnostics(
+    counts: wp.array(dtype=wp.int32),
+    free_counts: wp.array(dtype=wp.int32),
+    scaling: wp.array(dtype=wp.int32),
+    required_release: wp.array(dtype=wp.int32),
+    scaling_required: wp.array(dtype=wp.int32),
+) -> None:
+    """Commit validated private policy selection to P4 diagnostic sidecars."""
+    box = wp.tid()
+    required_release[box] = wp.max(counts[box] - free_counts[box], 0)
+    scaling_required[box] = scaling[box]
+
+
+@wp.kernel
+def _aggregate_p4_preflight_status(
+    invalid: wp.array(dtype=wp.int32),
+    release: wp.array(dtype=wp.int32),
+    scaling: wp.array(dtype=wp.int32),
+    status: wp.array(dtype=wp.int32),
+) -> None:
+    """Aggregate all P4 preflight results into one scalar status word."""
+    box = wp.tid()
+    if invalid[0] != 0:
+        status[0] = 1
+    if release[box] != 0:
+        wp.atomic_or(status, 0, 2)
+    if scaling[box] != 0:
+        wp.atomic_or(status, 0, 4)
+
+
+def _validate_p4_buffers(
+    preflight: _NucleationPreflight,
+    buffers: NucleationExhaustionBuffers,
+) -> tuple[Any, ...]:
+    """Validate P4 and nested E6-F6 storage before any P4 writer runs."""
+    if not isinstance(buffers, NucleationExhaustionBuffers):
+        raise ValueError("buffers must be NucleationExhaustionBuffers.")
+    if not isinstance(buffers.resampling_buffers, ResamplingBuffers):
+        raise ValueError("resampling_buffers must be ResamplingBuffers.")
+    b, n, s, device = (
+        preflight.n_boxes,
+        preflight.n_particles,
+        preflight.n_species,
+        preflight.device,
+    )
+    schema = (
+        ("demand_workspace", wp.float64, (b,)),
+        ("final_demand", wp.float64, (b,)),
+        ("requested_scale", wp.float64, (b,)),
+        ("minimum_scale", wp.float64, (b,)),
+        ("minimum_volume", wp.float64, (b,)),
+        ("resolved_scale", wp.float64, (b,)),
+        ("resampling_releasable_counts", wp.int32, (b,)),
+        ("required_release_counts", wp.int32, (b,)),
+        ("scaling_required", wp.int32, (b,)),
+        ("final_counts", wp.int32, (b,)),
+        ("final_selected_slot_indices", wp.int32, (b, n)),
+    )
+    arrays = tuple(
+        _array(buffers, name, dtype, shape, device)
+        for name, dtype, shape in schema
+    )
+    nested_schema = (
+        ("retained_counts", wp.int32, (b,)),
+        ("released_counts", wp.int32, (b,)),
+        ("retained_indices", wp.int32, (b, n)),
+        ("released_indices", wp.int32, (b, n)),
+        ("sorted_indices", wp.int32, (b, n)),
+        ("replacement_masses", wp.float64, (b, n, s)),
+        ("replacement_concentration", wp.float64, (b, n)),
+        ("replacement_charge", wp.float64, (b, n)),
+        ("source_radii", wp.float64, (b, n)),
+        ("radius_cubed_relative_error", wp.float64, (b,)),
+        ("mean_radius_relative_error", wp.float64, (b,)),
+        ("surface_relative_error", wp.float64, (b,)),
+        ("diversity_absolute_error", wp.float64, (b,)),
+        ("planning_status", wp.int32, (b,)),
+    )
+    nested = tuple(
+        _array(buffers.resampling_buffers, name, dtype, shape, device)
+        for name, dtype, shape in nested_schema
+    )
+    protected = (
+        preflight.particles.masses,
+        preflight.particles.concentration,
+        preflight.particles.charge,
+        preflight.particles.density,
+        preflight.particles.volume,
+        preflight.gas.molar_mass,
+        preflight.gas.concentration,
+        preflight.gas.partitioning,
+        *preflight.p3_sidecars,
+    )
+    _no_overlap(protected + arrays + nested)
+    return arrays + nested
+
+
+def _orchestrate_nucleation_exhaustion(  # noqa: C901
+    preflight: _NucleationPreflight,
+    finalized_demand: NucleationFinalizedDemandBuffers,
+    diagnostics: NucleationDiagnosticBuffers,
+    controls: NucleationExhaustionControls,
+    buffers: NucleationExhaustionBuffers,
+) -> None:
+    """Privately apply P4 capacity policy and write finalized diagnostics.
+
+    All expected P4 rejections are detected before P4 workspace writes or an
+    E6-F6 primitive call. Once a selected primitive begins, its independent
+    planning/commit failure contract applies; P4 intentionally provides no
+    cross-primitive rollback. This concrete-only seam neither activates slots
+    nor mutates gas.
+    """
+    if not isinstance(preflight, _NucleationPreflight):
+        raise ValueError("preflight must be _NucleationPreflight.")
+    if not isinstance(controls, NucleationExhaustionControls):
+        raise ValueError("controls must be NucleationExhaustionControls.")
+    controls.__post_init__()
+    _validate_staged_nucleation_sidecars(
+        preflight, finalized_demand, diagnostics
+    )
+    _validate_p4_buffers(preflight, buffers)
+    if preflight.n_boxes == 0:
+        return
+    categories = wp.empty(
+        (preflight.n_boxes, preflight.n_particles),
+        dtype=wp.int32,
+        device=preflight.device,
+    )
+    invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
+    if preflight.n_particles:
+        wp.launch(
+            _classify_slots,
+            dim=(preflight.n_boxes, preflight.n_particles),
+            inputs=[
+                preflight.particles.masses,
+                preflight.particles.concentration,
+                preflight.particles.charge,
+                categories,
+                invalid,
+            ],
+            device=preflight.device,
+        )
+    wp.launch(
+        _validate_p4_handoff,
+        dim=preflight.n_boxes,
+        inputs=[
+            finalized_demand.accepted_demand,
+            finalized_demand.accepted_counts,
+            preflight.particles.volume,
+            categories,
+            diagnostics.free_slot_indices,
+            diagnostics.active_slot_counts,
+            diagnostics.free_slot_counts,
+            diagnostics.selected_slot_indices,
+            buffers.resampling_releasable_counts,
+            buffers.requested_scale,
+            buffers.minimum_scale,
+            buffers.minimum_volume,
+            invalid,
+        ],
+        device=preflight.device,
+    )
+    release = wp.zeros(
+        preflight.n_boxes, dtype=wp.int32, device=preflight.device
+    )
+    scaling = wp.zeros(
+        preflight.n_boxes, dtype=wp.int32, device=preflight.device
+    )
+    wp.launch(
+        _select_p4_policy,
+        dim=preflight.n_boxes,
+        inputs=[
+            finalized_demand.accepted_counts,
+            diagnostics.free_slot_counts,
+            buffers.resampling_releasable_counts,
+            buffers.requested_scale,
+            buffers.minimum_volume,
+            preflight.particles.volume,
+            int(controls.resampling),
+            int(controls.representative_volume_scaling),
+            release,
+            scaling,
+            invalid,
+        ],
+        device=preflight.device,
+    )
+    preflight_status = wp.zeros(1, dtype=wp.int32, device=preflight.device)
+    wp.launch(
+        _aggregate_p4_preflight_status,
+        dim=preflight.n_boxes,
+        inputs=[invalid, release, scaling, preflight_status],
+        device=preflight.device,
+    )
+    status = int(preflight_status.numpy()[0])
+    if status & 1:
+        raise ValueError("P4 handoff, policy input, or capacity is invalid.")
+    wp.launch(
+        _write_p4_policy_diagnostics,
+        dim=preflight.n_boxes,
+        inputs=[
+            finalized_demand.accepted_counts,
+            diagnostics.free_slot_counts,
+            scaling,
+            buffers.required_release_counts,
+            buffers.scaling_required,
+        ],
+        device=preflight.device,
+    )
+    wp.launch(
+        _copy_p4_workspace,
+        dim=preflight.n_boxes,
+        inputs=[finalized_demand.accepted_demand, buffers.demand_workspace],
+        device=preflight.device,
+    )
+    if status & 2:
+        resampling_step_gpu(
+            preflight.particles, release, buffers.resampling_buffers
+        )
+    if status & 4:
+        representative_volume_scaling_step_gpu(
+            preflight.particles,
+            buffers.demand_workspace,
+            scaling,
+            buffers.requested_scale,
+            buffers.minimum_scale,
+            buffers.minimum_volume,
+            buffers.resolved_scale,
+        )
+    else:
+        wp.launch(
+            _write_unscaled_p4_resolution,
+            dim=preflight.n_boxes,
+            inputs=[scaling, buffers.resolved_scale],
+            device=preflight.device,
+        )
+    final_invalid = wp.zeros(1, dtype=wp.int32, device=preflight.device)
+    current_free = diagnostics.free_slot_indices
+    current_count = diagnostics.free_slot_counts
+    if status & 2:
+        # Resampling is the only selected primitive that changes slot state.
+        final_categories = wp.empty(
+            (preflight.n_boxes, preflight.n_particles),
+            dtype=wp.int32,
+            device=preflight.device,
+        )
+        if preflight.n_particles:
+            wp.launch(
+                _classify_slots,
+                dim=(preflight.n_boxes, preflight.n_particles),
+                inputs=[
+                    preflight.particles.masses,
+                    preflight.particles.concentration,
+                    preflight.particles.charge,
+                    final_categories,
+                    final_invalid,
+                ],
+                device=preflight.device,
+            )
+        # Keep P3 records immutable by writing current state into private work.
+        current_free = wp.empty(
+            (preflight.n_boxes, preflight.n_particles),
+            dtype=wp.int32,
+            device=preflight.device,
+        )
+        current_count = wp.empty(
+            preflight.n_boxes, dtype=wp.int32, device=preflight.device
+        )
+        wp.launch(
+            _write_current_p4_diagnostics,
+            dim=preflight.n_boxes,
+            inputs=[final_categories, current_free, current_count],
+            device=preflight.device,
+        )
+    wp.launch(
+        _validate_p4_final,
+        dim=preflight.n_boxes,
+        inputs=[
+            buffers.demand_workspace,
+            preflight.particles.volume,
+            current_count,
+            final_invalid,
+        ],
+        device=preflight.device,
+    )
+    if int(final_invalid.numpy()[0]):
+        raise ValueError("P4 final demand does not fit available capacity.")
+    wp.launch(
+        _write_p4_final,
+        dim=preflight.n_boxes,
+        inputs=[
+            buffers.demand_workspace,
+            preflight.particles.volume,
+            current_free,
+            buffers.final_demand,
+            buffers.final_counts,
+            buffers.final_selected_slot_indices,
         ],
         device=preflight.device,
     )

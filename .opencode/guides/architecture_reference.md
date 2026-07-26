@@ -64,9 +64,13 @@ diagnostics, and retains demand beyond free capacity while writing only the
 count and fixed-shape diagnostic sidecars. It stages the selectable free-slot
 prefix without activation or exhaustion policy and has no package export.
 Conversion rejection occurs before sidecar writes; rollback is not promised
-after a successful asynchronous diagnostic or P3 commit launch. E6-F6
-capacity policy, activation, particle/gas mutation, and E6-F9 integration
-remain deferred.
+after a successful asynchronous diagnostic or P3 commit launch. Private P4
+consumes immutable P2/P3 handoffs and caller-owned sidecars, selecting fully
+viable resampling before representative-volume scaling fallback, then emits
+final demand/count/free-slot diagnostics. Expected P4 all-box rejection occurs
+before workspace or primitive writes; entered E6-F6 primitives retain their own
+no-cross-primitive-rollback boundary. Activation, particle/gas mutation, and
+E6-F9 integration remain deferred.
 
 ## Scientific Utilities
 
