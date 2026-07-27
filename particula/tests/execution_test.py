@@ -16,7 +16,10 @@ from particula.execution import (
     CapabilityMatrix,
     CapabilityRequirements,
     Device,
+    ExecutionContext,
+    ExecutionRequest,
     Process,
+    _AdapterRegistry,
 )
 
 
@@ -373,6 +376,38 @@ builtins.__import__ = guarded_import
 import particula.execution
 assert "warp" not in sys.modules
 assert "particula.gpu" not in sys.modules
+
+from particula.execution import (
+    Backend,
+    CapabilityDeclaration,
+    CapabilityMatrix,
+    CapabilityRequirements,
+    Device,
+    ExecutionContext,
+    ExecutionRequest,
+    Process,
+)
+
+class Adapter:
+    def __init__(self):
+        self.calls = 0
+
+    def execute(self, *args, **kwargs):
+        self.calls += 1
+
+device = Device(Backend.CPU, "cpu")
+process = Process("condensation")
+requirements = CapabilityRequirements(frozenset())
+matrix = CapabilityMatrix(
+    frozenset({CapabilityDeclaration(device, process, requirements)})
+)
+context = ExecutionContext(matrix)
+adapter = Adapter()
+context._registry._register_adapter(process, Backend.CPU, adapter)
+assert context.resolve(
+    ExecutionRequest(Backend.CPU, device, process, requirements)
+) is adapter
+assert adapter.calls == 0
 """
 
     completed = subprocess.run(  # noqa: S603 -- fixed test interpreter
@@ -387,3 +422,337 @@ assert "particula.gpu" not in sys.modules
     assert completed.returncode == 0, (
         f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
     )
+
+
+class _FakeAdapter:
+    """Record whether P2 selection incorrectly invokes an adapter."""
+
+    def __init__(self) -> None:
+        """Create an adapter with no prior execution calls."""
+        self.calls = 0
+
+    def execute(self, *args: object, **kwargs: object) -> object:
+        """Record an invocation that P2 must never make."""
+        del args, kwargs
+        self.calls += 1
+        return None
+
+
+def _context(
+    device: Device | None = None,
+    process: Process | None = None,
+    requirements: CapabilityRequirements | None = None,
+) -> ExecutionContext:
+    """Create a context with one exact declared capability entry."""
+    declared_device = device or _device()
+    declared_process = process or _process()
+    declared_requirements = requirements or _requirements()
+    matrix = CapabilityMatrix(
+        frozenset(
+            {
+                CapabilityDeclaration(
+                    declared_device,
+                    declared_process,
+                    declared_requirements,
+                )
+            }
+        )
+    )
+    return ExecutionContext(matrix)
+
+
+def _request(
+    backend: Backend = Backend.CPU,
+    device: Device | None = None,
+    process: Process | None = None,
+    requirements: CapabilityRequirements | None = None,
+) -> ExecutionRequest:
+    """Create a typed request with the standard CPU values by default."""
+    return ExecutionRequest(
+        backend,
+        device or _device(),
+        process or _process(),
+        requirements or _requirements(),
+    )
+
+
+def test_execution_request_validates_fields_in_order_and_freezes() -> None:
+    """Test typed P2 requests reject fields before backend pairing checks."""
+    request = _request()
+
+    with pytest.raises(FrozenInstanceError):
+        request.backend = Backend.WARP  # type: ignore[misc]
+    with pytest.raises(
+        TypeError, match="^ExecutionRequest.backend must be a Backend.$"
+    ):
+        ExecutionRequest("cpu", "device", "process", "requirements")  # type: ignore[arg-type]
+    with pytest.raises(
+        TypeError, match="^ExecutionRequest.device must be a Device.$"
+    ):
+        ExecutionRequest(Backend.CPU, "device", "process", "requirements")  # type: ignore[arg-type]
+    with pytest.raises(
+        TypeError, match="^ExecutionRequest.process must be a Process.$"
+    ):
+        ExecutionRequest(Backend.CPU, _device(), "process", "requirements")  # type: ignore[arg-type]
+    with pytest.raises(
+        TypeError,
+        match=(
+            "^ExecutionRequest.requirements must be a CapabilityRequirements.$"
+        ),
+    ):
+        ExecutionRequest(Backend.CPU, _device(), _process(), "requirements")  # type: ignore[arg-type]
+    with pytest.raises(
+        ValueError,
+        match="^ExecutionRequest.backend must match device.backend.$",
+    ):
+        _request(Backend.CPU, Device(Backend.WARP, "cuda:0"))
+
+
+def test_context_rejects_non_matrix_before_creating_registry() -> None:
+    """Test a context requires immutable capability metadata."""
+    with pytest.raises(TypeError, match="^matrix must be a CapabilityMatrix.$"):
+        ExecutionContext(object())  # type: ignore[arg-type]
+
+
+def test_context_selects_canonical_cpu_adapter_without_execution() -> None:
+    """Test CPU selection returns the exact adapter without dispatching it."""
+    context = _context()
+    adapter = _FakeAdapter()
+    context._registry._register_adapter(_process(), Backend.CPU, adapter)
+
+    resolved = context.resolve(_request())
+
+    assert resolved is adapter
+    assert _request().device == Device(Backend.CPU, "cpu")
+    assert adapter.calls == 0
+
+
+def test_context_selects_warp_adapter_with_opaque_native_identifier() -> None:
+    """Test Warp selection preserves opaque native names without a probe."""
+    warp_device = Device(Backend.WARP, "cuda:0")
+    context = _context(warp_device)
+    adapter = _FakeAdapter()
+    context._registry._register_adapter(_process(), Backend.WARP, adapter)
+
+    resolved = context.resolve(_request(Backend.WARP, warp_device))
+
+    assert resolved is adapter
+    assert warp_device.native == "cuda:0"
+    assert adapter.calls == 0
+
+
+@pytest.mark.parametrize("native", ["cpu:0", "cuda:0"])
+def test_cpu_native_rejection_precedes_matrix_and_registry_lookup(
+    native: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test invalid CPU spelling fails before capability or adapter access."""
+    context = _context()
+    calls: list[str] = []
+    monkeypatch.setattr(
+        CapabilityMatrix,
+        "require",
+        lambda *args: calls.append("require"),
+    )
+    monkeypatch.setattr(
+        _AdapterRegistry,
+        "_lookup",
+        lambda *args: calls.append("lookup"),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="^CPU execution requires Device\\(Backend.CPU, 'cpu'\\).$",
+    ):
+        context.resolve(_request(device=Device(Backend.CPU, native)))
+
+    assert calls == []
+
+
+def test_resolve_non_request_precedes_matrix_and_registry_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test resolve type validation occurs before all selection work."""
+    context = _context()
+    calls: list[str] = []
+    monkeypatch.setattr(
+        CapabilityMatrix,
+        "require",
+        lambda *args: calls.append("require"),
+    )
+    monkeypatch.setattr(
+        _AdapterRegistry,
+        "_lookup",
+        lambda *args: calls.append("lookup"),
+    )
+
+    with pytest.raises(
+        TypeError, match="^request must be an ExecutionRequest.$"
+    ):
+        context.resolve(object())  # type: ignore[arg-type]
+
+    assert calls == []
+
+
+def test_resolve_requires_capability_before_one_registry_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test successful CPU selection performs require then one exact lookup."""
+    context = _context()
+    adapter = _FakeAdapter()
+    context._registry._register_adapter(_process(), Backend.CPU, adapter)
+    calls: list[tuple[str, object]] = []
+    original_require = CapabilityMatrix.require
+    original_lookup = _AdapterRegistry._lookup
+
+    def record_require(
+        matrix: CapabilityMatrix,
+        device: Device,
+        process: Process,
+        requirements: CapabilityRequirements,
+    ) -> None:
+        calls.append(("require", device))
+        original_require(matrix, device, process, requirements)
+
+    def record_lookup(
+        registry: _AdapterRegistry,
+        process: Process,
+        backend: Backend,
+    ) -> object:
+        calls.append(("lookup", (process, backend)))
+        return original_lookup(registry, process, backend)
+
+    monkeypatch.setattr(CapabilityMatrix, "require", record_require)
+    monkeypatch.setattr(_AdapterRegistry, "_lookup", record_lookup)
+
+    assert context.resolve(_request()) is adapter
+    assert calls == [
+        ("require", Device(Backend.CPU, "cpu")),
+        ("lookup", (_process(), Backend.CPU)),
+    ]
+
+
+def test_resolve_warp_requires_capability_before_one_registry_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test Warp selection preserves its opaque device through validation."""
+    warp_device = Device(Backend.WARP, "cuda:0")
+    context = _context(warp_device)
+    adapter = _FakeAdapter()
+    context._registry._register_adapter(_process(), Backend.WARP, adapter)
+    calls: list[tuple[str, object]] = []
+    original_require = CapabilityMatrix.require
+    original_lookup = _AdapterRegistry._lookup
+
+    def record_require(
+        matrix: CapabilityMatrix,
+        device: Device,
+        process: Process,
+        requirements: CapabilityRequirements,
+    ) -> None:
+        calls.append(("require", device))
+        original_require(matrix, device, process, requirements)
+
+    def record_lookup(
+        registry: _AdapterRegistry,
+        process: Process,
+        backend: Backend,
+    ) -> object:
+        calls.append(("lookup", (process, backend)))
+        return original_lookup(registry, process, backend)
+
+    monkeypatch.setattr(CapabilityMatrix, "require", record_require)
+    monkeypatch.setattr(_AdapterRegistry, "_lookup", record_lookup)
+
+    assert context.resolve(_request(Backend.WARP, warp_device)) is adapter
+    assert calls == [
+        ("require", warp_device),
+        ("lookup", (_process(), Backend.WARP)),
+    ]
+    assert adapter.calls == 0
+
+
+def test_unsupported_request_precedes_registry_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test unsupported capability errors cannot fall back to an adapter."""
+    context = _context(requirements=_requirements("isothermal"))
+    alternate = _FakeAdapter()
+    context._registry._register_adapter(_process(), Backend.CPU, alternate)
+    calls: list[object] = []
+    monkeypatch.setattr(
+        _AdapterRegistry,
+        "_lookup",
+        lambda *args: calls.append(args),
+    )
+
+    with pytest.raises(
+        ValueError, match="^Unsupported capability declaration:"
+    ):
+        context.resolve(_request(requirements=_requirements("latent_heat")))
+
+    assert calls == []
+    assert alternate.calls == 0
+
+
+def test_supported_unregistered_request_raises_exact_lookup_error() -> None:
+    """Test supported selection has no fallback adapter when unregistered."""
+    with pytest.raises(
+        LookupError,
+        match="^No adapter registered for process and backend.$",
+    ):
+        _context().resolve(_request())
+
+
+@pytest.mark.parametrize(
+    ("process", "backend", "adapter", "message"),
+    [
+        ("process", "backend", object(), "process must be a Process."),
+        (_process(), "backend", object(), "backend must be a Backend."),
+        (
+            _process(),
+            Backend.CPU,
+            object(),
+            "adapter must have a callable execute attribute.",
+        ),
+        (
+            _process(),
+            Backend.CPU,
+            type("Adapter", (), {"execute": None})(),
+            "adapter must have a callable execute attribute.",
+        ),
+    ],
+)
+def test_registry_rejects_invalid_entries_without_mutation(
+    process: object,
+    backend: object,
+    adapter: object,
+    message: str,
+) -> None:
+    """Test registration validation order leaves local state unchanged."""
+    registry = _AdapterRegistry()
+    before = registry._snapshot()
+
+    with pytest.raises(TypeError, match=f"^{re.escape(message)}$"):
+        registry._register_adapter(process, backend, adapter)
+
+    assert registry._snapshot() == before
+
+
+def test_duplicate_registration_preserves_original_adapter() -> None:
+    """Test duplicate private registration never replaces the original."""
+    context = _context()
+    original = _FakeAdapter()
+    duplicate = _FakeAdapter()
+    context._registry._register_adapter(_process(), Backend.CPU, original)
+    before = context._registry._snapshot()
+
+    with pytest.raises(
+        ValueError,
+        match="^Adapter already registered for process and backend.$",
+    ):
+        context._registry._register_adapter(_process(), Backend.CPU, duplicate)
+
+    assert context._registry._snapshot() == before
+    assert context.resolve(_request()) is original
+    assert original.calls == duplicate.calls == 0

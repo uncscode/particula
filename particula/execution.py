@@ -9,6 +9,7 @@ or execute processes.
 import re
 from dataclasses import dataclass
 from enum import Enum
+from typing import Protocol, runtime_checkable
 
 _NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 
@@ -308,3 +309,178 @@ def _validate_request(
         raise TypeError("process must be a Process.")
     if not isinstance(requirements, CapabilityRequirements):
         raise TypeError("requirements must be a CapabilityRequirements.")
+
+
+@dataclass(frozen=True)
+class ExecutionRequest:
+    """Declare a typed request for adapter selection without execution.
+
+    This value only describes selection. It neither probes a backend, transfers
+    state, nor establishes execution state or result contracts.
+
+    Args:
+        backend: Backend requested for selection.
+        device: Device requested on the backend.
+        process: Process requested on the device.
+        requirements: Exact capability requirements for the process.
+
+    Raises:
+        TypeError: If a field is not its declared metadata type.
+        ValueError: If the backend does not match the device backend.
+    """
+
+    backend: Backend
+    device: Device
+    process: Process
+    requirements: CapabilityRequirements
+
+    def __post_init__(self) -> None:
+        """Validate request metadata without resolving or executing it.
+
+        Raises:
+            TypeError: If a field is not its declared metadata type.
+            ValueError: If backend and device backend differ.
+        """
+        if not isinstance(self.backend, Backend):
+            raise TypeError("ExecutionRequest.backend must be a Backend.")
+        if not isinstance(self.device, Device):
+            raise TypeError("ExecutionRequest.device must be a Device.")
+        if not isinstance(self.process, Process):
+            raise TypeError("ExecutionRequest.process must be a Process.")
+        if not isinstance(self.requirements, CapabilityRequirements):
+            raise TypeError(
+                "ExecutionRequest.requirements must be a "
+                "CapabilityRequirements."
+            )
+        if self.backend != self.device.backend:
+            raise ValueError(
+                "ExecutionRequest.backend must match device.backend."
+            )
+
+
+@runtime_checkable
+class _ExecutionAdapter(Protocol):
+    """Describe the minimal private adapter shape for selection only.
+
+    P2 validates this shape but does not call it, probe optional dependencies,
+    or transfer data.
+    """
+
+    def execute(self, *args: object, **kwargs: object) -> object:
+        """Declare a future execution seam without invoking it."""
+
+
+class _AdapterRegistry:
+    """Keep context-local adapter registrations without execution."""
+
+    def __init__(self) -> None:
+        """Create an empty registry without loading or probing backends."""
+        self._adapters: dict[tuple[Process, Backend], _ExecutionAdapter] = {}
+
+    def _register_adapter(
+        self,
+        process: object,
+        backend: object,
+        adapter: object,
+    ) -> None:
+        """Register one shaped adapter without invoking or inspecting it.
+
+        Raises:
+            TypeError: If arguments are invalid in process, backend, adapter
+                order.
+            ValueError: If the process/backend pair is already registered.
+        """
+        if not isinstance(process, Process):
+            raise TypeError("process must be a Process.")
+        if not isinstance(backend, Backend):
+            raise TypeError("backend must be a Backend.")
+        if not isinstance(adapter, _ExecutionAdapter) or not callable(
+            getattr(adapter, "execute", None)
+        ):
+            raise TypeError("adapter must have a callable execute attribute.")
+        key = (process, backend)
+        if key in self._adapters:
+            raise ValueError(
+                "Adapter already registered for process and backend."
+            )
+        self._adapters[key] = adapter
+
+    def _lookup(self, process: Process, backend: Backend) -> _ExecutionAdapter:
+        """Return one exact adapter without fallback or adapter execution.
+
+        Raises:
+            LookupError: If no adapter has the exact process/backend key.
+        """
+        try:
+            return self._adapters[(process, backend)]
+        except KeyError as error:
+            raise LookupError(
+                "No adapter registered for process and backend."
+            ) from error
+
+    def _snapshot(self) -> dict[tuple[Process, Backend], _ExecutionAdapter]:
+        """Return a fresh private-registration snapshot for focused tests."""
+        return dict(self._adapters)
+
+
+class ExecutionContext:
+    """Select declared adapters without executing, probing, or transferring.
+
+    Each context owns its private registry, preventing mutable module-global
+    registration state.
+    """
+
+    def __init__(self, matrix: CapabilityMatrix) -> None:
+        """Store a matrix and create an empty private adapter registry.
+
+        Raises:
+            TypeError: If ``matrix`` is not a CapabilityMatrix.
+        """
+        if not isinstance(matrix, CapabilityMatrix):
+            raise TypeError("matrix must be a CapabilityMatrix.")
+        self._matrix = matrix
+        self._registry = _AdapterRegistry()
+
+    def resolve(self, request: ExecutionRequest) -> _ExecutionAdapter:
+        """Return one exact adapter after validation without invoking it.
+
+        Capability support is checked before the single registry lookup. This
+        method does not catch adapter errors because it never executes adapters.
+
+        Args:
+            request: Typed selection request.
+
+        Returns:
+            The registered adapter object by identity.
+
+        Raises:
+            TypeError: If request is not an ExecutionRequest.
+            ValueError: If CPU device spelling is invalid or support is absent.
+            LookupError: If supported request has no exact registered adapter.
+        """
+        if not isinstance(request, ExecutionRequest):
+            raise TypeError("request must be an ExecutionRequest.")
+        device = _normalize_request_device(request)
+        self._matrix.require(device, request.process, request.requirements)
+        return self._registry._lookup(request.process, request.backend)
+
+
+def _normalize_request_device(request: ExecutionRequest) -> Device:
+    """Normalize CPU selection without parsing, probing, or transferring.
+
+    Warp native identifiers remain opaque and are returned verbatim.
+
+    Raises:
+        ValueError: If the CPU spelling or backend/device pairing is invalid.
+    """
+    if request.backend != request.device.backend:
+        raise ValueError("ExecutionRequest.backend must match device.backend.")
+    if request.backend is Backend.CPU:
+        if request.device.native != "cpu":
+            raise ValueError(
+                "CPU execution requires Device(Backend.CPU, 'cpu')."
+            )
+        return Device(Backend.CPU, "cpu")
+    if request.backend is Backend.WARP:
+        return request.device
+    raise ValueError("ExecutionRequest.backend must match device.backend.")
