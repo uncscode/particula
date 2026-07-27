@@ -58,19 +58,12 @@
     unsupported-profile preflight; and no transfer, synchronization, fallback,
     or recovery.
 
-- [x] **E7-F2-P5:** Prove CPU and Warp condensation parity, conservation, and transfer boundaries
-  - Issue: #1474 | Size: S | Status: Shipped
-  - Delivered: Added test-only native legacy-CPU and resident direct-Warp
-    integration evidence. Warp uses a local independent NumPy fixed-four-
-    substep P2 oracle rather than CPU numerical output; no public API or
-    production implementation changed.
-  - Files: `particula/execution/tests/condensation_integration_test.py`
-  - Tests: CPU uptake, evaporation, zero gas, inactive, skip-partitioning, and
-    exact zero-time cases; Warp CPU uptake, evaporation, disabled partitioning,
-    zero gas, inactive slots, distinct two-box environment/gas inputs, latent
-    heat/energy sidecars, per-case mass/gas tolerances, conservation, exact
-    zero-time behavior, and resident-boundary spies. Optional CUDA runs uptake,
-    two-box, and latent-heat rows and skips explicitly when unavailable.
+- [ ] **E7-F2-P5:** Prove CPU and Warp condensation parity, conservation, and transfer boundaries
+  - Issue: TBD | Size: S | Status: Not Started
+  - Goal: Record bounded parity and conservation evidence for selected one-box and multi-box fixtures on Warp CPU, with optional CUDA rows.
+  - Files: `particula/execution/tests/condensation_adapter_test.py`,
+    `particula/execution/tests/condensation_integration_test.py`
+  - Tests: Uptake, evaporation, disabled partitioning, latent heat, zero gas, inactive slots, conservation, explicit tolerances, no intermediate transfer
 
 - [ ] **E7-F2-P6:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

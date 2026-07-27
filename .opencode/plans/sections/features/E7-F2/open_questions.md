@@ -15,11 +15,9 @@ implementation; they do not authorize scope expansion.
    reconstruction; the Warp value is the actual kernel tuple, including its
    caller-owned total-transfer result. Typed process-result expansion remains
    deferred.
-4. **Resolved for P5:** the native legacy CPU fixture is evidence for its own
-    behavior and conservation, not a Warp numerical oracle. Resident Warp uses
-    a local independent NumPy float64 fixed-four-substep P2 oracle with explicit
-    per-case mass and gas tolerances; no CPU/Warp numerical-equality claim is
-    made.
+4. Which existing CPU condensation fixture is the canonical scientific oracle
+   for the first selected isothermal/latent-heat workflow, and what justified
+   parity tolerances apply given different substep algorithms?
 5. Is kappa water activity the only non-ideal GPU mapping admitted in E7-F2,
    with all BAT-specific CPU configurations rejected, or is there a narrower
    representable BAT-derived configuration already covered by shipped kernels?

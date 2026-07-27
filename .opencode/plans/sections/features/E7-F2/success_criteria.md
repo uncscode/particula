@@ -75,18 +75,3 @@
 - [x] Focused tests cover sidecar identity, no-/zero-heat behavior, finalized
   transfer energy accounting, deferred-work behavior, native validation seams,
   and unsupported-profile preflight.
-
-## P5 Delivered Criteria (Issue #1474)
-
-- [x] Test-only native CPU and resident Warp integration coverage lives in
-  `particula/execution/tests/condensation_integration_test.py`; no public API
-  or production implementation changed.
-- [x] Warp CPU mass and gas results are separately compared to an independent
-  local NumPy fixed-four-substep P2 oracle using recorded per-case tolerances;
-  CPU behavior is not used as a numerical Warp oracle.
-- [x] The bounded matrix covers uptake, evaporation, disabled partitioning,
-  zero gas, inactive slots, distinct two-box inputs, latent heat/energy,
-  concentration-weighted conservation where applicable, exact zero-time
-  behavior, and resident identity/transfer boundaries.
-- [x] CUDA evidence is limited to uptake, two-box, and latent-heat rows and
-  skips explicitly when CUDA is unavailable.

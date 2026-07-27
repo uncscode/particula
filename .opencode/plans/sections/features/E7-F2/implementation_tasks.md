@@ -44,14 +44,11 @@
   state.
 - [x] Assert P2 same-device fixed-shape metadata, writable-output ownership,
   caller-owned sidecar identity, and no execution/transfer/synchronization.
-- [x] Cover fixed four-substep semantics, coupled gas inventory,
-  vapor-pressure refresh, total transfer, latent heat, and energy accounting
-  through the local independent Warp P2 oracle and resident integration cases.
-- [x] Cover selected native CPU and Warp CPU workflows with explicit per-case
-  tolerances and particle-plus-gas conservation checks, without asserting
-  cross-backend numerical equality.
-- [x] Add optional CUDA parametrization for uptake, two-box, and latent-heat
-  cases that skips cleanly when unavailable.
+- [ ] Cover fixed four-substep semantics, coupled gas inventory,
+  vapor-pressure refresh, total transfer, latent heat, and energy accounting.
+- [ ] Compare selected CPU and Warp CPU workflows with explicit per-case
+  tolerances and particle-plus-gas conservation checks.
+- [ ] Add optional CUDA parametrization that skips cleanly when unavailable.
 - [x] Cover CPU/Warp selected dispatch, exact native arguments and call counts,
   identity-preserving normalization, exception propagation, lazy Warp import,
   and the public export boundary.

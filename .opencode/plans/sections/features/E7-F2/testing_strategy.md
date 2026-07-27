@@ -84,21 +84,6 @@ existing tight conservation target (`rtol=1e-12`, `atol=1e-30`) where the
 fixture supports it. Algorithmic differences use justified parity tolerances,
 not a false bitwise-equality promise.
 
-## Shipped P5 Integration Evidence
-
-`particula/execution/tests/condensation_integration_test.py` supplies the
-test-only P5 evidence without changing public APIs. Native one-box legacy CPU
-cases exercise uptake, evaporation, zero gas, inactive concentration,
-skip-partitioning, conservation, identity, and exact zero-time behavior.
-Resident Warp CPU cases use a local independent NumPy float64 fixed-four-
-substep P2 oracle for separate particle-mass and gas-concentration assertions
-with explicit per-case tolerances. They cover uptake, evaporation, disabled
-partitioning, zero gas, inactive slots, differing two-box environment/gas
-inputs, latent-heat transfer/energy sidecars, conservation where applicable,
-and exact zero-time behavior. Boundary spies reject adapter-initiated
-conversion, restoration, copy, synchronization, or CPU fallback. CUDA reuses
-uptake, two-box, and latent-heat rows and explicitly skips when unavailable.
-
 ## Transfer and Compatibility Assertions
 
 Spy on conversion, restore, synchronization, and CPU runnable calls. A normal

@@ -46,15 +46,6 @@ the direct kernel by identity. CPU remains isothermal; Warp profile failures
 occur before lazy kernel resolution, while the direct kernel retains thermal
 validation, execution, exception, and energy-accounting authority.
 
-Issue #1474 shipped E7-F2-P5 as test-only integration evidence in
-`particula/execution/tests/condensation_integration_test.py`. Native legacy CPU
-cases and resident direct-Warp cases are intentionally independent: Warp is
-checked against a local NumPy fixed-four-substep P2 oracle, not CPU numerical
-output. The evidence covers bounded case-specific mass/gas tolerances,
-concentration-weighted inventory, protected lanes, sidecar identity/energy,
-resident execution, Warp CPU, and an optional CUDA subset; no public API or
-production implementation changed.
-
 ## User Stories
 
 - As a simulation user, I want to request CPU or Warp condensation through one

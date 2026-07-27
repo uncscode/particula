@@ -81,12 +81,16 @@ class _WarpCase:
     temperature: np.ndarray
     pressure: np.ndarray
     vapor_pressure: np.ndarray
+    protected_mass_mask: np.ndarray | None = None
+    protected_gas_mask: np.ndarray | None = None
     time_step: float = 0.1
     latent_heat: bool = False
     mass_rtol: float = 1.0e-10
     mass_atol: float = 1.0e-30
     gas_rtol: float = 1.0e-10
     gas_atol: float = 1.0e-30
+    energy_rtol: float = 1.0e-10
+    energy_atol: float = 1.0e-30
     conserved: bool = True
 
 
@@ -195,6 +199,20 @@ def _cases() -> tuple[_WarpCase, ...]:
             **common,
         ),
         _WarpCase(
+            "mixed_transfer",
+            masses=np.array([[[1.0e-24], [1.0e-15]]], dtype=np.float64),
+            concentration=np.array([[1.0e6, 1.0e12]], dtype=np.float64),
+            gas=np.zeros((1, 1)),
+            partitioning=np.array([[True]]),
+            temperature=np.array([298.15]),
+            pressure=np.array([101325.0]),
+            vapor_pressure=np.full((1, 1), 1.0e-2),
+            mass_rtol=1.0e-10,
+            mass_atol=1.0e-30,
+            gas_rtol=1.0e-10,
+            gas_atol=1.0e-30,
+        ),
+        _WarpCase(
             "disabled",
             gas=np.array([[1.0e-6]]),
             vapor_pressure=np.zeros((1, 1)),
@@ -207,6 +225,8 @@ def _cases() -> tuple[_WarpCase, ...]:
             mass_atol=1.0e-30,
             gas_rtol=1.0e-10,
             gas_atol=1.0e-30,
+            protected_mass_mask=np.ones((1, 2, 1), dtype=bool),
+            protected_gas_mask=np.ones((1, 1), dtype=bool),
             conserved=False,
         ),
         _WarpCase(
@@ -217,6 +237,7 @@ def _cases() -> tuple[_WarpCase, ...]:
             mass_atol=1.0e-30,
             gas_rtol=1.0e-10,
             gas_atol=1.0e-30,
+            protected_gas_mask=np.ones((1, 1), dtype=bool),
             **common,
         ),
         _WarpCase(
@@ -232,6 +253,7 @@ def _cases() -> tuple[_WarpCase, ...]:
             mass_atol=1.0e-30,
             gas_rtol=1.0e-10,
             gas_atol=1.0e-30,
+            protected_mass_mask=np.array([[[False], [True]]], dtype=bool),
         ),
         _WarpCase(
             "two_box",
@@ -256,6 +278,8 @@ def _cases() -> tuple[_WarpCase, ...]:
             mass_atol=1.0e-30,
             gas_rtol=1.0e-10,
             gas_atol=1.0e-30,
+            energy_rtol=1.0e-10,
+            energy_atol=1.0e-30,
             **common,
         ),
     )
@@ -264,7 +288,9 @@ def _cases() -> tuple[_WarpCase, ...]:
 WARP_CASES = _cases()
 
 
-def _build_warp_state(case: _WarpCase, device: str) -> dict[str, Any]:
+def _build_warp_state(
+    case: _WarpCase, device: str, *, sentinel_outputs: bool = False
+) -> dict[str, Any]:
     """Convert one detached float64 CPU fixture once and retain snapshots."""
     wp = pytest.importorskip("warp")
     from particula.gpu.conversion import (
@@ -293,13 +319,21 @@ def _build_warp_state(case: _WarpCase, device: str) -> dict[str, Any]:
         saturation_ratio=np.ones_like(case.gas),
     )
     particles = to_warp_particle_data(particle_data, device=device)
+    vapor_pressure = (
+        np.full_like(case.vapor_pressure, 17.0)
+        if sentinel_outputs
+        else case.vapor_pressure
+    )
     gas = to_warp_gas_data(
-        gas_data, device=device, vapor_pressure=case.vapor_pressure
+        gas_data, device=device, vapor_pressure=vapor_pressure
     )
     environment = to_warp_environment_data(environment_data, device=device)
     boxes, slots, species = case.masses.shape
-    transfer = wp.zeros(
-        (boxes, slots, species), dtype=wp.float64, device=device
+    transfer = wp.full(
+        (boxes, slots, species),
+        wp.float64(7.0 if sentinel_outputs else 0.0),
+        dtype=wp.float64,
+        device=device,
     )
     latent_heat = (
         wp.array([2.0e5], dtype=wp.float64, device=device)
@@ -307,9 +341,20 @@ def _build_warp_state(case: _WarpCase, device: str) -> dict[str, Any]:
         else None
     )
     energy = (
-        wp.zeros((boxes, species), dtype=wp.float64, device=device)
+        wp.full(
+            (boxes, species),
+            wp.float64(11.0 if sentinel_outputs else 0.0),
+            dtype=wp.float64,
+            device=device,
+        )
         if case.latent_heat
         else None
+    )
+    thermal_work = wp.full(
+        species,
+        wp.float64(13.0 if sentinel_outputs else 0.0),
+        dtype=wp.float64,
+        device=device,
     )
     thermodynamics = ThermodynamicsConfig(
         modes=wp.zeros(species, dtype=wp.int32, device=device),
@@ -330,6 +375,7 @@ def _build_warp_state(case: _WarpCase, device: str) -> dict[str, Any]:
             mass_transfer=transfer,
             latent_heat=latent_heat,
             energy_transfer=energy,
+            thermal_work=thermal_work,
         ),
         case.time_step,
     )
@@ -340,6 +386,7 @@ def _build_warp_state(case: _WarpCase, device: str) -> dict[str, Any]:
         "transfer": transfer,
         "latent_heat": latent_heat,
         "energy": energy,
+        "thermal_work": thermal_work,
         "initial_mass": case.masses.copy(),
         "initial_concentration": case.concentration.copy(),
         "latent_heat_values": (
@@ -406,6 +453,43 @@ def _assert_mass_and_gas(
                 atol=case.gas_atol,
                 err_msg=_case_message(
                     case, device, "gas concentration", box, species
+                ),
+            )
+
+
+def _assert_protected_lanes(
+    case: _WarpCase,
+    device: str,
+    masses: np.ndarray,
+    gas: np.ndarray,
+    expected_mass: np.ndarray,
+    expected_gas: np.ndarray,
+) -> None:
+    """Assert any declared protected particle or gas lanes remain stable."""
+    if case.protected_mass_mask is not None:
+        for box, slot, species in np.argwhere(case.protected_mass_mask):
+            npt.assert_array_equal(
+                masses[box, slot, species],
+                expected_mass[box, slot, species],
+                err_msg=_case_message(
+                    case,
+                    device,
+                    "protected particle mass",
+                    int(box),
+                    int(species),
+                ),
+            )
+    if case.protected_gas_mask is not None:
+        for box, species in np.argwhere(case.protected_gas_mask):
+            npt.assert_array_equal(
+                gas[box, species],
+                expected_gas[box, species],
+                err_msg=_case_message(
+                    case,
+                    device,
+                    "protected gas",
+                    int(box),
+                    int(species),
                 ),
             )
 
@@ -493,12 +577,21 @@ def _p2_oracle(case: _WarpCase) -> tuple[np.ndarray, np.ndarray]:
                     rate = get_mass_transfer_rate(**rate_arguments)
                 proposal[box, slot, 0] = rate * case.time_step / 4.0
         proposal = np.maximum(proposal, -masses)
+        evaporation = np.minimum(proposal, 0.0)
+        gas_after_evaporation = gas - np.sum(
+            evaporation * concentration[..., None], axis=1
+        )
         demand = np.sum(
             np.maximum(proposal, 0.0) * concentration[..., None], axis=1
         )
         scale = np.minimum(
             1.0,
-            np.divide(gas, demand, out=np.ones_like(gas), where=demand > 0.0),
+            np.divide(
+                gas_after_evaporation,
+                demand,
+                out=np.ones_like(gas),
+                where=demand > 0.0,
+            ),
         )
         proposal = np.where(
             proposal > 0.0, proposal * scale[:, None, :], proposal
@@ -624,6 +717,9 @@ def test_warp_adapter_matches_independent_p2_oracle_and_conserves_inventory(
     backend_value = cast(tuple[Any, ...], result.backend_result.value)
     assert backend_value[0] is resources["particles"]
     _assert_mass_and_gas(case, "cpu", masses, gas, expected_mass, expected_gas)
+    _assert_protected_lanes(
+        case, "cpu", masses, gas, expected_mass, expected_gas
+    )
     if case.conserved:
         _assert_inventory(resources, masses, gas)
     if case.name == "disabled":
@@ -633,26 +729,44 @@ def test_warp_adapter_matches_independent_p2_oracle_and_conserves_inventory(
         npt.assert_array_equal(masses[:, 1], resources["initial_mass"][:, 1])
     if case.name == "zero_gas":
         assert np.all(gas >= 0.0)
+    if case.name == "mixed_transfer":
+        assert masses[0, 0, 0] < resources["initial_mass"][0, 0, 0]
+        assert masses[0, 1, 0] > resources["initial_mass"][0, 1, 0]
     assert np.all(masses >= 0.0)
 
 
 @pytest.mark.warp
 def test_warp_adapter_zero_time_is_an_exact_noop() -> None:
-    """Resident Warp zero duration preserves primary fields and output sidecars."""
-    case = _cases()[0]
-    resources = _build_warp_state(case, "cpu")
+    """Zero time retains the resident primary state and native return value."""
+    case = next(case for case in WARP_CASES if case.name == "uptake")
+    resources = _build_warp_state(case, "cpu", sentinel_outputs=True)
     state = WarpCondensationExecutionState(resources["state"].state, 0.0)
-    before = _snapshot(resources)
+    before = {
+        "masses": resources["particles"].masses.numpy().copy(),
+        "concentration": resources["particles"].concentration.numpy().copy(),
+        "gas": resources["gas"].concentration.numpy().copy(),
+        "transfer": resources["transfer"].numpy().copy(),
+    }
     result = WarpCondensationExecutionAdapter().execute(state)
     pytest.importorskip("warp").synchronize()
-    after = _snapshot(resources)
     assert result.state is state
     assert result.backend_result is not None
     backend_value = cast(tuple[Any, ...], result.backend_result.value)
     assert backend_value[0] is resources["particles"]
     assert backend_value[1] is resources["transfer"]
-    for expected, actual in zip(before, after, strict=True):
-        npt.assert_array_equal(actual, expected)
+    npt.assert_array_equal(
+        resources["particles"].masses.numpy(), before["masses"]
+    )
+    npt.assert_array_equal(
+        resources["particles"].concentration.numpy(), before["concentration"]
+    )
+    npt.assert_array_equal(
+        resources["gas"].concentration.numpy(), before["gas"]
+    )
+    npt.assert_array_equal(resources["transfer"].numpy(), 0.0)
+    npt.assert_array_equal(
+        resources["gas"].vapor_pressure.numpy(), case.vapor_pressure
+    )
 
 
 @pytest.mark.warp
@@ -675,8 +789,8 @@ def test_warp_adapter_latent_heat_sidecars_have_identity_and_energy_accounting()
     npt.assert_allclose(
         energy,
         np.sum(transfer, axis=1) * latent_heat_values[None, :],
-        rtol=case.gas_rtol,
-        atol=case.gas_atol,
+        rtol=case.energy_rtol,
+        atol=case.energy_atol,
     )
 
 
@@ -750,4 +864,7 @@ def test_warp_adapter_cuda_smoke_preserves_p2_inventory(
     wp.synchronize()
     masses, gas, _, _ = _snapshot(resources)
     _assert_mass_and_gas(case, "cuda", masses, gas, expected_mass, expected_gas)
+    _assert_protected_lanes(
+        case, "cuda", masses, gas, expected_mass, expected_gas
+    )
     _assert_inventory(resources, masses, gas)
