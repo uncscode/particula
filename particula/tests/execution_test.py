@@ -16,12 +16,30 @@ from particula.aerosol import Aerosol
 from particula.dynamics.dilution import DilutionStrategy
 from particula.dynamics.particle_process import Dilution
 from particula.execution import (
+    CONDENSATION_CAPABILITY_MATRIX,
+    CONDENSATION_COMPOSITION_WEIGHTED_SURFACE_CAPABILITY,
+    CONDENSATION_EQUAL_STEP_CAPABILITY,
+    CONDENSATION_IDEAL_ACTIVITY_CAPABILITY,
+    CONDENSATION_KAPPA_ACTIVITY_CAPABILITY,
+    CONDENSATION_LATENT_HEAT_CAPABILITY,
+    CONDENSATION_NO_LATENT_HEAT_CAPABILITY,
+    CONDENSATION_NONREPRESENTABLE_ACTIVITY_CAPABILITY,
+    CONDENSATION_NONREPRESENTABLE_SURFACE_CAPABILITY,
+    CONDENSATION_PROCESS,
+    CONDENSATION_STAGGERED_CAPABILITY,
+    CONDENSATION_STATIC_SURFACE_CAPABILITY,
+    CPU_CONDENSATION_PROFILE_DEVICE,
+    WARP_CONDENSATION_PROFILE_DEVICE,
     Backend,
     BackendResult,
     Capability,
     CapabilityDeclaration,
     CapabilityMatrix,
     CapabilityRequirements,
+    CondensationActivityMode,
+    CondensationConfiguration,
+    CondensationExecutionMode,
+    CondensationSurfaceMode,
     CPUExecutionAdapter,
     CPUExecutionState,
     Device,
@@ -34,6 +52,9 @@ from particula.execution import (
     MutationScope,
     Process,
     _AdapterRegistry,
+    condensation_profile_supports,
+    get_condensation_requirements,
+    require_condensation_profile,
     validate_execution_result,
 )
 from particula.gas.atmosphere import Atmosphere
@@ -433,6 +454,354 @@ assert device.native == "cuda:0"
 assert adapter.calls == 0
 """
 
+    completed = subprocess.run(  # noqa: S603 -- fixed test interpreter
+        [sys.executable, "-c", script],
+        cwd=repository_root,
+        capture_output=True,
+        check=False,
+        env=environment,
+        text=True,
+    )
+
+    assert completed.returncode == 0, (
+        f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
+    )
+
+
+def _condensation_configuration(
+    execution_mode: CondensationExecutionMode = CondensationExecutionMode.EQUAL_STEP,
+    latent_heat: bool = False,
+    activity_mode: CondensationActivityMode = CondensationActivityMode.IDEAL,
+    surface_mode: CondensationSurfaceMode = CondensationSurfaceMode.STATIC,
+) -> CondensationConfiguration:
+    """Create a valid semantic condensation configuration."""
+    return CondensationConfiguration(
+        execution_mode,
+        latent_heat,
+        activity_mode,
+        surface_mode,
+    )
+
+
+def _condensation_expected_requirements(
+    configuration: CondensationConfiguration,
+) -> CapabilityRequirements:
+    """Create the exact expected requirement set for a configuration."""
+    execution_capabilities = {
+        CondensationExecutionMode.EQUAL_STEP: CONDENSATION_EQUAL_STEP_CAPABILITY,
+        CondensationExecutionMode.STAGGERED: CONDENSATION_STAGGERED_CAPABILITY,
+    }
+    latent_heat_capabilities = {
+        True: CONDENSATION_LATENT_HEAT_CAPABILITY,
+        False: CONDENSATION_NO_LATENT_HEAT_CAPABILITY,
+    }
+    activity_capabilities = {
+        CondensationActivityMode.IDEAL: CONDENSATION_IDEAL_ACTIVITY_CAPABILITY,
+        CondensationActivityMode.KAPPA: CONDENSATION_KAPPA_ACTIVITY_CAPABILITY,
+        CondensationActivityMode.NONREPRESENTABLE: (
+            CONDENSATION_NONREPRESENTABLE_ACTIVITY_CAPABILITY
+        ),
+    }
+    surface_capabilities = {
+        CondensationSurfaceMode.STATIC: CONDENSATION_STATIC_SURFACE_CAPABILITY,
+        CondensationSurfaceMode.COMPOSITION_WEIGHTED: (
+            CONDENSATION_COMPOSITION_WEIGHTED_SURFACE_CAPABILITY
+        ),
+        CondensationSurfaceMode.NONREPRESENTABLE: (
+            CONDENSATION_NONREPRESENTABLE_SURFACE_CAPABILITY
+        ),
+    }
+    return CapabilityRequirements(
+        frozenset(
+            {
+                execution_capabilities[configuration.execution_mode],
+                latent_heat_capabilities[configuration.latent_heat],
+                activity_capabilities[configuration.activity_mode],
+                surface_capabilities[configuration.surface_mode],
+            }
+        )
+    )
+
+
+def test_condensation_catalogue_maps_all_cpu_configurations() -> None:
+    """Test all semantic configurations map to exact CPU declarations."""
+    configurations = [
+        _condensation_configuration(execution, latent_heat, activity, surface)
+        for execution in CondensationExecutionMode
+        for latent_heat in (True, False)
+        for activity in CondensationActivityMode
+        for surface in CondensationSurfaceMode
+    ]
+    cpu_declarations = {
+        declaration
+        for declaration in CONDENSATION_CAPABILITY_MATRIX.declarations
+        if declaration.device == CPU_CONDENSATION_PROFILE_DEVICE
+    }
+
+    assert len(configurations) == 36
+    assert len(cpu_declarations) == 36
+    assert len(CONDENSATION_CAPABILITY_MATRIX.declarations) == 44
+    assert all(
+        len(entry.requirements.values) == 4
+        for entry in CONDENSATION_CAPABILITY_MATRIX.declarations
+    )
+    for configuration in configurations:
+        requirements = get_condensation_requirements(configuration)
+        assert requirements == _condensation_expected_requirements(
+            configuration
+        )
+        assert requirements is not get_condensation_requirements(configuration)
+        assert len(requirements.values) == 4
+        assert condensation_profile_supports(Backend.CPU, configuration)
+
+
+def test_condensation_catalogue_maps_exact_warp_profile_rows() -> None:
+    """Test only equal-step representable configurations are Warp declarations."""
+    configurations = [
+        _condensation_configuration(
+            CondensationExecutionMode.EQUAL_STEP,
+            latent_heat,
+            activity,
+            surface,
+        )
+        for latent_heat in (True, False)
+        for activity in (
+            CondensationActivityMode.IDEAL,
+            CondensationActivityMode.KAPPA,
+        )
+        for surface in (
+            CondensationSurfaceMode.STATIC,
+            CondensationSurfaceMode.COMPOSITION_WEIGHTED,
+        )
+    ]
+    warp_declarations = {
+        declaration
+        for declaration in CONDENSATION_CAPABILITY_MATRIX.declarations
+        if declaration.device == WARP_CONDENSATION_PROFILE_DEVICE
+    }
+
+    assert len(configurations) == 8
+    assert len(warp_declarations) == 8
+    assert len(CONDENSATION_CAPABILITY_MATRIX.declarations) == 44
+    assert all(
+        len(entry.requirements.values) == 4 for entry in warp_declarations
+    )
+    for configuration in configurations:
+        assert condensation_profile_supports(Backend.WARP, configuration)
+        require_condensation_profile(Backend.WARP, configuration)
+
+
+@pytest.mark.parametrize(
+    "configuration",
+    [
+        _condensation_configuration(
+            CondensationExecutionMode.STAGGERED,
+        ),
+        _condensation_configuration(
+            activity_mode=CondensationActivityMode.NONREPRESENTABLE,
+        ),
+        _condensation_configuration(
+            surface_mode=CondensationSurfaceMode.NONREPRESENTABLE,
+        ),
+        _condensation_configuration(
+            CondensationExecutionMode.STAGGERED,
+            True,
+            CondensationActivityMode.NONREPRESENTABLE,
+            CondensationSurfaceMode.NONREPRESENTABLE,
+        ),
+    ],
+)
+def test_condensation_warp_profile_rejects_unsupported_semantics(
+    configuration: CondensationConfiguration,
+) -> None:
+    """Test unsupported Warp semantics fail through the stable matrix error."""
+    assert not condensation_profile_supports(Backend.WARP, configuration)
+    with pytest.raises(
+        ValueError, match="^Unsupported capability declaration: "
+    ):
+        require_condensation_profile(Backend.WARP, configuration)
+
+
+def test_condensation_configuration_validates_types_and_is_frozen() -> None:
+    """Test configuration fields are exact semantic metadata types."""
+    configuration = _condensation_configuration()
+    with pytest.raises(FrozenInstanceError):
+        configuration.latent_heat = True  # type: ignore[misc]
+
+    invalid_values = (
+        (
+            "equal_step",
+            False,
+            CondensationActivityMode.IDEAL,
+            CondensationSurfaceMode.STATIC,
+        ),
+        (
+            CondensationExecutionMode.EQUAL_STEP,
+            1,
+            CondensationActivityMode.IDEAL,
+            CondensationSurfaceMode.STATIC,
+        ),
+        (
+            CondensationExecutionMode.EQUAL_STEP,
+            False,
+            "ideal",
+            CondensationSurfaceMode.STATIC,
+        ),
+        (
+            CondensationExecutionMode.EQUAL_STEP,
+            False,
+            CondensationActivityMode.IDEAL,
+            "static",
+        ),
+    )
+    for values in invalid_values:
+        with pytest.raises(TypeError):
+            CondensationConfiguration(*values)  # type: ignore[arg-type]
+
+
+def test_condensation_helpers_validate_in_deterministic_order() -> None:
+    """Test backend validation precedes configuration validation and lookup."""
+    malformed = object()
+    unsupported = _condensation_configuration(
+        execution_mode=CondensationExecutionMode.STAGGERED,
+    )
+
+    with pytest.raises(TypeError, match="^backend must be a Backend.$"):
+        condensation_profile_supports("warp", malformed)  # type: ignore[arg-type]
+    with pytest.raises(
+        TypeError, match="^configuration must be a CondensationConfiguration.$"
+    ):
+        condensation_profile_supports(  # type: ignore[arg-type]
+            Backend.WARP,
+            malformed,
+        )
+    with pytest.raises(
+        ValueError, match="^Unsupported capability declaration: "
+    ):
+        require_condensation_profile(Backend.WARP, unsupported)
+    with pytest.raises(TypeError):
+        condensation_profile_supports(
+            Backend.CPU, _condensation_configuration(), "cpu"
+        )  # type: ignore[call-arg]
+
+
+def test_condensation_catalogue_is_exact_not_composable() -> None:
+    """Test individual axis declarations cannot compose a full request."""
+    configuration = _condensation_configuration()
+    requirements = get_condensation_requirements(configuration)
+    matrix = CapabilityMatrix(
+        frozenset(
+            CapabilityDeclaration(
+                CPU_CONDENSATION_PROFILE_DEVICE,
+                CONDENSATION_PROCESS,
+                CapabilityRequirements(frozenset({capability})),
+            )
+            for capability in requirements.values
+        )
+    )
+
+    assert not matrix.supports(
+        CPU_CONDENSATION_PROFILE_DEVICE,
+        CONDENSATION_PROCESS,
+        requirements,
+    )
+
+
+def test_condensation_helpers_are_read_only_and_do_not_select_adapters(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test pure mapping and profile queries only reach their matrix layer."""
+    configuration = _condensation_configuration()
+    declarations_before = CONDENSATION_CAPABILITY_MATRIX.declarations
+    hashes_before = {hash(value) for value in declarations_before}
+    calls: list[str] = []
+    original_supports = CapabilityMatrix.supports
+    original_require = CapabilityMatrix.require
+
+    def supports_spy(self: CapabilityMatrix, *args: object) -> bool:
+        """Record matrix support queries while retaining their behavior."""
+        calls.append("supports")
+        return original_supports(self, *args)  # type: ignore[arg-type]
+
+    def require_spy(self: CapabilityMatrix, *args: object) -> None:
+        """Record matrix require queries while retaining their behavior."""
+        calls.append("require")
+        return original_require(self, *args)  # type: ignore[arg-type]
+
+    def lookup_spy(*args: object, **kwargs: object) -> object:
+        """Fail if a pure catalogue helper reaches adapter selection."""
+        del args, kwargs
+        raise AssertionError("Unexpected adapter lookup.")
+
+    monkeypatch.setattr(CapabilityMatrix, "supports", supports_spy)
+    monkeypatch.setattr(CapabilityMatrix, "require", require_spy)
+    monkeypatch.setattr(_AdapterRegistry, "_lookup", lookup_spy)
+
+    requirements = get_condensation_requirements(configuration)
+    assert calls == []
+    assert requirements == _condensation_expected_requirements(configuration)
+    assert condensation_profile_supports(Backend.CPU, configuration)
+    assert calls == ["supports"]
+    require_condensation_profile(Backend.CPU, configuration)
+    assert calls == ["supports", "require", "supports"]
+    assert CONDENSATION_CAPABILITY_MATRIX.declarations is declarations_before
+    assert {hash(value) for value in declarations_before} == hashes_before
+
+
+def test_condensation_profile_import_isolation() -> None:
+    """Test direct condensation metadata imports no optional backend modules."""
+    repository_root = Path(__file__).parents[2]
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = os.pathsep.join(
+        filter(None, (str(repository_root), environment.get("PYTHONPATH")))
+    )
+    script = """
+import builtins
+import sys
+
+original_import = builtins.__import__
+def guarded_import(name, *args, **kwargs):
+    if name == "warp" or name.startswith("warp.") or name == "particula.gpu" or name.startswith("particula.gpu."):
+        raise AssertionError(f"Unexpected optional backend import: {name}")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = guarded_import
+from particula.execution import (
+    Backend,
+    CondensationActivityMode,
+    CondensationConfiguration,
+    CondensationExecutionMode,
+    CondensationSurfaceMode,
+    condensation_profile_supports,
+    get_condensation_requirements,
+    require_condensation_profile,
+)
+
+configuration = CondensationConfiguration(
+    CondensationExecutionMode.EQUAL_STEP,
+    False,
+    CondensationActivityMode.IDEAL,
+    CondensationSurfaceMode.STATIC,
+)
+assert len(get_condensation_requirements(configuration).values) == 4
+assert condensation_profile_supports(Backend.CPU, configuration)
+assert condensation_profile_supports(Backend.WARP, configuration)
+staggered = CondensationConfiguration(
+    CondensationExecutionMode.STAGGERED,
+    False,
+    CondensationActivityMode.IDEAL,
+    CondensationSurfaceMode.STATIC,
+)
+try:
+    require_condensation_profile(Backend.WARP, staggered)
+except ValueError:
+    pass
+else:
+    raise AssertionError("Expected unsupported profile declaration.")
+assert "warp" not in sys.modules
+assert "particula.gpu" not in sys.modules
+assert not any(name.startswith("particula.gpu.") for name in sys.modules)
+"""
     completed = subprocess.run(  # noqa: S603 -- fixed test interpreter
         [sys.executable, "-c", script],
         cwd=repository_root,

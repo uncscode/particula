@@ -22,6 +22,7 @@ import inspect
 import re
 from dataclasses import dataclass
 from enum import Enum
+from itertools import product
 from math import isfinite
 from numbers import Integral, Rational, Real
 from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
@@ -333,6 +334,256 @@ class CapabilityMatrix:
             "Unsupported capability declaration: "
             + repr(CapabilityDeclaration(device, process, requirements))
         )
+
+
+class CondensationExecutionMode(str, Enum):
+    """Declare the semantic condensation time-stepping mode."""
+
+    EQUAL_STEP = "equal_step"
+    STAGGERED = "staggered"
+
+
+class CondensationActivityMode(str, Enum):
+    """Declare the semantic condensation activity-coefficient mode."""
+
+    IDEAL = "ideal"
+    KAPPA = "kappa"
+    NONREPRESENTABLE = "nonrepresentable"
+
+
+class CondensationSurfaceMode(str, Enum):
+    """Declare the semantic condensation surface-tension mode."""
+
+    STATIC = "static"
+    COMPOSITION_WEIGHTED = "composition_weighted"
+    NONREPRESENTABLE = "nonrepresentable"
+
+
+@dataclass(frozen=True)
+class CondensationConfiguration:
+    """Declare immutable semantic condensation configuration metadata.
+
+    This metadata does not inspect or translate strategy objects, device names,
+    optional-backend sidecars, or concrete activity and surface implementations.
+
+    Args:
+        execution_mode: Semantic time-stepping mode.
+        latent_heat: Whether latent-heat semantics are required.
+        activity_mode: Semantic activity-coefficient mode.
+        surface_mode: Semantic surface-tension mode.
+
+    Raises:
+        TypeError: If a field is not its exact declared metadata type.
+    """
+
+    execution_mode: CondensationExecutionMode
+    latent_heat: bool
+    activity_mode: CondensationActivityMode
+    surface_mode: CondensationSurfaceMode
+
+    def __post_init__(self) -> None:
+        """Validate the exact semantic configuration field types."""
+        if not isinstance(self.execution_mode, CondensationExecutionMode):
+            raise TypeError(
+                "CondensationConfiguration.execution_mode must be a "
+                "CondensationExecutionMode."
+            )
+        if type(self.latent_heat) is not bool:
+            raise TypeError(
+                "CondensationConfiguration.latent_heat must be a bool."
+            )
+        if not isinstance(self.activity_mode, CondensationActivityMode):
+            raise TypeError(
+                "CondensationConfiguration.activity_mode must be a "
+                "CondensationActivityMode."
+            )
+        if not isinstance(self.surface_mode, CondensationSurfaceMode):
+            raise TypeError(
+                "CondensationConfiguration.surface_mode must be a "
+                "CondensationSurfaceMode."
+            )
+
+
+CONDENSATION_PROCESS = Process("condensation")
+CPU_CONDENSATION_PROFILE_DEVICE = Device(Backend.CPU, "cpu")
+# "profile" is an opaque catalogue-only identifier, not a native-device claim.
+WARP_CONDENSATION_PROFILE_DEVICE = Device(Backend.WARP, "profile")
+
+CONDENSATION_EQUAL_STEP_CAPABILITY = Capability("condensation_equal_step")
+CONDENSATION_STAGGERED_CAPABILITY = Capability("condensation_staggered")
+CONDENSATION_LATENT_HEAT_CAPABILITY = Capability("condensation_latent_heat")
+CONDENSATION_NO_LATENT_HEAT_CAPABILITY = Capability(
+    "condensation_no_latent_heat"
+)
+CONDENSATION_IDEAL_ACTIVITY_CAPABILITY = Capability(
+    "condensation_ideal_activity"
+)
+CONDENSATION_KAPPA_ACTIVITY_CAPABILITY = Capability(
+    "condensation_kappa_activity"
+)
+CONDENSATION_NONREPRESENTABLE_ACTIVITY_CAPABILITY = Capability(
+    "condensation_nonrepresentable_activity"
+)
+CONDENSATION_STATIC_SURFACE_CAPABILITY = Capability(
+    "condensation_static_surface"
+)
+CONDENSATION_COMPOSITION_WEIGHTED_SURFACE_CAPABILITY = Capability(
+    "condensation_composition_weighted_surface"
+)
+CONDENSATION_NONREPRESENTABLE_SURFACE_CAPABILITY = Capability(
+    "condensation_nonrepresentable_surface"
+)
+
+_CONDENSATION_EXECUTION_CAPABILITIES = {
+    CondensationExecutionMode.EQUAL_STEP: CONDENSATION_EQUAL_STEP_CAPABILITY,
+    CondensationExecutionMode.STAGGERED: CONDENSATION_STAGGERED_CAPABILITY,
+}
+_CONDENSATION_LATENT_HEAT_CAPABILITIES = {
+    True: CONDENSATION_LATENT_HEAT_CAPABILITY,
+    False: CONDENSATION_NO_LATENT_HEAT_CAPABILITY,
+}
+_CONDENSATION_ACTIVITY_CAPABILITIES = {
+    CondensationActivityMode.IDEAL: CONDENSATION_IDEAL_ACTIVITY_CAPABILITY,
+    CondensationActivityMode.KAPPA: CONDENSATION_KAPPA_ACTIVITY_CAPABILITY,
+    CondensationActivityMode.NONREPRESENTABLE: (
+        CONDENSATION_NONREPRESENTABLE_ACTIVITY_CAPABILITY
+    ),
+}
+_CONDENSATION_SURFACE_CAPABILITIES = {
+    CondensationSurfaceMode.STATIC: CONDENSATION_STATIC_SURFACE_CAPABILITY,
+    CondensationSurfaceMode.COMPOSITION_WEIGHTED: (
+        CONDENSATION_COMPOSITION_WEIGHTED_SURFACE_CAPABILITY
+    ),
+    CondensationSurfaceMode.NONREPRESENTABLE: (
+        CONDENSATION_NONREPRESENTABLE_SURFACE_CAPABILITY
+    ),
+}
+
+
+def get_condensation_requirements(
+    configuration: CondensationConfiguration,
+) -> CapabilityRequirements:
+    """Return the exact four-axis requirements for a configuration.
+
+    Args:
+        configuration: Validated semantic condensation configuration.
+
+    Returns:
+        A new requirements value containing exactly one capability per axis.
+
+    Raises:
+        TypeError: If ``configuration`` is not a CondensationConfiguration.
+    """
+    if not isinstance(configuration, CondensationConfiguration):
+        raise TypeError("configuration must be a CondensationConfiguration.")
+    return CapabilityRequirements(
+        frozenset(
+            {
+                _CONDENSATION_EXECUTION_CAPABILITIES[
+                    configuration.execution_mode
+                ],
+                _CONDENSATION_LATENT_HEAT_CAPABILITIES[
+                    configuration.latent_heat
+                ],
+                _CONDENSATION_ACTIVITY_CAPABILITIES[
+                    configuration.activity_mode
+                ],
+                _CONDENSATION_SURFACE_CAPABILITIES[configuration.surface_mode],
+            }
+        )
+    )
+
+
+def _condensation_declarations() -> frozenset[CapabilityDeclaration]:
+    """Build the immutable CPU and declarative Warp profile catalogue."""
+    all_configurations = tuple(
+        CondensationConfiguration(*values)
+        for values in product(
+            CondensationExecutionMode,
+            (True, False),
+            CondensationActivityMode,
+            CondensationSurfaceMode,
+        )
+    )
+    warp_configurations = (
+        configuration
+        for configuration in all_configurations
+        if configuration.execution_mode is CondensationExecutionMode.EQUAL_STEP
+        and configuration.activity_mode
+        is not CondensationActivityMode.NONREPRESENTABLE
+        and configuration.surface_mode
+        is not CondensationSurfaceMode.NONREPRESENTABLE
+    )
+    return frozenset(
+        CapabilityDeclaration(
+            device,
+            CONDENSATION_PROCESS,
+            get_condensation_requirements(configuration),
+        )
+        for device, configurations in (
+            (CPU_CONDENSATION_PROFILE_DEVICE, all_configurations),
+            (WARP_CONDENSATION_PROFILE_DEVICE, warp_configurations),
+        )
+        for configuration in configurations
+    )
+
+
+CONDENSATION_CAPABILITY_MATRIX = CapabilityMatrix(_condensation_declarations())
+
+
+def _condensation_profile_device(backend: Backend) -> Device:
+    """Return the fixed catalogue-only device for a validated backend."""
+    if not isinstance(backend, Backend):
+        raise TypeError("backend must be a Backend.")
+    return {
+        Backend.CPU: CPU_CONDENSATION_PROFILE_DEVICE,
+        Backend.WARP: WARP_CONDENSATION_PROFILE_DEVICE,
+    }[backend]
+
+
+def condensation_profile_supports(
+    backend: Backend,
+    configuration: CondensationConfiguration,
+) -> bool:
+    """Return whether a fixed backend profile declares a configuration.
+
+    Args:
+        backend: Catalogue backend profile to query.
+        configuration: Semantic condensation configuration to query.
+
+    Returns:
+        True when the exact configuration is declared by the backend profile.
+    """
+    device = _condensation_profile_device(backend)
+    requirements = get_condensation_requirements(configuration)
+    return CONDENSATION_CAPABILITY_MATRIX.supports(
+        device,
+        CONDENSATION_PROCESS,
+        requirements,
+    )
+
+
+def require_condensation_profile(
+    backend: Backend,
+    configuration: CondensationConfiguration,
+) -> None:
+    """Require that a fixed backend profile declares a configuration.
+
+    Args:
+        backend: Catalogue backend profile to query.
+        configuration: Semantic condensation configuration to require.
+
+    Raises:
+        TypeError: If either argument is not its declared metadata type.
+        ValueError: If the configuration is not declared by the profile.
+    """
+    device = _condensation_profile_device(backend)
+    requirements = get_condensation_requirements(configuration)
+    CONDENSATION_CAPABILITY_MATRIX.require(
+        device,
+        CONDENSATION_PROCESS,
+        requirements,
+    )
 
 
 def _validate_request(
