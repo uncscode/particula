@@ -33,8 +33,8 @@ its documented partial-failure boundary.
 
 ## Shipped P1 Metadata Boundary
 
-P1 adds a closed, immutable semantic catalogue directly to
-`particula/execution.py`, before any future adapter boundary. A frozen
+P1's closed, immutable semantic catalogue now resides in
+`particula/execution/__init__.py`, before any future adapter boundary. A frozen
 `CondensationConfiguration` maps through an explicit lookup to exactly four
 requirements: execution mode, latent-heat choice, activity mode, and surface
 mode. The catalogue declares all 36 CPU combinations and only the eight
@@ -46,6 +46,30 @@ it does not create an execution context, resolve a device, select an adapter,
 import Warp, or mutate state. Consequently, runtime availability, fallback,
 native-device normalization, state ownership, and execution remain future-phase
 concerns.
+
+## Shipped P2 Carrier Boundary
+
+P2 migrated `particula.execution` from a module to a package without changing
+its exact ten-name public selection `__all__` or importing adapters from that
+boundary. `particula.execution.adapters.condensation` is concrete-only and
+provides frozen, identity-equality-disabled carriers:
+
+- `CondensationExecutionConfig` retains an exact
+  `CondensationConfiguration` without profile selection.
+- `CPUCondensationState` retains an `Aerosol` without inspecting its backing
+  data or running a runnable.
+- `WarpCondensationState` lazily imports Warp only when constructed, retains
+  primary Warp containers and opaque sidecars by identity, and exposes the
+  primary `(particles, gas, environment)` tuple as its backend payload.
+
+Warp-state construction validates ordered primary type and same-device shape/
+dtype metadata, requires only non-`None` opaque thermodynamics, and validates
+only the writable `mass_transfer` and `energy_transfer` outputs. The outputs
+must have the required metadata, be contiguous, and not alias or byte-range
+overlap primary fields or one another; empty valid outputs are allowed. No
+direct-kernel physics validators, host reads, launches, copies, allocations,
+or synchronization occur. Rejected construction is non-mutating; this
+pre-launch guarantee does not promise rollback for a future launched adapter.
 
 ## Data / API / Workflow Changes
 

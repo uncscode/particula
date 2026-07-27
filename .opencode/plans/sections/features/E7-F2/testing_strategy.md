@@ -32,6 +32,20 @@ fresh-process isolation from `warp` and `particula.gpu`. These tests intentional
 do not claim runtime availability, native-device, adapter, or GPU execution
 coverage; those remain later-phase responsibilities.
 
+## Shipped P2 Coverage
+
+`particula/execution/tests/condensation_adapter_test.py` covers package/direct
+concrete imports, frozen identity carriers, exact-type and ordered validation,
+CPU non-mutation, and lazy Warp import behavior. Its Warp rows cover one- and
+multi-box metadata, dtype/shape/device rejection, opaque references,
+thermodynamics ordering, writable-output aliases/overlaps/non-contiguity,
+empty outputs, and rejection non-mutation. Dedicated guards prove construction
+does not launch, copy, convert, synchronize, or execute. Existing
+`particula/tests/execution_test.py` and
+`particula/tests/execution_exports_test.py` lock the package migration,
+legacy imports, exact ten-name `__all__`, and absence of concrete carriers from
+selection and top-level exports. CUDA remains optional.
+
 ## Parity and Scientific Validation
 
 Use independent CPU/NumPy references rather than comparing the Warp adapter to

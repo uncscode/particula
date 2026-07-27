@@ -19,14 +19,20 @@ returned. Isothermal and latent-heat direct variants are supported; staggered
  and unsupported BAT configurations fail before mutation rather than moving data
  or silently changing backend.
 
-## Shipped P1 Foundation
+## Shipped P1–P2 Foundation
 
 Issue #1470 shipped E7-F2-P1's dependency-neutral metadata foundation in
-`particula/execution.py`: immutable condensation configuration vocabularies,
+`particula.execution`: immutable condensation configuration vocabularies,
 exact four-axis capability requirements, and a declarative catalogue of 36 CPU
 and 8 Warp-profile configurations. This is direct-module-only semantic support
 metadata, not a selected execution workflow. Runtime availability, native device
 handling, adapter selection, exports, and GPU APIs remain unchanged.
+
+Issue #1471 shipped E7-F2-P2. `particula.execution` is now a package while
+retaining its exact ten-name selection `__all__`. Concrete-only carriers at
+`particula.execution.adapters.condensation` retain CPU or lazy Warp resources
+by identity, perform ordered read-only metadata and writable-output ownership
+checks, and do not select, execute, transfer, allocate, or synchronize.
 
 ## User Stories
 

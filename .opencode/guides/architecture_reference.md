@@ -13,6 +13,7 @@ particula/
 ├── activity/          # Activity coefficients and phase separation
 ├── dynamics/          # Coagulation, condensation, wall loss
 ├── equilibria/        # Partitioning calculations
+├── execution/         # Dependency-neutral execution selection
 ├── gas/               # Gas phase, species, vapor pressure
 ├── particles/         # Particle distributions and representations
 ├── util/              # Constants, validation, chemistry utilities
@@ -27,6 +28,21 @@ particula/
 - Keep tests co-located with modules in `tests/` directories.
 - Export public APIs deliberately through package `__init__.py` files.
 - Keep validation close to public function boundaries.
+
+## Execution Selection and Condensation State
+
+`particula.execution` is a package. Its supported selection surface remains
+the existing exact ten-name public export list; do not promote adapter modules
+or state carriers through it or through top-level `particula`.
+
+`particula.execution.adapters.condensation` contains concrete-only P2
+condensation state carriers for future adapters. They retain caller-owned CPU
+or resident Warp resources by identity and perform construction-time,
+read-only metadata and ownership checks only. They do not select or execute an
+adapter, transfer, allocate, or synchronize resources. Frozen carriers prevent
+field rebinding, not mutation of retained caller-owned resources. Future
+adapter authors remain responsible for resource lifetime, synchronization,
+concurrency, and any post-launch mutation or rollback semantics.
 
 ## Wall Loss
 

@@ -37,3 +37,16 @@
   native devices.
 - [x] Focused execution tests cover mapping, rejection order, purity, and
   optional-import isolation while leaving exports and GPU APIs unchanged.
+
+## P2 Delivered Criteria (Issue #1471)
+
+- [x] `particula.execution` is a package with unchanged legacy selection
+  imports and exact ten-name `__all__`; concrete carriers remain absent from
+  selection and top-level exports.
+- [x] Concrete CPU and lazy Warp carriers are frozen, identity-retaining,
+  metadata-only, and non-executing; CPU-only import/construction remains
+  Warp/GPU-free.
+- [x] Warp construction validates ordered primary metadata and only writable
+  output ownership, retaining opaque sidecars without inspecting them.
+- [x] Focused tests prove validation ordering, alias/overlap rejection,
+  non-mutation, and no transfer, synchronization, conversion, or execution.

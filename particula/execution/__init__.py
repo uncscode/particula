@@ -1,4 +1,4 @@
-"""Declare dependency-neutral execution selection and result contracts.
+"""Declare dependency-neutral public execution selection and result contracts.
 
 This module validates immutable backend, device, process, and capability
 declarations. An ``ExecutionContext`` capability-validates a typed request and
@@ -21,6 +21,11 @@ The direct-module-only condensation profile catalogue declares semantic support
 only. It neither selects an adapter nor validates runtime or native-device
 availability, imports optional backends, allocates state, or exposes a
 user-facing API.
+
+The public selection API is limited to this package's ten-name ``__all__``.
+Concrete condensation state carriers are intentionally available only from
+``particula.execution.adapters.condensation``. Importing this package does not
+import that concrete module, Warp, or ``particula.gpu``.
 """
 
 import inspect

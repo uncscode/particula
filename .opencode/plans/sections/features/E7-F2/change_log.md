@@ -1,5 +1,18 @@
 # Change Log
 
+## 2026-07-27 — E7-F2-P2 shipped (Issue #1471)
+
+- Migrated `particula/execution.py` to the `particula.execution` package while
+  preserving legacy selection imports and the exact ten-name public `__all__`.
+- Added concrete-only `CondensationExecutionConfig`, `CPUCondensationState`,
+  and lazy `WarpCondensationState` carriers in
+  `particula/execution/adapters/condensation.py`.
+- Added identity retention, ordered metadata-only validation, and contiguous
+  writable-output alias/overlap protection without execution, transfer,
+  allocation, or synchronization.
+- Added carrier/import-export tests covering CPU and Warp construction,
+  validation ordering, ownership checks, and accepted/rejected non-mutation.
+
 ## 2026-07-27 — E7-F2-P1 shipped (Issue #1470)
 
 - Added direct-module-only condensation configuration vocabularies and frozen

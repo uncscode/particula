@@ -5,25 +5,35 @@
   - Delivered: Direct-module-only immutable condensation vocabulary,
     configuration validation, exact four-axis requirements mapping, and a
     36-entry CPU plus 8-entry declarative Warp-profile catalogue.
-  - Files: `particula/execution.py`, `particula/tests/execution_test.py`
+  - Files: `particula/execution/__init__.py`,
+    `particula/tests/execution_test.py`
   - Tests: Mapping/catalogue counts, supported and rejected profiles,
     validation order, immutability/purity, non-composable requirements, and
     fresh-process optional-import isolation.
   - Boundary: No runtime availability or native-device handling, adapter
     selection, exports, or GPU API changes.
 
-- [ ] **E7-F2-P2:** Define condensation execution state and sidecar ownership with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Model typed configuration/state and explicit mutation, identity, lifetime, and partial-failure semantics without changing container schemas.
+- [x] **E7-F2-P2:** Define condensation execution state and sidecar ownership with unit tests
+  - Issue: #1471 | Size: S | Status: Shipped
+  - Delivered: Migrated `particula.execution` to a package while preserving its
+    exact ten-name selection `__all__`; added concrete-only frozen CPU and lazy
+    Warp state carriers with identity retention, metadata-only validation, and
+    writable-output ownership checks.
   - Files: `particula/execution/adapters/condensation.py`,
     `particula/execution/__init__.py`,
     `particula/execution/tests/condensation_adapter_test.py`
-  - Tests: Type/schema validation, shape/device checks, identity retention, alias rejection, validation atomicity
+  - Tests: Import/export boundaries; CPU and Warp type/schema/shape/device
+    validation; validation order; identity retention; alias/overlap and
+    contiguity rejection; no execution, transfer, or synchronization; and
+    accepted/rejected construction non-mutation.
+  - Boundary: No profile selection, adapter registration or execution, kernel
+    physics validation, conversion, allocation, transfer, synchronization, or
+    top-level concrete exports.
 
 - [ ] **E7-F2-P3:** Implement backend-selected isothermal condensation adapter with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Route explicit CPU and Warp requests to existing implementations while preserving exact arguments, fixed four-substep GPU behavior, and result semantics.
-  - Files: `particula/execution.py`,
+  - Files: `particula/execution/__init__.py`,
     `particula/execution/adapters/condensation.py`,
     `particula/execution/tests/condensation_adapter_test.py`
   - Tests: Dispatch, call arguments/counts, in-place particle/gas mutation, transfer result identity, no fallback or conversion

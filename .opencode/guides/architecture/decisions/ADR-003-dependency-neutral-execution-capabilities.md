@@ -1,6 +1,7 @@
 # ADR-003: Dependency-Neutral Execution Capability Vocabulary
 
-**Status:** Accepted (amended for shipped P2--P5 surface)
+**Status:** Accepted (amended for shipped P2--P5 surface and #1471 package
+migration)
 **Date:** 2026-07-27
 **Decision Makers:** ADW Development Team
 **Technical Story:** [#1462](https://github.com/Gorkowski/particula/issues/1462)
@@ -33,7 +34,7 @@ or running a process.
 
 ## Decision
 
-Add the deliberately dependency-neutral `particula.execution` P1 module. It
+Add the deliberately dependency-neutral `particula.execution` P1 package. It
 provides immutable standard-library-only `Backend`, `Device`, `Process`,
 `Capability`, requirement/declaration records, and a pure exact-match
 `CapabilityMatrix`. The module remains a direct import rather than a top-level
@@ -54,6 +55,19 @@ only `CPUExecutionState` and `CPUExecutionAdapter`, a narrow CPU runnable
 dispatch boundary. P5 deliberately exports only the stable selection vocabulary
 through `particula.execution`; P3/P4 carriers and CPU dispatch remain excluded
 from the top-level package and are not a high-level execution API.
+
+### Amendment: #1471 Package Migration and Condensation P2 Carriers
+
+`particula.execution` is now a package, preserving its exact ten-name public
+selection export surface. Its concrete-only
+`particula.execution.adapters.condensation` module supplies P2 configuration
+and CPU/Warp state carriers for future condensation adapters without promoting
+them through `particula.execution` or top-level `particula`. The package-level
+selection seam remains dependency-neutral; the concrete module imports Warp
+only when validating a Warp state. Carrier construction retains caller-owned
+resources by identity and performs read-only metadata/ownership validation. It
+does not select or execute an adapter, transfer, allocate, or synchronize
+resources, and creates no execution or transfer boundary.
 
 ### Chosen Option
 
@@ -143,12 +157,18 @@ avoids duplicating backend-specific validation or availability behavior.
 
 ### Required Changes
 
-1. **Metadata module** (`particula/execution.py`)
+1. **Selection package** (`particula/execution/__init__.py`)
    - Define immutable declarations and pure `CapabilityMatrix` lookup.
    - Restrict imports to the Python standard library.
-2. **Focused coverage** (`particula/tests/execution_test.py`)
+2. **Concrete condensation carriers**
+   (`particula/execution/adapters/condensation.py`)
+   - Keep construction-only P2 carriers unexported and retain resources by
+     identity.
+   - Defer the optional Warp import until Warp-state validation.
+3. **Focused coverage** (`particula/tests/execution_test.py` and
+   `particula/execution/tests/`)
    - Verify exact matching, immutability, validation order, and a guarded fresh
-     import that rejects Warp and GPU imports.
+   import that rejects Warp and GPU imports.
 
 ### Testing Strategy
 
@@ -158,9 +178,10 @@ coverage, and Ruff. Verify that guarded fresh imports do not load `warp` or
 
 ### Rollback Plan
 
-Remove the isolated module and its tests only with a replacement for the shipped
-selection and direct-module execution contracts. The API has no optional-backend
-dependency, transfer path, or high-level execution integration to unwind.
+Replace the isolated package and its tests only with a replacement for the
+shipped selection and concrete-module execution contracts. The public selection
+API has no optional-backend dependency, transfer path, or high-level execution
+integration to unwind.
 
 ## Validation
 
@@ -182,6 +203,7 @@ dependency, transfer path, or high-level execution integration to unwind.
 - [Architecture Guide](../architecture_guide.md)
 - [Architecture Outline](../architecture_outline.md)
 - [Issue #1462](https://github.com/Gorkowski/particula/issues/1462)
+- [Issue #1471](https://github.com/Gorkowski/particula/issues/1471)
 
 ## Notes
 

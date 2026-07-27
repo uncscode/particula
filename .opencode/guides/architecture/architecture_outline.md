@@ -31,9 +31,12 @@ fallback, error taxonomy, API stability, and export policy. GPU adapters,
 resident sessions or loops, schedulers, implicit transfer/synchronization,
 retry, fallback, and replacement of direct GPU APIs remain deferred.
 
-### particula/execution.py
+### particula/execution/
 
 **Key Components:**
+- `__init__.py` - Dependency-neutral selection seam. It preserves the exact
+  ten-name public selection export surface and does not import Warp, the GPU
+  package, or concrete adapters.
 - `Backend`, `Device`, `Process`, and `Capability` - Immutable typed metadata;
   `Device.native` is an opaque native identifier.
 - `CapabilityRequirements` and `CapabilityDeclaration` - Immutable exact
@@ -50,6 +53,13 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
   select adapters by identity after matrix validation and never execute them.
   P3/P4 state, result, mutation, and concrete CPU execution-adapter types stay
   direct-module-only.
+- `adapters/condensation.py` - Concrete-only P2 condensation configuration and
+  CPU/Warp state carriers for future adapters. It retains caller-owned
+  resources by identity and performs construction-time, read-only validation;
+  it is intentionally unexported, performs no selection or execution, and
+  establishes no transfer or synchronization boundary. Warp is imported only
+  when Warp-state validation requires runtime types.
+- `tests/` - Test coverage
 
 ## Particle Package
 

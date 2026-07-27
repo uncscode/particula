@@ -2,8 +2,8 @@
 
 ## Capability and Configuration
 
-- [x] Add direct-module-only condensation process/capability declarations in
-  `particula/execution.py` for CPU and declarative Warp profiles.
+- [x] Add direct selection-boundary condensation process/capability declarations
+  in `particula/execution/__init__.py` for CPU and declarative Warp profiles.
 - [x] Define immutable configuration vocabulary and exact requirements mapping
   for execution mode, latent heat, ideal/kappa/nonrepresentable activity, and
   static/composition-weighted/nonrepresentable surface semantics.
@@ -15,10 +15,11 @@
 
 ## Adapter Implementation
 
-- [ ] Define immutable configuration/state views in
+- [x] Define immutable configuration/state views in
   `particula/execution/adapters/condensation.py`, including
   `CondensationExecutionConfig`, CPU `Aerosol` state, and resident Warp
-  particle/gas/environment/sidecar references.
+  particle/gas/environment/sidecar references. Migrate `particula.execution`
+  to a package while preserving its exact ten-name public selection `__all__`.
 - [ ] Implement CPU delegation to `MassCondensation.execute()` without changing
   time-step, substep, exception, returned-object, or mutation behavior.
 - [ ] Implement a GPU-scoped adapter that calls `condensation_step_gpu` with
@@ -31,13 +32,15 @@
 
 ## Validation and Testing
 
-- [ ] Add per-phase tests in
+- [x] Add P2 carrier tests in
   `particula/execution/tests/condensation_adapter_test.py` for every helper and
-  rejection branch; add cross-backend workflow fixtures only in
+  rejection branch, including import/export, CPU/Warp metadata, validation
+  ordering, ownership, and non-mutation. Add cross-backend workflow fixtures only in
   `particula/execution/tests/condensation_integration_test.py`.
 - [ ] Lock selection-level validation order and prove invalid requests do not
   invoke an adapter, allocate adapter resources, transfer, or mutate state.
-- [ ] Assert same-device fixed-shape metadata and caller-owned sidecar identity.
+- [x] Assert P2 same-device fixed-shape metadata, writable-output ownership,
+  caller-owned sidecar identity, and no execution/transfer/synchronization.
 - [ ] Cover fixed four-substep semantics, coupled gas inventory,
   vapor-pressure refresh, total transfer, latent heat, and energy accounting.
 - [ ] Compare selected CPU and Warp CPU workflows with explicit per-case

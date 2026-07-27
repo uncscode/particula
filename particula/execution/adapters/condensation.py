@@ -1,12 +1,13 @@
-"""Concrete, non-executing condensation state carriers.
+"""Provide concrete-only, non-executing condensation state carriers.
 
-These frozen carriers retain caller-owned resources by identity and perform
-only read-only construction-time metadata checks.  They neither select nor run
-an adapter, transfer, allocate, or synchronize resources.  Frozen fields only
-prevent rebinding: retained resources remain mutable and caller-owned.  A
-future adapter may mutate particle and gas fields and writable sidecars, so
-callers retain lifetime, synchronization, and concurrency responsibility until
-that future launch completes.
+Import these carriers from ``particula.execution.adapters.condensation``, not
+from ``particula.execution`` or top-level ``particula``. They retain
+caller-owned resources by identity and perform only read-only construction-time
+metadata checks. They neither select nor run an adapter, transfer, allocate, or
+synchronize resources. Frozen fields prevent rebinding only; retained resources
+remain mutable and caller-owned. A future adapter may mutate particle masses,
+gas concentration or vapor pressure, and writable sidecars. Callers own their
+lifetime, synchronization, and concurrency until that future launch completes.
 """
 
 from dataclasses import dataclass
@@ -19,18 +20,30 @@ from particula.execution import CondensationConfiguration
 
 @dataclass(frozen=True, eq=False)
 class CondensationExecutionConfig:
-    """Retain exact semantic condensation configuration by identity.
+    """Retain an exact semantic condensation configuration by identity.
 
-    Profile selection remains the responsibility of a future selection caller.
+    This concrete-only P2 carrier does not select a profile or inspect its
+    configuration. A future selection caller remains responsible for calling
+    ``require_condensation_profile()`` when that semantic check is needed.
+    Frozen status prevents field rebinding but does not copy the configuration.
 
     Args:
         configuration: Exact concrete condensation configuration.
+
+    Raises:
+        TypeError: If ``configuration`` is not an exact
+            ``CondensationConfiguration`` instance.
     """
 
     configuration: CondensationConfiguration
 
     def __post_init__(self) -> None:
-        """Validate the exact configuration carrier type."""
+        """Validate the exact configuration carrier type.
+
+        Raises:
+            TypeError: If ``configuration`` is not an exact
+                ``CondensationConfiguration`` instance.
+        """
         if type(self.configuration) is not CondensationConfiguration:
             raise TypeError(
                 "configuration must be an exact CondensationConfiguration."
@@ -41,16 +54,33 @@ class CondensationExecutionConfig:
 class CPUCondensationState:
     """Retain caller-owned CPU condensation state without executing it.
 
+    This concrete-only P2 carrier validates only the configuration and aerosol
+    types, in that order. It does not inspect aerosol backing data, validate
+    condensation physics, add execution controls, copy resources, or invoke a
+    runnable. Frozen status prevents field rebinding only; ``aerosol`` remains
+    caller-owned and mutable.
+
     Args:
         config: Exact P2 condensation execution configuration.
         aerosol: Caller-owned aerosol retained by identity.
+
+    Raises:
+        TypeError: If ``config`` is not an exact
+            ``CondensationExecutionConfig`` or ``aerosol`` is not an
+            ``Aerosol``.
     """
 
     config: CondensationExecutionConfig
     aerosol: Aerosol
 
     def __post_init__(self) -> None:
-        """Validate state inputs in configuration then aerosol order."""
+        """Validate state inputs in configuration then aerosol order.
+
+        Raises:
+            TypeError: If ``config`` is not an exact
+                ``CondensationExecutionConfig`` or ``aerosol`` is not an
+                ``Aerosol``.
+        """
         if type(self.config) is not CondensationExecutionConfig:
             raise TypeError(
                 "config must be an exact CondensationExecutionConfig."
@@ -60,7 +90,11 @@ class CPUCondensationState:
 
     @property
     def backend_payload(self) -> Aerosol:
-        """Return the caller-owned aerosol without inspecting it."""
+        """Return the caller-owned aerosol without inspecting it.
+
+        Returns:
+            The exact aerosol retained by this state.
+        """
         return self.aerosol
 
 
@@ -71,7 +105,19 @@ def _validate_array(
     shape: tuple[int, ...],
     device: Any | None = None,
 ) -> None:
-    """Validate Warp-array metadata only, without device operations."""
+    """Validate Warp-array metadata without device operations.
+
+    Args:
+        name: Qualified field name used in validation errors.
+        array: Candidate Warp array whose metadata is read.
+        dtype: Required Warp dtype.
+        shape: Required array shape.
+        device: Required device, or ``None`` when no device comparison applies.
+
+    Raises:
+        ValueError: If the candidate lacks required Warp metadata or its dtype,
+            shape, or device is invalid.
+    """
     attributes = ("dtype", "shape", "device")
     if not all(hasattr(array, attribute) for attribute in attributes):
         raise ValueError(f"{name} must be a Warp array.")
@@ -90,7 +136,22 @@ def _memory_range(
     *,
     require_contiguous: bool = True,
 ) -> tuple[int, int] | None:
-    """Return the metadata-only storage range, or None for an empty array."""
+    """Return a metadata-only storage range, or ``None`` for an empty array.
+
+    Args:
+        name: Qualified field name used in ownership errors.
+        array: Metadata-valid Warp array whose storage is inspected.
+        itemsize: Size in bytes of one array element.
+        require_contiguous: Whether to reject non-contiguous storage.
+
+    Returns:
+        The half-open byte range occupied by nonempty storage, or ``None`` for
+        an empty array.
+
+    Raises:
+        ValueError: If required pointer or stride metadata is absent, or if
+            contiguous storage is required but unavailable.
+    """
     strides = getattr(array, "strides", None)
     if not hasattr(array, "ptr"):
         raise ValueError(
@@ -125,7 +186,20 @@ def _validate_output_ownership(
     energy_transfer: Any | None,
     primary_fields: tuple[Any, ...],
 ) -> None:
-    """Reject writable outputs overlapping primary fields or each other."""
+    """Reject writable outputs overlapping primary fields or each other.
+
+    This check reads pointer, shape, stride, and dtype metadata only. Omitted
+    and empty outputs have no storage range and therefore cannot overlap.
+
+    Args:
+        mass_transfer: Optional writable mass-transfer output.
+        energy_transfer: Optional writable energy-transfer output.
+        primary_fields: Primary state arrays that outputs must not overlap.
+
+    Raises:
+        ValueError: If a supplied output is non-contiguous or aliases primary
+            state or the other supplied output.
+    """
     outputs = (
         ("mass_transfer", mass_transfer),
         ("energy_transfer", energy_transfer),
@@ -160,12 +234,28 @@ def _validate_output_ownership(
 
 
 def _dtype_itemsize(dtype: Any) -> int:
-    """Return the fixed byte size of P2 primary Warp dtypes."""
+    """Return the fixed byte size of a P2 primary Warp dtype.
+
+    Args:
+        dtype: P2-validated ``wp.float64`` or ``wp.int32`` dtype metadata.
+
+    Returns:
+        The dtype item size in bytes.
+    """
     return 4 if str(dtype) == "int32" else 8
 
 
 def _overlaps(first: tuple[int, int], second: tuple[int, int] | None) -> bool:
-    """Return whether two nonempty contiguous byte ranges overlap."""
+    """Return whether two half-open byte ranges overlap.
+
+    Args:
+        first: Nonempty first byte range.
+        second: Optional second byte range, with ``None`` representing empty
+            storage.
+
+    Returns:
+        True if both ranges contain at least one common byte.
+    """
     return second is not None and first[0] < second[1] and second[0] < first[1]
 
 
@@ -173,10 +263,38 @@ def _overlaps(first: tuple[int, int], second: tuple[int, int] | None) -> bool:
 class WarpCondensationState:
     """Retain validated caller-owned resident Warp condensation resources.
 
-    P2 validates primary container metadata and writable output ownership only.
-    Thermodynamics and all other sidecars are opaque except that thermodynamics
-    must be non-None.  Rejection occurs before a writer launch and mutates
-    nothing; it does not promise post-launch rollback for a future adapter.
+    This concrete-only P2 carrier lazily imports Warp during construction. It
+    validates primary-container metadata and writable-output ownership only.
+    Thermodynamics and all sidecars other than writable ``mass_transfer`` and
+    ``energy_transfer`` remain opaque; thermodynamics need only be non-None.
+    Construction does not select a profile, execute a kernel or runnable,
+    transfer, allocate, synchronize, or validate direct-kernel physics.
+
+    Rejection occurs before a writer launch and mutates nothing. That
+    construction guarantee does not promise post-launch rollback for a future
+    adapter. Frozen status prevents field rebinding only. All retained
+    containers and sidecars remain caller-owned and mutable.
+
+    Args:
+        config: Exact P2 condensation execution configuration.
+        particles: Resident ``WarpParticleData`` primary container.
+        gas: Resident ``WarpGasData`` primary container.
+        environment: Resident ``WarpEnvironmentData`` primary container.
+        thermodynamics: Required opaque thermodynamics reference.
+        activity_surface: Optional opaque activity and surface reference.
+        scratch_buffers: Optional opaque scratch-buffer reference.
+        mass_transfer: Optional writable mass-transfer output sidecar.
+        latent_heat: Optional opaque latent-heat reference.
+        energy_transfer: Optional writable energy-transfer output sidecar.
+        thermal_work: Optional opaque thermal-work reference.
+
+    Raises:
+        TypeError: If the configuration or a primary container has an invalid
+            type.
+        RuntimeError: If the optional Warp runtime is unavailable when state
+            validation requires it.
+        ValueError: If primary metadata, required thermodynamics, writable
+            output metadata, or writable-output ownership is invalid.
     """
 
     config: CondensationExecutionConfig
@@ -192,7 +310,18 @@ class WarpCondensationState:
     thermal_work: object | None = None
 
     def __post_init__(self) -> None:
-        """Perform ordered metadata and writable-output ownership validation."""
+        """Perform ordered metadata and writable-output ownership validation.
+
+        The lazy imports make importing this concrete module and constructing
+        CPU-only carriers independent of the optional Warp runtime.
+
+        Raises:
+            TypeError: If the configuration or primary-container types are
+                invalid.
+            RuntimeError: If Warp is unavailable.
+            ValueError: If required metadata, thermodynamics, or writable
+                output ownership is invalid.
+        """
         if type(self.config) is not CondensationExecutionConfig:
             raise TypeError(
                 "config must be an exact CondensationExecutionConfig."
@@ -352,5 +481,9 @@ class WarpCondensationState:
 
     @property
     def backend_payload(self) -> tuple[object, object, object]:
-        """Return the three caller-owned primary containers by identity."""
+        """Return the three caller-owned primary containers by identity.
+
+        Returns:
+            The ``(particles, gas, environment)`` primary-container tuple.
+        """
         return self.particles, self.gas, self.environment
