@@ -6,6 +6,7 @@ import subprocess
 import sys
 from dataclasses import FrozenInstanceError
 from pathlib import Path
+from typing import cast
 
 import pytest
 from particula.execution import (
@@ -37,6 +38,17 @@ def _requirements(*names: str) -> CapabilityRequirements:
 def _declaration(*names: str) -> CapabilityDeclaration:
     """Create a standard capability declaration."""
     return CapabilityDeclaration(_device(), _process(), _requirements(*names))
+
+
+def _require_supported(
+    matrix: CapabilityMatrix,
+    device: Device,
+    process: Process,
+    requirements: CapabilityRequirements,
+) -> object:
+    """Call require for a supported request and return None."""
+    matrix.require(device, process, requirements)
+    return None
 
 
 def test_declarations_compare_hash_and_freeze_by_value() -> None:
@@ -144,7 +156,7 @@ def test_requirements_reject_iterable_coercion(values: object) -> None:
 
 def test_requirements_validate_members_and_empty_set() -> None:
     """Test requirement members are typed and an empty set remains valid."""
-    empty = frozenset()
+    empty: frozenset[Capability] = frozenset()
 
     assert CapabilityRequirements(empty).values is empty
     with pytest.raises(
@@ -201,16 +213,16 @@ def test_declaration_rejects_invalid_fields(
 ) -> None:
     """Test declarations validate each typed field independently."""
     with pytest.raises(TypeError, match=f"^{re.escape(message)}$"):
-        CapabilityDeclaration(  # type: ignore[arg-type]
-            device,
-            process,
-            requirements,
+        CapabilityDeclaration(
+            cast(Device, device),
+            cast(Process, process),
+            cast(CapabilityRequirements, requirements),
         )
 
 
 def test_matrix_validates_collection_and_members() -> None:
     """Test matrices accept only typed immutable declaration collections."""
-    empty = frozenset()
+    empty: frozenset[CapabilityDeclaration] = frozenset()
 
     assert CapabilityMatrix(empty).declarations is empty
     assert CapabilityMatrix(frozenset({_declaration()})).declarations
@@ -310,7 +322,12 @@ def test_matrix_require_is_pure_and_reports_unsupported_request(
     assert matrix.supports(_device(), _process(), _requirements("isothermal"))
     assert not matrix.supports(device, process, unsupported)
     assert (
-        matrix.require(_device(), _process(), _requirements("isothermal"))
+        _require_supported(
+            matrix,
+            _device(),
+            _process(),
+            _requirements("isothermal"),
+        )
         is None
     )
     expected = "Unsupported capability declaration: " + repr(
