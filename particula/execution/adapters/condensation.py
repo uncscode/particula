@@ -2,13 +2,13 @@
 
 Import these carriers from ``particula.execution.adapters.condensation``, not
 from ``particula.execution`` or top-level ``particula``. They retain
- caller-owned resources by identity. P2 carriers perform read-only
- construction-time metadata checks; P3 adapters make one selected native call.
- Neither selection nor these adapters transfer, allocate, restore, synchronize,
- retry, or fall back. Frozen fields prevent rebinding only; retained resources
- remain mutable and caller-owned. Native calls may mutate particle masses, gas
- concentration or vapor pressure, and writable sidecars. Callers own resource
- lifetime, synchronization, concurrency, and any post-launch recovery limits.
+caller-owned resources by identity. P2 carriers perform read-only
+construction-time metadata checks; P3 adapters make one selected native call.
+Neither selection nor these adapters transfer, allocate, restore, synchronize,
+retry, or fall back. Frozen fields prevent rebinding only; retained resources
+remain mutable and caller-owned. Native calls may mutate particle masses, gas
+concentration or vapor pressure, and writable sidecars. Callers own resource
+lifetime, synchronization, concurrency, and any post-launch recovery limits.
 """
 
 from dataclasses import dataclass
