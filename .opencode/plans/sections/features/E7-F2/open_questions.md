@@ -3,16 +3,18 @@
 These questions must be resolved from the shipped E7-F1/E7-F6 contracts before
 implementation; they do not authorize scope expansion.
 
-1. **Partially resolved by P2:** concrete carrier types live at
-   `particula.execution.adapters.condensation`, while `particula.execution`
-   remains Warp/GPU-free on import and retains its exact ten-name selection
-   export. The future E7-F1/E7-F6 registration seam remains open.
+1. **Partially resolved by P3:** concrete carrier and selected adapter types live at
+    `particula.execution.adapters.condensation`, while `particula.execution`
+    remains Warp/GPU-free on CPU import and retains its exact ten-name selection
+    export. Registrations are context-local; module-global or implicit
+    registration remains outside this phase.
 2. Which condensation configuration names are stable public values versus
    concrete adapter details, and how are unavailable Warp CPU and CUDA devices
    represented in the E7-F6 error taxonomy?
-3. Does E7-F1's `ExecutionResult` directly carry the kernel's total transfer, or
-   should it reference a typed process result while mutation metadata remains
-   generic?
+3. **Resolved for P3:** `ExecutionResult` wraps the native backend value without
+   reconstruction; the Warp value is the actual kernel tuple, including its
+   caller-owned total-transfer result. Typed process-result expansion remains
+   deferred.
 4. Which existing CPU condensation fixture is the canonical scientific oracle
    for the first selected isothermal/latent-heat workflow, and what justified
    parity tolerances apply given different substep algorithms?

@@ -514,7 +514,17 @@ class CPUCondensationExecutionState:
     Import this concrete-only P3 carrier from
     ``particula.execution.adapters.condensation``. Construction validates only
     exact P2 state and runnable types; execution controls remain opaque until
-    dispatch. The retained runnable and aerosol are caller-owned.
+    dispatch. The retained runnable and aerosol are caller-owned and mutable;
+    frozen fields prevent rebinding only.
+
+    Args:
+        state: Exact P2 CPU state retained by identity.
+        time_step: Original execution time step in s, validated at dispatch.
+        sub_steps: Original number of CPU substeps, validated at dispatch.
+        runnable: Exact caller-owned ``MassCondensation`` runnable.
+
+    Raises:
+        TypeError: If ``state`` or ``runnable`` is not the required exact type.
     """
 
     state: CPUCondensationState
@@ -523,7 +533,12 @@ class CPUCondensationExecutionState:
     runnable: MassCondensation
 
     def __post_init__(self) -> None:
-        """Validate exact P2-state and runnable carrier types."""
+        """Validate exact P2-state and runnable carrier types.
+
+        Raises:
+            TypeError: If ``state`` or ``runnable`` is not the required exact
+                type.
+        """
         if type(self.state) is not CPUCondensationState:
             raise TypeError("state must be an exact CPUCondensationState.")
         if type(self.runnable) is not MassCondensation:
@@ -531,7 +546,11 @@ class CPUCondensationExecutionState:
 
     @property
     def backend_payload(self) -> Aerosol:
-        """Return the exact caller-owned CPU aerosol payload."""
+        """Return the exact caller-owned CPU aerosol payload.
+
+        Returns:
+            The aerosol retained by the P2 state.
+        """
         return self.state.backend_payload
 
 
@@ -541,24 +560,47 @@ class WarpCondensationExecutionState:
 
     This concrete-only P3 carrier preserves the exact P2 state and time step.
     Construction neither imports a kernel nor inspects retained resources.
+
+    Args:
+        state: Exact P2 Warp state retained by identity.
+        time_step: Original execution time step in s, validated at dispatch.
+
+    Raises:
+        TypeError: If ``state`` is not an exact ``WarpCondensationState``.
     """
 
     state: WarpCondensationState
     time_step: object
 
     def __post_init__(self) -> None:
-        """Validate the exact P2 Warp state carrier type."""
+        """Validate the exact P2 Warp state carrier type.
+
+        Raises:
+            TypeError: If ``state`` is not an exact ``WarpCondensationState``.
+        """
         if type(self.state) is not WarpCondensationState:
             raise TypeError("state must be an exact WarpCondensationState.")
 
     @property
     def backend_payload(self) -> tuple[object, object, object]:
-        """Return the exact caller-owned resident primary payload."""
+        """Return the exact caller-owned resident primary payload.
+
+        Returns:
+            The ``(particles, gas, environment)`` tuple from the P2 state.
+        """
         return self.state.backend_payload
 
 
 def _validate_time_step(time_step: object) -> None:
-    """Validate a non-boolean, finite, nonnegative real time step."""
+    """Validate a non-boolean, finite, nonnegative real time step.
+
+    Args:
+        time_step: Candidate execution time step in s.
+
+    Raises:
+        TypeError: If ``time_step`` is not a non-boolean real scalar.
+        ValueError: If ``time_step`` is non-finite or negative.
+    """
     if isinstance(time_step, bool) or not isinstance(time_step, Real):
         raise TypeError("time_step must be a real scalar.")
     if not _isfinite_real(time_step) or time_step < 0:
@@ -566,7 +608,14 @@ def _validate_time_step(time_step: object) -> None:
 
 
 def _require_isothermal(configuration: CondensationConfiguration) -> None:
-    """Reject semantic latent heat at the selected isothermal boundary."""
+    """Reject semantic latent heat at the selected isothermal boundary.
+
+    Args:
+        configuration: Selected condensation configuration to inspect.
+
+    Raises:
+        ValueError: If the configuration enables latent heat.
+    """
     if configuration.latent_heat:
         raise ValueError(
             "isothermal condensation execution requires latent_heat=False."
@@ -574,7 +623,14 @@ def _require_isothermal(configuration: CondensationConfiguration) -> None:
 
 
 def _get_condensation_step_gpu() -> Any:
-    """Lazily resolve the optional direct Warp kernel after preflight."""
+    """Lazily resolve the optional direct Warp kernel after preflight.
+
+    Returns:
+        The direct ``condensation_step_gpu`` kernel entry point.
+
+    Raises:
+        ImportError: If the optional Warp kernel dependencies are unavailable.
+    """
     from particula.gpu.kernels import condensation_step_gpu
 
     return condensation_step_gpu
@@ -587,10 +643,25 @@ class CPUCondensationExecutionAdapter:
     caller-owned ``MassCondensation`` runnable once without splitting controls.
     It neither converts state nor catches delegate exceptions. The runnable must
     return the original aerosol, and successful results declare state mutation.
+
+    Backend exceptions propagate unchanged. This adapter is concrete-only and
+    must be imported from ``particula.execution.adapters.condensation``.
     """
 
     def execute(self, state: ExecutionState) -> ExecutionResult:
-        """Execute one exact CPU P3 state without fallback or recovery."""
+        """Execute one exact CPU P3 state without fallback or recovery.
+
+        Args:
+            state: Exact selected CPU P3 execution state.
+
+        Returns:
+            A result retaining ``state`` and the original aerosol by identity.
+
+        Raises:
+            TypeError: If ``state`` or its time step has an invalid type.
+            ValueError: If controls or the selected profile are invalid, latent
+                heat is enabled, or the runnable returns another aerosol.
+        """
         if type(state) is not CPUCondensationExecutionState:
             raise TypeError("state must be a CPUCondensationExecutionState.")
         _validate_time_step(state.time_step)
@@ -625,10 +696,29 @@ class WarpCondensationExecutionAdapter:
     native call without conversion, restoration, synchronization, fallback, or
     exception recovery. Kernel failures, including post-launch mutation limits,
     remain the direct kernel's responsibility.
+
+    This concrete-only adapter is imported from
+    ``particula.execution.adapters.condensation``. It forwards the exact
+    native kernel tuple without reconstructing it.
     """
 
     def execute(self, state: ExecutionState) -> ExecutionResult:
-        """Execute one exact Warp P3 state with no post-launch recovery."""
+        """Execute one exact Warp P3 state with no post-launch recovery.
+
+        Args:
+            state: Exact selected Warp P3 execution state.
+
+        Returns:
+            A result retaining ``state`` and the native kernel result by
+            identity.
+
+        Raises:
+            TypeError: If ``state`` or its time step has an invalid type.
+            ValueError: If controls or the selected profile are invalid, or
+                thermal state violates the isothermal boundary.
+            ImportError: If the optional Warp kernel cannot be imported after
+                successful preflight.
+        """
         if type(state) is not WarpCondensationExecutionState:
             raise TypeError("state must be a WarpCondensationExecutionState.")
         _validate_time_step(state.time_step)

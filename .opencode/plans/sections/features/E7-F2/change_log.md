@@ -1,5 +1,15 @@
 # Change Log
 
+## 2026-07-27 — E7-F2-P3 shipped (Issue #1472)
+
+- Added concrete-only selected isothermal CPU and Warp P3 carriers/adapters in
+  `particula/execution/adapters/condensation.py`.
+- Added exact preflight, one unchanged native call, and identity-preserving
+  `ExecutionResult` normalization; Warp kernel resolution remains lazy.
+- Kept the boundary free of transfer, restoration, synchronization, fallback,
+  and failure recovery, and retained the narrow public export surface.
+- Added CPU/Warp dispatch and export-boundary coverage.
+
 ## 2026-07-27 — E7-F2-P2 shipped (Issue #1471)
 
 - Migrated `particula/execution.py` to the `particula.execution` package while

@@ -34,6 +34,12 @@ retaining its exact ten-name selection `__all__`. Concrete-only carriers at
 by identity, perform ordered read-only metadata and writable-output ownership
 checks, and do not select, execute, transfer, allocate, or synchronize.
 
+Issue #1472 shipped E7-F2-P3. The same concrete-only module now supplies
+selected isothermal CPU and Warp adapters: each performs exact local preflight,
+makes one native backend call, and normalizes its native result while preserving
+caller-owned identity. The Warp path resolves its kernel lazily and performs no
+transfer, synchronization, fallback, or recovery.
+
 ## User Stories
 
 - As a simulation user, I want to request CPU or Warp condensation through one

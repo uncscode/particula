@@ -54,11 +54,17 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
   P3/P4 state, result, mutation, and concrete CPU execution-adapter types stay
   direct-module-only.
 - `adapters/condensation.py` - Concrete-only P2 condensation configuration and
-  CPU/Warp state carriers for future adapters. It retains caller-owned
-  resources by identity and performs construction-time, read-only validation;
-  it is intentionally unexported, performs no selection or execution, and
-  establishes no transfer or synchronization boundary. Warp is imported only
-  when Warp-state validation requires runtime types.
+  CPU/Warp state carriers plus selected P3 CPU/Warp execution carriers and
+  adapters. P2 construction retains caller-owned resources by identity and
+  performs read-only validation. After local P3 preflight, each adapter makes
+  exactly one selected native call: CPU dispatches to the caller-owned
+  `MassCondensation` runnable and Warp lazily resolves and dispatches to
+  `condensation_step_gpu`. Neither path transfers, allocates, restores,
+  synchronizes, retries, falls back, or recovers after native dispatch; native
+  exceptions and post-launch limits remain authoritative. The isothermal
+  boundary rejects semantic latent heat; Warp also rejects P2 latent-heat and
+  energy-transfer sidecars. All carriers and adapters remain direct-module-only
+  and Warp is imported only for Warp P2 validation or after P3 Warp preflight.
 - `tests/` - Test coverage
 
 ## Particle Package

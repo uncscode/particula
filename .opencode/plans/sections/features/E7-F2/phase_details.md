@@ -30,13 +30,18 @@
     physics validation, conversion, allocation, transfer, synchronization, or
     top-level concrete exports.
 
-- [ ] **E7-F2-P3:** Implement backend-selected isothermal condensation adapter with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Route explicit CPU and Warp requests to existing implementations while preserving exact arguments, fixed four-substep GPU behavior, and result semantics.
+- [x] **E7-F2-P3:** Implement backend-selected isothermal condensation adapter with unit tests
+  - Issue: #1472 | Size: S | Status: Shipped
+  - Delivered: Concrete-only selected isothermal CPU and Warp P3 carriers and
+    adapters with exact preflight, one unchanged native call, and
+    identity-preserving normalized results. Warp kernel resolution is lazy;
+    neither path transfers, synchronizes, falls back, or recovers failures.
   - Files: `particula/execution/__init__.py`,
     `particula/execution/adapters/condensation.py`,
     `particula/execution/tests/condensation_adapter_test.py`
-  - Tests: Dispatch, call arguments/counts, in-place particle/gas mutation, transfer result identity, no fallback or conversion
+  - Tests: CPU/Warp dispatch, exact call arguments/counts, normalized-result
+    identity, exception propagation, lazy Warp import, no transfer/sync/fallback,
+    and public export boundaries.
 
 - [ ] **E7-F2-P4:** Add latent-heat support and explicit unsupported-mode errors with unit tests
   - Issue: TBD | Size: S | Status: Not Started

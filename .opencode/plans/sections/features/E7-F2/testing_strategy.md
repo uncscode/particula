@@ -44,7 +44,20 @@ does not launch, copy, convert, synchronize, or execute. Existing
 `particula/tests/execution_test.py` and
 `particula/tests/execution_exports_test.py` lock the package migration,
 legacy imports, exact ten-name `__all__`, and absence of concrete carriers from
-selection and top-level exports. CUDA remains optional.
+ selection and top-level exports. CUDA remains optional.
+
+## Shipped P3 Coverage
+
+`particula/execution/tests/condensation_adapter_test.py` now covers concrete
+selected isothermal CPU and Warp dispatch. It verifies exact P3 preflight,
+single native-call argument and call-count preservation, normalized-result and
+state identity, native exception propagation, and the rejection boundary.
+Warp dispatch coverage verifies lazy kernel resolution and guards against
+conversion, restoration, synchronization, CPU fallback, and recovery. Export
+coverage retains the exact ten-name `particula.execution.__all__` boundary and
+keeps concrete P3 names direct-module-only. These are adapter-contract tests;
+they do not claim CPU/Warp numerical parity, real-kernel allocation behavior,
+or post-launch rollback.
 
 ## Parity and Scientific Validation
 

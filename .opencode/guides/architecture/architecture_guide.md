@@ -31,6 +31,36 @@
   resident sessions or loops, schedulers, implicit transfer/synchronization,
   retry, fallback, and replacement of direct GPU APIs remain deferred.
 
+## Concrete Condensation Execution Boundary
+
+- `particula.execution.adapters.condensation` remains concrete-only. It retains
+  P2 CPU/Warp resource carriers and selected P3 CPU/Warp execution-state and
+  adapter types; none are promoted through `particula.execution`, its adapters
+  package, or top-level `particula`.
+- P3 carriers retain their exact P2 state, controls, and CPU runnable by
+  identity. They are frozen against field rebinding, but retained caller-owned
+  resources remain mutable. Construction is side-effect-free and P2 retains its
+  read-only ownership and metadata validation boundary.
+- The selected CPU adapter completes local validation, requires the selected
+  isothermal CPU profile, then calls the supplied `MassCondensation.execute()`
+  once with the original aerosol, `time_step`, and `sub_steps`. The runnable
+  must return that same aerosol. The adapter neither splits controls nor catches
+  delegate exceptions.
+- The selected Warp adapter completes local validation and the isothermal Warp
+  profile check before lazily resolving `condensation_step_gpu`; it then makes
+  one direct native call with the retained resources and forwards its native
+  result unchanged. It imports neither Warp nor `particula.gpu` on the CPU path,
+  and does not resolve the direct kernel before successful Warp preflight.
+- Both adapters report state mutation while retaining state and backend results
+  by identity. They perform no conversion, allocation, transfer, restoration,
+  synchronization, retry, fallback, or post-launch recovery. Backend exceptions
+  propagate unchanged; a launched Warp kernel retains its native rollback
+  limits.
+- This selected boundary is isothermal: semantic configuration latent heat is
+  rejected, and the Warp path additionally rejects P2 `latent_heat` and
+  `energy_transfer` sidecars. `thermal_work` remains opaque caller-owned state
+  forwarded to the direct kernel.
+
 ## CPU Nucleation Boundaries
 
 - `particula.dynamics.nucleation` provides the bounded CPU-only P4 construction

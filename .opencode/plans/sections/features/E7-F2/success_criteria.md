@@ -50,3 +50,14 @@
   output ownership, retaining opaque sidecars without inspecting them.
 - [x] Focused tests prove validation ordering, alias/overlap rejection,
   non-mutation, and no transfer, synchronization, conversion, or execution.
+
+## P3 Delivered Criteria (Issue #1472)
+
+- [x] Concrete-only selected isothermal CPU and Warp adapters validate their
+  exact P3/P2 carriers and controls before one native backend call.
+- [x] CPU preserves `MassCondensation.execute()` control, return, exception,
+  and identity semantics; Warp preserves the native kernel tuple by identity.
+- [x] Warp resolves its native kernel lazily only after preflight and performs
+  no transfer, restoration, synchronization, fallback, or recovery.
+- [x] Focused dispatch and export-boundary tests cover CPU/Warp call contracts,
+  identity normalization, lazy import, and narrow public exports.
