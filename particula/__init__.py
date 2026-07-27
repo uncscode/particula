@@ -1,16 +1,8 @@
-"""a simple, fast, and powerful particle simulator.
+"""Top-level package for the particula particle simulator.
 
-particula is a simple, fast, and powerful particle simulator,
-or at least two of the three, we hope. It is a simple particle
-system that is designed to be easy to use and easy to extend.
-The goal is to have a robust aerosol (gas phase + particle phase)
-simulation system that can be used to answer scientific questions
-that arise for experiments and research discussions.
-
-The main features of particula are:
-...
-
-More details to follow.
+This package exposes the primary aerosol, execution, runnable, and namespace
+modules used by the public API while keeping optional backends out of the
+import path.
 """
 
 # pylint: disable=unused-import
