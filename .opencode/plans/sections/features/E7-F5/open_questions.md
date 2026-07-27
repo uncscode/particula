@@ -12,22 +12,18 @@
     runtime failures never imply fallback.
   - Evidence: `.opencode/plans/sections/features/E7-F4/architecture_design.md:71-82`.
 
-- [ ] What is the precise canonical placement of nucleation relative to
+- [x] What is the precise canonical placement of nucleation relative to
   condensation when both consume the same gas species?
-  - Open: Both processes mutate current gas inventory, but the only shipped
-    sequence is explicitly illustrative and cannot establish scientific intent.
-  - Recommendation: **A - Require a reviewed scheduling profile to declare the order**
-  - Suggested answer: Choose **A** because repository evidence establishes
-    sequential gas visibility but does not justify one universal scientific
-    ordering.
-  - Options:
-    - [ ] A. Require a reviewed scheduling profile to declare one fixed edge for
-      the configured workflow (Recommended)
-    - [ ] B. Make condensation before nucleation universal
-    - [ ] C. Make nucleation before condensation universal
-  - Evidence considered:
+  - Resolved 2026-07-27: Each reviewed scheduling profile must declare one fixed
+    nucleation/condensation edge for its configured workflow. No universal
+    scientific order is imposed.
+  - Rationale: Both processes mutate current gas inventory, and repository
+    evidence establishes sequential visibility without justifying one universal
+    scientific ordering.
+  - Evidence:
     - `docs/Features/Roadmap/data-oriented-gpu.md:1527` - the roadmap gives only
       an example process ordering, not a nucleation/condensation rule.
+  - Resolved by: PR #1452 decision
 
 - [x] Does saturation refresh require a new narrow GPU primitive or can it be
   composed safely from existing thermodynamic state without host readback?

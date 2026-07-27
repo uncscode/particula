@@ -37,9 +37,10 @@ CPU reference inputs + BackendRequest + TimestepPlan
   not already supply them. Results use fixed `(n_boxes,)`, `(n_boxes, n_species)`,
   or explicitly documented scalar shapes and same-device float64 storage. Freeze
   checkpoint schema/version and evidence metadata; do not change core containers.
-- **API Surface:** Expose user-relevant diagnostic requests/results through the
-  deliberate `particula.execution` boundary. Keep Warp kernels, status arrays,
-  scratch records, fixture builders, and closeout tooling private/test-only.
+- **API Surface:** Expose typed diagnostic descriptors and explicit-boundary
+  observation results through the deliberate `particula.execution` boundary.
+  Keep reducers, restart resources, Warp kernels, status arrays, scratch records,
+  fixture builders, and closeout tooling private/test-only.
 - **Diagnostics semantics:** Total species mass includes concentration-weighted
   particle inventory and gas amount using box volume. Number is particle number
   concentration. Energy follows E7-F2 latent-heat sign/unit conventions.

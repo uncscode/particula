@@ -18,20 +18,16 @@
     restart payloads.
   - Evidence: issue #1451 T8 completion signal and E7-F4 checkpoint seam.
 
-- [ ] What public logical box ID type should the first stable API accept?
-  - Open: Reorder independence requires stable IDs, but no accepted requirement
-    chooses strings, bounded integers, or a canonical multi-type encoder.
-  - Recommendation: **A - Use unique non-empty UTF-8 strings**
-  - Suggested answer: Choose **A** because semantic identifiers already remain
-    host-owned string metadata rather than device-row fields.
-  - Options:
-    - [ ] A. Unique non-empty UTF-8 strings with a documented length limit
-      (Recommended)
-    - [ ] B. Unique nonnegative unsigned 64-bit integers
-    - [ ] C. Strings and integers through one versioned canonical encoder
-  - Evidence considered:
+- [x] What public logical box ID type should the first stable API accept?
+  - Resolved 2026-07-27: Accept unique, non-empty UTF-8 strings and define a
+    documented finite encoded-byte length limit in the public contract.
+  - Rationale: Semantic identifiers remain host-owned string metadata rather
+    than device-row fields, while a finite limit bounds validation and checkpoint
+    resource use.
+  - Evidence:
     - `particula/gpu/conversion.py:490` - semantic species identity is already
       caller-owned string metadata outside numeric Warp containers.
+  - Resolved by: PR #1452 decision
 
 - [x] How should disabled per-box execution reach kernels that currently launch
   across all boxes?

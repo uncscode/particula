@@ -8,6 +8,8 @@ never lowered; changed modules target at least 80%.
   unsupported capabilities, malformed dependencies, cycles, and stable errors.
 - **P2:** Unit-test registration-order invariance, canonical tie breaking,
   disabled nodes, dependency closure, invalidation edges, and prelaunch atomicity.
+  Test reviewed profiles with each permitted fixed nucleation/condensation edge,
+  and reject profiles that declare neither direction or both directions.
 - **P3:** Adapter contract tests spy on exact direct calls and assert state,
   sidecar, output, and RNG identity; cover no-op/rejection/failure paths and no
   conversion, synchronization, fallback, or private-kernel bypass.

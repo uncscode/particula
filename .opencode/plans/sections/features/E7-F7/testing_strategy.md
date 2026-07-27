@@ -15,6 +15,7 @@ must maintain at least 80% coverage.
   sparse slots, and extreme valid values. Assert masses, density, charge,
   shapes, and identities remain unchanged.
 - **P3:** Test one-way advection, symmetric mixing, chains, arbitrary box pairs,
+  physical inverse-time rates integrated over varied `time_step` values,
   edge-order permutations, closed-ledger gas conservation, and declared open
   source/sink accounting. Rejected calls must not commit gas or volume.
 - **P4:** Test whole and fractional particle populations, matching and free
@@ -39,6 +40,8 @@ must maintain at least 80% coverage.
   requires a documented alternative.
 - Expansion/compression alone conserves extensive inventories while changing
   concentrations by `old_volume / new_volume`.
+- Combined transport and volume updates construct every edge amount from
+  pre-step volume, apply final volume afterward, and normalize exactly once.
 - Results are independent of edge registration order and unrelated isolated
   boxes. Adding or reordering disabled boxes must not change enabled-box results.
 - Empty/disabled communication and unchanged volume are write-free after full

@@ -45,9 +45,9 @@ must declare source/sink ledgers so apparent non-conservation is explicit.
 
 - **Data model:** Add immutable communication configuration with fixed edge
   capacity, source/destination `int32` arrays, enabled mask, finite nonnegative
-  transfer weights or prescribed amounts, transport mode, optional boundary
-  accounting, and prescribed final-volume/rate inputs. Shapes and edge capacity
-  remain stable for the session.
+  physical inverse-time transfer rates integrated over `time_step`, transport
+  mode, optional boundary accounting, and prescribed final-volume inputs. Shapes
+  and edge capacity remain stable for the session.
 - **Resident resources:** Add same-device `float64` amount ledgers for gas,
   particle concentration and species inventory, `int32` slot plans/status, and
   documented diagnostics. E7-F4 allocates or validates them once and checkpoints
@@ -67,7 +67,8 @@ must declare source/sink ledgers so apparent non-conservation is explicit.
 - **Volume semantics:** `particles.volume` remains the sole simulation-volume
   owner. Positive finite prescribed final volumes update in place. Particle
   masses, density, and charge do not scale merely because box volume changes;
-  concentrations scale through extensive inventory normalization.
+  concentrations scale through extensive inventory normalization. Construct all
+  edge amounts from pre-step volume, then apply final volume and normalize once.
 - **Ordering:** Communication/volume execution is a canonical pre-process
   barrier. If it changes gas concentration or volume, dependent diagnostics and
   thermodynamic state are invalidated. E7-F5's environment update and derived

@@ -13,9 +13,10 @@ rewriting kernel physics.
 The scheduler builds a deterministic capability graph and executes a canonical
 order. Environment changes precede derived thermodynamic refreshes; refreshed
 vapor pressure and saturation state precede consuming processes. Multi-box
-transport is an explicit fixed-shape operation, not hidden inside process
-kernels. Checkpoint/finalize operations synchronize and restore CPU state;
-normal timesteps do neither.
+transport uses a fixed-capacity canonical edge list with canonical
+source/destination order and an active-edge count; it is not hidden inside
+process kernels. Checkpoint/finalize operations synchronize and restore CPU
+state; normal timesteps do neither.
 
 ## Data Ownership Rules
 

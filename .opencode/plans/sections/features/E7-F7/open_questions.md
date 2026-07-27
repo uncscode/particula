@@ -15,37 +15,26 @@
       require explicit transport rules and potentially distinct kernels.
   - Resolved by: plan-question-resolver
 
-- [ ] Are edge weights transfer fractions per scheduler step or physical rates
+- [x] Are edge weights transfer fractions per scheduler step or physical rates
   multiplied by `time_step`?
-  - Open: The roadmap does not define edge-weight units, and choosing fractions
-    versus rates changes public semantics and timestep dependence.
-  - Recommendation: **A - Use physical rates with explicit inverse-time units**
-  - Suggested answer: Choose **A** because existing transport-like dilution
-    integrates an inverse-time coefficient over `time_step` and avoids a weight
-    whose meaning changes with scheduler cadence.
-  - Options:
-    - [ ] A. Physical rates with explicit inverse-time units, integrated over
-      `time_step` (Recommended)
-    - [ ] B. Bounded transfer fractions already integrated per scheduler step
-    - [ ] C. Two separately named declaration types for rates and fractions
-  - Evidence considered:
+  - Resolved 2026-07-27: Edge weights are physical inverse-time rates integrated
+    over `time_step`.
+  - Rationale: This matches existing finite-step transport-like semantics and
+    avoids a weight whose meaning changes with scheduler cadence.
+  - Evidence:
     - `particula/gpu/kernels/dilution.py:323` - the existing finite-step sink
       uses `alpha` in s^-1 and integrates it over `time_step`.
+  - Resolved by: PR #1452 decision
 
-- [ ] Should volume updates occur before or after edge amount construction?
-  - Open: Both orderings are implementable, but they produce different
-    unequal-volume mixing semantics and no canonical transport oracle exists.
-  - Recommendation: **A - Construct amounts from pre-step volume**
-  - Suggested answer: Choose **A** because a pre-step snapshot supports one
-    auditable extensive ledger before normalization by prescribed final volume.
-  - Options:
-    - [ ] A. Build all edge amounts from pre-step volume, then apply final volume
-      and normalize once (Recommended)
-    - [ ] B. Apply prescribed volume updates first, then construct edge amounts
-      from post-update volume
-  - Evidence considered:
+- [x] Should volume updates occur before or after edge amount construction?
+  - Resolved 2026-07-27: Construct all edge amounts from pre-step volume, then
+    apply final volume and normalize once.
+  - Rationale: A pre-step snapshot supports one auditable extensive ledger and
+    deterministic unequal-volume mixing semantics before final normalization.
+  - Evidence:
     - `docs/Features/Roadmap/data-oriented-gpu.md:1565` - `ParticleData.volume`
       owns simulation-volume evolution but no relative ordering is specified.
+  - Resolved by: PR #1452 decision
 
 - [x] Which open-boundary source/sink forms are part of T7?
   - Resolved 2026-07-27: Support prescribed dilution/outflow sinks for particle

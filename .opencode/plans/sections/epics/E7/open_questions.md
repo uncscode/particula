@@ -46,21 +46,16 @@
       limited to named observation and final-result boundaries.
   - Resolved by: plan-question-resolver
 
-- [ ] Which transport map representation best preserves fixed-shape and
+- [x] Which transport map representation best preserves fixed-shape and
   deterministic execution?
-  - Open: The roadmap permits both fixed-shape maps and sparse edge lists, and
-    no workload or memory evidence establishes one representation universally.
-  - Recommendation: **A - Use a fixed-capacity canonical edge list**
-  - Suggested answer: Choose **A** because it preserves stable allocation while
+  - Resolved 2026-07-27: Use a fixed-capacity canonical edge list with canonical
+    source/destination order and an active-edge count.
+  - Rationale: This preserves stable allocation and deterministic traversal while
     avoiding dense storage for prescribed low-degree communication graphs.
-  - Options:
-    - [ ] A. Fixed-capacity edge list with canonical source/destination order and
-      an active-edge count (Recommended)
-    - [ ] B. Dense box-to-box transfer matrix with zero entries for absent edges
-    - [ ] C. Freeze separate dense and sparse public schemas in the first release
-  - Evidence considered:
+  - Evidence:
     - `docs/Features/Roadmap/data-oriented-gpu.md:1573` - both fixed-shape maps
       and sparse edge lists are explicitly allowed.
+  - Resolved by: PR #1452 decision
 
 - [x] How are stream identities preserved when boxes are reordered?
   - Resolved 2026-07-27: Key each process stream by a stable caller-provided

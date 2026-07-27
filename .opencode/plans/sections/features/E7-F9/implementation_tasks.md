@@ -4,8 +4,9 @@
 
 - [ ] Inventory E7-F1 through E7-F8 public contracts and resolve any handoff
   mismatch with the owning track before adding closeout fixtures.
-- [ ] Implement fixed-shape diagnostic request/result records in
-  `particula/execution/diagnostics.py` only where E7-F5 hooks are insufficient.
+- [ ] Implement public typed diagnostic descriptors and explicit-boundary
+  observation results in `particula/execution/diagnostics.py` only where E7-F5
+  hooks are insufficient; keep reducers and restart resources private.
 - [ ] Implement device-side total species mass, number concentration,
   latent-energy, and ledger-aware conservation reductions.
 - [ ] Register diagnostic buffers through E7-F4 resources and preserve their
@@ -18,8 +19,9 @@
 
 - [ ] Add `particula/execution/tests/full_loop_test.py` with independent CPU
   references, transfer/sync spies, canonical order, and derived-state checks.
-- [ ] Add larger particle-resolved `multi_box_loop_test.py` fixtures and one-box
-  decomposition/isolation metamorphic assertions.
+- [ ] Add a 4-box, 16-particle-slot, 2-species particle-resolved
+  `multi_box_loop_test.py` fixture and one-box decomposition/isolation
+  metamorphic assertions.
 - [ ] Add prescribed advection, dilution, mixing, and expansion cases in
   `transport_loop_test.py` with extensive-amount conservation accounting.
 - [ ] Add checkpoint/restart and logical-box stream equivalence cases in

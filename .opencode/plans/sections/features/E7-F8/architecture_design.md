@@ -32,8 +32,10 @@ root seed + stable logical box IDs + stochastic process IDs
 - **Data Model:** Add immutable `StreamKey`, `StreamDescriptor`, and checkpoint
   records plus a session-owned `StreamRegistry`. The registry maps stable logical
   box IDs to storage lanes and process-specific same-device `wp.uint32` arrays.
-  Root seed, derivation/schema version, process ID, ordered logical IDs, and
-  current state are checkpointed. Particle/gas/environment schemas do not change.
+  Public logical box IDs are unique, non-empty UTF-8 strings subject to a
+  documented finite encoded-byte length limit. Root seed, derivation/schema
+  version, process ID, ordered logical IDs, and current state are checkpointed.
+  Particle/gas/environment schemas do not change.
 - **Seed derivation:** Use a specified deterministic integer mixing algorithm,
   not Python `hash()`, over unsigned root seed, schema/process namespace, and
   logical box ID. Freeze test vectors. Detect duplicate logical IDs and reject

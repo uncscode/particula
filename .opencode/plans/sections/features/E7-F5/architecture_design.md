@@ -19,7 +19,7 @@ TimestepPlan + ExecutionContext + ResidentSession
                  |
       vapor-pressure + saturation refresh
                  |
-  nucleation -> condensation -> coagulation -> wall loss -> dilution
+  profile-declared nucleation/condensation edge -> remaining process graph
                  |
         gas update nodes / diagnostic hooks at declared barriers
                  |
@@ -29,7 +29,10 @@ TimestepPlan + ExecutionContext + ResidentSession
 The exact graph, rather than input list order, is authoritative. Required edges
 ensure environment changes precede derived-state refresh and every consumer sees
 current gas and thermodynamic state. Independent nodes use stable process IDs as
-the tie breaker. Disabled nodes disappear only after dependency validation.
+the tie breaker. Every reviewed scheduling profile declares exactly one fixed
+edge between nucleation and condensation for its configured workflow; neither
+direction is universal. Disabled nodes disappear only after dependency
+validation.
 
 ## Data / API / Workflow Changes
 

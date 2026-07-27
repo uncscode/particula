@@ -8,15 +8,17 @@ Warp baseline; CUDA rows are optional and skip cleanly when unavailable.
 ## Per-Phase Approach
 
 - **P1:** Unit/contract tests for reductions against independent NumPy float64
-  oracles, validation ordering, identity, no host readback, and conservation.
+  oracles, public typed descriptors and explicit-boundary observation results,
+  private reducer/restart resources, validation ordering, identity, no host
+  readback, and conservation.
 - **P2:** Checkpoint schema and round-trip tests, malformed/versioned payloads,
   metadata preservation, uninterrupted versus restart equivalence.
 - **P3:** Full-loop integration tests for condensation, Brownian coagulation,
   wall loss, dilution, nucleation, environment/gas refresh, exact canonical
   order, one upload, zero intermediate bulk transfers/syncs, and stable shapes.
 - **P4:** Independent multi-box versus decomposed one-box parity; unrelated-box
-  addition, disablement, and reordering metamorphic tests; larger fixed-capacity
-  particle-resolved fixtures.
+  addition, disablement, and reordering metamorphic tests; a 4-box,
+  16-particle-slot, 2-species fixed-capacity particle-resolved fixture.
 - **P5:** CPU extensive-amount oracles for advection/mixing/dilution/expansion,
   open/closed ledgers, conservation, checkpoint/restart, and RNG continuation.
 - **P6:** Execute the published example with warnings as errors; assert public
@@ -43,5 +45,5 @@ Warp baseline; CUDA rows are optional and skip cleanly when unavailable.
 Stochastic tests do not require exact CPU/CUDA trajectories. Use stable stream
 contracts for same-backend restart and aggregate/statistical bounds otherwise.
 Conservation should retain the repository's tight concentration-weighted policy
-where applicable (`rtol=1e-12`, `atol=1e-30`) unless a owning process contract
+where applicable (`rtol=1e-12`, `atol=1e-30`) unless an owning process contract
 records a different justified tolerance.
