@@ -1,5 +1,16 @@
 # Change Log
 
+## 2026-07-27 — E7-F2-P5 shipped (Issue #1474)
+
+- Added test-only native CPU and resident direct-Warp condensation integration
+  evidence in `particula/execution/tests/condensation_integration_test.py`.
+- Kept CPU behavior and Warp verification independent: the resident Warp matrix
+  uses a local NumPy float64 fixed-four-substep P2 oracle with explicit
+  case-specific mass and gas tolerances, not CPU/Warp numerical equality.
+- Added conservation, protected-lane, zero-duration, latent-energy sidecar,
+  resident no-conversion/restore/copy/synchronization/fallback, Warp CPU, and
+  optional CUDA-subset evidence without changing production APIs.
+
 ## 2026-07-27 — E7-F2-P4 shipped (Issue #1473)
 
 - Enabled selected Warp condensation dispatch to forward caller-owned
