@@ -16,7 +16,13 @@ import inspect
 import re
 from dataclasses import dataclass
 from enum import Enum
-from typing import Protocol, cast, runtime_checkable
+from math import isfinite
+from numbers import Integral, Real
+from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
+
+if TYPE_CHECKING:
+    from particula.aerosol import Aerosol
+    from particula.runnable import RunnableABC
 
 _NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 
@@ -580,6 +586,101 @@ def validate_execution_result(
             "ExecutionResult.backend_result must be a BackendResult."
         )
     return result
+
+
+class _CPURunnable(Protocol):
+    """Describe the CPU runnable seam without importing runtime physics."""
+
+    def execute(
+        self,
+        aerosol: "Aerosol",
+        time_step: float,
+        sub_steps: int = 1,
+    ) -> "Aerosol":
+        """Execute one CPU process over the supplied controls."""
+
+
+@dataclass(frozen=True)
+class CPUExecutionState:
+    """Retain CPU execution inputs without validating or copying them.
+
+    Args:
+        aerosol: Caller-owned aerosol supplied to the CPU runnable.
+        time_step: Caller-supplied total execution duration.
+        sub_steps: Caller-supplied number of runnable substeps.
+    """
+
+    aerosol: object
+    time_step: object
+    sub_steps: object
+
+    @property
+    def backend_payload(self) -> object:
+        """Return the caller-owned aerosol as the opaque CPU payload."""
+        return self.aerosol
+
+
+class CPUExecutionAdapter:
+    """Dispatch one validated CPU state to one caller-supplied runnable.
+
+    This direct boundary neither selects adapters nor transfers, converts, or
+    otherwise validates process state. The stored runnable owns process and
+    aerosol validation.
+
+    Args:
+        runnable: Runnable invoked once for every valid execution state.
+    """
+
+    def __init__(self, runnable: "_CPURunnable | RunnableABC") -> None:
+        """Retain the runnable by identity without inspecting it.
+
+        Args:
+            runnable: Runnable invoked by :meth:`execute`.
+        """
+        self._runnable = runnable
+
+    def execute(self, state: ExecutionState) -> ExecutionResult:
+        """Validate controls, execute once, and retain the original state.
+
+        Args:
+            state: Concrete CPU state to dispatch.
+
+        Returns:
+            A state-mutation result retaining the state and returned aerosol.
+
+        Raises:
+            TypeError: If the state or time-step scalar type is invalid.
+            ValueError: If controls are invalid or the runnable replaces
+                aerosol.
+        """
+        if type(state) is not CPUExecutionState:
+            raise TypeError("state must be a CPUExecutionState.")
+        if isinstance(state.time_step, bool) or not isinstance(
+            state.time_step, Real
+        ):
+            raise TypeError("time_step must be a real scalar.")
+        if not isfinite(state.time_step) or state.time_step < 0:
+            raise ValueError("time_step must be finite and nonnegative.")
+        if (
+            isinstance(state.sub_steps, bool)
+            or not isinstance(state.sub_steps, Integral)
+            or state.sub_steps <= 0
+        ):
+            raise ValueError("sub_steps must be a positive integer.")
+
+        returned_aerosol = self._runnable.execute(
+            cast("Aerosol", state.aerosol),
+            cast(float, state.time_step),
+            cast(int, state.sub_steps),
+        )
+        if returned_aerosol is not state.aerosol:
+            raise ValueError("CPU runnable must return the original aerosol.")
+        return ExecutionResult(
+            state,
+            (),
+            MutationDeclaration(frozenset({MutationScope.STATE})),
+            BackendResult(returned_aerosol),
+        )
 
 
 @runtime_checkable

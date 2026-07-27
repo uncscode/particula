@@ -8,7 +8,12 @@ from dataclasses import FrozenInstanceError, fields
 from pathlib import Path
 from typing import cast
 
+import numpy as np
+import numpy.testing as npt
 import pytest
+from particula.aerosol import Aerosol
+from particula.dynamics.dilution import DilutionStrategy
+from particula.dynamics.particle_process import Dilution
 from particula.execution import (
     Backend,
     BackendResult,
@@ -16,6 +21,8 @@ from particula.execution import (
     CapabilityDeclaration,
     CapabilityMatrix,
     CapabilityRequirements,
+    CPUExecutionAdapter,
+    CPUExecutionState,
     Device,
     ExecutionAdapter,
     ExecutionContext,
@@ -28,6 +35,13 @@ from particula.execution import (
     _AdapterRegistry,
     validate_execution_result,
 )
+from particula.gas.atmosphere import Atmosphere
+from particula.gas.species import GasSpecies
+from particula.particles.activity_strategies import ActivityIdealMass
+from particula.particles.distribution_strategies import MassBasedMovingBin
+from particula.particles.representation import ParticleRepresentation
+from particula.particles.surface_strategies import SurfaceStrategyVolume
+from particula.runnable import RunnableABC
 
 
 def _device() -> Device:
@@ -1305,3 +1319,317 @@ def test_validator_rejects_malformed_forms_without_mutation(
     assert getattr(result, "metadata", None) is metadata
     assert context._registry._snapshot() == registry
     assert adapter.calls == 0
+
+
+# P4 CPU execution adapter contract
+class _RecordingRunnable(RunnableABC):
+    """Record CPU adapter dispatches and retain the received aerosol."""
+
+    def __init__(self) -> None:
+        """Create an empty recording runnable."""
+        self.calls: list[tuple[object, object, object]] = []
+
+    def rate(self, aerosol: Aerosol) -> object:
+        """Provide the required unused runnable rate seam."""
+        del aerosol
+        return None
+
+    def execute(
+        self,
+        aerosol: Aerosol,
+        time_step: float,
+        sub_steps: int = 1,
+    ) -> Aerosol:
+        """Record controls and return the original aerosol."""
+        self.calls.append((aerosol, time_step, sub_steps))
+        return aerosol
+
+
+def _make_cpu_adapter_aerosol() -> Aerosol:
+    """Build deterministic particle and gas concentration state."""
+    particles = ParticleRepresentation(
+        strategy=MassBasedMovingBin(),
+        activity=ActivityIdealMass(),
+        surface=SurfaceStrategyVolume(),
+        distribution=np.array([1e-18, 2e-18], dtype=np.float64),
+        density=np.array([1000.0], dtype=np.float64),
+        concentration=np.array([4.0, 8.0], dtype=np.float64),
+        charge=np.array([1.0, -1.0], dtype=np.float64),
+        volume=2.0,
+    )
+    partitioning = GasSpecies(
+        name="partitioning",
+        molar_mass=0.1,
+        concentration=3.0,
+        partitioning=True,
+    )
+    gas_only = GasSpecies(
+        name=np.array(["gas_a", "gas_b"]),
+        molar_mass=np.array([0.02, 0.03], dtype=np.float64),
+        concentration=np.array([5.0, 7.0], dtype=np.float64),
+        partitioning=False,
+    )
+    return Aerosol(
+        atmosphere=Atmosphere(
+            temperature=298.15,
+            total_pressure=101325.0,
+            partitioning_species=partitioning,
+            gas_only_species=gas_only,
+        ),
+        particles=particles,
+    )
+
+
+def _cpu_adapter_concentrations(
+    aerosol: Aerosol,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Copy all CPU adapter concentration domains."""
+    return (
+        aerosol.particles.get_concentration().copy(),
+        np.asarray(
+            aerosol.atmosphere.partitioning_species.get_concentration()
+        ).copy(),
+        np.asarray(
+            aerosol.atmosphere.gas_only_species.get_concentration()
+        ).copy(),
+    )
+
+
+def test_cpu_adapter_dispatches_once_and_retains_p3_identity() -> None:
+    """Test successful CPU dispatch retains all P3 carrier identities."""
+    aerosol = object()
+    time_step = 2.0
+    sub_steps = 3
+    runnable = _RecordingRunnable()
+    state = CPUExecutionState(aerosol, time_step, sub_steps)  # type: ignore[arg-type]
+
+    adapter = CPUExecutionAdapter(runnable)
+    result = adapter.execute(state)
+
+    assert isinstance(adapter, ExecutionAdapter)
+    assert runnable.calls == [(aerosol, time_step, sub_steps)]
+    assert result.state is state
+    assert state.backend_payload is aerosol
+    assert result.metadata == ()
+    assert result.mutation.scopes == frozenset({MutationScope.STATE})
+    assert result.backend_result is not None
+    assert result.backend_result.value is aerosol
+
+
+def test_cpu_adapter_constructor_does_not_inspect_runnable() -> None:
+    """Test adapter construction retains a hostile runnable untouched."""
+
+    class HostileRunnable:
+        """Reject dynamic lookup of its execute method."""
+
+        def __getattribute__(self, name: str) -> object:
+            """Reject inspection of the execution seam."""
+            if name == "execute":
+                raise AssertionError("constructor must not inspect execute")
+            return object.__getattribute__(self, name)
+
+    runnable = HostileRunnable()
+    adapter = CPUExecutionAdapter(runnable)  # type: ignore[arg-type]
+
+    assert adapter._runnable is runnable
+
+
+def test_cpu_adapter_delegates_real_dilution_runnable() -> None:
+    """Test adapter leaves dilution control and substep semantics to runnable."""
+    aerosol = _make_cpu_adapter_aerosol()
+    sources = _cpu_adapter_concentrations(aerosol)
+    state = CPUExecutionState(aerosol, 4.0, 2)
+
+    result = CPUExecutionAdapter(Dilution(DilutionStrategy(0.25))).execute(
+        state
+    )
+
+    assert result.state is state
+    assert result.backend_result is not None
+    assert result.backend_result.value is aerosol
+    for result_values, source in zip(
+        _cpu_adapter_concentrations(aerosol), sources, strict=True
+    ):
+        npt.assert_allclose(
+            result_values,
+            source * np.exp(-1.0),
+            rtol=1e-12,
+            atol=0.0,
+        )
+
+
+@pytest.mark.parametrize(
+    ("state", "exception", "message"),
+    [
+        (_State(object()), TypeError, "state must be a CPUExecutionState."),
+        (
+            type("DerivedCPUState", (CPUExecutionState,), {})(object(), 1.0, 1),
+            TypeError,
+            "state must be a CPUExecutionState.",
+        ),
+        *[
+            (
+                CPUExecutionState(object(), value, 1),
+                TypeError,
+                "time_step must be a real scalar.",
+            )
+            for value in (None, "one", object(), 1j, True)
+        ],
+        *[
+            (
+                CPUExecutionState(object(), value, 1),
+                ValueError,
+                "time_step must be finite and nonnegative.",
+            )
+            for value in (-1.0, np.nan, np.inf, -np.inf)
+        ],
+        *[
+            (
+                CPUExecutionState(object(), 1.0, value),
+                ValueError,
+                "sub_steps must be a positive integer.",
+            )
+            for value in (0, -1, True, 1.0, "one", None)
+        ],
+    ],
+)
+def test_cpu_adapter_rejects_invalid_state_and_controls_before_dispatch(
+    state: ExecutionState,
+    exception: type[Exception],
+    message: str,
+) -> None:
+    """Test malformed state or controls make no runnable call."""
+    runnable = _RecordingRunnable()
+
+    with pytest.raises(exception, match=f"^{re.escape(message)}$"):
+        CPUExecutionAdapter(runnable).execute(state)
+
+    assert runnable.calls == []
+
+
+def test_cpu_adapter_forwards_numpy_scalars_by_identity() -> None:
+    """Test supported NumPy controls reach the runnable without coercion."""
+    aerosol = object()
+    time_step = np.float64(1.5)
+    sub_steps = np.int64(2)
+    runnable = _RecordingRunnable()
+
+    CPUExecutionAdapter(runnable).execute(
+        CPUExecutionState(aerosol, time_step, sub_steps)  # type: ignore[arg-type]
+    )
+
+    call = runnable.calls[0]
+    assert call[0] is aerosol
+    assert call[1] is time_step
+    assert call[2] is sub_steps
+
+
+def test_cpu_adapter_propagates_exception_after_one_dispatch() -> None:
+    """Test runnable exceptions escape unchanged after their sole call."""
+    error = RuntimeError("runnable failed")
+
+    class RaisingRunnable(_RecordingRunnable):
+        """Raise the preconstructed sentinel error during dispatch."""
+
+        def execute(
+            self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
+        ) -> Aerosol:
+            """Record one call and raise the sentinel error."""
+            self.calls.append((aerosol, time_step, sub_steps))
+            raise error
+
+    runnable = RaisingRunnable()
+    state = CPUExecutionState(object(), 1.0, 1)  # type: ignore[arg-type]
+
+    with pytest.raises(RuntimeError) as raised:
+        CPUExecutionAdapter(runnable).execute(state)
+
+    assert raised.value is error
+    assert len(runnable.calls) == 1
+
+
+def test_cpu_adapter_rejects_replacement_aerosol_after_one_dispatch() -> None:
+    """Test a runnable replacement result fails after its one allowed call."""
+
+    class ReplacingRunnable(_RecordingRunnable):
+        """Return a distinct aerosol sentinel after recording the call."""
+
+        def execute(
+            self, aerosol: Aerosol, time_step: float, sub_steps: int = 1
+        ) -> Aerosol:
+            """Record the call and deliberately return another object."""
+            self.calls.append((aerosol, time_step, sub_steps))
+            return cast(Aerosol, object())
+
+    runnable = ReplacingRunnable()
+    state = CPUExecutionState(object(), 1.0, 1)  # type: ignore[arg-type]
+
+    with pytest.raises(
+        ValueError, match="^CPU runnable must return the original aerosol.$"
+    ):
+        CPUExecutionAdapter(runnable).execute(state)
+
+    assert len(runnable.calls) == 1
+
+
+def test_cpu_adapter_delegates_zero_duration_once() -> None:
+    """Test zero duration follows ordinary dispatch rather than an adapter no-op."""
+    aerosol = object()
+    runnable = _RecordingRunnable()
+    state = CPUExecutionState(aerosol, 0.0, 1)  # type: ignore[arg-type]
+
+    result = CPUExecutionAdapter(runnable).execute(state)
+
+    assert runnable.calls == [(aerosol, 0.0, 1)]
+    assert result.state is state
+
+
+def test_cpu_adapter_execution_does_not_load_optional_backends() -> None:
+    """Test fresh CPU adapter dispatch imports no optional backend modules."""
+    repository_root = Path(__file__).parents[2]
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = os.pathsep.join(
+        filter(None, (str(repository_root), environment.get("PYTHONPATH")))
+    )
+    script = """
+import builtins
+import sys
+
+original_import = builtins.__import__
+def guarded_import(name, *args, **kwargs):
+    guarded = ("warp", "particula.gpu", "particula.gpu.conversion")
+    if any(name == prefix or name.startswith(prefix + ".") for prefix in guarded):
+        raise AssertionError(f"Unexpected optional backend import: {name}")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = guarded_import
+from particula.execution import CPUExecutionAdapter, CPUExecutionState
+
+class Runnable:
+    def execute(self, aerosol, time_step, sub_steps=1):
+        assert (time_step, sub_steps) == (1.0, 2)
+        return aerosol
+
+aerosol = object()
+state = CPUExecutionState(aerosol, 1.0, 2)
+result = CPUExecutionAdapter(Runnable()).execute(state)
+assert result.state is state
+assert result.backend_result.value is aerosol
+assert not any(
+    name == "warp" or name.startswith("warp.") or name == "particula.gpu"
+    or name.startswith("particula.gpu.") for name in sys.modules
+)
+"""
+
+    completed = subprocess.run(  # noqa: S603 -- fixed test interpreter
+        [sys.executable, "-c", script],
+        cwd=repository_root,
+        capture_output=True,
+        check=False,
+        env=environment,
+        text=True,
+    )
+
+    assert completed.returncode == 0, (
+        f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
+    )
