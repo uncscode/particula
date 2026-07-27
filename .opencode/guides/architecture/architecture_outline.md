@@ -2,25 +2,32 @@
 
 ## Execution Capability Vocabulary
 
-`particula.execution` is a dependency-neutral, standard-library-only selection
-boundary. Its ten selection/context symbols and
-`ExecutionContext.register_adapter()` are package-level public APIs, while the
-backing registry remains private. Immutable exact declarations validate before
-one context-local `(Process, Backend)` lookup: exact matrix validation happens
-before lookup, and a resolved adapter retains
-identity and is not executed. CPU metadata uses exactly
-`Device(Backend.CPU, "cpu")`. Selection does not import, probe, or resolve a
-backend; transfer or synchronize data; retry or fallback; or define generic
-execution arguments, results, state, or mutation semantics. P3/P4 state,
-result, mutation, and concrete CPU-adapter types remain direct-module-only.
+`particula.execution` is a dependency-neutral, standard-library-only,
+explicit-selection seam. Its package-level public APIs are exactly `Backend`,
+`Device`, `Process`, `Capability`, `CapabilityRequirements`,
+`CapabilityDeclaration`, `CapabilityMatrix`, `ExecutionRequest`,
+`ExecutionAdapter`, and `ExecutionContext`, plus the public
+`ExecutionContext.register_adapter()` method. The backing per-context registry
+remains private.
+
+Declarations and requests are immutable exact metadata. CPU metadata uses
+exactly `Device(Backend.CPU, "cpu")`. Registration and resolution are
+context-local, selection-only operations: complete exact matrix validation
+occurs before one exact `(Process, Backend)` lookup. A resolved adapter retains
+identity and is not executed by selection. Selection does not import,
+probe, resolve, or check availability of a backend; transfer or synchronize
+data; execute an adapter; retry; or fallback. Generic execution argument,
+result, state, mutation, and runtime-error semantics are not public. P3/P4
+state, result, mutation, and concrete CPU execution-adapter types remain
+direct-module-only.
 
 Strategy physics, builder configuration, and existing CPU `RunnableABC`
 behavior remain separate from E7-F1 typed selection and downstream process
-adapter/session layers. The ordering is
+adapter/session layers. The exact ordering is
 `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`; E7-F6 owns availability,
 fallback, error taxonomy, API stability, and export policy. GPU adapters,
-resident sessions/loops, scheduling, implicit transfer/synchronization, and
-replacement of direct GPU APIs remain unsupported.
+resident sessions or loops, schedulers, implicit transfer/synchronization,
+retry, fallback, and replacement of direct GPU APIs remain deferred.
 
 ### particula/execution.py
 
@@ -38,6 +45,8 @@ replacement of direct GPU APIs remain unsupported.
 - `_AdapterRegistry` - Private, per-context exact-key backing registry.
   `ExecutionContext.register_adapter()` is public; registration and resolution
   select adapters by identity after matrix validation and never execute them.
+  P3/P4 state, result, mutation, and concrete CPU execution-adapter types stay
+  direct-module-only.
 
 ## Particle Package
 

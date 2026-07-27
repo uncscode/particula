@@ -1484,11 +1484,11 @@ The downstream ordering is:
 `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`.
 
 E7-F6 owns availability, fallback, error taxonomy, API stability, and export
-policy. E7-F1 supplies no transfer or fallback. E7-F2 supplies condensation
-adapters, E7-F3 supplies coagulation adapters, E7-F4 supplies resident
-session/container/sidecar lifecycle, and E7-F5 is their later scheduling
-consumer. These consumers register or use adapters only after their own
-contracts exist and do not alter the shipped direct-kernel path.
+policy. E7-F1 supplies neither transfer nor fallback. E7-F2 supplies
+condensation adapters, E7-F3 supplies coagulation adapters, E7-F4 supplies
+resident session/container/sidecar lifecycle, and E7-F5 is their later
+scheduling consumer. These consumers register or use adapters only after their
+own contracts exist and do not alter the shipped direct-kernel path.
 
 ### High-Level Integration
 

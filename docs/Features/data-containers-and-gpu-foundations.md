@@ -129,8 +129,9 @@ state. Invocation, arguments, state/result ownership, mutation declaration,
 and runtime errors remain caller and registered-adapter responsibilities until
 a later public contract exists.
 
-An unsupported declaration fails before lookup. A supported declaration without
-an exact registration raises `LookupError`; no alternate backend is selected.
+An unsupported declaration fails before lookup with `ValueError`. A supported
+declaration without an exact registration raises `LookupError`; no alternate
+backend is selected.
 Selection has ended after an adapter is returned and does not catch, retry, or
 fallback from adapter failures.
 
