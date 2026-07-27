@@ -1,18 +1,26 @@
 # Architecture Guide
 
-## Execution Capability Vocabulary Boundary
+## Execution Capability and Private Selection Boundary
 
-- `particula.execution` is a direct-import, P1 typed metadata module; it is not
-  exported through top-level `particula`.
+- `particula.execution` is a direct-import, dependency-neutral typed metadata
+  and P2 private-selection module; it is not exported through top-level
+  `particula`.
 - It contains only immutable standard-library declarations for `Backend`, an
   opaque `Device` native identifier, `Process`, `Capability`, exact
-  requirements/declarations, and a pure `CapabilityMatrix`.
+  requirements/declarations, and a pure `CapabilityMatrix`. P2 adds immutable
+  `ExecutionRequest` values and an `ExecutionContext` with a private,
+  context-local adapter registry.
 - A nonempty request is supported only by a complete exact declaration. The
   matrix must not infer a combined capability from separately declared entries;
   empty requirements require an existing device/process declaration.
-- This boundary does not import Warp or `particula.gpu`, resolve a device, probe
-  availability, transfer state, select an adapter, or execute a process.
-- Execution contexts, requests, adapters, and registries are P2+ concerns. See
+- Selection validates a request's declared capability support before one exact
+  `(Process, Backend)` private-registry lookup. CPU requests must use the
+  canonical `Device(Backend.CPU, "cpu")`; Warp native identifiers remain opaque.
+  Selection returns the registered adapter by identity and neither invokes it
+  nor tries alternate adapters.
+- This boundary does not import Warp or `particula.gpu`, resolve or probe a
+  backend, transfer state, execute a process, or provide fallback. Registration
+  and adapter shapes remain private implementation seams, not public APIs. See
   [ADR-003](decisions/ADR-003-dependency-neutral-execution-capabilities.md).
 
 ## CPU Nucleation Boundaries

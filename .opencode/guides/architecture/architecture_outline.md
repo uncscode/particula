@@ -2,12 +2,12 @@
 
 ## Execution Capability Vocabulary
 
-`particula.execution` is a deliberately dependency-neutral P1 metadata boundary
-for typed execution support declarations. It is standard-library-only and is
-not exported through top-level `particula`. It does not import Warp or
-`particula.gpu`, resolve devices, probe availability, transfer data, select
-adapters, or execute processes. Execution contexts, requests, adapters, and
-registries are deferred to P2+.
+`particula.execution` is a deliberately dependency-neutral metadata and private
+selection boundary. It is standard-library-only and is not exported through
+top-level `particula`. Its P2 selection layer validates declared capability
+support, normalizes the CPU spelling, and returns one context-local adapter by
+the exact `(Process, Backend)` key. It does not import Warp or `particula.gpu`,
+resolve or probe backends, transfer data, invoke adapters, or provide fallback.
 
 ### particula/execution.py
 
@@ -19,6 +19,13 @@ registries are deferred to P2+.
 - `CapabilityMatrix` - Pure, immutable exact-match lookup. Nonempty
   requirements must match a complete declaration; an empty requirement is
   supported only when its device/process base has a declaration.
+- `ExecutionRequest` and `ExecutionContext` - Direct-import selection values
+  and context-local coordinator. Requests must pair matching backends/devices;
+  CPU selection accepts only `Device(Backend.CPU, "cpu")`, while Warp native
+  identifiers remain opaque.
+- `_AdapterRegistry` and `_ExecutionAdapter` - Private, per-context exact-key
+  registration seam. Adapters are selected by identity only after matrix
+  validation; registration and execution are deliberately not public APIs.
 
 ## Particle Package
 

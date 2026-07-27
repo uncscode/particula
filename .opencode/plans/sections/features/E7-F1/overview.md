@@ -6,10 +6,13 @@
 
 ## Implementation Status
 
-**E7-F1-P1 shipped for issue #1462.** `particula.execution` now provides the
-dependency-neutral typed capability vocabulary and immutable pure lookup matrix.
-It deliberately does not provide execution requests or contexts, adapters,
-registries, availability checks, transfers, execution, or package exports;
+**E7-F1-P1 shipped for issue #1462; P2 shipped for issue #1463.**
+`particula.execution` now provides the dependency-neutral typed capability
+vocabulary and immutable pure lookup matrix, plus typed request validation and
+exact adapter selection in context-local private registries. P2 preserves
+opaque Warp device identifiers and canonicalizes only the CPU `"cpu"` spelling.
+It deliberately does not execute adapters, probe availability, transfer data,
+retry, fall back, define state/result contracts, or publish package exports;
 those remain later phases.
 
 ## Problem Statement

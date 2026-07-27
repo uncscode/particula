@@ -5,8 +5,8 @@
 Backend selection belongs in a separate `particula.execution` layer. Strategies
 continue to describe physics, builders continue to construct strategies, and
 `RunnableABC` remains the CPU `Aerosol` contract. The execution context resolves
-an explicit request against immutable capability declarations and invokes a
-typed adapter only after validation.
+an explicit request against immutable capability declarations and returns a
+typed adapter by identity; P2 does not invoke it.
 
 ```text
 ExecutionRequest(backend, device, process, required capabilities)
@@ -17,18 +17,14 @@ ExecutionRequest(backend, device, process, required capabilities)
            unsupported      supported
              -> raise           |
                                 v
-                       ExecutionContext
-                                |
-                     adapter selected explicitly
+                        ExecutionContext
+                                 |
+                   exact adapter selected (P2)
                                 |
                +----------------+----------------+
                |                                 |
-       CPUExecutionAdapter              future E7 GPU adapter
-       RunnableABC + Aerosol             Warp resident state
-               |                                 |
-               +------> ExecutionResult <--------+
-                       (state identity,
-                        mutation metadata)
+        future CPU adapter               future E7 GPU adapter
+        RunnableABC + Aerosol             Warp resident state
 ```
 
 Selection never catches runtime failures to retry another backend. The neutral
@@ -45,7 +41,20 @@ declared capabilities are never inferred as a combined capability; its empty
 requirement lookup recognizes only a declared device/process base. `require()`
 is a fail-closed pure wrapper around that lookup. No request/context, adapter,
 registry, availability probe, transfer, execution path, or public package
-export was added.
+ export was added.
+
+## P2 Implementation Record
+
+Issue #1463 adds selection only. `ExecutionRequest` validates fields in
+backend/device/process/requirements order and rejects mismatched backend/device
+pairs at construction. `ExecutionContext.resolve()` validates and normalizes a
+request, invokes immutable-matrix `require()`, and then performs one private
+exact `(Process, Backend)` lookup. Each context owns its own registry; malformed
+or duplicate registrations do not replace entries. CPU accepts only the
+canonical `Device(Backend.CPU, "cpu")`; a Warp device's native value is passed
+unchanged to matrix validation. No adapter call, fallback, retry, transfer,
+optional-backend import, availability probe, state/result contract, or package
+export is part of this phase.
 
 ## Data / API / Workflow Changes
 

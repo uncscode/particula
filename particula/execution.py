@@ -1,9 +1,10 @@
-"""Declare dependency-neutral, immutable execution capability metadata.
+"""Declare dependency-neutral execution capability metadata and selection.
 
-This module models declared backend, device, process, and capability support.
-It only performs structural validation and read-only capability lookup; it does
-not load optional backends, resolve devices, transfer state, choose adapters,
-or execute processes.
+This module validates immutable backend, device, process, and capability
+declarations. An ``ExecutionContext`` capability-validates a typed request and
+returns one exact context-local adapter. Selection does not invoke adapters,
+load or probe optional backends, resolve native devices, transfer state, or
+define execution state and result contracts.
 """
 
 import re
@@ -367,11 +368,23 @@ class _ExecutionAdapter(Protocol):
     """
 
     def execute(self, *args: object, **kwargs: object) -> object:
-        """Declare a future execution seam without invoking it."""
+        """Declare a future execution seam without invoking it.
+
+        Args:
+            *args: Positional arguments for a future execution contract.
+            **kwargs: Keyword arguments for a future execution contract.
+
+        Returns:
+            A future execution result whose contract is not defined by P2.
+        """
 
 
 class _AdapterRegistry:
-    """Keep context-local adapter registrations without execution."""
+    """Keep exact context-local adapter registrations without execution.
+
+    The registry validates only an adapter's callable ``execute`` shape. It
+    neither invokes adapters nor loads, probes, or transfers backend state.
+    """
 
     def __init__(self) -> None:
         """Create an empty registry without loading or probing backends."""
@@ -384,6 +397,11 @@ class _AdapterRegistry:
         adapter: object,
     ) -> None:
         """Register one shaped adapter without invoking or inspecting it.
+
+        Args:
+            process: Process to associate with the adapter.
+            backend: Backend to associate with the adapter.
+            adapter: Object with a callable ``execute`` attribute.
 
         Raises:
             TypeError: If arguments are invalid in process, backend, adapter
@@ -408,6 +426,13 @@ class _AdapterRegistry:
     def _lookup(self, process: Process, backend: Backend) -> _ExecutionAdapter:
         """Return one exact adapter without fallback or adapter execution.
 
+        Args:
+            process: Process associated with the requested adapter.
+            backend: Backend associated with the requested adapter.
+
+        Returns:
+            The adapter registered under the exact process/backend pair.
+
         Raises:
             LookupError: If no adapter has the exact process/backend key.
         """
@@ -419,7 +444,11 @@ class _AdapterRegistry:
             ) from error
 
     def _snapshot(self) -> dict[tuple[Process, Backend], _ExecutionAdapter]:
-        """Return a fresh private-registration snapshot for focused tests."""
+        """Return a fresh private-registration snapshot for focused tests.
+
+        Returns:
+            A copy of the registry mapping that cannot mutate registrations.
+        """
         return dict(self._adapters)
 
 
@@ -427,11 +456,15 @@ class ExecutionContext:
     """Select declared adapters without executing, probing, or transferring.
 
     Each context owns its private registry, preventing mutable module-global
-    registration state.
+    registration state. It performs selection only: it never invokes an
+    adapter, probes availability, or transfers data.
     """
 
     def __init__(self, matrix: CapabilityMatrix) -> None:
         """Store a matrix and create an empty private adapter registry.
+
+        Args:
+            matrix: Immutable capability declarations used for selection.
 
         Raises:
             TypeError: If ``matrix`` is not a CapabilityMatrix.
@@ -468,7 +501,14 @@ class ExecutionContext:
 def _normalize_request_device(request: ExecutionRequest) -> Device:
     """Normalize CPU selection without parsing, probing, or transferring.
 
-    Warp native identifiers remain opaque and are returned verbatim.
+    CPU requests must use the canonical ``Device(Backend.CPU, "cpu")``
+    spelling. Warp native identifiers remain opaque and are returned verbatim.
+
+    Args:
+        request: Typed selection request whose device requires normalization.
+
+    Returns:
+        Canonical CPU device metadata or the request's unchanged Warp device.
 
     Raises:
         ValueError: If the CPU spelling or backend/device pairing is invalid.

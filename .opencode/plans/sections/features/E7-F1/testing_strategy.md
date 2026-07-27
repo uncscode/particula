@@ -13,9 +13,12 @@ thresholds must never be lowered; changed execution modules must retain at least
   fixed validation order; pure `supports()`/`require()` behavior; and a fresh
   subprocess import with `warp` and `particula.gpu` guarded. This suite is
   CPU-only and does not simulate adapters, transfers, or process physics.
-- **P2 — context and validation:** Use fake adapters to verify normalization,
-  full preflight before dispatch, deterministic validation order, one dispatch,
-  and no implicit backend retry after adapter failure.
+- **P2 — context and validation (completed, #1463):**
+  `particula/tests/execution_test.py` uses fake adapters, matrix/lookup spies,
+  and guarded subprocess imports to verify typed construction order, canonical
+  CPU normalization, opaque Warp preservation, matrix-before-single-lookup
+  ordering, identity selection, context-local registration non-mutation, and
+  no adapter execution, retry, fallback, transfer, or optional dependency.
 - **P3 — state/result contract:** Test runtime protocols, caller-owned state
   identity, immutable metadata, explicit mutation declaration, malformed state
   and result rejection, and backend-specific payload opacity.
@@ -55,4 +58,4 @@ mkdocs build --strict
 ```
 
 The export regression at `particula/tests/execution_exports_test.py` is P5
-verification and is not part of the completed P1 command set.
+verification and is not part of the completed P1/P2 command sets.

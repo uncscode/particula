@@ -12,7 +12,21 @@
   remain read-only, and use the specified deterministic unsupported-request
   error.
 - [x] Unit coverage includes constructor boundaries, immutable value semantics,
-  matrix behavior and non-mutation, and a fresh guarded no-Warp import.
+   matrix behavior and non-mutation, and a fresh guarded no-Warp import.
+
+## Delivered P2 criteria (issue #1463)
+
+- [x] `ExecutionRequest` and a separate `ExecutionContext` validate typed
+  backend/device/process/requirements selection without executing an adapter.
+- [x] CPU selection canonicalizes only `Device(Backend.CPU, "cpu")`; Warp
+  native identifiers remain opaque and dependency-neutral.
+- [x] Resolution performs request/device validation, capability validation, and
+  exactly one exact private lookup in that order; unsupported requests do not
+  query the registry.
+- [x] Private registrations are context-local, typed, and non-replacing; tests
+  prove exact identity selection and rejection/non-mutation behavior.
+- [x] P2 tests prove no adapter execution, retry, fallback, transfer, optional
+  backend probing, or optional backend import.
 
 - [ ] Backend selection is located in a documented, typed, separate execution
   context rather than embedded in strategies, builders, or `RunnableABC`.

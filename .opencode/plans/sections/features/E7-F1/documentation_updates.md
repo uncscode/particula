@@ -20,3 +20,10 @@
 
 Validation: run relevant documentation regressions, verify all relative links,
 and run `mkdocs build --strict` with warnings treated as failures.
+
+## P2 Record (issue #1463)
+
+No user-facing documentation was updated: `ExecutionContext` registration is
+private and P2 has no executable adapter or stable public export. The structured
+plan now records the selection-only boundary; publish user imports and examples
+only after the later public-export and execution-contract phases.

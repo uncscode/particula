@@ -19,13 +19,17 @@ documentation phase. Unit tests are co-located with every production phase.
     and exact unsupported errors, plus a fresh subprocess import guarded against
     `warp` and `particula.gpu`.
 
-- [ ] **E7-F1-P2:** Add the execution-context selection protocol and validation tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F1-P2:** Add the execution-context selection protocol and validation tests
+  - Issue: #1463 | Size: S | Status: Completed
   - Goal: Select an adapter from explicit context configuration after complete
     backend/device/capability validation, with no implicit fallback.
   - Files: `particula/execution.py`, `particula/tests/execution_test.py`
-  - Tests: CPU/device normalization, invalid combinations, deterministic
-    validation order, and rejection before adapter execution.
+  - Delivered: frozen `ExecutionRequest`, canonical CPU normalization, opaque
+    Warp preservation, context-local private adapter registration, and exact
+    capability-gated selection in `particula/execution.py`.
+  - Tests: request/registration validation order, invalid combinations,
+    matrix-before-single-lookup ordering, registry non-mutation and locality,
+    exact identity selection, no execution/fallback, and guarded no-Warp import.
 
 - [ ] **E7-F1-P3:** Specify state ownership mutation and result contracts with unit tests
   - Issue: TBD | Size: S | Status: Not Started

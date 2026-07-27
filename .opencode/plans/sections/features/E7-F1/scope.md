@@ -27,7 +27,23 @@ strategies, builders, or the existing `Aerosol`-typed runnable hierarchy.
   declared device/process base.
 - `particula/tests/execution_test.py` covers validation, immutability, exact
   matching, non-mutation, and an import path guarded against optional Warp/GPU
-  imports.
+   imports.
+
+## Delivered in P2 (issue #1463)
+
+- `particula/execution.py` now provides frozen `ExecutionRequest` validation,
+  `ExecutionContext`, and a private per-context `_AdapterRegistry` keyed only
+  by exact `(Process, Backend)` pairs.
+- Resolution validates the typed request and CPU spelling, calls
+  `CapabilityMatrix.require()`, then performs exactly one exact adapter lookup.
+  Supported but unregistered requests raise `LookupError`; rejected requests do
+  not reach lookup.
+- CPU normalizes only `Device(Backend.CPU, "cpu")`; Warp native identifiers are
+  retained verbatim without optional-backend import, availability probing, or
+  device resolution.
+- `particula/tests/execution_test.py` verifies validation order, private
+  registry non-mutation and context locality, identity selection, no execution
+  or fallback, and guarded dependency-neutral import behavior.
 
 ## Out of Scope
 
