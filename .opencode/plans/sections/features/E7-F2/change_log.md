@@ -1,5 +1,17 @@
 # Change Log
 
+## 2026-07-27 — E7-F2-P1 shipped (Issue #1470)
+
+- Added direct-module-only condensation configuration vocabularies and frozen
+  validation in `particula/execution.py`.
+- Added exact four-axis requirements mapping and immutable catalogue entries for
+  36 CPU configurations and 8 declarative Warp profiles.
+- Added focused `particula/tests/execution_test.py` coverage for catalogue and
+  mapping semantics, deterministic rejection order, purity/immutability, and
+  optional-import isolation.
+- Kept runtime availability, native-device handling, adapter selection, public
+  exports, and GPU APIs unchanged; those concerns remain outside P1.
+
 ## 2026-07-26 — Initial Draft
 
 - Created E7-F2 from issue #1451 Track T2 under parent epic E7.

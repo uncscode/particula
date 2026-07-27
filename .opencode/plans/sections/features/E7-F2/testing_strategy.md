@@ -22,6 +22,16 @@ testing phase is deferred. Place neutral execution tests under
   supplied outputs unchanged; later substep failure follows the existing
   documented partial-commit boundary.
 
+## Shipped P1 Coverage
+
+`particula/tests/execution_test.py` now covers the pure metadata boundary:
+the 36 CPU and 8 Warp-profile declarations, exact four-member requirements,
+supported and rejected Warp configurations, type and backend-first validation,
+immutable/read-only behaviour, non-composable requirement semantics, and
+fresh-process isolation from `warp` and `particula.gpu`. These tests intentionally
+do not claim runtime availability, native-device, adapter, or GPU execution
+coverage; those remain later-phase responsibilities.
+
 ## Parity and Scientific Validation
 
 Use independent CPU/NumPy references rather than comparing the Warp adapter to

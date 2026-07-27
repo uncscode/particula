@@ -25,3 +25,15 @@
 - [ ] Documentation identifies E7-F4/E7-F5 handoff requirements while keeping
   resident sessions, full scheduling, graph capture, performance, and autodiff
   outside E7-F2.
+
+## P1 Delivered Criteria (Issue #1470)
+
+- [x] Every valid semantic configuration maps to one exact, immutable
+  four-axis requirement set without composing partial declarations.
+- [x] The catalogue contains 36 CPU and 8 declarative Warp-profile entries;
+  Warp fails closed for staggered and nonrepresentable activity/surface modes.
+- [x] Metadata queries are dependency-neutral and read-only, preserve the
+  existing unsupported-declaration error, and cannot select adapters or parse
+  native devices.
+- [x] Focused execution tests cover mapping, rejection order, purity, and
+  optional-import isolation while leaving exports and GPU APIs unchanged.

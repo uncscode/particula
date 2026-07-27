@@ -16,6 +16,11 @@ preflights concrete CPU state and execution controls, delegates exactly once to
 a caller-supplied CPU runnable, and retains the original state and aerosol by
 identity. It does not select adapters, validate process physics, transfer or
 convert data, or load optional backends.
+
+The direct-module-only condensation profile catalogue declares semantic support
+only. It neither selects an adapter nor validates runtime or native-device
+availability, imports optional backends, allocates state, or exposes a
+user-facing API.
 """
 
 import inspect
@@ -337,14 +342,31 @@ class CapabilityMatrix:
 
 
 class CondensationExecutionMode(str, Enum):
-    """Declare the semantic condensation time-stepping mode."""
+    """Declare the semantic condensation time-stepping mode.
+
+    This vocabulary describes configuration semantics only; it does not select
+    an execution implementation.
+
+    Attributes:
+        EQUAL_STEP: Equal-step condensation semantics.
+        STAGGERED: Staggered condensation semantics.
+    """
 
     EQUAL_STEP = "equal_step"
     STAGGERED = "staggered"
 
 
 class CondensationActivityMode(str, Enum):
-    """Declare the semantic condensation activity-coefficient mode."""
+    """Declare the semantic condensation activity-coefficient mode.
+
+    ``NONREPRESENTABLE`` is a valid semantic category that a profile may not
+    support. It does not inspect or detect concrete activity implementations.
+
+    Attributes:
+        IDEAL: Ideal activity-coefficient semantics.
+        KAPPA: Kappa activity-coefficient semantics.
+        NONREPRESENTABLE: Semantics not representable by a profile.
+    """
 
     IDEAL = "ideal"
     KAPPA = "kappa"
@@ -352,7 +374,16 @@ class CondensationActivityMode(str, Enum):
 
 
 class CondensationSurfaceMode(str, Enum):
-    """Declare the semantic condensation surface-tension mode."""
+    """Declare the semantic condensation surface-tension mode.
+
+    ``NONREPRESENTABLE`` is a valid semantic category that a profile may not
+    support. It does not inspect or detect concrete surface implementations.
+
+    Attributes:
+        STATIC: Static surface-tension semantics.
+        COMPOSITION_WEIGHTED: Composition-weighted surface-tension semantics.
+        NONREPRESENTABLE: Semantics not representable by a profile.
+    """
 
     STATIC = "static"
     COMPOSITION_WEIGHTED = "composition_weighted"
@@ -365,6 +396,7 @@ class CondensationConfiguration:
 
     This metadata does not inspect or translate strategy objects, device names,
     optional-backend sidecars, or concrete activity and surface implementations.
+    It also does not select an adapter or determine runtime availability.
 
     Args:
         execution_mode: Semantic time-stepping mode.
@@ -406,7 +438,8 @@ class CondensationConfiguration:
 
 CONDENSATION_PROCESS = Process("condensation")
 CPU_CONDENSATION_PROFILE_DEVICE = Device(Backend.CPU, "cpu")
-# "profile" is an opaque catalogue-only identifier, not a native-device claim.
+# "profile" is an opaque catalogue-only identifier, never a native-device
+# claim or a device accepted or normalized by ``ExecutionContext.resolve()``.
 WARP_CONDENSATION_PROFILE_DEVICE = Device(Backend.WARP, "profile")
 
 CONDENSATION_EQUAL_STEP_CAPABILITY = Capability("condensation_equal_step")
@@ -463,7 +496,10 @@ _CONDENSATION_SURFACE_CAPABILITIES = {
 def get_condensation_requirements(
     configuration: CondensationConfiguration,
 ) -> CapabilityRequirements:
-    """Return the exact four-axis requirements for a configuration.
+    """Return the exact four-axis semantic requirements for a configuration.
+
+    The pure mapping does not compose declarations, select an adapter, or
+    inspect runtime, device, or optional-backend state.
 
     Args:
         configuration: Validated semantic condensation configuration.
@@ -495,7 +531,11 @@ def get_condensation_requirements(
 
 
 def _condensation_declarations() -> frozenset[CapabilityDeclaration]:
-    """Build the immutable CPU and declarative Warp profile catalogue."""
+    """Build the immutable CPU and declarative Warp profile catalogue.
+
+    The Warp rows describe semantics only and make no native-device or runtime
+    availability claim.
+    """
     all_configurations = tuple(
         CondensationConfiguration(*values)
         for values in product(
@@ -532,7 +572,20 @@ CONDENSATION_CAPABILITY_MATRIX = CapabilityMatrix(_condensation_declarations())
 
 
 def _condensation_profile_device(backend: Backend) -> Device:
-    """Return the fixed catalogue-only device for a validated backend."""
+    """Return the fixed catalogue-only device for a validated backend.
+
+    This helper intentionally accepts no native-device identifier and cannot
+    resolve or validate a runtime device.
+
+    Args:
+        backend: Backend whose fixed profile device is requested.
+
+    Returns:
+        The backend's opaque catalogue-only profile device.
+
+    Raises:
+        TypeError: If ``backend`` is not a Backend.
+    """
     if not isinstance(backend, Backend):
         raise TypeError("backend must be a Backend.")
     return {
@@ -546,6 +599,9 @@ def condensation_profile_supports(
     configuration: CondensationConfiguration,
 ) -> bool:
     """Return whether a fixed backend profile declares a configuration.
+
+    This pure catalogue query does not accept or parse a native device, select
+    an adapter, import an optional backend, or determine runtime availability.
 
     Args:
         backend: Catalogue backend profile to query.
@@ -568,6 +624,10 @@ def require_condensation_profile(
     configuration: CondensationConfiguration,
 ) -> None:
     """Require that a fixed backend profile declares a configuration.
+
+    This pure catalogue check preserves the matrix's unsupported-declaration
+    error. It does not accept or parse a native device, select an adapter,
+    import an optional backend, or determine runtime availability.
 
     Args:
         backend: Catalogue backend profile to query.

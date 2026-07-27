@@ -1,12 +1,16 @@
 # Phase Details
 
-- [ ] **E7-F2-P1:** Map condensation capabilities and configuration semantics with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Freeze the CPU/Warp isothermal, latent-heat, activity, staggered, and BAT support matrix plus deterministic rejection order.
-  - Files: `particula/execution.py`,
-    `particula/execution/adapters/condensation.py`,
-    `particula/execution/tests/condensation_adapter_test.py`
-  - Tests: Capability queries, invalid combinations, unavailable backend/device, no adapter invocation on rejection
+- [x] **E7-F2-P1:** Map condensation capabilities and configuration semantics with unit tests
+  - Issue: #1470 | Size: S | Status: Shipped
+  - Delivered: Direct-module-only immutable condensation vocabulary,
+    configuration validation, exact four-axis requirements mapping, and a
+    36-entry CPU plus 8-entry declarative Warp-profile catalogue.
+  - Files: `particula/execution.py`, `particula/tests/execution_test.py`
+  - Tests: Mapping/catalogue counts, supported and rejected profiles,
+    validation order, immutability/purity, non-composable requirements, and
+    fresh-process optional-import isolation.
+  - Boundary: No runtime availability or native-device handling, adapter
+    selection, exports, or GPU API changes.
 
 - [ ] **E7-F2-P2:** Define condensation execution state and sidecar ownership with unit tests
   - Issue: TBD | Size: S | Status: Not Started

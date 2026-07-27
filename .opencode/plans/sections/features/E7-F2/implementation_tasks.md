@@ -2,16 +2,16 @@
 
 ## Capability and Configuration
 
-- [ ] Create `particula/execution/adapters/condensation.py`; keep its Warp
-  imports lazy so importing `particula.execution` remains CPU-only safe.
-- [ ] Wait for and consume E7-F1 and E7-F6 public contracts; do not duplicate
-  their backend, device, fallback, or error taxonomy.
-- [ ] Add condensation process/capability declarations for CPU and Warp
-  isothermal and latent-heat execution.
-- [ ] Define exact mappings for thermodynamics, ideal/kappa activity, static or
-  composition-weighted surface tension, scratch, transfer, and thermal inputs.
-- [ ] Mark staggered GPU execution and non-representable BAT configurations as
-  unsupported capabilities with stable pre-mutation errors.
+- [x] Add direct-module-only condensation process/capability declarations in
+  `particula/execution.py` for CPU and declarative Warp profiles.
+- [x] Define immutable configuration vocabulary and exact requirements mapping
+  for execution mode, latent heat, ideal/kappa/nonrepresentable activity, and
+  static/composition-weighted/nonrepresentable surface semantics.
+- [x] Declare all 36 CPU combinations and the eight supported Warp-profile
+  combinations; staggered and nonrepresentable Warp semantics fail closed via
+  the existing matrix error.
+- [x] Preserve CPU-only import safety: P1 has no adapter module, Warp import,
+  runtime/device availability logic, fallback, export, or GPU API behavior.
 
 ## Adapter Implementation
 
