@@ -45,8 +45,7 @@ thresholds must never be lowered; changed execution modules must retain at least
 ## Verification Commands
 
 ```bash
-pytest particula/tests/execution_test.py \
-  particula/tests/execution_exports_test.py -q -Werror
+pytest particula/tests/execution_test.py -q -Werror
 pytest particula/tests/runnable_test.py \
   particula/gpu/tests/kernel_exports_test.py -q -Werror
 pytest particula/tests/execution_test.py -q \
@@ -54,3 +53,6 @@ pytest particula/tests/execution_test.py -q \
 ruff check particula/ && mypy particula/ --ignore-missing-imports
 mkdocs build --strict
 ```
+
+The export regression at `particula/tests/execution_exports_test.py` is P5
+verification and is not part of the completed P1 command set.

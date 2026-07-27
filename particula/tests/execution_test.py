@@ -257,6 +257,7 @@ def test_matrix_supports_exact_declarations_without_composition() -> None:
             {
                 CapabilityDeclaration(cpu, process, isothermal),
                 CapabilityDeclaration(cpu, process, latent_heat),
+                CapabilityDeclaration(cpu, process, combined),
                 CapabilityDeclaration(warp_cpu, process, isothermal),
                 CapabilityDeclaration(cpu, coagulation, isothermal),
             }
@@ -265,7 +266,16 @@ def test_matrix_supports_exact_declarations_without_composition() -> None:
 
     assert matrix.supports(cpu, process, isothermal)
     assert matrix.supports(cpu, process, latent_heat)
-    assert not matrix.supports(cpu, process, combined)
+    assert matrix.supports(cpu, process, combined)
+    separate_matrix = CapabilityMatrix(
+        frozenset(
+            {
+                CapabilityDeclaration(cpu, process, isothermal),
+                CapabilityDeclaration(cpu, process, latent_heat),
+            }
+        )
+    )
+    assert not separate_matrix.supports(cpu, process, combined)
     assert matrix.supports(cpu, process, _requirements())
     assert matrix.supports(warp_cpu, process, _requirements())
     assert matrix.supports(cpu, coagulation, _requirements())
