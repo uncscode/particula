@@ -23,7 +23,7 @@ import re
 from dataclasses import dataclass
 from enum import Enum
 from math import isfinite
-from numbers import Integral, Real
+from numbers import Integral, Rational, Real
 from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
 
 if TYPE_CHECKING:
@@ -145,6 +145,21 @@ def _validate_name(value: object, field_name: str) -> None:
         raise TypeError(f"{field_name} must be a str.")
     if not _NAME_PATTERN.fullmatch(value):
         raise ValueError(f"{field_name} must match ^[a-z][a-z0-9_]*$.")
+
+
+def _isfinite_real(value: Real) -> bool:
+    """Return whether a real scalar is finite without coercing rationals.
+
+    ``math.isfinite`` converts its input to ``float``. That conversion can
+    overflow for finite rational values such as large ``Fraction`` instances.
+
+    Args:
+        value: Real scalar already validated by the caller.
+
+    Returns:
+        True when the scalar is finite.
+    """
+    return isinstance(value, Rational) or isfinite(value)
 
 
 @dataclass(frozen=True)
@@ -697,7 +712,7 @@ class CPUExecutionAdapter:
             state.time_step, Real
         ):
             raise TypeError("time_step must be a real scalar.")
-        if not isfinite(state.time_step) or state.time_step < 0:
+        if not _isfinite_real(state.time_step) or state.time_step < 0:
             raise ValueError("time_step must be finite and nonnegative.")
         if (
             isinstance(state.sub_steps, bool)

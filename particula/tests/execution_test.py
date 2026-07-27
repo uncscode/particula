@@ -5,6 +5,7 @@ import re
 import subprocess
 import sys
 from dataclasses import FrozenInstanceError, fields
+from fractions import Fraction
 from pathlib import Path
 from typing import cast
 
@@ -1522,6 +1523,21 @@ def test_cpu_adapter_forwards_numpy_scalars_by_identity() -> None:
     assert call[0] is aerosol
     assert call[1] is time_step
     assert call[2] is sub_steps
+
+
+def test_cpu_adapter_forwards_large_finite_fraction_by_identity() -> None:
+    """Test finite fractions beyond float range bypass float coercion."""
+    aerosol = object()
+    time_step = Fraction(10**1000, 1)
+    runnable = _RecordingRunnable()
+
+    CPUExecutionAdapter(runnable).execute(
+        CPUExecutionState(aerosol, time_step, 1)  # type: ignore[arg-type]
+    )
+
+    assert len(runnable.calls) == 1
+    assert runnable.calls[0][0] is aerosol
+    assert runnable.calls[0][1] is time_step
 
 
 def test_cpu_adapter_propagates_exception_after_one_dispatch() -> None:
