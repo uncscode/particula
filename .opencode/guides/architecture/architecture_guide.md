@@ -46,20 +46,22 @@
   once with the original aerosol, `time_step`, and `sub_steps`. The runnable
   must return that same aerosol. The adapter neither splits controls nor catches
   delegate exceptions.
-- The selected Warp adapter completes local validation and the isothermal Warp
-  profile check before lazily resolving `condensation_step_gpu`; it then makes
-  one direct native call with the retained resources and forwards its native
-  result unchanged. It imports neither Warp nor `particula.gpu` on the CPU path,
-  and does not resolve the direct kernel before successful Warp preflight.
+- The selected Warp adapter completes local validation and profile preflight
+  before lazily resolving `condensation_step_gpu`; it then makes one direct
+  native call with the retained resources and forwards its native result
+  unchanged. It imports neither Warp nor `particula.gpu` on the CPU path, and
+  does not resolve the direct kernel before successful Warp preflight.
 - Both adapters report state mutation while retaining state and backend results
   by identity. They perform no conversion, allocation, transfer, restoration,
   synchronization, retry, fallback, or post-launch recovery. Backend exceptions
   propagate unchanged; a launched Warp kernel retains its native rollback
   limits.
-- This selected boundary is isothermal: semantic configuration latent heat is
-  rejected, and the Warp path additionally rejects P2 `latent_heat` and
-  `energy_transfer` sidecars. `thermal_work` remains opaque caller-owned state
-  forwarded to the direct kernel.
+- The CPU selected boundary remains isothermal and rejects semantic latent heat.
+  The selected Warp boundary forwards caller-owned `latent_heat`,
+  `energy_transfer`, and deferred `thermal_work` sidecars by identity. The
+  direct kernel retains thermal-sidecar validation, execution, exception, and
+  post-launch authority; the adapter adds no transfer, allocation,
+  synchronization, fallback, result reconstruction, or rollback behavior.
 
 ## CPU Nucleation Boundaries
 

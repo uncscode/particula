@@ -22,9 +22,10 @@
   to a package while preserving its exact ten-name public selection `__all__`.
 - [x] Implement CPU delegation to `MassCondensation.execute()` without changing
   time-step, substep, exception, returned-object, or mutation behavior.
-- [x] Implement a GPU-scoped isothermal adapter that calls
-  `condensation_step_gpu` with
-  caller-owned resident state and sidecars; perform no conversion or sync.
+- [x] Implement a GPU-scoped adapter that calls `condensation_step_gpu` with
+  caller-owned resident state and sidecars, forwarding Warp thermal sidecars by
+  identity while retaining CPU-isothermal dispatch; perform no conversion or
+  sync.
 - [x] Normalize the heterogeneous backend outputs into E7-F1's
   `ExecutionResult` while preserving actual object identity and mutation facts.
 - [x] Support typed context registration and resolution of the concrete adapter
@@ -51,3 +52,6 @@
 - [x] Cover CPU/Warp selected dispatch, exact native arguments and call counts,
   identity-preserving normalization, exception propagation, lazy Warp import,
   and the public export boundary.
+- [x] Cover selected-Warp latent-heat sidecar identity, direct native thermal
+  validation propagation, omitted/zero heat behavior, energy accounting, and
+  unsupported profile rejection before lazy resolution or writes.

@@ -287,8 +287,11 @@ class WarpCondensationState:
 
     This concrete-only P2 carrier lazily imports Warp during construction. It
     validates primary-container metadata and writable-output ownership only.
-    Thermodynamics and all sidecars other than writable ``mass_transfer`` and
-    ``energy_transfer`` remain opaque; thermodynamics need only be non-None.
+    Thermodynamics need only be non-None. ``latent_heat`` and deferred
+    ``thermal_work`` remain opaque, while writable ``mass_transfer`` and
+    ``energy_transfer`` receive metadata and ownership checks. The selected
+    Warp adapter forwards all three thermal sidecars by identity; the direct
+    kernel owns their dependency, schema, value, and execution validation.
     Construction does not select a profile, execute a kernel or runnable,
     transfer, allocate, synchronize, or validate direct-kernel physics.
 
@@ -745,8 +748,9 @@ class WarpCondensationExecutionAdapter:
     Preflight completes before the optional kernel import. The adapter makes one
     native call without conversion, allocation, restoration, synchronization,
     fallback, or exception recovery. Profile preflight completes before lazy
-    resolution. The direct kernel owns thermal-sidecar validation, execution,
-    and post-launch mutation limits.
+    resolution. It forwards caller-owned ``latent_heat``, ``energy_transfer``,
+    and deferred ``thermal_work`` sidecars by identity. The direct kernel owns
+    thermal-sidecar validation, execution, and post-launch mutation limits.
 
     This concrete-only adapter is imported from
     ``particula.execution.adapters.condensation``. It forwards the exact
@@ -755,6 +759,11 @@ class WarpCondensationExecutionAdapter:
 
     def execute(self, state: ExecutionState) -> ExecutionResult:
         """Execute one exact Warp P3 state with no post-launch recovery.
+
+        Profile preflight occurs before lazy kernel resolution. After that
+        preflight, this method forwards the caller-owned thermal sidecars by
+        identity and leaves their validation and any post-launch behavior to the
+        direct kernel.
 
         Args:
             state: Exact selected Warp P3 execution state.
@@ -765,8 +774,9 @@ class WarpCondensationExecutionAdapter:
 
         Raises:
             TypeError: If ``state`` or its time step has an invalid type.
-            ValueError: If controls or the selected profile are invalid. Direct
-                thermal-sidecar validation errors propagate unchanged.
+            ValueError: If controls or the selected profile are invalid, or if
+                the direct kernel rejects thermal sidecars. Direct errors
+                propagate unchanged.
             ImportError: If the optional Warp kernel cannot be imported after
                 successful preflight.
         """

@@ -74,11 +74,11 @@
     {
       "id": "E7-F2-P4",
       "title": "Add latent-heat support and explicit unsupported-mode errors with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-27",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,

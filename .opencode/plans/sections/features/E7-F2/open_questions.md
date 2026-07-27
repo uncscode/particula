@@ -24,6 +24,10 @@ implementation; they do not authorize scope expansion.
 6. **Resolved for P2 only:** scratch may be omitted and, when supplied, is an
    opaque caller-owned reference. A selected API's stable scratch policy remains
    deferred.
+7. **Resolved for P4:** selected Warp dispatch retains and forwards thermal
+   sidecars by identity, but their dependency/schema validation, execution, and
+   energy output remain the direct kernel's contract. CPU selected dispatch does
+   not gain latent-heat support.
 
 Default decisions if no upstream contract says otherwise: preserve direct
 kernel optionality, expose no concrete scratch type at top level, reject

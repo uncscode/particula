@@ -38,7 +38,13 @@ Issue #1472 shipped E7-F2-P3. The same concrete-only module now supplies
 selected isothermal CPU and Warp adapters: each performs exact local preflight,
 makes one native backend call, and normalizes its native result while preserving
 caller-owned identity. The Warp path resolves its kernel lazily and performs no
-transfer, synchronization, fallback, or recovery.
+ transfer, synchronization, fallback, or recovery.
+
+Issue #1473 shipped E7-F2-P4. Selected Warp dispatch now forwards resident
+caller-owned `latent_heat`, `energy_transfer`, and deferred `thermal_work` to
+the direct kernel by identity. CPU remains isothermal; Warp profile failures
+occur before lazy kernel resolution, while the direct kernel retains thermal
+validation, execution, exception, and energy-accounting authority.
 
 ## User Stories
 

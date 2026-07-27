@@ -59,6 +59,19 @@ keeps concrete P3 names direct-module-only. These are adapter-contract tests;
 they do not claim CPU/Warp numerical parity, real-kernel allocation behavior,
 or post-launch rollback.
 
+## Shipped P4 Coverage
+
+`particula/execution/tests/condensation_adapter_test.py` covers selected-Warp
+thermal dispatch without duplicating direct-kernel physics validation. Spy and
+real-Warp rows verify identity forwarding for `latent_heat`, `energy_transfer`,
+and deferred `thermal_work`, one native call and unchanged two-item results,
+native energy-without-latent and invalid-deferred-work errors, omitted versus
+zero heat behavior, and finalized-transfer energy accounting. The unsupported
+staggered/nonrepresentable activity/surface matrix verifies deterministic
+profile failure before lazy resolver lookup, dispatch, or writes. These rows do
+not claim rollback after a native launch; CPU latent semantic rejection remains
+covered as the CPU path stays isothermal.
+
 ## Parity and Scientific Validation
 
 Use independent CPU/NumPy references rather than comparing the Warp adapter to

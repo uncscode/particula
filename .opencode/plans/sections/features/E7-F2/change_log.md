@@ -1,5 +1,17 @@
 # Change Log
 
+## 2026-07-27 — E7-F2-P4 shipped (Issue #1473)
+
+- Enabled selected Warp condensation dispatch to forward caller-owned
+  `latent_heat`, `energy_transfer`, and deferred `thermal_work` by identity to
+  `condensation_step_gpu`; CPU selected dispatch remains isothermal.
+- Kept capability-profile rejection before lazy native resolution and preserved
+  direct-kernel authority for thermal validation, execution, exceptions, and
+  energy accounting.
+- Added adapter coverage for identity and one-call dispatch, native validation
+  propagation, omitted/zero heat behavior, energy accounting, and unsupported
+  profile preflight; updated the architecture outline contract.
+
 ## 2026-07-27 — E7-F2-P3 shipped (Issue #1472)
 
 - Added concrete-only selected isothermal CPU and Warp P3 carriers/adapters in

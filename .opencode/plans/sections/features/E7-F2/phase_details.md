@@ -43,12 +43,20 @@
     identity, exception propagation, lazy Warp import, no transfer/sync/fallback,
     and public export boundaries.
 
-- [ ] **E7-F2-P4:** Add latent-heat support and explicit unsupported-mode errors with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Map latent-heat and energy sidecars and reject staggered or unsupported BAT configurations before mutation.
+- [x] **E7-F2-P4:** Add latent-heat support and explicit unsupported-mode errors with unit tests
+  - Issue: #1473 | Size: S | Status: Shipped
+  - Delivered: Selected Warp dispatch forwards caller-owned `latent_heat`,
+    `energy_transfer`, and deferred `thermal_work` by identity to
+    `condensation_step_gpu`; CPU remains isothermal. Capability-profile failure
+    occurs before lazy kernel resolution, while direct-kernel thermal validation,
+    execution, exceptions, and energy accounting remain authoritative.
   - Files: `particula/execution/adapters/condensation.py`,
-    `particula/execution/tests/condensation_adapter_test.py`
-  - Tests: Isothermal zero/omitted latent heat, latent energy accounting, output ownership, unsupported modes, failure boundaries
+    `particula/execution/tests/condensation_adapter_test.py`,
+    `.opencode/guides/architecture/architecture_outline.md`
+  - Tests: Sidecar and native-result identity; native energy/deferred-work
+    validation propagation; omitted/zero heat behavior; energy accounting;
+    unsupported-profile preflight; and no transfer, synchronization, fallback,
+    or recovery.
 
 - [ ] **E7-F2-P5:** Prove CPU and Warp condensation parity, conservation, and transfer boundaries
   - Issue: TBD | Size: S | Status: Not Started

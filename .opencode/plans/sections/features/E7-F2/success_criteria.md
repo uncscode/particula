@@ -60,4 +60,18 @@
 - [x] Warp resolves its native kernel lazily only after preflight and performs
   no transfer, restoration, synchronization, fallback, or recovery.
 - [x] Focused dispatch and export-boundary tests cover CPU/Warp call contracts,
-  identity normalization, lazy import, and narrow public exports.
+   identity normalization, lazy import, and narrow public exports.
+
+## P4 Delivered Criteria (Issue #1473)
+
+- [x] Selected Warp dispatch forwards `latent_heat`, `energy_transfer`, and
+  deferred `thermal_work` by identity in its one native call; CPU remains
+  isothermal and the native tuple shape is unchanged.
+- [x] Capability-profile rejection for staggered and nonrepresentable Warp
+  semantics occurs before lazy resolver lookup, native dispatch, and writes.
+- [x] Direct-kernel thermal validation and exceptions propagate unchanged through
+  the adapter; no adapter thermal solver, recovery, rollback, transfer, or sync
+  was added.
+- [x] Focused tests cover sidecar identity, no-/zero-heat behavior, finalized
+  transfer energy accounting, deferred-work behavior, native validation seams,
+  and unsupported-profile preflight.

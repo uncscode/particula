@@ -1,5 +1,14 @@
 # Documentation Updates
 
+## Shipped P4 Architecture Update (Issue #1473)
+
+`.opencode/guides/architecture/architecture_outline.md` now records that CPU
+selected dispatch remains isothermal; selected Warp dispatch profile-preflights
+before lazy resolution and forwards caller-owned `latent_heat`,
+`energy_transfer`, and deferred `thermal_work` by identity. It also assigns
+thermal validation/execution and exceptions to `condensation_step_gpu`, without
+adding transfer, allocation, synchronization, restoration, or fallback.
+
 ## User-Facing Contract
 
 - Add backend-selected condensation usage to the E7 execution-context guide,

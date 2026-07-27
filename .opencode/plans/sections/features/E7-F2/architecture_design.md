@@ -96,7 +96,7 @@ pre-launch guarantee does not promise rollback for a future launched adapter.
   state; E7-F5 schedules the adapter after environment changes and before
   downstream consumers. Neither concern is implemented here.
 
-## Shipped P3 Selected Isothermal Boundary
+## Shipped P3–P4 Selected Boundary
 
 `particula.execution.adapters.condensation` now contains frozen
 `CPUCondensationExecutionState` and `WarpCondensationExecutionState` carriers
@@ -106,14 +106,16 @@ profile, and the isothermal restriction before making exactly one unchanged
 `MassCondensation.execute()` call. Its normalized result retains the returned
 source aerosol by identity.
 
-Warp preflight applies the corresponding exact state, time, profile, and
-isothermal checks before lazily resolving `condensation_step_gpu`. It makes one
-native call with the caller-owned particle, gas, transfer, environment,
-thermodynamics, activity/surface, scratch, and deferred thermal-work resources;
-latent heat and energy transfer are explicitly unsupported at this phase. The
-returned native two-item tuple is retained by identity. Neither adapter catches
-backend failures, so native exception and post-launch rollback boundaries
-remain authoritative.
+Warp preflight applies the exact state, time, and capability-profile checks
+before lazily resolving `condensation_step_gpu`. It then makes one native call
+with caller-owned particle, gas, transfer, environment, thermodynamics,
+activity/surface, scratch, latent-heat, energy-transfer, and deferred
+thermal-work resources, retaining every supplied thermal sidecar by identity.
+The returned native two-item tuple is retained by identity. CPU retains its
+isothermal restriction. The direct kernel, not the adapter, owns detailed
+thermal dependency/schema validation, thermal execution, and exceptions; neither
+adapter catches backend failures, so the native post-launch rollback boundary
+remains authoritative.
 
 ## Validation and Failure Semantics
 
