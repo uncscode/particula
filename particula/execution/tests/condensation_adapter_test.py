@@ -7,18 +7,32 @@ from dataclasses import FrozenInstanceError
 from pathlib import Path
 from typing import Any, cast
 
+import numpy as np
 import pytest
 
 from particula.aerosol import Aerosol
 from particula.execution import (
+    CONDENSATION_PROCESS,
+    Backend,
+    CapabilityDeclaration,
+    CapabilityMatrix,
     CondensationActivityMode,
     CondensationConfiguration,
     CondensationExecutionMode,
     CondensationSurfaceMode,
+    Device,
+    ExecutionContext,
+    ExecutionRequest,
+    MutationScope,
+    get_condensation_requirements,
 )
 from particula.execution.adapters.condensation import (
     CondensationExecutionConfig,
+    CPUCondensationExecutionAdapter,
+    CPUCondensationExecutionState,
     CPUCondensationState,
+    WarpCondensationExecutionAdapter,
+    WarpCondensationExecutionState,
     _memory_range,
     _overlaps,
     _validate_array,
@@ -454,3 +468,671 @@ def test_warp_state_accepts_output_adjacent_to_int32_partitioning() -> None:
 
     assert cast(Any, state.gas).partitioning is gas.partitioning
     assert state.mass_transfer is mass_transfer
+
+
+def test_cpu_execution_state_and_adapter_dispatch_once_by_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test selected CPU dispatch forwards uncoerced controls exactly once."""
+    from particula.dynamics import MassCondensation
+
+    aerosol = _aerosol()
+    p2_state = CPUCondensationState(
+        CondensationExecutionConfig(_configuration()), aerosol
+    )
+    runnable = object.__new__(MassCondensation)
+    time_step = np.float64(2.0)
+    sub_steps = np.int64(3)
+    state = CPUCondensationExecutionState(
+        p2_state, time_step, sub_steps, runnable
+    )
+    calls: list[tuple[object, object, object]] = []
+
+    def execute(
+        self: MassCondensation,
+        received_aerosol: Aerosol,
+        received_time_step: object,
+        received_sub_steps: object,
+    ) -> Aerosol:
+        """Record the exact forwarded request and return its aerosol."""
+        assert self is runnable
+        calls.append((received_aerosol, received_time_step, received_sub_steps))
+        return received_aerosol
+
+    monkeypatch.setattr(MassCondensation, "execute", execute)
+    result = CPUCondensationExecutionAdapter().execute(state)
+
+    assert state.backend_payload is aerosol
+    assert calls == [(aerosol, time_step, sub_steps)]
+    assert result.state is state
+    assert result.backend_result is not None
+    assert result.backend_result.value is aerosol
+    assert result.metadata == ()
+    assert result.mutation.scopes == frozenset({MutationScope.STATE})
+
+
+@pytest.mark.parametrize("sub_steps", [True, 0, -1, 1.5, object()])
+def test_cpu_execution_adapter_rejects_invalid_sub_steps_before_delegate(
+    sub_steps: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test invalid sub-step controls cannot invoke the selected runnable."""
+    from particula.dynamics import MassCondensation
+
+    runnable = object.__new__(MassCondensation)
+    calls = 0
+
+    def execute(*args: object, **kwargs: object) -> Aerosol:
+        """Fail if invalid controls reach the delegated runnable."""
+        nonlocal calls
+        del args, kwargs
+        calls += 1
+        raise AssertionError("invalid controls must not reach the runnable")
+
+    monkeypatch.setattr(MassCondensation, "execute", execute)
+    state = CPUCondensationExecutionState(
+        CPUCondensationState(
+            CondensationExecutionConfig(_configuration()), _aerosol()
+        ),
+        1.0,
+        sub_steps,
+        runnable,
+    )
+
+    with pytest.raises(
+        ValueError, match="^sub_steps must be a positive integer.$"
+    ):
+        CPUCondensationExecutionAdapter().execute(state)
+
+    assert calls == 0
+
+
+def test_cpu_execution_adapter_rejects_semantic_latent_heat_before_delegate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test the isothermal boundary rejects latent heat before delegation."""
+    from particula.dynamics import MassCondensation
+
+    runnable = object.__new__(MassCondensation)
+    calls = 0
+
+    def execute(*args: object, **kwargs: object) -> Aerosol:
+        """Fail if rejected semantic state reaches the runnable."""
+        nonlocal calls
+        del args, kwargs
+        calls += 1
+        raise AssertionError("latent heat must be rejected before delegation")
+
+    monkeypatch.setattr(MassCondensation, "execute", execute)
+    configuration = CondensationConfiguration(
+        CondensationExecutionMode.EQUAL_STEP,
+        True,
+        CondensationActivityMode.IDEAL,
+        CondensationSurfaceMode.STATIC,
+    )
+    state = CPUCondensationExecutionState(
+        CPUCondensationState(
+            CondensationExecutionConfig(configuration), _aerosol()
+        ),
+        1.0,
+        1,
+        runnable,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="^isothermal condensation execution requires latent_heat=False.$",
+    ):
+        CPUCondensationExecutionAdapter().execute(state)
+
+    assert calls == 0
+
+
+def test_cpu_execution_adapter_propagates_delegate_errors_by_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a runnable error escapes after exactly one selected invocation."""
+    from particula.dynamics import MassCondensation
+
+    runnable = object.__new__(MassCondensation)
+    error = RuntimeError("delegate failure")
+    calls = 0
+
+    def execute(*args: object, **kwargs: object) -> Aerosol:
+        """Raise the prepared error after recording the native call."""
+        nonlocal calls
+        del args, kwargs
+        calls += 1
+        raise error
+
+    monkeypatch.setattr(MassCondensation, "execute", execute)
+    state = CPUCondensationExecutionState(
+        CPUCondensationState(
+            CondensationExecutionConfig(_configuration()), _aerosol()
+        ),
+        1.0,
+        1,
+        runnable,
+    )
+
+    with pytest.raises(RuntimeError) as caught:
+        CPUCondensationExecutionAdapter().execute(state)
+
+    assert caught.value is error
+    assert calls == 1
+
+
+def test_execution_states_retain_p2_carriers_and_require_exact_types() -> None:
+    """Test P3 carriers are frozen identity carriers with exact boundaries."""
+    from particula.dynamics import MassCondensation
+
+    p2_state = CPUCondensationState(
+        CondensationExecutionConfig(_configuration()), _aerosol()
+    )
+    state = CPUCondensationExecutionState(
+        p2_state, 1.0, 1, object.__new__(MassCondensation)
+    )
+
+    assert state.state is p2_state
+    assert state != CPUCondensationExecutionState(
+        p2_state, 1.0, 1, object.__new__(MassCondensation)
+    )
+    with pytest.raises(FrozenInstanceError):
+        state.time_step = 2.0  # type: ignore[misc]
+    with pytest.raises(
+        TypeError, match="^state must be an exact CPUCondensationState.$"
+    ):
+        CPUCondensationExecutionState(
+            cast(CPUCondensationState, object()),
+            1.0,
+            1,
+            object.__new__(MassCondensation),
+        )
+    with pytest.raises(
+        TypeError, match="^runnable must be an exact MassCondensation.$"
+    ):
+        CPUCondensationExecutionState(p2_state, 1.0, 1, object())  # type: ignore[arg-type]
+
+
+def test_execution_states_reject_p2_and_runnable_subclasses() -> None:
+    """Test P3 construction excludes P2 and runnable subclasses."""
+    from particula.dynamics import MassCondensation
+
+    class DerivedState(CPUCondensationState):
+        """Unsupported P2 CPU state subtype."""
+
+    class DerivedRunnable(MassCondensation):
+        """Unsupported runnable subtype."""
+
+    config = CondensationExecutionConfig(_configuration())
+    derived_state = DerivedState(config, _aerosol())
+    with pytest.raises(
+        TypeError, match="^state must be an exact CPUCondensationState.$"
+    ):
+        CPUCondensationExecutionState(
+            derived_state, 1.0, 1, object.__new__(MassCondensation)
+        )
+    with pytest.raises(
+        TypeError, match="^runnable must be an exact MassCondensation.$"
+    ):
+        CPUCondensationExecutionState(
+            CPUCondensationState(config, _aerosol()),
+            1.0,
+            1,
+            object.__new__(DerivedRunnable),
+        )
+
+
+def test_cpu_execution_adapter_rejects_replacement_aerosol(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a replacement result is rejected after the sole delegate call."""
+    from particula.dynamics import MassCondensation
+
+    runnable = object.__new__(MassCondensation)
+    calls = 0
+
+    def execute(*args: object, **kwargs: object) -> Aerosol:
+        """Return a replacement aerosol after recording the native call."""
+        nonlocal calls
+        del args, kwargs
+        calls += 1
+        return _aerosol()
+
+    monkeypatch.setattr(MassCondensation, "execute", execute)
+    state = CPUCondensationExecutionState(
+        CPUCondensationState(
+            CondensationExecutionConfig(_configuration()), _aerosol()
+        ),
+        1.0,
+        1,
+        runnable,
+    )
+
+    with pytest.raises(
+        ValueError, match="^CPU runnable must return the original aerosol.$"
+    ):
+        CPUCondensationExecutionAdapter().execute(state)
+
+    assert calls == 1
+
+
+def test_cpu_execution_adapter_and_state_do_not_import_optional_backend() -> (
+    None
+):
+    """Test concrete CPU dispatch remains independent of optional Warp imports."""
+    root = Path(__file__).parents[3]
+    environment = os.environ | {
+        "PYTHONPATH": os.pathsep.join(
+            filter(None, (str(root), os.environ.get("PYTHONPATH")))
+        )
+    }
+    script = """
+import builtins
+import sys
+
+original_import = builtins.__import__
+def guarded_import(name, *args, **kwargs):
+    if name == "warp" or name.startswith("warp.") or name == "particula.gpu" or name.startswith("particula.gpu."):
+        raise AssertionError(f"Unexpected optional backend import: {name}")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = guarded_import
+from particula.aerosol import Aerosol
+from particula.dynamics import MassCondensation
+from particula.execution import (
+    CondensationActivityMode, CondensationConfiguration,
+    CondensationExecutionMode, CondensationSurfaceMode,
+)
+from particula.execution.adapters.condensation import (
+    CPUCondensationExecutionAdapter, CPUCondensationExecutionState,
+    CPUCondensationState, CondensationExecutionConfig,
+)
+
+configuration = CondensationConfiguration(
+    CondensationExecutionMode.EQUAL_STEP, False,
+    CondensationActivityMode.IDEAL, CondensationSurfaceMode.STATIC,
+)
+aerosol = object.__new__(Aerosol)
+runnable = object.__new__(MassCondensation)
+MassCondensation.execute = lambda self, source, time_step, sub_steps: source
+state = CPUCondensationExecutionState(
+    CPUCondensationState(CondensationExecutionConfig(configuration), aerosol),
+    1.0, 1, runnable,
+)
+assert CPUCondensationExecutionAdapter().execute(state).backend_result.value is aerosol
+assert not any(
+    name == "warp" or name.startswith("warp.")
+    or name == "particula.gpu" or name.startswith("particula.gpu.")
+    for name in sys.modules
+)
+"""
+    completed = subprocess.run(  # noqa: S603 -- fixed interpreter and script
+        [sys.executable, "-c", script],
+        cwd=root,
+        capture_output=True,
+        check=False,
+        env=environment,
+        text=True,
+    )
+
+    assert completed.returncode == 0, (
+        f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
+    )
+
+
+def test_condensation_adapters_register_and_resolve_context_locally() -> None:
+    """Test selected concrete adapters remain context-local registration values."""
+    configuration = _configuration()
+    requirements = get_condensation_requirements(configuration)
+    cpu_device = Device(Backend.CPU, "cpu")
+    warp_device = Device(Backend.WARP, "cpu")
+    context = ExecutionContext(
+        CapabilityMatrix(
+            frozenset(
+                {
+                    CapabilityDeclaration(
+                        cpu_device, CONDENSATION_PROCESS, requirements
+                    ),
+                    CapabilityDeclaration(
+                        warp_device, CONDENSATION_PROCESS, requirements
+                    ),
+                }
+            )
+        )
+    )
+    cpu_adapter = CPUCondensationExecutionAdapter()
+    warp_adapter = WarpCondensationExecutionAdapter()
+    context.register_adapter(CONDENSATION_PROCESS, Backend.CPU, cpu_adapter)
+    context.register_adapter(CONDENSATION_PROCESS, Backend.WARP, warp_adapter)
+
+    assert (
+        context.resolve(
+            ExecutionRequest(
+                Backend.CPU,
+                cpu_device,
+                CONDENSATION_PROCESS,
+                requirements,
+            )
+        )
+        is cpu_adapter
+    )
+    assert (
+        context.resolve(
+            ExecutionRequest(
+                Backend.WARP,
+                warp_device,
+                CONDENSATION_PROCESS,
+                requirements,
+            )
+        )
+        is warp_adapter
+    )
+
+
+@pytest.mark.parametrize(
+    "time_step", [True, -1.0, float("inf"), float("nan"), object()]
+)
+def test_cpu_execution_adapter_rejects_controls_before_delegate(
+    time_step: object,
+) -> None:
+    """Test invalid CPU time controls cannot reach the selected runnable."""
+    from particula.dynamics import MassCondensation
+
+    state = CPUCondensationExecutionState(
+        CPUCondensationState(
+            CondensationExecutionConfig(_configuration()), _aerosol()
+        ),
+        time_step,
+        1,
+        object.__new__(MassCondensation),
+    )
+
+    with pytest.raises((TypeError, ValueError)):
+        CPUCondensationExecutionAdapter().execute(state)
+
+
+def test_cpu_execution_adapter_rejects_unrelated_state() -> None:
+    """Test CPU dispatch rejects an unselected execution-state carrier."""
+    with pytest.raises(
+        TypeError, match="^state must be a CPUCondensationExecutionState.$"
+    ):
+        CPUCondensationExecutionAdapter().execute(cast(Any, object()))
+
+
+@pytest.mark.warp
+def test_warp_execution_adapter_lazily_dispatches_native_tuple_by_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test selected Warp dispatch neither converts nor reconstructs results."""
+    import particula.execution.adapters.condensation as condensation
+
+    particles, gas, environment = _warp_state_inputs()
+    transfer = pytest.importorskip("warp").zeros(
+        (1, 2, 1), dtype=pytest.importorskip("warp").float64, device="cpu"
+    )
+    p2_state = condensation.WarpCondensationState(
+        CondensationExecutionConfig(_configuration()),
+        particles,
+        gas,
+        environment,
+        object(),
+        mass_transfer=transfer,
+        thermal_work=object(),
+    )
+    state = WarpCondensationExecutionState(p2_state, 1.0)
+    expected = (particles, transfer)
+    calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
+
+    def kernel(*args: object, **kwargs: object) -> tuple[object, object]:
+        """Record the direct native call without launching Warp work."""
+        calls.append((args, kwargs))
+        return expected
+
+    monkeypatch.setattr(
+        condensation, "_get_condensation_step_gpu", lambda: kernel
+    )
+    result = WarpCondensationExecutionAdapter().execute(state)
+
+    assert len(calls) == 1
+    assert calls[0][0] == (particles, gas, None, None, 1.0)
+    assert calls[0][1]["mass_transfer"] is transfer
+    assert calls[0][1]["environment"] is environment
+    assert calls[0][1]["thermodynamics"] is p2_state.thermodynamics
+    assert calls[0][1]["activity_surface"] is p2_state.activity_surface
+    assert calls[0][1]["scratch_buffers"] is p2_state.scratch_buffers
+    assert calls[0][1]["thermal_work"] is p2_state.thermal_work
+    assert calls[0][1]["latent_heat"] is None
+    assert calls[0][1]["energy_transfer"] is None
+    assert result.state is state
+    assert result.backend_result is not None
+    assert result.backend_result.value is expected
+    assert result.metadata == ()
+    assert result.mutation.scopes == frozenset({MutationScope.STATE})
+
+
+@pytest.mark.warp
+def test_warp_execution_state_is_frozen_identity_carrier() -> None:
+    """Test the P3 Warp state retains the P2 carrier without rebinding."""
+    import particula.execution.adapters.condensation as condensation
+
+    particles, gas, environment = _warp_state_inputs()
+    p2_state = condensation.WarpCondensationState(
+        CondensationExecutionConfig(_configuration()),
+        particles,
+        gas,
+        environment,
+        object(),
+    )
+    state = WarpCondensationExecutionState(p2_state, 1.0)
+
+    assert state.state is p2_state
+    assert state.backend_payload == (particles, gas, environment)
+    assert state != WarpCondensationExecutionState(p2_state, 1.0)
+    with pytest.raises(FrozenInstanceError):
+        state.time_step = 2.0  # type: ignore[misc]
+    with pytest.raises(
+        TypeError, match="^state must be an exact WarpCondensationState.$"
+    ):
+        WarpCondensationExecutionState(object(), 1.0)  # type: ignore[arg-type]
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("sidecar_name", "message"),
+    [
+        (
+            "latent_heat",
+            "isothermal condensation execution requires latent_heat=None.",
+        ),
+        (
+            "energy_transfer",
+            "isothermal condensation execution requires energy_transfer=None.",
+        ),
+    ],
+)
+def test_warp_execution_rejects_thermal_sidecars_before_kernel_resolution(
+    sidecar_name: str,
+    message: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test isothermal rejection leaves the direct-kernel seam untouched."""
+    import particula.execution.adapters.condensation as condensation
+
+    particles, gas, environment = _warp_state_inputs()
+    if sidecar_name == "energy_transfer":
+        wp = pytest.importorskip("warp")
+        sidecar = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    else:
+        sidecar = object()
+    kwargs = {sidecar_name: sidecar}
+    p2_state = condensation.WarpCondensationState(
+        CondensationExecutionConfig(_configuration()),
+        particles,
+        gas,
+        environment,
+        object(),
+        **kwargs,
+    )
+    state = WarpCondensationExecutionState(p2_state, 1.0)
+    monkeypatch.setattr(
+        condensation,
+        "_get_condensation_step_gpu",
+        lambda: pytest.fail("preflight must not resolve the kernel"),
+    )
+
+    with pytest.raises(ValueError, match=f"^{message}$"):
+        WarpCondensationExecutionAdapter().execute(state)
+
+
+@pytest.mark.warp
+def test_warp_execution_propagates_native_exception_without_recovery(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a direct-kernel error escapes by identity after its one call."""
+    import particula.execution.adapters.condensation as condensation
+
+    particles, gas, environment = _warp_state_inputs()
+    p2_state = condensation.WarpCondensationState(
+        CondensationExecutionConfig(_configuration()),
+        particles,
+        gas,
+        environment,
+        object(),
+    )
+    error = RuntimeError("native failure")
+    calls = 0
+
+    def fail(*args: object, **kwargs: object) -> object:
+        """Raise the prepared native error after recording the call."""
+        nonlocal calls
+        del args, kwargs
+        calls += 1
+        raise error
+
+    monkeypatch.setattr(
+        condensation, "_get_condensation_step_gpu", lambda: fail
+    )
+    with pytest.raises(RuntimeError) as caught:
+        WarpCondensationExecutionAdapter().execute(
+            WarpCondensationExecutionState(p2_state, 1.0)
+        )
+
+    assert caught.value is error
+    assert calls == 1
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "time_step", [True, -1.0, float("inf"), float("nan"), object()]
+)
+def test_warp_execution_rejects_invalid_controls_before_kernel_resolution(
+    time_step: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test invalid Warp controls do not resolve or call the direct kernel."""
+    import particula.execution.adapters.condensation as condensation
+
+    particles, gas, environment = _warp_state_inputs()
+    p2_state = condensation.WarpCondensationState(
+        CondensationExecutionConfig(_configuration()),
+        particles,
+        gas,
+        environment,
+        object(),
+    )
+    resolutions = 0
+
+    def resolve() -> object:
+        """Record an unexpected lazy-kernel resolution."""
+        nonlocal resolutions
+        resolutions += 1
+        return object()
+
+    monkeypatch.setattr(condensation, "_get_condensation_step_gpu", resolve)
+
+    with pytest.raises((TypeError, ValueError)):
+        WarpCondensationExecutionAdapter().execute(
+            WarpCondensationExecutionState(p2_state, time_step)
+        )
+
+    assert resolutions == 0
+
+
+@pytest.mark.warp
+def test_warp_execution_rejects_unselected_state_and_profile_before_kernel(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test state and profile preflight precede the optional kernel import."""
+    import particula.execution.adapters.condensation as condensation
+
+    resolutions = 0
+
+    def resolve() -> object:
+        """Record an unexpected lazy-kernel resolution."""
+        nonlocal resolutions
+        resolutions += 1
+        return object()
+
+    monkeypatch.setattr(condensation, "_get_condensation_step_gpu", resolve)
+    with pytest.raises(
+        TypeError, match="^state must be a WarpCondensationExecutionState.$"
+    ):
+        WarpCondensationExecutionAdapter().execute(cast(Any, object()))
+
+    particles, gas, environment = _warp_state_inputs()
+    unsupported = CondensationConfiguration(
+        CondensationExecutionMode.EQUAL_STEP,
+        False,
+        CondensationActivityMode.NONREPRESENTABLE,
+        CondensationSurfaceMode.STATIC,
+    )
+    state = WarpCondensationExecutionState(
+        condensation.WarpCondensationState(
+            CondensationExecutionConfig(unsupported),
+            particles,
+            gas,
+            environment,
+            object(),
+        ),
+        1.0,
+    )
+    with pytest.raises(
+        ValueError, match="^Unsupported capability declaration:"
+    ):
+        WarpCondensationExecutionAdapter().execute(state)
+
+    latent_heat = CondensationConfiguration(
+        CondensationExecutionMode.EQUAL_STEP,
+        True,
+        CondensationActivityMode.IDEAL,
+        CondensationSurfaceMode.STATIC,
+    )
+    semantic_state = WarpCondensationExecutionState(
+        condensation.WarpCondensationState(
+            CondensationExecutionConfig(latent_heat),
+            particles,
+            gas,
+            environment,
+            object(),
+        ),
+        1.0,
+    )
+    with pytest.raises(
+        ValueError,
+        match="^isothermal condensation execution requires latent_heat=False.$",
+    ):
+        WarpCondensationExecutionAdapter().execute(semantic_state)
+
+    assert resolutions == 0
+
+
+@pytest.mark.warp
+def test_get_condensation_step_gpu_resolves_the_direct_kernel() -> None:
+    """Test the private lazy resolver returns the supported direct entry point."""
+    from particula.execution.adapters.condensation import (
+        _get_condensation_step_gpu,
+    )
+    from particula.gpu.kernels import condensation_step_gpu
+
+    assert _get_condensation_step_gpu() is condensation_step_gpu

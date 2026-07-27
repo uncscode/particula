@@ -46,6 +46,10 @@ EXCLUDED_EXPORTS = (
     "CondensationExecutionConfig",
     "CPUCondensationState",
     "WarpCondensationState",
+    "CPUCondensationExecutionState",
+    "WarpCondensationExecutionState",
+    "CPUCondensationExecutionAdapter",
+    "WarpCondensationExecutionAdapter",
 )
 
 

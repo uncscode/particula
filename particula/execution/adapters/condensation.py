@@ -1,21 +1,34 @@
-"""Provide concrete-only, non-executing condensation state carriers.
+"""Provide concrete-only condensation state carriers and selected adapters.
 
 Import these carriers from ``particula.execution.adapters.condensation``, not
 from ``particula.execution`` or top-level ``particula``. They retain
-caller-owned resources by identity and perform only read-only construction-time
-metadata checks. They neither select nor run an adapter, transfer, allocate, or
-synchronize resources. Frozen fields prevent rebinding only; retained resources
-remain mutable and caller-owned. A future adapter may mutate particle masses,
-gas concentration or vapor pressure, and writable sidecars. Callers own their
-lifetime, synchronization, and concurrency until that future launch completes.
+ caller-owned resources by identity. P2 carriers perform read-only
+ construction-time metadata checks; P3 adapters make one selected native call.
+ Neither selection nor these adapters transfer, allocate, restore, synchronize,
+ retry, or fall back. Frozen fields prevent rebinding only; retained resources
+ remain mutable and caller-owned. Native calls may mutate particle masses, gas
+ concentration or vapor pressure, and writable sidecars. Callers own resource
+ lifetime, synchronization, concurrency, and any post-launch recovery limits.
 """
 
 from dataclasses import dataclass
 from math import prod
+from numbers import Integral, Real
 from typing import Any, cast
 
 from particula.aerosol import Aerosol
-from particula.execution import CondensationConfiguration
+from particula.dynamics import MassCondensation
+from particula.execution import (
+    Backend,
+    BackendResult,
+    CondensationConfiguration,
+    ExecutionResult,
+    ExecutionState,
+    MutationDeclaration,
+    MutationScope,
+    _isfinite_real,
+    require_condensation_profile,
+)
 
 
 @dataclass(frozen=True, eq=False)
@@ -492,3 +505,170 @@ class WarpCondensationState:
             The ``(particles, gas, environment)`` primary-container tuple.
         """
         return self.particles, self.gas, self.environment
+
+
+@dataclass(frozen=True, eq=False)
+class CPUCondensationExecutionState:
+    """Retain selected CPU condensation controls and runnable by identity.
+
+    Import this concrete-only P3 carrier from
+    ``particula.execution.adapters.condensation``. Construction validates only
+    exact P2 state and runnable types; execution controls remain opaque until
+    dispatch. The retained runnable and aerosol are caller-owned.
+    """
+
+    state: CPUCondensationState
+    time_step: object
+    sub_steps: object
+    runnable: MassCondensation
+
+    def __post_init__(self) -> None:
+        """Validate exact P2-state and runnable carrier types."""
+        if type(self.state) is not CPUCondensationState:
+            raise TypeError("state must be an exact CPUCondensationState.")
+        if type(self.runnable) is not MassCondensation:
+            raise TypeError("runnable must be an exact MassCondensation.")
+
+    @property
+    def backend_payload(self) -> Aerosol:
+        """Return the exact caller-owned CPU aerosol payload."""
+        return self.state.backend_payload
+
+
+@dataclass(frozen=True, eq=False)
+class WarpCondensationExecutionState:
+    """Retain selected resident-Warp condensation controls by identity.
+
+    This concrete-only P3 carrier preserves the exact P2 state and time step.
+    Construction neither imports a kernel nor inspects retained resources.
+    """
+
+    state: WarpCondensationState
+    time_step: object
+
+    def __post_init__(self) -> None:
+        """Validate the exact P2 Warp state carrier type."""
+        if type(self.state) is not WarpCondensationState:
+            raise TypeError("state must be an exact WarpCondensationState.")
+
+    @property
+    def backend_payload(self) -> tuple[object, object, object]:
+        """Return the exact caller-owned resident primary payload."""
+        return self.state.backend_payload
+
+
+def _validate_time_step(time_step: object) -> None:
+    """Validate a non-boolean, finite, nonnegative real time step."""
+    if isinstance(time_step, bool) or not isinstance(time_step, Real):
+        raise TypeError("time_step must be a real scalar.")
+    if not _isfinite_real(time_step) or time_step < 0:
+        raise ValueError("time_step must be finite and nonnegative.")
+
+
+def _require_isothermal(configuration: CondensationConfiguration) -> None:
+    """Reject semantic latent heat at the selected isothermal boundary."""
+    if configuration.latent_heat:
+        raise ValueError(
+            "isothermal condensation execution requires latent_heat=False."
+        )
+
+
+def _get_condensation_step_gpu() -> Any:
+    """Lazily resolve the optional direct Warp kernel after preflight."""
+    from particula.gpu.kernels import condensation_step_gpu
+
+    return condensation_step_gpu
+
+
+class CPUCondensationExecutionAdapter:
+    """Dispatch one selected isothermal CPU condensation request exactly once.
+
+    This concrete-only adapter performs local preflight, then invokes the
+    caller-owned ``MassCondensation`` runnable once without splitting controls.
+    It neither converts state nor catches delegate exceptions. The runnable must
+    return the original aerosol, and successful results declare state mutation.
+    """
+
+    def execute(self, state: ExecutionState) -> ExecutionResult:
+        """Execute one exact CPU P3 state without fallback or recovery."""
+        if type(state) is not CPUCondensationExecutionState:
+            raise TypeError("state must be a CPUCondensationExecutionState.")
+        _validate_time_step(state.time_step)
+        if (
+            isinstance(state.sub_steps, bool)
+            or not isinstance(state.sub_steps, Integral)
+            or state.sub_steps <= 0
+        ):
+            raise ValueError("sub_steps must be a positive integer.")
+        configuration = state.state.config.configuration
+        require_condensation_profile(Backend.CPU, configuration)
+        _require_isothermal(configuration)
+        aerosol = state.runnable.execute(
+            state.state.aerosol,
+            cast(float, state.time_step),
+            cast(int, state.sub_steps),
+        )
+        if aerosol is not state.state.aerosol:
+            raise ValueError("CPU runnable must return the original aerosol.")
+        return ExecutionResult(
+            state,
+            (),
+            MutationDeclaration(frozenset({MutationScope.STATE})),
+            BackendResult(aerosol),
+        )
+
+
+class WarpCondensationExecutionAdapter:
+    """Dispatch one selected isothermal Warp request to its direct kernel.
+
+    Preflight completes before the optional kernel import. The adapter makes one
+    native call without conversion, restoration, synchronization, fallback, or
+    exception recovery. Kernel failures, including post-launch mutation limits,
+    remain the direct kernel's responsibility.
+    """
+
+    def execute(self, state: ExecutionState) -> ExecutionResult:
+        """Execute one exact Warp P3 state with no post-launch recovery."""
+        if type(state) is not WarpCondensationExecutionState:
+            raise TypeError("state must be a WarpCondensationExecutionState.")
+        _validate_time_step(state.time_step)
+        p2_state = state.state
+        configuration = p2_state.config.configuration
+        require_condensation_profile(Backend.WARP, configuration)
+        _require_isothermal(configuration)
+        if p2_state.latent_heat is not None:
+            raise ValueError(
+                "isothermal condensation execution requires latent_heat=None."
+            )
+        if p2_state.energy_transfer is not None:
+            raise ValueError(
+                "isothermal condensation execution requires "
+                "energy_transfer=None."
+            )
+        condensation_step_gpu = _get_condensation_step_gpu()
+        value = condensation_step_gpu(
+            p2_state.particles,
+            p2_state.gas,
+            None,
+            None,
+            state.time_step,
+            mass_transfer=p2_state.mass_transfer,
+            environment=p2_state.environment,
+            thermodynamics=p2_state.thermodynamics,
+            activity_surface=p2_state.activity_surface,
+            scratch_buffers=p2_state.scratch_buffers,
+            latent_heat=None,
+            energy_transfer=None,
+            thermal_work=p2_state.thermal_work,
+        )
+        return ExecutionResult(
+            state,
+            (),
+            MutationDeclaration(frozenset({MutationScope.STATE})),
+            BackendResult(value),
+        )
+
+
+# Short direct-module aliases retain compatibility with the P2 carrier naming.
+CPUCondensationAdapter = CPUCondensationExecutionAdapter
+WarpCondensationAdapter = WarpCondensationExecutionAdapter
