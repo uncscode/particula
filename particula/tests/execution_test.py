@@ -802,6 +802,58 @@ def test_duplicate_registration_preserves_original_adapter() -> None:
     assert original.calls == duplicate.calls == 0
 
 
+class _DynamicExecuteAdapter:
+    """Reject dynamic execute lookup during private registration."""
+
+    def __init__(self) -> None:
+        """Create an adapter with no dynamic lookup attempts."""
+        self.lookups = 0
+
+    def __getattribute__(self, name: str) -> object:
+        """Record and reject dynamic access to the execution seam."""
+        if name == "execute":
+            object.__setattr__(
+                self,
+                "lookups",
+                object.__getattribute__(self, "lookups") + 1,
+            )
+            raise AssertionError("P2 must not dynamically inspect execute.")
+        return object.__getattribute__(self, name)
+
+    def execute(self) -> object:
+        """Provide a statically discoverable callable execution seam."""
+        return None
+
+
+def test_registry_uses_static_callable_inspection_without_invocation() -> None:
+    """Test registration avoids dynamic execute lookup and preserves identity."""
+    context = _context()
+    adapter = _DynamicExecuteAdapter()
+
+    context._registry._register_adapter(_process(), Backend.CPU, adapter)
+
+    assert context.resolve(_request()) is adapter
+    assert adapter.lookups == 0
+
+
+def test_registry_accepts_statically_discovered_classmethod_execute() -> None:
+    """Test static inspection retains normal callable classmethod acceptance."""
+
+    class ClassMethodAdapter:
+        """Provide a callable execute seam through a classmethod."""
+
+        @classmethod
+        def execute(cls) -> object:
+            """Provide the unused future execution seam."""
+            return cls
+
+    context = _context()
+    adapter = ClassMethodAdapter()
+    context._registry._register_adapter(_process(), Backend.CPU, adapter)
+
+    assert context.resolve(_request()) is adapter
+
+
 class _State:
     """Provide a structurally valid state with an opaque payload."""
 
@@ -964,6 +1016,52 @@ def test_mutation_declaration_rejects_frozenset_subclass() -> None:
         MutationDeclaration(MutationScopes({MutationScope.NONE}))
 
 
+def _fabricate_mutation_declaration(scopes: object) -> MutationDeclaration:
+    """Create a declaration that bypasses frozen dataclass construction."""
+    mutation = object.__new__(MutationDeclaration)
+    object.__setattr__(mutation, "scopes", scopes)
+    return mutation
+
+
+@pytest.mark.parametrize(
+    ("scopes", "exception", "message"),
+    [
+        (set(), TypeError, "MutationDeclaration.scopes must be a frozenset."),
+        (
+            frozenset({"none"}),
+            TypeError,
+            "MutationDeclaration.scopes must contain only MutationScope instances.",
+        ),
+        (
+            frozenset(),
+            ValueError,
+            "MutationDeclaration.scopes must contain exactly one mutation scope.",
+        ),
+        (
+            frozenset({MutationScope.NONE, MutationScope.STATE}),
+            ValueError,
+            "MutationDeclaration.scopes must contain exactly one mutation scope.",
+        ),
+    ],
+)
+def test_validator_rejects_fabricated_invalid_mutation_declarations(
+    scopes: object,
+    exception: type[Exception],
+    message: str,
+) -> None:
+    """Test result validation rechecks declarations bypassing construction."""
+    payload = object()
+    state = _State(payload)
+    mutation = _fabricate_mutation_declaration(scopes)
+    result = _valid_result(state, mutation)
+
+    with pytest.raises(exception, match=f"^{re.escape(message)}$"):
+        validate_execution_result(state, result)
+
+    assert state.backend_payload is payload
+    assert result.mutation is mutation
+
+
 def test_backend_result_retains_opaque_objects_by_identity() -> None:
     """Test opaque backend fields are retained without inspection or copying."""
     value = object()
@@ -1008,6 +1106,23 @@ def test_validator_accepts_empty_metadata_and_default_backend_result() -> None:
 
     assert validate_execution_result(state, result) is result
     assert result.backend_result is None
+
+
+def test_validator_rejects_execution_result_subclasses() -> None:
+    """Test P3 accepts only the exact immutable ExecutionResult carrier."""
+
+    class DerivedExecutionResult(ExecutionResult):
+        """Represent an otherwise-valid unsupported result subclass."""
+
+    state = _State(object())
+    result = DerivedExecutionResult(
+        state,
+        (),
+        MutationDeclaration(frozenset({MutationScope.NONE})),
+    )
+
+    with pytest.raises(TypeError, match="^result must be an ExecutionResult.$"):
+        validate_execution_result(state, result)
 
 
 def test_validator_does_not_inspect_opaque_state_payload() -> None:

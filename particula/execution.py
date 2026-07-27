@@ -12,10 +12,11 @@ It does not import a backend, provide fallback behavior, transfer state, or
 execute adapters. P2 selection remains context-local and callable-only.
 """
 
+import inspect
 import re
 from dataclasses import dataclass
 from enum import Enum
-from typing import Protocol, runtime_checkable
+from typing import Protocol, cast, runtime_checkable
 
 _NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 
@@ -419,21 +420,52 @@ class MutationDeclaration:
 
     def __post_init__(self) -> None:
         """Validate the closed, immutable mutation declaration."""
-        if type(self.scopes) is not frozenset:
-            raise TypeError("MutationDeclaration.scopes must be a frozenset.")
-        if not all(isinstance(scope, MutationScope) for scope in self.scopes):
-            raise TypeError(
-                "MutationDeclaration.scopes must contain only MutationScope "
-                "instances."
-            )
-        if not self.scopes or self.scopes not in (
-            frozenset({MutationScope.NONE}),
-            frozenset({MutationScope.STATE}),
-        ):
-            raise ValueError(
-                "MutationDeclaration.scopes must contain exactly one mutation "
-                "scope."
-            )
+        _validate_mutation_scopes(self.scopes)
+
+
+def _validate_mutation_scopes(value: object) -> None:
+    """Validate one exact immutable mutation scope declaration.
+
+    This helper is also called at the result boundary so declarations fabricated
+    by bypassing frozen dataclass construction cannot bypass the P3 contract.
+
+    Args:
+        value: Candidate exact frozenset of mutation scopes.
+
+    Raises:
+        TypeError: If the collection or one of its members has an invalid type.
+        ValueError: If the declaration is empty or contains multiple scopes.
+    """
+    if type(value) is not frozenset:
+        raise TypeError("MutationDeclaration.scopes must be a frozenset.")
+    if not all(isinstance(scope, MutationScope) for scope in value):
+        raise TypeError(
+            "MutationDeclaration.scopes must contain only MutationScope "
+            "instances."
+        )
+    if value not in (
+        frozenset({MutationScope.NONE}),
+        frozenset({MutationScope.STATE}),
+    ):
+        raise ValueError(
+            "MutationDeclaration.scopes must contain exactly one mutation "
+            "scope."
+        )
+
+
+def _is_static_execute_callable(adapter: object) -> bool:
+    """Return whether an adapter statically exposes a callable execute seam.
+
+    Args:
+        adapter: Candidate adapter to inspect without dynamic attribute access.
+
+    Returns:
+        True when a statically discoverable execute member is callable.
+    """
+    execute = inspect.getattr_static(adapter, "execute", None)
+    if isinstance(execute, classmethod):
+        return callable(execute.__func__)
+    return callable(execute)
 
 
 @dataclass(frozen=True)
@@ -531,7 +563,7 @@ def validate_execution_result(
         ValueError: If state was replaced or metadata is otherwise invalid.
     """
     _validate_execution_state(original_state, "original_state")
-    if not isinstance(result, ExecutionResult):
+    if type(result) is not ExecutionResult:
         raise TypeError("result must be an ExecutionResult.")
     if result.state is not original_state:
         raise ValueError("ExecutionResult.state must be original_state.")
@@ -540,6 +572,7 @@ def validate_execution_result(
         raise TypeError(
             "ExecutionResult.mutation must be a MutationDeclaration."
         )
+    _validate_mutation_scopes(result.mutation.scopes)
     if result.backend_result is not None and not isinstance(
         result.backend_result, BackendResult
     ):
@@ -602,16 +635,15 @@ class _AdapterRegistry:
             raise TypeError("process must be a Process.")
         if not isinstance(backend, Backend):
             raise TypeError("backend must be a Backend.")
-        if not isinstance(adapter, _ExecutionAdapter) or not callable(
-            getattr(adapter, "execute", None)
-        ):
+        if not _is_static_execute_callable(adapter):
             raise TypeError("adapter must have a callable execute attribute.")
+        typed_adapter = cast(_ExecutionAdapter, adapter)
         key = (process, backend)
         if key in self._adapters:
             raise ValueError(
                 "Adapter already registered for process and backend."
             )
-        self._adapters[key] = adapter
+        self._adapters[key] = typed_adapter
 
     def _lookup(self, process: Process, backend: Backend) -> _ExecutionAdapter:
         """Return one exact adapter without fallback or adapter execution.
