@@ -45,11 +45,11 @@
     {
       "id": "E7-F1-P2",
       "title": "Add the execution-context selection protocol and validation tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-27",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
