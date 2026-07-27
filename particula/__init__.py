@@ -27,6 +27,18 @@ from particula import (
 )
 from particula.aerosol import Aerosol
 from particula.aerosol_builder import AerosolBuilder
+from particula.execution import (
+    Backend,
+    Capability,
+    CapabilityDeclaration,
+    CapabilityMatrix,
+    CapabilityRequirements,
+    Device,
+    ExecutionAdapter,
+    ExecutionContext,
+    ExecutionRequest,
+    Process,
+)
 from particula.runnable import RunnableSequence
 
 from particula.logger_setup import setup

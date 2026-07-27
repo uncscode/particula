@@ -26,6 +26,19 @@ from math import isfinite
 from numbers import Integral, Rational, Real
 from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
 
+__all__ = [
+    "Backend",
+    "Device",
+    "Process",
+    "Capability",
+    "CapabilityRequirements",
+    "CapabilityDeclaration",
+    "CapabilityMatrix",
+    "ExecutionRequest",
+    "ExecutionAdapter",
+    "ExecutionContext",
+]
+
 if TYPE_CHECKING:
     from particula.aerosol import Aerosol
     from particula.runnable import RunnableABC
@@ -407,16 +420,22 @@ class ExecutionState(Protocol):
 
 @runtime_checkable
 class ExecutionAdapter(Protocol):
-    """Declare the P3 adapter seam without registering or invoking adapters."""
+    """Declare the structural registration and selection seam.
 
-    def execute(self, state: ExecutionState) -> "ExecutionResult":
-        """Execute a state under the future P3 adapter contract.
+    Registration validates this callable shape without invoking or probing an
+    adapter. Selection returns the registered adapter by identity and does not
+    establish an execution, state, or result contract.
+    """
+
+    def execute(self, *args: object, **kwargs: object) -> object:
+        """Declare an execution seam without defining its contract.
 
         Args:
-            state: Caller-owned state retained by the result.
+            *args: Positional arguments for a future execution contract.
+            **kwargs: Keyword arguments for a future execution contract.
 
         Returns:
-            A result governed by the P3 validation boundary.
+            An object governed by a future execution contract.
         """
 
 
@@ -765,7 +784,7 @@ class _AdapterRegistry:
 
     def __init__(self) -> None:
         """Create an empty registry without loading or probing backends."""
-        self._adapters: dict[tuple[Process, Backend], _ExecutionAdapter] = {}
+        self._adapters: dict[tuple[Process, Backend], ExecutionAdapter] = {}
 
     def _register_adapter(
         self,
@@ -791,7 +810,7 @@ class _AdapterRegistry:
             raise TypeError("backend must be a Backend.")
         if not _is_static_execute_callable(adapter):
             raise TypeError("adapter must have a callable execute attribute.")
-        typed_adapter = cast(_ExecutionAdapter, adapter)
+        typed_adapter = cast(ExecutionAdapter, adapter)
         key = (process, backend)
         if key in self._adapters:
             raise ValueError(
@@ -799,7 +818,7 @@ class _AdapterRegistry:
             )
         self._adapters[key] = typed_adapter
 
-    def _lookup(self, process: Process, backend: Backend) -> _ExecutionAdapter:
+    def _lookup(self, process: Process, backend: Backend) -> ExecutionAdapter:
         """Return one exact adapter without fallback or adapter execution.
 
         Args:
@@ -819,7 +838,7 @@ class _AdapterRegistry:
                 "No adapter registered for process and backend."
             ) from error
 
-    def _snapshot(self) -> dict[tuple[Process, Backend], _ExecutionAdapter]:
+    def _snapshot(self) -> dict[tuple[Process, Backend], ExecutionAdapter]:
         """Return a fresh private-registration snapshot for focused tests.
 
         Returns:
@@ -850,7 +869,31 @@ class ExecutionContext:
         self._matrix = matrix
         self._registry = _AdapterRegistry()
 
-    def resolve(self, request: ExecutionRequest) -> _ExecutionAdapter:
+    def register_adapter(
+        self,
+        process: Process,
+        backend: Backend,
+        adapter: ExecutionAdapter,
+    ) -> None:
+        """Register one context-local adapter for selection only.
+
+        Registration never invokes or probes the adapter, transfers data, or
+        loads an optional backend. The adapter is available only from this
+        context and is selected later by its exact process/backend pair.
+
+        Args:
+            process: Process to associate with the adapter.
+            backend: Backend to associate with the adapter.
+            adapter: Structurally callable adapter to register.
+
+        Raises:
+            TypeError: If arguments are invalid in process, backend, adapter
+                order.
+            ValueError: If the process/backend pair is already registered.
+        """
+        self._registry._register_adapter(process, backend, adapter)
+
+    def resolve(self, request: ExecutionRequest) -> ExecutionAdapter:
         """Return one exact adapter after validation without invoking it.
 
         Capability support is checked before the single registry lookup. This
