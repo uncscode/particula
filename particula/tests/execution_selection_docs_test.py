@@ -51,7 +51,16 @@ def test_execution_selection_example_executes_public_selection_only_contract() -
     """Test the published CPU-only selection example remains executable."""
     section = _section(FEATURE_PATH, "Execution selection")
     fences = re.findall(r"```python\n(.*?)```", section, flags=re.DOTALL)
+    public_import = next(fence for fence in fences if "Capability," in fence)
     example = next(fence for fence in fences if "class LocalAdapter:" in fence)
+
+    ast.parse(public_import)
+    public_namespace: dict[str, object] = {}
+    exec(public_import, public_namespace)  # noqa: S102 -- published import fence
+    public_names = {
+        name for name in public_namespace if not name.startswith("__")
+    }
+    assert public_names == set(PUBLIC_NAMES)
 
     ast.parse(example)
     namespace: dict[str, object] = {}
@@ -74,6 +83,9 @@ def test_execution_selection_documentation_states_selection_and_failure_bounds()
         assert name in section
     for phrase in (
         'Device(Backend.CPU, "cpu")',
+        "Nonempty requirements must match a complete declaration exactly",
+        "Empty requirements are accepted when the matrix contains a declaration "
+        "for the same `Device` and `Process`",
         "one exact context-local `(Process, Backend)` lookup",
         "No adapter `execute` call occurs before the final assertion",
         "local to this example, not a generic `ExecutionAdapter`",
@@ -85,6 +97,58 @@ def test_execution_selection_documentation_states_selection_and_failure_bounds()
         assert phrase in normalized
     for private_name in ("CPUExecutionState", "CPUExecutionAdapter"):
         assert private_name not in section
+
+
+def test_execution_selection_docs_cover_empty_requirements_base_declaration() -> (
+    None
+):
+    """Test empty requirements select from a matching device/process base."""
+    from particula import (
+        Backend,
+        Capability,
+        CapabilityDeclaration,
+        CapabilityMatrix,
+        CapabilityRequirements,
+        Device,
+        ExecutionContext,
+        ExecutionRequest,
+        Process,
+    )
+
+    class SelectionAdapter:
+        """Provide a minimal adapter for a selection-only regression test."""
+
+        def execute(self, *args: object, **kwargs: object) -> object:
+            """Provide the required callable attribute without invoking it."""
+            return None
+
+    device = Device(Backend.CPU, "cpu")
+    process = Process("condensation")
+    declared_requirements = CapabilityRequirements(
+        frozenset({Capability("isothermal")})
+    )
+    matrix = CapabilityMatrix(
+        frozenset(
+            {
+                CapabilityDeclaration(
+                    device,
+                    process,
+                    declared_requirements,
+                )
+            }
+        )
+    )
+    context = ExecutionContext(matrix)
+    adapter = SelectionAdapter()
+    context.register_adapter(process, Backend.CPU, adapter)
+    empty_request = ExecutionRequest(
+        Backend.CPU,
+        device,
+        process,
+        CapabilityRequirements(frozenset()),
+    )
+
+    assert context.resolve(empty_request) is adapter
 
 
 def test_execution_roadmap_preserves_shipped_and_deferred_boundaries() -> None:
@@ -121,6 +185,9 @@ def test_execution_architecture_guides_agree_on_public_and_private_contract(
         "package-level public APIs",
         "context-local",
         "exact matrix validation",
+        "Nonempty requirements must match a complete declaration exactly",
+        "empty requirements are accepted when the matrix contains a declaration "
+        "for the same `Device` and `Process`",
         "retains identity",
         "not executed",
         'Device(Backend.CPU, "cpu")',

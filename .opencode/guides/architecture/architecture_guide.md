@@ -9,11 +9,14 @@
   `ExecutionAdapter`, and `ExecutionContext`, plus the public
   `ExecutionContext.register_adapter()` method. The per-context backing
   registry remains private.
-- Declarations and requests are immutable exact metadata. CPU metadata is
-  spelled exactly `Device(Backend.CPU, "cpu")`; native identifiers for other
-  backends remain opaque. Registration and resolution are context-local,
-  selection-only operations: complete exact matrix validation occurs before one
-  exact `(Process, Backend)` registry lookup. A resolved adapter retains
+- Declarations and requests are immutable exact metadata. Nonempty requirements
+  must match a complete declaration exactly; empty requirements are accepted
+  when the matrix contains a declaration for the same `Device` and `Process`.
+  CPU metadata is spelled exactly `Device(Backend.CPU, "cpu")`; native
+  identifiers for other backends remain opaque. Registration and resolution are
+  context-local, selection-only operations: complete exact matrix validation of
+  nonempty requirements occurs before one exact `(Process, Backend)` registry
+  lookup. A resolved adapter retains
   identity, and the adapter is not executed during selection.
 - This seam does not import, probe, or resolve a backend; perform availability
   detection; transfer or synchronize state; execute an adapter; retry; or

@@ -10,15 +10,17 @@ explicit-selection seam. Its package-level public APIs are exactly `Backend`,
 `ExecutionContext.register_adapter()` method. The backing per-context registry
 remains private.
 
-Declarations and requests are immutable exact metadata. CPU metadata uses
-exactly `Device(Backend.CPU, "cpu")`. Registration and resolution are
-context-local, selection-only operations: complete exact matrix validation
-occurs before one exact `(Process, Backend)` lookup. A resolved adapter retains
-identity and is not executed by selection. Selection does not import,
-probe, resolve, or check availability of a backend; transfer or synchronize
-data; execute an adapter; retry; or fallback. Generic execution argument,
-result, state, mutation, and runtime-error semantics are not public. P3/P4
-state, result, mutation, and concrete CPU execution-adapter types remain
+Declarations and requests are immutable exact metadata. Nonempty requirements
+must match a complete declaration exactly; empty requirements are accepted when
+the matrix contains a declaration for the same `Device` and `Process`. CPU
+metadata uses exactly `Device(Backend.CPU, "cpu")`. Registration and resolution
+are context-local, selection-only operations: complete exact matrix validation
+of nonempty requirements occurs before one exact `(Process, Backend)` lookup.
+A resolved adapter retains identity and is not executed by selection. Selection
+does not import, probe, resolve, or check availability of a backend; transfer or
+synchronize data; execute an adapter; retry; or fallback. Generic execution
+argument, result, state, mutation, and runtime-error semantics are not public.
+P3/P4 state, result, mutation, and concrete CPU execution-adapter types remain
 direct-module-only.
 
 Strategy physics, builder configuration, and existing CPU `RunnableABC`
@@ -37,8 +39,9 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
 - `CapabilityRequirements` and `CapabilityDeclaration` - Immutable exact
   capability-support declarations.
 - `CapabilityMatrix` - Pure, immutable exact-match lookup. Nonempty
-  requirements must match a complete declaration; an empty requirement is
-  supported only when its device/process base has a declaration.
+  requirements must match a complete declaration exactly; empty requirements
+  are accepted when the matrix contains a declaration for the same `Device` and
+  `Process`.
 - `ExecutionRequest` and `ExecutionContext` - Package-level public selection
   values and context-local coordinator. Requests must pair matching
   backends/devices; CPU selection accepts only `Device(Backend.CPU, "cpu")`.

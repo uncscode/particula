@@ -72,10 +72,12 @@ from particula import (
 )
 ```
 
-Declarations and requests are immutable exact metadata. A complete matching
-declaration must be accepted by `CapabilityMatrix.require()` before
-`ExecutionContext.resolve()` performs one exact context-local
-`(Process, Backend)` lookup. The canonical CPU device spelling is exactly
+Declarations and requests are immutable exact metadata. Nonempty requirements
+must match a complete declaration exactly. Empty requirements are accepted when
+the matrix contains a declaration for the same `Device` and `Process`.
+`CapabilityMatrix.require()` completes this validation before
+`ExecutionContext.resolve()` performs one exact context-local `(Process,
+Backend)` lookup. The canonical CPU device spelling is exactly
 `Device(Backend.CPU, "cpu")`.
 
 The following CPU-only example demonstrates explicit construction, public
