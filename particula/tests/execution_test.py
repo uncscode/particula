@@ -4,22 +4,29 @@ import os
 import re
 import subprocess
 import sys
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, fields
 from pathlib import Path
 from typing import cast
 
 import pytest
 from particula.execution import (
     Backend,
+    BackendResult,
     Capability,
     CapabilityDeclaration,
     CapabilityMatrix,
     CapabilityRequirements,
     Device,
+    ExecutionAdapter,
     ExecutionContext,
     ExecutionRequest,
+    ExecutionResult,
+    ExecutionState,
+    MutationDeclaration,
+    MutationScope,
     Process,
     _AdapterRegistry,
+    validate_execution_result,
 )
 
 
@@ -793,3 +800,393 @@ def test_duplicate_registration_preserves_original_adapter() -> None:
     assert context._registry._snapshot() == before
     assert context.resolve(_request()) is original
     assert original.calls == duplicate.calls == 0
+
+
+class _State:
+    """Provide a structurally valid state with an opaque payload."""
+
+    def __init__(self, payload: object) -> None:
+        self.backend_payload = payload
+
+
+class _MissingPayloadState:
+    """Deliberately omit the state protocol payload."""
+
+
+class _OpaqueState:
+    """Provide a state whose opaque payload raises when read."""
+
+    @property
+    def backend_payload(self) -> object:
+        """Reject payload inspection at the validation boundary."""
+        raise AssertionError("P3 must not inspect backend_payload.")
+
+
+class _TypedAdapter:
+    """Provide the typed P3 adapter shape without executing it."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def execute(self, state: ExecutionState) -> ExecutionResult:
+        del state
+        self.calls += 1
+        raise AssertionError("P2 must not execute a P3 adapter.")
+
+
+class _IncompatibleAdapter:
+    """Provide a callable execute member with an incompatible signature."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def execute(self) -> object:
+        self.calls += 1
+        return None
+
+
+def _valid_result(
+    state: ExecutionState,
+    mutation: MutationDeclaration | None = None,
+    metadata: tuple[tuple[str, str], ...] = (("phase", "p3"),),
+    backend_result: BackendResult | None = None,
+) -> ExecutionResult:
+    """Create a valid execution result with P3 defaults."""
+    return ExecutionResult(
+        state,
+        metadata,
+        mutation or MutationDeclaration(frozenset({MutationScope.NONE})),
+        backend_result,
+    )
+
+
+def test_p3_protocols_are_structural_and_do_not_change_p2_selection() -> None:
+    """Test structural protocols permit callable-only P2 registration."""
+    state = _State(object())
+    typed = _TypedAdapter()
+    incompatible = _IncompatibleAdapter()
+
+    assert isinstance(state, ExecutionState)
+    assert not isinstance(_MissingPayloadState(), ExecutionState)
+    assert isinstance(typed, ExecutionAdapter)
+    assert isinstance(incompatible, ExecutionAdapter)
+    assert not isinstance(object(), ExecutionAdapter)
+    assert not isinstance(
+        type("NoCall", (), {"execute": None})(), ExecutionAdapter
+    )
+
+    context = _context()
+    context._registry._register_adapter(_process(), Backend.CPU, incompatible)
+
+    assert context.resolve(_request()) is incompatible
+    assert incompatible.calls == typed.calls == 0
+
+
+def test_p3_closed_representation_and_frozen_carriers() -> None:
+    """Test closed result vocabulary, field order, defaults, and freezing."""
+    state = _State(object())
+    mutation = MutationDeclaration(frozenset({MutationScope.NONE}))
+    backend_result = BackendResult(object())
+    result = _valid_result(state, mutation)
+
+    assert list(MutationScope) == [MutationScope.NONE, MutationScope.STATE]
+    assert [scope.value for scope in MutationScope] == ["none", "state"]
+    assert [field.name for field in fields(ExecutionResult)] == [
+        "state",
+        "metadata",
+        "mutation",
+        "backend_result",
+    ]
+    assert result.backend_result is None
+    with pytest.raises(FrozenInstanceError):
+        mutation.scopes = frozenset({MutationScope.STATE})  # type: ignore[misc]
+    with pytest.raises(FrozenInstanceError):
+        backend_result.value = object()  # type: ignore[misc]
+    with pytest.raises(FrozenInstanceError):
+        result.state = state  # type: ignore[misc]
+
+
+@pytest.mark.parametrize("scope", [MutationScope.NONE, MutationScope.STATE])
+def test_mutation_declaration_accepts_one_scope(scope: MutationScope) -> None:
+    """Test either closed mutation permission is accepted by identity."""
+    scopes = frozenset({scope})
+
+    assert MutationDeclaration(scopes).scopes is scopes
+
+
+@pytest.mark.parametrize(
+    ("scopes", "exception", "message"),
+    [
+        (set(), TypeError, "MutationDeclaration.scopes must be a frozenset."),
+        ((), TypeError, "MutationDeclaration.scopes must be a frozenset."),
+        (
+            frozenset({"none"}),
+            TypeError,
+            "MutationDeclaration.scopes must contain only MutationScope instances.",
+        ),
+        (
+            frozenset({object()}),
+            TypeError,
+            "MutationDeclaration.scopes must contain only MutationScope instances.",
+        ),
+        (
+            frozenset(),
+            ValueError,
+            "MutationDeclaration.scopes must contain exactly one mutation scope.",
+        ),
+        (
+            frozenset({MutationScope.NONE, MutationScope.STATE}),
+            ValueError,
+            "MutationDeclaration.scopes must contain exactly one mutation scope.",
+        ),
+    ],
+)
+def test_mutation_declaration_rejects_invalid_scopes(
+    scopes: object,
+    exception: type[Exception],
+    message: str,
+) -> None:
+    """Test declarations do not coerce mutable, unknown, or mixed scopes."""
+    with pytest.raises(exception, match=f"^{re.escape(message)}$"):
+        MutationDeclaration(scopes)  # type: ignore[arg-type]
+
+
+def test_mutation_declaration_rejects_frozenset_subclass() -> None:
+    """Test declarations require the exact built-in frozenset type."""
+
+    class MutationScopes(frozenset[MutationScope]):
+        """Represent an unsupported frozenset subtype."""
+
+    with pytest.raises(
+        TypeError,
+        match="^MutationDeclaration.scopes must be a frozenset.$",
+    ):
+        MutationDeclaration(MutationScopes({MutationScope.NONE}))
+
+
+def test_backend_result_retains_opaque_objects_by_identity() -> None:
+    """Test opaque backend fields are retained without inspection or copying."""
+    value = object()
+    diagnostics = object()
+    result = BackendResult(value, diagnostics)
+
+    assert result.value is value
+    assert result.diagnostics is diagnostics
+
+
+@pytest.mark.parametrize("scope", [MutationScope.NONE, MutationScope.STATE])
+def test_validator_returns_valid_result_and_opaque_values_by_identity(
+    scope: MutationScope,
+) -> None:
+    """Test valid results retain state, metadata, and backend values exactly."""
+    payload = object()
+    value = object()
+    diagnostics = object()
+    state = _State(payload)
+    metadata = (("first", "one"), ("second", "two"))
+    backend_result = BackendResult(value, diagnostics)
+    result = _valid_result(
+        state,
+        MutationDeclaration(frozenset({scope})),
+        metadata,
+        backend_result,
+    )
+
+    assert validate_execution_result(state, result) is result
+    assert result.state is state
+    assert state.backend_payload is payload
+    assert result.metadata is metadata
+    assert result.backend_result is backend_result
+    assert backend_result.value is value
+    assert backend_result.diagnostics is diagnostics
+
+
+def test_validator_accepts_empty_metadata_and_default_backend_result() -> None:
+    """Test empty immutable metadata and omitted backend result are valid."""
+    state = _State(object())
+    result = _valid_result(state, metadata=())
+
+    assert validate_execution_result(state, result) is result
+    assert result.backend_result is None
+
+
+def test_validator_does_not_inspect_opaque_state_payload() -> None:
+    """Test structural validation leaves an opaque state payload unread."""
+    state = _OpaqueState()
+    result = _valid_result(state)
+
+    assert validate_execution_result(state, result) is result
+
+
+@pytest.mark.parametrize("key", ["Name", "1name", "bad name", "bad-name"])
+def test_validator_rejects_each_metadata_name_grammar_class(key: str) -> None:
+    """Test metadata keys share the declared lowercase-name grammar."""
+    state = _State(object())
+    result = _valid_result(state, metadata=((key, "value"),))
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "^"
+            + re.escape(
+                "ExecutionResult.metadata key must match ^[a-z][a-z0-9_]*$."
+            )
+            + "$"
+        ),
+    ):
+        validate_execution_result(state, result)
+
+
+def test_validator_rejects_tuple_subclasses_and_mutable_metadata_entry() -> (
+    None
+):
+    """Test metadata requires exact built-in outer and inner tuple types."""
+
+    class Metadata(tuple):
+        """Represent an unsupported tuple subtype."""
+
+    class MetadataEntry(tuple):
+        """Represent an unsupported metadata-entry tuple subtype."""
+
+    state = _State(object())
+    with pytest.raises(
+        TypeError,
+        match="^ExecutionResult.metadata must be a tuple.$",
+    ):
+        validate_execution_result(
+            state, _valid_result(state, metadata=Metadata())
+        )
+    with pytest.raises(
+        TypeError,
+        match=r"^ExecutionResult.metadata entries must be \(str, str\) tuples.$",
+    ):
+        validate_execution_result(
+            state,
+            _valid_result(
+                state,
+                metadata=(MetadataEntry(("key", "value")),),  # type: ignore[arg-type]
+            ),
+        )
+    with pytest.raises(
+        TypeError,
+        match=r"^ExecutionResult.metadata entries must be \(str, str\) tuples.$",
+    ):
+        validate_execution_result(
+            state,
+            _valid_result(
+                state,
+                metadata=cast(
+                    tuple[tuple[str, str], ...],
+                    (["a", "b"],),
+                ),
+            ),
+        )
+
+
+@pytest.mark.parametrize(
+    ("original_state", "result_factory", "exception", "message"),
+    [
+        (
+            _MissingPayloadState(),
+            lambda state: _valid_result(state),
+            TypeError,
+            "original_state must be an ExecutionState.",
+        ),
+        (
+            _State(object()),
+            lambda state: object(),
+            TypeError,
+            "result must be an ExecutionResult.",
+        ),
+        (
+            _State(object()),
+            lambda state: _valid_result(_State(object())),
+            ValueError,
+            "ExecutionResult.state must be original_state.",
+        ),
+        (
+            _State(object()),
+            lambda state: _valid_result(
+                state,
+                metadata=cast(tuple[tuple[str, str], ...], []),
+            ),
+            TypeError,
+            "ExecutionResult.metadata must be a tuple.",
+        ),
+        (
+            _State(object()),
+            lambda state: _valid_result(
+                state,
+                metadata=cast(tuple[tuple[str, str], ...], (("key",),)),
+            ),
+            TypeError,
+            "ExecutionResult.metadata entries must be (str, str) tuples.",
+        ),
+        (
+            _State(object()),
+            lambda state: _valid_result(
+                state,
+                metadata=cast(tuple[tuple[str, str], ...], (("key", 1),)),
+            ),
+            TypeError,
+            "ExecutionResult.metadata entries must be (str, str) tuples.",
+        ),
+        (
+            _State(object()),
+            lambda state: _valid_result(state, metadata=(("Name", "value"),)),
+            ValueError,
+            "ExecutionResult.metadata key must match ^[a-z][a-z0-9_]*$.",
+        ),
+        (
+            _State(object()),
+            lambda state: _valid_result(
+                state, metadata=(("same", "one"), ("same", "two"))
+            ),
+            ValueError,
+            "ExecutionResult.metadata keys must be unique.",
+        ),
+        (
+            _State(object()),
+            lambda state: ExecutionResult(
+                state,
+                (),
+                cast(MutationDeclaration, object()),
+            ),
+            TypeError,
+            "ExecutionResult.mutation must be a MutationDeclaration.",
+        ),
+        (
+            _State(object()),
+            lambda state: ExecutionResult(
+                state,
+                (),
+                MutationDeclaration(frozenset({MutationScope.NONE})),
+                cast(BackendResult, object()),
+            ),
+            TypeError,
+            "ExecutionResult.backend_result must be a BackendResult.",
+        ),
+    ],
+)
+def test_validator_rejects_malformed_forms_without_mutation(
+    original_state: object,
+    result_factory: object,
+    exception: type[Exception],
+    message: str,
+) -> None:
+    """Test invalid boundaries retain inputs and do not invoke P2 adapters."""
+    result = cast(object, result_factory(original_state))  # type: ignore[operator]
+    payload = getattr(original_state, "backend_payload", None)
+    metadata = getattr(result, "metadata", None)
+    context = _context()
+    adapter = _FakeAdapter()
+    context._registry._register_adapter(_process(), Backend.CPU, adapter)
+    registry = context._registry._snapshot()
+
+    with pytest.raises(exception, match=f"^{re.escape(message)}$"):
+        validate_execution_result(original_state, result)
+
+    assert getattr(original_state, "backend_payload", None) is payload
+    assert getattr(result, "metadata", None) is metadata
+    assert context._registry._snapshot() == registry
+    assert adapter.calls == 0

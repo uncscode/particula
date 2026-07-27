@@ -1,10 +1,15 @@
-"""Declare dependency-neutral execution capability metadata and selection.
+"""Declare dependency-neutral execution selection and result contracts.
 
 This module validates immutable backend, device, process, and capability
 declarations. An ``ExecutionContext`` capability-validates a typed request and
 returns one exact context-local adapter. Selection does not invoke adapters,
 load or probe optional backends, resolve native devices, transfer state, or
-define execution state and result contracts.
+validate P3 state or result contracts.
+
+P3 result validation retains caller-owned state by identity, keeps backend
+payloads and results opaque, and records explicit in-place mutation permission.
+It does not import a backend, provide fallback behavior, transfer state, or
+execute adapters. P2 selection remains context-local and callable-only.
 """
 
 import re
@@ -357,6 +362,188 @@ class ExecutionRequest:
             raise ValueError(
                 "ExecutionRequest.backend must match device.backend."
             )
+
+
+@runtime_checkable
+class ExecutionState(Protocol):
+    """Describe retained caller-owned state with an opaque backend payload.
+
+    The payload is not inspected by this module. Boundary validation requires
+    the same state object supplied by the caller.
+    """
+
+    @property
+    def backend_payload(self) -> object:
+        """Return opaque backend-owned payload state."""
+
+
+@runtime_checkable
+class ExecutionAdapter(Protocol):
+    """Declare the P3 adapter seam without registering or invoking adapters."""
+
+    def execute(self, state: ExecutionState) -> "ExecutionResult":
+        """Execute a state under the future P3 adapter contract.
+
+        Args:
+            state: Caller-owned state retained by the result.
+
+        Returns:
+            A result governed by the P3 validation boundary.
+        """
+
+
+class MutationScope(str, Enum):
+    """Declare the one allowed mutation scope for an execution result.
+
+    ``STATE`` permits in-place mutation of retained state. P3 does not infer or
+    verify that a declared mutation occurred.
+    """
+
+    NONE = "none"
+    STATE = "state"
+
+
+@dataclass(frozen=True)
+class MutationDeclaration:
+    """Declare exactly one explicit state-mutation permission.
+
+    Args:
+        scopes: Exact frozenset containing either ``NONE`` or ``STATE``.
+
+    Raises:
+        TypeError: If scopes is not an exact frozenset of MutationScope values.
+        ValueError: If scopes is empty or combines mutation scopes.
+    """
+
+    scopes: frozenset[MutationScope]
+
+    def __post_init__(self) -> None:
+        """Validate the closed, immutable mutation declaration."""
+        if type(self.scopes) is not frozenset:
+            raise TypeError("MutationDeclaration.scopes must be a frozenset.")
+        if not all(isinstance(scope, MutationScope) for scope in self.scopes):
+            raise TypeError(
+                "MutationDeclaration.scopes must contain only MutationScope "
+                "instances."
+            )
+        if not self.scopes or self.scopes not in (
+            frozenset({MutationScope.NONE}),
+            frozenset({MutationScope.STATE}),
+        ):
+            raise ValueError(
+                "MutationDeclaration.scopes must contain exactly one mutation "
+                "scope."
+            )
+
+
+@dataclass(frozen=True)
+class BackendResult:
+    """Retain opaque backend result values without inspection.
+
+    Args:
+        value: Opaque backend-owned result value.
+        diagnostics: Optional opaque backend-owned diagnostic value.
+    """
+
+    value: object
+    diagnostics: object | None = None
+
+
+@dataclass(frozen=True)
+class ExecutionResult:
+    """Declare immutable P3 result ownership and mutation metadata.
+
+    Args:
+        state: Original caller-owned execution state.
+        metadata: Ordered immutable key-value result metadata.
+        mutation: Explicit permission for in-place state mutation.
+        backend_result: Optional opaque backend result retained by identity.
+    """
+
+    state: ExecutionState
+    metadata: tuple[tuple[str, str], ...]
+    mutation: MutationDeclaration
+    backend_result: BackendResult | None = None
+
+
+def _validate_execution_state(value: object, field_name: str) -> None:
+    """Validate state structure without reading its opaque payload.
+
+    Args:
+        value: Candidate state object.
+        field_name: Qualified name used in the error message.
+
+    Raises:
+        TypeError: If value does not structurally satisfy ExecutionState.
+    """
+    if not isinstance(value, ExecutionState):
+        raise TypeError(f"{field_name} must be an ExecutionState.")
+
+
+def _validate_execution_metadata(value: object) -> None:
+    """Validate ordered immutable execution metadata without copying it.
+
+    Args:
+        value: Candidate metadata collection.
+
+    Raises:
+        TypeError: If collection, entries, keys, or values have invalid types.
+        ValueError: If a key is invalid or appears more than once.
+    """
+    if type(value) is not tuple:
+        raise TypeError("ExecutionResult.metadata must be a tuple.")
+    names: set[str] = set()
+    for entry in value:
+        if type(entry) is not tuple or len(entry) != 2:
+            raise TypeError(
+                "ExecutionResult.metadata entries must be (str, str) tuples."
+            )
+        key, item = entry
+        if type(key) is not str or type(item) is not str:
+            raise TypeError(
+                "ExecutionResult.metadata entries must be (str, str) tuples."
+            )
+        _validate_name(key, "ExecutionResult.metadata key")
+        if key in names:
+            raise ValueError("ExecutionResult.metadata keys must be unique.")
+        names.add(key)
+
+
+def validate_execution_result(
+    original_state: object,
+    result: object,
+) -> ExecutionResult:
+    """Validate and return an immutable P3 result without executing an adapter.
+
+    Args:
+        original_state: Caller-owned state supplied before execution.
+        result: Candidate result that retains the original state by identity.
+
+    Returns:
+        The exact validated result object.
+
+    Raises:
+        TypeError: If state, result layout, metadata, or declarations are
+            invalid.
+        ValueError: If state was replaced or metadata keys are duplicated.
+    """
+    _validate_execution_state(original_state, "original_state")
+    if not isinstance(result, ExecutionResult):
+        raise TypeError("result must be an ExecutionResult.")
+    if result.state is not original_state:
+        raise ValueError("ExecutionResult.state must be original_state.")
+    _validate_execution_metadata(result.metadata)
+    if not isinstance(result.mutation, MutationDeclaration):
+        raise TypeError(
+            "ExecutionResult.mutation must be a MutationDeclaration."
+        )
+    if result.backend_result is not None and not isinstance(
+        result.backend_result, BackendResult
+    ):
+        raise TypeError(
+            "ExecutionResult.backend_result must be a BackendResult."
+        )
+    return result
 
 
 @runtime_checkable
