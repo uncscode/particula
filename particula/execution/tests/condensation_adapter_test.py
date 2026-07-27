@@ -414,3 +414,43 @@ def test_warp_state_validates_writable_outputs_and_ownership() -> None:
             object(),
             energy_transfer=gas.concentration,
         )
+
+
+@pytest.mark.warp
+def test_warp_state_accepts_output_adjacent_to_int32_partitioning() -> None:
+    """Test an output beside int32 primary storage is not an ownership alias."""
+    wp = pytest.importorskip("warp")
+    from particula.execution.adapters.condensation import WarpCondensationState
+
+    particles, gas, environment = _warp_state_inputs()
+    backing = wp.zeros(3, dtype=wp.float64, device="cpu")
+    gas.partitioning = wp.array(
+        ptr=backing.ptr,
+        capacity=backing.capacity,
+        dtype=wp.int32,
+        shape=(1, 1),
+        strides=(4, 4),
+        device="cpu",
+        copy=False,
+    )
+    mass_transfer = wp.array(
+        ptr=backing.ptr + 4,
+        capacity=backing.capacity - 4,
+        dtype=wp.float64,
+        shape=(1, 2, 1),
+        strides=(16, 8, 8),
+        device="cpu",
+        copy=False,
+    )
+
+    state = WarpCondensationState(
+        CondensationExecutionConfig(_configuration()),
+        particles,
+        gas,
+        environment,
+        object(),
+        mass_transfer=mass_transfer,
+    )
+
+    assert cast(Any, state.gas).partitioning is gas.partitioning
+    assert state.mass_transfer is mass_transfer

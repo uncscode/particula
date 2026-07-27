@@ -242,7 +242,12 @@ def _dtype_itemsize(dtype: Any) -> int:
     Returns:
         The dtype item size in bytes.
     """
-    return 4 if str(dtype) == "int32" else 8
+    import warp as wp
+
+    return {
+        wp.float64: 8,
+        wp.int32: 4,
+    }.get(dtype, 8)
 
 
 def _overlaps(first: tuple[int, int], second: tuple[int, int] | None) -> bool:
