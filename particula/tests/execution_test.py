@@ -355,8 +355,8 @@ def test_matrix_require_is_pure_and_reports_unsupported_request(
     } == hashes_before
 
 
-def test_execution_import_does_not_load_optional_backend() -> None:
-    """Test a fresh execution import neither imports Warp nor particula.gpu."""
+def test_execution_warp_selection_does_not_load_optional_backend() -> None:
+    """Test fresh Warp selection neither imports nor probes optional modules."""
     repository_root = Path(__file__).parents[2]
     environment = os.environ.copy()
     environment["PYTHONPATH"] = os.pathsep.join(
@@ -395,7 +395,7 @@ class Adapter:
     def execute(self, *args, **kwargs):
         self.calls += 1
 
-device = Device(Backend.CPU, "cpu")
+device = Device(Backend.WARP, "cuda:0")
 process = Process("condensation")
 requirements = CapabilityRequirements(frozenset())
 matrix = CapabilityMatrix(
@@ -403,10 +403,11 @@ matrix = CapabilityMatrix(
 )
 context = ExecutionContext(matrix)
 adapter = Adapter()
-context._registry._register_adapter(process, Backend.CPU, adapter)
+context._registry._register_adapter(process, Backend.WARP, adapter)
 assert context.resolve(
-    ExecutionRequest(Backend.CPU, device, process, requirements)
+    ExecutionRequest(Backend.WARP, device, process, requirements)
 ) is adapter
+assert device.native == "cuda:0"
 assert adapter.calls == 0
 """
 
@@ -702,6 +703,42 @@ def test_supported_unregistered_request_raises_exact_lookup_error() -> None:
         match="^No adapter registered for process and backend.$",
     ):
         _context().resolve(_request())
+
+
+def test_cpu_selection_does_not_fall_back_to_warp_adapter() -> None:
+    """Test CPU selection fails without executing a registered Warp adapter."""
+    context = _context()
+    warp_adapter = _FakeAdapter()
+    context._registry._register_adapter(_process(), Backend.WARP, warp_adapter)
+
+    with pytest.raises(
+        LookupError,
+        match="^No adapter registered for process and backend.$",
+    ):
+        context.resolve(_request())
+
+    assert warp_adapter.calls == 0
+
+
+def test_context_registries_are_isolated_with_shared_matrix() -> None:
+    """Test registrations are owned by their individual execution context."""
+    matrix = CapabilityMatrix(frozenset({_declaration()}))
+    registered_context = ExecutionContext(matrix)
+    unregistered_context = ExecutionContext(matrix)
+    adapter = _FakeAdapter()
+    registered_context._registry._register_adapter(
+        _process(),
+        Backend.CPU,
+        adapter,
+    )
+
+    assert registered_context.resolve(_request()) is adapter
+    with pytest.raises(
+        LookupError,
+        match="^No adapter registered for process and backend.$",
+    ):
+        unregistered_context.resolve(_request())
+    assert adapter.calls == 0
 
 
 @pytest.mark.parametrize(
