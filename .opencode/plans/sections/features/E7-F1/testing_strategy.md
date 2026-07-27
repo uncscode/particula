@@ -33,11 +33,13 @@ thresholds must never be lowered; changed execution modules must retain at least
   invalid state/control zero-call preflight, exception propagation, replacement
   aerosol rejection, and normal zero-time dispatch. A fresh subprocess executes
   the adapter while guarding Warp, GPU, and conversion imports.
-- **P5 — exports/contracts:** Add
-  `particula/tests/execution_exports_test.py`; test exact intended top-level
-  symbols, fresh-process imports with Warp blocked, extension registration, and
-  unchanged low-level kernel export boundaries. Run existing runnable and GPU
-  export regressions.
+- **P5 — exports/contracts (completed, #1466):**
+  `particula/tests/execution_exports_test.py` locks the exact ten-name
+  `particula.execution.__all__` and top-level identity surface; public typed
+  registration, validation order, duplicate/non-mutation, context locality,
+  static execute discovery, and zero invocation; a fresh guarded CPU-only
+  subprocess; P3/P4 exclusions; and runnable/direct-GPU compatibility
+  boundaries.
 - **P6 — documentation:** Run documentation contract tests and
   `mkdocs build --strict`; verify links, examples, support wording, and E7
   dependency references.
@@ -57,14 +59,16 @@ thresholds must never be lowered; changed execution modules must retain at least
 
 ```bash
 pytest particula/tests/execution_test.py -q -Werror
+pytest particula/tests/execution_exports_test.py -q -Werror
 pytest particula/tests/runnable_test.py -q -Werror
 pytest particula/tests/execution_test.py -q \
   --cov=particula.execution --cov-report=term-missing --cov-fail-under=80
-ruff check particula/execution.py particula/tests/execution_test.py
-ruff format --check particula/execution.py particula/tests/execution_test.py
+ruff check particula/__init__.py particula/execution.py \
+  particula/tests/execution_exports_test.py
+ruff format --check particula/__init__.py particula/execution.py \
+  particula/tests/execution_exports_test.py
 mypy particula/ --ignore-missing-imports
 mkdocs build --strict
 ```
 
-The export regression at `particula/tests/execution_exports_test.py` is P5
-verification and is not part of the completed P1/P2 command sets.
+The P5 export regression is distinct from the earlier P1/P2 execution tests.

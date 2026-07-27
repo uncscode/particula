@@ -41,3 +41,11 @@ No user-facing documentation was updated. `CPUExecutionState` and
 `CPUExecutionAdapter` are unexported direct-module execution seams; they add no
 stable public import or GPU execution path. The structured plan records the
 completed CPU contract, while publication and examples remain deferred to P5/P6.
+
+## P5 Record (issue #1466)
+
+No user-facing documentation files were updated. P5 deliberately publishes only
+the ten dependency-neutral selection/context symbols and the typed,
+context-local registration seam; its public-surface tests document the exact
+boundary. P3/P4 and GPU contracts remain excluded. User-facing usage guidance
+and broader contract documentation remain P6 work.

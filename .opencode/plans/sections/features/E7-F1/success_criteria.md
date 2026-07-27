@@ -51,8 +51,22 @@
   metadata `ExecutionResult` declared with `MutationScope.STATE`; replacement
   aerosols fail after their sole call and runnable exceptions propagate.
 - [x] Focused fake, concrete-runnable, and fresh-process tests prove no GPU
-  import/conversion/fallback/selection, while focused tests, coverage, Ruff,
-  formatting, and mypy pass.
+   import/conversion/fallback/selection, while focused tests, coverage, Ruff,
+   formatting, and mypy pass.
+
+## Delivered P5 criteria (issue #1466)
+
+- [x] `particula.execution.__all__` and top-level `particula` publish exactly
+  `Backend`, `Device`, `Process`, `Capability`, `CapabilityRequirements`,
+  `CapabilityDeclaration`, `CapabilityMatrix`, `ExecutionRequest`,
+  `ExecutionAdapter`, and `ExecutionContext` by identity.
+- [x] `ExecutionContext.register_adapter()` is typed, context-local, and
+  selection-only, retaining registry validation order, static inspection,
+  duplicate/non-mutation behavior, and zero adapter invocation.
+- [x] P3/P4 state, mutation, result, validator, and CPU-adapter names, plus GPU
+  APIs, remain outside the new package export boundary.
+- [x] Public-surface, registration, guarded CPU-only import, and compatibility
+  regression coverage locks the published contract.
 
 - [ ] Backend selection is located in a documented, typed, separate execution
   context rather than embedded in strategies, builders, or `RunnableABC`.
@@ -64,11 +78,12 @@
   exact time and substep inputs, and retains current `Aerosol` return semantics.
 - [ ] No selection or failure path performs hidden CPU/Warp transfer, catches a
   runtime error to retry another backend, or requires Warp for CPU-only import.
-- [ ] Public exports are deliberate and contract-tested; direct kernels and
-  concrete sidecars are not promoted through the new surface.
+- [x] Public exports are deliberate and contract-tested; direct kernels and
+   concrete sidecars are not promoted through the new surface. (P5, #1466)
 - [ ] E7-F6 can extend policy and E7-F2/F3/F4 can register implementations
   without changing the T1 request, state, or result vocabulary.
-- [ ] Existing runnable and GPU export regressions pass unchanged.
+- [x] Existing runnable and GPU export compatibility regressions are covered
+   unchanged. (P5, #1466)
 - [ ] Every phase includes tests, changed execution code has at least 80%
   coverage, Ruff/mypy pass, and no repository threshold is lowered.
 - [ ] Backend/device selection behavior and limitations are published and

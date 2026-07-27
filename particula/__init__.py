@@ -1,8 +1,9 @@
 """Top-level package for the particula particle simulator.
 
 This package exposes the primary aerosol, execution, runnable, and namespace
-modules used by the public API while keeping optional backends out of the
-import path.
+modules used by the public API. Its execution exports provide dependency-neutral
+backend-selection metadata plus context-local adapter registration; optional
+backends remain outside the import path.
 """
 
 # pylint: disable=unused-import

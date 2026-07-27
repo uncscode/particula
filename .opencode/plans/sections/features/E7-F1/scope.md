@@ -73,7 +73,25 @@ strategies, builders, or the existing `Aerosol`-typed runnable hierarchy.
   process/substep reinterpretation; runnable exceptions propagate unchanged.
 - `particula/tests/execution_test.py` covers fake and concrete runnable
   dispatch, identity/error boundaries, NumPy scalar forwarding, and guarded
-  fresh-process absence of GPU imports.
+   fresh-process absence of GPU imports.
+
+## Delivered in P5 (issue #1466)
+
+- `particula/execution.py` declares exactly ten stable, dependency-neutral
+  selection/context symbols in `__all__`: `Backend`, `Device`, `Process`,
+  `Capability`, `CapabilityRequirements`, `CapabilityDeclaration`,
+  `CapabilityMatrix`, `ExecutionRequest`, `ExecutionAdapter`, and
+  `ExecutionContext`.
+- `particula/__init__.py` imports those same ten names without defining a new
+  package `__all__`; their public objects retain identity with
+  `particula.execution`.
+- `ExecutionContext.register_adapter()` is a typed public, context-local,
+  selection-only delegation to the private registry. Existing validation order,
+  static callable discovery, duplicate rejection, exact lookup, and
+  no-mutation-on-rejection semantics remain intact.
+- `particula/tests/execution_exports_test.py` covers the public surface,
+  registration/locality/static-inspection behavior, a guarded CPU-only import
+  subprocess, P3/P4 exclusions, and existing runnable/GPU import boundaries.
 
 ## Out of Scope
 
@@ -86,5 +104,5 @@ strategies, builders, or the existing `Aerosol`-typed runnable hierarchy.
   regressions (E7-F7 through E7-F9).
 - Kernel-physics changes, GPU staggered condensation, dynamic resizing,
   multi-GPU/distributed execution, graph capture, optimization, or autodiff.
-- Public exports and user-facing documentation for the P3/P4 contracts; they
-  remain internal until a later deliberate publication phase.
+- Public exports for P3/P4 state, mutation, result, and concrete CPU-adapter
+  contracts; they remain direct-module-only.

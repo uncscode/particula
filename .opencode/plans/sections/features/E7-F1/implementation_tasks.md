@@ -17,8 +17,8 @@
 - [x] Keep private context-local registration constrained to typed
   process/backend keys; reject duplicate or malformed registrations before
   changing the registry. (P2, #1463)
-- [ ] Add narrow exports to `particula/__init__.py`; do not re-export direct
-  kernels, sidecars, or concrete GPU configuration types.
+- [x] Add narrow exports to `particula/__init__.py`; do not re-export direct
+   kernels, sidecars, or concrete GPU configuration types. (P5, #1466)
 
 ## Validation and Compatibility
 
@@ -30,8 +30,8 @@
   attempt CPU or another device.
 - [x] Prove importing and resolving a CPU selection path works when Warp is
   unavailable. (P2, #1463)
-- [ ] Verify existing `RunnableABC`, `RunnableSequence`, conversion helpers,
-  and direct kernel APIs remain behaviorally and import-surface compatible.
+- [x] Verify existing `RunnableABC`, `RunnableSequence`, and direct kernel APIs
+   remain behaviorally and import-surface compatible. (P5, #1466)
 - [ ] Document extension seams for E7-F2/F3 adapters, E7-F4 state, and E7-F6
   availability/fallback policy without implementing those tracks.
 
@@ -39,8 +39,8 @@
 
 - [x] Add focused P2 unit coverage in `particula/tests/execution_test.py` for
   request/context/registry selection and rejection cases. (P2, #1463)
-- [ ] Add `particula/tests/execution_exports_test.py` to lock exact exports and
-  optional-dependency behavior in a fresh subprocess.
+- [x] Add `particula/tests/execution_exports_test.py` to lock exact exports and
+   optional-dependency behavior in a fresh subprocess. (P5, #1466)
 - [x] Use fake adapters to assert selection identity, zero execute calls, and
   no fallback or transfer behavior. (P2, #1463)
 - [x] Use fake adapters to assert P3 structural behavior, opaque identity,

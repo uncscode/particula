@@ -848,11 +848,12 @@ class _AdapterRegistry:
 
 
 class ExecutionContext:
-    """Select declared adapters without executing, probing, or transferring.
+    """Register and select declared adapters without executing or transferring.
 
     Each context owns its private registry, preventing mutable module-global
-    registration state. It performs selection only: it never invokes an
-    adapter, probes availability, or transfers data.
+    registration state. Registration and selection are context-local only:
+    neither invokes an adapter, probes availability, loads a backend, nor
+    transfers data.
     """
 
     def __init__(self, matrix: CapabilityMatrix) -> None:

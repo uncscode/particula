@@ -60,14 +60,20 @@ documentation phase. Unit tests are co-located with every production phase.
     forwarding, exception/replacement propagation, zero-time dispatch, and
     fresh-process guarded absence of GPU imports.
 
-- [ ] **E7-F1-P5:** Publish deliberate API exports and contract regression tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F1-P5:** Publish deliberate API exports and contract regression tests
+  - Issue: #1466 | Size: S | Status: Completed
   - Goal: Expose only the stable T1 selection types and lock the extension seam
     used by E7-F2, E7-F3, E7-F4, and E7-F6.
   - Files: `particula/__init__.py`, `particula/execution.py`,
     `particula/tests/execution_exports_test.py`
-  - Tests: Exact public export list, import without Warp, typing surface,
-    capability-extension registration, and no low-level kernel promotion.
+  - Delivered: exactly ten dependency-neutral names in
+    `particula.execution.__all__` and top-level `particula` imports, plus typed
+    context-local `ExecutionContext.register_adapter()` delegation. P3/P4 and
+    GPU symbols remain excluded.
+  - Tests: exact export identity/list, public registration validation,
+    duplicate/non-mutation, context locality, static callable inspection and
+    zero execution, guarded CPU-only subprocess import, P3/P4 exclusions, and
+    runnable/direct-GPU compatibility.
 
 - [ ] **E7-F1-P6:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

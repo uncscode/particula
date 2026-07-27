@@ -7,7 +7,7 @@
 ## Implementation Status
 
 **E7-F1-P1 shipped for issue #1462; P2 shipped for issue #1463; P3 shipped
-for issue #1464; P4 shipped for issue #1465.**
+for issue #1464; P4 shipped for issue #1465; P5 shipped for issue #1466.**
 `particula.execution` now provides the dependency-neutral typed capability
 vocabulary and immutable pure lookup matrix, plus typed request validation and
 exact adapter selection in context-local private registries. P2 preserves
@@ -20,7 +20,11 @@ It deliberately does not execute adapters, probe availability, transfer data,
   and single-dispatch adapter for existing CPU runnables. It performs strict
   control preflight, preserves state/aerosol identity, and neither imports nor
   converts to GPU state. Public exports and user documentation remain later
-  phases.
+   phases. P5 publishes exactly ten dependency-neutral selection/context names
+   through `particula.execution.__all__` and top-level `particula` imports,
+   and makes typed adapter registration context-local through
+   `ExecutionContext.register_adapter()`. P3/P4 state, mutation, result, and
+   CPU-adapter names remain direct-module-only; no GPU surface is promoted.
 
 ## Problem Statement
 

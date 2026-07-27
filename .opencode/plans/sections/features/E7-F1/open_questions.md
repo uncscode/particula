@@ -23,17 +23,28 @@
       including `"cuda:0"` and `"cpu"`.
     - `particula/gpu/conversion.py:67` - validation delegates the complete value
       to Warp's native device resolver.
-  - Resolved by: plan-question-resolver
+   - Resolved by: plan-question-resolver
+
+- [x] What may P5 publish at the package boundary?
+  - Resolved 2026-07-27 by issue #1466: Publish exactly the ten
+    dependency-neutral selection/context names and
+    `ExecutionContext.register_adapter()`; retain P3/P4 and GPU symbols as
+    direct-module-only APIs.
+  - Rationale: This provides a stable typed extension seam without promoting
+    execution state, result, CPU implementation, optional-backend, or transfer
+    contracts.
 
 - [x] Should adapter registration be public in E7-F1 or remain internal until
   E7-F2/E7-F3 exercise real GPU adapters?
-  - Resolved 2026-07-27: Publish the adapter protocol and selection contracts,
-    but keep mutable registration and registry storage private in E7-F1.
-  - Rationale: No plugin requirement exists, while public mutation would freeze
-    replacement, compatibility, and lifecycle rules before real adapters land.
+  - Resolved 2026-07-27 by issue #1466: Publish typed,
+    context-local `ExecutionContext.register_adapter()` as a selection-only
+    delegation, while retaining mutable registry storage private.
+  - Rationale: The narrow public seam supports downstream adapters without
+    freezing registry snapshots, replacement, lifecycle, dispatch, or transfer
+    policy.
   - Evidence:
-    - `.opencode/plans/sections/features/E7-F1/architecture_design.md:48` - the
-      accepted architecture keeps concrete adapters and registries module-local.
+    - `particula/execution.py` - public registration delegates to the private
+      per-context registry.
     - `.opencode/guides/architecture_reference.md:28` - public APIs must be
       exported deliberately.
   - Resolved by: plan-question-resolver

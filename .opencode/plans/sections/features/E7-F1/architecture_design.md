@@ -91,9 +91,11 @@ exceptions, select a backend, import GPU code, transfer, convert, or fall back.
 - **Capability matrix:** Key support by backend, process, and constraints;
   expose deterministic `supports()` and validating `require()` behavior.
   Declarations describe support but do not load kernels or probe by execution.
-- **API surface:** P3 is confined to `particula.execution`; it adds no top-level
-  export. Concrete adapters and registries remain module-local, and publication
-  remains a later deliberate phase.
+- **API surface:** P5 explicitly publishes the ten P1/P2 selection/context
+  names from `particula.execution` and package top level.
+  `ExecutionContext.register_adapter()` delegates public typed registration to
+  private per-context storage. P3/P4 contracts, concrete adapters, and GPU APIs
+  remain module-local.
 - **CPU adapter:** P4's internal `CPUExecutionState` and
   `CPUExecutionAdapter` delegate exact state-held `time_step`/`sub_steps` to
   one `RunnableABC.execute()` call, retain state/aerosol identity, and report
