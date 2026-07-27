@@ -1,0 +1,53 @@
+# Testing Strategy
+
+Every production phase ships self-contained tests in the same change. Coverage
+thresholds must never be lowered; changed execution modules must retain at least
+80% coverage. Tests use the repository `*_test.py` convention.
+
+## Per-Phase Coverage
+
+- **P1 — capability matrix:** Parameterize supported/unsupported backend,
+  device, process, and capability combinations in
+  `particula/tests/execution_test.py`. Assert immutable/hashable declarations,
+  pure queries, exact failures, and CPU-only import without Warp.
+- **P2 — context and validation:** Use fake adapters to verify normalization,
+  full preflight before dispatch, deterministic validation order, one dispatch,
+  and no implicit backend retry after adapter failure.
+- **P3 — state/result contract:** Test runtime protocols, caller-owned state
+  identity, immutable metadata, explicit mutation declaration, malformed state
+  and result rejection, and backend-specific payload opacity.
+- **P4 — CPU adapter:** Use representative fake and concrete runnables to assert
+  exact `time_step`/`sub_steps`, in-place behavior, returned `Aerosol` handling,
+  exception propagation, and zero calls to conversion helpers.
+- **P5 — exports/contracts:** Add
+  `particula/tests/execution_exports_test.py`; test exact intended top-level
+  symbols, fresh-process imports with Warp blocked, extension registration, and
+  unchanged low-level kernel export boundaries. Run existing runnable and GPU
+  export regressions.
+- **P6 — documentation:** Run documentation contract tests and
+  `mkdocs build --strict`; verify links, examples, support wording, and E7
+  dependency references.
+
+## Edge and Negative Cases
+
+- Unknown backend/process/capability, CPU paired with a CUDA-only device, empty
+  requirements, duplicate registration, invalid state type, non-finite or
+  negative time, invalid substep count, adapter exception, and returned identity
+  mismatch where the adapter contract requires identity.
+- Optional Warp absent; Warp present with CPU device; CUDA remains optional and
+  is not needed to validate this backend-neutral/API-only feature.
+- Assertions distinguish request-validation failure from execution failure;
+  neither path may trigger a transfer or fallback.
+
+## Verification Commands
+
+```bash
+pytest particula/tests/execution_test.py \
+  particula/tests/execution_exports_test.py -q -Werror
+pytest particula/tests/runnable_test.py \
+  particula/gpu/tests/kernel_exports_test.py -q -Werror
+pytest particula/tests/execution_test.py -q \
+  --cov=particula.execution --cov-report=term-missing --cov-fail-under=80
+ruff check particula/ && mypy particula/ --ignore-missing-imports
+mkdocs build --strict
+```

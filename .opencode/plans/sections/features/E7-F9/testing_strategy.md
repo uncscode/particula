@@ -1,0 +1,47 @@
+# Testing Strategy
+
+Every phase ships its implementation or evidence artifact with co-located tests.
+Coverage thresholds are never lowered; changed executable modules maintain at
+least 80% coverage. Test files use `*_test.py`. Warp CPU is the routine installed-
+Warp baseline; CUDA rows are optional and skip cleanly when unavailable.
+
+## Per-Phase Approach
+
+- **P1:** Unit/contract tests for reductions against independent NumPy float64
+  oracles, validation ordering, identity, no host readback, and conservation.
+- **P2:** Checkpoint schema and round-trip tests, malformed/versioned payloads,
+  metadata preservation, uninterrupted versus restart equivalence.
+- **P3:** Full-loop integration tests for condensation, Brownian coagulation,
+  wall loss, dilution, nucleation, environment/gas refresh, exact canonical
+  order, one upload, zero intermediate bulk transfers/syncs, and stable shapes.
+- **P4:** Independent multi-box versus decomposed one-box parity; unrelated-box
+  addition, disablement, and reordering metamorphic tests; larger fixed-capacity
+  particle-resolved fixtures.
+- **P5:** CPU extensive-amount oracles for advection/mixing/dilution/expansion,
+  open/closed ledgers, conservation, checkpoint/restart, and RNG continuation.
+- **P6:** Execute the published example with warnings as errors; assert public
+  imports, checkpoint-only transfer counts, clean no-Warp guidance, and outputs.
+- **P7:** Run focused regressions, full fast suite, export checks, optional CUDA
+  rows, coverage, and `mkdocs build --strict`; publish reproducible commands.
+
+## Required Validation Matrix
+
+| Concern | Required evidence | Backend / acceptance |
+|---------|-------------------|----------------------|
+| Selection adapters | Condensation and Brownian workflows vs CPU | Warp CPU, recorded `rtol`/`atol` |
+| Resident loop | One setup upload; no bulk transfer/sync until checkpoint | Transfer/sync spies, exact counts |
+| Ordering | Current environment, vapor pressure, saturation, gas | Exact call/order and state assertions |
+| Identity/capacity | Containers, arrays, sidecars stable across steps | Identity, shape, dtype, capacity assertions |
+| Conservation | Particle-plus-gas species and transport ledgers | Independent float64 oracle; explicit tolerances |
+| Independent boxes | Multi-box equals decomposed one-box runs | Deterministic parity; stochastic stream/stat rules |
+| Communication | Advection, dilution, mixing, expansion | CPU extensive-amount oracle; open/closed accounting |
+| RNG/restart | Added/disabled/reordered boxes; checkpoint continuation | Stable logical streams; exact same-backend continuation |
+| Errors/fallback | Missing device and unsupported physics | Clear error or explicit transition; never silent |
+| CUDA | Same bounded rows where hardware exists | Optional pass; clean skip when unavailable |
+| Documentation | Complete example and support contract | Executable docs regression; strict build |
+
+Stochastic tests do not require exact CPU/CUDA trajectories. Use stable stream
+contracts for same-backend restart and aggregate/statistical bounds otherwise.
+Conservation should retain the repository's tight concentration-weighted policy
+where applicable (`rtol=1e-12`, `atol=1e-30`) unless a owning process contract
+records a different justified tolerance.

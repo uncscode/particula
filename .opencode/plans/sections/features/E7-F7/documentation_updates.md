@@ -1,0 +1,24 @@
+# Documentation Updates
+
+- Update `docs/Features/Roadmap/data-oriented-gpu.md` Track T7 status and retain
+  the boundary between prescribed maps and full CFD coupling.
+- Update `docs/Features/data-containers-and-gpu-foundations.md` with volume
+  authority, communication ownership, supported map/representation table,
+  fixed-capacity behavior, and explicit transfer/synchronization rules.
+- Add or update an E7 execution guide under `.opencode/guides/` describing map
+  construction, scheduler ordering, derived-state invalidation, failure
+  boundaries, and checkpoint/restart responsibilities.
+- Document equations for amount-ledger transport and expansion:
+  `amount = concentration * volume` and
+  `new_concentration = final_amount / new_volume`.
+- Document particle slot semantics, matching/free-slot rules, capacity errors,
+  conservation diagnostics, and unsupported representation combinations.
+- Document Warp CPU validation as routine evidence and CUDA as optional evidence;
+  avoid performance or exact cross-device replay claims.
+- Add a focused prescribed 1D communication/expansion example only if it can be
+  kept runnable and regression-tested without absorbing E7-F9's complete-loop
+  example ownership.
+- Update `.opencode/plans/sections/features/E7-F7/` with shipped phase status,
+  resolved decisions, exact files, tolerances, and reproduction commands as
+  implementation lands.
+- Run `mkdocs build --strict` and relevant docs tests before completing P7.

@@ -1,0 +1,32 @@
+# Testing Strategy
+
+Every phase ships tests in the same PR under `particula/execution/tests/` using
+the `*_test.py` suffix. Repository and changed-module coverage thresholds are
+never lowered; changed modules target at least 80%.
+
+- **P1:** Unit-test immutable declarations, duplicate and unknown process IDs,
+  unsupported capabilities, malformed dependencies, cycles, and stable errors.
+- **P2:** Unit-test registration-order invariance, canonical tie breaking,
+  disabled nodes, dependency closure, invalidation edges, and prelaunch atomicity.
+- **P3:** Adapter contract tests spy on exact direct calls and assert state,
+  sidecar, output, and RNG identity; cover no-op/rejection/failure paths and no
+  conversion, synchronization, fallback, or private-kernel bypass.
+- **P4:** Unit-test per-box environment/gas updates for dtype, shape, device,
+  aliasing, finite physical ranges, deterministic mutation, and rejection
+  without caller-state changes.
+- **P5:** Call-order tests prove temperature updates precede on-device vapor
+  pressure and saturation refresh, and refresh precedes condensation. Cover
+  unchanged state, multi-species/multi-box state, and no host evaluation.
+- **P6:** Integration-test repeated complete timesteps on Warp CPU using the
+  E6-F9 fixtures. Assert one setup, no intermediate bulk transfer or sync,
+  stable identities, one lifecycle increment, current gas visibility,
+  particle-plus-gas conservation, deterministic call order, and session faulting.
+  Independent boxes match equivalent one-box runs when transport is absent.
+  CUDA rows are optional and skip cleanly.
+- **P7:** Validate import/export wording, links, examples, and strict MkDocs.
+
+Deterministic fields use explicit `rtol`/`atol` recorded by the owning process.
+Stochastic coagulation/wall-loss checks use persistent stream contracts,
+invariants, or aggregate statistics—not exact CPU/CUDA trajectory equality.
+Focused commands include `pytest particula/execution/tests -q -Werror`, existing
+GPU process-sequence/export tests, Ruff, mypy, and `mkdocs build --strict`.
