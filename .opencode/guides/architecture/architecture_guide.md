@@ -1,5 +1,20 @@
 # Architecture Guide
 
+## Execution Capability Vocabulary Boundary
+
+- `particula.execution` is a direct-import, P1 typed metadata module; it is not
+  exported through top-level `particula`.
+- It contains only immutable standard-library declarations for `Backend`, an
+  opaque `Device` native identifier, `Process`, `Capability`, exact
+  requirements/declarations, and a pure `CapabilityMatrix`.
+- A nonempty request is supported only by a complete exact declaration. The
+  matrix must not infer a combined capability from separately declared entries;
+  empty requirements require an existing device/process declaration.
+- This boundary does not import Warp or `particula.gpu`, resolve a device, probe
+  availability, transfer state, select an adapter, or execute a process.
+- Execution contexts, requests, adapters, and registries are P2+ concerns. See
+  [ADR-003](decisions/ADR-003-dependency-neutral-execution-capabilities.md).
+
 ## CPU Nucleation Boundaries
 
 - `particula.dynamics.nucleation` provides the bounded CPU-only P4 construction

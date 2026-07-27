@@ -36,6 +36,17 @@ module must import and execute in environments without Warp. Device resolution,
 transfers, synchronization, and backend availability remain explicit adapter or
 E7-F6 responsibilities.
 
+## P1 Implementation Record
+
+Issue #1462 implements the declaration layer at `particula.execution` using
+only the standard library. `CapabilityMatrix` is frozen and validates exact
+typed declarations. Its nonempty lookup is membership-based, so separately
+declared capabilities are never inferred as a combined capability; its empty
+requirement lookup recognizes only a declared device/process base. `require()`
+is a fail-closed pure wrapper around that lookup. No request/context, adapter,
+registry, availability probe, transfer, execution path, or public package
+export was added.
+
 ## Data / API / Workflow Changes
 
 - **Data model:** Add immutable typed declarations for backend, device request,

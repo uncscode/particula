@@ -1,5 +1,19 @@
 # Success Criteria
 
+## Delivered P1 criteria (issue #1462)
+
+- [x] `particula.execution` provides frozen, validated standard-library-only
+  backend/device/process/capability declarations and an immutable capability
+  matrix without importing Warp or `particula.gpu`.
+- [x] Nonempty capability requests use exact complete-declaration matching;
+  separate declarations cannot be silently combined. Empty requirements require
+  a declared device/process base.
+- [x] `supports()` and `require()` validate request arguments in fixed order,
+  remain read-only, and use the specified deterministic unsupported-request
+  error.
+- [x] Unit coverage includes constructor boundaries, immutable value semantics,
+  matrix behavior and non-mutation, and a fresh guarded no-Warp import.
+
 - [ ] Backend selection is located in a documented, typed, separate execution
   context rather than embedded in strategies, builders, or `RunnableABC`.
 - [ ] The capability matrix deterministically accepts every declared supported

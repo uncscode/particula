@@ -4,6 +4,14 @@
 **Parent:** [E7](../../epics/E7/vision_problem.md)  
 **Scope authority:** issue #1451, Track T1
 
+## Implementation Status
+
+**E7-F1-P1 shipped for issue #1462.** `particula.execution` now provides the
+dependency-neutral typed capability vocabulary and immutable pure lookup matrix.
+It deliberately does not provide execution requests or contexts, adapters,
+registries, availability checks, transfers, execution, or package exports;
+those remain later phases.
+
 ## Problem Statement
 
 Particula exposes deterministic CPU `RunnableABC` processes and deliberate

@@ -6,10 +6,13 @@ thresholds must never be lowered; changed execution modules must retain at least
 
 ## Per-Phase Coverage
 
-- **P1 — capability matrix:** Parameterize supported/unsupported backend,
-  device, process, and capability combinations in
-  `particula/tests/execution_test.py`. Assert immutable/hashable declarations,
-  pure queries, exact failures, and CPU-only import without Warp.
+- **P1 — capability matrix (completed, #1462):**
+  `particula/tests/execution_test.py` covers declaration equality, hashing and
+  frozen assignment; constructor and stable-error boundaries; exact declared
+  matches, no inferred combinations, empty-base and empty-matrix rules;
+  fixed validation order; pure `supports()`/`require()` behavior; and a fresh
+  subprocess import with `warp` and `particula.gpu` guarded. This suite is
+  CPU-only and does not simulate adapters, transfers, or process physics.
 - **P2 — context and validation:** Use fake adapters to verify normalization,
   full preflight before dispatch, deterministic validation order, one dispatch,
   and no implicit backend retry after adapter failure.

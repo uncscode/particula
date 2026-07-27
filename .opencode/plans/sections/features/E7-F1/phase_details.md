@@ -4,13 +4,20 @@ These phases preserve issue #1451 T1's five suggested outcomes. The fifth
 outcome is split into implementation/contract coverage and the required final
 documentation phase. Unit tests are co-located with every production phase.
 
-- [ ] **E7-F1-P1:** Define the typed backend capability matrix with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F1-P1:** Define the typed backend capability matrix with unit tests
+  - Issue: #1462 | Size: S | Status: Completed
   - Goal: Model backend, device, process, and capability declarations and make
     support queries deterministic and side-effect free.
   - Files: `particula/execution.py`, `particula/tests/execution_test.py`
-  - Tests: Enum/dataclass validation, immutable declarations, supported and
-    unsupported query matrices, no optional-Warp import on CPU-only import.
+  - Delivered: frozen standard-library-only `Backend`, `Device`, `Process`,
+    `Capability`, requirements/declaration values, and `CapabilityMatrix` in
+    `particula/execution.py`; exact nonempty matching prevents composing
+    separately declared capabilities, while empty requirements match a declared
+    device/process base.
+  - Tests: Constructor and stable-error validation, value hashing/frozen state,
+    fixed-order matrix argument validation, pure `supports()`/`require()` lookup
+    and exact unsupported errors, plus a fresh subprocess import guarded against
+    `warp` and `particula.gpu`.
 
 - [ ] **E7-F1-P2:** Add the execution-context selection protocol and validation tests
   - Issue: TBD | Size: S | Status: Not Started

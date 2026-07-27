@@ -1,7 +1,9 @@
-"""Immutable execution capability metadata.
+"""Declare dependency-neutral, immutable execution capability metadata.
 
-This module declares metadata only. It does not load backends, resolve devices,
-transfer state, choose adapters, or execute processes.
+This module models declared backend, device, process, and capability support.
+It only performs structural validation and read-only capability lookup; it does
+not load optional backends, resolve devices, transfer state, choose adapters,
+or execute processes.
 """
 
 import re
@@ -12,7 +14,12 @@ _NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 
 
 class Backend(str, Enum):
-    """Closed set of declared execution backends."""
+    """Identify a declared execution backend without loading it.
+
+    Attributes:
+        CPU: The declared CPU backend.
+        WARP: The declared Warp backend.
+    """
 
     CPU = "cpu"
     WARP = "warp"
@@ -20,16 +27,30 @@ class Backend(str, Enum):
 
 @dataclass(frozen=True)
 class Device:
-    """Immutable backend and opaque native device identifier.
+    """Declare an immutable backend and opaque native device identifier.
 
-    The native identifier is retained verbatim and is never resolved here.
+    The native identifier is retained verbatim and is never parsed, resolved,
+    or checked against backend availability.
+
+    Args:
+        backend: Declared backend for the device.
+        native: Nonempty native identifier without surrounding whitespace.
+
+    Raises:
+        TypeError: If ``backend`` is not a Backend or ``native`` is not a str.
+        ValueError: If ``native`` is empty or has surrounding whitespace.
     """
 
     backend: Backend
     native: str
 
     def __post_init__(self) -> None:
-        """Validate the declared backend and opaque native identifier."""
+        """Validate the declared backend and opaque native identifier.
+
+        Raises:
+            TypeError: If the backend or native identifier has the wrong type.
+            ValueError: If the native identifier is empty or padded.
+        """
         if not isinstance(self.backend, Backend):
             raise TypeError("Device.backend must be a Backend.")
         if not isinstance(self.native, str):
@@ -43,28 +64,63 @@ class Device:
 
 @dataclass(frozen=True)
 class Process:
-    """Immutable, validated process name declaration."""
+    """Declare an immutable, validated process name.
+
+    Args:
+        name: Lowercase identifier-style process name.
+
+    Raises:
+        TypeError: If ``name`` is not a str.
+        ValueError: If ``name`` is not a lowercase identifier-style name.
+    """
 
     name: str
 
     def __post_init__(self) -> None:
-        """Validate the process name."""
+        """Validate the process name.
+
+        Raises:
+            TypeError: If the name is not a str.
+            ValueError: If the name is not a lowercase identifier-style name.
+        """
         _validate_name(self.name, "Process.name")
 
 
 @dataclass(frozen=True)
 class Capability:
-    """Immutable, validated capability name declaration."""
+    """Declare an immutable, validated capability name.
+
+    Args:
+        name: Lowercase identifier-style capability name.
+
+    Raises:
+        TypeError: If ``name`` is not a str.
+        ValueError: If ``name`` is not a lowercase identifier-style name.
+    """
 
     name: str
 
     def __post_init__(self) -> None:
-        """Validate the capability name."""
+        """Validate the capability name.
+
+        Raises:
+            TypeError: If the name is not a str.
+            ValueError: If the name is not a lowercase identifier-style name.
+        """
         _validate_name(self.name, "Capability.name")
 
 
 def _validate_name(value: object, field_name: str) -> None:
-    """Validate a lowercase identifier-style metadata name."""
+    """Validate a lowercase identifier-style metadata name.
+
+    Args:
+        value: Candidate name to validate.
+        field_name: Qualified field name used in error messages.
+
+    Raises:
+        TypeError: If ``value`` is not a str.
+        ValueError: If ``value`` does not match the supported name pattern.
+    """
     if not isinstance(value, str):
         raise TypeError(f"{field_name} must be a str.")
     if not _NAME_PATTERN.fullmatch(value):
@@ -73,12 +129,26 @@ def _validate_name(value: object, field_name: str) -> None:
 
 @dataclass(frozen=True)
 class CapabilityRequirements:
-    """Immutable exact set of capability declarations."""
+    """Declare an immutable exact set of required capabilities.
+
+    The empty set is valid. Requirements are declarations, not composable
+    features inferred by the matrix.
+
+    Args:
+        values: Exact frozenset of capability declarations.
+
+    Raises:
+        TypeError: If ``values`` is not a frozenset of Capability instances.
+    """
 
     values: frozenset[Capability]
 
     def __post_init__(self) -> None:
-        """Validate the exact immutable capability collection type."""
+        """Validate the exact immutable capability collection type.
+
+        Raises:
+            TypeError: If the collection or one of its members is invalid.
+        """
         if type(self.values) is not frozenset:
             raise TypeError(
                 "CapabilityRequirements.values must be a frozenset."
@@ -92,14 +162,27 @@ class CapabilityRequirements:
 
 @dataclass(frozen=True)
 class CapabilityDeclaration:
-    """Immutable capability support declaration for one device and process."""
+    """Declare immutable capability support for one device and process.
+
+    Args:
+        device: Device receiving the declaration.
+        process: Process supported by the device.
+        requirements: Exact required capability set for the support entry.
+
+    Raises:
+        TypeError: If any field is not its declared metadata type.
+    """
 
     device: Device
     process: Process
     requirements: CapabilityRequirements
 
     def __post_init__(self) -> None:
-        """Validate the declaration's typed value objects."""
+        """Validate the declaration's typed value objects.
+
+        Raises:
+            TypeError: If any declaration field has the wrong type.
+        """
         if not isinstance(self.device, Device):
             raise TypeError("CapabilityDeclaration.device must be a Device.")
         if not isinstance(self.process, Process):
@@ -113,12 +196,28 @@ class CapabilityDeclaration:
 
 @dataclass(frozen=True)
 class CapabilityMatrix:
-    """Immutable, pure lookup table for exact capability declarations."""
+    """Provide immutable, pure lookup of exact capability declarations.
+
+    Nonempty requirements must match one complete declaration. Empty
+    requirements are supported when at least one declaration has the requested
+    device and process. Lookup neither probes backend availability nor selects
+    an execution adapter.
+
+    Args:
+        declarations: Exact frozenset of capability declarations.
+
+    Raises:
+        TypeError: If ``declarations`` is not a frozenset of declarations.
+    """
 
     declarations: frozenset[CapabilityDeclaration]
 
     def __post_init__(self) -> None:
-        """Validate the exact immutable declaration collection type."""
+        """Validate the exact immutable declaration collection type.
+
+        Raises:
+            TypeError: If the collection or one of its members is invalid.
+        """
         if type(self.declarations) is not frozenset:
             raise TypeError(
                 "CapabilityMatrix.declarations must be a frozenset."
@@ -138,7 +237,19 @@ class CapabilityMatrix:
         process: Process,
         requirements: CapabilityRequirements,
     ) -> bool:
-        """Return whether this matrix exactly declares the request."""
+        """Return whether the matrix exactly declares a capability request.
+
+        Args:
+            device: Device requested for the process.
+            process: Process requested on the device.
+            requirements: Exact capability requirements for the request.
+
+        Returns:
+            True if the request is declared by this matrix; otherwise, False.
+
+        Raises:
+            TypeError: If an argument is not its declared metadata type.
+        """
         _validate_request(device, process, requirements)
         if requirements.values:
             return (
@@ -156,7 +267,17 @@ class CapabilityMatrix:
         process: Process,
         requirements: CapabilityRequirements,
     ) -> None:
-        """Require an exact capability declaration or raise ValueError."""
+        """Require a declared capability request without executing it.
+
+        Args:
+            device: Device requested for the process.
+            process: Process requested on the device.
+            requirements: Exact capability requirements for the request.
+
+        Raises:
+            TypeError: If an argument is not its declared metadata type.
+            ValueError: If the valid request is not declared by this matrix.
+        """
         _validate_request(device, process, requirements)
         if self.supports(device, process, requirements):
             return
@@ -171,7 +292,16 @@ def _validate_request(
     process: object,
     requirements: object,
 ) -> None:
-    """Validate matrix request arguments in their required order."""
+    """Validate matrix request arguments in their required order.
+
+    Args:
+        device: Candidate device metadata.
+        process: Candidate process metadata.
+        requirements: Candidate capability requirements metadata.
+
+    Raises:
+        TypeError: If an argument has the wrong type, checked in argument order.
+    """
     if not isinstance(device, Device):
         raise TypeError("device must be a Device.")
     if not isinstance(process, Process):

@@ -1,5 +1,25 @@
 # Architecture Outline
 
+## Execution Capability Vocabulary
+
+`particula.execution` is a deliberately dependency-neutral P1 metadata boundary
+for typed execution support declarations. It is standard-library-only and is
+not exported through top-level `particula`. It does not import Warp or
+`particula.gpu`, resolve devices, probe availability, transfer data, select
+adapters, or execute processes. Execution contexts, requests, adapters, and
+registries are deferred to P2+.
+
+### particula/execution.py
+
+**Key Components:**
+- `Backend`, `Device`, `Process`, and `Capability` - Immutable typed metadata;
+  `Device.native` is an opaque native identifier.
+- `CapabilityRequirements` and `CapabilityDeclaration` - Immutable exact
+  capability-support declarations.
+- `CapabilityMatrix` - Pure, immutable exact-match lookup. Nonempty
+  requirements must match a complete declaration; an empty requirement is
+  supported only when its device/process base has a declaration.
+
 ## Particle Package
 
 `particula/particles/` contains particle-data representations, distribution

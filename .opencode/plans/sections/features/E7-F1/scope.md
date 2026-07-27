@@ -17,6 +17,18 @@ strategies, builders, or the existing `Aerosol`-typed runnable hierarchy.
 - Deliberate public exports and positive/negative contract tests.
 - Documentation of extension points consumed by E7-F2 through E7-F6.
 
+## Delivered in P1 (issue #1462)
+
+- `particula/execution.py` supplies frozen, standard-library-only metadata for
+  closed backend identity, opaque native devices, process and capability names,
+  exact capability requirements, declarations, and a capability matrix.
+- Matrix lookup is structural and read-only: nonempty requirements require one
+  complete declaration, and an empty request succeeds only for an otherwise
+  declared device/process base.
+- `particula/tests/execution_test.py` covers validation, immutability, exact
+  matching, non-mutation, and an import path guarded against optional Warp/GPU
+  imports.
+
 ## Out of Scope
 
 - GPU condensation or coagulation adapters (E7-F2 and E7-F3).
