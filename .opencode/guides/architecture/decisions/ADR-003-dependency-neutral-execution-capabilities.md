@@ -1,6 +1,6 @@
 # ADR-003: Dependency-Neutral Execution Capability Vocabulary
 
-**Status:** Accepted
+**Status:** Accepted (amended for shipped P2--P5 surface)
 **Date:** 2026-07-27
 **Decision Makers:** ADW Development Team
 **Technical Story:** [#1462](https://github.com/Gorkowski/particula/issues/1462)
@@ -36,7 +36,24 @@ or running a process.
 Add the deliberately dependency-neutral `particula.execution` P1 module. It
 provides immutable standard-library-only `Backend`, `Device`, `Process`,
 `Capability`, requirement/declaration records, and a pure exact-match
-`CapabilityMatrix`. The module is not exported from top-level `particula`.
+`CapabilityMatrix`. The module remains a direct import rather than a top-level
+`particula` export.
+
+### Amendment: Shipped P2--P5 Surface
+
+P2--P5 are now shipped on the same dependency-neutral module boundary. P2 adds
+`ExecutionRequest`, `ExecutionAdapter`, and context-local `ExecutionContext`
+registration and exact selection. Registration and selection inspect only the
+callable seam and capability declarations; they do not invoke adapters, probe
+availability, resolve devices, transfer state, or provide fallback.
+
+P3 adds direct-module-only `ExecutionState`, `MutationDeclaration`,
+`BackendResult`, `ExecutionResult`, and result validation. These carriers retain
+caller-owned opaque payloads and state by identity. P4 adds the direct-module-
+only `CPUExecutionState` and `CPUExecutionAdapter`, a narrow CPU runnable
+dispatch boundary. P5 deliberately exports only the stable selection vocabulary
+through `particula.execution`; P3/P4 carriers and CPU dispatch remain excluded
+from the top-level package and are not a high-level execution API.
 
 ### Chosen Option
 
@@ -48,8 +65,9 @@ The module will:
 2. Use a frozen matrix with exact whole-declaration matching for nonempty
    requirements and a declared-base rule for empty requirements.
 3. Avoid imports of Warp, `particula.gpu`, or any optional backend.
-4. Leave execution contexts, requests, adapters, registries, availability
-   probing, device resolution, data transfer, and execution to P2 and later.
+4. At P1 adoption, leave execution contexts, requests, adapters, registries,
+   availability probing, device resolution, data transfer, and execution to P2
+   and later.
 
 ## Alternatives Considered
 
@@ -111,8 +129,10 @@ avoids duplicating backend-specific validation or availability behavior.
 
 ### Negative
 
-- Callers cannot resolve native devices or run work through this module.
-- P2+ must add contexts, requests, adapters, and registries separately.
+- The module does not resolve native devices, probe runtime availability, or
+  provide transfer, fallback, scheduler, or GPU-adapter behavior.
+- P2/P3/P4 contracts remain narrowly separated; selection does not execute, P3
+  validates ownership only, and P4 is the sole CPU reference dispatch boundary.
 
 ### Neutral
 
@@ -138,8 +158,9 @@ coverage, and Ruff. Verify that guarded fresh imports do not load `warp` or
 
 ### Rollback Plan
 
-Remove the isolated module and its tests. No top-level exports, backend
-execution paths, or runtime state depend on P1.
+Remove the isolated module and its tests only with a replacement for the shipped
+selection and direct-module execution contracts. The API has no optional-backend
+dependency, transfer path, or high-level execution integration to unwind.
 
 ## Validation
 
@@ -149,8 +170,11 @@ execution paths, or runtime state depend on P1.
   matrix lookup.
 - [x] Matrix lookup uses whole exact declarations and does not compose
   capabilities.
-- [x] The module does not resolve devices, probe availability, transfer data,
-  select adapters, or execute work.
+- [x] The P1 metadata layer does not resolve devices, probe availability,
+  transfer data, select adapters, or execute work.
+- [x] The shipped P2 layer performs exact context-local selection without
+  adapter execution; P3 ownership validation and P4 CPU dispatch retain their
+  documented direct-module-only boundaries.
 - [x] The module is not exported from top-level `particula`.
 
 ## References
@@ -161,5 +185,6 @@ execution paths, or runtime state depend on P1.
 
 ## Notes
 
-No prior ADR is superseded. P2+ owns execution contexts, requests, adapters,
-and registries.
+No prior ADR is superseded. This ADR records the original P1 decision and its
+P2--P5 amendment; future availability, fallback, GPU-adapter, transfer,
+scheduling, and resident-session decisions remain separate Epic G work.

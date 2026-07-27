@@ -1473,8 +1473,9 @@ scheduling, resident loops, and transport remain Epic G work.
 
 Status: active.
 
-E7-F1 is shipped. It provides a separate public, dependency-neutral,
-explicit-selection context with a limited CPU/reference registration use case.
+E7-F1 is shipped (P1--P6 complete). It provides a separate public,
+dependency-neutral, explicit-selection context with a limited CPU/reference
+registration use case.
 It is neither a high-level execution API nor a GPU adapter. Callers construct
 an exact request, context-local registration supplies an adapter, and selection
 does not execute that adapter.

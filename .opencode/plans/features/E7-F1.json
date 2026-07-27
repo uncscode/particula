@@ -2,13 +2,13 @@
   "id": "E7-F1",
   "type": "feature",
   "title": "Backend-Selection and Execution-Context API",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
+  "completion_date": "2026-07-27",
   "last_updated": "2026-07-27",
   "dependencies": [],
   "section_files": {
@@ -84,11 +84,11 @@
     {
       "id": "E7-F1-P5",
       "title": "Publish deliberate API exports and contract regression tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-27",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -97,11 +97,11 @@
     {
       "id": "E7-F1-P6",
       "title": "Update development documentation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-27",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -109,5 +109,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "shipped"
 }

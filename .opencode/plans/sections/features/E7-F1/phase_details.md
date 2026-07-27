@@ -75,10 +75,12 @@ documentation phase. Unit tests are co-located with every production phase.
     zero execution, guarded CPU-only subprocess import, P3/P4 exclusions, and
     runnable/direct-GPU compatibility.
 
-- [ ] **E7-F1-P6:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E7-F1-P6:** Update development documentation
+  - Issue: #1469 | Size: XS | Status: Shipped
   - Goal: Publish backend-selection, ownership, mutation, dependency, and
     unsupported-scope contracts for downstream maintainers.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`, `.opencode/guides/`
-  - Tests: `mkdocs build --strict` and documentation contract/link regressions.
+  - Delivered: Roadmap and architecture records document the shipped
+    dependency-neutral P2--P5 surface and its deferred integration boundaries.
+  - Tests: documentation contract/link regressions and `mkdocs build --strict`.

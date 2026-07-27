@@ -7,7 +7,7 @@ import sys
 from dataclasses import FrozenInstanceError, fields
 from fractions import Fraction
 from pathlib import Path
-from typing import cast
+from typing import assert_type, cast
 
 import numpy as np
 import numpy.testing as npt
@@ -935,18 +935,28 @@ def test_p3_protocols_are_structural_and_do_not_change_p2_selection() -> None:
 
     assert isinstance(state, ExecutionState)
     assert not isinstance(_MissingPayloadState(), ExecutionState)
-    assert isinstance(typed, ExecutionAdapter)
-    assert isinstance(incompatible, ExecutionAdapter)
-    assert not isinstance(object(), ExecutionAdapter)
-    assert not isinstance(
-        type("NoCall", (), {"execute": None})(), ExecutionAdapter
-    )
-
     context = _context()
     context._registry._register_adapter(_process(), Backend.CPU, incompatible)
 
     assert context.resolve(_request()) is incompatible
     assert incompatible.calls == typed.calls == 0
+
+
+def test_execution_adapter_accepts_narrow_execute_signature_statically() -> (
+    None
+):
+    """Test a narrow documented adapter satisfies the public protocol in mypy."""
+
+    class NarrowAdapter:
+        """Provide an adapter with its own narrow execution contract."""
+
+        def execute(self, state: ExecutionState) -> ExecutionResult:
+            """Declare the P3-specific execution contract."""
+            raise RuntimeError(state)
+
+    adapter: ExecutionAdapter = NarrowAdapter()
+
+    assert_type(adapter, ExecutionAdapter)
 
 
 def test_p3_closed_representation_and_frozen_carriers() -> None:
@@ -1085,6 +1095,29 @@ def test_backend_result_retains_opaque_objects_by_identity() -> None:
 
     assert result.value is value
     assert result.diagnostics is diagnostics
+
+
+def test_opaque_payload_carriers_compare_and_hash_by_identity() -> None:
+    """Test payload carriers never compare or hash opaque payload contents."""
+    array = np.array([1.0])
+    payload = ["unhashable"]
+    state = _State(payload)
+    mutation = MutationDeclaration(frozenset({MutationScope.NONE}))
+    backend_first = BackendResult(array, payload)
+    backend_second = BackendResult(array, payload)
+    result_first = ExecutionResult(state, (), mutation, backend_first)
+    result_second = ExecutionResult(state, (), mutation, backend_second)
+    cpu_first = CPUExecutionState(array, payload, payload)
+    cpu_second = CPUExecutionState(array, payload, payload)
+
+    for first, second in (
+        (backend_first, backend_second),
+        (result_first, result_second),
+        (cpu_first, cpu_second),
+    ):
+        assert first is not second
+        assert first != second
+        assert isinstance(hash(first), int)
 
 
 @pytest.mark.parametrize("scope", [MutationScope.NONE, MutationScope.STATE])

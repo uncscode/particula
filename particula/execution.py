@@ -422,21 +422,14 @@ class ExecutionState(Protocol):
 class ExecutionAdapter(Protocol):
     """Declare the structural registration and selection seam.
 
-    Registration validates this callable shape without invoking or probing an
-    adapter. Selection returns the registered adapter by identity and does not
-    establish an execution, state, or result contract.
+    Registration validates that an adapter exposes a callable ``execute``
+    attribute without invoking or probing it. Selection returns the registered
+    adapter by identity and does not establish an execution, state, or result
+    contract.
     """
 
-    def execute(self, *args: object, **kwargs: object) -> object:
-        """Declare an execution seam without defining its contract.
-
-        Args:
-            *args: Positional arguments for a future execution contract.
-            **kwargs: Keyword arguments for a future execution contract.
-
-        Returns:
-            An object governed by a future execution contract.
-        """
+    execute: object
+    """Execution seam retained structurally; registration checks callability."""
 
 
 class MutationScope(str, Enum):
@@ -514,7 +507,7 @@ def _is_static_execute_callable(adapter: object) -> bool:
     return callable(execute)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class BackendResult:
     """Retain opaque backend result values by identity without inspection.
 
@@ -527,7 +520,7 @@ class BackendResult:
     diagnostics: object | None = None
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class ExecutionResult:
     """Declare immutable P3 result ownership and mutation metadata.
 
@@ -655,7 +648,7 @@ class _CPURunnable(Protocol):
         """
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class CPUExecutionState:
     """Retain CPU execution inputs for the direct CPU adapter.
 
