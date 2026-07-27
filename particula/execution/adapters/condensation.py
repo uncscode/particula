@@ -748,9 +748,10 @@ class WarpCondensationExecutionAdapter:
     Preflight completes before the optional kernel import. The adapter makes one
     native call without conversion, allocation, restoration, synchronization,
     fallback, or exception recovery. Profile preflight completes before lazy
-    resolution. It forwards caller-owned ``latent_heat``, ``energy_transfer``,
-    and deferred ``thermal_work`` sidecars by identity. The direct kernel owns
-    thermal-sidecar validation, execution, and post-launch mutation limits.
+    resolution. It forwards valid caller-owned ``latent_heat``,
+    ``energy_transfer``, and deferred ``thermal_work`` sidecars by identity.
+    The direct kernel owns detailed thermal-sidecar validation, execution, and
+    post-launch mutation limits.
 
     This concrete-only adapter is imported from
     ``particula.execution.adapters.condensation``. It forwards the exact
@@ -762,8 +763,8 @@ class WarpCondensationExecutionAdapter:
 
         Profile preflight occurs before lazy kernel resolution. After that
         preflight, this method forwards the caller-owned thermal sidecars by
-        identity and leaves their validation and any post-launch behavior to the
-        direct kernel.
+        identity and leaves detailed validation and any post-launch behavior to
+        the direct kernel.
 
         Args:
             state: Exact selected Warp P3 execution state.
@@ -775,8 +776,8 @@ class WarpCondensationExecutionAdapter:
         Raises:
             TypeError: If ``state`` or its time step has an invalid type.
             ValueError: If controls or the selected profile are invalid, or if
-                the direct kernel rejects thermal sidecars. Direct errors
-                propagate unchanged.
+                the direct kernel rejects detailed thermal-sidecar validation.
+                Direct errors propagate unchanged.
             ImportError: If the optional Warp kernel cannot be imported after
                 successful preflight.
         """

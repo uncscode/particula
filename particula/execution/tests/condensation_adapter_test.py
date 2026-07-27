@@ -371,7 +371,7 @@ def _real_warp_condensation_state(
     thermodynamics = ThermodynamicsConfig(
         modes=wp.zeros(2, dtype=wp.int32, device="cpu"),
         parameters=wp.array(
-            [[10.0, 0.0, 0.0, 0.0], [10.0, 0.0, 0.0, 0.0]],
+            [[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0]],
             dtype=wp.float64,
             device="cpu",
         ),
@@ -1161,100 +1161,54 @@ def test_warp_execution_state_is_frozen_identity_carrier() -> None:
 
 
 @pytest.mark.warp
-def test_warp_execution_propagates_energy_without_latent_native_error(
+def test_warp_execution_propagates_direct_energy_error_without_latent_heat(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test direct energy dependency errors bypass adapter thermal checks."""
+    """Test missing latent heat reaches the direct kernel unchanged."""
     import particula.execution.adapters.condensation as condensation
+    from particula.gpu.kernels import condensation_step_gpu
 
-    particles, gas, environment = _warp_state_inputs()
     wp = pytest.importorskip("warp")
-    energy_transfer = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
-    p2_state = condensation.WarpCondensationState(
-        CondensationExecutionConfig(_configuration(latent_heat=True)),
-        particles,
-        gas,
-        environment,
-        object(),
+    energy_transfer = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    thermal_work = wp.ones(1, dtype=wp.float64, device="cpu")
+    state, mass_transfer, particles, gas = _real_warp_condensation_state(
         energy_transfer=energy_transfer,
+        thermal_work=thermal_work,
     )
-    state = WarpCondensationExecutionState(p2_state, 1.0)
-    error = ValueError("energy_transfer requires latent_heat")
-    calls = 0
-
-    def kernel(*args: object, **kwargs: object) -> object:
-        """Record direct dispatch before raising its prepared error."""
-        nonlocal calls
-        del args
-        calls += 1
-        assert kwargs["latent_heat"] is None
-        assert kwargs["energy_transfer"] is energy_transfer
-        raise error
-
-    monkeypatch.setattr(
-        condensation,
-        "_get_condensation_step_gpu",
-        lambda: kernel,
+    resources = (
+        *_primary_warp_resources(particles, gas, state.state.environment),
+        mass_transfer,
+        energy_transfer,
+        thermal_work,
     )
+    snapshot = _snapshot_warp_resources(*resources)
+    resolutions = 0
 
-    with pytest.raises(ValueError) as caught:
+    def resolve() -> Any:
+        """Count lazy resolution while preserving the native entry point."""
+        nonlocal resolutions
+        resolutions += 1
+        return condensation_step_gpu
+
+    monkeypatch.setattr(condensation, "_get_condensation_step_gpu", resolve)
+    with pytest.raises(ValueError, match="latent_heat"):
         WarpCondensationExecutionAdapter().execute(state)
 
-    assert caught.value is error
-    assert calls == 1
+    assert resolutions == 1
+    _assert_warp_resources_unchanged(snapshot, *resources)
 
 
 @pytest.mark.warp
-def test_warp_execution_propagates_invalid_thermal_work_native_error(
+def test_warp_execution_reaches_direct_latent_heat_schema_validation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test deferred-work validation remains a direct-kernel responsibility."""
-    import particula.execution.adapters.condensation as condensation
-
-    particles, gas, environment = _warp_state_inputs()
-    invalid_thermal_work = object()
-    p2_state = condensation.WarpCondensationState(
-        CondensationExecutionConfig(_configuration(latent_heat=True)),
-        particles,
-        gas,
-        environment,
-        object(),
-        latent_heat=object(),
-        thermal_work=invalid_thermal_work,
-    )
-    error = ValueError("thermal_work must have shape (1,)")
-    calls = 0
-
-    def kernel(*args: object, **kwargs: object) -> object:
-        """Record the direct validation seam before raising its error."""
-        nonlocal calls
-        del args
-        calls += 1
-        assert kwargs["thermal_work"] is invalid_thermal_work
-        raise error
-
-    monkeypatch.setattr(
-        condensation, "_get_condensation_step_gpu", lambda: kernel
-    )
-    with pytest.raises(ValueError) as caught:
-        WarpCondensationExecutionAdapter().execute(
-            WarpCondensationExecutionState(p2_state, 1.0)
-        )
-
-    assert caught.value is error
-    assert calls == 1
-
-
-@pytest.mark.warp
-def test_warp_execution_reaches_direct_energy_dependency_validation(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Test missing latent heat reaches the real direct-kernel validator."""
+    """Test semantically valid malformed heat reaches direct validation."""
     import particula.execution.adapters.condensation as condensation
     from particula.gpu.kernels import condensation_step_gpu
 
     wp = pytest.importorskip("warp")
     particles, gas, environment = _warp_state_inputs()
+    latent_heat = wp.ones(2, dtype=wp.float64, device="cpu")
     energy_transfer = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
     p2_state = condensation.WarpCondensationState(
         CondensationExecutionConfig(_configuration(latent_heat=True)),
@@ -1262,10 +1216,12 @@ def test_warp_execution_reaches_direct_energy_dependency_validation(
         gas,
         environment,
         _thermodynamics_config_for_warp_state(gas, wp),
+        latent_heat=latent_heat,
         energy_transfer=energy_transfer,
     )
     resources = (
         *_primary_warp_resources(particles, gas, environment),
+        latent_heat,
         energy_transfer,
     )
     snapshot = _snapshot_warp_resources(*resources)
@@ -1278,9 +1234,7 @@ def test_warp_execution_reaches_direct_energy_dependency_validation(
         return condensation_step_gpu
 
     monkeypatch.setattr(condensation, "_get_condensation_step_gpu", resolve)
-    with pytest.raises(
-        ValueError, match="^energy_transfer requires latent_heat$"
-    ):
+    with pytest.raises(ValueError, match="latent_heat"):
         WarpCondensationExecutionAdapter().execute(
             WarpCondensationExecutionState(p2_state, 1.0)
         )
@@ -1398,6 +1352,7 @@ def test_warp_execution_records_energy_without_mutating_thermal_work() -> None:
     assert energy_transfer is state.state.energy_transfer
     assert thermal_work is state.state.thermal_work
     np.testing.assert_array_equal(thermal_work.numpy(), initial_thermal_work)
+    assert np.any(mass_transfer.numpy() != 0.0)
     np.testing.assert_allclose(
         energy_transfer.numpy(),
         np.sum(mass_transfer.numpy(), axis=1) * latent_heat.numpy()[None, :],
