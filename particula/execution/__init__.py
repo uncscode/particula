@@ -1158,7 +1158,7 @@ class ExecutionContext:
         self,
         process: Process,
         backend: Backend,
-        adapter: ExecutionAdapter,
+        adapter: object,
     ) -> None:
         """Register one context-local adapter for selection only.
 

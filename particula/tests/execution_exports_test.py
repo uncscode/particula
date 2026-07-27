@@ -43,6 +43,9 @@ EXCLUDED_EXPORTS = (
     "validate_execution_result",
     "CPUExecutionState",
     "CPUExecutionAdapter",
+    "CondensationExecutionConfig",
+    "CPUCondensationState",
+    "WarpCondensationState",
 )
 
 
@@ -106,6 +109,7 @@ def test_execution_exports_are_exact_and_identical_at_package_boundary() -> (
         assert getattr(particula, name) is getattr(execution, name)
 
     assert isinstance(_Adapter(), ExecutionAdapter)
+    assert hasattr(execution, "__path__")
 
 
 def test_public_registration_resolves_by_identity_without_execution() -> None:
