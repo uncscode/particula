@@ -53,6 +53,87 @@ from particula.gpu import (
 from particula.particles import ParticleData
 ```
 
+## Execution selection
+
+The package-level selection API has a separate, dependency-neutral contract:
+
+```python
+from particula import (
+    Backend,
+    Capability,
+    CapabilityDeclaration,
+    CapabilityMatrix,
+    CapabilityRequirements,
+    Device,
+    ExecutionAdapter,
+    ExecutionContext,
+    ExecutionRequest,
+    Process,
+)
+```
+
+Declarations and requests are immutable exact metadata. A complete matching
+declaration must be accepted by `CapabilityMatrix.require()` before
+`ExecutionContext.resolve()` performs one exact context-local
+`(Process, Backend)` lookup. The canonical CPU device spelling is exactly
+`Device(Backend.CPU, "cpu")`.
+
+The following CPU-only example demonstrates explicit construction, public
+registration, and selection. Its `LocalAdapter.execute()` argument and return
+behavior are local to this example, not a generic `ExecutionAdapter`, result,
+state, identity, or mutation guarantee.
+
+```python
+from particula import (
+    Backend,
+    CapabilityDeclaration,
+    CapabilityMatrix,
+    CapabilityRequirements,
+    Device,
+    ExecutionContext,
+    ExecutionRequest,
+    Process,
+)
+
+
+class LocalAdapter:
+    """Example-local adapter contract."""
+
+    def execute(self, message: str) -> str:
+        """Return this example's message unchanged."""
+        return message
+
+
+device = Device(Backend.CPU, "cpu")
+process = Process("condensation")
+requirements = CapabilityRequirements(frozenset())
+matrix = CapabilityMatrix(
+    frozenset(
+        {CapabilityDeclaration(device, process, requirements)}
+    )
+)
+context = ExecutionContext(matrix)
+adapter = LocalAdapter()
+context.register_adapter(process, Backend.CPU, adapter)
+request = ExecutionRequest(Backend.CPU, device, process, requirements)
+
+selected = context.resolve(request)
+assert selected is adapter
+assert selected.execute("example-local result") == "example-local result"
+```
+
+`selected is adapter` proves selection preserves adapter identity. No adapter
+`execute` call occurs before the final assertion, which the caller invokes.
+Registration and resolution neither execute an adapter nor mutate simulation
+state. Invocation, arguments, state/result ownership, mutation declaration,
+and runtime errors remain caller and registered-adapter responsibilities until
+a later public contract exists.
+
+An unsupported declaration fails before lookup. A supported declaration without
+an exact registration raises `LookupError`; no alternate backend is selected.
+Selection has ended after an adapter is returned and does not catch, retry, or
+fallback from adapter failures.
+
 ### Complete direct-process illustration
 
 The [complete direct-process source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py)

@@ -2,12 +2,25 @@
 
 ## Execution Capability Vocabulary
 
-`particula.execution` is a deliberately dependency-neutral metadata and private
-selection boundary. It is standard-library-only and is not exported through
-top-level `particula`. Its P2 selection layer validates declared capability
-support, normalizes the CPU spelling, and returns one context-local adapter by
-the exact `(Process, Backend)` key. It does not import Warp or `particula.gpu`,
-resolve or probe backends, transfer data, invoke adapters, or provide fallback.
+`particula.execution` is a dependency-neutral, standard-library-only selection
+boundary. Its ten selection/context symbols and
+`ExecutionContext.register_adapter()` are package-level public APIs, while the
+backing registry remains private. Immutable exact declarations validate before
+one context-local `(Process, Backend)` lookup: exact matrix validation happens
+before lookup, and a resolved adapter retains
+identity and is not executed. CPU metadata uses exactly
+`Device(Backend.CPU, "cpu")`. Selection does not import, probe, or resolve a
+backend; transfer or synchronize data; retry or fallback; or define generic
+execution arguments, results, state, or mutation semantics. P3/P4 state,
+result, mutation, and concrete CPU-adapter types remain direct-module-only.
+
+Strategy physics, builder configuration, and existing CPU `RunnableABC`
+behavior remain separate from E7-F1 typed selection and downstream process
+adapter/session layers. The ordering is
+`E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`; E7-F6 owns availability,
+fallback, error taxonomy, API stability, and export policy. GPU adapters,
+resident sessions/loops, scheduling, implicit transfer/synchronization, and
+replacement of direct GPU APIs remain unsupported.
 
 ### particula/execution.py
 
@@ -19,13 +32,12 @@ resolve or probe backends, transfer data, invoke adapters, or provide fallback.
 - `CapabilityMatrix` - Pure, immutable exact-match lookup. Nonempty
   requirements must match a complete declaration; an empty requirement is
   supported only when its device/process base has a declaration.
-- `ExecutionRequest` and `ExecutionContext` - Direct-import selection values
-  and context-local coordinator. Requests must pair matching backends/devices;
-  CPU selection accepts only `Device(Backend.CPU, "cpu")`, while Warp native
-  identifiers remain opaque.
-- `_AdapterRegistry` and `_ExecutionAdapter` - Private, per-context exact-key
-  registration seam. Adapters are selected by identity only after matrix
-  validation; registration and execution are deliberately not public APIs.
+- `ExecutionRequest` and `ExecutionContext` - Package-level public selection
+  values and context-local coordinator. Requests must pair matching
+  backends/devices; CPU selection accepts only `Device(Backend.CPU, "cpu")`.
+- `_AdapterRegistry` - Private, per-context exact-key backing registry.
+  `ExecutionContext.register_adapter()` is public; registration and resolution
+  select adapters by identity after matrix validation and never execute them.
 
 ## Particle Package
 

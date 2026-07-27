@@ -1,27 +1,29 @@
 # Architecture Guide
 
-## Execution Capability and Private Selection Boundary
+## Execution Capability and Selection Boundary
 
-- `particula.execution` is a direct-import, dependency-neutral typed metadata
-  and P2 private-selection module; it is not exported through top-level
-  `particula`.
-- It contains only immutable standard-library declarations for `Backend`, an
-  opaque `Device` native identifier, `Process`, `Capability`, exact
-  requirements/declarations, and a pure `CapabilityMatrix`. P2 adds immutable
-  `ExecutionRequest` values and an `ExecutionContext` with a private,
-  context-local adapter registry.
-- A nonempty request is supported only by a complete exact declaration. The
-  matrix must not infer a combined capability from separately declared entries;
-  empty requirements require an existing device/process declaration.
-- Selection validates a request's declared capability support before one exact
-  `(Process, Backend)` private-registry lookup. CPU requests must use the
-  canonical `Device(Backend.CPU, "cpu")`; Warp native identifiers remain opaque.
-  Selection returns the registered adapter by identity and neither invokes it
-  nor tries alternate adapters.
-- This boundary does not import Warp or `particula.gpu`, resolve or probe a
-  backend, transfer state, execute a process, or provide fallback. Registration
-  and adapter shapes remain private implementation seams, not public APIs. See
-  [ADR-003](decisions/ADR-003-dependency-neutral-execution-capabilities.md).
+- `particula.execution` is dependency-neutral and standard-library-only. Its
+  ten selection/context symbols and `ExecutionContext.register_adapter()` are
+  package-level public APIs; the backing registry remains private.
+- Immutable exact metadata includes `Backend`, `Device`, `Process`,
+  `Capability`, `CapabilityRequirements`, `CapabilityDeclaration`,
+  `CapabilityMatrix`, and `ExecutionRequest`. CPU metadata must use
+  `Device(Backend.CPU, "cpu")`; native identifiers for other backends remain
+  opaque.
+- Registration and resolution are context-local, selection-only operations.
+  exact matrix validation happens before one `(Process, Backend)` lookup, and
+  the resolved adapter retains identity and is not executed.
+- This boundary does not import, probe, or resolve a backend; transfer or
+  synchronize state; execute an adapter; retry or fallback. Generic execution
+  argument, result, state, and mutation semantics are not public. P3/P4 state,
+  result, mutation, and concrete CPU-adapter types remain direct-module-only.
+- Strategy physics, builder configuration, and existing CPU `RunnableABC`
+  behavior remain distinct from E7-F1 typed selection and downstream process
+  adapter/session layers. The ordering is
+  `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`; E7-F6 owns availability,
+  fallback, error taxonomy, API stability, and export policy. GPU adapters,
+  resident sessions/loops, scheduling, implicit transfer/synchronization, and
+  replacement of direct GPU APIs remain unsupported.
 
 ## CPU Nucleation Boundaries
 

@@ -1473,37 +1473,22 @@ scheduling, resident loops, and transport remain Epic G work.
 
 Status: active.
 
-Make GPU execution reachable from user-facing APIs and keep full simulations
-resident on the device between checkpoints. This epic also owns the
-cross-cutting CPU-fallback and API-stability decisions formerly tracked as a
-separate epic.
+E7-F1 is shipped. It provides a separate public, dependency-neutral,
+explicit-selection context with a limited CPU/reference registration use case.
+It is neither a high-level execution API nor a GPU adapter. Callers construct
+an exact request, context-local registration supplies an adapter, and selection
+does not execute that adapter.
 
-Planned features:
+The downstream ordering is:
 
-1. Backend-selection API design: decide whether selection belongs on
-   strategies, runnables, builders, or a separate execution context.
-2. Backend selection for at least one condensation workflow, with explicit
-   return types and mutation semantics.
-3. Backend selection for at least one Brownian coagulation workflow.
-4. GPU simulation loop abstraction that keeps `WarpParticleData`,
-   `WarpGasData`, and `WarpEnvironmentData` resident on the selected device
-   across all enabled dynamics.
-5. Deterministic process ordering/scheduler for full aerosol simulations
-   (condensation, coagulation, wall loss, dilution, environment updates, and
-   gas updates between steps).
-6. CPU fallback and API-stability policy: mark low-level `particula.gpu.*`
-   APIs experimental until selection and full-loop validation land; missing
-   GPU processes raise clear errors or use explicit fallback boundaries; no
-   silent CPU/GPU data movement in long simulations.
-7. Multi-box communication: prescribed advection, dilution, expansion, and
-   simple mixing maps, including per-box volume changes for parcel and
-   combustion cases.
-8. Per-box RNG streams so independent boxes remain reproducible, with
-   GPU-resident RNG state exercised in loop tests.
-9. Documentation and regression coverage: a GPU-resident multi-timestep
-   example that transfers back only at checkpoints, plus larger multi-box and
-   particle-resolved regression cases for independent boxes, prescribed
-   advection, dilution, and expansion.
+`E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`.
+
+E7-F6 owns availability, fallback, error taxonomy, API stability, and export
+policy. E7-F1 supplies no transfer or fallback. E7-F2 supplies condensation
+adapters, E7-F3 supplies coagulation adapters, E7-F4 supplies resident
+session/container/sidecar lifecycle, and E7-F5 is their later scheduling
+consumer. These consumers register or use adapters only after their own
+contracts exist and do not alter the shipped direct-kernel path.
 
 ### High-Level Integration
 
@@ -1511,64 +1496,22 @@ Planned features:
   [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
   guide and
   [Data Containers example](../../Examples/Data_Containers/index.md) as the
-  current baseline for explicit transfer helpers, `EnvironmentData` ownership,
-  support boundaries, and runnable entrypoint wording before layering new
-  high-level GPU execution APIs on top.
-
-- Add user-facing APIs that can choose CPU or GPU execution without requiring
-  users to call kernel modules directly.
-- Decide whether backend selection belongs on strategies, runnables, builders,
-  or a separate execution context.
-- Preserve CPU behavior as the reference path and make GPU fallback behavior
-  explicit when Warp or CUDA is unavailable.
-- Add a GPU simulation loop abstraction that keeps `WarpParticleData`,
-  `WarpGasData`, and `WarpEnvironmentData` resident on the selected device
-  across all enabled dynamics.
-- Support process ordering for full aerosol simulations, for example
-  condensation, coagulation, wall loss, dilution, environment updates, and any
-  gas updates that must occur between those steps.
+   current baseline for explicit transfer helpers, `EnvironmentData` ownership,
+   and direct-kernel support boundaries.
+- E7-F1 does not introduce GPU adapters, resident loops, scheduling, implicit
+  transfer or synchronization, fallback, retry, or replacement of direct GPU
+  APIs. Those scopes remain deferred and policy questions belong to E7-F6.
+- E7-F2, E7-F3, and E7-F4 may add their bounded consumers only after their
+  process-adapter or resident-lifecycle contracts are established. E7-F5 is a
+  later consumer, not a consequence of E7-F1 selection alone.
 
 ### Full GPU-Resident Simulation
 
-- Define the minimum dynamics set required for a complete GPU-only aerosol
-  simulation loop.
-- Keep particles, gases, environment state, temporary work buffers, and
-  random-number state on the GPU between timesteps.
-- Transfer data back to CPU only for checkpoints, diagnostics, visualization, or
-  final results.
-- Add a process graph or scheduler that can execute supported GPU processes in
-  a deterministic order.
-- Provide explicit errors or CPU fallback boundaries when a requested dynamics
-  process has no GPU implementation.
-- Treat multiple independent boxes as a first-class simulation mode. Each box
-  should keep its own particle, gas, environment, volume, and diagnostic state
-  while sharing process configuration when appropriate.
-- Support simple box communication through prescribed advection or mixing maps.
-  This should cover early 1D parcel workflows such as rising parcels, expanding
-  parcels, and flame/combustion-style expansion where box volumes and gas states
-  evolve in a prescribed way.
-
-Candidate GPU process coverage for Epic G integration:
-
-- Condensation: integrate the shipped isothermal and latent-heat direct variants
-  (staggered stays CPU-only).
-- Coagulation: integrate the shipped particle-resolved singleton, two-way, and
-  four-way masks. Three-way masks plus DNS/general turbulence remain deferred
-  from the near-term GPU scope.
-- Wall loss: integrate the shipped neutral and charged spherical/rectangular
-  direct paths.
-- Dilution: integrate the shipped direct particle and gas concentration update.
-- Nucleation: integrate the shipped direct fixed-slot particle-source process.
-- Gas updates: partitioning-related gas concentration changes needed by coupled
-  condensation workflows, plus scheduler orchestration that uses the existing
-  on-device vapor-pressure refresh after temperature changes.
-- Environment updates: prescribed or process-driven per-box temperature and
-  pressure updates, plus recomputation of derived thermodynamic fields;
-  simulation-volume evolution remains owned by `ParticleData.volume`.
-- Diagnostics: optional GPU-side reductions for total mass, number
-  concentration, latent heat energy, and conservation checks.
-- Box transport: prescribed advection, dilution, expansion, and simple mixing
-  between neighboring boxes or user-defined box pairs.
+Resident sessions and loops, full-process scheduling, high-level GPU adapters,
+and user-facing CPU/GPU orchestration are explicitly deferred. They require
+separate contracts from E7-F2 through E7-F5 after E7-F6 establishes policy.
+They must not imply hidden transfer, availability probing, fallback, retry, or
+replacement of the direct-kernel APIs.
 
 ### Multi-Box Communication
 
@@ -1599,11 +1542,10 @@ Fixed-capacity slot management for these loops is defined in
   graph-captured execution tests.
 - Document expected reproducibility limits across CPU, Warp CPU, and CUDA.
 
-**Exit bar:** At least one condensation and one coagulation workflow run on
-GPU through the selection API, match CPU within recorded tolerance, and are
-used in a documented example, and a multi-box GPU-resident loop runs all
-supported processes between checkpoints with per-box RNG streams and no
-hidden CPU transfers.
+**Exit bar:** E7-F1 remains a bounded selection seam. Any future condensation,
+coagulation, resident-session, or scheduling work must establish its own
+contract through E7-F2, E7-F3, E7-F4, or E7-F5 after E7-F6 policy is defined;
+the direct GPU path remains explicit and unchanged.
 
 ## Epic H: Graph Capture and Performance
 
