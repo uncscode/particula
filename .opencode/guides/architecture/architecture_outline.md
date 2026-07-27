@@ -61,10 +61,14 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
   `MassCondensation` runnable and Warp lazily resolves and dispatches to
   `condensation_step_gpu`. Neither path transfers, allocates, restores,
   synchronizes, retries, falls back, or recovers after native dispatch; native
-  exceptions and post-launch limits remain authoritative. The isothermal
-  boundary rejects semantic latent heat; Warp also rejects P2 latent-heat and
-  energy-transfer sidecars. All carriers and adapters remain direct-module-only
-  and Warp is imported only for Warp P2 validation or after P3 Warp preflight.
+  exceptions and post-launch limits remain authoritative. CPU dispatch remains
+  isothermal. Warp profile preflight occurs before lazy kernel resolution and
+  forwards caller-owned `latent_heat`, `energy_transfer`, and deferred
+  `thermal_work` sidecars by identity; the direct kernel owns thermal validation
+  and execution. Warp does not transfer, allocate, synchronize, restore,
+  reconstruct results, fall back, or recover after native dispatch. All carriers
+  and adapters remain direct-module-only and Warp is imported only for Warp P2
+  validation or after P3 Warp preflight.
 - `tests/` - Test coverage
 
 ## Particle Package

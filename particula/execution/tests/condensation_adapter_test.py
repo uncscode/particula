@@ -34,6 +34,7 @@ from particula.execution.adapters.condensation import (
     CPUCondensationState,
     WarpCondensationExecutionAdapter,
     WarpCondensationExecutionState,
+    WarpCondensationState,
     _memory_range,
     _overlaps,
     _validate_array,
@@ -41,13 +42,19 @@ from particula.execution.adapters.condensation import (
 )
 
 
-def _configuration() -> CondensationConfiguration:
+def _configuration(
+    *,
+    latent_heat: bool = False,
+    execution_mode: CondensationExecutionMode = CondensationExecutionMode.EQUAL_STEP,
+    activity_mode: CondensationActivityMode = CondensationActivityMode.IDEAL,
+    surface_mode: CondensationSurfaceMode = CondensationSurfaceMode.STATIC,
+) -> CondensationConfiguration:
     """Create valid semantic configuration metadata."""
     return CondensationConfiguration(
-        CondensationExecutionMode.EQUAL_STEP,
-        False,
-        CondensationActivityMode.IDEAL,
-        CondensationSurfaceMode.STATIC,
+        execution_mode,
+        latent_heat,
+        activity_mode,
+        surface_mode,
     )
 
 
@@ -301,6 +308,97 @@ def _primary_warp_resources(
         environment.pressure,
         environment.saturation_ratio,
     )
+
+
+def _thermodynamics_config_for_warp_state(gas: Any, wp: Any) -> Any:
+    """Create a valid constant-mode thermodynamics sidecar for one species."""
+    from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
+
+    return ThermodynamicsConfig(
+        modes=wp.zeros(1, dtype=wp.int32, device="cpu"),
+        parameters=wp.array(
+            [[800.0, 0.0, 0.0, 0.0]], dtype=wp.float64, device="cpu"
+        ),
+        molar_mass_reference=wp.array(
+            gas.molar_mass.numpy(), dtype=wp.float64, device="cpu"
+        ),
+    )
+
+
+def _real_warp_condensation_state(
+    *,
+    latent_heat: Any | None = None,
+    energy_transfer: Any | None = None,
+    thermal_work: Any | None = None,
+) -> tuple[Any, Any, Any, Any]:
+    """Build a production-converted two-particle, two-species Warp state."""
+    wp = pytest.importorskip("warp")
+    from particula.gas import EnvironmentData
+    from particula.gas.gas_data import GasData
+    from particula.gpu.conversion import (
+        to_warp_environment_data,
+        to_warp_gas_data,
+        to_warp_particle_data,
+    )
+    from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
+    from particula.particles.particle_data import ParticleData
+
+    cpu_particles = ParticleData(
+        masses=np.array([[[1.0e-18, 2.0e-18], [2.0e-18, 1.0e-18]]]),
+        concentration=np.array([[1.0e6, 2.0e6]]),
+        charge=np.zeros((1, 2)),
+        density=np.array([1000.0, 1200.0]),
+        volume=np.array([1.0e-6]),
+    )
+    cpu_gas = GasData(
+        name=["species_0", "species_1"],
+        molar_mass=np.array([0.018, 0.098]),
+        concentration=np.array([[1.0e-6, 5.0e-7]]),
+        partitioning=np.array([True, True]),
+    )
+    cpu_environment = EnvironmentData(
+        temperature=np.array([298.15]),
+        pressure=np.array([101325.0]),
+        saturation_ratio=np.ones((1, 2)),
+    )
+    particles = to_warp_particle_data(cpu_particles, device="cpu")
+    gas = to_warp_gas_data(
+        cpu_gas,
+        device="cpu",
+        vapor_pressure=np.zeros((1, 2)),
+    )
+    environment = to_warp_environment_data(cpu_environment, device="cpu")
+    thermodynamics = ThermodynamicsConfig(
+        modes=wp.zeros(2, dtype=wp.int32, device="cpu"),
+        parameters=wp.array(
+            [[10.0, 0.0, 0.0, 0.0], [10.0, 0.0, 0.0, 0.0]],
+            dtype=wp.float64,
+            device="cpu",
+        ),
+        molar_mass_reference=wp.array(
+            cpu_gas.molar_mass,
+            dtype=wp.float64,
+            device="cpu",
+        ),
+    )
+    mass_transfer = wp.zeros((1, 2, 2), dtype=wp.float64, device="cpu")
+    state = WarpCondensationExecutionState(
+        WarpCondensationState(
+            CondensationExecutionConfig(
+                _configuration(latent_heat=latent_heat is not None)
+            ),
+            particles,
+            gas,
+            environment,
+            thermodynamics,
+            mass_transfer=mass_transfer,
+            latent_heat=latent_heat,
+            energy_transfer=energy_transfer,
+            thermal_work=thermal_work,
+        ),
+        0.1,
+    )
+    return state, mass_transfer, particles, gas
 
 
 @pytest.mark.warp
@@ -971,17 +1069,21 @@ def test_warp_execution_adapter_lazily_dispatches_native_tuple_by_identity(
     import particula.execution.adapters.condensation as condensation
 
     particles, gas, environment = _warp_state_inputs()
-    transfer = pytest.importorskip("warp").zeros(
-        (1, 2, 1), dtype=pytest.importorskip("warp").float64, device="cpu"
-    )
+    wp = pytest.importorskip("warp")
+    transfer = wp.zeros((1, 2, 1), dtype=wp.float64, device="cpu")
+    latent_heat = wp.ones(1, dtype=wp.float64, device="cpu")
+    energy_transfer = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    thermal_work = wp.ones(1, dtype=wp.float64, device="cpu")
     p2_state = condensation.WarpCondensationState(
-        CondensationExecutionConfig(_configuration()),
+        CondensationExecutionConfig(_configuration(latent_heat=True)),
         particles,
         gas,
         environment,
         object(),
         mass_transfer=transfer,
-        thermal_work=object(),
+        latent_heat=latent_heat,
+        energy_transfer=energy_transfer,
+        thermal_work=thermal_work,
     )
     state = WarpCondensationExecutionState(p2_state, 1.0)
     expected = (particles, transfer)
@@ -995,7 +1097,6 @@ def test_warp_execution_adapter_lazily_dispatches_native_tuple_by_identity(
     monkeypatch.setattr(
         condensation, "_get_condensation_step_gpu", lambda: kernel
     )
-    wp = pytest.importorskip("warp")
     from particula.gpu import conversion
 
     def fail_boundary_work(*args: object, **kwargs: object) -> None:
@@ -1024,8 +1125,8 @@ def test_warp_execution_adapter_lazily_dispatches_native_tuple_by_identity(
     assert calls[0][1]["activity_surface"] is p2_state.activity_surface
     assert calls[0][1]["scratch_buffers"] is p2_state.scratch_buffers
     assert calls[0][1]["thermal_work"] is p2_state.thermal_work
-    assert calls[0][1]["latent_heat"] is None
-    assert calls[0][1]["energy_transfer"] is None
+    assert calls[0][1]["latent_heat"] is latent_heat
+    assert calls[0][1]["energy_transfer"] is energy_transfer
     assert result.state is state
     assert result.backend_result is not None
     assert result.backend_result.value is expected
@@ -1060,57 +1161,249 @@ def test_warp_execution_state_is_frozen_identity_carrier() -> None:
 
 
 @pytest.mark.warp
-@pytest.mark.parametrize(
-    ("sidecar_name", "message"),
-    [
-        (
-            "latent_heat",
-            "isothermal condensation execution requires latent_heat=None.",
-        ),
-        (
-            "energy_transfer",
-            "isothermal condensation execution requires energy_transfer=None.",
-        ),
-    ],
-)
-def test_warp_execution_rejects_thermal_sidecars_before_kernel_resolution(
-    sidecar_name: str,
-    message: str,
+def test_warp_execution_propagates_energy_without_latent_native_error(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test isothermal rejection leaves the direct-kernel seam untouched."""
+    """Test direct energy dependency errors bypass adapter thermal checks."""
     import particula.execution.adapters.condensation as condensation
 
     particles, gas, environment = _warp_state_inputs()
-    if sidecar_name == "energy_transfer":
-        wp = pytest.importorskip("warp")
-        sidecar = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
-    else:
-        sidecar = object()
-    kwargs = {sidecar_name: sidecar}
+    wp = pytest.importorskip("warp")
+    energy_transfer = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
     p2_state = condensation.WarpCondensationState(
-        CondensationExecutionConfig(_configuration()),
+        CondensationExecutionConfig(_configuration(latent_heat=True)),
         particles,
         gas,
         environment,
         object(),
-        **kwargs,
+        energy_transfer=energy_transfer,
     )
     state = WarpCondensationExecutionState(p2_state, 1.0)
-    resources = (*_primary_warp_resources(particles, gas, environment),)
-    if sidecar_name == "energy_transfer":
-        resources += (sidecar,)
-    snapshot = _snapshot_warp_resources(*resources)
+    error = ValueError("energy_transfer requires latent_heat")
+    calls = 0
+
+    def kernel(*args: object, **kwargs: object) -> object:
+        """Record direct dispatch before raising its prepared error."""
+        nonlocal calls
+        del args
+        calls += 1
+        assert kwargs["latent_heat"] is None
+        assert kwargs["energy_transfer"] is energy_transfer
+        raise error
+
     monkeypatch.setattr(
         condensation,
         "_get_condensation_step_gpu",
-        lambda: pytest.fail("preflight must not resolve the kernel"),
+        lambda: kernel,
     )
 
-    with pytest.raises(ValueError, match=f"^{message}$"):
+    with pytest.raises(ValueError) as caught:
         WarpCondensationExecutionAdapter().execute(state)
 
+    assert caught.value is error
+    assert calls == 1
+
+
+@pytest.mark.warp
+def test_warp_execution_propagates_invalid_thermal_work_native_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test deferred-work validation remains a direct-kernel responsibility."""
+    import particula.execution.adapters.condensation as condensation
+
+    particles, gas, environment = _warp_state_inputs()
+    invalid_thermal_work = object()
+    p2_state = condensation.WarpCondensationState(
+        CondensationExecutionConfig(_configuration(latent_heat=True)),
+        particles,
+        gas,
+        environment,
+        object(),
+        latent_heat=object(),
+        thermal_work=invalid_thermal_work,
+    )
+    error = ValueError("thermal_work must have shape (1,)")
+    calls = 0
+
+    def kernel(*args: object, **kwargs: object) -> object:
+        """Record the direct validation seam before raising its error."""
+        nonlocal calls
+        del args
+        calls += 1
+        assert kwargs["thermal_work"] is invalid_thermal_work
+        raise error
+
+    monkeypatch.setattr(
+        condensation, "_get_condensation_step_gpu", lambda: kernel
+    )
+    with pytest.raises(ValueError) as caught:
+        WarpCondensationExecutionAdapter().execute(
+            WarpCondensationExecutionState(p2_state, 1.0)
+        )
+
+    assert caught.value is error
+    assert calls == 1
+
+
+@pytest.mark.warp
+def test_warp_execution_reaches_direct_energy_dependency_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test missing latent heat reaches the real direct-kernel validator."""
+    import particula.execution.adapters.condensation as condensation
+    from particula.gpu.kernels import condensation_step_gpu
+
+    wp = pytest.importorskip("warp")
+    particles, gas, environment = _warp_state_inputs()
+    energy_transfer = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    p2_state = condensation.WarpCondensationState(
+        CondensationExecutionConfig(_configuration(latent_heat=True)),
+        particles,
+        gas,
+        environment,
+        _thermodynamics_config_for_warp_state(gas, wp),
+        energy_transfer=energy_transfer,
+    )
+    resources = (
+        *_primary_warp_resources(particles, gas, environment),
+        energy_transfer,
+    )
+    snapshot = _snapshot_warp_resources(*resources)
+    resolutions = 0
+
+    def resolve() -> Any:
+        """Count resolution while preserving the real direct entry point."""
+        nonlocal resolutions
+        resolutions += 1
+        return condensation_step_gpu
+
+    monkeypatch.setattr(condensation, "_get_condensation_step_gpu", resolve)
+    with pytest.raises(
+        ValueError, match="^energy_transfer requires latent_heat$"
+    ):
+        WarpCondensationExecutionAdapter().execute(
+            WarpCondensationExecutionState(p2_state, 1.0)
+        )
+
+    assert resolutions == 1
     _assert_warp_resources_unchanged(snapshot, *resources)
+
+
+@pytest.mark.warp
+def test_warp_execution_reaches_direct_deferred_work_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test malformed deferred work reaches the real direct-kernel validator."""
+    import particula.execution.adapters.condensation as condensation
+    from particula.gpu.kernels import condensation_step_gpu
+
+    wp = pytest.importorskip("warp")
+    particles, gas, environment = _warp_state_inputs()
+    latent_heat = wp.ones(1, dtype=wp.float64, device="cpu")
+    energy_transfer = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    thermal_work = wp.ones(2, dtype=wp.float64, device="cpu")
+    p2_state = condensation.WarpCondensationState(
+        CondensationExecutionConfig(_configuration(latent_heat=True)),
+        particles,
+        gas,
+        environment,
+        _thermodynamics_config_for_warp_state(gas, wp),
+        latent_heat=latent_heat,
+        energy_transfer=energy_transfer,
+        thermal_work=thermal_work,
+    )
+    resources = (
+        *_primary_warp_resources(particles, gas, environment),
+        latent_heat,
+        energy_transfer,
+        thermal_work,
+    )
+    snapshot = _snapshot_warp_resources(*resources)
+    resolutions = 0
+
+    def resolve() -> Any:
+        """Count resolution while preserving the real direct entry point."""
+        nonlocal resolutions
+        resolutions += 1
+        return condensation_step_gpu
+
+    monkeypatch.setattr(condensation, "_get_condensation_step_gpu", resolve)
+    with pytest.raises(ValueError, match="thermal_work"):
+        WarpCondensationExecutionAdapter().execute(
+            WarpCondensationExecutionState(p2_state, 1.0)
+        )
+
+    assert resolutions == 1
+    _assert_warp_resources_unchanged(snapshot, *resources)
+
+
+@pytest.mark.warp
+def test_warp_execution_omitted_and_zero_latent_heat_are_isothermal() -> None:
+    """Test omitted and all-zero latent heat retain the isothermal result."""
+    wp = pytest.importorskip("warp")
+    omitted_state, omitted_transfer, omitted_particles, omitted_gas = (
+        _real_warp_condensation_state()
+    )
+    zero_heat = wp.zeros(2, dtype=wp.float64, device="cpu")
+    zero_state, zero_transfer, zero_particles, zero_gas = (
+        _real_warp_condensation_state(latent_heat=zero_heat)
+    )
+
+    WarpCondensationExecutionAdapter().execute(omitted_state)
+    WarpCondensationExecutionAdapter().execute(zero_state)
+    wp.synchronize()
+
+    np.testing.assert_allclose(
+        zero_particles.masses.numpy(),
+        omitted_particles.masses.numpy(),
+        rtol=1.0e-12,
+        atol=0.0,
+    )
+    np.testing.assert_allclose(
+        zero_gas.concentration.numpy(),
+        omitted_gas.concentration.numpy(),
+        rtol=1.0e-12,
+        atol=0.0,
+    )
+    np.testing.assert_allclose(
+        zero_transfer.numpy(),
+        omitted_transfer.numpy(),
+        rtol=1.0e-12,
+        atol=0.0,
+    )
+
+
+@pytest.mark.warp
+def test_warp_execution_records_energy_without_mutating_thermal_work() -> None:
+    """Test native energy accounting retains caller-owned deferred work."""
+    wp = pytest.importorskip("warp")
+    latent_heat = wp.array([2.0e5, 3.0e5], dtype=wp.float64, device="cpu")
+    energy_transfer = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    thermal_work = wp.array([7.0, 11.0], dtype=wp.float64, device="cpu")
+    initial_thermal_work = np.array(thermal_work.numpy(), copy=True)
+    state, mass_transfer, particles, _ = _real_warp_condensation_state(
+        latent_heat=latent_heat,
+        energy_transfer=energy_transfer,
+        thermal_work=thermal_work,
+    )
+
+    result = WarpCondensationExecutionAdapter().execute(state)
+    wp.synchronize()
+
+    assert result.backend_result is not None
+    native_value = cast(tuple[Any, Any], result.backend_result.value)
+    assert len(native_value) == 2
+    assert native_value[0] is particles
+    assert native_value[1] is mass_transfer
+    assert energy_transfer is state.state.energy_transfer
+    assert thermal_work is state.state.thermal_work
+    np.testing.assert_array_equal(thermal_work.numpy(), initial_thermal_work)
+    np.testing.assert_allclose(
+        energy_transfer.numpy(),
+        np.sum(mass_transfer.numpy(), axis=1) * latent_heat.numpy()[None, :],
+        rtol=1.0e-12,
+        atol=1.0e-30,
+    )
 
 
 @pytest.mark.warp
@@ -1235,27 +1528,98 @@ def test_warp_execution_rejects_unselected_state_and_profile_before_kernel(
     ):
         WarpCondensationExecutionAdapter().execute(state)
 
-    latent_heat = CondensationConfiguration(
-        CondensationExecutionMode.EQUAL_STEP,
-        True,
-        CondensationActivityMode.IDEAL,
-        CondensationSurfaceMode.STATIC,
-    )
-    semantic_state = WarpCondensationExecutionState(
+    assert resolutions == 0
+    _assert_warp_resources_unchanged(snapshot, *resources)
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("execution_mode", "activity_mode", "surface_mode", "latent_enabled"),
+    (
+        (
+            CondensationExecutionMode.STAGGERED,
+            CondensationActivityMode.IDEAL,
+            CondensationSurfaceMode.STATIC,
+            True,
+        ),
+        (
+            CondensationExecutionMode.EQUAL_STEP,
+            CondensationActivityMode.NONREPRESENTABLE,
+            CondensationSurfaceMode.STATIC,
+            False,
+        ),
+        (
+            CondensationExecutionMode.EQUAL_STEP,
+            CondensationActivityMode.IDEAL,
+            CondensationSurfaceMode.NONREPRESENTABLE,
+            False,
+        ),
+        (
+            CondensationExecutionMode.EQUAL_STEP,
+            CondensationActivityMode.NONREPRESENTABLE,
+            CondensationSurfaceMode.NONREPRESENTABLE,
+            False,
+        ),
+    ),
+)
+def test_warp_execution_rejects_unsupported_profiles_before_resolution(
+    execution_mode: CondensationExecutionMode,
+    activity_mode: CondensationActivityMode,
+    surface_mode: CondensationSurfaceMode,
+    latent_enabled: bool,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test unsupported semantic profiles preserve all caller resources."""
+    import particula.execution.adapters.condensation as condensation
+
+    wp = pytest.importorskip("warp")
+    particles, gas, environment = _warp_state_inputs()
+    mass_transfer = wp.zeros((1, 2, 1), dtype=wp.float64, device="cpu")
+    energy_transfer = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    latent_heat = wp.ones(1, dtype=wp.float64, device="cpu")
+    thermal_work = wp.ones(1, dtype=wp.float64, device="cpu")
+    state = WarpCondensationExecutionState(
         condensation.WarpCondensationState(
-            CondensationExecutionConfig(latent_heat),
+            CondensationExecutionConfig(
+                _configuration(
+                    latent_heat=latent_enabled,
+                    execution_mode=execution_mode,
+                    activity_mode=activity_mode,
+                    surface_mode=surface_mode,
+                )
+            ),
             particles,
             gas,
             environment,
             object(),
+            mass_transfer=mass_transfer,
+            latent_heat=latent_heat,
+            energy_transfer=energy_transfer,
+            thermal_work=thermal_work,
         ),
         1.0,
     )
+    resources = (
+        *_primary_warp_resources(particles, gas, environment),
+        mass_transfer,
+        energy_transfer,
+        latent_heat,
+        thermal_work,
+    )
+    snapshot = _snapshot_warp_resources(*resources)
+    resolutions = 0
+
+    def resolve() -> object:
+        """Record an unexpected direct-kernel resolution."""
+        nonlocal resolutions
+        resolutions += 1
+        raise AssertionError("unsupported profiles must not resolve kernels")
+
+    monkeypatch.setattr(condensation, "_get_condensation_step_gpu", resolve)
     with pytest.raises(
-        ValueError,
-        match="^isothermal condensation execution requires latent_heat=False.$",
+        ValueError, match="^Unsupported capability declaration:"
     ):
-        WarpCondensationExecutionAdapter().execute(semantic_state)
+        WarpCondensationExecutionAdapter().execute(state)
 
     assert resolutions == 0
     _assert_warp_resources_unchanged(snapshot, *resources)

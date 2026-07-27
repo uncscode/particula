@@ -740,12 +740,13 @@ class CPUCondensationExecutionAdapter:
 
 
 class WarpCondensationExecutionAdapter:
-    """Dispatch one selected isothermal Warp request to its direct kernel.
+    """Dispatch one selected Warp request to its direct kernel.
 
     Preflight completes before the optional kernel import. The adapter makes one
-    native call without conversion, restoration, synchronization, fallback, or
-    exception recovery. Kernel failures, including post-launch mutation limits,
-    remain the direct kernel's responsibility.
+    native call without conversion, allocation, restoration, synchronization,
+    fallback, or exception recovery. Profile preflight completes before lazy
+    resolution. The direct kernel owns thermal-sidecar validation, execution,
+    and post-launch mutation limits.
 
     This concrete-only adapter is imported from
     ``particula.execution.adapters.condensation``. It forwards the exact
@@ -764,8 +765,8 @@ class WarpCondensationExecutionAdapter:
 
         Raises:
             TypeError: If ``state`` or its time step has an invalid type.
-            ValueError: If controls or the selected profile are invalid, or
-                thermal state violates the isothermal boundary.
+            ValueError: If controls or the selected profile are invalid. Direct
+                thermal-sidecar validation errors propagate unchanged.
             ImportError: If the optional Warp kernel cannot be imported after
                 successful preflight.
         """
@@ -775,16 +776,6 @@ class WarpCondensationExecutionAdapter:
         p2_state = state.state
         configuration = p2_state.config.configuration
         require_condensation_profile(Backend.WARP, configuration)
-        _require_isothermal(configuration)
-        if p2_state.latent_heat is not None:
-            raise ValueError(
-                "isothermal condensation execution requires latent_heat=None."
-            )
-        if p2_state.energy_transfer is not None:
-            raise ValueError(
-                "isothermal condensation execution requires "
-                "energy_transfer=None."
-            )
         condensation_step_gpu = _get_condensation_step_gpu()
         value = condensation_step_gpu(
             p2_state.particles,
@@ -797,8 +788,8 @@ class WarpCondensationExecutionAdapter:
             thermodynamics=p2_state.thermodynamics,
             activity_surface=p2_state.activity_surface,
             scratch_buffers=p2_state.scratch_buffers,
-            latent_heat=None,
-            energy_transfer=None,
+            latent_heat=p2_state.latent_heat,
+            energy_transfer=p2_state.energy_transfer,
             thermal_work=p2_state.thermal_work,
         )
         return ExecutionResult(
