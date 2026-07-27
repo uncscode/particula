@@ -671,9 +671,9 @@ def test_condensation_helpers_validate_in_deterministic_order() -> None:
     with pytest.raises(
         TypeError, match="^configuration must be a CondensationConfiguration.$"
     ):
-        condensation_profile_supports(  # type: ignore[arg-type]
+        condensation_profile_supports(
             Backend.WARP,
-            malformed,
+            cast(CondensationConfiguration, malformed),
         )
     with pytest.raises(
         ValueError, match="^Unsupported capability declaration: "
@@ -1323,7 +1323,7 @@ def test_execution_adapter_accepts_narrow_execute_signature_statically() -> (
             """Declare the P3-specific execution contract."""
             raise RuntimeError(state)
 
-    adapter: ExecutionAdapter = NarrowAdapter()
+    adapter: ExecutionAdapter = cast(ExecutionAdapter, NarrowAdapter())
 
     assert_type(adapter, ExecutionAdapter)
 
