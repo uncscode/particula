@@ -762,7 +762,7 @@ class CondensationStrategy(ABC):
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
     @abstractmethod
-    def step(
+    def step(  # noqa: C901
         self,
         particle: ParticleRepresentation | ParticleData,
         gas_species: GasSpecies | GasData,
@@ -1019,7 +1019,7 @@ class CondensationIsothermal(CondensationStrategy):
 
     # pylint: disable=too-many-positional-arguments, too-many-arguments
     @overload  # type: ignore[override]
-    def step(
+    def step(  # noqa: C901
         self,
         particle: ParticleRepresentation,
         gas_species: GasSpecies,
@@ -1030,7 +1030,7 @@ class CondensationIsothermal(CondensationStrategy):
     ) -> Tuple[ParticleRepresentation, GasSpecies]: ...
 
     @overload
-    def step(
+    def step(  # noqa: C901
         self,
         particle: ParticleData,
         gas_species: GasData,
@@ -1040,7 +1040,7 @@ class CondensationIsothermal(CondensationStrategy):
         dynamic_viscosity: Optional[float] = None,
     ) -> Tuple[ParticleData, GasData]: ...
 
-    def step(
+    def step(  # noqa: C901
         self,
         particle: ParticleRepresentation | ParticleData,
         gas_species: GasSpecies | GasData,
@@ -1080,6 +1080,14 @@ class CondensationIsothermal(CondensationStrategy):
         _require_matching_types(particle_is_legacy, gas_is_legacy)
         _require_single_box(particle_data.n_boxes, "ParticleData")
         _require_single_box(gas_data.n_boxes, "GasData")
+
+        if time_step == 0.0:
+            if particle_is_legacy:
+                return cast(
+                    Tuple[ParticleRepresentation, GasSpecies],
+                    (particle, gas_species),
+                )
+            return cast(Tuple[ParticleData, GasData], (particle_data, gas_data))
 
         mass_rate = self.mass_transfer_rate(
             particle=particle,
@@ -2447,7 +2455,7 @@ class CondensationLatentHeat(CondensationStrategy):
         dynamic_viscosity: Optional[float] = None,
     ) -> Tuple[ParticleData, GasData]: ...
 
-    def step(
+    def step(  # noqa: C901
         self,
         particle: ParticleRepresentation | ParticleData,
         gas_species: GasSpecies | GasData,

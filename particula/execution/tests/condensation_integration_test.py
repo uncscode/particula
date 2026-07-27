@@ -178,12 +178,20 @@ def _cases() -> tuple[_WarpCase, ...]:
             "uptake",
             gas=np.array([[1.0e-6]]),
             vapor_pressure=np.zeros((1, 1)),
+            mass_rtol=1.0e-10,
+            mass_atol=1.0e-30,
+            gas_rtol=1.0e-10,
+            gas_atol=1.0e-30,
             **common,
         ),
         _WarpCase(
             "evaporation",
             gas=np.array([[1.0e-12]]),
             vapor_pressure=np.full((1, 1), 1.0),
+            mass_rtol=1.0e-10,
+            mass_atol=1.0e-30,
+            gas_rtol=1.0e-10,
+            gas_atol=1.0e-30,
             **common,
         ),
         _WarpCase(
@@ -195,12 +203,20 @@ def _cases() -> tuple[_WarpCase, ...]:
             concentration=base_number,
             temperature=np.array([298.15]),
             pressure=np.array([101325.0]),
+            mass_rtol=1.0e-10,
+            mass_atol=1.0e-30,
+            gas_rtol=1.0e-10,
+            gas_atol=1.0e-30,
             conserved=False,
         ),
         _WarpCase(
             "zero_gas",
             gas=np.zeros((1, 1)),
             vapor_pressure=np.zeros((1, 1)),
+            mass_rtol=1.0e-10,
+            mass_atol=1.0e-30,
+            gas_rtol=1.0e-10,
+            gas_atol=1.0e-30,
             **common,
         ),
         _WarpCase(
@@ -212,6 +228,10 @@ def _cases() -> tuple[_WarpCase, ...]:
             partitioning=np.array([[True]]),
             temperature=np.array([298.15]),
             pressure=np.array([101325.0]),
+            mass_rtol=1.0e-10,
+            mass_atol=1.0e-30,
+            gas_rtol=1.0e-10,
+            gas_atol=1.0e-30,
         ),
         _WarpCase(
             "two_box",
@@ -222,12 +242,20 @@ def _cases() -> tuple[_WarpCase, ...]:
             temperature=np.array([290.0, 310.0]),
             pressure=np.array([100000.0, 90000.0]),
             vapor_pressure=np.zeros((2, 1)),
+            mass_rtol=1.0e-10,
+            mass_atol=1.0e-30,
+            gas_rtol=1.0e-10,
+            gas_atol=1.0e-30,
         ),
         _WarpCase(
             "latent_heat",
             gas=np.array([[1.0e-6]]),
             vapor_pressure=np.zeros((1, 1)),
             latent_heat=True,
+            mass_rtol=1.0e-10,
+            mass_atol=1.0e-30,
+            gas_rtol=1.0e-10,
+            gas_atol=1.0e-30,
             **common,
         ),
     )
@@ -339,6 +367,47 @@ def _inventory(
 ) -> np.ndarray:
     """Return per-box, per-species concentration-weighted inventory."""
     return np.sum(masses * concentration[..., None], axis=1) + gas
+
+
+def _case_message(
+    case: _WarpCase, device: str, field: str, box: int, species: int
+) -> str:
+    """Build a failure message with case, device, field, box, and species."""
+    return (
+        f"case={case.name}, device={device}, field={field}, "
+        f"box={box}, species={species}"
+    )
+
+
+def _assert_mass_and_gas(
+    case: _WarpCase,
+    device: str,
+    masses: np.ndarray,
+    gas: np.ndarray,
+    expected_mass: np.ndarray,
+    expected_gas: np.ndarray,
+) -> None:
+    """Assert case-specific particle mass and gas concentration slices."""
+    for box in range(masses.shape[0]):
+        for species in range(masses.shape[2]):
+            npt.assert_allclose(
+                masses[box, :, species],
+                expected_mass[box, :, species],
+                rtol=case.mass_rtol,
+                atol=case.mass_atol,
+                err_msg=_case_message(
+                    case, device, "particle mass", box, species
+                ),
+            )
+            npt.assert_allclose(
+                gas[box, species],
+                expected_gas[box, species],
+                rtol=case.gas_rtol,
+                atol=case.gas_atol,
+                err_msg=_case_message(
+                    case, device, "gas concentration", box, species
+                ),
+            )
 
 
 def _p2_oracle(case: _WarpCase) -> tuple[np.ndarray, np.ndarray]:
@@ -513,10 +582,6 @@ def test_cpu_adapter_executes_native_cases_and_conserves_inventory(
         assert np.all(final_gas > initial_gas)
 
 
-@pytest.mark.xfail(
-    reason="Legacy CondensationIsothermal rejects zero duration before no-op.",
-    raises=ValueError,
-)
 def test_cpu_adapter_zero_time_is_an_exact_noop() -> None:
     """Native CPU zero duration leaves the supplied aerosol exactly unchanged."""
     state = _build_legacy_cpu_state("uptake", time_step=0.0)
@@ -558,20 +623,7 @@ def test_warp_adapter_matches_independent_p2_oracle_and_conserves_inventory(
     assert result.backend_result is not None
     backend_value = cast(tuple[Any, ...], result.backend_result.value)
     assert backend_value[0] is resources["particles"]
-    npt.assert_allclose(
-        masses,
-        expected_mass,
-        rtol=case.mass_rtol,
-        atol=case.mass_atol,
-        err_msg=f"case={case.name}, device=cpu, field=particle mass",
-    )
-    npt.assert_allclose(
-        gas,
-        expected_gas,
-        rtol=case.gas_rtol,
-        atol=case.gas_atol,
-        err_msg=f"case={case.name}, device=cpu, field=gas concentration",
-    )
+    _assert_mass_and_gas(case, "cpu", masses, gas, expected_mass, expected_gas)
     if case.conserved:
         _assert_inventory(resources, masses, gas)
     if case.name == "disabled":
@@ -595,6 +647,10 @@ def test_warp_adapter_zero_time_is_an_exact_noop() -> None:
     pytest.importorskip("warp").synchronize()
     after = _snapshot(resources)
     assert result.state is state
+    assert result.backend_result is not None
+    backend_value = cast(tuple[Any, ...], result.backend_result.value)
+    assert backend_value[0] is resources["particles"]
+    assert backend_value[1] is resources["transfer"]
     for expected, actual in zip(before, after, strict=True):
         npt.assert_array_equal(actual, expected)
 
@@ -693,18 +749,5 @@ def test_warp_adapter_cuda_smoke_preserves_p2_inventory(
     WarpCondensationExecutionAdapter().execute(resources["state"])
     wp.synchronize()
     masses, gas, _, _ = _snapshot(resources)
-    npt.assert_allclose(
-        masses,
-        expected_mass,
-        rtol=case.mass_rtol,
-        atol=case.mass_atol,
-        err_msg=f"case={case.name}, device=cuda, field=particle mass",
-    )
-    npt.assert_allclose(
-        gas,
-        expected_gas,
-        rtol=case.gas_rtol,
-        atol=case.gas_atol,
-        err_msg=f"case={case.name}, device=cuda, field=gas concentration",
-    )
+    _assert_mass_and_gas(case, "cuda", masses, gas, expected_mass, expected_gas)
     _assert_inventory(resources, masses, gas)
