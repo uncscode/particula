@@ -6,8 +6,8 @@
 - [ ] Define typed immutable backend, process, device, and capability values.
 - [ ] Implement `CapabilityMatrix.supports()` for pure support queries and
   `CapabilityMatrix.require()` for deterministic preflight validation.
-- [ ] Define execution-state/adapter protocols and `ExecutionResult` with
-  explicit state identity and mutation metadata. (P3)
+- [x] Define execution-state/adapter protocols and `ExecutionResult` with
+  explicit state identity and mutation metadata. (P3, #1464)
 - [x] Define frozen `ExecutionRequest` and implement `ExecutionContext`
   construction and exact adapter resolution from an explicit request; reject
   missing registrations and capability mismatches. (P2, #1463)
@@ -41,8 +41,10 @@
   optional-dependency behavior in a fresh subprocess.
 - [x] Use fake adapters to assert selection identity, zero execute calls, and
   no fallback or transfer behavior. (P2, #1463)
-- [ ] Use fake runnables/adapters to assert execution arguments, mutation
-  declarations, and error propagation. (P3/P4)
+- [x] Use fake adapters to assert P3 structural behavior, opaque identity,
+  mutation declarations, rejection non-mutation, and no execution. (P3, #1464)
+- [ ] Use fake runnables/adapters to assert P4 execution arguments and error
+  propagation. (P4)
 - [ ] Run focused tests with `-Werror`, then repository Ruff and mypy checks;
   maintain at least 80% changed-module coverage without lowering thresholds.
 - [ ] Run `mkdocs build --strict` and relevant docs contract tests in P6.

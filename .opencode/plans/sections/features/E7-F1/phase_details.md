@@ -31,13 +31,18 @@ documentation phase. Unit tests are co-located with every production phase.
     matrix-before-single-lookup ordering, registry non-mutation and locality,
     exact identity selection, no execution/fallback, and guarded no-Warp import.
 
-- [ ] **E7-F1-P3:** Specify state ownership mutation and result contracts with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F1-P3:** Specify state ownership mutation and result contracts with unit tests
+  - Issue: #1464 | Size: S | Status: Completed
   - Goal: Define typed execution state/result protocols that preserve caller
     ownership and state identity while making backend-specific payloads explicit.
   - Files: `particula/execution.py`, `particula/tests/execution_test.py`
-  - Tests: Runtime protocol checks, identity preservation, immutable metadata,
-    explicit mutation flags, and malformed result rejection.
+  - Delivered: runtime structural `ExecutionState`/`ExecutionAdapter` protocols,
+    closed mutation declaration values, opaque `BackendResult`, frozen
+    `ExecutionResult`, and a nonexecuting identity-preserving validator in
+    `particula/execution.py`.
+  - Tests: protocol structure, exact immutable layouts, opaque identity,
+    accepted/rejected mutation declarations, validation rejection/non-mutation,
+    and P2 separation without adapter invocation.
 
 - [ ] **E7-F1-P4:** Implement the CPU reference execution adapter with unit tests
   - Issue: TBD | Size: S | Status: Not Started

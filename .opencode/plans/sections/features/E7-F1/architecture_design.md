@@ -54,21 +54,33 @@ or duplicate registrations do not replace entries. CPU accepts only the
 canonical `Device(Backend.CPU, "cpu")`; a Warp device's native value is passed
 unchanged to matrix validation. No adapter call, fallback, retry, transfer,
 optional-backend import, availability probe, state/result contract, or package
-export is part of this phase.
+ export is part of this phase.
+
+## P3 Implementation Record
+
+Issue #1464 adds contracts only, beside the P2 selection seam. Runtime-checkable
+`ExecutionState` requires only an opaque readable `backend_payload`, while
+`ExecutionAdapter` documents the future execute seam without changing P2's
+callable-only registration rule. `MutationDeclaration` accepts exactly one of
+the closed `NONE` or `STATE` scopes. Frozen `ExecutionResult` retains its state,
+ordered immutable metadata, declaration, and optional opaque `BackendResult`.
+`validate_execution_result()` validates the original structural state, exact
+result layout, retained state identity, metadata, declaration, and wrapper type
+in order, returning the same result object. It neither invokes adapters nor
+inspects opaque fields, imports a backend, transfers data, or adds fallback.
 
 ## Data / API / Workflow Changes
 
-- **Data model:** Add immutable typed declarations for backend, device request,
-  process identity, capability set, execution request, and execution result.
-  Define protocols for execution state and adapters. Do not modify CPU or Warp
-  container schemas.
+- **Data model:** Immutable typed declarations now cover backend, device request,
+  process identity, capability set, execution request, and internal P3 result
+  contracts. P3 protocols preserve opaque state ownership and explicit mutation
+  permission without modifying CPU or Warp container schemas.
 - **Capability matrix:** Key support by backend, process, and constraints;
   expose deterministic `supports()` and validating `require()` behavior.
   Declarations describe support but do not load kernels or probe by execution.
-- **API surface:** Add `particula.execution` and deliberately re-export only the
-  user-facing request/context/types from `particula`. Keep concrete adapters and
-  registries module-local unless downstream extension requires a documented
-  protocol.
+- **API surface:** P3 is confined to `particula.execution`; it adds no top-level
+  export. Concrete adapters and registries remain module-local, and publication
+  remains a later deliberate phase.
 - **CPU adapter:** Accept CPU state carrying an `Aerosol`, delegate exact
   `time_step`/`sub_steps` to `RunnableABC.execute()`, retain the returned object,
   and report in-place mutation semantics. It does no conversion or fallback.

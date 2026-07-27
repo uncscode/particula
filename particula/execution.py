@@ -369,7 +369,7 @@ class ExecutionState(Protocol):
     """Describe retained caller-owned state with an opaque backend payload.
 
     The payload is not inspected by this module. Boundary validation requires
-    the same state object supplied by the caller.
+    the same state object supplied by the caller and retains it by identity.
     """
 
     @property
@@ -438,7 +438,7 @@ class MutationDeclaration:
 
 @dataclass(frozen=True)
 class BackendResult:
-    """Retain opaque backend result values without inspection.
+    """Retain opaque backend result values by identity without inspection.
 
     Args:
         value: Opaque backend-owned result value.
@@ -453,9 +453,12 @@ class BackendResult:
 class ExecutionResult:
     """Declare immutable P3 result ownership and mutation metadata.
 
+    ``validate_execution_result`` verifies this carrier at the execution
+    boundary, including that ``state`` is the original caller-owned object.
+
     Args:
-        state: Original caller-owned execution state.
-        metadata: Ordered immutable key-value result metadata.
+        state: Execution state expected to be the original caller-owned object.
+        metadata: Ordered immutable key-value result metadata for validation.
         mutation: Explicit permission for in-place state mutation.
         backend_result: Optional opaque backend result retained by identity.
     """
@@ -525,7 +528,7 @@ def validate_execution_result(
     Raises:
         TypeError: If state, result layout, metadata, or declarations are
             invalid.
-        ValueError: If state was replaced or metadata keys are duplicated.
+        ValueError: If state was replaced or metadata is otherwise invalid.
     """
     _validate_execution_state(original_state, "original_state")
     if not isinstance(result, ExecutionResult):

@@ -19,9 +19,13 @@ thresholds must never be lowered; changed execution modules must retain at least
   CPU normalization, opaque Warp preservation, matrix-before-single-lookup
   ordering, identity selection, context-local registration non-mutation, and
   no adapter execution, retry, fallback, transfer, or optional dependency.
-- **P3 — state/result contract:** Test runtime protocols, caller-owned state
-  identity, immutable metadata, explicit mutation declaration, malformed state
-  and result rejection, and backend-specific payload opacity.
+- **P3 — state/result contract (completed, #1464):**
+  `particula/tests/execution_test.py` tests structural runtime protocols,
+  exact closed/frozen value layouts, caller-state/result identity, ordered
+  immutable metadata, mutation-declaration boundaries, opaque backend-result
+  identity, and stable rejection/non-mutation semantics. It also proves P2
+  registration/resolution stays callable-only and does not execute or validate
+  P3 adapter results.
 - **P4 — CPU adapter:** Use representative fake and concrete runnables to assert
   exact `time_step`/`sub_steps`, in-place behavior, returned `Aerosol` handling,
   exception propagation, and zero calls to conversion helpers.

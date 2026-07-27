@@ -27,3 +27,10 @@ No user-facing documentation was updated: `ExecutionContext` registration is
 private and P2 has no executable adapter or stable public export. The structured
 plan now records the selection-only boundary; publish user imports and examples
 only after the later public-export and execution-contract phases.
+
+## P3 Record (issue #1464)
+
+No user-facing documentation was updated. P3 contracts are internal to
+`particula.execution`, have no public export, and deliberately provide no
+executable adapter path. Publication and examples remain deferred to the later
+export/documentation phases.

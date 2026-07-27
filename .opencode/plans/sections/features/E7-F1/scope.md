@@ -43,7 +43,22 @@ strategies, builders, or the existing `Aerosol`-typed runnable hierarchy.
   device resolution.
 - `particula/tests/execution_test.py` verifies validation order, private
   registry non-mutation and context locality, identity selection, no execution
-  or fallback, and guarded dependency-neutral import behavior.
+   or fallback, and guarded dependency-neutral import behavior.
+
+## Delivered in P3 (issue #1464)
+
+- `particula/execution.py` now contains dependency-neutral internal P3
+  contracts: runtime structural `ExecutionState` and `ExecutionAdapter`
+  protocols, closed `MutationScope`/`MutationDeclaration` values, opaque
+  `BackendResult`, immutable `ExecutionResult`, and
+  `validate_execution_result()`.
+- The validator preserves the supplied caller state and valid result by
+  identity; it validates result layout, ordered immutable metadata, explicit
+  mutation permission, and backend-result wrapper type without executing an
+  adapter or inspecting opaque payloads/results.
+- `particula/tests/execution_test.py` covers structural protocols, exact frozen
+  layouts, accepted/rejected mutation declarations, identity and opacity,
+  rejection non-mutation, and P2 selection separation.
 
 ## Out of Scope
 
@@ -56,3 +71,5 @@ strategies, builders, or the existing `Aerosol`-typed runnable hierarchy.
   regressions (E7-F7 through E7-F9).
 - Kernel-physics changes, GPU staggered condensation, dynamic resizing,
   multi-GPU/distributed execution, graph capture, optimization, or autodiff.
+- Public exports and user-facing documentation for the P3 contracts; P3 remains
+  internal until a later deliberate publication phase.

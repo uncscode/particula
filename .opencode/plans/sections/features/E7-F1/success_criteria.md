@@ -28,12 +28,24 @@
 - [x] P2 tests prove no adapter execution, retry, fallback, transfer, optional
   backend probing, or optional backend import.
 
+## Delivered P3 criteria (issue #1464)
+
+- [x] Internal runtime structural state/adapter protocols, closed mutation
+  declarations, opaque backend results, and frozen execution results are
+  defined in dependency-neutral `particula.execution`.
+- [x] Validation retains original caller state and valid result objects by
+  identity, preserves ordered immutable metadata and opaque values, and never
+  executes adapters or inspects opaque payloads.
+- [x] Tests lock exact enum/result layouts, frozen carriers, stable malformed
+  rejection/non-mutation behavior, and separation from P2 selection.
+- [x] P3 adds neither public exports nor user-facing documentation.
+
 - [ ] Backend selection is located in a documented, typed, separate execution
   context rather than embedded in strategies, builders, or `RunnableABC`.
 - [ ] The capability matrix deterministically accepts every declared supported
   combination and rejects every unsupported combination before mutation.
 - [ ] Backend, device, state ownership, mutation, identity, and return behavior
-  are represented in types and documented for downstream adapters.
+  are published and documented for downstream adapters.
 - [ ] The CPU adapter preserves existing process physics, delegates exact time
   and substep inputs, and retains current `Aerosol` return semantics.
 - [ ] No selection or failure path performs hidden CPU/Warp transfer, catches a
