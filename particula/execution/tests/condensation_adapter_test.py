@@ -1,5 +1,6 @@
 """Tests for concrete, non-executing condensation state carriers."""
 
+import builtins
 import os
 import subprocess
 import sys
@@ -263,6 +264,45 @@ def _warp_state_inputs() -> tuple[Any, Any, Any]:
     return particles, gas, environment
 
 
+def _snapshot_warp_resources(*resources: Any) -> list[tuple[int, np.ndarray]]:
+    """Snapshot caller-owned Warp arrays while retaining their identities."""
+    return [
+        (id(resource), np.array(resource.numpy(), copy=True))
+        for resource in resources
+    ]
+
+
+def _assert_warp_resources_unchanged(
+    snapshot: list[tuple[int, np.ndarray]], *resources: Any
+) -> None:
+    """Assert caller-owned Warp arrays retain identity and values."""
+    assert [id(resource) for resource in resources] == [
+        identity for identity, _ in snapshot
+    ]
+    for (_, expected), resource in zip(snapshot, resources, strict=True):
+        np.testing.assert_array_equal(resource.numpy(), expected)
+
+
+def _primary_warp_resources(
+    particles: Any, gas: Any, environment: Any
+) -> tuple[Any, ...]:
+    """Return all mutable primary arrays from a P2 Warp state."""
+    return (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        gas.molar_mass,
+        gas.concentration,
+        gas.vapor_pressure,
+        gas.partitioning,
+        environment.temperature,
+        environment.pressure,
+        environment.saturation_ratio,
+    )
+
+
 @pytest.mark.warp
 def test_warp_state_retains_primary_and_opaque_resources_by_identity() -> None:
     """Test valid Warp metadata construction has no ownership conversion."""
@@ -361,6 +401,69 @@ def test_warp_state_validates_config_and_primary_types_before_metadata() -> (
     with pytest.raises(
         TypeError, match="^particles must be a WarpParticleData.$"
     ):
+        WarpCondensationState(
+            CondensationExecutionConfig(_configuration()),
+            object(),
+            object(),
+            object(),
+            object(),
+        )
+
+
+@pytest.mark.warp
+def test_warp_state_rejects_missing_mass_metadata_before_shape_access() -> None:
+    """Test malformed mass metadata reports the documented preflight error."""
+    from particula.execution.adapters.condensation import WarpCondensationState
+    from particula.gpu.warp_types import WarpParticleData
+
+    _, gas, environment = _warp_state_inputs()
+    with pytest.raises(
+        ValueError, match="^particles.masses must be a Warp array.$"
+    ):
+        WarpCondensationState(
+            CondensationExecutionConfig(_configuration()),
+            WarpParticleData(),
+            gas,
+            environment,
+            object(),
+        )
+
+
+def test_warp_state_reports_only_missing_top_level_warp_as_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test internal Warp-type import failures propagate without relabeling."""
+    from particula.execution.adapters.condensation import WarpCondensationState
+
+    original_import = cast(Any, builtins.__import__)
+
+    def missing_warp(name: str, *args: object, **kwargs: object) -> object:
+        """Simulate an absent optional top-level Warp package."""
+        if name == "warp":
+            raise ModuleNotFoundError("No module named 'warp'", name="warp")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", missing_warp)
+    with pytest.raises(
+        RuntimeError,
+        match="^WarpCondensationState requires the optional Warp runtime.$",
+    ):
+        WarpCondensationState(
+            CondensationExecutionConfig(_configuration()),
+            object(),
+            object(),
+            object(),
+            object(),
+        )
+
+    def broken_warp_types(name: str, *args: object, **kwargs: object) -> object:
+        """Simulate a dependency failure internal to the Warp type module."""
+        if name == "particula.gpu.warp_types":
+            raise ImportError("broken Warp type dependency")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", broken_warp_types)
+    with pytest.raises(ImportError, match="^broken Warp type dependency$"):
         WarpCondensationState(
             CondensationExecutionConfig(_configuration()),
             object(),
@@ -892,6 +995,25 @@ def test_warp_execution_adapter_lazily_dispatches_native_tuple_by_identity(
     monkeypatch.setattr(
         condensation, "_get_condensation_step_gpu", lambda: kernel
     )
+    wp = pytest.importorskip("warp")
+    from particula.gpu import conversion
+
+    def fail_boundary_work(*args: object, **kwargs: object) -> None:
+        """Fail if dispatch crosses the explicit caller-owned boundary."""
+        del args, kwargs
+        raise AssertionError("Warp dispatch must not transfer or synchronize.")
+
+    monkeypatch.setattr(wp, "synchronize", fail_boundary_work)
+    monkeypatch.setattr(wp, "copy", fail_boundary_work)
+    for name in (
+        "to_warp_particle_data",
+        "to_warp_gas_data",
+        "to_warp_environment_data",
+        "from_warp_particle_data",
+        "from_warp_gas_data",
+        "from_warp_environment_data",
+    ):
+        monkeypatch.setattr(conversion, name, fail_boundary_work)
     result = WarpCondensationExecutionAdapter().execute(state)
 
     assert len(calls) == 1
@@ -975,6 +1097,10 @@ def test_warp_execution_rejects_thermal_sidecars_before_kernel_resolution(
         **kwargs,
     )
     state = WarpCondensationExecutionState(p2_state, 1.0)
+    resources = (*_primary_warp_resources(particles, gas, environment),)
+    if sidecar_name == "energy_transfer":
+        resources += (sidecar,)
+    snapshot = _snapshot_warp_resources(*resources)
     monkeypatch.setattr(
         condensation,
         "_get_condensation_step_gpu",
@@ -983,6 +1109,8 @@ def test_warp_execution_rejects_thermal_sidecars_before_kernel_resolution(
 
     with pytest.raises(ValueError, match=f"^{message}$"):
         WarpCondensationExecutionAdapter().execute(state)
+
+    _assert_warp_resources_unchanged(snapshot, *resources)
 
 
 @pytest.mark.warp
@@ -1041,6 +1169,8 @@ def test_warp_execution_rejects_invalid_controls_before_kernel_resolution(
         environment,
         object(),
     )
+    resources = _primary_warp_resources(particles, gas, environment)
+    snapshot = _snapshot_warp_resources(*resources)
     resolutions = 0
 
     def resolve() -> object:
@@ -1057,6 +1187,7 @@ def test_warp_execution_rejects_invalid_controls_before_kernel_resolution(
         )
 
     assert resolutions == 0
+    _assert_warp_resources_unchanged(snapshot, *resources)
 
 
 @pytest.mark.warp
@@ -1081,6 +1212,8 @@ def test_warp_execution_rejects_unselected_state_and_profile_before_kernel(
         WarpCondensationExecutionAdapter().execute(cast(Any, object()))
 
     particles, gas, environment = _warp_state_inputs()
+    resources = _primary_warp_resources(particles, gas, environment)
+    snapshot = _snapshot_warp_resources(*resources)
     unsupported = CondensationConfiguration(
         CondensationExecutionMode.EQUAL_STEP,
         False,
@@ -1125,6 +1258,7 @@ def test_warp_execution_rejects_unselected_state_and_profile_before_kernel(
         WarpCondensationExecutionAdapter().execute(semantic_state)
 
     assert resolutions == 0
+    _assert_warp_resources_unchanged(snapshot, *resources)
 
 
 @pytest.mark.warp

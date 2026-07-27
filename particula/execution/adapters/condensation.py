@@ -115,7 +115,7 @@ def _validate_array(
     name: str,
     array: Any,
     dtype: Any,
-    shape: tuple[int, ...],
+    shape: tuple[int, ...] | None,
     device: Any | None = None,
 ) -> None:
     """Validate Warp-array metadata without device operations.
@@ -124,7 +124,7 @@ def _validate_array(
         name: Qualified field name used in validation errors.
         array: Candidate Warp array whose metadata is read.
         dtype: Required Warp dtype.
-        shape: Required array shape.
+        shape: Required array shape, or ``None`` to validate only metadata.
         device: Required device, or ``None`` when no device comparison applies.
 
     Raises:
@@ -136,6 +136,10 @@ def _validate_array(
         raise ValueError(f"{name} must be a Warp array.")
     if array.dtype != dtype:
         raise ValueError(f"{name} must use dtype {dtype}.")
+    if not isinstance(array.shape, tuple):
+        raise ValueError(f"{name} must be a Warp array.")
+    if shape is None:
+        return
     if tuple(array.shape) != shape:
         raise ValueError(f"{name} must have shape {shape}.")
     if device is not None and str(array.device) != str(device):
@@ -347,16 +351,17 @@ class WarpCondensationState:
 
         try:
             import warp as wp
-
-            from particula.gpu.warp_types import (
-                WarpEnvironmentData,
-                WarpGasData,
-                WarpParticleData,
-            )
-        except ImportError as error:
+        except ModuleNotFoundError as error:
+            if error.name != "warp":
+                raise
             raise RuntimeError(
                 "WarpCondensationState requires the optional Warp runtime."
             ) from error
+        from particula.gpu.warp_types import (
+            WarpEnvironmentData,
+            WarpGasData,
+            WarpParticleData,
+        )
 
         # ``@wp.struct`` exposes a Warp ``Struct`` descriptor.  Its callable
         # creates a generated instance subclass, so validate against the
@@ -371,7 +376,32 @@ class WarpCondensationState:
         if not isinstance(self.environment, environment_type):
             raise TypeError("environment must be a WarpEnvironmentData.")
 
-        masses = self.particles.masses
+        masses = self._validate_primary_arrays(wp)
+        boxes, particles, species = masses.shape
+        device = masses.device
+        if self.thermodynamics is None:
+            raise ValueError("thermodynamics must not be None.")
+        self._validate_optional_outputs(wp, boxes, particles, species, device)
+
+    def _validate_primary_arrays(self, wp: Any) -> Any:
+        """Validate all primary Warp arrays and return the mass storage.
+
+        Args:
+            wp: Imported Warp module used for dtype metadata.
+
+        Returns:
+            The validated ``particles.masses`` array.
+
+        Raises:
+            ValueError: If a required primary array is missing or malformed.
+        """
+        particles = cast(Any, self.particles)
+        gas = cast(Any, self.gas)
+        environment = cast(Any, self.environment)
+        if not hasattr(particles, "masses"):
+            raise ValueError("particles.masses must be a Warp array.")
+        masses = particles.masses
+        _validate_array("particles.masses", masses, wp.float64, None)
         _validate_array(
             "particles.masses",
             masses,
@@ -380,93 +410,113 @@ class WarpCondensationState:
         )
         if len(masses.shape) != 3:
             raise ValueError("particles.masses must have shape (B, N, S).")
-        boxes, particles, species = masses.shape
+        boxes, particle_count, species = masses.shape
         device = masses.device
         _validate_array(
             "particles.concentration",
-            self.particles.concentration,
+            particles.concentration,
             wp.float64,
-            (boxes, particles),
+            (boxes, particle_count),
             device,
         )
         _validate_array(
             "particles.charge",
-            self.particles.charge,
+            particles.charge,
             wp.float64,
-            (boxes, particles),
+            (boxes, particle_count),
             device,
         )
         _validate_array(
             "particles.density",
-            self.particles.density,
+            particles.density,
             wp.float64,
             (species,),
             device,
         )
         _validate_array(
             "particles.volume",
-            self.particles.volume,
+            particles.volume,
             wp.float64,
             (boxes,),
             device,
         )
         _validate_array(
             "gas.molar_mass",
-            self.gas.molar_mass,
+            gas.molar_mass,
             wp.float64,
             (species,),
             device,
         )
         _validate_array(
             "gas.concentration",
-            self.gas.concentration,
+            gas.concentration,
             wp.float64,
             (boxes, species),
             device,
         )
         _validate_array(
             "gas.vapor_pressure",
-            self.gas.vapor_pressure,
+            gas.vapor_pressure,
             wp.float64,
             (boxes, species),
             device,
         )
         _validate_array(
             "gas.partitioning",
-            self.gas.partitioning,
+            gas.partitioning,
             wp.int32,
             (boxes, species),
             device,
         )
         _validate_array(
             "environment.temperature",
-            self.environment.temperature,
+            environment.temperature,
             wp.float64,
             (boxes,),
             device,
         )
         _validate_array(
             "environment.pressure",
-            self.environment.pressure,
+            environment.pressure,
             wp.float64,
             (boxes,),
             device,
         )
         _validate_array(
             "environment.saturation_ratio",
-            self.environment.saturation_ratio,
+            environment.saturation_ratio,
             wp.float64,
             (boxes, species),
             device,
         )
-        if self.thermodynamics is None:
-            raise ValueError("thermodynamics must not be None.")
+        return masses
+
+    def _validate_optional_outputs(
+        self,
+        wp: Any,
+        boxes: int,
+        particle_count: int,
+        species: int,
+        device: Any,
+    ) -> None:
+        """Validate optional outputs and ownership against primary state.
+
+        Args:
+            wp: Imported Warp module used for dtype metadata.
+            boxes: Number of validated boxes in the primary state.
+            particles: Number of validated particles in the primary state.
+            species: Number of validated species in the primary state.
+            device: Device metadata from the validated mass storage.
+        """
+        particles = cast(Any, self.particles)
+        gas = cast(Any, self.gas)
+        environment = cast(Any, self.environment)
         if self.mass_transfer is not None:
             _validate_array(
                 "mass_transfer",
                 self.mass_transfer,
                 wp.float64,
-                (boxes, particles, species),
+                (boxes, particle_count, species),
                 device,
             )
         if self.energy_transfer is not None:
@@ -482,18 +532,18 @@ class WarpCondensationState:
             self.mass_transfer,
             self.energy_transfer,
             (
-                masses,
-                self.particles.concentration,
-                self.particles.charge,
-                self.particles.density,
-                self.particles.volume,
-                self.gas.molar_mass,
-                self.gas.concentration,
-                self.gas.vapor_pressure,
-                self.gas.partitioning,
-                self.environment.temperature,
-                self.environment.pressure,
-                self.environment.saturation_ratio,
+                particles.masses,
+                particles.concentration,
+                particles.charge,
+                particles.density,
+                particles.volume,
+                gas.molar_mass,
+                gas.concentration,
+                gas.vapor_pressure,
+                gas.partitioning,
+                environment.temperature,
+                environment.pressure,
+                environment.saturation_ratio,
             ),
         )
 
