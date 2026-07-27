@@ -11,8 +11,9 @@
 - [x] Define frozen `ExecutionRequest` and implement `ExecutionContext`
   construction and exact adapter resolution from an explicit request; reject
   missing registrations and capability mismatches. (P2, #1463)
-- [ ] Implement `CPUExecutionAdapter` delegation to `RunnableABC.execute()` and
-  preserve exact time-step, substep, exception, and returned-state semantics.
+- [x] Implement internal `CPUExecutionState`/`CPUExecutionAdapter` delegation
+  to `RunnableABC.execute()` and preserve exact time-step, substep, exception,
+  state, and returned-aerosol semantics. (P4, #1465)
 - [x] Keep private context-local registration constrained to typed
   process/backend keys; reject duplicate or malformed registrations before
   changing the registry. (P2, #1463)
@@ -23,7 +24,8 @@
 
 - [x] Validate backend/device compatibility before selection and define stable
   validation order in tests. (P2, #1463)
-- [ ] Validate finite nonnegative time inputs before adapter execution. (P4)
+- [x] Validate exact CPU state, finite nonnegative real time, and positive
+  integral substeps before adapter execution. (P4, #1465)
 - [ ] Make unsupported requests fail closed; do not catch execution errors to
   attempt CPU or another device.
 - [x] Prove importing and resolving a CPU selection path works when Warp is
@@ -43,8 +45,8 @@
   no fallback or transfer behavior. (P2, #1463)
 - [x] Use fake adapters to assert P3 structural behavior, opaque identity,
   mutation declarations, rejection non-mutation, and no execution. (P3, #1464)
-- [ ] Use fake runnables/adapters to assert P4 execution arguments and error
-  propagation. (P4)
-- [ ] Run focused tests with `-Werror`, then repository Ruff and mypy checks;
-  maintain at least 80% changed-module coverage without lowering thresholds.
+- [x] Use fake and concrete runnables to assert P4 positional execution
+  arguments, identity/error behavior, and no-GPU-import dispatch. (P4, #1465)
+- [x] Run P4 focused tests with `-Werror`, execution-module coverage, Ruff, and
+  mypy without lowering thresholds. (P4, #1465)
 - [ ] Run `mkdocs build --strict` and relevant docs contract tests in P6.

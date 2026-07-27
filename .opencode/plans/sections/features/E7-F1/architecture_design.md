@@ -66,8 +66,21 @@ the closed `NONE` or `STATE` scopes. Frozen `ExecutionResult` retains its state,
 ordered immutable metadata, declaration, and optional opaque `BackendResult`.
 `validate_execution_result()` validates the original structural state, exact
 result layout, retained state identity, metadata, declaration, and wrapper type
-in order, returning the same result object. It neither invokes adapters nor
-inspects opaque fields, imports a backend, transfers data, or adds fallback.
+ in order, returning the same result object. It neither invokes adapters nor
+ inspects opaque fields, imports a backend, transfers data, or adds fallback.
+
+## P4 Implementation Record
+
+Issue #1465 implements the CPU reference execution seam without changing P2
+selection. Frozen `CPUExecutionState` carries the caller-owned aerosol and
+controls through its opaque payload property. `CPUExecutionAdapter` requires
+that exact state type, validates non-boolean finite nonnegative real duration
+and positive non-boolean integral substeps, then makes one positional
+`runnable.execute(aerosol, time_step, sub_steps)` call. A successful runnable
+must return the original aerosol; the adapter retains the original state and
+that aerosol by identity in an `ExecutionResult` with `MutationScope.STATE`.
+It deliberately does not inspect runnable/aerosol types, split time, catch
+exceptions, select a backend, import GPU code, transfer, convert, or fall back.
 
 ## Data / API / Workflow Changes
 
@@ -81,9 +94,10 @@ inspects opaque fields, imports a backend, transfers data, or adds fallback.
 - **API surface:** P3 is confined to `particula.execution`; it adds no top-level
   export. Concrete adapters and registries remain module-local, and publication
   remains a later deliberate phase.
-- **CPU adapter:** Accept CPU state carrying an `Aerosol`, delegate exact
-  `time_step`/`sub_steps` to `RunnableABC.execute()`, retain the returned object,
-  and report in-place mutation semantics. It does no conversion or fallback.
+- **CPU adapter:** P4's internal `CPUExecutionState` and
+  `CPUExecutionAdapter` delegate exact state-held `time_step`/`sub_steps` to
+  one `RunnableABC.execute()` call, retain state/aerosol identity, and report
+  `MutationScope.STATE`. They do no conversion, fallback, or GPU import.
 - **Workflow hooks:** E7-F6 extends validation with availability/error policy;
   E7-F2/F3 register process adapters; E7-F4 supplies resident session state;
   E7-F5 consumes contexts in deterministic scheduling.

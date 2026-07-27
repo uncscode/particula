@@ -10,6 +10,12 @@ P3 result validation retains caller-owned state by identity, keeps backend
 payloads and results opaque, and records explicit in-place mutation permission.
 It does not import a backend, provide fallback behavior, transfer state, or
 execute adapters. P2 selection remains context-local and callable-only.
+
+The direct-module-only CPU adapter is a narrow P4 dispatch boundary. It
+preflights concrete CPU state and execution controls, delegates exactly once to
+a caller-supplied CPU runnable, and retains the original state and aerosol by
+identity. It does not select adapters, validate process physics, transfer or
+convert data, or load optional backends.
 """
 
 import inspect
@@ -589,7 +595,12 @@ def validate_execution_result(
 
 
 class _CPURunnable(Protocol):
-    """Describe the CPU runnable seam without importing runtime physics."""
+    """Describe the CPU runnable seam without importing runtime physics.
+
+    Implementations own aerosol and process validation. This structural
+    protocol permits the direct CPU boundary to retain a runnable without a
+    runtime dependency on the runnable implementation hierarchy.
+    """
 
     def execute(
         self,
@@ -597,12 +608,26 @@ class _CPURunnable(Protocol):
         time_step: float,
         sub_steps: int = 1,
     ) -> "Aerosol":
-        """Execute one CPU process over the supplied controls."""
+        """Execute one CPU process over the supplied controls.
+
+        Args:
+            aerosol: Caller-owned aerosol to mutate and return by identity.
+            time_step: Total process duration forwarded without coercion.
+            sub_steps: Positive process substep count forwarded without
+                coercion.
+
+        Returns:
+            The original aerosol object after process execution.
+        """
 
 
 @dataclass(frozen=True)
 class CPUExecutionState:
-    """Retain CPU execution inputs without validating or copying them.
+    """Retain CPU execution inputs for the direct CPU adapter.
+
+    Construction is intentionally side-effect-free: control validation occurs
+    at ``CPUExecutionAdapter.execute`` so invalid states can reach that
+    boundary. The carrier neither copies nor validates the aerosol or controls.
 
     Args:
         aerosol: Caller-owned aerosol supplied to the CPU runnable.
@@ -623,9 +648,13 @@ class CPUExecutionState:
 class CPUExecutionAdapter:
     """Dispatch one validated CPU state to one caller-supplied runnable.
 
-    This direct boundary neither selects adapters nor transfers, converts, or
-    otherwise validates process state. The stored runnable owns process and
-    aerosol validation.
+    The adapter accepts only an exact ``CPUExecutionState``, locally validates
+    finite nonnegative duration and a positive integral substep count, then
+    delegates once using those state-held objects. It requires the runnable to
+    return the original aerosol and reports ``MutationScope.STATE``. This
+    direct-module-only boundary neither selects adapters nor transfers,
+    converts, or otherwise validates process state. The stored runnable owns
+    aerosol and process-physics validation.
 
     Args:
         runnable: Runnable invoked once for every valid execution state.
@@ -635,23 +664,32 @@ class CPUExecutionAdapter:
         """Retain the runnable by identity without inspecting it.
 
         Args:
-            runnable: Runnable invoked by :meth:`execute`.
+            runnable: CPU runnable invoked once by :meth:`execute` for each
+                valid state.
         """
         self._runnable = runnable
 
     def execute(self, state: ExecutionState) -> ExecutionResult:
-        """Validate controls, execute once, and retain the original state.
+        """Dispatch one concrete CPU state and retain its identity.
+
+        This method performs local state and control preflight before one
+        positional runnable call. It does not split time steps, catch runnable
+        exceptions, inspect aerosol physics, select adapters, or use a
+        conversion or fallback path.
 
         Args:
-            state: Concrete CPU state to dispatch.
+            state: Exact ``CPUExecutionState`` containing the aerosol and
+                execution controls.
 
         Returns:
-            A state-mutation result retaining the state and returned aerosol.
+            An ``ExecutionResult`` retaining the original state and aerosol by
+            identity, with ``MutationScope.STATE`` and no metadata.
 
         Raises:
-            TypeError: If the state or time-step scalar type is invalid.
-            ValueError: If controls are invalid or the runnable replaces
-                aerosol.
+            TypeError: If state is not an exact CPU state or time_step is not a
+                non-boolean real scalar.
+            ValueError: If controls are invalid or the runnable returns a
+                different aerosol object.
         """
         if type(state) is not CPUExecutionState:
             raise TypeError("state must be a CPUExecutionState.")

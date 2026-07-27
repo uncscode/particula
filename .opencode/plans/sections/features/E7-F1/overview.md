@@ -7,7 +7,7 @@
 ## Implementation Status
 
 **E7-F1-P1 shipped for issue #1462; P2 shipped for issue #1463; P3 shipped
-for issue #1464.**
+for issue #1464; P4 shipped for issue #1465.**
 `particula.execution` now provides the dependency-neutral typed capability
 vocabulary and immutable pure lookup matrix, plus typed request validation and
 exact adapter selection in context-local private registries. P2 preserves
@@ -15,8 +15,12 @@ opaque Warp device identifiers and canonicalizes only the CPU `"cpu"` spelling.
 It deliberately does not execute adapters, probe availability, transfer data,
  retry, fall back, or publish package exports. P3 adds internal structural
  state/adapter protocols, closed mutation declarations, opaque backend results,
- immutable execution results, and a nonexecuting identity-retaining validator.
- CPU execution, public exports, and user documentation remain later phases.
+  immutable execution results, and a nonexecuting identity-retaining validator.
+  P4 adds the unexported direct CPU execution seam: a concrete state carrier
+  and single-dispatch adapter for existing CPU runnables. It performs strict
+  control preflight, preserves state/aerosol identity, and neither imports nor
+  converts to GPU state. Public exports and user documentation remain later
+  phases.
 
 ## Problem Statement
 

@@ -32,5 +32,12 @@ only after the later public-export and execution-contract phases.
 
 No user-facing documentation was updated. P3 contracts are internal to
 `particula.execution`, have no public export, and deliberately provide no
-executable adapter path. Publication and examples remain deferred to the later
-export/documentation phases.
+ executable adapter path. Publication and examples remain deferred to the later
+ export/documentation phases.
+
+## P4 Record (issue #1465)
+
+No user-facing documentation was updated. `CPUExecutionState` and
+`CPUExecutionAdapter` are unexported direct-module execution seams; they add no
+stable public import or GPU execution path. The structured plan records the
+completed CPU contract, while publication and examples remain deferred to P5/P6.

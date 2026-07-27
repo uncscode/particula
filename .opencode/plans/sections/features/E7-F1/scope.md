@@ -58,7 +58,22 @@ strategies, builders, or the existing `Aerosol`-typed runnable hierarchy.
   adapter or inspecting opaque payloads/results.
 - `particula/tests/execution_test.py` covers structural protocols, exact frozen
   layouts, accepted/rejected mutation declarations, identity and opacity,
-  rejection non-mutation, and P2 selection separation.
+   rejection non-mutation, and P2 selection separation.
+
+## Delivered in P4 (issue #1465)
+
+- `particula/execution.py` now provides frozen `CPUExecutionState` and an
+  unexported direct `CPUExecutionAdapter` over an existing CPU runnable.
+- The adapter exact-type validates state, finite nonnegative real `time_step`,
+  and positive integral `sub_steps` before exactly one positional runnable
+  call. It preserves the exact state and aerosol identities in an
+  `ExecutionResult` declared with `MutationScope.STATE`, and rejects a
+  replacement aerosol after dispatch.
+- This seam performs no GPU import, conversion, fallback, backend selection, or
+  process/substep reinterpretation; runnable exceptions propagate unchanged.
+- `particula/tests/execution_test.py` covers fake and concrete runnable
+  dispatch, identity/error boundaries, NumPy scalar forwarding, and guarded
+  fresh-process absence of GPU imports.
 
 ## Out of Scope
 
@@ -71,5 +86,5 @@ strategies, builders, or the existing `Aerosol`-typed runnable hierarchy.
   regressions (E7-F7 through E7-F9).
 - Kernel-physics changes, GPU staggered condensation, dynamic resizing,
   multi-GPU/distributed execution, graph capture, optimization, or autodiff.
-- Public exports and user-facing documentation for the P3 contracts; P3 remains
-  internal until a later deliberate publication phase.
+- Public exports and user-facing documentation for the P3/P4 contracts; they
+  remain internal until a later deliberate publication phase.

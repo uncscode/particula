@@ -40,14 +40,28 @@
   rejection/non-mutation behavior, and separation from P2 selection.
 - [x] P3 adds neither public exports nor user-facing documentation.
 
+## Delivered P4 criteria (issue #1465)
+
+- [x] Internal `CPUExecutionState` satisfies the P3 state seam through its
+  opaque payload, and `CPUExecutionAdapter` satisfies the P3 adapter seam.
+- [x] The adapter exact-type validates state and validates finite nonnegative
+  real time plus positive integral substeps before exactly one positional
+  runnable dispatch, without coercing caller scalar objects.
+- [x] Success retains the original state and aerosol by identity in an empty
+  metadata `ExecutionResult` declared with `MutationScope.STATE`; replacement
+  aerosols fail after their sole call and runnable exceptions propagate.
+- [x] Focused fake, concrete-runnable, and fresh-process tests prove no GPU
+  import/conversion/fallback/selection, while focused tests, coverage, Ruff,
+  formatting, and mypy pass.
+
 - [ ] Backend selection is located in a documented, typed, separate execution
   context rather than embedded in strategies, builders, or `RunnableABC`.
 - [ ] The capability matrix deterministically accepts every declared supported
   combination and rejects every unsupported combination before mutation.
 - [ ] Backend, device, state ownership, mutation, identity, and return behavior
   are published and documented for downstream adapters.
-- [ ] The CPU adapter preserves existing process physics, delegates exact time
-  and substep inputs, and retains current `Aerosol` return semantics.
+- [x] The internal CPU adapter preserves existing process physics, delegates
+  exact time and substep inputs, and retains current `Aerosol` return semantics.
 - [ ] No selection or failure path performs hidden CPU/Warp transfer, catches a
   runtime error to retry another backend, or requires Warp for CPU-only import.
 - [ ] Public exports are deliberate and contract-tested; direct kernels and

@@ -44,13 +44,21 @@ documentation phase. Unit tests are co-located with every production phase.
     accepted/rejected mutation declarations, validation rejection/non-mutation,
     and P2 separation without adapter invocation.
 
-- [ ] **E7-F1-P4:** Implement the CPU reference execution adapter with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F1-P4:** Implement the CPU reference execution adapter with unit tests
+  - Issue: #1465 | Size: S | Status: Shipped
   - Goal: Adapt existing `RunnableABC.execute()` without changing its process
     physics, substep behavior, `Aerosol` mutation, or return identity.
   - Files: `particula/execution.py`, `particula/tests/execution_test.py`
-  - Tests: Delegation arguments, return/identity semantics, error propagation,
-    no transfer calls, and representative runnable regression.
+  - Delivered: frozen `CPUExecutionState` and unexported
+    `CPUExecutionAdapter` in `particula/execution.py`. The adapter exact-type
+    validates state and finite nonnegative real time/positive integral substeps,
+    makes one positional runnable call, retains state/aerosol identity in a
+    `MutationScope.STATE` result, and rejects a replacement aerosol after that
+    call.
+  - Tests: exact delegation and identity, constructor non-inspection, concrete
+    dilution regression, invalid-control zero-call preflight, NumPy scalar
+    forwarding, exception/replacement propagation, zero-time dispatch, and
+    fresh-process guarded absence of GPU imports.
 
 - [ ] **E7-F1-P5:** Publish deliberate API exports and contract regression tests
   - Issue: TBD | Size: S | Status: Not Started

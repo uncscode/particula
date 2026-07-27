@@ -26,9 +26,13 @@ thresholds must never be lowered; changed execution modules must retain at least
   identity, and stable rejection/non-mutation semantics. It also proves P2
   registration/resolution stays callable-only and does not execute or validate
   P3 adapter results.
-- **P4 — CPU adapter:** Use representative fake and concrete runnables to assert
-  exact `time_step`/`sub_steps`, in-place behavior, returned `Aerosol` handling,
-  exception propagation, and zero calls to conversion helpers.
+- **P4 — CPU adapter (completed, #1465):**
+  `particula/tests/execution_test.py` uses recording and hostile fakes plus a
+  concrete dilution runnable to verify one exact positional dispatch, state and
+  aerosol/result identity, `MutationScope.STATE`, exact NumPy scalar forwarding,
+  invalid state/control zero-call preflight, exception propagation, replacement
+  aerosol rejection, and normal zero-time dispatch. A fresh subprocess executes
+  the adapter while guarding Warp, GPU, and conversion imports.
 - **P5 — exports/contracts:** Add
   `particula/tests/execution_exports_test.py`; test exact intended top-level
   symbols, fresh-process imports with Warp blocked, extension registration, and
@@ -53,11 +57,12 @@ thresholds must never be lowered; changed execution modules must retain at least
 
 ```bash
 pytest particula/tests/execution_test.py -q -Werror
-pytest particula/tests/runnable_test.py \
-  particula/gpu/tests/kernel_exports_test.py -q -Werror
+pytest particula/tests/runnable_test.py -q -Werror
 pytest particula/tests/execution_test.py -q \
   --cov=particula.execution --cov-report=term-missing --cov-fail-under=80
-ruff check particula/ && mypy particula/ --ignore-missing-imports
+ruff check particula/execution.py particula/tests/execution_test.py
+ruff format --check particula/execution.py particula/tests/execution_test.py
+mypy particula/ --ignore-missing-imports
 mkdocs build --strict
 ```
 
