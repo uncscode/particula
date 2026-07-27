@@ -755,26 +755,6 @@ class CPUExecutionAdapter:
         )
 
 
-@runtime_checkable
-class _ExecutionAdapter(Protocol):
-    """Describe the minimal private adapter shape for selection only.
-
-    P2 validates this shape but does not call it, probe optional dependencies,
-    or transfer data.
-    """
-
-    def execute(self, *args: object, **kwargs: object) -> object:
-        """Declare a future execution seam without invoking it.
-
-        Args:
-            *args: Positional arguments for a future execution contract.
-            **kwargs: Keyword arguments for a future execution contract.
-
-        Returns:
-            A future execution result whose contract is not defined by P2.
-        """
-
-
 class _AdapterRegistry:
     """Keep exact context-local adapter registrations without execution.
 
