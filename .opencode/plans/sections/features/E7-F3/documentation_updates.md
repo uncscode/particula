@@ -22,8 +22,10 @@ deferrals, links, and forced-no-Warp example path. Focused validation passed:
 pytest particula/tests/backend_selected_coagulation_docs_test.py -q -Werror
 pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror
 pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror
+mkdocs build --strict
 ```
 
 E7-F4 resident sessions, E7-F5 scheduling, E7-F8 checkpoint/restart stream
 policy, public exports, fallback, and changes to the multi-mechanism direct
-kernel remain deferred.
+kernel remain deferred. This is completed P6 publication evidence only; it
+does not mark overall E7-F3 shipped.

@@ -77,10 +77,14 @@
     import path, thermo forms, ownership, persistent RNG lifecycle, capability
     exclusions, and E7-F4/E7-F5/E7-F8 deferrals. The focused explicit-transfer
     example now dispatches through the selected Warp adapter.
+  - Publication scope: This records completed P6 documentation and validation
+    evidence only. It does not mark overall E7-F3 shipped or ship deferred
+    E7-F4 resident sessions, E7-F5 scheduling, or E7-F8 checkpoint/restart.
   - Files: `docs/Features/coagulation_strategy_system.md`,
     `docs/Examples/gpu_coagulation_direct.py`,
     `particula/tests/backend_selected_coagulation_docs_test.py`, and E7-F3
     planning records
   - Tests: `pytest particula/tests/backend_selected_coagulation_docs_test.py -q -Werror`;
     `pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror`;
-    `pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror`
+    `pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror`;
+    `mkdocs build --strict`

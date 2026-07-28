@@ -29,7 +29,7 @@ class ExampleRun:
 
     Attributes:
         output: Deterministic, human-readable execution metadata.
-        particle_data: CPU checkpoint restored after both direct calls.
+        particle_data: CPU checkpoint restored after both selected dispatches.
         collision_pairs: Caller-owned collision-pair sidecar.
         n_collisions: Caller-owned per-box collision-count sidecar.
         rng_states: Caller-owned persistent RNG sidecar.
