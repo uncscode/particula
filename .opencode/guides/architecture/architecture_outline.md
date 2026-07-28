@@ -69,6 +69,15 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
   reconstruct results, fall back, or recover after native dispatch. All carriers
   and adapters remain direct-module-only and Warp is imported only for Warp P2
   validation or after P3 Warp preflight.
+- `adapters/coagulation.py` - Concrete-only P2 Brownian coagulation resource
+  carriers for CPU and resident-Warp resources. Construction retains
+  caller-owned state and persistent RNG intent by identity while applying only
+  selection-owned kind/form and metadata-detectable ownership checks. It does
+  not dispatch a kernel or runnable; select a backend; import a GPU kernel;
+  transfer, synchronize, or allocate; or seed, reset, or advance RNG state.
+  Native physical/schema validation and all future execution remain at the
+  direct-kernel boundary. These carriers are absent from `particula.execution`,
+  the adapters package, and top-level exports.
 - `tests/` - Test coverage
 
 ## Particle Package

@@ -19,6 +19,12 @@ synchronization, reseeding, or fallback. This gives E7-F5 a schedulable
 coagulation node and gives E7-F8 a precise RNG seam for stream and restart
 semantics.
 
+E7-F3-P2 now establishes the concrete, non-dispatching carrier seam at
+`particula.execution.adapters.coagulation`: frozen CPU and resident-Warp
+Brownian request/result views retain caller resources by identity and record
+RNG seed/reset intent only. Dispatch, kernel validation, mutation, and backend
+selection remain later phases.
+
 ## User Stories
 
 - As a simulation user, I want to request Brownian coagulation by backend so

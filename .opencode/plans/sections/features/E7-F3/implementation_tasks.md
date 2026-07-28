@@ -2,15 +2,16 @@
 
 ## Backend
 
-- [ ] Create `particula/execution/adapters/coagulation.py`; defer Warp imports
-  until Warp adapter resolution so neutral execution imports remain CPU-safe.
+- [x] Create `particula/execution/adapters/coagulation.py`; CPU carrier imports
+  remain Warp-free and resident-Warp carrier resolution imports Warp lazily.
 - [ ] Add Brownian coagulation capability declarations to the E7-F1 matrix,
   gated by E7-F6 backend/device availability and error policy.
-- [ ] Define `BrownianCoagulationConfig` plus typed CPU and resident Warp state
-  views in `particula/execution/adapters/coagulation.py` without changing
-  `Aerosol`, `ParticleData`, or `WarpParticleData` schemas.
-- [ ] Define collision-output ownership and a persistent RNG resource contract
-  with seed-once, reuse, and explicit-reset operations.
+- [x] Define `BrownianCoagulationConfig` plus frozen typed CPU and resident-Warp
+  request/result views in `particula/execution/adapters/coagulation.py` without
+  changing `Aerosol`, `ParticleData`, or `WarpParticleData` schemas.
+- [x] Define collision-output ownership and caller-owned persistent RNG
+  seed/reuse/reset intent with identity and metadata-detectable alias checks;
+  P2 does not execute seed, reuse, or reset operations.
 - [ ] Implement the CPU adapter by delegating exact `time_step`/`sub_steps` to
   `particula.dynamics.Coagulation.execute()`.
 - [ ] Implement the Warp adapter by delegating Brownian particle-resolved work
@@ -27,10 +28,10 @@
 
 ## Tooling / Tests
 
-- [ ] Add `particula/execution/tests/coagulation_adapter_test.py` coverage for
-  capabilities, typed state, dispatch, validation ordering, identities, and
-  failure propagation; reserve cross-backend fixtures for
-  `particula/execution/tests/coagulation_integration_test.py`.
+- [x] Add `particula/execution/tests/coagulation_adapter_test.py` focused
+  carrier coverage for typed state, import boundaries, validation ordering,
+  identity, ownership/alias rejection, and write-free construction; reserve
+  dispatch and cross-backend fixtures for later phases.
 - [ ] Add repeated-call tests proving RNG progression without reseeding and
   explicit reset reproducibility from the same seed.
 - [ ] Add one-box and multi-box Warp CPU invariant tests for mass/charge

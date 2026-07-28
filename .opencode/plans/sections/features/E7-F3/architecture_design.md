@@ -34,6 +34,18 @@ is never inferred from a repeated seed value. The adapter must not upload,
 restore, synchronize, allocate a hidden long-lived stream, or catch a runtime
 failure to invoke CPU.
 
+### P2 Carrier Boundary (implemented)
+
+`particula.execution.adapters.coagulation` now supplies concrete-only frozen
+CPU and resident-Warp Brownian request/result carriers. They retain resources
+by identity, use selection-owned kind and metadata-detectable alias checks, and
+leave physical schemas, direct-kernel validation, dispatch, and mutation to a
+future call boundary. `rng_states`, `rng_seed`, and `initialize_rng` record
+caller-owned persistent-RNG intent without seeding, resetting, advancing, or
+otherwise mutating the sidecar. The module imports no dispatch/kernel API,
+performs no transfer, synchronization, allocation, or backend selection, and
+does not change package exports.
+
 ## Data / API / Workflow Changes
 
 - **Data model:** Add immutable Brownian process configuration and typed CPU/Warp

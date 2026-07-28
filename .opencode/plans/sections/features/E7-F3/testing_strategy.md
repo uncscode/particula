@@ -10,9 +10,13 @@ rows skip cleanly when unavailable.
 - **P1:** Parameterize every declared CPU/Warp Brownian capability and all
   unsupported mechanisms/distributions/devices. Assert selection rejection
   precedes adapter invocation and mutation.
-- **P2:** Validate typed CPU/Warp state, collision capacity/dtype/device,
-  environment/volume modes, RNG `(n_boxes,)` `wp.uint32` ownership, identity,
-  seed-once, reuse, and explicit reset behavior.
+- **P2 (implemented):** Focused carrier tests cover frozen CPU/Warp
+  request/result identity, CPU-safe and lazy-Warp imports, ownership-form and
+  metadata-detectable alias rejection, and caller-owned RNG intent retention.
+  They verify construction is read-only and performs no kernel import,
+  dispatch, transfer, synchronization, allocation, or RNG advancement. Native
+  collision/RNG schema validation and behavioral seed/reuse/reset evidence
+  remain for the future dispatch phases.
 - **P3:** Spy on CPU `Coagulation.execute()` and Warp
   `coagulation_step_gpu()` to verify exact dispatch count/arguments, CPU
   substeps, identical returned state/buffers, no conversion, no synchronization,

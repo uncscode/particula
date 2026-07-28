@@ -1,5 +1,11 @@
 # Documentation Updates
 
+## P2 Status
+
+No user-facing documentation or exports changed in P2. The concrete carrier
+module docstrings record its ownership and non-dispatch contract; selected API
+documentation remains deferred to P6.
+
 - Add backend-selected Brownian coagulation to the E7 backend-selection feature
   guide, including CPU and Warp setup, explicit backend/device requests, and
   capability errors.

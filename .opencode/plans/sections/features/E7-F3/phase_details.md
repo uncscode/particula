@@ -8,13 +8,20 @@
     `particula/execution/tests/coagulation_adapter_test.py`
   - Tests: Capability queries, unsupported mechanisms/distributions, unavailable backend/device, no invocation on rejection
 
-- [ ] **E7-F3-P2:** Define coagulation outputs and persistent RNG ownership with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Model collision buffers, environment/volume inputs, seed-once/reset semantics, state identity, and asynchronous failure ownership.
+- [x] **E7-F3-P2:** Define coagulation resource carriers and persistent RNG ownership with unit tests
+  - Issue: #1478 | Size: S | Status: Completed 2026-07-28
+  - Delivered: Concrete-only frozen CPU and resident-Warp Brownian request/result
+    carriers in `particula/execution/adapters/coagulation.py`. They retain
+    caller resources by identity; apply kind, ownership-form, and
+    metadata-detectable alias checks; and record persistent RNG seed/reset intent
+    without mutation.
+  - Boundaries retained: No dispatch/kernel import, transfer, synchronization,
+    allocation, backend selection, physical/schema validation, or export change.
+    Native kernel validation and actual RNG progression/reset remain P3/P4 work.
   - Files: `particula/execution/adapters/coagulation.py`,
-    `particula/execution/__init__.py`,
     `particula/execution/tests/coagulation_adapter_test.py`
-  - Tests: State schemas, output capacity/dtype/device, RNG identity/reuse/reset, alias and validation failures
+  - Tests: Focused CPU/Warp carrier identity, lazy-import, ownership/alias,
+    no-mutation, and no-dispatch coverage
 
 - [ ] **E7-F3-P3:** Implement backend-selected Brownian coagulation adapter with unit tests
   - Issue: TBD | Size: S | Status: Not Started
