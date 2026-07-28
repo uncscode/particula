@@ -137,6 +137,47 @@ backend is selected.
 Selection has ended after an adapter is returned and does not catch, retry, or
 fallback from adapter failures.
 
+### Selected-condensation ownership and API boundary
+
+This is a non-runnable API and ownership reference. `particula.execution` and
+top-level `particula` export only the ten selection primitives. Selected
+condensation state carriers and adapters are intentionally concrete-only at
+`particula.execution.adapters.condensation` pending E7-F6 policy; there is no
+provisional public selected-condensation import, backend-registration recipe,
+or selected-step workflow.
+
+Selected CPU execution retains a caller-owned legacy `Aerosol` and calls a
+caller-owned `MassCondensation`. Selected Warp execution retains caller-owned
+resident `WarpParticleData`, `WarpGasData`, and `WarpEnvironmentData`, plus
+same-device fixed-shape sidecars. Its result retains selected state and native
+payload identity; it does not convert or restore either state form.
+
+Before resident Warp execution, callers explicitly use
+`to_warp_particle_data`, `to_warp_gas_data`, and `to_warp_environment_data`.
+Callers synchronize before host observation and restore only at their
+checkpoint. Normal selected Warp dispatch does no upload, restore,
+synchronization, allocation, retry, or silent CPU fallback.
+
+Successful Warp calls mutate particle masses, gas concentration, derived
+GPU-only vapor pressure, finalized total transfer, eligible scratch/work
+buffers, and optional energy output in place. `energy_transfer` is a
+caller-owned write-only output, never a third return item; `thermal_work` is
+validated deferred state.
+
+Invalid adapter state, time, or profile rejection and aggregate direct-kernel
+preflight preserve caller primary and output state before a writer launch. A
+raw-proposal failure occurs before P2 commit in its failing substep, but
+completed earlier substeps remain committed and documented vapor-pressure/work
+sidecars may already be written. Callers needing retry semantics must use their
+own snapshot/restore.
+
+The [direct-kernel quick start](../Examples/gpu_direct_kernels_quick_start.py)
+is the currently runnable explicit-transfer path. The
+[Epic G handoff](Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
+defers E7-F4/E7-F5 resident-resource lifecycle and deterministic scheduling;
+resident sessions, automatic availability selection, scheduling, and broader
+orchestration remain deferred.
+
 ### Complete direct-process illustration
 
 The [complete direct-process source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py)

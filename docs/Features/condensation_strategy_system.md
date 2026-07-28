@@ -751,6 +751,40 @@ CUDA is unavailable; a skip is not GPU execution. P3's CPU skip and narrowly
 scoped CUDA strict expected failure document the public-step host-readback
 limitation rather than a successful capture replay.
 
+## Backend-selected condensation
+
+Selected condensation is a bounded concrete adapter layer over the existing
+legacy CPU `MassCondensation` runnable and the direct
+`condensation_step_gpu` boundary. It is not new physics, a new public runnable,
+a scheduler, a resident session, or automatic backend selection. Ownership and
+selection boundaries are described in the
+[execution-selection guide](data-containers-and-gpu-foundations.md#execution-selection)
+and its [GPU thermodynamics and condensation refresh record](data-containers-and-gpu-foundations.md#gpu-thermodynamics-and-condensation-refresh).
+
+| Selection/backend case | Contract |
+| --- | --- |
+| CPU semantic catalogue | All 36 equal-step/staggered, latent, activity, and surface semantic combinations are declared, including `NONREPRESENTABLE` categories. This is catalogue support only. |
+| Selected CPU execution | The concrete adapter accepts a declared profile but is isothermal only (`latent_heat=False`) and calls the caller-owned `MassCondensation` once; equal-step or staggered semantics remain CPU-side. |
+| Selected Warp execution | Exactly 8 declared profiles: equal-step, latent heat enabled or disabled, ideal or kappa activity, and static or composition-weighted surface tension. |
+| Unavailable selected Warp mapping | Staggered/Gauss-Seidel and every `NONREPRESENTABLE`/BAT activity or surface mapping reject during capability-profile preflight before lazy kernel resolution, native dispatch, or adapter-driven writes; no conversion, approximation, or fallback occurs. |
+
+Warp delegation executes exactly four equal `time_step / 4.0` substeps. Each
+substep overwrites and refreshes temperature-driven vapor pressure, then applies
+P2 inventory-limited particle/gas coupling. It mutates particle masses, gas
+concentration, and derived GPU vapor pressure in place. The caller owns the
+finalized total-transfer output; optional scratch and work storage;
+`latent_heat`; write-only `energy_transfer`; and validated but deferred
+`thermal_work` sidecars.
+
+Bounded evidence uses an independent fixed-four-substep P2 oracle that compares
+particle mass and gas concentration separately at `rtol=1e-10, atol=1e-30`.
+Inventory is checked separately. Warp CPU is the installed-Warp baseline, and
+CUDA rows are optional guarded evidence. This does not claim general
+CPU-strategy parity, performance, adaptive stepping, graph capture/replay,
+autodiff, multi-GPU, resizing, or full scheduler support. The
+[Epic G handoff](Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
+defers E7-F4 resident-resource lifecycle and E7-F5 deterministic scheduling.
+
 ## Limitations
 
 - Staggered solver is Gauss-Seidel only; other solvers are not exposed.
