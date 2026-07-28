@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-26",
+  "last_updated": "2026-07-28",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E7-F3/architecture_design.md",
@@ -45,11 +45,11 @@
     {
       "id": "E7-F3-P2",
       "title": "Define coagulation outputs and persistent RNG ownership with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-28",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
