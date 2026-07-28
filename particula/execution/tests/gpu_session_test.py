@@ -175,7 +175,6 @@ def test_dimensions_reject_invalid_values(
         (object(), (), TypeError, "exact Device"),
         (Device(Backend.CPU, "cpu"), (), ValueError, "Backend.WARP"),
         (Device(Backend.WARP, "cpu"), [], TypeError, "exact tuple"),
-        (Device(Backend.WARP, "cpu"), ("ok", 1), TypeError, "exact str"),
     ],
 )
 def test_metadata_rejects_invalid_values(
@@ -184,6 +183,22 @@ def test_metadata_rejects_invalid_values(
     """Test metadata does not normalize invalid device or name declarations."""
     with pytest.raises(error, match=message):
         ResidentMetadata(device, names)  # type: ignore[arg-type]
+
+
+def test_metadata_preserves_valid_names_by_identity() -> None:
+    """Test metadata retains valid tuple and string names by identity."""
+    names = ("ok", "still_ok")
+
+    metadata = ResidentMetadata(Device(Backend.WARP, "cpu"), names)
+
+    assert metadata.gas_names is names
+
+
+@pytest.mark.parametrize("names", [("ok", object()), ("ok", 1)])
+def test_metadata_rejects_non_string_names(names: tuple[object, ...]) -> None:
+    """Test metadata requires exact string gas-name entries."""
+    with pytest.raises(TypeError, match="exact str instances"):
+        ResidentMetadata(Device(Backend.WARP, "cpu"), names)  # type: ignore[arg-type]
 
 
 def test_module_import_does_not_load_warp_or_gpu() -> None:
@@ -211,7 +226,10 @@ assert not any(name == 'warp' or name.startswith('particula.gpu') for name in sy
 
 
 @pytest.mark.warp
-@pytest.mark.parametrize("shape", [(1, 2, 1), (2, 1, 2), (1, 0, 0)])
+@pytest.mark.parametrize(
+    "shape",
+    [(1, 2, 1), (2, 1, 2), (1, 0, 0), (1, 0, 1), (1, 2, 0)],
+)
 def test_session_retains_valid_resources_by_identity(
     shape: tuple[int, int, int],
 ) -> None:
@@ -247,6 +265,26 @@ def test_session_retains_valid_resources_by_identity(
             particles, gas, environment, dimensions, metadata, lifecycle
         )
     assert _snapshot_resources(particles, gas, environment) == before
+
+
+@pytest.mark.warp
+def test_session_preserves_gas_name_identity() -> None:
+    """Test valid session construction preserves valid gas-name tuples."""
+    particles, gas, environment = _warp_resources(species=2)
+    names = ("species_0", "species_1")
+    metadata = ResidentMetadata(Device(Backend.WARP, "cpu"), names)
+
+    session = ResidentSession(
+        particles,
+        gas,
+        environment,
+        ResidentDimensions(1, 2, 2),
+        metadata,
+        ResidentLifecycle.ACTIVE,
+    )
+
+    assert session.metadata.gas_names is names
+    assert session.metadata.gas_names == names
 
 
 @pytest.mark.warp
@@ -399,7 +437,8 @@ def test_missing_warp_runtime_is_covered_without_loading_generated_types(
 
 
 def test_session_carriers_remain_concrete_only() -> None:
-    """Test P1 names do not alter public execution or adapter exports."""
+    """Test P1 names do not alter public execution, adapter, or root exports."""
+    import particula
     import particula.execution as execution
     import particula.execution.adapters as adapters
 
@@ -410,6 +449,7 @@ def test_session_carriers_remain_concrete_only() -> None:
         "ResidentSession",
     }
     assert names.isdisjoint(execution.__all__)
+    assert all(not hasattr(particula, name) for name in names)
     assert all(not hasattr(execution, name) for name in names)
     assert all(not hasattr(adapters, name) for name in names)
 
@@ -443,6 +483,19 @@ def test_session_revalidates_fabricated_cpu_carriers_before_warp_import() -> (
             object(),
             ResidentDimensions(1, 0, 0),
             invalid_metadata,
+            ResidentLifecycle.ACTIVE,
+        )
+
+    invalid_names = object.__new__(ResidentMetadata)
+    object.__setattr__(invalid_names, "device", Device(Backend.WARP, "cpu"))
+    object.__setattr__(invalid_names, "gas_names", ("ok", object()))
+    with pytest.raises(TypeError, match="exact str instances"):
+        ResidentSession(
+            object(),
+            object(),
+            object(),
+            ResidentDimensions(1, 0, 0),
+            invalid_names,
             ResidentLifecycle.ACTIVE,
         )
 
@@ -670,7 +723,7 @@ def test_session_rejects_primary_array_without_metadata_read_only() -> None:
 
 
 @pytest.mark.warp
-def test_session_schema_validation_never_reads_syncs_launches_or_allocates(
+def test_session_schema_validation_never_performs_runtime_work(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test valid and invalid schema construction performs metadata-only work."""
@@ -690,11 +743,24 @@ def test_session_schema_validation_never_reads_syncs_launches_or_allocates(
         )
 
     def forbidden(*_: object, **__: object) -> None:
-        raise AssertionError("P1 must not synchronize, launch, or allocate.")
+        raise AssertionError("P1 must not perform runtime work.")
 
-    monkeypatch.setattr(wp, "synchronize", forbidden)
-    monkeypatch.setattr(wp, "zeros", forbidden)
-    monkeypatch.setattr(wp, "ones", forbidden)
+    for name in (
+        "synchronize",
+        "launch",
+        "copy",
+        "from_numpy",
+        "zeros",
+        "ones",
+        "empty",
+        "full",
+        "zeros_like",
+        "ones_like",
+        "empty_like",
+        "clone",
+    ):
+        if hasattr(wp, name):
+            monkeypatch.setattr(wp, name, forbidden)
     session = ResidentSession(
         particles,
         gas,

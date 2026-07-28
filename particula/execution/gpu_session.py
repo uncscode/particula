@@ -1,8 +1,8 @@
 """Define concrete-only GPU-resident session ownership carriers.
 
 These immutable carriers retain caller-owned Warp containers and CPU gas-name
-metadata by identity. They perform construction-time metadata validation only;
-they do not convert, allocate, schedule, synchronize, restore, fall back,
+metadata by identity. They perform construction-time metadata validation only.
+They do not convert, allocate, schedule, synchronize, restore, fall back,
 resize, migrate devices, operate on lifecycle state, or change package exports.
 """
 
@@ -33,6 +33,21 @@ def _validate_dimension(value: object, name: str, *, positive: bool) -> None:
         raise ValueError(f"{name} must be greater than zero.")
     if not positive and value < 0:
         raise ValueError(f"{name} must be nonnegative.")
+
+
+def _validate_gas_names(gas_names: object) -> None:
+    """Validate an exact tuple of exact string gas names.
+
+    Args:
+        gas_names: Candidate ordered gas-name metadata.
+
+    Raises:
+        TypeError: If the metadata is not an exact tuple of exact strings.
+    """
+    if type(gas_names) is not tuple:
+        raise TypeError("gas_names must be an exact tuple.")
+    if not all(type(name) is str for name in gas_names):
+        raise TypeError("gas_names entries must be exact str instances.")
 
 
 @dataclass(frozen=True)
@@ -80,27 +95,25 @@ class ResidentMetadata:
 
     Attributes:
         device: Exact Warp-backed execution device declaration.
-        gas_names: Ordered exact-string gas names; names are not normalized.
+        gas_names: Ordered caller-declared gas names; entries are not inspected
+            or normalized at this boundary.
     """
 
     device: Device
     gas_names: tuple[str, ...]
 
     def __post_init__(self) -> None:
-        """Validate exact metadata contents without normalizing names.
+        """Validate fixed-cost metadata declarations without normalizing names.
 
         Raises:
-            TypeError: If the device, name tuple, or a name has the wrong type.
+            TypeError: If the device or name tuple has the wrong type.
             ValueError: If the device does not declare the Warp backend.
         """
         if type(self.device) is not Device:
             raise TypeError("device must be an exact Device.")
         if self.device.backend is not Backend.WARP:
             raise ValueError("device.backend must be Backend.WARP.")
-        if type(self.gas_names) is not tuple:
-            raise TypeError("gas_names must be an exact tuple.")
-        if any(type(name) is not str for name in self.gas_names):
-            raise TypeError("gas_names must contain only exact str values.")
+        _validate_gas_names(self.gas_names)
 
 
 def _validate_array(
@@ -292,6 +305,55 @@ def _validate_schema(
         )
 
 
+def _validate_resident_carriers(
+    dimensions: object,
+    metadata: object,
+    lifecycle: object,
+) -> tuple[ResidentDimensions, ResidentMetadata, ResidentLifecycle]:
+    """Validate exact resident carrier declarations.
+
+    Args:
+        dimensions: Declared resident dimensions.
+        metadata: Declared resident metadata.
+        lifecycle: Declared lifecycle value.
+
+    Returns:
+        The validated resident carriers.
+    """
+    if type(dimensions) is not ResidentDimensions:
+        raise TypeError("dimensions must be an exact ResidentDimensions.")
+    dimensions.__post_init__()
+    if type(metadata) is not ResidentMetadata:
+        raise TypeError("metadata must be an exact ResidentMetadata.")
+    if type(metadata.device) is not Device:
+        raise TypeError("device must be an exact Device.")
+    if metadata.device.backend is not Backend.WARP:
+        raise ValueError("device.backend must be Backend.WARP.")
+    _validate_gas_names(metadata.gas_names)
+    if len(metadata.gas_names) != dimensions.n_species:
+        raise ValueError("metadata.gas_names length must match n_species.")
+    if type(lifecycle) is not ResidentLifecycle:
+        raise TypeError("lifecycle must be an exact ResidentLifecycle.")
+    return (
+        cast(ResidentDimensions, dimensions),
+        cast(ResidentMetadata, metadata),
+        cast(ResidentLifecycle, lifecycle),
+    )
+
+
+def _validate_resident_imports() -> Any:
+    """Import Warp for resident checks and preserve missing-runtime errors."""
+    try:
+        import warp as wp
+    except ModuleNotFoundError as error:
+        if error.name != "warp":
+            raise
+        raise RuntimeError(
+            "ResidentSession requires the optional Warp runtime."
+        ) from error
+    return wp
+
+
 @dataclass(frozen=True, eq=False)
 class ResidentSession:
     """Retain one validated caller-owned GPU-resident session by identity.
@@ -326,30 +388,20 @@ class ResidentSession:
             RuntimeError: If resident validation requires an unavailable Warp
                 runtime.
         """
-        if type(self.dimensions) is not ResidentDimensions:
-            raise TypeError("dimensions must be an exact ResidentDimensions.")
-        self.dimensions.__post_init__()
-        if type(self.metadata) is not ResidentMetadata:
-            raise TypeError("metadata must be an exact ResidentMetadata.")
-        self.metadata.__post_init__()
-        if len(self.metadata.gas_names) != self.dimensions.n_species:
-            raise ValueError("metadata.gas_names length must match n_species.")
-        if type(self.lifecycle) is not ResidentLifecycle:
-            raise TypeError("lifecycle must be an exact ResidentLifecycle.")
+        (
+            dimensions,
+            metadata,
+            lifecycle,
+        ) = _validate_resident_carriers(
+            self.dimensions, self.metadata, self.lifecycle
+        )
         if self.particles is self.gas:
             raise ValueError("particles and gas must not be identical.")
         if self.particles is self.environment:
             raise ValueError("particles and environment must not be identical.")
         if self.gas is self.environment:
             raise ValueError("gas and environment must not be identical.")
-        try:
-            import warp as wp
-        except ModuleNotFoundError as error:
-            if error.name != "warp":
-                raise
-            raise RuntimeError(
-                "ResidentSession requires the optional Warp runtime."
-            ) from error
+        wp = _validate_resident_imports()
         _validate_generated_containers(
             self.particles, self.gas, self.environment
         )
@@ -357,7 +409,7 @@ class ResidentSession:
             self.particles,
             self.gas,
             self.environment,
-            self.dimensions,
-            self.metadata,
+            dimensions,
+            metadata,
             wp,
         )
