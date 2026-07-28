@@ -231,14 +231,22 @@ def test_enabled_path_uses_selected_adapter_and_explicit_lifecycle(
     events: list[str] = []
     gpu_particles = types.SimpleNamespace(volume=object())
     restored = example_module._build_particle_data()
+
+    def convert(_: Any, device: str | None = None) -> Any:
+        """Return the fake GPU particle container after recording conversion."""
+        del device
+        events.append("convert")
+        return gpu_particles
+
+    def restore(_: Any) -> Any:
+        """Return the restored CPU checkpoint after recording restoration."""
+        events.append("restore")
+        return restored
+
     monkeypatch.setattr(
         example_module,
         "_load_gpu_helpers",
-        lambda: (
-            True,
-            lambda data, device: events.append("convert") or gpu_particles,
-            lambda data: events.append("restore") or restored,
-        ),
+        lambda: (True, convert, restore),
     )
     monkeypatch.setattr(
         example_module,
@@ -316,16 +324,18 @@ def test_failures_propagate_without_fallback_or_restore(
                 raise RuntimeError("synchronize")
             super().synchronize()
 
-    def conversion(data: Any, device: str) -> Any:
+    def conversion(data: Any, device: str | None = None) -> Any:
         """Return a fake GPU particle container or raise the requested error."""
         del data, device
         if failure_at == "conversion":
             raise RuntimeError("conversion")
         return types.SimpleNamespace(volume=object())
 
-    monkeypatch.setattr(
-        example_module, "_load_gpu_helpers", lambda: (True, conversion, restore)
-    )
+    def load_helpers() -> tuple[bool, Any, Any]:
+        """Return the fake helper tuple used by the selected-adapter path."""
+        return True, conversion, restore
+
+    monkeypatch.setattr(example_module, "_load_gpu_helpers", load_helpers)
     monkeypatch.setattr(
         example_module,
         "_load_gpu_runtime",
