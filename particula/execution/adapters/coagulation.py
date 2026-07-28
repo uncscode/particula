@@ -191,6 +191,19 @@ def _validate_time_step(time_step: object) -> None:
         raise ValueError("time_step must be finite and nonnegative.")
 
 
+def _validate_initialize_rng(initialize_rng: object) -> None:
+    """Validate the explicit persistent-RNG reset control.
+
+    Args:
+        initialize_rng: Candidate request to initialize the supplied RNG state.
+
+    Raises:
+        TypeError: If ``initialize_rng`` is not an exact boolean.
+    """
+    if type(initialize_rng) is not bool:
+        raise TypeError("initialize_rng must be a boolean.")
+
+
 def _validate_cpu_brownian_runnable(runnable: Coagulation) -> None:
     """Validate the selected CPU Brownian particle-resolved capability.
 
@@ -209,6 +222,105 @@ def _validate_cpu_brownian_runnable(runnable: Coagulation) -> None:
         raise ValueError(
             "runnable must use Brownian particle_resolved coagulation."
         )
+
+
+def _validate_warp_brownian_state_form(
+    state: "WarpBrownianCoagulationState",
+    particle_type: type,
+    environment_type: type,
+) -> bool:
+    """Validate resident-Warp payload form and return environment usage.
+
+    Args:
+        state: Selected resident-Warp request carrier.
+        particle_type: Exact Warp particle-data class.
+        environment_type: Exact Warp environment-data class.
+
+    Returns:
+        ``True`` when the environment form is used, otherwise ``False``.
+
+    Raises:
+        TypeError: If particles or the optional environment has an invalid type.
+        ValueError: If the selected temperature/pressure form is invalid.
+    """
+    if not isinstance(state.particles, particle_type):
+        raise TypeError("particles must be a WarpParticleData.")
+    environment_form = state.environment is not None
+    if environment_form and not isinstance(state.environment, environment_type):
+        raise TypeError("environment must be a WarpEnvironmentData.")
+    if environment_form:
+        valid_form = state.temperature is None and state.pressure is None
+    else:
+        valid_form = (
+            state.temperature is not None and state.pressure is not None
+        )
+    if not valid_form:
+        raise ValueError(
+            "provide either environment or both temperature and pressure."
+        )
+    return environment_form
+
+
+def _validate_warp_brownian_state_controls(
+    state: "WarpBrownianCoagulationState",
+) -> None:
+    """Validate scalar execution controls before ownership checks.
+
+    Args:
+        state: Selected resident-Warp request carrier.
+
+    Raises:
+        TypeError: If the selected time step or reset control has an invalid
+            type.
+        ValueError: If the selected time step is non-finite, negative, or the
+            persistent RNG sidecar is missing.
+    """
+    _validate_time_step(state.time_step)
+    _validate_initialize_rng(state.initialize_rng)
+    if state.rng_states is None:
+        raise ValueError("rng_states must be supplied.")
+
+
+def _validate_warp_brownian_state_ownership(
+    state: "WarpBrownianCoagulationState",
+    wp: Any,
+    environment_form: bool,
+) -> None:
+    """Validate writable sidecar ownership for resident-Warp dispatch.
+
+    Args:
+        state: Selected resident-Warp request carrier.
+        wp: Imported Warp module used for metadata interpretation.
+        environment_form: Whether the selected request uses environment input.
+
+    Raises:
+        ValueError: If writable sidecars alias a protected resource or each
+            other.
+    """
+    protected = _available_fields(
+        state.particles,
+        ("masses", "concentration", "charge", "density", "volume"),
+    )
+    if environment_form:
+        protected += _available_fields(
+            state.environment,
+            ("temperature", "pressure", "saturation_ratio"),
+        )
+    else:
+        protected += tuple(
+            value
+            for value in (state.temperature, state.pressure)
+            if _memory_range(value, wp) is not None
+        )
+    if _memory_range(state.volume, wp) is not None:
+        protected += (state.volume,)
+    _validate_ownership(
+        wp,
+        protected,
+        state.collision_pairs,
+        state.n_collisions,
+        state.rng_states,
+    )
 
 
 class CPUCoagulationExecutionAdapter:
@@ -419,10 +531,10 @@ class WarpBrownianCoagulationState:
     capacity, and detailed RNG schemas remain native-kernel concerns.
 
     Construction is write-free: it does not import a kernel, transfer,
-    synchronize, allocate, seed, reset, or advance ``rng_states``. A future
-    dispatch may seed the caller-owned ``(n_boxes,)`` ``wp.uint32`` sidecar only
-    when ``initialize_rng`` is true, and otherwise must reuse it even for the
-    same seed. Callers own synchronization and recovery after a future launch.
+    synchronize, allocate, seed, reset, or advance ``rng_states``. Dispatch
+    seeds the caller-owned ``(n_boxes,)`` ``wp.uint32`` sidecar only when the
+    exact boolean ``initialize_rng`` is true, and otherwise reuses it even for
+    the same seed. Callers own synchronization and recovery after a launch.
 
     Args:
         config: Exact Brownian mechanism marker.
@@ -436,8 +548,8 @@ class WarpBrownianCoagulationState:
         collision_pairs: Optional caller-owned collision-pair output.
         n_collisions: Optional caller-owned collision-count output.
         rng_states: Required caller-owned persistent RNG sidecar.
-        rng_seed: Opaque future seed intent retained without interpretation.
-        initialize_rng: Opaque future reset intent retained without mutation.
+        rng_seed: Opaque seed intent retained without interpretation.
+        initialize_rng: Exact boolean request to reset the supplied RNG sidecar.
         environment: Caller-owned ``WarpEnvironmentData``, or ``None`` for
             direct temperature and pressure inputs.
 
@@ -493,48 +605,13 @@ class WarpBrownianCoagulationState:
 
         particle_type = cast(Any, WarpParticleData).cls
         environment_type = cast(Any, WarpEnvironmentData).cls
-        if not isinstance(self.particles, particle_type):
-            raise TypeError("particles must be a WarpParticleData.")
-        environment_form = self.environment is not None
-        if environment_form and not isinstance(
-            self.environment, environment_type
-        ):
-            raise TypeError("environment must be a WarpEnvironmentData.")
-        if environment_form:
-            valid_form = self.temperature is None and self.pressure is None
-        else:
-            valid_form = (
-                self.temperature is not None and self.pressure is not None
-            )
-        if not valid_form:
-            raise ValueError(
-                "provide either environment or both temperature and pressure."
-            )
-        _validate_time_step(self.time_step)
-        if self.rng_states is None:
-            raise ValueError("rng_states must be supplied.")
-        protected = _available_fields(
-            self.particles,
-            ("masses", "concentration", "charge", "density", "volume"),
+        environment_form = _validate_warp_brownian_state_form(
+            self,
+            particle_type,
+            environment_type,
         )
-        if environment_form:
-            protected += _available_fields(
-                self.environment,
-                ("temperature", "pressure", "saturation_ratio"),
-            )
-        else:
-            protected += tuple(
-                value
-                for value in (self.temperature, self.pressure, self.volume)
-                if _memory_range(value, wp) is not None
-            )
-        _validate_ownership(
-            wp,
-            protected,
-            self.collision_pairs,
-            self.n_collisions,
-            self.rng_states,
-        )
+        _validate_warp_brownian_state_controls(self)
+        _validate_warp_brownian_state_ownership(self, wp, environment_form)
 
     @property
     def backend_payload(self) -> object:
@@ -548,11 +625,11 @@ class WarpBrownianCoagulationState:
 
 @dataclass(frozen=True, eq=False)
 class WarpBrownianCoagulationResult:
-    """Retain a future direct-Warp result and supplied resource identities.
+    """Retain a direct-Warp result and supplied resource identities.
 
     State-supplied diagnostic outputs must be returned by identity. Diagnostics
-    omitted from the state remain optional for a future direct call to allocate
-    or return according to its native contract.
+    omitted from the state are allocated and returned according to the native
+    direct-kernel contract.
 
     Args:
         state: Exact resident-Warp request state retained by identity.

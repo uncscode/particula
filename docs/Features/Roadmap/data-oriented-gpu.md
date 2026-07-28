@@ -1480,7 +1480,7 @@ It is neither a high-level execution API nor a GPU adapter. Callers construct
 an exact request, context-local registration supplies an adapter, and selection
 does not execute that adapter.
 
-The downstream ordering is:
+The full-policy downstream ordering is:
 
 `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`.
 
@@ -1490,6 +1490,11 @@ condensation adapters, E7-F3 supplies coagulation adapters, E7-F4 supplies
 resident session/container/sidecar lifecycle, and E7-F5 is their later
 scheduling consumer. These consumers register or use adapters only after their
 own contracts exist and do not alter the shipped direct-kernel path.
+
+E7-F3's shipped concrete-only Brownian seam is a bounded exception to this
+full-policy ordering: it has no public export, availability probing, fallback,
+or scheduler dependency, so it can preserve the direct-kernel contract while
+E7-F6 remains deferred. Any broader integration still follows the ordering.
 
 ### High-Level Integration
 
@@ -1502,9 +1507,10 @@ own contracts exist and do not alter the shipped direct-kernel path.
 - E7-F1 does not introduce GPU adapters, resident loops, scheduling, implicit
   transfer or synchronization, fallback, retry, or replacement of direct GPU
   APIs. Those scopes remain deferred and policy questions belong to E7-F6.
-- E7-F2, E7-F3, and E7-F4 may add their bounded consumers only after their
-  process-adapter or resident-lifecycle contracts are established. E7-F5 is a
-  later consumer, not a consequence of E7-F1 selection alone.
+- E7-F2, E7-F3, and E7-F4 may add bounded consumers after their process-adapter
+  or resident-lifecycle contracts are established. E7-F3's shipped
+  concrete-only seam is the documented exception to the full-policy ordering;
+  E7-F5 remains a later consumer, not a consequence of E7-F1 selection alone.
 - E7-F3 P6 has shipped bounded selected-Brownian adapter documentation and
   evidence in the [coagulation strategy guide](../coagulation_strategy_system.md)
   and its [explicit-transfer example](../../Examples/gpu_coagulation_direct.py).

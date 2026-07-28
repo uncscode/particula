@@ -9,7 +9,7 @@ Warp dispatch.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import numpy.testing as npt
@@ -205,6 +205,7 @@ def _dispatch(
     initialize_rng: bool,
     rng_seed: int = 41,
     direct_thermo: bool = False,
+    diagnostics: bool = True,
 ) -> Any:
     """Dispatch one selected resident call without adapter-side synchronization.
 
@@ -220,8 +221,8 @@ def _dispatch(
         pressure if direct_thermo else None,
         time_step,
         volume=bundle.particles.volume if direct_thermo else None,
-        collision_pairs=bundle.pairs,
-        n_collisions=bundle.counts,
+        collision_pairs=bundle.pairs if diagnostics else None,
+        n_collisions=bundle.counts if diagnostics else None,
         rng_states=bundle.rng,
         rng_seed=rng_seed,
         initialize_rng=initialize_rng,
@@ -303,6 +304,63 @@ def test_cpu_adapter_matches_local_brownian_kernel_reference_and_preserves_ident
     assert result.backend_result is not None
     assert isinstance(result.backend_result.value, CPUCoagulationResult)
     assert result.backend_result.value.aerosol is aerosol
+
+
+def test_cpu_adapter_nonzero_step_mutates_and_conserves_particle_mass() -> None:
+    """A real nonzero selected CPU call mutates while conserving particle mass."""
+    aerosol, runnable = _make_cpu_aerosol()
+    runnable.coagulation_strategy.random_generator = np.random.default_rng(41)
+    before_mass = aerosol.particles.get_mass().copy()
+    before_concentration = aerosol.particles.get_concentration().copy()
+    before_charge = aerosol.particles.get_charge().copy()
+    request = CPUCoagulationExecutionState(
+        CPUCoagulationState(BrownianCoagulationConfig(), aerosol),
+        1.0e14,
+        1,
+        runnable,
+    )
+
+    result = CPUCoagulationExecutionAdapter().execute(request)
+
+    after_mass = aerosol.particles.get_mass()
+    after_concentration = aerosol.particles.get_concentration()
+    after_charge = aerosol.particles.get_charge()
+    assert result.backend_result is not None
+    cpu_result = cast(CPUCoagulationResult, result.backend_result.value)
+    assert cpu_result.aerosol is aerosol
+    assert not np.array_equal(after_concentration, before_concentration)
+    npt.assert_allclose(after_mass.sum(), before_mass.sum(), rtol=1e-12)
+    npt.assert_allclose(after_charge.sum(), before_charge.sum(), rtol=1e-12)
+
+
+@pytest.mark.warp
+def test_warp_adapter_allocates_and_wraps_omitted_diagnostics() -> None:
+    """Omitted native diagnostics are allocated and retained in the result."""
+    wp = pytest.importorskip("warp")
+    fixture = _fixture()
+    bundle = _warp_bundle(fixture)
+    result = _dispatch(
+        bundle,
+        time_step=1.0,
+        initialize_rng=True,
+        diagnostics=False,
+    )
+
+    wp.synchronize()
+    assert result.backend_result is not None
+    value = cast(WarpBrownianCoagulationResult, result.backend_result.value)
+    assert isinstance(value, WarpBrownianCoagulationResult)
+    assert value.particles is bundle.particles
+    collision_pairs = cast(Any, value.collision_pairs)
+    n_collisions = cast(Any, value.n_collisions)
+    assert collision_pairs is not None
+    assert n_collisions is not None
+    assert collision_pairs is not bundle.pairs
+    assert n_collisions is not bundle.counts
+    assert collision_pairs.shape == (1, 2, 2)
+    assert collision_pairs.dtype == wp.int32
+    assert n_collisions.shape == (1,)
+    assert n_collisions.dtype == wp.int32
 
 
 @pytest.mark.warp

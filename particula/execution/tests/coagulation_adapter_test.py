@@ -732,6 +732,95 @@ def test_warp_state_rejects_required_sidecar_aliases(
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize(
+    "sidecar_name", ("collision_pairs", "n_collisions", "rng_states")
+)
+def test_warp_environment_form_protects_explicit_volume_from_sidecars(
+    sidecar_name: str,
+) -> None:
+    """Test an environment-form explicit volume cannot be a writable sidecar."""
+    wp = pytest.importorskip("warp")
+    particles = _warp_particles()
+    environment = _environment()
+    volume = wp.ones(1, dtype=wp.float64, device="cpu")
+    resources = (particles.masses, environment.temperature, volume)
+    before = _resource_values(*resources)
+    sidecars: dict[str, object] = {
+        "collision_pairs": None,
+        "n_collisions": None,
+        "rng_states": wp.zeros(1, dtype=wp.uint32, device="cpu"),
+    }
+    sidecars[sidecar_name] = volume
+
+    with pytest.raises(
+        ValueError, match="^caller-owned Warp resources must not alias.$"
+    ):
+        WarpBrownianCoagulationState(
+            BrownianCoagulationConfig(),
+            particles,
+            None,
+            None,
+            1.0,
+            volume=volume,
+            collision_pairs=sidecars["collision_pairs"],
+            n_collisions=sidecars["n_collisions"],
+            rng_states=sidecars["rng_states"],
+            environment=environment,
+        )
+    for expected, resource in zip(before, resources, strict=True):
+        np.testing.assert_array_equal(resource.numpy(), expected)
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("initialize_rng", (0, 1, "true", None))
+def test_warp_state_requires_exact_boolean_initialize_rng(
+    initialize_rng: object,
+) -> None:
+    """Test truthy and falsy non-booleans cannot reset persistent RNG state."""
+    wp = pytest.importorskip("warp")
+    particles = _warp_particles()
+    environment = _environment()
+    rng_states = wp.array([19], dtype=wp.uint32, device="cpu")
+    before = _resource_values(particles.masses, rng_states)
+
+    with pytest.raises(TypeError, match="^initialize_rng must be a boolean.$"):
+        WarpBrownianCoagulationState(
+            BrownianCoagulationConfig(),
+            particles,
+            None,
+            None,
+            1.0,
+            rng_states=rng_states,
+            initialize_rng=initialize_rng,
+            environment=environment,
+        )
+    for expected, resource in zip(
+        before, (particles.masses, rng_states), strict=True
+    ):
+        np.testing.assert_array_equal(resource.numpy(), expected)
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("initialize_rng", (False, True))
+def test_warp_state_accepts_boolean_initialize_rng(
+    initialize_rng: bool,
+) -> None:
+    """Test both exact boolean persistent-RNG controls remain valid."""
+    wp = pytest.importorskip("warp")
+    state = WarpBrownianCoagulationState(
+        BrownianCoagulationConfig(),
+        _warp_particles(),
+        None,
+        None,
+        1.0,
+        rng_states=wp.zeros(1, dtype=wp.uint32, device="cpu"),
+        initialize_rng=initialize_rng,
+        environment=_environment(),
+    )
+    assert state.initialize_rng is initialize_rng
+
+
+@pytest.mark.warp
 def test_warp_state_retains_request_and_rng_intent_by_identity() -> None:
     """Test P2 preserves all opaque controls without executing Warp work."""
     wp = pytest.importorskip("warp")

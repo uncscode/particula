@@ -27,5 +27,6 @@ mkdocs build --strict
 
 E7-F4 resident sessions, E7-F5 scheduling, E7-F8 checkpoint/restart stream
 policy, public exports, fallback, and changes to the multi-mechanism direct
-kernel remain deferred. This is completed P6 publication evidence only; it
-does not mark overall E7-F3 shipped.
+kernel remain deferred. This completed P6 publication evidence contributes to
+the authoritative shipped/completed E7-F3 feature record without shipping those
+separate deferred scopes.

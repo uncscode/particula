@@ -142,8 +142,8 @@ def _output_prefix(particle_data: ParticleData) -> list[str]:
 def run_example(device: str = "cpu") -> ExampleRun:
     """Run two selected-Brownian calls with persistent caller-owned sidecars.
 
-    The enabled route transfers the CPU fixture explicitly, executes the public
-    concrete selected adapter twice, synchronizes once, and restores a CPU
+    The enabled route transfers the CPU fixture explicitly, executes the
+    concrete-only selected adapter twice, synchronizes once, and restores a CPU
     particle data only after both calls succeed. Failures from runtime loading,
     conversion, allocation, execution, synchronization, or restoration
     propagate without a success result.
