@@ -9,6 +9,8 @@ from typing import Any
 
 import pytest
 
+import particula.execution as execution
+import particula.execution.adapters as adapters
 from particula.aerosol import Aerosol
 from particula.execution.adapters.coagulation import (
     BrownianCoagulationConfig,
@@ -143,6 +145,33 @@ assert not any(
     assert completed.returncode == 0, (
         f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
     )
+
+
+def test_execution_exports_stay_narrow_and_concrete_carriers_stay_private() -> (
+    None
+):
+    """Test the public execution package stays carrier-free."""
+    assert execution.__all__ == [
+        "Backend",
+        "Device",
+        "Process",
+        "Capability",
+        "CapabilityRequirements",
+        "CapabilityDeclaration",
+        "CapabilityMatrix",
+        "ExecutionRequest",
+        "ExecutionAdapter",
+        "ExecutionContext",
+    ]
+    for name in (
+        "BrownianCoagulationConfig",
+        "CPUCoagulationState",
+        "CPUCoagulationResult",
+        "WarpBrownianCoagulationState",
+        "WarpBrownianCoagulationResult",
+    ):
+        assert not hasattr(execution, name)
+        assert not hasattr(adapters, name)
 
 
 def test_metadata_helpers_detect_only_supported_contiguous_ranges() -> None:
