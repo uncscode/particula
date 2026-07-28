@@ -3,7 +3,7 @@
 - [ ] **E7-F3-P1:** Map Brownian capabilities and validation semantics with unit tests
   - Issue: TBD | Size: S | Status: Not Started
   - Goal: Freeze CPU/Warp Brownian support, distribution/device constraints, and deterministic selection-level rejection order.
-  - Files: `particula/execution.py`,
+  - Files: `particula/execution/` package,
     `particula/execution/adapters/coagulation.py`,
     `particula/execution/tests/coagulation_adapter_test.py`
   - Tests: Capability queries, unsupported mechanisms/distributions, unavailable backend/device, no invocation on rejection
@@ -57,12 +57,19 @@
     ordered Warp P2 rejection/no-mutation snapshots; CPU control rejection;
     and one-call native/pass-through/writer-failure coverage
 
-- [ ] **E7-F3-P5:** Prove parity stochastic behavior conservation and persistent RNG integration
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Provide bounded CPU-reference/Warp CPU evidence for Brownian rates and invariants while proving persistent RNG progression and explicit transfer boundaries.
-  - Files: `particula/execution/tests/coagulation_adapter_test.py`,
+- [x] **E7-F3-P5:** Prove parity stochastic behavior conservation and persistent RNG integration
+  - Issue: #1481 | Size: S | Status: Completed 2026-07-28
+  - Delivered: Test-only evidence for the concrete-only CPU and resident-Warp
+    Brownian adapters. It separates CPU reference checks from Warp stochastic
+    evidence and preserves the existing runtime ownership boundary.
+  - Files: `particula/execution/adapters/coagulation.py`,
+    `particula/execution/tests/coagulation_adapter_test.py`,
     `particula/execution/tests/coagulation_integration_test.py`
-  - Tests: One/multi-box cases, mass and charge conservation, inactive slots, stochastic bounds, reproducible reset, optional CUDA, no intermediate transfer
+  - Tests: CPU reference and identity; one-/multi-box Warp resource identity,
+    conservation, pair validity, inactive-slot preservation, and box isolation;
+    fixed 100-trial acceptance bounds; persistent RNG advance and reset replay;
+    optional CUDA invariants; no adapter conversion, restore, synchronization,
+    or fallback
 
 - [ ] **E7-F3-P6:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

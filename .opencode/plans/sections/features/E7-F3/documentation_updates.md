@@ -1,11 +1,12 @@
 # Documentation Updates
 
-## P2/P3/P4 Status
+## P2/P3/P4/P5 Status
 
-No user-facing documentation or exports changed in P2, P3, or P4. The adapter remains a
+No user-facing documentation or exports changed in P2, P3, P4, or P5. The adapter remains a
 concrete-only adapter boundary, so this implementation intentionally adds no
 README, feature-guide, API-reference, example, or public-export documentation.
-Selected API documentation remains deferred to P6.
+P5 adds test-only CPU/Warp evidence and retains explicit caller synchronization
+and resource ownership; selected API documentation remains deferred to P6.
 
 - Add backend-selected Brownian coagulation to the E7 backend-selection feature
   guide, including CPU and Warp setup, explicit backend/device requests, and

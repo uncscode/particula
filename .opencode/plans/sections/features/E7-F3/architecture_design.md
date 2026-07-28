@@ -70,6 +70,20 @@ rolls back delegate mutation. Both emit `ExecutionResult` with
 P2 result. P1/E7-F6 capability policy and later runtime-mode validation remain
 separate work.
 
+### P5 Evidence Boundary (implemented)
+
+`particula/execution/tests/coagulation_integration_test.py` exercises the
+existing concrete-only adapter rather than extending its runtime boundary. CPU
+Brownian rate/reference checks are separate from resident-Warp invariant and
+stochastic evidence. Warp tests retain caller-owned particle, diagnostics, and
+RNG resources by identity; synchronize only in tests before host observation;
+and verify concentration-weighted mass, signed charge, valid active-only pairs,
+inactive sentinel preservation, and box isolation. A fixed 100 fresh-trial
+experiment checks aggregate acceptance, while separate nonterminal repeated-call
+and explicit-reset cases establish persistent RNG behavior. CUDA is optional and
+invariant-only. No adapter transfer, restore, synchronization, fallback, or
+public/export change was introduced.
+
 ## Data / API / Workflow Changes
 
 - **Data model:** Add immutable Brownian process configuration and typed CPU/Warp

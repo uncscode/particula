@@ -1,4 +1,8 @@
-"""Tests for concrete-only Brownian coagulation carriers and adapters."""
+"""Unit tests for concrete-only Brownian coagulation carriers and adapters.
+
+These tests verify selected-call forwarding and caller-owned resident-resource
+boundaries. They do not compare CPU and Warp stochastic trajectories.
+"""
 
 import os
 import subprocess

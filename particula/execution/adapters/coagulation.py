@@ -10,6 +10,9 @@ The persistent RNG sidecar records direct-Warp dispatch intent. A dispatch may
 seed it only when ``initialize_rng`` is true; otherwise it reuses the supplied
 sidecar, including when the seed is unchanged. Callers own synchronization and
 recovery after a kernel launch.
+
+CPU and resident-Warp calls have independent stochastic trajectories. This
+concrete boundary provides no seed-by-seed cross-backend trajectory comparison.
 """
 
 from dataclasses import dataclass

@@ -1,8 +1,9 @@
 """Integration evidence for concrete-only Brownian coagulation adapters.
 
 CPU and Warp stochastic trajectories are deliberately not compared seed by
-seed.  These tests instead check local CPU rates, resident-resource ownership,
-and physical invariants after explicitly synchronizing Warp calls.
+seed. These tests instead check local CPU rates, caller-owned resident-resource
+identity, and physical invariants after explicit caller synchronization of each
+Warp dispatch.
 """
 
 from __future__ import annotations
@@ -204,7 +205,11 @@ def _dispatch(
     initialize_rng: bool,
     rng_seed: int = 41,
 ) -> Any:
-    """Dispatch one selected resident call without adapter-side synchronization."""
+    """Dispatch one selected resident call without adapter-side synchronization.
+
+    The caller retains every resident resource and must explicitly synchronize
+    before observing device state.
+    """
     state = WarpBrownianCoagulationState(
         BrownianCoagulationConfig(),
         bundle.particles,

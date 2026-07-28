@@ -43,15 +43,15 @@
    handoff, and no conversion/synchronization/fallback; and failure propagation.
 - [x] Add P4 marker-precedence, no-Warp import, ordered P2 no-mutation,
   one-resolver/one-kernel pass-through, and post-launch no-recovery tests.
-- [ ] Add repeated-call tests proving RNG progression without reseeding and
+- [x] Add repeated-call tests proving RNG progression without reseeding and
   explicit reset reproducibility from the same seed.
-- [ ] Add one-box and multi-box Warp CPU invariant tests for mass/charge
+- [x] Add one-box and multi-box Warp CPU invariant tests for mass/charge
   conservation, inactive slots, output bounds, and caller-owned buffers.
-- [ ] Add bounded CPU-reference comparisons for deterministic Brownian rates
+- [x] Add bounded CPU-reference comparisons for deterministic Brownian rates
   and aggregate stochastic outcomes; do not require exact trajectories.
-- [ ] Add transfer/synchronization spies proving selected steps do not invoke
+- [x] Add transfer/synchronization spies proving selected steps do not invoke
   conversion helpers, restore helpers, or implicit synchronization.
-- [ ] Add optional CUDA rows that skip cleanly and preserve the same contract.
+- [x] Add optional CUDA rows that skip cleanly and preserve the same contract.
 - [ ] Maintain at least 80% changed-module coverage and do not lower any
   repository threshold.
 - [ ] Run focused pytest, Ruff, mypy, export regressions, and strict docs build.

@@ -39,6 +39,14 @@ dtype, capacity, and detailed RNG schemas. CPU validates selected execution
 controls before its one runnable call; Warp resolves and calls the native entry
 point once and propagates native and post-launch failures without recovery.
 
+E7-F3-P5 supplies bounded, test-only evidence for the completed adapter.
+Concrete-only adapter and integration tests cover the CPU Brownian reference,
+resident-Warp one- and multi-box resource identity and invariants, inactive-slot
+protection, a fixed 100-trial acceptance check, persistent RNG advancement and
+explicit reset replay, plus optional CUDA invariant rows. This evidence makes no
+cross-backend trajectory claim and adds no public API, adapter transfer/restore,
+synchronization, or fallback behavior.
+
 ## User Stories
 
 - As a simulation user, I want to request Brownian coagulation by backend so

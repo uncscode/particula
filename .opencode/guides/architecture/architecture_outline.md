@@ -69,15 +69,21 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
   reconstruct results, fall back, or recover after native dispatch. All carriers
   and adapters remain direct-module-only and Warp is imported only for Warp P2
   validation or after P3 Warp preflight.
-- `adapters/coagulation.py` - Concrete-only P2 Brownian coagulation resource
-  carriers for CPU and resident-Warp resources. Construction retains
-  caller-owned state and persistent RNG intent by identity while applying only
-  selection-owned kind/form and metadata-detectable ownership checks. It does
-  not dispatch a kernel or runnable; select a backend; import a GPU kernel;
-  transfer, synchronize, or allocate; or seed, reset, or advance RNG state.
-  Native physical/schema validation and all future execution remain at the
-  direct-kernel boundary. These carriers are absent from `particula.execution`,
-  the adapters package, and top-level exports.
+- `adapters/coagulation.py` - Concrete-only P2 Brownian coagulation state and
+  result carriers plus selected P3 CPU and resident-Warp execution states and
+  adapters. Construction retains caller-owned CPU or resident-Warp resources,
+  diagnostic sidecars, and persistent RNG intent by identity while applying
+  only selection-owned kind/form and metadata-detectable ownership checks.
+  After local control/state preflight, each adapter makes exactly one selected
+  native call: CPU dispatches the caller-owned `Coagulation` runnable and Warp
+  lazily resolves and calls `coagulation_step_gpu`. Neither path selects another
+  backend; transfers, converts, restores, synchronizes, allocates, retries,
+  falls back, or recovers. The resident-Warp adapter forwards the caller-owned
+  RNG sidecar and its explicit initialization intent unchanged; the direct
+  kernel owns native physical/schema validation, RNG advancement/reset, and
+  post-launch behavior. CPU and Warp stochastic trajectories are independent.
+  All carriers and adapters are absent from `particula.execution`, the adapters
+  package, and top-level exports.
 - `tests/` - Test coverage
 
 ## Particle Package

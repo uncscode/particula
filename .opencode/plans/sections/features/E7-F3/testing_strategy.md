@@ -36,11 +36,16 @@ rows skip cleanly when unavailable.
   single runnable call, and one resolver/kernel call for native-schema and
   writer-like post-launch failures. Native exceptions propagate by identity and
   writer mutations remain visible; no recovery or rollback is asserted.
-- **P5:** Run one-box and multi-box Brownian fixtures on Warp CPU. Compare
-  deterministic rate inputs to independent CPU/NumPy references, then test
-  aggregate stochastic behavior, accepted-pair bounds, mass/charge
-  conservation, inactive slots, RNG progression, reset replay, and no
-  intermediate transfer. Add optional CUDA rows without exact CPU/CUDA replay.
+- **P5 (implemented):**
+  `particula/execution/tests/coagulation_integration_test.py` adds isolated CPU
+  reference and resident-Warp fixture/assertion coverage. It covers one- and
+  multi-box resource identity, concentration-weighted mass and signed-charge
+  conservation, active-only/disjoint pair validity, inactive-slot preservation,
+  box isolation, exact zero/one-active no-merge cases, a fixed 100-trial
+  three-sigma acceptance check, persistent RNG advancement, explicit RNG-reset
+  replay, and optional CUDA invariant rows. The retained adapter tests prove no
+  selected-path conversion, restore, implicit synchronization, or fallback.
+  CPU/Warp trajectories are not compared seed-by-seed.
 - **P6:** Execute focused examples/import snippets, documentation regression
   tests, link checks, and `mkdocs build --strict`.
 
