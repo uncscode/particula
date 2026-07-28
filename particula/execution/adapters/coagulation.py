@@ -382,9 +382,10 @@ def _validate_ownership(
 class WarpBrownianCoagulationState:
     """Retain a resident direct-Brownian request without native validation.
 
-    Only primary kind, environment/direct-input form, required persistent RNG,
-    and metadata-detectable sidecar ownership are checked.  Physical values,
-    array schemas, and direct-kernel ordering remain native concerns.
+    Only marker, container kind, environment/direct-input form, selected time,
+    required persistent RNG, and metadata-detectable sidecar ownership are
+    checked. Particle, environment/volume, output-buffer, device, dtype,
+    capacity, and detailed RNG schemas remain native-kernel concerns.
 
     Construction is write-free: it does not import a kernel, transfer,
     synchronize, allocate, seed, reset, or advance ``rng_states``. A future
@@ -399,7 +400,7 @@ class WarpBrownianCoagulationState:
             ``environment``.
         pressure: Direct caller-owned pressure, or ``None`` with
             ``environment``.
-        time_step: Opaque direct-kernel time-step input.
+        time_step: Finite, nonnegative real direct-kernel time step in s.
         volume: Optional opaque direct-kernel volume input.
         collision_pairs: Optional caller-owned collision-pair output.
         n_collisions: Optional caller-owned collision-count output.
@@ -414,8 +415,9 @@ class WarpBrownianCoagulationState:
             has an invalid type.
         RuntimeError: If the optional Warp runtime is unavailable after valid
             configuration preflight.
-        ValueError: If input form is invalid, no RNG sidecar is supplied, or
-            metadata establishes forbidden caller-resource aliasing.
+        ValueError: If input form or selected time is invalid, no RNG sidecar
+            is supplied, or metadata establishes forbidden caller-resource
+            aliasing.
     """
 
     config: BrownianCoagulationConfig
@@ -432,7 +434,7 @@ class WarpBrownianCoagulationState:
     environment: object | None = None
 
     def __post_init__(self) -> None:
-        """Perform ordered kind, form, required-RNG, and ownership checks.
+        """Perform ordered kind, form, time, required-RNG, and ownership checks.
 
         The configuration check occurs before the lazy Warp import, preserving
         CPU-only construction and deterministic error ordering.
@@ -440,7 +442,8 @@ class WarpBrownianCoagulationState:
         Raises:
             TypeError: If a selection-owned kind check fails.
             RuntimeError: If Warp is unavailable after configuration preflight.
-            ValueError: If resource form, RNG presence, or ownership is invalid.
+            ValueError: If resource form, selected time, RNG presence, or
+                ownership is invalid.
         """
         if type(self.config) is not BrownianCoagulationConfig:
             raise TypeError("config must be a BrownianCoagulationConfig.")
@@ -476,6 +479,7 @@ class WarpBrownianCoagulationState:
             raise ValueError(
                 "provide either environment or both temperature and pressure."
             )
+        _validate_time_step(self.time_step)
         if self.rng_states is None:
             raise ValueError("rng_states must be supplied.")
         protected = _available_fields(

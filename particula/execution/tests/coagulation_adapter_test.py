@@ -3,9 +3,9 @@
 import os
 import subprocess
 import sys
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import pytest
@@ -30,6 +30,29 @@ from particula.execution.adapters.coagulation import (
     _memory_range,
     _overlaps,
     _validate_ownership,
+)
+
+
+@dataclass(frozen=True)
+class _RequestedCoagulationMechanism:
+    """Represent a test-only request for a non-Brownian mechanism."""
+
+    mechanisms: tuple[str, ...]
+    distribution_type: str = "particle_resolved"
+
+
+class _BrownianMarkerSubclass(BrownianCoagulationConfig):
+    """Exercise the exact Brownian marker boundary."""
+
+
+_UNSUPPORTED_MARKERS = (
+    _RequestedCoagulationMechanism(("charged_hard_sphere",)),
+    _RequestedCoagulationMechanism(("sedimentation_sp2016",)),
+    _RequestedCoagulationMechanism(("turbulent_shear_st1956",)),
+    _RequestedCoagulationMechanism(("brownian", "charged_hard_sphere")),
+    _RequestedCoagulationMechanism(("unknown",)),
+    _RequestedCoagulationMechanism(("brownian",), "discrete"),
+    _BrownianMarkerSubclass(),
 )
 
 
@@ -93,6 +116,50 @@ def test_cpu_carriers_require_exact_config_and_validate_result_kind() -> None:
         CPUCoagulationResult(state, object())  # type: ignore[arg-type]
 
 
+@pytest.mark.parametrize("marker", _UNSUPPORTED_MARKERS)
+def test_cpu_p2_rejects_non_brownian_requests_before_runnable(
+    marker: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test CPU P2 rejects unsupported markers before runnable execution."""
+    monkeypatch.setattr(
+        Coagulation,
+        "execute",
+        lambda *_: pytest.fail("invalid marker must not invoke the runnable"),
+    )
+
+    with pytest.raises(
+        TypeError, match="^config must be a BrownianCoagulationConfig.$"
+    ):
+        CPUCoagulationState(marker, _aerosol())  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("marker", _UNSUPPORTED_MARKERS)
+def test_warp_p2_rejects_non_brownian_requests_before_resolver(
+    marker: object,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test Warp P2 rejects unsupported markers before lazy resolution."""
+    monkeypatch.setattr(
+        coagulation_adapter,
+        "_get_coagulation_step_gpu",
+        lambda: pytest.fail("invalid marker must not resolve the kernel"),
+    )
+
+    with pytest.raises(
+        TypeError, match="^config must be a BrownianCoagulationConfig.$"
+    ):
+        WarpBrownianCoagulationState(
+            cast(BrownianCoagulationConfig, marker),
+            object(),
+            object(),
+            None,
+            object(),
+            rng_states=None,
+            environment=object(),
+        )
+
+
 def test_cpu_result_requires_exact_state_before_other_validation() -> None:
     """Test CPU result rejects state subclasses before inspecting aerosol."""
 
@@ -139,6 +206,61 @@ assert not any(
     or name == "particula.gpu" or name.startswith("particula.gpu.")
     for name in sys.modules
 )
+"""
+    completed = subprocess.run(  # noqa: S603 -- fixed interpreter and script
+        [sys.executable, "-c", script],
+        cwd=root,
+        capture_output=True,
+        check=False,
+        env=environment,
+        text=True,
+    )
+
+    assert completed.returncode == 0, (
+        f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
+    )
+
+
+def test_warp_p2_marker_validation_precedes_optional_warp_import() -> None:
+    """Test invalid markers fail before Warp import and valid markers need Warp."""
+    root = Path(__file__).parents[3]
+    environment = os.environ | {
+        "PYTHONPATH": os.pathsep.join(
+            filter(None, (str(root), os.environ.get("PYTHONPATH")))
+        )
+    }
+    script = """
+import builtins
+
+from particula.execution.adapters.coagulation import (
+    BrownianCoagulationConfig,
+    WarpBrownianCoagulationState,
+)
+
+original_import = builtins.__import__
+def guarded_import(name, *args, **kwargs):
+    if name == "warp" or name.startswith("warp."):
+        raise ModuleNotFoundError("blocked Warp import", name="warp")
+    return original_import(name, *args, **kwargs)
+
+builtins.__import__ = guarded_import
+try:
+    WarpBrownianCoagulationState(object(), object(), None, None, 1.0)
+except TypeError as error:
+    assert str(error) == "config must be a BrownianCoagulationConfig."
+else:
+    raise AssertionError("invalid marker did not reject")
+
+try:
+    WarpBrownianCoagulationState(
+        BrownianCoagulationConfig(), object(), None, None, 1.0
+    )
+except RuntimeError as error:
+    assert str(error) == (
+        "Warp is required to construct WarpBrownianCoagulationState."
+    )
+else:
+    raise AssertionError("valid marker did not attempt Warp import")
 """
     completed = subprocess.run(  # noqa: S603 -- fixed interpreter and script
         [sys.executable, "-c", script],
@@ -386,7 +508,7 @@ def test_warp_state_construction_is_write_free_and_never_dispatches(
         particles,
         None,
         None,
-        object(),
+        1.0,
         collision_pairs=collision_pairs,
         n_collisions=n_collisions,
         rng_states=rng_states,
@@ -402,11 +524,23 @@ def test_warp_state_construction_is_write_free_and_never_dispatches(
 
 @pytest.mark.warp
 def test_warp_state_preserves_p2_validation_order() -> None:
-    """Test config, resource kind, form, RNG, then ownership precedence."""
+    """Test config, resource kind, form, time, RNG, then ownership order."""
     wp = pytest.importorskip("warp")
     particles = _warp_particles()
     environment = _environment()
-    _rng_states = wp.zeros(1, dtype=wp.uint32, device="cpu")
+    rng_states = wp.zeros(1, dtype=wp.uint32, device="cpu")
+    resources = (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        environment.temperature,
+        environment.pressure,
+        environment.saturation_ratio,
+        rng_states,
+    )
+    before = _resource_values(*resources)
     invalid_config: Any = object()
 
     with pytest.raises(
@@ -437,6 +571,17 @@ def test_warp_state_preserves_p2_validation_order() -> None:
         WarpBrownianCoagulationState(
             BrownianCoagulationConfig(), particles, None, None, 1.0
         )
+    for invalid_time, error in ((object(), TypeError), (-1.0, ValueError)):
+        with pytest.raises(error, match="^time_step"):
+            WarpBrownianCoagulationState(
+                BrownianCoagulationConfig(),
+                particles,
+                None,
+                None,
+                invalid_time,
+                rng_states=particles.concentration,
+                environment=environment,
+            )
     with pytest.raises(ValueError, match="^rng_states must be supplied.$"):
         WarpBrownianCoagulationState(
             BrownianCoagulationConfig(),
@@ -458,6 +603,8 @@ def test_warp_state_preserves_p2_validation_order() -> None:
             rng_states=particles.concentration,
             environment=environment,
         )
+    for expected, resource in zip(before, resources, strict=True):
+        np.testing.assert_array_equal(resource.numpy(), expected)
 
 
 @pytest.mark.warp
@@ -474,7 +621,7 @@ def test_warp_state_defers_native_schema_validation() -> None:
         particles,
         temperature,
         pressure,
-        object(),
+        1.0,
         rng_states=opaque_rng_state,
     )
 
@@ -552,7 +699,7 @@ def test_warp_state_retains_request_and_rng_intent_by_identity() -> None:
         particles,
         None,
         None,
-        object(),
+        1.0,
         collision_pairs=collision_pairs,
         n_collisions=n_collisions,
         rng_states=rng_states,
@@ -920,6 +1067,7 @@ def test_warp_adapter_forwards_p2_resources_once(
     )
     state = WarpBrownianCoagulationExecutionState(p2_state)
     calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
+    resolver_calls = 0
 
     def kernel(
         *args: object, **kwargs: object
@@ -928,10 +1076,17 @@ def test_warp_adapter_forwards_p2_resources_once(
         calls.append((args, kwargs))
         return particles, collision_pairs, n_collisions
 
+    def resolve() -> Any:
+        """Record the sole native resolver call."""
+        nonlocal resolver_calls
+        resolver_calls += 1
+        return kernel
+
     monkeypatch.setattr(
-        coagulation_adapter, "_get_coagulation_step_gpu", lambda: kernel
+        coagulation_adapter, "_get_coagulation_step_gpu", resolve
     )
     result = WarpBrownianCoagulationExecutionAdapter().execute(state)
+    assert resolver_calls == 1
     assert len(calls) == 1
     args, kwargs = calls[0]
     assert args == (
@@ -1077,6 +1232,7 @@ def test_warp_adapter_rejects_replaced_results_without_retry(
         environment=_environment(),
     )
     calls = 0
+    resolver_calls = 0
 
     def kernel(*_: object, **__: object) -> tuple[object, object, object]:
         """Return a replacement particle object after one selected call."""
@@ -1084,14 +1240,21 @@ def test_warp_adapter_rejects_replaced_results_without_retry(
         calls += 1
         return object(), collision_pairs, n_collisions
 
+    def resolve() -> Any:
+        """Record native resolution before returning the invalid result."""
+        nonlocal resolver_calls
+        resolver_calls += 1
+        return kernel
+
     monkeypatch.setattr(
-        coagulation_adapter, "_get_coagulation_step_gpu", lambda: kernel
+        coagulation_adapter, "_get_coagulation_step_gpu", resolve
     )
     with pytest.raises(ValueError, match="particles must be state.particles"):
         WarpBrownianCoagulationExecutionAdapter().execute(
             WarpBrownianCoagulationExecutionState(p2_state)
         )
     assert calls == 1
+    assert resolver_calls == 1
 
 
 @pytest.mark.warp
@@ -1151,10 +1314,20 @@ def test_warp_adapter_rejects_replaced_diagnostics_and_reuses_rng(
 
 
 @pytest.mark.warp
-def test_warp_adapter_propagates_kernel_failure_without_retry(
+@pytest.mark.parametrize(
+    ("label", "failure"),
+    [
+        ("particle_environment_volume", ValueError("native particle failure")),
+        ("output_capacity_dtype_device", ValueError("native output failure")),
+        ("rng_schema", ValueError("native RNG failure")),
+    ],
+)
+def test_warp_adapter_propagates_native_sentinels_once(
     monkeypatch: pytest.MonkeyPatch,
+    label: str,
+    failure: Exception,
 ) -> None:
-    """Test a selected kernel exception propagates without adapter recovery."""
+    """Test selected native exceptions propagate without adapter recovery."""
     wp = pytest.importorskip("warp")
     p2_state = WarpBrownianCoagulationState(
         BrownianCoagulationConfig(),
@@ -1165,8 +1338,8 @@ def test_warp_adapter_propagates_kernel_failure_without_retry(
         rng_states=wp.zeros(1, dtype=wp.uint32, device="cpu"),
         environment=_environment(),
     )
-    failure = RuntimeError("kernel failure")
     calls = 0
+    resolver_calls = 0
 
     def kernel(*_: object, **__: object) -> tuple[object, object, object]:
         """Raise a sentinel error after exactly one native invocation."""
@@ -1174,14 +1347,75 @@ def test_warp_adapter_propagates_kernel_failure_without_retry(
         calls += 1
         raise failure
 
+    def resolve() -> Any:
+        """Record native resolution before returning the sentinel kernel."""
+        nonlocal resolver_calls
+        resolver_calls += 1
+        return kernel
+
     monkeypatch.setattr(
-        coagulation_adapter,
-        "_get_coagulation_step_gpu",
-        lambda: kernel,
+        coagulation_adapter, "_get_coagulation_step_gpu", resolve
+    )
+    with pytest.raises(type(failure)) as error:
+        WarpBrownianCoagulationExecutionAdapter().execute(
+            WarpBrownianCoagulationExecutionState(p2_state)
+        )
+    assert error.value is failure
+    assert label in {
+        "particle_environment_volume",
+        "output_capacity_dtype_device",
+        "rng_schema",
+    }
+    assert resolver_calls == 1
+    assert calls == 1
+
+
+@pytest.mark.warp
+def test_warp_adapter_preserves_writer_mutation_after_native_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a writer failure leaves its caller-owned sidecar mutation intact."""
+    wp = pytest.importorskip("warp")
+    particles = _warp_particles()
+    rng_states = wp.array([19], dtype=wp.uint32, device="cpu")
+    p2_state = WarpBrownianCoagulationState(
+        BrownianCoagulationConfig(),
+        particles,
+        None,
+        None,
+        1.0,
+        rng_states=rng_states,
+        environment=_environment(),
+    )
+    failure = RuntimeError("writer failure")
+    calls = 0
+    resolver_calls = 0
+
+    def writer(*_: object, **__: object) -> tuple[object, object, object]:
+        """Mutate the supplied sidecar before raising the native sentinel."""
+        nonlocal calls
+        calls += 1
+        wp.copy(
+            rng_states,
+            wp.array([101], dtype=wp.uint32, device="cpu"),
+        )
+        raise failure
+
+    def resolve() -> Any:
+        """Record native resolution before returning the writer sentinel."""
+        nonlocal resolver_calls
+        resolver_calls += 1
+        return writer
+
+    monkeypatch.setattr(
+        coagulation_adapter, "_get_coagulation_step_gpu", resolve
     )
     with pytest.raises(RuntimeError) as error:
         WarpBrownianCoagulationExecutionAdapter().execute(
             WarpBrownianCoagulationExecutionState(p2_state)
         )
+
     assert error.value is failure
+    assert resolver_calls == 1
     assert calls == 1
+    np.testing.assert_array_equal(rng_states.numpy(), np.array([101]))
