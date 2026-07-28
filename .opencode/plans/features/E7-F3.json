@@ -71,11 +71,11 @@
     {
       "id": "E7-F3-P4",
       "title": "Add unsupported-mode and failure-boundary validation with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-28",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
