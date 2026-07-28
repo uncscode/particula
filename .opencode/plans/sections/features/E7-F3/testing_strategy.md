@@ -27,9 +27,15 @@ rows skip cleanly when unavailable.
   they cover both direct temperature/pressure and environment-backed P2 forms.
   They do not claim native physics, stochastic, conservation, CUDA, or P4
   unsupported-mode coverage.
-- **P4:** Cover malformed state, invalid time, unavailable backend/device,
-  charged/sedimentation/turbulent/combined requests, output capacity mismatch,
-  launch failures, and preflight-atomic versus post-launch no-rollback wording.
+- **P4 (implemented):** Focused adapter tests parameterize charged,
+  sedimentation, turbulent, combined, unknown, discrete-Brownian, and inexact
+  marker request-shaped values and assert exact-marker rejection before CPU
+  dispatch, optional Warp import, or lazy resolver access. They cover Warp P2
+  precedence (including selected time before missing RNG/alias), no-mutation
+  snapshots for selection rejection, CPU execution-control rejection before its
+  single runnable call, and one resolver/kernel call for native-schema and
+  writer-like post-launch failures. Native exceptions propagate by identity and
+  writer mutations remain visible; no recovery or rollback is asserted.
 - **P5:** Run one-box and multi-box Brownian fixtures on Warp CPU. Compare
   deterministic rate inputs to independent CPU/NumPy references, then test
   aggregate stochastic behavior, accepted-pair bounds, mass/charge

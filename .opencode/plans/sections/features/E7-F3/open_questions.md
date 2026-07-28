@@ -44,6 +44,15 @@
   - Evidence:
     - `.opencode/plans/sections/features/E7-F3/implementation_tasks.md:5` - the
       canonical task names the concrete adapter module and lazy import boundary.
-    - `.opencode/plans/sections/features/E7-F1/architecture_design.md:39` - the
-      neutral layer owns generic request, result, state, and adapter protocols.
-  - Resolved by: plan-question-resolver
+   - `.opencode/plans/sections/features/E7-F1/architecture_design.md:39` - the
+     neutral layer owns generic request, result, state, and adapter protocols.
+   - Resolved by: plan-question-resolver
+
+- [x] Should the adapter classify native direct-kernel mechanism configurations?
+  - Resolved 2026-07-28: No. Its state carriers accept only the exact,
+    fieldless `BrownianCoagulationConfig` marker; every other object is rejected
+    before optional Warp import, kernel resolution, or CPU dispatch.
+  - Rationale: Native mechanism/configuration resolution remains owned by the
+    direct kernel, and adapter classification would widen this concrete-only
+    seam.
+  - Evidence: issue #1480 implementation at commit `0dfce5efb`.

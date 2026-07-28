@@ -1,8 +1,8 @@
 # Documentation Updates
 
-## P2/P3 Status
+## P2/P3/P4 Status
 
-No user-facing documentation or exports changed in P2 or P3. P3 remains a
+No user-facing documentation or exports changed in P2, P3, or P4. The adapter remains a
 concrete-only adapter boundary, so this implementation intentionally adds no
 README, feature-guide, API-reference, example, or public-export documentation.
 Selected API documentation remains deferred to P6.

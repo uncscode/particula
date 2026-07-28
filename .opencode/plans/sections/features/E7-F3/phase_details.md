@@ -42,13 +42,20 @@
     direct/environment forwarding, lazy resolution, identity, RNG handoff,
     no-conversion/no-sync/no-fallback, and failure coverage
 
-- [ ] **E7-F3-P4:** Add unsupported-mode and failure-boundary validation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Fail closed for non-Brownian requests and preserve issue #1451 validation, preflight atomicity, and post-launch no-rollback semantics.
-  - Files: `particula/execution.py`,
-    `particula/execution/adapters/coagulation.py`,
+- [x] **E7-F3-P4:** Validate the Brownian adapter failure boundary with unit tests
+  - Issue: #1480 | Size: S | Status: Completed 2026-07-28
+  - Delivered: Exact-type, fieldless `BrownianCoagulationConfig` marker
+    validation now rejects all non-Brownian request-shaped objects before CPU
+    dispatch, optional Warp import, or lazy native-kernel resolution. Warp P2
+    validates selected finite, nonnegative time while retaining native ownership
+    of physical and resident-array schemas. CPU validates execution controls
+    before one runnable call; Warp resolves/calls once and propagates native and
+    post-launch failures without recovery or rollback.
+  - Files: `particula/execution/adapters/coagulation.py`,
     `particula/execution/tests/coagulation_adapter_test.py`
-  - Tests: Charged/sedimentation/turbulent/combined rejection, invalid time/state/device, validation order, launch failure propagation
+  - Tests: Marker-first CPU/Warp rejection and no-Warp subprocess coverage;
+    ordered Warp P2 rejection/no-mutation snapshots; CPU control rejection;
+    and one-call native/pass-through/writer-failure coverage
 
 - [ ] **E7-F3-P5:** Prove parity stochastic behavior conservation and persistent RNG integration
   - Issue: TBD | Size: S | Status: Not Started

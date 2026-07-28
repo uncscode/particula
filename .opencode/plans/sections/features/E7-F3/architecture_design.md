@@ -34,17 +34,22 @@ is never inferred from a repeated seed value. The adapter must not upload,
 restore, synchronize, allocate a hidden long-lived stream, or catch a runtime
 failure to invoke CPU.
 
-### P2 Carrier Boundary (implemented)
+### P2 Carrier Boundary (implemented through P4)
 
 `particula.execution.adapters.coagulation` now supplies concrete-only frozen
 CPU and resident-Warp Brownian request/result carriers. They retain resources
-by identity, use selection-owned kind and metadata-detectable alias checks, and
-leave physical schemas, direct-kernel validation, dispatch, and mutation to a
-future call boundary. `rng_states`, `rng_seed`, and `initialize_rng` record
+by identity, use an exact `BrownianCoagulationConfig` marker, selection-owned
+kind/form, selected-time, and metadata-detectable alias checks, and leave
+physical schemas, direct-kernel validation, dispatch, and mutation to the
+native boundary. The marker check precedes optional Warp import and lazy-kernel
+resolution, so request-shaped non-Brownian values fail closed without probing
+the native resolver. `rng_states`, `rng_seed`, and `initialize_rng` record
 caller-owned persistent-RNG intent without seeding, resetting, advancing, or
 otherwise mutating the sidecar. At P2, the carriers did not dispatch or import
-kernels; they performed no transfer, synchronization, allocation, or backend
-selection, and did not change package exports.
+kernels for invalid markers; they performed no transfer, synchronization,
+allocation, or export change. The direct Warp kernel remains authoritative for
+particle, environment/volume, output-buffer, device, dtype, capacity, and
+detailed RNG schemas.
 
 ### P3 Dispatch Boundary (implemented)
 
@@ -55,7 +60,7 @@ one positional `Coagulation.execute(aerosol, time_step, sub_steps)` call. The
 returned aerosol must retain the P2 aerosol identity.
 
 `WarpBrownianCoagulationExecutionState` retains the exact P2 Warp state without
-resolving the kernel or inspecting resident resources. Its adapter resolves
+resolving the kernel or revalidating native resource schemas. Its adapter resolves
 `coagulation_step_gpu` lazily only after exact-state preflight, calls it once
 with the P2 direct/environment form, diagnostics, and RNG sidecar/intent, and
 wraps its native tuple only after existing identity checks. Neither adapter
@@ -93,9 +98,11 @@ separate work.
 
 ## Validation and Failure Semantics
 
-Selection-level checks cover request/process/mode, backend/device availability,
-state kind, finite nonnegative time, explicit Brownian-only capability, and
-required persistent resource declarations before adapter invocation. The Warp
+The concrete P4 selection boundary accepts only the exact Brownian marker before
+CPU dispatch, optional Warp import, or Warp resolver access. Warp P2 validates
+kind/form and finite, nonnegative selected time before required RNG and
+metadata-detectable alias checks. CPU validates finite, nonnegative selected
+time and positive integral `sub_steps` before its sole runnable call. The Warp
 entry point remains authoritative for particle arrays, environment/volume,
 output capacity/dtype/device, RNG schema, and detailed validation order.
 Pre-launch rejection must leave caller state unchanged. After Warp launches,

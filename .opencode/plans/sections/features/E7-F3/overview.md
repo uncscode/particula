@@ -30,6 +30,15 @@ resident resources and RNG intent. Both return `ExecutionResult` with
 selection, conversion, synchronization, fallback, public exports, and
 user-facing documentation remain outside this completed phase.
 
+E7-F3-P4 closes the adapter failure boundary. State construction accepts only
+the fieldless, exact-type `BrownianCoagulationConfig` marker, rejecting all
+other request-shaped objects before Warp import or lazy kernel resolution. Warp
+P2 additionally owns finite, nonnegative selected-time validation while
+retaining native ownership of particle, environment/volume, output, device,
+dtype, capacity, and detailed RNG schemas. CPU validates selected execution
+controls before its one runnable call; Warp resolves and calls the native entry
+point once and propagates native and post-launch failures without recovery.
+
 ## User Stories
 
 - As a simulation user, I want to request Brownian coagulation by backend so

@@ -21,9 +21,12 @@
 - [x] Preserve particles, supplied output buffers, and RNG identities in typed
   P2 results wrapped by `ExecutionResult` with `MutationScope.STATE`, without
   host collision-count readback.
-- [ ] Reject charged, sedimentation, turbulent, combined, unsupported
-  distribution, unavailable-device, and malformed state requests before
-  concrete invocation where selection owns the check.
+- [x] Fail closed on every non-exact Brownian marker, including charged,
+  sedimentation, turbulent, combined, unknown, and unsupported-distribution
+  request-shaped values, before CPU dispatch, Warp import, or lazy resolution.
+- [x] Validate Warp selected time at P2 and CPU selected time/`sub_steps` at P3;
+  retain native ownership of resident physical, output, device, dtype, capacity,
+  and detailed RNG schema validation.
 - [x] Propagate concrete runtime failures without CPU retry, transfer,
   synchronization, RNG reset, or rollback claims.
 - [ ] Add only E7-F6-approved public exports and retain concrete mechanism and
@@ -36,8 +39,10 @@
   identity, ownership/alias rejection, and write-free construction; reserve
   dispatch and cross-backend fixtures for later phases.
 - [x] Add focused P3 boundary tests for CPU controls and one-call delegation;
-  Warp direct/environment forwarding, lazy resolution, identity, persistent RNG
-  handoff, and no conversion/synchronization/fallback; and failure propagation.
+   Warp direct/environment forwarding, lazy resolution, identity, persistent RNG
+   handoff, and no conversion/synchronization/fallback; and failure propagation.
+- [x] Add P4 marker-precedence, no-Warp import, ordered P2 no-mutation,
+  one-resolver/one-kernel pass-through, and post-launch no-recovery tests.
 - [ ] Add repeated-call tests proving RNG progression without reseeding and
   explicit reset reproducibility from the same seed.
 - [ ] Add one-box and multi-box Warp CPU invariant tests for mass/charge
