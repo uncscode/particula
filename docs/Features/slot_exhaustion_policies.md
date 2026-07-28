@@ -2,7 +2,7 @@
 
 ## Complete direct-process context
 
-Fixed-shape slot sidecars remain caller-owned in the illustrative [direct-process example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). See [private P2 evidence](../../particula/gpu/tests/process_sequence_test.py) and the [P3 regression](../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py). This documentation does not add resizing, hidden transfer, CPU fallback, or a production scheduler.
+Fixed-shape slot sidecars remain caller-owned in the illustrative [direct-process example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py). See [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and the [P3 regression](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py). This documentation does not add resizing, hidden transfer, CPU fallback, or a production scheduler.
 
 This guide documents shipped fixed-capacity CPU primitives and direct Warp
 primitives. The concrete CPU-only P3

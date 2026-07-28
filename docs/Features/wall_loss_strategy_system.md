@@ -2,7 +2,7 @@
 
 ## Complete direct-process context
 
-The direct wall-loss call appears in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), with [private P2 evidence](../../particula/gpu/tests/process_sequence_test.py) and a [P3 regression](../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py). Caller-owned persistent RNG and sidecars remain explicit; this is not a `Runnable`, backend selector, scheduler, or CPU fallback.
+The direct wall-loss call appears in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), with [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [P3 regression](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py). Caller-owned persistent RNG and sidecars remain explicit; this is not a `Runnable`, backend selector, scheduler, or CPU fallback.
 
 > Strategy-based wall loss for chamber simulations that plugs directly into particula's dynamics workflow.
 

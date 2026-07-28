@@ -1231,24 +1231,24 @@ that nucleation and graph capture depend on.
 
 | ID | Title | Status text |
 | --- | --- | --- |
-| [`E6`](../../../.opencode/plans/epics/E6.json) | GPU Process Completeness | Shipped |
-| [`E6-F1`](../../../.opencode/plans/features/E6-F1.json) | CPU Dilution Strategy and Runnable Reference | Shipped |
-| [`E6-F2`](../../../.opencode/plans/features/E6-F2.json) | Direct GPU Dilution with CPU Parity | Shipped |
-| [`E6-F3`](../../../.opencode/plans/features/E6-F3.json) | Neutral Spherical and Rectangular GPU Wall Loss | Shipped |
-| [`E6-F4`](../../../.opencode/plans/features/E6-F4.json) | Charged GPU Wall Loss with Neutral Fallback | Shipped |
-| [`E6-F5`](../../../.opencode/plans/features/E6-F5.json) | CPU and GPU Fixed-Slot Activation and Diagnostics | Shipped |
-| [`E6-F6`](../../../.opencode/plans/features/E6-F6.json) | CPU and GPU Slot Exhaustion Policies | Shipped |
-| [`E6-F7`](../../../.opencode/plans/features/E6-F7.json) | CPU Nucleation and Particle-Source Process | Shipped |
-| [`E6-F8`](../../../.opencode/plans/features/E6-F8.json) | Direct GPU Nucleation Process | Shipped |
-| [`E6-F9`](../../../.opencode/plans/features/E6-F9.json) | Integrated Validation Documentation and Epic Closeout | Shipped |
+| `E6` | GPU Process Completeness | Shipped |
+| `E6-F1` | CPU Dilution Strategy and Runnable Reference | Shipped |
+| `E6-F2` | Direct GPU Dilution with CPU Parity | Shipped |
+| `E6-F3` | Neutral Spherical and Rectangular GPU Wall Loss | Shipped |
+| `E6-F4` | Charged GPU Wall Loss with Neutral Fallback | Shipped |
+| `E6-F5` | CPU and GPU Fixed-Slot Activation and Diagnostics | Shipped |
+| `E6-F6` | CPU and GPU Slot Exhaustion Policies | Shipped |
+| `E6-F7` | CPU Nucleation and Particle-Source Process | Shipped |
+| `E6-F8` | Direct GPU Nucleation Process | Shipped |
+| `E6-F9` | Integrated Validation Documentation and Epic Closeout | Shipped |
 
 The private
-[P2 sequence evidence](../../../particula/gpu/tests/process_sequence_test.py)
+[P2 sequence evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py)
 and [P3 published source](../../Examples/gpu_complete_process_sequence.py) cover
 the fixed illustrative order: `condensation_step_gpu`,
 `coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, then
 `nucleation_step_gpu`. This is illustrative, not a production coordinator;
-the P3 [regression](../../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py)
+the P3 [regression](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py)
 keeps explicit transfers visible.
 
 Delivered dilution scope:
@@ -1505,6 +1505,12 @@ own contracts exist and do not alter the shipped direct-kernel path.
 - E7-F2, E7-F3, and E7-F4 may add their bounded consumers only after their
   process-adapter or resident-lifecycle contracts are established. E7-F5 is a
   later consumer, not a consequence of E7-F1 selection alone.
+- E7-F3 P6 has shipped bounded selected-Brownian adapter documentation and
+  evidence in the [coagulation strategy guide](../coagulation_strategy_system.md)
+  and its [explicit-transfer example](../../Examples/gpu_coagulation_direct.py).
+  It preserves the direct-kernel contract and defers E7-F4 resident sessions,
+  E7-F5 scheduling, E7-F8 checkpoint/restart stream policy, public exports,
+  fallback, and hidden transfer.
 
 ### Full GPU-Resident Simulation
 

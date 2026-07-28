@@ -2,7 +2,7 @@
 
 ## Complete direct-process context
 
-The direct coagulation call is part of the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), with [private P2 evidence](../../particula/gpu/tests/process_sequence_test.py) and a [P3 regression](../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py). Persistent RNG remains caller-owned; the example is not a backend selector, scheduler, `Runnable`, resident loop, or CPU fallback.
+The direct coagulation call is part of the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), with [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [P3 regression](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py). Persistent RNG remains caller-owned; the example is not a backend selector, scheduler, `Runnable`, resident loop, or CPU fallback.
 
 > Strategy-based coagulation kernels with unified builders, factory selection, runnable integration, and particle-resolved support.
 
@@ -499,11 +499,66 @@ pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q 
 This optional/local command is additive and skips cleanly when CUDA is
 unavailable.
 
-For a runnable Brownian-only introduction to this direct path, see the
-[direct GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py). It
-keeps transfers and caller-owned collision/RNG sidecars explicit; it is an
-example of the supported direct interface, not a CPU fallback or a high-level
-`Runnable` workflow. The evidence/command record above defines the complete
+### E7-F3 concrete selected-Brownian adapter
+
+The concrete E7-F3 adapter is a separate selected route beside the
+multi-mechanism direct-kernel contract above. It accepts an exact
+`BrownianCoagulationConfig` marker only. The CPU reference route retains a
+caller-owned `Aerosol` and exact `Coagulation` runnable. The resident-Warp
+route retains caller-owned `WarpParticleData`. It supports Brownian
+`particle_resolved` dispatch only. CPU and Warp stochastic trajectories have
+no seed-by-seed parity claim.
+
+Import the concrete-only marker, state carriers, and adapters from their
+concrete module:
+
+```python
+from particula.execution.adapters.coagulation import (
+    BrownianCoagulationConfig,
+    CPUCoagulationExecutionAdapter,
+    CPUCoagulationExecutionState,
+    CPUCoagulationState,
+    WarpBrownianCoagulationExecutionAdapter,
+    WarpBrownianCoagulationExecutionState,
+    WarpBrownianCoagulationState,
+)
+```
+
+Neither `particula.execution` nor the top-level `particula` package exports
+these concrete names. The exact marker fails closed before selected dispatch
+for charged, sedimentation, turbulent shear, combined, or unknown mechanisms,
+non-`particle_resolved` requests, and marker subclasses. These are
+selection-owned capability errors; native direct-kernel physical, device, and
+schema errors retain their native behavior.
+
+The Warp state accepts exactly one thermo form: provide both `temperature` and
+`pressure` with `environment=None`, or provide `temperature=None` and
+`pressure=None` with a `WarpEnvironmentData`. Optional `volume` is valid in
+either form. Mixing an environment with either direct thermo input fails
+adapter-owned form validation.
+
+The caller retains the aerosol or resident particles, environment or direct
+thermo/volume values, optional collision outputs, and required persistent
+`(n_boxes,)` `wp.uint32` RNG sidecar by identity. Supplied diagnostic outputs
+have an adapter identity guarantee; omitted direct-kernel diagnostics remain
+native call-local convenience results. Diagnostics do not imply a host
+readback. Seed the sidecar on the first selected Warp dispatch with
+`initialize_rng=True`; ordinary later dispatches reuse that identical sidecar
+with `initialize_rng=False`. Only `initialize_rng=True` resets it, even when
+`rng_seed` repeats.
+
+Callers control conversion, restoration, device placement, and
+`wp.synchronize()` before observing or resolving device state. The adapter
+does not upload, restore, synchronize, select a fallback, reseed per step,
+retry, create a session or scheduler, or roll back state after launch. E7-F4
+resident-session lifecycle, E7-F5 scheduling, and E7-F8 checkpoint/restart
+stream policy remain explicitly deferred.
+
+For a runnable selected-Brownian introduction, see the
+[GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py). It
+keeps explicit conversion, synchronization, restoration, and caller-owned
+collision/RNG sidecars; it is not a CPU fallback or a high-level `Runnable`
+workflow. The direct-kernel evidence/command record above remains the complete
 approved-mask evidence boundary.
 
 ## Related Documentation

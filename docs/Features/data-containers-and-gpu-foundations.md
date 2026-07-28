@@ -198,8 +198,8 @@ Configuration and scratch sidecars remain concrete-module imports.
 Caller-owned sidecars have stable fixed shapes; persistent coagulation and
 wall-loss RNG is also caller-owned. There is no hidden transfer or CPU fallback,
 high-level `Runnable`, backend selector, scheduler, resident production loop, or
-transport API. See the [private P2 evidence](../../particula/gpu/tests/process_sequence_test.py),
-[P3 regression](../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py),
+transport API. See the [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py),
+[P3 regression](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py),
 and [E6 inventory](Roadmap/data-oriented-gpu.md#e6-roadmap-inventory).
 
 `WarpParticleData`, `WarpEnvironmentData`, and `WarpGasData` are exported from

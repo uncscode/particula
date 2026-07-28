@@ -1,29 +1,29 @@
 # Documentation Updates
 
-## P2/P3/P4/P5 Status
+## P6 Shipped Documentation
 
-No user-facing documentation or exports changed in P2, P3, P4, or P5. The adapter remains a
-concrete-only adapter boundary, so this implementation intentionally adds no
-README, feature-guide, API-reference, example, or public-export documentation.
-P5 adds test-only CPU/Warp evidence and retains explicit caller synchronization
-and resource ownership; selected API documentation remains deferred to P6.
+P6 documents the concrete-only selected-Brownian coagulation adapter without
+adding a public export or altering the direct-kernel contract. The strategy
+guide now distinguishes the CPU reference route from resident-Warp
+particle-resolved dispatch; it specifies exact marker validation, both Warp
+thermo forms, optional volume, caller-owned diagnostics and persistent RNG,
+and the no-transfer/no-fallback/no-rollback boundary.
 
-- Add backend-selected Brownian coagulation to the E7 backend-selection feature
-  guide, including CPU and Warp setup, explicit backend/device requests, and
-  capability errors.
-- Update the coagulation feature/API documentation with the T3 support matrix:
-  Brownian selection only, CPU reference behavior, Warp particle-resolved
-  behavior, and explicit exclusions for other mechanisms/distributions.
-- Document caller ownership and lifetime of particles, environment/volume,
-  collision buffers, and `(n_boxes,)` persistent RNG state. Show seed once,
-  reuse with no reset, and deliberate reset examples.
-- State that selected execution performs no hidden upload, restore,
-  synchronization, fallback, or per-step reseeding and that asynchronous Warp
-  failures have no rollback guarantee after launch.
-- Add or update a focused runnable example based on
-  `docs/Examples/gpu_coagulation_direct.py` without misrepresenting T3 as the
-  future E7-F4 resident session or E7-F5 scheduler.
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` and E7 plan status only
-  when the implementation evidence ships; preserve Epic H/I deferrals.
-- Add documentation regression coverage for supported imports, limitations,
-  persistent RNG wording, and example execution; run `mkdocs build --strict`.
+The explicit-transfer example constructs the selected Warp state and execution
+carrier for two adapter dispatches. It allocates the direct kernel's effective
+default pair capacity, initializes its caller-owned RNG sidecar once, reuses it,
+synchronizes before restoration, and contains no direct-kernel mechanism or
+collision-capacity arguments.
+
+Hardware-free regression coverage verifies the guide boundary, imports,
+deferrals, links, and forced-no-Warp example path. Focused validation passed:
+
+```bash
+pytest particula/tests/backend_selected_coagulation_docs_test.py -q -Werror
+pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror
+pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror
+```
+
+E7-F4 resident sessions, E7-F5 scheduling, E7-F8 checkpoint/restart stream
+policy, public exports, fallback, and changes to the multi-mechanism direct
+kernel remain deferred.

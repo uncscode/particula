@@ -3,7 +3,7 @@
 ## Complete direct-process context
 
 CPU dilution remains the semantic source. The direct GPU step is one call in the
-illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), backed by [private P2 evidence](../../particula/gpu/tests/process_sequence_test.py) and its [P3 regression](../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py). It does not create public coordination, hidden transfer, CPU fallback, or a resident loop.
+illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py), backed by [private P2 evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and its [P3 regression](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py). It does not create public coordination, hidden transfer, CPU fallback, or a resident loop.
 
 The CPU dilution system provides a bounded chamber-loss process for a single
 `Aerosol`. It is the completed CPU contract from parent **E6**. **E6-F2** is a

@@ -1,10 +1,11 @@
-"""Run direct GPU coagulation with explicit CPU-to-Warp transfers.
+"""Run selected-adapter GPU coagulation with explicit CPU-to-Warp transfers.
 
 This standalone example demonstrates the bounded, low-level,
 particle-resolved Brownian coagulation path. It defaults to Warp ``device="cpu"``
-and reuses caller-owned collision and RNG sidecars for two direct calls before
-explicitly restoring a CPU checkpoint. It has no hidden CPU fallback, Runnable
-API, CUDA requirement, or performance claim.
+and reuses caller-owned collision and RNG sidecars for two concrete
+selected-adapter dispatches before explicitly restoring a CPU checkpoint. It
+has no hidden CPU fallback, Runnable API, CUDA requirement, or performance
+claim.
 """
 
 from __future__ import annotations
@@ -22,7 +23,7 @@ _FORCE_NO_WARP_ENV = "PARTICULA_EXAMPLE_FORCE_NO_WARP"
 
 @dataclass
 class ExampleRun:
-    """Store metadata and optional outputs from the direct coagulation path.
+    """Store metadata and optional outputs from selected-adapter dispatch.
 
     All optional fields are ``None`` when Warp is unavailable or disabled.
 
@@ -103,20 +104,23 @@ def _load_gpu_helpers() -> tuple[bool, Any, Any]:
     )
 
 
-def _load_gpu_runtime() -> tuple[Any, Any, Any]:
-    """Lazily load Warp plus the public step and concrete configuration.
+def _load_gpu_runtime() -> tuple[Any, Any, Any, Any, Any]:
+    """Lazily load Warp and concrete selected-Brownian adapter classes.
 
     Returns:
-        Warp, public ``coagulation_step_gpu``, and concrete
-        ``CoagulationMechanismConfig`` in that order.
+        Warp, the Brownian marker, Warp state, execution state, and execution
+        adapter classes in that order.
     """
     wp = importlib.import_module("warp")
-    kernels = importlib.import_module("particula.gpu.kernels")
-    coagulation = importlib.import_module("particula.gpu.kernels.coagulation")
+    coagulation = importlib.import_module(
+        "particula.execution.adapters.coagulation"
+    )
     return (
         wp,
-        kernels.coagulation_step_gpu,
-        coagulation.CoagulationMechanismConfig,
+        coagulation.BrownianCoagulationConfig,
+        coagulation.WarpBrownianCoagulationState,
+        coagulation.WarpBrownianCoagulationExecutionState,
+        coagulation.WarpBrownianCoagulationExecutionAdapter,
     )
 
 
@@ -136,15 +140,16 @@ def _output_prefix(particle_data: ParticleData) -> list[str]:
 
 
 def run_example(device: str = "cpu") -> ExampleRun:
-    """Run two direct Brownian calls with persistent caller-owned sidecars.
+    """Run two selected-Brownian calls with persistent caller-owned sidecars.
 
     The enabled route transfers the CPU fixture explicitly, executes the public
-    low-level step twice, and restores a CPU checkpoint only after both calls
-    succeed. Failures from runtime loading, conversion, allocation, execution,
-    or restoration propagate without a success result.
+    concrete selected adapter twice, synchronizes once, and restores a CPU
+    checkpoint only after both calls succeed. Failures from runtime loading,
+    conversion, allocation, execution, synchronization, or restoration
+    propagate without a success result.
 
     Args:
-        device: Warp device for the optional direct path. Defaults to Warp CPU.
+        device: Warp device for the optional selected path. Defaults to Warp CPU.
 
     Returns:
         Metadata only when disabled, otherwise the restored checkpoint and
@@ -157,44 +162,47 @@ def run_example(device: str = "cpu") -> ExampleRun:
         return ExampleRun(output=output)
 
     _, to_warp_particle_data, from_warp_particle_data = _load_gpu_helpers()
-    wp, coagulation_step_gpu, mechanism_config_type = _load_gpu_runtime()
+    (
+        wp,
+        config_type,
+        state_type,
+        execution_state_type,
+        adapter_type,
+    ) = _load_gpu_runtime()
     gpu_particle_data = to_warp_particle_data(particle_data, device=device)
     n_boxes = particle_data.n_boxes
-    collision_pairs = wp.zeros((n_boxes, 1, 2), dtype=wp.int32, device=device)
+    collision_capacity = max(1, particle_data.n_particles // 2)
+    collision_pairs = wp.zeros(
+        (n_boxes, collision_capacity, 2), dtype=wp.int32, device=device
+    )
     n_collisions = wp.zeros((n_boxes,), dtype=wp.int32, device=device)
     rng_states = wp.zeros((n_boxes,), dtype=wp.uint32, device=device)
-    mechanism_config = mechanism_config_type(
-        mechanisms=("brownian",),
-        distribution_type="particle_resolved",
-    )
-    common_arguments = {
-        "temperature": 298.15,
-        "pressure": 101325.0,
-        "time_step": 1.0,
-        "volume": gpu_particle_data.volume,
-        "max_collisions": 1,
-        "rng_seed": 41,
-        "collision_pairs": collision_pairs,
-        "n_collisions": n_collisions,
-        "rng_states": rng_states,
-        "mechanism_config": mechanism_config,
-    }
-    _, collision_pairs, n_collisions = coagulation_step_gpu(
-        gpu_particle_data,
-        initialize_rng=True,
-        **common_arguments,
-    )
-    _, collision_pairs, n_collisions = coagulation_step_gpu(
-        gpu_particle_data,
-        initialize_rng=False,
-        **common_arguments,
-    )
+    adapter = adapter_type()
+    for initialize_rng in (True, False):
+        state = state_type(
+            config_type(),
+            gpu_particle_data,
+            298.15,
+            101325.0,
+            1.0,
+            volume=gpu_particle_data.volume,
+            collision_pairs=collision_pairs,
+            n_collisions=n_collisions,
+            rng_states=rng_states,
+            rng_seed=41,
+            initialize_rng=initialize_rng,
+        )
+        result = adapter.execute(execution_state_type(state))
+        backend_result = result.backend_result.value
+        collision_pairs = backend_result.collision_pairs
+        n_collisions = backend_result.n_collisions
+    wp.synchronize()
     restored_particle_data = from_warp_particle_data(gpu_particle_data)
     output.extend(
         [
-            "Explicit helpers: CPU→Warp conversion -> direct coagulation -> CPU checkpoint",
+            "Explicit helpers: CPU→Warp conversion -> selected-adapter dispatch -> CPU checkpoint",
             (
-                "Direct Brownian coagulation complete: "
+                "Selected Brownian coagulation complete: "
                 f"device={device}, calls=2, collision_pairs="
                 f"{collision_pairs.shape}, n_collisions={n_collisions.shape}"
             ),
@@ -202,7 +210,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
                 "Final checkpoint restored: "
                 f"particle_masses={restored_particle_data.masses.shape}"
             ),
-            "Three-item direct return; collision and RNG sidecars remain caller-owned.",
+            "Adapter result retains supplied collision and RNG sidecars by identity.",
             "Persistent RNG state is initialized once and reused by the second call.",
         ]
     )

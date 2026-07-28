@@ -71,8 +71,16 @@
     optional CUDA invariants; no adapter conversion, restore, synchronization,
     or fallback
 
-- [ ] **E7-F3-P6:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document selected Brownian usage, support matrix, outputs, persistent RNG ownership, errors, limitations, and E7-F5/E7-F8 handoffs.
-  - Files: backend-selection feature guide, coagulation docs, focused example/API reference, plan status
-  - Tests: Documentation regression, import snippets/example execution, `mkdocs build --strict`
+- [x] **E7-F3-P6:** Update development documentation
+  - Issue: #1482 | Size: XS | Status: Shipped 2026-07-28
+  - Delivered: Concrete-only selected-Brownian CPU/Warp boundaries, exact
+    import path, thermo forms, ownership, persistent RNG lifecycle, capability
+    exclusions, and E7-F4/E7-F5/E7-F8 deferrals. The focused explicit-transfer
+    example now dispatches through the selected Warp adapter.
+  - Files: `docs/Features/coagulation_strategy_system.md`,
+    `docs/Examples/gpu_coagulation_direct.py`,
+    `particula/tests/backend_selected_coagulation_docs_test.py`, and E7-F3
+    planning records
+  - Tests: `pytest particula/tests/backend_selected_coagulation_docs_test.py -q -Werror`;
+    `pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror`;
+    `pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror`
