@@ -1,15 +1,15 @@
-"""Provide concrete-only Brownian coagulation resource carriers.
+"""Provide concrete-only CPU and resident-Warp Brownian adapters.
 
-These P2 carriers retain caller-owned CPU and resident-Warp resources by
-identity. Frozen dataclasses prohibit field rebinding only; retained resources
-remain mutable. They do not execute a kernel or ``Coagulation`` runnable,
-transfer, synchronize, allocate, select a backend, or seed, reset, or advance
-RNG state.
+P2 carriers and P3 execution states retain caller-owned resources by identity.
+Frozen dataclasses prohibit field rebinding only; retained resources remain
+mutable. The adapters dispatch only their already-selected CPU runnable or
+resident-Warp kernel. They do not select another backend, transfer,
+synchronize, convert, retry, recover, or roll back caller-owned state.
 
-The persistent RNG sidecar records future dispatch intent only. A future direct
-call may seed it only when ``initialize_rng`` is true; otherwise it must reuse
-the supplied sidecar, including when the seed is unchanged. Callers own
-synchronization, recovery, and the absence of rollback after a future launch.
+The persistent RNG sidecar records direct-Warp dispatch intent. A dispatch may
+seed it only when ``initialize_rng`` is true; otherwise it reuses the supplied
+sidecar, including when the seed is unchanged. Callers own synchronization and
+recovery after a kernel launch.
 """
 
 from dataclasses import dataclass
@@ -129,9 +129,18 @@ class CPUCoagulationResult:
 class CPUCoagulationExecutionState:
     """Retain selected CPU coagulation controls and runnable by identity.
 
-    Construction validates only exact P2-state and runnable types. Execution
-    controls remain opaque until dispatch, and the retained resources remain
-    caller-owned and mutable.
+    This concrete-only P3 carrier validates only exact P2-state and runnable
+    types. Execution controls remain opaque until dispatch, and retained
+    resources remain caller-owned and mutable.
+
+    Args:
+        state: Exact P2 CPU state retained by identity.
+        time_step: Original execution time step in s, validated at dispatch.
+        sub_steps: Original number of runnable substeps, validated at dispatch.
+        runnable: Exact caller-owned ``Coagulation`` runnable.
+
+    Raises:
+        TypeError: If ``state`` or ``runnable`` is not the required exact type.
     """
 
     state: CPUCoagulationState
@@ -148,12 +157,24 @@ class CPUCoagulationExecutionState:
 
     @property
     def backend_payload(self) -> Aerosol:
-        """Return the exact caller-owned CPU aerosol payload."""
+        """Return the exact caller-owned CPU aerosol payload.
+
+        Returns:
+            The aerosol retained by the P2 state.
+        """
         return self.state.backend_payload
 
 
 def _validate_time_step(time_step: object) -> None:
-    """Validate a non-boolean, finite, nonnegative real time step."""
+    """Validate a non-boolean, finite, nonnegative real time step.
+
+    Args:
+        time_step: Candidate execution time step in s.
+
+    Raises:
+        TypeError: If ``time_step`` is not a non-boolean real scalar.
+        ValueError: If ``time_step`` is non-finite or negative.
+    """
     if isinstance(time_step, bool) or not isinstance(time_step, Real):
         raise TypeError("time_step must be a real scalar.")
     if not _isfinite_real(time_step) or time_step < 0:
@@ -161,10 +182,28 @@ def _validate_time_step(time_step: object) -> None:
 
 
 class CPUCoagulationExecutionAdapter:
-    """Dispatch one selected CPU coagulation request exactly once."""
+    """Dispatch one selected CPU coagulation request exactly once.
+
+    This concrete-only adapter validates local controls and invokes the
+    caller-owned runnable once without splitting, converting, retrying, or
+    recovering. Successful results retain the original aerosol and declare
+    state mutation. Delegate exceptions propagate unchanged.
+    """
 
     def execute(self, state: ExecutionState) -> ExecutionResult:
-        """Execute one exact CPU P3 state without fallback or recovery."""
+        """Execute one exact CPU P3 state without fallback or recovery.
+
+        Args:
+            state: Exact selected CPU P3 execution state.
+
+        Returns:
+            A result retaining ``state`` and the original aerosol by identity.
+
+        Raises:
+            TypeError: If ``state`` or its time step has an invalid type.
+            ValueError: If controls are invalid or the runnable returns another
+                aerosol.
+        """
         if type(state) is not CPUCoagulationExecutionState:
             raise TypeError("state must be a CPUCoagulationExecutionState.")
         _validate_time_step(state.time_step)
@@ -534,8 +573,16 @@ class WarpBrownianCoagulationResult:
 class WarpBrownianCoagulationExecutionState:
     """Retain one selected resident-Warp coagulation request by identity.
 
-    Construction validates only the exact P2 state. It neither imports a kernel
-    nor inspects or synchronizes the caller-owned resident resources.
+    This concrete-only P3 carrier validates only the exact P2 state. It neither
+    imports a kernel nor inspects or synchronizes caller-owned resident
+    resources.
+
+    Args:
+        state: Exact P2 resident-Warp state retained by identity.
+
+    Raises:
+        TypeError: If ``state`` is not an exact
+            ``WarpBrownianCoagulationState``.
     """
 
     state: WarpBrownianCoagulationState
@@ -549,22 +596,55 @@ class WarpBrownianCoagulationExecutionState:
 
     @property
     def backend_payload(self) -> object:
-        """Return the exact caller-owned resident particle payload."""
+        """Return the exact caller-owned resident particle payload.
+
+        Returns:
+            The particle container retained by the P2 state.
+        """
         return self.state.backend_payload
 
 
 def _get_coagulation_step_gpu() -> Any:
-    """Lazily resolve the optional direct Warp coagulation kernel."""
+    """Lazily resolve the optional direct Warp coagulation kernel.
+
+    Returns:
+        The direct ``coagulation_step_gpu`` kernel entry point.
+
+    Raises:
+        ImportError: If optional Warp kernel dependencies are unavailable.
+    """
     from particula.gpu.kernels import coagulation_step_gpu
 
     return coagulation_step_gpu
 
 
 class WarpBrownianCoagulationExecutionAdapter:
-    """Dispatch one selected resident-Warp Brownian request exactly once."""
+    """Dispatch one selected resident-Warp Brownian request exactly once.
+
+    This concrete-only adapter resolves the selected kernel lazily after local
+    state validation and calls it once. It forwards P2 resources by identity
+    without conversion, synchronization, fallback, retry, or recovery. Kernel
+    exceptions and any post-launch mutation remain governed by the kernel.
+    """
 
     def execute(self, state: ExecutionState) -> ExecutionResult:
-        """Execute one exact Warp P3 state without fallback or recovery."""
+        """Execute one exact Warp P3 state without fallback or recovery.
+
+        Args:
+            state: Exact selected resident-Warp P3 execution state.
+
+        Returns:
+            A result retaining ``state`` and native result resources by
+            identity.
+
+        Raises:
+            TypeError: If ``state`` is not the required exact P3 state.
+            ValueError: If the direct kernel returns resources that violate P2
+                result identity requirements. Direct kernel errors propagate
+                unchanged.
+            ImportError: If optional Warp kernel dependencies are unavailable
+                after local preflight.
+        """
         if type(state) is not WarpBrownianCoagulationExecutionState:
             raise TypeError(
                 "state must be a WarpBrownianCoagulationExecutionState."

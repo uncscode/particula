@@ -22,7 +22,8 @@ ownership, validation, mutation, and unsupported behavior explicit.
   selection layer owns validation.
 - Add CPU/Warp CPU bounded parity, conservation, stochastic, persistence,
   identity, negative, and no-transfer tests; make CUDA rows optional.
-- Document the selected API and handoffs to E7-F5 and E7-F8.
+- Keep the P3 adapter concrete-only: do not add public documentation, exports,
+  conversion, synchronization, fallback, or API handoffs in this phase.
 
 ## Out of Scope
 

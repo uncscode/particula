@@ -1,10 +1,11 @@
 # Documentation Updates
 
-## P2 Status
+## P2/P3 Status
 
-No user-facing documentation or exports changed in P2. The concrete carrier
-module docstrings record its ownership and non-dispatch contract; selected API
-documentation remains deferred to P6.
+No user-facing documentation or exports changed in P2 or P3. P3 remains a
+concrete-only adapter boundary, so this implementation intentionally adds no
+README, feature-guide, API-reference, example, or public-export documentation.
+Selected API documentation remains deferred to P6.
 
 - Add backend-selected Brownian coagulation to the E7 backend-selection feature
   guide, including CPU and Warp setup, explicit backend/device requests, and

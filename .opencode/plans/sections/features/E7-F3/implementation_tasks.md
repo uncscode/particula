@@ -12,16 +12,19 @@
 - [x] Define collision-output ownership and caller-owned persistent RNG
   seed/reuse/reset intent with identity and metadata-detectable alias checks;
   P2 does not execute seed, reuse, or reset operations.
-- [ ] Implement the CPU adapter by delegating exact `time_step`/`sub_steps` to
-  `particula.dynamics.Coagulation.execute()`.
-- [ ] Implement the Warp adapter by delegating Brownian particle-resolved work
-  to `particula.gpu.kernels.coagulation_step_gpu()` exactly once per call.
-- [ ] Preserve particles, supplied output buffers, and RNG identities in the
-  E7-F1 result/mutation metadata; avoid host readback of collision counts.
+- [x] Implement the CPU P3 adapter by delegating exact `time_step`/`sub_steps`
+  to `particula.dynamics.Coagulation.execute()` once, after local control
+  preflight.
+- [x] Implement the resident-Warp P3 adapter by lazily resolving and delegating
+  Brownian particle-resolved work to
+  `particula.gpu.kernels.coagulation_step_gpu()` exactly once per call.
+- [x] Preserve particles, supplied output buffers, and RNG identities in typed
+  P2 results wrapped by `ExecutionResult` with `MutationScope.STATE`, without
+  host collision-count readback.
 - [ ] Reject charged, sedimentation, turbulent, combined, unsupported
   distribution, unavailable-device, and malformed state requests before
   concrete invocation where selection owns the check.
-- [ ] Propagate concrete runtime failures without CPU retry, transfer,
+- [x] Propagate concrete runtime failures without CPU retry, transfer,
   synchronization, RNG reset, or rollback claims.
 - [ ] Add only E7-F6-approved public exports and retain concrete mechanism and
   scratch types at current module locations.
@@ -32,6 +35,9 @@
   carrier coverage for typed state, import boundaries, validation ordering,
   identity, ownership/alias rejection, and write-free construction; reserve
   dispatch and cross-backend fixtures for later phases.
+- [x] Add focused P3 boundary tests for CPU controls and one-call delegation;
+  Warp direct/environment forwarding, lazy resolution, identity, persistent RNG
+  handoff, and no conversion/synchronization/fallback; and failure propagation.
 - [ ] Add repeated-call tests proving RNG progression without reseeding and
   explicit reset reproducibility from the same seed.
 - [ ] Add one-box and multi-box Warp CPU invariant tests for mass/charge

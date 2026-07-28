@@ -23,13 +23,23 @@
   - Tests: Focused CPU/Warp carrier identity, lazy-import, ownership/alias,
     no-mutation, and no-dispatch coverage
 
-- [ ] **E7-F3-P3:** Implement backend-selected Brownian coagulation adapter with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Route explicit CPU and Warp requests to existing implementations without hidden transfer, synchronization, fallback, or physics changes.
-  - Files: `particula/execution.py`,
-    `particula/execution/adapters/coagulation.py`,
+- [x] **E7-F3-P3:** Implement concrete-only backend-selected Brownian coagulation adapter with unit tests
+  - Issue: #1479 | Size: S | Status: Completed 2026-07-28
+  - Delivered: CPU P3 state/adapter makes one locally preflighted
+    `Coagulation.execute()` call with original `time_step` and `sub_steps`.
+    Resident-Warp P3 state/adapter lazily resolves and calls
+    `coagulation_step_gpu()` once with retained P2 resources, diagnostics, and
+    RNG intent. Both wrap typed P2 identity results in an `ExecutionResult`
+    declaring `MutationScope.STATE`.
+  - Boundaries retained: No capability selection, conversion, synchronization,
+    fallback, retry, rollback, physics/schema change, export change, or public
+    documentation change. Native kernel validation and unsupported-mode policy
+    remain later work.
+  - Files: `particula/execution/adapters/coagulation.py`,
     `particula/execution/tests/coagulation_adapter_test.py`
-  - Tests: Dispatch arguments/counts, CPU substeps, particle/output identity, repeated Warp calls, no conversion or fallback
+  - Tests: Spy-driven CPU control/one-call/identity/failure coverage and Warp
+    direct/environment forwarding, lazy resolution, identity, RNG handoff,
+    no-conversion/no-sync/no-fallback, and failure coverage
 
 - [ ] **E7-F3-P4:** Add unsupported-mode and failure-boundary validation with unit tests
   - Issue: TBD | Size: S | Status: Not Started

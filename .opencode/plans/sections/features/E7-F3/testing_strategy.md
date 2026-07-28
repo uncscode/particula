@@ -17,10 +17,16 @@ rows skip cleanly when unavailable.
   dispatch, transfer, synchronization, allocation, or RNG advancement. Native
   collision/RNG schema validation and behavioral seed/reuse/reset evidence
   remain for the future dispatch phases.
-- **P3:** Spy on CPU `Coagulation.execute()` and Warp
-  `coagulation_step_gpu()` to verify exact dispatch count/arguments, CPU
-  substeps, identical returned state/buffers, no conversion, no synchronization,
-  and no fallback.
+- **P3 (implemented):**
+  `particula/execution/tests/coagulation_adapter_test.py` uses CPU and
+  Warp-CPU spy-driven boundary tests to verify exact P3-state construction,
+  local CPU control rejection, one-call CPU/Warp dispatch and forwarding,
+  typed `ExecutionResult` wrapping, result identities, retained RNG intent,
+  lazy resolution, and propagation of resolver/delegate/kernel failures.
+  Warp tests prohibit conversion helpers, synchronization, and CPU fallback;
+  they cover both direct temperature/pressure and environment-backed P2 forms.
+  They do not claim native physics, stochastic, conservation, CUDA, or P4
+  unsupported-mode coverage.
 - **P4:** Cover malformed state, invalid time, unavailable backend/device,
   charged/sedimentation/turbulent/combined requests, output capacity mismatch,
   launch failures, and preflight-atomic versus post-launch no-rollback wording.

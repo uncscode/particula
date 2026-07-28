@@ -19,11 +19,16 @@ synchronization, reseeding, or fallback. This gives E7-F5 a schedulable
 coagulation node and gives E7-F8 a precise RNG seam for stream and restart
 semantics.
 
-E7-F3-P2 now establishes the concrete, non-dispatching carrier seam at
-`particula.execution.adapters.coagulation`: frozen CPU and resident-Warp
-Brownian request/result views retain caller resources by identity and record
-RNG seed/reset intent only. Dispatch, kernel validation, mutation, and backend
-selection remain later phases.
+E7-F3-P2 established the concrete carrier seam, and E7-F3-P3 now adds the
+concrete-only dispatch boundary at
+`particula.execution.adapters.coagulation`. Frozen CPU and resident-Warp P3
+states retain the P2 resources by identity. The CPU adapter invokes
+`Coagulation.execute()` once with the original controls; the Warp adapter
+lazily resolves and invokes `coagulation_step_gpu()` once with the retained
+resident resources and RNG intent. Both return `ExecutionResult` with
+`MutationScope.STATE` and the existing typed P2 result carrier. Capability
+selection, conversion, synchronization, fallback, public exports, and
+user-facing documentation remain outside this completed phase.
 
 ## User Stories
 

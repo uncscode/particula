@@ -44,7 +44,26 @@ future call boundary. `rng_states`, `rng_seed`, and `initialize_rng` record
 caller-owned persistent-RNG intent without seeding, resetting, advancing, or
 otherwise mutating the sidecar. The module imports no dispatch/kernel API,
 performs no transfer, synchronization, allocation, or backend selection, and
-does not change package exports.
+  does not change package exports.
+
+### P3 Dispatch Boundary (implemented)
+
+`CPUCoagulationExecutionState` retains an exact P2 CPU state, opaque controls,
+and an exact `Coagulation` runnable. Its adapter validates finite,
+nonnegative real `time_step` and positive integral `sub_steps` before making
+one positional `Coagulation.execute(aerosol, time_step, sub_steps)` call. The
+returned aerosol must retain the P2 aerosol identity.
+
+`WarpBrownianCoagulationExecutionState` retains the exact P2 Warp state without
+resolving the kernel or inspecting resident resources. Its adapter resolves
+`coagulation_step_gpu` lazily only after exact-state preflight, calls it once
+with the P2 direct/environment form, diagnostics, and RNG sidecar/intent, and
+wraps its native tuple only after existing identity checks. Neither adapter
+converts, synchronizes, retries, selects another backend, catches failures, or
+rolls back delegate mutation. Both emit `ExecutionResult` with
+`MutationScope.STATE` and a `BackendResult` containing the corresponding typed
+P2 result. P1/E7-F6 capability policy and later runtime-mode validation remain
+separate work.
 
 ## Data / API / Workflow Changes
 
