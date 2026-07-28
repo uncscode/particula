@@ -4592,6 +4592,8 @@
       
         
       
+        
+      
     
     
     
@@ -4636,6 +4638,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="API/particula/execution/adapters/coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.adapters.coagulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -15919,13 +15949,18 @@ migration, or CPU-strategy/runnable parity. See the <a href="Features/data-conta
  matrix</a>
  for focused troubleshooting and reproduction commands. Entry-point
  validation can still perform synchronous device-to-host readbacks.
-   For a focused supported coagulation route, the
-<a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py">direct GPU coagulation example</a>
-   explicitly transfers <code>ParticleData</code>, runs two Brownian particle-resolved
-   calls with caller-owned collision and persistent RNG sidecars on Warp CPU
-   by default, then restores a CPU checkpoint. When Warp is unavailable or
-   disabled, it runs no conversion or kernel and provides no CPU fallback.
-   It makes no <code>Runnable</code>, CUDA, or performance claim.
+For a focused Brownian route, the
+ <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py">GPU coagulation example</a>
+explicitly transfers <code>ParticleData</code>, then makes two concrete,
+selected-adapter Brownian particle-resolved dispatches with caller-owned
+collision and persistent RNG sidecars on Warp CPU by default before
+ explicitly restoring CPU particle data. The adapter is concrete-only; see the
+<a href="Features/coagulation_strategy_system/#e7-f3-concrete-selected-brownian-adapter">coagulation strategy guide</a>
+for its import and capability boundary. When Warp is unavailable or
+disabled, the example runs no conversion or dispatch and provides no CPU
+fallback. It makes no public adapter, <code>Runnable</code>, CUDA, or performance
+ claim. Explicit restoration is not checkpoint or restart support; caller
+ state persistence and restart behavior remain deferred.
 - <a href="Features/particle-data-migration/">ParticleData and GasData migration guide</a>
   — migration workflow and before/after examples for moving from legacy facades
   to the canonical data-container contract documented in the foundation guide.

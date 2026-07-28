@@ -4278,6 +4278,8 @@
       
         
       
+        
+      
     
     
     
@@ -4322,6 +4324,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/execution/adapters/coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.adapters.coagulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -12428,6 +12458,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#e7-f3-concrete-selected-brownian-adapter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E7-F3 concrete selected-Brownian adapter
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -16130,6 +16171,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#e7-f3-concrete-selected-brownian-adapter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E7-F3 concrete selected-Brownian adapter
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -16232,7 +16284,7 @@
 
 <h1 id="coagulation-strategy-system">Coagulation Strategy System<a class="headerlink" href="#coagulation-strategy-system" title="Permanent link">&para;</a></h1>
 <h2 id="complete-direct-process-context">Complete direct-process context<a class="headerlink" href="#complete-direct-process-context" title="Permanent link">&para;</a></h2>
-<p>The direct coagulation call is part of the illustrative <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py">explicit-transfer sequence</a>, with <a href="../../particula/gpu/tests/process_sequence_test.py">private P2 evidence</a> and a <a href="../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py">P3 regression</a>. Persistent RNG remains caller-owned; the example is not a backend selector, scheduler, <code>Runnable</code>, resident loop, or CPU fallback.</p>
+<p>The direct coagulation call is part of the illustrative <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py">explicit-transfer sequence</a>, with <a href="https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py">private P2 evidence</a> and a <a href="https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py">P3 regression</a>. Persistent RNG remains caller-owned; the example is not a backend selector, scheduler, <code>Runnable</code>, resident loop, or CPU fallback.</p>
 <blockquote>
 <p>Strategy-based coagulation kernels with unified builders, factory selection, runnable integration, and particle-resolved support.</p>
 </blockquote>
@@ -16683,11 +16735,57 @@ pytest<span class="w"> </span>particula/tests/gpu_coagulation_docs_test.py<span 
 </code></pre></div>
 <p>This optional/local command is additive and skips cleanly when CUDA is
 unavailable.</p>
-<p>For a runnable Brownian-only introduction to this direct path, see the
-<a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py">direct GPU coagulation example</a>. It
-keeps transfers and caller-owned collision/RNG sidecars explicit; it is an
-example of the supported direct interface, not a CPU fallback or a high-level
-<code>Runnable</code> workflow. The evidence/command record above defines the complete
+<h3 id="e7-f3-concrete-selected-brownian-adapter">E7-F3 concrete selected-Brownian adapter<a class="headerlink" href="#e7-f3-concrete-selected-brownian-adapter" title="Permanent link">&para;</a></h3>
+<p>The concrete E7-F3 adapter is a separate selected route beside the
+multi-mechanism direct-kernel contract above. It accepts an exact
+<code>BrownianCoagulationConfig</code> marker only. The CPU reference route retains a
+caller-owned <code>Aerosol</code> and exact <code>Coagulation</code> runnable. The resident-Warp
+route retains caller-owned <code>WarpParticleData</code>. It supports Brownian
+<code>particle_resolved</code> dispatch only. CPU and Warp stochastic trajectories have
+no seed-by-seed parity claim.</p>
+<p>Import the concrete-only marker, state carriers, and adapters from their
+concrete module:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.execution.adapters.coagulation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BrownianCoagulationConfig</span><span class="p">,</span>
+    <span class="n">CPUCoagulationExecutionAdapter</span><span class="p">,</span>
+    <span class="n">CPUCoagulationExecutionState</span><span class="p">,</span>
+    <span class="n">CPUCoagulationState</span><span class="p">,</span>
+    <span class="n">WarpBrownianCoagulationExecutionAdapter</span><span class="p">,</span>
+    <span class="n">WarpBrownianCoagulationExecutionState</span><span class="p">,</span>
+    <span class="n">WarpBrownianCoagulationState</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Neither <code>particula.execution</code> nor the top-level <code>particula</code> package exports
+these concrete names. The exact marker fails closed before selected dispatch
+for charged, sedimentation, turbulent shear, combined, or unknown mechanisms,
+non-<code>particle_resolved</code> requests, and marker subclasses. These are
+selection-owned capability errors; native direct-kernel physical, device, and
+schema errors retain their native behavior.</p>
+<p>The Warp state accepts exactly one thermo form: provide both <code>temperature</code> and
+<code>pressure</code> with <code>environment=None</code>, or provide <code>temperature=None</code> and
+<code>pressure=None</code> with a <code>WarpEnvironmentData</code>. Optional <code>volume</code> is valid in
+either form. Mixing an environment with either direct thermo input fails
+adapter-owned form validation.</p>
+<p>The caller retains the aerosol or resident particles, environment or direct
+thermo/volume values, optional collision outputs, and required persistent
+<code>(n_boxes,)</code> <code>wp.uint32</code> RNG sidecar by identity. Supplied diagnostic outputs
+have an adapter identity guarantee; omitted direct-kernel diagnostics remain
+native call-local convenience results. Diagnostics do not imply a host
+readback. Seed the sidecar on the first selected Warp dispatch with
+<code>initialize_rng=True</code>; ordinary later dispatches reuse that identical sidecar
+with <code>initialize_rng=False</code>. Only <code>initialize_rng=True</code> resets it, even when
+<code>rng_seed</code> repeats.</p>
+<p>Callers control conversion, restoration, device placement, and
+<code>wp.synchronize()</code> before observing or resolving device state. The adapter
+does not upload, restore, synchronize, select a fallback, reseed per step,
+retry, create a session or scheduler, or roll back state after launch. E7-F4
+resident-session lifecycle, E7-F5 scheduling, and E7-F8 checkpoint/restart
+stream policy remain explicitly deferred.</p>
+<p>For a runnable selected-Brownian introduction, see the
+<a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py">GPU coagulation example</a>. It
+keeps explicit conversion, synchronization, restoration, and caller-owned
+collision/RNG sidecars; it is not a CPU fallback or a high-level <code>Runnable</code>
+workflow. The direct-kernel evidence/command record above remains the complete
 approved-mask evidence boundary.</p>
 <h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>
 <ul>

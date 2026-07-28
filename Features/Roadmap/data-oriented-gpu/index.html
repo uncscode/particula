@@ -4278,6 +4278,8 @@
       
         
       
+        
+      
     
     
     
@@ -4322,6 +4324,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API/particula/execution/adapters/coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.adapters.coagulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -18133,64 +18163,64 @@ that nucleation and graph capture depend on.</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../../../.opencode/plans/epics/E6.json"><code>E6</code></a></td>
+<td><code>E6</code></td>
 <td>GPU Process Completeness</td>
 <td>Shipped</td>
 </tr>
 <tr>
-<td><a href="../../../.opencode/plans/features/E6-F1.json"><code>E6-F1</code></a></td>
+<td><code>E6-F1</code></td>
 <td>CPU Dilution Strategy and Runnable Reference</td>
 <td>Shipped</td>
 </tr>
 <tr>
-<td><a href="../../../.opencode/plans/features/E6-F2.json"><code>E6-F2</code></a></td>
+<td><code>E6-F2</code></td>
 <td>Direct GPU Dilution with CPU Parity</td>
 <td>Shipped</td>
 </tr>
 <tr>
-<td><a href="../../../.opencode/plans/features/E6-F3.json"><code>E6-F3</code></a></td>
+<td><code>E6-F3</code></td>
 <td>Neutral Spherical and Rectangular GPU Wall Loss</td>
 <td>Shipped</td>
 </tr>
 <tr>
-<td><a href="../../../.opencode/plans/features/E6-F4.json"><code>E6-F4</code></a></td>
+<td><code>E6-F4</code></td>
 <td>Charged GPU Wall Loss with Neutral Fallback</td>
 <td>Shipped</td>
 </tr>
 <tr>
-<td><a href="../../../.opencode/plans/features/E6-F5.json"><code>E6-F5</code></a></td>
+<td><code>E6-F5</code></td>
 <td>CPU and GPU Fixed-Slot Activation and Diagnostics</td>
 <td>Shipped</td>
 </tr>
 <tr>
-<td><a href="../../../.opencode/plans/features/E6-F6.json"><code>E6-F6</code></a></td>
+<td><code>E6-F6</code></td>
 <td>CPU and GPU Slot Exhaustion Policies</td>
 <td>Shipped</td>
 </tr>
 <tr>
-<td><a href="../../../.opencode/plans/features/E6-F7.json"><code>E6-F7</code></a></td>
+<td><code>E6-F7</code></td>
 <td>CPU Nucleation and Particle-Source Process</td>
 <td>Shipped</td>
 </tr>
 <tr>
-<td><a href="../../../.opencode/plans/features/E6-F8.json"><code>E6-F8</code></a></td>
+<td><code>E6-F8</code></td>
 <td>Direct GPU Nucleation Process</td>
 <td>Shipped</td>
 </tr>
 <tr>
-<td><a href="../../../.opencode/plans/features/E6-F9.json"><code>E6-F9</code></a></td>
+<td><code>E6-F9</code></td>
 <td>Integrated Validation Documentation and Epic Closeout</td>
 <td>Shipped</td>
 </tr>
 </tbody>
 </table>
 <p>The private
-<a href="../../../particula/gpu/tests/process_sequence_test.py">P2 sequence evidence</a>
+<a href="https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py">P2 sequence evidence</a>
 and <a href="../../../Examples/gpu_complete_process_sequence/">P3 published source</a> cover
 the fixed illustrative order: <code>condensation_step_gpu</code>,
 <code>coagulation_step_gpu</code>, <code>dilution_step_gpu</code>, <code>wall_loss_step_gpu</code>, then
 <code>nucleation_step_gpu</code>. This is illustrative, not a production coordinator;
-the P3 <a href="../../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py">regression</a>
+the P3 <a href="https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py">regression</a>
 keeps explicit transfers visible.</p>
 <p>Delivered dilution scope:</p>
 <ul>
@@ -18409,7 +18439,7 @@ registration use case.
 It is neither a high-level execution API nor a GPU adapter. Callers construct
 an exact request, context-local registration supplies an adapter, and selection
 does not execute that adapter.</p>
-<p>The downstream ordering is:</p>
+<p>The full-policy downstream ordering is:</p>
 <p><code>E7-F1 -&gt; E7-F6 -&gt; {E7-F2, E7-F3, E7-F4} -&gt; E7-F5</code>.</p>
 <p>E7-F6 owns availability, fallback, error taxonomy, API stability, and export
 policy. E7-F1 supplies neither transfer nor fallback. E7-F2 supplies
@@ -18417,6 +18447,10 @@ condensation adapters, E7-F3 supplies coagulation adapters, E7-F4 supplies
 resident session/container/sidecar lifecycle, and E7-F5 is their later
 scheduling consumer. These consumers register or use adapters only after their
 own contracts exist and do not alter the shipped direct-kernel path.</p>
+<p>E7-F3's shipped concrete-only Brownian seam is a bounded exception to this
+full-policy ordering: it has no public export, availability probing, fallback,
+or scheduler dependency, so it can preserve the direct-kernel contract while
+E7-F6 remains deferred. Any broader integration still follows the ordering.</p>
 <h3 id="high-level-integration">High-Level Integration<a class="headerlink" href="#high-level-integration" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Use the shipped
@@ -18428,9 +18462,16 @@ own contracts exist and do not alter the shipped direct-kernel path.</p>
 <li>E7-F1 does not introduce GPU adapters, resident loops, scheduling, implicit
   transfer or synchronization, fallback, retry, or replacement of direct GPU
   APIs. Those scopes remain deferred and policy questions belong to E7-F6.</li>
-<li>E7-F2, E7-F3, and E7-F4 may add their bounded consumers only after their
-  process-adapter or resident-lifecycle contracts are established. E7-F5 is a
-  later consumer, not a consequence of E7-F1 selection alone.</li>
+<li>E7-F2, E7-F3, and E7-F4 may add bounded consumers after their process-adapter
+  or resident-lifecycle contracts are established. E7-F3's shipped
+  concrete-only seam is the documented exception to the full-policy ordering;
+  E7-F5 remains a later consumer, not a consequence of E7-F1 selection alone.</li>
+<li>E7-F3 P6 has shipped bounded selected-Brownian adapter documentation and
+  evidence in the <a href="../../coagulation_strategy_system/">coagulation strategy guide</a>
+  and its <a href="../../../Examples/gpu_coagulation_direct/">explicit-transfer example</a>.
+  It preserves the direct-kernel contract and defers E7-F4 resident sessions,
+  E7-F5 scheduling, E7-F8 checkpoint/restart stream policy, public exports,
+  fallback, and hidden transfer.</li>
 </ul>
 <h3 id="full-gpu-resident-simulation">Full GPU-Resident Simulation<a class="headerlink" href="#full-gpu-resident-simulation" title="Permanent link">&para;</a></h3>
 <p>Resident sessions and loops, full-process scheduling, high-level GPU adapters,

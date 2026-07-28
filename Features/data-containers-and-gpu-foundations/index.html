@@ -4278,6 +4278,8 @@
       
         
       
+        
+      
     
     
     
@@ -4322,6 +4324,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/execution/adapters/coagulation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.adapters.coagulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -16099,8 +16129,8 @@ Configuration and scratch sidecars remain concrete-module imports.
 Caller-owned sidecars have stable fixed shapes; persistent coagulation and
 wall-loss RNG is also caller-owned. There is no hidden transfer or CPU fallback,
 high-level <code>Runnable</code>, backend selector, scheduler, resident production loop, or
-transport API. See the <a href="../../particula/gpu/tests/process_sequence_test.py">private P2 evidence</a>,
-<a href="../../particula/gpu/tests/gpu_complete_process_sequence_example_test.py">P3 regression</a>,
+transport API. See the <a href="https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py">private P2 evidence</a>,
+<a href="https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/gpu_complete_process_sequence_example_test.py">P3 regression</a>,
 and <a href="../Roadmap/data-oriented-gpu/#e6-roadmap-inventory">E6 inventory</a>.</p>
 <p><code>WarpParticleData</code>, <code>WarpEnvironmentData</code>, and <code>WarpGasData</code> are exported from
 <code>particula.gpu</code> only when Warp is available, so import them only behind an
