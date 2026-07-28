@@ -61,13 +61,16 @@ from the top-level package and are not a high-level execution API.
 `particula.execution` is now a package, preserving its exact ten-name public
 selection export surface. Its concrete-only
 `particula.execution.adapters.condensation` module supplies P2 configuration
-and CPU/Warp state carriers for future condensation adapters without promoting
-them through `particula.execution` or top-level `particula`. The package-level
-selection seam remains dependency-neutral; the concrete module imports Warp
-only when validating a Warp state. Carrier construction retains caller-owned
-resources by identity and performs read-only metadata/ownership validation. It
-does not select or execute an adapter, transfer, allocate, or synchronize
-resources, and creates no execution or transfer boundary.
+and CPU/Warp state carriers plus shipped P3/P4 selected adapters, without
+promoting them through `particula.execution` or top-level `particula`. The
+package-level selection seam remains dependency-neutral; the concrete module
+imports Warp only when validating a Warp state or selected sidecars. Carrier
+construction retains caller-owned resources by identity and performs read-only
+metadata/ownership validation. After exact profile preflight, P3 CPU dispatches
+one supplied isothermal runnable call and P4 Warp dispatches one direct-kernel
+call; neither transfers, restores, synchronizes, falls back, nor recovers
+failures. Native property-array fallback allocation remains a direct-kernel
+contract, while callers own reusable sidecars and post-launch synchronization.
 
 ### Chosen Option
 
@@ -144,9 +147,10 @@ avoids duplicating backend-specific validation or availability behavior.
 ### Negative
 
 - The module does not resolve native devices, probe runtime availability, or
-  provide transfer, fallback, scheduler, or GPU-adapter behavior.
-- P2/P3/P4 contracts remain narrowly separated; selection does not execute, P3
-  validates ownership only, and P4 is the sole CPU reference dispatch boundary.
+  provide transfer, fallback, scheduler, or high-level GPU-adapter behavior.
+- P2/P3/P4 contracts remain narrowly separated; selection does not execute,
+  P2 validates ownership, and the concrete P3/P4 adapters provide only their
+  one-call CPU/Warp condensation dispatch boundaries.
 
 ### Neutral
 

@@ -36,13 +36,17 @@ the existing exact ten-name public export list; do not promote adapter modules
 or state carriers through it or through top-level `particula`.
 
 `particula.execution.adapters.condensation` contains concrete-only P2
-condensation state carriers for future adapters. They retain caller-owned CPU
-or resident Warp resources by identity and perform construction-time,
-read-only metadata and ownership checks only. They do not select or execute an
-adapter, transfer, allocate, or synchronize resources. Frozen carriers prevent
-field rebinding, not mutation of retained caller-owned resources. Future
-adapter authors remain responsible for resource lifetime, synchronization,
-concurrency, and any post-launch mutation or rollback semantics.
+condensation state carriers and shipped P3/P4 selected CPU/Warp adapters. The
+carriers retain caller-owned CPU or resident Warp resources by identity and
+perform construction-time, read-only metadata and ownership checks. The
+adapters select no profile themselves: after exact profile and sidecar
+preflight, CPU calls the supplied isothermal runnable once and Warp calls the
+direct kernel once. They do not transfer, restore, synchronize, fall back, or
+recover failures. Omitted direct-kernel property arrays retain the native
+step's documented step-local fallback allocation behavior; callers own reusable
+native sidecars, resource lifetime, synchronization, concurrency, and any
+post-launch mutation or rollback semantics. These concrete names remain absent
+from the package selection surface and top-level `particula`.
 
 ## Wall Loss
 

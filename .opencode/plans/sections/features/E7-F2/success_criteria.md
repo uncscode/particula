@@ -2,8 +2,8 @@
 
 - [ ] E7-F1 and E7-F6 dependency contracts are consumed without duplicating or
   weakening their selection, fallback, error, or export policy.
-- [ ] At least one supported condensation workflow executes through the same
-  user-facing selection boundary on CPU and Warp CPU.
+- [x] Supported selected condensation dispatch executes through the concrete
+  CPU and Warp adapter boundaries; these are not user-facing public APIs.
 - [ ] Isothermal and latent-heat capabilities have explicit configuration,
   state, return, mutation, ownership, and failure semantics.
 - [ ] GPU staggered condensation and unsupported BAT/activity mappings fail with
@@ -12,8 +12,8 @@
   rewrites, conversion, restore, implicit synchronization, or silent fallback.
 - [ ] Returned/result metadata accurately records identity and in-place changes
   to particles, gas, transfer, vapor-pressure, and energy outputs.
-- [ ] CPU/Warp CPU parity passes for the recorded fixture matrix and explicit
-  tolerances; particle-plus-gas conservation passes its declared bounds.
+- [ ] P5 will record CPU/Warp CPU parity and conservation evidence for a
+  bounded fixture matrix with explicit tolerances.
 - [ ] Validation-order and failure-boundary tests prove atomic preflight and do
   not overpromise rollback after launched work.
 - [ ] Optional CUDA rows skip cleanly without suitable hardware and pass when

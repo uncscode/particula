@@ -186,6 +186,18 @@ def _memory_range(
     if prod(array.shape) == 0:
         return None
     start = int(array.ptr)
+    if start <= 0:
+        raise ValueError(f"{name} must have a nonzero storage pointer.")
+    if start % itemsize != 0:
+        raise ValueError(
+            f"{name} storage pointer must be {itemsize}-byte aligned."
+        )
+    capacity = getattr(array, "capacity", None)
+    if isinstance(capacity, bool) or not isinstance(capacity, Integral):
+        raise ValueError(f"{name} must provide storage capacity.")
+    required_capacity = prod(array.shape) * itemsize
+    if capacity < required_capacity:
+        raise ValueError(f"{name} storage capacity is insufficient.")
     if strides is None:
         raise ValueError(f"{name} must provide strides for ownership checks.")
     offsets = tuple(
@@ -746,12 +758,15 @@ class WarpCondensationExecutionAdapter:
     """Dispatch one selected Warp request to its direct kernel.
 
     Preflight completes before the optional kernel import. The adapter makes one
-    native call without conversion, allocation, restoration, synchronization,
-    fallback, or exception recovery. Profile preflight completes before lazy
-    resolution. It forwards valid caller-owned ``latent_heat``,
+    native call without conversion, adapter allocation, restoration,
+    synchronization, fallback, or exception recovery. Profile preflight
+    completes before lazy resolution. It forwards valid caller-owned
+    ``latent_heat``,
     ``energy_transfer``, and deferred ``thermal_work`` sidecars by identity.
     The direct kernel owns detailed thermal-sidecar validation, execution, and
-    post-launch mutation limits.
+    post-launch mutation limits. Omitted direct-kernel property arrays retain
+    the native step's documented step-local fallback allocations; callers that
+    require reuse must supply the direct kernel's caller-owned sidecars.
 
     This concrete-only adapter is imported from
     ``particula.execution.adapters.condensation``. It forwards the exact
@@ -787,6 +802,7 @@ class WarpCondensationExecutionAdapter:
         p2_state = state.state
         configuration = p2_state.config.configuration
         require_condensation_profile(Backend.WARP, configuration)
+        _validate_selected_warp_sidecars(p2_state, configuration)
         condensation_step_gpu = _get_condensation_step_gpu()
         value = condensation_step_gpu(
             p2_state.particles,
@@ -808,6 +824,67 @@ class WarpCondensationExecutionAdapter:
             (),
             MutationDeclaration(frozenset({MutationScope.STATE})),
             BackendResult(value),
+        )
+
+
+def _validate_selected_warp_sidecars(
+    state: WarpCondensationState,
+    configuration: CondensationConfiguration,
+) -> None:
+    """Validate semantic-profile sidecars before native kernel resolution.
+
+    Args:
+        state: Validated P2 state holding caller-owned sidecars.
+        configuration: Selected semantic configuration.
+
+    Raises:
+        ValueError: If a required sidecar is missing or incompatible with the
+            selected latent-heat, activity, or surface-tension semantics.
+    """
+    import warp as wp
+
+    species = cast(Any, state.particles).masses.shape[2]
+    device = cast(Any, state.particles).masses.device
+    if configuration.latent_heat:
+        if state.latent_heat is None:
+            raise ValueError("latent_heat is required by the selected profile.")
+        _validate_array(
+            "latent_heat", state.latent_heat, wp.float64, (species,), device
+        )
+
+    requires_activity_surface = (
+        configuration.activity_mode.value == "kappa"
+        or configuration.surface_mode.value == "composition_weighted"
+    )
+    sidecar = state.activity_surface
+    if requires_activity_surface and sidecar is None:
+        raise ValueError(
+            "activity_surface is required by the selected profile."
+        )
+    if sidecar is None:
+        return
+    if not hasattr(sidecar, "activity_mode") or not hasattr(
+        sidecar, "surface_tension_mode"
+    ):
+        raise ValueError("activity_surface must provide profile selectors.")
+    sidecar = cast(Any, sidecar)
+    expected_activity = 1 if configuration.activity_mode.value == "kappa" else 0
+    expected_surface = (
+        1 if configuration.surface_mode.value == "composition_weighted" else 0
+    )
+    if sidecar.activity_mode != expected_activity:
+        raise ValueError("activity_surface activity mode mismatches profile.")
+    if sidecar.surface_tension_mode != expected_surface:
+        raise ValueError("activity_surface surface mode mismatches profile.")
+    for name in ("kappas", "molar_mass_reference"):
+        if not hasattr(sidecar, name):
+            raise ValueError(f"activity_surface must provide {name}.")
+        _validate_array(
+            f"activity_surface.{name}",
+            getattr(sidecar, name),
+            wp.float64,
+            (species,),
+            device,
         )
 
 

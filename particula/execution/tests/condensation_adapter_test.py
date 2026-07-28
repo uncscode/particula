@@ -22,6 +22,7 @@ from particula.execution import (
     CondensationExecutionMode,
     CondensationSurfaceMode,
     Device,
+    ExecutionAdapter,
     ExecutionContext,
     ExecutionRequest,
     MutationScope,
@@ -196,22 +197,28 @@ class _Array:
         strides: tuple[int, ...] | None,
         dtype: object = "float64",
         device: object = "cpu",
+        capacity: int | None = None,
     ) -> None:
         self.ptr = ptr
         self.shape = shape
         self.strides = strides
         self.dtype = dtype
         self.device = device
+        self.capacity = (
+            capacity
+            if capacity is not None
+            else int(np.prod(shape, dtype=int)) * 8
+        )
 
 
 def test_metadata_helpers_validate_schema_ranges_and_output_ownership() -> None:
     """Test private metadata helpers reject invalid and aliased writable data."""
-    valid = _Array(100, (2, 1), (8, 8))
+    valid = _Array(104, (2, 1), (8, 8))
     _validate_array("value", valid, "float64", (2, 1), "cpu")
-    assert _memory_range("value", valid, 8) == (100, 116)
+    assert _memory_range("value", valid, 8) == (104, 120)
     assert _memory_range("empty", _Array(0, (0,), (8,)), 8) is None
-    assert _overlaps((100, 116), (108, 124))
-    assert not _overlaps((100, 116), None)
+    assert _overlaps((104, 120), (112, 128))
+    assert not _overlaps((104, 120), None)
 
     with pytest.raises(ValueError, match="^value must use dtype float64.$"):
         _validate_array(
@@ -230,6 +237,19 @@ def test_metadata_helpers_validate_schema_ranges_and_output_ownership() -> None:
         match="^mass_transfer must be contiguous for ownership checks.$",
     ):
         _memory_range("mass_transfer", _Array(0, (2,), (16,)), 8)
+    with pytest.raises(
+        ValueError, match="^mass_transfer must have a nonzero storage pointer.$"
+    ):
+        _memory_range("mass_transfer", _Array(0, (2,), (8,)), 8)
+    with pytest.raises(
+        ValueError,
+        match="^mass_transfer storage pointer must be 8-byte aligned.$",
+    ):
+        _memory_range("mass_transfer", _Array(4, (2,), (8,)), 8)
+    with pytest.raises(
+        ValueError, match="^mass_transfer storage capacity is insufficient.$"
+    ):
+        _memory_range("mass_transfer", _Array(8, (2,), (8,), capacity=8), 8)
     with pytest.raises(
         ValueError, match="^mass_transfer must not overlap primary state.$"
     ):
@@ -649,8 +669,8 @@ def test_warp_state_accepts_output_adjacent_to_int32_partitioning() -> None:
         copy=False,
     )
     mass_transfer = wp.array(
-        ptr=backing.ptr + 4,
-        capacity=backing.capacity - 4,
+        ptr=backing.ptr + 8,
+        capacity=backing.capacity - 8,
         dtype=wp.float64,
         shape=(1, 2, 1),
         strides=(16, 8, 8),
@@ -1002,8 +1022,8 @@ def test_condensation_adapters_register_and_resolve_context_locally() -> None:
             )
         )
     )
-    cpu_adapter = CPUCondensationExecutionAdapter()
-    warp_adapter = WarpCondensationExecutionAdapter()
+    cpu_adapter = cast(ExecutionAdapter, CPUCondensationExecutionAdapter())
+    warp_adapter = cast(ExecutionAdapter, WarpCondensationExecutionAdapter())
     context.register_adapter(CONDENSATION_PROCESS, Backend.CPU, cpu_adapter)
     context.register_adapter(CONDENSATION_PROCESS, Backend.WARP, warp_adapter)
 
@@ -1036,10 +1056,21 @@ def test_condensation_adapters_register_and_resolve_context_locally() -> None:
 )
 def test_cpu_execution_adapter_rejects_controls_before_delegate(
     time_step: object,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test invalid CPU time controls cannot reach the selected runnable."""
     from particula.dynamics import MassCondensation
 
+    calls = 0
+
+    def execute(*args: object, **kwargs: object) -> Aerosol:
+        """Record any unexpected rejected preflight delegation."""
+        nonlocal calls
+        del args, kwargs
+        calls += 1
+        raise AssertionError("invalid controls must not reach the runnable")
+
+    monkeypatch.setattr(MassCondensation, "execute", execute)
     state = CPUCondensationExecutionState(
         CPUCondensationState(
             CondensationExecutionConfig(_configuration()), _aerosol()
@@ -1051,6 +1082,8 @@ def test_cpu_execution_adapter_rejects_controls_before_delegate(
 
     with pytest.raises((TypeError, ValueError)):
         CPUCondensationExecutionAdapter().execute(state)
+
+    assert calls == 0
 
 
 def test_cpu_execution_adapter_rejects_unrelated_state() -> None:
@@ -1135,6 +1168,117 @@ def test_warp_execution_adapter_lazily_dispatches_native_tuple_by_identity(
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize(
+    ("activity_mode", "surface_mode", "expected_activity", "expected_surface"),
+    (
+        (CondensationActivityMode.KAPPA, CondensationSurfaceMode.STATIC, 1, 0),
+        (
+            CondensationActivityMode.IDEAL,
+            CondensationSurfaceMode.COMPOSITION_WEIGHTED,
+            0,
+            1,
+        ),
+    ),
+)
+def test_warp_execution_dispatches_supported_profile_sidecars(
+    activity_mode: CondensationActivityMode,
+    surface_mode: CondensationSurfaceMode,
+    expected_activity: int,
+    expected_surface: int,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test selected activity and surface profiles require matching sidecars."""
+    import particula.execution.adapters.condensation as condensation
+
+    wp = pytest.importorskip("warp")
+    particles, gas, environment = _warp_state_inputs()
+
+    class Sidecar:
+        """Minimal profile-compatible activity/surface sidecar."""
+
+        activity_mode: int
+        surface_tension_mode: int
+        kappas: Any
+        molar_mass_reference: Any
+
+    sidecar = Sidecar()
+    sidecar.activity_mode = expected_activity
+    sidecar.surface_tension_mode = expected_surface
+    sidecar.kappas = wp.zeros(1, dtype=wp.float64, device="cpu")
+    sidecar.molar_mass_reference = wp.ones(1, dtype=wp.float64, device="cpu")
+
+    state = WarpCondensationExecutionState(
+        condensation.WarpCondensationState(
+            CondensationExecutionConfig(
+                _configuration(
+                    activity_mode=activity_mode,
+                    surface_mode=surface_mode,
+                )
+            ),
+            particles,
+            gas,
+            environment,
+            object(),
+            activity_surface=sidecar,
+        ),
+        1.0,
+    )
+    calls = 0
+
+    def kernel(*args: object, **kwargs: object) -> tuple[object, object]:
+        """Record selected-profile dispatch without launching native work."""
+        nonlocal calls
+        del args, kwargs
+        calls += 1
+        return particles, object()
+
+    monkeypatch.setattr(
+        condensation, "_get_condensation_step_gpu", lambda: kernel
+    )
+    WarpCondensationExecutionAdapter().execute(state)
+
+    assert calls == 1
+
+
+@pytest.mark.warp
+def test_warp_execution_rejects_required_profile_sidecar_before_resolution(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test required profile sidecars reject before native resolution."""
+    import particula.execution.adapters.condensation as condensation
+
+    particles, gas, environment = _warp_state_inputs()
+    state = WarpCondensationExecutionState(
+        condensation.WarpCondensationState(
+            CondensationExecutionConfig(
+                _configuration(activity_mode=CondensationActivityMode.KAPPA)
+            ),
+            particles,
+            gas,
+            environment,
+            object(),
+        ),
+        1.0,
+    )
+    resolutions = 0
+
+    def resolve() -> object:
+        """Record unexpected native resolution."""
+        nonlocal resolutions
+        resolutions += 1
+        return object()
+
+    monkeypatch.setattr(condensation, "_get_condensation_step_gpu", resolve)
+    with pytest.raises(
+        ValueError,
+        match="^activity_surface is required by the selected profile.$",
+    ):
+        WarpCondensationExecutionAdapter().execute(state)
+
+    assert resolutions == 0
+
+
+@pytest.mark.warp
 def test_warp_execution_state_is_frozen_identity_carrier() -> None:
     """Test the P3 Warp state retains the P2 carrier without rebinding."""
     import particula.execution.adapters.condensation as condensation
@@ -1199,12 +1343,11 @@ def test_warp_execution_propagates_direct_energy_error_without_latent_heat(
 
 
 @pytest.mark.warp
-def test_warp_execution_reaches_direct_latent_heat_schema_validation(
+def test_warp_execution_rejects_invalid_latent_heat_before_resolution(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test semantically valid malformed heat reaches direct validation."""
+    """Test profile-required latent heat validates before kernel resolution."""
     import particula.execution.adapters.condensation as condensation
-    from particula.gpu.kernels import condensation_step_gpu
 
     wp = pytest.importorskip("warp")
     particles, gas, environment = _warp_state_inputs()
@@ -1228,10 +1371,10 @@ def test_warp_execution_reaches_direct_latent_heat_schema_validation(
     resolutions = 0
 
     def resolve() -> Any:
-        """Count resolution while preserving the real direct entry point."""
+        """Record an unexpected native resolution."""
         nonlocal resolutions
         resolutions += 1
-        return condensation_step_gpu
+        return object()
 
     monkeypatch.setattr(condensation, "_get_condensation_step_gpu", resolve)
     with pytest.raises(ValueError, match="latent_heat"):
@@ -1239,7 +1382,7 @@ def test_warp_execution_reaches_direct_latent_heat_schema_validation(
             WarpCondensationExecutionState(p2_state, 1.0)
         )
 
-    assert resolutions == 1
+    assert resolutions == 0
     _assert_warp_resources_unchanged(snapshot, *resources)
 
 
