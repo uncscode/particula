@@ -9,34 +9,37 @@ before lazy resolution and forwards caller-owned `latent_heat`,
 thermal validation/execution and exceptions to `condensation_step_gpu`, without
 adding transfer, allocation, synchronization, restoration, or fallback.
 
-## User-Facing Contract
+## Shipped P6 Selected-Condensation Contract (Issue #1475)
 
-- Add backend-selected condensation usage to the E7 execution-context guide,
-  showing explicit CPU and Warp requests and typed results.
-- Update `docs/Features/condensation_strategy_system.md` with the support matrix:
-  isothermal and latent-heat direct paths, representable activity/surface modes,
-  CPU-only staggered behavior, and unsupported BAT boundaries.
-- Cross-reference `docs/Features/data-containers-and-gpu-foundations.md` for
-  device ownership, fixed shapes, explicit transfers, synchronization, and
-  concrete-only sidecars.
+`docs/Features/condensation_strategy_system.md` now publishes the bounded
+selected-condensation support matrix and evidence limits: 36 declared CPU
+semantic profiles, isothermal selected CPU execution, eight selected Warp
+profiles, and pre-dispatch rejection for staggered or nonrepresentable/BAT Warp
+mappings. It records four equal Warp substeps, per-substep vapor-pressure
+refresh, P2 inventory-limited coupling, in-place primary/output mutation, the
+`rtol=1e-10, atol=1e-30` integration comparison tolerance, separate inventory
+checks, Warp CPU baseline, optional CUDA rows, and the E7-F4/E7-F5 handoff.
 
-## Semantics to State Explicitly
+`docs/Features/data-containers-and-gpu-foundations.md` now records that the
+exact ten-name public selection surface excludes selected-condensation carriers
+and adapters, which remain concrete-only. It distinguishes caller-owned legacy
+CPU `Aerosol`/`MassCondensation` state from resident Warp particle, gas,
+environment, and sidecar state; keeps conversion, synchronization, and restore
+at caller checkpoints; and states that normal Warp dispatch performs no upload,
+restore, synchronization, allocation, retry, or silent CPU fallback.
 
-- CPU and Warp input/state types are intentionally distinct.
-- Warp execution mutates particle mass, gas concentration, vapor pressure, and
-  documented caller-owned outputs in place; describe transfer-result identity.
-- The direct Warp path always executes four equal substeps and refreshes vapor
-  pressure before each proposal.
-- Normal selected steps do not upload, restore, synchronize, or silently fall
-  back. Checkpoints and resident-session lifecycle belong to E7-F4.
-- Pre-launch validation is atomic; post-launch partial failures do not promise
-  rollback.
-- Publish parity cases, numerical tolerances, conservation checks, Warp CPU
-  baseline, optional CUDA status, and excluded claims.
+The published failure narrative distinguishes write-free adapter/direct
+preflight rejection from a raw-proposal failure after earlier successful
+substeps, for which callers own snapshot/restore if retry is required.
+`energy_transfer` remains a caller-owned write-only output and `thermal_work`
+remains validated deferred state. The direct quick start remains the only
+runnable explicit-transfer path; no selected-condensation import, workflow, or
+public API was introduced.
 
-## Examples and Validation
+## Validation
 
-Add or update a focused runnable example only after the E7-F1/E7-F6 public API
-is final. Guard imports and output assertions with a documentation regression.
-Run the example, focused docs test, and `mkdocs build --strict`. Do not present
-the existing direct-kernel complete-process example as a production scheduler.
+`particula/tests/execution_selection_docs_test.py` adds hardware-free Markdown
+regressions for the private, non-runnable ownership subsection; support,
+ownership, dispatch, and failure statements; and the new internal links. The
+focused documentation test and `mkdocs build --strict` validate the rendered
+contract.

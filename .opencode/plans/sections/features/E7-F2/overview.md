@@ -46,6 +46,13 @@ the direct kernel by identity. CPU remains isothermal; Warp profile failures
 occur before lazy kernel resolution, while the direct kernel retains thermal
 validation, execution, exception, and energy-accounting authority.
 
+Issue #1475 shipped E7-F2-P6's documentation-only selected-condensation
+contract. The published guidance records the concrete-only API boundary,
+CPU-versus-resident-Warp ownership split, explicit movement and sidecar rules,
+bounded support/evidence matrix, preflight and partial-commit failure limits,
+and E7-F4/E7-F5 scheduler handoff. It introduces no public selected runnable,
+adapter export, physics change, or automatic backend selection.
+
 ## User Stories
 
 - As a simulation user, I want to request CPU or Warp condensation through one

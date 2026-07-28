@@ -70,7 +70,19 @@ zero heat behavior, and finalized-transfer energy accounting. The unsupported
 staggered/nonrepresentable activity/surface matrix verifies deterministic
 profile failure before lazy resolver lookup, dispatch, or writes. These rows do
 not claim rollback after a native launch; CPU latent semantic rejection remains
-covered as the CPU path stays isothermal.
+    covered as the CPU path stays isothermal.
+
+## Shipped P6 Documentation Coverage
+
+`particula/tests/execution_selection_docs_test.py` reads documentation only and
+does not require Warp or CUDA. It preserves the executable generic-selection
+example check while adding narrow assertions for the selected-condensation
+support matrix, concrete-only and non-runnable boundary, caller-owned resident
+state and sidecars, normal-dispatch prohibitions, preflight versus
+partial-commit failure behavior, bounded evidence, and cross-reference targets.
+The focused command is `pytest particula/tests/execution_selection_docs_test.py
+-q -Werror`; `mkdocs build --strict` remains the authority for Markdown links
+and anchors.
 
 ## Parity and Scientific Validation
 

@@ -65,8 +65,19 @@
     `particula/execution/tests/condensation_integration_test.py`
   - Tests: Uptake, evaporation, disabled partitioning, latent heat, zero gas, inactive slots, conservation, explicit tolerances, no intermediate transfer
 
-- [ ] **E7-F2-P6:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document selected condensation usage, support matrix, ownership, errors, tolerances, limitations, and downstream scheduler handoff.
-  - Files: `docs/Features/condensation_strategy_system.md`, data-container/backend-selection guides, focused example or API reference
-  - Tests: Documentation regression, import snippets, `mkdocs build --strict`
+- [x] **E7-F2-P6:** Update development documentation
+  - Issue: #1475 | Size: XS | Status: Shipped
+  - Delivered: Published the bounded, concrete-only selected-condensation
+    contract without changing production adapters, kernels, physics, or public
+    exports. The documentation distinguishes the 36-entry CPU semantic
+    catalogue, selected isothermal CPU dispatch, the eight selected Warp
+    profiles, and deterministic rejection of staggered or
+    nonrepresentable/BAT Warp mappings before lazy kernel resolution or writes.
+  - Files: `docs/Features/condensation_strategy_system.md`,
+    `docs/Features/data-containers-and-gpu-foundations.md`,
+    `particula/tests/execution_selection_docs_test.py`
+  - Tests: Hardware-free selected-condensation documentation regressions cover
+    the private/non-runnable API boundary, ownership, dispatch prohibitions,
+    failure boundaries, support/evidence language, and published links;
+    `pytest particula/tests/execution_selection_docs_test.py -q -Werror` and
+    `mkdocs build --strict` validate the contract.

@@ -776,10 +776,11 @@ finalized total-transfer output; optional scratch and work storage;
 `latent_heat`; write-only `energy_transfer`; and validated but deferred
 `thermal_work` sidecars.
 
-Bounded evidence uses an independent fixed-four-substep P2 oracle that compares
-particle mass and gas concentration separately at `rtol=1e-10, atol=1e-30`.
-Inventory is checked separately. Warp CPU is the installed-Warp baseline, and
-CUDA rows are optional guarded evidence. This does not claim general
+Bounded integration fixtures use an independent fixed-four-substep P2 oracle
+that separately compares particle mass and gas concentration at
+`rtol=1e-10, atol=1e-30`. Inventory is checked separately. Warp CPU is the
+installed-Warp baseline, and CUDA rows are optional guarded evidence. This does
+not claim general
 CPU-strategy parity, performance, adaptive stepping, graph capture/replay,
 autodiff, multi-GPU, resizing, or full scheduler support. The
 [Epic G handoff](Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)

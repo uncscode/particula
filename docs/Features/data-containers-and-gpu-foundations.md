@@ -164,8 +164,8 @@ buffers, and optional energy output in place. `energy_transfer` is a
 caller-owned write-only output, never a third return item; `thermal_work` is
 validated deferred state.
 
-Invalid adapter state, time, or profile rejection and aggregate direct-kernel
-preflight preserve caller primary and output state before a writer launch. A
+Invalid adapter state, time, or profile rejection, and aggregate direct-kernel
+preflight, preserve caller primary and output state before a writer launch. A
 raw-proposal failure occurs before P2 commit in its failing substep, but
 completed earlier substeps remain committed and documented vapor-pressure/work
 sidecars may already be written. Callers needing retry semantics must use their

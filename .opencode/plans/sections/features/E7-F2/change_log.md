@@ -1,5 +1,18 @@
 # Change Log
 
+## 2026-07-27 — E7-F2-P6 shipped (Issue #1475)
+
+- Published selected-condensation support, ownership, failure, evidence, and
+  downstream-handoff contracts in the condensation strategy and data-container
+  guides without changing production code or public exports.
+- Kept selected carriers/adapters concrete-only and the direct quick start as
+  the only runnable explicit-transfer path; no selected-condensation workflow,
+  transfer, restore, synchronization, allocation, retry, or fallback was
+  introduced.
+- Added hardware-free documentation regressions for the private API boundary,
+  support matrix, ownership and failure language, and required links; strict
+  MkDocs rendering validates the documentation targets.
+
 ## 2026-07-27 — E7-F2-P4 shipped (Issue #1473)
 
 - Enabled selected Warp condensation dispatch to forward caller-owned

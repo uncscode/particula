@@ -32,7 +32,15 @@ ORDERING = "E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5"
 
 
 def _section(path: Path, heading: str) -> str:
-    """Read a second-level Markdown section through its next peer heading."""
+    """Read a second-level Markdown section through its next peer heading.
+
+    Args:
+        path: Markdown file containing the section.
+        heading: Exact level-two heading to extract.
+
+    Returns:
+        Content after the heading through the next level-two heading.
+    """
     content = path.read_text(encoding="utf-8")
     match = re.search(
         rf"^## {re.escape(heading)}\n(.*?)(?=^## |\Z)",
@@ -44,15 +52,27 @@ def _section(path: Path, heading: str) -> str:
 
 
 def _normalize(content: str) -> str:
-    """Normalize Markdown whitespace for resilient phrase assertions."""
+    """Normalize Markdown whitespace for resilient phrase assertions.
+
+    Args:
+        content: Markdown content to normalize.
+
+    Returns:
+        Content with consecutive whitespace replaced by single spaces.
+    """
     return " ".join(content.split())
 
 
 def _subsection(path: Path, heading: str) -> str:
     """Read a third-level Markdown subsection through its next peer or parent.
 
+    Args:
+        path: Markdown file containing the subsection.
+        heading: Exact level-three heading to extract.
+
     Returns:
-        The content through the next level-two or level-three heading.
+        Content after the heading through the next level-two or level-three
+        heading.
     """
     content = path.read_text(encoding="utf-8")
     match = re.search(
