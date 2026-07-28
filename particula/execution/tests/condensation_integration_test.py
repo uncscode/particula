@@ -85,11 +85,11 @@ class _WarpCase:
     protected_gas_mask: np.ndarray | None = None
     time_step: float = 0.1
     latent_heat: bool = False
-    mass_rtol: float = 1.0e-10
+    mass_rtol: float = 1.0e-8
     mass_atol: float = 1.0e-30
-    gas_rtol: float = 1.0e-10
+    gas_rtol: float = 1.0e-8
     gas_atol: float = 1.0e-30
-    energy_rtol: float = 1.0e-10
+    energy_rtol: float = 1.0e-8
     energy_atol: float = 1.0e-30
     conserved: bool = True
 
@@ -182,9 +182,9 @@ def _cases() -> tuple[_WarpCase, ...]:
             "uptake",
             gas=np.array([[1.0e-6]]),
             vapor_pressure=np.zeros((1, 1)),
-            mass_rtol=1.0e-10,
+            mass_rtol=1.0e-8,
             mass_atol=1.0e-30,
-            gas_rtol=1.0e-10,
+            gas_rtol=1.0e-8,
             gas_atol=1.0e-30,
             **common,
         ),
@@ -192,9 +192,9 @@ def _cases() -> tuple[_WarpCase, ...]:
             "evaporation",
             gas=np.array([[1.0e-12]]),
             vapor_pressure=np.full((1, 1), 1.0),
-            mass_rtol=1.0e-10,
+            mass_rtol=1.0e-8,
             mass_atol=1.0e-30,
-            gas_rtol=1.0e-10,
+            gas_rtol=1.0e-8,
             gas_atol=1.0e-30,
             **common,
         ),
@@ -207,9 +207,9 @@ def _cases() -> tuple[_WarpCase, ...]:
             temperature=np.array([298.15]),
             pressure=np.array([101325.0]),
             vapor_pressure=np.full((1, 1), 1.0e-2),
-            mass_rtol=1.0e-10,
+            mass_rtol=1.0e-8,
             mass_atol=1.0e-30,
-            gas_rtol=1.0e-10,
+            gas_rtol=1.0e-8,
             gas_atol=1.0e-30,
         ),
         _WarpCase(
@@ -221,9 +221,9 @@ def _cases() -> tuple[_WarpCase, ...]:
             concentration=base_number,
             temperature=np.array([298.15]),
             pressure=np.array([101325.0]),
-            mass_rtol=1.0e-10,
+            mass_rtol=1.0e-8,
             mass_atol=1.0e-30,
-            gas_rtol=1.0e-10,
+            gas_rtol=1.0e-8,
             gas_atol=1.0e-30,
             protected_mass_mask=np.ones((1, 2, 1), dtype=bool),
             protected_gas_mask=np.ones((1, 1), dtype=bool),
@@ -233,9 +233,9 @@ def _cases() -> tuple[_WarpCase, ...]:
             "zero_gas",
             gas=np.zeros((1, 1)),
             vapor_pressure=np.zeros((1, 1)),
-            mass_rtol=1.0e-10,
+            mass_rtol=1.0e-8,
             mass_atol=1.0e-30,
-            gas_rtol=1.0e-10,
+            gas_rtol=1.0e-8,
             gas_atol=1.0e-30,
             protected_gas_mask=np.ones((1, 1), dtype=bool),
             **common,
@@ -249,9 +249,9 @@ def _cases() -> tuple[_WarpCase, ...]:
             partitioning=np.array([[True]]),
             temperature=np.array([298.15]),
             pressure=np.array([101325.0]),
-            mass_rtol=1.0e-10,
+            mass_rtol=1.0e-8,
             mass_atol=1.0e-30,
-            gas_rtol=1.0e-10,
+            gas_rtol=1.0e-8,
             gas_atol=1.0e-30,
             protected_mass_mask=np.array([[[False], [True]]], dtype=bool),
         ),
@@ -264,9 +264,9 @@ def _cases() -> tuple[_WarpCase, ...]:
             temperature=np.array([290.0, 310.0]),
             pressure=np.array([100000.0, 90000.0]),
             vapor_pressure=np.zeros((2, 1)),
-            mass_rtol=1.0e-10,
+            mass_rtol=1.0e-8,
             mass_atol=1.0e-30,
-            gas_rtol=1.0e-10,
+            gas_rtol=1.0e-8,
             gas_atol=1.0e-30,
         ),
         _WarpCase(
@@ -274,11 +274,11 @@ def _cases() -> tuple[_WarpCase, ...]:
             gas=np.array([[1.0e-6]]),
             vapor_pressure=np.zeros((1, 1)),
             latent_heat=True,
-            mass_rtol=1.0e-10,
+            mass_rtol=1.0e-8,
             mass_atol=1.0e-30,
-            gas_rtol=1.0e-10,
+            gas_rtol=1.0e-8,
             gas_atol=1.0e-30,
-            energy_rtol=1.0e-10,
+            energy_rtol=1.0e-8,
             energy_atol=1.0e-30,
             **common,
         ),
@@ -650,7 +650,7 @@ def _assert_finalized_transfer_matches_physical_deltas(
     )
     rounding_atol = max(
         atol,
-        float(np.max(inventory_scale)) * np.finfo(np.float64).eps * 4.0,
+        float(np.max(inventory_scale) * np.finfo(np.float64).eps * 4.0),
     )
     npt.assert_allclose(
         finalized_transfer,

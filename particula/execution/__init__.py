@@ -30,6 +30,7 @@ import that concrete module, Warp, or ``particula.gpu``.
 
 import inspect
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from itertools import product
@@ -744,8 +745,9 @@ class ExecutionAdapter(Protocol):
     contract.
     """
 
-    execute: object
-    """Execution seam retained structurally; registration checks callability."""
+    @property
+    def execute(self) -> Callable[..., object]:
+        """Return the callable execution seam without fixing its signature."""
 
 
 class MutationScope(str, Enum):
