@@ -22,6 +22,9 @@ from typing import Any, cast
 
 from particula.aerosol import Aerosol
 from particula.dynamics import Coagulation
+from particula.dynamics.coagulation.coagulation_strategy import (
+    brownian_coagulation_strategy,
+)
 from particula.execution import (
     BackendResult,
     ExecutionResult,
@@ -29,6 +32,10 @@ from particula.execution import (
     MutationDeclaration,
     MutationScope,
     _isfinite_real,
+)
+
+BrownianCoagulationStrategy = (
+    brownian_coagulation_strategy.BrownianCoagulationStrategy
 )
 
 
@@ -184,6 +191,26 @@ def _validate_time_step(time_step: object) -> None:
         raise ValueError("time_step must be finite and nonnegative.")
 
 
+def _validate_cpu_brownian_runnable(runnable: Coagulation) -> None:
+    """Validate the selected CPU Brownian particle-resolved capability.
+
+    Args:
+        runnable: Exact caller-owned coagulation runnable selected for dispatch.
+
+    Raises:
+        ValueError: If the runnable is not the supported Brownian,
+            particle-resolved configuration.
+    """
+    strategy = runnable.coagulation_strategy
+    if (
+        type(strategy) is not BrownianCoagulationStrategy
+        or strategy.distribution_type != "particle_resolved"
+    ):
+        raise ValueError(
+            "runnable must use Brownian particle_resolved coagulation."
+        )
+
+
 class CPUCoagulationExecutionAdapter:
     """Dispatch one selected CPU coagulation request exactly once.
 
@@ -216,6 +243,7 @@ class CPUCoagulationExecutionAdapter:
             or state.sub_steps <= 0
         ):
             raise ValueError("sub_steps must be a positive integer.")
+        _validate_cpu_brownian_runnable(state.runnable)
         aerosol = state.runnable.execute(
             state.state.aerosol,
             cast(float, state.time_step),
@@ -242,7 +270,7 @@ def _dtype_itemsize(dtype: object, wp: Any) -> int | None:
     """
     if dtype is wp.float64:
         return 8
-    if dtype is wp.int32 or dtype is wp.uint32:
+    if dtype is wp.float32 or dtype is wp.int32 or dtype is wp.uint32:
         return 4
     return None
 

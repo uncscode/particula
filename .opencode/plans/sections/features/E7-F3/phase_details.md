@@ -1,12 +1,17 @@
 # Phase Details
 
-- [ ] **E7-F3-P1:** Map Brownian capabilities and validation semantics with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Freeze CPU/Warp Brownian support, distribution/device constraints, and deterministic selection-level rejection order.
+- [x] **E7-F3-P1:** Map Brownian capabilities and validation semantics with unit tests
+  - Issue: #1482 | Size: S | Status: Shipped 2026-07-28
+  - Delivered: The selected CPU route accepts only the exact Brownian
+    `particle_resolved` runnable configuration before dispatch; the resident
+    Warp route retains the same selected boundary without narrowing native
+    direct-kernel capabilities.
   - Files: `particula/execution/` package,
     `particula/execution/adapters/coagulation.py`,
     `particula/execution/tests/coagulation_adapter_test.py`
-  - Tests: Capability queries, unsupported mechanisms/distributions, unavailable backend/device, no invocation on rejection
+  - Tests: Capability queries, unsupported mechanisms/distributions, unavailable
+    backend/device, no invocation on rejection, and float32 ownership-overlap
+    regression coverage
 
 - [x] **E7-F3-P2:** Define coagulation resource carriers and persistent RNG ownership with unit tests
   - Issue: #1478 | Size: S | Status: Completed 2026-07-28

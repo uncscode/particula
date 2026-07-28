@@ -3,9 +3,9 @@
 This standalone example demonstrates the bounded, low-level,
 particle-resolved Brownian coagulation path. It defaults to Warp ``device="cpu"``
 and reuses caller-owned collision and RNG sidecars for two concrete
-selected-adapter dispatches before explicitly restoring a CPU checkpoint. It
-has no hidden CPU fallback, Runnable API, CUDA requirement, or performance
-claim.
+selected-adapter dispatches before explicitly restoring CPU particle data. It
+has no hidden CPU fallback, Runnable API, CUDA requirement, restart/checkpoint
+support, or performance claim.
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ class ExampleRun:
 
     Attributes:
         output: Deterministic, human-readable execution metadata.
-        particle_data: CPU checkpoint restored after both selected dispatches.
+        particle_data: CPU particle data restored after both selected dispatches.
         collision_pairs: Caller-owned collision-pair sidecar.
         n_collisions: Caller-owned per-box collision-count sidecar.
         rng_states: Caller-owned persistent RNG sidecar.
@@ -144,7 +144,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
     The enabled route transfers the CPU fixture explicitly, executes the public
     concrete selected adapter twice, synchronizes once, and restores a CPU
-    checkpoint only after both calls succeed. Failures from runtime loading,
+    particle data only after both calls succeed. Failures from runtime loading,
     conversion, allocation, execution, synchronization, or restoration
     propagate without a success result.
 
@@ -152,7 +152,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
         device: Warp device for the optional selected path. Defaults to Warp CPU.
 
     Returns:
-        Metadata only when disabled, otherwise the restored checkpoint and
+        Metadata only when disabled, otherwise the restored particle data and
         caller-owned sidecars.
     """
     particle_data = _build_particle_data()
@@ -200,14 +200,14 @@ def run_example(device: str = "cpu") -> ExampleRun:
     restored_particle_data = from_warp_particle_data(gpu_particle_data)
     output.extend(
         [
-            "Explicit helpers: CPU→Warp conversion -> selected-adapter dispatch -> CPU checkpoint",
+            "Explicit helpers: CPU→Warp conversion -> selected-adapter dispatch -> CPU restoration",
             (
                 "Selected Brownian coagulation complete: "
                 f"device={device}, calls=2, collision_pairs="
                 f"{collision_pairs.shape}, n_collisions={n_collisions.shape}"
             ),
             (
-                "Final checkpoint restored: "
+                "Final particle data restored: "
                 f"particle_masses={restored_particle_data.masses.shape}"
             ),
             "Adapter result retains supplied collision and RNG sidecars by identity.",

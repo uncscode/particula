@@ -19,6 +19,9 @@ import particula.execution.adapters as adapters
 import particula.execution.adapters.coagulation as coagulation_adapter
 from particula.aerosol import Aerosol
 from particula.dynamics import Coagulation
+from particula.dynamics.coagulation.coagulation_strategy.brownian_coagulation_strategy import (
+    BrownianCoagulationStrategy,
+)
 from particula.execution.adapters.coagulation import (
     BrownianCoagulationConfig,
     CPUCoagulationExecutionAdapter,
@@ -314,6 +317,7 @@ def test_metadata_helpers_detect_only_supported_contiguous_ranges() -> None:
         """Minimal Warp dtype namespace for helper-only tests."""
 
         float64 = object()
+        float32 = object()
         int32 = object()
         uint32 = object()
 
@@ -338,6 +342,7 @@ def test_metadata_helpers_detect_only_supported_contiguous_ranges() -> None:
     wp = WarpTypes()
     metadata = Metadata()
     assert _dtype_itemsize(wp.float64, wp) == 8
+    assert _dtype_itemsize(wp.float32, wp) == 4
     assert _dtype_itemsize(wp.int32, wp) == 4
     assert _dtype_itemsize(object(), wp) is None
     assert _memory_range(metadata, wp) == (8, 56)
@@ -354,6 +359,7 @@ def test_memory_range_defers_invalid_or_noncontiguous_metadata() -> None:
         """Minimal Warp dtype namespace for helper-only tests."""
 
         float64 = object()
+        float32 = object()
         int32 = object()
         uint32 = object()
 
@@ -389,6 +395,7 @@ def test_ownership_helpers_reject_identity_but_defer_unknown_metadata() -> None:
         """Minimal Warp namespace for unknown-metadata ownership checks."""
 
         float64 = object()
+        float32 = object()
         int32 = object()
         uint32 = object()
 
@@ -414,6 +421,7 @@ def test_ownership_helpers_reject_detectable_range_overlaps() -> None:
         """Minimal Warp dtype namespace for overlap tests."""
 
         float64 = object()
+        float32 = object()
         int32 = object()
         uint32 = object()
 
@@ -438,6 +446,40 @@ def test_ownership_helpers_reject_detectable_range_overlaps() -> None:
         ValueError, match="^caller-owned Warp resources must not alias.$"
     ):
         _validate_ownership(wp, (), Metadata(8), Metadata(16), Metadata(32))
+
+
+def test_ownership_helpers_reject_float32_direct_input_overlap() -> None:
+    """Test float32 direct-input ranges reject overlapping sidecars."""
+
+    class WarpTypes:
+        """Minimal Warp dtype namespace for float32 ownership checks."""
+
+        float64 = object()
+        float32 = object()
+        int32 = object()
+        uint32 = object()
+
+    class Metadata:
+        """Contiguous float32 storage metadata with configurable pointer."""
+
+        dtype = WarpTypes.float32
+        shape = (2,)
+        strides = (4,)
+        capacity = 8
+
+        def __init__(self, ptr: int) -> None:
+            self.ptr = ptr
+
+    wp = WarpTypes()
+    direct_temperature = Metadata(8)
+    non_overlapping_rng = Metadata(16)
+    _validate_ownership(
+        wp, (direct_temperature,), None, None, non_overlapping_rng
+    )
+    with pytest.raises(
+        ValueError, match="^caller-owned Warp resources must not alias.$"
+    ):
+        _validate_ownership(wp, (direct_temperature,), None, None, Metadata(12))
 
 
 def _warp_particles() -> Any:
@@ -851,7 +893,7 @@ def _cpu_execution_state(
     """Create an unconfigured exact runnable P3 state for spy-driven tests."""
     aerosol = _aerosol()
     state = CPUCoagulationState(BrownianCoagulationConfig(), aerosol)
-    runnable = object.__new__(Coagulation)
+    runnable = Coagulation(BrownianCoagulationStrategy("particle_resolved"))
     return CPUCoagulationExecutionState(
         state, time_step, sub_steps, runnable
     ), aerosol
@@ -872,7 +914,7 @@ def test_cpu_execution_state_retains_identity_and_exact_types() -> None:
         """Exercise the exact runnable boundary."""
 
     p2_subclass = P2Subclass(BrownianCoagulationConfig(), aerosol)
-    runnable = object.__new__(Coagulation)
+    runnable = Coagulation(BrownianCoagulationStrategy("particle_resolved"))
     with pytest.raises(TypeError, match="exact CPUCoagulationState"):
         CPUCoagulationExecutionState(p2_subclass, object(), object(), runnable)
     with pytest.raises(TypeError, match="exact Coagulation"):
@@ -936,6 +978,38 @@ def test_cpu_adapter_dispatches_once_and_wraps_typed_result(
     assert isinstance(value, CPUCoagulationResult)
     assert value.state is state.state
     assert value.aerosol is aerosol
+
+
+@pytest.mark.parametrize(
+    "strategy",
+    (
+        BrownianCoagulationStrategy("discrete"),
+        object(),
+    ),
+)
+def test_cpu_adapter_rejects_unsupported_runnable_before_delegation(
+    monkeypatch: pytest.MonkeyPatch,
+    strategy: object,
+) -> None:
+    """Test CPU dispatch accepts only Brownian particle-resolved runnables."""
+    aerosol = _aerosol()
+    request = CPUCoagulationExecutionState(
+        CPUCoagulationState(BrownianCoagulationConfig(), aerosol),
+        1.0,
+        1,
+        Coagulation(cast(Any, strategy)),
+    )
+    monkeypatch.setattr(
+        Coagulation,
+        "execute",
+        lambda *_: pytest.fail("unsupported runnable must not execute"),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="^runnable must use Brownian particle_resolved coagulation.$",
+    ):
+        CPUCoagulationExecutionAdapter().execute(request)
 
 
 @pytest.mark.parametrize(

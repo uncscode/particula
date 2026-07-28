@@ -86,18 +86,17 @@ public/export change was introduced.
 
 ## Data / API / Workflow Changes
 
-- **Data model:** Add immutable Brownian process configuration and typed CPU/Warp
-  state views. The Warp view carries particle/environment or direct physical
-  inputs, optional volume and collision outputs, max-collision policy, RNG seed,
-  caller-owned `(n_boxes,)` RNG state, and explicit reset intent. Existing CPU
-  and Warp container schemas do not change.
-- **Capability mapping:** CPU admits the existing Brownian strategy modes that
-  E7-F1 declares. Warp selection is intentionally limited to shipped Brownian,
-  particle-resolved execution. Other direct-kernel mechanisms are not promoted
-  by T3 and fail as capability errors.
-- **API surface:** Register a Brownian coagulation adapter through E7-F1's typed
-  registry. Export only stable configuration/state names allowed by E7-F6.
-  Keep direct kernel configuration and scratch internals concrete-only.
+- **Data model:** Immutable concrete-only Brownian configuration and typed
+  CPU/Warp state views retain caller-owned resources. The Warp view carries
+  particle/environment or direct physical inputs, optional volume and collision
+  outputs, RNG seed, caller-owned `(n_boxes,)` RNG state, and explicit reset
+  intent. Existing CPU and Warp container schemas do not change.
+- **Capability mapping:** CPU and selected Warp routes admit only Brownian,
+  `particle_resolved` execution. Other direct-kernel mechanisms retain their
+  native direct-kernel capability support but are not promoted by this adapter.
+- **API surface:** The adapter, configuration, and state names remain
+  concrete-only: no registry integration or public export was shipped. Direct
+  kernel configuration and scratch internals remain concrete-only.
 - **CPU behavior:** Delegate to `Coagulation.execute()` with exact time and
   substeps and preserve its returned `Aerosol` semantics. Do not promise shared
   stochastic trajectories with Warp.
@@ -106,9 +105,9 @@ public/export change was introduced.
   supplied collision buffers through `ExecutionResult`; report accepted counts
   without host readback. RNG mutates in place but is not added to the kernel's
   return tuple.
-- **Workflow hooks:** E7-F4 may store output/RNG resources in resident session
-  state. E7-F5 schedules this adapter. E7-F8 extends this seam with stream
-  identity, box independence, and checkpoint/restart semantics.
+- **Workflow hooks:** Resident sessions, scheduling, and checkpoint/restart
+  behavior remain deferred to E7-F4, E7-F5, and E7-F8 respectively. This
+  adapter ships no max-collision policy, session, scheduler, or restart seam.
 
 ## Validation and Failure Semantics
 

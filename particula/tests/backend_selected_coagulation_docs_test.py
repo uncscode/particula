@@ -17,6 +17,9 @@ PLAN_PATH = ROOT / ".opencode/plans/features/E7-F3.json"
 PHASE_DETAILS_PATH = (
     ROOT / ".opencode/plans/sections/features/E7-F3/phase_details.md"
 )
+ARCHITECTURE_PATH = (
+    ROOT / ".opencode/plans/sections/features/E7-F3/architecture_design.md"
+)
 SECTION_HEADING = "### E7-F3 concrete selected-Brownian adapter"
 DIRECT_HEADING = "### GPU direct-kernel foundations and limitations"
 COMMANDS = (
@@ -109,6 +112,9 @@ def test_example_uses_adapter_and_forced_no_warp_path() -> None:
     assert example.index("wp.synchronize()") < example.rindex(
         "from_warp_particle_data("
     )
+    assert "CPU checkpoint" not in example
+    assert "restart/checkpoint" in example
+    assert "support" in example
 
     process = subprocess.run(  # noqa: S603
         [sys.executable, str(EXAMPLE_PATH)],
@@ -127,6 +133,7 @@ def test_publication_commands_links_and_records_are_resolvable() -> None:
     selected = _section(strategy, SECTION_HEADING)
     roadmap = ROADMAP_PATH.read_text(encoding="utf-8")
     phase_details = PHASE_DETAILS_PATH.read_text(encoding="utf-8")
+    architecture = ARCHITECTURE_PATH.read_text(encoding="utf-8")
     plan = json.loads(PLAN_PATH.read_text(encoding="utf-8"))
 
     assert plan["id"] == "E7-F3"
@@ -138,6 +145,14 @@ def test_publication_commands_links_and_records_are_resolvable() -> None:
     assert "E7-F3 P6 has shipped" in roadmap
     assert "E7-F3-P6" in phase_details
     assert "Status: Shipped 2026-07-28" in phase_details
+    assert "E7-F3-P1" in phase_details
+    assert (
+        "Issue: #1482 | Size: S | Status: Shipped 2026-07-28" in phase_details
+    )
+    assert (
+        "no registry integration or public export was shipped" in architecture
+    )
+    assert "ships no max-collision policy" in architecture
     for command in COMMANDS:
         assert "-q" in command and "-Werror" in command
         assert (ROOT / command.split()[1]).exists()

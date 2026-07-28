@@ -308,16 +308,17 @@ print(result)
      for focused troubleshooting and reproduction commands. Entry-point
      validation can still perform synchronous device-to-host readbacks.
     For a focused Brownian route, the
-    [GPU coagulation example](Examples/gpu_coagulation_direct.py)
+     [GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py)
     explicitly transfers `ParticleData`, then makes two concrete,
     selected-adapter Brownian particle-resolved dispatches with caller-owned
     collision and persistent RNG sidecars on Warp CPU by default before
-    restoring a CPU checkpoint. The adapter is concrete-only; see the
+     explicitly restoring CPU particle data. The adapter is concrete-only; see the
     [coagulation strategy guide](Features/coagulation_strategy_system.md#e7-f3-concrete-selected-brownian-adapter)
     for its import and capability boundary. When Warp is unavailable or
     disabled, the example runs no conversion or dispatch and provides no CPU
     fallback. It makes no public adapter, `Runnable`, CUDA, or performance
-    claim.
+     claim. Explicit restoration is not checkpoint or restart support; caller
+     state persistence and restart behavior remain deferred.
 - [ParticleData and GasData migration guide](Features/particle-data-migration/index.md)
   — migration workflow and before/after examples for moving from legacy facades
   to the canonical data-container contract documented in the foundation guide.

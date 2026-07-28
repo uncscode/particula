@@ -204,24 +204,28 @@ def _dispatch(
     time_step: float,
     initialize_rng: bool,
     rng_seed: int = 41,
+    direct_thermo: bool = False,
 ) -> Any:
     """Dispatch one selected resident call without adapter-side synchronization.
 
     The caller retains every resident resource and must explicitly synchronize
     before observing device state.
     """
+    temperature = float(bundle.environment.temperature.numpy()[0])
+    pressure = float(bundle.environment.pressure.numpy()[0])
     state = WarpBrownianCoagulationState(
         BrownianCoagulationConfig(),
         bundle.particles,
-        None,
-        None,
+        temperature if direct_thermo else None,
+        pressure if direct_thermo else None,
         time_step,
+        volume=bundle.particles.volume if direct_thermo else None,
         collision_pairs=bundle.pairs,
         n_collisions=bundle.counts,
         rng_states=bundle.rng,
         rng_seed=rng_seed,
         initialize_rng=initialize_rng,
-        environment=bundle.environment,
+        environment=None if direct_thermo else bundle.environment,
     )
     return WarpBrownianCoagulationExecutionAdapter().execute(
         WarpBrownianCoagulationExecutionState(state)
@@ -312,6 +316,26 @@ def test_warp_adapter_preserves_resident_resources_and_conservation(
     fixture = _fixture(boxes)
     bundle = _warp_bundle(fixture)
     result = _dispatch(bundle, time_step=1.0e10, initialize_rng=True)
+    wp.synchronize()
+    _assert_warp_result_identities(result, bundle)
+    _assert_warp_invariants(bundle, fixture)
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_warp_adapter_supports_direct_scalar_thermo_inputs() -> None:
+    """Direct scalar thermo forwarding retains result and sidecar identities."""
+    wp = pytest.importorskip("warp")
+    fixture = _fixture()
+    bundle = _warp_bundle(fixture)
+
+    result = _dispatch(
+        bundle,
+        time_step=1.0e10,
+        initialize_rng=True,
+        direct_thermo=True,
+    )
+
     wp.synchronize()
     _assert_warp_result_identities(result, bundle)
     _assert_warp_invariants(bundle, fixture)
