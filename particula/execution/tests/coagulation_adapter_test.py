@@ -7,10 +7,12 @@ from dataclasses import FrozenInstanceError
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import pytest
 
 import particula.execution as execution
 import particula.execution.adapters as adapters
+import particula.execution.adapters.coagulation as coagulation_adapter
 from particula.aerosol import Aerosol
 from particula.execution.adapters.coagulation import (
     BrownianCoagulationConfig,
@@ -333,6 +335,202 @@ def _environment() -> Any:
         (1, 1), dtype=wp.float64, device="cpu"
     )
     return environment
+
+
+def _resource_values(*resources: Any) -> list[np.ndarray]:
+    """Copy caller-owned Warp arrays for a write-free assertion."""
+    return [resource.numpy().copy() for resource in resources]
+
+
+@pytest.mark.warp
+def test_warp_state_construction_is_write_free_and_never_dispatches(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test P2 construction neither changes resources nor enters Warp runtime work."""
+    wp = pytest.importorskip("warp")
+    particles = _warp_particles()
+    environment = _environment()
+    collision_pairs = wp.zeros((1, 2), dtype=wp.int32, device="cpu")
+    n_collisions = wp.zeros(1, dtype=wp.int32, device="cpu")
+    rng_states = wp.array([19], dtype=wp.uint32, device="cpu")
+    resources = (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        environment.temperature,
+        environment.pressure,
+        environment.saturation_ratio,
+        collision_pairs,
+        n_collisions,
+        rng_states,
+    )
+    before = _resource_values(*resources)
+
+    def fail_if_called(*_: object, **__: object) -> None:
+        """Fail when state construction attempts runtime work."""
+        raise AssertionError("state-only construction must not enter Warp work")
+
+    monkeypatch.setattr(wp, "launch", fail_if_called)
+    monkeypatch.setattr(wp, "copy", fail_if_called)
+    monkeypatch.setattr(wp, "synchronize", fail_if_called)
+
+    state = WarpBrownianCoagulationState(
+        BrownianCoagulationConfig(),
+        particles,
+        None,
+        None,
+        object(),
+        collision_pairs=collision_pairs,
+        n_collisions=n_collisions,
+        rng_states=rng_states,
+        rng_seed=41,
+        initialize_rng=True,
+        environment=environment,
+    )
+
+    assert state.particles is particles
+    for expected, resource in zip(before, resources, strict=True):
+        np.testing.assert_array_equal(resource.numpy(), expected)
+
+
+@pytest.mark.warp
+def test_warp_state_preserves_p2_validation_order() -> None:
+    """Test config, resource kind, form, RNG, then ownership precedence."""
+    wp = pytest.importorskip("warp")
+    particles = _warp_particles()
+    environment = _environment()
+    _rng_states = wp.zeros(1, dtype=wp.uint32, device="cpu")
+    invalid_config: Any = object()
+
+    with pytest.raises(
+        TypeError, match="^config must be a BrownianCoagulationConfig.$"
+    ):
+        WarpBrownianCoagulationState(invalid_config, object(), None, None, 1.0)
+    with pytest.raises(
+        TypeError, match="^particles must be a WarpParticleData.$"
+    ):
+        WarpBrownianCoagulationState(
+            BrownianCoagulationConfig(), object(), None, None, 1.0
+        )
+    with pytest.raises(
+        TypeError, match="^environment must be a WarpEnvironmentData.$"
+    ):
+        WarpBrownianCoagulationState(
+            BrownianCoagulationConfig(),
+            particles,
+            None,
+            None,
+            1.0,
+            environment=object(),
+        )
+    with pytest.raises(
+        ValueError,
+        match="^provide either environment or both temperature and pressure.$",
+    ):
+        WarpBrownianCoagulationState(
+            BrownianCoagulationConfig(), particles, None, None, 1.0
+        )
+    with pytest.raises(ValueError, match="^rng_states must be supplied.$"):
+        WarpBrownianCoagulationState(
+            BrownianCoagulationConfig(),
+            particles,
+            None,
+            None,
+            1.0,
+            environment=environment,
+        )
+    with pytest.raises(
+        ValueError, match="^caller-owned Warp resources must not alias.$"
+    ):
+        WarpBrownianCoagulationState(
+            BrownianCoagulationConfig(),
+            particles,
+            None,
+            None,
+            1.0,
+            rng_states=particles.concentration,
+            environment=environment,
+        )
+
+
+@pytest.mark.warp
+def test_warp_state_defers_native_schema_validation() -> None:
+    """Test malformed native arrays remain opaque when they do not alias."""
+    wp = pytest.importorskip("warp")
+    particles = _warp_particles()
+    temperature = wp.ones((1, 1), dtype=wp.float32, device="cpu")
+    pressure = wp.ones((2,), dtype=wp.float32, device="cpu")
+    opaque_rng_state = object()
+
+    state = WarpBrownianCoagulationState(
+        BrownianCoagulationConfig(),
+        particles,
+        temperature,
+        pressure,
+        object(),
+        rng_states=opaque_rng_state,
+    )
+
+    assert state.temperature is temperature
+    assert state.pressure is pressure
+    assert state.rng_states is opaque_rng_state
+
+
+@pytest.mark.warp
+def test_warp_state_rejects_required_sidecar_aliases(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test identity and metadata-detectable P2 sidecar aliases reject."""
+    wp = pytest.importorskip("warp")
+    particles = _warp_particles()
+    environment = _environment()
+    collision_pairs = wp.zeros((1, 2), dtype=wp.int32, device="cpu")
+    _n_collisions = wp.zeros(1, dtype=wp.int32, device="cpu")
+    rng_states = wp.zeros(1, dtype=wp.uint32, device="cpu")
+    error = "^caller-owned Warp resources must not alias.$"
+
+    for sidecar in (environment.temperature, particles.masses):
+        with pytest.raises(ValueError, match=error):
+            WarpBrownianCoagulationState(
+                BrownianCoagulationConfig(),
+                particles,
+                None,
+                None,
+                1.0,
+                rng_states=sidecar,
+                environment=environment,
+            )
+    with pytest.raises(ValueError, match=error):
+        WarpBrownianCoagulationState(
+            BrownianCoagulationConfig(),
+            particles,
+            None,
+            None,
+            1.0,
+            collision_pairs=collision_pairs,
+            n_collisions=collision_pairs,
+            rng_states=rng_states,
+            environment=environment,
+        )
+
+    ranges = {environment.pressure: (8, 16), rng_states: (12, 20)}
+    monkeypatch.setattr(
+        coagulation_adapter,
+        "_memory_range",
+        lambda resource, _: ranges.get(resource),
+    )
+    with pytest.raises(ValueError, match=error):
+        WarpBrownianCoagulationState(
+            BrownianCoagulationConfig(),
+            particles,
+            None,
+            None,
+            1.0,
+            rng_states=rng_states,
+            environment=environment,
+        )
 
 
 @pytest.mark.warp
