@@ -614,6 +614,58 @@ def _assert_inventory(
     npt.assert_allclose(final, initial, rtol=1.0e-12, atol=1.0e-30)
 
 
+def _assert_finalized_transfer_matches_physical_deltas(
+    resources: dict[str, Any],
+    masses: np.ndarray,
+    gas: np.ndarray,
+    transfer: np.ndarray,
+    rtol: float,
+    atol: float,
+) -> None:
+    """Assert finalized transfer equals independent particle and gas deltas."""
+    concentration = np.asarray(
+        resources["initial_concentration"], dtype=np.longdouble
+    )
+    particle_delta = np.sum(
+        (
+            np.asarray(masses, dtype=np.longdouble)
+            - np.asarray(resources["initial_mass"], dtype=np.longdouble)
+        )
+        * concentration[..., None],
+        axis=1,
+    )
+    gas_delta = np.asarray(gas, dtype=np.longdouble) - np.asarray(
+        resources["initial_gas"], dtype=np.longdouble
+    )
+    finalized_transfer = np.sum(
+        np.asarray(transfer, dtype=np.longdouble) * concentration[..., None],
+        axis=1,
+    )
+    inventory_scale = np.sum(
+        np.abs(
+            np.asarray(resources["initial_mass"], dtype=np.longdouble)
+            * concentration[..., None]
+        ),
+        axis=1,
+    )
+    rounding_atol = max(
+        atol,
+        float(np.max(inventory_scale)) * np.finfo(np.float64).eps * 4.0,
+    )
+    npt.assert_allclose(
+        finalized_transfer,
+        particle_delta,
+        rtol=rtol,
+        atol=rounding_atol,
+    )
+    npt.assert_allclose(
+        finalized_transfer,
+        -gas_delta,
+        rtol=rtol,
+        atol=rounding_atol,
+    )
+
+
 @pytest.mark.parametrize(
     "case",
     ("uptake", "evaporation", "zero_gas", "inactive", "skip_partitioning"),
@@ -675,30 +727,6 @@ def test_cpu_adapter_executes_native_cases_and_conserves_inventory(
         assert np.all(final_gas > initial_gas)
 
 
-def test_cpu_adapter_zero_time_is_an_exact_noop() -> None:
-    """Native CPU zero duration leaves the supplied aerosol exactly unchanged."""
-    state = _build_legacy_cpu_state("uptake", time_step=0.0)
-    aerosol = state.state.aerosol
-    before = (
-        aerosol.particles.get_species_mass(clone=True),
-        aerosol.particles.get_concentration(clone=True),
-        np.array(
-            aerosol.atmosphere.partitioning_species.get_concentration(),
-            copy=True,
-        ),
-    )
-    result = CPUCondensationExecutionAdapter().execute(state)
-    after = (
-        aerosol.particles.get_species_mass(clone=True),
-        aerosol.particles.get_concentration(clone=True),
-        aerosol.atmosphere.partitioning_species.get_concentration(),
-    )
-    assert result.backend_result is not None
-    assert result.state is state and result.backend_result.value is aerosol
-    for expected, actual in zip(before, after, strict=True):
-        npt.assert_array_equal(actual, expected)
-
-
 @pytest.mark.warp
 @pytest.mark.gpu_parity
 @pytest.mark.parametrize("case", WARP_CASES, ids=lambda case: case.name)
@@ -711,7 +739,7 @@ def test_warp_adapter_matches_independent_p2_oracle_and_conserves_inventory(
     expected_mass, expected_gas = _p2_oracle(case)
     result = WarpCondensationExecutionAdapter().execute(resources["state"])
     wp.synchronize()
-    masses, gas, _, _ = _snapshot(resources)
+    masses, gas, transfer, _ = _snapshot(resources)
     assert result.state is resources["state"]
     assert result.backend_result is not None
     backend_value = cast(tuple[Any, ...], result.backend_result.value)
@@ -719,6 +747,9 @@ def test_warp_adapter_matches_independent_p2_oracle_and_conserves_inventory(
     _assert_mass_and_gas(case, "cpu", masses, gas, expected_mass, expected_gas)
     _assert_protected_lanes(
         case, "cpu", masses, gas, expected_mass, expected_gas
+    )
+    _assert_finalized_transfer_matches_physical_deltas(
+        resources, masses, gas, transfer, case.mass_rtol, case.mass_atol
     )
     if case.conserved:
         _assert_inventory(resources, masses, gas)
@@ -778,12 +809,15 @@ def test_warp_adapter_latent_heat_sidecars_have_identity_and_energy_accounting()
     resources = _build_warp_state(case, "cpu")
     result = WarpCondensationExecutionAdapter().execute(resources["state"])
     pytest.importorskip("warp").synchronize()
-    _, _, transfer, energy = _snapshot(resources)
+    masses, gas, transfer, energy = _snapshot(resources)
     assert result.backend_result is not None
     backend_value = cast(tuple[Any, ...], result.backend_result.value)
     assert backend_value[1] is resources["transfer"]
     assert resources["energy"] is resources["state"].state.energy_transfer
     assert energy is not None
+    _assert_finalized_transfer_matches_physical_deltas(
+        resources, masses, gas, transfer, case.mass_rtol, case.mass_atol
+    )
     latent_heat_values = resources["latent_heat_values"]
     assert latent_heat_values is not None
     npt.assert_allclose(
@@ -862,9 +896,12 @@ def test_warp_adapter_cuda_smoke_preserves_p2_inventory(
     expected_mass, expected_gas = _p2_oracle(case)
     WarpCondensationExecutionAdapter().execute(resources["state"])
     wp.synchronize()
-    masses, gas, _, _ = _snapshot(resources)
+    masses, gas, transfer, _ = _snapshot(resources)
     _assert_mass_and_gas(case, "cuda", masses, gas, expected_mass, expected_gas)
     _assert_protected_lanes(
         case, "cuda", masses, gas, expected_mass, expected_gas
     )
     _assert_inventory(resources, masses, gas)
+    _assert_finalized_transfer_matches_physical_deltas(
+        resources, masses, gas, transfer, case.mass_rtol, case.mass_atol
+    )

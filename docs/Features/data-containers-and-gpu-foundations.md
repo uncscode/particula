@@ -139,24 +139,30 @@ fallback from adapter failures.
 
 ### Selected-condensation ownership and API boundary
 
-This is a non-runnable API and ownership reference. `particula.execution` and
-top-level `particula` export only the ten selection primitives. Selected
-condensation state carriers and adapters are intentionally concrete-only at
+This is a non-runnable API and ownership reference. `particula.execution`
+provides a bounded ten-name public selection surface; top-level `particula`
+has broader exports. Selected condensation state carriers and adapters are
+intentionally concrete-only at
 `particula.execution.adapters.condensation` pending E7-F6 policy; there is no
 provisional public selected-condensation import, backend-registration recipe,
 or selected-step workflow.
 
 Selected CPU execution retains a caller-owned legacy `Aerosol` and calls a
-caller-owned `MassCondensation`. Selected Warp execution retains caller-owned
-resident `WarpParticleData`, `WarpGasData`, and `WarpEnvironmentData`, plus
-same-device fixed-shape sidecars. Its result retains selected state and native
-payload identity; it does not convert or restore either state form.
+caller-owned `MassCondensation`. Selected Warp execution retains supplied
+caller-owned resident `WarpParticleData`, `WarpGasData`, and
+`WarpEnvironmentData`, plus same-device fixed-shape sidecars. Profile selection
+is catalogue/capability metadata: it does not bind or validate a supplied CPU
+runnable or Warp sidecars against that profile. The result retains selected
+state and native payload identity; it does not convert or restore either state
+form.
 
 Before resident Warp execution, callers explicitly use
 `to_warp_particle_data`, `to_warp_gas_data`, and `to_warp_environment_data`.
 Callers synchronize before host observation and restore only at their
-checkpoint. Normal selected Warp dispatch does no upload, restore,
-synchronization, allocation, retry, or silent CPU fallback.
+checkpoint. Adapter dispatch does no hidden upload, restore, retry, or silent
+CPU fallback. Direct-kernel validation may perform permitted device scans or
+status readbacks, and omitted optional scratch or output buffers may use
+direct-kernel fallback allocation.
 
 Successful Warp calls mutate particle masses, gas concentration, derived
 GPU-only vapor pressure, finalized total transfer, eligible scratch/work

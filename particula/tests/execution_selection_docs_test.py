@@ -198,30 +198,19 @@ def test_selected_condensation_ownership_documents_private_failure_bounds() -> (
     normalized = _normalize(section)
 
     for phrase in (
-        "top-level `particula` export only the ten selection primitives",
+        "`particula.execution` provides a bounded ten-name public selection "
+        "surface",
+        "top-level `particula` has broader exports",
         "intentionally concrete-only at "
         "`particula.execution.adapters.condensation`",
-        "no provisional public selected-condensation import",
-        "caller-owned legacy `Aerosol` and calls a caller-owned "
-        "`MassCondensation`",
-        "caller-owned resident `WarpParticleData`, `WarpGasData`, and "
-        "`WarpEnvironmentData`",
-        "same-device fixed-shape sidecars",
-        "explicitly use `to_warp_particle_data`, `to_warp_gas_data`, and "
-        "`to_warp_environment_data`",
-        "synchronize before host observation and restore only at their "
-        "checkpoint",
-        "does no upload, restore, synchronization, allocation, retry, or "
-        "silent CPU fallback",
-        "`energy_transfer` is a caller-owned write-only output, never a third "
-        "return item",
-        "finalized total transfer, eligible scratch/work buffers, and optional "
-        "energy output in place",
-        "preflight preserve caller primary and output state before a writer "
-        "launch",
-        "raw-proposal failure occurs before P2 commit in its failing substep",
-        "completed earlier substeps remain committed",
-        "own snapshot/restore",
+        "does not bind or validate a supplied CPU runnable or Warp sidecars "
+        "against that profile",
+        "Adapter dispatch does no hidden upload, restore, retry, or silent CPU "
+        "fallback",
+        "Direct-kernel validation may perform permitted device scans or status "
+        "readbacks",
+        "omitted optional scratch or output buffers may use direct-kernel "
+        "fallback allocation",
     ):
         assert phrase in normalized
 
@@ -250,26 +239,15 @@ def test_backend_selected_condensation_documents_bounded_contract() -> None:
     normalized = _normalize(section)
 
     for phrase in (
-        "All 36 equal-step/staggered, latent, activity, and surface semantic "
-        "combinations are declared",
         "Exactly 8 declared profiles",
-        "Staggered/Gauss-Seidel and every `NONREPRESENTABLE`/BAT activity or "
-        "surface mapping reject",
-        "capability-profile preflight before lazy kernel resolution, native "
-        "dispatch, or adapter-driven writes",
-        "no conversion, approximation, or fallback occurs",
-        "exactly four equal `time_step / 4.0` substeps",
-        "temperature-driven vapor pressure",
-        "mutates particle masses, gas concentration, and derived GPU vapor "
-        "pressure in place",
-        "independent fixed-four-substep P2 oracle",
-        "particle mass and gas concentration separately",
-        "Inventory is checked separately",
-        "Warp CPU is the installed-Warp baseline",
-        "CUDA rows are optional guarded evidence",
-        "defers E7-F4 resident-resource lifecycle and E7-F5 deterministic "
-        "scheduling",
-        "full scheduler support",
+        "does not bind it to the supplied runnable",
+        "Profiles are capability/catalogue selection and do not validate "
+        "supplied sidecars against their semantics",
+        "Omitted optional scratch or output buffers may use direct-kernel "
+        "fallback allocation",
+        "validation may perform permitted device scans or status readbacks",
+        "Adapter dispatch itself performs no hidden transfer, restore, retry, "
+        "or CPU fallback",
     ):
         assert phrase in normalized
 

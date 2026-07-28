@@ -764,17 +764,20 @@ and its [GPU thermodynamics and condensation refresh record](data-containers-and
 | Selection/backend case | Contract |
 | --- | --- |
 | CPU semantic catalogue | All 36 equal-step/staggered, latent, activity, and surface semantic combinations are declared, including `NONREPRESENTABLE` categories. This is catalogue support only. |
-| Selected CPU execution | The concrete adapter accepts a declared profile but is isothermal only (`latent_heat=False`) and calls the caller-owned `MassCondensation` once; equal-step or staggered semantics remain CPU-side. |
-| Selected Warp execution | Exactly 8 declared profiles: equal-step, latent heat enabled or disabled, ideal or kappa activity, and static or composition-weighted surface tension. |
+| Selected CPU execution | The concrete adapter accepts declared catalogue metadata but does not bind it to the supplied runnable; it is isothermal only (`latent_heat=False`) and calls the caller-owned `MassCondensation` once. Equal-step or staggered semantics remain CPU-side. |
+| Selected Warp execution | Exactly 8 declared profiles: equal-step, latent heat enabled or disabled, ideal or kappa activity, and static or composition-weighted surface tension. Profiles are capability/catalogue selection and do not validate supplied sidecars against their semantics. |
 | Unavailable selected Warp mapping | Staggered/Gauss-Seidel and every `NONREPRESENTABLE`/BAT activity or surface mapping reject during capability-profile preflight before lazy kernel resolution, native dispatch, or adapter-driven writes; no conversion, approximation, or fallback occurs. |
 
 Warp delegation executes exactly four equal `time_step / 4.0` substeps. Each
 substep overwrites and refreshes temperature-driven vapor pressure, then applies
 P2 inventory-limited particle/gas coupling. It mutates particle masses, gas
-concentration, and derived GPU vapor pressure in place. The caller owns the
-finalized total-transfer output; optional scratch and work storage;
-`latent_heat`; write-only `energy_transfer`; and validated but deferred
-`thermal_work` sidecars.
+concentration, and derived GPU vapor pressure in place. The caller owns supplied
+finalized total-transfer output, scratch/work storage, `latent_heat`, write-only
+`energy_transfer`, and validated but deferred `thermal_work` sidecars. Omitted
+optional scratch or output buffers may use direct-kernel fallback allocation;
+validation may perform permitted device scans or status readbacks. Adapter
+dispatch itself performs no hidden transfer, restore, retry, or CPU fallback,
+and callers synchronize before host observation.
 
 Bounded integration fixtures use an independent fixed-four-substep P2 oracle
 that separately compares particle mass and gas concentration at

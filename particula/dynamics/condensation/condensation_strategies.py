@@ -1081,14 +1081,6 @@ class CondensationIsothermal(CondensationStrategy):
         _require_single_box(particle_data.n_boxes, "ParticleData")
         _require_single_box(gas_data.n_boxes, "GasData")
 
-        if time_step == 0.0:
-            if particle_is_legacy:
-                return cast(
-                    Tuple[ParticleRepresentation, GasSpecies],
-                    (particle, gas_species),
-                )
-            return cast(Tuple[ParticleData, GasData], (particle_data, gas_data))
-
         mass_rate = self.mass_transfer_rate(
             particle=particle,
             gas_species=gas_species,
