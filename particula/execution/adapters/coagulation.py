@@ -14,9 +14,19 @@ synchronization, recovery, and the absence of rollback after a future launch.
 
 from dataclasses import dataclass
 from math import prod
+from numbers import Integral, Real
 from typing import Any, cast
 
 from particula.aerosol import Aerosol
+from particula.dynamics import Coagulation
+from particula.execution import (
+    BackendResult,
+    ExecutionResult,
+    ExecutionState,
+    MutationDeclaration,
+    MutationScope,
+    _isfinite_real,
+)
 
 
 @dataclass(frozen=True, eq=False)
@@ -113,6 +123,69 @@ class CPUCoagulationResult:
             The exact aerosol retained by this result.
         """
         return self.aerosol
+
+
+@dataclass(frozen=True, eq=False)
+class CPUCoagulationExecutionState:
+    """Retain selected CPU coagulation controls and runnable by identity.
+
+    Construction validates only exact P2-state and runnable types. Execution
+    controls remain opaque until dispatch, and the retained resources remain
+    caller-owned and mutable.
+    """
+
+    state: CPUCoagulationState
+    time_step: object
+    sub_steps: object
+    runnable: Coagulation
+
+    def __post_init__(self) -> None:
+        """Validate exact P2-state and runnable carrier types."""
+        if type(self.state) is not CPUCoagulationState:
+            raise TypeError("state must be an exact CPUCoagulationState.")
+        if type(self.runnable) is not Coagulation:
+            raise TypeError("runnable must be an exact Coagulation.")
+
+    @property
+    def backend_payload(self) -> Aerosol:
+        """Return the exact caller-owned CPU aerosol payload."""
+        return self.state.backend_payload
+
+
+def _validate_time_step(time_step: object) -> None:
+    """Validate a non-boolean, finite, nonnegative real time step."""
+    if isinstance(time_step, bool) or not isinstance(time_step, Real):
+        raise TypeError("time_step must be a real scalar.")
+    if not _isfinite_real(time_step) or time_step < 0:
+        raise ValueError("time_step must be finite and nonnegative.")
+
+
+class CPUCoagulationExecutionAdapter:
+    """Dispatch one selected CPU coagulation request exactly once."""
+
+    def execute(self, state: ExecutionState) -> ExecutionResult:
+        """Execute one exact CPU P3 state without fallback or recovery."""
+        if type(state) is not CPUCoagulationExecutionState:
+            raise TypeError("state must be a CPUCoagulationExecutionState.")
+        _validate_time_step(state.time_step)
+        if (
+            isinstance(state.sub_steps, bool)
+            or not isinstance(state.sub_steps, Integral)
+            or state.sub_steps <= 0
+        ):
+            raise ValueError("sub_steps must be a positive integer.")
+        aerosol = state.runnable.execute(
+            state.state.aerosol,
+            state.time_step,
+            state.sub_steps,
+        )
+        cpu_result = CPUCoagulationResult(state.state, aerosol)
+        return ExecutionResult(
+            state,
+            (),
+            MutationDeclaration(frozenset({MutationScope.STATE})),
+            BackendResult(cpu_result),
+        )
 
 
 def _dtype_itemsize(dtype: object, wp: Any) -> int | None:
@@ -455,3 +528,71 @@ class WarpBrownianCoagulationResult:
             The exact particle container retained by this result.
         """
         return self.particles
+
+
+@dataclass(frozen=True, eq=False)
+class WarpBrownianCoagulationExecutionState:
+    """Retain one selected resident-Warp coagulation request by identity.
+
+    Construction validates only the exact P2 state. It neither imports a kernel
+    nor inspects or synchronizes the caller-owned resident resources.
+    """
+
+    state: WarpBrownianCoagulationState
+
+    def __post_init__(self) -> None:
+        """Validate the exact P2 Warp state carrier type."""
+        if type(self.state) is not WarpBrownianCoagulationState:
+            raise TypeError(
+                "state must be an exact WarpBrownianCoagulationState."
+            )
+
+    @property
+    def backend_payload(self) -> object:
+        """Return the exact caller-owned resident particle payload."""
+        return self.state.backend_payload
+
+
+def _get_coagulation_step_gpu() -> Any:
+    """Lazily resolve the optional direct Warp coagulation kernel."""
+    from particula.gpu.kernels import coagulation_step_gpu
+
+    return coagulation_step_gpu
+
+
+class WarpBrownianCoagulationExecutionAdapter:
+    """Dispatch one selected resident-Warp Brownian request exactly once."""
+
+    def execute(self, state: ExecutionState) -> ExecutionResult:
+        """Execute one exact Warp P3 state without fallback or recovery."""
+        if type(state) is not WarpBrownianCoagulationExecutionState:
+            raise TypeError(
+                "state must be a WarpBrownianCoagulationExecutionState."
+            )
+        p2_state = state.state
+        coagulation_step_gpu = _get_coagulation_step_gpu()
+        particles, collision_pairs, n_collisions = coagulation_step_gpu(
+            p2_state.particles,
+            p2_state.temperature,
+            p2_state.pressure,
+            p2_state.time_step,
+            p2_state.volume,
+            rng_seed=p2_state.rng_seed,
+            collision_pairs=p2_state.collision_pairs,
+            n_collisions=p2_state.n_collisions,
+            rng_states=p2_state.rng_states,
+            initialize_rng=p2_state.initialize_rng,
+            environment=p2_state.environment,
+        )
+        warp_result = WarpBrownianCoagulationResult(
+            p2_state,
+            particles,
+            collision_pairs,
+            n_collisions,
+        )
+        return ExecutionResult(
+            state,
+            (),
+            MutationDeclaration(frozenset({MutationScope.STATE})),
+            BackendResult(warp_result),
+        )
