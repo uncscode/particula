@@ -262,6 +262,7 @@ def _assert_warp_result_identities(
     result: ExecutionResult, bundle: Any
 ) -> None:
     """Assert a resident dispatch returns every supplied resource by identity."""
+    assert result.backend_result is not None
     value = result.backend_result.value
     assert isinstance(value, WarpBrownianCoagulationResult)
     assert value.particles is bundle.particles
@@ -288,6 +289,7 @@ def test_cpu_adapter_matches_local_brownian_kernel_reference_and_preserves_ident
     )
     result = CPUCoagulationExecutionAdapter().execute(request)
     assert isinstance(result, ExecutionResult)
+    assert result.backend_result is not None
     assert isinstance(result.backend_result.value, CPUCoagulationResult)
     assert result.backend_result.value.aerosol is aerosol
 
