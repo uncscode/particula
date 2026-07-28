@@ -212,5 +212,7 @@ integration to unwind.
 ## Notes
 
 No prior ADR is superseded. This ADR records the original P1 decision and its
-P2--P5 amendment; future availability, fallback, GPU-adapter, transfer,
-scheduling, and resident-session decisions remain separate Epic G work.
+P2--P5 amendment; future availability, fallback, GPU-adapter, transfer, and
+scheduling decisions remain separate Epic G work. The concrete P1
+resident-session boundary is recorded separately in
+[ADR-004](ADR-004-concrete-gpu-resident-session-boundary.md).

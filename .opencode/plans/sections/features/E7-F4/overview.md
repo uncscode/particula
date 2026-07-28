@@ -35,3 +35,13 @@ all existing direct-kernel physics and ownership contracts.
 This epic-linked feature belongs to E7 and depends on E7-F1 and E7-F6. It
 implements only issue #1451 Track T4; deterministic process scheduling remains
 E7-F5, transport remains E7-F7, and full RNG stream policy remains E7-F8.
+
+## Implementation Status
+
+P1 was implemented in issue #1484 (source plan #1460). The concrete-only
+`particula/execution/gpu_session.py` boundary now retains caller-owned Warp
+particle, gas, and environment containers by identity with immutable resident
+dimensions, Warp device/gas-name metadata, and declared lifecycle values.
+Construction is metadata-only and lazy-imports Warp; setup uploads, sidecars,
+scheduling, lifecycle operations, checkpointing, restoration, and finalization
+remain future phases.

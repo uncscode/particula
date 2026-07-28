@@ -27,6 +27,20 @@ the behavior or signatures of shipped direct process kernels.
 - Warp CPU tests, no-intermediate-transfer spies, identity/shape tests,
   checkpoint/restart tests, and optional CUDA rows.
 
+## Implemented in P1 (Issue #1484)
+
+- `particula/execution/gpu_session.py` defines concrete-only frozen
+  `ResidentDimensions`, `ResidentMetadata`, and `ResidentSession`, plus the
+  four-value `ResidentLifecycle` vocabulary.
+- Resident construction retains the three supplied generated Warp containers,
+  dimensions, metadata, and lifecycle value by identity after constant-cost
+  dtype, shape, and shared-device metadata checks.
+- Warp and generated container types are imported only during resident
+  validation. P1 performs no payload access, transfer, synchronization, kernel
+  launch, allocation, conversion, fallback, device migration, export change, or
+  lifecycle operation.
+- Co-located tests are in `particula/execution/tests/gpu_session_test.py`.
+
 ## Out of Scope
 
 - Process ordering, environment evolution, or derived thermodynamic refresh

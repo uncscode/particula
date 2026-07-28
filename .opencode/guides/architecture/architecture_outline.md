@@ -53,6 +53,16 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
   select adapters by identity after matrix validation and never execute them.
   P3/P4 state, result, mutation, and concrete CPU execution-adapter types stay
   direct-module-only.
+- `gpu_session.py` - Concrete-only, unexported P1 resident-state carrier for
+  already caller-owned Warp particle, gas, and environment containers. A
+  `ResidentSession` retains all containers, immutable dimensions, Warp `Device`
+  metadata, CPU gas-name tuple, and one declared lifecycle value by identity.
+  Construction is read-only, fixed-cost validation of generated-container type,
+  primary-array dtype/shape/device metadata, and shared device agreement; Warp
+  and generated types load lazily. It does not read payloads, synchronize,
+  convert, allocate, schedule, migrate, fall back, or expose transition,
+  finalize, or close operations. It is absent from package exports; later phases
+  own operational lifecycle semantics. See [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md).
 - `adapters/condensation.py` - Concrete-only P2 condensation configuration and
   CPU/Warp state carriers plus selected P3 CPU/Warp execution carriers and
   adapters. P2 construction retains caller-owned resources by identity and

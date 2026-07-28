@@ -68,6 +68,25 @@ CPU ParticleData + GasData + EnvironmentData + ordered metadata
   runnables, and exports remain unchanged. No hidden transfer or fallback is
   introduced.
 
+## P1 Implementation
+
+Issue #1484 implemented the construction-only foundation in
+`particula/execution/gpu_session.py`. `ResidentDimensions` validates positive
+box and nonnegative particle/species counts; `ResidentMetadata` retains an
+exact Warp `Device` and ordered exact-string gas-name tuple; and
+`ResidentLifecycle` declares `ACTIVE`, `FAULTED`, `FINALIZED`, and `CLOSED`
+without transitions. Frozen, `eq=False` `ResidentSession` validates exact
+carrier types, gas-name count, non-identical top-level containers, generated
+Warp struct forms, twelve primary-array metadata declarations, and the declared
+native device string.
+
+The ordered preflight validates CPU-only carriers before attempting the optional
+Warp import. It reads only fixed metadata (`dtype`, tuple `shape`, and device),
+so validation is O(1) in `(B, N, S)` and has no payload read, synchronization,
+transfer, launch, or data-sized allocation. P4 retains ownership of lifecycle
+transition guards; P2, P3, P5, and P6 retain conversion, resources,
+checkpoint/finalization, and failure/close behavior.
+
 ## Failure and Atomicity
 
 - Validation and capability failures occur before conversion/allocation where

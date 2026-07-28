@@ -7,9 +7,15 @@ deterministic baseline; CUDA rows are optional and skip cleanly.
 
 ## Per-Phase Coverage
 
-- **P1:** Unit-test dimensions, metadata immutability, resident container
-  identity, lifecycle transitions, malformed state, and neutral imports when
-  Warp is unavailable in `particula/execution/tests/gpu_session_test.py`.
+- **P1 (implemented in issue #1484):**
+  `particula/execution/tests/gpu_session_test.py` covers frozen dimensions and
+  metadata, all four immutable lifecycle values (not transitions), concrete-only
+  exports, lazy no-Warp imports, missing-Warp ordering/error text, identity
+  retention, zero particle/species shapes, generated-container form, and
+  isolated primary-array dtype/shape/device rejection. Metadata-operation
+  sentinels verify successful and invalid-schema construction performs no host
+  payload read, synchronization, launch, or allocation. Warp-dependent tests
+  are marked `warp` and import Warp inside test bodies.
 - **P2:** Spy on `to_warp_particle_data`, `to_warp_gas_data`, and
   `to_warp_environment_data` to prove exactly one setup call each. Test no
   conversion after preflight rejection, Warp CPU setup, missing Warp/CUDA,

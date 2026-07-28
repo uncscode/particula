@@ -1,13 +1,15 @@
 # Phase Details
 
-- [ ] **E7-F4-P1:** Define resident session state and ownership invariants with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Define typed active/faulted/finalized lifecycle, resident container
-    ownership, immutable dimensions/device metadata, and CPU-only metadata.
+- [x] **E7-F4-P1:** Define resident session state and ownership invariants with unit tests
+  - Issue: #1484 (source plan #1460) | Size: S | Status: Implemented
+  - Delivered: Concrete-only immutable dimensions, Warp device/ordered gas-name
+    metadata, four immutable lifecycle values, and identity-retained generated
+    Warp containers with O(1) metadata-only construction validation.
   - Files: `particula/execution/gpu_session.py`,
     `particula/execution/tests/gpu_session_test.py`
-  - Tests: Construction, state transitions, immutable metadata, identity, and
-    malformed-state rejection without requiring CUDA.
+  - Tests: CPU-only carrier/import isolation plus Warp-marked identity,
+    schema/dtype/shape/device rejection, zero-size boundary, and no-operation
+    sentinel coverage. P1 accepts lifecycle values only; transitions remain P4.
 
 - [ ] **E7-F4-P2:** Implement one-time conversion and setup with unit tests
   - Issue: TBD | Size: S | Status: Not Started

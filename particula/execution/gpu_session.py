@@ -15,7 +15,18 @@ from particula.execution import Backend, Device
 
 
 def _validate_dimension(value: object, name: str, *, positive: bool) -> None:
-    """Validate one immutable resident dimension."""
+    """Validate one immutable resident dimension.
+
+    Args:
+        value: Candidate dimension value.
+        name: Dimension name used in validation errors.
+        positive: Whether the value must be greater than zero instead of
+            nonnegative.
+
+    Raises:
+        TypeError: If ``value`` is not an integral value or is a boolean.
+        ValueError: If ``value`` violates its required lower bound.
+    """
     if isinstance(value, bool) or not isinstance(value, Integral):
         raise TypeError(f"{name} must be an integral, not bool.")
     if positive and value <= 0:
@@ -26,21 +37,36 @@ def _validate_dimension(value: object, name: str, *, positive: bool) -> None:
 
 @dataclass(frozen=True)
 class ResidentDimensions:
-    """Declare immutable dimensions for caller-owned resident state."""
+    """Declare immutable dimensions for caller-owned resident state.
+
+    Attributes:
+        n_boxes: Positive number of resident boxes.
+        n_particles: Nonnegative fixed particle capacity per box.
+        n_species: Nonnegative number of gas species.
+    """
 
     n_boxes: int
     n_particles: int
     n_species: int
 
     def __post_init__(self) -> None:
-        """Validate resident dimensions."""
+        """Validate the immutable resident dimensions.
+
+        Raises:
+            TypeError: If a dimension is not an integral value or is boolean.
+            ValueError: If a dimension violates its required lower bound.
+        """
         _validate_dimension(self.n_boxes, "n_boxes", positive=True)
         _validate_dimension(self.n_particles, "n_particles", positive=False)
         _validate_dimension(self.n_species, "n_species", positive=False)
 
 
 class ResidentLifecycle(Enum):
-    """Declare P1 immutable lifecycle vocabulary without transition logic."""
+    """Declare P1 immutable lifecycle vocabulary without transition logic.
+
+    This vocabulary records a supplied state only. Lifecycle transitions,
+    recovery, finalization, and close operations are outside this module.
+    """
 
     ACTIVE = "active"
     FAULTED = "faulted"
@@ -50,13 +76,23 @@ class ResidentLifecycle(Enum):
 
 @dataclass(frozen=True)
 class ResidentMetadata:
-    """Retain declared Warp-device and ordered gas-name metadata by identity."""
+    """Retain declared Warp-device and ordered gas-name metadata by identity.
+
+    Attributes:
+        device: Exact Warp-backed execution device declaration.
+        gas_names: Ordered exact-string gas names; names are not normalized.
+    """
 
     device: Device
     gas_names: tuple[str, ...]
 
     def __post_init__(self) -> None:
-        """Validate exact metadata contents without normalizing names."""
+        """Validate exact metadata contents without normalizing names.
+
+        Raises:
+            TypeError: If the device, name tuple, or a name has the wrong type.
+            ValueError: If the device does not declare the Warp backend.
+        """
         if type(self.device) is not Device:
             raise TypeError("device must be an exact Device.")
         if self.device.backend is not Backend.WARP:
@@ -74,7 +110,18 @@ def _validate_array(
     shape: tuple[int, ...],
     device: Any,
 ) -> None:
-    """Validate only one Warp primary-array metadata declaration."""
+    """Validate only one Warp primary-array metadata declaration.
+
+    Args:
+        name: Fully qualified primary-array name for validation errors.
+        array: Candidate Warp array whose metadata is inspected.
+        dtype: Required Warp dtype.
+        shape: Required immutable array shape.
+        device: Required shared Warp device.
+
+    Raises:
+        ValueError: If the array metadata is absent or differs from the schema.
+    """
     if not all(
         hasattr(array, attribute) for attribute in ("dtype", "shape", "device")
     ):
@@ -94,7 +141,16 @@ def _validate_generated_containers(
     gas: object,
     environment: object,
 ) -> None:
-    """Validate generated Warp structs without reading their payloads."""
+    """Validate generated Warp structs without reading their payloads.
+
+    Args:
+        particles: Candidate generated particle container.
+        gas: Candidate generated gas container.
+        environment: Candidate generated environment container.
+
+    Raises:
+        TypeError: If a container is not its required generated Warp struct.
+    """
     from particula.gpu.warp_types import (
         WarpEnvironmentData,
         WarpGasData,
@@ -120,7 +176,19 @@ def _validate_schema(
     metadata: ResidentMetadata,
     wp: Any,
 ) -> None:
-    """Validate fixed primary schemas and shared Warp-device metadata."""
+    """Validate fixed primary schemas and shared Warp-device metadata.
+
+    Args:
+        particles: Validated generated particle container.
+        gas: Validated generated gas container.
+        environment: Validated generated environment container.
+        dimensions: Declared resident dimensions to match the particle schema.
+        metadata: Declared device metadata to match the shared Warp device.
+        wp: Lazily imported Warp module.
+
+    Raises:
+        ValueError: If a primary array has incompatible metadata or device.
+    """
     masses = cast(Any, particles).masses
     if not all(
         hasattr(masses, attribute) for attribute in ("dtype", "shape", "device")
@@ -226,7 +294,20 @@ def _validate_schema(
 
 @dataclass(frozen=True, eq=False)
 class ResidentSession:
-    """Retain one validated caller-owned GPU-resident session by identity."""
+    """Retain one validated caller-owned GPU-resident session by identity.
+
+    Construction performs only O(1) schema and device metadata validation. It
+    neither reads resident payloads nor transfers, allocates, synchronizes,
+    schedules, or operates on the retained lifecycle state.
+
+    Attributes:
+        particles: Caller-owned generated Warp particle container.
+        gas: Caller-owned generated Warp gas container.
+        environment: Caller-owned generated Warp environment container.
+        dimensions: Immutable dimensions that describe the retained containers.
+        metadata: Immutable Warp-device and ordered gas-name metadata.
+        lifecycle: Immutable supplied lifecycle vocabulary value.
+    """
 
     particles: object
     gas: object
@@ -236,7 +317,15 @@ class ResidentSession:
     lifecycle: ResidentLifecycle
 
     def __post_init__(self) -> None:
-        """Perform ordered O(1) metadata-only resident-session preflight."""
+        """Perform ordered O(1) metadata-only resident-session preflight.
+
+        Raises:
+            TypeError: If carrier, lifecycle, or generated container types are
+                invalid.
+            ValueError: If declared metadata, schema, or device values disagree.
+            RuntimeError: If resident validation requires an unavailable Warp
+                runtime.
+        """
         if type(self.dimensions) is not ResidentDimensions:
             raise TypeError("dimensions must be an exact ResidentDimensions.")
         self.dimensions.__post_init__()

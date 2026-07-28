@@ -31,6 +31,27 @@
   resident sessions or loops, schedulers, implicit transfer/synchronization,
   retry, fallback, and replacement of direct GPU APIs remain deferred.
 
+## Concrete GPU-Resident Session Boundary
+
+- `particula.execution.gpu_session` is an intentionally concrete-only,
+  unexported P1 boundary. `ResidentSession` retains valid caller-owned Warp
+  particle, gas, and environment containers, immutable dimensions, a Warp
+  `Device`, a CPU-owned gas-name tuple, and one declared lifecycle value by
+  identity. These names must not be promoted through `particula.execution`,
+  `particula.execution.adapters`, or top-level `particula`.
+- Construction performs only fixed-cost, read-only carrier and generated Warp
+  container/primary-array metadata validation: type, dtype, shape, and same
+  device agreement. Warp and generated types are lazy imports; CPU-only carrier
+  validation does not import or probe Warp. Construction neither reads payloads
+  nor synchronizes, transfers, converts, allocates, launches kernels, or
+  schedules work.
+- The lifecycle vocabulary (`ACTIVE`, `FAULTED`, `FINALIZED`, and `CLOSED`)
+  declares immutable state only. This P1 boundary has no transition, recovery,
+  finalize, close, migration, fallback, or execution operation; P4 and later
+  phases own those semantics. Existing direct GPU kernels and adapter-local
+  physical validation remain authoritative. See
+  [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md).
+
 ## Concrete Condensation Execution Boundary
 
 - `particula.execution.adapters.condensation` remains concrete-only. It retains

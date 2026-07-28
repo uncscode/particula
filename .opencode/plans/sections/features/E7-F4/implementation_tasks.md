@@ -2,10 +2,14 @@
 
 ## Execution Layer
 
-- [ ] Add `ResidentDimensions`, lifecycle state, CPU metadata, and
-  `ResidentSession` types in `particula/execution/gpu_session.py`.
-- [ ] Validate `(n_boxes, n_particles, n_species)`, gas/environment agreement,
-  fixed dtypes, requested device, and E7-F1 capability before setup.
+- [x] Add concrete-only `ResidentDimensions`, immutable lifecycle vocabulary,
+  `ResidentMetadata`, and `ResidentSession` types in
+  `particula/execution/gpu_session.py` (P1, issue #1484).
+- [x] Validate declared `(n_boxes, n_particles, n_species)`, gas-name count,
+  generated Warp container form, fixed primary dtype/shape/shared-device
+  metadata, and declared native device without payload access (P1, #1484).
+- [x] Add co-located metadata-only construction and rejection coverage in
+  `particula/execution/tests/gpu_session_test.py` (P1, #1484).
 - [ ] Implement all-or-nothing setup using the three existing `to_warp_*`
   helpers exactly once each.
 - [ ] Preserve ordered gas names and schema/version metadata outside

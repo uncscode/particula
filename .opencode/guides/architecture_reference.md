@@ -1,7 +1,7 @@
 # Architecture Reference
 
 **Project:** particula  
-**Last Updated:** 2026-07-25
+**Last Updated:** 2026-07-28
 
 This reference summarizes the particula package structure and key architectural
 conventions migrated from the legacy guide set.
@@ -47,6 +47,19 @@ step's documented step-local fallback allocation behavior; callers own reusable
 native sidecars, resource lifetime, synchronization, concurrency, and any
 post-launch mutation or rollback semantics. These concrete names remain absent
 from the package selection surface and top-level `particula`.
+
+`particula.execution.gpu_session` is a separate concrete-only, direct-import P1
+boundary for already-resident caller-owned Warp particle, gas, and environment
+containers. `ResidentSession` retains those containers, immutable dimensions,
+Warp `Device` metadata, a CPU gas-name tuple, and immutable lifecycle vocabulary
+by identity after fixed-cost read-only type/schema/dtype/shape/device metadata
+validation. Warp and generated types import only during resident validation. It
+does not inspect payload values, synchronize, convert, allocate, launch, schedule,
+fallback, migrate, transition, finalize, or close, and is not a supported export
+from `particula.execution`, its adapters package, or top-level `particula`.
+Later phases own operational lifecycle semantics; direct kernel and adapter
+boundaries retain physical validation. See
+[ADR-004](architecture/decisions/ADR-004-concrete-gpu-resident-session-boundary.md).
 
 ## Wall Loss
 

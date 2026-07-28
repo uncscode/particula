@@ -22,3 +22,9 @@
   phase issues, shipped status, and validation evidence.
 - Validate all documentation with `mkdocs build --strict`, link checks, and
   executable documentation regression tests on the no-Warp and Warp CPU paths.
+
+## P1 Status
+
+Issue #1484 updated the structured plan only. No user-facing documentation,
+examples, exports, or lifecycle API were added because P1 is a concrete-only
+construction boundary; broader documentation remains P7 work.

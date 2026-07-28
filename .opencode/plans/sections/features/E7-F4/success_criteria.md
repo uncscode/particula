@@ -2,6 +2,12 @@
 
 - [ ] E7-F1 and E7-F6 contracts are consumed rather than duplicated, and all
   public names follow their capability/error/export policy.
+- [x] P1 provides concrete-only immutable resident dimensions, metadata,
+  lifecycle vocabulary, and identity-retained Warp containers with O(1)
+  metadata-only validation (issue #1484).
+- [x] P1 construction has regression coverage for no payload access, transfer,
+  synchronization, kernel launch, allocation, conversion, fallback, migration,
+  lifecycle operation, or export change.
 - [ ] Setup validates the complete CPU state and performs exactly one particle,
   one gas, and one environment upload.
 - [ ] A session owns same-device fixed-shape Warp particle, gas, and environment
