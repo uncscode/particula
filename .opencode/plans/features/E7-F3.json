@@ -2,7 +2,7 @@
   "id": "E7-F3",
   "type": "feature",
   "title": "Backend-Selected Brownian Coagulation",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -109,5 +109,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
