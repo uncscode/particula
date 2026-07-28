@@ -951,10 +951,13 @@ def test_warp_adapter_forwards_p2_resources_once(
     }
     assert result.state is state
     assert result.mutation.scopes == frozenset({execution.MutationScope.STATE})
+    assert result.backend_result is not None
     assert isinstance(
         result.backend_result.value, WarpBrownianCoagulationResult
     )
-    assert result.backend_result.value.particles is particles
+    warp_result = result.backend_result.value
+    assert isinstance(warp_result, WarpBrownianCoagulationResult)
+    assert warp_result.particles is particles
 
 
 @pytest.mark.warp
@@ -1010,7 +1013,10 @@ def test_warp_adapter_uses_no_conversion_or_synchronization(
         WarpBrownianCoagulationExecutionState(p2_state)
     )
 
-    assert result.backend_result.value.particles is particles
+    assert result.backend_result is not None
+    warp_result = result.backend_result.value
+    assert isinstance(warp_result, WarpBrownianCoagulationResult)
+    assert warp_result.particles is particles
 
 
 @pytest.mark.warp

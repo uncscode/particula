@@ -176,8 +176,8 @@ class CPUCoagulationExecutionAdapter:
             raise ValueError("sub_steps must be a positive integer.")
         aerosol = state.runnable.execute(
             state.state.aerosol,
-            state.time_step,
-            state.sub_steps,
+            cast(float, state.time_step),
+            cast(int, state.sub_steps),
         )
         cpu_result = CPUCoagulationResult(state.state, aerosol)
         return ExecutionResult(
