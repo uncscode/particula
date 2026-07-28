@@ -256,7 +256,9 @@ def _assert_warp_invariants(bundle: Any, before: _Fixture) -> None:
         npt.assert_array_equal(charge[box, -1], before.charge[box, -1])
         assert concentration[box, -1] == 0.0
         used: set[int] = set()
-        for pair in pairs[box, : counts[box]]:
+        count = int(counts[box])
+        assert 0 <= count <= pairs.shape[1]
+        for pair in pairs[box, :count]:
             first, second = map(int, pair)
             assert first < second and first in active and second in active
             assert first not in used and second not in used
@@ -413,13 +415,16 @@ def test_warp_brownian_acceptance_matches_fixed_trial_three_sigma_bound() -> (
             bundle,
             time_step=time_step,
             initialize_rng=True,
-            rng_seed=41 + seed,
+            rng_seed=41 + 7919 * seed,
         )
         wp.synchronize()
         _assert_warp_invariants(bundle, fixture)
         observed += int(bundle.counts.numpy()[0])
-    expected = kernel * time_step * trials / reference.volume[0]
-    assert abs(observed - expected) <= 3.0 * np.sqrt(expected)
+    probability = kernel * time_step / reference.volume[0]
+    expected = trials * probability
+    assert abs(observed - expected) <= 3.0 * np.sqrt(
+        trials * probability * (1.0 - probability)
+    )
 
 
 @pytest.mark.warp
