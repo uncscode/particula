@@ -15,9 +15,10 @@
     caller resources by identity; apply kind, ownership-form, and
     metadata-detectable alias checks; and record persistent RNG seed/reset intent
     without mutation.
-  - Boundaries retained: No dispatch/kernel import, transfer, synchronization,
-    allocation, backend selection, physical/schema validation, or export change.
-    Native kernel validation and actual RNG progression/reset remain P3/P4 work.
+  - Boundaries retained: P2 carriers performed no dispatch or kernel import,
+    transfer, synchronization, allocation, backend selection, physical/schema
+    validation, or export change. Native kernel validation and actual RNG
+    progression/reset remain P3/P4 work.
   - Files: `particula/execution/adapters/coagulation.py`,
     `particula/execution/tests/coagulation_adapter_test.py`
   - Tests: Focused CPU/Warp carrier identity, lazy-import, ownership/alias,

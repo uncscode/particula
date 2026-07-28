@@ -42,9 +42,9 @@ by identity, use selection-owned kind and metadata-detectable alias checks, and
 leave physical schemas, direct-kernel validation, dispatch, and mutation to a
 future call boundary. `rng_states`, `rng_seed`, and `initialize_rng` record
 caller-owned persistent-RNG intent without seeding, resetting, advancing, or
-otherwise mutating the sidecar. The module imports no dispatch/kernel API,
-performs no transfer, synchronization, allocation, or backend selection, and
-  does not change package exports.
+otherwise mutating the sidecar. At P2, the carriers did not dispatch or import
+kernels; they performed no transfer, synchronization, allocation, or backend
+selection, and did not change package exports.
 
 ### P3 Dispatch Boundary (implemented)
 

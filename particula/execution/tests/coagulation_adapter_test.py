@@ -1098,7 +1098,7 @@ def test_warp_adapter_rejects_replaced_results_without_retry(
 def test_warp_adapter_rejects_replaced_diagnostics_and_reuses_rng(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test identity failures and repeated calls preserve RNG handoff intent."""
+    """Test identity failures and repeated calls preserve RNG reuse intent."""
     wp = pytest.importorskip("warp")
     particles = _warp_particles()
     collision_pairs = wp.zeros((1, 2), dtype=wp.int32, device="cpu")
@@ -1114,7 +1114,7 @@ def test_warp_adapter_rejects_replaced_diagnostics_and_reuses_rng(
         n_collisions=n_collisions,
         rng_states=rng_states,
         rng_seed=41,
-        initialize_rng=True,
+        initialize_rng=False,
         environment=_environment(),
     )
     calls: list[dict[str, object]] = []
@@ -1135,7 +1135,7 @@ def test_warp_adapter_rejects_replaced_diagnostics_and_reuses_rng(
     adapter.execute(state)
     assert len(calls) == 2
     assert all(call["rng_states"] is rng_states for call in calls)
-    assert all(call["initialize_rng"] is True for call in calls)
+    assert all(call["initialize_rng"] is False for call in calls)
 
     monkeypatch.setattr(
         coagulation_adapter,
