@@ -127,6 +127,21 @@
   saturation ratio; it does not acquire resources, transport or transfer host
   data, synchronize, alter lifecycle state, fall back, or gain package/top-level
   exports. See [ADR-010](decisions/ADR-010-resident-state-update-boundary.md).
+- `particula.execution.thermodynamic_updates` is a concrete-only,
+  direct-import Warp-dependent freshness coordinator. Its exact request binds
+  an active `ResidentSession`, pinned `GPUResourceRegistry`, resolver-produced
+  graph, resolved schedule, and `ThermodynamicsConfig`. Callers report only
+  successful ordinary nodes; coordinator-owned cursor and stale markers then
+  consume immediately preceding virtual refresh IDs before one explicit
+  condensation or diagnostics callback. It delegates vapor-pressure writes to
+  the authoritative primitive (including its documented configuration
+  fingerprint reads) and calculates saturation on resident device arrays. A
+  failed vapor writer leaves both fields stale; if vapor succeeds and saturation
+  fails, vapor remains fresh and saturation stale, with no cursor advance. The
+  coordinator preserves resident identities and does not acquire resources, own
+  lifecycle, transfer, synchronize, fall back, run a full scheduler, or provide
+  general process dispatch or package/top-level exports. See
+  [ADR-011](decisions/ADR-011-resident-thermodynamic-freshness-coordinator.md).
 - P5 adds a concrete-only in-memory checkpoint boundary in
   `particula.execution.checkpoint`. `ResidentSession.checkpoint(registry, guard)`
   and `.finalize(registry, guard)` bind one controller by exact identity to that

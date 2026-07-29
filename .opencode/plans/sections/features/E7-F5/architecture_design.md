@@ -47,7 +47,40 @@ mass/partitioning/vapor pressure, environment saturation ratio, sidecars, graph
 declarations, and lifecycle state untouched. Empty canonical box or zero-species
 schemas skip scalar scans and writers. It does not execute a graph, establish
 freshness or derived-state refresh, acquire resources, transfer data to host,
-provide fallback, or make lifecycle guarantees after a launched copy failure.
+ provide fallback, or make lifecycle guarantees after a launched copy failure.
+
+### P5 implemented thermodynamic-freshness boundary
+
+`particula.execution.thermodynamic_updates` is a concrete-only, direct-import
+Warp boundary, not an extension of the declaration-only scheduler. Its frozen
+request retains one exact active `ResidentSession`, its pinned
+`GPUResourceRegistry`, a resolver-produced `ResolvedProcessGraph`, a resolved
+schedule, and `ThermodynamicsConfig`. Before each operation it validates the
+binding, graph provenance, exact schedule-member identities and dependencies,
+and canonical thermodynamic node roles.
+
+`ResidentThermodynamicUpdateCoordinator` begins with vapor pressure and
+saturation ratio stale. `record_completed()` is caller-owned reporting after a
+successful ordinary node; it records only that node's declared invalidations
+and advances a local cursor. `execute_consumer()` accepts only the next
+canonical condensation or diagnostics node and a zero-argument callback. It
+consumes the immediately preceding virtual `vapor_pressure_refresh` then
+`saturation_refresh` nodes, writes only stale fields, and invokes the callback
+once. A successful consumer records its invalidations; notably condensation
+makes saturation stale for a later consumer.
+
+Vapor pressure delegates exclusively to
+`particula.gpu.kernels.thermodynamics.refresh_vapor_pressure_gpu()`. A private
+Warp kernel writes saturation as `concentration * GAS_CONSTANT * temperature /
+(molar_mass * vapor_pressure)` on resident `(n_boxes, n_species)` lanes. The
+coordinator itself performs no host payload read, synchronization, conversion,
+fallback, or CPU vapor-pressure calculation; delegated configuration
+fingerprint reads retain the primitive's existing behavior. A failed virtual
+writer or callback leaves the cursor unchanged. If vapor pressure succeeds and
+saturation fails, only vapor pressure becomes fresh; rollback after a writer
+launch is not promised. The boundary neither owns lifecycle/guard tokens nor
+acquires resources, dispatches a whole timestep or general process, transfers,
+restores gas, or changes exports.
 
 ### Future runtime scheduler
 

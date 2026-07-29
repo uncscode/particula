@@ -181,9 +181,10 @@ direct GPU APIs.
   primitive and launches the on-device SI saturation calculation without host
   payload reads, transfer, synchronization, or CPU fallback. Writer failures do
   not advance the cursor: a failed vapor writer keeps both fields stale, while a
-  subsequent saturation failure retains fresh vapor pressure and stale
-  saturation. It has no lifecycle, resource acquisition, full scheduler, or
-  general process-dispatch behavior and is not package- or top-level-exported.
+   subsequent saturation failure retains fresh vapor pressure and stale
+   saturation. It has no lifecycle, resource acquisition, full scheduler, or
+   general process-dispatch behavior and is not package- or top-level-exported.
+   See [ADR-011](decisions/ADR-011-resident-thermodynamic-freshness-coordinator.md).
 - `adapters/condensation.py` - Concrete-only P2 condensation configuration and
   CPU/Warp state carriers plus selected P3 CPU/Warp execution carriers and
   adapters. P2 construction retains caller-owned resources by identity and

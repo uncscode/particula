@@ -22,6 +22,14 @@
   `particula.execution.state_updates` is concrete-only and direct-import-only.
   Its module and focused tests document exact graph-node binding, preflight,
   protected fields, and empty-schema no-op behavior without claiming scheduling,
-  derived refresh, transport, host transfer, fallback, or lifecycle behavior.
+   derived refresh, transport, host transfer, fallback, or lifecycle behavior.
+- P5 (#1496) added concrete-only architecture documentation in
+  `.opencode/guides/architecture_reference.md` and
+  `.opencode/guides/architecture/architecture_outline.md`. It records exact
+  identity binding, caller-reported successful nodes, cursor/virtual-writer
+  ordering, stale-marker partial-failure semantics, identity preservation, the
+  delegated configuration-fingerprint-read caveat, and exclusions for
+  lifecycle, transfer, fallback, full scheduler dispatch, and general process
+  dispatch. No public documentation or export changed.
 - Run documentation regressions and `mkdocs build --strict`; if a paired notebook
   is touched, edit its Jupytext `.py`, sync, execute, and commit both files.

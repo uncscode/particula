@@ -26,11 +26,25 @@
   write-free no-ops (#1495).
 - [x] P4 remains concrete-only and direct-import-only: it adds no package
   export, scheduler execution, derived refresh, transport, host transfer,
-  fallback, or lifecycle behavior (#1495).
+   fallback, or lifecycle behavior (#1495).
+- [x] P5 binds by exact identity to an active resident session, pinned registry,
+  resolver-produced graph, and resolved schedule; caller-reported ordinary
+  nodes update only coordinator-owned freshness markers (#1496).
+- [x] P5 writes stale vapor pressure then saturation immediately before only the
+  next scheduled condensation or diagnostics callback, preserves primary
+  identities, and uses the resident SI saturation formula with `GAS_CONSTANT`
+  (#1496).
+- [x] P5 writer/callback failures suppress the consumer and leave the cursor
+  unchanged; successful vapor refresh remains fresh if a following saturation
+  writer fails (#1496).
+- [x] P5 remains direct-import-only and concrete-only: it adds no lifecycle,
+  resource acquisition, whole-timestep scheduler dispatch, transfer,
+  synchronization, fallback, gas restore, or package export (#1496).
 - [ ] Condensation, Brownian coagulation, dilution, wall loss, and nucleation
   execute through their owning adapters/direct boundaries without physics rewrites.
-- [ ] Environment changes precede vapor-pressure and saturation refresh; every
-  consumer observes current derived thermodynamic and gas state.
+- [x] Within P5's explicit consumer bracket, reported environment/gas changes
+  precede needed derived-state writes and condensation/diagnostics observe the
+  current resident gas and thermodynamic state (#1496).
 - [ ] Repeated normal timesteps perform no bulk conversion, host readback,
   checkpoint/finalize call, implicit synchronization, or silent fallback.
 - [ ] Resident container, array, sidecar, output, and RNG identities and fixed

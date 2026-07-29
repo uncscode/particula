@@ -55,4 +55,20 @@ payload identities. Ordered preflight validates that binding, schemas, device,
 contiguity, nonempty alias ranges, and physical values before in-place copies;
 canonical empty schemas are write-free no-ops. The boundary neither schedules
 nodes nor refreshes derived state, transfers host data, provides fallback or
-exports, or changes resident lifecycle behavior.
+ exports, or changes resident lifecycle behavior.
+
+## Delivered: E7-F5-P5 (#1496)
+
+`particula.execution.thermodynamic_updates` now provides a concrete-only,
+direct-import Warp-resident freshness coordinator. It binds by identity to one
+active resident session, its pinned registry, and resolver-produced graph and
+schedule metadata. Callers explicitly report successful ordinary nodes; the
+coordinator consumes the declared invalidations and brackets only the next
+scheduled condensation or diagnostics callback with its immediately preceding
+virtual writers. It delegates vapor-pressure refresh to the existing primitive
+and writes saturation ratio on device, in vapor-pressure then saturation order,
+only when their coordinator-owned markers are stale. Writer/callback failure
+does not advance the cursor; after a successful vapor writer followed by a
+failed saturation writer, vapor pressure remains fresh and saturation remains
+stale. This boundary adds no lifecycle handling, scheduler dispatch, transfer,
+fallback, host payload read, or package export.

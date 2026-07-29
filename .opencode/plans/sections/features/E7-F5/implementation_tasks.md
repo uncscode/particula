@@ -34,12 +34,14 @@
   write-free no-ops (P4, #1495).
 - [ ] Keep simulation volume on `ParticleData.volume`; reserve transport and
   expansion policy for E7-F7.
-- [ ] Track invalidation explicitly so temperature changes require on-device
-  vapor-pressure and saturation refresh before condensation.
-- [ ] Reuse `refresh_vapor_pressure_gpu()` and implement/compose the narrow
-  saturation refresh boundary without host vapor-pressure evaluation.
-- [ ] Ensure condensation gas mutation is visible to later nodes in the same
-  step; do not replay or overwrite coupled gas changes.
+- [x] Add the P5 concrete coordinator with caller-reported invalidations,
+  virtual refresh ordering, and exact resident graph/schedule binding (#1496).
+- [x] Reuse `refresh_vapor_pressure_gpu()` and compose a private on-device
+  `GAS_CONSTANT` saturation writer without coordinator host payload evaluation
+  (#1496).
+- [x] Ensure a successful condensation callback invalidates saturation and that
+  later diagnostics refresh from its in-place gas mutation without replay or
+  overwrite (#1496).
 
 ## Tooling / Tests
 
@@ -50,7 +52,10 @@
 - [ ] Add `process_adapters_test.py` under `particula/execution/tests/` with P3.
 - [x] Add `state_updates_test.py` under `particula/execution/tests/` with lazy
   Warp graph-binding, validation, commit-order, immutability, empty-schema, and
-  import-isolation coverage (P4, #1495).
+   import-isolation coverage (P4, #1495).
+- [x] Add `thermodynamic_updates_test.py` with coordinator order, SI-reference,
+  identity, rejection, empty-schema, and partial-writer/callback failure
+  coverage (P5, #1496).
 - [ ] Generalize existing process-sequence fixtures and transfer/sync spies.
 - [ ] Test registration-order invariance, graph rejection, exact call order,
   lifecycle, identity, no-op paths, update freshness, and failure propagation.

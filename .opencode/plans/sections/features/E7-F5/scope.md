@@ -68,6 +68,31 @@ environment, derived-thermodynamic, gas, and diagnostic boundaries.
 - Did not add scheduler execution, derived-state refresh, transport, host
   transfer, fallback, lifecycle behavior, or package exports.
 
+## Delivered in P5 (#1496)
+
+- Added direct-import-only `particula/execution/thermodynamic_updates.py` with
+  exact session/registry/graph/schedule/configuration identity binding and
+  resolver/schedule/role validation before every report or consumer bracket.
+- Added `ResidentThermodynamicUpdateCoordinator`, seeded with stale vapor
+  pressure and saturation markers. Callers report only successfully completed
+  ordinary nodes; the coordinator records their declared invalidations and
+  advances its local cursor.
+- Added consumer bracketing for only canonical `condensation` and `diagnostics`:
+  immediately preceding virtual refresh nodes are consumed in vapor-pressure
+  then saturation order, and only stale fields are written.
+- Reused `refresh_vapor_pressure_gpu()` as the authoritative vapor writer and
+  added a private on-device saturation writer using `GAS_CONSTANT` and current
+  resident concentration, molar mass, temperature, and vapor pressure.
+- Preserved container and primary-array identities. Failed writers/callbacks do
+  not advance the cursor; a completed vapor writer remains fresh if a following
+  saturation writer fails.
+- Added focused Warp tests in
+  `particula/execution/tests/thermodynamic_updates_test.py` and concrete-only
+  architecture-guide documentation.
+- Did not add lifecycle/guard behavior, resource acquisition, scheduler or
+  general-process dispatch, transfer, synchronization, fallback, gas restore,
+  or package exports.
+
 ## Out of Scope
 
 - Silent CPU fallback, hidden CPU/GPU movement, or runtime retry on another

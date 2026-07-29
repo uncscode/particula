@@ -42,11 +42,25 @@
   - Deferred: scheduler execution, derived refresh, transport, host transfers,
     fallback, package exports, and lifecycle behavior.
 
-- [ ] **E7-F5-P5:** Order vapor-pressure and saturation refreshes with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Refresh derived thermodynamic state exactly when invalidated and before condensation or diagnostics consume it.
-  - Files: `particula/execution/thermodynamic_updates.py`, scheduler and co-located tests
-  - Tests: temperature invalidation, unchanged-state elision, multi-species saturation, call order, no host evaluation.
+- [x] **E7-F5-P5:** Order vapor-pressure and saturation refreshes with unit tests
+  - Issue: #1496 | Size: S | Status: Completed
+  - Delivered: A concrete-only coordinator retains exact resident
+    session/registry/graph/schedule/configuration identities, receives explicit
+    successful-node reports, and consumes virtual vapor-pressure/saturation
+    writers immediately before scheduled condensation or diagnostics callbacks.
+    It owns stale markers and a schedule cursor; partial writer failures retain
+    successful freshness markers without cursor advancement.
+  - Files: `particula/execution/thermodynamic_updates.py`,
+    `particula/execution/tests/thermodynamic_updates_test.py`,
+    `.opencode/guides/architecture_reference.md`, and
+    `.opencode/guides/architecture/architecture_outline.md`.
+  - Tests: canonical cursor/writer/callback order; stale-writer elision;
+    one- and multi-box/species SI saturation references; identity preservation;
+    empty-schema paths; binding/role/order/callback rejection; and vapor,
+    saturation, and callback partial-failure markers.
+  - Deferred: lifecycle/guard ownership, resource acquisition, full-timestep
+    scheduler dispatch, transport, transfer, fallback, public exports, and
+    general process dispatch.
 
 - [ ] **E7-F5-P6:** Add diagnostics hooks and complete-loop integration tests
   - Issue: TBD | Size: S | Status: Not Started

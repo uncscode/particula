@@ -1,9 +1,13 @@
-"""Coordinate concrete resident thermodynamic freshness updates.
+"""Coordinate resident thermodynamic derived-state freshness.
 
-This direct-import-only Warp boundary consumes already resolved graph and
-schedule metadata.  It does not own scheduling, lifecycle, transfers, or
-process dispatch; callers report successful ordinary nodes and bracket each
-supported consumer explicitly.
+This direct-import-only Warp boundary consumes resolver-produced graph and
+schedule metadata. Callers explicitly report successful ordinary nodes and
+bracket supported consumer callbacks. The coordinator refreshes stale
+vapor-pressure and saturation-ratio fields immediately before a consumer.
+
+It does not own lifecycle, resource acquisition, scheduling, transfers,
+fallbacks, or general process dispatch. Refreshing vapor pressure delegates to
+the authoritative GPU primitive; saturation refresh is a private device writer.
 """
 
 from __future__ import annotations
@@ -38,7 +42,13 @@ def _refresh_saturation_ratio_kernel(
     temperature: Any,
     saturation_ratio: Any,
 ) -> None:
-    """Refresh saturation ratios from resident gas and environment fields."""
+    """Write saturation ratios from resident gas and environment fields.
+
+    The kernel applies ``c × R × T / (M × p_v)`` independently to each
+    box/species lane, where concentration ``c`` is in kg/m³, ``R`` is the gas
+    constant, temperature ``T`` is in K, molar mass ``M`` is in kg/mol, and
+    vapor pressure ``p_v`` is in Pa.
+    """
     box_idx, species_idx = wp.tid()  # type: ignore[misc]
     saturation_ratio[box_idx, species_idx] = (
         concentration[box_idx, species_idx]
@@ -57,11 +67,20 @@ def _registry_type() -> type[object]:
 
 @dataclass(frozen=True, eq=False)
 class ResidentThermodynamicUpdateRequest:
-    """Bind one coordinator to exact resident state and resolved metadata.
+    """Bind a coordinator to exact resident state and resolved metadata.
 
     Construction intentionally validates only exact concrete carrier types.
     Graph provenance, schedule membership, session ownership, and array schemas
     are checked immediately before a reported node or consumer is executed.
+
+    Attributes:
+        session: Active resident session whose gas and environment fields are
+            refreshed in place.
+        registry: Pinned registry that must be bound to ``session``.
+        graph: Resolver-produced process graph that owns canonical nodes.
+        schedule: Resolver-produced ordered schedule of graph nodes.
+        thermodynamics: Configuration passed unchanged to the authoritative
+            vapor-pressure writer.
     """
 
     session: ResidentSession
@@ -71,7 +90,12 @@ class ResidentThermodynamicUpdateRequest:
     thermodynamics: ThermodynamicsConfig
 
     def __post_init__(self) -> None:
-        """Validate exact retained carrier types without inspecting payloads."""
+        """Validate exact retained carrier types without inspecting payloads.
+
+        Raises:
+            TypeError: If any retained object is not its required exact
+                concrete type.
+        """
         if type(self.session) is not ResidentSession:
             raise TypeError("session must be an exact ResidentSession.")
         if type(self.registry) is not _registry_type():
@@ -155,10 +179,32 @@ _CONSUMER_IDS = frozenset({"condensation", "diagnostics"})
 
 
 class ResidentThermodynamicUpdateCoordinator:
-    """Track stale derived fields around explicit resident consumer calls."""
+    """Track derived-state freshness around explicit resident consumer calls.
+
+    The coordinator begins with vapor pressure and saturation ratio stale. A
+    successfully reported ordinary node contributes its declared invalidations.
+    Before each scheduled condensation or diagnostics callback, virtual refresh
+    nodes write only stale fields in vapor-pressure then saturation order. A
+    failed writer or callback does not advance the schedule cursor; a successful
+    vapor refresh remains fresh if a later saturation refresh fails.
+
+    Attributes:
+        cursor: Number of successfully consumed schedule node IDs.
+        stale_states: Immutable view of coordinator-owned stale derived-state
+            markers.
+    """
 
     def __init__(self, request: ResidentThermodynamicUpdateRequest) -> None:
-        """Retain one exact coordinator request and initialize stale markers."""
+        """Retain a request and initialize both derived fields as stale.
+
+        Args:
+            request: Exact concrete binding to the resident session, registry,
+                resolved graph, schedule, and thermodynamic configuration.
+
+        Raises:
+            TypeError: If ``request`` is not an exact
+                ``ResidentThermodynamicUpdateRequest``.
+        """
         if type(request) is not ResidentThermodynamicUpdateRequest:
             raise TypeError(
                 "request must be an exact ResidentThermodynamicUpdateRequest."
@@ -172,12 +218,21 @@ class ResidentThermodynamicUpdateCoordinator:
 
     @property
     def cursor(self) -> int:
-        """Return the count of schedule IDs successfully consumed."""
+        """Return the number of schedule IDs successfully consumed.
+
+        Returns:
+            Number of consumed ordinary, virtual, and consumer nodes.
+        """
         return self._cursor
 
     @property
     def stale_states(self) -> frozenset[InvalidatedState]:
-        """Return coordinator-owned derived-state stale markers."""
+        """Return coordinator-owned derived-state stale markers.
+
+        Returns:
+            Immutable set of fields that require refresh before their next
+            supported consumer.
+        """
         return frozenset(self._stale)
 
     def _validate_binding(self) -> None:
@@ -251,7 +306,21 @@ class ResidentThermodynamicUpdateCoordinator:
         )
 
     def record_completed(self, node: ProcessNode) -> None:
-        """Consume one successfully completed non-virtual schedule node."""
+        """Record one successfully completed ordinary schedule node.
+
+        The node must be the next scheduled graph member and must not be a
+        virtual refresh or supported consumer. Its declared invalidations are
+        added to the coordinator-owned stale markers.
+
+        Args:
+            node: Exact next canonical graph node, reported only after its
+                caller-owned execution succeeds.
+
+        Raises:
+            TypeError: If ``node`` is not an exact ``ProcessNode``.
+            ValueError: If resident binding or schedule metadata is invalid, or
+                if ``node`` is out of order, virtual, or a consumer.
+        """
         if type(node) is not ProcessNode:
             raise TypeError("node must be an exact ProcessNode.")
         expected = self._next_node()
@@ -297,7 +366,29 @@ class ResidentThermodynamicUpdateCoordinator:
     def execute_consumer(
         self, node: ProcessNode, callback: Callable[[], object]
     ) -> object:
-        """Refresh stale fields then call the next supported consumer."""
+        """Refresh stale fields and call the next scheduled consumer once.
+
+        Only condensation and diagnostics consumers are supported. The method
+        consumes their immediately preceding virtual refresh nodes, writes stale
+        fields in dependency order, then invokes ``callback``. It applies the
+        consumer invalidations and advances the cursor only after the callback
+        returns successfully.
+
+        Args:
+            node: Exact next scheduled condensation or diagnostics graph node.
+            callback: Zero-argument callable that executes that consumer.
+
+        Returns:
+            The value returned by ``callback``.
+
+        Raises:
+            TypeError: If ``node`` is not an exact ``ProcessNode`` or callback
+                is not callable.
+            ValueError: If resident binding, schedule metadata, refresh-window
+                ordering, or the requested consumer is invalid.
+            Exception: Propagates a refresh-writer or callback failure without
+                consuming the consumer node.
+        """
         if type(node) is not ProcessNode:
             raise TypeError("node must be an exact ProcessNode.")
         if not callable(callback):

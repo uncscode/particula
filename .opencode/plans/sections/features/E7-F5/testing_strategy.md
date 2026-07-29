@@ -31,9 +31,17 @@ never lowered; changed modules target at least 80%.
   and empty-box/zero-species write-free no-ops. Import isolation preserves the
   ten-name `particula.execution.__all__`; tests make no scheduler, refresh,
   transfer, fallback, or lifecycle claim.
-- **P5:** Call-order tests prove temperature updates precede on-device vapor
-  pressure and saturation refresh, and refresh precedes condensation. Cover
-  unchanged state, multi-species/multi-box state, and no host evaluation.
+- **P5 (completed, #1496):**
+  `particula/execution/tests/thermodynamic_updates_test.py` uses lazy Warp
+  resident fixtures and resolver-produced graph/schedule records. It covers
+  successful environment/gas reporting and cursor order; vapor then saturation
+  writer/callback ordering and stale-writer elision; condensation-to-diagnostics
+  gas visibility; one- and multi-box/species SI saturation references; and
+  write-free empty dimensions. Rejection coverage includes invalid callback and
+  out-of-order reporting. Separate vapor-writer, saturation-writer, and
+  callback failure rows assert callback suppression, unchanged cursor, and the
+  defined partial-failure stale-marker state. The tests retain direct-module
+  scope and make no lifecycle, full-scheduler, transfer, or fallback claim.
 - **P6:** Integration-test repeated complete timesteps on Warp CPU using the
   E6-F9 fixtures. Assert one setup, no intermediate bulk transfer or sync,
   stable identities, one lifecycle increment, current gas visibility,
