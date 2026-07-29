@@ -67,7 +67,19 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
   restoration, sidecars, lifecycle transition, finalization, close, scheduler,
   or migration behavior, and remains absent from package exports. See
   [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md) and
-  [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md).
+   [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md).
+- `gpu_resources.py` - Direct-import-only, Warp-dependent concrete registry for
+  complete reusable native process sidecars. It accepts only an exact `ACTIVE`
+  `ResidentSession`, pins its lifecycle, dimensions, device, and all primary
+  array identities, and rejects session drift before every acquisition. Typed
+  concrete manifests drive fixed schema/device/contiguity checks, checked
+  allocation sizes, and metadata-only primary/sidecar nonaliasing. A role pins
+  one caller- or registry-allocated identity; compatible repeats preserve the
+  exact view, records, and arrays. This validates pinned ownership rather than
+  unverifiable allocator provenance. It creates no public package export and
+  has no execution/selection, transfer/sync/restore, lifecycle, transport,
+  process-configuration/physics, or RNG reset/advance/initialization behavior.
+  Condensation thermodynamic roles are derived scratch/property storage only.
 - `adapters/condensation.py` - Concrete-only P2 condensation configuration and
   CPU/Warp state carriers plus selected P3 CPU/Warp execution carriers and
   adapters. P2 construction retains caller-owned resources by identity and

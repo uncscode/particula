@@ -64,6 +64,21 @@ Later phases own operational lifecycle semantics; direct kernel and adapter
 boundaries retain physical validation. See
 [ADR-004](architecture/decisions/ADR-004-concrete-gpu-resident-session-boundary.md).
 
+`particula.execution.gpu_resources` is a separate direct-import-only,
+Warp-dependent concrete boundary beside `gpu_session`. `GPUResourceRegistry`
+accepts only one exact `ACTIVE` `ResidentSession`, pins its dimensions, device,
+lifecycle, and all primary-array identities, and rejects any later drift before
+acquisition. It builds complete reusable native condensation, coagulation,
+wall-loss, and nucleation sidecars, validates their fixed schemas and metadata,
+and rejects primary/sidecar aliasing. Compatible repeats return the same views,
+records, and Warp arrays by identity. Ownership means pinned role identity and
+nonaliasing, not allocator-provenance inference. Its typed manifests and views
+remain concrete-only and absent from package exports. The boundary performs no
+execution or selection, transfer/synchronization/restoration, lifecycle change,
+transport allocation, process physics/configuration, or RNG initialization,
+advancement, or reset. Condensation thermodynamic entries are derived scratch
+storage only, never thermodynamic configuration.
+
 ## Wall Loss
 
 Wall loss strategies live in `particula.dynamics.wall_loss` and are exported
