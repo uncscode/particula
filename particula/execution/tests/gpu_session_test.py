@@ -1012,10 +1012,11 @@ def test_setup_resident_session_rejects_remaining_cpu_schema_before_upload(
     [
         (["species_0", "extra"], ValueError, "gas.name length"),
         ([object()], TypeError, "exact str instances"),
+        ("ab", TypeError, "ordered collection of strings"),
     ],
 )
 def test_setup_resident_session_rejects_gas_names_before_upload(
-    names: list[object], error: type[Exception], message: str
+    names: object, error: type[Exception], message: str
 ) -> None:
     """Test invalid CPU gas-name metadata cannot reach conversion helpers."""
     particles, gas, environment = _cpu_resources()
@@ -1074,6 +1075,11 @@ def test_setup_resident_session_rejects_device_subclass_before_upload() -> None:
         ("gas.concentration = np.ones((1,))", "ValueError", "concentration"),
         ("gas.name = ['species_0', 'extra']", "ValueError", "name length"),
         ("gas.name = [object()]", "TypeError", "exact str instances"),
+        (
+            "gas.name = 'ab'",
+            "TypeError",
+            "ordered collection of strings",
+        ),
         (
             "environment.temperature = np.ones((2,))",
             "ValueError",

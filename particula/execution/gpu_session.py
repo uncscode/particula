@@ -1,12 +1,13 @@
 """Define concrete-only GPU-resident session carriers and setup.
 
 The immutable carriers retain caller-owned Warp containers and CPU gas-name
-metadata by identity. ``setup_resident_session`` is P2's sole CPU-to-Warp
-upload point: local CPU preflight precedes conversion imports, then particles,
-gas, and environment convert once in that order before one complete ACTIVE
-session is published. Gas names remain ordered CPU-owned metadata and are not
-stored on the Warp gas container. This module provides no public export,
-lifecycle operation, fallback, synchronization, restore, or process sidecar.
+metadata. ``setup_resident_session`` snapshots validated ordered CPU gas names
+into immutable tuple metadata and is P2's sole CPU-to-Warp upload point: local
+CPU preflight precedes conversion imports, then particles, gas, and environment
+convert once in that order before one complete ACTIVE session is published. Gas
+names are not stored on the Warp gas container. This module provides no public
+export, lifecycle operation, fallback, synchronization, restore, or process
+sidecar.
 Selected native Warp-device availability remains an upstream E7-F6
 precondition.
 """
@@ -129,6 +130,8 @@ def _preflight_cpu_session(
         "gas.concentration",
         (boxes, species),
     )
+    if isinstance(gas.name, str):
+        raise TypeError("gas.name must be an ordered collection of strings.")
     if len(gas.name) != species:
         raise ValueError("gas.name length must match n_species.")
     _validate_cpu_shape(
@@ -526,9 +529,10 @@ def setup_resident_session(
 
     This concrete-only, unexported factory is P2's only CPU-to-Warp upload
     point. Local CPU preflight completes before conversion helpers are imported.
-    It then converts particles, gas, and environment once in that order, keeps
-    ordered gas names as CPU-owned metadata, and publishes only one complete,
-    validated ACTIVE session retaining converted containers by identity. It
+    It then converts particles, gas, and environment once in that order,
+    snapshots ordered gas names into immutable CPU-owned tuple metadata, and
+    publishes only one complete, validated ACTIVE session retaining converted
+    containers by identity. It
     provides no lifecycle operations, fallback, synchronization, restore, or
     process sidecars. The selected native Warp device must already be
     availability-approved by upstream E7-F6; this revision does not probe it.
