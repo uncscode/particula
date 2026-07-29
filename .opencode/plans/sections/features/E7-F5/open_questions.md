@@ -39,4 +39,12 @@
       is already device resident.
     - `particula/gas/properties/pressure_function.py:19` - CPU reference
       equations define partial pressure and saturation ratio from those fields.
-  - Resolved by: plan-question-resolver
+   - Resolved by: plan-question-resolver
+
+- [x] Does a prescribed resident environment or gas update execute scheduling or
+  derived-state refresh?
+  - Resolved 2026-07-29: No. P4 is only a graph-node-bound, direct-import
+    in-place update seam. Scheduling and P5 vapor-pressure/saturation refresh
+    remain separate work.
+  - Evidence: `particula/execution/state_updates.py` and
+    `particula/execution/tests/state_updates_test.py`.

@@ -29,11 +29,18 @@
   - Files: `particula/execution/process_adapters.py`, `particula/execution/tests/process_adapters_test.py`
   - Tests: identity, exact delegation, sidecars/RNG, validation, no-op, and failure propagation.
 
-- [ ] **E7-F5-P4:** Apply prescribed environment and gas updates with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Apply validated fixed-shape per-box updates at explicit graph nodes before their consumers.
+- [x] **E7-F5-P4:** Apply prescribed environment and gas updates with unit tests
+  - Issue: #1495 | Size: S | Status: Completed
+  - Delivered: Concrete-only direct-import requests and executor bind prescribed
+    updates to exact resident session/registry/graph/node identities, complete
+    deterministic preflight, then copy only designated resident arrays in place.
+    Empty canonical schemas are write-free no-ops.
   - Files: `particula/execution/state_updates.py`, `particula/execution/tests/state_updates_test.py`
-  - Tests: shape/dtype/device/alias checks, positivity, nonnegativity, update ordering, rejected-call immutability.
+  - Tests: lazy-Warp binding, role, schema/device/contiguity/alias, scalar,
+    copy-order, protected-field, rejected-call immutability, empty-schema, and
+    import-isolation coverage.
+  - Deferred: scheduler execution, derived refresh, transport, host transfers,
+    fallback, package exports, and lifecycle behavior.
 
 - [ ] **E7-F5-P5:** Order vapor-pressure and saturation refreshes with unit tests
   - Issue: TBD | Size: S | Status: Not Started

@@ -22,9 +22,15 @@ never lowered; changed modules target at least 80%.
 - **P3:** Adapter contract tests spy on exact direct calls and assert state,
   sidecar, output, and RNG identity; cover no-op/rejection/failure paths and no
   conversion, synchronization, fallback, or private-kernel bypass.
-- **P4:** Unit-test per-box environment/gas updates for dtype, shape, device,
-  aliasing, finite physical ranges, deterministic mutation, and rejection
-  without caller-state changes.
+- **P4 (completed, #1495):**
+  `particula/execution/tests/state_updates_test.py` uses lazy Warp fixtures to
+  cover exact carrier/session/registry/graph/node binding; canonical node roles;
+  schema, device, contiguity, identity and nonempty byte-range alias rejection;
+  finite positive environment and finite nonnegative gas values; ordered
+  in-place copies; protected-field preservation; rejected-call write freedom;
+  and empty-box/zero-species write-free no-ops. Import isolation preserves the
+  ten-name `particula.execution.__all__`; tests make no scheduler, refresh,
+  transfer, fallback, or lifecycle claim.
 - **P5:** Call-order tests prove temperature updates precede on-device vapor
   pressure and saturation refresh, and refresh precedes condensation. Cover
   unchanged state, multi-species/multi-box state, and no host evaluation.

@@ -44,3 +44,15 @@ direction profiles into declaration-only schedules, retaining dependency closure
 and deriving freshness edges before topology resolution. It has no launch,
 lifecycle, resource, backend, or export side effects; resident timestep
 execution remains later work.
+
+## Delivered: E7-F5-P4 (#1495)
+
+`particula.execution.state_updates` now supplies a concrete-only, direct-import
+boundary for prescribed resident environment and gas replacements bound to the
+resolved `environment_update` and `gas_update` graph nodes. Immutable requests
+retain exact resident session, registry, graph, node, and caller-owned Warp
+payload identities. Ordered preflight validates that binding, schemas, device,
+contiguity, nonempty alias ranges, and physical values before in-place copies;
+canonical empty schemas are write-free no-ops. The boundary neither schedules
+nodes nor refreshes derived state, transfers host data, provides fallback or
+exports, or changes resident lifecycle behavior.

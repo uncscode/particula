@@ -11,3 +11,4 @@
 | [ADR-007](ADR-007-resident-session-checkpoint-finalize-restart.md) | Resident Session Checkpoint, Finalize, and Restart Boundary | Accepted | 2026-07-28 |
 | [ADR-008](ADR-008-resident-session-failure-close-semantics.md) | Resident Session Failure and Terminal Close Semantics | Accepted | 2026-07-29 |
 | [ADR-009](ADR-009-resident-process-delegation-adapters.md) | Resident Process Delegation Adapters | Accepted | 2026-07-29 |
+| [ADR-010](ADR-010-resident-state-update-boundary.md) | Resident State Update Boundary | Accepted | 2026-07-29 |

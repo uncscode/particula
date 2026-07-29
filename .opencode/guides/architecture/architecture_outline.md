@@ -154,8 +154,23 @@ direct GPU APIs.
    back, falls back, or performs physics; direct-kernel validation, mutation,
    and post-launch failure semantics remain authoritative. No name is exported
    through `particula.execution`, its adapters package, or top-level
-   `particula`. See
-   [ADR-009](decisions/ADR-009-resident-process-delegation-adapters.md).
+    `particula`. See
+    [ADR-009](decisions/ADR-009-resident-process-delegation-adapters.md).
+- `state_updates.py` - Concrete-only, direct-import Warp-resident state-update
+  boundary beside the session, registry, and process adapters. Frozen immutable
+  environment and gas request carriers retain the exact active
+  `ResidentSession`, pinned `GPUResourceRegistry`, `ResolvedProcessGraph`, and
+  canonical `environment_update` or `gas_update` `ProcessNode` by identity.
+  After deterministic read-only registry, graph-role, schema, alias, and payload
+  validation, the executor copies only temperature/pressure or gas concentration
+  into the existing resident arrays. Canonical zero-box and zero-species schemas
+  are accepted write-free no-ops. It preserves all resident/container/primary
+  identities, leaves `particles.volume` and every untargeted array unchanged,
+  and does not schedule, refresh vapor pressure or saturation ratio, acquire
+  registry resources, transfer host data, synchronize, change lifecycle,
+  transport, fall back, or export names through `particula.execution` or the
+  top-level package. See
+  [ADR-010](decisions/ADR-010-resident-state-update-boundary.md).
 - `adapters/condensation.py` - Concrete-only P2 condensation configuration and
   CPU/Warp state carriers plus selected P3 CPU/Warp execution carriers and
   adapters. P2 construction retains caller-owned resources by identity and

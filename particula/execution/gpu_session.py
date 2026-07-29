@@ -300,7 +300,7 @@ def _validate_contiguous_array(
     shape: tuple[int, ...],
     item_size: int,
 ) -> None:
-    """Validate pointer and contiguous-stride primary metadata.
+    """Validate contiguous-stride primary metadata and nonempty pointers.
 
     Args:
         name: Fully qualified array name used in validation errors.
@@ -309,7 +309,8 @@ def _validate_contiguous_array(
         item_size: Element size in bytes.
 
     Raises:
-        ValueError: If the array is not contiguous or lacks a valid pointer.
+        ValueError: If the array is not contiguous or a nonempty array lacks a
+            valid pointer. Canonical empty schemas require no pointer.
     """
     expected: list[int] = []
     stride = item_size

@@ -70,7 +70,21 @@ def _registry_type() -> type[object]:
 
 @dataclass(frozen=True, eq=False)
 class ResidentEnvironmentUpdateRequest:
-    """Retain one exact graph-bound environment replacement request."""
+    """Retain one exact graph-bound environment replacement request.
+
+    The immutable carrier preserves session, registry, graph, node, and Warp
+    input-array identities. Construction validates only the concrete dependency
+    carriers; execution validates the graph binding, array schemas, ownership,
+    and positive finite temperature and pressure values.
+
+    Attributes:
+        session: Exact resident session whose environment arrays may be updated.
+        registry: Exact registry pinned to ``session``.
+        graph: Exact resolved graph containing ``node`` by identity.
+        node: Canonical ``environment_update`` graph node.
+        temperature: Caller-owned float64 Warp array shaped ``(n_boxes,)`` in K.
+        pressure: Caller-owned float64 Warp array shaped ``(n_boxes,)`` in Pa.
+    """
 
     session: ResidentSession
     registry: GPUResourceRegistry
@@ -80,7 +94,11 @@ class ResidentEnvironmentUpdateRequest:
     pressure: object
 
     def __post_init__(self) -> None:
-        """Validate only exact dependency carrier types in field order."""
+        """Validate only exact dependency carrier types in field order.
+
+        Raises:
+            TypeError: If a dependency is not its exact required concrete type.
+        """
         if type(self.session) is not ResidentSession:
             raise TypeError("session must be an exact ResidentSession.")
         if type(self.registry) is not _registry_type():
@@ -93,7 +111,21 @@ class ResidentEnvironmentUpdateRequest:
 
 @dataclass(frozen=True, eq=False)
 class ResidentGasUpdateRequest:
-    """Retain one exact graph-bound gas concentration replacement request."""
+    """Retain one exact graph-bound gas concentration replacement request.
+
+    The immutable carrier preserves session, registry, graph, node, and Warp
+    input-array identities. Construction validates only the concrete dependency
+    carriers; execution validates the graph binding, array schema, ownership,
+    and finite nonnegative concentration values.
+
+    Attributes:
+        session: Exact resident session whose gas concentration may be updated.
+        registry: Exact registry pinned to ``session``.
+        graph: Exact resolved graph containing ``node`` by identity.
+        node: Canonical ``gas_update`` graph node.
+        concentration: Caller-owned float64 Warp array shaped
+            ``(n_boxes, n_species)`` in the resident gas concentration units.
+    """
 
     session: ResidentSession
     registry: GPUResourceRegistry
@@ -102,7 +134,11 @@ class ResidentGasUpdateRequest:
     concentration: object
 
     def __post_init__(self) -> None:
-        """Validate only exact dependency carrier types in field order."""
+        """Validate only exact dependency carrier types in field order.
+
+        Raises:
+            TypeError: If a dependency is not its exact required concrete type.
+        """
         if type(self.session) is not ResidentSession:
             raise TypeError("session must be an exact ResidentSession.")
         if type(self.registry) is not _registry_type():
@@ -290,10 +326,30 @@ def _scan(
 
 
 class ResidentStateUpdateExecutor:
-    """Apply one validated prescribed update without scheduler behavior."""
+    """Apply one graph-bound resident replacement without scheduler behavior.
+
+    Execution preserves all resident container and primary-array identities. It
+    updates only environment temperature and pressure or gas concentration;
+    canonical empty schemas are successful write-free no-ops. It does not
+    refresh derived state, schedule work, transfer host data, alter lifecycle
+    state, or provide rollback after a copy writer launches.
+    """
 
     def execute(self, request: object) -> object:
-        """Validate and apply one exact environment or gas update request."""
+        """Validate and apply one exact environment or gas update request.
+
+        Args:
+            request: Exact immutable environment or gas update request.
+
+        Returns:
+            The identical resident environment or gas container that was
+            targeted by ``request``.
+
+        Raises:
+            TypeError: If ``request`` is not an exact supported request type.
+            ValueError: If the pinned binding, graph role, input schema,
+                ownership, or scalar values are invalid.
+        """
         if type(request) is ResidentEnvironmentUpdateRequest:
             return self._execute_environment(request)
         if type(request) is ResidentGasUpdateRequest:

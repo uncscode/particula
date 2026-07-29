@@ -27,8 +27,11 @@
 
 ## Environment, Gas, and Derived State
 
-- [ ] Add fixed-shape prescribed update declarations and executors in
-  `particula/execution/state_updates.py` with deterministic validation order.
+- [x] Add fixed-shape prescribed environment/gas request declarations and a
+  direct-import executor in `particula/execution/state_updates.py` with exact
+  resident session/registry/graph/node binding, deterministic preflight,
+  protected-field preservation, in-place copy commit, and empty-schema
+  write-free no-ops (P4, #1495).
 - [ ] Keep simulation volume on `ParticleData.volume`; reserve transport and
   expansion policy for E7-F7.
 - [ ] Track invalidation explicitly so temperature changes require on-device
@@ -44,8 +47,10 @@
   cycle, and backend-neutral import coverage (P1, #1492).
 - [x] Add P2 topology/scheduler tests in `process_graph_test.py` and
   `scheduler_test.py`, including guarded no-backend imports (#1493).
-- [ ] Add `process_adapters_test.py` and `state_updates_test.py` under
-  `particula/execution/tests/` with their phases.
+- [ ] Add `process_adapters_test.py` under `particula/execution/tests/` with P3.
+- [x] Add `state_updates_test.py` under `particula/execution/tests/` with lazy
+  Warp graph-binding, validation, commit-order, immutability, empty-schema, and
+  import-isolation coverage (P4, #1495).
 - [ ] Generalize existing process-sequence fixtures and transfer/sync spies.
 - [ ] Test registration-order invariance, graph rejection, exact call order,
   lifecycle, identity, no-op paths, update freshness, and failure propagation.

@@ -111,7 +111,22 @@
   writer failures. These names remain absent from `particula.execution`, its
   adapters package, and top-level `particula`; the direct kernel retains
   numerical validation and post-launch semantics. See
-  [ADR-009](decisions/ADR-009-resident-process-delegation-adapters.md).
+   [ADR-009](decisions/ADR-009-resident-process-delegation-adapters.md).
+- `particula.execution.state_updates` is a separate concrete-only,
+  direct-import Warp-resident update boundary. Its frozen request carriers retain
+  exact identities for an active `ResidentSession`, its pinned
+  `GPUResourceRegistry`, a `ResolvedProcessGraph`, and a canonical
+  `environment_update` or `gas_update` `ProcessNode`. The executor first
+  validates that registry binding, graph membership and canonical role, and
+  complete input schemas, ownership, and payload values without a writer. It
+  then copies only temperature and pressure or gas concentration into the
+  existing resident storage. It preserves resident/container/primary-array
+  identity and leaves particle volume and all untargeted arrays unchanged.
+  Canonical zero-box and `(n_boxes, 0)` gas schemas are accepted write-free
+  no-ops. The boundary neither schedules nodes nor refreshes vapor pressure or
+  saturation ratio; it does not acquire resources, transport or transfer host
+  data, synchronize, alter lifecycle state, fall back, or gain package/top-level
+  exports. See [ADR-010](decisions/ADR-010-resident-state-update-boundary.md).
 - P5 adds a concrete-only in-memory checkpoint boundary in
   `particula.execution.checkpoint`. `ResidentSession.checkpoint(registry, guard)`
   and `.finalize(registry, guard)` bind one controller by exact identity to that

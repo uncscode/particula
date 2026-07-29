@@ -14,7 +14,19 @@
   direction policy, and no disabled-endpoint edges (#1493).
 - [x] P2 remains direct-import-only and prelaunch-only: no package export,
   lifecycle/resource/backend import, launch, transfer, synchronization, or
-  mutation occurs during schedule resolution (#1493).
+   mutation occurs during schedule resolution (#1493).
+- [x] P4 accepts only exact immutable requests bound to the active resident
+  session, pinned registry, resolved graph, and canonical environment/gas update
+  node; malformed bindings reject before payload work or writes (#1495).
+- [x] P4 validates fixed Warp schemas, resident device, contiguity, protected
+  array aliasing, and physical values before ordered in-place copies; rejected
+  calls preserve resident primaries and prescribed payloads (#1495).
+- [x] P4 preserves container and primary-array identities, leaves protected
+  fields untouched, and treats canonical empty-box/zero-species inputs as
+  write-free no-ops (#1495).
+- [x] P4 remains concrete-only and direct-import-only: it adds no package
+  export, scheduler execution, derived refresh, transport, host transfer,
+  fallback, or lifecycle behavior (#1495).
 - [ ] Condensation, Brownian coagulation, dilution, wall loss, and nucleation
   execute through their owning adapters/direct boundaries without physics rewrites.
 - [ ] Environment changes precede vapor-pressure and saturation refresh; every

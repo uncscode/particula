@@ -29,7 +29,9 @@
 
 P1 node contracts and declaration normalization completed in #1492. P2 completed
 in #1493 with canonical declaration-only topology/schedule resolution; it does
-not provide runtime scheduling. P3 process integration and P4 state updates may
-build on P2 but must both land before P5 can execute freshness refreshes. P6
-composes all prior phases and validates the complete loop. P7 documents the
-settled contract last. Every production phase includes co-located tests.
+not provide runtime scheduling. P4 completed in #1495 with direct node-bound
+resident environment/gas updates, but does not execute scheduling or freshness
+refreshes. P3 process integration and P4 are prerequisites for P5 freshness
+refreshes. P6 composes all prior phases and validates the complete loop. P7
+documents the settled contract last. Every production phase includes co-located
+tests.

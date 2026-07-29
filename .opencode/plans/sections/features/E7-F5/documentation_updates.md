@@ -17,6 +17,11 @@
 - P2 (#1493) likewise required no user-facing documentation: its scheduler
   foundation is direct-import-only, declaration-only, and unexported. The
   module and record docstrings document canonical ordering, P1-first validation,
-  closure, and no-launch semantics.
+   closure, and no-launch semantics.
+- P4 (#1495) required no user-facing documentation or export change because
+  `particula.execution.state_updates` is concrete-only and direct-import-only.
+  Its module and focused tests document exact graph-node binding, preflight,
+  protected fields, and empty-schema no-op behavior without claiming scheduling,
+  derived refresh, transport, host transfer, fallback, or lifecycle behavior.
 - Run documentation regressions and `mkdocs build --strict`; if a paired notebook
   is touched, edit its Jupytext `.py`, sync, execute, and commit both files.

@@ -31,6 +31,24 @@ to the P1 helper. It imports no resident lifecycle/resource, adapter, GPU, or
 Warp code and has no launch, mutation, transfer, synchronization, or fallback
 behavior.
 
+### P4 implemented resident state-update boundary
+
+`particula.execution.state_updates` is a concrete-only, direct-import boundary
+below any future runtime scheduler. Frozen `eq=False` environment and gas
+request carriers retain exact session, pinned registry, resolved graph, node,
+and caller-owned Warp update arrays. Its executor first validates the pinned
+session, exact graph-node membership and canonical update role, then validates
+target/input schema, resident device, contiguity, identity/nonempty byte-range
+nonaliasing, and scalar payloads. Only successful preflight performs in-place
+`wp.copy` commits: temperature then pressure, or gas concentration.
+
+The executor leaves particle data (including authoritative volume), gas molar
+mass/partitioning/vapor pressure, environment saturation ratio, sidecars, graph
+declarations, and lifecycle state untouched. Empty canonical box or zero-species
+schemas skip scalar scans and writers. It does not execute a graph, establish
+freshness or derived-state refresh, acquire resources, transfer data to host,
+provide fallback, or make lifecycle guarantees after a launched copy failure.
+
 ### Future runtime scheduler
 
 The runtime scheduler will be a typed orchestration layer above process adapters and E7-F4
@@ -93,7 +111,12 @@ an enabled consumer cannot retain a missing explicit or derived predecessor.
   immutable update descriptions. Temperature and pressure remain positive and
   finite; concentrations/saturation remain finite and nonnegative. Temperature
   changes invalidate vapor pressure and saturation. Condensation's coupled gas
-  mutation is retained rather than duplicated by the scheduler.
+   mutation is retained rather than duplicated by the scheduler.
+- **P4 Update API:** `ResidentEnvironmentUpdateRequest`,
+  `ResidentGasUpdateRequest`, and `ResidentStateUpdateExecutor` are direct
+  imports from `particula.execution.state_updates`; `particula.execution.__all__`
+  remains unchanged. This is an explicit node-bound mutation seam, not a
+  scheduler or derived-state boundary.
 - **Diagnostics:** Hooks are ordered barriers with typed resident views and may
   write only registered diagnostic buffers. Host callbacks/readbacks are not
   part of the normal GPU step.

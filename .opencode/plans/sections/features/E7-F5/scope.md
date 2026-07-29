@@ -12,8 +12,10 @@ environment, derived-thermodynamic, gas, and diagnostic boundaries.
 - Backend-selected condensation and Brownian coagulation from E7-F2/E7-F3.
 - Resident direct adapters for shipped dilution, neutral/charged wall loss, and
   fixed-slot nucleation without changing their kernel contracts.
-- Prescribed per-box temperature, pressure, and gas updates with strict shape,
-  dtype, device, finiteness, positivity/nonnegativity, and alias validation.
+- Concrete-only prescribed per-box temperature, pressure, and gas replacements
+  at exact resolved graph nodes, with strict shape, dtype, device, contiguity,
+  nonempty alias-range, finiteness, positivity/nonnegativity, and identity
+  validation; canonical empty schemas are write-free no-ops.
 - Vapor-pressure and saturation refresh after relevant updates and before every
   consumer; simulation volume remains `ParticleData.volume` state.
 - E7-F4 `begin_step()`/`complete_step()` lifecycle integration, stable identity,
@@ -47,6 +49,24 @@ environment, derived-thermodynamic, gas, and diagnostic boundaries.
 - Added co-located `process_graph_test.py` and `scheduler_test.py` coverage.
 - Kept package exports, lifecycle/resource behavior, process launches, backend
   imports, transfers, synchronization, and state mutation unchanged.
+
+## Delivered in P4 (#1495)
+
+- Added direct-import-only `particula/execution/state_updates.py` with frozen
+  environment and gas update requests and a resident in-place copy executor.
+- Bound requests by exact identity to the active resident session, pinned
+  registry, resolved graph, and canonical `environment_update` or `gas_update`
+  node before payload validation or writer launch.
+- Added deterministic metadata, protected-array alias, and scalar-value
+  preflight; temperature/pressure require finite positive values and gas
+  concentration requires finite nonnegative values.
+- Preserved target/container identities and protected particle, gas, and
+  environment fields; empty-box and zero-species schemas complete without scan
+  or copy.
+- Added focused lazy-Warp coverage in
+  `particula/execution/tests/state_updates_test.py`.
+- Did not add scheduler execution, derived-state refresh, transport, host
+  transfer, fallback, lifecycle behavior, or package exports.
 
 ## Out of Scope
 
