@@ -2,7 +2,7 @@
 
 from dataclasses import replace
 from fractions import Fraction
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pytest
@@ -23,8 +23,15 @@ from particula.execution.gpu_session import (
     ResidentStepGuard,
 )
 
+if TYPE_CHECKING:
+    from particula.execution.gpu_resources import GPUResourceRegistry
 
-def _resident_binding() -> tuple[ResidentSession, Any, ResidentStepGuard]:
+
+def _resident_binding() -> tuple[
+    ResidentSession,
+    "GPUResourceRegistry",
+    ResidentStepGuard,
+]:
     """Create a tiny active Warp CPU session, registry, and closed guard."""
     wp = pytest.importorskip("warp")
     from particula.execution.gpu_resources import GPUResourceRegistry
@@ -100,7 +107,7 @@ def test_checkpoint_carrier_is_frozen() -> None:
         object(),
         (),
         0,
-        0,
+        Fraction(0, 1),
         ResidentLifecycle.ACTIVE,
         object(),
         object(),
@@ -173,7 +180,7 @@ def test_validate_payload_rejects_malformed_immutable_descriptors(
 def test_checkpoint_is_detached_and_preserves_active_session() -> None:
     """A checkpoint copies primaries while leaving its source usable and active."""
     session, registry, guard = _resident_binding()
-    masses = session.particles.masses
+    masses = cast(Any, session.particles).masses
 
     checkpoint = session.checkpoint(registry, guard)
 
@@ -222,17 +229,21 @@ def test_finalize_is_cached_and_restart_restores_primary_state() -> None:
     assert restored_guard is not guard
     assert restored.metadata.gas_names == ("water",)
     np.testing.assert_array_equal(
-        restored.particles.masses.numpy(), session.particles.masses.numpy()
+        cast(Any, restored.particles).masses.numpy(),
+        cast(Any, session.particles).masses.numpy(),
     )
     np.testing.assert_array_equal(
-        restored.gas.vapor_pressure.numpy(), session.gas.vapor_pressure.numpy()
+        cast(Any, restored.gas).vapor_pressure.numpy(),
+        cast(Any, session.gas).vapor_pressure.numpy(),
     )
 
 
 def test_restart_rejects_non_checkpoint_and_terminal_checkpoint() -> None:
     """Restart rejects invalid carriers before importing or allocating Warp."""
     with pytest.raises(TypeError, match="exact ResidentCheckpoint"):
-        restart_resident_session(object(), Device(Backend.WARP, "cpu"))
+        restart_resident_session(
+            cast(ResidentCheckpoint, object()), Device(Backend.WARP, "cpu")
+        )
 
     terminal = ResidentCheckpoint(
         1,
@@ -241,7 +252,7 @@ def test_restart_rejects_non_checkpoint_and_terminal_checkpoint() -> None:
         Device(Backend.WARP, "cpu"),
         (),
         0,
-        0,
+        Fraction(0, 1),
         ResidentLifecycle.FINALIZED,
         object(),
         object(),
