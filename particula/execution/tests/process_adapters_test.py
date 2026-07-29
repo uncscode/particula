@@ -9,6 +9,7 @@ from typing import Any
 
 import pytest
 
+import particula.execution.process_adapters as process_adapters
 from particula.execution.process_adapters import (
     ResidentDilutionAdapter,
     ResidentDilutionRequest,
@@ -141,8 +142,7 @@ def test_dilution_adapter_delegates_exactly_once(
         return result
 
     monkeypatch.setattr(
-        "particula.execution.process_adapters._get_dilution_step_gpu",
-        lambda: step,
+        process_adapters, "_get_dilution_step_gpu", lambda: step
     )
 
     assert ResidentDilutionAdapter().execute(request) is result
@@ -175,8 +175,7 @@ def test_wall_loss_adapter_delegates_published_rng_once(
         return result
 
     monkeypatch.setattr(
-        "particula.execution.process_adapters._get_wall_loss_step_gpu",
-        lambda: step,
+        process_adapters, "_get_wall_loss_step_gpu", lambda: step
     )
 
     assert ResidentWallLossAdapter().execute(request) is result
@@ -210,8 +209,7 @@ def test_nucleation_adapter_delegates_all_published_sidecars_once(
         return result
 
     monkeypatch.setattr(
-        "particula.execution.process_adapters._get_nucleation_step_gpu",
-        lambda: step,
+        process_adapters, "_get_nucleation_step_gpu", lambda: step
     )
 
     assert ResidentNucleationAdapter().execute(request) is result
@@ -287,8 +285,7 @@ def test_direct_kernel_error_escapes_without_adapter_recovery(
         raise failure
 
     monkeypatch.setattr(
-        "particula.execution.process_adapters._get_dilution_step_gpu",
-        lambda: step,
+        process_adapters, "_get_dilution_step_gpu", lambda: step
     )
     with pytest.raises(RuntimeError) as caught:
         ResidentDilutionAdapter().execute(request)
@@ -329,9 +326,7 @@ def test_established_view_rejection_resolves_no_kernel_and_mutates_nothing(
         )
         adapter = ResidentNucleationAdapter()
         target = "_get_nucleation_step_gpu"
-    monkeypatch.setattr(
-        f"particula.execution.process_adapters.{target}", resolver
-    )
+    monkeypatch.setattr(process_adapters, target, resolver)
     bindings = registry._bindings.copy()
     views = registry._views.copy()
     capacities = registry._capacities.copy()
@@ -364,9 +359,7 @@ def test_dilution_binding_rejection_resolves_no_kernel_and_preserves_state(
         calls += 1
         return object()
 
-    monkeypatch.setattr(
-        "particula.execution.process_adapters._get_dilution_step_gpu", resolver
-    )
+    monkeypatch.setattr(process_adapters, "_get_dilution_step_gpu", resolver)
     with pytest.raises(ValueError, match="pinned ResidentSession"):
         ResidentDilutionAdapter().execute(request)
 
