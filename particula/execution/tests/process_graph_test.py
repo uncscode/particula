@@ -24,6 +24,7 @@ from particula.execution.process_graph import (
     ResolvedProcessGraph,
     ResourceRequirement,
     TimestepPlan,
+    resolve_canonical_topological_order,
     resolve_timestep_plan,
 )
 
@@ -475,6 +476,66 @@ def test_resolver_accepts_empty_and_dependency_free_declarations() -> None:
     assert empty == ResolvedProcessGraph((), ())
     assert single.nodes == (single_node,)
     assert single.dependencies == ()
+
+
+def test_canonical_topology_is_independent_of_declaration_order() -> None:
+    """Test lexical Kahn ordering for independent and dependent declarations."""
+    nodes = (_node("wall_loss"), _node("diagnostics"), _node("dilution"))
+    edges = (DependencyEdge("wall_loss", "diagnostics"),)
+
+    assert resolve_canonical_topological_order(nodes, edges) == (
+        "dilution",
+        "wall_loss",
+        "diagnostics",
+    )
+    assert resolve_canonical_topological_order(nodes[::-1], edges) == (
+        "dilution",
+        "wall_loss",
+        "diagnostics",
+    )
+
+
+def test_canonical_topology_rejects_missing_endpoints_and_cycles() -> None:
+    """Test topology utility does not return partial orders for invalid graphs."""
+    nodes = (_node("nucleation"), _node("condensation"))
+    with pytest.raises(ValueError, match="endpoints must be declared"):
+        resolve_canonical_topological_order(
+            (_node("dilution"),),
+            (DependencyEdge("dilution", "diagnostics"),),
+        )
+    with pytest.raises(
+        ValueError, match="^Cycle detected: condensation, nucleation.$"
+    ):
+        resolve_canonical_topological_order(
+            nodes,
+            (
+                DependencyEdge("nucleation", "condensation"),
+                DependencyEdge("condensation", "nucleation"),
+            ),
+        )
+
+
+def test_canonical_topology_requires_exact_records_and_unique_ids() -> None:
+    """Test topology records cannot bypass exact type or uniqueness checks."""
+
+    class NodeSubclass(ProcessNode):
+        """Exercise the exact topology node-record boundary."""
+
+    node = _node("dilution")
+    duplicate = (_node("dilution"), _node("dilution"))
+    subclass = NodeSubclass(
+        node.node_id,
+        node.kind,
+        node.process,
+        node.requirements,
+        node.resources,
+        node.invalidates,
+    )
+
+    with pytest.raises(TypeError, match="only ProcessNode instances"):
+        resolve_canonical_topological_order((subclass,), ())
+    with pytest.raises(ValueError, match="node IDs must be unique"):
+        resolve_canonical_topological_order(duplicate, ())
 
 
 def test_resolver_rejects_unknown_duplicate_and_invalid_requirements() -> None:

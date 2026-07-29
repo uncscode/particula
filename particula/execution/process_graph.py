@@ -355,6 +355,85 @@ def resolve_timestep_plan(plan: TimestepPlan) -> ResolvedProcessGraph:
     return ResolvedProcessGraph(normalized_nodes, normalized_edges)
 
 
+def resolve_canonical_topological_order(
+    nodes: tuple[ProcessNode, ...],
+    dependencies: tuple[DependencyEdge, ...],
+) -> tuple[str, ...]:
+    """Return the deterministic dependency order for validated graph records.
+
+    Ready nodes and successor traversal use lexical node identifiers, so the
+    result never depends on declaration order. This read-only helper validates
+    tuple/member shape and edge endpoints but does not validate the closed P1
+    catalogue or execute graph nodes.
+
+    Args:
+        nodes: Exact tuple of declared graph nodes with unique identifiers.
+        dependencies: Exact tuple of dependency edges between declared nodes.
+
+    Returns:
+        Canonical topological node identifiers.
+
+    Raises:
+        TypeError: If containers or members do not have the declared types.
+        ValueError: If node identifiers repeat, an endpoint is absent, or the
+            effective dependencies contain a cycle.
+    """
+    _validate_topology_members(nodes, dependencies)
+    node_ids = [node.node_id for node in nodes]
+    if len(node_ids) != len(set(node_ids)):
+        raise ValueError("Topology node IDs must be unique.")
+    declared_ids = frozenset(node_ids)
+    adjacent: dict[str, list[str]] = {node_id: [] for node_id in declared_ids}
+    indegree = {node_id: 0 for node_id in declared_ids}
+    for edge in dependencies:
+        if (
+            edge.before_id not in declared_ids
+            or edge.after_id not in declared_ids
+        ):
+            raise ValueError("Dependency endpoints must be declared node IDs.")
+        adjacent[edge.before_id].append(edge.after_id)
+        indegree[edge.after_id] += 1
+
+    ready = sorted(
+        node_id for node_id, degree in indegree.items() if degree == 0
+    )
+    ordered: list[str] = []
+    while ready:
+        node_id = ready.pop(0)
+        ordered.append(node_id)
+        for successor in sorted(adjacent[node_id]):
+            indegree[successor] -= 1
+            if indegree[successor] == 0:
+                ready.append(successor)
+        ready.sort()
+
+    if len(ordered) != len(declared_ids):
+        remaining = sorted(
+            node_id for node_id, degree in indegree.items() if degree > 0
+        )
+        raise ValueError("Cycle detected: " + ", ".join(remaining) + ".")
+    return tuple(ordered)
+
+
+def _validate_topology_members(
+    nodes: object,
+    dependencies: object,
+) -> None:
+    """Validate exact topology utility containers and record members."""
+    if type(nodes) is not tuple:
+        raise TypeError("Topology.nodes must be a tuple.")
+    if not all(type(node) is ProcessNode for node in nodes):
+        raise TypeError(
+            "Topology.nodes must contain only ProcessNode instances."
+        )
+    if type(dependencies) is not tuple:
+        raise TypeError("Topology.dependencies must be a tuple.")
+    if not all(type(edge) is DependencyEdge for edge in dependencies):
+        raise TypeError(
+            "Topology.dependencies must contain only DependencyEdge instances."
+        )
+
+
 def _validate_node_id(value: object, field_name: str) -> None:
     """Validate a canonical lower-case identifier-style node identifier."""
     if not isinstance(value, str):
@@ -464,26 +543,4 @@ def _raise_for_cycle(
     edges: tuple[DependencyEdge, ...],
 ) -> None:
     """Raise an error when normalized declarations contain a cycle."""
-    adjacent: dict[str, list[str]] = {node.node_id: [] for node in nodes}
-    for edge in edges:
-        adjacent[edge.before_id].append(edge.after_id)
-    visited: set[str] = set()
-    active: list[str] = []
-
-    def visit(node_id: str) -> None:
-        """Traverse sorted dependencies and report the first canonical cycle."""
-        if node_id in active:
-            cycle = active[active.index(node_id) :]
-            raise ValueError(
-                "Cycle detected: " + ", ".join(sorted(cycle)) + "."
-            )
-        if node_id in visited:
-            return
-        active.append(node_id)
-        for after_id in sorted(adjacent[node_id]):
-            visit(after_id)
-        active.pop()
-        visited.add(node_id)
-
-    for node in nodes:
-        visit(node.node_id)
+    resolve_canonical_topological_order(nodes, edges)
