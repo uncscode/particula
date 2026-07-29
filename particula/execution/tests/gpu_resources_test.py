@@ -9,6 +9,7 @@ from typing import Any, cast
 
 import pytest
 
+import particula.execution.gpu_resources as gpu_resources
 from particula.execution import Backend, Device
 from particula.execution.gpu_resources import (
     GPUResourceRegistry,
@@ -257,6 +258,48 @@ def test_registry_rejects_replaced_primary_identity_before_publication() -> (
 
 
 @pytest.mark.warp
+def test_registry_rejects_replaced_container_before_allocation() -> None:
+    """Test replacing a container rejects even when its arrays are unchanged."""
+    from particula.gpu.warp_types import WarpParticleData
+
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    original_particles = cast(Any, session.particles)
+    replacement_particles = WarpParticleData()
+    for name in ("masses", "concentration", "charge", "density", "volume"):
+        setattr(replacement_particles, name, getattr(original_particles, name))
+    object.__setattr__(session, "particles", replacement_particles)
+
+    with pytest.raises(ValueError, match="signature changed"):
+        registry.acquire_wall_loss()
+
+    assert registry._bindings == {}
+
+
+@pytest.mark.warp
+def test_registry_rejects_non_warp_primary_metadata_impostor() -> None:
+    """Test primary metadata-shaped values cannot impersonate Warp arrays."""
+    wp = pytest.importorskip("warp")
+
+    class MetadataImpostor:
+        """Provide the metadata shape of a Warp array without its type."""
+
+        dtype = wp.float64
+        shape = (1, 2, 1)
+        device = "cpu"
+        ptr = 0
+        strides = (16, 8, 8)
+
+    session = _session()
+    object.__setattr__(
+        cast(Any, session.particles), "masses", MetadataImpostor()
+    )
+
+    with pytest.raises(ValueError, match="Warp array"):
+        GPUResourceRegistry(session)
+
+
+@pytest.mark.warp
 @pytest.mark.parametrize(
     ("carrier", "field", "role"),
     [
@@ -295,6 +338,30 @@ def test_registry_rejects_cross_family_duplicate_sidecar_identity() -> None:
     with pytest.raises(ValueError, match="share identity"):
         registry.acquire_coagulation(1, rng_states=wall_loss.rng_states)
 
+    assert set(registry._bindings) == {"wall_loss"}
+
+
+@pytest.mark.warp
+def test_cross_family_alias_rejects_before_omitted_allocations(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test supplied cross-family aliases fail before omitted buffers allocate."""
+    registry = GPUResourceRegistry(_session())
+    wall_loss = registry.acquire_wall_loss()
+    calls = 0
+    original_zeros = cast(Any, gpu_resources.wp.zeros)
+
+    def tracked_zeros(*args: object, **kwargs: object) -> Any:
+        """Track unexpected omitted-sidecar allocations."""
+        nonlocal calls
+        calls += 1
+        return original_zeros(*args, **kwargs)
+
+    monkeypatch.setattr(cast(Any, gpu_resources.wp), "zeros", tracked_zeros)
+    with pytest.raises(ValueError, match="share identity"):
+        registry.acquire_coagulation(1, rng_states=wall_loss.rng_states)
+
+    assert calls == 0
     assert set(registry._bindings) == {"wall_loss"}
 
 
@@ -427,5 +494,31 @@ def test_registry_allocation_failure_does_not_publish_partial_family(
     with pytest.raises(RuntimeError, match="allocation failed"):
         registry.acquire_wall_loss()
 
+    assert registry._bindings == {}
+    assert registry._views == {}
+
+
+@pytest.mark.warp
+def test_registry_partial_allocation_failure_does_not_publish_family(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a later allocation failure cannot publish a partial candidate."""
+    registry = GPUResourceRegistry(_session())
+    original_allocate = cast(Any, registry._allocate)
+    calls = 0
+
+    def fail_after_one(*args: object, **kwargs: object) -> Any:
+        """Allocate one local candidate sidecar then fail deterministically."""
+        nonlocal calls
+        calls += 1
+        if calls > 1:
+            raise RuntimeError("allocation failed")
+        return original_allocate(*args, **kwargs)
+
+    monkeypatch.setattr(registry, "_allocate", fail_after_one)
+    with pytest.raises(RuntimeError, match="allocation failed"):
+        registry.acquire_condensation()
+
+    assert calls == 2
     assert registry._bindings == {}
     assert registry._views == {}

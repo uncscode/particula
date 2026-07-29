@@ -735,18 +735,6 @@ def test_session_schema_validation_never_performs_runtime_work(
     """Test valid and invalid schema construction performs metadata-only work."""
     wp = pytest.importorskip("warp")
     particles, gas, environment = _warp_resources()
-    for carrier, field, _, _ in _primary_fields():
-        resource = {
-            "particles": particles,
-            "gas": gas,
-            "environment": environment,
-        }[carrier]
-        value = getattr(resource, field)
-        object.__setattr__(
-            resource,
-            field,
-            _MetadataArray(value.dtype, value.shape, value.device),
-        )
 
     def forbidden(*_: object, **__: object) -> None:
         raise AssertionError("P1 must not perform runtime work.")

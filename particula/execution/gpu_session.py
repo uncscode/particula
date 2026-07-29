@@ -251,6 +251,37 @@ def _validate_array(
         raise ValueError(f"{name} must have shape {shape}.")
     if array.device != device:
         raise ValueError(f"{name} device must match particles.masses device.")
+    if not (
+        type(array).__module__.startswith("warp")
+        and type(array).__name__ == "array"
+    ):
+        raise ValueError(f"{name} must be a Warp array.")
+    _validate_contiguous_array(
+        name,
+        array,
+        shape,
+        8 if getattr(dtype, "__name__", None) == "float64" else 4,
+    )
+
+
+def _validate_contiguous_array(
+    name: str,
+    array: Any,
+    shape: tuple[int, ...],
+    item_size: int,
+) -> None:
+    """Validate pointer and contiguous-stride primary metadata."""
+    expected: list[int] = []
+    stride = item_size
+    for length in reversed(shape):
+        expected.insert(0, stride)
+        stride *= length
+    if getattr(array, "strides", None) != tuple(expected):
+        raise ValueError(f"{name} must be contiguous.")
+    if all(shape) and (
+        not isinstance(getattr(array, "ptr", None), Integral) or array.ptr < 0
+    ):
+        raise ValueError(f"{name} must have a valid pointer.")
 
 
 def _validate_generated_containers(
@@ -326,6 +357,13 @@ def _validate_schema(
     boxes = dimensions_from_masses.n_boxes
     particle_count = dimensions_from_masses.n_particles
     species = dimensions_from_masses.n_species
+    _validate_array(
+        "particles.masses",
+        masses,
+        wp.float64,
+        (boxes, particle_count, species),
+        device,
+    )
     _validate_array(
         "particles.concentration",
         cast(Any, particles).concentration,

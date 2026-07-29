@@ -264,6 +264,9 @@ class GPUResourceRegistry:
             self._session.lifecycle,
             self._session.dimensions,
             particles.masses.device,
+            id(self._session.particles),
+            id(self._session.gas),
+            id(self._session.environment),
             *(id(value) for value in _primary_arrays(self._session)),
         )
 
@@ -482,12 +485,44 @@ class GPUResourceRegistry:
             ):
                 raise ValueError("Sidecar byte ranges must not overlap.")
 
+    def _validate_supplied_nonalias(
+        self,
+        supplied: dict[str, Any],
+        entries: tuple[ManifestEntry, ...],
+    ) -> None:
+        """Reject supplied aliases before allocating omitted sidecars."""
+        values = [supplied[entry.role] for entry in entries]
+        values = [value for value in values if value is not None]
+        registered = [
+            value
+            for family_bindings in self._bindings.values()
+            for value in family_bindings.values()
+        ]
+        registered_ranges = [self._array_range(value) for value in registered]
+        self._reject_shared_identities(values, registered)
+        self._reject_primary_aliases(values)
+        ranges = [self._array_range(value) for value in values]
+        for index, byte_range in enumerate(ranges):
+            if any(
+                self._ranges_overlap(byte_range, other)
+                for other in ranges[index + 1 :] + registered_ranges
+            ):
+                raise ValueError("Sidecar byte ranges must not overlap.")
+
     @staticmethod
     def _array_range(array: Any) -> tuple[int, int] | None:
         """Return one validated registry array's nonempty byte range."""
         strides = getattr(array, "strides", None)
         if not isinstance(strides, tuple) or len(strides) != len(array.shape):
             raise ValueError("Registry arrays must have contiguous strides.")
+        item_size = _item_size(array.dtype)
+        expected: list[int] = []
+        stride = item_size
+        for length in reversed(array.shape):
+            expected.insert(0, stride)
+            stride *= length
+        if strides != tuple(expected):
+            raise ValueError("Registry arrays must be contiguous.")
         count = 1
         for length in array.shape:
             count *= length
@@ -497,8 +532,7 @@ class GPUResourceRegistry:
             array.ptr < 0
         ):
             raise ValueError("Registry arrays must have a valid pointer.")
-        size = _item_size(array.dtype)
-        return int(array.ptr), int(array.ptr) + count * size
+        return int(array.ptr), int(array.ptr) + count * item_size
 
     def _acquire(
         self,
@@ -540,6 +574,7 @@ class GPUResourceRegistry:
             value = candidate[entry.role]
             if value is not None:
                 self._validate_array(entry, value, capacity)
+        self._validate_supplied_nonalias(candidate, manifest.entries)
         for entry in manifest.entries:
             if candidate[entry.role] is None:
                 candidate[entry.role] = self._allocate(entry, capacity)
