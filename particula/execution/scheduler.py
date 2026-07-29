@@ -190,12 +190,14 @@ def _validate_schedule_content(schedule: ResolvedTimestepSchedule) -> None:
             "ResolvedTimestepSchedule dependency endpoints must be schedule "
             "nodes."
         )
-    if set(schedule.ordered_node_ids) != set(node_ids) or len(
-        schedule.ordered_node_ids
-    ) != len(node_ids):
+    canonical_order = resolve_canonical_topological_order(
+        schedule.nodes,
+        schedule.dependencies,
+    )
+    if schedule.ordered_node_ids != canonical_order:
         raise ValueError(
-            "ResolvedTimestepSchedule.ordered_node_ids must be a permutation "
-            "of nodes."
+            "ResolvedTimestepSchedule.ordered_node_ids must equal the "
+            "canonical topological order."
         )
 
 

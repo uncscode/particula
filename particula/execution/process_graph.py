@@ -466,13 +466,13 @@ def _validate_plan_members(
     """Validate exact tuple containers and their declared member types."""
     if type(nodes) is not tuple:
         raise TypeError(f"{owner}.nodes must be a tuple.")
-    if not all(isinstance(node, ProcessNode) for node in nodes):
+    if not all(type(node) is ProcessNode for node in nodes):
         raise TypeError(
             f"{owner}.nodes must contain only ProcessNode instances."
         )
     if type(dependencies) is not tuple:
         raise TypeError(f"{owner}.dependencies must be a tuple.")
-    if not all(isinstance(edge, DependencyEdge) for edge in dependencies):
+    if not all(type(edge) is DependencyEdge for edge in dependencies):
         raise TypeError(
             f"{owner}.dependencies must contain only DependencyEdge instances."
         )

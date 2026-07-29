@@ -429,6 +429,34 @@ def test_plan_records_require_exact_immutable_containers(
         owner(nodes, dependencies)  # type: ignore[arg-type]
 
 
+@pytest.mark.parametrize("owner", [TimestepPlan, ResolvedProcessGraph])
+def test_plan_records_reject_process_graph_record_subclasses(owner) -> None:
+    """Test every P1 carrier rejects node and edge subclasses."""
+
+    class NodeSubclass(ProcessNode):
+        """Exercise the exact P1 node-record boundary."""
+
+    class EdgeSubclass(DependencyEdge):
+        """Exercise the exact P1 edge-record boundary."""
+
+    node = _node("dilution")
+    node_subclass = NodeSubclass(
+        node.node_id,
+        node.kind,
+        node.process,
+        node.requirements,
+        node.resources,
+        node.invalidates,
+    )
+    with pytest.raises(TypeError, match="only ProcessNode instances"):
+        owner((node_subclass,), ())
+    with pytest.raises(TypeError, match="only DependencyEdge instances"):
+        owner(
+            (_node("diagnostics"), _node("dilution")),
+            (EdgeSubclass("dilution", "diagnostics"),),
+        )
+
+
 def test_resolver_requires_exact_plan_type_before_inspecting_plan() -> None:
     """Test resolver rejects subclasses and unrelated values at its boundary."""
 

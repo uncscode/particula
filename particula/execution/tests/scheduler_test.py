@@ -90,19 +90,53 @@ def test_scheduler_carriers_are_immutable_and_validate_types() -> None:
         SchedulerProfile("both")  # type: ignore[arg-type]
     with pytest.raises(TypeError, match="NucleationCondensationDirection"):
         SchedulerProfile(None)  # type: ignore[arg-type]
+    with pytest.raises(TypeError):
+        SchedulerProfile()  # type: ignore[call-arg]
 
 
-def test_schedule_requires_canonical_members_and_order_permutation() -> None:
+def test_schedule_requires_canonical_members_and_topological_order() -> None:
     """Test direct schedule construction rejects noncanonical metadata."""
     dilution = _node("dilution")
     diagnostics = _node("diagnostics")
     edge = DependencyEdge("dilution", "diagnostics")
     with pytest.raises(ValueError, match="nodes must be sorted"):
         ResolvedTimestepSchedule((dilution, diagnostics), (), ())
-    with pytest.raises(ValueError, match="permutation"):
+    with pytest.raises(ValueError, match="canonical topological order"):
         ResolvedTimestepSchedule((diagnostics,), (), ("dilution",))
     with pytest.raises(ValueError, match="endpoints"):
         ResolvedTimestepSchedule((diagnostics,), (edge,), ("diagnostics",))
+
+
+def test_schedule_rejects_noncanonical_or_cyclic_direct_orders() -> None:
+    """Test direct schedule construction requires one acyclic lexical order."""
+    condensation = _node("condensation")
+    diagnostics = _node("diagnostics")
+    dilution = _node("dilution")
+    nucleation = _node("nucleation")
+
+    with pytest.raises(ValueError, match="canonical topological order"):
+        ResolvedTimestepSchedule(
+            (diagnostics, dilution),
+            (DependencyEdge("dilution", "diagnostics"),),
+            ("diagnostics", "dilution"),
+        )
+    with pytest.raises(ValueError, match="canonical topological order"):
+        ResolvedTimestepSchedule(
+            (dilution, _node("wall_loss")),
+            (),
+            ("wall_loss", "dilution"),
+        )
+    with pytest.raises(
+        ValueError, match="^Cycle detected: condensation, nucleation.$"
+    ):
+        ResolvedTimestepSchedule(
+            (condensation, nucleation),
+            (
+                DependencyEdge("condensation", "nucleation"),
+                DependencyEdge("nucleation", "condensation"),
+            ),
+            ("condensation", "nucleation"),
+        )
 
 
 @pytest.mark.parametrize(
@@ -423,6 +457,7 @@ def test_direction_policy_adds_exact_edge(
         direction
         is NucleationCondensationDirection.NUCLEATION_THEN_CONDENSATION
     ):
+        assert ("nucleation", "saturation_refresh") in pairs
         assert (
             schedule.ordered_node_ids.index("nucleation")
             < schedule.ordered_node_ids.index("saturation_refresh")
