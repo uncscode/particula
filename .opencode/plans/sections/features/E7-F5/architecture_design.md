@@ -101,20 +101,28 @@ agreement before `begin_step()`, then opens exactly one token and dispatches
 `schedule.ordered_node_ids` without substituting a handwritten order. It does
 not implement process physics or infer fallback from an exception.
 
+The following is a conditional dependency shape, not a universal static
+schedule. The resolver produces the actual order from the validated graph and
+reviewed profile; independent ready nodes use stable IDs only as a tie breaker.
+
 ```text
-TimestepPlan + ExecutionContext + ResidentSession
-                 |
-          validate capabilities, dimensions, resources, graph
-                 |
-                 v
-             begin_step()
-                 |
- environment update -> gas update -> virtual refreshes -> condensation
-                  |
- brownian coagulation -> dilution -> wall loss -> nucleation -> diagnostics
-                 |
-            complete_step()
+begin_step()
+    |
+environment_update --> vapor_pressure_refresh --> saturation_refresh
+gas_update -------------------------------------> saturation_refresh
+saturation_refresh -----------------------------> {condensation, diagnostics}
+condensation and nucleation --------------------> saturation_refresh (later consumer)
+
+condensation <--> nucleation: exactly one profile-selected direction
+brownian_coagulation, dilution, and wall_loss: placement is graph-dependent
+    |
+complete_step()
 ```
+
+`vapor_pressure_refresh` and `saturation_refresh` are virtual nodes consumed
+only in the condensation and diagnostics consumer windows. Environment
+invalidates both derived fields; gas, condensation, and nucleation invalidate
+saturation for a later consumer.
 
 The exact graph, rather than input list order, is authoritative. Required edges
 ensure environment changes precede derived-state refresh and every consumer sees

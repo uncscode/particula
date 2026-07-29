@@ -61,9 +61,11 @@
 - [x] Warp CPU complete-loop tests pass with explicit deterministic tolerances,
   conservation/loss checks, and independent-box equivalence; optional CUDA
   skips cleanly (#1497).
-- [x] P7 documentation states the concrete-only scope, profile/graph-dependent
-  order, freshness and authority limits from issue #1451, and does not absorb
-  E7-F7/E7-F8/E7-F9, Epic H, or Epic I work (#1498).
+- [x] P7 documentation and its focused Warp-independent regression state and
+  verify the concrete-only scope, profile/graph-dependent order, freshness and
+  authority limits from issue #1451, checkpoint separation, and exclusions; they
+  do not absorb E7-F7 transport/volume evolution, E7-F8 scheduled RNG/restart
+  policy, E7-F9 closeout, Epic H, or Epic I work (#1498).
 
 ## Metrics
 

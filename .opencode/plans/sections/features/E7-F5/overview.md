@@ -1,10 +1,12 @@
 # Overview
 
-**Problem Statement:** Particula has backend-selected condensation and Brownian
-coagulation plus a resident GPU session, but no production scheduler that orders
-all supported processes and state refreshes. Ad hoc loops can consume stale
-temperature-dependent vapor pressure or saturation state, move gas at the wrong
-time, reset stochastic resources, or violate the session's no-transfer contract.
+**Problem Statement:** Particula's resident GPU execution now has a bounded,
+concrete-only scheduler for the complete resolved ten-node timestep. Its
+published contract must make clear that order is resolver/profile/graph
+dependent, thermodynamic freshness is coordinator-owned, and normal execution
+does not relax the resident no-transfer, no-fallback, or no-rollback limits.
+Transport/volume evolution, detailed scheduled RNG/restart policy, and closeout
+products remain deferred to E7-F7, E7-F8, and E7-F9 respectively.
 
 **Value Proposition:** E7-F5 turns the shipped adapters and direct-process
 boundaries into one validated, deterministic timestep. It executes supported

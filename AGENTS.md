@@ -313,8 +313,10 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
 - Restart compatibility is fail-closed: only an ACTIVE `ResidentCheckpoint`
   with schema version `1`, carrier type `"ResidentSession"`, complete valid
   payload descriptors and bytes, and an exactly equal target `Device` is
-  accepted. E7-F5 scheduling, E7-F7 transport, and E7-F8 detailed RNG policy
-  remain deferred.
+  accepted. E7-F5 scheduling is shipped as a concrete-only resident-scheduler
+  contract; normal scheduler calls never checkpoint, finalize, or restart.
+  E7-F7 transport and E7-F8 detailed scheduled RNG/restart policy remain
+  deferred.
 
 ### Complete direct GPU process illustration
 

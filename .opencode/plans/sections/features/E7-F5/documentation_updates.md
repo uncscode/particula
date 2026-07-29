@@ -7,8 +7,10 @@
   transport, E7-F8 final RNG semantics, or E7-F9 closeout.
 - [x] Updated the feature and checkpoint pages with resident state authority,
   explicit checkpoint boundaries, and no-hidden-transfer rules.
-- Extend a scheduler-focused example only when the dependent public APIs exist;
-  keep `docs/Examples/gpu_complete_process_sequence.py` labeled illustrative.
+- [ ] Deferred to E7-F9: extend a scheduler-focused example only when dependent
+  public APIs exist. `docs/Examples/gpu_complete_process_sequence.py` remains an
+  illustrative explicit-transfer five-call sequence, not a resident scheduler
+  example.
 - [x] Updated `AGENTS.md` with resolver-produced process order, focused
   validation commands, freshness invalidations, and unsupported boundaries.
 - P1 (#1492) required no user-facing documentation because it is an unexported,
