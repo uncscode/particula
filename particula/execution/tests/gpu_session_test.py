@@ -21,6 +21,8 @@ from particula.execution.gpu_session import (
     ResidentSession,
     ResidentStepGuard,
     ResidentStepToken,
+    _handle_failed_resident_operation,
+    _ResidentOperationOutcome,
     setup_resident_session,
 )
 from particula.gas import EnvironmentData, GasData
@@ -1533,3 +1535,428 @@ def test_setup_resident_session_propagates_final_schema_failure(
 
     assert calls == ["particles", "gas", "environment"]
     assert _snapshot_cpu_resources(particles, gas, environment) == before
+
+
+@pytest.mark.warp
+def test_failed_read_only_operation_releases_token_and_remains_reusable() -> (
+    None
+):
+    """Test an explicitly read-only failure leaves a session reusable."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    token = guard.begin_step(1.0)
+
+    _handle_failed_resident_operation(
+        session,
+        registry,
+        guard,
+        token,
+        _ResidentOperationOutcome.READ_ONLY,
+    )
+
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert guard._open_token is None
+    assert registry._open_step_token is None
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == 0
+    retry = guard.begin_step(2.0)
+    guard.complete_step(retry)
+
+
+@pytest.mark.warp
+def test_failed_writer_operation_faults_and_can_close() -> None:
+    """Test a possible launched writer faults without rolling back state."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    token = guard.begin_step(1.0)
+
+    _handle_failed_resident_operation(
+        session,
+        registry,
+        guard,
+        token,
+        _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
+    )
+
+    assert session.lifecycle is ResidentLifecycle.FAULTED
+    assert guard._open_token is None
+    assert registry._open_step_token is None
+    with pytest.raises(ValueError, match="ACTIVE"):
+        guard.begin_step(1.0)
+    session.close(registry, guard)
+    assert session.lifecycle is ResidentLifecycle.CLOSED
+
+
+@pytest.mark.warp
+def test_abort_rejection_preserves_the_open_token() -> None:
+    """Test abort validates before changing token ownership or counters."""
+    guard = _guard()
+    token = guard.begin_step(1.0)
+
+    with pytest.raises(ValueError, match="does not match"):
+        guard._abort_step(ResidentStepToken(guard, 1.0))
+
+    assert guard._open_token is token
+    assert guard._registry._open_step_token is token
+    assert guard.completed_steps == 0
+    guard.complete_step(token)
+
+
+@pytest.mark.warp
+def test_close_requires_closed_active_guard_and_is_idempotent() -> None:
+    """Test active close is gated and closed close performs no validation."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    token = guard.begin_step(1.0)
+
+    with pytest.raises(RuntimeError, match="timestep is open"):
+        session.close(registry, guard)
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    guard._abort_step(token)
+    session.discard(registry, guard)
+    assert session.lifecycle is ResidentLifecycle.CLOSED
+    session.close(cast(Any, object()), cast(Any, object()))
+    assert session.lifecycle is ResidentLifecycle.CLOSED
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("outcome", "expected_lifecycle"),
+    [
+        (_ResidentOperationOutcome.READ_ONLY, ResidentLifecycle.ACTIVE),
+        (
+            _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
+            ResidentLifecycle.FAULTED,
+        ),
+    ],
+)
+def test_direct_owner_failure_preserves_original_exception_and_cleans_token(
+    outcome: _ResidentOperationOutcome,
+    expected_lifecycle: ResidentLifecycle,
+) -> None:
+    """Test an owner reraises its original error after explicit cleanup."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    sentinel = RuntimeError("direct operation failed")
+
+    def direct_owner() -> None:
+        """Open a step, classify an injected failure, and preserve that error."""
+        token = guard.begin_step(1.0)
+        try:
+            raise sentinel
+        except BaseException:
+            _handle_failed_resident_operation(
+                session,
+                registry,
+                guard,
+                token,
+                outcome,
+            )
+            raise
+
+    with pytest.raises(RuntimeError) as error:
+        direct_owner()
+
+    assert error.value is sentinel
+    assert error.tb is not None
+    assert session.lifecycle is expected_lifecycle
+    assert guard._open_token is None
+    assert registry._open_step_token is None
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == 0
+    if outcome is _ResidentOperationOutcome.READ_ONLY:
+        retry = guard.begin_step(0.0)
+        guard.complete_step(retry)
+    else:
+        with pytest.raises(ValueError, match="ACTIVE"):
+            guard.begin_step(0.0)
+
+
+@pytest.mark.warp
+def test_failed_operation_rejections_leave_valid_open_token_unchanged() -> None:
+    """Test failure-seam type and token errors do not silently abort a step."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    token = guard.begin_step(1.0)
+
+    with pytest.raises(TypeError, match="exact _ResidentOperationOutcome"):
+        _handle_failed_resident_operation(
+            session,
+            registry,
+            guard,
+            token,
+            cast(Any, object()),
+        )
+    with pytest.raises(ValueError, match="does not match"):
+        _handle_failed_resident_operation(
+            session,
+            registry,
+            guard,
+            ResidentStepToken(guard, 1.0),
+            _ResidentOperationOutcome.READ_ONLY,
+        )
+
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert guard._open_token is token
+    assert registry._open_step_token is token
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == 0
+    guard.complete_step(token)
+
+
+@pytest.mark.warp
+def test_faulted_close_uses_identity_binding_without_active_validation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test faulted close skips active-only registry validation."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    token = guard.begin_step(1.0)
+    _handle_failed_resident_operation(
+        session,
+        registry,
+        guard,
+        token,
+        _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
+    )
+
+    def forbidden(_: object) -> None:
+        """Fail if terminal fault disposal revalidates an active session."""
+        raise AssertionError("faulted close must not validate active binding")
+
+    monkeypatch.setattr(registry, "validate_pinned_session", forbidden)
+    session.discard(registry, guard)
+
+    assert session.lifecycle is ResidentLifecycle.CLOSED
+    assert guard._open_token is None
+    assert registry._open_step_token is None
+
+
+@pytest.mark.warp
+def test_active_close_validates_once_and_preserves_payload_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test active close validates once and changes only lifecycle state."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    before = _snapshot_resources(
+        session.particles,
+        session.gas,
+        session.environment,
+    )
+    original_validation = registry.validate_pinned_session
+    calls = 0
+
+    def validate_once(candidate: ResidentSession) -> None:
+        """Record the one active close binding validation."""
+        nonlocal calls
+        calls += 1
+        original_validation(candidate)
+
+    monkeypatch.setattr(registry, "validate_pinned_session", validate_once)
+    session.close(registry, guard)
+
+    assert calls == 1
+    assert session.lifecycle is ResidentLifecycle.CLOSED
+    assert (
+        _snapshot_resources(
+            session.particles,
+            session.gas,
+            session.environment,
+        )
+        == before
+    )
+
+
+@pytest.mark.warp
+def test_abort_rejects_closed_token_without_changing_bookkeeping() -> None:
+    """Test abort cannot release a token after it has already completed."""
+    guard = _guard()
+    token = guard.begin_step(1.5)
+    guard.complete_step(token)
+
+    with pytest.raises(RuntimeError, match="No resident timestep is open"):
+        guard._abort_step(token)
+
+    assert guard._open_token is None
+    assert guard._registry._open_step_token is None
+    assert guard.completed_steps == 1
+    assert guard.simulated_time == 1.5
+
+
+@pytest.mark.warp
+def test_failure_seam_validation_rejection_preserves_open_token(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test failed pinned validation neither aborts nor faults a session."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    token = guard.begin_step(1.0)
+
+    def reject(_: ResidentSession) -> None:
+        """Model a pinned-session validation failure before cleanup."""
+        raise ValueError("pinned binding drift")
+
+    monkeypatch.setattr(registry, "validate_pinned_session", reject)
+    with pytest.raises(ValueError, match="pinned binding drift"):
+        _handle_failed_resident_operation(
+            session,
+            registry,
+            guard,
+            token,
+            _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
+        )
+
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert guard._open_token is token
+    assert registry._open_step_token is token
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == 0
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("argument", "message"),
+    [
+        ("session", "exact ResidentSession"),
+        ("registry", "exact GPUResourceRegistry"),
+        ("guard", "exact ResidentStepGuard"),
+        ("token", "exact ResidentStepToken"),
+    ],
+)
+def test_failure_seam_type_rejections_preserve_valid_open_token(
+    argument: str, message: str
+) -> None:
+    """Test each exact-type rejection occurs before failure cleanup mutates."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    token = guard.begin_step(1.0)
+    values: dict[str, object] = {
+        "session": session,
+        "registry": registry,
+        "guard": guard,
+        "token": token,
+    }
+    values[argument] = object()
+
+    with pytest.raises(TypeError, match=message):
+        _handle_failed_resident_operation(
+            cast(ResidentSession, values["session"]),
+            cast(Any, values["registry"]),
+            cast(ResidentStepGuard, values["guard"]),
+            cast(ResidentStepToken, values["token"]),
+            _ResidentOperationOutcome.READ_ONLY,
+        )
+
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert guard._open_token is token
+    assert registry._open_step_token is token
+    guard.complete_step(token)
+
+
+@pytest.mark.warp
+def test_writer_cleanup_failure_does_not_replace_original_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a direct owner retains its operational error when cleanup fails."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    sentinel = RuntimeError("writer failure")
+    cleanup_errors: list[BaseException] = []
+
+    def failed_cleanup(_: ResidentStepToken) -> None:
+        """Inject a cleanup failure after a token has been opened."""
+        raise ValueError("cleanup failed")
+
+    monkeypatch.setattr(guard, "_abort_step", failed_cleanup)
+
+    def direct_owner() -> None:
+        """Model the required bare-reraise direct-owner failure boundary."""
+        token = guard.begin_step(1.0)
+        try:
+            raise sentinel
+        except BaseException:
+            try:
+                _handle_failed_resident_operation(
+                    session,
+                    registry,
+                    guard,
+                    token,
+                    _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
+                )
+            except BaseException as cleanup_error:
+                cleanup_errors.append(cleanup_error)
+            raise
+
+    with pytest.raises(RuntimeError) as error:
+        direct_owner()
+
+    assert error.value is sentinel
+    assert error.tb is not None
+    assert len(cleanup_errors) == 1
+    assert str(cleanup_errors[0]) == "cleanup failed"
+    # Incomplete cleanup retains the open token and never claims reusability.
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert guard._open_token is not None
+    assert registry._open_step_token is guard._open_token
+
+
+@pytest.mark.warp
+def test_close_rejections_preserve_active_binding_and_payloads(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test invalid active close leaves lifecycle, identities, and guard intact."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    before = _snapshot_resources(
+        session.particles,
+        session.gas,
+        session.environment,
+    )
+
+    def reject(_: ResidentSession) -> None:
+        """Reject the one required active-binding validation."""
+        raise ValueError("active validation failed")
+
+    monkeypatch.setattr(registry, "validate_pinned_session", reject)
+    with pytest.raises(ValueError, match="active validation failed"):
+        session.close(registry, guard)
+
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert guard._open_token is None
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == 0
+    assert (
+        _snapshot_resources(
+            session.particles,
+            session.gas,
+            session.environment,
+        )
+        == before
+    )
+
+
+@pytest.mark.warp
+def test_finalized_close_is_write_free_without_binding_validation() -> None:
+    """Test finalized close ignores supplied bindings and retains final state."""
+    guard = _guard()
+    session = guard._session
+    object.__setattr__(session, "lifecycle", ResidentLifecycle.FINALIZED)
+
+    session.close(cast(Any, object()), cast(Any, object()))
+    session.discard(cast(Any, object()), cast(Any, object()))
+
+    assert session.lifecycle is ResidentLifecycle.FINALIZED
+    assert guard._open_token is None
+    assert guard.completed_steps == 0

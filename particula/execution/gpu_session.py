@@ -17,7 +17,11 @@ before their own work; raw low-level helpers remain outside that gate's
 interception. Checkpoint support is concrete-only in
 ``particula.execution.checkpoint``: ``ResidentSession.checkpoint()`` is
 nonterminal, while ``finalize()`` caches its snapshot and transitions the
-session to FINALIZED. Restart is explicit, same-device, and never automatic.
+session to FINALIZED. P6 failure handling classifies direct-owner errors as
+read-only or potentially post-launch: the latter faults the session without
+rollback. ``close``/``discard`` only dispose lifecycle state after a closed
+guard; they do not restore, synchronize, or otherwise operate on payloads.
+Restart is explicit, same-device, and never automatic.
 Selected native Warp-device availability remains an upstream E7-F6
 precondition.
 """
@@ -196,14 +200,29 @@ class ResidentLifecycle(Enum):
 
     ``ResidentSession`` starts ACTIVE. Its narrow checkpoint-only helper may
     transition exactly ACTIVE to FINALIZED after a controller has cached an
-    immutable checkpoint. Fault, close, recovery, and all other transitions are
-    outside this module.
+    immutable checkpoint. P6 additionally permits a direct owner to transition
+    ACTIVE to FAULTED after a writer may have launched, and close/discard
+    transition ACTIVE or FAULTED to CLOSED. Faulting and closing never roll back
+    resident payloads.
     """
 
     ACTIVE = "active"
     FAULTED = "faulted"
     FINALIZED = "finalized"
     CLOSED = "closed"
+
+
+class _ResidentOperationOutcome(Enum):
+    """Classify an operation-owner failure without inspecting its exception.
+
+    Direct operation owners must explicitly select this classification. A
+    read-only failure leaves a successfully aborted session active; a failure
+    after a writer may have launched faults it because resident payload mutation
+    is observable and no rollback is available.
+    """
+
+    READ_ONLY = "read_only"
+    WRITER_MAY_HAVE_LAUNCHED = "writer_may_have_launched"
 
 
 @dataclass(frozen=True)
@@ -649,6 +668,50 @@ class ResidentSession:
             raise ValueError("session.lifecycle must be ACTIVE.")
         object.__setattr__(self, "lifecycle", ResidentLifecycle.FINALIZED)
 
+    def close(
+        self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
+    ) -> None:
+        """Terminally discard this binding without touching resident payloads.
+
+        An active session validates its exact pinned binding once and requires a
+        closed guard before becoming CLOSED. A faulted session uses only exact
+        identity checks because active-only registry validation is deliberately
+        unavailable after a possible writer failure. CLOSED and FINALIZED are
+        idempotent write-free no-ops. Finalization retains its cached
+        checkpoint.
+
+        Args:
+            registry: Exact registry pinned to this session.
+            guard: Exact closed guard bound to this session and registry.
+
+        Raises:
+            TypeError: If the registry or guard is not an exact concrete type.
+            ValueError: If the binding is wrong or the lifecycle is invalid.
+            RuntimeError: If a resident timestep remains open.
+        """
+        if self.lifecycle in {
+            ResidentLifecycle.CLOSED,
+            ResidentLifecycle.FINALIZED,
+        }:
+            return
+        _validate_terminal_binding(self, registry, guard)
+        if self.lifecycle is ResidentLifecycle.ACTIVE:
+            registry.validate_pinned_session(self)
+            guard.assert_step_closed()
+            object.__setattr__(self, "lifecycle", ResidentLifecycle.CLOSED)
+            return
+        if self.lifecycle is ResidentLifecycle.FAULTED:
+            guard.assert_step_closed()
+            object.__setattr__(self, "lifecycle", ResidentLifecycle.CLOSED)
+            return
+        raise ValueError("session.lifecycle must be ACTIVE or FAULTED.")
+
+    def discard(
+        self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
+    ) -> None:
+        """Delegate to :meth:`close` using identical terminal semantics."""
+        self.close(registry, guard)
+
 
 @dataclass(frozen=True, eq=False)
 class ResidentStepToken:
@@ -817,6 +880,31 @@ class ResidentStepGuard:
         self._open_token = None
         self._registry.release_open_step(token)
 
+    def _abort_step(self, token: ResidentStepToken) -> None:
+        """Release an exact open token without advancing timestep bookkeeping.
+
+        This private failure seam only closes the token held by this guard and
+        its pinned registry. It does not execute work, allocate, transfer,
+        synchronize, or roll back any device payload mutation.
+
+        Args:
+            token: Exact outstanding token owned by this guard.
+
+        Raises:
+            ValueError: If the active pinned binding or token identity is
+                invalid.
+            RuntimeError: If no resident timestep is open.
+        """
+        self._registry.validate_pinned_session(self._session)
+        if self._open_token is None:
+            raise RuntimeError("No resident timestep is open.")
+        if token is not self._open_token:
+            raise ValueError("token does not match the open resident timestep.")
+        if token is not self._registry._open_step_token:
+            raise ValueError("token does not match the open resident timestep.")
+        self._open_token = None
+        self._registry.release_open_step(token)
+
     def assert_step_closed(self) -> None:
         """Reject a lifecycle boundary while a guarded timestep remains open.
 
@@ -870,6 +958,77 @@ class ResidentStepGuard:
         validated_time = self._validate_duration(simulated_time)
         self._completed_steps = int(completed_steps)
         self._simulated_time = validated_time
+
+
+def _validate_terminal_binding(
+    session: ResidentSession,
+    registry: "GPUResourceRegistry",
+    guard: ResidentStepGuard,
+) -> None:
+    """Validate exact session, registry, and guard ownership identities.
+
+    Unlike ``GPUResourceRegistry.validate_pinned_session``, this local check is
+    valid for a FAULTED session and intentionally performs no lifecycle/schema
+    validation or runtime work.
+    """
+    from particula.execution.gpu_resources import GPUResourceRegistry
+
+    if type(session) is not ResidentSession:
+        raise TypeError("session must be an exact ResidentSession.")
+    if type(registry) is not GPUResourceRegistry:
+        raise TypeError("registry must be an exact GPUResourceRegistry.")
+    if type(guard) is not ResidentStepGuard:
+        raise TypeError("guard must be an exact ResidentStepGuard.")
+    if (
+        registry._session is not session
+        or guard._session is not session
+        or guard._registry is not registry
+    ):
+        raise ValueError("guard must match the resident session and registry.")
+
+
+def _handle_failed_resident_operation(
+    session: ResidentSession,
+    registry: "GPUResourceRegistry",
+    guard: ResidentStepGuard,
+    token: ResidentStepToken,
+    outcome: _ResidentOperationOutcome,
+) -> None:
+    """Release a failed operation token and apply its explicit outcome.
+
+    Direct operation owners call this only after opening ``token`` and catch
+    their original operational exception with a bare ``raise``. Classification
+    is explicit rather than inferred from exception type. READ_ONLY failures
+    leave the session active after aborting the token; a possible writer launch
+    faults the session after that same abort. No device payload rollback,
+    transfer, synchronization, retry, or recovery occurs here.
+    """
+    from particula.execution.gpu_resources import GPUResourceRegistry
+
+    if type(session) is not ResidentSession:
+        raise TypeError("session must be an exact ResidentSession.")
+    if type(registry) is not GPUResourceRegistry:
+        raise TypeError("registry must be an exact GPUResourceRegistry.")
+    if type(guard) is not ResidentStepGuard:
+        raise TypeError("guard must be an exact ResidentStepGuard.")
+    if type(token) is not ResidentStepToken:
+        raise TypeError("token must be an exact ResidentStepToken.")
+    if type(outcome) is not _ResidentOperationOutcome:
+        raise TypeError("outcome must be an exact _ResidentOperationOutcome.")
+    if (
+        registry._session is not session
+        or guard._session is not session
+        or guard._registry is not registry
+    ):
+        raise ValueError("guard must match the resident session and registry.")
+    if session.lifecycle is not ResidentLifecycle.ACTIVE:
+        raise ValueError("session.lifecycle must be ACTIVE.")
+    registry.validate_pinned_session(session)
+    if token is not guard._open_token or token is not registry._open_step_token:
+        raise ValueError("token does not match the open resident timestep.")
+    guard._abort_step(token)
+    if outcome is _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED:
+        object.__setattr__(session, "lifecycle", ResidentLifecycle.FAULTED)
 
 
 def setup_resident_session(
