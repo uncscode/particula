@@ -134,9 +134,28 @@ direct GPU APIs.
   and has no execution/selection, transfer/sync/restore, lifecycle, transport,
    process-configuration/physics, or RNG reset/advance/initialization behavior.
    `validate_pinned_session()` is the metadata-only integration seam: it
-   requires exact retained-session identity and reuses active
-   lifecycle/signature/schema validation without acquisition or allocation.
-   Condensation thermodynamic roles are derived scratch/property storage only.
+    requires exact retained-session identity and reuses active
+    lifecycle/signature/schema validation without acquisition or allocation.
+    `validate_wall_loss_resources()` and `validate_nucleation_resources()` first
+    validate that pinned session, then require the exact already-published view
+    and its pinned sidecar bindings for the corresponding family. These
+    established-view seams neither acquire resources nor inspect payloads,
+    mutate registry state, transfer, synchronize, or execute physics.
+    Condensation thermodynamic roles are derived scratch/property storage only.
+- `process_adapters.py` - Concrete-only, direct-import resident delegation
+   boundary for dilution, wall loss, and nucleation. Frozen request carriers
+   retain the exact active `ResidentSession`, its pinned
+   `GPUResourceRegistry`, and (for wall loss/nucleation) an exact established
+   published resource view by identity. After metadata-only session/view
+   validation, each adapter lazily resolves and invokes exactly one supported
+   direct GPU kernel, forwarding resident containers, sidecars, controls, and
+   persistent RNG state unchanged and returning the native result. It never
+   transfers, synchronizes, acquires or replaces resources, retries, rolls
+   back, falls back, or performs physics; direct-kernel validation, mutation,
+   and post-launch failure semantics remain authoritative. No name is exported
+   through `particula.execution`, its adapters package, or top-level
+   `particula`. See
+   [ADR-009](decisions/ADR-009-resident-process-delegation-adapters.md).
 - `adapters/condensation.py` - Concrete-only P2 condensation configuration and
   CPU/Warp state carriers plus selected P3 CPU/Warp execution carriers and
   adapters. P2 construction retains caller-owned resources by identity and

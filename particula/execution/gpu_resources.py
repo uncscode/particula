@@ -323,8 +323,9 @@ class GPUResourceRegistry:
 
         This concrete-only adapter seam verifies the exact active session before
         checking that ``resources`` is the already-published wall-loss view. It
-        performs metadata and identity checks only; it does not allocate,
-        acquire, inspect payloads, or mutate registry state.
+        retains the view and its RNG sidecar by identity, performs metadata and
+        identity checks only, and does not allocate, acquire, inspect payloads,
+        mutate registry state, transfer, synchronize, or recover failures.
 
         Args:
             session: Exact active session pinned by this registry.
@@ -357,7 +358,9 @@ class GPUResourceRegistry:
 
         This concrete-only adapter seam verifies exact active-session ownership,
         the exact published view identity, and every pinned record binding. It
-        does not allocate, acquire, inspect sidecar payloads, or mutate state.
+        retains all resource records and sidecars by identity and does not
+        allocate, acquire, inspect payloads, mutate state, transfer,
+        synchronize, or recover failures.
 
         Args:
             session: Exact active session pinned by this registry.

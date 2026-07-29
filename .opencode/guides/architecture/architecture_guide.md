@@ -90,8 +90,28 @@
   sidecar acquisition, allocation, or mutation. Future checkpoint, restore,
   finalize, close, fault, conversion, resize, and rebind boundaries must call
   `assert_step_closed()` before their own work; P5/P6 retain those operations
-   and their policy. The gate does not globally intercept raw low-level helpers.
-   See [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md).
+    and their policy. The gate does not globally intercept raw low-level helpers.
+    See [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md).
+- `GPUResourceRegistry.validate_wall_loss_resources()` and
+  `.validate_nucleation_resources()` are direct-module-only, metadata-only
+  established-view seams. After validating the exact pinned active session,
+  they require the exact already-published resource view and retain its pinned
+  sidecar bindings by identity. They neither acquire or replace sidecars,
+  inspect payloads, mutate registry state, transfer, synchronize, nor execute
+  a process.
+- `particula.execution.process_adapters` is a concrete-only, direct-import
+  delegation boundary for resident dilution, wall loss, and nucleation. Its
+  frozen request carriers retain exact session/registry references and, where
+  required, exact established wall-loss or nucleation views. Each matching
+  adapter completes metadata-only preflight, lazily resolves one supported
+  direct kernel, invokes it exactly once, and returns its native result
+  unchanged. It forwards resident containers, published sidecars, controls, and
+  persistent RNG state by identity. It does not acquire resources, transfer,
+  synchronize, retry, roll back, fall back, inspect physics, or recover direct
+  writer failures. These names remain absent from `particula.execution`, its
+  adapters package, and top-level `particula`; the direct kernel retains
+  numerical validation and post-launch semantics. See
+  [ADR-009](decisions/ADR-009-resident-process-delegation-adapters.md).
 - P5 adds a concrete-only in-memory checkpoint boundary in
   `particula.execution.checkpoint`. `ResidentSession.checkpoint(registry, guard)`
   and `.finalize(registry, guard)` bind one controller by exact identity to that

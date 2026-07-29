@@ -40,7 +40,13 @@ class ResidentDilutionRequest:
 
     This concrete-only carrier retains references without inspecting physical
     values. The direct dilution kernel owns all numerical validation and writer
-    failure semantics.
+    failure semantics. It neither copies nor recovers the retained state.
+
+    Attributes:
+        session: Exact active resident-session reference.
+        registry: Exact registry pinned to ``session``.
+        coefficient: Opaque dilution coefficient for the direct kernel.
+        time_step: Opaque duration for the direct kernel.
     """
 
     session: ResidentSession
@@ -49,7 +55,12 @@ class ResidentDilutionRequest:
     time_step: object
 
     def __post_init__(self) -> None:
-        """Validate exact resident dependency types without kernel imports."""
+        """Validate exact resident dependency types without kernel imports.
+
+        Raises:
+            TypeError: If ``session`` or ``registry`` is not its exact required
+                concrete type.
+        """
         if type(self.session) is not ResidentSession:
             raise TypeError("session must be an exact ResidentSession.")
         registry_type, _, _ = _resource_types()
@@ -63,6 +74,16 @@ class ResidentWallLossRequest:
 
     This concrete-only carrier preserves every reference by identity and leaves
     physical validation, RNG behavior, and writer failures to the direct step.
+    It neither copies retained state nor provides recovery.
+
+    Attributes:
+        session: Exact active resident-session reference.
+        registry: Exact registry pinned to ``session``.
+        resources: Exact established wall-loss resource view.
+        config: Opaque direct-kernel configuration.
+        time_step: Opaque duration for the direct kernel.
+        rng_seed: Opaque seed forwarded unchanged to the direct kernel.
+        initialize_rng: Opaque reset flag forwarded unchanged to the kernel.
     """
 
     session: ResidentSession
@@ -74,7 +95,12 @@ class ResidentWallLossRequest:
     initialize_rng: object = False
 
     def __post_init__(self) -> None:
-        """Validate exact dependencies without inspecting kernel arguments."""
+        """Validate exact dependencies without inspecting kernel arguments.
+
+        Raises:
+            TypeError: If a resident dependency or resource view is not its
+                exact required concrete type.
+        """
         if type(self.session) is not ResidentSession:
             raise TypeError("session must be an exact ResidentSession.")
         registry_type, wall_loss_type, _ = _resource_types()
@@ -89,7 +115,16 @@ class ResidentNucleationRequest:
     """Retain one nucleation call and its established sidecar resource view.
 
     This concrete-only carrier preserves references by identity and delegates
-    controls, physical validation, and writer failure semantics unchanged.
+    controls, physical validation, and writer failure semantics unchanged. It
+    neither copies retained state nor provides recovery.
+
+    Attributes:
+        session: Exact active resident-session reference.
+        registry: Exact registry pinned to ``session``.
+        resources: Exact established nucleation resource view.
+        config: Opaque direct-kernel configuration.
+        time_step: Opaque duration for the direct kernel.
+        exhaustion_controls: Opaque direct-kernel exhaustion controls.
     """
 
     session: ResidentSession
@@ -100,7 +135,12 @@ class ResidentNucleationRequest:
     exhaustion_controls: object
 
     def __post_init__(self) -> None:
-        """Validate exact dependencies without inspecting kernel arguments."""
+        """Validate exact dependencies without inspecting kernel arguments.
+
+        Raises:
+            TypeError: If a resident dependency or resource view is not its
+                exact required concrete type.
+        """
         if type(self.session) is not ResidentSession:
             raise TypeError("session must be an exact ResidentSession.")
         registry_type, _, nucleation_type = _resource_types()
@@ -132,10 +172,31 @@ def _get_nucleation_step_gpu() -> Callable[..., object]:
 
 
 class ResidentDilutionAdapter:
-    """Delegate exactly one dilution request through its pinned session."""
+    """Delegate one dilution request through its exact pinned session.
+
+    This concrete-only adapter resolves one supported direct kernel after
+    metadata-only preflight. It does not acquire resources, transfer data,
+    synchronize, retry, roll back, or recover writer failures.
+    """
 
     def execute(self, request: object) -> object:
-        """Validate a concrete request then return the native step result."""
+        """Validate and delegate one dilution request.
+
+        Args:
+            request: Exact dilution request retaining the pinned session and
+                registry.
+
+        Returns:
+            Native result returned by the supported direct dilution kernel.
+
+        Raises:
+            TypeError: If ``request`` is not an exact dilution request.
+            ValueError: If the request session is not the registry's active,
+                pinned session.
+
+        Direct-kernel exceptions and mutations propagate without adapter retry,
+        rollback, recovery, transfer, or synchronization.
+        """
         if type(request) is not ResidentDilutionRequest:
             raise TypeError("request must be an exact ResidentDilutionRequest.")
         request.registry.validate_pinned_session(request.session)
@@ -149,10 +210,32 @@ class ResidentDilutionAdapter:
 
 
 class ResidentWallLossAdapter:
-    """Delegate exactly one wall-loss request through its published view."""
+    """Delegate one wall-loss request through its exact published view.
+
+    This concrete-only adapter resolves one supported direct kernel after
+    metadata-only preflight. It preserves container, sidecar, and RNG identity
+    and provides no acquisition, transfer, synchronization, or recovery.
+    """
 
     def execute(self, request: object) -> object:
-        """Validate a concrete request then return the native step result."""
+        """Validate and delegate one wall-loss request.
+
+        Args:
+            request: Exact wall-loss request retaining the pinned published
+                view.
+
+        Returns:
+            Native result returned by the supported direct wall-loss kernel.
+
+        Raises:
+            TypeError: If ``request`` is not an exact wall-loss request or its
+                resource view has the wrong concrete type.
+            ValueError: If the session or resource view is no longer the active
+                registry-pinned publication.
+
+        Direct-kernel exceptions and mutations propagate without adapter retry,
+        rollback, recovery, transfer, or synchronization.
+        """
         if type(request) is not ResidentWallLossRequest:
             raise TypeError("request must be an exact ResidentWallLossRequest.")
         request.registry.validate_pinned_session(request.session)
@@ -174,10 +257,32 @@ class ResidentWallLossAdapter:
 
 
 class ResidentNucleationAdapter:
-    """Delegate exactly one nucleation request through its published view."""
+    """Delegate one nucleation request through its exact published view.
+
+    This concrete-only adapter resolves one supported direct kernel after
+    metadata-only preflight. It preserves container and sidecar identity and
+    provides no acquisition, transfer, synchronization, or recovery.
+    """
 
     def execute(self, request: object) -> object:
-        """Validate a concrete request then return the native step result."""
+        """Validate and delegate one nucleation request without altering result.
+
+        Args:
+            request: Exact nucleation request retaining the pinned published
+                view.
+
+        Returns:
+            Native result returned by the supported direct nucleation kernel.
+
+        Raises:
+            TypeError: If ``request`` is not an exact nucleation request or its
+                resource view has the wrong concrete type.
+            ValueError: If the session or resource view is no longer the active
+                registry-pinned publication.
+
+        Direct-kernel exceptions and mutations propagate without adapter retry,
+        rollback, recovery, transfer, or synchronization.
+        """
         if type(request) is not ResidentNucleationRequest:
             raise TypeError(
                 "request must be an exact ResidentNucleationRequest."

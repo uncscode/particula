@@ -10,3 +10,4 @@
 | [ADR-006](ADR-006-resident-gpu-step-lifecycle-guard.md) | Resident GPU Step Lifecycle Guard | Accepted | 2026-07-28 |
 | [ADR-007](ADR-007-resident-session-checkpoint-finalize-restart.md) | Resident Session Checkpoint, Finalize, and Restart Boundary | Accepted | 2026-07-28 |
 | [ADR-008](ADR-008-resident-session-failure-close-semantics.md) | Resident Session Failure and Terminal Close Semantics | Accepted | 2026-07-29 |
+| [ADR-009](ADR-009-resident-process-delegation-adapters.md) | Resident Process Delegation Adapters | Accepted | 2026-07-29 |

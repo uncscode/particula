@@ -132,6 +132,27 @@ Its narrow `validate_pinned_session()` seam first requires exact session
 identity, then reuses the existing active lifecycle/signature/schema validation
 without acquisition, allocation, payload inspection, or mutation.
 
+`GPUResourceRegistry.validate_wall_loss_resources()` and
+`.validate_nucleation_resources()` are metadata-only direct-module seams for
+resident delegation. Each first validates the exact pinned active session, then
+requires the exact already-published wall-loss or nucleation view and its pinned
+sidecar bindings by identity. Neither seam acquires or replaces resources,
+inspects payloads, mutates registry state, transfers, synchronizes, nor invokes
+physics.
+
+`particula.execution.process_adapters` is a concrete-only direct-import
+delegation boundary for resident dilution, wall loss, and nucleation. Its frozen
+request carriers retain exact active session/registry bindings and, for wall
+loss and nucleation, exact established published views. After metadata-only
+preflight, each adapter lazily resolves and calls exactly one supported direct
+GPU kernel, forwarding resident containers, sidecars, controls, and persistent
+RNG state by identity and returning the kernel's native result unchanged. It
+does not acquire resources, transfer, synchronize, retry, roll back, fall back,
+or perform physics; direct-kernel validation, mutation, and post-launch failure
+semantics remain authoritative. No process-adapter name is exported through
+`particula.execution`, its adapters package, or top-level `particula`. See
+[ADR-009](architecture/decisions/ADR-009-resident-process-delegation-adapters.md).
+
 ## Wall Loss
 
 Wall loss strategies live in `particula.dynamics.wall_loss` and are exported
