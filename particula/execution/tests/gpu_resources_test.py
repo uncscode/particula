@@ -455,7 +455,7 @@ assert 'warp' not in sys.modules
 assert not any(name == 'particula.gpu' or name.startswith('particula.gpu.') for name in sys.modules)
 """
     completed = subprocess.run(  # noqa: S603 -- fixed interpreter and script
-        [sys.executable, "-c", script],
+        [sys.executable, "-Werror", "-c", script],
         cwd=root,
         capture_output=True,
         check=False,
@@ -591,6 +591,7 @@ def test_established_view_validators_reject_absence_identity_and_binding_drift()
     session = _session()
     registry = GPUResourceRegistry(session)
     capacities = registry._capacities.copy()
+    primaries = (session.particles, session.gas, session.environment)
     token = object()
     registry.reserve_open_step(token)
 
@@ -623,11 +624,24 @@ def test_established_view_validators_reject_absence_identity_and_binding_drift()
     with pytest.raises(ValueError, match="bindings changed"):
         registry.validate_wall_loss_resources(session, wall_loss)
 
+    replacement_scratch = type(nucleation.scratch)(
+        **{
+            field.name: getattr(nucleation.scratch, field.name)
+            for field in fields(nucleation.scratch)
+        }
+    )
+    object.__setattr__(nucleation, "scratch", replacement_scratch)
+    with pytest.raises(ValueError, match="record bindings changed"):
+        registry.validate_nucleation_resources(session, nucleation)
+
     assert registry._bindings.keys() == {"wall_loss", "nucleation"}
     assert registry._views["wall_loss"] is wall_loss
     assert registry._views["nucleation"] is nucleation
     assert registry._capacities == capacities
     assert registry._open_step_token is token
+    assert session.particles is primaries[0]
+    assert session.gas is primaries[1]
+    assert session.environment is primaries[2]
     registry.release_open_step(token)
 
 

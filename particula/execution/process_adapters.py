@@ -43,8 +43,10 @@ class ResidentDilutionRequest:
     failure semantics. It neither copies nor recovers the retained state.
 
     Attributes:
-        session: Exact active resident-session reference.
-        registry: Exact registry pinned to ``session``.
+        session: Exact concrete resident-session reference. Execution validates
+            that it is active and pinned by ``registry``.
+        registry: Exact concrete registry reference. Execution validates its
+            binding to ``session``.
         coefficient: Opaque dilution coefficient for the direct kernel.
         time_step: Opaque duration for the direct kernel.
     """
@@ -77,9 +79,12 @@ class ResidentWallLossRequest:
     It neither copies retained state nor provides recovery.
 
     Attributes:
-        session: Exact active resident-session reference.
-        registry: Exact registry pinned to ``session``.
-        resources: Exact established wall-loss resource view.
+        session: Exact concrete resident-session reference. Execution validates
+            that it is active and pinned by ``registry``.
+        registry: Exact concrete registry reference. Execution validates its
+            binding to ``session``.
+        resources: Exact concrete wall-loss resource view. Execution validates
+            that it is the established publication.
         config: Opaque direct-kernel configuration.
         time_step: Opaque duration for the direct kernel.
         rng_seed: Opaque seed forwarded unchanged to the direct kernel.
@@ -119,9 +124,12 @@ class ResidentNucleationRequest:
     neither copies retained state nor provides recovery.
 
     Attributes:
-        session: Exact active resident-session reference.
-        registry: Exact registry pinned to ``session``.
-        resources: Exact established nucleation resource view.
+        session: Exact concrete resident-session reference. Execution validates
+            that it is active and pinned by ``registry``.
+        registry: Exact concrete registry reference. Execution validates its
+            binding to ``session``.
+        resources: Exact concrete nucleation resource view. Execution validates
+            that it is the established publication.
         config: Opaque direct-kernel configuration.
         time_step: Opaque duration for the direct kernel.
         exhaustion_controls: Opaque direct-kernel exhaustion controls.

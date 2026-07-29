@@ -257,6 +257,7 @@ class GPUResourceRegistry:
         self._signature = self._session_signature()
         self._bindings: dict[str, dict[str, Any]] = {}
         self._views: dict[str, Any] = {}
+        self._nucleation_records: tuple[Any, ...] | None = None
         self._capacities: dict[str, int] = {}
         self._open_step_token: Any | None = None
 
@@ -379,6 +380,30 @@ class GPUResourceRegistry:
             raise ValueError("nucleation resources have not been acquired.")
         if resources is not published:
             raise ValueError("resources must be the published nucleation view.")
+        published_records = self._nucleation_records
+        if published_records is None:
+            raise ValueError("nucleation resource records are unavailable.")
+        resource_records = (
+            resources.scratch,
+            resources.finalized_demand,
+            resources.diagnostics,
+            resources.exhaustion,
+            resources.exhaustion.resampling_buffers,
+        )
+        record_types = (
+            NucleationScratchBuffers,
+            NucleationFinalizedDemandBuffers,
+            NucleationDiagnosticBuffers,
+            NucleationExhaustionBuffers,
+            ResamplingBuffers,
+        )
+        if any(
+            type(record) is not record_type or record is not published_record
+            for record, published_record, record_type in zip(
+                resource_records, published_records, record_types, strict=True
+            )
+        ):
+            raise ValueError("nucleation resource record bindings changed.")
         bindings = self._record_bindings(resources.scratch)
         bindings.update(self._record_bindings(resources.finalized_demand))
         bindings.update(self._record_bindings(resources.diagnostics))
@@ -1002,4 +1027,12 @@ class GPUResourceRegistry:
         bindings = self._acquire(_NUCLEATION, supplied)
         if "nucleation" not in self._views:
             self._views["nucleation"] = self._nucleation_view(bindings)
+            view = self._views["nucleation"]
+            self._nucleation_records = (
+                view.scratch,
+                view.finalized_demand,
+                view.diagnostics,
+                view.exhaustion,
+                view.exhaustion.resampling_buffers,
+            )
         return self._views["nucleation"]

@@ -5,11 +5,17 @@ import subprocess
 import sys
 from dataclasses import FrozenInstanceError
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
 import particula.execution.process_adapters as process_adapters
+from particula.execution.gpu_resources import (
+    GPUResourceRegistry,
+    NucleationResources,
+    WallLossResources,
+)
+from particula.execution.gpu_session import ResidentSession
 from particula.execution.process_adapters import (
     ResidentDilutionAdapter,
     ResidentDilutionRequest,
@@ -20,15 +26,15 @@ from particula.execution.process_adapters import (
 )
 
 
-def _registry(session: object) -> object:
+def _registry(session: ResidentSession) -> GPUResourceRegistry:
     """Construct a Warp registry only for a Warp-dependent test."""
     pytest.importorskip("warp")
     from particula.execution.gpu_resources import GPUResourceRegistry
 
-    return GPUResourceRegistry(session)  # type: ignore[arg-type]
+    return GPUResourceRegistry(session)
 
 
-def _session() -> object:
+def _session() -> ResidentSession:
     """Build a Warp session only for a Warp-dependent test."""
     pytest.importorskip("warp")
     from particula.execution.tests.gpu_resources_test import _session as build
@@ -43,7 +49,7 @@ def test_request_carriers_retain_exact_dependencies_and_opaque_inputs() -> None:
     registry = _registry(session)
     wall_loss = registry.acquire_wall_loss()
     nucleation = registry.acquire_nucleation()
-    opaque = object()
+    opaque: Any = object()
 
     dilution = ResidentDilutionRequest(session, registry, opaque, opaque)
     wall = ResidentWallLossRequest(session, registry, wall_loss, opaque, opaque)
@@ -63,14 +69,21 @@ def test_request_carriers_retain_exact_dependencies_and_opaque_inputs() -> None:
     with pytest.raises(FrozenInstanceError):
         dilution.time_step = 1  # type: ignore[misc]
     with pytest.raises(TypeError, match="exact ResidentSession"):
-        ResidentDilutionRequest(object(), registry, opaque, opaque)
+        ResidentDilutionRequest(cast(Any, object()), registry, opaque, opaque)
     with pytest.raises(TypeError, match="exact GPUResourceRegistry"):
-        ResidentDilutionRequest(session, object(), opaque, opaque)
+        ResidentDilutionRequest(session, cast(Any, object()), opaque, opaque)
     with pytest.raises(TypeError, match="exact WallLossResources"):
-        ResidentWallLossRequest(session, registry, object(), opaque, opaque)
+        ResidentWallLossRequest(
+            session, registry, cast(Any, object()), opaque, opaque
+        )
     with pytest.raises(TypeError, match="exact NucleationResources"):
         ResidentNucleationRequest(
-            session, registry, object(), opaque, opaque, opaque
+            session,
+            registry,
+            cast(Any, object()),
+            opaque,
+            opaque,
+            opaque,
         )
 
 
@@ -79,20 +92,19 @@ def test_request_carriers_enforce_exact_types_in_documented_order() -> None:
     """Test subclasses reject while opaque kernel inputs remain uninspected."""
     session = _session()
     registry = _registry(session)
-    wall_loss = registry.acquire_wall_loss()
     nucleation = registry.acquire_nucleation()
-    opaque = object()
+    opaque: Any = object()
 
-    class SessionSubclass(type(session)):
+    class SessionSubclass(ResidentSession):
         """Provide an inexact session type without invoking its constructor."""
 
-    class RegistrySubclass(type(registry)):
+    class RegistrySubclass(GPUResourceRegistry):
         """Provide an inexact registry type without invoking its constructor."""
 
-    class WallLossSubclass(type(wall_loss)):
+    class WallLossSubclass(WallLossResources):
         """Provide an inexact established wall-loss view type."""
 
-    class NucleationSubclass(type(nucleation)):
+    class NucleationSubclass(NucleationResources):
         """Provide an inexact established nucleation view type."""
 
     inexact_session = object.__new__(SessionSubclass)
@@ -102,19 +114,36 @@ def test_request_carriers_enforce_exact_types_in_documented_order() -> None:
 
     with pytest.raises(TypeError, match="exact ResidentSession"):
         ResidentWallLossRequest(
-            inexact_session, object(), object(), opaque, opaque
+            cast(Any, inexact_session),
+            cast(Any, object()),
+            cast(Any, object()),
+            opaque,
+            opaque,
         )
     with pytest.raises(TypeError, match="exact GPUResourceRegistry"):
         ResidentWallLossRequest(
-            session, inexact_registry, object(), opaque, opaque
+            session,
+            cast(Any, inexact_registry),
+            cast(Any, object()),
+            opaque,
+            opaque,
         )
     with pytest.raises(TypeError, match="exact WallLossResources"):
         ResidentWallLossRequest(
-            session, registry, inexact_wall_loss, opaque, opaque
+            session,
+            registry,
+            cast(Any, inexact_wall_loss),
+            opaque,
+            opaque,
         )
     with pytest.raises(TypeError, match="exact NucleationResources"):
         ResidentNucleationRequest(
-            session, registry, inexact_nucleation, opaque, opaque, opaque
+            session,
+            registry,
+            cast(Any, inexact_nucleation),
+            opaque,
+            opaque,
+            opaque,
         )
 
     request = ResidentNucleationRequest(
@@ -131,8 +160,8 @@ def test_dilution_adapter_delegates_exactly_once(
     """Test dilution dispatch preserves containers and opaque inputs by identity."""
     session = _session()
     registry = _registry(session)
-    coefficient = object()
-    time_step = object()
+    coefficient: Any = object()
+    time_step: Any = object()
     request = ResidentDilutionRequest(session, registry, coefficient, time_step)
     result = object()
     calls: list[tuple[object, ...]] = []
@@ -157,7 +186,7 @@ def test_wall_loss_adapter_delegates_published_rng_once(
     session = _session()
     registry = _registry(session)
     resources = registry.acquire_wall_loss()
-    config = object()
+    config: Any = object()
     request = ResidentWallLossRequest(
         session,
         registry,
@@ -196,8 +225,8 @@ def test_nucleation_adapter_delegates_all_published_sidecars_once(
     session = _session()
     registry = _registry(session)
     resources = registry.acquire_nucleation()
-    config = object()
-    controls = object()
+    config: Any = object()
+    controls: Any = object()
     request = ResidentNucleationRequest(
         session, registry, resources, config, object(), controls
     )
@@ -296,6 +325,59 @@ def test_direct_kernel_error_escapes_without_adapter_recovery(
 
 @pytest.mark.warp
 @pytest.mark.parametrize("family", ["wall_loss", "nucleation"])
+def test_view_adapter_direct_error_escapes_without_recovery(
+    family: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Test view adapters call a failing direct boundary exactly once."""
+    session = _session()
+    registry = _registry(session)
+    opaque: Any = object()
+    failure = RuntimeError(f"{family} direct writer failed")
+    calls = 0
+    primaries = (session.particles, session.gas, session.environment)
+    request: Any
+    adapter: Any
+    resources: Any
+
+    def step(*_args: object, **_kwargs: object) -> object:
+        nonlocal calls
+        calls += 1
+        raise failure
+
+    if family == "wall_loss":
+        resources = registry.acquire_wall_loss()
+        request = ResidentWallLossRequest(
+            session, registry, resources, opaque, opaque
+        )
+        adapter = ResidentWallLossAdapter()
+        target = "_get_wall_loss_step_gpu"
+    else:
+        resources = registry.acquire_nucleation()
+        request = ResidentNucleationRequest(
+            session, registry, resources, opaque, opaque, opaque
+        )
+        adapter = ResidentNucleationAdapter()
+        target = "_get_nucleation_step_gpu"
+    bindings = registry._bindings.copy()
+    views = registry._views.copy()
+    capacities = registry._capacities.copy()
+    monkeypatch.setattr(process_adapters, target, lambda: step)
+
+    with pytest.raises(RuntimeError) as caught:
+        adapter.execute(request)
+
+    assert caught.value is failure
+    assert calls == 1
+    assert registry._bindings == bindings
+    assert registry._views == views
+    assert registry._capacities == capacities
+    assert session.particles is primaries[0]
+    assert session.gas is primaries[1]
+    assert session.environment is primaries[2]
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("family", ["wall_loss", "nucleation"])
 def test_established_view_rejection_resolves_no_kernel_and_mutates_nothing(
     family: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -303,8 +385,11 @@ def test_established_view_rejection_resolves_no_kernel_and_mutates_nothing(
     session = _session()
     registry = _registry(session)
     foreign_registry = _registry(_session())
-    opaque = object()
+    opaque: Any = object()
     resolver_calls = 0
+    request: Any
+    adapter: Any
+    resources: Any
 
     def resolver() -> object:
         """Fail if adapter preflight attempts to import a direct boundary."""
@@ -317,7 +402,7 @@ def test_established_view_rejection_resolves_no_kernel_and_mutates_nothing(
         request = ResidentWallLossRequest(
             session, registry, resources, opaque, opaque
         )
-        adapter: Any = ResidentWallLossAdapter()
+        adapter = ResidentWallLossAdapter()
         target = "_get_wall_loss_step_gpu"
     else:
         resources = foreign_registry.acquire_nucleation()
@@ -391,7 +476,7 @@ assert 'particula.execution.gpu_resources' not in sys.modules
 assert 'warp' not in sys.modules
 """
     completed = subprocess.run(  # noqa: S603 -- fixed interpreter and script
-        [sys.executable, "-c", script],
+        [sys.executable, "-Werror", "-c", script],
         cwd=root,
         capture_output=True,
         check=False,
