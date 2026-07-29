@@ -24,3 +24,13 @@ E7-F9.
   launch so process physics remains delegated to its owning implementation.
 
 Parent epic: E7. Scope authority: issue #1451, Track T5.
+
+## Delivered: E7-F5-P1 (#1492)
+
+`particula/execution/process_graph.py` now provides the unexported, pure
+backend-neutral declaration and validation boundary. It validates immutable
+closed-catalogue nodes and allowed dependency edges, detects cycles, and
+normalizes node and edge declaration order deterministically. It deliberately
+does not schedule or execute work, access resident resources, select a backend,
+or change `particula.execution` exports. Later phases retain scheduler and
+resident-timestep delivery.

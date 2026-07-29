@@ -27,7 +27,9 @@
 
 ## Phase Ordering
 
-P1 node contracts precede P2 graph resolution. P3 process integration and P4
-state updates may build on P2 but must both land before P5 can enforce freshness.
-P6 composes all prior phases and validates the complete loop. P7 documents the
-settled contract last. Every production phase includes co-located tests.
+P1 node contracts and declaration normalization completed in #1492. P2 adds
+graph scheduling/topological resolution on that validated boundary. P3 process
+integration and P4 state updates may build on P2 but must both land before P5
+can enforce freshness. P6 composes all prior phases and validates the complete
+loop. P7 documents the settled contract last. Every production phase includes
+co-located tests.

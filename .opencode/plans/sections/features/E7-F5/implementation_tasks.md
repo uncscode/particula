@@ -2,11 +2,16 @@
 
 ## Execution Layer
 
-- [ ] Add immutable graph/node/update types in `particula/execution/process_graph.py`.
-- [ ] Encode canonical process IDs, required resources, invalidation sets, and
+- [x] Add immutable graph/node types in `particula/execution/process_graph.py`
+  (P1, #1492).
+- [x] Encode canonical process IDs, required resources, invalidation sets, and
   dependency edges for supported condensation, Brownian coagulation, dilution,
-  wall loss, nucleation, environment, gas, derived-state, and diagnostics nodes.
-- [ ] Implement stable topological resolution and deterministic cycle/error reporting.
+  wall loss, nucleation, environment, gas, derived-state, and diagnostics nodes
+  (P1, #1492).
+- [x] Implement deterministic declaration normalization and cycle/error
+  reporting without an execution-order field (P1, #1492).
+- [ ] Implement stable topological resolution only as part of scheduler work
+  (P2); P1 intentionally does not schedule.
 - [ ] Add `SimulationScheduler` in `particula/execution/scheduler.py`; validate
   the full step before `ResidentSession.begin_step()` and advance counters once.
 - [ ] Route E7-F2/F3 adapters through `ExecutionContext` and add resident
@@ -29,7 +34,9 @@
 
 ## Tooling / Tests
 
-- [ ] Add `process_graph_test.py`, `process_adapters_test.py`,
+- [x] Add `process_graph_test.py` with declaration, validation, normalization,
+  cycle, and backend-neutral import coverage (P1, #1492).
+- [ ] Add `process_adapters_test.py`,
   `state_updates_test.py`, and `scheduler_test.py` under
   `particula/execution/tests/` with every phase.
 - [ ] Generalize existing process-sequence fixtures and transfer/sync spies.

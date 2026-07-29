@@ -4,8 +4,14 @@ Every phase ships tests in the same PR under `particula/execution/tests/` using
 the `*_test.py` suffix. Repository and changed-module coverage thresholds are
 never lowered; changed modules target at least 80%.
 
-- **P1:** Unit-test immutable declarations, duplicate and unknown process IDs,
-  unsupported capabilities, malformed dependencies, cycles, and stable errors.
+- **P1 (completed, #1492):**
+  `particula/execution/tests/process_graph_test.py` covers frozen declarations
+  and enums; exact tuple/frozenset contracts; all ten catalogue rows; duplicate
+  and unknown IDs; requirements; allowed/disallowed, malformed, duplicate, and
+  missing-endpoint dependencies; deterministic normalization and cycle text;
+  retry after rejection; and a guarded import proving no Warp/GPU backend load.
+  The focused warning-clean and changed-module-coverage commands are recorded
+  in the implementation specification.
 - **P2:** Unit-test registration-order invariance, canonical tie breaking,
   disabled nodes, dependency closure, invalidation edges, and prelaunch atomicity.
   Test reviewed profiles with each permitted fixed nucleation/condensation edge,

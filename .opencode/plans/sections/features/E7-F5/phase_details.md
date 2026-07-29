@@ -1,10 +1,14 @@
 # Phase Details
 
-- [ ] **E7-F5-P1:** Define typed process capability nodes and validation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Model immutable process/update nodes, requirements, and rejection order without importing Warp in the neutral layer.
+- [x] **E7-F5-P1:** Define typed process capability nodes and validation with unit tests
+  - Issue: #1492 | Size: S | Status: Completed
+  - Delivered: Immutable closed-catalogue node/dependency declarations and pure
+    deterministic validation/normalization, with no scheduler, execution,
+    resource access, backend behavior, or package export change.
   - Files: `particula/execution/process_graph.py`, `particula/execution/tests/process_graph_test.py`
-  - Tests: duplicate/unknown nodes, unsupported capabilities, cycles, malformed dependencies, deterministic normalization.
+  - Tests: immutable records, catalogue exactness, requirements, malformed and
+    allowed/disallowed dependencies, canonical cycles/normalization, recovery,
+    and guarded no-Warp/GPU import coverage.
 
 - [ ] **E7-F5-P2:** Build canonical deterministic dependency order with unit tests
   - Issue: TBD | Size: S | Status: Not Started

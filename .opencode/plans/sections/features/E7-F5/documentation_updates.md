@@ -11,6 +11,8 @@
   keep `docs/Examples/gpu_complete_process_sequence.py` labeled illustrative.
 - Update `AGENTS.md` with canonical process order, focused validation commands,
   environment/gas freshness rules, and explicit unsupported boundaries.
-- Update E7 and E7-F5 plan sections with shipped phase status and issue links.
+- P1 (#1492) required no user-facing documentation because it is an unexported,
+  declaration-only internal boundary. E7-F5 plan sections now record its
+  implementation and retained non-scheduler boundary.
 - Run documentation regressions and `mkdocs build --strict`; if a paired notebook
   is touched, edit its Jupytext `.py`, sync, execute, and commit both files.

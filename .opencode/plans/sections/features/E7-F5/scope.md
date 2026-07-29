@@ -21,6 +21,18 @@ environment, derived-thermodynamic, gas, and diagnostic boundaries.
 - Optional non-mutating diagnostic hooks and complete-loop Warp CPU tests;
   optional CUDA rows skip cleanly.
 
+## Delivered in P1 (#1492)
+
+- Added `particula/execution/process_graph.py` with frozen node, dependency,
+  plan, and resolved-graph declarations; a ten-row closed node catalogue; and
+  a closed allowed-edge schema.
+- Added pure validation and deterministic declaration normalization, including
+  exact immutable-container checks, catalogue/requirement validation, and
+  canonical cycle reporting.
+- Added focused tests in `particula/execution/tests/process_graph_test.py`.
+- Kept the layer unexported and backend-neutral: no Warp/GPU import, resident
+  resource access, scheduler, execution order, state update, or mutation.
+
 ## Out of Scope
 
 - Silent CPU fallback, hidden CPU/GPU movement, or runtime retry on another

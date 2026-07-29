@@ -20,7 +20,11 @@ _EMPTY_REQUIREMENTS = CapabilityRequirements(frozenset())
 
 
 class NodeKind(str, Enum):
-    """Identify a declaration-only process-graph node kind."""
+    """Identify the role of a declaration-only process-graph node.
+
+    Node kinds describe graph declarations only; they do not select or run an
+    execution backend.
+    """
 
     PROCESS = "process"
     ENVIRONMENT_UPDATE = "environment_update"
@@ -31,7 +35,11 @@ class NodeKind(str, Enum):
 
 
 class ResourceRequirement(str, Enum):
-    """Identify neutral state required by a declared graph node."""
+    """Identify backend-neutral state required by a declared graph node.
+
+    These symbolic requirements describe state ownership without accessing a
+    resource or selecting a backend.
+    """
 
     PARTICLES = "particles"
     GAS = "gas"
@@ -42,7 +50,11 @@ class ResourceRequirement(str, Enum):
 
 
 class InvalidatedState(str, Enum):
-    """Identify derived state invalidated by a declared graph node."""
+    """Identify derived state invalidated by a declared graph node.
+
+    Invalidations are declarations for validation and do not refresh or mutate
+    the named state.
+    """
 
     VAPOR_PRESSURE = "vapor_pressure"
     SATURATION_RATIO = "saturation_ratio"
@@ -50,7 +62,12 @@ class InvalidatedState(str, Enum):
 
 @dataclass(frozen=True)
 class DependencyEdge:
-    """Declare one ordered dependency between two graph node identifiers."""
+    """Declare one ordered dependency between distinct graph node identifiers.
+
+    Attributes:
+        before_id: Canonical identifier of the predecessor node.
+        after_id: Canonical identifier of the successor node.
+    """
 
     before_id: str
     after_id: str
@@ -65,7 +82,16 @@ class DependencyEdge:
 
 @dataclass(frozen=True)
 class ProcessNode:
-    """Declare one immutable, backend-neutral process graph node."""
+    """Declare one immutable, backend-neutral process-graph node.
+
+    Attributes:
+        node_id: Canonical identifier for the declared node.
+        kind: Role assigned to the node.
+        process: Process declaration for process nodes, otherwise ``None``.
+        requirements: Capability requirements for a process node.
+        resources: Symbolic resources required by the node.
+        invalidates: Derived state the node declares invalid.
+    """
 
     node_id: str
     kind: NodeKind
@@ -106,7 +132,12 @@ class ProcessNode:
 
 @dataclass(frozen=True)
 class TimestepPlan:
-    """Declare an immutable unordered graph plan without execution behavior."""
+    """Declare an immutable process graph before validation and normalization.
+
+    Attributes:
+        nodes: Supplied process-node declarations in caller-provided order.
+        dependencies: Supplied dependency declarations in caller-provided order.
+    """
 
     nodes: tuple[ProcessNode, ...]
     dependencies: tuple[DependencyEdge, ...]
@@ -118,7 +149,16 @@ class TimestepPlan:
 
 @dataclass(frozen=True)
 class ResolvedProcessGraph:
-    """Store a validated, normalized graph declaration without scheduling."""
+    """Store typed node and dependency tuples for a resolved declaration.
+
+    Direct construction validates only exact tuple and member types. Use
+    ``resolve_timestep_plan`` to validate catalogue membership, dependencies,
+    and cycles, then canonicalize declaration order.
+
+    Attributes:
+        nodes: Process-node declarations.
+        dependencies: Dependency declarations.
+    """
 
     nodes: tuple[ProcessNode, ...]
     dependencies: tuple[DependencyEdge, ...]
@@ -287,13 +327,19 @@ _ALLOWED_EDGES = frozenset(
 def resolve_timestep_plan(plan: TimestepPlan) -> ResolvedProcessGraph:
     """Validate and deterministically normalize a declaration-only plan.
 
-    The pure boundary neither schedules nor executes the declared graph.
+    This pure boundary neither schedules nor executes the declared graph,
+    accesses resources, or selects an execution backend.
 
     Args:
         plan: Exact immutable plan declaration to validate and normalize.
 
     Returns:
         A new graph with nodes and dependencies in canonical declaration order.
+
+    Raises:
+        TypeError: If the plan is not a ``TimestepPlan``.
+        ValueError: If declarations violate the closed catalogue, dependency
+            schema, or acyclic graph constraints.
     """
     if type(plan) is not TimestepPlan:
         raise TypeError("plan must be a TimestepPlan.")

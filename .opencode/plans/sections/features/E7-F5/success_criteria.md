@@ -1,10 +1,14 @@
 # Success Criteria
 
-- [ ] A typed graph accepts exactly supported process/update declarations and
-  rejects duplicates, cycles, unavailable capabilities, and malformed state
-  before any process launch.
-- [ ] Equivalent declarations resolve to the same canonical order regardless of
-  registration or mapping iteration order.
+- [x] P1 typed declarations accept exactly the supported closed-catalogue nodes
+  and dependency pairs and reject duplicates, cycles, unavailable requirements,
+  and malformed declarations before any runtime behavior (#1492).
+- [x] P1 equivalent declarations normalize to identical node-ID and edge-pair
+  ordering, independent of input declaration order; this is not a scheduler or
+  topological execution order (#1492).
+- [x] P1 remains unexported, pure, and backend-neutral: it does not import
+  Warp/GPU modules, access resources, schedule, execute, or mutate state
+  (#1492).
 - [ ] Condensation, Brownian coagulation, dilution, wall loss, and nucleation
   execute through their owning adapters/direct boundaries without physics rewrites.
 - [ ] Environment changes precede vapor-pressure and saturation refresh; every

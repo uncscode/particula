@@ -2,6 +2,22 @@
 
 ## High-Level Design
 
+### P1 implemented declaration boundary
+
+`process_graph.py` is below the future orchestration layer and above no runtime
+resource layer: it imports only standard-library modules plus E7-F1 execution
+declarations and condensation capability metadata. `resolve_timestep_plan()`
+validates a supplied immutable `TimestepPlan` against a private closed
+catalogue, allowed dependency pairs, and acyclicity, then returns a new
+`ResolvedProcessGraph` whose nodes and edges are sorted by identifier. The
+resolved record deliberately has no topological/execution-order field.
+
+The catalogue uses E7-F1's condensation matrix for condensation requirements;
+the other supported process rows use explicitly empty baseline requirements.
+This P1 layer neither invokes `begin_step()` nor imports resource views, Warp,
+or GPU modules. Scheduling, hazard insertion, disabled-node handling, and
+execution remain P2 and later work.
+
 The scheduler is a typed orchestration layer above process adapters and E7-F4
 resident-session lifecycle. It validates the complete declaration before
 `begin_step()`, derives a canonical graph order, and then delegates each node.
@@ -36,10 +52,11 @@ validation.
 
 ## Data / API / Workflow Changes
 
-- **Data Model:** Add immutable `ProcessNode`, `NodeKind`, `TimestepPlan`,
-  `ResolvedProcessGraph`, update declarations, and hook records. They reference
-  E7-F1 capability IDs and E7-F4 process-resource views; CPU/Warp container
-  schemas do not change.
+- **Data Model:** P1 added immutable `ProcessNode`, `NodeKind`,
+  `DependencyEdge`, `TimestepPlan`, and `ResolvedProcessGraph` declarations.
+  They reference E7-F1 capability IDs only; E7-F4 process-resource views,
+  update declarations, and hooks remain later work. CPU/Warp schemas do not
+  change.
 - **API Surface:** Add a scheduler entry point such as
   `SimulationScheduler.step(session, plan, time_step)` through the deliberate
   `particula.execution` export policy. Concrete adapters and scratch records

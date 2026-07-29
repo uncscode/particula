@@ -5,6 +5,10 @@
   containers through the `Aerosol`-typed runnable contract.
 - E7-F1's planned `particula.execution` request, capability, context, and result
   types are the neutral scheduler boundary.
+- P1 (#1492) reuses only `Process`, `CapabilityRequirements`,
+  `CONDENSATION_PROCESS`, and `CONDENSATION_CAPABILITY_MATRIX` from
+  `particula.execution`; it deliberately does not reuse/import E7-F4 resource
+  views or any Warp/GPU module.
 - E7-F2's condensation adapter delegates to `MassCondensation.execute()` and
   `condensation_step_gpu()`; reuse its typed state/resource view.
 - E7-F3's Brownian adapter delegates to `Coagulation.execute()` and
