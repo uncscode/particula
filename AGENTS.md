@@ -897,6 +897,40 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   `python -Werror docs/Examples/Nucleation/gpu_direct_nucleation.py` and
   `pytest particula/gpu/tests/gpu_direct_nucleation_example_test.py -q -Werror`.
 
+### GPU-resident session lifecycle
+
+- Import concrete resident seams directly: setup/session/guard from
+  `particula.execution.gpu_session`, the registry from
+  `particula.execution.gpu_resources`, and records/controller/restart from
+  `particula.execution.checkpoint`. They are not `particula.execution` or
+  top-level exports.
+- Setup converts CPU particle, gas, then environment data once. The session
+  retains fixed dimensions and resident identities; ordered gas names remain
+  CPU metadata. The registry pins fixed-shape, same-device, nonaliasing sidecars
+  and does not execute, transfer, synchronize, or initialize RNG streams.
+- Checkpoint, finalize, close, and discard require an exact session/registry/
+  closed-guard binding. Normal guard bookkeeping has no bulk synchronization.
+  Read-only failures can remain ACTIVE after token release; writer failures can
+  fault without rollback; close/discard do not checkpoint, restore, synchronize,
+  or mutate payloads.
+- Inspection `GasData` is lossy. Canonical checkpoint bytes preserve GPU vapor
+  pressure and per-box partitioning and are restart authority. Restart is
+  explicit, exact-device, and creates fresh identities; no implicit restore,
+  fallback, migration, or normal-step bulk synchronization exists.
+- Compatibility is fail-closed: only checkpoint schema version `1`, carrier
+  type `"ResidentSession"`, ACTIVE state, complete valid payloads, and an
+  exactly equal `Device` restart. E7-F5 scheduling, E7-F7 transport, and E7-F8
+  detailed RNG policy remain deferred.
+
+Focused commands:
+
+```bash
+pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror
+pytest particula/execution/tests/gpu_session_test.py \
+  particula/execution/tests/gpu_resources_test.py \
+  particula/execution/tests/checkpoint_test.py -q -Werror
+```
+
 ## ADW Workflows
 
 **Available workflows:**

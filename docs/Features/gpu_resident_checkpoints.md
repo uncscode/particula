@@ -27,6 +27,16 @@ target `Device` through `restart_resident_session(checkpoint, device)`.
 same exact compatible device and create fresh session, registry, guard, and
 resident-array identities.
 
+Restart compatibility is intentionally exact and fail-closed. The implementation
+accepts only `ResidentCheckpoint` records with schema version `1`, carrier type
+`"ResidentSession"`, lifecycle `ACTIVE`, complete valid canonical payload
+descriptors, and an exactly equal target `Device`. It rejects other versions or
+carrier schemas, malformed or incomplete payloads, terminal checkpoints, and
+device mismatches; it does not promise forward or backward compatibility.
+
+For a lazy lifecycle-only walkthrough that does not schedule or launch physics,
+run [`docs/Examples/gpu_resident_session.py`](../Examples/gpu_resident_session.py).
+
 Validate documentation with:
 
 ```bash

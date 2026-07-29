@@ -1486,10 +1486,10 @@ The full-policy downstream ordering is:
 
 E7-F6 owns availability, fallback, error taxonomy, API stability, and export
 policy. E7-F1 supplies neither transfer nor fallback. E7-F2 supplies
-condensation adapters, E7-F3 supplies coagulation adapters, E7-F4 supplies
-resident session/container/sidecar lifecycle, and E7-F5 is their later
-scheduling consumer. These consumers register or use adapters only after their
-own contracts exist and do not alter the shipped direct-kernel path.
+condensation adapters and E7-F3 supplies coagulation adapters. E7-F4 supplies
+resident session/container/sidecar lifecycle; P1--P7 are shipped as its bounded
+concrete-only prerequisite. E7-F5 is their later scheduling consumer. These
+consumers do not alter the shipped direct-kernel path.
 
 E7-F3's shipped concrete-only Brownian seam is a bounded exception to this
 full-policy ordering: it has no public export, availability probing, fallback,
@@ -1514,17 +1514,17 @@ E7-F6 remains deferred. Any broader integration still follows the ordering.
 - E7-F3 P6 has shipped bounded selected-Brownian adapter documentation and
   evidence in the [coagulation strategy guide](../coagulation_strategy_system.md)
   and its [explicit-transfer example](../../Examples/gpu_coagulation_direct.py).
-  It preserves the direct-kernel contract and defers E7-F4 resident sessions,
-  E7-F5 scheduling, E7-F8 checkpoint/restart stream policy, public exports,
+  It preserves the direct-kernel contract and defers E7-F5 scheduling,
+  E7-F8 detailed RNG stream policy, public exports,
   fallback, and hidden transfer.
 
 ### Full GPU-Resident Simulation
 
-Resident sessions and loops, full-process scheduling, high-level GPU adapters,
-and user-facing CPU/GPU orchestration are explicitly deferred. They require
-separate contracts from E7-F2 through E7-F5 after E7-F6 establishes policy.
-They must not imply hidden transfer, availability probing, fallback, retry, or
-replacement of the direct-kernel APIs.
+E7-F4 ships resident-session lifecycle and in-memory checkpoint/restart only.
+Resident loops, full-process scheduling, high-level GPU adapters, and user-facing
+CPU/GPU orchestration remain deferred to later contracts, including E7-F5 after
+E7-F6 establishes policy. They must not imply hidden transfer, availability
+probing, fallback, retry, or replacement of the direct-kernel APIs.
 
 ### Multi-Box Communication
 

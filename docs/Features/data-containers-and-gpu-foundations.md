@@ -178,11 +178,55 @@ sidecars may already be written. Callers needing retry semantics must use their
 own snapshot/restore.
 
 The [direct-kernel quick start](../Examples/gpu_direct_kernels_quick_start.py)
-is the currently runnable explicit-transfer path. The
-[Epic G handoff](Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
-defers E7-F4/E7-F5 resident-resource lifecycle and deterministic scheduling;
-resident sessions, automatic availability selection, scheduling, and broader
-orchestration remain deferred.
+is the supported explicit-transfer path. It is separate from the bounded
+[GPU-resident session example](../Examples/gpu_resident_session.py), which
+documents lifecycle ownership rather than process execution.
+
+### GPU-resident session lifecycle
+
+`particula.execution` is the resident-session boundary, but its ten-name public
+export list is unchanged. Import resident seams only from their concrete
+modules: `setup_resident_session`, `ResidentSession`, and `ResidentStepGuard`
+from `particula.execution.gpu_session`; `GPUResourceRegistry` and its manifests
+or views from `particula.execution.gpu_resources`; and checkpoint records,
+`ResidentCheckpointController`, and `restart_resident_session` from
+`particula.execution.checkpoint`. None of these names is a package or top-level
+export.
+
+`setup_resident_session` converts CPU particle, gas, then environment data once
+and retains the resulting resident container identities. Dimensions are
+immutable. Ordered gas names remain CPU-only metadata, while the registry pins
+one exact active session and owns fixed-shape, same-device, nonaliasing sidecar
+families. Registry acquisition validates or allocates resources only: it does
+not execute, transfer, synchronize, or choose an RNG policy.
+
+A guard permits one token at a time. Checkpoint, finalization, close, and
+discard require the exact session/registry/guard binding and a closed guard.
+Normal guard bookkeeping neither bulk-transfers nor synchronizes. A read-only
+failure can release its token and leave an ACTIVE session reusable; a possible
+post-launch writer failure can fault the session without rollback. Close and
+discard do not checkpoint, synchronize, restore, or mutate resident payloads.
+
+A normal checkpoint is fresh and nonterminal; finalization is terminal. A
+checkpoint owns immutable in-memory canonical bytes for primary arrays and
+acquired sidecars, plus detached CPU inspection carriers. Inspection `GasData`
+is lossy: it cannot recreate GPU vapor pressure or per-box partitioning.
+Canonical bytes, rather than inspection carriers, are restart authority.
+Snapshotting performs one synchronization and three `sync=False` inspection
+restores, and needs roughly one additional host copy of resident payload bytes
+as well as detached inspection copies. The first successful finalization caches
+its snapshot; a later exact matching finalization returns that same object.
+
+The implemented compatibility boundary is exact and fail-closed: restart accepts
+only a `ResidentCheckpoint` with schema version `1`, carrier type
+`"ResidentSession"`, lifecycle `ACTIVE`, complete valid payload descriptors and
+payloads, and an exactly equal target `Device`. Other versions or carrier
+schemas, malformed or incomplete records, terminal checkpoints, and device
+mismatches are rejected. Restart is explicit, never automatic, and creates
+fresh session, registry, guard, containers, primary arrays, and sidecars. It
+does not select or migrate a device, provide fallback, or guarantee rollback
+after an asynchronous writer launches. See
+[GPU resident checkpoints](gpu_resident_checkpoints.md).
 
 ### Complete direct-process illustration
 
