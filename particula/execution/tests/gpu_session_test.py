@@ -1795,11 +1795,12 @@ def test_abort_rejects_closed_token_without_changing_bookkeeping() -> None:
 def test_failure_seam_validation_rejection_preserves_open_token(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test failed pinned validation neither aborts nor faults a session."""
+    """Test failed writer validation faults while retaining its open token."""
     guard = _guard()
     session = guard._session
     registry = guard._registry
     token = guard.begin_step(1.0)
+    original_validation = registry.validate_pinned_session
 
     def reject(_: ResidentSession) -> None:
         """Model a pinned-session validation failure before cleanup."""
@@ -1815,11 +1816,16 @@ def test_failure_seam_validation_rejection_preserves_open_token(
             _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
         )
 
-    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert session.lifecycle is ResidentLifecycle.FAULTED
     assert guard._open_token is token
     assert registry._open_step_token is token
     assert guard.completed_steps == 0
     assert guard.simulated_time == 0
+    monkeypatch.setattr(
+        registry, "validate_pinned_session", original_validation
+    )
+    with pytest.raises(ValueError, match="ACTIVE"):
+        guard.begin_step(1.0)
 
 
 @pytest.mark.warp
@@ -1867,12 +1873,15 @@ def test_failure_seam_type_rejections_preserve_valid_open_token(
 def test_writer_cleanup_failure_does_not_replace_original_error(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test a direct owner retains its operational error when cleanup fails."""
+    """Test a failed mutated writer faults without masking its error."""
     guard = _guard()
     session = guard._session
     registry = guard._registry
     sentinel = RuntimeError("writer failure")
-    cleanup_errors: list[BaseException] = []
+    particles: Any = session.particles
+    masses: Any = particles.masses
+    before = masses.numpy().copy()
+    masses.assign(np.full((1, 2, 1), 7.0, dtype=np.float64))
 
     def failed_cleanup(_: ResidentStepToken) -> None:
         """Inject a cleanup failure after a token has been opened."""
@@ -1881,11 +1890,11 @@ def test_writer_cleanup_failure_does_not_replace_original_error(
     monkeypatch.setattr(guard, "_abort_step", failed_cleanup)
 
     def direct_owner() -> None:
-        """Model the required bare-reraise direct-owner failure boundary."""
+        """Model operation-error preservation with cleanup diagnostics."""
         token = guard.begin_step(1.0)
         try:
             raise sentinel
-        except BaseException:
+        except BaseException as operation_error:
             try:
                 _handle_failed_resident_operation(
                     session,
@@ -1895,7 +1904,7 @@ def test_writer_cleanup_failure_does_not_replace_original_error(
                     _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
                 )
             except BaseException as cleanup_error:
-                cleanup_errors.append(cleanup_error)
+                raise operation_error from cleanup_error
             raise
 
     with pytest.raises(RuntimeError) as error:
@@ -1903,12 +1912,19 @@ def test_writer_cleanup_failure_does_not_replace_original_error(
 
     assert error.value is sentinel
     assert error.tb is not None
-    assert len(cleanup_errors) == 1
-    assert str(cleanup_errors[0]) == "cleanup failed"
-    # Incomplete cleanup retains the open token and never claims reusability.
-    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert str(error.value.__cause__) == "cleanup failed"
+    # Incomplete cleanup retains the open token but faults the session.
+    assert session.lifecycle is ResidentLifecycle.FAULTED
     assert guard._open_token is not None
     assert registry._open_step_token is guard._open_token
+    np.testing.assert_array_equal(
+        cast(Any, session.particles).masses.numpy(), np.full_like(before, 7.0)
+    )
+    np.testing.assert_array_equal(before, np.ones_like(before))
+    with pytest.raises(ValueError, match="ACTIVE"):
+        guard.begin_step(1.0)
+    with pytest.raises(ValueError, match="ACTIVE"):
+        registry.validate_pinned_session(session)
 
 
 @pytest.mark.warp

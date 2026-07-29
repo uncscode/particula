@@ -1019,33 +1019,19 @@ def _validate_terminal_binding(
         raise ValueError("guard must match the resident session and registry.")
 
 
-def _handle_failed_resident_operation(
+def _fault_resident_session(session: ResidentSession) -> None:
+    """Mark one resident session as faulted without any recovery work."""
+    object.__setattr__(session, "lifecycle", ResidentLifecycle.FAULTED)
+
+
+def _validate_failed_operation_context(
     session: ResidentSession,
     registry: "GPUResourceRegistry",
     guard: ResidentStepGuard,
     token: ResidentStepToken,
     outcome: _ResidentOperationOutcome,
 ) -> None:
-    """Release a failed operation token and apply its explicit outcome.
-
-    Direct operation owners call this only after opening ``token`` and catch
-    their original operational exception with a bare ``raise``. Classification
-    is explicit rather than inferred from exception type. READ_ONLY failures
-    leave the session active after aborting the token; a possible writer launch
-    faults the session after that same abort. No device payload rollback,
-    transfer, synchronization, retry, or recovery occurs here.
-
-    Args:
-        session: Exact resident session owning the failure.
-        registry: Exact registry pinned to ``session``.
-        guard: Exact guard bound to ``session`` and ``registry``.
-        token: Exact open timestep token created by ``guard``.
-        outcome: Explicit classification chosen by the direct owner.
-
-    Raises:
-        TypeError: If any argument is not the exact required concrete type.
-        ValueError: If the binding, lifecycle, or token identity is invalid.
-    """
+    """Validate the exact resident failure context before cleanup."""
     from particula.execution.gpu_resources import GPUResourceRegistry
 
     if type(session) is not ResidentSession:
@@ -1066,12 +1052,51 @@ def _handle_failed_resident_operation(
         raise ValueError("guard must match the resident session and registry.")
     if session.lifecycle is not ResidentLifecycle.ACTIVE:
         raise ValueError("session.lifecycle must be ACTIVE.")
-    registry.validate_pinned_session(session)
     if token is not guard._open_token or token is not registry._open_step_token:
         raise ValueError("token does not match the open resident timestep.")
-    guard._abort_step(token)
+
+
+def _handle_failed_resident_operation(
+    session: ResidentSession,
+    registry: "GPUResourceRegistry",
+    guard: ResidentStepGuard,
+    token: ResidentStepToken,
+    outcome: _ResidentOperationOutcome,
+) -> None:
+    """Release a failed operation token and apply its explicit outcome.
+
+    Direct operation owners call this only after opening ``token``. They retain
+    their operational exception while calling this seam, so a cleanup exception
+    can be chained as diagnostic context without replacing the operation error.
+    Classification is explicit rather than inferred from exception type.
+    READ_ONLY failures leave the session active after aborting the token; a
+    possible writer launch faults the session after that same abort. If writer
+    cleanup or active-binding validation fails, the session is faulted before
+    that cleanup error propagates. No device payload rollback, transfer,
+    synchronization, retry, or recovery occurs here.
+
+    Args:
+        session: Exact resident session owning the failure.
+        registry: Exact registry pinned to ``session``.
+        guard: Exact guard bound to ``session`` and ``registry``.
+        token: Exact open timestep token created by ``guard``.
+        outcome: Explicit classification chosen by the direct owner.
+
+    Raises:
+        TypeError: If any argument is not the exact required concrete type.
+        ValueError: If the binding, lifecycle, or token identity is invalid.
+    """
+    _validate_failed_operation_context(session, registry, guard, token, outcome)
+
+    try:
+        registry.validate_pinned_session(session)
+        guard._abort_step(token)
+    except BaseException:
+        if outcome is _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED:
+            _fault_resident_session(session)
+        raise
     if outcome is _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED:
-        object.__setattr__(session, "lifecycle", ResidentLifecycle.FAULTED)
+        _fault_resident_session(session)
 
 
 def setup_resident_session(
