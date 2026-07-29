@@ -162,8 +162,30 @@ launched device operation.
 - `close()` is idempotent and never implies restore. `finalize()` is the
   terminal snapshot/finalization operation. `restart_resident_session()` is the
   explicit restoration operation and creates a fresh compatible session. A
-  failed finalization remains observable and may be retried only if E7-F6 policy
-  classifies it as pre-transfer/recoverable.
+   failed finalization remains observable and may be retried only if E7-F6 policy
+   classifies it as pre-transfer/recoverable.
+
+## P6 Implementation
+
+Issue #1489 implemented direct-owner failure and disposal semantics in
+`particula/execution/gpu_session.py`. Private
+`_ResidentOperationOutcome` has only `READ_ONLY` and
+`WRITER_MAY_HAVE_LAUNCHED`; the owner supplies that classification explicitly.
+After exact-type, identity, active-lifecycle, pinned-session, and open-token
+validation, `_handle_failed_resident_operation()` calls
+`ResidentStepGuard._abort_step()`. Abort clears/releases the same token from the
+guard and registry but deliberately leaves step count and simulated time
+unchanged. A read-only result remains `ACTIVE`; a writer-uncertain result faults
+the session only after confirming the guard is closed. Direct owners bare-reraise
+the caught operational exception, so cleanup errors cannot replace it.
+
+`ResidentSession.close(registry, guard)` and `discard()` are concrete-only
+terminal lifecycle operations. Active close validates the pinned binding exactly
+once and a closed guard before `ACTIVE -> CLOSED`; faulted close uses a private
+identity-only binding check because active-only validation is invalid after a
+fault. `CLOSED -> CLOSED` and `FINALIZED -> FINALIZED` do no validation or
+runtime work. Close/discard never checkpoint, synchronize, restore, allocate,
+migrate, retry, or roll back resident payloads.
 
 ## Security & Compliance
 

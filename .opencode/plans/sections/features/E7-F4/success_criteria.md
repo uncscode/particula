@@ -38,8 +38,13 @@
 - [x] Restart from a compatible checkpoint restores fresh same-device resident
   state, canonical vapor pressure, acquired sidecars, and lifecycle metadata
   (P5, issue #1488).
-- [ ] Preflight failures preserve caller-owned state; post-launch uncertainty
-  faults the session and never triggers hidden rollback or CPU fallback.
+- [x] Explicit read-only failure cleanup preserves reusable `ACTIVE` session and
+  payload identities; writer-may-have-launched failure releases its exact token,
+  faults the session, preserves the original error and observable mutation, and
+  never triggers hidden rollback or CPU fallback (P6, issue #1489).
+- [x] Concrete close/discard terminally closes valid active/faulted bindings
+  without runtime work; closed/finalized calls are write-free idempotent and P5
+  finalized-checkpoint identity is retained (P6, issue #1489).
 - [ ] E7-F6 availability seam: native-device availability remains an explicit
   upstream precondition for P2; unavailable-device rejection awaits E7-F6's
   public runtime API and is not emulated by this factory.

@@ -9,3 +9,4 @@
 | [ADR-005](ADR-005-one-time-gpu-resident-session-setup.md) | One-Time GPU Resident-Session Setup | Accepted | 2026-07-29 |
 | [ADR-006](ADR-006-resident-gpu-step-lifecycle-guard.md) | Resident GPU Step Lifecycle Guard | Accepted | 2026-07-28 |
 | [ADR-007](ADR-007-resident-session-checkpoint-finalize-restart.md) | Resident Session Checkpoint, Finalize, and Restart Boundary | Accepted | 2026-07-28 |
+| [ADR-008](ADR-008-resident-session-failure-close-semantics.md) | Resident Session Failure and Terminal Close Semantics | Accepted | 2026-07-29 |

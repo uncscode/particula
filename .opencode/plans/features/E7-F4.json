@@ -100,11 +100,11 @@
     {
       "id": "E7-F4-P6",
       "title": "Enforce session failure and close semantics with regression tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-29",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,

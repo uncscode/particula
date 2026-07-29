@@ -51,7 +51,12 @@
   checkpoint without duplicate device activity (P5, #1488).
 - [x] Restart explicitly into a fresh, same-device-compatible session after full
   schema/descriptor preflight (P5, #1488).
-- [ ] Define close/discard behavior that never restores implicitly.
+- [x] Define concrete close/discard behavior that never restores implicitly;
+  active/faulted sessions close terminally and closed/finalized calls are
+  write-free idempotent cases (P6, issue #1489).
+- [x] Classify failed direct operations explicitly, release matching failed-step
+  tokens without advancing accounting, retain read-only session reuse, and fault
+  uncertain writer sessions without rollback (P6, issue #1489).
 
 ## Tooling / Tests
 
@@ -66,7 +71,10 @@
   sidecar shape/dtype/device/alias matrix.
 - [x] Add `particula/execution/tests/checkpoint_test.py` for immutable payload,
   restore, resource-family restart, malformed-descriptor, and terminal behavior
-  coverage (P5, #1488).
+   coverage (P5, #1488).
+- [x] Add P6 failure-outcome, abort, fault/close/discard, original-error, and
+  no-runtime-work regression coverage in
+  `particula/execution/tests/gpu_session_test.py` (issue #1489).
 - [ ] Reuse canonical fixtures from
   `particula/gpu/tests/process_sequence_test.py` rather than inventing divergent
   physics fixtures.

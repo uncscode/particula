@@ -1,33 +1,19 @@
-"""Define concrete-only GPU-resident sessions, setup, and lifecycle hooks.
+"""Define concrete-only GPU-resident sessions and lifecycle bookkeeping.
 
-The immutable carriers retain caller-owned Warp containers and CPU gas-name
-metadata. ``setup_resident_session`` snapshots validated ordered CPU gas names
-into immutable tuple metadata and is P2's sole CPU-to-Warp upload point: local
-CPU preflight precedes conversion imports, then particles, gas, and environment
-convert once in that order before one complete ACTIVE session is published. Gas
-names are not stored on the Warp gas container. This module provides no package
-export, fallback, implicit transfer, or process sidecar. Its concrete-only P4
-``ResidentStepGuard`` and identity-only
-``ResidentStepToken`` track one open timestep for one pinned active
-session/registry binding. They execute no adapters, transfer no data,
-synchronize no Warp work, allocate no resources, and provide no fallback.
-Future checkpoint, restore, finalize, close, fault, conversion, and
-resize/rebind boundaries must call the guard's ``assert_step_closed`` gate
-before their own work; raw low-level helpers remain outside that gate's
-interception. Checkpoint support is concrete-only in
-``particula.execution.checkpoint``: ``ResidentSession.checkpoint()`` is
-nonterminal, while ``finalize()`` caches its snapshot and transitions the
-session to FINALIZED. P6 failure handling classifies direct-owner errors as
-read-only or potentially post-launch: the latter faults the session without
-rollback. ``close``/``discard`` only dispose lifecycle state after a closed
-guard; they do not restore, synchronize, or otherwise operate on payloads.
-Restart is explicit, same-device, and never automatic.
-Selected native Warp-device availability remains an upstream E7-F6
-precondition. P6 direct-owner failures are classified explicitly so a
-read-only failure keeps the session ACTIVE while a possible post-launch writer
-failure faults the exact active session without rollback. ``close`` and
-``discard`` are terminal lifecycle transitions only; they do not restore or
-mutate resident payloads.
+Immutable carriers retain caller-owned Warp containers and CPU gas-name
+metadata. ``setup_resident_session`` is the sole CPU-to-Warp upload boundary;
+it preflights locally, then converts particles, gas, and environment once in
+that order before publishing an ACTIVE session. Gas names remain CPU metadata.
+
+``ResidentStepGuard`` and ``ResidentStepToken`` track one open timestep for an
+exact active session-registry binding. They execute no adapters and perform no
+implicit transfer, synchronization, allocation, fallback, or payload work.
+Direct owners explicitly classify failures: read-only failures release the open
+token and retain ACTIVE state, while possible post-launch writer failures fault
+the session without rollback. ``close`` and ``discard`` only perform terminal
+lifecycle transitions after the guard closes; they never restore, synchronize,
+or mutate resident payloads. Checkpoint, restart, and raw low-level helpers
+remain separate concrete-only boundaries.
 """
 
 from dataclasses import dataclass
@@ -211,12 +197,11 @@ class ResidentDimensions:
 class ResidentLifecycle(Enum):
     """Declare resident lifecycle vocabulary.
 
-    ``ResidentSession`` starts ACTIVE. Its narrow checkpoint-only helper may
-    transition exactly ACTIVE to FINALIZED after a controller has cached an
-    immutable checkpoint. P6 additionally permits a direct owner to transition
-    ACTIVE to FAULTED after a writer may have launched, and close/discard
-    transition ACTIVE or FAULTED to CLOSED. Faulting and closing never roll back
-    resident payloads.
+    ``ResidentSession`` starts ACTIVE. Checkpoint finalization transitions
+    ACTIVE to FINALIZED after caching an immutable checkpoint. A direct owner
+    can transition ACTIVE to FAULTED after a writer may have launched; close or
+    discard transitions ACTIVE or FAULTED to CLOSED. Faulting and closing do
+    not roll back resident payloads.
     """
 
     ACTIVE = "active"
@@ -577,8 +562,9 @@ class ResidentSession:
         environment: Caller-owned generated Warp environment container.
         dimensions: Immutable dimensions that describe the retained containers.
         metadata: Immutable Warp-device and ordered gas-name metadata.
-        lifecycle: Current lifecycle vocabulary value; only checkpoint
-            finalization may change ACTIVE to FINALIZED.
+        lifecycle: Current lifecycle value. Checkpoint finalization can change
+            ACTIVE to FINALIZED; classified writer failures can fault ACTIVE;
+            and close or discard can close ACTIVE or FAULTED.
     """
 
     particles: object
@@ -740,14 +726,19 @@ class ResidentSession:
     def discard(
         self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
     ) -> None:
-        """Discard this binding using the same terminal semantics as close.
+        """Discard this binding using the same terminal semantics as ``close``.
+
+        This alias only changes lifecycle state when ``close`` permits it. It
+        does not restore, synchronize, allocate, or mutate resident payloads.
 
         Args:
             registry: Exact registry pinned to this session.
             guard: Exact closed guard bound to this session and registry.
 
-        Returns:
-            None.
+        Raises:
+            TypeError: If the registry or guard is not an exact concrete type.
+            ValueError: If the binding is wrong or the lifecycle is invalid.
+            RuntimeError: If a resident timestep remains open.
         """
         self.close(registry, guard)
 
@@ -779,6 +770,8 @@ class ResidentStepGuard:
     :class:`GPUResourceRegistry` binding by identity. A successful
     :meth:`begin_step` creates the sole open token; only successful matching
     :meth:`complete_step` advances completed-step and simulated-time metadata.
+    The private failure seam can instead abort the exact token without advancing
+    either counter.
 
     This concrete-only scheduler bookkeeping does not execute adapters,
     transfer or restore data, synchronize Warp, acquire sidecars, resize

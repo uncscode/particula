@@ -56,15 +56,20 @@
     primary/vapor-pressure recovery, resource-family restart, malformed
     descriptors, and closed-step rejection on Warp CPU.
 
-- [ ] **E7-F4-P6:** Enforce session failure and close semantics with regression tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Keep preflight failures reusable, mark uncertain post-launch failures
-    faulted, propagate original errors, and never rollback, restore, or fall back
-    implicitly.
+- [x] **E7-F4-P6:** Enforce session failure and close semantics with regression tests
+  - Issue: #1489 | Size: S | Status: Shipped | Completed: 2026-07-29
+  - Delivered: Explicit private read-only/writer-uncertain failure outcomes,
+    exact-token abort/release without guard accounting advancement, original-error
+    preservation, no rollback after uncertain writer failure, and concrete-only
+    terminal close/discard. Read-only failures leave sessions reusable; uncertain
+    writer failures fault them; active/faulted sessions can close without restore;
+    closed/finalized calls are write-free idempotent cases.
   - Files: `particula/execution/gpu_session.py`,
     `particula/execution/tests/gpu_session_test.py`
-  - Tests: Failure injection before/after launch, mutation preservation,
-    faulted-state guards, explicit discard/close, and cleanup idempotency.
+  - Tests: Co-located failure injection before/after token opening, mutation
+    preservation, faulted-state guards, abort/failure-seam validation, original
+    exception propagation, explicit discard/close, and no-runtime-work
+    idempotency.
 
 - [ ] **E7-F4-P7:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

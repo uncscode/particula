@@ -51,10 +51,18 @@ deterministic baseline; CUDA rows are optional and skip cleanly.
   import and use the Warp CPU baseline. Transfer/order, failure-injection,
   descriptor-matrix, and optional CUDA coverage are retained as focused
   regression expectations for this concrete-only boundary.
-- **P6:** Inject validation failures, allocation failures, failures before
-  process launch, and simulated post-launch failures. Assert no rollback or
-  fallback, faulted-state guards, original error propagation, no implicit
-  restore on close, and idempotent close/finalize rules.
+- **P6 (implemented in issue #1489):**
+  `particula/execution/tests/gpu_session_test.py` injects before-token,
+  read-only-after-token, and writer-may-have-launched failures. It asserts exact
+  original exception/traceback propagation, token release without guard
+  counter/time advancement, reusable read-only sessions, observable writer
+  mutation with `FAULTED` lifecycle, and deterministic pre-runtime faulted
+  operation rejection. It also covers invalid failure-seam/abort inputs and
+  cleanup failures without masking the original error. Close/discard rows cover
+  active, faulted, closed, and finalized behavior; binding/open-token rejection;
+  active-validation-once versus faulted identity-only validation; retained
+  payload/checkpoint identity; and spies proving no synchronization, conversion,
+  checkpoint/restart, allocation, restore, retry, migration, or fallback.
 - **P7:** Run `mkdocs build --strict`, link validation, no-Warp import tests, and
   focused documented examples.
 

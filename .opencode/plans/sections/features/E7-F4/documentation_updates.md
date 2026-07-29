@@ -54,4 +54,13 @@ concrete-only direct import, explicit registry/guard ownership, nonterminal
 checkpoint and idempotent terminal finalization, immutable canonical payloads,
 lossy inspection vapor pressure, same-device fresh restart, host-copy cost, and
 the exclusions for package exports, serialization, migration, fallback, and
-rollback. The feature page is validated with `mkdocs build --strict`.
+  rollback. The feature page is validated with `mkdocs build --strict`.
+
+## P6 Status
+
+Issue #1489 updated concrete `gpu_session.py` docstrings and these structured
+plan sections only. The documented concrete-only contract distinguishes explicit
+read-only versus uncertain-writer failure outcomes, no-accounting abort/release,
+original-error preservation, fault/no-rollback behavior, and terminal
+close/discard without implicit restore. No user-facing API, export, example, or
+broad documentation surface was added; P7 remains responsible for that work.

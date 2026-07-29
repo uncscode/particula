@@ -75,3 +75,13 @@ vapor pressure) and every acquired sidecar, while detached CPU inspection
 carriers remain non-authoritative. Checkpoint/restart remains concrete-only:
 there is no package export, device selection or migration, serialization, CPU
 fallback, scheduler, or RNG-policy expansion.
+
+P6 was completed in issue #1489. The concrete-only resident-session boundary
+now explicitly classifies direct-owner failures as read-only or writer-may-have-
+launched. Read-only cleanup releases the exact open token without advancing
+guard counters or simulated time and leaves the session `ACTIVE`; an uncertain
+writer failure preserves observable device mutation, faults the exact session,
+and preserves the original exception. `close()`/`discard()` provide terminal
+no-restore disposal: active and faulted sessions transition to `CLOSED`, while
+closed and finalized sessions are write-free idempotent cases. No package export
+or adapter boundary changed.

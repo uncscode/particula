@@ -72,18 +72,30 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
    completion. It does not execute adapters, transfer, synchronize, allocate,
    resize, restore, or fall back. Future checkpoint, restore, finalize, close,
    fault, conversion, and resize/rebind boundaries must call
-   `assert_step_closed()` before their own work; P5/P6 retain those operations
-   and policy. P5 adds direct-import-only `ResidentSession.checkpoint()` and
+  `assert_step_closed()` before their own work. P5 adds direct-import-only
+  `ResidentSession.checkpoint()` and
    `ResidentSession.finalize()`, delegated to one exact-identity-bound
    controller with its active session, pinned `GPUResourceRegistry`, and closed
    `ResidentStepGuard`. A checkpoint is a fresh immutable host snapshot and is
    nonterminal; finalization caches its first complete snapshot, then makes the
    session terminal `FINALIZED`, and later calls return that exact cached object.
-   The controller/records/restart helper remain absent from all package exports.
-   Raw low-level helper calls are not globally intercepted. See
+  The controller/records/restart helper remain absent from all package exports.
+  P6 adds private direct-owner failure classification and exact-token abort:
+  read-only failures release the token without advancing guard counters/time
+  and leave the session `ACTIVE`; a writer that may have launched releases the
+  exact token and faults that session with no rollback. It preserves the
+  original operational exception and does not intercept raw helpers. P6
+  `close()`/`discard()` are identity-bound terminal lifecycle operations only:
+  active close validates the pinned binding and a closed guard, faulted close
+  uses identity-only binding checks, and repeated `CLOSED` or `FINALIZED`
+  closes are write-free no-ops. They never checkpoint, restore, synchronize,
+  transfer, allocate, or perform implicit runtime work. P5 checkpoint,
+  finalize, and restart behavior remains unchanged. See
    [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md),
    [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md), and
-   [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md).
+  [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md),
+  [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md),
+  and [ADR-008](decisions/ADR-008-resident-session-failure-close-semantics.md).
 - `checkpoint.py` - Concrete-only P5 in-memory checkpoint/restart boundary.
    `ResidentCheckpoint` stores versioned immutable canonical bytes for all
    primary arrays, including GPU-only gas vapor pressure, and acquired registry

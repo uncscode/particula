@@ -58,10 +58,9 @@
   session publication. P2 has no fallback, synchronization, restoration,
   sidecars, retry, or cleanup behavior.
 - The lifecycle vocabulary (`ACTIVE`, `FAULTED`, `FINALIZED`, and `CLOSED`)
-  declares immutable state only. This P1 boundary has no transition, recovery,
-  finalize, close, migration, fallback, or execution operation; P4 and later
-  phases own those semantics. Existing direct GPU kernels and adapter-local
-  physical validation remain authoritative. See
+  begins as immutable P1 state; P5 owns checkpoint/finalize and P6 owns explicit
+  failure and terminal-close transitions. Existing direct GPU kernels and
+  adapter-local physical validation remain authoritative. See
    [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md) and
    [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md).
 - P4 adds direct-import-only `ResidentStepGuard` and identity-only,
@@ -70,8 +69,13 @@
   completed-step count and simulated time advance only after matching token
   completion. The guard does not execute adapters, transfer or restore state,
   synchronize, acquire or allocate sidecars, resize, evolve the environment, or
-  fall back. An adapter failure remains outside the guard and leaves its token
-  and bookkeeping unchanged.
+  fall back. P6 permits only an explicit direct operation owner to classify a
+  failure: a read-only failure aborts and releases the matching open token with
+  no counter/time advance and leaves the session reusable; a writer that may
+  have launched releases that token, faults the exact active session, preserves
+  observable device mutation, and provides no rollback. The seam never infers
+  outcomes from exception types, intercepts raw helpers, or replaces the
+  original operational exception.
 - `GPUResourceRegistry.validate_pinned_session()` is the direct-module-only P4
   binding seam: it requires exact retained-session identity and reuses active
   lifecycle, pinned-signature, and schema validation without payload inspection,
@@ -105,6 +109,16 @@
   Snapshotting requires roughly one additional host copy of resident payload
   bytes plus detached inspection copies. See
   [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md).
+- P6 `ResidentSession.close(registry, guard)` and its `discard()` spelling are
+  concrete-only terminal lifecycle operations, not recovery actions. From
+  `ACTIVE`, close validates the exact pinned binding once and requires a closed
+  guard; from `FAULTED`, it uses only exact local binding checks and a closed
+  guard. Both transitions end at `CLOSED`. Repeated close on `CLOSED`, and close
+  on `FINALIZED`, are write-free no-ops retaining existing identities and the
+  P5 cached checkpoint. Close/discard never synchronizes, checkpoints,
+  finalizes, restores, restarts, converts, allocates, transfers, retries,
+  migrates, falls back, or performs other implicit runtime work. See
+  [ADR-008](decisions/ADR-008-resident-session-failure-close-semantics.md).
 
 ## Concrete Condensation Execution Boundary
 

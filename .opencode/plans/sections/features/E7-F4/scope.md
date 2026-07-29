@@ -97,7 +97,31 @@ the behavior or signatures of shipped direct process kernels.
 - `GPUResourceRegistry._enumerate_resources()` is the narrow checkpoint-only
   internal seam. It validates the active pinned binding and yields established
   family/role arrays in manifest order without payload access, copying,
-  allocation, synchronization, or mutation.
+   allocation, synchronization, or mutation.
+
+## Implemented in P6 (Issue #1489)
+
+- `particula/execution/gpu_session.py` adds the private
+  `_ResidentOperationOutcome` classification and
+  `_handle_failed_resident_operation()` seam for exact active
+  session/registry/guard/token bindings. It never infers failure class from an
+  exception or intercepts raw kernels.
+- `ResidentStepGuard._abort_step()` releases only its matching open token after
+  pinned-binding validation. Abort does not advance completed-step/time
+  accounting, invoke adapters, synchronize, allocate, transfer, or roll back
+  resident payloads.
+- Read-only failed operations return the binding to reusable `ACTIVE` state.
+  Writer-may-have-launched failures fault that exact session after token release;
+  mutation remains observable, rollback/retry/recovery is not supplied, and the
+  direct owner retains the original exception.
+- Concrete `ResidentSession.close()` and `discard()` transition valid active or
+  faulted bindings to `CLOSED` without synchronization, conversion, checkpoint,
+  restore, allocation, or payload mutation. Repeated closed calls and finalized
+  calls are write-free no-ops; finalized sessions retain their P5 checkpoint.
+- Co-located `particula/execution/tests/gpu_session_test.py` covers failure
+  classification, original-error preservation, token/counter invariants,
+  faulted-operation rejection, terminal close/discard, and concrete-only
+  boundaries.
 
 ## Out of Scope
 
