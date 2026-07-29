@@ -597,3 +597,205 @@ def test_execution_package_does_not_export_scheduler_symbols() -> None:
     assert len(execution.__all__) == 10
     assert "scheduler" not in execution.__all__
     assert not hasattr(execution, "resolve_timestep_schedule")
+
+
+def _resident_scheduler() -> Any:
+    """Import the concrete Warp scheduler only for resident-loop tests."""
+    pytest.importorskip("warp")
+    import particula.execution.resident_scheduler as resident_scheduler
+
+    return resident_scheduler
+
+
+def _scheduler_request(module: Any) -> tuple[Any, Any]:
+    """Build a minimal already-preflighted request for dispatch tests."""
+    node_ids = (
+        "environment_update",
+        "gas_update",
+        "vapor_pressure_refresh",
+        "saturation_refresh",
+        "condensation",
+        "brownian_coagulation",
+        "dilution",
+        "wall_loss",
+        "nucleation",
+        "diagnostics",
+    )
+    nodes = tuple(
+        type("Node", (), {"node_id": node_id})() for node_id in node_ids
+    )
+
+    class Guard:
+        """Record the single token lifecycle used by the scheduler."""
+
+        def __init__(self) -> None:
+            self.token = object()
+            self.calls: list[tuple[str, object]] = []
+
+        def begin_step(self, duration: object) -> object:
+            self.calls.append(("begin", duration))
+            return self.token
+
+        def complete_step(self, token: object) -> None:
+            self.calls.append(("complete", token))
+
+    request = object.__new__(module.ResidentSimulationRequest)
+    guard = Guard()
+    object.__setattr__(request, "graph", type("Graph", (), {"nodes": nodes})())
+    object.__setattr__(
+        request,
+        "schedule",
+        type("Schedule", (), {"ordered_node_ids": node_ids})(),
+    )
+    object.__setattr__(request, "guard", guard)
+    object.__setattr__(request, "environment_update", object())
+    object.__setattr__(request, "gas_update", object())
+    object.__setattr__(request, "condensation", object())
+    object.__setattr__(request, "coagulation", object())
+    object.__setattr__(request, "dilution", object())
+    object.__setattr__(request, "wall_loss", object())
+    object.__setattr__(request, "nucleation", object())
+    object.__setattr__(request, "diagnostics", object())
+    object.__setattr__(request, "session", object())
+    object.__setattr__(request, "registry", object())
+    object.__setattr__(request, "thermodynamics", object())
+    return request, guard
+
+
+@pytest.mark.warp
+def test_resident_scheduler_dispatches_resolved_nodes_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Complete loops dispatch resolved nonvirtual nodes and close one token."""
+    module = _resident_scheduler()
+    request, guard = _scheduler_request(module)
+    scheduler = module.ResidentSimulationScheduler(request)
+    calls: list[str] = []
+
+    class Updates:
+        """Record environment and gas update dispatches."""
+
+        def execute(self, item: object) -> None:
+            calls.append(
+                "environment_update"
+                if item is request.environment_update
+                else "gas_update"
+            )
+
+    class Thermal:
+        """Record virtual-refresh consumers and completed ordinary nodes."""
+
+        def __init__(self, _request: object) -> None:
+            pass
+
+        def record_completed(self, node: object) -> None:
+            calls.append(cast(Any, node).node_id)
+
+        def execute_consumer(self, node: object, callback: Any) -> None:
+            calls.append(f"consumer:{cast(Any, node).node_id}")
+            callback()
+
+    def adapter(name: str) -> type[Any]:
+        """Create one adapter that records its corresponding dispatch."""
+
+        class Adapter:
+            """Record one adapter invocation."""
+
+            def execute(self, _request: object) -> None:
+                calls.append(name)
+
+        return Adapter
+
+    monkeypatch.setattr(scheduler, "_validate", lambda _duration: None)
+    monkeypatch.setattr(module, "ResidentStateUpdateExecutor", Updates)
+    monkeypatch.setattr(
+        module, "ResidentThermodynamicUpdateRequest", lambda *args: args
+    )
+    monkeypatch.setattr(
+        module, "ResidentThermodynamicUpdateCoordinator", Thermal
+    )
+    monkeypatch.setattr(
+        module, "WarpCondensationExecutionAdapter", adapter("condensation")
+    )
+    monkeypatch.setattr(
+        module,
+        "WarpBrownianCoagulationExecutionAdapter",
+        adapter("brownian_coagulation"),
+    )
+    monkeypatch.setattr(module, "ResidentDilutionAdapter", adapter("dilution"))
+    monkeypatch.setattr(module, "ResidentWallLossAdapter", adapter("wall_loss"))
+    monkeypatch.setattr(
+        module, "ResidentNucleationAdapter", adapter("nucleation")
+    )
+    monkeypatch.setattr(
+        module, "ResidentDiagnosticsExecutor", adapter("diagnostics")
+    )
+
+    scheduler.execute(2.0)
+
+    assert calls == [
+        "environment_update",
+        "environment_update",
+        "gas_update",
+        "gas_update",
+        "consumer:condensation",
+        "condensation",
+        "brownian_coagulation",
+        "brownian_coagulation",
+        "dilution",
+        "dilution",
+        "wall_loss",
+        "wall_loss",
+        "nucleation",
+        "nucleation",
+        "consumer:diagnostics",
+        "diagnostics",
+    ]
+    assert guard.calls == [("begin", 2.0), ("complete", guard.token)]
+
+
+@pytest.mark.warp
+def test_resident_scheduler_faults_after_adapter_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Adapter failures retain their error and use writer-capable cleanup."""
+    module = _resident_scheduler()
+    request, guard = _scheduler_request(module)
+    scheduler = module.ResidentSimulationScheduler(request)
+    cleanup: list[tuple[object, object, object, object, object]] = []
+
+    class FailingUpdates:
+        """Fail at the first ordinary operation after the token opens."""
+
+        def execute(self, _request: object) -> None:
+            raise RuntimeError("adapter failed")
+
+    monkeypatch.setattr(scheduler, "_validate", lambda _duration: None)
+    monkeypatch.setattr(module, "ResidentStateUpdateExecutor", FailingUpdates)
+    monkeypatch.setattr(
+        module, "ResidentThermodynamicUpdateRequest", lambda *args: args
+    )
+    monkeypatch.setattr(
+        module,
+        "ResidentThermodynamicUpdateCoordinator",
+        lambda _request: object(),
+    )
+    monkeypatch.setattr(
+        module,
+        "_handle_failed_resident_operation",
+        lambda *args: cleanup.append(args),
+    )
+
+    with pytest.raises(RuntimeError, match="adapter failed"):
+        scheduler.execute(1.0)
+
+    assert guard.calls == [("begin", 1.0)]
+    assert cleanup == [
+        (
+            request.session,
+            request.registry,
+            request.guard,
+            guard.token,
+            module._ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
+        )
+    ]

@@ -134,8 +134,21 @@ direct GPU APIs.
   and has no execution/selection, transfer/sync/restore, lifecycle, transport,
    process-configuration/physics, or RNG reset/advance/initialization behavior.
    `validate_pinned_session()` is the metadata-only integration seam: it
-    requires exact retained-session identity and reuses active
-    lifecycle/signature/schema validation without acquisition or allocation.
+     requires exact retained-session identity and reuses active
+     lifecycle/signature/schema validation without acquisition or allocation.
+   `validate_diagnostic_outputs()` similarly validates only separately owned
+   contiguous float64 `(B, S)` diagnostic outputs against pinned primaries and
+   established sidecars; it neither publishes nor allocates those outputs.
+- `diagnostics.py` and `resident_scheduler.py` - Concrete direct-import-only
+  E7-F5 P6 resident composition seams. Diagnostics is a closed, ordered
+  two-operation snapshot protocol for gas concentration and saturation ratio;
+  empty valid outputs are no-dispatch no-ops. The scheduler requires the exact
+  active session/registry/closed-guard binding and exactly the ten canonical
+  resolved nodes. It dispatches the resolver order, consumes virtual
+  thermodynamic refreshes only through their consumer windows, and completes one
+  guard token only after the entire loop succeeds. These seams have no package
+  export, transfer, synchronization, fallback, resource replacement, or
+  rollback; possible post-launch failures fault the resident session.
     `validate_wall_loss_resources()` and `validate_nucleation_resources()` first
     validate that pinned session, then require the exact already-published view
     and its pinned sidecar bindings for the corresponding family. These

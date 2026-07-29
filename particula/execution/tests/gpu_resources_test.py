@@ -7,12 +7,19 @@ from dataclasses import fields
 from pathlib import Path
 from typing import Any, cast
 
+import numpy as np
 import pytest
 
 pytest.importorskip("warp")
 
 import particula.execution.gpu_resources as gpu_resources
 from particula.execution import Backend, Device
+from particula.execution.diagnostics import (
+    ResidentDiagnosticOperation,
+    ResidentDiagnosticRegistration,
+    ResidentDiagnosticsExecutor,
+    ResidentDiagnosticsPlan,
+)
 from particula.execution.gpu_resources import (
     GPUResourceRegistry,
     ManifestEntry,
@@ -24,6 +31,11 @@ from particula.execution.gpu_session import (
     ResidentMetadata,
     ResidentSession,
 )
+from particula.execution.process_graph import (
+    TimestepPlan,
+    resolve_timestep_plan,
+)
+from particula.execution.scheduler import ResolvedTimestepSchedule
 
 
 def _session(
@@ -74,6 +86,56 @@ def _session(
             tuple(str(index) for index in range(species)),
         ),
         ResidentLifecycle.ACTIVE,
+    )
+
+
+def _diagnostics_plan(
+    session: ResidentSession,
+    registry: GPUResourceRegistry,
+    outputs: tuple[Any, ...],
+) -> ResidentDiagnosticsPlan:
+    """Build the smallest resolver-produced final diagnostics schedule."""
+    from particula.execution import CapabilityRequirements
+    from particula.execution.process_graph import (
+        NodeKind,
+        ProcessNode,
+        ResourceRequirement,
+    )
+
+    node = ProcessNode(
+        "diagnostics",
+        NodeKind.DIAGNOSTIC,
+        None,
+        CapabilityRequirements(frozenset()),
+        frozenset(
+            {
+                ResourceRequirement.PARTICLES,
+                ResourceRequirement.GAS,
+                ResourceRequirement.ENVIRONMENT,
+                ResourceRequirement.THERMODYNAMICS,
+                ResourceRequirement.DIAGNOSTICS,
+            }
+        ),
+        frozenset(),
+    )
+    graph = resolve_timestep_plan(TimestepPlan((node,), ()))
+    schedule = ResolvedTimestepSchedule(graph.nodes, (), ("diagnostics",))
+    return ResidentDiagnosticsPlan(
+        session,
+        registry,
+        graph,
+        schedule,
+        graph.nodes[0],
+        (
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT,
+                outputs[0],
+            ),
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT,
+                outputs[1],
+            ),
+        ),
     )
 
 
@@ -688,3 +750,77 @@ def test_registry_partial_allocation_failure_does_not_publish_family(
     assert calls == 2
     assert registry._bindings == {}
     assert registry._views == {}
+
+
+@pytest.mark.warp
+def test_diagnostics_executor_snapshots_closed_operations_in_order() -> None:
+    """Test diagnostics copies current resident fields into owned outputs."""
+    wp = pytest.importorskip("warp")
+    session = _session(boxes=2, particle_count=1, species=2)
+    registry = GPUResourceRegistry(session)
+    gas_output = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
+    saturation_output = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
+    plan = _diagnostics_plan(session, registry, (gas_output, saturation_output))
+
+    ResidentDiagnosticsExecutor().execute(plan)
+    wp.synchronize()
+
+    np.testing.assert_array_equal(
+        gas_output.numpy(), cast(Any, session.gas).concentration.numpy()
+    )
+    np.testing.assert_array_equal(
+        saturation_output.numpy(),
+        cast(Any, session.environment).saturation_ratio.numpy(),
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("shape", [(0, 1), (1, 0), (0, 0)])
+def test_diagnostics_accepts_canonical_empty_outputs_without_dispatch(
+    shape: tuple[int, int],
+) -> None:
+    """Test canonical empty diagnostic schemas are successful no-ops."""
+    wp = pytest.importorskip("warp")
+    session = _session(boxes=shape[0], particle_count=1, species=shape[1])
+    registry = GPUResourceRegistry(session)
+    outputs = (
+        wp.zeros(shape, dtype=wp.float64, device="cpu"),
+        wp.zeros(shape, dtype=wp.float64, device="cpu"),
+    )
+
+    ResidentDiagnosticsExecutor().execute(
+        _diagnostics_plan(session, registry, outputs)
+    )
+
+    assert tuple(output.shape for output in outputs) == (shape, shape)
+
+
+@pytest.mark.warp
+def test_diagnostics_rejects_duplicate_operations_before_writing() -> None:
+    """Test closed diagnostics reject duplicate operations before a launch."""
+    wp = pytest.importorskip("warp")
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    first = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    second = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    plan = _diagnostics_plan(session, registry, (first, second))
+    duplicate = ResidentDiagnosticsPlan(
+        plan.session,
+        plan.registry,
+        plan.graph,
+        plan.schedule,
+        plan.node,
+        (
+            plan.registrations[0],
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT,
+                second,
+            ),
+        ),
+    )
+
+    with pytest.raises(ValueError, match="operations must be unique"):
+        ResidentDiagnosticsExecutor().execute(duplicate)
+
+    np.testing.assert_array_equal(first.numpy(), np.zeros((1, 1)))
+    np.testing.assert_array_equal(second.numpy(), np.zeros((1, 1)))

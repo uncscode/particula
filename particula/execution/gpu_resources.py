@@ -317,6 +317,56 @@ class GPUResourceRegistry:
             raise ValueError("session must be the pinned ResidentSession.")
         self._validate_session_signature()
 
+    def validate_diagnostic_outputs(
+        self, session: ResidentSession, outputs: tuple[Any, ...]
+    ) -> None:
+        """Validate caller-owned diagnostic outputs without publishing them.
+
+        The diagnostics boundary owns neither these arrays nor their lifetime.
+        This metadata-only check rejects aliasing with resident primaries and
+        acquired sidecars, while accepting canonical empty ``(B, S)`` arrays.
+        """
+        self.validate_pinned_session(session)
+        if type(outputs) is not tuple:
+            raise TypeError("outputs must be an exact tuple.")
+        ranges: list[tuple[int, int] | None] = []
+        values = list(outputs)
+        for output in values:
+            entry = ManifestEntry(
+                "diagnostic output", "diagnostics", wp.float64, "bs"
+            )
+            byte_range = self._validate_array(entry, output, capacity=None)
+            ranges.append(byte_range)
+        protected = list(_primary_arrays(self._session)) + [
+            value
+            for bindings in self._bindings.values()
+            for value in bindings.values()
+        ]
+        protected_ranges = [self._array_range(value) for value in protected]
+        for index, (output, byte_range) in enumerate(
+            zip(values, ranges, strict=True)
+        ):
+            if any(output is value for value in protected):
+                raise ValueError(
+                    "Diagnostic outputs must not alias resident resources."
+                )
+            if any(
+                self._ranges_overlap(byte_range, item)
+                for item in protected_ranges
+            ):
+                raise ValueError(
+                    "Diagnostic output byte ranges must not overlap."
+                )
+            for other, other_range in zip(
+                values[index + 1 :], ranges[index + 1 :], strict=True
+            ):
+                if output is other or self._ranges_overlap(
+                    byte_range, other_range
+                ):
+                    raise ValueError(
+                        "Diagnostic outputs must not overlap each other."
+                    )
+
     def validate_wall_loss_resources(
         self, session: ResidentSession, resources: WallLossResources
     ) -> None:

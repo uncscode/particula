@@ -168,6 +168,20 @@ semantics remain authoritative. No process-adapter name is exported through
 `particula.execution`, its adapters package, or top-level `particula`. See
 [ADR-009](architecture/decisions/ADR-009-resident-process-delegation-adapters.md).
 
+E7-F5 P6 adds two further direct-import-only resident boundaries:
+`particula.execution.diagnostics` and
+`particula.execution.resident_scheduler`. Diagnostics is a closed two-operation
+protocol (`GAS_CONCENTRATION_SNAPSHOT` and `SATURATION_RATIO_SNAPSHOT`), not a
+callback API. Its separately caller-owned contiguous float64 `(B, S)` outputs
+are checked against primaries, published sidecars, and one another; canonical
+empty shapes are successful write-free no-ops. The scheduler accepts only the
+complete ten-node resolver-produced schedule and one exact active
+session/registry/closed-guard binding. It dispatches that resolved order, using
+the thermodynamic consumer windows for condensation and diagnostics. Neither
+boundary is package-exported and neither uploads, restores, synchronizes,
+checkpoints, acquires/replaces storage, resizes, or falls back. After a writer
+may launch, a failure closes the token and faults the session without rollback.
+
 ## Wall Loss
 
 Wall loss strategies live in `particula.dynamics.wall_loss` and are exported
