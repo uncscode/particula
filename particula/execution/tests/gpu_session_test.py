@@ -173,7 +173,6 @@ def test_carriers_validate_and_remain_immutable() -> None:
     [
         (True, "n_boxes", True, TypeError, "integral, not bool"),
         (1.0, "n_boxes", True, TypeError, "integral, not bool"),
-        (0, "n_boxes", True, ValueError, "greater than zero"),
         (-1, "n_particles", False, ValueError, "nonnegative"),
         (-1, "n_species", False, ValueError, "nonnegative"),
     ],
@@ -770,11 +769,11 @@ def test_session_revalidates_fabricated_cpu_carriers_before_warp_import() -> (
 ):
     """Test bypassed carrier, metadata, name, and lifecycle errors are ordered."""
     dimensions = object.__new__(ResidentDimensions)
-    object.__setattr__(dimensions, "n_boxes", 0)
+    object.__setattr__(dimensions, "n_boxes", -1)
     object.__setattr__(dimensions, "n_particles", 0)
     object.__setattr__(dimensions, "n_species", 0)
     metadata = _metadata(0)
-    with pytest.raises(ValueError, match="n_boxes must be greater than zero"):
+    with pytest.raises(ValueError, match="n_boxes must be nonnegative"):
         ResidentSession(
             object(),
             object(),

@@ -173,7 +173,7 @@ class ResidentDimensions:
     """Declare immutable dimensions for caller-owned resident state.
 
     Attributes:
-        n_boxes: Positive number of resident boxes.
+        n_boxes: Nonnegative number of resident boxes.
         n_particles: Nonnegative fixed particle capacity per box.
         n_species: Nonnegative number of gas species.
     """
@@ -189,7 +189,7 @@ class ResidentDimensions:
             TypeError: If a dimension is not an integral value or is boolean.
             ValueError: If a dimension violates its required lower bound.
         """
-        _validate_dimension(self.n_boxes, "n_boxes", positive=True)
+        _validate_dimension(self.n_boxes, "n_boxes", positive=False)
         _validate_dimension(self.n_particles, "n_particles", positive=False)
         _validate_dimension(self.n_species, "n_species", positive=False)
 
