@@ -6,6 +6,10 @@ It allocates and validates resources only: it neither executes a process nor
 transfers, synchronizes, restores, resizes, or initializes RNG state.  The
 manifests and views here are concrete-only and are deliberately not exported
 from :mod:`particula.execution`.
+
+The registry retains array identities and performs metadata-only schema and
+nonaliasing checks. It does not establish allocator provenance, execute a
+kernel, or change session lifecycle or random-number-generator policy.
 """
 
 from __future__ import annotations
@@ -218,7 +222,18 @@ class GPUResourceRegistry:
     """
 
     def __init__(self, session: ResidentSession) -> None:
-        """Create a registry for one exact, already validated active session."""
+        """Create a sidecar registry pinned to one active resident session.
+
+        Args:
+            session: Exact active resident session that supplies the fixed
+                dimensions, device, and protected primary-array identities.
+
+        Raises:
+            TypeError: If ``session`` or its lifecycle carriers are not exact
+                resident-session types.
+            ValueError: If the session is not active or fails its metadata
+                validation.
+        """
         if type(session) is not ResidentSession:
             raise TypeError("session must be an exact ResidentSession.")
         self._session = session
@@ -230,10 +245,20 @@ class GPUResourceRegistry:
 
     @property
     def manifests(self) -> tuple[ResourceManifest, ...]:
-        """Return the canonical immutable direct-module manifest set."""
+        """Return the canonical immutable direct-module manifest set.
+
+        Returns:
+            The condensation, coagulation, wall-loss, and nucleation manifests.
+        """
         return (_CONDENSATION, _COAGULATION, _WALL_LOSS, _NUCLEATION)
 
     def _session_signature(self) -> tuple[Any, ...]:
+        """Build the pinned lifecycle, dimension, device, and identity
+        signature.
+
+        Returns:
+            Immutable metadata used to detect session drift before acquisition.
+        """
         particles = cast(Any, self._session.particles)
         return (
             self._session.lifecycle,
@@ -271,6 +296,18 @@ class GPUResourceRegistry:
     def _shape(
         self, entry: ManifestEntry, capacity: int | None = None
     ) -> tuple[int, ...]:
+        """Resolve a manifest entry to its fixed resident-session shape.
+
+        Args:
+            entry: Manifest role whose shape formula is resolved.
+            capacity: Required collision capacity for ``"bc2"`` entries.
+
+        Returns:
+            Exact Warp-array shape for the entry.
+
+        Raises:
+            ValueError: If a collision-pair shape lacks its required capacity.
+        """
         dimensions = self._session.dimensions
         shapes: dict[str, tuple[int, ...]] = {
             "b": (dimensions.n_boxes,),
@@ -291,6 +328,20 @@ class GPUResourceRegistry:
     def _validate_array(
         self, entry: ManifestEntry, value: Any, capacity: int | None
     ) -> tuple[int, int] | None:
+        """Validate one sidecar's Warp metadata against its manifest role.
+
+        Args:
+            entry: Expected dtype and shape specification.
+            value: Caller-supplied Warp array to inspect without reading.
+            capacity: Collision capacity for collision-pair entries.
+
+        Returns:
+            Nonempty half-open byte range, or ``None`` for an empty array.
+
+        Raises:
+            TypeError: If ``value`` is not a Warp array.
+            ValueError: If its schema, device, pointer, or strides are invalid.
+        """
         array_type = getattr(wp, "array", None)
         if isinstance(array_type, type) and not isinstance(value, array_type):
             raise TypeError(f"{entry.role} must be a Warp array.")
@@ -345,6 +396,19 @@ class GPUResourceRegistry:
         return left * right
 
     def _allocate(self, entry: ManifestEntry, capacity: int | None) -> Any:
+        """Allocate one manifest-conforming sidecar on the pinned device.
+
+        Args:
+            entry: Manifest role to allocate.
+            capacity: Collision capacity for collision-pair entries.
+
+        Returns:
+            Zero-filled Warp array matching the entry's fixed schema.
+
+        Raises:
+            ValueError: If the computed allocation element or byte count
+                exceeds the supported range.
+        """
         shape = self._shape(entry, capacity)
         count = 1
         for length in shape:
@@ -442,6 +506,21 @@ class GPUResourceRegistry:
         supplied: dict[str, Any],
         capacity: int | None = None,
     ) -> dict[str, Any]:
+        """Validate, allocate, and atomically publish one resource family.
+
+        Args:
+            manifest: Complete schema for the resource family.
+            supplied: Role-to-array bindings; ``None`` requests allocation.
+            capacity: Collision capacity for the coagulation family.
+
+        Returns:
+            Pinned role-to-array bindings for the established family.
+
+        Raises:
+            TypeError: If supplied arrays fail the required Warp type checks.
+            ValueError: If the session drifted, bindings are incompatible,
+                alias protected storage, or coagulation capacity changes.
+        """
         self._validate_session_signature()
         if manifest.family in self._bindings:
             if (
@@ -473,7 +552,20 @@ class GPUResourceRegistry:
     def acquire_condensation(
         self, *, buffers: CondensationScratchBuffers | None = None
     ) -> CondensationResources:
-        """Acquire one complete pinned condensation scratch record."""
+        """Acquire one complete pinned condensation scratch record.
+
+        Args:
+            buffers: Optional complete exact native scratch record. Missing
+                records are allocated as a complete fixed-shape set.
+
+        Returns:
+            Stable view containing the native scratch record by identity.
+
+        Raises:
+            TypeError: If ``buffers`` is not an exact native record.
+            ValueError: If it is incomplete, incompatible, aliases protected
+                storage, or the pinned session has drifted.
+        """
         if (
             buffers is not None
             and type(buffers) is not CondensationScratchBuffers
@@ -506,7 +598,23 @@ class GPUResourceRegistry:
         n_collisions: Any | None = None,
         rng_states: Any | None = None,
     ) -> CoagulationResources:
-        """Acquire fixed-capacity coagulation output and RNG sidecars."""
+        """Acquire fixed-capacity coagulation output and RNG sidecars.
+
+        Args:
+            collision_capacity: Positive, non-boolean integral collision bound.
+            collision_pairs: Optional ``int32`` collision-pair sidecar.
+            n_collisions: Optional ``int32`` per-box count sidecar.
+            rng_states: Optional ``uint32`` persistent per-box RNG sidecar.
+
+        Returns:
+            Stable view with the fixed capacity and pinned native sidecars.
+
+        Raises:
+            TypeError: If capacity is not a non-boolean integral or a supplied
+                sidecar is not a Warp array.
+            ValueError: If capacity, schema, aliasing, or session signature is
+                incompatible with the established registry state.
+        """
         if isinstance(collision_capacity, bool) or not isinstance(
             collision_capacity, Integral
         ):
@@ -535,7 +643,19 @@ class GPUResourceRegistry:
     def acquire_wall_loss(
         self, *, rng_states: Any | None = None
     ) -> WallLossResources:
-        """Acquire one persistent wall-loss RNG sidecar."""
+        """Acquire one persistent wall-loss RNG sidecar.
+
+        Args:
+            rng_states: Optional ``uint32`` per-box native RNG sidecar.
+
+        Returns:
+            Stable view containing the pinned RNG sidecar.
+
+        Raises:
+            TypeError: If a supplied sidecar is not a Warp array.
+            ValueError: If its schema, aliasing, or session signature is
+                incompatible.
+        """
         bindings = self._acquire(_WALL_LOSS, {"rng_states": rng_states})
         if "wall_loss" not in self._views:
             self._views["wall_loss"] = WallLossResources(**bindings)
@@ -631,7 +751,24 @@ class GPUResourceRegistry:
         diagnostics: NucleationDiagnosticBuffers | None = None,
         exhaustion: NucleationExhaustionBuffers | None = None,
     ) -> NucleationResources:
-        """Acquire complete pinned native nucleation records and scratch."""
+        """Acquire complete pinned native nucleation records and scratch.
+
+        Args:
+            scratch: Optional complete exact nucleation scratch record.
+            finalized_demand: Optional complete exact finalized-demand record.
+            diagnostics: Optional complete exact diagnostic record.
+            exhaustion: Optional complete exact exhaustion record, including its
+                complete nested resampling buffers.
+
+        Returns:
+            Stable view holding complete native records built from pinned
+            arrays.
+
+        Raises:
+            TypeError: If supplied records are not exact native record types.
+            ValueError: If records are incomplete, their sidecars are
+                incompatible or aliasing, or the session signature drifted.
+        """
         supplied = self._nucleation_supplied_bindings(
             scratch,
             finalized_demand,
