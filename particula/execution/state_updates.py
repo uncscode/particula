@@ -25,6 +25,7 @@ from particula.execution.process_graph import (
     ProcessNode,
     ResolvedProcessGraph,
     ResourceRequirement,
+    _is_resolver_produced_graph,
 )
 
 if TYPE_CHECKING:
@@ -38,7 +39,7 @@ def _scan_positive(
     index = wp.tid()
     value = values[index]
     if not wp.isfinite(value) or value <= 0.0:
-        invalid[0] = 1
+        wp.atomic_max(invalid, 0, 1)
 
 
 @wp.kernel
@@ -48,7 +49,7 @@ def _scan_nonnegative(
     index = wp.tid()
     value = values[index]
     if not wp.isfinite(value) or value < 0.0:
-        invalid[0] = 1
+        wp.atomic_max(invalid, 0, 1)
 
 
 @wp.kernel
@@ -58,7 +59,7 @@ def _scan_nonnegative_matrix(
     box, species = wp.tid()
     value = values[box, species]
     if not wp.isfinite(value) or value < 0.0:
-        invalid[0] = 1
+        wp.atomic_max(invalid, 0, 1)
 
 
 def _registry_type() -> type[object]:
@@ -169,7 +170,7 @@ def _array_range(
     if count == 0:
         return None
     pointer = getattr(value, "ptr", None)
-    if not isinstance(pointer, Integral) or pointer < 0:
+    if not isinstance(pointer, Integral) or pointer <= 0:
         raise ValueError(f"{name} must have a valid pointer.")
     return int(pointer), int(pointer) + count * item_size
 
@@ -253,10 +254,12 @@ def _reject_primary_aliases(
 
 
 def _validate_node(request: object, *, environment: bool) -> None:
-    """Validate exact graph membership and the canonical update declaration."""
+    """Validate resolver provenance, membership, and canonical update role."""
     typed = cast(
         ResidentEnvironmentUpdateRequest | ResidentGasUpdateRequest, request
     )
+    if not _is_resolver_produced_graph(typed.graph):
+        raise ValueError("request graph must be produced by plan resolution.")
     if not any(node is typed.node for node in typed.graph.nodes):
         raise ValueError("request node must be a member of graph.nodes.")
     expected = (

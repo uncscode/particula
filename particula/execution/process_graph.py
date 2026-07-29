@@ -18,6 +18,7 @@ from particula.execution import (
 
 _NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 _EMPTY_REQUIREMENTS = CapabilityRequirements(frozenset())
+_RESOLVED_GRAPH_IDENTITIES: dict[int, "ResolvedProcessGraph"] = {}
 
 
 class NodeKind(str, Enum):
@@ -353,7 +354,14 @@ def resolve_timestep_plan(plan: TimestepPlan) -> ResolvedProcessGraph:
         )
     )
     _raise_for_cycle(normalized_nodes, normalized_edges)
-    return ResolvedProcessGraph(normalized_nodes, normalized_edges)
+    graph = ResolvedProcessGraph(normalized_nodes, normalized_edges)
+    _RESOLVED_GRAPH_IDENTITIES[id(graph)] = graph
+    return graph
+
+
+def _is_resolver_produced_graph(graph: ResolvedProcessGraph) -> bool:
+    """Return whether ``graph`` is the exact result of plan resolution."""
+    return _RESOLVED_GRAPH_IDENTITIES.get(id(graph)) is graph
 
 
 def resolve_canonical_topological_order(

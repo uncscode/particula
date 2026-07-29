@@ -42,9 +42,10 @@ Warp-resident boundary. It provides frozen identity-oriented environment and gas
 update requests and an executor. No names are exported through
 `particula.execution` or top-level `particula`.
 
-The executor validates the exact pinned session/registry binding, exact graph
-membership and canonical `environment_update` or `gas_update` role, then input
-schema, nonaliasing, and scalar payloads before committing. A successful
+The executor validates the exact pinned session/registry binding,
+resolver-produced graph provenance, exact graph membership, and canonical
+`environment_update` or `gas_update` role, then input schema, nonaliasing, and
+scalar payloads before committing. A successful
 environment request copies only temperature then pressure; a successful gas
 request copies only concentration. The existing resident arrays and containers
 remain authoritative. Canonical zero-box and zero-species schemas are successful
@@ -95,9 +96,10 @@ only and preserve fixed container identities.
 
 ## Rationale
 
-Exact identity binding prevents stale sessions, foreign registries, manually
-constructed graph roles, and unrelated nodes from authorizing writes. Completing
-read-only validation before the copy sequence makes preflight rejection
+Exact identity binding and resolver-produced graph provenance prevent stale
+sessions, foreign registries, manually constructed graph roles, and unrelated
+nodes from authorizing writes. Completing read-only validation before the copy
+sequence makes preflight rejection
 write-free. Retaining updates separately from P5 leaves vapor-pressure and
 saturation-ratio invalidation and refresh policy explicit rather than hidden.
 
