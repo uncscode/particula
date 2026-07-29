@@ -1,17 +1,24 @@
-"""Define concrete-only GPU-resident session ownership carriers.
+"""Define concrete-only GPU-resident session ownership carriers and setup.
 
 These immutable carriers retain caller-owned Warp containers and CPU gas-name
 metadata by identity. They perform construction-time metadata validation only.
-They do not convert, allocate, schedule, synchronize, restore, fall back,
-resize, migrate devices, operate on lifecycle state, or change package exports.
+``setup_resident_session`` is P2's sole CPU-to-Warp upload point. It publishes
+one complete active session after local CPU-schema preflight and exactly one
+conversion of each carrier. It does not provide lifecycle operations, fallback,
+synchronization, restoration, process sidecars, or package exports. Native Warp
+device availability is an upstream E7-F6 precondition in this revision.
 """
 
 from dataclasses import dataclass
 from enum import Enum
 from numbers import Integral
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from particula.execution import Backend, Device
+
+if TYPE_CHECKING:
+    from particula.gas import EnvironmentData, GasData
+    from particula.particles import ParticleData
 
 
 def _validate_dimension(value: object, name: str, *, positive: bool) -> None:
@@ -48,6 +55,98 @@ def _validate_gas_names(gas_names: object) -> None:
         raise TypeError("gas_names must be an exact tuple.")
     if not all(type(name) is str for name in gas_names):
         raise TypeError("gas_names entries must be exact str instances.")
+
+
+def _validate_cpu_shape(
+    value: object,
+    name: str,
+    expected_shape: tuple[int, ...],
+) -> None:
+    """Validate one CPU field shape without reading or copying its values."""
+    if getattr(value, "shape", None) != expected_shape:
+        raise ValueError(f"{name} must have shape {expected_shape}.")
+
+
+def _preflight_cpu_session(
+    particles: object,
+    gas: object,
+    environment: object,
+    device: object,
+) -> tuple[
+    "ParticleData",
+    "GasData",
+    "EnvironmentData",
+    "ResidentDimensions",
+    tuple[str, ...],
+]:
+    """Validate local CPU session inputs before importing conversion helpers.
+
+    This function intentionally does not probe native-device availability. That
+    policy is an upstream E7-F6 responsibility and the selected device is
+    assumed to have been capability-approved before this boundary.
+    """
+    if type(device) is not Device:
+        raise TypeError("device must be an exact Device.")
+    if device.backend is not Backend.WARP:
+        raise ValueError("device.backend must be Backend.WARP.")
+
+    from particula.gas import EnvironmentData, GasData
+    from particula.particles import ParticleData
+
+    if not isinstance(particles, ParticleData):
+        raise TypeError("particles must be a ParticleData.")
+    if not isinstance(gas, GasData):
+        raise TypeError("gas must be a GasData.")
+    if not isinstance(environment, EnvironmentData):
+        raise TypeError("environment must be an EnvironmentData.")
+
+    masses_shape = getattr(particles.masses, "shape", None)
+    if not isinstance(masses_shape, tuple) or len(masses_shape) != 3:
+        raise ValueError("particles.masses must have rank 3.")
+    dimensions = ResidentDimensions(*masses_shape)
+    boxes = dimensions.n_boxes
+    particle_count = dimensions.n_particles
+    species = dimensions.n_species
+
+    _validate_cpu_shape(
+        particles.concentration,
+        "particles.concentration",
+        (boxes, particle_count),
+    )
+    _validate_cpu_shape(
+        particles.charge,
+        "particles.charge",
+        (boxes, particle_count),
+    )
+    _validate_cpu_shape(particles.density, "particles.density", (species,))
+    _validate_cpu_shape(particles.volume, "particles.volume", (boxes,))
+    _validate_cpu_shape(gas.molar_mass, "gas.molar_mass", (species,))
+    _validate_cpu_shape(gas.partitioning, "gas.partitioning", (species,))
+    _validate_cpu_shape(
+        gas.concentration,
+        "gas.concentration",
+        (boxes, species),
+    )
+    if len(gas.name) != species:
+        raise ValueError("gas.name length must match n_species.")
+    _validate_cpu_shape(
+        environment.temperature,
+        "environment.temperature",
+        (boxes,),
+    )
+    _validate_cpu_shape(
+        environment.pressure,
+        "environment.pressure",
+        (boxes,),
+    )
+    _validate_cpu_shape(
+        environment.saturation_ratio,
+        "environment.saturation_ratio",
+        (boxes, species),
+    )
+    gas_names = tuple(gas.name)
+    _validate_gas_names(gas_names)
+    return particles, gas, environment, dimensions, gas_names
 
 
 @dataclass(frozen=True)
@@ -413,3 +512,68 @@ class ResidentSession:
             metadata,
             wp,
         )
+
+
+def setup_resident_session(
+    particles: "ParticleData",
+    gas: "GasData",
+    environment: "EnvironmentData",
+    device: Device,
+) -> ResidentSession:
+    """Upload CPU carriers once and publish one active resident session.
+
+    This concrete-only factory is P2's only CPU-to-Warp upload point. It keeps
+    CPU gas names in metadata, retains converted containers by identity, and
+    publishes only a fully validated active session. It does not synchronize,
+    restore, manage lifecycle transitions, use fallback, or allocate process
+    sidecars. The supplied Warp device must already be availability-approved by
+    the upstream E7-F6 boundary; this revision does not probe native devices.
+
+    Args:
+        particles: CPU particle carrier to upload.
+        gas: CPU gas carrier to upload; its ordered names remain CPU metadata.
+        environment: CPU environment carrier to upload.
+        device: Exact, upstream-approved Warp device declaration.
+
+    Returns:
+        One complete active session retaining conversion results by identity.
+
+    Raises:
+        TypeError: If a local device, carrier, or gas-name declaration is
+            invalid.
+        ValueError: If the backend or cross-container CPU schema is invalid.
+        RuntimeError: If optional Warp conversion or session validation requires
+            an unavailable runtime.
+    """
+    (
+        validated_particles,
+        validated_gas,
+        validated_environment,
+        dimensions,
+        gas_names,
+    ) = _preflight_cpu_session(particles, gas, environment, device)
+
+    from particula.gpu.conversion import (
+        to_warp_environment_data,
+        to_warp_gas_data,
+        to_warp_particle_data,
+    )
+
+    warp_particles = to_warp_particle_data(
+        validated_particles,
+        device=device.native,
+    )
+    warp_gas = to_warp_gas_data(validated_gas, device=device.native)
+    warp_environment = to_warp_environment_data(
+        validated_environment,
+        device=device.native,
+    )
+    metadata = ResidentMetadata(device, gas_names)
+    return ResidentSession(
+        warp_particles,
+        warp_gas,
+        warp_environment,
+        dimensions,
+        metadata,
+        ResidentLifecycle.ACTIVE,
+    )

@@ -3,10 +3,12 @@
 import os
 import subprocess
 import sys
+import textwrap
 from dataclasses import FrozenInstanceError
 from pathlib import Path
 from typing import Any, cast
 
+import numpy as np
 import pytest
 
 from particula.execution import Backend, Device
@@ -15,7 +17,10 @@ from particula.execution.gpu_session import (
     ResidentLifecycle,
     ResidentMetadata,
     ResidentSession,
+    setup_resident_session,
 )
+from particula.gas import EnvironmentData, GasData
+from particula.particles import ParticleData
 
 
 def _metadata(species: int = 1) -> ResidentMetadata:
@@ -447,6 +452,7 @@ def test_session_carriers_remain_concrete_only() -> None:
         "ResidentLifecycle",
         "ResidentMetadata",
         "ResidentSession",
+        "setup_resident_session",
     }
     assert names.isdisjoint(execution.__all__)
     assert all(not hasattr(particula, name) for name in names)
@@ -787,3 +793,479 @@ def test_session_schema_validation_never_performs_runtime_work(
             _metadata(),
             ResidentLifecycle.ACTIVE,
         )
+
+
+def _cpu_resources(
+    boxes: int = 1,
+    particle_count: int = 2,
+    species: int = 1,
+) -> tuple[ParticleData, GasData, EnvironmentData]:
+    """Create matching float64 CPU carriers for resident-session setup."""
+    particles = ParticleData(
+        masses=np.ones((boxes, particle_count, species), dtype=np.float64),
+        concentration=np.ones((boxes, particle_count), dtype=np.float64),
+        charge=np.zeros((boxes, particle_count), dtype=np.float64),
+        density=np.ones(species, dtype=np.float64),
+        volume=np.ones(boxes, dtype=np.float64),
+    )
+    gas = GasData(
+        name=[f"species_{index}" for index in range(species)],
+        molar_mass=np.ones(species, dtype=np.float64),
+        concentration=np.ones((boxes, species), dtype=np.float64),
+        partitioning=np.ones(species, dtype=np.bool_),
+    )
+    environment = EnvironmentData(
+        temperature=np.full(boxes, 298.15, dtype=np.float64),
+        pressure=np.full(boxes, 101325.0, dtype=np.float64),
+        saturation_ratio=np.ones((boxes, species), dtype=np.float64),
+    )
+    return particles, gas, environment
+
+
+@pytest.mark.warp
+def test_setup_resident_session_converts_once_and_retains_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test setup performs the sole ordered upload after CPU-only preflight."""
+    particles, gas, environment = _cpu_resources(boxes=2, species=2)
+    before = _snapshot_cpu_resources(particles, gas, environment)
+    warp_particles, warp_gas, warp_environment = _warp_resources(2, 2, 2)
+    from particula.gpu import conversion
+
+    calls: list[tuple[object, str]] = []
+
+    def particle_upload(value: object, *, device: str) -> object:
+        calls.append((value, device))
+        return warp_particles
+
+    def gas_upload(value: object, *, device: str) -> object:
+        calls.append((value, device))
+        return warp_gas
+
+    def environment_upload(value: object, *, device: str) -> object:
+        calls.append((value, device))
+        return warp_environment
+
+    monkeypatch.setattr(conversion, "to_warp_particle_data", particle_upload)
+    monkeypatch.setattr(conversion, "to_warp_gas_data", gas_upload)
+    monkeypatch.setattr(
+        conversion, "to_warp_environment_data", environment_upload
+    )
+
+    session = setup_resident_session(
+        particles,
+        gas,
+        environment,
+        Device(Backend.WARP, "cpu"),
+    )
+
+    assert calls == [(particles, "cpu"), (gas, "cpu"), (environment, "cpu")]
+    assert session.particles is warp_particles
+    assert session.gas is warp_gas
+    assert session.environment is warp_environment
+    assert session.dimensions == ResidentDimensions(2, 2, 2)
+    assert session.metadata.gas_names == tuple(gas.name)
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert not hasattr(warp_gas, "name")
+    assert _snapshot_cpu_resources(particles, gas, environment) == before
+
+
+@pytest.mark.parametrize(
+    ("argument", "error", "message"),
+    [
+        ("device", TypeError, "exact Device"),
+        ("cpu_device", ValueError, "Backend.WARP"),
+        ("particles", TypeError, "ParticleData"),
+        ("gas", TypeError, "GasData"),
+        ("environment", TypeError, "EnvironmentData"),
+    ],
+)
+def test_setup_resident_session_rejects_local_types_before_conversion(
+    argument: str,
+    error: type[Exception],
+    message: str,
+) -> None:
+    """Test local device and carrier failures precede optional conversion."""
+    particles, gas, environment = _cpu_resources()
+    device: object = Device(Backend.WARP, "cpu")
+    if argument == "device":
+        device = object()
+    elif argument == "cpu_device":
+        device = Device(Backend.CPU, "cpu")
+    elif argument == "particles":
+        particles = cast(ParticleData, object())
+    elif argument == "gas":
+        gas = cast(GasData, object())
+    else:
+        environment = cast(EnvironmentData, object())
+
+    with pytest.raises(error, match=message):
+        setup_resident_session(particles, gas, environment, device)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "concentration",
+        "charge",
+        "density",
+        "volume",
+    ],
+)
+def test_setup_resident_session_rejects_particle_shape_before_conversion(
+    field: str,
+) -> None:
+    """Test each cross-container particle schema field is checked locally."""
+    particles, gas, environment = _cpu_resources()
+    wrong_shape = (1,) if field in {"concentration", "charge"} else (2,)
+    setattr(particles, field, np.zeros(wrong_shape, dtype=np.float64))
+    before = _snapshot_cpu_resources(particles, gas, environment)
+
+    with pytest.raises(ValueError, match=f"particles.{field} must have shape"):
+        setup_resident_session(
+            particles,
+            gas,
+            environment,
+            Device(Backend.WARP, "cpu"),
+        )
+
+    assert _snapshot_cpu_resources(particles, gas, environment) == before
+
+
+def _snapshot_cpu_resources(
+    particles: ParticleData,
+    gas: GasData,
+    environment: EnvironmentData,
+) -> tuple[tuple[object, ...], ...]:
+    """Capture CPU carrier arrays and ordered gas names without mutation."""
+    values = (
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        gas.molar_mass,
+        gas.concentration,
+        gas.partitioning,
+        environment.temperature,
+        environment.pressure,
+        environment.saturation_ratio,
+    )
+    return tuple(
+        (id(value), value.shape, tuple(value.flat)) for value in values
+    ) + ((id(gas.name), tuple(gas.name)),)
+
+
+@pytest.mark.parametrize(
+    ("carrier", "field", "wrong_shape", "message"),
+    [
+        ("particles", "masses", (1, 2), "particles.masses must have rank 3"),
+        ("gas", "molar_mass", (2,), "gas.molar_mass must have shape"),
+        ("gas", "partitioning", (2,), "gas.partitioning must have shape"),
+        ("gas", "concentration", (1,), "gas.concentration must have shape"),
+        (
+            "environment",
+            "temperature",
+            (2,),
+            "environment.temperature must have shape",
+        ),
+        (
+            "environment",
+            "pressure",
+            (2,),
+            "environment.pressure must have shape",
+        ),
+        (
+            "environment",
+            "saturation_ratio",
+            (1,),
+            "environment.saturation_ratio must have shape",
+        ),
+    ],
+)
+def test_setup_resident_session_rejects_remaining_cpu_schema_before_upload(
+    carrier: str,
+    field: str,
+    wrong_shape: tuple[int, ...],
+    message: str,
+) -> None:
+    """Test every remaining cross-carrier schema rejection is read-only."""
+    particles, gas, environment = _cpu_resources()
+    target = {
+        "particles": particles,
+        "gas": gas,
+        "environment": environment,
+    }[carrier]
+    setattr(target, field, np.zeros(wrong_shape, dtype=np.float64))
+    before = _snapshot_cpu_resources(particles, gas, environment)
+
+    with pytest.raises(ValueError, match=message):
+        setup_resident_session(
+            particles, gas, environment, Device(Backend.WARP, "cpu")
+        )
+
+    assert _snapshot_cpu_resources(particles, gas, environment) == before
+
+
+@pytest.mark.parametrize(
+    ("names", "error", "message"),
+    [
+        (["species_0", "extra"], ValueError, "gas.name length"),
+        ([object()], TypeError, "exact str instances"),
+    ],
+)
+def test_setup_resident_session_rejects_gas_names_before_upload(
+    names: list[object], error: type[Exception], message: str
+) -> None:
+    """Test invalid CPU gas-name metadata cannot reach conversion helpers."""
+    particles, gas, environment = _cpu_resources()
+    gas.name = names  # type: ignore[assignment]
+    before = _snapshot_cpu_resources(particles, gas, environment)
+
+    with pytest.raises(error, match=message):
+        setup_resident_session(
+            particles, gas, environment, Device(Backend.WARP, "cpu")
+        )
+
+    assert _snapshot_cpu_resources(particles, gas, environment) == before
+
+
+def test_setup_resident_session_rejects_device_subclass_before_upload() -> None:
+    """Test setup requires an exact Device rather than a compatible subclass."""
+
+    class DeviceSubclass(Device):
+        """Provide a distinct Device runtime type for exactness coverage."""
+
+    particles, gas, environment = _cpu_resources()
+    with pytest.raises(TypeError, match="exact Device"):
+        setup_resident_session(
+            particles, gas, environment, DeviceSubclass(Backend.WARP, "cpu")
+        )
+
+
+@pytest.mark.parametrize(
+    ("mutation", "error", "message"),
+    [
+        ("device = object()", "TypeError", "exact Device"),
+        (
+            "device = type('DeviceSubclass', (Device,), {})(Backend.WARP, 'cpu')",
+            "TypeError",
+            "exact Device",
+        ),
+        ("device = Device(Backend.CPU, 'cpu')", "ValueError", "Backend.WARP"),
+        ("particles = object()", "TypeError", "ParticleData"),
+        ("gas = object()", "TypeError", "GasData"),
+        ("environment = object()", "TypeError", "EnvironmentData"),
+        ("particles.masses = np.ones((1, 2))", "ValueError", "rank 3"),
+        (
+            "particles.concentration = np.ones((1,))",
+            "ValueError",
+            "concentration",
+        ),
+        ("particles.charge = np.ones((1,))", "ValueError", "charge"),
+        ("particles.density = np.ones((2,))", "ValueError", "density"),
+        ("particles.volume = np.ones((2,))", "ValueError", "volume"),
+        ("gas.molar_mass = np.ones((2,))", "ValueError", "molar_mass"),
+        (
+            "gas.partitioning = np.ones((2,), dtype=bool)",
+            "ValueError",
+            "partitioning",
+        ),
+        ("gas.concentration = np.ones((1,))", "ValueError", "concentration"),
+        ("gas.name = ['species_0', 'extra']", "ValueError", "name length"),
+        ("gas.name = [object()]", "TypeError", "exact str instances"),
+        (
+            "environment.temperature = np.ones((2,))",
+            "ValueError",
+            "temperature",
+        ),
+        ("environment.pressure = np.ones((2,))", "ValueError", "pressure"),
+        (
+            "environment.saturation_ratio = np.ones((1,))",
+            "ValueError",
+            "saturation_ratio",
+        ),
+    ],
+)
+def test_setup_resident_session_local_preflight_never_imports_gpu_subprocess(
+    mutation: str, error: str, message: str
+) -> None:
+    """Test every local rejection precedes optional GPU and Warp imports."""
+    root = Path(__file__).parents[3]
+    environment = os.environ | {"PYTHONPATH": str(root)}
+    script = f"""
+import builtins
+import numpy as np
+import sys
+from particula.execution import Backend, Device
+from particula.execution.gpu_session import setup_resident_session
+from particula.gas import EnvironmentData, GasData
+from particula.particles import ParticleData
+
+particles = ParticleData(
+    masses=np.ones((1, 2, 1)), concentration=np.ones((1, 2)),
+    charge=np.zeros((1, 2)), density=np.ones((1,)), volume=np.ones((1,)),
+)
+gas = GasData(
+    name=['species_0'], molar_mass=np.ones((1,)),
+    concentration=np.ones((1, 1)), partitioning=np.ones((1,), dtype=bool),
+)
+environment = EnvironmentData(
+    temperature=np.ones((1,)), pressure=np.ones((1,)),
+    saturation_ratio=np.ones((1, 1)),
+)
+device = Device(Backend.WARP, 'cpu')
+{mutation}
+empty = np.array([])
+before = (
+    tuple((id(value), value.shape, tuple(value.flat)) for value in (
+        getattr(particles, 'masses', empty),
+        getattr(particles, 'concentration', empty),
+        getattr(particles, 'charge', empty),
+        getattr(particles, 'density', empty),
+        getattr(particles, 'volume', empty),
+        getattr(gas, 'molar_mass', empty),
+        getattr(gas, 'concentration', empty),
+        getattr(gas, 'partitioning', empty),
+        getattr(environment, 'temperature', empty),
+        getattr(environment, 'pressure', empty),
+        getattr(environment, 'saturation_ratio', empty),
+    )),
+    tuple(getattr(gas, 'name', [])),
+)
+original_import = builtins.__import__
+builtins.__import__ = lambda name, *args, **kwargs: (_ for _ in ()).throw(AssertionError(f'unexpected optional import: {{name}}')) if (name == 'warp' or name.startswith('warp.') or name.startswith('particula.gpu')) else original_import(name, *args, **kwargs)
+try:
+    setup_resident_session(particles, gas, environment, device)
+except {error} as caught:
+    assert {message!r} in str(caught)
+else:
+    raise AssertionError('local preflight unexpectedly succeeded')
+assert not any(name == 'warp' or name.startswith('particula.gpu') for name in sys.modules)
+after = (
+    tuple((id(value), value.shape, tuple(value.flat)) for value in (
+        getattr(particles, 'masses', empty),
+        getattr(particles, 'concentration', empty),
+        getattr(particles, 'charge', empty),
+        getattr(particles, 'density', empty),
+        getattr(particles, 'volume', empty),
+        getattr(gas, 'molar_mass', empty),
+        getattr(gas, 'concentration', empty),
+        getattr(gas, 'partitioning', empty),
+        getattr(environment, 'temperature', empty),
+        getattr(environment, 'pressure', empty),
+        getattr(environment, 'saturation_ratio', empty),
+    )),
+    tuple(getattr(gas, 'name', [])),
+)
+assert after == before
+"""
+    completed = subprocess.run(  # noqa: S603 -- fixed interpreter and script
+        [sys.executable, "-c", textwrap.dedent(script)],
+        cwd=root,
+        capture_output=True,
+        check=False,
+        env=environment,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("failure_index", [0, 1, 2])
+def test_setup_resident_session_propagates_upload_failure_in_order(
+    monkeypatch: pytest.MonkeyPatch, failure_index: int
+) -> None:
+    """Test an upload failure publishes no session or later upload calls."""
+    particles, gas, environment = _cpu_resources()
+    before = _snapshot_cpu_resources(particles, gas, environment)
+    warp_resources = _warp_resources()
+    from particula.gpu import conversion
+
+    calls: list[str] = []
+    sentinel = RuntimeError(f"upload failure {failure_index}")
+
+    def upload(index: int, name: str, result: object) -> Any:
+        """Return one helper that records order and fails at its assigned slot."""
+
+        def helper(value: object, *, device: str) -> object:
+            assert device == "cpu"
+            calls.append(name)
+            if index == failure_index:
+                raise sentinel
+            return result
+
+        return helper
+
+    monkeypatch.setattr(
+        conversion,
+        "to_warp_particle_data",
+        upload(0, "particles", warp_resources[0]),
+    )
+    monkeypatch.setattr(
+        conversion, "to_warp_gas_data", upload(1, "gas", warp_resources[1])
+    )
+    monkeypatch.setattr(
+        conversion,
+        "to_warp_environment_data",
+        upload(2, "environment", warp_resources[2]),
+    )
+
+    with pytest.raises(RuntimeError) as error:
+        setup_resident_session(
+            particles, gas, environment, Device(Backend.WARP, "cpu")
+        )
+
+    assert error.value is sentinel
+    assert calls == ["particles", "gas", "environment"][: failure_index + 1]
+    assert _snapshot_cpu_resources(particles, gas, environment) == before
+
+
+@pytest.mark.warp
+def test_setup_resident_session_propagates_final_schema_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test all uploads complete before invalid data rejects publication."""
+    particles, gas, environment = _cpu_resources()
+    before = _snapshot_cpu_resources(particles, gas, environment)
+    warp_particles, warp_gas, warp_environment = _warp_resources()
+    from particula.gpu import conversion
+
+    calls: list[str] = []
+
+    def record(name: str, result: object) -> Any:
+        """Build an upload stub that records its single invocation."""
+
+        def helper(_: object, *, device: str) -> object:
+            assert device == "cpu"
+            calls.append(name)
+            return result
+
+        return helper
+
+    object.__setattr__(warp_gas, "concentration", object())
+    monkeypatch.setattr(
+        conversion,
+        "to_warp_particle_data",
+        record("particles", warp_particles),
+    )
+    monkeypatch.setattr(
+        conversion,
+        "to_warp_gas_data",
+        record("gas", warp_gas),
+    )
+    monkeypatch.setattr(
+        conversion,
+        "to_warp_environment_data",
+        record("environment", warp_environment),
+    )
+
+    with pytest.raises(
+        ValueError, match="gas.concentration must be a Warp array"
+    ):
+        setup_resident_session(
+            particles, gas, environment, Device(Backend.WARP, "cpu")
+        )
+
+    assert calls == ["particles", "gas", "environment"]
+    assert _snapshot_cpu_resources(particles, gas, environment) == before
