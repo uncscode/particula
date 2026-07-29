@@ -14,6 +14,16 @@
 - [x] P2 publishes only a complete validated `ACTIVE` session, retains converted
   containers by identity, and preserves ordered CPU gas names in metadata
   (issue #1485).
+- [x] P4 provides direct-import-only identity-token timestep bookkeeping for one
+  exact active session/registry binding; only matching completion advances
+  guard-owned count/time state (issue #1487).
+- [x] P4 rejects nested/mismatched lifecycle operations and uses
+  `assert_step_closed()` as the explicit future-boundary gate without adapter
+  execution, transfer, synchronization, allocation, resize, restore, or
+  fallback (issue #1487).
+- [x] P4's metadata-only `validate_pinned_session()` rejects session/lifecycle/
+  primary identity drift without acquiring or mutating registry resources
+  (issue #1487).
 - [ ] A session owns same-device fixed-shape Warp particle, gas, and environment
   state plus validated reusable process resources.
 - [ ] Container, array, and supplied sidecar identities and shapes remain stable

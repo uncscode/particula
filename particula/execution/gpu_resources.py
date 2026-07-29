@@ -10,6 +10,11 @@ from :mod:`particula.execution`.
 The registry retains array identities and performs metadata-only schema and
 nonaliasing checks. It does not establish allocator provenance, execute a
 kernel, or change session lifecycle or random-number-generator policy.
+``validate_pinned_session`` is the narrow direct-module-only integration seam
+for resident timestep guards. It requires the exact retained session, then
+revalidates its active lifecycle, pinned container and primary-array identities,
+and schema metadata without inspecting payloads, acquiring sidecars, allocating,
+transferring, or synchronizing.
 """
 
 from __future__ import annotations
@@ -218,7 +223,9 @@ class GPUResourceRegistry:
 
     Publication pins caller- or registry-allocated Warp objects by role. This
     validates identity and nonaliasing, not unverifiable allocator provenance.
-    No payload is read, copied, synchronized, or mutated by acquisition.
+    No payload is read, copied, synchronized, or mutated by acquisition. Its
+    concrete-only :meth:`validate_pinned_session` seam lets lifecycle guards
+    verify the exact active binding without resource acquisition or execution.
     """
 
     def __init__(self, session: ResidentSession) -> None:
@@ -279,14 +286,21 @@ class GPUResourceRegistry:
         self._session.__post_init__()
 
     def validate_pinned_session(self, session: ResidentSession) -> None:
-        """Validate an exact pinned session without acquiring resources.
+        """Validate the exact active pinned session without acquiring resources.
+
+        This direct-module-only guard seam first requires ``session is`` the
+        registry's retained session. It then performs the existing metadata-only
+        active-lifecycle, container identity, primary-array identity, and schema
+        validation. It does not inspect payloads, acquire sidecars, allocate,
+        transfer, synchronize, execute, or mutate registry bindings or views.
 
         Args:
             session: The exact resident session retained at registry creation.
 
         Raises:
-            ValueError: If the supplied session is not the pinned session or its
-                lifecycle, schema, or protected identity signature changed.
+            ValueError: If ``session`` is not the retained object or its active
+                lifecycle, schema, protected container identity, or primary
+                array identity signature changed.
         """
         if session is not self._session:
             raise ValueError("session must be the pinned ResidentSession.")

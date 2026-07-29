@@ -165,5 +165,7 @@ unwind.
 
 ## Notes
 
-This ADR complements ADR-003 and supersedes none. P4 owns lifecycle operations
-and transition guards; P5/P6 own finalization and failure/close behavior.
+This ADR complements ADR-003 and supersedes none. P4 bookkeeping and its
+closed-step gate are defined by
+[ADR-006: Resident GPU Step Lifecycle Guard](ADR-006-resident-gpu-step-lifecycle-guard.md);
+P5/P6 own finalization and failure/close behavior.

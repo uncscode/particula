@@ -44,7 +44,8 @@ CPU ParticleData + GasData + EnvironmentData + ordered metadata
   `WarpGasData`, and `WarpEnvironmentData`; no container schema changes are
   required.
 - **Metadata:** Retain ordered gas names, backend/device identity, shape tuple,
-  simulation step/time counters, schema version, and process-resource manifest.
+  schema version, and process-resource manifest. P4 step/time counters are
+  mutable `ResidentStepGuard` state, not fields on immutable `ResidentSession`.
   GPU-only derived fields and mutable sidecars are represented explicitly rather
   than silently dropped by CPU `GasData` restore.
 - **Setup API:** Accept CPU containers plus E7-F1 context and E7-F6-validated
@@ -55,9 +56,13 @@ CPU ParticleData + GasData + EnvironmentData + ordered metadata
   caller-supplied arrays. Registry keys are typed/internal; concrete kernel
   records remain in their owner modules. Process adapters receive only their
   required view.
-- **Lifecycle API:** `begin_step()`/`complete_step()` maintain counters and
-  reject re-entry but do not schedule processes. `checkpoint()` is nonterminal;
-  `finalize()` is terminal. Both are explicit synchronization/restore boundaries.
+- **Lifecycle API:** Concrete-only `ResidentStepGuard.begin_step()` returns one
+  opaque identity token for an exact active session/registry binding;
+  `complete_step()` advances count/time only for that same token. It neither
+  schedules nor invokes processes. `assert_step_closed()` is the required
+  preflight gate for future checkpoint/finalize/close/conversion/resize/rebind/
+  fault boundaries; it has no transfer, synchronization, allocation, or global
+  interception behavior. P5/P6 own those boundaries and their policy.
 - **Restart:** Reconstruct CPU containers and upload into a fresh session.
   E7-F4 preserves opaque mutable RNG/resource state; E7-F8 defines stream
   semantics and exact stochastic restart guarantees.
@@ -103,6 +108,24 @@ shared-device gate; errors propagate with no partial-session publication. P2
 does not query availability, select or normalize devices, use fallback,
 synchronize, restore, create sidecars, or add exports. Availability approval is
 E7-F6's explicit upstream responsibility.
+
+## P4 Implementation
+
+Issue #1487 (commit `61f101de1`) added `ResidentStepGuard` and
+`ResidentStepToken` in `particula/execution/gpu_session.py`. The frozen token
+uses identity equality and guard-private origin/duration fields, so only the
+single outstanding token can complete its originating guard. Duration accepts
+finite nonnegative non-boolean `Real` values without coercion; zero-duration
+cycles are valid. Binding validation occurs before token publication or metadata
+updates, preserving guard state on invalid duration, inactive/drifted binding,
+nested begin, and mismatched/repeated completion.
+
+The same change added direct-module-only
+`GPUResourceRegistry.validate_pinned_session(session)`. It first checks
+`session is self._session` and then calls the existing pinned-signature
+validation path, retaining its ACTIVE lifecycle, primary-identity, and schema
+checks without allocating resources or examining payloads. The guard and token
+remain absent from `particula.execution`, adapter exports, and top-level exports.
 
 ## Failure and Atomicity
 

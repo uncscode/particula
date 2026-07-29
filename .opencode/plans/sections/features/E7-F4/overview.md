@@ -53,3 +53,14 @@ It converts particles, gas, and environment once, in that order, retains ordered
 CPU gas names in `ResidentMetadata`, and publishes one validated `ACTIVE`
 session. It adds no exports, fallback, synchronization, restore, or sidecars.
 Native-device availability remains an explicit E7-F6 upstream precondition.
+
+P4 was implemented in issue #1487 (commit `61f101de1`). Concrete-only
+`ResidentStepGuard` and frozen identity-only `ResidentStepToken` now provide
+one-open-step bookkeeping for one exact active `ResidentSession` and
+`GPUResourceRegistry` binding. `GPUResourceRegistry.validate_pinned_session()`
+validates that exact pinned session through the existing active signature/schema
+checks without resource acquisition. Matching completion alone advances the
+guard's completed-step count and simulated time; the guard neither dispatches
+adapters nor transfers, synchronizes, allocates, resizes, restores, or falls
+back. Its `assert_step_closed()` gate is the required preflight for future P5/P6
+lifecycle boundaries, while P5/P6 retain checkpoint/finalize/close/fault policy.

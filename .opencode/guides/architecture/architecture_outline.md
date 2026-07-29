@@ -74,8 +74,9 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
    fault, conversion, and resize/rebind boundaries must call
    `assert_step_closed()` before their own work; P5/P6 retain those operations
    and policy. Raw low-level helper calls are not globally intercepted. See
-  [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md) and
-   [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md).
+   [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md),
+   [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md), and
+   [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md).
 - `gpu_resources.py` - Direct-import-only, Warp-dependent concrete registry for
   complete reusable native process sidecars. Each registry accepts exactly one
   exact `ACTIVE` `ResidentSession`, pins its lifecycle, dimensions, device, and

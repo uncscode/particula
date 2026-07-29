@@ -178,4 +178,6 @@ persistent resource, lifecycle transition, or data migration is introduced.
 
 ## Notes
 
-This ADR extends ADR-004's resident-session boundary and supersedes none.
+This ADR extends ADR-004's resident-session boundary and supersedes none. Its
+completed active session is the P4 guard input defined by
+[ADR-006: Resident GPU Step Lifecycle Guard](ADR-006-resident-gpu-step-lifecycle-guard.md).

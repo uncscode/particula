@@ -54,6 +54,23 @@ the behavior or signatures of shipped direct process kernels.
 - E7-F6 device availability is not probed or emulated: selected native-device
   availability remains an upstream precondition.
 
+## Implemented in P4 (Issue #1487)
+
+- `particula/execution/gpu_session.py` defines direct-import-only
+  `ResidentStepGuard` and frozen, identity-equality `ResidentStepToken`.
+  The guard retains one exact session/registry pair, permits one outstanding
+  token, and updates completed-step/time bookkeeping only after matching token
+  completion.
+- `GPUResourceRegistry.validate_pinned_session()` is the metadata-only binding
+  seam: it first requires the exact retained session and then reuses the
+  registry's active signature/schema validation. It does not acquire sidecars,
+  allocate, inspect payloads, or mutate registry state.
+- `assert_step_closed()` rejects future guarded checkpoint, finalize, close,
+  conversion/restore, resize/rebind, and fault entries while a token is open.
+  It does not globally intercept raw low-level helpers. P4 adds no adapter
+  ordering/execution, synchronization, conversion, restore, resizing, or CPU
+  fallback.
+
 ## Out of Scope
 
 - Process ordering, environment evolution, or derived thermodynamic refresh

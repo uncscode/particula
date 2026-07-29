@@ -569,8 +569,16 @@ class ResidentSession:
 class ResidentStepToken:
     """Retain one guard-owned timestep identity and validated duration.
 
+    A token is opaque to scheduler callers. ``complete_step`` accepts only the
+    exact outstanding token by identity. Its private origin and duration fields
+    are guard bookkeeping, not a process-execution interface.
     This concrete-only token does not execute work, transfer data, synchronize,
     allocate resources, or provide a fallback.
+
+    Attributes:
+        _guard: Guard that created this token.
+        _duration: Validated nonnegative finite duration retained without
+            coercion.
     """
 
     _guard: object
@@ -580,17 +588,37 @@ class ResidentStepToken:
 class ResidentStepGuard:
     """Track one open timestep for one pinned active resident session.
 
-    The guard is concrete-only scheduler bookkeeping. It does not execute
-    adapters, transfer or restore data, synchronize Warp, acquire sidecars,
-    resize resident state, evolve the environment, or provide a CPU fallback.
-    Future checkpoint, finalize, close, conversion, resize, rebind, and fault
-    boundaries must call :meth:`assert_step_closed` before their own work.
+    The guard retains one exact :class:`ResidentSession` and
+    :class:`GPUResourceRegistry` binding by identity. A successful
+    :meth:`begin_step` creates the sole open token; only successful matching
+    :meth:`complete_step` advances completed-step and simulated-time metadata.
+
+    This concrete-only scheduler bookkeeping does not execute adapters,
+    transfer or restore data, synchronize Warp, acquire sidecars, resize
+    resident state, evolve the environment, or provide a CPU fallback. Future
+    checkpoint, finalize, close, conversion, resize, rebind, and fault
+    boundaries must call :meth:`assert_step_closed` before their own work. The
+    gate does not intercept callers that bypass those lifecycle boundaries with
+    raw low-level helpers.
     """
 
     def __init__(
         self, session: ResidentSession, registry: "GPUResourceRegistry"
     ) -> None:
-        """Create a closed guard for one exact session and registry binding."""
+        """Create a closed guard for one exact active session-registry binding.
+
+        Construction validates the pinned binding without acquiring sidecars or
+        executing, transferring, synchronizing, or mutating resident state.
+
+        Args:
+            session: Exact active resident session retained by ``registry``.
+            registry: Exact resource registry pinned to ``session``.
+
+        Raises:
+            TypeError: If either argument is not its exact concrete type.
+            ValueError: If the registry does not retain ``session`` or its
+                active metadata-only signature is invalid.
+        """
         from particula.execution.gpu_resources import GPUResourceRegistry
 
         if type(session) is not ResidentSession:
@@ -609,17 +637,37 @@ class ResidentStepGuard:
 
     @property
     def completed_steps(self) -> int:
-        """Return the number of successfully completed guarded timesteps."""
+        """Return the number of successfully completed guarded timesteps.
+
+        Returns:
+            Count advanced only after successful matching completion.
+        """
         return self._completed_steps
 
     @property
     def simulated_time(self) -> Real:
-        """Return the sum of successfully completed timestep durations."""
+        """Return the sum of successfully completed timestep durations.
+
+        Returns:
+            Uncoerced-real sum advanced only after successful matching
+            completion.
+        """
         return cast(Real, self._simulated_time)
 
     @staticmethod
     def _validate_duration(duration: object) -> Any:
-        """Validate one nonnegative finite real duration without coercion."""
+        """Validate one nonnegative finite real duration without coercion.
+
+        Args:
+            duration: Candidate timestep duration.
+
+        Returns:
+            The validated duration unchanged.
+
+        Raises:
+            TypeError: If the duration is boolean or not a real number.
+            ValueError: If the duration is negative or non-finite.
+        """
         if isinstance(duration, bool) or not isinstance(duration, Real):
             raise TypeError("duration must be a non-boolean real.")
         if not _isfinite_real(duration) or duration < 0:
@@ -627,7 +675,25 @@ class ResidentStepGuard:
         return duration
 
     def begin_step(self, duration: object) -> ResidentStepToken:
-        """Open and return the sole token for a validated timestep duration."""
+        """Open and return the sole token for a validated timestep duration.
+
+        The guard validates duration before its pinned active session-registry
+        binding. It performs bookkeeping only; callers execute any process work
+        outside this method and must complete the returned exact token only
+        after that work succeeds.
+
+        Args:
+            duration: Nonnegative finite real timestep duration.
+
+        Returns:
+            The new opaque token for the sole open timestep.
+
+        Raises:
+            TypeError: If ``duration`` is boolean or not a real number.
+            ValueError: If ``duration`` is invalid or the pinned session binding
+                is no longer valid and active.
+            RuntimeError: If another timestep is already open.
+        """
         validated_duration = self._validate_duration(duration)
         self._registry.validate_pinned_session(self._session)
         if self._open_token is not None:
@@ -637,7 +703,21 @@ class ResidentStepGuard:
         return token
 
     def complete_step(self, token: ResidentStepToken) -> None:
-        """Complete the exact outstanding token and advance bookkeeping."""
+        """Complete the exact outstanding token and advance bookkeeping.
+
+        Completed-step count and simulated time change only after the current
+        pinned binding validates and ``token`` is the exact open token. This
+        method executes no adapter and supplies no failure recovery or rollback
+        for external process work.
+
+        Args:
+            token: Exact opaque token returned by this guard's open step.
+
+        Raises:
+            ValueError: If the pinned session binding is invalid or ``token``
+                does not match the open token by identity.
+            RuntimeError: If no timestep is open.
+        """
         self._registry.validate_pinned_session(self._session)
         if self._open_token is None:
             raise RuntimeError("No resident timestep is open.")
@@ -648,7 +728,16 @@ class ResidentStepGuard:
         self._open_token = None
 
     def assert_step_closed(self) -> None:
-        """Reject lifecycle operations while a guarded timestep remains open."""
+        """Reject a lifecycle boundary while a guarded timestep remains open.
+
+        Future checkpoint, finalize, close, conversion, resize, rebind, and
+        fault boundaries must call this side-effect-free gate before their own
+        transfer, synchronization, mutation, or state transition. It does not
+        globally intercept direct raw helper calls.
+
+        Raises:
+            RuntimeError: If this guard has an outstanding timestep token.
+        """
         if self._open_token is not None:
             raise RuntimeError("A resident timestep is open.")
 

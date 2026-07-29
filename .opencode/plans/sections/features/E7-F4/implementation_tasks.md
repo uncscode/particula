@@ -15,11 +15,15 @@
   issue #1485).
 - [x] Preserve ordered CPU gas names outside `WarpGasData` in validated
   `ResidentMetadata` (P2, issue #1485).
-- [ ] Add scheduler-facing step entry/exit guards without process ordering,
-  synchronization, transfer, or fallback.
-- [ ] Track step/time metadata only after successful step completion.
-- [ ] Add active, faulted, finalized, and closed guards with deterministic
-  exception types supplied by E7-F6.
+- [x] Add concrete-only scheduler-facing `ResidentStepGuard`/
+  `ResidentStepToken` entry/exit guards without process ordering,
+  synchronization, transfer, allocation, or fallback (P4, issue #1487).
+- [x] Track guard-owned step/time metadata only after matching successful token
+  completion (P4, issue #1487).
+- [x] Validate the exact active registry/session binding before begin and
+  completion through `GPUResourceRegistry.validate_pinned_session()`; terminal
+  lifecycle states and identity drift reject without guard mutation (P4,
+  issue #1487).
 
 ## Resource Registry
 
@@ -53,7 +57,11 @@
 
 - [x] Add P2 setup preflight, conversion-spy, identity, and failure coverage to
   `particula/execution/tests/gpu_session_test.py` (issue #1485). Availability
-  rejection remains pending the E7-F6 public seam.
+   rejection remains pending the E7-F6 public seam.
+- [x] Add P4 session-guard, closed-step-gate, no-transfer/no-allocation, and
+  pinned-session validation regression coverage in
+  `particula/execution/tests/gpu_session_test.py` and
+  `particula/execution/tests/gpu_resources_test.py` (issue #1487).
 - [ ] Add `particula/execution/tests/gpu_resources_test.py` for the complete
   sidecar shape/dtype/device/alias matrix.
 - [ ] Add `particula/execution/tests/checkpoint_test.py` for synchronized

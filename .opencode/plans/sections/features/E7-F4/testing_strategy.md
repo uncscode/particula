@@ -29,10 +29,19 @@ deterministic baseline; CUDA rows are optional and skip cleanly.
   `particula/execution/tests/gpu_resources_test.py`. Assert same-device
   ownership, exact identity across repeated acquisition, duplicate/unknown key
   rejection, prohibited aliases, and no broad concrete-record exports.
-- **P4:** Run multiple empty scheduler-facing lifecycle cycles and process
-  adapter stubs while a generalized conversion guard proves zero
-  `from_warp_*` calls and zero session-level synchronization. Assert dimensions,
-  container identities, and resource identities remain stable.
+- **P4 (implemented in issue #1487):**
+  `particula/execution/tests/gpu_session_test.py` covers zero, float, and
+  `Rational` step cycles; opaque token identity/frozen mutation; invalid
+  duration; nested, missing, fabricated, cross-guard, mismatched, and repeated
+  completion; terminal lifecycle and primary-identity drift; and
+  `assert_step_closed()` future-boundary stubs. It also proves external adapter
+  failure leaves the token open and counters unchanged. Conversion, restore,
+  synchronization, upload, and allocation spies establish that guard paths do
+  none of those operations.
+  `particula/execution/tests/gpu_resources_test.py` covers
+  `validate_pinned_session()` for the exact session, distinct sessions,
+  fabricated terminal states, and primary/container drift, including unchanged
+  bindings/views and no allocation or mutation.
 - **P5:** In `particula/execution/tests/checkpoint_test.py`, assert one explicit
   sync and three `sync=False` restores, ordered-name retention, gas
   vapor-pressure lossiness is represented in metadata/resources, active state
@@ -67,6 +76,7 @@ deterministic baseline; CUDA rows are optional and skip cleanly.
 ```bash
 pytest particula/execution/tests/gpu_session_test.py -q -Werror
 pytest particula/execution/tests/gpu_resources_test.py -q -Werror
+pytest particula/execution/tests/gpu_session_test.py particula/execution/tests/gpu_resources_test.py --cov=particula.execution.gpu_session --cov=particula.execution.gpu_resources --cov-report=term-missing --cov-fail-under=80 -q -Werror
 pytest particula/execution/tests/checkpoint_test.py -q -Werror
 pytest particula/gpu/tests/process_sequence_test.py -q -Werror
 pytest particula/gpu/tests/kernel_exports_test.py -q -Werror

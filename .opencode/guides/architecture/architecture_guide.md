@@ -62,8 +62,24 @@
   finalize, close, migration, fallback, or execution operation; P4 and later
   phases own those semantics. Existing direct GPU kernels and adapter-local
   physical validation remain authoritative. See
-  [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md) and
-  [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md).
+   [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md) and
+   [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md).
+- P4 adds direct-import-only `ResidentStepGuard` and identity-only,
+  frozen `ResidentStepToken` beside the immutable P1 carrier. One exact active
+  `ResidentSession`/`GPUResourceRegistry` binding permits one open token only;
+  completed-step count and simulated time advance only after matching token
+  completion. The guard does not execute adapters, transfer or restore state,
+  synchronize, acquire or allocate sidecars, resize, evolve the environment, or
+  fall back. An adapter failure remains outside the guard and leaves its token
+  and bookkeeping unchanged.
+- `GPUResourceRegistry.validate_pinned_session()` is the direct-module-only P4
+  binding seam: it requires exact retained-session identity and reuses active
+  lifecycle, pinned-signature, and schema validation without payload inspection,
+  sidecar acquisition, allocation, or mutation. Future checkpoint, restore,
+  finalize, close, fault, conversion, resize, and rebind boundaries must call
+  `assert_step_closed()` before their own work; P5/P6 retain those operations
+  and their policy. The gate does not globally intercept raw low-level helpers.
+  See [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md).
 
 ## Concrete Condensation Execution Boundary
 

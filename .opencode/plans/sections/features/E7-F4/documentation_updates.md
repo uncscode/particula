@@ -36,3 +36,13 @@ structured plan sections. No user-facing documentation, example, export, or
 lifecycle API was added: `setup_resident_session()` remains concrete-only and
 direct-import-only. P7 remains responsible for broader documentation after the
 remaining lifecycle surface exists.
+
+## P4 Status
+
+Issue #1487 updated the concrete `gpu_session`/resource-registry contract and
+the architecture references only. The updates document direct-import-only
+`ResidentStepGuard`/`ResidentStepToken`, identity-token completion, the
+metadata-only `validate_pinned_session()` seam, and the required
+`assert_step_closed()` hook for future P5/P6 lifecycle boundaries. No public
+API, user example, checkpoint/restore implementation, or broad documentation
+surface was added.
