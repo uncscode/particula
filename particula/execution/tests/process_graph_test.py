@@ -5,6 +5,7 @@ import subprocess
 import sys
 from dataclasses import FrozenInstanceError
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -243,8 +244,14 @@ def test_every_catalogue_node_resolves_only_with_exact_declaration() -> None:
     [
         (lambda: DependencyEdge("Bad", "good"), "before_id"),
         (lambda: DependencyEdge("same", "same"), "endpoints must differ"),
-        (lambda: TimestepPlan([], ()), "nodes must be a tuple"),
-        (lambda: TimestepPlan((), []), "dependencies must be a tuple"),
+        (
+            lambda: TimestepPlan(cast(Any, []), ()),
+            "nodes must be a tuple",
+        ),
+        (
+            lambda: TimestepPlan((), cast(Any, [])),
+            "dependencies must be a tuple",
+        ),
         (
             lambda: ProcessNode(
                 "x",

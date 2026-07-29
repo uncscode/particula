@@ -418,7 +418,7 @@ def _raise_for_cycle(
     edges: tuple[DependencyEdge, ...],
 ) -> None:
     """Raise an error when normalized declarations contain a cycle."""
-    adjacent = {node.node_id: [] for node in nodes}
+    adjacent: dict[str, list[str]] = {node.node_id: [] for node in nodes}
     for edge in edges:
         adjacent[edge.before_id].append(edge.after_id)
     visited: set[str] = set()
