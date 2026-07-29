@@ -14,36 +14,31 @@
   - Resolved by: plan-question-resolver
 
 - [x] What is the minimum versioned checkpoint payload?
-  - Resolved 2026-07-27: Store the schema version, process-boundary step/time,
-    authoritative particle, gas, and environment state, ordered CPU semantic
-    metadata, stable box-to-row identities, persistent per-process RNG state,
-    and configuration/capability identity; reconstruct scratch and derived
-    thermodynamic buffers.
-  - Rationale: Those fields are the minimum authoritative state needed to
-    resume the same logical boxes and stochastic streams, while vapor pressure
-    and scratch remain derived or replaceable implementation state.
+  - Resolved 2026-07-29: Store schema version plus immutable canonical bytes for
+    every primary resident array, including GPU vapor pressure, and all acquired
+    sidecars. Detached CPU inspection carriers and ordered gas-name metadata are
+    included for inspection only; they are not restart authority.
+  - Rationale: Inspection carriers are intentionally lossy, so exact same-device
+    restart reconstructs fresh resident state from canonical bytes rather than a
+    CPU restore. Acquired sidecars are checkpoint payload, not reconstructed
+    scratch state.
   - Evidence:
-    - `particula/gpu/conversion.py:422` - checkpoint restoration covers all
-      authoritative particle fields.
-    - `particula/gpu/conversion.py:468` - gas restoration requires caller-owned
-      ordered names and intentionally drops GPU-only vapor pressure.
-    - `particula/gpu/conversion.py:584` - environment restoration preserves
-      temperature, pressure, and saturation ratio.
-    - `docs/Features/Roadmap/data-oriented-gpu.md:1592` - persistent per-box RNG
-      streams are required resident execution state.
+    - `particula.execution.checkpoint` preserves canonical payload descriptors
+      and bytes for primary arrays and acquired sidecars.
+    - `docs/Features/gpu_resident_checkpoints.md` documents lossy inspection and
+      canonical-byte restart authority.
   - Resolved by: plan-question-resolver
 
 - [x] Where should explicit CPU fallback occur?
-  - Resolved 2026-07-27: Select CPU before GPU upload, or transition only after
-    a caller-requested synchronized checkpoint/finalize restores complete CPU
-    state; never fall back inside an adapter or scheduler step.
-  - Rationale: This keeps every transfer visible and prevents retrying from
-    partially mutated resident state.
+  - Resolved 2026-07-29: No complete CPU fallback or restore is implemented at
+    the resident checkpoint boundary. Restart is explicit, same-device only, and
+    reconstructs fresh resident state from canonical checkpoint bytes.
+  - Rationale: Detached CPU inspection carriers are lossy and cannot serve as a
+    complete restore source. The boundary never selects a device, migrates state,
+    or falls back inside an adapter or scheduler step.
   - Evidence:
-    - `docs/Features/Roadmap/data-oriented-gpu.md:1494` - missing GPU processes
-      require explicit fallback boundaries and no silent movement.
-    - `docs/Features/Roadmap/data-oriented-gpu.md:1535` - CPU transfers are
-      limited to named observation and final-result boundaries.
+    - `docs/Features/gpu_resident_checkpoints.md` documents no CPU fallback or
+      migration and exact-device restart.
   - Resolved by: plan-question-resolver
 
 - [x] Which transport map representation best preserves fixed-shape and

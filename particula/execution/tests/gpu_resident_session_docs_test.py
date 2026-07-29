@@ -85,13 +85,40 @@ def test_missing_warp_skips_fixture(
     monkeypatch.setattr(
         example_module.importlib,
         "import_module",
-        lambda name: (_ for _ in ()).throw(ImportError(name)),
+        lambda name: (_ for _ in ()).throw(ModuleNotFoundError(name=name)),
     )
     monkeypatch.setattr(
         example_module, "_build_cpu_state", lambda: pytest.fail("fixture")
     )
 
     assert example_module.run_example().output == _DISABLED
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        ImportError("Warp extension failed to load"),
+        ModuleNotFoundError(name="warp_transitive_dependency"),
+    ],
+)
+def test_broken_enabled_warp_import_propagates(
+    example_module: Any, monkeypatch: pytest.MonkeyPatch, error: ImportError
+) -> None:
+    """Only a missing top-level Warp module is treated as disabled."""
+    monkeypatch.delenv("PARTICULA_EXAMPLE_FORCE_NO_WARP", raising=False)
+    monkeypatch.setattr(
+        example_module.importlib,
+        "import_module",
+        lambda name: (_ for _ in ()).throw(error),
+    )
+    monkeypatch.setattr(
+        example_module, "_build_cpu_state", lambda: pytest.fail("fixture")
+    )
+
+    with pytest.raises(type(error)) as raised:
+        example_module.run_example()
+
+    assert raised.value is error
 
 
 def test_forced_disabled_script_has_exact_stdout() -> None:
@@ -190,6 +217,15 @@ def test_lifecycle_documentation_preserves_published_boundaries() -> None:
     checkpoint = (
         _ROOT / "docs" / "Features" / "gpu_resident_checkpoints.md"
     ).read_text()
+    open_questions = (
+        _ROOT
+        / ".opencode"
+        / "plans"
+        / "sections"
+        / "epics"
+        / "E7"
+        / "open_questions.md"
+    ).read_text()
     roadmap = (
         _ROOT / "docs" / "Features" / "Roadmap" / "data-oriented-gpu.md"
     ).read_text()
@@ -197,7 +233,9 @@ def test_lifecycle_documentation_preserves_published_boundaries() -> None:
         _ROOT / ".opencode" / "guides" / "architecture_reference.md"
     ).read_text()
     agents = (_ROOT / "AGENTS.md").read_text()
-    combined = "\n".join((feature, checkpoint, roadmap, architecture, agents))
+    combined = "\n".join(
+        (feature, checkpoint, roadmap, architecture, agents, open_questions)
+    )
     for phrase in (
         "particula.execution.gpu_session",
         "particula.execution.gpu_resources",
@@ -210,6 +248,11 @@ def test_lifecycle_documentation_preserves_published_boundaries() -> None:
         "E7-F7",
         "E7-F8",
         "gpu_resident_session.py",
+        "source session",
+        "ACTIVE`, restartable checkpoint",
+        "acquired sidecars",
+        "lossy",
+        "No complete CPU fallback or restore is implemented",
     ):
         assert phrase in combined
     assert "defers E7-F4 resident sessions" not in roadmap
@@ -252,7 +295,8 @@ def test_real_warp_cpu_lifecycle_example() -> None:
     assert all(
         phrase in result.output
         for phrase in (
-            "Checkpoint is nonterminal; finalization is terminal and cached.",
+            "Finalization terminalizes its source; returned checkpoint is ACTIVE "
+            "and cached.",
             "Restart is explicit, same-device, and never automatic.",
             "Inspection is lossy; canonical checkpoint bytes are restart authority.",
             "Checkpoint schema version 1 compatibility is exact and fail-closed.",

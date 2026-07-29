@@ -52,7 +52,9 @@ def _warp_enabled() -> bool:
     """Return whether the optional Warp runtime is enabled and importable.
 
     A force-disable environment variable short-circuits before the Warp probe.
-    A missing Warp installation is treated as an unavailable optional runtime.
+    Only a missing top-level Warp installation is treated as an unavailable
+    optional runtime. Broken enabled imports propagate to make their failure
+    visible.
 
     Returns:
         ``True`` when Warp is enabled and imports successfully; otherwise,
@@ -62,15 +64,18 @@ def _warp_enabled() -> bool:
         return False
     try:
         importlib.import_module("warp")
-    except ImportError:
-        return False
+    except ModuleNotFoundError as error:
+        if error.name == "warp":
+            return False
+        raise
     return True
 
 
 def _load_enabled_runtime() -> SimpleNamespace:
     """Load the enabled-only Warp and concrete resident-session modules.
 
-    The import order keeps ``particula.gpu`` out of this lifecycle-only flow.
+    This example does not directly import ``particula.gpu``. Its concrete
+    ``gpu_resources`` dependency may import that package transitively.
 
     Returns:
         Namespace containing Warp plus the resident-session types and helpers.
@@ -190,7 +195,8 @@ def run_example(device: str = "cpu") -> ExampleRun:
     return ExampleRun(
         output=[
             "Canonical path: docs/Examples/gpu_resident_session.py",
-            "Checkpoint is nonterminal; finalization is terminal and cached.",
+            "Finalization terminalizes its source; returned checkpoint is ACTIVE "
+            "and cached.",
             "Restart is explicit, same-device, and never automatic.",
             "Inspection is lossy; canonical checkpoint bytes are restart authority.",
             "Checkpoint schema version 1 compatibility is exact and fail-closed.",

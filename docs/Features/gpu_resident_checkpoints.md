@@ -30,9 +30,11 @@ resident-array identities.
 Restart compatibility is intentionally exact and fail-closed. The implementation
 accepts only `ResidentCheckpoint` records with schema version `1`, carrier type
 `"ResidentSession"`, lifecycle `ACTIVE`, complete valid canonical payload
-descriptors, and an exactly equal target `Device`. It rejects other versions or
-carrier schemas, malformed or incomplete payloads, terminal checkpoints, and
-device mismatches; it does not promise forward or backward compatibility.
+descriptors, and an exactly equal target `Device`. Finalization terminalizes its
+source session but returns an `ACTIVE`, restartable checkpoint record. Restart
+rejects other versions or carrier schemas, malformed or incomplete payloads,
+non-`ACTIVE` checkpoint records, and device mismatches; it does not promise
+forward or backward compatibility.
 
 For a lazy lifecycle-only walkthrough that does not schedule or launch physics,
 see the

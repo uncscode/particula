@@ -207,11 +207,12 @@ failure can release its token and leave an ACTIVE session reusable; a possible
 post-launch writer failure can fault the session without rollback. Close and
 discard do not checkpoint, synchronize, restore, or mutate resident payloads.
 
-A normal checkpoint is fresh and nonterminal; finalization is terminal. A
-checkpoint owns immutable in-memory canonical bytes for primary arrays and
-acquired sidecars, plus detached CPU inspection carriers. Inspection `GasData`
-is lossy: it cannot recreate GPU vapor pressure or per-box partitioning.
-Canonical bytes, rather than inspection carriers, are restart authority.
+A normal checkpoint is fresh and nonterminal; finalization terminalizes its
+source session while returning an `ACTIVE`, restartable checkpoint. A checkpoint
+owns immutable in-memory canonical bytes for primary arrays and acquired
+sidecars, plus detached CPU inspection carriers. Inspection `GasData` is lossy:
+it cannot recreate GPU vapor pressure or per-box partitioning. Canonical bytes,
+rather than inspection carriers, are restart authority.
 Snapshotting performs one synchronization and three `sync=False` inspection
 restores, and needs roughly one additional host copy of resident payload bytes
 as well as detached inspection copies. The first successful finalization caches
@@ -221,8 +222,8 @@ The implemented compatibility boundary is exact and fail-closed: restart accepts
 only a `ResidentCheckpoint` with schema version `1`, carrier type
 `"ResidentSession"`, lifecycle `ACTIVE`, complete valid payload descriptors and
 payloads, and an exactly equal target `Device`. Other versions or carrier
-schemas, malformed or incomplete records, terminal checkpoints, and device
-mismatches are rejected. Restart is explicit, never automatic, and creates
+schemas, malformed or incomplete records, non-`ACTIVE` checkpoint records, and
+device mismatches are rejected. Restart is explicit, never automatic, and creates
 fresh session, registry, guard, containers, primary arrays, and sidecars. It
 does not select or migrate a device, provide fallback, or guarantee rollback
 after an asynchronous writer launches. See

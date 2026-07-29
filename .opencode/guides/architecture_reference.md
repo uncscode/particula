@@ -92,8 +92,10 @@ writer launches. See
 Restart compatibility is exact and fail-closed: only schema version `1`, carrier
 type `"ResidentSession"`, ACTIVE records, complete valid payload schemas, and an
 exactly equal `Device` are accepted. Other versions, schemas, malformed records,
-terminal checkpoints, and device mismatches reject. E7-F5, E7-F7, and E7-F8 own
-future scheduling, transport, and detailed RNG-stream policy respectively.
+non-ACTIVE checkpoint records, and device mismatches reject. Finalization makes
+its source session terminal but returns an ACTIVE checkpoint eligible for explicit
+restart. E7-F5, E7-F7, and E7-F8 own future scheduling, transport, and detailed
+RNG-stream policy respectively.
 
 `particula.execution.gpu_resources` is a separate direct-import-only,
 Warp-dependent concrete boundary beside `gpu_session`. Each `GPUResourceRegistry`
