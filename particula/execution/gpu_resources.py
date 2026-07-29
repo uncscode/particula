@@ -316,6 +316,80 @@ class GPUResourceRegistry:
             raise ValueError("session must be the pinned ResidentSession.")
         self._validate_session_signature()
 
+    def validate_wall_loss_resources(
+        self, session: ResidentSession, resources: WallLossResources
+    ) -> None:
+        """Validate one established wall-loss view without acquiring sidecars.
+
+        This concrete-only adapter seam verifies the exact active session before
+        checking that ``resources`` is the already-published wall-loss view. It
+        performs metadata and identity checks only; it does not allocate,
+        acquire, inspect payloads, or mutate registry state.
+
+        Args:
+            session: Exact active session pinned by this registry.
+            resources: Exact established wall-loss resource view.
+
+        Raises:
+            TypeError: If ``resources`` is not an exact wall-loss view.
+            ValueError: If the family is unavailable, the view differs from the
+                published view, or its pinned sidecar binding changed.
+        """
+        self.validate_pinned_session(session)
+        if type(resources) is not WallLossResources:
+            raise TypeError("resources must be an exact WallLossResources.")
+        published = self._views.get("wall_loss")
+        if published is None:
+            raise ValueError("wall_loss resources have not been acquired.")
+        if resources is not published:
+            raise ValueError("resources must be the published wall_loss view.")
+        bindings = self._bindings["wall_loss"]
+        if resources.rng_states is not bindings["rng_states"]:
+            raise ValueError("wall_loss resource bindings changed.")
+        self._validate_array(
+            _WALL_LOSS.entries[0], resources.rng_states, capacity=None
+        )
+
+    def validate_nucleation_resources(
+        self, session: ResidentSession, resources: NucleationResources
+    ) -> None:
+        """Validate one established nucleation view without acquiring sidecars.
+
+        This concrete-only adapter seam verifies exact active-session ownership,
+        the exact published view identity, and every pinned record binding. It
+        does not allocate, acquire, inspect sidecar payloads, or mutate state.
+
+        Args:
+            session: Exact active session pinned by this registry.
+            resources: Exact established nucleation resource view.
+
+        Raises:
+            TypeError: If ``resources`` is not an exact nucleation view.
+            ValueError: If the family is unavailable, the view differs from the
+                published view, or a pinned sidecar binding changed.
+        """
+        self.validate_pinned_session(session)
+        if type(resources) is not NucleationResources:
+            raise TypeError("resources must be an exact NucleationResources.")
+        published = self._views.get("nucleation")
+        if published is None:
+            raise ValueError("nucleation resources have not been acquired.")
+        if resources is not published:
+            raise ValueError("resources must be the published nucleation view.")
+        bindings = self._record_bindings(resources.scratch)
+        bindings.update(self._record_bindings(resources.finalized_demand))
+        bindings.update(self._record_bindings(resources.diagnostics))
+        bindings.update(self._record_bindings(resources.exhaustion))
+        bindings.update(
+            self._record_bindings(resources.exhaustion.resampling_buffers)
+        )
+        for entry in _NUCLEATION.entries:
+            if bindings.get(entry.role) is not self._bindings["nucleation"].get(
+                entry.role
+            ):
+                raise ValueError("nucleation resource bindings changed.")
+            self._validate_array(entry, bindings[entry.role], capacity=None)
+
     def _enumerate_resources(
         self,
     ) -> tuple[tuple[str, str, Any, int | None], ...]:

@@ -561,6 +561,77 @@ def test_validate_pinned_session_rejects_primary_and_container_drift() -> None:
 
 
 @pytest.mark.warp
+def test_established_view_validators_require_exact_published_views() -> None:
+    """Test adapter seams accept only their exact acquired resource views."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    wall_loss = registry.acquire_wall_loss()
+    nucleation = registry.acquire_nucleation()
+    bindings = registry._bindings.copy()
+    views = registry._views.copy()
+    capacities = registry._capacities.copy()
+
+    registry.validate_wall_loss_resources(session, wall_loss)
+    registry.validate_nucleation_resources(session, nucleation)
+    with pytest.raises(TypeError, match="exact WallLossResources"):
+        registry.validate_wall_loss_resources(session, object())  # type: ignore[arg-type]
+    with pytest.raises(TypeError, match="exact NucleationResources"):
+        registry.validate_nucleation_resources(session, object())  # type: ignore[arg-type]
+
+    assert registry._bindings == bindings
+    assert registry._views == views
+    assert registry._capacities == capacities
+
+
+@pytest.mark.warp
+def test_established_view_validators_reject_absence_identity_and_binding_drift() -> (
+    None
+):
+    """Test published-view rejection paths leave registry bookkeeping intact."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    capacities = registry._capacities.copy()
+    token = object()
+    registry.reserve_open_step(token)
+
+    foreign = GPUResourceRegistry(_session())
+    foreign_wall = foreign.acquire_wall_loss()
+    foreign_nucleation = foreign.acquire_nucleation()
+    with pytest.raises(ValueError, match="have not been acquired"):
+        registry.validate_wall_loss_resources(session, foreign_wall)
+    with pytest.raises(ValueError, match="have not been acquired"):
+        registry.validate_nucleation_resources(session, foreign_nucleation)
+
+    wall_loss = registry.acquire_wall_loss()
+    nucleation = registry.acquire_nucleation()
+    with pytest.raises(ValueError, match="published wall_loss"):
+        registry.validate_wall_loss_resources(
+            session, gpu_resources.WallLossResources(wall_loss.rng_states)
+        )
+    with pytest.raises(ValueError, match="published nucleation"):
+        registry.validate_nucleation_resources(
+            session,
+            gpu_resources.NucleationResources(
+                nucleation.scratch,
+                nucleation.finalized_demand,
+                nucleation.diagnostics,
+                nucleation.exhaustion,
+            ),
+        )
+
+    object.__setattr__(wall_loss, "rng_states", foreign_wall.rng_states)
+    with pytest.raises(ValueError, match="bindings changed"):
+        registry.validate_wall_loss_resources(session, wall_loss)
+
+    assert registry._bindings.keys() == {"wall_loss", "nucleation"}
+    assert registry._views["wall_loss"] is wall_loss
+    assert registry._views["nucleation"] is nucleation
+    assert registry._capacities == capacities
+    assert registry._open_step_token is token
+    registry.release_open_step(token)
+
+
+@pytest.mark.warp
 def test_registry_allocation_failure_does_not_publish_partial_family(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
