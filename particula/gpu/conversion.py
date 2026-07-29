@@ -469,6 +469,8 @@ def from_warp_gas_data(
     gpu_data: "WarpGasData",
     name: list[str] | None = None,
     sync: bool = True,
+    *,
+    allow_per_box_partitioning: bool = False,
 ) -> "GasData":
     """Transfer WarpGasData back to CPU with an intentionally lossy restore.
 
@@ -506,6 +508,8 @@ def from_warp_gas_data(
         sync: If True (default), synchronize device before transfer
             to ensure all GPU operations have completed. Set False
             only if you've already synchronized manually.
+        allow_per_box_partitioning: Internal checkpoint-only escape hatch for
+            building a lossy CPU inspection carrier from a nonuniform GPU mask.
 
     Returns:
         CPU-side GasData with NumPy arrays.
@@ -563,7 +567,9 @@ def from_warp_gas_data(
             "partitioning mask has no authoritative box"
         )
     partitioning_bool_by_box = _restore_partitioning_bool(partitioning_values)
-    if not np.all(partitioning_bool_by_box == partitioning_bool_by_box[0]):
+    if not allow_per_box_partitioning and not np.all(
+        partitioning_bool_by_box == partitioning_bool_by_box[0]
+    ):
         raise ValueError(
             "GPU partitioning must be an identical binary (n_boxes, n_species) "
             "mask to restore CPU GasData."

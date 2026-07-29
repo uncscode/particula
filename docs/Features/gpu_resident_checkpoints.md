@@ -8,11 +8,13 @@ The direct-import-only checkpoint boundary is available from
 `checkpoint(registry, guard)` and `finalize(registry, guard)` methods.
 
 `checkpoint()` is nonterminal and returns a fresh immutable host snapshot.
-`finalize()` is terminal and idempotent: after its first successful call the
-session is `FINALIZED` and later calls return the cached snapshot. Checkpoints
-are explicit in-memory, same-device recovery only. They do not serialize to
-disk, select or migrate a device, synchronize implicitly during restart, or
-provide rollback after a device writer has launched.
+`finalize()` is terminal and idempotent only when called again with the exact
+bound session, pinned registry, and closed guard. After its first successful
+call the session is `FINALIZED` and later calls with that matching binding return
+the cached snapshot without device work; mismatched or invalid bindings are
+rejected. Checkpoints are explicit in-memory, same-device recovery only. They
+do not serialize to disk, select or migrate a device, synchronize implicitly
+during restart, or provide rollback after a device writer has launched.
 
 The snapshot owns immutable canonical bytes for primary arrays and acquired
 sidecars, plus detached CPU inspection carriers. Inspection `GasData` is
@@ -21,6 +23,9 @@ restart uses canonical bytes and restores vapor pressure exactly. Snapshotting
 requires approximately one additional host copy of resident payload bytes plus
 the detached inspection copies. Restart explicitly requires the compatible
 target `Device` through `restart_resident_session(checkpoint, device)`.
+`restart_checkpoint` is an equivalent concrete-only alias; both require the
+same exact compatible device and create fresh session, registry, guard, and
+resident-array identities.
 
 Validate documentation with:
 

@@ -15,13 +15,14 @@ promised once a device operation has launched.
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass
 from numbers import Integral, Real
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
-from particula.execution import Device, _isfinite_real
+from particula.execution import Backend, Device, _isfinite_real
 from particula.execution.gpu_session import (
     ResidentDimensions,
     ResidentLifecycle,
@@ -29,6 +30,11 @@ from particula.execution.gpu_session import (
     ResidentStepGuard,
     setup_resident_session,
 )
+
+if TYPE_CHECKING:
+    from particula.execution.gpu_resources import GPUResourceRegistry
+    from particula.gas import EnvironmentData, GasData
+    from particula.particles import ParticleData
 
 _SCHEMA_VERSION = 1
 _PRIMARY_ROLES = (
@@ -99,23 +105,27 @@ class ResidentCheckpoint:
 
     schema_version: int
     carrier_type: str
-    dimensions: object
-    device: object
+    dimensions: ResidentDimensions
+    device: Device
     gas_names: tuple[str, ...]
     completed_steps: int
     simulated_time: Real
     lifecycle: ResidentLifecycle
-    particles: object
-    gas: object
-    environment: object
+    particles: "ParticleData"
+    gas: "GasData"
+    environment: "EnvironmentData"
     payloads: tuple[CheckpointPayload, ...]
 
 
 def _payload(
-    family: str, role: str, value: Any, capacity: int | None = None
+    family: str,
+    role: str,
+    value: Any,
+    capacity: int | None = None,
 ) -> CheckpointPayload:
     """Copy one synchronized Warp array into immutable canonical bytes."""
-    array = np.ascontiguousarray(value.numpy())
+    host_value = value if isinstance(value, np.ndarray) else value.numpy()
+    array = np.ascontiguousarray(host_value)
     return CheckpointPayload(
         family,
         role,
@@ -126,33 +136,47 @@ def _payload(
     )
 
 
-def _validate_payload(item: object) -> CheckpointPayload:
-    """Validate one immutable payload descriptor without materializing it."""
-    if type(item) is not CheckpointPayload:
-        raise TypeError(
-            "checkpoint payloads must be exact CheckpointPayload values."
-        )
+def _validate_payload_metadata(item: CheckpointPayload) -> None:
+    """Validate the exact descriptor metadata and size contract."""
     if type(item.family) is not str or type(item.role) is not str:
         raise TypeError("checkpoint payload family and role must be str.")
     if type(item.dtype) is not str or type(item.shape) is not tuple:
         raise TypeError("checkpoint payload dtype and shape are invalid.")
     if any(type(length) is not int or length < 0 for length in item.shape):
         raise ValueError("checkpoint payload shape is invalid.")
-    if type(item.data) is not bytes:
-        raise TypeError("checkpoint payload data must be immutable bytes.")
     if item.capacity is not None and (
         isinstance(item.capacity, bool)
         or not isinstance(item.capacity, Integral)
         or item.capacity <= 0
     ):
         raise ValueError("checkpoint payload capacity is invalid.")
+
+
+def _validate_payload_bytes(item: CheckpointPayload) -> None:
+    """Validate the exact dtype and immutable byte payload."""
     try:
         dtype = np.dtype(item.dtype)
     except TypeError as error:
         raise ValueError("checkpoint payload dtype is invalid.") from error
-    size = int(np.prod(item.shape, dtype=np.int64)) * dtype.itemsize
+    size = dtype.itemsize
+    for length in item.shape:
+        if length and size > sys.maxsize // length:
+            raise ValueError("checkpoint payload byte length is too large.")
+        size *= length
     if len(item.data) != size:
         raise ValueError("checkpoint payload byte length is invalid.")
+
+
+def _validate_payload(item: object) -> CheckpointPayload:
+    """Validate one immutable payload descriptor without materializing it."""
+    if type(item) is not CheckpointPayload:
+        raise TypeError(
+            "checkpoint payloads must be exact CheckpointPayload values."
+        )
+    _validate_payload_metadata(item)
+    if type(item.data) is not bytes:
+        raise TypeError("checkpoint payload data must be immutable bytes.")
+    _validate_payload_bytes(item)
     return item
 
 
@@ -168,7 +192,10 @@ class ResidentCheckpointController:
     """
 
     def __init__(
-        self, session: ResidentSession, registry: Any, guard: ResidentStepGuard
+        self,
+        session: ResidentSession,
+        registry: "GPUResourceRegistry",
+        guard: ResidentStepGuard,
     ) -> None:
         """Bind exact active session, registry, and guard identities.
 
@@ -238,14 +265,32 @@ class ResidentCheckpointController:
             cast(Any, self._session.gas),
             name=list(self._session.metadata.gas_names),
             sync=False,
+            allow_per_box_partitioning=True,
         )
         environment = from_warp_environment_data(
             cast(Any, self._session.environment), sync=False
         )
+        resident_gas = cast(Any, self._session.gas)
+        # Reuse conversion readbacks for inspection and canonical payloads. The
+        # CPU GasData carrier intentionally has no vapor pressure and collapses
+        # partitioning to shared species state, so only those two canonical GPU
+        # fields need their own readback.
+        primary_values = {
+            ("particles", "masses"): particles.masses,
+            ("particles", "concentration"): particles.concentration,
+            ("particles", "charge"): particles.charge,
+            ("particles", "density"): particles.density,
+            ("particles", "volume"): particles.volume,
+            ("gas", "molar_mass"): gas.molar_mass,
+            ("gas", "concentration"): gas.concentration,
+            ("gas", "vapor_pressure"): resident_gas.vapor_pressure,
+            ("gas", "partitioning"): resident_gas.partitioning,
+            ("environment", "temperature"): environment.temperature,
+            ("environment", "pressure"): environment.pressure,
+            ("environment", "saturation_ratio"): environment.saturation_ratio,
+        }
         payloads = [
-            _payload(
-                family, role, getattr(getattr(self._session, family), role)
-            )
+            _payload(family, role, primary_values[(family, role)])
             for family, role in _PRIMARY_ROLES
         ]
         payloads.extend(
@@ -289,8 +334,8 @@ class ResidentCheckpointController:
 
 def restart_resident_session(  # noqa: C901
     checkpoint: ResidentCheckpoint,
-    device: object,
-) -> tuple[ResidentSession, Any, ResidentStepGuard]:
+    device: Device,
+) -> tuple[ResidentSession, "GPUResourceRegistry", ResidentStepGuard]:
     """Restart a fresh compatible resident session from canonical bytes.
 
     This concrete-only operation requires a nonterminal checkpoint and an exact
@@ -333,6 +378,8 @@ def restart_resident_session(  # noqa: C901
         list(checkpoint.gas_names),
         unpack("gas", "molar_mass"),
         unpack("gas", "concentration"),
+        # GasData carries shared CPU partitioning only. The exact per-box
+        # canonical payload is copied into the resident carrier after setup.
         unpack("gas", "partitioning")[0].astype(bool),
     )
     environment = EnvironmentData(
@@ -340,15 +387,15 @@ def restart_resident_session(  # noqa: C901
         unpack("environment", "pressure"),
         unpack("environment", "saturation_ratio"),
     )
+    # Repeat complete descriptor validation at the allocation boundary. Frozen
+    # records can still be maliciously forged with low-level attribute writes.
+    _preflight_restart(checkpoint, device)
     session = setup_resident_session(particles, gas, environment, target_device)
     import warp as wp
 
-    vapor: Any = wp.array(
-        unpack("gas", "vapor_pressure"),
-        dtype=wp.float64,
-        device=target_device.native,
-    )
-    wp.copy(cast(Any, session.gas).vapor_pressure, vapor)
+    restored_gas = cast(Any, session.gas)
+    restored_gas.vapor_pressure.assign(unpack("gas", "vapor_pressure"))
+    restored_gas.partitioning.assign(unpack("gas", "partitioning"))
     from particula.execution.gpu_resources import GPUResourceRegistry
 
     registry = GPUResourceRegistry(session)
@@ -399,7 +446,9 @@ def _preflight_restart(  # noqa: C901
     if type(checkpoint) is not ResidentCheckpoint:
         raise TypeError("checkpoint must be an exact ResidentCheckpoint.")
     if (
-        checkpoint.schema_version != _SCHEMA_VERSION
+        type(checkpoint.schema_version) is not int
+        or checkpoint.schema_version != _SCHEMA_VERSION
+        or type(checkpoint.carrier_type) is not str
         or checkpoint.carrier_type != "ResidentSession"
     ):
         raise ValueError("Unsupported resident checkpoint schema.")
@@ -411,7 +460,24 @@ def _preflight_restart(  # noqa: C901
         )
     if type(checkpoint.device) is not Device:
         raise TypeError("checkpoint device metadata is invalid.")
-    if device != checkpoint.device:
+    dimensions = checkpoint.dimensions
+    if (
+        type(dimensions.n_boxes) is not int
+        or type(dimensions.n_particles) is not int
+        or type(dimensions.n_species) is not int
+        or dimensions.n_boxes <= 0
+        or dimensions.n_particles < 0
+        or dimensions.n_species < 0
+    ):
+        raise ValueError("checkpoint dimensions are invalid.")
+    if (
+        type(checkpoint.device.backend) is not Backend
+        or type(checkpoint.device.native) is not str
+        or not checkpoint.device.native
+        or checkpoint.device.native != checkpoint.device.native.strip()
+    ):
+        raise ValueError("checkpoint device metadata is invalid.")
+    if type(device) is not Device or device != checkpoint.device:
         raise ValueError("device must exactly match checkpoint.device.")
     if type(checkpoint.gas_names) is not tuple or any(
         type(name) is not str for name in checkpoint.gas_names
@@ -420,8 +486,7 @@ def _preflight_restart(  # noqa: C901
     if len(checkpoint.gas_names) != checkpoint.dimensions.n_species:
         raise ValueError("checkpoint gas_names do not match dimensions.")
     if (
-        isinstance(checkpoint.completed_steps, bool)
-        or not isinstance(checkpoint.completed_steps, Integral)
+        type(checkpoint.completed_steps) is not int
         or checkpoint.completed_steps < 0
     ):
         raise ValueError(
@@ -445,7 +510,6 @@ def _preflight_restart(  # noqa: C901
             "checkpoint primary payload descriptors are incomplete."
         )
     primary = dict(zip(keys, payloads, strict=True))
-    dimensions = checkpoint.dimensions
     expected = {
         ("particles", "masses"): (
             "<f8",

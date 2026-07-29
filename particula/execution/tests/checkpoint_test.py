@@ -1,5 +1,6 @@
 """Focused boundary checks for concrete resident checkpoint imports."""
 
+import sys
 from dataclasses import replace
 from fractions import Fraction
 from typing import TYPE_CHECKING, Any, cast
@@ -27,7 +28,9 @@ if TYPE_CHECKING:
     from particula.execution.gpu_resources import GPUResourceRegistry
 
 
-def _resident_binding() -> tuple[
+def _resident_binding(
+    n_boxes: int = 1,
+) -> tuple[
     ResidentSession,
     "GPUResourceRegistry",
     ResidentStepGuard,
@@ -42,27 +45,43 @@ def _resident_binding() -> tuple[
     )
 
     particles = WarpParticleData()
-    particles.masses = wp.array([[[1.0]]], dtype=wp.float64, device="cpu")
-    particles.concentration = wp.array([[2.0]], dtype=wp.float64, device="cpu")
-    particles.charge = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    particles.masses = wp.array(
+        np.ones((n_boxes, 1, 1)), dtype=wp.float64, device="cpu"
+    )
+    particles.concentration = wp.array(
+        np.full((n_boxes, 1), 2.0), dtype=wp.float64, device="cpu"
+    )
+    particles.charge = wp.zeros((n_boxes, 1), dtype=wp.float64, device="cpu")
     particles.density = wp.array([1000.0], dtype=wp.float64, device="cpu")
-    particles.volume = wp.array([1.0], dtype=wp.float64, device="cpu")
+    particles.volume = wp.array(
+        np.ones(n_boxes), dtype=wp.float64, device="cpu"
+    )
     gas = WarpGasData()
     gas.molar_mass = wp.array([0.018], dtype=wp.float64, device="cpu")
-    gas.concentration = wp.array([[3.0]], dtype=wp.float64, device="cpu")
-    gas.vapor_pressure = wp.array([[42.0]], dtype=wp.float64, device="cpu")
-    gas.partitioning = wp.array([[1]], dtype=wp.int32, device="cpu")
+    gas.concentration = wp.array(
+        np.full((n_boxes, 1), 3.0), dtype=wp.float64, device="cpu"
+    )
+    gas.vapor_pressure = wp.array(
+        np.full((n_boxes, 1), 42.0), dtype=wp.float64, device="cpu"
+    )
+    gas.partitioning = wp.array(
+        np.ones((n_boxes, 1)), dtype=wp.int32, device="cpu"
+    )
     environment = WarpEnvironmentData()
-    environment.temperature = wp.array([298.15], dtype=wp.float64, device="cpu")
-    environment.pressure = wp.array([101325.0], dtype=wp.float64, device="cpu")
+    environment.temperature = wp.array(
+        np.full(n_boxes, 298.15), dtype=wp.float64, device="cpu"
+    )
+    environment.pressure = wp.array(
+        np.full(n_boxes, 101325.0), dtype=wp.float64, device="cpu"
+    )
     environment.saturation_ratio = wp.array(
-        [[0.5]], dtype=wp.float64, device="cpu"
+        np.full((n_boxes, 1), 0.5), dtype=wp.float64, device="cpu"
     )
     session = ResidentSession(
         particles,
         gas,
         environment,
-        ResidentDimensions(1, 1, 1),
+        ResidentDimensions(n_boxes, 1, 1),
         ResidentMetadata(Device(Backend.WARP, "cpu"), ("water",)),
         ResidentLifecycle.ACTIVE,
     )
@@ -84,15 +103,15 @@ def test_checkpoint_carrier_retains_uncoerced_fraction_time() -> None:
     checkpoint = ResidentCheckpoint(
         1,
         "ResidentSession",
-        object(),
-        object(),
+        cast(ResidentDimensions, object()),
+        cast(Device, object()),
         (),
         0,
         Fraction(1, 3),
         ResidentLifecycle.ACTIVE,
-        object(),
-        object(),
-        object(),
+        cast(Any, object()),
+        cast(Any, object()),
+        cast(Any, object()),
         (),
     )
     assert checkpoint.simulated_time == Fraction(1, 3)
@@ -103,15 +122,15 @@ def test_checkpoint_carrier_is_frozen() -> None:
     checkpoint = ResidentCheckpoint(
         1,
         "ResidentSession",
-        object(),
-        object(),
+        cast(ResidentDimensions, object()),
+        cast(Device, object()),
         (),
         0,
         Fraction(0, 1),
         ResidentLifecycle.ACTIVE,
-        object(),
-        object(),
-        object(),
+        cast(Any, object()),
+        cast(Any, object()),
+        cast(Any, object()),
         (),
     )
 
@@ -163,6 +182,13 @@ def test_payload_copies_a_contiguous_immutable_array_representation() -> None:
             CheckpointPayload("gas", "vapor_pressure", "<f8", (), b"", 0),
             ValueError,
             "capacity",
+        ),
+        (
+            CheckpointPayload(
+                "gas", "vapor_pressure", "<f8", (sys.maxsize, 2), b""
+            ),
+            ValueError,
+            "too large",
         ),
     ],
 )
@@ -239,6 +265,24 @@ def test_finalize_is_cached_and_restart_restores_primary_state() -> None:
 
 
 @pytest.mark.warp
+def test_restart_preserves_distinct_per_box_partitioning() -> None:
+    """Checkpoint inspection is lossy while restart preserves the full mask."""
+    session, registry, guard = _resident_binding(n_boxes=2)
+    original = np.array([[1], [0]], dtype=np.int32)
+    cast(Any, session.gas).partitioning.assign(original)
+
+    checkpoint = session.checkpoint(registry, guard)
+    restored, _, _ = restart_resident_session(
+        checkpoint, Device(Backend.WARP, "cpu")
+    )
+
+    np.testing.assert_array_equal(checkpoint.gas.partitioning, np.array([True]))
+    np.testing.assert_array_equal(
+        cast(Any, restored.gas).partitioning.numpy(), original
+    )
+
+
+@pytest.mark.warp
 def test_restart_restores_each_acquired_resource_family() -> None:
     """Restart reconstructs all resource families through registry APIs."""
     session, registry, guard = _resident_binding()
@@ -271,15 +315,15 @@ def test_restart_rejects_non_checkpoint_and_terminal_checkpoint() -> None:
     terminal = ResidentCheckpoint(
         1,
         "ResidentSession",
-        object(),
+        cast(ResidentDimensions, object()),
         Device(Backend.WARP, "cpu"),
         (),
         0,
         Fraction(0, 1),
         ResidentLifecycle.FINALIZED,
-        object(),
-        object(),
-        object(),
+        cast(Any, object()),
+        cast(Any, object()),
+        cast(Any, object()),
         (),
     )
     with pytest.raises(ValueError, match="active session"):
@@ -296,6 +340,31 @@ def test_restart_rejects_duplicate_payload_before_setup() -> None:
     )
 
     with pytest.raises(ValueError, match="unique"):
+        restart_resident_session(malformed, Device(Backend.WARP, "cpu"))
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("field", "value", "exception", "match"),
+    [
+        ("schema_version", True, ValueError, "schema"),
+        ("dimensions", object(), TypeError, "ResidentDimensions"),
+        ("device", object(), TypeError, "device metadata"),
+        ("completed_steps", 1.0, ValueError, "completed_steps"),
+    ],
+)
+def test_restart_rejects_forged_metadata_before_setup(
+    field: str,
+    value: object,
+    exception: type[Exception],
+    match: str,
+) -> None:
+    """Forged checkpoint metadata fails before resident setup can begin."""
+    session, registry, guard = _resident_binding()
+    checkpoint = session.checkpoint(registry, guard)
+    malformed = replace(checkpoint, **{field: value})
+
+    with pytest.raises(exception, match=match):
         restart_resident_session(malformed, Device(Backend.WARP, "cpu"))
 
 
