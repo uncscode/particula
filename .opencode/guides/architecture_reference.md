@@ -112,6 +112,21 @@ lexical tie-breaking utility used by the scheduler; it does not add an execution
 order field, scheduling policy, lifecycle behavior, or backend work to the
 resolved P1 graph.
 
+`particula.execution.thermodynamic_updates` is the P5 direct-import-only,
+Warp-dependent resident freshness boundary. Its request binds one exact active
+session, pinned registry, resolver-produced graph, resolved schedule, and
+thermodynamic configuration by identity. Callers explicitly report only
+successful non-refresh nodes. The coordinator owns its cursor and stale markers,
+then immediately brackets a scheduled condensation or diagnostics callback with
+the required virtual vapor-pressure and saturation writers. Vapor pressure is
+delegated to the concrete GPU primitive (including its documented configuration
+fingerprint reads); saturation is an on-device resident calculation. A failed
+vapor writer leaves both fields stale; after a successful vapor writer, a failed
+saturation writer leaves only saturation stale, and neither failure advances the
+cursor. This concrete boundary preserves resident identities and provides no
+lifecycle work, transfer, synchronization, fallback, full scheduler, or general
+process dispatch. It is absent from package and top-level exports.
+
 `particula.execution.gpu_resources` is a separate direct-import-only,
 Warp-dependent concrete boundary beside `gpu_session`. Each `GPUResourceRegistry`
 accepts exactly one exact `ACTIVE` `ResidentSession`, pins its dimensions,

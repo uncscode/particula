@@ -171,6 +171,19 @@ direct GPU APIs.
   transport, fall back, or export names through `particula.execution` or the
   top-level package. See
   [ADR-010](decisions/ADR-010-resident-state-update-boundary.md).
+- `thermodynamic_updates.py` - Concrete-only, direct-import Warp-resident
+  freshness coordinator. Its immutable request retains exact session, pinned
+  registry, resolver-produced graph, resolved schedule, and thermodynamic
+  configuration identities. Callers report each successful ordinary node; the
+  coordinator owns cursor and stale markers and, before one explicit
+  condensation or diagnostics callback, consumes immediately preceding virtual
+  refresh IDs. It delegates vapor-pressure writes to the authoritative concrete
+  primitive and launches the on-device SI saturation calculation without host
+  payload reads, transfer, synchronization, or CPU fallback. Writer failures do
+  not advance the cursor: a failed vapor writer keeps both fields stale, while a
+  subsequent saturation failure retains fresh vapor pressure and stale
+  saturation. It has no lifecycle, resource acquisition, full scheduler, or
+  general process-dispatch behavior and is not package- or top-level-exported.
 - `adapters/condensation.py` - Concrete-only P2 condensation configuration and
   CPU/Warp state carriers plus selected P3 CPU/Warp execution carriers and
   adapters. P2 construction retains caller-owned resources by identity and
