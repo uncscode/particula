@@ -28,6 +28,7 @@ from particula.execution.gpu_session import (
     ResidentLifecycle,
     ResidentSession,
     ResidentStepGuard,
+    _fault_resident_session,
     setup_resident_session,
 )
 
@@ -234,7 +235,7 @@ class ResidentCheckpointController:
                 "guard must match the resident session and registry."
             )
         self._registry.validate_pinned_session(self._session)
-        self._guard.assert_step_closed()
+        self._registry.assert_step_closed()
 
     def checkpoint(self) -> ResidentCheckpoint:
         """Return a fresh immutable snapshot while leaving the session active.
@@ -257,7 +258,11 @@ class ResidentCheckpointController:
             from_warp_particle_data,
         )
 
-        wp.synchronize()
+        try:
+            wp.synchronize()
+        except BaseException:
+            _fault_resident_session(self._session)
+            raise
         particles = from_warp_particle_data(
             cast(Any, self._session.particles), sync=False
         )

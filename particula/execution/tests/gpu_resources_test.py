@@ -9,6 +9,8 @@ from typing import Any, cast
 
 import pytest
 
+pytest.importorskip("warp")
+
 import particula.execution.gpu_resources as gpu_resources
 from particula.execution import Backend, Device
 from particula.execution.gpu_resources import (

@@ -378,6 +378,18 @@ class GPUResourceRegistry:
             raise ValueError("token does not match the open resident timestep.")
         self._open_step_token = None
 
+    def assert_step_closed(self) -> None:
+        """Reject lifecycle work while this registry has an open timestep.
+
+        This binding-wide check covers every guard sharing the registry rather
+        than only the guard passed to a lifecycle boundary.
+
+        Raises:
+            RuntimeError: If a resident timestep remains open.
+        """
+        if self._open_step_token is not None:
+            raise RuntimeError("A resident timestep is open.")
+
     def _validate_session_state(self) -> None:
         """Recheck the metadata-only invariants needed by this boundary."""
         self._validate_session_carriers()

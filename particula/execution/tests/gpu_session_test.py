@@ -570,6 +570,39 @@ def test_step_guards_share_one_open_token_per_registry_binding() -> None:
 
 
 @pytest.mark.warp
+def test_step_guard_rejects_nonfinite_completed_time_atomically() -> None:
+    """Test overflowing completed time preserves the open-step ownership."""
+    from particula.execution.gpu_resources import GPUResourceRegistry
+
+    particles, gas, environment = _warp_resources()
+    session = ResidentSession(
+        particles,
+        gas,
+        environment,
+        ResidentDimensions(1, 2, 1),
+        _metadata(),
+        ResidentLifecycle.ACTIVE,
+    )
+    registry = GPUResourceRegistry(session)
+    guard = ResidentStepGuard(session, registry)
+    other_guard = ResidentStepGuard(session, registry)
+    object.__setattr__(guard, "_simulated_time", sys.float_info.max)
+    token = guard.begin_step(sys.float_info.max)
+
+    with pytest.raises(
+        ValueError, match="completed simulated time must be finite"
+    ):
+        guard.complete_step(token)
+
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == sys.float_info.max
+    assert guard._open_token is token
+    assert registry._open_step_token is token
+    with pytest.raises(RuntimeError, match="already open"):
+        other_guard.begin_step(1.0)
+
+
+@pytest.mark.warp
 def test_step_guard_completion_time_failure_is_atomic() -> None:
     """Test failed time arithmetic preserves guard and binding ownership."""
     from particula.execution.gpu_resources import GPUResourceRegistry
@@ -1619,6 +1652,25 @@ def test_close_requires_closed_active_guard_and_is_idempotent() -> None:
     session.discard(registry, guard)
     assert session.lifecycle is ResidentLifecycle.CLOSED
     session.close(cast(Any, object()), cast(Any, object()))
+    assert session.lifecycle is ResidentLifecycle.CLOSED
+
+
+@pytest.mark.warp
+def test_close_rejects_step_opened_by_another_shared_guard() -> None:
+    """Test close observes registry-wide rather than only local step state."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    other_guard = ResidentStepGuard(session, registry)
+    token = other_guard.begin_step(1.0)
+
+    with pytest.raises(RuntimeError, match="timestep is open"):
+        session.close(registry, guard)
+
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert registry._open_step_token is token
+    other_guard._abort_step(token)
+    session.close(registry, guard)
     assert session.lifecycle is ResidentLifecycle.CLOSED
 
 

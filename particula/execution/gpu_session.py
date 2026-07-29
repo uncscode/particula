@@ -714,11 +714,11 @@ class ResidentSession:
         _validate_terminal_binding(self, registry, guard)
         if self.lifecycle is ResidentLifecycle.ACTIVE:
             registry.validate_pinned_session(self)
-            guard.assert_step_closed()
+            registry.assert_step_closed()
             object.__setattr__(self, "lifecycle", ResidentLifecycle.CLOSED)
             return
         if self.lifecycle is ResidentLifecycle.FAULTED:
-            guard.assert_step_closed()
+            registry.assert_step_closed()
             object.__setattr__(self, "lifecycle", ResidentLifecycle.CLOSED)
             return
         raise ValueError("session.lifecycle must be ACTIVE or FAULTED.")
@@ -907,6 +907,8 @@ class ResidentStepGuard:
         if token is not self._registry._open_step_token:
             raise ValueError("token does not match the open resident timestep.")
         simulated_time = self._simulated_time + token._duration
+        if not _isfinite_real(simulated_time) or simulated_time < 0:
+            raise ValueError("completed simulated time must be finite.")
         self._completed_steps += 1
         self._simulated_time = simulated_time
         self._open_token = None

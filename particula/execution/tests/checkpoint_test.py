@@ -379,3 +379,43 @@ def test_checkpoint_rejects_open_step_without_mutating_session() -> None:
 
     assert session.lifecycle is ResidentLifecycle.ACTIVE
     guard.complete_step(token)
+
+
+@pytest.mark.warp
+def test_checkpoint_rejects_step_opened_by_another_shared_guard() -> None:
+    """Test checkpoint checks the registry-wide step ownership boundary."""
+    session, registry, first_guard = _resident_binding()
+    second_guard = ResidentStepGuard(session, registry)
+    token = first_guard.begin_step(Fraction(1, 2))
+
+    with pytest.raises(RuntimeError, match="timestep is open"):
+        session.checkpoint(registry, second_guard)
+
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert registry._open_step_token is token
+    first_guard.complete_step(token)
+    assert session.checkpoint(registry, second_guard).lifecycle is (
+        ResidentLifecycle.ACTIVE
+    )
+
+
+@pytest.mark.warp
+def test_checkpoint_synchronization_failure_faults_and_reraises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a synchronization failure faults the session before propagation."""
+    wp = pytest.importorskip("warp")
+    session, registry, guard = _resident_binding()
+    failure = RuntimeError("synchronize failed")
+
+    def fail_synchronize() -> None:
+        """Raise the operation failure exposed at the synchronization boundary."""
+        raise failure
+
+    monkeypatch.setattr(wp, "synchronize", fail_synchronize)
+
+    with pytest.raises(RuntimeError) as caught:
+        session.checkpoint(registry, guard)
+
+    assert caught.value is failure
+    assert session.lifecycle is ResidentLifecycle.FAULTED
