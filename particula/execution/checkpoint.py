@@ -1,9 +1,16 @@
-"""Provide explicit in-memory checkpoints for concrete resident Warp sessions.
+"""Provide concrete-only immutable in-memory resident-session checkpoints.
 
-Checkpoints are immutable host snapshots for same-device recovery only.  They
-need roughly one additional host copy of every resident primary and acquired
-sidecar, in addition to detached CPU inspection containers.  They are not a
-serializer, device migration mechanism, CPU fallback, or rollback facility.
+This direct-import-only module snapshots an active resident Warp session after
+its guard is closed. A snapshot contains immutable host bytes for every primary
+array and acquired same-device sidecar, plus detached, non-authoritative CPU
+inspection carriers. Checkpointing needs approximately one additional host copy
+of resident payload bytes and the inspection copies.
+
+Restart is explicit and same-device: it creates a fresh compatible session from
+the canonical bytes, never migrates data, serializes to disk, chooses a device,
+or falls back to CPU execution. ``checkpoint()`` is nonterminal; ``finalize()``
+caches a snapshot and terminally ends normal session use. No rollback is
+promised once a device operation has launched.
 """
 
 from __future__ import annotations
@@ -42,7 +49,11 @@ _PRIMARY_ROLES = (
 
 @dataclass(frozen=True)
 class CheckpointPayload:
-    """Store an immutable exact host representation of one Warp array.
+    """Store one immutable exact host representation of a resident array.
+
+    Payload bytes are canonical recovery state, never a live Warp reference or
+    mutable NumPy alias. They may describe a primary carrier field or an
+    acquired registry sidecar.
 
     Attributes:
         family: Primary carrier family or acquired resource family.
@@ -63,11 +74,27 @@ class CheckpointPayload:
 
 @dataclass(frozen=True)
 class ResidentCheckpoint:
-    """Retain a versioned immutable inspection and recovery snapshot.
+    """Retain a versioned immutable inspection and same-device recovery state.
 
-    Inspection carriers are detached and ``gas`` intentionally has no vapor
-    pressure field.  Canonical payload bytes, not inspection carriers, are
-    authoritative for restart.
+    The detached inspection carriers are convenient but non-authoritative:
+    ``gas`` intentionally omits GPU-only vapor pressure. Restart always uses
+    canonical payload bytes, which preserve vapor pressure and all acquired
+    sidecars exactly. The record is an in-memory, concrete-only checkpoint, not
+    a portable serialization or device-migration format.
+
+    Attributes:
+        schema_version: Exact checkpoint schema version.
+        carrier_type: Exact resident carrier type name.
+        dimensions: Immutable resident dimensions.
+        device: Declared Warp device that restart must match exactly.
+        gas_names: Ordered CPU-owned gas names.
+        completed_steps: Number of completed guarded timesteps.
+        simulated_time: Finite nonnegative cumulative timestep duration.
+        lifecycle: Lifecycle state captured before a normal checkpoint.
+        particles: Detached CPU particle inspection carrier.
+        gas: Detached CPU gas inspection carrier without vapor pressure.
+        environment: Detached CPU environment inspection carrier.
+        payloads: Canonical immutable primary and acquired-sidecar payloads.
     """
 
     schema_version: int
@@ -130,7 +157,15 @@ def _validate_payload(item: object) -> CheckpointPayload:
 
 
 class ResidentCheckpointController:
-    """Bind checkpoint/finalization operations to one exact resident binding."""
+    """Bind checkpoint and terminal finalization to one resident lifecycle.
+
+    The controller is identity-bound to one active session, its pinned registry,
+    and its closed-step guard. A normal checkpoint preserves ACTIVE usability
+    and returns a fresh equivalent record. The first finalization snapshots,
+    then atomically changes the session to FINALIZED; later finalizations return
+    the cached record without validation, synchronization, transfer, or
+    allocation. A failed pre-transition snapshot leaves the source ACTIVE.
+    """
 
     def __init__(
         self, session: ResidentSession, registry: Any, guard: ResidentStepGuard
@@ -176,6 +211,12 @@ class ResidentCheckpointController:
 
     def checkpoint(self) -> ResidentCheckpoint:
         """Return a fresh immutable snapshot while leaving the session active.
+
+        Validation occurs before synchronization, transfer, payload access, or
+        mutation. On success, this operation synchronizes once, reads the three
+        primary carriers in order, and captures canonical primary and acquired
+        sidecar bytes. It neither transfers ownership nor rolls back device work
+        that was already launched by another operation.
 
         Returns:
             A new independent checkpoint record.
@@ -229,7 +270,15 @@ class ResidentCheckpointController:
         )
 
     def finalize(self) -> ResidentCheckpoint:
-        """Create once, cache, and terminally finalize this resident session."""
+        """Create once, cache, and terminally finalize this resident session.
+
+        The first successful call has checkpoint semantics and then transitions
+        the bound session from ACTIVE to FINALIZED. Repeated calls return the
+        identical cached checkpoint in O(1) without device activity.
+
+        Returns:
+            The cached immutable terminal checkpoint.
+        """
         if self._finalized is not None:
             return self._finalized
         checkpoint = self.checkpoint()
@@ -244,9 +293,23 @@ def restart_resident_session(  # noqa: C901
 ) -> tuple[ResidentSession, Any, ResidentStepGuard]:
     """Restart a fresh compatible resident session from canonical bytes.
 
-    The target device must exactly match the checkpoint declaration.  This
-    explicit in-memory operation never migrates devices and has no rollback
-    guarantee after an asynchronous device write has launched.
+    This concrete-only operation requires a nonterminal checkpoint and an exact
+    matching target device. It never reuses source containers, primary arrays,
+    sidecars, registry, or guard identities. Full descriptor preflight happens
+    before setup and upload; after an asynchronous device write has launched,
+    rollback is not guaranteed.
+
+    Args:
+        checkpoint: Exact immutable active-session checkpoint to materialize.
+        device: Explicit target device exactly equal to checkpoint metadata.
+
+    Returns:
+        Fresh compatible session, pinned registry, and restored closed guard.
+
+    Raises:
+        TypeError: If the checkpoint carrier or required metadata is invalid.
+        ValueError: If compatibility, lifecycle, counters, or payload schemas
+            are invalid, or the device does not exactly match.
     """
     primary = _preflight_restart(checkpoint, device)
     target_device = cast(Device, device)

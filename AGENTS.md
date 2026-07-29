@@ -283,6 +283,34 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
 
 ### GPU environment round trips
 
+### Resident GPU checkpoint lifecycle
+
+- The resident checkpoint boundary is concrete-only. Import checkpoint records,
+  `ResidentCheckpointController`, and `restart_resident_session` directly from
+  `particula.execution.checkpoint`; they are intentionally absent from
+  `particula.execution` and top-level package exports.
+- Bind a controller to one exact active `ResidentSession`, its pinned
+  `GPUResourceRegistry`, and its closed `ResidentStepGuard`, or call the
+  session's `checkpoint(registry, guard)` and `finalize(registry, guard)`
+  methods. `checkpoint()` returns a fresh immutable host snapshot and leaves
+  the session active. The first successful `finalize()` caches that snapshot
+  and transitions the session to `FINALIZED`; later calls return that exact
+  cached object.
+- A checkpoint owns immutable canonical primary-array and acquired-sidecar
+  bytes, plus detached CPU inspection carriers. Inspection `GasData` has no
+  GPU vapor-pressure field and is intentionally lossy; restart restores the
+  canonical device vapor-pressure bytes rather than treating inspection data as
+  authoritative. Snapshotting needs roughly one additional host copy of
+  resident payload bytes as well as the detached inspection copies.
+- Restart is explicit and same-device only:
+  `restart_resident_session(checkpoint, device)` requires an exactly compatible
+  target `Device` and creates fresh session, registry, guard, containers,
+  primary arrays, and sidecars. It never selects or migrates a device, reuses
+  source identities, performs CPU fallback, or runs automatically during normal
+  session use. There is no disk, remote, delta, or rollback facility; after an
+  asynchronous device writer launches, rollback is not guaranteed. See
+  [GPU resident checkpoints](docs/Features/gpu_resident_checkpoints.md).
+
 ### Complete direct GPU process illustration
 
 - `docs/Examples/gpu_complete_process_sequence.py` is an illustrative,

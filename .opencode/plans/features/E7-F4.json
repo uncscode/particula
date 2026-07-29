@@ -87,11 +87,11 @@
     {
       "id": "E7-F4-P5",
       "title": "Implement explicit checkpoint and finalize operations with restart tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-28",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,

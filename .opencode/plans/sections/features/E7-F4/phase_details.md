@@ -1,7 +1,7 @@
 # Phase Details
 
 - [x] **E7-F4-P1:** Define resident session state and ownership invariants with unit tests
-  - Issue: #1484 (source plan #1460) | Size: S | Status: Implemented
+  - Issue: #1484 (source plan #1460) | Size: S | Status: Shipped
   - Delivered: Concrete-only immutable dimensions, Warp device/ordered gas-name
     metadata, four immutable lifecycle values, and identity-retained generated
     Warp containers with O(1) metadata-only construction validation.
@@ -12,7 +12,7 @@
     sentinel coverage. P1 accepts lifecycle values only; transitions remain P4.
 
 - [x] **E7-F4-P2:** Implement one-time conversion and setup with unit tests
-  - Issue: #1485 | Size: S | Status: Implemented
+  - Issue: #1485 | Size: S | Status: Shipped
   - Delivered: Concrete-only `setup_resident_session()` performs local exact
     Warp-device, CPU carrier, rank, shape, and gas-name preflight before any
     conversion import; uploads particle/gas/environment exactly once in order;
@@ -34,8 +34,8 @@
   - Tests: Exact shape/dtype/device matrices, key ownership, duplicate-key and
     alias rejection, stable identity, and concrete-record export boundaries.
 
-- [ ] **E7-F4-P4:** Define timestep lifecycle and resident-state guards with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F4-P4:** Define timestep lifecycle and resident-state guards with unit tests
+  - Issue: TBD | Size: S | Status: Shipped | Completed: 2026-07-29
   - Goal: Expose scheduler-facing begin/complete hooks and prohibit conversion,
     resize, checkpoint re-entry, or use after fault/finalization.
   - Files: `particula/execution/gpu_session.py`,
@@ -43,16 +43,18 @@
   - Tests: Multi-step identity, no `from_warp_*` calls, lifecycle ordering,
     nested-operation rejection, and no implicit synchronization.
 
-- [ ] **E7-F4-P5:** Implement explicit checkpoint and finalize operations with restart tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Synchronize once, restore all CPU-owned state, preserve checkpoint
-    metadata/resources, support restart, and make finalization terminal.
+- [x] **E7-F4-P5:** Implement explicit checkpoint and finalize operations with restart tests
+  - Issue: #1488 | Size: S | Status: Shipped | Completed: 2026-07-28
+  - Delivered: Concrete-only immutable canonical primary/sidecar payloads,
+    nonterminal snapshots, cached idempotent terminal finalization, deterministic
+    registry enumeration, and explicit same-device fresh-session restart.
   - Files: `particula/execution/checkpoint.py`,
     `particula/execution/gpu_session.py`,
     `particula/execution/tests/checkpoint_test.py`
-  - Tests: One-sync/three-restore counts, names and metadata, nonterminal
-    checkpoint identity, terminal finalize idempotency, and uninterrupted versus
-    checkpoint/restart equivalence on Warp CPU.
+  - Tests: `particula/execution/tests/checkpoint_test.py` covers immutable
+    payloads, inspection detachment, active/terminal lifecycle behavior,
+    primary/vapor-pressure recovery, resource-family restart, malformed
+    descriptors, and closed-step rejection on Warp CPU.
 
 - [ ] **E7-F4-P6:** Enforce session failure and close semantics with regression tests
   - Issue: TBD | Size: S | Status: Not Started

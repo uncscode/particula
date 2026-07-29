@@ -78,8 +78,33 @@
   sidecar acquisition, allocation, or mutation. Future checkpoint, restore,
   finalize, close, fault, conversion, resize, and rebind boundaries must call
   `assert_step_closed()` before their own work; P5/P6 retain those operations
-  and their policy. The gate does not globally intercept raw low-level helpers.
-  See [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md).
+   and their policy. The gate does not globally intercept raw low-level helpers.
+   See [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md).
+- P5 adds a concrete-only in-memory checkpoint boundary in
+  `particula.execution.checkpoint`. `ResidentSession.checkpoint(registry, guard)`
+  and `.finalize(registry, guard)` bind one controller by exact identity to that
+  session, its pinned `GPUResourceRegistry`, and its `ResidentStepGuard`; both
+  require the active pinned binding and a closed step before readback. The
+  controller, checkpoint records, and restart helper are direct imports only and
+  are not exported through `particula.execution`, its adapters package, or
+  top-level `particula`.
+- `checkpoint()` leaves the session active and returns a fresh immutable host
+  snapshot. The first successful `finalize()` creates and caches the complete
+  snapshot before transitioning the session to terminal `FINALIZED`; every later
+  call returns the exact cached snapshot without new validation, synchronization,
+  conversion, allocation, or upload. Snapshots include canonical immutable bytes
+  for primaries and acquired sidecars and detached CPU inspection carriers. The
+  inspection `GasData` intentionally omits GPU-only vapor pressure and is not
+  authoritative; restart recovers vapor pressure from canonical bytes.
+- `restart_resident_session(checkpoint, device)` is explicit and same-device
+  only. After complete host-side preflight it creates fresh session, registry,
+  guard, container, primary-array, and sidecar identities; it never reuses the
+  source binding. It neither chooses nor migrates a device, falls back to CPU,
+  restarts automatically during normal use, provides disk/remote/delta storage,
+  nor promises rollback after an asynchronous device writer launches.
+  Snapshotting requires roughly one additional host copy of resident payload
+  bytes plus detached inspection copies. See
+  [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md).
 
 ## Concrete Condensation Execution Boundary
 

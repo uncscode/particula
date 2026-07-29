@@ -30,13 +30,14 @@
   across at least two successful timesteps.
 - [ ] No bulk CPU-to-Warp or Warp-to-CPU conversion occurs during normal step
   lifecycle operations.
-- [ ] A nonterminal checkpoint performs one explicit synchronization and one
+- [x] A nonterminal checkpoint performs one explicit synchronization and one
   restore per CPU container, preserves ordered metadata, and leaves the live
-  session active.
-- [ ] Finalization uses the same explicit boundary and makes the session
-  terminal without a duplicate restore on repeated calls.
-- [ ] Restart from a compatible checkpoint matches an uninterrupted
-  deterministic Warp CPU run for resident state and lifecycle metadata.
+  session active (P5, issue #1488).
+- [x] Finalization uses the same explicit boundary and makes the session
+  terminal without a duplicate restore on repeated calls (P5, issue #1488).
+- [x] Restart from a compatible checkpoint restores fresh same-device resident
+  state, canonical vapor pressure, acquired sidecars, and lifecycle metadata
+  (P5, issue #1488).
 - [ ] Preflight failures preserve caller-owned state; post-launch uncertainty
   faults the session and never triggers hidden rollback or CPU fallback.
 - [ ] E7-F6 availability seam: native-device availability remains an explicit

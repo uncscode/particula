@@ -69,8 +69,35 @@ falls back. Future checkpoint, restore, finalize, close, fault, conversion, and
 resize/rebind boundaries must call `assert_step_closed()` before their own work;
 P5/P6 retain those operations and their policy. Direct low-level helpers remain
 outside the guard's interception. Later phases own operational lifecycle
-semantics; direct kernel and adapter boundaries retain physical validation. See
-[ADR-004](architecture/decisions/ADR-004-concrete-gpu-resident-session-boundary.md).
+ semantics; direct kernel and adapter boundaries retain physical validation. See
+ [ADR-004](architecture/decisions/ADR-004-concrete-gpu-resident-session-boundary.md).
+
+P5 adds the concrete-only `particula.execution.checkpoint` boundary. It is not
+exported through `particula.execution`, its adapters package, or top-level
+`particula`. `ResidentSession.checkpoint(registry, guard)` and
+`ResidentSession.finalize(registry, guard)` use one controller bound by exact
+identity to that active session, its pinned `GPUResourceRegistry`, and its
+closed `ResidentStepGuard`. A checkpoint is a fresh immutable host snapshot;
+the first successful finalization caches the complete snapshot and transitions
+the session to terminal `FINALIZED`, while later finalization calls return that
+same cached object.
+
+Checkpoint records retain canonical immutable bytes for every primary array,
+including GPU-only gas vapor pressure, and acquired sidecars, as well as
+detached CPU inspection `ParticleData`, `GasData`, and `EnvironmentData`.
+Inspection gas intentionally has no vapor-pressure field and is non-authoritative;
+restart recovers canonical vapor-pressure bytes rather than inspection data.
+Snapshots require approximately one additional host copy of resident payload
+bytes plus detached inspection copies.
+
+`restart_resident_session(checkpoint, device)` is an explicit direct import and
+only accepts an exactly compatible target device. After complete host preflight,
+it creates fresh session, registry, guard, containers, primaries, and sidecars;
+it never reuses source identities. It does not select or migrate a device, fall
+back to CPU, restart automatically during normal session use, provide disk,
+remote, or delta persistence, or guarantee rollback after an asynchronous device
+writer launches. See
+[ADR-007](architecture/decisions/ADR-007-resident-session-checkpoint-finalize-restart.md).
 
 `particula.execution.gpu_resources` is a separate direct-import-only,
 Warp-dependent concrete boundary beside `gpu_session`. Each `GPUResourceRegistry`

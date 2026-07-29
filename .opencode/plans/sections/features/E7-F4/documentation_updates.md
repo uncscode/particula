@@ -46,3 +46,12 @@ metadata-only `validate_pinned_session()` seam, and the required
 `assert_step_closed()` hook for future P5/P6 lifecycle boundaries. No public
 API, user example, checkpoint/restore implementation, or broad documentation
 surface was added.
+
+## P5 Status
+
+Issue #1488 added `docs/Features/gpu_resident_checkpoints.md`. It documents the
+concrete-only direct import, explicit registry/guard ownership, nonterminal
+checkpoint and idempotent terminal finalization, immutable canonical payloads,
+lossy inspection vapor pressure, same-device fresh restart, host-copy cost, and
+the exclusions for package exports, serialization, migration, fallback, and
+rollback. The feature page is validated with `mkdocs build --strict`.

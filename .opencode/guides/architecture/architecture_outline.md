@@ -73,10 +73,31 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
    resize, restore, or fall back. Future checkpoint, restore, finalize, close,
    fault, conversion, and resize/rebind boundaries must call
    `assert_step_closed()` before their own work; P5/P6 retain those operations
-   and policy. Raw low-level helper calls are not globally intercepted. See
+   and policy. P5 adds direct-import-only `ResidentSession.checkpoint()` and
+   `ResidentSession.finalize()`, delegated to one exact-identity-bound
+   controller with its active session, pinned `GPUResourceRegistry`, and closed
+   `ResidentStepGuard`. A checkpoint is a fresh immutable host snapshot and is
+   nonterminal; finalization caches its first complete snapshot, then makes the
+   session terminal `FINALIZED`, and later calls return that exact cached object.
+   The controller/records/restart helper remain absent from all package exports.
+   Raw low-level helper calls are not globally intercepted. See
    [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md),
    [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md), and
    [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md).
+- `checkpoint.py` - Concrete-only P5 in-memory checkpoint/restart boundary.
+   `ResidentCheckpoint` stores versioned immutable canonical bytes for all
+   primary arrays, including GPU-only gas vapor pressure, and acquired registry
+   sidecars, plus detached CPU inspection carriers. Inspection data is
+   non-authoritative and intentionally lossy for vapor pressure; restart uses
+   canonical payload bytes. Direct-import-only `restart_resident_session()`
+   first fully validates the record, then creates fresh session, registry,
+   guard, containers, primary arrays, and sidecars only on an explicitly exact
+   compatible device. It does not select or migrate devices, automatically
+   restart normal session use, fall back to CPU, serialize to disk/remote, or
+   guarantee rollback after an asynchronous device writer launches. Snapshotting
+   requires roughly one additional host copy of resident payload bytes plus
+   detached inspection copies. See
+   [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md).
 - `gpu_resources.py` - Direct-import-only, Warp-dependent concrete registry for
   complete reusable native process sidecars. Each registry accepts exactly one
   exact `ACTIVE` `ResidentSession`, pins its lifecycle, dimensions, device, and

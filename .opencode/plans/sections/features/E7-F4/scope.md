@@ -69,7 +69,35 @@ the behavior or signatures of shipped direct process kernels.
   conversion/restore, resize/rebind, and fault entries while a token is open.
   It does not globally intercept raw low-level helpers. P4 adds no adapter
   ordering/execution, synchronization, conversion, restore, resizing, or CPU
-  fallback.
+   fallback.
+
+## Implemented in P5 (Issue #1488)
+
+- `particula/execution/checkpoint.py` provides frozen `CheckpointPayload` and
+  `ResidentCheckpoint` records, `ResidentCheckpointController`, and the
+  direct-import-only `restart_resident_session()`/`restart_checkpoint()`
+  recovery entry points.
+- A successful checkpoint validates the exact active session/registry/guard
+  binding and closed step before one synchronization, then performs the three
+  ordered `sync=False` CPU conversions. It snapshots the canonical 12 primary
+  payloads, ordered gas names, guard counters, and deterministic acquired
+  sidecar descriptors/bytes without retaining live Warp or mutable NumPy
+  references.
+- `checkpoint()` leaves the source session ACTIVE and returns a fresh equivalent
+  record. First `finalize()` snapshots and atomically changes only ACTIVE to
+  FINALIZED; repeated calls return the cached object without validation,
+  transfer, enumeration, allocation, or upload. Pre-transition failures leave
+  the source active and the cache empty.
+- Restart fully preflights schema, metadata, counters, payload immutability,
+  descriptor order/completeness, dtype/shape/capacity, and target-device
+  compatibility before setup. It creates fresh primaries, registry, sidecars,
+  and guard on the explicitly matching device; vapor pressure is restored from
+  canonical bytes in place and guard counters are restored only after resource
+  publication.
+- `GPUResourceRegistry._enumerate_resources()` is the narrow checkpoint-only
+  internal seam. It validates the active pinned binding and yields established
+  family/role arrays in manifest order without payload access, copying,
+  allocation, synchronization, or mutation.
 
 ## Out of Scope
 

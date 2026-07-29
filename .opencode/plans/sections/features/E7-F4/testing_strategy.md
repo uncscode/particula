@@ -42,11 +42,15 @@ deterministic baseline; CUDA rows are optional and skip cleanly.
   `validate_pinned_session()` for the exact session, distinct sessions,
   fabricated terminal states, and primary/container drift, including unchanged
   bindings/views and no allocation or mutation.
-- **P5:** In `particula/execution/tests/checkpoint_test.py`, assert one explicit
-  sync and three `sync=False` restores, ordered-name retention, gas
-  vapor-pressure lossiness is represented in metadata/resources, active state
-  remains usable after checkpoint, finalization is terminal, and restart
-  matches an uninterrupted deterministic Warp CPU sequence.
+- **P5 (implemented in issue #1488):**
+  `particula/execution/tests/checkpoint_test.py` covers frozen immutable payload
+  records, detached inspection carriers, canonical primary/vapor-pressure
+  restoration, active checkpoint behavior, cached terminal finalization, fresh
+  restart identities, acquired resource-family restoration, malformed payload
+  rejection before setup, and the closed-step rejection path. Warp cases defer
+  import and use the Warp CPU baseline. Transfer/order, failure-injection,
+  descriptor-matrix, and optional CUDA coverage are retained as focused
+  regression expectations for this concrete-only boundary.
 - **P6:** Inject validation failures, allocation failures, failures before
   process launch, and simulated post-launch failures. Assert no rollback or
   fallback, faulted-state guards, original error propagation, no implicit
@@ -78,6 +82,7 @@ pytest particula/execution/tests/gpu_session_test.py -q -Werror
 pytest particula/execution/tests/gpu_resources_test.py -q -Werror
 pytest particula/execution/tests/gpu_session_test.py particula/execution/tests/gpu_resources_test.py --cov=particula.execution.gpu_session --cov=particula.execution.gpu_resources --cov-report=term-missing --cov-fail-under=80 -q -Werror
 pytest particula/execution/tests/checkpoint_test.py -q -Werror
+pytest particula/execution/tests/checkpoint_test.py --cov=particula.execution.checkpoint --cov-report=term-missing --cov-fail-under=80 -q -Werror
 pytest particula/gpu/tests/process_sequence_test.py -q -Werror
 pytest particula/gpu/tests/kernel_exports_test.py -q -Werror
 mkdocs build --strict

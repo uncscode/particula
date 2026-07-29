@@ -41,16 +41,16 @@
 
 ## Checkpoint and Finalization
 
-- [ ] Add a versioned immutable checkpoint model in
-  `particula/execution/checkpoint.py`.
-- [ ] Implement one explicit `wp.synchronize()` followed by all three
-  `from_warp_*` calls with `sync=False`.
-- [ ] Capture CPU containers, ordered names, dimensions, device/backend,
-  step/time counters, and restart-required mutable resource payloads.
-- [ ] Keep `checkpoint()` nonterminal and identity-preserving for the live
-  resident session; make `finalize()` terminal and idempotent.
-- [ ] Implement explicit restart into a fresh session and reject incompatible
-  checkpoint versions or requested dimensions/devices.
+- [x] Add the versioned immutable concrete-only checkpoint model and controller
+  in `particula/execution/checkpoint.py` (P5, issue #1488).
+- [x] Synchronize once and perform ordered particle/gas/environment
+  `from_warp_*` conversions with `sync=False` (P5, #1488).
+- [x] Capture detached inspection containers plus canonical primary/sidecar
+  bytes, ordered names, dimensions/device, and step/time metadata (P5, #1488).
+- [x] Keep checkpoint nonterminal; cache and idempotently finalize the terminal
+  checkpoint without duplicate device activity (P5, #1488).
+- [x] Restart explicitly into a fresh, same-device-compatible session after full
+  schema/descriptor preflight (P5, #1488).
 - [ ] Define close/discard behavior that never restores implicitly.
 
 ## Tooling / Tests
@@ -64,8 +64,9 @@
   `particula/execution/tests/gpu_resources_test.py` (issue #1487).
 - [ ] Add `particula/execution/tests/gpu_resources_test.py` for the complete
   sidecar shape/dtype/device/alias matrix.
-- [ ] Add `particula/execution/tests/checkpoint_test.py` for synchronized
-  restore, metadata, restart equivalence, and terminal behavior.
+- [x] Add `particula/execution/tests/checkpoint_test.py` for immutable payload,
+  restore, resource-family restart, malformed-descriptor, and terminal behavior
+  coverage (P5, #1488).
 - [ ] Reuse canonical fixtures from
   `particula/gpu/tests/process_sequence_test.py` rather than inventing divergent
   physics fixtures.

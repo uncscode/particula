@@ -64,3 +64,14 @@ guard's completed-step count and simulated time; the guard neither dispatches
 adapters nor transfers, synchronizes, allocates, resizes, restores, or falls
 back. Its `assert_step_closed()` gate is the required preflight for future P5/P6
 lifecycle boundaries, while P5/P6 retain checkpoint/finalize/close/fault policy.
+
+P5 was completed in issue #1488. Direct-import-only
+`particula.execution.checkpoint` now supplies immutable, versioned in-memory
+checkpoints and same-device restart. `ResidentSession.checkpoint()` is a
+nonterminal, synchronized snapshot; `finalize()` caches its first checkpoint,
+transitions to `FINALIZED`, and returns that exact cached record thereafter.
+Canonical payload bytes preserve all 12 primary arrays (including GPU-only
+vapor pressure) and every acquired sidecar, while detached CPU inspection
+carriers remain non-authoritative. Checkpoint/restart remains concrete-only:
+there is no package export, device selection or migration, serialization, CPU
+fallback, scheduler, or RNG-policy expansion.

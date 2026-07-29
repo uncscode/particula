@@ -14,7 +14,14 @@ kernel, or change session lifecycle or random-number-generator policy.
 for resident timestep guards. It requires the exact retained session, then
 revalidates its active lifecycle, pinned container and primary-array identities,
 and schema metadata without inspecting payloads, acquiring sidecars, allocating,
-transferring, or synchronizing.
+ transferring, or synchronizing.
+
+For concrete checkpointing, the private deterministic enumeration seam exposes
+established live sidecars only after the same active pinned-session validation.
+Checkpoint code owns any immutable host copy it creates; this registry retains
+caller- or registry-owned device arrays. Enumeration neither copies nor
+transfers payloads, and this module offers no restart, migration, or rollback
+after launched device work.
 """
 
 from __future__ import annotations
@@ -226,6 +233,8 @@ class GPUResourceRegistry:
     No payload is read, copied, synchronized, or mutated by acquisition. Its
     concrete-only :meth:`validate_pinned_session` seam lets lifecycle guards
     verify the exact active binding without resource acquisition or execution.
+    Its private checkpoint enumeration reports acquired sidecars in manifest
+    order without changing their ownership or creating host copies.
     """
 
     def __init__(self, session: ResidentSession) -> None:
@@ -313,8 +322,18 @@ class GPUResourceRegistry:
         """Return established sidecars in deterministic manifest order.
 
         This checkpoint-only seam validates the exact active pinned session but
-        does not synchronize, copy, allocate, or inspect array payloads.  Each
-        item is ``(family, role, live_array, capacity)``.
+        does not synchronize, copy, allocate, or inspect array payloads. Each
+        item is ``(family, role, live_array, capacity)``. The returned arrays
+        remain registry-owned live device arrays; a checkpoint controller alone
+        decides whether and how to capture immutable host bytes.
+
+        Returns:
+            Established sidecars as deterministic family/role descriptors with
+            live arrays and optional coagulation capacity.
+
+        Raises:
+            ValueError: If the exact pinned session is inactive or its protected
+                metadata, containers, or primary-array identities drifted.
         """
         self.validate_pinned_session(self._session)
         entries: list[tuple[str, str, Any, int | None]] = []

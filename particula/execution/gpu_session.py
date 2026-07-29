@@ -1,20 +1,23 @@
-"""Define concrete-only GPU-resident session carriers and setup.
+"""Define concrete-only GPU-resident sessions, setup, and lifecycle hooks.
 
 The immutable carriers retain caller-owned Warp containers and CPU gas-name
 metadata. ``setup_resident_session`` snapshots validated ordered CPU gas names
 into immutable tuple metadata and is P2's sole CPU-to-Warp upload point: local
 CPU preflight precedes conversion imports, then particles, gas, and environment
 convert once in that order before one complete ACTIVE session is published. Gas
-names are not stored on the Warp gas container. This module provides no public
-export, lifecycle operation, fallback, synchronization, restore, or process
-sidecar. Its concrete-only P4 ``ResidentStepGuard`` and identity-only
+names are not stored on the Warp gas container. This module provides no package
+export, fallback, implicit transfer, or process sidecar. Its concrete-only P4
+``ResidentStepGuard`` and identity-only
 ``ResidentStepToken`` track one open timestep for one pinned active
 session/registry binding. They execute no adapters, transfer no data,
 synchronize no Warp work, allocate no resources, and provide no fallback.
 Future checkpoint, restore, finalize, close, fault, conversion, and
 resize/rebind boundaries must call the guard's ``assert_step_closed`` gate
 before their own work; raw low-level helpers remain outside that gate's
-interception.
+interception. Checkpoint support is concrete-only in
+``particula.execution.checkpoint``: ``ResidentSession.checkpoint()`` is
+nonterminal, while ``finalize()`` caches its snapshot and transitions the
+session to FINALIZED. Restart is explicit, same-device, and never automatic.
 Selected native Warp-device availability remains an upstream E7-F6
 precondition.
 """
@@ -189,10 +192,12 @@ class ResidentDimensions:
 
 
 class ResidentLifecycle(Enum):
-    """Declare P1 immutable lifecycle vocabulary without transition logic.
+    """Declare resident lifecycle vocabulary.
 
-    This vocabulary records a supplied state only. Lifecycle transitions,
-    recovery, finalization, and close operations are outside this module.
+    ``ResidentSession`` starts ACTIVE. Its narrow checkpoint-only helper may
+    transition exactly ACTIVE to FINALIZED after a controller has cached an
+    immutable checkpoint. Fault, close, recovery, and all other transitions are
+    outside this module.
     """
 
     ACTIVE = "active"
@@ -510,7 +515,11 @@ class ResidentSession:
 
     Construction performs only O(1) schema and device metadata validation. It
     neither reads resident payloads nor transfers, allocates, synchronizes,
-    schedules, or operates on the retained lifecycle state.
+    schedules, or operates on the retained lifecycle state. Concrete-only
+    checkpoint methods bind exact session, registry, and guard identities;
+    checkpoint is nonterminal, whereas successful finalization caches a
+    checkpoint and makes the session FINALIZED. They neither select a device nor
+    provide migration, CPU fallback, or rollback after launched device work.
 
     Attributes:
         particles: Caller-owned generated Warp particle container.
@@ -518,7 +527,8 @@ class ResidentSession:
         environment: Caller-owned generated Warp environment container.
         dimensions: Immutable dimensions that describe the retained containers.
         metadata: Immutable Warp-device and ordered gas-name metadata.
-        lifecycle: Immutable supplied lifecycle vocabulary value.
+        lifecycle: Current lifecycle vocabulary value; only checkpoint
+            finalization may change ACTIVE to FINALIZED.
     """
 
     particles: object
@@ -567,10 +577,12 @@ class ResidentSession:
     def _checkpoint_controller(
         self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
     ) -> Any:
-        """Return the exact lifecycle controller bound to this session.
+        """Return the exact checkpoint controller bound to this session.
 
         The controller is intentionally attached outside the frozen data-carrier
-        fields so P1 construction remains a metadata-only operation.
+        fields so construction remains a metadata-only operation. Its binding is
+        exact: a different registry or guard is rejected rather than rebinding
+        the session or transferring ownership.
         """
         from particula.execution.checkpoint import ResidentCheckpointController
 
@@ -590,13 +602,40 @@ class ResidentSession:
     def checkpoint(
         self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
     ) -> Any:
-        """Create a nonterminal explicit in-memory resident checkpoint."""
+        """Create a nonterminal immutable in-memory resident checkpoint.
+
+        The session, registry, and closed guard must be the controller's exact
+        active binding. The returned concrete-only record owns detached host
+        inspection carriers and canonical primary/sidecar bytes; this session
+        and all resident identities remain active and caller-owned.
+
+        Args:
+            registry: Exact registry pinned to this active session.
+            guard: Exact closed guard bound to the same session and registry.
+
+        Returns:
+            A fresh immutable checkpoint record.
+        """
         return self._checkpoint_controller(registry, guard).checkpoint()
 
     def finalize(
         self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
     ) -> Any:
-        """Create or return the terminal cached resident checkpoint."""
+        """Create or return the terminal cached resident checkpoint.
+
+        The first successful call snapshots the exact active binding, caches the
+        resulting record, and transitions this session to FINALIZED. Later calls
+        return that identical record without further device work. A failure
+        before the transition leaves this session active; no rollback is
+        guaranteed after an already-launched device operation.
+
+        Args:
+            registry: Exact registry pinned to this active session.
+            guard: Exact closed guard bound to the same session and registry.
+
+        Returns:
+            The immutable cached terminal checkpoint.
+        """
         return self._checkpoint_controller(registry, guard).finalize()
 
     def _finalize_checkpoint(self) -> None:
@@ -795,7 +834,22 @@ class ResidentStepGuard:
     def _restore_checkpoint_counters(
         self, completed_steps: object, simulated_time: object
     ) -> None:
-        """Restore counters only into a fresh closed active guard binding."""
+        """Restore counters only into a fresh closed active guard binding.
+
+        This private restart seam changes bookkeeping only after a checkpoint
+        restart has established every fresh primary and acquired sidecar. It
+        does not restore arrays, synchronize, launch device work, or roll back a
+        launched device operation.
+
+        Args:
+            completed_steps: Nonnegative count to restore exactly.
+            simulated_time: Finite nonnegative real duration to restore without
+                coercion.
+
+        Raises:
+            ValueError: If the guard is not fresh and closed, its pinned binding
+                is inactive, or a counter violates its invariant.
+        """
         if (
             self._open_token is not None
             or self._completed_steps != 0

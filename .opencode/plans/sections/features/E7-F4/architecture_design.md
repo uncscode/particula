@@ -127,6 +127,29 @@ validation path, retaining its ACTIVE lifecycle, primary-identity, and schema
 checks without allocating resources or examining payloads. The guard and token
 remain absent from `particula.execution`, adapter exports, and top-level exports.
 
+## P5 Implementation
+
+Issue #1488 implemented the explicit checkpoint boundary in
+`particula/execution/checkpoint.py`. `ResidentCheckpointController` is bound by
+identity to one `ResidentSession`, `GPUResourceRegistry`, and
+`ResidentStepGuard`. Before any readback it requires ACTIVE lifecycle, the exact
+pinned binding, and a closed step. It synchronizes exactly once, converts
+particle/gas/environment in that order with `sync=False`, then captures
+immutable canonical bytes for the 12 primary arrays and each acquired registry
+sidecar. Detached inspection carriers are deliberately non-authoritative:
+their gas carrier loses vapor pressure, while the primary payload restores it
+exactly.
+
+`checkpoint()` returns a new equivalent ACTIVE snapshot. `finalize()` performs
+that operation once, changes the session from ACTIVE to FINALIZED only after a
+successful capture, and caches the exact record for O(1) idempotent later
+calls. Restart accepts an exact nonterminal checkpoint and explicit matching
+`Device`, validates every record and descriptor before setup, uploads fresh CPU
+primaries, restores vapor pressure in place, acquires independently materialized
+sidecars through the registry APIs, and restores guard counters last. It never
+reuses source identities, selects/migrates devices, or offers rollback after a
+launched device operation.
+
 ## Failure and Atomicity
 
 - Validation and capability failures occur before conversion/allocation where
@@ -136,9 +159,11 @@ remain absent from `particula.execution`, adapter exports, and top-level exports
 - A failure after launched work may leave resident arrays partially changed;
   mark the session faulted, preserve the original exception, and require
   explicit discard/close. Do not promise rollback or checkpoint uncertain state.
-- `close()` is idempotent and never implies restore. `finalize()` is the only
-  terminal restore operation. A failed finalization remains observable and may
-  be retried only if E7-F6 policy classifies it as pre-transfer/recoverable.
+- `close()` is idempotent and never implies restore. `finalize()` is the
+  terminal snapshot/finalization operation. `restart_resident_session()` is the
+  explicit restoration operation and creates a fresh compatible session. A
+  failed finalization remains observable and may be retried only if E7-F6 policy
+  classifies it as pre-transfer/recoverable.
 
 ## Security & Compliance
 
