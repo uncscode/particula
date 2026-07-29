@@ -1499,8 +1499,8 @@ E7-F6 owns availability, fallback, error taxonomy, API stability, and export
 policy. E7-F1 supplies neither transfer nor fallback. E7-F2 supplies
 condensation adapters and E7-F3 supplies coagulation adapters. E7-F4 supplies
 resident session/container/sidecar lifecycle; P1--P7 are shipped as its bounded
-concrete-only prerequisite. E7-F5 is shipped as their bounded, concrete-only
-scheduling consumer. These consumers do not alter the shipped direct-kernel
+concrete-only prerequisite. E7-F5 is their later scheduling consumer, shipped
+as a bounded, concrete-only seam. These consumers do not alter the shipped direct-kernel
 path.
 
 E7-F3's shipped concrete-only Brownian seam is a bounded exception to this
