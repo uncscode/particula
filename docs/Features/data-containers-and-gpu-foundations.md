@@ -229,10 +229,61 @@ does not select or migrate a device, provide fallback, or guarantee rollback
 after an asynchronous writer launches. See
 [GPU resident checkpoints](gpu_resident_checkpoints.md).
 
+### GPU-resident deterministic timestep
+
+`particula.execution.resident_scheduler` and
+`particula.execution.diagnostics` are concrete-only direct-import seams. They
+are not exported by `particula.execution` or the top-level package. The
+scheduler accepts one identity-bound active session, pinned registry, closed
+guard, and resolver-produced complete schedule; direct adapters retain the
+resident objects by identity. Diagnostics is a closed two-snapshot protocol,
+not a callback API: it copies only to separate caller-owned outputs and supplies
+no implicit host inspection or transfer.
+
+The closed schedule contains exactly these node IDs:
+
+`environment_update`, `gas_update`, `vapor_pressure_refresh`,
+`saturation_refresh`, `condensation`, `brownian_coagulation`, `dilution`,
+`wall_loss`, `nucleation`, and `diagnostics`.
+
+Its displayed order is resolver-produced and profile/graph-dependent, not a
+universal static order. Authoritative process dependencies come from the
+resolved graph; virtual freshness edges are `environment_update ->
+vapor_pressure_refresh`, `environment_update -> saturation_refresh`,
+`gas_update -> saturation_refresh`, `vapor_pressure_refresh ->
+saturation_refresh`, and `saturation_refresh -> {condensation, diagnostics}`.
+The `SchedulerProfile` selects exactly one reviewed edge:
+`condensation -> nucleation` or `nucleation -> condensation`; the latter also
+requires nucleation before the saturation-refresh consumer window.
+
+| Resident responsibility | Authority and boundary |
+| --- | --- |
+| Environment and gas updates | Prescribed identity-preserving resident updates |
+| Vapor pressure and saturation | Derived virtual freshness state |
+| Condensation, Brownian coagulation, dilution, wall loss, nucleation | Direct resident adapters over the resolved process nodes |
+| Gas-concentration and saturation-ratio diagnostics | Closed snapshots to separate caller-owned outputs |
+
+The direct scheduler skips virtual refresh-node dispatch. Instead, the
+thermodynamic coordinator refreshes stale state in vapor-pressure-then-
+saturation order immediately before condensation or diagnostics consumer
+callbacks. Environment invalidates vapor pressure and saturation; gas,
+condensation, and nucleation invalidate saturation. `ParticleData.volume` is
+fixed resident state: transport, mixing, advection, and volume evolution belong
+to E7-F7.
+
+Normal steps do not convert or transfer data, synchronize, restore, checkpoint,
+finalize, restart, acquire or replace resources, fall back to CPU, retry, resize,
+compact, capture graphs, claim performance, use multiple GPUs, or rewrite
+physics. Preflight rejection leaves active state unchanged. After writer-capable
+dispatch begins, a failure may fault the session and has no rollback or retry
+guarantee. Checkpoint/finalize/restart remain the explicit exact-device boundary
+documented in [GPU resident checkpoints](gpu_resident_checkpoints.md).
+
 ### Complete direct-process illustration
 
 The [complete direct-process source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py)
-is illustrative, not a production coordinator. It imports the five direct
+is an illustrative explicit-transfer five-call sequence, not a resident
+scheduler or coordinator example. It imports the five direct
 boundaries from `particula.gpu.kernels` in order: `condensation_step_gpu`,
 `coagulation_step_gpu`, `dilution_step_gpu`, `wall_loss_step_gpu`, then
 `nucleation_step_gpu`. CPU↔Warp conversion helpers remain under

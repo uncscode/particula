@@ -81,8 +81,12 @@
     no-transfer/sync/fallback, read-only abort, uncertain-writer faulting, Warp
     CPU, and skip-clean optional CUDA.
 
-- [ ] **E7-F5-P7:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Document process order, state authority, support boundaries, errors, and downstream handoffs.
+- [x] **E7-F5-P7:** Update development documentation
+  - Issue: #1498 | Size: XS | Status: Completed
+  - Delivered: Published the concrete-only, profile/graph-dependent ten-node
+    scheduler contract, virtual freshness windows and invalidations, identity and
+    diagnostics authority, lifecycle limits, checkpoint separation, and E7-F7--F9
+    handoffs without adding an API or export.
   - Files: `docs/Features/`, `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`, E7 plan sections
-  - Tests: `mkdocs build --strict`, documentation regression and import/export checks.
+  - Tests: focused documentation regression, scheduler/export checks, Ruff,
+    mypy, and `mkdocs build --strict`.

@@ -1491,7 +1491,7 @@ It is neither a high-level execution API nor a GPU adapter. Callers construct
 an exact request, context-local registration supplies an adapter, and selection
 does not execute that adapter.
 
-The full-policy downstream ordering is:
+The full-policy downstream ordering was:
 
 `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`.
 
@@ -1499,8 +1499,9 @@ E7-F6 owns availability, fallback, error taxonomy, API stability, and export
 policy. E7-F1 supplies neither transfer nor fallback. E7-F2 supplies
 condensation adapters and E7-F3 supplies coagulation adapters. E7-F4 supplies
 resident session/container/sidecar lifecycle; P1--P7 are shipped as its bounded
-concrete-only prerequisite. E7-F5 is their later scheduling consumer. These
-consumers do not alter the shipped direct-kernel path.
+concrete-only prerequisite. E7-F5 is shipped as their bounded, concrete-only
+scheduling consumer. These consumers do not alter the shipped direct-kernel
+path.
 
 E7-F3's shipped concrete-only Brownian seam is a bounded exception to this
 full-policy ordering: it has no public export, availability probing, fallback,
@@ -1521,12 +1522,13 @@ E7-F6 remains deferred. Any broader integration still follows the ordering.
 - E7-F2, E7-F3, and E7-F4 may add bounded consumers after their process-adapter
   or resident-lifecycle contracts are established. E7-F3's shipped
   concrete-only seam is the documented exception to the full-policy ordering;
-  E7-F5 remains a later consumer, not a consequence of E7-F1 selection alone.
+  E7-F5 is a shipped bounded consumer, not a consequence of E7-F1 selection
+  alone.
 - E7-F3 P6 has shipped bounded selected-Brownian adapter documentation and
   evidence in the [coagulation strategy guide](../coagulation_strategy_system.md)
   and its [explicit-transfer example](../../Examples/gpu_coagulation_direct.py).
-  It preserves the direct-kernel contract and defers E7-F5 scheduling,
-  E7-F8 detailed RNG stream policy, public exports,
+  It preserves the direct-kernel contract and defers E7-F8 detailed RNG stream
+  policy, public exports,
   fallback, and hidden transfer.
 
 ### Full GPU-Resident Simulation
@@ -1537,11 +1539,20 @@ in-memory checkpoint/restart prerequisite. See
 seams, closed-guard binding, canonical recovery bytes, and exact-device fresh
 restart contract. It is not a resident loop or a process coordinator.
 
-E7-F5 scheduling, E7-F7 transport, and E7-F8 detailed RNG-stream policy remain
-deferred. Full-process scheduling, high-level GPU adapters, and user-facing
-CPU/GPU orchestration also remain later contracts after E7-F6 establishes
-policy. They must not imply hidden transfer, availability probing, fallback,
-retry, or replacement of the direct-kernel APIs.
+E7-F5 is shipped as a bounded concrete-only exception: it runs only the complete
+resolver-produced ten-node schedule, retains one exact resident identity binding,
+uses coordinator-owned vapor-pressure/saturation freshness windows, and exposes
+only closed diagnostics snapshots. It adds no hidden transfer, public
+orchestration, or export surface. E7-F4 remains its prerequisite and the
+explicit checkpoint/restart boundary.
+
+E7-F7 transport, mixing/advection, and volume evolution remain deferred.
+E7-F8 owns scheduled persistent stream identity/reset and checkpoint/restart RNG
+policy. E7-F9 owns final diagnostics products, complete examples, and closeout.
+High-level GPU adapters and user-facing CPU/GPU orchestration remain later
+contracts after E7-F6 establishes policy. They must not imply availability
+probing, fallback, retry, graph capture, performance claims, distributed or
+multi-GPU work, or replacement of the direct-kernel APIs.
 
 ### Multi-Box Communication
 
@@ -1572,10 +1583,11 @@ Fixed-capacity slot management for these loops is defined in
   graph-captured execution tests.
 - Document expected reproducibility limits across CPU, Warp CPU, and CUDA.
 
-**Exit bar:** E7-F1 remains a bounded selection seam. Any future condensation,
-coagulation, resident-session, or scheduling work must establish its own
-contract through E7-F2, E7-F3, E7-F4, or E7-F5 after E7-F6 policy is defined;
-the direct GPU path remains explicit and unchanged.
+**Exit bar:** E7-F1 remains a bounded selection seam and E7-F5 remains a
+bounded concrete-only resident scheduler. E7-F7--E7-F9 and any public,
+availability-policy, fallback/retry, graph-capture, performance, or distributed
+integration must establish their own contract. The direct GPU path remains
+explicit and unchanged.
 
 ## Epic H: Graph Capture and Performance
 

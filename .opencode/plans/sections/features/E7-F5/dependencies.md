@@ -33,5 +33,5 @@ not provide runtime scheduling. P4 completed in #1495 with direct node-bound
 resident environment/gas updates, but does not execute scheduling or freshness
 refreshes. P3 process integration and P4 are prerequisites for P5 freshness
 refreshes. P6 composes all prior phases and validates the complete loop. P7
-documents the settled contract last. Every production phase includes co-located
-tests.
+documented the settled concrete-only contract in #1498. Every production phase
+includes co-located tests.

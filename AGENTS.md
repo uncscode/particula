@@ -936,24 +936,32 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   saturation refresh, condensation, Brownian coagulation, dilution, wall loss,
   nucleation, and diagnostics. It retains one exact active session, pinned
   registry, and closed guard by identity; opens one token only after preflight;
-  dispatches the resolved order; and uses thermodynamic consumer windows for
-  condensation and diagnostics. It performs no transfer, restore,
-  synchronization, checkpoint/finalize, resource acquisition or replacement,
-  fallback, resize, or compaction. A failure after a writer-capable call closes
-  the token, faults the session, and has no rollback guarantee.
+  dispatches the profile/graph-dependent resolved order; and uses thermodynamic
+  consumer windows for condensation and diagnostics. The virtual refresh nodes
+  run vapor-pressure then saturation immediately before those consumers:
+  environment invalidates vapor pressure and saturation, while gas,
+  condensation, and nucleation invalidate saturation. It performs no transfer,
+  restore, synchronization, checkpoint/finalize, resource acquisition or
+  replacement, fallback, retry, resize, or compaction. A failure after a
+  writer-capable call closes the token, faults the session, and has no rollback
+  or retry guarantee.
 - Compatibility is fail-closed: only checkpoint schema version `1`, carrier
   type `"ResidentSession"`, ACTIVE state, complete valid payloads, and an
-  exactly equal `Device` restart. E7-F5 scheduling, E7-F7 transport, and E7-F8
-  detailed RNG policy remain deferred.
+  exactly equal `Device` restart. E7-F5 scheduling is shipped as this
+  concrete-only bounded contract. `ParticleData.volume` remains fixed resident
+  state; E7-F7 owns transport, mixing/advection, and volume evolution. E7-F8
+  owns detailed scheduled RNG/restart policy, and E7-F9 owns final diagnostics,
+  complete examples, and closeout.
 
 Focused commands:
 
 ```bash
 pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror
 pytest particula/execution/tests/scheduler_test.py -q -Werror
-pytest particula/execution/tests/gpu_session_test.py \
-  particula/execution/tests/gpu_resources_test.py \
-  particula/execution/tests/checkpoint_test.py -q -Werror
+pytest particula/tests/execution_exports_test.py -q -Werror
+ruff check particula/execution/
+mypy particula/execution/ --ignore-missing-imports
+mkdocs build --strict
 ```
 
 ## ADW Workflows

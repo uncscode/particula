@@ -73,6 +73,14 @@
 - [x] May the runtime compose a partial or handwritten process order?
   - Resolved 2026-07-29 in #1497: No. It accepts only the exact
     resolver-produced complete ten-node schedule and dispatches its ordered IDs;
-    virtual thermodynamic nodes are consumed only by their consumer windows.
-  - Evidence: `particula/execution/resident_scheduler.py` and
+   virtual thermodynamic nodes are consumed only by their consumer windows.
+   - Evidence: `particula/execution/resident_scheduler.py` and
     `particula/execution/tests/scheduler_test.py`.
+
+- [x] Does published scheduler documentation establish a universal physical
+  nucleation/condensation direction?
+  - Resolved 2026-07-29 in #1498: No. The resolver applies exactly one reviewed
+    `SchedulerProfile` direction to the resolved graph; documentation labels the
+    order profile/graph-dependent.
+  - Evidence: `docs/Features/data-containers-and-gpu-foundations.md` and
+    `particula/execution/scheduler.py`.

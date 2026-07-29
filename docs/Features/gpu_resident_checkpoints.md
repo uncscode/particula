@@ -36,6 +36,11 @@ rejects other versions or carrier schemas, malformed or incomplete payloads,
 non-`ACTIVE` checkpoint records, and device mismatches; it does not promise
 forward or backward compatibility.
 
+Normal resident scheduler calls never checkpoint, finalize, or restart. Those
+operations remain this explicit, concrete-only exact-device boundary; see the
+[GPU-resident deterministic timestep](data-containers-and-gpu-foundations.md#gpu-resident-deterministic-timestep)
+contract for normal-step limits.
+
 For a lazy lifecycle-only walkthrough that does not schedule or launch physics,
 see the
 [GPU-resident session lifecycle source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_session.py).

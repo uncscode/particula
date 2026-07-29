@@ -71,4 +71,7 @@
 - [x] Add optional CUDA rows that skip cleanly and retain persistent stochastic
   RNG identity without exact trajectory assertions (#1497).
 - [x] Maintain combined P6 diagnostics/scheduler coverage at or above 80% and
-  run focused warning-clean validation and architecture-guide updates (#1497).
+   run focused warning-clean validation and architecture-guide updates (#1497).
+- [x] Publish P7 documentation and focused Warp-independent regression coverage
+  for resolver/profile-dependent ordering, authority, exclusions, checkpoint
+  separation, and E7-F7--F9 handoffs (#1498).

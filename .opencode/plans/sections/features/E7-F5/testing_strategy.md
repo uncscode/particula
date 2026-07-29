@@ -50,10 +50,17 @@ never lowered; changed modules target at least 80%.
   rollback claims; no transfer/sync/checkpoint/fallback; deterministic loops,
   conservation/loss, isolation, persistent RNG identity, Warp CPU, and
   skip-clean CUDA. Combined diagnostics/scheduler coverage is at least 80%.
-- **P7:** Validate import/export wording, links, examples, and strict MkDocs.
+- **P7 (completed, #1498):** The Warp-independent resident-session
+  documentation regression checks the published IDs, resolver/profile-dependent
+  order, virtual consumer windows, invalidations, authority boundaries,
+  checkpoint separation, handoffs, and exclusions. It also rejects stale E7-F5
+  deferral and hidden-transfer/fallback/retry wording.
 
 Deterministic fields use explicit `rtol`/`atol` recorded by the owning process.
 Stochastic coagulation/wall-loss checks use persistent stream contracts,
 invariants, or aggregate statistics—not exact CPU/CUDA trajectory equality.
-Focused commands include `pytest particula/execution/tests -q -Werror`, existing
-GPU process-sequence/export tests, Ruff, mypy, and `mkdocs build --strict`.
+Focused P7 commands are `pytest particula/execution/tests/scheduler_test.py -q
+-Werror`, `pytest particula/execution/tests/gpu_resident_session_docs_test.py -q
+-Werror`, `pytest particula/tests/execution_exports_test.py -q -Werror`, `ruff
+check particula/execution/`, `mypy particula/execution/ --ignore-missing-imports`,
+and `mkdocs build --strict`.
