@@ -34,3 +34,13 @@ normalizes node and edge declaration order deterministically. It deliberately
 does not schedule or execute work, access resident resources, select a backend,
 or change `particula.execution` exports. Later phases retain scheduler and
 resident-timestep delivery.
+
+## Delivered: E7-F5-P2 (#1493)
+
+`resolve_canonical_topological_order()` now provides lexical Kahn ordering for
+validated process-graph declarations. The new direct-import-only
+`particula.execution.scheduler` resolves immutable enabled-node selections and
+direction profiles into declaration-only schedules, retaining dependency closure
+and deriving freshness edges before topology resolution. It has no launch,
+lifecycle, resource, backend, or export side effects; resident timestep
+execution remains later work.

@@ -3,7 +3,8 @@
 This concrete module validates immutable P1 graph declarations before applying
 enabled-node selection, direction policy, and freshness closure. Resolution is
 prelaunch-only: it neither loads backends nor enters lifecycle state, allocates
-resources, executes refreshes, or mutates caller-owned data.
+resources, executes refreshes, or mutates caller-owned data. Its names are not
+package exports and must be imported from this module directly.
 """
 
 import re
@@ -39,6 +40,9 @@ _FRESHNESS_EDGES = (
 @dataclass(frozen=True)
 class EnabledNodeSelection:
     """Declare the complete immutable set of enabled P1 node identifiers.
+
+    Graph membership is deliberately deferred to schedule resolution, after
+    complete P1 plan validation.
 
     Args:
         enabled_node_ids: Exact frozenset of syntactically valid node IDs.
@@ -76,6 +80,9 @@ class NucleationCondensationDirection(str, Enum):
 class SchedulerProfile:
     """Declare immutable scheduler direction policy without selecting execution.
 
+    The enum represents exactly one reviewed nucleation/condensation direction;
+    it cannot encode both directions or no direction.
+
     Args:
         nucleation_condensation_direction: The one permitted direction policy.
     """
@@ -99,7 +106,8 @@ class ResolvedTimestepSchedule:
     """Store canonical, immutable declaration-only scheduling metadata.
 
     Nodes and dependencies are canonically sorted. The order is a permutation
-    of node IDs created before any lifecycle entry or process launch.
+    of node IDs created before any lifecycle entry, resource action, or process
+    launch.
 
     Args:
         nodes: Sorted exact tuple of enabled process nodes.
@@ -198,9 +206,11 @@ def resolve_timestep_schedule(
 ) -> ResolvedTimestepSchedule:
     """Resolve an immutable effective schedule without running any process.
 
-    P1 complete-graph validation always happens before selection or profile
-    inspection. Afterwards this function applies selected IDs, direction
-    policy, required freshness closure, and canonical topology ordering.
+    After exact carrier-type checks, complete P1 graph validation happens before
+    selection or profile inspection. This function then applies selected IDs,
+    direction policy, required freshness closure, and canonical topology
+    ordering. It returns metadata only and performs no lifecycle, resource, or
+    GPU work.
 
     Args:
         plan: Exact P1 plan declaration.
@@ -213,7 +223,8 @@ def resolve_timestep_schedule(
     Raises:
         TypeError: If a carrier is not its exact declared type.
         ValueError: If selection, direction, closure, or effective topology is
-            invalid. No input is mutated when resolution fails.
+            invalid. No input is mutated when resolution fails; no rollback is
+            required because resolution has no side effects.
     """
     _validate_resolution_inputs(plan, selection, profile)
     resolved = resolve_timestep_plan(plan)

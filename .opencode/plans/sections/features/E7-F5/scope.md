@@ -33,6 +33,21 @@ environment, derived-thermodynamic, gas, and diagnostic boundaries.
 - Kept the layer unexported and backend-neutral: no Warp/GPU import, resident
   resource access, scheduler, execution order, state update, or mutation.
 
+## Delivered in P2 (#1493)
+
+- Added `resolve_canonical_topological_order()` to
+  `particula/execution/process_graph.py`: a read-only lexical Kahn ordering
+  helper with endpoint and effective-cycle rejection.
+- Added direct-import-only `particula/execution/scheduler.py` with immutable
+  selection, nucleation/condensation direction-profile, and resolved-schedule
+  records.
+- Added P1-first declaration-only schedule resolution: selected-node and
+  predecessor closure, reviewed direction handling, derived freshness edges,
+  deterministic effective-edge ordering, and canonical topology delegation.
+- Added co-located `process_graph_test.py` and `scheduler_test.py` coverage.
+- Kept package exports, lifecycle/resource behavior, process launches, backend
+  imports, transfers, synchronization, and state mutation unchanged.
+
 ## Out of Scope
 
 - Silent CPU fallback, hidden CPU/GPU movement, or runtime retry on another

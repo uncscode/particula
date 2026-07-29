@@ -12,10 +12,13 @@ never lowered; changed modules target at least 80%.
   retry after rejection; and a guarded import proving no Warp/GPU backend load.
   The focused warning-clean and changed-module-coverage commands are recorded
   in the implementation specification.
-- **P2:** Unit-test registration-order invariance, canonical tie breaking,
-  disabled nodes, dependency closure, invalidation edges, and prelaunch atomicity.
-  Test reviewed profiles with each permitted fixed nucleation/condensation edge,
-  and reject profiles that declare neither direction or both directions.
+- **P2 (completed, #1493):** `process_graph_test.py` covers lexical canonical
+  topology, endpoint validation, and effective-cycle rejection.
+  `scheduler_test.py` covers immutable/exact-type records, P1-first validation,
+  selection and predecessor closure, derived freshness edges, both reviewed
+  nucleation/condensation directions, registration-order invariance, and guarded
+  imports proving no optional backend/lifecycle/resource/adapter load. Both
+  modules are declaration-only and perform no launch or mutation.
 - **P3:** Adapter contract tests spy on exact direct calls and assert state,
   sidecar, output, and RNG identity; cover no-op/rejection/failure paths and no
   conversion, synchronization, fallback, or private-kernel bypass.

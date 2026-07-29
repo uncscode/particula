@@ -9,6 +9,12 @@
 - [x] P1 remains unexported, pure, and backend-neutral: it does not import
   Warp/GPU modules, access resources, schedule, execute, or mutate state
   (#1492).
+- [x] P2 resolves registration-independent lexical topological order and a
+  declaration-only selected schedule with explicit/derived closure, reviewed
+  direction policy, and no disabled-endpoint edges (#1493).
+- [x] P2 remains direct-import-only and prelaunch-only: no package export,
+  lifecycle/resource/backend import, launch, transfer, synchronization, or
+  mutation occurs during schedule resolution (#1493).
 - [ ] Condensation, Brownian coagulation, dilution, wall loss, and nucleation
   execute through their owning adapters/direct boundaries without physics rewrites.
 - [ ] Environment changes precede vapor-pressure and saturation refresh; every

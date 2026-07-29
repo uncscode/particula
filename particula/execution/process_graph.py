@@ -1,7 +1,8 @@
-"""Declare and validate neutral process-graph plans without scheduling.
+"""Declare and validate neutral process-graph plans.
 
-This module only validates and normalizes immutable process declarations.  It
-does not schedule or execute work, access resources, or load optional backends.
+This module validates and normalizes immutable process declarations and
+provides a read-only canonical topological-order helper. It does not resolve
+scheduler policy, execute work, access resources, or load optional backends.
 """
 
 import re
@@ -359,12 +360,13 @@ def resolve_canonical_topological_order(
     nodes: tuple[ProcessNode, ...],
     dependencies: tuple[DependencyEdge, ...],
 ) -> tuple[str, ...]:
-    """Return the deterministic dependency order for validated graph records.
+    """Return a deterministic canonical dependency order for graph records.
 
     Ready nodes and successor traversal use lexical node identifiers, so the
     result never depends on declaration order. This read-only helper validates
-    tuple/member shape and edge endpoints but does not validate the closed P1
-    catalogue or execute graph nodes.
+    tuple/member shape, unique node IDs, and edge endpoints, but does not
+    validate the closed P1 catalogue, resolve scheduler policy, or execute
+    graph nodes.
 
     Args:
         nodes: Exact tuple of declared graph nodes with unique identifiers.

@@ -10,10 +10,16 @@
   (P1, #1492).
 - [x] Implement deterministic declaration normalization and cycle/error
   reporting without an execution-order field (P1, #1492).
-- [ ] Implement stable topological resolution only as part of scheduler work
-  (P2); P1 intentionally does not schedule.
-- [ ] Add `SimulationScheduler` in `particula/execution/scheduler.py`; validate
-  the full step before `ResidentSession.begin_step()` and advance counters once.
+- [x] Add `resolve_canonical_topological_order()` in
+  `particula/execution/process_graph.py` with lexical Kahn ordering, endpoint
+  validation, and effective-cycle rejection (P2, #1493).
+- [x] Add direct-import-only declaration scheduler resolution in
+  `particula/execution/scheduler.py`: immutable selections/profiles/schedules,
+  P1-first validation, closure, direction policy, and freshness dependencies
+  (P2, #1493).
+- [ ] Add runtime `SimulationScheduler` lifecycle integration after declaration
+  resolution; validate before `ResidentSession.begin_step()` and advance
+  counters once.
 - [ ] Route E7-F2/F3 adapters through `ExecutionContext` and add resident
   dilution, wall-loss, and nucleation adapters without direct private-kernel use.
 - [ ] Preserve all input/output container, array, sidecar, and RNG identities.
@@ -36,9 +42,10 @@
 
 - [x] Add `process_graph_test.py` with declaration, validation, normalization,
   cycle, and backend-neutral import coverage (P1, #1492).
-- [ ] Add `process_adapters_test.py`,
-  `state_updates_test.py`, and `scheduler_test.py` under
-  `particula/execution/tests/` with every phase.
+- [x] Add P2 topology/scheduler tests in `process_graph_test.py` and
+  `scheduler_test.py`, including guarded no-backend imports (#1493).
+- [ ] Add `process_adapters_test.py` and `state_updates_test.py` under
+  `particula/execution/tests/` with their phases.
 - [ ] Generalize existing process-sequence fixtures and transfer/sync spies.
 - [ ] Test registration-order invariance, graph rejection, exact call order,
   lifecycle, identity, no-op paths, update freshness, and failure propagation.

@@ -1,7 +1,7 @@
 # Architecture Reference
 
 **Project:** particula  
-**Last Updated:** 2026-07-28
+**Last Updated:** 2026-07-29
 
 This reference summarizes the particula package structure and key architectural
 conventions migrated from the legacy guide set.
@@ -94,8 +94,23 @@ type `"ResidentSession"`, ACTIVE records, complete valid payload schemas, and an
 exactly equal `Device` are accepted. Other versions, schemas, malformed records,
 non-ACTIVE checkpoint records, and device mismatches reject. Finalization makes
 its source session terminal but returns an ACTIVE checkpoint eligible for explicit
-restart. E7-F5, E7-F7, and E7-F8 own future scheduling, transport, and detailed
-RNG-stream policy respectively.
+restart. E7-F5 P2 supplies declaration-only scheduling; E7-F7 transport and
+E7-F8 detailed RNG-stream policy remain future work.
+
+E7-F5 P2 adds `particula.execution.scheduler`, a concrete direct-import-only
+declaration-only scheduling boundary. It first resolves the complete P1 graph,
+then applies enabled-node selection, one reviewed nucleation/condensation
+direction, required freshness closure, and deterministic lexical topology. Its
+immutable result is metadata only: it does not load GPU/Warp, lifecycle, or
+resource boundaries; allocate, transfer, mutate, refresh, synchronize, or
+launch processes. Scheduler names remain absent from `particula.execution` and
+top-level exports.
+
+`particula.execution.process_graph` remains the P1 owner of graph declaration
+validation and normalization. Its canonical topology helper is a read-only,
+lexical tie-breaking utility used by the scheduler; it does not add an execution
+order field, scheduling policy, lifecycle behavior, or backend work to the
+resolved P1 graph.
 
 `particula.execution.gpu_resources` is a separate direct-import-only,
 Warp-dependent concrete boundary beside `gpu_session`. Each `GPUResourceRegistry`

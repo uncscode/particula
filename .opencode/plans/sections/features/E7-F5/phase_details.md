@@ -10,11 +10,18 @@
     allowed/disallowed dependencies, canonical cycles/normalization, recovery,
     and guarded no-Warp/GPU import coverage.
 
-- [ ] **E7-F5-P2:** Build canonical deterministic dependency order with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Resolve a stable topological order with environment and derived-state hazards encoded as edges.
-  - Files: `particula/execution/process_graph.py`, `particula/execution/scheduler.py`, co-located tests
-  - Tests: registration-order invariance, disabled nodes, tie breaking, stale-state prevention, prelaunch failures.
+- [x] **E7-F5-P2:** Build canonical deterministic dependency order with unit tests
+  - Issue: #1493 | Size: S | Status: Completed
+  - Delivered: Lexical Kahn topology resolution plus a direct-import-only,
+    declaration-only scheduler with selection/profile records, P1-first
+    validation, closure, reviewed direction policy, and freshness dependencies.
+  - Files: `particula/execution/process_graph.py`,
+    `particula/execution/scheduler.py`,
+    `particula/execution/tests/process_graph_test.py`,
+    `particula/execution/tests/scheduler_test.py`
+  - Tests: registration-order invariance, canonical ties, disabled-node and
+    freshness closure, both direction profiles, P1-first rejection,
+    effective-cycle rejection, and guarded no-backend imports.
 
 - [ ] **E7-F5-P3:** Integrate dilution, wall loss, and nucleation adapters with unit tests
   - Issue: TBD | Size: S | Status: Not Started

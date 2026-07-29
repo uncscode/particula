@@ -14,5 +14,9 @@
 - P1 (#1492) required no user-facing documentation because it is an unexported,
   declaration-only internal boundary. E7-F5 plan sections now record its
   implementation and retained non-scheduler boundary.
+- P2 (#1493) likewise required no user-facing documentation: its scheduler
+  foundation is direct-import-only, declaration-only, and unexported. The
+  module and record docstrings document canonical ordering, P1-first validation,
+  closure, and no-launch semantics.
 - Run documentation regressions and `mkdocs build --strict`; if a paired notebook
   is touched, edit its Jupytext `.py`, sync, execute, and commit both files.
