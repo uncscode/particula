@@ -5,6 +5,7 @@ import subprocess
 import sys
 from dataclasses import fields
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -86,19 +87,23 @@ def test_all_families_allocate_complete_stable_resources(
     wall_loss = registry.acquire_wall_loss()
     nucleation = registry.acquire_nucleation()
 
+    condensation_buffers = cast(Any, condensation.scratch_buffers)
+    nucleation_exhaustion = cast(Any, nucleation.exhaustion)
+    nucleation_finalized_demand = cast(Any, nucleation.finalized_demand)
+
     assert registry.acquire_condensation() is condensation
     assert registry.acquire_coagulation(3) is coagulation
     assert registry.acquire_wall_loss() is wall_loss
     assert registry.acquire_nucleation() is nucleation
-    assert condensation.scratch_buffers.work_mass_transfer.shape == shape
+    assert condensation_buffers.work_mass_transfer.shape == shape
     assert coagulation.collision_pairs.shape == (shape[0], 3, 2)
     assert coagulation.n_collisions.shape == (shape[0],)
     assert wall_loss.rng_states is not coagulation.rng_states
     assert (
-        nucleation.exhaustion.resampling_buffers.replacement_masses.shape
+        nucleation_exhaustion.resampling_buffers.replacement_masses.shape
         == shape
     )
-    assert nucleation.finalized_demand.precursor_mass_change.shape == (
+    assert nucleation_finalized_demand.precursor_mass_change.shape == (
         shape[0],
         shape[2],
     )
@@ -116,20 +121,23 @@ def test_registry_allocates_canonical_zero_dimension_schemas(
     condensation = registry.acquire_condensation()
     coagulation = registry.acquire_coagulation(1)
     nucleation = registry.acquire_nucleation()
+    condensation_buffers = cast(Any, condensation.scratch_buffers)
+    nucleation_diagnostics = cast(Any, nucleation.diagnostics)
+    nucleation_finalized_demand = cast(Any, nucleation.finalized_demand)
 
-    assert condensation.scratch_buffers.work_mass_transfer.shape == shape
-    assert condensation.scratch_buffers.work_mass_transfer.strides == (
+    assert condensation_buffers.work_mass_transfer.shape == shape
+    assert condensation_buffers.work_mass_transfer.strides == (
         shape[1] * shape[2] * 8,
         shape[2] * 8,
         8,
     )
     assert coagulation.collision_pairs.shape == (shape[0], 1, 2)
     assert coagulation.collision_pairs.dtype == wp.int32
-    assert nucleation.diagnostics.selected_slot_indices.shape == (
+    assert nucleation_diagnostics.selected_slot_indices.shape == (
         shape[0],
         shape[1],
     )
-    assert nucleation.finalized_demand.precursor_mass_change.shape == (
+    assert nucleation_finalized_demand.precursor_mass_change.shape == (
         shape[0],
         shape[2],
     )
@@ -141,8 +149,9 @@ def test_registry_rejects_replacement_capacity_and_primary_alias() -> None:
     session = _session()
     registry = GPUResourceRegistry(session)
     view = registry.acquire_wall_loss()
+    session_temperature = cast(Any, session.environment).temperature
     with pytest.raises(ValueError, match="replaced"):
-        registry.acquire_wall_loss(rng_states=session.environment.temperature)
+        registry.acquire_wall_loss(rng_states=session_temperature)
     registry.acquire_coagulation(1)
     with pytest.raises(ValueError, match="cannot change"):
         registry.acquire_coagulation(2)
@@ -236,7 +245,7 @@ def test_registry_rejects_replaced_primary_identity_before_publication() -> (
     session = _session()
     registry = GPUResourceRegistry(session)
     object.__setattr__(
-        session.environment,
+        cast(Any, session.environment),
         "temperature",
         wp.ones((1,), dtype=wp.float64, device="cpu"),
     )

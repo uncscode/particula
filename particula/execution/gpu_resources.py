@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, fields
 from numbers import Integral
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import warp as wp
 
@@ -181,19 +181,22 @@ _NUCLEATION = ResourceManifest(
 
 def _primary_arrays(session: ResidentSession) -> tuple[Any, ...]:
     """Return the protected resident primary arrays in canonical order."""
+    particles = cast(Any, session.particles)
+    gas = cast(Any, session.gas)
+    environment = cast(Any, session.environment)
     return (
-        session.particles.masses,
-        session.particles.concentration,
-        session.particles.charge,
-        session.particles.density,
-        session.particles.volume,
-        session.gas.molar_mass,
-        session.gas.concentration,
-        session.gas.vapor_pressure,
-        session.gas.partitioning,
-        session.environment.temperature,
-        session.environment.pressure,
-        session.environment.saturation_ratio,
+        particles.masses,
+        particles.concentration,
+        particles.charge,
+        particles.density,
+        particles.volume,
+        gas.molar_mass,
+        gas.concentration,
+        gas.vapor_pressure,
+        gas.partitioning,
+        environment.temperature,
+        environment.pressure,
+        environment.saturation_ratio,
     )
 
 
@@ -231,10 +234,11 @@ class GPUResourceRegistry:
         return (_CONDENSATION, _COAGULATION, _WALL_LOSS, _NUCLEATION)
 
     def _session_signature(self) -> tuple[Any, ...]:
+        particles = cast(Any, self._session.particles)
         return (
             self._session.lifecycle,
             self._session.dimensions,
-            self._session.particles.masses.device,
+            particles.masses.device,
             *(id(value) for value in _primary_arrays(self._session)),
         )
 
@@ -326,9 +330,8 @@ class GPUResourceRegistry:
             count = self._checked_product(count, length)
         if count == 0:
             return None
-        if (
-            not isinstance(getattr(value, "ptr", None), Integral)
-            or value.ptr < 0
+        if not isinstance(getattr(value, "ptr", None), Integral) or (
+            value.ptr < 0
         ):
             raise ValueError(f"{role} must have a valid pointer.")
         return int(value.ptr), int(value.ptr) + count * item_size
@@ -418,11 +421,18 @@ class GPUResourceRegistry:
     @staticmethod
     def _array_range(array: Any) -> tuple[int, int] | None:
         """Return one validated registry array's nonempty byte range."""
+        strides = getattr(array, "strides", None)
+        if not isinstance(strides, tuple) or len(strides) != len(array.shape):
+            raise ValueError("Registry arrays must have contiguous strides.")
         count = 1
         for length in array.shape:
             count *= length
         if count == 0:
             return None
+        if not isinstance(getattr(array, "ptr", None), Integral) or (
+            array.ptr < 0
+        ):
+            raise ValueError("Registry arrays must have a valid pointer.")
         size = _item_size(array.dtype)
         return int(array.ptr), int(array.ptr) + count * size
 
