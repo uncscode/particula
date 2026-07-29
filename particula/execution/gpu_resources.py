@@ -307,6 +307,28 @@ class GPUResourceRegistry:
             raise ValueError("session must be the pinned ResidentSession.")
         self._validate_session_signature()
 
+    def _enumerate_resources(
+        self,
+    ) -> tuple[tuple[str, str, Any, int | None], ...]:
+        """Return established sidecars in deterministic manifest order.
+
+        This checkpoint-only seam validates the exact active pinned session but
+        does not synchronize, copy, allocate, or inspect array payloads.  Each
+        item is ``(family, role, live_array, capacity)``.
+        """
+        self.validate_pinned_session(self._session)
+        entries: list[tuple[str, str, Any, int | None]] = []
+        for manifest in self.manifests:
+            bindings = self._bindings.get(manifest.family)
+            if bindings is None:
+                continue
+            capacity = self._capacities.get(manifest.family)
+            entries.extend(
+                (manifest.family, entry.role, bindings[entry.role], capacity)
+                for entry in manifest.entries
+            )
+        return tuple(entries)
+
     def reserve_open_step(self, token: Any) -> None:
         """Reserve the binding's sole open timestep token by identity.
 

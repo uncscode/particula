@@ -111,6 +111,34 @@ def test_all_families_allocate_complete_stable_resources(
 
 
 @pytest.mark.warp
+def test_enumerate_resources_returns_established_arrays_in_manifest_order() -> (
+    None
+):
+    """Checkpoint enumeration omits absent families and preserves live identities."""
+    registry = GPUResourceRegistry(_session())
+
+    assert registry._enumerate_resources() == ()
+
+    condensation = registry.acquire_condensation()
+    coagulation = registry.acquire_coagulation(2)
+    entries = registry._enumerate_resources()
+
+    expected = [
+        (manifest.family, entry.role)
+        for manifest in (
+            gpu_resources._CONDENSATION,
+            gpu_resources._COAGULATION,
+        )
+        for entry in manifest.entries
+    ]
+    assert [(family, role) for family, role, _, _ in entries] == expected
+    assert entries[0][2] is condensation.scratch_buffers.work_mass_transfer
+    assert entries[-1][2] is coagulation.rng_states
+    assert all(capacity is None for *_, capacity in entries[:7])
+    assert all(capacity == 2 for *_, capacity in entries[7:])
+
+
+@pytest.mark.warp
 @pytest.mark.parametrize("shape", [(1, 0, 0), (1, 0, 1), (1, 2, 0)])
 def test_registry_allocates_canonical_zero_dimension_schemas(
     shape: tuple[int, int, int],

@@ -564,6 +564,52 @@ class ResidentSession:
             wp,
         )
 
+    def _checkpoint_controller(
+        self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
+    ) -> Any:
+        """Return the exact lifecycle controller bound to this session.
+
+        The controller is intentionally attached outside the frozen data-carrier
+        fields so P1 construction remains a metadata-only operation.
+        """
+        from particula.execution.checkpoint import ResidentCheckpointController
+
+        controller = getattr(self, "_resident_checkpoint_controller", None)
+        if controller is None:
+            controller = ResidentCheckpointController(self, registry, guard)
+            object.__setattr__(
+                self, "_resident_checkpoint_controller", controller
+            )
+        elif (
+            controller._registry is not registry
+            or controller._guard is not guard
+        ):
+            raise ValueError("checkpoint controller binding does not match.")
+        return controller
+
+    def checkpoint(
+        self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
+    ) -> Any:
+        """Create a nonterminal explicit in-memory resident checkpoint."""
+        return self._checkpoint_controller(registry, guard).checkpoint()
+
+    def finalize(
+        self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
+    ) -> Any:
+        """Create or return the terminal cached resident checkpoint."""
+        return self._checkpoint_controller(registry, guard).finalize()
+
+    def _finalize_checkpoint(self) -> None:
+        """Transition this exact active session to its terminal lifecycle.
+
+        This checkpoint-only helper performs no transfer, allocation, or
+        payload mutation.  Its narrow transition prevents a controller from
+        silently overwriting any lifecycle state other than ``ACTIVE``.
+        """
+        if self.lifecycle is not ResidentLifecycle.ACTIVE:
+            raise ValueError("session.lifecycle must be ACTIVE.")
+        object.__setattr__(self, "lifecycle", ResidentLifecycle.FINALIZED)
+
 
 @dataclass(frozen=True, eq=False)
 class ResidentStepToken:
@@ -745,6 +791,31 @@ class ResidentStepGuard:
         """
         if self._open_token is not None:
             raise RuntimeError("A resident timestep is open.")
+
+    def _restore_checkpoint_counters(
+        self, completed_steps: object, simulated_time: object
+    ) -> None:
+        """Restore counters only into a fresh closed active guard binding."""
+        if (
+            self._open_token is not None
+            or self._completed_steps != 0
+            or self._simulated_time != 0
+        ):
+            raise ValueError(
+                "guard must be fresh and closed for checkpoint restore."
+            )
+        self._registry.validate_pinned_session(self._session)
+        if (
+            isinstance(completed_steps, bool)
+            or not isinstance(completed_steps, Integral)
+            or completed_steps < 0
+        ):
+            raise ValueError(
+                "completed_steps must be a non-boolean nonnegative int."
+            )
+        validated_time = self._validate_duration(simulated_time)
+        self._completed_steps = int(completed_steps)
+        self._simulated_time = validated_time
 
 
 def setup_resident_session(
