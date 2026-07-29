@@ -349,6 +349,10 @@ class GPUResourceRegistry:
                 "diagnostic output", "diagnostics", wp.float64, "bs"
             )
             byte_range = self._validate_array(entry, output, capacity=None)
+            if byte_range is not None and byte_range[0] == 0:
+                raise ValueError(
+                    "Nonempty diagnostic outputs must have a valid pointer."
+                )
             ranges.append(byte_range)
         protected = list(_primary_arrays(self._session)) + [
             value

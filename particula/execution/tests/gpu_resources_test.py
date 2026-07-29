@@ -623,6 +623,32 @@ def test_validate_pinned_session_rejects_primary_and_container_drift() -> None:
 
 
 @pytest.mark.warp
+def test_diagnostics_rejects_nonempty_null_pointer_before_alias_checks(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test nonempty diagnostic buffers require a usable native pointer."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    device = cast(Any, session.particles).masses.device
+    null_output = type(
+        "array",
+        (),
+        {
+            "dtype": gpu_resources.wp.float64,
+            "shape": (1, 1),
+            "strides": (8, 8),
+            "device": device,
+            "ptr": 0,
+        },
+    )()
+    type(null_output).__module__ = "warp"
+    monkeypatch.setattr(gpu_resources.wp, "array", None)
+
+    with pytest.raises(ValueError, match="Nonempty diagnostic outputs"):
+        registry.validate_diagnostic_outputs(session, (null_output,))
+
+
+@pytest.mark.warp
 def test_established_view_validators_require_exact_published_views() -> None:
     """Test adapter seams accept only their exact acquired resource views."""
     session = _session()

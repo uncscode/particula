@@ -19,12 +19,14 @@ from particula.execution.process_graph import (
     NodeKind,
     ProcessNode,
     TimestepPlan,
+    resolve_timestep_plan,
 )
 from particula.execution.scheduler import (
     EnabledNodeSelection,
     NucleationCondensationDirection,
     ResolvedTimestepSchedule,
     SchedulerProfile,
+    is_resolver_produced_schedule,
     resolve_timestep_schedule,
 )
 
@@ -92,6 +94,33 @@ def test_scheduler_carriers_are_immutable_and_validate_types() -> None:
         SchedulerProfile(None)  # type: ignore[arg-type]
     with pytest.raises(TypeError):
         SchedulerProfile()  # type: ignore[call-arg]
+
+
+def test_resolved_schedule_retains_private_graph_provenance() -> None:
+    """Test only resolver output binds a schedule to its source graph."""
+    plan = TimestepPlan((_node("dilution"),), ())
+    schedule = resolve_timestep_schedule(
+        plan, EnabledNodeSelection(frozenset({"dilution"})), _profile()
+    )
+    assert schedule.source_graph is not None
+    assert is_resolver_produced_schedule(schedule, schedule.source_graph)
+
+    unrelated_graph = resolve_timestep_plan(plan)
+    assert not is_resolver_produced_schedule(schedule, unrelated_graph)
+
+
+def test_schedule_cannot_spoof_resolver_provenance_with_source_graph() -> None:
+    """Test a direct schedule cannot enter with only a graph reference."""
+    plan = TimestepPlan((_node("dilution"),), ())
+    graph = resolve_timestep_plan(plan)
+    forged = ResolvedTimestepSchedule(
+        graph.nodes,
+        graph.dependencies,
+        ("dilution",),
+        source_graph=graph,
+    )
+
+    assert not is_resolver_produced_schedule(forged, graph)
 
 
 def test_schedule_requires_canonical_members_and_topological_order() -> None:
@@ -660,6 +689,131 @@ def _scheduler_request(module: Any) -> tuple[Any, Any]:
     object.__setattr__(request, "registry", object())
     object.__setattr__(request, "thermodynamics", object())
     return request, guard
+
+
+@pytest.mark.warp
+def test_resident_scheduler_preflight_accepts_complete_refresh_window() -> None:
+    """Test the complete virtual refresh window remains an accepted schedule."""
+    module = _resident_scheduler()
+    ids = (
+        "environment_update",
+        "gas_update",
+        "vapor_pressure_refresh",
+        "saturation_refresh",
+        "condensation",
+        "brownian_coagulation",
+        "dilution",
+        "wall_loss",
+        "nucleation",
+        "diagnostics",
+    )
+    dependencies = (
+        module.DependencyEdge("vapor_pressure_refresh", "saturation_refresh"),
+        module.DependencyEdge("saturation_refresh", "condensation"),
+        module.DependencyEdge("saturation_refresh", "diagnostics"),
+    )
+
+    module.ResidentSimulationScheduler._validate_virtual_refresh_windows(
+        ids,
+        dependencies,
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("ids", "dependencies"),
+    [
+        (
+            (
+                "environment_update",
+                "gas_update",
+                "saturation_refresh",
+                "vapor_pressure_refresh",
+                "condensation",
+                "brownian_coagulation",
+                "dilution",
+                "wall_loss",
+                "nucleation",
+                "diagnostics",
+            ),
+            (
+                ("vapor_pressure_refresh", "saturation_refresh"),
+                ("saturation_refresh", "condensation"),
+                ("saturation_refresh", "diagnostics"),
+            ),
+        ),
+        (
+            (
+                "environment_update",
+                "gas_update",
+                "vapor_pressure_refresh",
+                "saturation_refresh",
+                "brownian_coagulation",
+                "condensation",
+                "dilution",
+                "wall_loss",
+                "nucleation",
+                "diagnostics",
+            ),
+            (
+                ("vapor_pressure_refresh", "saturation_refresh"),
+                ("saturation_refresh", "condensation"),
+                ("saturation_refresh", "diagnostics"),
+            ),
+        ),
+        (
+            (
+                "environment_update",
+                "gas_update",
+                "vapor_pressure_refresh",
+                "saturation_refresh",
+                "condensation",
+                "brownian_coagulation",
+                "dilution",
+                "wall_loss",
+                "diagnostics",
+                "nucleation",
+            ),
+            (
+                ("vapor_pressure_refresh", "saturation_refresh"),
+                ("saturation_refresh", "condensation"),
+                ("saturation_refresh", "diagnostics"),
+            ),
+        ),
+        (
+            (
+                "environment_update",
+                "gas_update",
+                "vapor_pressure_refresh",
+                "saturation_refresh",
+                "condensation",
+                "brownian_coagulation",
+                "dilution",
+                "wall_loss",
+                "nucleation",
+                "diagnostics",
+            ),
+            (
+                ("saturation_refresh", "condensation"),
+                ("saturation_refresh", "diagnostics"),
+            ),
+        ),
+    ],
+)
+def test_resident_scheduler_preflight_rejects_incomplete_refresh_windows(
+    ids: tuple[str, ...], dependencies: tuple[tuple[str, str], ...]
+) -> None:
+    """Test virtual refresh ordering and edges fail before a lifecycle token."""
+    module = _resident_scheduler()
+    edges = tuple(module.DependencyEdge(*edge) for edge in dependencies)
+
+    with pytest.raises(
+        ValueError, match="complete thermodynamic refresh windows"
+    ):
+        module.ResidentSimulationScheduler._validate_virtual_refresh_windows(
+            ids,
+            edges,
+        )
 
 
 @pytest.mark.warp

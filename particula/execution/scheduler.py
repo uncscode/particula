@@ -8,7 +8,7 @@ package exports and must be imported from this module directly.
 """
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 from particula.execution.process_graph import (
@@ -35,6 +35,7 @@ _FRESHNESS_EDGES = (
     ("saturation_refresh", "condensation"),
     ("saturation_refresh", "diagnostics"),
 )
+_SCHEDULE_PROVENANCE = object()
 
 
 @dataclass(frozen=True)
@@ -118,6 +119,10 @@ class ResolvedTimestepSchedule:
     nodes: tuple[ProcessNode, ...]
     dependencies: tuple[DependencyEdge, ...]
     ordered_node_ids: tuple[str, ...]
+    source_graph: ResolvedProcessGraph | None = field(
+        default=None, repr=False, compare=False
+    )
+    _provenance: object | None = field(default=None, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         """Validate canonical immutable schedule fields."""
@@ -241,7 +246,27 @@ def resolve_timestep_schedule(
     )
     dependencies = tuple(DependencyEdge(*pair) for pair in sorted(pairs))
     order = resolve_canonical_topological_order(nodes, dependencies)
-    return ResolvedTimestepSchedule(nodes, dependencies, order)
+    return ResolvedTimestepSchedule(
+        nodes,
+        dependencies,
+        order,
+        source_graph=resolved,
+        _provenance=_SCHEDULE_PROVENANCE,
+    )
+
+
+def is_resolver_produced_schedule(
+    schedule: ResolvedTimestepSchedule, graph: ResolvedProcessGraph
+) -> bool:
+    """Return whether a schedule retains its exact resolver-produced graph.
+
+    This internal provenance check prevents a structurally similar hand-built
+    schedule from entering the resident execution boundary.
+    """
+    return (
+        schedule.source_graph is graph
+        and schedule._provenance is _SCHEDULE_PROVENANCE
+    )
 
 
 def _validate_resolution_inputs(

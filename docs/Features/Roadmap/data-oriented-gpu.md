@@ -1,5 +1,16 @@
 # Data-Oriented Design and GPU Roadmap
 
+## Resident complete-loop boundary
+
+The shipped concrete-only `particula.execution.resident_scheduler` executes
+only the resolver-produced complete ten-node resident schedule. It binds one
+exact active session, registry, and closed guard; validates schedule provenance
+and thermodynamic refresh windows before opening its one lifecycle token; and
+does not provide a package export, transfer, fallback, checkpoint, restore,
+resize, or rollback guarantee. Its paired concrete-only diagnostics boundary is
+a closed, ordered two-operation protocol for caller-owned gas-concentration and
+saturation-ratio outputs, not callback registration or optional update wiring.
+
 This page tracks the status of the data-oriented container migration and the
 Warp-backed GPU work for particle-resolved aerosol simulations.
 

@@ -39,12 +39,16 @@ from particula.execution.process_adapters import (
     ResidentWallLossRequest,
 )
 from particula.execution.process_graph import (
+    DependencyEdge,
     ProcessNode,
     ResolvedProcessGraph,
     _is_resolver_produced_graph,
     resolve_canonical_topological_order,
 )
-from particula.execution.scheduler import ResolvedTimestepSchedule
+from particula.execution.scheduler import (
+    ResolvedTimestepSchedule,
+    is_resolver_produced_schedule,
+)
 from particula.execution.state_updates import (
     ResidentEnvironmentUpdateRequest,
     ResidentGasUpdateRequest,
@@ -220,6 +224,10 @@ class ResidentSimulationScheduler:
         registry.validate_pinned_session(request.session)
         if not _is_resolver_produced_graph(request.graph):
             raise ValueError("graph must be produced by plan resolution.")
+        if not is_resolver_produced_schedule(request.schedule, request.graph):
+            raise ValueError(
+                "schedule must be produced for the exact resolved graph."
+            )
         ids = request.schedule.ordered_node_ids
         if frozenset(ids) != _COMPLETE_IDS or len(ids) != len(_COMPLETE_IDS):
             raise ValueError(
@@ -231,13 +239,44 @@ class ResidentSimulationScheduler:
             raise ValueError("schedule must use canonical topological order.")
         graph_by_id = {node.node_id: node for node in request.graph.nodes}
         for node in request.schedule.nodes:
-            if graph_by_id.get(node.node_id) is not node:
+            node_id = node.node_id
+            if graph_by_id.get(node_id) is not node:
                 raise ValueError(
                     "schedule nodes must be identical graph members."
                 )
+        self._validate_virtual_refresh_windows(
+            ids, request.schedule.dependencies
+        )
         self._validate_request_nodes(graph_by_id)
         ResidentDiagnosticsExecutor().validate(request.diagnostics)
         self._validate_durations(duration)
+
+    @staticmethod
+    def _validate_virtual_refresh_windows(
+        ids: tuple[str, ...], dependencies: tuple[DependencyEdge, ...]
+    ) -> None:
+        """Require the complete resolver freshness window.
+
+        The refresh nodes must remain adjacent to condensation and diagnostics
+        before lifecycle entry.
+        """
+        positions = {node_id: index for index, node_id in enumerate(ids)}
+        vapor = positions["vapor_pressure_refresh"]
+        saturation = positions["saturation_refresh"]
+        condensation = positions["condensation"]
+        diagnostics = positions["diagnostics"]
+        pairs = {(edge.before_id, edge.after_id) for edge in dependencies}
+        if (
+            saturation != vapor + 1
+            or condensation != saturation + 1
+            or diagnostics != len(ids) - 1
+            or ("vapor_pressure_refresh", "saturation_refresh") not in pairs
+            or ("saturation_refresh", "condensation") not in pairs
+            or ("saturation_refresh", "diagnostics") not in pairs
+        ):
+            raise ValueError(
+                "schedule must retain complete thermodynamic refresh windows."
+            )
 
     def _validate_request_nodes(
         self, graph_by_id: dict[str, ProcessNode]
