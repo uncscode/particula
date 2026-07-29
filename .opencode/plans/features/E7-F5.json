@@ -58,11 +58,11 @@
     {
       "id": "E7-F5-P3",
       "title": "Integrate dilution, wall loss, and nucleation adapters with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-29",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
