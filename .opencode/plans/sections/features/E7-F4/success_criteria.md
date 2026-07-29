@@ -8,8 +8,12 @@
 - [x] P1 construction has regression coverage for no payload access, transfer,
   synchronization, kernel launch, allocation, conversion, fallback, migration,
   lifecycle operation, or export change.
-- [ ] Setup validates the complete CPU state and performs exactly one particle,
-  one gas, and one environment upload.
+- [x] P2 setup validates the complete local CPU state before conversion and
+  performs exactly one particle, one gas, and one environment upload in order
+  (issue #1485).
+- [x] P2 publishes only a complete validated `ACTIVE` session, retains converted
+  containers by identity, and preserves ordered CPU gas names in metadata
+  (issue #1485).
 - [ ] A session owns same-device fixed-shape Warp particle, gas, and environment
   state plus validated reusable process resources.
 - [ ] Container, array, and supplied sidecar identities and shapes remain stable
@@ -25,8 +29,9 @@
   deterministic Warp CPU run for resident state and lifecycle metadata.
 - [ ] Preflight failures preserve caller-owned state; post-launch uncertainty
   faults the session and never triggers hidden rollback or CPU fallback.
-- [ ] Missing Warp/CUDA and incompatible checkpoint/device requests produce
-  E7-F6-defined explicit errors.
+- [ ] E7-F6 availability seam: native-device availability remains an explicit
+  upstream precondition for P2; unavailable-device rejection awaits E7-F6's
+  public runtime API and is not emulated by this factory.
 - [ ] Existing direct-kernel contracts and narrow scratch/configuration export
   boundaries remain unchanged.
 - [ ] Warp CPU tests, focused coverage, linters, and strict documentation pass;

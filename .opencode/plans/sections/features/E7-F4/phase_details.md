@@ -11,14 +11,19 @@
     schema/dtype/shape/device rejection, zero-size boundary, and no-operation
     sentinel coverage. P1 accepts lifecycle values only; transitions remain P4.
 
-- [ ] **E7-F4-P2:** Implement one-time conversion and setup with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Upload each CPU container exactly once after E7-F1/E7-F6 capability
-    validation and preserve ordered gas metadata.
+- [x] **E7-F4-P2:** Implement one-time conversion and setup with unit tests
+  - Issue: #1485 | Size: S | Status: Implemented
+  - Delivered: Concrete-only `setup_resident_session()` performs local exact
+    Warp-device, CPU carrier, rank, shape, and gas-name preflight before any
+    conversion import; uploads particle/gas/environment exactly once in order;
+    retains ordered CPU gas names; and publishes a validated `ACTIVE` session.
+    E7-F6 native availability remains an explicit upstream precondition.
   - Files: `particula/execution/gpu_session.py`,
     `particula/execution/tests/gpu_session_test.py`
-  - Tests: Conversion call counts, Warp CPU setup, unavailable-device errors,
-    shape mismatch rejection, and no silent fallback.
+  - Tests: Subprocess import-isolation preflight matrix, Warp-CPU conversion
+    spies and identity checks, conversion failure ordering, final schema failure,
+    and input immutability. No unavailable-device test was added because the
+    E7-F6 availability API is not present.
 
 - [ ] **E7-F4-P3:** Add fixed-shape reusable sidecar registry with unit tests
   - Issue: TBD | Size: S | Status: Not Started

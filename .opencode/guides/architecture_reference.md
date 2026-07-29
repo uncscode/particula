@@ -48,15 +48,18 @@ native sidecars, resource lifetime, synchronization, concurrency, and any
 post-launch mutation or rollback semantics. These concrete names remain absent
 from the package selection surface and top-level `particula`.
 
-`particula.execution.gpu_session` is a separate concrete-only, direct-import P1
-boundary for already-resident caller-owned Warp particle, gas, and environment
-containers. `ResidentSession` retains those containers, immutable dimensions,
-Warp `Device` metadata, a CPU gas-name tuple, and immutable lifecycle vocabulary
-by identity after fixed-cost read-only type/schema/dtype/shape/device metadata
-validation. Warp and generated types import only during resident validation. It
-does not inspect payload values, synchronize, convert, allocate, launch, schedule,
-fallback, migrate, transition, finalize, or close, and is not a supported export
-from `particula.execution`, its adapters package, or top-level `particula`.
+`particula.execution.gpu_session` is a separate concrete-only, direct-import
+boundary. Its P1 `ResidentSession` retains already-resident caller-owned Warp
+particle, gas, and environment containers, immutable dimensions, Warp `Device`
+metadata, a CPU gas-name tuple, and immutable lifecycle vocabulary by identity
+after fixed-cost read-only type/schema/dtype/shape/device metadata validation.
+P2 adds the direct-import-only `setup_resident_session` factory: CPU-only local
+preflight precedes exactly one particle, gas, then environment conversion. It
+retains the ordered CPU gas-name tuple and publishes only the fully validated,
+`ACTIVE` resident session. Selected-device runtime availability remains the
+upstream E7-F6 responsibility. This boundary has no export from
+`particula.execution`, its adapters package, or top-level `particula`; it adds
+no fallback, synchronization, restoration, sidecars, or lifecycle operations.
 Later phases own operational lifecycle semantics; direct kernel and adapter
 boundaries retain physical validation. See
 [ADR-004](architecture/decisions/ADR-004-concrete-gpu-resident-session-boundary.md).

@@ -42,6 +42,14 @@ P1 was implemented in issue #1484 (source plan #1460). The concrete-only
 `particula/execution/gpu_session.py` boundary now retains caller-owned Warp
 particle, gas, and environment containers by identity with immutable resident
 dimensions, Warp device/gas-name metadata, and declared lifecycle values.
-Construction is metadata-only and lazy-imports Warp; setup uploads, sidecars,
-scheduling, lifecycle operations, checkpointing, restoration, and finalization
-remain future phases.
+Construction is metadata-only and lazy-imports Warp; sidecars, scheduling,
+lifecycle operations, checkpointing, restoration, and finalization remain future
+phases.
+
+P2 was implemented in issue #1485. The concrete-only
+`setup_resident_session()` factory performs exact local `Device`/Warp-backend
+and CPU cross-container schema preflight before importing conversion helpers.
+It converts particles, gas, and environment once, in that order, retains ordered
+CPU gas names in `ResidentMetadata`, and publishes one validated `ACTIVE`
+session. It adds no exports, fallback, synchronization, restore, or sidecars.
+Native-device availability remains an explicit E7-F6 upstream precondition.

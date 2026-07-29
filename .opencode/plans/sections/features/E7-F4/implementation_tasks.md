@@ -10,10 +10,11 @@
   metadata, and declared native device without payload access (P1, #1484).
 - [x] Add co-located metadata-only construction and rejection coverage in
   `particula/execution/tests/gpu_session_test.py` (P1, #1484).
-- [ ] Implement all-or-nothing setup using the three existing `to_warp_*`
-  helpers exactly once each.
-- [ ] Preserve ordered gas names and schema/version metadata outside
-  `WarpGasData`.
+- [x] Implement all-or-nothing publication setup using the three existing
+  `to_warp_*` helpers exactly once each, in particle/gas/environment order (P2,
+  issue #1485).
+- [x] Preserve ordered CPU gas names outside `WarpGasData` in validated
+  `ResidentMetadata` (P2, issue #1485).
 - [ ] Add scheduler-facing step entry/exit guards without process ordering,
   synchronization, transfer, or fallback.
 - [ ] Track step/time metadata only after successful step completion.
@@ -50,8 +51,9 @@
 
 ## Tooling / Tests
 
-- [ ] Add `particula/execution/tests/gpu_session_test.py` for setup, lifecycle,
-  identity, transfer-spy, availability, and failure semantics.
+- [x] Add P2 setup preflight, conversion-spy, identity, and failure coverage to
+  `particula/execution/tests/gpu_session_test.py` (issue #1485). Availability
+  rejection remains pending the E7-F6 public seam.
 - [ ] Add `particula/execution/tests/gpu_resources_test.py` for the complete
   sidecar shape/dtype/device/alias matrix.
 - [ ] Add `particula/execution/tests/checkpoint_test.py` for synchronized

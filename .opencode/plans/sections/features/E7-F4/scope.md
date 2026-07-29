@@ -41,6 +41,19 @@ the behavior or signatures of shipped direct process kernels.
   lifecycle operation.
 - Co-located tests are in `particula/execution/tests/gpu_session_test.py`.
 
+## Implemented in P2 (Issue #1485)
+
+- Concrete-only `setup_resident_session()` locally validates an exact Warp
+  `Device`, CPU carrier types, rank-3 particle masses, and required `(B, N, S)`
+  cross-container shapes before importing conversion helpers.
+- It snapshots ordered CPU gas names as an exact-string tuple, converts particle,
+  gas, and environment carriers exactly once in that order using unchanged
+  `device.native`, then constructs the sole published `ACTIVE` session.
+- Tests cover import-free local failures, conversion ordering/failures, final
+  session-schema rejection, identity retention, and input immutability.
+- E7-F6 device availability is not probed or emulated: selected native-device
+  availability remains an upstream precondition.
+
 ## Out of Scope
 
 - Process ordering, environment evolution, or derived thermodynamic refresh

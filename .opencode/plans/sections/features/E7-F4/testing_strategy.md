@@ -16,10 +16,15 @@ deterministic baseline; CUDA rows are optional and skip cleanly.
   sentinels verify successful and invalid-schema construction performs no host
   payload read, synchronization, launch, or allocation. Warp-dependent tests
   are marked `warp` and import Warp inside test bodies.
-- **P2:** Spy on `to_warp_particle_data`, `to_warp_gas_data`, and
-  `to_warp_environment_data` to prove exactly one setup call each. Test no
-  conversion after preflight rejection, Warp CPU setup, missing Warp/CUDA,
-  device mismatch, and absence of fallback.
+- **P2 (implemented in issue #1485):**
+  `particula/execution/tests/gpu_session_test.py` uses a subprocess matrix that
+  blocks Warp/GPU imports to prove exact-device, carrier, rank/shape, and
+  gas-name failures occur locally. Warp-CPU conversion spies prove one call per
+  carrier in particle/gas/environment order with the unchanged native device;
+  tests also cover input identity/immutability, failures at every conversion
+  position, and final `ResidentSession` schema failure. E7-F6 availability
+  rejection remains untested because its public runtime seam is absent; P2
+  neither probes nor falls back.
 - **P3:** Parameterize all canonical sidecar shapes and dtypes in
   `particula/execution/tests/gpu_resources_test.py`. Assert same-device
   ownership, exact identity across repeated acquisition, duplicate/unknown key

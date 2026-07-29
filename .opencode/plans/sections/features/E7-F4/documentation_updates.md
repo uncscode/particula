@@ -27,4 +27,12 @@
 
 Issue #1484 updated the structured plan only. No user-facing documentation,
 examples, exports, or lifecycle API were added because P1 is a concrete-only
-construction boundary; broader documentation remains P7 work.
+ construction boundary; broader documentation remains P7 work.
+
+## P2 Status
+
+Issue #1485 updated only code-level module/factory docstrings and these
+structured plan sections. No user-facing documentation, example, export, or
+lifecycle API was added: `setup_resident_session()` remains concrete-only and
+direct-import-only. P7 remains responsible for broader documentation after the
+remaining lifecycle surface exists.

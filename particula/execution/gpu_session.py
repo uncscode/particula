@@ -1,12 +1,14 @@
-"""Define concrete-only GPU-resident session ownership carriers and setup.
+"""Define concrete-only GPU-resident session carriers and setup.
 
-These immutable carriers retain caller-owned Warp containers and CPU gas-name
-metadata by identity. They perform construction-time metadata validation only.
-``setup_resident_session`` is P2's sole CPU-to-Warp upload point. It publishes
-one complete active session after local CPU-schema preflight and exactly one
-conversion of each carrier. It does not provide lifecycle operations, fallback,
-synchronization, restoration, process sidecars, or package exports. Native Warp
-device availability is an upstream E7-F6 precondition in this revision.
+The immutable carriers retain caller-owned Warp containers and CPU gas-name
+metadata by identity. ``setup_resident_session`` is P2's sole CPU-to-Warp
+upload point: local CPU preflight precedes conversion imports, then particles,
+gas, and environment convert once in that order before one complete ACTIVE
+session is published. Gas names remain ordered CPU-owned metadata and are not
+stored on the Warp gas container. This module provides no public export,
+lifecycle operation, fallback, synchronization, restore, or process sidecar.
+Selected native Warp-device availability remains an upstream E7-F6
+precondition.
 """
 
 from dataclasses import dataclass
@@ -522,12 +524,14 @@ def setup_resident_session(
 ) -> ResidentSession:
     """Upload CPU carriers once and publish one active resident session.
 
-    This concrete-only factory is P2's only CPU-to-Warp upload point. It keeps
-    CPU gas names in metadata, retains converted containers by identity, and
-    publishes only a fully validated active session. It does not synchronize,
-    restore, manage lifecycle transitions, use fallback, or allocate process
-    sidecars. The supplied Warp device must already be availability-approved by
-    the upstream E7-F6 boundary; this revision does not probe native devices.
+    This concrete-only, unexported factory is P2's only CPU-to-Warp upload
+    point. Local CPU preflight completes before conversion helpers are imported.
+    It then converts particles, gas, and environment once in that order, keeps
+    ordered gas names as CPU-owned metadata, and publishes only one complete,
+    validated ACTIVE session retaining converted containers by identity. It
+    provides no lifecycle operations, fallback, synchronization, restore, or
+    process sidecars. The selected native Warp device must already be
+    availability-approved by upstream E7-F6; this revision does not probe it.
 
     Args:
         particles: CPU particle carrier to upload.
@@ -536,7 +540,7 @@ def setup_resident_session(
         device: Exact, upstream-approved Warp device declaration.
 
     Returns:
-        One complete active session retaining conversion results by identity.
+        One complete ACTIVE session retaining conversion results by identity.
 
     Raises:
         TypeError: If a local device, carrier, or gas-name declaration is

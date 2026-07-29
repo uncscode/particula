@@ -9,7 +9,10 @@
 - **E7-F6 (T6): Fallback, Capability Errors, and API Stability** must freeze
   Warp/device availability checks, explicit fallback boundaries, exception
   taxonomy, and deliberate export policy. E7-F4 never catches a runtime error
-  to move state to CPU.
+  to move state to CPU. P2/#1485 consumes only the local exact-`Device`/
+  Warp-backend contract. This revision has no E7-F6 public availability probe,
+  so native-device availability is an explicit caller/upstream precondition
+  rather than a silently accepted or locally emulated fallback policy.
 - Shipped E2 CPU/Warp fixed-shape schemas and explicit conversion helpers.
 - Shipped direct GPU condensation, coagulation, dilution, wall-loss, and
   nucleation entry points plus E6-F9 integrated fixtures.

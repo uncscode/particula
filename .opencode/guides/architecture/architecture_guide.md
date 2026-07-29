@@ -34,23 +34,36 @@
 ## Concrete GPU-Resident Session Boundary
 
 - `particula.execution.gpu_session` is an intentionally concrete-only,
-  unexported P1 boundary. `ResidentSession` retains valid caller-owned Warp
+  unexported P1/P2 boundary. `ResidentSession` retains valid caller-owned Warp
   particle, gas, and environment containers, immutable dimensions, a Warp
   `Device`, a CPU-owned gas-name tuple, and one declared lifecycle value by
-  identity. These names must not be promoted through `particula.execution`,
-  `particula.execution.adapters`, or top-level `particula`.
+  identity. `setup_resident_session` is direct-import-only and must not be
+  promoted through `particula.execution`, `particula.execution.adapters`, or
+  top-level `particula`.
 - Construction performs only fixed-cost, read-only carrier and generated Warp
   container/primary-array metadata validation: type, dtype, shape, and same
   device agreement. Warp and generated types are lazy imports; CPU-only carrier
   validation does not import or probe Warp. Construction neither reads payloads
   nor synchronizes, transfers, converts, allocates, launches kernels, or
   schedules work.
+- P2 setup first performs CPU-only local preflight of an exact Warp `Device`;
+  `ParticleData`, `GasData`, and `EnvironmentData`; their cross-container
+  shapes; and exact-string ordered gas names. Native availability is an upstream
+  E7-F6 precondition: this boundary does not probe, normalize, select, or
+  substitute a device. Only after preflight, it calls each established
+  `particula.gpu.conversion` upload helper exactly once in particle, gas, and
+  environment order with the unchanged native identifier. It retains only
+  `tuple(gas.name)` as CPU metadata; names are never uploaded to `WarpGasData`.
+  A conversion or final session-validation error propagates with no partial
+  session publication. P2 has no fallback, synchronization, restoration,
+  sidecars, retry, or cleanup behavior.
 - The lifecycle vocabulary (`ACTIVE`, `FAULTED`, `FINALIZED`, and `CLOSED`)
   declares immutable state only. This P1 boundary has no transition, recovery,
   finalize, close, migration, fallback, or execution operation; P4 and later
   phases own those semantics. Existing direct GPU kernels and adapter-local
   physical validation remain authoritative. See
-  [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md).
+  [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md) and
+  [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md).
 
 ## Concrete Condensation Execution Boundary
 

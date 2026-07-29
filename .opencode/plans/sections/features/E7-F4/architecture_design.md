@@ -87,6 +87,23 @@ transfer, launch, or data-sized allocation. P4 retains ownership of lifecycle
 transition guards; P2, P3, P5, and P6 retain conversion, resources,
 checkpoint/finalization, and failure/close behavior.
 
+## P2 Implementation
+
+Issue #1485 added direct-import-only `setup_resident_session()` to
+`particula/execution/gpu_session.py`. Local preflight requires an exact
+`Device` with `Backend.WARP`, validates concrete CPU carriers and their shared
+`(B, N, S)` schema without importing Warp or conversion helpers, then derives
+dimensions and validates the ordered exact-string CPU gas-name tuple.
+
+Only after preflight, the factory function-locally imports established
+conversion helpers and calls `to_warp_particle_data`, `to_warp_gas_data`, and
+`to_warp_environment_data` once each, in order, using the unmodified native
+device identifier. `ResidentSession` remains the final generated-schema and
+shared-device gate; errors propagate with no partial-session publication. P2
+does not query availability, select or normalize devices, use fallback,
+synchronize, restore, create sidecars, or add exports. Availability approval is
+E7-F6's explicit upstream responsibility.
+
 ## Failure and Atomicity
 
 - Validation and capability failures occur before conversion/allocation where
