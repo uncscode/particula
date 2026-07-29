@@ -699,6 +699,7 @@ class ResidentStepGuard:
         if self._open_token is not None:
             raise RuntimeError("A resident timestep is already open.")
         token = ResidentStepToken(self, validated_duration)
+        self._registry.reserve_open_step(token)
         self._open_token = token
         return token
 
@@ -723,9 +724,13 @@ class ResidentStepGuard:
             raise RuntimeError("No resident timestep is open.")
         if token is not self._open_token:
             raise ValueError("token does not match the open resident timestep.")
+        if token is not self._registry._open_step_token:
+            raise ValueError("token does not match the open resident timestep.")
+        simulated_time = self._simulated_time + token._duration
         self._completed_steps += 1
-        self._simulated_time += self._open_token._duration
+        self._simulated_time = simulated_time
         self._open_token = None
+        self._registry.release_open_step(token)
 
     def assert_step_closed(self) -> None:
         """Reject a lifecycle boundary while a guarded timestep remains open.

@@ -6,6 +6,7 @@ import sys
 import textwrap
 from dataclasses import FrozenInstanceError
 from fractions import Fraction
+from numbers import Real
 from pathlib import Path
 from typing import Any, cast
 
@@ -532,6 +533,141 @@ def test_step_guard_rejections_preserve_open_token_and_bookkeeping() -> None:
     guard.complete_step(token)
     with pytest.raises(RuntimeError, match="No resident timestep"):
         guard.complete_step(token)
+
+
+@pytest.mark.warp
+def test_step_guards_share_one_open_token_per_registry_binding() -> None:
+    """Test guards sharing one binding cannot overlap resident timesteps."""
+    from particula.execution.gpu_resources import GPUResourceRegistry
+
+    particles, gas, environment = _warp_resources()
+    session = ResidentSession(
+        particles,
+        gas,
+        environment,
+        ResidentDimensions(1, 2, 1),
+        _metadata(),
+        ResidentLifecycle.ACTIVE,
+    )
+    registry = GPUResourceRegistry(session)
+    first_guard = ResidentStepGuard(session, registry)
+    second_guard = ResidentStepGuard(session, registry)
+
+    token = first_guard.begin_step(1.0)
+    with pytest.raises(RuntimeError, match="already open"):
+        second_guard.begin_step(1.0)
+
+    assert first_guard._open_token is token
+    assert second_guard._open_token is None
+    assert registry._open_step_token is token
+    first_guard.complete_step(token)
+
+    second_token = second_guard.begin_step(2.0)
+    assert registry._open_step_token is second_token
+    second_guard.complete_step(second_token)
+
+
+@pytest.mark.warp
+def test_step_guard_completion_time_failure_is_atomic() -> None:
+    """Test failed time arithmetic preserves guard and binding ownership."""
+    from particula.execution.gpu_resources import GPUResourceRegistry
+
+    class ExplodingDuration:
+        """Provide an accepted real duration that fails time addition."""
+
+        def __float__(self) -> float:
+            return 0.5
+
+        def __lt__(self, _: object) -> bool:
+            return False
+
+        def __radd__(self, _: object) -> object:
+            raise RuntimeError("time addition failed")
+
+    Real.register(ExplodingDuration)
+
+    particles, gas, environment = _warp_resources()
+    session = ResidentSession(
+        particles,
+        gas,
+        environment,
+        ResidentDimensions(1, 2, 1),
+        _metadata(),
+        ResidentLifecycle.ACTIVE,
+    )
+    registry = GPUResourceRegistry(session)
+    guard = ResidentStepGuard(session, registry)
+    other_guard = ResidentStepGuard(session, registry)
+    token = guard.begin_step(ExplodingDuration())
+
+    with pytest.raises(RuntimeError, match="time addition failed"):
+        guard.complete_step(token)
+
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == 0
+    assert guard._open_token is token
+    assert registry._open_step_token is token
+    with pytest.raises(RuntimeError, match="already open"):
+        other_guard.begin_step(1.0)
+
+
+@pytest.mark.warp
+def test_step_guard_completion_drift_preserves_open_bookkeeping() -> None:
+    """Test completion binding drift leaves the token and counts unchanged."""
+    guard = _guard()
+    token = guard.begin_step(1.0)
+    object.__setattr__(guard._session, "lifecycle", ResidentLifecycle.CLOSED)
+
+    with pytest.raises(ValueError, match="ACTIVE"):
+        guard.complete_step(token)
+
+    assert guard._open_token is token
+    assert guard._registry._open_step_token is token
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == 0
+
+
+@pytest.mark.warp
+def test_step_guard_valid_transitions_perform_no_runtime_work(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test valid guard transitions remain metadata-only bookkeeping."""
+    wp = pytest.importorskip("warp")
+    from particula.execution.gpu_resources import GPUResourceRegistry
+    from particula.gpu import conversion
+
+    guard = _guard()
+
+    def forbidden(*_: object, **__: object) -> None:
+        """Fail when a guard transition attempts runtime work."""
+        raise AssertionError("step transitions must not perform runtime work")
+
+    for name in (
+        "acquire_condensation",
+        "acquire_coagulation",
+        "acquire_wall_loss",
+        "acquire_nucleation",
+        "_allocate",
+    ):
+        monkeypatch.setattr(GPUResourceRegistry, name, forbidden)
+    if hasattr(wp, "synchronize"):
+        monkeypatch.setattr(wp, "synchronize", forbidden)
+    for name in (
+        "to_warp_particle_data",
+        "to_warp_gas_data",
+        "to_warp_environment_data",
+        "from_warp_particle_data",
+        "from_warp_gas_data",
+        "from_warp_environment_data",
+    ):
+        if hasattr(conversion, name):
+            monkeypatch.setattr(conversion, name, forbidden)
+
+    token = guard.begin_step(1.0)
+    guard.complete_step(token)
+
+    assert guard.completed_steps == 1
+    assert guard.simulated_time == 1.0
 
 
 @pytest.mark.warp

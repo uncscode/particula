@@ -249,6 +249,7 @@ class GPUResourceRegistry:
         self._bindings: dict[str, dict[str, Any]] = {}
         self._views: dict[str, Any] = {}
         self._capacities: dict[str, int] = {}
+        self._open_step_token: Any | None = None
 
     @property
     def manifests(self) -> tuple[ResourceManifest, ...]:
@@ -305,6 +306,36 @@ class GPUResourceRegistry:
         if session is not self._session:
             raise ValueError("session must be the pinned ResidentSession.")
         self._validate_session_signature()
+
+    def reserve_open_step(self, token: Any) -> None:
+        """Reserve the binding's sole open timestep token by identity.
+
+        The resident step guard calls this only after validating the pinned
+        session. This bookkeeping-only seam neither acquires resources nor
+        performs runtime work.
+
+        Args:
+            token: Newly created opaque resident-step token.
+
+        Raises:
+            RuntimeError: If this exact registry binding already has a token.
+        """
+        if self._open_step_token is not None:
+            raise RuntimeError("A resident timestep is already open.")
+        self._open_step_token = token
+
+    def release_open_step(self, token: Any) -> None:
+        """Release the exact outstanding binding-level timestep token.
+
+        Args:
+            token: The exact token previously reserved for this binding.
+
+        Raises:
+            ValueError: If ``token`` is not the outstanding token by identity.
+        """
+        if token is not self._open_step_token:
+            raise ValueError("token does not match the open resident timestep.")
+        self._open_step_token = None
 
     def _validate_session_state(self) -> None:
         """Recheck the metadata-only invariants needed by this boundary."""
