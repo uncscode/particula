@@ -25,6 +25,7 @@ from particula.execution.process_graph import (
     ResolvedProcessGraph,
     ResourceRequirement,
     _is_resolver_produced_graph,
+    resolve_canonical_topological_order,
 )
 from particula.execution.scheduler import ResolvedTimestepSchedule
 from particula.gpu.kernels.thermodynamics import (
@@ -252,6 +253,11 @@ class ResidentThermodynamicUpdateCoordinator:
             raise ValueError(
                 "schedule IDs must be an ordered subset of graph IDs."
             )
+        if schedule_ids != resolve_canonical_topological_order(
+            request.schedule.nodes,
+            request.schedule.dependencies,
+        ):
+            raise ValueError("schedule IDs must be an ordered schedule.")
         for node in request.schedule.nodes:
             graph_node = graph_by_id.get(node.node_id)
             if node is not graph_node:
@@ -369,8 +375,10 @@ class ResidentThermodynamicUpdateCoordinator:
         """Refresh stale fields and call the next scheduled consumer once.
 
         Only condensation and diagnostics consumers are supported. The method
-        consumes their immediately preceding virtual refresh nodes, writes stale
-        fields in dependency order, then invokes ``callback``. It applies the
+        consumes immediately preceding virtual refresh nodes when present,
+        writes stale fields in dependency order, then invokes ``callback``.
+        Stale fields may persist across reported ordinary nodes, so diagnostics
+        may refresh them without an adjacent virtual-node window. It applies the
         consumer invalidations and advances the cursor only after the callback
         returns successfully.
 
@@ -446,17 +454,12 @@ class ResidentThermodynamicUpdateCoordinator:
                     "virtual refresh nodes must precede one consumer."
                 )
         expected = by_id[schedule.ordered_node_ids[index]]
+        if not virtual_nodes and expected.node_id == "diagnostics":
+            # Condensation can leave saturation stale after its virtual window
+            # has been consumed. Ordinary nodes report successfully without
+            # changing that marker, so diagnostics performs the pending refresh.
+            return virtual_nodes, expected
         if not virtual_nodes:
-            preceding_id = (
-                schedule.ordered_node_ids[self._cursor - 1]
-                if self._cursor
-                else None
-            )
-            if (
-                expected.node_id == "diagnostics"
-                and preceding_id == "condensation"
-            ):
-                return virtual_nodes, expected
             raise ValueError(
                 "a consumer requires immediately preceding virtual refresh "
                 "nodes."

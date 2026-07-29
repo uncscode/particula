@@ -12,6 +12,8 @@ from particula.execution import (
 )
 from particula.execution.gpu_resources import GPUResourceRegistry
 from particula.execution.process_graph import (
+    DependencyEdge,
+    NodeKind,
     ProcessNode,
     TimestepPlan,
     resolve_timestep_plan,
@@ -57,7 +59,10 @@ def _node(node_id: str) -> ProcessNode:
 
 
 def _coordinator(
-    node_ids: frozenset[str], boxes: int = 1, species: int = 1
+    node_ids: frozenset[str],
+    boxes: int = 1,
+    species: int = 1,
+    dependencies: tuple[DependencyEdge, ...] = (),
 ) -> tuple[ResidentThermodynamicUpdateCoordinator, dict[str, ProcessNode], Any]:
     """Build a coordinator with a resolver-produced graph and CPU Warp state."""
     wp = pytest.importorskip("warp")
@@ -75,7 +80,7 @@ def _coordinator(
     )
     registry = GPUResourceRegistry(session)
     nodes = tuple(_node(node_id) for node_id in node_ids)
-    plan = TimestepPlan(nodes, ())
+    plan = TimestepPlan(nodes, dependencies)
     graph = resolve_timestep_plan(plan)
     schedule = resolve_timestep_schedule(
         plan,
@@ -216,6 +221,141 @@ def test_condensation_refreshes_saturation_before_later_diagnostics() -> None:
     npt.assert_allclose(
         session.environment.saturation_ratio.numpy(), [[expected]], rtol=1e-12
     )
+
+
+@pytest.mark.warp
+def test_condensation_refresh_survives_wall_loss_before_diagnostics(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test diagnostics refreshes condensation state after an ordinary node."""
+    import particula.execution.thermodynamic_updates as updates
+
+    ids = frozenset(
+        {
+            "environment_update",
+            "gas_update",
+            "vapor_pressure_refresh",
+            "saturation_refresh",
+            "condensation",
+            "wall_loss",
+            "diagnostics",
+        }
+    )
+    coordinator, nodes, session = _coordinator(
+        ids,
+        dependencies=(DependencyEdge("wall_loss", "diagnostics"),),
+    )
+    gas = cast(Any, session.gas)
+    wp = pytest.importorskip("warp")
+    calls: list[str] = []
+    original_vapor = updates.refresh_vapor_pressure_gpu
+    original_saturation = coordinator._refresh_saturation_ratio
+
+    def vapor(
+        config: ThermodynamicsConfig, gas_data: Any, temperature: Any
+    ) -> None:
+        calls.append("vapor")
+        original_vapor(config, gas_data, temperature)
+
+    def saturation() -> None:
+        calls.append("saturation")
+        original_saturation()
+
+    monkeypatch.setattr(updates, "refresh_vapor_pressure_gpu", vapor)
+    monkeypatch.setattr(coordinator, "_refresh_saturation_ratio", saturation)
+
+    def condense() -> None:
+        wp.copy(
+            gas.concentration,
+            wp.full((1, 1), 2.0, dtype=wp.float64, device="cpu"),
+        )
+        calls.append("condensation")
+
+    coordinator.record_completed(nodes["environment_update"])
+    coordinator.record_completed(nodes["gas_update"])
+    coordinator.execute_consumer(nodes["condensation"], condense)
+    coordinator.record_completed(nodes["wall_loss"])
+    coordinator.execute_consumer(
+        nodes["diagnostics"], lambda: calls.append("diagnostics")
+    )
+
+    assert calls == [
+        "vapor",
+        "saturation",
+        "condensation",
+        "saturation",
+        "diagnostics",
+    ]
+    assert coordinator.cursor == 7
+    assert not coordinator.stale_states
+    expected = 2.0 * GAS_CONSTANT * 300.0 / 2.0
+    npt.assert_allclose(
+        session.environment.saturation_ratio.numpy(), [[expected]], rtol=1e-12
+    )
+
+
+@pytest.mark.warp
+def test_rejected_preflight_preserves_state_and_allows_retry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test invalid schedule, schema, and binding checks retain coordinator state."""
+    ids = frozenset(
+        {
+            "environment_update",
+            "gas_update",
+            "vapor_pressure_refresh",
+            "saturation_refresh",
+            "diagnostics",
+        }
+    )
+    coordinator, nodes, _ = _coordinator(ids)
+    request = coordinator._request
+    initial_stale = coordinator.stale_states
+    schedule = request.schedule
+    original_ids = schedule.ordered_node_ids
+
+    object.__setattr__(
+        schedule, "ordered_node_ids", tuple(reversed(original_ids))
+    )
+    with pytest.raises(ValueError, match="ordered schedule"):
+        coordinator.execute_consumer(
+            nodes["diagnostics"], lambda: pytest.fail()
+        )
+    object.__setattr__(schedule, "ordered_node_ids", original_ids)
+
+    original_kind = nodes["diagnostics"].kind
+    object.__setattr__(nodes["diagnostics"], "kind", NodeKind.PROCESS)
+    with pytest.raises(ValueError, match="invalid canonical"):
+        coordinator.execute_consumer(
+            nodes["diagnostics"], lambda: pytest.fail()
+        )
+    object.__setattr__(nodes["diagnostics"], "kind", original_kind)
+
+    registry = cast(Any, request.registry)
+    original_validation = registry.validate_pinned_session
+    monkeypatch.setattr(
+        registry,
+        "validate_pinned_session",
+        lambda _session: (_ for _ in ()).throw(ValueError("binding failure")),
+    )
+    with pytest.raises(ValueError, match="binding failure"):
+        coordinator.execute_consumer(
+            nodes["diagnostics"], lambda: pytest.fail()
+        )
+    monkeypatch.setattr(
+        registry, "validate_pinned_session", original_validation
+    )
+
+    assert coordinator.cursor == 0
+    assert coordinator.stale_states == initial_stale
+    coordinator.record_completed(nodes["environment_update"])
+    coordinator.record_completed(nodes["gas_update"])
+    assert (
+        coordinator.execute_consumer(nodes["diagnostics"], lambda: "retry")
+        == "retry"
+    )
+    assert coordinator.cursor == 5
+    assert not coordinator.stale_states
 
 
 @pytest.mark.warp

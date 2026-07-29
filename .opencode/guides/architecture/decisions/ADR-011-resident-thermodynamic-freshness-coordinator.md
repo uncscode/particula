@@ -41,11 +41,14 @@ through `particula.execution` or top-level `particula`.
 
 Callers report only successful ordinary nodes through `record_completed()`. The
 coordinator owns a schedule cursor plus vapor-pressure and saturation-ratio
-stale markers. `execute_consumer()` consumes the immediately preceding virtual
-refresh IDs for the next canonical condensation or diagnostics callback, writes
-only stale fields in vapor-then-saturation order, and invokes that callback
-once. It advances the consumer cursor and applies consumer invalidations only
-after callback success.
+stale markers. `execute_consumer()` consumes immediately preceding virtual
+refresh IDs when present, writes only stale fields in vapor-then-saturation
+order, and invokes the next canonical condensation or diagnostics callback once.
+Stale markers persist across ordinary scheduled nodes: for example,
+`condensation -> wall_loss -> diagnostics` implicitly refreshes saturation
+immediately before diagnostics even though no virtual refresh ID is adjacent to
+diagnostics. It advances the consumer cursor and applies consumer invalidations
+only after callback success.
 
 ### Chosen Option
 
