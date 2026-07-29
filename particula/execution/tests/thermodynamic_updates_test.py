@@ -16,7 +16,6 @@ from particula.execution.process_graph import (
     NodeKind,
     ProcessNode,
     TimestepPlan,
-    resolve_timestep_plan,
 )
 from particula.execution.scheduler import (
     EnabledNodeSelection,
@@ -81,7 +80,6 @@ def _coordinator(
     registry = GPUResourceRegistry(session)
     nodes = tuple(_node(node_id) for node_id in node_ids)
     plan = TimestepPlan(nodes, dependencies)
-    graph = resolve_timestep_plan(plan)
     schedule = resolve_timestep_schedule(
         plan,
         EnabledNodeSelection(node_ids),
@@ -89,6 +87,7 @@ def _coordinator(
             NucleationCondensationDirection.NUCLEATION_THEN_CONDENSATION
         ),
     )
+    graph = cast(Any, schedule.source_graph)
     config = ThermodynamicsConfig(
         wp.zeros(species, dtype=wp.int32, device="cpu"),
         wp.full((species, 4), 2.0, dtype=wp.float64, device="cpu"),

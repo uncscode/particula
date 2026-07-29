@@ -208,10 +208,20 @@ def validate_thermodynamics_config(
             "thermodynamics.parameters must be finite and non-negative in "
             f"{caller_name}."
         )
-    if not np.all(np.isfinite(references)) or np.any(references < 0.0):
+    if not np.all(np.isfinite(references)) or np.any(references <= 0.0):
         raise ValueError(
             "thermodynamics.molar_mass_reference must be finite and "
-            f"non-negative in {caller_name}."
+            f"positive in {caller_name}."
+        )
+    if not np.all(np.isfinite(gas_masses)) or np.any(gas_masses <= 0.0):
+        raise ValueError(
+            f"gas.molar_mass must be finite and positive in {caller_name}."
+        )
+    constant = modes == int(THERMODYNAMICS_MODE_CONSTANT)
+    if np.any(parameters[constant, 0] <= 0.0):
+        raise ValueError(
+            "constant vapor-pressure parameters must be positive in "
+            f"{caller_name}."
         )
     if not np.array_equal(references, gas_masses):
         raise ValueError(

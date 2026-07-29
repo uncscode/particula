@@ -486,6 +486,43 @@ def _validate_schema(
         raise ValueError(
             "particles.masses device must match metadata.device.native."
         )
+    _reject_primary_aliases(particles, gas, environment)
+
+
+def _reject_primary_aliases(
+    particles: object, gas: object, environment: object
+) -> None:
+    """Reject overlapping primary storage before publishing a session."""
+    arrays = (
+        cast(Any, particles).masses,
+        cast(Any, particles).concentration,
+        cast(Any, particles).charge,
+        cast(Any, particles).density,
+        cast(Any, particles).volume,
+        cast(Any, gas).molar_mass,
+        cast(Any, gas).concentration,
+        cast(Any, gas).vapor_pressure,
+        cast(Any, gas).partitioning,
+        cast(Any, environment).temperature,
+        cast(Any, environment).pressure,
+        cast(Any, environment).saturation_ratio,
+    )
+    ranges: list[tuple[int, int] | None] = []
+    for array in arrays:
+        count = 1
+        for length in array.shape:
+            count *= length
+        if count == 0:
+            ranges.append(None)
+            continue
+        item_size = 8 if array.dtype.__name__ == "float64" else 4
+        ranges.append((array.ptr, array.ptr + count * item_size))
+    for index, left in enumerate(ranges):
+        if left is None:
+            continue
+        for right in ranges[index + 1 :]:
+            if right is not None and left[0] < right[1] and right[0] < left[1]:
+                raise ValueError("resident primary arrays must not alias.")
 
 
 def _validate_resident_carriers(

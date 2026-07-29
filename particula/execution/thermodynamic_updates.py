@@ -27,7 +27,10 @@ from particula.execution.process_graph import (
     _is_resolver_produced_graph,
     resolve_canonical_topological_order,
 )
-from particula.execution.scheduler import ResolvedTimestepSchedule
+from particula.execution.scheduler import (
+    ResolvedTimestepSchedule,
+    is_resolver_produced_schedule,
+)
 from particula.gpu.kernels.thermodynamics import (
     ThermodynamicsConfig,
     refresh_vapor_pressure_gpu,
@@ -244,6 +247,10 @@ class ResidentThermodynamicUpdateCoordinator:
         if not _is_resolver_produced_graph(request.graph):
             raise ValueError(
                 "request graph must be produced by plan resolution."
+            )
+        if not is_resolver_produced_schedule(request.schedule, request.graph):
+            raise ValueError(
+                "request schedule must be produced for the exact graph."
             )
         graph_by_id = {node.node_id: node for node in request.graph.nodes}
         schedule_ids = request.schedule.ordered_node_ids

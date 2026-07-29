@@ -21,7 +21,10 @@ from particula.execution.process_graph import (
     _is_resolver_produced_graph,
     resolve_canonical_topological_order,
 )
-from particula.execution.scheduler import ResolvedTimestepSchedule
+from particula.execution.scheduler import (
+    ResolvedTimestepSchedule,
+    is_resolver_produced_schedule,
+)
 
 
 class ResidentDiagnosticOperation(str, Enum):
@@ -128,16 +131,10 @@ class ResidentDiagnosticsExecutor:
     empty matrices.
     """
 
-    def _validate(self, plan: ResidentDiagnosticsPlan) -> None:
-        """Validate plan provenance, closed operation order, and outputs.
-
-        Args:
-            plan: Exact diagnostics plan whose retained bindings are checked.
-
-        Raises:
-            ValueError: If lifecycle, graph, schedule, protocol, or output
-                metadata validation fails.
-        """
+    def _validate_graph_and_schedule(
+        self, plan: ResidentDiagnosticsPlan
+    ) -> None:
+        """Validate graph provenance, membership, and canonical order."""
         registry = cast(Any, plan.registry)
         if registry._session is not plan.session:
             raise ValueError("diagnostics registry must be bound to session.")
@@ -145,6 +142,10 @@ class ResidentDiagnosticsExecutor:
         if not _is_resolver_produced_graph(plan.graph):
             raise ValueError(
                 "diagnostics graph must be produced by plan resolution."
+            )
+        if not is_resolver_produced_schedule(plan.schedule, plan.graph):
+            raise ValueError(
+                "diagnostics schedule must be produced for the exact graph."
             )
         if not any(node is plan.node for node in plan.graph.nodes):
             raise ValueError("diagnostics node must be a graph member.")
@@ -174,15 +175,36 @@ class ResidentDiagnosticsExecutor:
             )
         ):
             raise ValueError("diagnostics schedule must be canonical.")
+
+    def _validate_registrations(self, plan: ResidentDiagnosticsPlan) -> None:
+        """Validate diagnostic registration ordering and uniqueness."""
         operations = tuple(item.operation for item in plan.registrations)
         if operations != tuple(ResidentDiagnosticOperation):
             raise ValueError(
                 "diagnostic operations must be unique and match the closed "
                 "canonical tuple."
             )
+
+    def _validate_outputs(self, plan: ResidentDiagnosticsPlan) -> None:
+        """Validate caller-owned diagnostic outputs against resident state."""
+        registry = cast(Any, plan.registry)
         registry.validate_diagnostic_outputs(
             plan.session, tuple(item.output for item in plan.registrations)
         )
+
+    def _validate(self, plan: ResidentDiagnosticsPlan) -> None:
+        """Validate plan provenance, closed operation order, and outputs.
+
+        Args:
+            plan: Exact diagnostics plan whose retained bindings are checked.
+
+        Raises:
+            ValueError: If lifecycle, graph, schedule, protocol, or output
+                metadata validation fails.
+        """
+        self._validate_graph_and_schedule(plan)
+        self._validate_registrations(plan)
+        self._validate_outputs(plan)
 
     def validate(self, plan: object) -> ResidentDiagnosticsPlan:
         """Validate one exact diagnostics plan without dispatching a kernel.

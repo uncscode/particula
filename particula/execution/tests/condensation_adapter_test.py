@@ -391,7 +391,7 @@ def _real_warp_condensation_state(
     thermodynamics = ThermodynamicsConfig(
         modes=wp.zeros(2, dtype=wp.int32, device="cpu"),
         parameters=wp.array(
-            [[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0]],
+            [[800.0, 0.0, 0.0, 0.0], [800.0, 0.0, 0.0, 0.0]],
             dtype=wp.float64,
             device="cpu",
         ),

@@ -25,7 +25,11 @@ def _config(n_species: int = 2):
     masses = np.linspace(0.018, 0.05, n_species, dtype=np.float64)
     return ThermodynamicsConfig(
         modes=wp.array([0, 1][:n_species], dtype=wp.int32, device="cpu"),
-        parameters=wp.zeros((n_species, 4), dtype=wp.float64, device="cpu"),
+        parameters=wp.array(
+            [[100.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0]][:n_species],
+            dtype=wp.float64,
+            device="cpu",
+        ),
         molar_mass_reference=wp.array(masses, dtype=wp.float64, device="cpu"),
     ), wp.array(masses, dtype=wp.float64, device="cpu")
 
@@ -321,6 +325,33 @@ def test_refresh_rejects_invalid_sidecar_without_mutation() -> None:
     with pytest.raises(ValueError, match="thermodynamics.modes"):
         refresh_vapor_pressure_gpu(
             invalid, gas, wp.array([298.15], dtype=wp.float64, device="cpu")
+        )
+
+    assert np.array_equal(gas.vapor_pressure.numpy(), before)
+
+
+def test_refresh_rejects_zero_constant_vapor_pressure_without_mutation() -> (
+    None
+):
+    """A constant model requires a strictly positive pressure before writes."""
+    wp = _warp()
+    from particula.gpu.kernels.thermodynamics import refresh_vapor_pressure_gpu
+
+    gas = _gas(n_species=1)
+    config = _refresh_config(
+        gas,
+        np.array([0], dtype=np.int32),
+        np.array([[0.0, 0.0, 0.0, 0.0]], dtype=np.float64),
+    )
+    before = gas.vapor_pressure.numpy().copy()
+
+    with pytest.raises(
+        ValueError, match="constant vapor-pressure parameters must be positive"
+    ):
+        refresh_vapor_pressure_gpu(
+            config,
+            gas,
+            wp.array([298.15], dtype=wp.float64, device="cpu"),
         )
 
     assert np.array_equal(gas.vapor_pressure.numpy(), before)

@@ -33,9 +33,13 @@ from particula.execution.gpu_session import (
 )
 from particula.execution.process_graph import (
     TimestepPlan,
-    resolve_timestep_plan,
 )
-from particula.execution.scheduler import ResolvedTimestepSchedule
+from particula.execution.scheduler import (
+    EnabledNodeSelection,
+    NucleationCondensationDirection,
+    SchedulerProfile,
+    resolve_timestep_schedule,
+)
 
 
 def _session(
@@ -95,37 +99,43 @@ def _diagnostics_plan(
     outputs: tuple[Any, ...],
 ) -> ResidentDiagnosticsPlan:
     """Build the smallest resolver-produced final diagnostics schedule."""
-    from particula.execution import CapabilityRequirements
-    from particula.execution.process_graph import (
-        NodeKind,
-        ProcessNode,
-        ResourceRequirement,
-    )
+    from particula.execution import CapabilityRequirements, process_graph
+    from particula.execution.process_graph import ProcessNode
 
-    node = ProcessNode(
+    node_ids = (
+        "environment_update",
+        "gas_update",
+        "vapor_pressure_refresh",
+        "saturation_refresh",
         "diagnostics",
-        NodeKind.DIAGNOSTIC,
-        None,
-        CapabilityRequirements(frozenset()),
-        frozenset(
-            {
-                ResourceRequirement.PARTICLES,
-                ResourceRequirement.GAS,
-                ResourceRequirement.ENVIRONMENT,
-                ResourceRequirement.THERMODYNAMICS,
-                ResourceRequirement.DIAGNOSTICS,
-            }
-        ),
-        frozenset(),
     )
-    graph = resolve_timestep_plan(TimestepPlan((node,), ()))
-    schedule = ResolvedTimestepSchedule(graph.nodes, (), ("diagnostics",))
+    nodes = tuple(
+        ProcessNode(
+            schema.node_id,
+            schema.kind,
+            schema.process,
+            CapabilityRequirements(frozenset()),
+            schema.resources,
+            schema.invalidates,
+        )
+        for schema in process_graph._NODE_CATALOGUE
+        if schema.node_id in node_ids
+    )
+    plan = TimestepPlan(nodes, ())
+    schedule = resolve_timestep_schedule(
+        plan,
+        EnabledNodeSelection(frozenset(node_ids)),
+        SchedulerProfile(
+            NucleationCondensationDirection.NUCLEATION_THEN_CONDENSATION
+        ),
+    )
+    graph = cast(Any, schedule.source_graph)
     return ResidentDiagnosticsPlan(
         session,
         registry,
         graph,
         schedule,
-        graph.nodes[0],
+        next(node for node in graph.nodes if node.node_id == "diagnostics"),
         (
             ResidentDiagnosticRegistration(
                 ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT,
@@ -146,9 +156,10 @@ def test_all_families_allocate_complete_stable_resources(
 ) -> None:
     """Test every family supplies complete records and stable repeats."""
     registry = GPUResourceRegistry(_session(*shape))
+    collision_capacity = min(3, max(1, shape[1] ** 2))
 
     condensation = registry.acquire_condensation()
-    coagulation = registry.acquire_coagulation(3)
+    coagulation = registry.acquire_coagulation(collision_capacity)
     wall_loss = registry.acquire_wall_loss()
     nucleation = registry.acquire_nucleation()
 
@@ -157,11 +168,15 @@ def test_all_families_allocate_complete_stable_resources(
     nucleation_finalized_demand = cast(Any, nucleation.finalized_demand)
 
     assert registry.acquire_condensation() is condensation
-    assert registry.acquire_coagulation(3) is coagulation
+    assert registry.acquire_coagulation(collision_capacity) is coagulation
     assert registry.acquire_wall_loss() is wall_loss
     assert registry.acquire_nucleation() is nucleation
     assert condensation_buffers.work_mass_transfer.shape == shape
-    assert coagulation.collision_pairs.shape == (shape[0], 3, 2)
+    assert coagulation.collision_pairs.shape == (
+        shape[0],
+        collision_capacity,
+        2,
+    )
     assert coagulation.n_collisions.shape == (shape[0],)
     assert wall_loss.rng_states is not coagulation.rng_states
     assert (
@@ -241,6 +256,8 @@ def test_registry_rejects_replacement_capacity_and_primary_alias() -> None:
     """Test established role identity and protected primary ownership checks."""
     session = _session()
     registry = GPUResourceRegistry(session)
+    with pytest.raises(ValueError, match="fixed-capacity bounds"):
+        registry.acquire_coagulation(5)
     view = registry.acquire_wall_loss()
     session_temperature = cast(Any, session.environment).temperature
     with pytest.raises(ValueError, match="replaced"):

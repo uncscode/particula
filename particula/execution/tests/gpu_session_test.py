@@ -348,6 +348,46 @@ def test_session_rejects_schema_and_metadata_mismatches() -> None:
         )
 
 
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("carrier", "field", "aliased_carrier", "aliased_field"),
+    [
+        ("particles", "charge", "particles", "concentration"),
+        ("environment", "saturation_ratio", "gas", "concentration"),
+    ],
+)
+def test_session_rejects_overlapping_primary_arrays(
+    carrier: str,
+    field: str,
+    aliased_carrier: str,
+    aliased_field: str,
+) -> None:
+    """Primary arrays with compatible schemas cannot reuse resident storage."""
+    particles, gas, environment = _warp_resources()
+    carriers = {
+        "particles": particles,
+        "gas": gas,
+        "environment": environment,
+    }
+    object.__setattr__(
+        carriers[carrier],
+        field,
+        getattr(carriers[aliased_carrier], aliased_field),
+    )
+
+    with pytest.raises(
+        ValueError, match="resident primary arrays must not alias"
+    ):
+        ResidentSession(
+            particles,
+            gas,
+            environment,
+            ResidentDimensions(1, 2, 1),
+            _metadata(),
+            ResidentLifecycle.ACTIVE,
+        )
+
+
 def test_preflight_rejects_cpu_carriers_before_warp_import() -> None:
     """Test carrier and identity failures precede optional Warp import."""
     dimensions = ResidentDimensions(1, 0, 0)

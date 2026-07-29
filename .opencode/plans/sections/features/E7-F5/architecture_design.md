@@ -111,7 +111,7 @@ begin_step()
 environment_update --> vapor_pressure_refresh --> saturation_refresh
 gas_update -------------------------------------> saturation_refresh
 saturation_refresh -----------------------------> {condensation, diagnostics}
-condensation and nucleation --------------------> saturation_refresh (later consumer)
+condensation and nucleation invalidate saturation for a later consumer
 
 condensation <--> nucleation: exactly one profile-selected direction
 brownian_coagulation, dilution, and wall_loss: placement is graph-dependent

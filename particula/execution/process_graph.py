@@ -6,6 +6,7 @@ scheduler policy, execute work, access resources, or load optional backends.
 """
 
 import re
+import weakref
 from dataclasses import dataclass
 from enum import Enum
 
@@ -18,7 +19,9 @@ from particula.execution import (
 
 _NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 _EMPTY_REQUIREMENTS = CapabilityRequirements(frozenset())
-_RESOLVED_GRAPH_IDENTITIES: dict[int, "ResolvedProcessGraph"] = {}
+_RESOLVED_GRAPH_IDENTITIES: weakref.WeakValueDictionary[
+    int, "ResolvedProcessGraph"
+] = weakref.WeakValueDictionary()
 
 
 class NodeKind(str, Enum):

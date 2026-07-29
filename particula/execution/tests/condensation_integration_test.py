@@ -181,7 +181,7 @@ def _cases() -> tuple[_WarpCase, ...]:
         _WarpCase(
             "uptake",
             gas=np.array([[1.0e-6]]),
-            vapor_pressure=np.zeros((1, 1)),
+            vapor_pressure=np.full((1, 1), 1.0e-30),
             mass_rtol=1.0e-8,
             mass_atol=1.0e-30,
             gas_rtol=1.0e-8,
@@ -215,7 +215,7 @@ def _cases() -> tuple[_WarpCase, ...]:
         _WarpCase(
             "disabled",
             gas=np.array([[1.0e-6]]),
-            vapor_pressure=np.zeros((1, 1)),
+            vapor_pressure=np.full((1, 1), 1.0e-30),
             partitioning=np.array([[False]]),
             masses=base_mass,
             concentration=base_number,
@@ -232,7 +232,7 @@ def _cases() -> tuple[_WarpCase, ...]:
         _WarpCase(
             "zero_gas",
             gas=np.zeros((1, 1)),
-            vapor_pressure=np.zeros((1, 1)),
+            vapor_pressure=np.full((1, 1), 1.0e-30),
             mass_rtol=1.0e-8,
             mass_atol=1.0e-30,
             gas_rtol=1.0e-8,
@@ -243,7 +243,7 @@ def _cases() -> tuple[_WarpCase, ...]:
         _WarpCase(
             "inactive",
             gas=np.array([[1.0e-6]]),
-            vapor_pressure=np.zeros((1, 1)),
+            vapor_pressure=np.full((1, 1), 1.0e-30),
             masses=base_mass,
             concentration=np.array([[1.0e6, 0.0]]),
             partitioning=np.array([[True]]),
@@ -263,7 +263,7 @@ def _cases() -> tuple[_WarpCase, ...]:
             partitioning=np.ones((2, 1), dtype=bool),
             temperature=np.array([290.0, 310.0]),
             pressure=np.array([100000.0, 90000.0]),
-            vapor_pressure=np.zeros((2, 1)),
+            vapor_pressure=np.full((2, 1), 1.0e-30),
             mass_rtol=1.0e-8,
             mass_atol=1.0e-30,
             gas_rtol=1.0e-8,
@@ -272,7 +272,7 @@ def _cases() -> tuple[_WarpCase, ...]:
         _WarpCase(
             "latent_heat",
             gas=np.array([[1.0e-6]]),
-            vapor_pressure=np.zeros((1, 1)),
+            vapor_pressure=np.full((1, 1), 1.0e-30),
             latent_heat=True,
             mass_rtol=1.0e-8,
             mass_atol=1.0e-30,

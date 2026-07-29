@@ -937,9 +937,18 @@ class GPUResourceRegistry:
             raise TypeError(
                 "collision_capacity must be a non-boolean integral."
             )
-        if collision_capacity <= 0 or collision_capacity > _INT32_MAX:
+        maximum_capacity = max(
+            1,
+            min(
+                _INT32_MAX,
+                _MAX_SIZE // max(1, self._session.dimensions.n_boxes * 2 * 4),
+                self._session.dimensions.n_particles**2,
+            ),
+        )
+        if collision_capacity <= 0 or collision_capacity > maximum_capacity:
             raise ValueError(
-                "collision_capacity must be positive and int32-sized."
+                "collision_capacity must be positive and within resident "
+                "fixed-capacity bounds."
             )
         bindings = self._acquire(
             _COAGULATION,

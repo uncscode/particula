@@ -1,14 +1,17 @@
 """Test declaration-only process graph validation and normalization."""
 
+import gc
 import os
 import subprocess
 import sys
+import weakref
 from dataclasses import FrozenInstanceError
 from pathlib import Path
 from typing import Any, cast
 
 import pytest
 
+import particula.execution.process_graph as process_graph
 from particula.execution import (
     CONDENSATION_CAPABILITY_MATRIX,
     CONDENSATION_PROCESS,
@@ -818,6 +821,19 @@ def test_rejected_plan_can_be_corrected_and_resubmitted() -> None:
 
     assert rejected.dependencies[0].after_id == "nucleation"
     assert resolved.dependencies == corrected.dependencies
+
+
+def test_resolved_graph_provenance_does_not_retain_released_graph() -> None:
+    """Resolved-graph provenance uses weak ownership."""
+    graph = resolve_timestep_plan(TimestepPlan((), ()))
+    graph_id = id(graph)
+    reference = weakref.ref(graph)
+
+    del graph
+    gc.collect()
+
+    assert reference() is None
+    assert graph_id not in process_graph._RESOLVED_GRAPH_IDENTITIES
 
 
 def test_importing_graph_does_not_load_optional_backend() -> None:
