@@ -8,7 +8,7 @@ readiness.
 |-----------|--------------|-------------|--------|-------|
 | M1: Selection foundation accepted | TBD | - | Not Started | E7-F1 capability matrix, typed API, CPU adapter, and tests |
 | M2: Explicit boundary policy frozen | TBD | - | Not Started | E7-F6 errors, fallback, exports, and negative tests |
-| M3: Process adapters and resident state ready | TBD | - | Not Started | E7-F2, E7-F3, and E7-F4; parallel after M2 |
+| M3: Process adapters and resident state ready | TBD | 2026-07-29 (partial) | In Progress | E7-F4 P1--P7 resident lifecycle/checkpoint foundation, lazy example, regressions, and strict docs validation shipped; E7-F2/F3 remain |
 | M4: Deterministic full loop operational | TBD | - | Not Started | E7-F5 canonical process and thermodynamic ordering |
 | M5: Multi-box and restart contracts ready | TBD | - | Not Started | E7-F7 and E7-F8; parallel after M4 |
 | M6: Epic G exit bar satisfied | TBD | - | Not Started | E7-F9 regressions, example, docs, and closeout evidence |

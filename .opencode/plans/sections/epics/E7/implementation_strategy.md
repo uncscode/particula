@@ -15,8 +15,12 @@ order. Environment changes precede derived thermodynamic refreshes; refreshed
 vapor pressure and saturation state precede consuming processes. Multi-box
 transport uses a fixed-capacity canonical edge list with canonical
 source/destination order and an active-edge count; it is not hidden inside
-process kernels. Checkpoint/finalize operations synchronize and restore CPU
-state; normal timesteps do neither.
+process kernels. Checkpoint/finalize operations synchronize and restore detached
+CPU inspection state; normal timesteps do neither. E7-F4 ships this as
+concrete-only seams: `gpu_session` owns setup/session/guard lifecycle,
+`gpu_resources` pins a bound registry of fixed-shape sidecars, and `checkpoint`
+owns immutable snapshots and explicit restart. These names are not package or
+top-level exports.
 
 ## Data Ownership Rules
 
@@ -28,6 +32,11 @@ state; normal timesteps do neither.
   not silently reset a stream.
 - Gas names and other intentionally CPU-owned metadata remain external to Warp
   containers and are carried by checkpoint metadata.
+- Inspection `GasData` is deliberately lossy: canonical checkpoint bytes, not
+  inspection carriers, preserve GPU vapor pressure and per-box partitioning for
+  restart. Checkpoint/restart accepts only the implemented version-1
+  `ResidentSession` schema and an exactly equal target device; restart creates
+  fresh session, registry, guard, containers, arrays, and sidecars.
 - Adapters return or retain identity according to shipped direct-kernel
   contracts; no intermediate conversion is allowed.
 

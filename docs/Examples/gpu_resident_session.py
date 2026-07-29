@@ -1,8 +1,11 @@
-"""Demonstrate the bounded GPU-resident session lifecycle.
+"""Demonstrate the bounded GPU-resident session lifecycle and checkpoints.
 
 The optional Warp runtime and every concrete resident seam are imported only on
-the enabled path. This example does not schedule processes, launch physics,
-select a backend, transport state, or provide fallback.
+the enabled path. The enabled path uploads deterministic CPU carriers once,
+then demonstrates guard ownership, a nonterminal checkpoint, an explicit
+same-device restart, and cached terminal finalization. This example does not
+schedule processes, launch physics, select a backend, transport state, or
+provide fallback.
 """
 
 from __future__ import annotations
@@ -22,7 +25,19 @@ _FORCE_NO_WARP_ENV = "PARTICULA_EXAMPLE_FORCE_NO_WARP"
 
 @dataclass
 class ExampleRun:
-    """Retain stable observations from the optional lifecycle demonstration."""
+    """Retain stable observations from the optional lifecycle demonstration.
+
+    All enabled-only fields remain ``None`` when Warp is unavailable or disabled.
+
+    Attributes:
+        output: Deterministic, address-free status lines.
+        session: Source resident session after the lifecycle demonstration.
+        registry: Resource registry bound to ``session``.
+        guard: Closed source step guard bound to ``session`` and ``registry``.
+        checkpoint: Nonterminal checkpoint captured while ``session`` is active.
+        restarted: Fresh ``(session, registry, guard)`` restarted binding.
+        terminal_checkpoint: Cached terminal checkpoint from source finalization.
+    """
 
     output: list[str]
     session: Any | None = None
@@ -34,7 +49,15 @@ class ExampleRun:
 
 
 def _warp_enabled() -> bool:
-    """Return whether the optional runtime is enabled and importable."""
+    """Return whether the optional Warp runtime is enabled and importable.
+
+    A force-disable environment variable short-circuits before the Warp probe.
+    A missing Warp installation is treated as an unavailable optional runtime.
+
+    Returns:
+        ``True`` when Warp is enabled and imports successfully; otherwise,
+        ``False``.
+    """
     if os.getenv(_FORCE_NO_WARP_ENV) == "1":
         return False
     try:
@@ -45,7 +68,16 @@ def _warp_enabled() -> bool:
 
 
 def _load_enabled_runtime() -> SimpleNamespace:
-    """Load Warp followed by execution and concrete resident modules."""
+    """Load the enabled-only Warp and concrete resident-session modules.
+
+    The import order keeps ``particula.gpu`` out of this lifecycle-only flow.
+
+    Returns:
+        Namespace containing Warp plus the resident-session types and helpers.
+
+    Raises:
+        ImportError: If an enabled-only runtime dependency cannot be imported.
+    """
     wp = importlib.import_module("warp")
     execution = importlib.import_module("particula.execution")
     session = importlib.import_module("particula.execution.gpu_session")
@@ -64,7 +96,11 @@ def _load_enabled_runtime() -> SimpleNamespace:
 
 
 def _build_cpu_state() -> tuple[ParticleData, GasData, EnvironmentData]:
-    """Build deterministic one-box CPU carriers for the single upload."""
+    """Build deterministic one-box CPU carriers for the single upload.
+
+    Returns:
+        Particle, gas, and environment carriers in that setup order.
+    """
     particles = ParticleData(
         masses=np.array([[[1.0e-18]]], dtype=np.float64),
         concentration=np.array([[1.0]], dtype=np.float64),
@@ -87,7 +123,11 @@ def _build_cpu_state() -> tuple[ParticleData, GasData, EnvironmentData]:
 
 
 def _disabled_output() -> list[str]:
-    """Return deterministic, address-free no-work status."""
+    """Return deterministic, address-free status for the no-Warp path.
+
+    Returns:
+        Status lines confirming that no CPU fixture or resident session exists.
+    """
     return [
         "Canonical path: docs/Examples/gpu_resident_session.py",
         "CPU fixture: not constructed because Warp is unavailable or disabled.",
@@ -100,6 +140,19 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
     Enabled-loader errors intentionally propagate. The two zero-duration guard
     tokens demonstrate ownership only, not scheduling or process ordering.
+
+    Args:
+        device: Warp device identifier for the explicit restart target. Defaults
+            to Warp CPU.
+
+    Returns:
+        Deterministic disabled-path status when Warp is unavailable or disabled;
+        otherwise, lifecycle observations for the source and restarted bindings.
+
+    Raises:
+        ImportError: If an enabled-only runtime dependency cannot be imported.
+        RuntimeError: If the resident lifecycle rejects an invalid transition.
+        ValueError: If the selected device or resident state is invalid.
     """
     if not _warp_enabled():
         return ExampleRun(output=_disabled_output())
@@ -153,7 +206,13 @@ def run_example(device: str = "cpu") -> ExampleRun:
 
 
 def main() -> None:
-    """Run the example and print its deterministic status lines."""
+    """Run the example and print its deterministic status lines.
+
+    Raises:
+        ImportError: If an enabled-only runtime dependency cannot be imported.
+        RuntimeError: If the resident lifecycle rejects an invalid transition.
+        ValueError: If the selected device or resident state is invalid.
+    """
     for line in run_example().output:
         print(line)
 

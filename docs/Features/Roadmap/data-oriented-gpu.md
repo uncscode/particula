@@ -1520,11 +1520,17 @@ E7-F6 remains deferred. Any broader integration still follows the ordering.
 
 ### Full GPU-Resident Simulation
 
-E7-F4 ships resident-session lifecycle and in-memory checkpoint/restart only.
-Resident loops, full-process scheduling, high-level GPU adapters, and user-facing
-CPU/GPU orchestration remain deferred to later contracts, including E7-F5 after
-E7-F6 establishes policy. They must not imply hidden transfer, availability
-probing, fallback, retry, or replacement of the direct-kernel APIs.
+E7-F4 P1--P7 ships the bounded concrete-only resident-session lifecycle and
+in-memory checkpoint/restart prerequisite. See
+[GPU resident checkpoints](../gpu_resident_checkpoints.md) for its direct-import
+seams, closed-guard binding, canonical recovery bytes, and exact-device fresh
+restart contract. It is not a resident loop or a process coordinator.
+
+E7-F5 scheduling, E7-F7 transport, and E7-F8 detailed RNG-stream policy remain
+deferred. Full-process scheduling, high-level GPU adapters, and user-facing
+CPU/GPU orchestration also remain later contracts after E7-F6 establishes
+policy. They must not imply hidden transfer, availability probing, fallback,
+retry, or replacement of the direct-kernel APIs.
 
 ### Multi-Box Communication
 

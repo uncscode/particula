@@ -68,4 +68,16 @@
       must remain reproducible when box count or enablement changes.
     - `particula/gpu/warp_types.py:164` - environment state is row-batched and
       contains no logical box identifier.
-  - Resolved by: plan-question-resolver
+   - Resolved by: plan-question-resolver
+
+- [x] What checkpoint compatibility boundary is implemented for resident
+  restart?
+  - Resolved 2026-07-29: Restart fails closed unless the checkpoint is schema
+    version `1`, carrier type `ResidentSession`, ACTIVE with complete valid
+    payloads, and the target `Device` is exactly equal to the source device.
+  - Rationale: Inspection carriers are lossy, so compatibility must be based on
+    canonical payload bytes and explicit schema/device checks rather than a
+    best-effort CPU restore or migration.
+  - Evidence: E7-F4-P7 documentation and regression coverage in
+    `particula/execution/tests/gpu_resident_session_docs_test.py`.
+  - Resolved by: issue #1490

@@ -9,6 +9,11 @@
   CPU/GPU transfers between explicit checkpoints.
 - [ ] Checkpoint and finalization paths explicitly synchronize and restore all
   documented state and metadata needed for restart.
+- [x] E7-F4 documents and regression-tests the bounded resident lifecycle:
+  concrete-only setup/session/registry/guard seams, nonterminal checkpoint,
+  terminal cached finalization, lossy inspection versus canonical bytes, and
+  explicit exact-device fresh restart. The lazy example and strict MkDocs build
+  were validated in issue #1490.
 - [ ] Container identities, array shapes, sidecar identities, and fixed capacity
   remain stable across repeated timesteps.
 - [ ] All supported processes run in a documented deterministic order with no

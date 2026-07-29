@@ -18,6 +18,12 @@
   refresh needed after temperature changes.
 - `docs/Examples/gpu_complete_process_sequence.py:380-494`: one-upload,
   five-process, one-restore illustrative sequence.
+- `particula/execution/gpu_session.py`, `gpu_resources.py`, and
+  `checkpoint.py`: concrete-only resident lifecycle, pinned resources, and
+  checkpoint/restart seams shipped through E7-F4.
+- `docs/Examples/gpu_resident_session.py`: lazy Warp lifecycle-only example;
+  it demonstrates closed-guard checkpoint/finalize/restart identities without
+  scheduling or physics execution.
 
 ## Validation References
 
@@ -29,6 +35,10 @@
   ordering, transfer, and failure-propagation regression patterns.
 - `particula/tests/runnable_test.py`: CPU scheduling assertions.
 - `particula/gpu/tests/kernel_exports_test.py`: public-export boundaries.
+- `particula/execution/tests/gpu_resident_session_docs_test.py`: lazy-import,
+  disabled-path, lifecycle identity, documentation, and example regressions.
+- `mkdocs build --strict` plus the focused execution session/resource/checkpoint
+  suites: E7-F4-P7 publication validation for issue #1490.
 
 ## Rejected Approaches
 

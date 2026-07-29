@@ -25,11 +25,14 @@ direct-module-only.
 
 Strategy physics, builder configuration, and existing CPU `RunnableABC`
 behavior remain separate from E7-F1 typed selection and downstream process
-adapter/session layers. The exact ordering is
+adapter/session layers. E7-F4 P1--P7 ships the bounded, concrete
+GPU-resident lifecycle below; it does not ship a resident loop or scheduler.
+The exact downstream ordering remains
 `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`; E7-F6 owns availability,
-fallback, error taxonomy, API stability, and export policy. GPU adapters,
-resident sessions or loops, schedulers, implicit transfer/synchronization,
-retry, fallback, and replacement of direct GPU APIs remain deferred.
+fallback, error taxonomy, API stability, and export policy. E7-F5 scheduling,
+E7-F7 transport, and E7-F8 detailed RNG-stream policy remain deferred, along
+with implicit transfer/synchronization, retry, fallback, and replacement of
+direct GPU APIs.
 
 ### particula/execution/
 
@@ -53,7 +56,11 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
   select adapters by identity after matrix validation and never execute them.
   P3/P4 state, result, mutation, and concrete CPU execution-adapter types stay
   direct-module-only.
-- `gpu_session.py` - Concrete-only, unexported resident-session boundary. P1
+- `gpu_session.py` - Concrete-only, unexported resident-session boundary. The
+  shipped E7-F4 P1--P7 lifecycle is available only by direct import from
+  `particula.execution.gpu_session`, `particula.execution.gpu_resources`, and
+  `particula.execution.checkpoint`; none of its names are package or top-level
+  exports. P1
   `ResidentSession` validates and retains already-resident caller-owned Warp
   particle, gas, and environment containers, immutable dimensions, `Device`
   metadata, a CPU gas-name tuple, and lifecycle state by identity. P2's
@@ -93,10 +100,10 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
   finalize, and restart behavior remains unchanged. See
    [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md),
    [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md), and
-  [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md),
+   [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md),
   [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md),
   and [ADR-008](decisions/ADR-008-resident-session-failure-close-semantics.md).
-- `checkpoint.py` - Concrete-only P5 in-memory checkpoint/restart boundary.
+- `checkpoint.py` - Concrete-only P5/P7 in-memory checkpoint/restart boundary.
    `ResidentCheckpoint` stores versioned immutable canonical bytes for all
    primary arrays, including GPU-only gas vapor pressure, and acquired registry
    sidecars, plus detached CPU inspection carriers. Inspection data is
@@ -104,12 +111,16 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
    canonical payload bytes. Direct-import-only `restart_resident_session()`
    first fully validates the record, then creates fresh session, registry,
    guard, containers, primary arrays, and sidecars only on an explicitly exact
-   compatible device. It does not select or migrate devices, automatically
+    compatible device. Restart compatibility fails closed: it accepts only an
+    `ACTIVE` `ResidentSession` carrier with schema version `1`, complete valid
+    payload descriptors and bytes, and an exactly equal target `Device`. It does
+    not select or migrate devices, automatically
    restart normal session use, fall back to CPU, serialize to disk/remote, or
    guarantee rollback after an asynchronous device writer launches. Snapshotting
    requires roughly one additional host copy of resident payload bytes plus
    detached inspection copies. See
-   [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md).
+   [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md)
+   and [ADR-008](decisions/ADR-008-resident-session-failure-close-semantics.md).
 - `gpu_resources.py` - Direct-import-only, Warp-dependent concrete registry for
   complete reusable native process sidecars. Each registry accepts exactly one
   exact `ACTIVE` `ResidentSession`, pins its lifecycle, dimensions, device, and

@@ -70,6 +70,16 @@ Welcome to the Particula Features documentation! This section provides comprehen
 
     [:octicons-arrow-right-24: Learn more](data-containers-and-gpu-foundations.md)
 
+-   __[GPU Resident Checkpoints](gpu_resident_checkpoints.md)__
+
+    ---
+
+    Concrete-only resident-session lifecycle and in-memory checkpoint/restart
+    boundaries, including canonical recovery state and explicit same-device
+    restart. This is not a scheduler, transport layer, or public high-level API.
+
+    [:octicons-arrow-right-24: Learn more](gpu_resident_checkpoints.md)
+
 -   __[Fixed-Capacity Slot Exhaustion Primitives](slot_exhaustion_policies.md)__
 
     ---

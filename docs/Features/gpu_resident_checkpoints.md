@@ -35,7 +35,8 @@ carrier schemas, malformed or incomplete payloads, terminal checkpoints, and
 device mismatches; it does not promise forward or backward compatibility.
 
 For a lazy lifecycle-only walkthrough that does not schedule or launch physics,
-run [`docs/Examples/gpu_resident_session.py`](../Examples/gpu_resident_session.py).
+see the
+[GPU-resident session lifecycle source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_session.py).
 
 Validate documentation with:
 

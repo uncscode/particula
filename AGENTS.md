@@ -310,6 +310,11 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   session use. There is no disk, remote, delta, or rollback facility; after an
   asynchronous device writer launches, rollback is not guaranteed. See
   [GPU resident checkpoints](docs/Features/gpu_resident_checkpoints.md).
+- Restart compatibility is fail-closed: only an ACTIVE `ResidentCheckpoint`
+  with schema version `1`, carrier type `"ResidentSession"`, complete valid
+  payload descriptors and bytes, and an exactly equal target `Device` is
+  accepted. E7-F5 scheduling, E7-F7 transport, and E7-F8 detailed RNG policy
+  remain deferred.
 
 ### Complete direct GPU process illustration
 

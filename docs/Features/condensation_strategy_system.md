@@ -787,7 +787,7 @@ not claim general
 CPU-strategy parity, performance, adaptive stepping, graph capture/replay,
 autodiff, multi-GPU, resizing, or full scheduler support. The
 [Epic G handoff](Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
-defers E7-F4 resident-resource lifecycle and E7-F5 deterministic scheduling.
+defers E7-F5 deterministic scheduling.
 
 ## Limitations
 

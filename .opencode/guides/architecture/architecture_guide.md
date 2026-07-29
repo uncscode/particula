@@ -25,14 +25,22 @@
   mutation, and concrete CPU execution-adapter types remain direct-module-only.
 - Strategy physics, builder configuration, and existing CPU `RunnableABC`
   behavior are separate from E7-F1 typed selection and downstream process
-  adapter/session layers. The exact downstream ordering is
+  adapter/session layers. E7-F4 P1--P7 ships the concrete lifecycle described
+  below, not a resident loop or scheduler. The exact downstream ordering is
   `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`: E7-F6 owns availability,
-  fallback, error taxonomy, API stability, and export policy. GPU adapters,
-  resident sessions or loops, schedulers, implicit transfer/synchronization,
-  retry, fallback, and replacement of direct GPU APIs remain deferred.
+  fallback, error taxonomy, API stability, and export policy. E7-F5 scheduling,
+  E7-F7 transport, E7-F8 detailed RNG-stream policy, implicit
+  transfer/synchronization, retry, fallback, and replacement of direct GPU APIs
+  remain deferred.
 
 ## Concrete GPU-Resident Session Boundary
 
+- E7-F4 P1--P7 is a bounded concrete lifecycle/checkpoint architecture. Its
+  direct import seams are `particula.execution.gpu_session` (setup, session,
+  and guard), `particula.execution.gpu_resources` (registry), and
+  `particula.execution.checkpoint` (records, controller, and explicit restart).
+  These names are deliberately absent from `particula.execution` and top-level
+  exports; the boundary is not a public resident-process API.
 - `particula.execution.gpu_session` is an intentionally concrete-only,
   unexported P1/P2 boundary. `ResidentSession` retains valid caller-owned Warp
   particle, gas, and environment containers, immutable dimensions, a Warp
@@ -101,7 +109,10 @@
   inspection `GasData` intentionally omits GPU-only vapor pressure and is not
   authoritative; restart recovers vapor pressure from canonical bytes.
 - `restart_resident_session(checkpoint, device)` is explicit and same-device
-  only. After complete host-side preflight it creates fresh session, registry,
+  only. Its preflight fails closed: only an `ACTIVE` checkpoint with schema
+  version `1`, carrier type `"ResidentSession"`, complete valid payload
+  descriptors and bytes, and an exactly equal target `Device` is accepted.
+  After complete host-side preflight it creates fresh session, registry,
   guard, container, primary-array, and sidecar identities; it never reuses the
   source binding. It neither chooses nor migrates a device, falls back to CPU,
   restarts automatically during normal use, provides disk/remote/delta storage,

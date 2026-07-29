@@ -179,7 +179,7 @@ own snapshot/restore.
 
 The [direct-kernel quick start](../Examples/gpu_direct_kernels_quick_start.py)
 is the supported explicit-transfer path. It is separate from the bounded
-[GPU-resident session example](../Examples/gpu_resident_session.py), which
+[GPU-resident session example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_session.py), which
 documents lifecycle ownership rather than process execution.
 
 ### GPU-resident session lifecycle
