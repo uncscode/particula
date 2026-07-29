@@ -238,6 +238,29 @@ def test_finalize_is_cached_and_restart_restores_primary_state() -> None:
     )
 
 
+@pytest.mark.warp
+def test_restart_restores_each_acquired_resource_family() -> None:
+    """Restart reconstructs all resource families through registry APIs."""
+    session, registry, guard = _resident_binding()
+    registry.acquire_condensation()
+    registry.acquire_coagulation(1)
+    registry.acquire_wall_loss()
+    registry.acquire_nucleation()
+
+    checkpoint = session.checkpoint(registry, guard)
+    _, restored_registry, _ = restart_resident_session(
+        checkpoint, Device(Backend.WARP, "cpu")
+    )
+
+    assert tuple(restored_registry._bindings) == (
+        "condensation",
+        "coagulation",
+        "wall_loss",
+        "nucleation",
+    )
+    assert restored_registry._capacities["coagulation"] == 1
+
+
 def test_restart_rejects_non_checkpoint_and_terminal_checkpoint() -> None:
     """Restart rejects invalid carriers before importing or allocating Warp."""
     with pytest.raises(TypeError, match="exact ResidentCheckpoint"):
