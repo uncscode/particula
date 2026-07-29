@@ -23,7 +23,11 @@ rollback. ``close``/``discard`` only dispose lifecycle state after a closed
 guard; they do not restore, synchronize, or otherwise operate on payloads.
 Restart is explicit, same-device, and never automatic.
 Selected native Warp-device availability remains an upstream E7-F6
-precondition.
+precondition. P6 direct-owner failures are classified explicitly so a
+read-only failure keeps the session ACTIVE while a possible post-launch writer
+failure faults the exact active session without rollback. ``close`` and
+``discard`` are terminal lifecycle transitions only; they do not restore or
+mutate resident payloads.
 """
 
 from dataclasses import dataclass
@@ -80,7 +84,16 @@ def _validate_cpu_shape(
     name: str,
     expected_shape: tuple[int, ...],
 ) -> None:
-    """Validate one CPU field shape without reading or copying its values."""
+    """Validate one CPU field shape without reading or copying values.
+
+    Args:
+        value: Candidate CPU-backed field.
+        name: Field name used in validation errors.
+        expected_shape: Required immutable shape.
+
+    Raises:
+        ValueError: If the value does not expose the required shape.
+    """
     if getattr(value, "shape", None) != expected_shape:
         raise ValueError(f"{name} must have shape {expected_shape}.")
 
@@ -302,7 +315,17 @@ def _validate_contiguous_array(
     shape: tuple[int, ...],
     item_size: int,
 ) -> None:
-    """Validate pointer and contiguous-stride primary metadata."""
+    """Validate pointer and contiguous-stride primary metadata.
+
+    Args:
+        name: Fully qualified array name used in validation errors.
+        array: Candidate Warp array.
+        shape: Required immutable shape.
+        item_size: Element size in bytes.
+
+    Raises:
+        ValueError: If the array is not contiguous or lacks a valid pointer.
+    """
     expected: list[int] = []
     stride = item_size
     for length in reversed(shape):
@@ -516,7 +539,15 @@ def _validate_resident_carriers(
 
 
 def _validate_resident_imports() -> Any:
-    """Import Warp for resident checks and preserve missing-runtime errors."""
+    """Import Warp for resident checks and preserve missing-runtime errors.
+
+    Returns:
+        The imported Warp module.
+
+    Raises:
+        RuntimeError: If Warp is unavailable.
+        ModuleNotFoundError: If a different import name is missing.
+    """
     try:
         import warp as wp
     except ModuleNotFoundError as error:
@@ -709,7 +740,15 @@ class ResidentSession:
     def discard(
         self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
     ) -> None:
-        """Delegate to :meth:`close` using identical terminal semantics."""
+        """Discard this binding using the same terminal semantics as close.
+
+        Args:
+            registry: Exact registry pinned to this session.
+            guard: Exact closed guard bound to this session and registry.
+
+        Returns:
+            None.
+        """
         self.close(registry, guard)
 
 
@@ -1002,6 +1041,17 @@ def _handle_failed_resident_operation(
     leave the session active after aborting the token; a possible writer launch
     faults the session after that same abort. No device payload rollback,
     transfer, synchronization, retry, or recovery occurs here.
+
+    Args:
+        session: Exact resident session owning the failure.
+        registry: Exact registry pinned to ``session``.
+        guard: Exact guard bound to ``session`` and ``registry``.
+        token: Exact open timestep token created by ``guard``.
+        outcome: Explicit classification chosen by the direct owner.
+
+    Raises:
+        TypeError: If any argument is not the exact required concrete type.
+        ValueError: If the binding, lifecycle, or token identity is invalid.
     """
     from particula.execution.gpu_resources import GPUResourceRegistry
 
@@ -1043,11 +1093,11 @@ def setup_resident_session(
     point. Local CPU preflight completes before conversion helpers are imported.
     It then converts particles, gas, and environment once in that order,
     snapshots ordered gas names into immutable CPU-owned tuple metadata, and
-    publishes only one complete, validated ACTIVE session retaining converted
-    containers by identity. It
-    provides no lifecycle operations, fallback, synchronization, restore, or
-    process sidecars. The selected native Warp device must already be
-    availability-approved by upstream E7-F6; this revision does not probe it.
+    publishes one complete, validated ACTIVE session retaining converted
+    containers by identity. It provides no lifecycle operations, fallback,
+    synchronization, restore, or process sidecars. The selected native Warp
+    device must already be availability-approved by upstream E7-F6; this
+    revision does not probe it.
 
     Args:
         particles: CPU particle carrier to upload.
