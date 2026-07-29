@@ -9,6 +9,7 @@ concrete names are deliberately not exported from :mod:`particula.execution`.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -109,21 +110,21 @@ class ResidentNucleationRequest:
             raise TypeError("resources must be an exact NucleationResources.")
 
 
-def _get_dilution_step_gpu() -> object:
+def _get_dilution_step_gpu() -> Callable[..., object]:
     """Lazily import the sole supported direct dilution boundary."""
     from particula.gpu.kernels import dilution_step_gpu
 
     return dilution_step_gpu
 
 
-def _get_wall_loss_step_gpu() -> object:
+def _get_wall_loss_step_gpu() -> Callable[..., object]:
     """Lazily import the sole supported direct wall-loss boundary."""
     from particula.gpu.kernels import wall_loss_step_gpu
 
     return wall_loss_step_gpu
 
 
-def _get_nucleation_step_gpu() -> object:
+def _get_nucleation_step_gpu() -> Callable[..., object]:
     """Lazily import the sole supported direct nucleation boundary."""
     from particula.gpu.kernels import nucleation_step_gpu
 
