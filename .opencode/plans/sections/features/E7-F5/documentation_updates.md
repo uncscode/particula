@@ -29,7 +29,13 @@
   identity binding, caller-reported successful nodes, cursor/virtual-writer
   ordering, stale-marker partial-failure semantics, identity preservation, the
   delegated configuration-fingerprint-read caveat, and exclusions for
-  lifecycle, transfer, fallback, full scheduler dispatch, and general process
-  dispatch. No public documentation or export changed.
+   lifecycle, transfer, fallback, full scheduler dispatch, and general process
+   dispatch. No public documentation or export changed.
+- P6 (#1497) updated `.opencode/guides/architecture_reference.md` and
+  `.opencode/guides/architecture/architecture_outline.md` with the
+  direct-import-only diagnostics and resident scheduler boundaries: two closed
+  snapshots, caller-owned output/nonaliasing and canonical empty no-ops, exact
+  ten-node scheduling, identity-bound lifecycle, consumer-window refreshes, and
+  no-transfer/no-fallback/no-rollback limits. No public export changed.
 - Run documentation regressions and `mkdocs build --strict`; if a paired notebook
   is touched, edit its Jupytext `.py`, sync, execute, and commit both files.

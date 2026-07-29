@@ -325,6 +325,19 @@ class GPUResourceRegistry:
         The diagnostics boundary owns neither these arrays nor their lifetime.
         This metadata-only check rejects aliasing with resident primaries and
         acquired sidecars, while accepting canonical empty ``(B, S)`` arrays.
+        It does not allocate, launch, synchronize, transfer, inspect payloads,
+        acquire a sidecar, or mutate registry state.
+
+        Args:
+            session: Exact active session pinned by this registry.
+            outputs: Exact tuple of caller-owned ``float64`` ``(B, S)`` Warp
+                arrays to validate in registration order.
+
+        Raises:
+            TypeError: If ``outputs`` is not an exact tuple or an output is not
+                a Warp array.
+            ValueError: If session ownership, output schema, device, pointer,
+                contiguity, or byte-range nonaliasing validation fails.
         """
         self.validate_pinned_session(session)
         if type(outputs) is not tuple:

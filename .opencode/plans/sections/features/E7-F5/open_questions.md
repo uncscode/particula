@@ -61,4 +61,18 @@
     in-place update seam. Scheduling and P5 vapor-pressure/saturation refresh
     remain separate work.
   - Evidence: `particula/execution/state_updates.py` and
-    `particula/execution/tests/state_updates_test.py`.
+   `particula/execution/tests/state_updates_test.py`.
+
+- [x] Are resident diagnostics arbitrary hooks or a closed device protocol?
+  - Resolved 2026-07-29 in #1497: They are exactly two direct-import-only
+    snapshots—gas concentration and saturation ratio—into caller-owned validated
+    outputs. Python callbacks, host readback, and resource exposure are excluded.
+  - Evidence: `particula/execution/diagnostics.py` and
+    `particula/execution/tests/scheduler_test.py`.
+
+- [x] May the runtime compose a partial or handwritten process order?
+  - Resolved 2026-07-29 in #1497: No. It accepts only the exact
+    resolver-produced complete ten-node schedule and dispatches its ordered IDs;
+    virtual thermodynamic nodes are consumed only by their consumer windows.
+  - Evidence: `particula/execution/resident_scheduler.py` and
+    `particula/execution/tests/scheduler_test.py`.

@@ -17,13 +17,15 @@
   `particula/execution/scheduler.py`: immutable selections/profiles/schedules,
   P1-first validation, closure, direction policy, and freshness dependencies
   (P2, #1493).
-- [ ] Add runtime `SimulationScheduler` lifecycle integration after declaration
-  resolution; validate before `ResidentSession.begin_step()` and advance
-  counters once.
+- [x] Add direct-import-only resident scheduler lifecycle integration after
+  declaration resolution; preflight before one `begin_step()`, dispatch the
+  exact ten-node resolved schedule, and advance counters once (P6, #1497).
 - [ ] Route E7-F2/F3 adapters through `ExecutionContext` and add resident
   dilution, wall-loss, and nucleation adapters without direct private-kernel use.
-- [ ] Preserve all input/output container, array, sidecar, and RNG identities.
-- [ ] Fault the session after uncertain launched work and never promise rollback.
+- [x] Preserve input/output container, array, sidecar, diagnostic-output, and
+  RNG identities across successful P6 loops (#1497).
+- [x] Fault the session after uncertain writer-capable P6 work and never promise
+  rollback (#1497).
 
 ## Environment, Gas, and Derived State
 
@@ -41,7 +43,10 @@
   (#1496).
 - [x] Ensure a successful condensation callback invalidates saturation and that
   later diagnostics refresh from its in-place gas mutation without replay or
-  overwrite (#1496).
+   overwrite (#1496).
+- [x] Add closed gas-concentration and saturation-ratio resident snapshots with
+  caller-owned output validation/nonaliasing and canonical empty no-ops (P6,
+  #1497).
 
 ## Tooling / Tests
 
@@ -56,12 +61,14 @@
 - [x] Add `thermodynamic_updates_test.py` with coordinator order, SI-reference,
   identity, rejection, empty-schema, and partial-writer/callback failure
   coverage (P5, #1496).
-- [ ] Generalize existing process-sequence fixtures and transfer/sync spies.
-- [ ] Test registration-order invariance, graph rejection, exact call order,
-  lifecycle, identity, no-op paths, update freshness, and failure propagation.
-- [ ] Compare complete Warp CPU loops against independent CPU/NumPy references
-  with explicit tolerances and particle-plus-gas conservation checks.
-- [ ] Add multi-box isolation rows without transport and optional CUDA rows that
-  skip cleanly; do not require exact CPU/CUDA stochastic trajectories.
-- [ ] Maintain changed-module coverage at or above 80%; run focused pytest with
-  `-Werror`, Ruff, mypy, export regressions, and `mkdocs build --strict`.
+- [x] Add P6 complete-loop fixtures and transfer/sync spies in `scheduler_test.py`
+  (#1497).
+- [x] Test exact resolved order, graph/binding rejection, lifecycle, identity,
+  diagnostics no-op paths, freshness, and read-only/writer failure propagation
+  (#1497).
+- [x] Cover deterministic Warp CPU loops, conservation/loss accounting, and
+  multi-box isolation with explicit tolerances (#1497).
+- [x] Add optional CUDA rows that skip cleanly and retain persistent stochastic
+  RNG identity without exact trajectory assertions (#1497).
+- [x] Maintain combined P6 diagnostics/scheduler coverage at or above 80% and
+  run focused warning-clean validation and architecture-guide updates (#1497).

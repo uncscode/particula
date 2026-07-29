@@ -62,11 +62,24 @@
     scheduler dispatch, transport, transfer, fallback, public exports, and
     general process dispatch.
 
-- [ ] **E7-F5-P6:** Add diagnostics hooks and complete-loop integration tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Complete one resident timestep contract and expose ordered, non-mutating hook points.
-  - Files: `particula/execution/scheduler.py`, `particula/execution/diagnostics.py`, `particula/execution/tests/scheduler_test.py`
-  - Tests: five-process loops, no intermediate transfer/sync, lifecycle counters, conservation, repeatability, faulting, Warp CPU and optional CUDA.
+- [x] **E7-F5-P6:** Add diagnostics hooks and complete-loop integration tests
+  - Issue: #1497 | Size: S | Status: Completed
+  - Delivered: Direct-import-only diagnostics implement two closed snapshots
+    with caller-owned validated outputs and canonical empty no-ops. The
+    direct-import-only resident scheduler accepts only the exact resolved
+    ten-node schedule, binds the active session/registry/closed guard by
+    identity, opens one token after whole-loop preflight, and dispatches the
+    resolver order with thermodynamic consumer windows. Writer-capable failures
+    fault without rollback.
+  - Files: `particula/execution/diagnostics.py`,
+    `particula/execution/resident_scheduler.py`,
+    `particula/execution/gpu_resources.py`,
+    `particula/execution/tests/scheduler_test.py`, and the two concrete
+    architecture guides.
+  - Tests: closed-protocol/output rejection/no-op coverage; complete-loop order,
+    lifecycle, freshness, identity, conservation/loss, isolation, repeatability,
+    no-transfer/sync/fallback, read-only abort, uncertain-writer faulting, Warp
+    CPU, and skip-clean optional CUDA.
 
 - [ ] **E7-F5-P7:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

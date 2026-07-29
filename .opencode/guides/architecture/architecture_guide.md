@@ -28,10 +28,11 @@
   adapter/session layers. E7-F4 P1--P7 ships the concrete lifecycle described
   below, not a resident loop or scheduler. The exact downstream ordering is
   `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`: E7-F6 owns availability,
-  fallback, error taxonomy, API stability, and export policy. E7-F5 scheduling,
-  E7-F7 transport, E7-F8 detailed RNG-stream policy, implicit
-  transfer/synchronization, retry, fallback, and replacement of direct GPU APIs
-  remain deferred.
+  fallback, error taxonomy, API stability, and export policy. The
+  dependency-neutral `scheduler` remains declaration-only; E7-F5 P6 separately
+  provides a bounded concrete resident complete-loop composer. E7-F7 transport,
+  E7-F8 detailed RNG-stream policy, implicit transfer/synchronization, retry,
+  fallback, and replacement of direct GPU APIs remain deferred.
 
 ## Concrete GPU-Resident Session Boundary
 
@@ -140,8 +141,30 @@
   fails, vapor remains fresh and saturation stale, with no cursor advance. The
   coordinator preserves resident identities and does not acquire resources, own
   lifecycle, transfer, synchronize, fall back, run a full scheduler, or provide
-  general process dispatch or package/top-level exports. See
-  [ADR-011](decisions/ADR-011-resident-thermodynamic-freshness-coordinator.md).
+    general process dispatch or package/top-level exports. See
+   [ADR-011](decisions/ADR-011-resident-thermodynamic-freshness-coordinator.md).
+- E7-F5 P6 adds `particula.execution.diagnostics` and
+  `particula.execution.resident_scheduler` as concrete direct-import-only
+  resident composition seams. Diagnostics is a closed, ordered protocol with
+  exactly `GAS_CONCENTRATION_SNAPSHOT` and `SATURATION_RATIO_SNAPSHOT`; it copies
+  the current resident `(B, S)` fields into separately caller-owned contiguous
+  float64 outputs after validating exact plan provenance and nonaliasing against
+  primaries, published sidecars, and other diagnostic outputs. Canonical empty
+  schemas are successful write-free no-ops. It does not expose callbacks,
+  arbitrary inspection, registration, or output allocation.
+- `ResidentSimulationScheduler` accepts only the exact resolver-produced
+  ten-node schedule: environment update, gas update, vapor-pressure refresh,
+  saturation refresh, condensation, Brownian coagulation, dilution, wall loss,
+  nucleation, and diagnostics. With exact active session/registry/closed-guard
+  and request bindings, it fully preflights before opening one token, dispatches
+  resolver order, and routes condensation and diagnostics through thermodynamic
+  consumer windows. A complete success calls `complete_step()` once. A failure
+  before writer-capable dispatch leaves the session active; after a writer may
+  launch it closes the token, faults the session, and offers no rollback. Neither
+  seam is package- or top-level-exported and neither transfers, restores,
+  synchronizes, checkpoints, finalizes, acquires/replaces resources, resizes,
+  compacts, or falls back. See
+  [ADR-012](decisions/ADR-012-resident-complete-loop-and-diagnostics.md).
 - P5 adds a concrete-only in-memory checkpoint boundary in
   `particula.execution.checkpoint`. `ResidentSession.checkpoint(registry, guard)`
   and `.finalize(registry, guard)` bind one controller by exact identity to that

@@ -71,4 +71,22 @@ only when their coordinator-owned markers are stale. Writer/callback failure
 does not advance the cursor; after a successful vapor writer followed by a
 failed saturation writer, vapor pressure remains fresh and saturation remains
 stale. This boundary adds no lifecycle handling, scheduler dispatch, transfer,
-fallback, host payload read, or package export.
+ fallback, host payload read, or package export.
+
+## Delivered: E7-F5-P6 (#1497)
+
+`particula.execution.diagnostics` now provides two direct-import-only closed
+resident snapshot operations, `GAS_CONCENTRATION_SNAPSHOT` and
+`SATURATION_RATIO_SNAPSHOT`. They copy current `(B, S)` resident fields into
+separately caller-owned, validated outputs; canonical `(0, S)`, `(B, 0)`, and
+`(0, 0)` outputs are successful write-free no-ops. No callbacks, readbacks, or
+public export were added.
+
+`particula.execution.resident_scheduler` now supplies the concrete complete-loop
+boundary. It accepts only the exact resolver-produced ten-node schedule, binds
+the active session, pinned registry, and closed guard by identity, preflights
+before opening one token, and dispatches the resolved order. Thermodynamic
+virtual refreshes are consumed only through condensation and diagnostics
+consumer windows. Writer-capable failures fault the session without rollback;
+normal execution adds no transfer, synchronization, fallback, checkpoint, or
+resource replacement.

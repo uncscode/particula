@@ -39,20 +39,28 @@
   writer fails (#1496).
 - [x] P5 remains direct-import-only and concrete-only: it adds no lifecycle,
   resource acquisition, whole-timestep scheduler dispatch, transfer,
-  synchronization, fallback, gas restore, or package export (#1496).
-- [ ] Condensation, Brownian coagulation, dilution, wall loss, and nucleation
-  execute through their owning adapters/direct boundaries without physics rewrites.
+   synchronization, fallback, gas restore, or package export (#1496).
+- [x] P6 diagnostics accept only the two closed snapshot operations, exact
+  resident bindings, nonaliasing caller-owned outputs, and canonical empty
+  write-free no-op schemas (#1497).
+- [x] P6 accepts only the exact resolver-produced ten-node schedule; it
+  preflights whole-loop ownership/requests before one token and dispatches the
+  resolved order with condensation/diagnostics consumer windows (#1497).
+- [x] P6 dispatches condensation, Brownian coagulation, dilution, wall loss, and
+  nucleation through their owning execution boundaries without physics rewrites
+  (#1497).
 - [x] Within P5's explicit consumer bracket, reported environment/gas changes
   precede needed derived-state writes and condensation/diagnostics observe the
   current resident gas and thermodynamic state (#1496).
-- [ ] Repeated normal timesteps perform no bulk conversion, host readback,
-  checkpoint/finalize call, implicit synchronization, or silent fallback.
-- [ ] Resident container, array, sidecar, output, and RNG identities and fixed
-  shapes remain stable across successful timesteps.
-- [ ] Prelaunch failures preserve state; post-launch uncertainty faults the
-  session and retains the original exception without rollback claims.
-- [ ] Warp CPU complete-loop tests pass with explicit deterministic tolerances,
-  conservation checks, and independent-box equivalence; optional CUDA skips cleanly.
+- [x] Repeated normal P6 timesteps perform no bulk conversion, host readback,
+  checkpoint/finalize call, explicit synchronization, or silent fallback (#1497).
+- [x] Resident container, array, sidecar, diagnostic-output, and RNG identities
+  and fixed shapes remain stable across successful P6 timesteps (#1497).
+- [x] P6 prelaunch failures preserve state; post-writer uncertainty faults the
+  session and retains the original exception without rollback claims (#1497).
+- [x] Warp CPU complete-loop tests pass with explicit deterministic tolerances,
+  conservation/loss checks, and independent-box equivalence; optional CUDA
+  skips cleanly (#1497).
 - [ ] Documentation states scope and limitations from issue #1451 and does not
   absorb T7/T8/T9, Epic H, or Epic I work.
 

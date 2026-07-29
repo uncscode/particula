@@ -28,11 +28,12 @@ behavior remain separate from E7-F1 typed selection and downstream process
 adapter/session layers. E7-F4 P1--P7 ships the bounded, concrete
 GPU-resident lifecycle below; it does not ship a resident loop or scheduler.
 The exact downstream ordering remains
-`E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`; E7-F6 owns availability,
-fallback, error taxonomy, API stability, and export policy. E7-F5 scheduling,
-E7-F7 transport, and E7-F8 detailed RNG-stream policy remain deferred, along
-with implicit transfer/synchronization, retry, fallback, and replacement of
-direct GPU APIs.
+  `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`; E7-F6 owns availability,
+  fallback, error taxonomy, API stability, and export policy. The
+  dependency-neutral `scheduler` remains declaration-only, while E7-F5 P6 adds
+  a bounded concrete resident complete-loop composer. E7-F7 transport and
+  E7-F8 detailed RNG-stream policy remain deferred, along with implicit
+  transfer/synchronization, retry, fallback, and replacement of direct GPU APIs.
 
 ### particula/execution/
 
@@ -139,22 +140,28 @@ direct GPU APIs.
    `validate_diagnostic_outputs()` similarly validates only separately owned
    contiguous float64 `(B, S)` diagnostic outputs against pinned primaries and
    established sidecars; it neither publishes nor allocates those outputs.
-- `diagnostics.py` and `resident_scheduler.py` - Concrete direct-import-only
-  E7-F5 P6 resident composition seams. Diagnostics is a closed, ordered
-  two-operation snapshot protocol for gas concentration and saturation ratio;
-  empty valid outputs are no-dispatch no-ops. The scheduler requires the exact
-  active session/registry/closed-guard binding and exactly the ten canonical
-  resolved nodes. It dispatches the resolver order, consumes virtual
-  thermodynamic refreshes only through their consumer windows, and completes one
-  guard token only after the entire loop succeeds. These seams have no package
-  export, transfer, synchronization, fallback, resource replacement, or
-  rollback; possible post-launch failures fault the resident session.
-    `validate_wall_loss_resources()` and `validate_nucleation_resources()` first
-    validate that pinned session, then require the exact already-published view
-    and its pinned sidecar bindings for the corresponding family. These
-    established-view seams neither acquire resources nor inspect payloads,
-    mutate registry state, transfer, synchronize, or execute physics.
-    Condensation thermodynamic roles are derived scratch/property storage only.
+   `validate_wall_loss_resources()` and `validate_nucleation_resources()` first
+   validate that pinned session, then require the exact already-published view
+   and its pinned sidecar bindings for the corresponding family. These
+   established-view seams neither acquire resources nor inspect payloads,
+   mutate registry state, transfer, synchronize, or execute physics.
+   Condensation thermodynamic roles are derived scratch/property storage only.
+- `diagnostics.py` - Concrete direct-import-only E7-F5 P6 closed resident
+  snapshot protocol. It supports only ordered gas-concentration and
+  saturation-ratio snapshots into separately caller-owned contiguous float64
+  `(B, S)` outputs, which are validated against resident primaries, published
+  sidecars, and each other. Canonical empty outputs are no-dispatch no-ops; it
+  exposes neither callbacks nor arbitrary resident inspection.
+- `resident_scheduler.py` - Concrete direct-import-only E7-F5 P6 composition
+  boundary. It requires the exact active session/registry/closed-guard binding,
+  matching request carriers, and exactly the ten resolver-produced canonical
+  nodes. It opens one token after complete preflight, dispatches resolver order,
+  consumes virtual thermodynamic refreshes only through condensation and
+  diagnostics consumer windows, and completes the token only after the full
+  loop succeeds. It has no package export, transfer, synchronization, fallback,
+  resource replacement, or rollback; a possible post-launch failure faults the
+  resident session. See
+  [ADR-012](decisions/ADR-012-resident-complete-loop-and-diagnostics.md).
 - `process_adapters.py` - Concrete-only, direct-import resident delegation
    boundary for dilution, wall loss, and nucleation. Frozen request carriers
    retain the exact active `ResidentSession`, its pinned

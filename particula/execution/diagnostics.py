@@ -25,7 +25,11 @@ from particula.execution.scheduler import ResolvedTimestepSchedule
 
 
 class ResidentDiagnosticOperation(str, Enum):
-    """Enumerate the closed resident diagnostic snapshot operations."""
+    """Enumerate the only resident diagnostic snapshot operations.
+
+    The protocol permits snapshots of current gas concentration and saturation
+    ratio only. It does not accept callbacks or arbitrary resident inspection.
+    """
 
     GAS_CONCENTRATION_SNAPSHOT = "gas_concentration_snapshot"
     SATURATION_RATIO_SNAPSHOT = "saturation_ratio_snapshot"
@@ -33,13 +37,22 @@ class ResidentDiagnosticOperation(str, Enum):
 
 @dataclass(frozen=True, eq=False)
 class ResidentDiagnosticRegistration:
-    """Bind one closed diagnostic operation to one caller-owned output."""
+    """Bind one closed diagnostic operation to one caller-owned output.
+
+    Attributes:
+        operation: Exact closed operation that selects the resident source.
+        output: Caller-owned Warp ``float64`` array validated by the executor.
+    """
 
     operation: ResidentDiagnosticOperation
     output: object
 
     def __post_init__(self) -> None:
-        """Validate the closed diagnostic operation."""
+        """Validate the exact closed diagnostic operation.
+
+        Raises:
+            TypeError: If ``operation`` is not an exact supported operation.
+        """
         if type(self.operation) is not ResidentDiagnosticOperation:
             raise TypeError(
                 "operation must be an exact ResidentDiagnosticOperation."
@@ -48,7 +61,16 @@ class ResidentDiagnosticRegistration:
 
 @dataclass(frozen=True, eq=False)
 class ResidentDiagnosticsPlan:
-    """Bind ordered closed diagnostics to one resident graph and schedule."""
+    """Bind ordered closed diagnostics to one resident graph and schedule.
+
+    Attributes:
+        session: Exact active resident session that owns diagnostic sources.
+        registry: Exact registry pinned to ``session``.
+        graph: Resolver-produced graph containing ``node`` by identity.
+        schedule: Matching resolved schedule that ends with ``node``.
+        node: Canonical ``diagnostics`` process node.
+        registrations: Ordered closed operation and output bindings.
+    """
 
     session: ResidentSession
     registry: object
@@ -58,7 +80,14 @@ class ResidentDiagnosticsPlan:
     registrations: tuple[ResidentDiagnosticRegistration, ...]
 
     def __post_init__(self) -> None:
-        """Validate the exact resident diagnostics binding."""
+        """Validate exact types for the resident diagnostics binding.
+
+        Structural graph, lifecycle, and output validation is deferred to the
+        executor so plan construction does not inspect Warp-array metadata.
+
+        Raises:
+            TypeError: If a carrier or registration has an inexact type.
+        """
         from particula.execution.gpu_resources import GPUResourceRegistry
 
         if type(self.session) is not ResidentSession:
@@ -85,15 +114,30 @@ class ResidentDiagnosticsPlan:
 
 @wp.kernel
 def _copy_snapshot(source: Any, output: Any) -> None:
-    """Copy one resident diagnostic matrix lane by lane."""
+    """Copy one resident diagnostic matrix element to its output."""
     box, species = wp.tid()  # type: ignore[misc]
     output[box, species] = source[box, species]
 
 
 class ResidentDiagnosticsExecutor:
-    """Execute an already-bound closed diagnostics plan without transfers."""
+    """Execute an already-bound closed diagnostics plan without transfers.
+
+    Validation preserves caller ownership and rejects outputs that alias
+    resident primaries, published sidecars, or another diagnostic output.
+    Execution copies registrations in declared order and is write-free for
+    empty matrices.
+    """
 
     def _validate(self, plan: ResidentDiagnosticsPlan) -> None:
+        """Validate plan provenance, closed operation order, and outputs.
+
+        Args:
+            plan: Exact diagnostics plan whose retained bindings are checked.
+
+        Raises:
+            ValueError: If lifecycle, graph, schedule, protocol, or output
+                metadata validation fails.
+        """
         registry = cast(Any, plan.registry)
         if registry._session is not plan.session:
             raise ValueError("diagnostics registry must be bound to session.")
@@ -152,7 +196,17 @@ class ResidentDiagnosticsExecutor:
         return plan
 
     def execute(self, plan: object) -> None:
-        """Validate and snapshot each registration in declared order."""
+        """Validate and snapshot each registration in declared order.
+
+        Empty ``(B, S)`` output schemas complete without a kernel launch.
+
+        Args:
+            plan: Exact plan selecting the sources and caller-owned outputs.
+
+        Raises:
+            TypeError: If ``plan`` is not an exact diagnostics plan.
+            ValueError: If its bindings or output metadata are invalid.
+        """
         plan = self.validate(plan)
         dimensions = plan.session.dimensions
         if not dimensions.n_boxes or not dimensions.n_species:

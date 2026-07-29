@@ -922,6 +922,25 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   pressure and per-box partitioning and are restart authority. Restart is
   explicit, exact-device, and creates fresh identities; no implicit restore,
   fallback, migration, or normal-step bulk synchronization exists.
+- Resident diagnostics and complete-loop execution are concrete-only direct
+  imports: use `particula.execution.diagnostics` for the closed
+  `GAS_CONCENTRATION_SNAPSHOT` and `SATURATION_RATIO_SNAPSHOT` protocol, and
+  `particula.execution.resident_scheduler` for the resolved resident loop.
+  Diagnostics copy current resident `(B, S)` gas concentration or saturation
+  ratio into separate caller-owned contiguous same-device `wp.float64` outputs;
+  outputs must not alias primaries, published sidecars, or each other. Canonical
+  empty `(0, S)`, `(B, 0)`, and `(0, 0)` outputs are successful write-free
+  no-ops. Neither module provides callbacks or package/top-level exports.
+- `ResidentSimulationScheduler` accepts only the resolver-produced complete
+  ten-node schedule: environment update, gas update, vapor-pressure refresh,
+  saturation refresh, condensation, Brownian coagulation, dilution, wall loss,
+  nucleation, and diagnostics. It retains one exact active session, pinned
+  registry, and closed guard by identity; opens one token only after preflight;
+  dispatches the resolved order; and uses thermodynamic consumer windows for
+  condensation and diagnostics. It performs no transfer, restore,
+  synchronization, checkpoint/finalize, resource acquisition or replacement,
+  fallback, resize, or compaction. A failure after a writer-capable call closes
+  the token, faults the session, and has no rollback guarantee.
 - Compatibility is fail-closed: only checkpoint schema version `1`, carrier
   type `"ResidentSession"`, ACTIVE state, complete valid payloads, and an
   exactly equal `Device` restart. E7-F5 scheduling, E7-F7 transport, and E7-F8
@@ -931,6 +950,7 @@ Focused commands:
 
 ```bash
 pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror
+pytest particula/execution/tests/scheduler_test.py -q -Werror
 pytest particula/execution/tests/gpu_session_test.py \
   particula/execution/tests/gpu_resources_test.py \
   particula/execution/tests/checkpoint_test.py -q -Werror
@@ -1050,6 +1070,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2026-07-25  
+**Last Updated:** 2026-07-29  
 **For questions about ADW:** See `.opencode/guides/README.md`  
 **For questions about particula:** See main `readme.md`

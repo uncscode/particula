@@ -181,6 +181,7 @@ the thermodynamic consumer windows for condensation and diagnostics. Neither
 boundary is package-exported and neither uploads, restores, synchronizes,
 checkpoints, acquires/replaces storage, resizes, or falls back. After a writer
 may launch, a failure closes the token and faults the session without rollback.
+See [ADR-012](architecture/decisions/ADR-012-resident-complete-loop-and-diagnostics.md).
 
 ## Wall Loss
 

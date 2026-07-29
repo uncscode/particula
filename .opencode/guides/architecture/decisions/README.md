@@ -13,3 +13,4 @@
 | [ADR-009](ADR-009-resident-process-delegation-adapters.md) | Resident Process Delegation Adapters | Accepted | 2026-07-29 |
 | [ADR-010](ADR-010-resident-state-update-boundary.md) | Resident State Update Boundary | Accepted | 2026-07-29 |
 | [ADR-011](ADR-011-resident-thermodynamic-freshness-coordinator.md) | Resident Thermodynamic Freshness Coordinator | Accepted | 2026-07-29 |
+| [ADR-012](ADR-012-resident-complete-loop-and-diagnostics.md) | Resident Complete Loop and Closed Diagnostics | Accepted | 2026-07-29 |

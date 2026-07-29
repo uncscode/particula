@@ -82,12 +82,24 @@ launch is not promised. The boundary neither owns lifecycle/guard tokens nor
 acquires resources, dispatches a whole timestep or general process, transfers,
 restores gas, or changes exports.
 
-### Future runtime scheduler
+### P6 implemented diagnostics and runtime scheduler
 
-The runtime scheduler will be a typed orchestration layer above process adapters and E7-F4
-resident-session lifecycle. It validates the complete declaration before
-`begin_step()`, derives a canonical graph order, and then delegates each node.
-It does not implement process physics or infer fallback from an exception.
+`particula.execution.diagnostics` is a concrete-only, direct-import closed
+protocol. Its only operations snapshot current resident gas concentration or
+saturation ratio into separately caller-owned `(B, S)` outputs. It binds plans
+and registrations by identity to the active session, pinned registry,
+resolver-produced graph/schedule, and final diagnostics node; registry
+validation rejects aliases with primaries, published sidecars, or other outputs.
+Canonical empty schemas are valid write-free no-dispatch no-ops. It exposes no
+callback, readback, transfer, synchronization, checkpoint, or package export.
+
+`particula.execution.resident_scheduler` is the typed orchestration layer above
+existing process boundaries and E7-F4 lifecycle. It accepts only the exact
+resolver-produced ten-node schedule and exact request/node/session/registry/
+closed-guard bindings. It validates the complete composition and stored-duration
+agreement before `begin_step()`, then opens exactly one token and dispatches
+`schedule.ordered_node_ids` without substituting a handwritten order. It does
+not implement process physics or infer fallback from an exception.
 
 ```text
 TimestepPlan + ExecutionContext + ResidentSession
@@ -97,13 +109,9 @@ TimestepPlan + ExecutionContext + ResidentSession
                  v
              begin_step()
                  |
-      environment update (if declared)
-                 |
-      vapor-pressure + saturation refresh
-                 |
-  profile-declared nucleation/condensation edge -> remaining process graph
-                 |
-        gas update nodes / diagnostic hooks at declared barriers
+ environment update -> gas update -> virtual refreshes -> condensation
+                  |
+ brownian coagulation -> dilution -> wall loss -> nucleation -> diagnostics
                  |
             complete_step()
 ```
@@ -115,6 +123,11 @@ the tie breaker. Every reviewed scheduling profile declares exactly one fixed
 edge between nucleation and condensation for its configured workflow; neither
 direction is universal. P2 selection occurs only after complete P1 validation;
 an enabled consumer cannot retain a missing explicit or derived predecessor.
+Virtual refresh IDs are consumed only through the condensation and diagnostics
+consumer windows, never independently dispatched. A failure after a
+writer-capable call closes the token, faults the session, and preserves the
+operational error without a rollback guarantee; a pre-writer failure aborts the
+token and leaves the session active.
 
 ## Data / API / Workflow Changes
 
@@ -129,9 +142,10 @@ an enabled consumer cannot retain a missing explicit or derived predecessor.
   sorted, and the ordered IDs are a permutation of the selected nodes.
 - **API Surface:** `resolve_timestep_schedule()` and the P2 records are
   direct imports from `particula.execution.scheduler`; no
-  `particula.execution` or top-level export changed. A runtime
-  `SimulationScheduler.step()` remains later work.
-- **Workflow Hooks (future runtime scheduler):** Pre-step validation is read-only. `begin_step()` opens the
+  `particula.execution` or top-level export changed. The concrete runtime
+  boundary is `ResidentSimulationScheduler` in the separate direct-import-only
+  `particula.execution.resident_scheduler` module.
+- **Workflow Hooks (P6 runtime scheduler):** Pre-step validation is read-only. `begin_step()` opens the
   mutation window; successful completion advances session time/step once.
   Prelaunch errors leave the session active and unchanged. Any exception after a
   process/update launch preserves the original error and faults the session;
@@ -150,9 +164,12 @@ an enabled consumer cannot retain a missing explicit or derived predecessor.
   imports from `particula.execution.state_updates`; `particula.execution.__all__`
   remains unchanged. This is an explicit node-bound mutation seam, not a
   scheduler or derived-state boundary.
-- **Diagnostics:** Hooks are ordered barriers with typed resident views and may
-  write only registered diagnostic buffers. Host callbacks/readbacks are not
-  part of the normal GPU step.
+- **Diagnostics:** `ResidentDiagnosticOperation`, registrations, and plans are
+  direct imports from `particula.execution.diagnostics`; only the two closed
+  snapshots exist. Host callbacks/readbacks are not part of the normal GPU step.
+- **Runtime API:** `ResidentSimulationRequest` and
+  `ResidentSimulationScheduler` are direct imports from
+  `particula.execution.resident_scheduler`; package exports remain unchanged.
 
 ## Security & Compliance
 

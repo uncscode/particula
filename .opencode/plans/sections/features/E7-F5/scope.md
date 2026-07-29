@@ -23,6 +23,20 @@ environment, derived-thermodynamic, gas, and diagnostic boundaries.
 - Optional non-mutating diagnostic hooks and complete-loop Warp CPU tests;
   optional CUDA rows skip cleanly.
 
+## Delivered in P6 (#1497)
+
+- Added direct-import-only `particula/execution/diagnostics.py` with the closed
+  gas-concentration and saturation-ratio snapshot protocol, caller-owned output
+  validation/nonaliasing, and canonical empty write-free no-ops.
+- Added direct-import-only `particula/execution/resident_scheduler.py` with the
+  exact complete-ten-node schedule requirement, identity-bound active
+  session/registry/closed-guard lifecycle, read-only whole-loop preflight,
+  one-token resolved-order dispatch, and thermodynamic consumer windows.
+- Added complete-loop coverage in `particula/execution/tests/scheduler_test.py`
+  and updated the concrete architecture guides. Normal scheduling performs no
+  transfer, restore, explicit synchronization, checkpoint/finalize, fallback,
+  resource acquisition/replacement, resize, or compaction.
+
 ## Delivered in P1 (#1492)
 
 - Added `particula/execution/process_graph.py` with frozen node, dependency,

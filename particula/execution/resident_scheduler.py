@@ -1,6 +1,6 @@
 """Run the closed ten-node GPU-resident simulation schedule.
 
-This is a concrete direct-import-only composition boundary.  It retains every
+This is a concrete direct-import-only composition boundary. It retains every
 resident object by identity and performs no upload, restore, synchronization,
 fallback, resource acquisition, or rollback.
 """
@@ -74,6 +74,11 @@ _VIRTUAL_IDS = frozenset({"vapor_pressure_refresh", "saturation_refresh"})
 
 
 def _registry_type() -> type[object]:
+    """Return the concrete registry type without creating an import cycle.
+
+    Returns:
+        The direct-module-only GPU resource registry type.
+    """
     from particula.execution.gpu_resources import GPUResourceRegistry
 
     return GPUResourceRegistry
@@ -81,7 +86,28 @@ def _registry_type() -> type[object]:
 
 @dataclass(frozen=True, eq=False)
 class ResidentSimulationRequest:
-    """Bind one complete resolved simulation loop to resident resources."""
+    """Bind one complete resolved simulation loop to resident resources.
+
+    The request retains all carriers by identity for the canonical ten-node
+    graph. It is concrete-only and does not acquire resources, begin a step, or
+    validate physical process inputs.
+
+    Attributes:
+        session: Exact active resident session.
+        registry: Exact registry pinned to ``session``.
+        guard: Exact closed lifecycle guard for the same binding.
+        graph: Resolver-produced process graph for the complete loop.
+        schedule: Canonical resolved schedule for ``graph``.
+        thermodynamics: Exact configuration shared by thermal consumers.
+        condensation: Exact resident condensation execution state.
+        coagulation: Exact resident Brownian-coagulation execution state.
+        dilution: Exact resident dilution request.
+        wall_loss: Exact resident wall-loss request.
+        nucleation: Exact resident nucleation request.
+        diagnostics: Exact closed diagnostics plan.
+        environment_update: Optional exact environment update request.
+        gas_update: Optional exact gas update request.
+    """
 
     session: ResidentSession
     registry: object
@@ -99,7 +125,12 @@ class ResidentSimulationRequest:
     gas_update: ResidentGasUpdateRequest | None = None
 
     def __post_init__(self) -> None:
-        """Validate exact request components and optional updates."""
+        """Validate exact request components and optional update types.
+
+        Raises:
+            TypeError: If a required component or optional update has an
+                inexact concrete type.
+        """
         exact = (
             (self.session, ResidentSession, "session"),
             (self.registry, _registry_type(), "registry"),
@@ -137,10 +168,23 @@ class ResidentSimulationRequest:
 
 
 class ResidentSimulationScheduler:
-    """Execute exactly one fully resolved resident timestep at a time."""
+    """Execute one canonical fully resolved resident timestep at a time.
+
+    Each successful call opens and completes exactly one lifecycle token while
+    dispatching the resolved ten-node schedule. It neither transfers nor
+    restores data, acquires resources, synchronizes, falls back, or rolls back
+    after a writer-capable operation may have launched.
+    """
 
     def __init__(self, request: ResidentSimulationRequest) -> None:
-        """Retain one exact resident simulation request."""
+        """Retain one exact resident simulation request.
+
+        Args:
+            request: Complete identity-bound resident simulation request.
+
+        Raises:
+            TypeError: If ``request`` is not an exact request instance.
+        """
         if type(request) is not ResidentSimulationRequest:
             raise TypeError(
                 "request must be an exact ResidentSimulationRequest."
@@ -148,6 +192,16 @@ class ResidentSimulationScheduler:
         self._request = request
 
     def _validate(self, duration: object) -> None:
+        """Preflight the lifecycle, graph, request, and duration bindings.
+
+        Args:
+            duration: Candidate nonnegative finite timestep duration.
+
+        Raises:
+            TypeError: If the duration is not a non-boolean real value.
+            ValueError: If duration, ownership, graph, schedule, request, or
+                diagnostics validation fails.
+        """
         request = self._request
         registry = cast(Any, request.registry)
         if isinstance(duration, bool) or not isinstance(duration, Real):
@@ -188,6 +242,15 @@ class ResidentSimulationScheduler:
     def _validate_request_nodes(
         self, graph_by_id: dict[str, ProcessNode]
     ) -> None:
+        """Validate request bindings against exact resolved graph nodes.
+
+        Args:
+            graph_by_id: Resolved graph nodes indexed by their canonical IDs.
+
+        Raises:
+            ValueError: If a state update, diagnostics plan, process request, or
+                execution state does not retain the scheduler's binding.
+        """
         request = self._request
         node_fields = (
             (request.environment_update, "environment_update"),
@@ -247,6 +310,14 @@ class ResidentSimulationScheduler:
             )
 
     def _validate_durations(self, duration: Real) -> None:
+        """Require every process request to retain the exact step duration.
+
+        Args:
+            duration: Prevalidated duration supplied to :meth:`execute`.
+
+        Raises:
+            ValueError: If a participating process ``time_step`` differs.
+        """
         request = self._request
         values = (
             request.condensation.time_step,
@@ -266,6 +337,16 @@ class ResidentSimulationScheduler:
         Failures before a writer-capable invocation leave the session active.
         Once dispatch begins, the token is closed and the session faults without
         rollback because a native writer may already have launched.
+
+        Args:
+            duration: Nonnegative finite duration matching each process request.
+
+        Raises:
+            TypeError: If preflight finds an inexact carrier or invalid
+                duration.
+            ValueError: If resolved bindings, duration agreement, or an invoked
+                operation reject execution.
+            RuntimeError: If lifecycle token handling rejects the timestep.
         """
         self._validate(duration)
         request = self._request

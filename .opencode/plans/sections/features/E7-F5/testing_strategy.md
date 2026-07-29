@@ -42,12 +42,14 @@ never lowered; changed modules target at least 80%.
   callback failure rows assert callback suppression, unchanged cursor, and the
   defined partial-failure stale-marker state. The tests retain direct-module
   scope and make no lifecycle, full-scheduler, transfer, or fallback claim.
-- **P6:** Integration-test repeated complete timesteps on Warp CPU using the
-  E6-F9 fixtures. Assert one setup, no intermediate bulk transfer or sync,
-  stable identities, one lifecycle increment, current gas visibility,
-  particle-plus-gas conservation, deterministic call order, and session faulting.
-  Independent boxes match equivalent one-box runs when transport is absent.
-  CUDA rows are optional and skip cleanly.
+- **P6 (completed, #1497):** `scheduler_test.py` retains the declaration-only
+  scheduler blocked-import regression and adds lazy-Warp complete-loop coverage:
+  closed diagnostics/output rejection and empty no-ops; exact resolved order;
+  one-token lifecycle; consumer-window freshness/current snapshots; stable
+  identities; read-only abort and writer/diagnostics-failure faulting without
+  rollback claims; no transfer/sync/checkpoint/fallback; deterministic loops,
+  conservation/loss, isolation, persistent RNG identity, Warp CPU, and
+  skip-clean CUDA. Combined diagnostics/scheduler coverage is at least 80%.
 - **P7:** Validate import/export wording, links, examples, and strict MkDocs.
 
 Deterministic fields use explicit `rtol`/`atol` recorded by the owning process.
