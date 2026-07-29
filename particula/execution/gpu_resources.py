@@ -278,6 +278,20 @@ class GPUResourceRegistry:
 
         self._session.__post_init__()
 
+    def validate_pinned_session(self, session: ResidentSession) -> None:
+        """Validate an exact pinned session without acquiring resources.
+
+        Args:
+            session: The exact resident session retained at registry creation.
+
+        Raises:
+            ValueError: If the supplied session is not the pinned session or its
+                lifecycle, schema, or protected identity signature changed.
+        """
+        if session is not self._session:
+            raise ValueError("session must be the pinned ResidentSession.")
+        self._validate_session_signature()
+
     def _validate_session_state(self) -> None:
         """Recheck the metadata-only invariants needed by this boundary."""
         self._validate_session_carriers()

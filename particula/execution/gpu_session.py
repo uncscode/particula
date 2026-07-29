@@ -7,19 +7,27 @@ CPU preflight precedes conversion imports, then particles, gas, and environment
 convert once in that order before one complete ACTIVE session is published. Gas
 names are not stored on the Warp gas container. This module provides no public
 export, lifecycle operation, fallback, synchronization, restore, or process
-sidecar.
+sidecar. Its concrete-only P4 ``ResidentStepGuard`` and identity-only
+``ResidentStepToken`` track one open timestep for one pinned active
+session/registry binding. They execute no adapters, transfer no data,
+synchronize no Warp work, allocate no resources, and provide no fallback.
+Future checkpoint, restore, finalize, close, fault, conversion, and
+resize/rebind boundaries must call the guard's ``assert_step_closed`` gate
+before their own work; raw low-level helpers remain outside that gate's
+interception.
 Selected native Warp-device availability remains an upstream E7-F6
 precondition.
 """
 
 from dataclasses import dataclass
 from enum import Enum
-from numbers import Integral
+from numbers import Integral, Real
 from typing import TYPE_CHECKING, Any, cast
 
-from particula.execution import Backend, Device
+from particula.execution import Backend, Device, _isfinite_real
 
 if TYPE_CHECKING:
+    from particula.execution.gpu_resources import GPUResourceRegistry
     from particula.gas import EnvironmentData, GasData
     from particula.particles import ParticleData
 
@@ -555,6 +563,94 @@ class ResidentSession:
             metadata,
             wp,
         )
+
+
+@dataclass(frozen=True, eq=False)
+class ResidentStepToken:
+    """Retain one guard-owned timestep identity and validated duration.
+
+    This concrete-only token does not execute work, transfer data, synchronize,
+    allocate resources, or provide a fallback.
+    """
+
+    _guard: object
+    _duration: Any
+
+
+class ResidentStepGuard:
+    """Track one open timestep for one pinned active resident session.
+
+    The guard is concrete-only scheduler bookkeeping. It does not execute
+    adapters, transfer or restore data, synchronize Warp, acquire sidecars,
+    resize resident state, evolve the environment, or provide a CPU fallback.
+    Future checkpoint, finalize, close, conversion, resize, rebind, and fault
+    boundaries must call :meth:`assert_step_closed` before their own work.
+    """
+
+    def __init__(
+        self, session: ResidentSession, registry: "GPUResourceRegistry"
+    ) -> None:
+        """Create a closed guard for one exact session and registry binding."""
+        from particula.execution.gpu_resources import GPUResourceRegistry
+
+        if type(session) is not ResidentSession:
+            raise TypeError("session must be an exact ResidentSession.")
+        if type(registry) is not GPUResourceRegistry:
+            raise TypeError("registry must be an exact GPUResourceRegistry.")
+        registry.validate_pinned_session(session)
+        self._session = session
+        self._registry = registry
+        self._open_token: ResidentStepToken | None = None
+        self._completed_steps = 0
+        # ``numbers.Real`` lacks static numeric-tower support in mypy. Values
+        # enter only through ``_validate_duration``, which enforces the runtime
+        # Real invariant while preserving finite Rational values without casts.
+        self._simulated_time: Any = 0
+
+    @property
+    def completed_steps(self) -> int:
+        """Return the number of successfully completed guarded timesteps."""
+        return self._completed_steps
+
+    @property
+    def simulated_time(self) -> Real:
+        """Return the sum of successfully completed timestep durations."""
+        return cast(Real, self._simulated_time)
+
+    @staticmethod
+    def _validate_duration(duration: object) -> Any:
+        """Validate one nonnegative finite real duration without coercion."""
+        if isinstance(duration, bool) or not isinstance(duration, Real):
+            raise TypeError("duration must be a non-boolean real.")
+        if not _isfinite_real(duration) or duration < 0:
+            raise ValueError("duration must be finite and nonnegative.")
+        return duration
+
+    def begin_step(self, duration: object) -> ResidentStepToken:
+        """Open and return the sole token for a validated timestep duration."""
+        validated_duration = self._validate_duration(duration)
+        self._registry.validate_pinned_session(self._session)
+        if self._open_token is not None:
+            raise RuntimeError("A resident timestep is already open.")
+        token = ResidentStepToken(self, validated_duration)
+        self._open_token = token
+        return token
+
+    def complete_step(self, token: ResidentStepToken) -> None:
+        """Complete the exact outstanding token and advance bookkeeping."""
+        self._registry.validate_pinned_session(self._session)
+        if self._open_token is None:
+            raise RuntimeError("No resident timestep is open.")
+        if token is not self._open_token:
+            raise ValueError("token does not match the open resident timestep.")
+        self._completed_steps += 1
+        self._simulated_time += self._open_token._duration
+        self._open_token = None
+
+    def assert_step_closed(self) -> None:
+        """Reject lifecycle operations while a guarded timestep remains open."""
+        if self._open_token is not None:
+            raise RuntimeError("A resident timestep is open.")
 
 
 def setup_resident_session(

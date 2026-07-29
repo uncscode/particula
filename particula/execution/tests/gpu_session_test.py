@@ -5,6 +5,7 @@ import subprocess
 import sys
 import textwrap
 from dataclasses import FrozenInstanceError
+from fractions import Fraction
 from pathlib import Path
 from typing import Any, cast
 
@@ -17,6 +18,8 @@ from particula.execution.gpu_session import (
     ResidentLifecycle,
     ResidentMetadata,
     ResidentSession,
+    ResidentStepGuard,
+    ResidentStepToken,
     setup_resident_session,
 )
 from particula.gas import EnvironmentData, GasData
@@ -70,6 +73,22 @@ def _warp_resources(
         (boxes, species), dtype=wp.float64, device="cpu"
     )
     return particles, gas, environment
+
+
+def _guard() -> ResidentStepGuard:
+    """Construct a valid P4 guard with its exact pinned registry."""
+    from particula.execution.gpu_resources import GPUResourceRegistry
+
+    particles, gas, environment = _warp_resources()
+    session = ResidentSession(
+        particles,
+        gas,
+        environment,
+        ResidentDimensions(1, 2, 1),
+        _metadata(),
+        ResidentLifecycle.ACTIVE,
+    )
+    return ResidentStepGuard(session, GPUResourceRegistry(session))
 
 
 class _MetadataArray:
@@ -453,11 +472,126 @@ def test_session_carriers_remain_concrete_only() -> None:
         "ResidentMetadata",
         "ResidentSession",
         "setup_resident_session",
+        "ResidentStepGuard",
+        "ResidentStepToken",
     }
     assert names.isdisjoint(execution.__all__)
     assert all(not hasattr(particula, name) for name in names)
     assert all(not hasattr(execution, name) for name in names)
     assert all(not hasattr(adapters, name) for name in names)
+
+
+@pytest.mark.warp
+def test_step_guard_completes_identity_tokens_and_preserves_duration_type() -> (
+    None
+):
+    """Test matching completions alone advance concrete guard bookkeeping."""
+    guard = _guard()
+
+    zero = guard.begin_step(0)
+    assert type(zero) is ResidentStepToken
+    assert zero is not ResidentStepToken(guard, 0)
+    guard.complete_step(zero)
+    rational = Fraction(3, 2)
+    token = guard.begin_step(rational)
+    guard.complete_step(token)
+
+    assert guard.completed_steps == 2
+    assert guard.simulated_time == rational
+    guard.assert_step_closed()
+    with pytest.raises(FrozenInstanceError):
+        token._duration = 0  # type: ignore[misc]
+
+
+@pytest.mark.warp
+def test_step_guard_rejections_preserve_open_token_and_bookkeeping() -> None:
+    """Test invalid durations and completions do not mutate guard state."""
+    guard = _guard()
+    for value, error in (
+        (True, TypeError),
+        (object(), TypeError),
+        (-1, ValueError),
+    ):
+        with pytest.raises(error):
+            guard.begin_step(value)  # type: ignore[arg-type]
+    for value in (float("nan"), float("inf")):
+        with pytest.raises(ValueError, match="finite"):
+            guard.begin_step(value)
+    with pytest.raises(RuntimeError, match="No resident timestep"):
+        guard.complete_step(object())  # type: ignore[arg-type]
+
+    token = guard.begin_step(1.0)
+    with pytest.raises(RuntimeError, match="already open"):
+        guard.begin_step(0)
+    with pytest.raises(ValueError, match="does not match"):
+        guard.complete_step(ResidentStepToken(guard, 1.0))
+    with pytest.raises(RuntimeError, match="timestep is open"):
+        guard.assert_step_closed()
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == 0
+    guard.complete_step(token)
+    with pytest.raises(RuntimeError, match="No resident timestep"):
+        guard.complete_step(token)
+
+
+@pytest.mark.warp
+def test_step_guard_validates_duration_before_registry_or_token_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test invalid duration rejects before registry work or opening a step."""
+    guard = _guard()
+    calls = 0
+
+    def forbidden_validation(_: object) -> None:
+        """Fail if duration validation incorrectly reaches the registry."""
+        nonlocal calls
+        calls += 1
+        raise AssertionError("registry validation must not run")
+
+    monkeypatch.setattr(
+        guard._registry,
+        "validate_pinned_session",
+        forbidden_validation,
+    )
+
+    with pytest.raises(ValueError, match="finite and nonnegative"):
+        guard.begin_step(-1)
+
+    assert calls == 0
+    assert guard._open_token is None
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == 0
+
+
+@pytest.mark.warp
+def test_step_guard_rejects_token_from_another_guard_without_mutation() -> None:
+    """Test only the exact outstanding token can complete a guard."""
+    guard = _guard()
+    other_guard = _guard()
+    token = guard.begin_step(1.0)
+    other_token = other_guard.begin_step(2.0)
+
+    with pytest.raises(ValueError, match="does not match"):
+        guard.complete_step(other_token)
+
+    assert guard._open_token is token
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == 0
+    guard.complete_step(token)
+    other_guard.complete_step(other_token)
+
+
+@pytest.mark.warp
+def test_step_guard_rejects_terminal_session_without_metadata_change() -> None:
+    """Test registry lifecycle validation precedes guard state transitions."""
+    guard = _guard()
+    object.__setattr__(guard._session, "lifecycle", ResidentLifecycle.CLOSED)
+
+    with pytest.raises(ValueError, match="ACTIVE"):
+        guard.begin_step(1.0)
+
+    assert guard.completed_steps == 0
+    assert guard.simulated_time == 0
 
 
 def test_session_revalidates_fabricated_cpu_carriers_before_warp_import() -> (

@@ -64,8 +64,16 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
   metadata and publishing only a complete `ACTIVE` session. It relies on the
   upstream E7-F6 native-availability precondition and neither probes nor
   substitutes devices. The boundary has no fallback, synchronization,
-  restoration, sidecars, lifecycle transition, finalization, close, scheduler,
-  or migration behavior, and remains absent from package exports. See
+   restoration, sidecars, lifecycle transition, finalization, close, scheduler,
+   or migration behavior, and remains absent from package exports. P4 adds
+   direct-import-only `ResidentStepGuard` and identity-only
+   `ResidentStepToken`: one exact active session/registry binding has at most
+   one open token, and count/time bookkeeping advances only on matching
+   completion. It does not execute adapters, transfer, synchronize, allocate,
+   resize, restore, or fall back. Future checkpoint, restore, finalize, close,
+   fault, conversion, and resize/rebind boundaries must call
+   `assert_step_closed()` before their own work; P5/P6 retain those operations
+   and policy. Raw low-level helper calls are not globally intercepted. See
   [ADR-004](decisions/ADR-004-concrete-gpu-resident-session-boundary.md) and
    [ADR-005](decisions/ADR-005-one-time-gpu-resident-session-setup.md).
 - `gpu_resources.py` - Direct-import-only, Warp-dependent concrete registry for
@@ -79,8 +87,11 @@ retry, fallback, and replacement of direct GPU APIs remain deferred.
   the exact view, records, and arrays. This validates pinned ownership rather
   than unverifiable allocator provenance. It creates no public package export
   and has no execution/selection, transfer/sync/restore, lifecycle, transport,
-  process-configuration/physics, or RNG reset/advance/initialization behavior.
-  Condensation thermodynamic roles are derived scratch/property storage only.
+   process-configuration/physics, or RNG reset/advance/initialization behavior.
+   `validate_pinned_session()` is the metadata-only integration seam: it
+   requires exact retained-session identity and reuses active
+   lifecycle/signature/schema validation without acquisition or allocation.
+   Condensation thermodynamic roles are derived scratch/property storage only.
 - `adapters/condensation.py` - Concrete-only P2 condensation configuration and
   CPU/Warp state carriers plus selected P3 CPU/Warp execution carriers and
   adapters. P2 construction retains caller-owned resources by identity and

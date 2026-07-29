@@ -480,6 +480,57 @@ def test_registry_requires_active_session_and_exposes_all_manifests() -> None:
 
 
 @pytest.mark.warp
+def test_validate_pinned_session_rejects_other_or_drift_without_allocation() -> (
+    None
+):
+    """Test direct binding validation is exact and metadata-only."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    bindings = registry._bindings.copy()
+    views = registry._views.copy()
+
+    with pytest.raises(ValueError, match="pinned ResidentSession"):
+        registry.validate_pinned_session(_session())
+    registry.validate_pinned_session(session)
+    object.__setattr__(session, "lifecycle", ResidentLifecycle.FINALIZED)
+    with pytest.raises(ValueError, match="ACTIVE"):
+        registry.validate_pinned_session(session)
+
+    assert registry._bindings == bindings
+    assert registry._views == views
+
+
+@pytest.mark.warp
+def test_validate_pinned_session_rejects_primary_and_container_drift() -> None:
+    """Test binding validation catches identity drift without acquisition."""
+    wp = pytest.importorskip("warp")
+    from particula.gpu.warp_types import WarpParticleData
+
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    particles = cast(Any, session.particles)
+    original_masses = particles.masses
+    object.__setattr__(
+        particles,
+        "masses",
+        wp.ones((1, 2, 1), dtype=wp.float64, device="cpu"),
+    )
+    with pytest.raises(ValueError, match="signature changed"):
+        registry.validate_pinned_session(session)
+    object.__setattr__(particles, "masses", original_masses)
+
+    replacement = WarpParticleData()
+    for name in ("masses", "concentration", "charge", "density", "volume"):
+        setattr(replacement, name, getattr(particles, name))
+    object.__setattr__(session, "particles", replacement)
+    with pytest.raises(ValueError, match="signature changed"):
+        registry.validate_pinned_session(session)
+
+    assert registry._bindings == {}
+    assert registry._views == {}
+
+
+@pytest.mark.warp
 def test_registry_allocation_failure_does_not_publish_partial_family(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

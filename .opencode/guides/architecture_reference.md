@@ -60,8 +60,16 @@ retains the ordered CPU gas-name tuple and publishes only the fully validated,
 upstream E7-F6 responsibility. This boundary has no export from
 `particula.execution`, its adapters package, or top-level `particula`; it adds
 no fallback, synchronization, restoration, sidecars, or lifecycle operations.
-Later phases own operational lifecycle semantics; direct kernel and adapter
-boundaries retain physical validation. See
+P4 adds direct-import-only `ResidentStepGuard` and identity-only
+`ResidentStepToken` bookkeeping beside the immutable P1 carrier. One exact
+active session/registry binding permits one open token; completed-step count and
+simulated time advance only after matching completion. The guard neither
+executes adapters nor transfers, restores, synchronizes, allocates, resizes, or
+falls back. Future checkpoint, restore, finalize, close, fault, conversion, and
+resize/rebind boundaries must call `assert_step_closed()` before their own work;
+P5/P6 retain those operations and their policy. Direct low-level helpers remain
+outside the guard's interception. Later phases own operational lifecycle
+semantics; direct kernel and adapter boundaries retain physical validation. See
 [ADR-004](architecture/decisions/ADR-004-concrete-gpu-resident-session-boundary.md).
 
 `particula.execution.gpu_resources` is a separate direct-import-only,
@@ -80,6 +88,9 @@ restoration, lifecycle change, transport allocation, process
 physics/configuration, or RNG initialization, advancement, or reset.
 Condensation thermodynamic entries are derived scratch storage only, never
 thermodynamic configuration.
+Its narrow `validate_pinned_session()` seam first requires exact session
+identity, then reuses the existing active lifecycle/signature/schema validation
+without acquisition, allocation, payload inspection, or mutation.
 
 ## Wall Loss
 
