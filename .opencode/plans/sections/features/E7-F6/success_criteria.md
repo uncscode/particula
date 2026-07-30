@@ -12,12 +12,17 @@
 - [x] P3 fallback results distinguish requested and selected backend and retain
   the capability reason without modifying native result metadata.
 - [x] Public `__all__` tests accept intended names and reject registries,
-  concrete adapters, sidecars, configs, and helper kernels.
+  concrete adapters, sidecars, configs, and helper kernels; they also preserve
+  ordered identity re-exports and CPU-only import neutrality.
 - [x] Existing low-level GPU imports remain callable and are documented
   experimental; no breaking removal occurs.
-- [x] Focused execution and documentation tests pass and strict documentation
-  builds. Existing execution coverage, export, and CPU-only import regressions
-  provide the P4/P6 evidence; CUDA and downstream deferred work remain separate.
+- [x] P6 documentation regressions validate the stable/concrete-only boundary,
+  closed fallback outcomes, no-movement resolver wording, the executable
+  selection-only fence, guarded resident pseudocode, and Markdown links; the
+  focused execution and documentation tests and strict documentation build pass.
+- [x] E7-F6 documentation does not claim automatic movement, recovery, retry,
+  or runtime behavior changes. CUDA, transport, detailed RNG/restart policy,
+  broad orchestration, and direct-kernel follow-up remain downstream.
 
 ## Metrics
 

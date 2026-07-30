@@ -41,8 +41,9 @@
   - Goal: Published the frozen 26-name value surface while retaining concrete
     mechanics and supported experimental low-level GPU APIs without breakage.
   - Evidence: `particula.execution.__all__` and
-    `particula/execution/tests/exports_test.py` enforce the ordered surface and
-    concrete-only boundary.
+    `particula/execution/tests/exports_test.py` enforce the ordered 26-name
+    surface, identity-preserving top-level re-exports, denied concrete names,
+    and CPU-only import neutrality with Warp and `particula.gpu` blocked.
 
 - [x] **E7-F6-P5:** Add no-silent-fallback integration regressions
   - Issue: #1504 | Size: S | Status: Implemented
@@ -59,7 +60,14 @@
   - Goal: Documented stable values, concrete-only mechanics, resolver ordering,
     closed fallback outcomes, and explicit caller-owned resident boundaries.
   - Files: `docs/Features/backend_selection.md`, Feature index, foundation and
-    roadmap references, and documentation regression coverage.
+    roadmap references, and
+    `particula/tests/execution_selection_docs_test.py` regression coverage.
   - Tests: `pytest particula/execution/tests -q -Werror --no-cov` (623 passed),
     `pytest particula/tests/execution_selection_docs_test.py -q -Werror --no-cov`
     (16 passed), CPU-only package imports, and `mkdocs build --strict` passed.
+    Regression coverage verifies the exact public surface, concrete-only
+    boundary, reason outcomes, resolver/no-movement wording, executable
+    selection-only fence, guarded resident pseudocode, and resolved links.
+  - Scope retained: documentation does not add automatic movement, recovery,
+    retry, availability dispatch, or runtime behavior. Transport, detailed RNG
+    policy, broad orchestration, and direct-kernel follow-up remain downstream.

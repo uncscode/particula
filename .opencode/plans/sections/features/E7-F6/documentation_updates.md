@@ -22,9 +22,14 @@ rollback.
   stable-versus-experimental distinction, and no-silent-movement guardrail.
 - [x] Documented that kernel/runtime/adapter failures propagate without retry;
   the guide does not imply resident/direct-GPU integration.
-- Document approved imports and concrete-module-only internals in API reference
-  material and `AGENTS.md` if its quick-reference contract changes.
-- Update E7-F1 and E7 epic plan cross-references if final names differ, then mark
-  E7-F6 phases/status as shipped through normal plan-update workflow.
 - [x] Validated links and snippets with `mkdocs build --strict`; the executable
   selection fence is CPU-only and resident pseudocode is explicitly Warp-gated.
+
+## Deferred Documentation
+
+- Broader transport, detailed RNG/restart policy, orchestration, and
+  direct-kernel follow-up documentation remain downstream work. They do not
+  change the shipped E7-F6 selection, availability, or explicit-fallback
+  boundary.
+- E7-F1 records were not changed: no demonstrated stale E7-F1 public-name or
+  path assertion was identified. Historical dependency ordering is retained.

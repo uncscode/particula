@@ -32,10 +32,12 @@ cleanly when unavailable.
   fallback provenance with unchanged native `ExecutionResult.metadata`; blocked
   optional imports; and adapter/result-validation failures that propagate with
   no retry or recovery.
-- **P4:** Export tests assert exact `__all__`, approved top-level imports,
-  forbidden internals, unchanged direct GPU imports, and a subprocess import
-  with Warp blocked. Avoid import-time experimental warnings that would violate
-  repository `-Werror` usage.
+- **P4 (implemented, issue #1505):**
+  `particula/execution/tests/exports_test.py` asserts the exact ordered
+  26-name `particula.execution.__all__`, identity-preserving top-level
+  re-exports, denied concrete names, and a fresh CPU-only subprocess import
+  with Warp and `particula.gpu` blocked. Existing direct GPU imports remain
+  callable; no import-time experimental warnings were added.
 - **P5 (implemented, issue #1504):**
   `particula/execution/tests/fallback_integration_test.py` uses fresh local P1,
   P2, and P3 collaborators plus forbidden-operation ledgers. It verifies P2
@@ -44,13 +46,22 @@ cleanly when unavailable.
   checkpoint, or restore seams; it verifies one explicit P3 CPU dispatch retains
   state identity and separate provenance; and it verifies a CPU adapter sentinel
   propagates unchanged without retry or reselection.
-- **P6:** Validate examples/import snippets and run `mkdocs build --strict`.
+- **P6 (implemented, issue #1505):**
+  `particula/tests/execution_selection_docs_test.py` validates the published
+  stable value and concrete-only boundary, exact closed reason outcomes,
+  resolver order and no-movement rule, the AST-parsed/executed public-only
+  selection fence, AST-parsed guarded resident pseudocode, and Feature-index,
+  roadmap, and guide links. It executes no resident or fallback workflow.
+  Validation passed with the focused execution suite (623 tests), documentation
+  suite (16 tests), CPU-only package import, and `mkdocs build --strict`.
 
 ## Focused Validation
 
 ```bash
 pytest particula/execution/tests -q -Werror \
   --cov=particula.execution --cov-report=term-missing --cov-fail-under=80
+pytest particula/tests/execution_selection_docs_test.py -q -Werror
+python -Werror -c "import particula; import particula.execution"
 pytest particula/gpu/tests/kernel_exports_test.py \
   particula/gpu/tests/conversion_test.py -q -Werror
 ruff check particula/execution particula/__init__.py particula/gpu/__init__.py

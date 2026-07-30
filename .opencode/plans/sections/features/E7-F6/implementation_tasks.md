@@ -23,6 +23,9 @@
 - [x] Keep concrete adapters, registries, probes, sidecars, and configs non-public.
 - [x] Document supported experimental `particula.gpu` APIs without import-time
   warnings or removal of existing direct imports.
+- [x] Add `docs/Features/backend_selection.md` and cross-links that distinguish
+  the frozen value API from concrete-only availability/fallback and resident
+  mechanics, without representing the guide as an automatic runtime path.
 
 ## Tooling / Tests
 
@@ -38,6 +41,10 @@
   re-raise, accepted-reason selection, authority rejection, import neutrality,
   metadata preservation, and no-retry failure propagation.
 - [x] Add exact export allow/deny tests modeled on `kernel_exports_test.py`.
+- [x] Add P6 documentation regressions in
+  `particula/tests/execution_selection_docs_test.py` for the ordered public
+  surface, reason table, resolver/no-movement rules, executable public-only
+  selection fence, guarded resident pseudocode, and Markdown links.
 - [x] Add P5 integration spies in
   `particula/execution/tests/fallback_integration_test.py` for rejected P2
   requests and explicit P3 CPU fallback: conversion, transfer, synchronization,
