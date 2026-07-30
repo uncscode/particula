@@ -50,6 +50,7 @@ def test_gpu_module_docstring_declares_experimental_supported_contract() -> (
     assert "caller-owned" in (gpu.__doc__ or "").lower()
 
 
+@pytest.mark.warp
 @pytest.mark.parametrize("symbol_name", SUPPORTED_STEP_SYMBOLS)
 def test_public_kernels_package_exports_supported_step_function(
     symbol_name: str,
@@ -79,6 +80,7 @@ def test_public_kernels_package_exports_supported_step_function(
     assert getattr(kernels, symbol_name) is concrete_symbol_map[symbol_name]
 
 
+@pytest.mark.warp
 def test_kernels_package_all_is_exact_supported_surface() -> None:
     """The package-level public surface is limited to supported step functions."""
     pytest.importorskip("warp")
@@ -106,6 +108,7 @@ def test_kernels_package_keeps_resampling_buffers_concrete_module_only() -> (
     assert not hasattr(kernels, "ResamplingBuffers")
 
 
+@pytest.mark.warp
 def test_kernels_package_keeps_p4_scaling_concrete_module_only() -> None:
     """P4 scaling is importable only from the concrete exhaustion module."""
     pytest.importorskip("warp")
@@ -194,6 +197,7 @@ def test_kernels_package_keeps_nucleation_module_lazy_in_fresh_process() -> (
     assert result.returncode == 0, result.stderr
 
 
+@pytest.mark.warp
 @pytest.mark.parametrize("helper_name", INTERNAL_HELPER_SYMBOLS)
 def test_kernels_package_does_not_export_internal_helpers(
     helper_name: str,
@@ -207,6 +211,7 @@ def test_kernels_package_does_not_export_internal_helpers(
     assert helper_name not in kernels.__all__
 
 
+@pytest.mark.warp
 def test_concrete_kernel_modules_still_expose_supported_and_internal_symbols() -> (
     None
 ):
