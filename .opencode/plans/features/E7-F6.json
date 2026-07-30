@@ -58,11 +58,11 @@
     {
       "id": "E7-F6-P3",
       "title": "Implement opt-in CPU fallback boundary with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-30",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
