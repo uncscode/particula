@@ -140,11 +140,12 @@ fallback from adapter failures.
 ### Selected-condensation ownership and API boundary
 
 This is a non-runnable API and ownership reference. `particula.execution`
-provides a frozen ordered 26-name public surface: ten selection declarations,
-the 13-name capability-error taxonomy, and three fallback policy enums.
-Top-level `particula` re-exports that execution subset and has broader unrelated
-exports. Selected condensation state carriers and adapters are intentionally
-concrete-only at
+provides a frozen ordered 26-name public surface: the 10 selection declarations,
+the 13-name capability-error taxonomy, and the three public fallback policy
+enums. Top-level `particula` re-exports that execution subset and has broader
+unrelated exports. The concrete fallback module remains direct-import-only for
+mechanics and carriers, while selected condensation state carriers and adapters
+are intentionally concrete-only at
 `particula.execution.adapters.condensation` pending E7-F6 policy; there is no
 provisional public selected-condensation import, backend-registration recipe,
 or selected-step workflow.

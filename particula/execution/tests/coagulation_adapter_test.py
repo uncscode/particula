@@ -287,7 +287,7 @@ def test_execution_exports_stay_narrow_and_concrete_carriers_stay_private() -> (
     None
 ):
     """Test the public execution package stays carrier-free."""
-    assert execution.__all__[:10] == [
+    assert execution.__all__ == [
         "Backend",
         "Device",
         "Process",
@@ -298,8 +298,23 @@ def test_execution_exports_stay_narrow_and_concrete_carriers_stay_private() -> (
         "ExecutionRequest",
         "ExecutionAdapter",
         "ExecutionContext",
+        "ExecutionCapabilityReason",
+        "ExecutionCapabilityError",
+        "UnknownExecutionTargetError",
+        "UnavailableExecutionTargetError",
+        "UnsupportedExecutionRequestError",
+        "UnknownBackendError",
+        "UnknownDeviceError",
+        "UnavailableRuntimeError",
+        "UnavailableDeviceError",
+        "UnsupportedProcessError",
+        "UnsupportedCapabilityError",
+        "InvalidExecutionStateError",
+        "FallbackDisallowedError",
+        "FallbackPolicy",
+        "FallbackBoundary",
+        "CPUStateAuthority",
     ]
-    assert len(execution.__all__) == 26
     for name in (
         "BrownianCoagulationConfig",
         "CPUCoagulationState",

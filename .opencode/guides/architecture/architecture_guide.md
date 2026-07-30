@@ -13,8 +13,9 @@
   `UnsupportedProcessError`, `UnsupportedCapabilityError`,
   `InvalidExecutionStateError`, `FallbackDisallowedError`; and
   `FallbackPolicy`, `FallbackBoundary`, `CPUStateAuthority`. These names are
-  top-level exports by identity; the per-context backing registry remains
-  private.
+  top-level exports by identity; the concrete `errors` and `fallback` modules
+  remain direct-import-only for their mechanics, while their public values are
+  re-exported. The per-context backing registry remains private.
 - Declarations and requests are immutable exact metadata. Nonempty requirements
   must match a complete declaration exactly; empty requirements are accepted
   when the matrix contains a declaration for the same `Device` and `Process`.

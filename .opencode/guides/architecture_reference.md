@@ -31,13 +31,15 @@ particula/
 
 ## Execution Selection and Condensation State
 
-`particula.execution` has a frozen ordered 26-name public surface: the ten
+`particula.execution` has a frozen ordered 26-name public surface: the 10
 selection declarations (`Backend` through `ExecutionContext`), the closed
 13-name capability-error taxonomy (`ExecutionCapabilityReason` through
 `FallbackDisallowedError`), and `FallbackPolicy`, `FallbackBoundary`, and
 `CPUStateAuthority`. These values are also top-level `particula` exports by
-identity. Concrete adapter modules, state/result carriers, availability,
-fallback operations and carriers, lifecycle seams, and GPU boundaries remain
+identity. The concrete `errors` and `fallback` modules remain direct-import-
+only for mechanics and carriers, but their public values are re-exported.
+Concrete adapter modules, state/result carriers, availability, fallback
+operations and carriers, lifecycle seams, and GPU boundaries remain
 direct-module-only.
 
 `particula.execution.availability` is the concrete, direct-import-only P2

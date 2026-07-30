@@ -4,11 +4,13 @@
 
 `particula.execution` is a dependency-neutral, standard-library-only,
 explicit-selection seam. Its frozen ordered 26-name package-level public APIs
-contains ten selection declarations (`Backend` through `ExecutionContext`), the
-13-name capability-error taxonomy (`ExecutionCapabilityReason` through
+contain the 10 selection declarations (`Backend` through `ExecutionContext`),
+the 13-name capability-error taxonomy (`ExecutionCapabilityReason` through
 `FallbackDisallowedError`), and `FallbackPolicy`, `FallbackBoundary`, and
 `CPUStateAuthority`, plus the public `ExecutionContext.register_adapter()`
-method. The backing per-context registry remains private.
+method. The concrete `errors` and `fallback` modules stay direct-import-only
+for their mechanics, but their public values are re-exported. The backing
+per-context registry remains private.
 
 Declarations and requests are immutable exact metadata. Nonempty requirements
 must match a complete declaration exactly; empty requirements are accepted when
@@ -41,9 +43,9 @@ The exact downstream ordering remains
 
 **Key Components:**
 - `__init__.py` - Dependency-neutral seam with a frozen ordered 26-name public
-  surface: ten selection declarations, the 13-name capability-error taxonomy,
-  and three fallback policy enums. It does not import Warp, the GPU package, or
-  concrete adapters and fallback mechanics.
+  surface: the 10 selection declarations, the 13-name capability-error
+  taxonomy, and three fallback policy enums. It does not import Warp, the GPU
+  package, or concrete adapters and fallback mechanics.
 - `errors.py` - Standard-library execution-capability error taxonomy. Its public
   values are re-exported by the package and top level, while this concrete module
   remains absent from their export lists.

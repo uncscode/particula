@@ -66,6 +66,16 @@ EXCLUDED_EXPORTS = (
     "WarpCondensationExecutionState",
     "CPUCondensationExecutionAdapter",
     "WarpCondensationExecutionAdapter",
+    "AvailabilityDecision",
+    "AvailabilityProvider",
+    "_CPUAvailabilityProvider",
+    "_WarpAvailabilityProvider",
+    "ResidentSession",
+    "ResidentStepGuard",
+    "ResidentStepToken",
+    "ResidentCheckpointController",
+    "CheckpointPayload",
+    "GPUResourceRegistry",
 )
 
 DIRECT_IMPORT_ONLY_NAMES = (

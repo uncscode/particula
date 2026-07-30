@@ -24,8 +24,9 @@ user-facing API.
 
 The public API is a frozen, dependency-neutral 26-name selection, capability
 error, and fallback-policy surface. Concrete fallback mechanics and
-condensation state carriers remain direct-module-only. Importing this package
-does not import those concrete modules, Warp, or ``particula.gpu``.
+condensation state carriers remain direct-module-only, while the three policy
+enums are re-exported here. Importing this package does not import those
+concrete modules, Warp, or ``particula.gpu``.
 """
 
 import inspect
