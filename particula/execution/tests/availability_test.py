@@ -3,6 +3,7 @@
 import subprocess
 import sys
 import textwrap
+from collections.abc import Iterator, Mapping
 from dataclasses import FrozenInstanceError
 from typing import cast
 
@@ -458,6 +459,55 @@ def test_malformed_registry_fails_before_provider_work(
         )
 
 
+def test_duplicate_yielding_registry_fails_before_provider_or_import_work(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Duplicate registry keys fail before provider access or Warp imports."""
+    request = _request()
+    provider_accessed = False
+    imports: list[str] = []
+
+    class DuplicateKeyRegistry(Mapping[Backend, object]):
+        """Expose duplicate expected keys while rejecting provider access."""
+
+        def __iter__(self) -> Iterator[Backend]:
+            """Yield a duplicate expected backend key."""
+            yield Backend.CPU
+            yield Backend.WARP
+            yield Backend.CPU
+
+        def __len__(self) -> int:
+            """Return the intentionally malformed yielded-key count."""
+            return 3
+
+        def __getitem__(self, _: Backend) -> object:
+            """Record prohibited provider access."""
+            nonlocal provider_accessed
+            provider_accessed = True
+            raise AssertionError("provider access must not occur")
+
+    def record_import(name: str) -> object:
+        """Record prohibited optional runtime access."""
+        imports.append(name)
+        raise AssertionError("optional import must not occur")
+
+    monkeypatch.setattr(availability.importlib, "import_module", record_import)
+
+    with pytest.raises(UnavailableRuntimeError) as raised:
+        availability.resolve_availability(
+            request,
+            _matrix(request),
+            providers=cast(
+                Mapping[Backend, availability.AvailabilityProvider],
+                DuplicateKeyRegistry(),
+            ),
+        )
+
+    assert raised.value.backend == "cpu"
+    assert not provider_accessed
+    assert imports == []
+
+
 def test_registry_property_failure_is_chained() -> None:
     """Inaccessible provider methods fail closed before recognition."""
     request = _request()
@@ -548,6 +598,47 @@ def test_warp_import_failure_maps_to_unavailable_runtime(
         availability.resolve_availability(request, _matrix(request))
 
     assert raised.value.backend == "warp"
+
+
+@pytest.mark.parametrize(
+    ("matrix", "error_type"),
+    [
+        (CapabilityMatrix(frozenset()), UnsupportedProcessError),
+        (
+            CapabilityMatrix(
+                frozenset(
+                    {
+                        CapabilityDeclaration(
+                            Device(Backend.WARP, "opaque:0"),
+                            Process("test_process"),
+                            CapabilityRequirements(frozenset()),
+                        )
+                    }
+                )
+            ),
+            UnsupportedCapabilityError,
+        ),
+    ],
+)
+def test_warp_structural_failures_precede_lazy_import(
+    monkeypatch: pytest.MonkeyPatch,
+    matrix: CapabilityMatrix,
+    error_type: type[Exception],
+) -> None:
+    """Default Warp structural failures occur before optional imports."""
+    request = _request(Backend.WARP)
+    imports: list[str] = []
+
+    monkeypatch.setattr(
+        availability.importlib,
+        "import_module",
+        lambda name: imports.append(name),
+    )
+
+    with pytest.raises(error_type):
+        availability.resolve_availability(request, matrix)
+
+    assert imports == []
 
 
 def test_warp_device_resolution_failure_maps_to_unavailable_device(

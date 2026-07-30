@@ -3,7 +3,8 @@
 This concrete, direct-import-only boundary validates P1 request metadata,
 capability declarations, optional runtime and device status, and
 request-associated state in a fixed order. It neither selects adapters nor
-allocates, transfers, synchronizes, mutates, or executes work.
+allocates execution resources, transfers, synchronizes, mutates, or executes
+work.
 """
 
 import importlib
@@ -218,10 +219,15 @@ def _validate_providers(
         keys = tuple(providers)
     except Exception as error:
         raise UnavailableRuntimeError(request.backend.value) from error
-    if not all(type(key) is Backend for key in keys) or set(keys) != {
-        Backend.CPU,
-        Backend.WARP,
-    }:
+    if (
+        len(keys) != 2
+        or not all(type(key) is Backend for key in keys)
+        or set(keys)
+        != {
+            Backend.CPU,
+            Backend.WARP,
+        }
+    ):
         raise UnavailableRuntimeError(request.backend.value)
     try:
         registry = cast(Mapping[Backend, object], providers)
@@ -288,7 +294,9 @@ def resolve_availability(
         request: Validated P1 request declaration.
         matrix: Capability declarations applicable to the exact device.
         providers: Optional complete CPU/Warp availability registry.
-        state_validator: Optional request-associated state validator.
+        state_validator: Optional request-associated state validator. Omitting
+            it selects an internal validator that accepts every request, so
+            state validation is substantive only when a validator is supplied.
 
     Returns:
         An immutable decision retaining the exact request by identity.
