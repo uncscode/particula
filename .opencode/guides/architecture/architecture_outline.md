@@ -3,12 +3,12 @@
 ## Execution Capability Vocabulary
 
 `particula.execution` is a dependency-neutral, standard-library-only,
-explicit-selection seam. Its package-level public APIs are exactly `Backend`,
-`Device`, `Process`, `Capability`, `CapabilityRequirements`,
-`CapabilityDeclaration`, `CapabilityMatrix`, `ExecutionRequest`,
-`ExecutionAdapter`, and `ExecutionContext`, plus the public
-`ExecutionContext.register_adapter()` method. The backing per-context registry
-remains private.
+explicit-selection seam. Its frozen ordered 26-name package-level public APIs
+contains ten selection declarations (`Backend` through `ExecutionContext`), the
+13-name capability-error taxonomy (`ExecutionCapabilityReason` through
+`FallbackDisallowedError`), and `FallbackPolicy`, `FallbackBoundary`, and
+`CPUStateAuthority`, plus the public `ExecutionContext.register_adapter()`
+method. The backing per-context registry remains private.
 
 Declarations and requests are immutable exact metadata. Nonempty requirements
 must match a complete declaration exactly; empty requirements are accepted when
@@ -40,14 +40,13 @@ The exact downstream ordering remains
 ### particula/execution/
 
 **Key Components:**
-- `__init__.py` - Dependency-neutral selection seam. It preserves the exact
-  ten-name public selection export surface and does not import Warp, the GPU
-  package, or concrete adapters.
-- `errors.py` - Direct-import-only, standard-library execution-capability error
-  taxonomy for future availability and fallback boundaries. Its closed reason
-  enum and structured exception hierarchy provide deterministic context without
-  provider/runtime imports, probing, resolution, fallback behavior, or package
-  and top-level exports.
+- `__init__.py` - Dependency-neutral seam with a frozen ordered 26-name public
+  surface: ten selection declarations, the 13-name capability-error taxonomy,
+  and three fallback policy enums. It does not import Warp, the GPU package, or
+  concrete adapters and fallback mechanics.
+- `errors.py` - Standard-library execution-capability error taxonomy. Its public
+  values are re-exported by the package and top level, while this concrete module
+  remains absent from their export lists.
 - `availability.py` - Concrete, direct-import-only E7-F6 P2 availability
   resolver. `resolve_availability()` consumes already-validated P1 request and
   capability metadata, first fail-closes an exact CPU/Warp provider registry,
@@ -68,8 +67,9 @@ The exact downstream ordering remains
   uploaded, or mutated state; performs one CPU selection and one adapter dispatch
   at most; and exposes requested backend, selected backend, and original reason
   without changing native result metadata. It does not transfer, synchronize,
-  manage lifecycle, restore, retry, or roll back, and is not package- or
-  top-level-exported. See
+   manage lifecycle, restore, retry, or roll back. Its concrete module,
+   operations, and carriers are not package- or top-level-exported; its three
+   policy enums are intentionally re-exported. See
   [ADR-014](decisions/ADR-014-opt-in-cpu-fallback-boundary.md).
 - `Backend`, `Device`, `Process`, and `Capability` - Immutable typed metadata;
   `Device.native` is an opaque native identifier.

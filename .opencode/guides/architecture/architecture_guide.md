@@ -2,13 +2,19 @@
 
 ## Execution Capability and Selection Boundary
 
-- `particula.execution` is a dependency-neutral, standard-library-only,
-  explicit-selection seam. The package-level public APIs are exactly
-  `Backend`, `Device`, `Process`, `Capability`, `CapabilityRequirements`,
-  `CapabilityDeclaration`, `CapabilityMatrix`, `ExecutionRequest`,
-  `ExecutionAdapter`, and `ExecutionContext`, plus the public
-  `ExecutionContext.register_adapter()` method. The per-context backing
-  registry remains private.
+- `particula.execution` is a dependency-neutral, standard-library-only seam.
+  Its frozen ordered 26-name package-level public APIs consist of `Backend`, `Device`,
+  `Process`, `Capability`, `CapabilityRequirements`, `CapabilityDeclaration`,
+  `CapabilityMatrix`, `ExecutionRequest`, `ExecutionAdapter`,
+  `ExecutionContext`; `ExecutionCapabilityReason`, `ExecutionCapabilityError`,
+  `UnknownExecutionTargetError`, `UnavailableExecutionTargetError`,
+  `UnsupportedExecutionRequestError`, `UnknownBackendError`,
+  `UnknownDeviceError`, `UnavailableRuntimeError`, `UnavailableDeviceError`,
+  `UnsupportedProcessError`, `UnsupportedCapabilityError`,
+  `InvalidExecutionStateError`, `FallbackDisallowedError`; and
+  `FallbackPolicy`, `FallbackBoundary`, `CPUStateAuthority`. These names are
+  top-level exports by identity; the per-context backing registry remains
+  private.
 - Declarations and requests are immutable exact metadata. Nonempty requirements
   must match a complete declaration exactly; empty requirements are accepted
   when the matrix contains a declaration for the same `Device` and `Process`.
@@ -54,9 +60,11 @@
   uploaded, and mutated state claims fail closed. It records requested backend,
   selected backend, and capability reason outside the unchanged native result
   metadata. The module performs neither transfer, conversion, synchronization,
-  lifecycle work, restoration, retry, nor rollback, and is absent from package
-  and top-level exports. It does not add implicit fallback to resident or direct
-  GPU boundaries. See [ADR-014](decisions/ADR-014-opt-in-cpu-fallback-boundary.md).
+  lifecycle work, restoration, retry, nor rollback. Its concrete module,
+  operations, and carriers remain absent from package and top-level exports,
+  while its three policy enums are intentionally public. It does not add
+  implicit fallback to resident or direct GPU boundaries. See
+  [ADR-014](decisions/ADR-014-opt-in-cpu-fallback-boundary.md).
 
 ## Concrete GPU-Resident Session Boundary
 

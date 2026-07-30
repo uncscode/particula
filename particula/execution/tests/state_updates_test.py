@@ -572,7 +572,7 @@ def test_request_carriers_are_frozen_and_execution_import_is_isolated() -> None:
     script = """
 import sys
 import particula.execution as execution
-assert execution.__all__ == [
+assert execution.__all__[:10] == [
     'Backend',
     'Device',
     'Process',
@@ -584,6 +584,7 @@ assert execution.__all__ == [
     'ExecutionAdapter',
     'ExecutionContext',
 ]
+assert len(execution.__all__) == 26
 assert 'particula.execution.state_updates' not in sys.modules
 assert 'particula.execution.gpu_resources' not in sys.modules
 assert 'particula.gpu' not in sys.modules

@@ -1,8 +1,12 @@
-"""GPU acceleration module for particula.
+"""Experimental GPU acceleration module for particula.
 
 This module provides GPU-accelerated data containers and CPU↔Warp
 conversion helpers using NVIDIA Warp for high-performance particle
 simulations.
+
+Its low-level containers, conversion helpers, and explicit-transfer/direct-
+kernel workflow are experimental. Their current import paths and caller-owned
+transfer model remain supported.
 
 The GPU module enables:
 - GPU-resident particle, gas, and environment data via Warp structs

@@ -589,6 +589,9 @@ assert not any(
 )
 assert 'fallback' not in execution.__all__
 assert not hasattr(particula, 'fallback')
+assert execution.FallbackPolicy is particula.FallbackPolicy
+assert execution.FallbackBoundary is particula.FallbackBoundary
+assert execution.CPUStateAuthority is particula.CPUStateAuthority
 """
 
     completed = subprocess.run(  # noqa: S603

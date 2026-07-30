@@ -31,9 +31,14 @@ particula/
 
 ## Execution Selection and Condensation State
 
-`particula.execution` is a package. Its supported selection surface remains
-the existing exact ten-name public export list; do not promote adapter modules
-or state carriers through it or through top-level `particula`.
+`particula.execution` has a frozen ordered 26-name public surface: the ten
+selection declarations (`Backend` through `ExecutionContext`), the closed
+13-name capability-error taxonomy (`ExecutionCapabilityReason` through
+`FallbackDisallowedError`), and `FallbackPolicy`, `FallbackBoundary`, and
+`CPUStateAuthority`. These values are also top-level `particula` exports by
+identity. Concrete adapter modules, state/result carriers, availability,
+fallback operations and carriers, lifecycle seams, and GPU boundaries remain
+direct-module-only.
 
 `particula.execution.availability` is the concrete, direct-import-only P2
 pre-execution resolver. `resolve_availability()` consumes already-valid P1

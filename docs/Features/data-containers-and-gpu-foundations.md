@@ -140,9 +140,11 @@ fallback from adapter failures.
 ### Selected-condensation ownership and API boundary
 
 This is a non-runnable API and ownership reference. `particula.execution`
-provides a bounded ten-name public selection surface; top-level `particula`
-has broader exports. Selected condensation state carriers and adapters are
-intentionally concrete-only at
+provides a frozen ordered 26-name public surface: ten selection declarations,
+the 13-name capability-error taxonomy, and three fallback policy enums.
+Top-level `particula` re-exports that execution subset and has broader unrelated
+exports. Selected condensation state carriers and adapters are intentionally
+concrete-only at
 `particula.execution.adapters.condensation` pending E7-F6 policy; there is no
 provisional public selected-condensation import, backend-registration recipe,
 or selected-step workflow.
@@ -184,8 +186,8 @@ documents lifecycle ownership rather than process execution.
 
 ### GPU-resident session lifecycle
 
-`particula.execution` is the resident-session boundary, but its ten-name public
-export list is unchanged. Import resident seams only from their concrete
+`particula.execution` is the resident-session boundary, but its frozen 26-name
+public export list excludes resident seams. Import resident seams only from their concrete
 modules: `setup_resident_session`, `ResidentSession`, and `ResidentStepGuard`
 from `particula.execution.gpu_session`; `GPUResourceRegistry` and its manifests
 or views from `particula.execution.gpu_resources`; and checkpoint records,

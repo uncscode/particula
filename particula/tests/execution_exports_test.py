@@ -1,4 +1,4 @@
-"""Tests for the public execution selection and registration surface."""
+"""Tests for the frozen public execution boundary."""
 
 import os
 import re
@@ -32,6 +32,22 @@ EXPECTED_EXPORTS = (
     "ExecutionRequest",
     "ExecutionAdapter",
     "ExecutionContext",
+    "ExecutionCapabilityReason",
+    "ExecutionCapabilityError",
+    "UnknownExecutionTargetError",
+    "UnavailableExecutionTargetError",
+    "UnsupportedExecutionRequestError",
+    "UnknownBackendError",
+    "UnknownDeviceError",
+    "UnavailableRuntimeError",
+    "UnavailableDeviceError",
+    "UnsupportedProcessError",
+    "UnsupportedCapabilityError",
+    "InvalidExecutionStateError",
+    "FallbackDisallowedError",
+    "FallbackPolicy",
+    "FallbackBoundary",
+    "CPUStateAuthority",
 )
 
 EXCLUDED_EXPORTS = (
@@ -52,21 +68,14 @@ EXCLUDED_EXPORTS = (
     "WarpCondensationExecutionAdapter",
 )
 
-DIRECT_IMPORT_ONLY_ERRORS = (
+DIRECT_IMPORT_ONLY_NAMES = (
     "errors",
-    "ExecutionCapabilityReason",
-    "ExecutionCapabilityError",
-    "UnknownExecutionTargetError",
-    "UnavailableExecutionTargetError",
-    "UnsupportedExecutionRequestError",
-    "UnknownBackendError",
-    "UnknownDeviceError",
-    "UnavailableRuntimeError",
-    "UnavailableDeviceError",
-    "UnsupportedProcessError",
-    "UnsupportedCapabilityError",
-    "InvalidExecutionStateError",
-    "FallbackDisallowedError",
+    "fallback",
+    "FallbackRequest",
+    "FallbackResolution",
+    "FallbackDispatchResult",
+    "resolve_cpu_fallback",
+    "dispatch_cpu_fallback",
 )
 
 
@@ -124,7 +133,7 @@ def _request() -> ExecutionRequest:
 def test_execution_exports_are_exact_and_identical_at_package_boundary() -> (
     None
 ):
-    """Test approved selection names are the complete public execution surface."""
+    """Test approved names are the complete public execution surface."""
     assert tuple(execution.__all__) == EXPECTED_EXPORTS
     for name in EXPECTED_EXPORTS:
         assert getattr(particula, name) is getattr(execution, name)
@@ -263,13 +272,13 @@ def test_public_registration_uses_static_execute_inspection() -> None:
 
 def test_result_and_cpu_types_remain_off_public_export_boundaries() -> None:
     """Test P3/P4 implementation types remain direct-module-only."""
-    for name in EXCLUDED_EXPORTS + DIRECT_IMPORT_ONLY_ERRORS:
+    for name in EXCLUDED_EXPORTS + DIRECT_IMPORT_ONLY_NAMES:
         assert name not in execution.__all__
         assert not hasattr(particula, name)
 
 
-def test_error_taxonomy_remains_direct_import_only_in_fresh_process() -> None:
-    """Test errors stay off package attributes until directly imported."""
+def test_public_error_and_policy_values_are_cpu_only_in_fresh_process() -> None:
+    """Test public values retain identity without optional-backend imports."""
     root = Path(__file__).parents[2]
     environment = os.environ | {
         "PYTHONPATH": os.pathsep.join(
@@ -280,14 +289,16 @@ def test_error_taxonomy_remains_direct_import_only_in_fresh_process() -> None:
 import particula
 import particula.execution as execution
 
-names = {DIRECT_IMPORT_ONLY_ERRORS!r}
+names = {DIRECT_IMPORT_ONLY_NAMES!r}
 for name in names:
     assert name not in execution.__all__
-    assert not hasattr(execution, name)
     assert not hasattr(particula, name)
 
-from particula.execution.errors import UnknownBackendError
-assert UnknownBackendError("cpu").backend == "cpu"
+from particula.execution.errors import UnknownBackendError as DirectError
+from particula.execution.fallback import FallbackPolicy as DirectPolicy
+assert particula.UnknownBackendError is execution.UnknownBackendError is DirectError
+assert particula.FallbackPolicy is execution.FallbackPolicy is DirectPolicy
+assert DirectError("cpu").backend == "cpu"
 """
 
     completed = subprocess.run(  # noqa: S603 -- fixed interpreter and script
@@ -326,7 +337,13 @@ builtins.__import__ = guarded_import
 from particula import (
     Backend, Capability, CapabilityDeclaration, CapabilityMatrix,
     CapabilityRequirements, Device, ExecutionAdapter, ExecutionContext,
-    ExecutionRequest, Process,
+    ExecutionRequest, Process, ExecutionCapabilityReason,
+    ExecutionCapabilityError, UnknownExecutionTargetError,
+    UnavailableExecutionTargetError, UnsupportedExecutionRequestError,
+    UnknownBackendError, UnknownDeviceError, UnavailableRuntimeError,
+    UnavailableDeviceError, UnsupportedProcessError, UnsupportedCapabilityError,
+    InvalidExecutionStateError, FallbackDisallowedError, FallbackPolicy,
+    FallbackBoundary, CPUStateAuthority,
 )
 import particula
 
@@ -350,6 +367,22 @@ assert context.resolve(
     ExecutionRequest(Backend.CPU, device, process, requirements)
 ) is adapter
 assert adapter.calls == 0
+assert ExecutionCapabilityReason is particula.ExecutionCapabilityReason
+assert ExecutionCapabilityError is particula.ExecutionCapabilityError
+assert UnknownExecutionTargetError is particula.UnknownExecutionTargetError
+assert UnavailableExecutionTargetError is particula.UnavailableExecutionTargetError
+assert UnsupportedExecutionRequestError is particula.UnsupportedExecutionRequestError
+assert UnknownBackendError is particula.UnknownBackendError
+assert UnknownDeviceError is particula.UnknownDeviceError
+assert UnavailableRuntimeError is particula.UnavailableRuntimeError
+assert UnavailableDeviceError is particula.UnavailableDeviceError
+assert UnsupportedProcessError is particula.UnsupportedProcessError
+assert UnsupportedCapabilityError is particula.UnsupportedCapabilityError
+assert InvalidExecutionStateError is particula.InvalidExecutionStateError
+assert FallbackDisallowedError is particula.FallbackDisallowedError
+assert FallbackPolicy is particula.FallbackPolicy
+assert FallbackBoundary is particula.FallbackBoundary
+assert CPUStateAuthority is particula.CPUStateAuthority
 assert not any(
     name == "warp" or name.startswith("warp.") or name == "particula.gpu"
     or name.startswith("particula.gpu.") for name in sys.modules

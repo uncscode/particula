@@ -1,4 +1,4 @@
-"""Declare dependency-neutral public execution selection and result contracts.
+"""Declare dependency-neutral public execution selection and error contracts.
 
 This module validates immutable backend, device, process, and capability
 declarations. An ``ExecutionContext`` capability-validates a typed request and
@@ -22,10 +22,10 @@ only. It neither selects an adapter nor validates runtime or native-device
 availability, imports optional backends, allocates state, or exposes a
 user-facing API.
 
-The public selection API is limited to this package's ten-name ``__all__``.
-Concrete condensation state carriers are intentionally available only from
-``particula.execution.adapters.condensation``. Importing this package does not
-import that concrete module, Warp, or ``particula.gpu``.
+The public API is a frozen, dependency-neutral 26-name selection, capability
+error, and fallback-policy surface. Concrete fallback mechanics and
+condensation state carriers remain direct-module-only. Importing this package
+does not import those concrete modules, Warp, or ``particula.gpu``.
 """
 
 import inspect
@@ -49,6 +49,22 @@ __all__ = [
     "ExecutionRequest",
     "ExecutionAdapter",
     "ExecutionContext",
+    "ExecutionCapabilityReason",
+    "ExecutionCapabilityError",
+    "UnknownExecutionTargetError",
+    "UnavailableExecutionTargetError",
+    "UnsupportedExecutionRequestError",
+    "UnknownBackendError",
+    "UnknownDeviceError",
+    "UnavailableRuntimeError",
+    "UnavailableDeviceError",
+    "UnsupportedProcessError",
+    "UnsupportedCapabilityError",
+    "InvalidExecutionStateError",
+    "FallbackDisallowedError",
+    "FallbackPolicy",
+    "FallbackBoundary",
+    "CPUStateAuthority",
 ]
 
 if TYPE_CHECKING:
@@ -1235,3 +1251,25 @@ def _normalize_request_device(request: ExecutionRequest) -> Device:
     if request.backend is Backend.WARP:
         return request.device
     raise ValueError("ExecutionRequest.backend must match device.backend.")
+
+
+from particula.execution.errors import (  # noqa: E402
+    ExecutionCapabilityError,
+    ExecutionCapabilityReason,
+    FallbackDisallowedError,
+    InvalidExecutionStateError,
+    UnavailableDeviceError,
+    UnavailableExecutionTargetError,
+    UnavailableRuntimeError,
+    UnknownBackendError,
+    UnknownDeviceError,
+    UnknownExecutionTargetError,
+    UnsupportedCapabilityError,
+    UnsupportedExecutionRequestError,
+    UnsupportedProcessError,
+)
+from particula.execution.fallback import (  # noqa: E402
+    CPUStateAuthority,
+    FallbackBoundary,
+    FallbackPolicy,
+)

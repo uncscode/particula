@@ -27,7 +27,24 @@ PUBLIC_NAMES = (
     "ExecutionRequest",
     "ExecutionAdapter",
     "ExecutionContext",
+    "ExecutionCapabilityReason",
+    "ExecutionCapabilityError",
+    "UnknownExecutionTargetError",
+    "UnavailableExecutionTargetError",
+    "UnsupportedExecutionRequestError",
+    "UnknownBackendError",
+    "UnknownDeviceError",
+    "UnavailableRuntimeError",
+    "UnavailableDeviceError",
+    "UnsupportedProcessError",
+    "UnsupportedCapabilityError",
+    "InvalidExecutionStateError",
+    "FallbackDisallowedError",
+    "FallbackPolicy",
+    "FallbackBoundary",
+    "CPUStateAuthority",
 )
+SELECTION_NAMES = PUBLIC_NAMES[:10]
 ORDERING = "E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5"
 
 
@@ -99,7 +116,7 @@ def test_execution_selection_example_executes_public_selection_only_contract() -
     public_names = {
         name for name in public_namespace if not name.startswith("__")
     }
-    assert public_names == set(PUBLIC_NAMES)
+    assert public_names == set(SELECTION_NAMES)
 
     ast.parse(example)
     namespace: dict[str, object] = {}
@@ -118,7 +135,7 @@ def test_execution_selection_documentation_states_selection_and_failure_bounds()
     section = _section(FEATURE_PATH, "Execution selection")
     normalized = _normalize(section)
 
-    for name in PUBLIC_NAMES:
+    for name in SELECTION_NAMES:
         assert name in section
     for phrase in (
         'Device(Backend.CPU, "cpu")',
@@ -198,9 +215,8 @@ def test_selected_condensation_ownership_documents_private_failure_bounds() -> (
     normalized = _normalize(section)
 
     for phrase in (
-        "`particula.execution` provides a bounded ten-name public selection "
-        "surface",
-        "top-level `particula` has broader exports",
+        "`particula.execution` provides a frozen ordered 26-name public surface",
+        "Top-level `particula` re-exports that execution subset and has broader unrelated exports",
         "intentionally concrete-only at "
         "`particula.execution.adapters.condensation`",
         "does not bind or validate a supplied CPU runnable or Warp sidecars "

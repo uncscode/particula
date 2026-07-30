@@ -10,8 +10,6 @@ from types import SimpleNamespace
 
 import pytest
 
-pytestmark = pytest.mark.warp
-
 ROOT = Path(__file__).resolve().parents[3]
 
 SUPPORTED_STEP_SYMBOLS = (
@@ -40,6 +38,16 @@ def test_gpu_top_level_does_not_reexport_kernel_steps() -> None:
     for symbol_name in SUPPORTED_STEP_SYMBOLS:
         assert not hasattr(gpu, symbol_name)
         assert symbol_name not in gpu.__all__
+
+
+def test_gpu_module_docstring_declares_experimental_supported_contract() -> (
+    None
+):
+    """Test GPU documentation marks its supported low-level path experimental."""
+    import particula.gpu as gpu
+
+    assert "experimental" in (gpu.__doc__ or "").lower()
+    assert "caller-owned" in (gpu.__doc__ or "").lower()
 
 
 @pytest.mark.parametrize("symbol_name", SUPPORTED_STEP_SYMBOLS)
