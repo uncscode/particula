@@ -3,6 +3,7 @@
 import ast
 import re
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -283,13 +284,13 @@ def test_backend_selection_selection_fence_is_public_only_and_noninvoking() -> (
     assert all(node.module == "particula.execution" for node in imports)
     imported = {alias.name for node in imports for alias in node.names}
     assert imported <= set(SELECTION_NAMES)
-    namespace: dict[str, object] = {}
+    namespace: dict[str, Any] = {}
     exec(fence, namespace)  # noqa: S102 -- executes published CPU-only fence
     assert (
-        namespace["context"].resolve(namespace["request"])
+        cast(Any, namespace["context"]).resolve(namespace["request"])
         is namespace["adapter"]
-    )  # type: ignore[union-attr]
-    assert namespace["adapter"].calls == 0  # type: ignore[union-attr]
+    )
+    assert cast(Any, namespace["adapter"]).calls == 0
 
 
 def test_backend_selection_resident_fence_guards_concrete_imports() -> None:
