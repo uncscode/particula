@@ -215,10 +215,9 @@ def test_selected_condensation_ownership_documents_private_failure_bounds() -> (
     normalized = _normalize(section)
 
     for phrase in (
-        "`particula.execution` provides a frozen ordered 26-name public surface: "
-        "the 10 selection declarations, the 13-name capability-error taxonomy, "
-        "and the three public fallback policy enums",
-        "Top-level `particula` re-exports that execution subset and has broader unrelated exports",
+        "`particula.execution` provides this frozen ordered 26-name public "
+        "surface, also re-exported by top-level `particula` alongside its "
+        "unrelated APIs",
         "intentionally concrete-only at "
         "`particula.execution.adapters.condensation`",
         "does not bind or validate a supplied CPU runnable or Warp sidecars "
