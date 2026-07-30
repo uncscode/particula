@@ -100,6 +100,24 @@ class MalformedAdapter:
         return object()
 
 
+class WrongStateAdapter:
+    """Return a valid result carrier associated with a different CPU state."""
+
+    def __init__(self, state: CPUExecutionState) -> None:
+        """Store the different state and initialize the execution counter."""
+        self.calls = 0
+        self.state = state
+
+    def execute(self, _: CPUExecutionState) -> ExecutionResult:
+        """Return a syntactically valid result with the wrong state identity."""
+        self.calls += 1
+        return ExecutionResult(
+            self.state,
+            (),
+            MutationDeclaration(frozenset({MutationScope.STATE})),
+        )
+
+
 def _request() -> ExecutionRequest:
     """Build a valid non-CPU request."""
     return ExecutionRequest(
@@ -387,6 +405,24 @@ def test_adapter_exceptions_and_malformed_results_are_not_retried() -> None:
     assert malformed_adapter.calls == 1
 
 
+def test_wrong_state_result_is_not_retried_or_reselected() -> None:
+    """A valid result for another CPU state fails after one dispatch."""
+    fallback, context, _ = _fallback()
+    wrong_state_adapter = WrongStateAdapter(CPUExecutionState(object(), 1.0, 1))
+    context = CountingContext(context._matrix)  # noqa: SLF001
+    context.register_adapter(
+        fallback.original_request.process,
+        Backend.CPU,
+        wrong_state_adapter,
+    )
+
+    with pytest.raises(ValueError, match="ExecutionResult.state"):
+        dispatch_cpu_fallback(replace(fallback, context=context))
+
+    assert context.calls == 1
+    assert wrong_state_adapter.calls == 1
+
+
 @pytest.mark.parametrize(
     ("field", "value", "message"),
     [
@@ -481,6 +517,56 @@ def test_resolution_and_dispatch_result_validate_exact_provenance() -> None:
         )
 
     assert isinstance(resolution, FallbackResolution)
+
+
+@pytest.mark.parametrize(
+    ("field", "message"),
+    [
+        ("policy", "policy"),
+        ("original_request", "original_request.backend"),
+        ("original_error", "original_error.reason"),
+    ],
+)
+def test_resolution_rejects_unauthorized_fallback_provenance(
+    field: str,
+    message: str,
+) -> None:
+    """Direct construction cannot claim fallback without resolver admission."""
+    fallback, context, adapter = _fallback()
+    cpu_request = ExecutionRequest(
+        Backend.CPU,
+        Device(Backend.CPU, "cpu"),
+        fallback.original_request.process,
+        fallback.original_request.requirements,
+    )
+    original_request = (
+        cpu_request
+        if field == "original_request"
+        else fallback.original_request
+    )
+    original_error = (
+        ExecutionCapabilityError(ExecutionCapabilityReason.UNKNOWN_BACKEND)
+        if field == "original_error"
+        else fallback.original_error
+    )
+    policy = FallbackPolicy.RAISE if field == "policy" else fallback.policy
+
+    with pytest.raises(ValueError, match=message):
+        FallbackResolution(
+            original_request,
+            cpu_request,
+            original_error,
+            cast(CPUExecutionState, fallback.cpu_state),
+            adapter,
+            policy,
+            fallback.boundary,
+            original_request.backend,
+            Backend.CPU,
+            original_error.reason,
+        )
+
+    assert context.calls == 0
+    assert adapter.calls == 0
 
 
 def test_fallback_import_is_direct_only_and_unexported() -> None:

@@ -178,6 +178,8 @@ class FallbackResolution:
         _validate_fallback_enums(
             self.policy, self.boundary, CPUStateAuthority.CPU_AUTHORITATIVE
         )
+        if self.policy is not FallbackPolicy.CPU:
+            raise ValueError("policy must be FallbackPolicy.CPU.")
         _validate_resolution_reason(self)
 
 
@@ -256,6 +258,8 @@ def _validate_resolution_request(resolution: FallbackResolution) -> None:
         raise TypeError("selected_backend must be a Backend.")
     if resolution.selected_backend is not Backend.CPU:
         raise ValueError("selected_backend must be Backend.CPU.")
+    if resolution.original_request.backend is Backend.CPU:
+        raise ValueError("original_request.backend must not be Backend.CPU.")
     if resolution.cpu_request.backend is not Backend.CPU:
         raise ValueError("cpu_request.backend must be Backend.CPU.")
     if not isinstance(resolution.requested_backend, Backend):
@@ -294,6 +298,8 @@ def _validate_resolution_reason(resolution: FallbackResolution) -> None:
         )
     if resolution.capability_reason is not resolution.original_error.reason:
         raise ValueError("capability_reason must match original_error.")
+    if resolution.original_error.reason not in _ELIGIBLE_REASONS:
+        raise ValueError("original_error.reason must be eligible for fallback.")
 
 
 def _validate_fallback_enums(
