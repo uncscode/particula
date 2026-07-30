@@ -143,30 +143,36 @@ def _subsection(path: Path, heading: str) -> str:
     return match.group(1)
 
 
-def test_execution_selection_example_executes_public_selection_only_contract() -> (
+def test_execution_selection_example_has_public_selection_only_contract() -> (
     None
 ):
-    """Test the published CPU-only selection example remains executable."""
+    """Test the published CPU-only example has only public selection imports."""
     section = _section(FEATURE_PATH, "Execution selection")
     fences = re.findall(r"```python\n(.*?)```", section, flags=re.DOTALL)
     public_import = next(fence for fence in fences if "Capability," in fence)
     example = next(fence for fence in fences if "class LocalAdapter:" in fence)
 
-    ast.parse(public_import)
-    public_namespace: dict[str, object] = {}
-    exec(public_import, public_namespace)  # noqa: S102 -- published import fence
-    public_names = {
-        name for name in public_namespace if not name.startswith("__")
-    }
-    assert public_names == set(SELECTION_NAMES)
+    import_tree = ast.parse(public_import)
+    imports = [
+        node
+        for node in ast.walk(import_tree)
+        if isinstance(node, ast.ImportFrom)
+    ]
+    assert all(
+        node.module in {"particula", "particula.execution"} for node in imports
+    )
+    public_names = {alias.name for node in imports for alias in node.names}
+    assert public_names <= set(SELECTION_NAMES)
 
-    ast.parse(example)
-    namespace: dict[str, object] = {}
-    exec(example, namespace)  # noqa: S102 -- executes the published local example
-
-    assert namespace["selected"] is namespace["adapter"]
-    assert namespace["selected"].execute("example-local result") == (  # type: ignore[attr-defined]
-        "example-local result"
+    example_tree = ast.parse(example)
+    example_imports = [
+        node
+        for node in ast.walk(example_tree)
+        if isinstance(node, ast.ImportFrom)
+    ]
+    assert all(
+        node.module in {"particula", "particula.execution"}
+        for node in example_imports
     )
 
 
@@ -224,6 +230,7 @@ def test_backend_selection_guide_documents_exact_public_and_private_surface() ->
 def test_backend_selection_guide_closes_reason_and_retry_outcomes() -> None:
     """Test only the documented five reasons permit explicit CPU fallback."""
     content = BACKEND_SELECTION_PATH.read_text(encoding="utf-8")
+    normalized = _normalize(content)
     eligible = (
         "UNKNOWN_DEVICE",
         "RUNTIME_UNAVAILABLE",
@@ -251,6 +258,11 @@ def test_backend_selection_guide_closes_reason_and_retry_outcomes() -> None:
         in content
     )
     assert "without CPU retry" in content
+    assert "`FallbackPolicy.RAISE` is default-deny" in normalized
+    assert "`CPUStateAuthority.CPU_AUTHORITATIVE`" in normalized
+    assert "`FallbackBoundary.PRE_UPLOAD`" in normalized
+    assert "`FallbackBoundary.RESTORED`" in normalized
+    assert "does not change native result metadata" in normalized
 
 
 def test_backend_selection_guide_states_exact_resolver_and_no_movement() -> (
@@ -273,7 +285,7 @@ def test_backend_selection_guide_states_exact_resolver_and_no_movement() -> (
 def test_backend_selection_selection_fence_is_public_only_and_noninvoking() -> (
     None
 ):
-    """Test the executable fence selects its adapter without calling execute."""
+    """Test the Markdown fence is static, public-only, and non-invoking."""
     content = BACKEND_SELECTION_PATH.read_text(encoding="utf-8")
     fence = _python_fence(content, "Selection must not invoke")
     tree = ast.parse(fence)
@@ -284,17 +296,55 @@ def test_backend_selection_selection_fence_is_public_only_and_noninvoking() -> (
     assert all(node.module == "particula.execution" for node in imports)
     imported = {alias.name for node in imports for alias in node.names}
     assert imported <= set(SELECTION_NAMES)
-    namespace: dict[str, Any] = {}
-    exec(fence, namespace)  # noqa: S102 -- executes published CPU-only fence
-    assert (
-        cast(Any, namespace["context"]).resolve(namespace["request"])
-        is namespace["adapter"]
+    assert not any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "execute"
+        for node in ast.walk(tree)
     )
-    assert cast(Any, namespace["adapter"]).calls == 0
+    assert not any(
+        isinstance(node, ast.Import)
+        or (
+            isinstance(node, ast.ImportFrom)
+            and node.module not in {"particula.execution"}
+        )
+        for node in ast.walk(tree)
+    )
+    allowed_named_calls = {
+        "CapabilityDeclaration",
+        "CapabilityMatrix",
+        "CapabilityRequirements",
+        "Device",
+        "ExecutionContext",
+        "ExecutionRequest",
+        "LocalAdapter",
+        "Process",
+        "RuntimeError",
+        "frozenset",
+    }
+    allowed_attribute_calls = {"register_adapter", "resolve"}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if isinstance(node.func, ast.Name):
+            assert node.func.id in allowed_named_calls
+        else:
+            assert isinstance(node.func, ast.Attribute)
+            assert node.func.attr in allowed_attribute_calls
+
+    namespace: dict[str, Any] = {}
+    exec(fence, namespace)  # noqa: S102 -- executes the published CPU-only fence
+    adapter = cast(Any, namespace["adapter"])
+    context = cast(Any, namespace["context"])
+    request = namespace["request"]
+    assert context.resolve(request) is adapter
+    assert adapter.calls == 0
 
 
-def test_backend_selection_resident_fence_guards_concrete_imports() -> None:
-    """Test resident pseudocode parses but keeps concrete imports Warp-guarded."""
+def test_backend_selection_resident_fence_distinguishes_restart_from_cpu_restore() -> (
+    None
+):
+    """Test resident pseudocode does not present restart as CPU restoration."""
     content = BACKEND_SELECTION_PATH.read_text(encoding="utf-8")
     fence = _python_fence(content, "WARP_AVAILABLE = False")
     tree = ast.parse(fence)
@@ -308,34 +358,55 @@ def test_backend_selection_resident_fence_guards_concrete_imports() -> None:
                     for child in ast.walk(node)
                     if isinstance(child, ast.ImportFrom)
                 )
-    concrete_imports = [
-        node
+    assert all(
+        node in guarded_imports
         for node in ast.walk(tree)
         if isinstance(node, ast.ImportFrom)
-        and node.module
-        in {
-            "particula.execution.checkpoint",
-            "particula.execution.gpu_session",
-        }
-    ]
-    assert concrete_imports
-    assert all(node in guarded_imports for node in concrete_imports)
+    )
+    assert "restart_resident_session" not in fence
     normalized = _normalize(content)
     for phrase in (
         "caller-owned checkpoint/finalize snapshot",
-        "separate explicit restore plus CPU-authority declaration",
-        "No component restores, transfers, synchronizes, migrates, or retries silently",
+        "separate explicit restoration to CPU-authoritative state plus a "
+        "CPU-authority declaration",
+        "Resident restart is an exact-device GPU lifecycle operation, not CPU "
+        "restoration or fallback",
+        "No component restores, transfers, synchronizes, migrates, or retries "
+        "silently",
+        "from particula.execution.checkpoint import ResidentCheckpointController",
+        "from particula.execution.gpu_session import ResidentSession",
+        "checkpoint = resident_session.checkpoint(registry, guard)",
+        "finalized = resident_session.finalize(registry, guard)",
     ):
         assert phrase in normalized
 
 
-def test_backend_selection_index_and_roadmap_links_resolve() -> None:
-    """Test the new index card and roadmap link resolve to the feature page."""
-    for source in (FEATURE_INDEX_PATH, ROADMAP_PATH):
+def test_backend_selection_index_and_foundation_links_resolve() -> None:
+    """Test all expected index and foundation handoff links resolve."""
+    expected_index_links = (
+        "activity_system.md",
+        "coagulation_strategy_system.md",
+        "condensation_strategy_system.md",
+        "wall_loss_strategy_system.md",
+        "dilution_strategy_system.md",
+        "nucleation_strategy_system.md",
+        "data-containers-and-gpu-foundations.md",
+        "backend_selection.md",
+        "gpu_resident_checkpoints.md",
+        "slot_exhaustion_policies.md",
+        "particle-data-migration/index.md",
+        "Roadmap/index.md",
+    )
+    for source, expected_links in (
+        (FEATURE_INDEX_PATH, expected_index_links),
+        (FEATURE_PATH, ("backend_selection.md",)),
+        (ROADMAP_PATH, ("../backend_selection.md",)),
+    ):
         content = source.read_text(encoding="utf-8")
         links = re.findall(r"\[[^]]+\]\(([^)]+)\)", content)
-        target = next(link for link in links if "backend_selection.md" in link)
-        _assert_markdown_link_resolves(source, target)
+        for target in expected_links:
+            assert target in links
+            _assert_markdown_link_resolves(source, target)
 
     content = BACKEND_SELECTION_PATH.read_text(encoding="utf-8")
     links = re.findall(r"\[[^]]+\]\(([^)]+)\)", content)

@@ -104,19 +104,22 @@ without CPU retry.
 
 The following is a boundary illustration, not an availability API or automatic
 fallback path. Active resident state requires a caller-owned checkpoint/finalize
-snapshot and a separate explicit restore plus CPU-authority declaration before
-a distinct CPU request. No component restores, transfers, synchronizes,
-migrates, or retries silently.
+snapshot and a separate explicit restoration to CPU-authoritative state plus a
+CPU-authority declaration before a distinct CPU request. Resident restart is
+an exact-device GPU lifecycle operation, not CPU restoration or fallback. No
+component restores, transfers, synchronizes, migrates, or retries silently.
 
 ```python
 WARP_AVAILABLE = False
 
 if WARP_AVAILABLE:
-    from particula.execution.checkpoint import restart_resident_session
+    from particula.execution.checkpoint import ResidentCheckpointController
     from particula.execution.gpu_session import ResidentSession
 
-    checkpoint = resident_session.finalize(registry, guard)
-    restored_session = restart_resident_session(checkpoint, device)
+    controller = ResidentCheckpointController()
+    checkpoint = resident_session.checkpoint(registry, guard)
+    finalized = resident_session.finalize(registry, guard)
+    cpu_state = caller_restore_to_cpu_authoritative_state(checkpoint)
     cpu_authority = "caller declares CPU_AUTHORITATIVE after explicit restore"
     cpu_request = "a distinct canonical CPU request"
 ```
