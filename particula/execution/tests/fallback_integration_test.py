@@ -355,6 +355,7 @@ def test_unavailable_device_short_circuits_before_dispatch() -> None:
         rejected.error,
         context,
         None,
+        state_authority=CPUStateAuthority.CPU_AUTHORITATIVE,
     )
 
     assert fallback.original_error is rejected.error

@@ -469,6 +469,40 @@ def test_forged_enum_and_request_metadata_fail_before_context_lookup() -> None:
     assert adapter.calls == 0
 
 
+def test_forged_nested_carriers_fail_before_context_lookup() -> None:
+    """Nested fallback request and context matrix values are fail-closed."""
+    fallback, context, adapter = _fallback()
+    object.__setattr__(fallback.original_request.device, "native", 1)
+
+    with pytest.raises(TypeError, match="original_request.device.native"):
+        resolve_cpu_fallback(fallback)
+
+    assert context.calls == 0
+    assert adapter.calls == 0
+
+    fallback, context, adapter = _fallback()
+    object.__setattr__(context._matrix, "declarations", ())  # noqa: SLF001
+
+    with pytest.raises(TypeError, match="context.matrix.declarations"):
+        resolve_cpu_fallback(fallback)
+
+    assert context.calls == 0
+    assert adapter.calls == 0
+
+
+def test_omitted_state_authority_is_rejected() -> None:
+    """Fallback callers must explicitly attest CPU state authority."""
+    fallback, _, _ = _fallback()
+
+    with pytest.raises(TypeError, match="state_authority"):
+        FallbackRequest(
+            fallback.original_request,
+            fallback.original_error,
+            fallback.context,
+            fallback.cpu_state,
+        )
+
+
 @pytest.mark.parametrize("field", ["state", "fallback_boundary"])
 def test_error_state_context_disallows_fallback_before_lookup(
     field: str,

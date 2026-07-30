@@ -535,6 +535,95 @@ def test_registry_property_failure_is_chained() -> None:
     assert isinstance(raised.value.__cause__, RuntimeError)
 
 
+def test_provider_uses_bound_methods_validated_during_preflight() -> None:
+    """Provider descriptors cannot change after registry validation."""
+    request = _request()
+    log: list[str] = []
+
+    class ChangingProvider:
+        """Expose every provider method once through dynamic descriptors."""
+
+        def __init__(self, log: list[str]) -> None:
+            """Initialize the provider with one shared log."""
+            self.log = log
+
+        def _read_once(self, name: str, method: object) -> object:
+            """Return a bound method once and reject later descriptor access."""
+            attribute = f"_{name}_read"
+            if hasattr(self, attribute):
+                raise RuntimeError("post-validation lookup")
+            setattr(self, attribute, True)
+            return method
+
+        @property
+        def recognizes(self) -> object:
+            """Return the recognition method only during preflight."""
+            return self._read_once("recognizes", self._recognizes)
+
+        @property
+        def runtime_available(self) -> object:
+            """Return the runtime method only during preflight."""
+            return self._read_once("runtime", self._runtime_available)
+
+        @property
+        def device_available(self) -> object:
+            """Return the device method only during preflight."""
+            return self._read_once("device", self._device_available)
+
+        def _recognizes(self, _: Device) -> bool:
+            """Record the bound recognition invocation."""
+            log.append("recognition")
+            return True
+
+        def _runtime_available(self) -> bool:
+            """Record the bound runtime invocation."""
+            log.append("runtime")
+            return True
+
+        def _device_available(self, _: Device) -> bool:
+            """Record the bound device invocation."""
+            log.append("device")
+            return True
+
+    providers = cast(
+        dict[Backend, availability.AvailabilityProvider],
+        {
+            Backend.CPU: ChangingProvider(log),
+            Backend.WARP: FakeProvider(log),
+        },
+    )
+
+    assert (
+        availability.resolve_availability(
+            request,
+            _matrix(request),
+            providers=providers,
+        ).request
+        is request
+    )
+    assert log == ["recognition", "runtime", "device"]
+
+
+def test_forged_nested_carriers_fail_before_registry_access() -> None:
+    """Forged nested request and matrix values fail in deterministic order."""
+    request = _request()
+    matrix = _matrix(request)
+    object.__setattr__(request.device, "native", 1)
+
+    with pytest.raises(TypeError, match="request.device.native"):
+        availability.resolve_availability(request, matrix)
+
+    request = _request()
+    matrix = _matrix(request)
+    declaration = next(iter(matrix.declarations))
+    declaration_process = Process("matrix_process")
+    object.__setattr__(declaration, "process", declaration_process)
+    object.__setattr__(declaration_process, "name", 1)
+
+    with pytest.raises(TypeError, match="matrix.declaration.process.name"):
+        availability.resolve_availability(request, matrix)
+
+
 def test_unselected_registry_provider_must_be_usable() -> None:
     """Malformed unselected providers fail before selected-provider work."""
     request = _request()

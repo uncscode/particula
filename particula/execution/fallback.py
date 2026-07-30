@@ -7,18 +7,16 @@ for providing CPU-authoritative state at a visible boundary.
 
 import inspect
 from dataclasses import dataclass
-from enum import Enum
+from typing import cast
 
 from particula.execution import (
     Backend,
-    CapabilityRequirements,
     CPUExecutionState,
     Device,
     ExecutionAdapter,
     ExecutionContext,
     ExecutionRequest,
     ExecutionResult,
-    Process,
     validate_execution_result,
 )
 from particula.execution.errors import (
@@ -26,55 +24,15 @@ from particula.execution.errors import (
     ExecutionCapabilityReason,
     FallbackDisallowedError,
 )
-
-
-class FallbackPolicy(str, Enum):
-    """Declare whether an eligible capability error is re-raised or dispatched.
-
-    ``RAISE`` is default-deny and preserves the original error. ``CPU`` permits
-    one explicit CPU adapter dispatch; it does not retry failed dispatches.
-
-    Attributes:
-        RAISE: Re-raise the original eligible capability error.
-        CPU: Select and dispatch the canonical CPU adapter once.
-    """
-
-    RAISE = "raise"
-    CPU = "cpu"
-
-
-class FallbackBoundary(str, Enum):
-    """Declare the caller-visible boundary for an explicit fallback request.
-
-    ``RESTORED`` is a caller assertion only. This module neither verifies nor
-    performs restoration.
-
-    Attributes:
-        PRE_UPLOAD: State is CPU-authoritative before any upload.
-        RESTORED: Caller asserts CPU-authoritative state was restored.
-    """
-
-    PRE_UPLOAD = "pre_upload"
-    RESTORED = "restored"
-
-
-class CPUStateAuthority(str, Enum):
-    """Declare the asserted authority of CPU state for a fallback request.
-
-    Only ``CPU_AUTHORITATIVE`` is accepted. The other values are closed
-    rejection states that prevent implicit movement or recovery.
-
-    Attributes:
-        CPU_AUTHORITATIVE: State is authoritative for CPU dispatch.
-        RESIDENT: State remains resident and is rejected.
-        UPLOADED: State has been uploaded and is rejected.
-        MUTATED: State was mutated outside the CPU authority boundary.
-    """
-
-    CPU_AUTHORITATIVE = "cpu_authoritative"
-    RESIDENT = "resident"
-    UPLOADED = "uploaded"
-    MUTATED = "mutated"
+from particula.execution.validation import (
+    validate_capability_matrix,
+    validate_execution_request,
+)
+from particula.execution.values import (
+    CPUStateAuthority,
+    FallbackBoundary,
+    FallbackPolicy,
+)
 
 
 @dataclass(frozen=True, eq=False)
@@ -100,7 +58,7 @@ class FallbackRequest:
     cpu_state: CPUExecutionState | None
     policy: FallbackPolicy = FallbackPolicy.RAISE
     boundary: FallbackBoundary = FallbackBoundary.PRE_UPLOAD
-    state_authority: CPUStateAuthority = CPUStateAuthority.CPU_AUTHORITATIVE
+    state_authority: CPUStateAuthority | None = None
 
     def __post_init__(self) -> None:
         """Validate carrier types without selecting or reading payloads.
@@ -364,38 +322,16 @@ def _validate_request_and_error(fallback: FallbackRequest) -> None:
     """
     request = fallback.original_request
     error = fallback.original_error
-    if not isinstance(request, ExecutionRequest):
-        raise TypeError("original_request must be an ExecutionRequest.")
+    validate_execution_request(request, "original_request")
     if not isinstance(error, ExecutionCapabilityError):
         raise TypeError("original_error must be an ExecutionCapabilityError.")
     if not isinstance(fallback.context, ExecutionContext):
         raise TypeError("context must be an ExecutionContext.")
-    _validate_request_fields(request)
+    validate_capability_matrix(
+        fallback.context._matrix,  # noqa: SLF001
+        "context.matrix",
+    )
     _validate_error_fields(error)
-
-
-def _validate_request_fields(request: ExecutionRequest) -> None:
-    """Validate the original request's closed carrier fields.
-
-    Args:
-        request: Original execution request to validate.
-
-    Raises:
-        TypeError: If a closed request field has an invalid type.
-        ValueError: If request and device backend values differ.
-    """
-    if not isinstance(request.backend, Backend):
-        raise TypeError("original_request.backend must be a Backend.")
-    if not isinstance(request.device, Device):
-        raise TypeError("original_request.device must be a Device.")
-    if not isinstance(request.process, Process):
-        raise TypeError("original_request.process must be a Process.")
-    if not isinstance(request.requirements, CapabilityRequirements):
-        raise TypeError(
-            "original_request.requirements must be a CapabilityRequirements."
-        )
-    if request.backend is not request.device.backend:
-        raise ValueError("original_request backend must match device.backend.")
 
 
 def _validate_error_fields(error: ExecutionCapabilityError) -> None:
@@ -530,9 +466,10 @@ def resolve_cpu_fallback(fallback: FallbackRequest) -> FallbackResolution:
             boundary=fallback.boundary.value,
         ) from error
     if fallback.state_authority is not CPUStateAuthority.CPU_AUTHORITATIVE:
+        state_authority = cast(CPUStateAuthority, fallback.state_authority)
         raise _disallow(
             fallback,
-            state=fallback.state_authority.value,
+            state=state_authority.value,
             boundary=fallback.boundary.value,
         ) from error
 

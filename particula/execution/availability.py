@@ -26,6 +26,10 @@ from particula.execution.errors import (
     UnsupportedCapabilityError,
     UnsupportedProcessError,
 )
+from particula.execution.validation import (
+    validate_capability_matrix,
+    validate_execution_request,
+)
 
 
 class AvailabilityProvider(Protocol):
@@ -199,7 +203,11 @@ def _context(request: ExecutionRequest) -> dict[str, str]:
 def _validate_providers(
     providers: object,
     request: ExecutionRequest,
-) -> AvailabilityProvider:
+) -> tuple[
+    Callable[[Device], object],
+    Callable[[], object],
+    Callable[[Device], object],
+]:
     """Return a selected provider after fail-closed registry validation.
 
     Args:
@@ -208,7 +216,7 @@ def _validate_providers(
         request: Validated request selecting one provider.
 
     Returns:
-        The validated provider for the request backend.
+        The validated bound provider methods for the request backend.
 
     Raises:
         UnavailableRuntimeError: If the registry is malformed or inaccessible.
@@ -231,7 +239,14 @@ def _validate_providers(
         raise UnavailableRuntimeError(request.backend.value)
     try:
         registry = cast(Mapping[Backend, object], providers)
-        validated_providers: dict[Backend, AvailabilityProvider] = {}
+        validated_providers: dict[
+            Backend,
+            tuple[
+                Callable[[Device], object],
+                Callable[[], object],
+                Callable[[Device], object],
+            ],
+        ] = {}
         for backend in (Backend.CPU, Backend.WARP):
             provider = cast(AvailabilityProvider, registry[backend])
             methods = (
@@ -241,7 +256,7 @@ def _validate_providers(
             )
             if not all(callable(method) for method in methods):
                 raise UnavailableRuntimeError(request.backend.value)
-            validated_providers[backend] = provider
+            validated_providers[backend] = methods
     except UnavailableRuntimeError:
         raise
     except Exception as error:
@@ -310,18 +325,16 @@ def resolve_availability(
         UnavailableDeviceError: If the runtime cannot resolve the device.
         InvalidExecutionStateError: If request-associated state is invalid.
     """
-    if not isinstance(request, ExecutionRequest):
-        raise TypeError("request must be an ExecutionRequest.")
-    if not isinstance(matrix, CapabilityMatrix):
-        raise TypeError("matrix must be a CapabilityMatrix.")
+    validate_execution_request(request, "request")
+    validate_capability_matrix(matrix, "matrix")
 
-    provider = _validate_providers(
+    recognizes, runtime_available, device_available = _validate_providers(
         _DEFAULT_PROVIDERS if providers is None else providers,
         request,
     )
     context = _context(request)
     if not _provider_result(
-        provider.recognizes,
+        recognizes,
         lambda: UnknownDeviceError(
             request.device.native,
             backend=request.backend.value,
@@ -353,12 +366,12 @@ def resolve_availability(
             process=request.process.name,
         )
     if not _provider_result(
-        provider.runtime_available,
+        runtime_available,
         lambda: UnavailableRuntimeError(request.backend.value),
     ):
         raise UnavailableRuntimeError(request.backend.value)
     if not _provider_result(
-        provider.device_available,
+        device_available,
         lambda: UnavailableDeviceError(
             request.device.native,
             backend=request.backend.value,

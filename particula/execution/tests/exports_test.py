@@ -9,7 +9,7 @@ from pathlib import Path
 
 import particula
 import particula.execution as execution
-from particula.execution import errors, fallback
+from particula.execution import errors, fallback, values
 
 EXPECTED_EXPORTS = (
     "Backend",
@@ -122,6 +122,7 @@ def test_execution_exports_are_exact_and_identity_preserving() -> None:
         assert getattr(execution, name) is getattr(errors, name)
     for name in ("FallbackPolicy", "FallbackBoundary", "CPUStateAuthority"):
         assert getattr(execution, name) is getattr(fallback, name)
+        assert getattr(execution, name) is getattr(values, name)
     for name in EXPECTED_EXPORTS:
         assert getattr(particula, name) is getattr(execution, name)
 

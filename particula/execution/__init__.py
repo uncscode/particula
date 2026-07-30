@@ -1269,7 +1269,7 @@ from particula.execution.errors import (  # noqa: E402
     UnsupportedExecutionRequestError,
     UnsupportedProcessError,
 )
-from particula.execution.fallback import (  # noqa: E402
+from particula.execution.values import (  # noqa: E402
     CPUStateAuthority,
     FallbackBoundary,
     FallbackPolicy,
