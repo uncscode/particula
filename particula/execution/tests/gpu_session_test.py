@@ -23,6 +23,7 @@ from particula.execution.gpu_session import (
     ResidentStepToken,
     _handle_failed_resident_operation,
     _ResidentOperationOutcome,
+    _validate_contiguous_array,
     setup_resident_session,
 )
 from particula.gas import EnvironmentData, GasData
@@ -35,6 +36,29 @@ def _metadata(species: int = 1) -> ResidentMetadata:
         Device(Backend.WARP, "cpu"),
         tuple(f"species_{index}" for index in range(species)),
     )
+
+
+@pytest.mark.parametrize(
+    ("pointer", "capacity", "match"),
+    (
+        (0, 8, "valid pointer"),
+        (4, 8, "8-byte aligned"),
+        (8, 7, "sufficient integral storage capacity"),
+        (8, 9, "sufficient integral storage capacity"),
+    ),
+)
+def test_primary_array_metadata_requires_valid_pointer_alignment_and_capacity(
+    pointer: int, capacity: int, match: str
+) -> None:
+    """Test primary metadata rejects unsafe nonempty native backing storage."""
+    array = type(
+        "PrimaryArray",
+        (),
+        {"strides": (8,), "ptr": pointer, "capacity": capacity},
+    )()
+
+    with pytest.raises(ValueError, match=match):
+        _validate_contiguous_array("primary", array, (1,), 8)
 
 
 def _warp_resources(
@@ -1146,12 +1170,40 @@ def _cpu_resources(
         concentration=np.ones((boxes, species), dtype=np.float64),
         partitioning=np.ones(species, dtype=np.bool_),
     )
-    environment = EnvironmentData(
-        temperature=np.full(boxes, 298.15, dtype=np.float64),
-        pressure=np.full(boxes, 101325.0, dtype=np.float64),
-        saturation_ratio=np.ones((boxes, species), dtype=np.float64),
-    )
+    if boxes == 0:
+        environment = object.__new__(EnvironmentData)
+        object.__setattr__(
+            environment,
+            "temperature",
+            np.full(0, 298.15, dtype=np.float64),
+        )
+        object.__setattr__(
+            environment,
+            "pressure",
+            np.full(0, 101325.0, dtype=np.float64),
+        )
+        object.__setattr__(
+            environment,
+            "saturation_ratio",
+            np.ones((0, species), dtype=np.float64),
+        )
+    else:
+        environment = EnvironmentData(
+            temperature=np.full(boxes, 298.15, dtype=np.float64),
+            pressure=np.full(boxes, 101325.0, dtype=np.float64),
+            saturation_ratio=np.ones((boxes, species), dtype=np.float64),
+        )
     return particles, gas, environment
+
+
+def test_setup_resident_session_rejects_zero_box_schema_before_upload() -> None:
+    """Test unsupported empty sessions fail before importing Warp converters."""
+    particles, gas, environment = _cpu_resources(boxes=0)
+
+    with pytest.raises(ValueError, match="n_boxes must be greater than zero"):
+        setup_resident_session(
+            particles, gas, environment, Device(Backend.WARP, "cpu")
+        )
 
 
 @pytest.mark.warp

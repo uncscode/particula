@@ -640,14 +640,26 @@ def test_validate_pinned_session_rejects_primary_and_container_drift() -> None:
 
 
 @pytest.mark.warp
-def test_diagnostics_rejects_nonempty_null_pointer_before_alias_checks(
+@pytest.mark.parametrize(
+    ("pointer", "capacity", "match"),
+    (
+        (0, 8, "valid pointer"),
+        (4, 8, "8-byte aligned"),
+        (8, 7, "sufficient integral storage capacity"),
+        (8, 9, "sufficient integral storage capacity"),
+    ),
+)
+def test_diagnostics_reject_invalid_nonempty_pointer_backing_before_alias_checks(
     monkeypatch: pytest.MonkeyPatch,
+    pointer: int,
+    capacity: int,
+    match: str,
 ) -> None:
-    """Test nonempty diagnostic buffers require a usable native pointer."""
+    """Test diagnostic outputs validate pointer alignment and capacity first."""
     session = _session()
     registry = GPUResourceRegistry(session)
     device = cast(Any, session.particles).masses.device
-    null_output = type(
+    invalid_output = type(
         "array",
         (),
         {
@@ -655,14 +667,15 @@ def test_diagnostics_rejects_nonempty_null_pointer_before_alias_checks(
             "shape": (1, 1),
             "strides": (8, 8),
             "device": device,
-            "ptr": 0,
+            "ptr": pointer,
+            "capacity": capacity,
         },
     )()
-    type(null_output).__module__ = "warp"
+    type(invalid_output).__module__ = "warp"
     monkeypatch.setattr(gpu_resources.wp, "array", None)
 
-    with pytest.raises(ValueError, match="Nonempty diagnostic outputs"):
-        registry.validate_diagnostic_outputs(session, (null_output,))
+    with pytest.raises(ValueError, match=match):
+        registry.validate_diagnostic_outputs(session, (invalid_output,))
 
 
 @pytest.mark.warp

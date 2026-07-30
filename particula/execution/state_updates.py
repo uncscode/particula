@@ -172,6 +172,19 @@ def _array_range(
     pointer = getattr(value, "ptr", None)
     if not isinstance(pointer, Integral) or pointer <= 0:
         raise ValueError(f"{name} must have a valid pointer.")
+    if pointer % item_size:
+        raise ValueError(f"{name} pointer must be {item_size}-byte aligned.")
+    capacity = getattr(value, "capacity", None)
+    required = count * item_size
+    if (
+        isinstance(capacity, bool)
+        or not isinstance(capacity, Integral)
+        or capacity < required
+        or capacity % item_size
+    ):
+        raise ValueError(
+            f"{name} must have sufficient integral storage capacity."
+        )
     return int(pointer), int(pointer) + count * item_size
 
 

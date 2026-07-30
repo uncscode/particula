@@ -122,6 +122,10 @@ def _preflight_cpu_session(
         raise ValueError("particles.masses must have rank 3.")
     dimensions = ResidentDimensions(*masses_shape)
     boxes = dimensions.n_boxes
+    if boxes == 0:
+        raise ValueError(
+            "n_boxes must be greater than zero for resident sessions."
+        )
     particle_count = dimensions.n_particles
     species = dimensions.n_species
 
@@ -309,8 +313,9 @@ def _validate_contiguous_array(
         item_size: Element size in bytes.
 
     Raises:
-        ValueError: If the array is not contiguous or a nonempty array lacks a
-            valid pointer. Canonical empty schemas require no pointer.
+        ValueError: If the array is not contiguous or its nonempty storage has
+            invalid pointer, alignment, or capacity metadata. Canonical empty
+            schemas require no pointer.
     """
     expected: list[int] = []
     stride = item_size
@@ -319,10 +324,27 @@ def _validate_contiguous_array(
         stride *= length
     if getattr(array, "strides", None) != tuple(expected):
         raise ValueError(f"{name} must be contiguous.")
-    if all(shape) and (
-        not isinstance(getattr(array, "ptr", None), Integral) or array.ptr < 0
-    ):
+    count = 1
+    for length in shape:
+        count *= length
+    if count == 0:
+        return
+    pointer = getattr(array, "ptr", None)
+    if not isinstance(pointer, Integral) or pointer <= 0:
         raise ValueError(f"{name} must have a valid pointer.")
+    if pointer % item_size:
+        raise ValueError(f"{name} pointer must be {item_size}-byte aligned.")
+    capacity = getattr(array, "capacity", None)
+    required = count * item_size
+    if (
+        isinstance(capacity, bool)
+        or not isinstance(capacity, Integral)
+        or capacity < required
+        or capacity % item_size
+    ):
+        raise ValueError(
+            f"{name} must have sufficient integral storage capacity."
+        )
 
 
 def _validate_generated_containers(

@@ -291,6 +291,7 @@ class ResidentSimulationScheduler:
                 execution state does not retain the scheduler's binding.
         """
         request = self._request
+        registry = cast(Any, request.registry)
         node_fields = (
             (request.environment_update, "environment_update"),
             (request.gas_update, "gas_update"),
@@ -347,6 +348,33 @@ class ResidentSimulationScheduler:
             raise ValueError(
                 "coagulation state does not match resident binding."
             )
+        condensation_resources = registry._views.get("condensation")
+        if condensation.scratch_buffers is not getattr(
+            condensation_resources, "scratch_buffers", None
+        ):
+            raise ValueError("condensation state must use published resources.")
+        registry.validate_condensation_resources(
+            request.session, condensation_resources
+        )
+        coagulation_resources = registry._views.get("coagulation")
+        if (
+            coagulation.collision_pairs
+            is not getattr(coagulation_resources, "collision_pairs", None)
+            or coagulation.n_collisions
+            is not getattr(coagulation_resources, "n_collisions", None)
+            or coagulation.rng_states
+            is not getattr(coagulation_resources, "rng_states", None)
+        ):
+            raise ValueError("coagulation state must use published resources.")
+        registry.validate_coagulation_resources(
+            request.session, coagulation_resources
+        )
+        registry.validate_wall_loss_resources(
+            request.session, request.wall_loss.resources
+        )
+        registry.validate_nucleation_resources(
+            request.session, request.nucleation.resources
+        )
 
     def _validate_durations(self, duration: Real) -> None:
         """Require every process request to retain the exact step duration.
@@ -434,8 +462,9 @@ class ResidentSimulationScheduler:
                     wall_loss.execute(request.wall_loss)
                     thermal.record_completed(node)
                 elif node_id == "nucleation":
-                    nucleation.execute(request.nucleation)
-                    thermal.record_completed(node)
+                    thermal.execute_consumer(
+                        node, lambda: nucleation.execute(request.nucleation)
+                    )
                 elif node_id == "diagnostics":
                     thermal.execute_consumer(
                         node, lambda: diagnostics.execute(request.diagnostics)

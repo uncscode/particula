@@ -405,6 +405,51 @@ def test_nonempty_null_pointer_rejects_before_copy(
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize(
+    ("pointer", "capacity", "match"),
+    (
+        (4, 8, "aligned"),
+        (8, 7, "sufficient integral storage capacity"),
+        (8, 9, "sufficient integral storage capacity"),
+    ),
+)
+def test_nonempty_pointer_backing_metadata_rejects_before_copy(
+    monkeypatch: pytest.MonkeyPatch,
+    pointer: int,
+    capacity: int,
+    match: str,
+) -> None:
+    """Test invalid pointer backing metadata cannot authorize native access."""
+    updates = _state_updates()
+    wp = pytest.importorskip("warp")
+    from particula.execution.gpu_resources import GPUResourceRegistry
+
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    graph, node = _request_node("gas_update")
+    invalid_input = wp.array(
+        ptr=pointer,
+        capacity=capacity,
+        dtype=wp.float64,
+        shape=(1, 1),
+        strides=(8, 8),
+        device="cpu",
+        copy=False,
+    )
+    request = updates.ResidentGasUpdateRequest(
+        session, registry, graph, node, invalid_input
+    )
+    monkeypatch.setattr(
+        updates.wp,
+        "copy",
+        lambda *_args, **_kwargs: pytest.fail("invalid input must not copy"),
+    )
+
+    with pytest.raises(ValueError, match=match):
+        updates.ResidentStateUpdateExecutor().execute(request)
+
+
+@pytest.mark.warp
 def test_update_rejects_primary_alias_and_noncanonical_node_before_copy(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

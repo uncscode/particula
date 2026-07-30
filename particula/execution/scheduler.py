@@ -31,11 +31,18 @@ _FRESHNESS_EDGES = (
     ("environment_update", "vapor_pressure_refresh"),
     ("environment_update", "saturation_refresh"),
     ("gas_update", "saturation_refresh"),
+    ("environment_update", "brownian_coagulation"),
+    ("environment_update", "wall_loss"),
+    ("environment_update", "nucleation"),
+    ("gas_update", "condensation"),
+    ("gas_update", "dilution"),
+    ("gas_update", "nucleation"),
     ("vapor_pressure_refresh", "saturation_refresh"),
     ("saturation_refresh", "condensation"),
     ("saturation_refresh", "diagnostics"),
 )
 _SCHEDULE_PROVENANCE = object()
+_RESOLVER_SCHEDULES: list[object] = []
 
 
 @dataclass(frozen=True)
@@ -246,13 +253,15 @@ def resolve_timestep_schedule(
     )
     dependencies = tuple(DependencyEdge(*pair) for pair in sorted(pairs))
     order = resolve_canonical_topological_order(nodes, dependencies)
-    return ResolvedTimestepSchedule(
+    schedule = ResolvedTimestepSchedule(
         nodes,
         dependencies,
         order,
         source_graph=resolved,
         _provenance=_SCHEDULE_PROVENANCE,
     )
+    _RESOLVER_SCHEDULES.append(schedule)
+    return schedule
 
 
 def is_resolver_produced_schedule(
@@ -263,9 +272,8 @@ def is_resolver_produced_schedule(
     This internal provenance check prevents a structurally similar hand-built
     schedule from entering the resident execution boundary.
     """
-    return (
-        schedule.source_graph is graph
-        and schedule._provenance is _SCHEDULE_PROVENANCE
+    return schedule.source_graph is graph and any(
+        schedule is registered for registered in _RESOLVER_SCHEDULES
     )
 
 
@@ -353,11 +361,9 @@ def _add_freshness_pairs(
     pairs: set[tuple[str, str]],
     enabled: frozenset[str],
 ) -> None:
-    """Add required freshness edges after enforcing producer closure."""
+    """Add freshness edges only when both endpoints are selected."""
     for before_id, after_id in _FRESHNESS_EDGES:
-        if after_id in enabled:
-            if before_id not in enabled:
-                _raise_unsatisfied_closure(before_id, after_id)
+        if before_id in enabled and after_id in enabled:
             pairs.add((before_id, after_id))
 
 

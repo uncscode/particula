@@ -419,6 +419,50 @@ class GPUResourceRegistry:
             _WALL_LOSS.entries[0], resources.rng_states, capacity=None
         )
 
+    def validate_condensation_resources(
+        self, session: ResidentSession, resources: CondensationResources
+    ) -> None:
+        """Require the exact established condensation view.
+
+        This does not acquire a new resource binding.
+        """
+        self.validate_pinned_session(session)
+        if type(resources) is not CondensationResources:
+            raise TypeError("resources must be an exact CondensationResources.")
+        if resources is not self._views.get("condensation"):
+            raise ValueError(
+                "resources must be the published condensation view."
+            )
+        for entry in _CONDENSATION.entries:
+            value = getattr(resources.scratch_buffers, entry.role)
+            if value is not self._bindings["condensation"][entry.role]:
+                raise ValueError("condensation resource bindings changed.")
+            self._validate_array(entry, value, capacity=None)
+
+    def validate_coagulation_resources(
+        self, session: ResidentSession, resources: CoagulationResources
+    ) -> None:
+        """Require the exact established coagulation view.
+
+        This does not acquire a new resource binding.
+        """
+        self.validate_pinned_session(session)
+        if type(resources) is not CoagulationResources:
+            raise TypeError("resources must be an exact CoagulationResources.")
+        if resources is not self._views.get("coagulation"):
+            raise ValueError(
+                "resources must be the published coagulation view."
+            )
+        if resources.collision_capacity != self._capacities.get("coagulation"):
+            raise ValueError("coagulation resource capacity changed.")
+        for entry in _COAGULATION.entries:
+            value = getattr(resources, entry.role)
+            if value is not self._bindings["coagulation"][entry.role]:
+                raise ValueError("coagulation resource bindings changed.")
+            self._validate_array(
+                entry, value, capacity=resources.collision_capacity
+            )
+
     def validate_nucleation_resources(
         self, session: ResidentSession, resources: NucleationResources
     ) -> None:
@@ -665,11 +709,25 @@ class GPUResourceRegistry:
             count = self._checked_product(count, length)
         if count == 0:
             return None
-        if not isinstance(getattr(value, "ptr", None), Integral) or (
-            value.ptr < 0
-        ):
+        pointer = getattr(value, "ptr", None)
+        if not isinstance(pointer, Integral) or pointer <= 0:
             raise ValueError(f"{role} must have a valid pointer.")
-        return int(value.ptr), int(value.ptr) + count * item_size
+        if pointer % item_size:
+            raise ValueError(
+                f"{role} pointer must be {item_size}-byte aligned."
+            )
+        capacity = getattr(value, "capacity", None)
+        required = count * item_size
+        if (
+            isinstance(capacity, bool)
+            or not isinstance(capacity, Integral)
+            or capacity < required
+            or capacity % item_size
+        ):
+            raise ValueError(
+                f"{role} must have sufficient integral storage capacity."
+            )
+        return int(pointer), int(pointer) + required
 
     @staticmethod
     def _checked_product(left: int, right: int) -> int:
@@ -809,11 +867,26 @@ class GPUResourceRegistry:
             count *= length
         if count == 0:
             return None
-        if not isinstance(getattr(array, "ptr", None), Integral) or (
-            array.ptr < 0
-        ):
+        pointer = getattr(array, "ptr", None)
+        if not isinstance(pointer, Integral) or pointer <= 0:
             raise ValueError("Registry arrays must have a valid pointer.")
-        return int(array.ptr), int(array.ptr) + count * item_size
+        if pointer % item_size:
+            raise ValueError(
+                "Registry array pointers must be element-size aligned."
+            )
+        capacity = getattr(array, "capacity", None)
+        required = count * item_size
+        if (
+            isinstance(capacity, bool)
+            or not isinstance(capacity, Integral)
+            or capacity < required
+            or capacity % item_size
+        ):
+            raise ValueError(
+                "Registry arrays must have sufficient integral "
+                "storage capacity."
+            )
+        return int(pointer), int(pointer) + required
 
     def _acquire(
         self,

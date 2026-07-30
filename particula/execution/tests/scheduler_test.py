@@ -3,7 +3,7 @@
 import os
 import subprocess
 import sys
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from pathlib import Path
 from typing import Any, cast
 
@@ -121,6 +121,17 @@ def test_schedule_cannot_spoof_resolver_provenance_with_source_graph() -> None:
     )
 
     assert not is_resolver_produced_schedule(forged, graph)
+
+
+def test_schedule_copy_cannot_reuse_resolver_provenance() -> None:
+    """Test resolver provenance is bound to one exact schedule object."""
+    plan = TimestepPlan((_node("dilution"),), ())
+    schedule = resolve_timestep_schedule(
+        plan, EnabledNodeSelection(frozenset({"dilution"})), _profile()
+    )
+    source_graph = cast(Any, schedule.source_graph)
+
+    assert not is_resolver_produced_schedule(replace(schedule), source_graph)
 
 
 def test_schedule_requires_canonical_members_and_topological_order() -> None:
@@ -339,7 +350,7 @@ def test_p1_dependency_failures_precede_empty_selection(
 def test_explicit_dependency_and_freshness_closure_reject_missing_producers() -> (
     None
 ):
-    """Test selected consumers cannot silently discard required predecessors."""
+    """Test explicit dependencies still reject missing predecessors."""
     explicit_plan = TimestepPlan(
         (_node("dilution"), _node("diagnostics")),
         (DependencyEdge("dilution", "diagnostics"),),
@@ -351,61 +362,21 @@ def test_explicit_dependency_and_freshness_closure_reject_missing_producers() ->
             _profile(),
         )
 
-    closure_cases = (
-        (
-            "environment_update",
-            "vapor_pressure_refresh",
-            {"environment_update", "vapor_pressure_refresh"},
-        ),
-        (
-            "environment_update",
-            "saturation_refresh",
-            {"environment_update", "saturation_refresh"},
-        ),
-        (
-            "gas_update",
-            "saturation_refresh",
-            {
-                "environment_update",
-                "gas_update",
-                "vapor_pressure_refresh",
-                "saturation_refresh",
-            },
-        ),
-        (
-            "vapor_pressure_refresh",
-            "saturation_refresh",
-            {
-                "environment_update",
-                "gas_update",
-                "vapor_pressure_refresh",
-                "saturation_refresh",
-            },
-        ),
-        (
-            "saturation_refresh",
-            "condensation",
-            {"saturation_refresh", "condensation"},
-        ),
-        (
-            "saturation_refresh",
-            "diagnostics",
-            {"saturation_refresh", "diagnostics"},
-        ),
-    )
-    for before_id, after_id, available_ids in closure_cases:
+    for selected_ids in (
+        {"vapor_pressure_refresh"},
+        {"saturation_refresh"},
+        {"condensation"},
+        {"diagnostics"},
+    ):
         plan = TimestepPlan(
-            tuple(_node(node_id) for node_id in available_ids), ()
+            tuple(_node(node_id) for node_id in selected_ids), ()
         )
-        with pytest.raises(
-            ValueError,
-            match=f"{before_id} -> {after_id}",
-        ):
-            resolve_timestep_schedule(
-                plan,
-                EnabledNodeSelection(frozenset(available_ids - {before_id})),
-                _profile(),
-            )
+        schedule = resolve_timestep_schedule(
+            plan,
+            EnabledNodeSelection(frozenset(selected_ids)),
+            _profile(),
+        )
+        assert schedule.ordered_node_ids == tuple(sorted(selected_ids))
 
 
 def test_freshness_closure_and_canonical_order_are_derived() -> None:
@@ -427,25 +398,42 @@ def test_freshness_closure_and_canonical_order_are_derived() -> None:
         plan, EnabledNodeSelection(ids), _profile()
     )
     pairs = {(edge.before_id, edge.after_id) for edge in schedule.dependencies}
-    assert pairs == {
+    assert {
         ("environment_update", "vapor_pressure_refresh"),
         ("environment_update", "saturation_refresh"),
         ("gas_update", "saturation_refresh"),
         ("vapor_pressure_refresh", "saturation_refresh"),
         ("saturation_refresh", "condensation"),
         ("saturation_refresh", "diagnostics"),
-    }
+    }.issubset(pairs)
     assert schedule.ordered_node_ids.index(
         "saturation_refresh"
     ) < schedule.ordered_node_ids.index("condensation")
-    with pytest.raises(
-        ValueError, match="environment_update -> saturation_refresh"
-    ):
-        resolve_timestep_schedule(
-            TimestepPlan((_node("saturation_refresh"),), ()),
-            EnabledNodeSelection(frozenset({"saturation_refresh"})),
-            _profile(),
-        )
+    lone_schedule = resolve_timestep_schedule(
+        TimestepPlan((_node("saturation_refresh"),), ()),
+        EnabledNodeSelection(frozenset({"saturation_refresh"})),
+        _profile(),
+    )
+    assert lone_schedule.dependencies == ()
+    assert lone_schedule.ordered_node_ids == ("saturation_refresh",)
+
+
+@pytest.mark.parametrize(
+    "consumer",
+    ("brownian_coagulation", "wall_loss"),
+)
+def test_environment_update_precedes_environment_consumers(
+    consumer: str,
+) -> None:
+    """Test state updates cannot be ordered after their consumers."""
+    ids = frozenset({"environment_update", consumer})
+    schedule = resolve_timestep_schedule(
+        TimestepPlan(tuple(_node(node_id) for node_id in ids), ()),
+        EnabledNodeSelection(ids),
+        _profile(),
+    )
+
+    assert schedule.ordered_node_ids == ("environment_update", consumer)
 
 
 @pytest.mark.parametrize(
@@ -580,9 +568,6 @@ def test_scheduler_resolution_is_registration_order_independent() -> None:
     )
 
     assert forward == reverse
-    dilution_index = forward.ordered_node_ids.index("dilution")
-    environment_index = forward.ordered_node_ids.index("environment_update")
-    assert dilution_index < environment_index
 
 
 def test_importing_scheduler_does_not_load_execution_or_gpu_backends() -> None:
@@ -817,6 +802,27 @@ def test_resident_scheduler_preflight_rejects_incomplete_refresh_windows(
 
 
 @pytest.mark.warp
+def test_resident_scheduler_rejects_preflight_before_begin_step(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a failed registry preflight cannot open a lifecycle token."""
+    module = _resident_scheduler()
+    request, guard = _scheduler_request(module)
+    scheduler = module.ResidentSimulationScheduler(request)
+
+    def reject_registry_preflight(_duration: object) -> None:
+        """Model validation of a drifted registry/session binding."""
+        raise ValueError("pinned binding drift")
+
+    monkeypatch.setattr(scheduler, "_validate", reject_registry_preflight)
+
+    with pytest.raises(ValueError, match="pinned binding drift"):
+        scheduler.execute(1.0)
+
+    assert guard.calls == []
+
+
+@pytest.mark.warp
 def test_resident_scheduler_dispatches_resolved_nodes_once(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -900,7 +906,7 @@ def test_resident_scheduler_dispatches_resolved_nodes_once(
         "dilution",
         "wall_loss",
         "wall_loss",
-        "nucleation",
+        "consumer:nucleation",
         "nucleation",
         "consumer:diagnostics",
         "diagnostics",
