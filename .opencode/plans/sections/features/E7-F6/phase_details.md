@@ -42,11 +42,15 @@
   - Files: `particula/execution/__init__.py`, `particula/__init__.py`, `particula/gpu/__init__.py`
   - Tests: Exact `__all__`, allowed imports, forbidden internals, CPU-only import subprocess.
 
-- [ ] **E7-F6-P5:** Add no-silent-fallback integration regressions
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Prove capability and runtime failures never trigger conversion, synchronization, adapter retry, or mutation.
+- [x] **E7-F6-P5:** Add no-silent-fallback integration regressions
+  - Issue: #1504 | Size: S | Status: Implemented
+  - Goal: Prove unavailable-device rejection reaches no execution/movement seam,
+    and explicit CPU fallback preserves provenance/state without retry.
   - Files: `particula/execution/tests/fallback_integration_test.py`
-  - Tests: Transfer/sync spies, sentinel adapter failures, state snapshots, explicit-boundary success.
+  - Tests: Local provider phase logs and P1 snapshots; CPU/GPU adapter and
+    conversion/transfer/synchronization/kernel/mutation/checkpoint/restore
+    spies; explicit pre-upload CPU fallback provenance/state preservation; and
+    unchanged propagation of a terminal CPU adapter sentinel.
 
 - [ ] **E7-F6-P6:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

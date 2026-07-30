@@ -38,5 +38,9 @@
   re-raise, accepted-reason selection, authority rejection, import neutrality,
   metadata preservation, and no-retry failure propagation.
 - [ ] Add exact export allow/deny tests modeled on `kernel_exports_test.py`.
-- [ ] Add conversion, synchronization, adapter-call, and mutation spies for rejected requests.
+- [x] Add P5 integration spies in
+  `particula/execution/tests/fallback_integration_test.py` for rejected P2
+  requests and explicit P3 CPU fallback: conversion, transfer, synchronization,
+  kernel, mutation, checkpoint/restore, CPU/GPU adapter calls, state identity,
+  provenance, and terminal adapter-error propagation.
 - [ ] Run focused tests, Ruff, mypy for the execution package, and `mkdocs build --strict`.

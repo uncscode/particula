@@ -38,6 +38,12 @@ capability-reason provenance separately from unchanged native result metadata,
 does not recover or move state, and is covered by focused contract tests and
 feature documentation.
 
+E7-F6-P5 was implemented for issue #1504 as test-only regression coverage in
+`particula/execution/tests/fallback_integration_test.py`. It verifies that P2
+device rejection reaches no execution seam or adapter, that an explicitly
+requested P3 CPU fallback preserves provenance and CPU state without movement,
+and that a selected CPU adapter error is terminal without retry or reselection.
+
 ## User Stories
 
 - As a simulation author, I want unsupported GPU requests to fail with a clear,

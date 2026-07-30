@@ -36,10 +36,14 @@ cleanly when unavailable.
   forbidden internals, unchanged direct GPU imports, and a subprocess import
   with Warp blocked. Avoid import-time experimental warnings that would violate
   repository `-Werror` usage.
-- **P5:** `fallback_integration_test.py` snapshots caller state and spies on all
-  conversion, synchronization, CPU/GPU adapter, and kernel seams. Capability
-  rejection calls none; explicit fallback calls only the CPU path; a sentinel
-  post-invocation error propagates without retry.
+- **P5 (implemented, issue #1504):**
+  `particula/execution/tests/fallback_integration_test.py` uses fresh local P1,
+  P2, and P3 collaborators plus forbidden-operation ledgers. It verifies P2
+  unavailable-device rejection does not validate later state, look up adapters,
+  or cross conversion, transfer, synchronization, kernel, mutation,
+  checkpoint, or restore seams; it verifies one explicit P3 CPU dispatch retains
+  state identity and separate provenance; and it verifies a CPU adapter sentinel
+  propagates unchanged without retry or reselection.
 - **P6:** Validate examples/import snippets and run `mkdocs build --strict`.
 
 ## Focused Validation
