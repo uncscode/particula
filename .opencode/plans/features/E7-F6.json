@@ -2,7 +2,7 @@
   "id": "E7-F6",
   "type": "feature",
   "title": "Fallback, Capability Errors, and API Stability",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
@@ -71,11 +71,11 @@
     {
       "id": "E7-F6-P4",
       "title": "Freeze public exports and experimental API policy with tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-30",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -97,11 +97,11 @@
     {
       "id": "E7-F6-P6",
       "title": "Update development documentation",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "XS",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-30",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
@@ -109,5 +109,5 @@
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }
