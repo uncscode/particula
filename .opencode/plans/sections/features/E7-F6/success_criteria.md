@@ -3,13 +3,14 @@
 - [ ] Every unsupported backend/device/process/capability outcome raises the
   documented typed error with stable reason metadata.
 - [ ] Importing the public execution API succeeds when Warp is absent.
-- [ ] Fallback is disabled by default and requires an explicit typed request.
-- [ ] Explicit fallback occurs only before upload/mutation with CPU-authoritative
-  state or after a caller-requested restore boundary.
-- [ ] Runtime/kernel/adapter exceptions propagate without CPU retry.
-- [ ] Rejected and failed requests perform zero hidden conversion,
+- [x] P3 fallback is disabled by default and requires an explicit typed request.
+- [x] P3 explicit fallback occurs only before upload/mutation with exact
+  CPU-authoritative state or at a caller-asserted restored boundary.
+- [x] P3 runtime/kernel/adapter exceptions propagate without CPU retry.
+- [x] P3 rejected and failed requests perform zero hidden conversion,
   synchronization, kernel launch, fallback adapter call, or state mutation.
-- [ ] Results distinguish requested and selected backend and retain the fallback reason.
+- [x] P3 fallback results distinguish requested and selected backend and retain
+  the capability reason without modifying native result metadata.
 - [ ] Public `__all__` tests accept intended names and reject registries,
   concrete adapters, sidecars, configs, and helper kernels.
 - [ ] Existing low-level GPU imports remain callable and are documented

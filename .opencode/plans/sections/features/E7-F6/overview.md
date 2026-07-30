@@ -12,7 +12,8 @@ which APIs are stable.
 
 E7-F6 gives E7 adapters and sessions one typed error taxonomy, fail-closed
 availability checks, and an opt-in CPU transition that is observable and occurs
-only before mutation or at an explicit restore boundary. It also freezes a
+only at a CPU-authoritative pre-upload or caller-asserted restored boundary. It
+also freezes a
 narrow public execution surface while marking low-level `particula.gpu.*` APIs
 experimental until backend selection and full-loop validation are complete.
 
@@ -27,8 +28,15 @@ E7-F6-P2 was implemented for issue #1501. The concrete, direct-import-only
 matrix metadata fail-closed in recognition, declarations, runtime, device, and
 state order. It returns a frozen request-only decision, keeps Warp native
 identifiers opaque with lazy optional runtime import, and remains unexported.
-Co-located tests cover its contract. Fallback selection, package exports, and
-user documentation remain deferred.
+Co-located tests cover its contract. Package exports remain deferred.
+
+E7-F6-P3 was implemented for issue #1502. The direct-import-only
+`particula.execution.fallback` module is default-deny: only explicit CPU policy
+may dispatch once for five eligible availability/support reasons and only with
+exact CPU-authoritative state. It retains requested/selected backend and
+capability-reason provenance separately from unchanged native result metadata,
+does not recover or move state, and is covered by focused contract tests and
+feature documentation.
 
 ## User Stories
 

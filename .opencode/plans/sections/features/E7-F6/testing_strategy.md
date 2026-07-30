@@ -23,9 +23,15 @@ cleanly when unavailable.
   mappings, state validation, and exact short-circuit order. Local fakes and a
   subprocess import guard keep the suite independent of Warp/CUDA and verify no
   adapter, transfer, synchronization, mutation, or kernel-launch seam is used.
-- **P3:** Fallback tests cover default rejection, explicit pre-upload CPU
-  selection, absent CPU state, active resident state, explicit-restored state,
-  and requested/selected/reason result metadata.
+- **P3 (implemented, issue #1502):**
+  `particula/execution/tests/fallback_test.py` uses local typed context, state,
+  adapter, payload, movement, and lifecycle fakes without Warp/CUDA. It covers
+  all five eligible reasons; identical default-deny re-raises; exactly one
+  canonical CPU lookup and dispatch; both accepted authority boundaries;
+  rejection of absent/resident/uploaded/mutated state before lookup; immutable
+  fallback provenance with unchanged native `ExecutionResult.metadata`; blocked
+  optional imports; and adapter/result-validation failures that propagate with
+  no retry or recovery.
 - **P4:** Export tests assert exact `__all__`, approved top-level imports,
   forbidden internals, unchanged direct GPU imports, and a subprocess import
   with Warp blocked. Avoid import-time experimental warnings that would violate

@@ -45,7 +45,18 @@
   dependency-neutral `scheduler` remains declaration-only; E7-F5 P6 separately
   provides a bounded concrete resident complete-loop composer. E7-F7 transport,
   E7-F8 detailed RNG-stream policy, implicit transfer/synchronization, retry,
-  fallback, and replacement of direct GPU APIs remain deferred.
+  broad fallback, and replacement of direct GPU APIs remain deferred.
+- `particula.execution.fallback` is the sole concrete, direct-import-only E7-F6
+  P3 opt-in CPU fallback boundary. Its default `RAISE` policy re-raises the
+  exact eligible typed availability/support failure. Explicit CPU policy may
+  select the already-registered canonical CPU adapter only for
+  CPU-authoritative `PRE_UPLOAD` or caller-asserted `RESTORED` state; resident,
+  uploaded, and mutated state claims fail closed. It records requested backend,
+  selected backend, and capability reason outside the unchanged native result
+  metadata. The module performs neither transfer, conversion, synchronization,
+  lifecycle work, restoration, retry, nor rollback, and is absent from package
+  and top-level exports. It does not add implicit fallback to resident or direct
+  GPU boundaries. See [ADR-014](decisions/ADR-014-opt-in-cpu-fallback-boundary.md).
 
 ## Concrete GPU-Resident Session Boundary
 

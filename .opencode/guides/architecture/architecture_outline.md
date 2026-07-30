@@ -33,7 +33,9 @@ The exact downstream ordering remains
   dependency-neutral `scheduler` remains declaration-only, while E7-F5 P6 adds
   a bounded concrete resident complete-loop composer. E7-F7 transport and
   E7-F8 detailed RNG-stream policy remain deferred, along with implicit
-  transfer/synchronization, retry, fallback, and replacement of direct GPU APIs.
+  transfer/synchronization, retry, broad fallback, and replacement of direct GPU
+  APIs. The sole shipped fallback seam is the explicit, CPU-authoritative,
+  direct-import-only boundary described below.
 
 ### particula/execution/
 
@@ -55,9 +57,20 @@ The exact downstream ordering remains
   exact request; it selects no adapter and performs no execution, transfer,
   synchronization, allocation, or mutation. CPU recognizes only
   `Device(Backend.CPU, "cpu")`; Warp accepts every validated Warp declaration
-  for recognition and passes its opaque native string unchanged to its lazy
-  runtime device check. This module is not package- or top-level-exported. See
-  [ADR-013](decisions/ADR-013-pre-execution-availability-resolution.md).
+   for recognition and passes its opaque native string unchanged to its lazy
+   runtime device check. This module is not package- or top-level-exported. See
+   [ADR-013](decisions/ADR-013-pre-execution-availability-resolution.md).
+- `fallback.py` - Concrete, direct-import-only E7-F6 P3 opt-in CPU fallback
+  policy boundary. It defaults to re-raising the exact eligible typed
+  availability/support error and selects the already-registered canonical CPU
+  adapter only when callers explicitly choose CPU policy and attest to a
+  CPU-authoritative `PRE_UPLOAD` or `RESTORED` boundary. It accepts no resident,
+  uploaded, or mutated state; performs one CPU selection and one adapter dispatch
+  at most; and exposes requested backend, selected backend, and original reason
+  without changing native result metadata. It does not transfer, synchronize,
+  manage lifecycle, restore, retry, or roll back, and is not package- or
+  top-level-exported. See
+  [ADR-014](decisions/ADR-014-opt-in-cpu-fallback-boundary.md).
 - `Backend`, `Device`, `Process`, and `Capability` - Immutable typed metadata;
   `Device.native` is an opaque native identifier.
 - `CapabilityRequirements` and `CapabilityDeclaration` - Immutable exact

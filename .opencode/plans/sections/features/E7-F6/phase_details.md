@@ -23,11 +23,18 @@
   - Scope retained: no adapter selection, fallback, package/top-level export,
     transfer, synchronization, or execution-state mutation.
 
-- [ ] **E7-F6-P3:** Implement opt-in CPU fallback boundary with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Permit fallback only when explicitly requested and CPU state is authoritative or explicitly restored.
-  - Files: `particula/execution/fallback.py`, E7-F1 request/result/context modules
-  - Tests: Default rejection, pre-upload fallback, requested/selected backend metadata, resident-state rejection.
+- [x] **E7-F6-P3:** Implement opt-in CPU fallback boundary with unit tests
+  - Issue: #1502 | Size: S | Status: Implemented
+  - Goal: Provide a default-deny, direct-import-only CPU fallback boundary that
+    dispatches only for explicit eligible capability errors and exact
+    CPU-authoritative state at pre-upload or caller-asserted restored boundaries.
+  - Files: `particula/execution/fallback.py`,
+    `particula/execution/tests/fallback_test.py`,
+    `docs/Features/data-containers-and-gpu-foundations.md`
+  - Tests: All five eligible reasons, default identical re-raise, one lookup and
+    one dispatch, authority/boundary rejection before lookup, provenance
+    metadata with unchanged native metadata, import neutrality, and propagation
+    of adapter/result failures without retry or recovery.
 
 - [ ] **E7-F6-P4:** Freeze public exports and experimental API policy with tests
   - Issue: TBD | Size: S | Status: Not Started

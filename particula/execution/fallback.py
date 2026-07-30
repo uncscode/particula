@@ -29,9 +29,14 @@ from particula.execution.errors import (
 
 
 class FallbackPolicy(str, Enum):
-    """Declare whether an eligible capability error is re-raised or retried.
+    """Declare whether an eligible capability error is re-raised or dispatched.
 
-    Retrying occurs on CPU.
+    ``RAISE`` is default-deny and preserves the original error. ``CPU`` permits
+    one explicit CPU adapter dispatch; it does not retry failed dispatches.
+
+    Attributes:
+        RAISE: Re-raise the original eligible capability error.
+        CPU: Select and dispatch the canonical CPU adapter once.
     """
 
     RAISE = "raise"
@@ -39,14 +44,32 @@ class FallbackPolicy(str, Enum):
 
 
 class FallbackBoundary(str, Enum):
-    """Declare the caller-visible boundary at which fallback is requested."""
+    """Declare the caller-visible boundary for an explicit fallback request.
+
+    ``RESTORED`` is a caller assertion only. This module neither verifies nor
+    performs restoration.
+
+    Attributes:
+        PRE_UPLOAD: State is CPU-authoritative before any upload.
+        RESTORED: Caller asserts CPU-authoritative state was restored.
+    """
 
     PRE_UPLOAD = "pre_upload"
     RESTORED = "restored"
 
 
 class CPUStateAuthority(str, Enum):
-    """Declare the authority of supplied CPU state for a fallback request."""
+    """Declare the asserted authority of CPU state for a fallback request.
+
+    Only ``CPU_AUTHORITATIVE`` is accepted. The other values are closed
+    rejection states that prevent implicit movement or recovery.
+
+    Attributes:
+        CPU_AUTHORITATIVE: State is authoritative for CPU dispatch.
+        RESIDENT: State remains resident and is rejected.
+        UPLOADED: State has been uploaded and is rejected.
+        MUTATED: State was mutated outside the CPU authority boundary.
+    """
 
     CPU_AUTHORITATIVE = "cpu_authoritative"
     RESIDENT = "resident"
@@ -66,6 +89,9 @@ class FallbackRequest:
         policy: Default-deny or explicit CPU fallback policy.
         boundary: Caller-visible fallback boundary.
         state_authority: Caller assertion about CPU-state authority.
+
+    The carrier validates types only. It does not inspect opaque state payloads
+    or select an adapter.
     """
 
     original_request: ExecutionRequest
@@ -77,7 +103,11 @@ class FallbackRequest:
     state_authority: CPUStateAuthority = CPUStateAuthority.CPU_AUTHORITATIVE
 
     def __post_init__(self) -> None:
-        """Validate carrier types without selecting or reading payloads."""
+        """Validate carrier types without selecting or reading payloads.
+
+        Raises:
+            TypeError: If a carrier field or fallback enum has an invalid type.
+        """
         if not isinstance(self.original_request, ExecutionRequest):
             raise TypeError("original_request must be an ExecutionRequest.")
         if not isinstance(self.original_error, ExecutionCapabilityError):
@@ -98,7 +128,20 @@ class FallbackRequest:
 
 @dataclass(frozen=True, eq=False)
 class FallbackResolution:
-    """Retain the one CPU selection made for an eligible fallback request."""
+    """Retain the one CPU selection made for an eligible fallback request.
+
+    Attributes:
+        original_request: Identity-preserved non-CPU request.
+        cpu_request: Canonical CPU request used for the single lookup.
+        original_error: Identity-preserved eligible capability error.
+        cpu_state: Identity-preserved CPU state passed to the adapter.
+        adapter: Adapter returned by the single CPU lookup.
+        policy: Explicit policy authorizing this resolution.
+        boundary: Caller-visible CPU authority boundary.
+        requested_backend: Backend requested by the original request.
+        selected_backend: Canonical selected CPU backend.
+        capability_reason: Capability reason retained from the original error.
+    """
 
     original_request: ExecutionRequest
     cpu_request: ExecutionRequest
@@ -112,7 +155,13 @@ class FallbackResolution:
     capability_reason: ExecutionCapabilityReason
 
     def __post_init__(self) -> None:
-        """Validate resolution metadata without reselecting an adapter."""
+        """Validate resolution metadata without reselecting an adapter.
+
+        Raises:
+            TypeError: If a retained carrier or metadata field has an invalid
+                type.
+            ValueError: If CPU request or error provenance is inconsistent.
+        """
         if not isinstance(self.original_request, ExecutionRequest):
             raise TypeError("original_request must be an ExecutionRequest.")
         if not isinstance(self.cpu_request, ExecutionRequest):
@@ -134,14 +183,27 @@ class FallbackResolution:
 
 @dataclass(frozen=True, eq=False)
 class FallbackDispatchResult:
-    """Retain a native result and immutable fallback provenance by identity."""
+    """Retain a native result and immutable fallback provenance by identity.
+
+    Attributes:
+        resolution: Identity-preserved CPU fallback resolution.
+        result: Identity-preserved, validated native adapter result.
+        metadata: Ordered fallback provenance separate from native metadata.
+    """
 
     resolution: FallbackResolution
     result: ExecutionResult
     metadata: tuple[tuple[str, str], ...]
 
     def __post_init__(self) -> None:
-        """Validate exact fallback metadata without changing native metadata."""
+        """Validate exact fallback metadata without changing native metadata.
+
+        Raises:
+            TypeError: If a carrier, native result, or metadata tuple is
+                invalid.
+            ValueError: If native result validation or fallback metadata
+                validation fails.
+        """
         if type(self.resolution) is not FallbackResolution:
             raise TypeError("resolution must be a FallbackResolution.")
         if type(self.result) is not ExecutionResult:
@@ -166,7 +228,14 @@ _ELIGIBLE_REASONS = frozenset(
 
 
 def _is_static_execution_adapter(adapter: object) -> bool:
-    """Return whether an adapter statically exposes a callable execute seam."""
+    """Return whether an adapter statically exposes a callable execute seam.
+
+    Args:
+        adapter: Object proposed as an execution adapter.
+
+    Returns:
+        ``True`` when the object's static ``execute`` attribute is callable.
+    """
     execute = inspect.getattr_static(adapter, "execute", None)
     if isinstance(execute, classmethod):
         return callable(execute.__func__)
@@ -174,7 +243,15 @@ def _is_static_execution_adapter(adapter: object) -> bool:
 
 
 def _validate_resolution_request(resolution: FallbackResolution) -> None:
-    """Validate that a resolution retains canonical CPU request metadata."""
+    """Validate that a resolution retains canonical CPU request metadata.
+
+    Args:
+        resolution: Resolution whose request and backend fields are checked.
+
+    Raises:
+        TypeError: If a backend field has an invalid type.
+        ValueError: If CPU request metadata is not canonical or preserved.
+    """
     if not isinstance(resolution.selected_backend, Backend):
         raise TypeError("selected_backend must be a Backend.")
     if resolution.selected_backend is not Backend.CPU:
@@ -202,7 +279,15 @@ def _validate_resolution_request(resolution: FallbackResolution) -> None:
 
 
 def _validate_resolution_reason(resolution: FallbackResolution) -> None:
-    """Validate that resolution provenance retains its original error reason."""
+    """Validate that resolution provenance retains its original error reason.
+
+    Args:
+        resolution: Resolution whose capability reason is checked.
+
+    Raises:
+        TypeError: If the capability reason has an invalid type.
+        ValueError: If the reason differs from the original error reason.
+    """
     if not isinstance(resolution.capability_reason, ExecutionCapabilityReason):
         raise TypeError(
             "capability_reason must be an ExecutionCapabilityReason."
@@ -216,7 +301,16 @@ def _validate_fallback_enums(
     boundary: object,
     state_authority: object,
 ) -> None:
-    """Validate the closed fallback enum fields."""
+    """Validate the closed fallback enum fields.
+
+    Args:
+        policy: Proposed fallback policy.
+        boundary: Proposed caller-visible boundary.
+        state_authority: Proposed CPU-state authority assertion.
+
+    Raises:
+        TypeError: If any value is outside its corresponding fallback enum.
+    """
     if not isinstance(policy, FallbackPolicy):
         raise TypeError("policy must be a FallbackPolicy.")
     if not isinstance(boundary, FallbackBoundary):
@@ -231,7 +325,16 @@ def _disallow(
     state: str,
     boundary: str,
 ) -> FallbackDisallowedError:
-    """Create a deterministic disallowed error chained by the caller."""
+    """Create a deterministic disallowed error for an invalid fallback path.
+
+    Args:
+        fallback: Request whose original execution metadata is reported.
+        state: Deterministic state label describing the rejection.
+        boundary: Deterministic boundary label describing the rejection.
+
+    Returns:
+        Error for the caller to chain from the original capability error.
+    """
     request = fallback.original_request
     return FallbackDisallowedError(
         boundary,
@@ -244,7 +347,15 @@ def _disallow(
 
 
 def _validate_request_and_error(fallback: FallbackRequest) -> None:
-    """Revalidate forged request and error carriers before context selection."""
+    """Revalidate forged request and error carriers before context selection.
+
+    Args:
+        fallback: Exact fallback carrier to revalidate.
+
+    Raises:
+        TypeError: If a carrier or its closed fields have invalid types.
+        ValueError: If request backend and device backend differ.
+    """
     request = fallback.original_request
     error = fallback.original_error
     if not isinstance(request, ExecutionRequest):
@@ -258,7 +369,15 @@ def _validate_request_and_error(fallback: FallbackRequest) -> None:
 
 
 def _validate_request_fields(request: ExecutionRequest) -> None:
-    """Validate the original request's closed carrier fields."""
+    """Validate the original request's closed carrier fields.
+
+    Args:
+        request: Original execution request to validate.
+
+    Raises:
+        TypeError: If a closed request field has an invalid type.
+        ValueError: If request and device backend values differ.
+    """
     if not isinstance(request.backend, Backend):
         raise TypeError("original_request.backend must be a Backend.")
     if not isinstance(request.device, Device):
@@ -274,7 +393,14 @@ def _validate_request_fields(request: ExecutionRequest) -> None:
 
 
 def _validate_error_fields(error: ExecutionCapabilityError) -> None:
-    """Validate the original capability error's closed carrier fields."""
+    """Validate the original capability error's closed carrier fields.
+
+    Args:
+        error: Original typed capability error to validate.
+
+    Raises:
+        TypeError: If a reason or optional context field has an invalid type.
+    """
     if not isinstance(error.reason, ExecutionCapabilityReason):
         raise TypeError(
             "original_error.reason must be an ExecutionCapabilityReason."
@@ -293,7 +419,15 @@ def _validate_error_fields(error: ExecutionCapabilityError) -> None:
 
 
 def _validate_error_context(fallback: FallbackRequest) -> None:
-    """Require any supplied error context to describe the original request."""
+    """Require any supplied error context to describe the original request.
+
+    Args:
+        fallback: Request and original error whose contexts must agree.
+
+    Raises:
+        FallbackDisallowedError: If supplied error context is inconsistent or
+            asserts a state or boundary this selector cannot verify.
+    """
     request = fallback.original_request
     error = fallback.original_error
     expected = {
@@ -321,7 +455,15 @@ def _validate_error_context(fallback: FallbackRequest) -> None:
 def _fallback_metadata(
     resolution: FallbackResolution,
 ) -> tuple[tuple[str, str], ...]:
-    """Return ordered immutable fallback provenance without copying results."""
+    """Return ordered immutable fallback provenance without copying results.
+
+    Args:
+        resolution: Validated resolution supplying fallback provenance.
+
+    Returns:
+        Ordered requested-backend, selected-backend, and capability-reason
+        metadata pairs.
+    """
     return (
         ("requested_backend", resolution.requested_backend.value),
         ("selected_backend", resolution.selected_backend.value),
@@ -339,7 +481,11 @@ def resolve_cpu_fallback(fallback: FallbackRequest) -> FallbackResolution:
         Immutable resolution retaining the selected adapter by identity.
 
     Raises:
-        ExecutionCapabilityError: The original error for default-deny policy.
+        TypeError: If the carrier or its validated fields have invalid types.
+        ValueError: If CPU capability lookup rejects the canonical request.
+        LookupError: If no CPU adapter is registered for the canonical request.
+        ExecutionCapabilityError: The identical original error for default-deny
+            policy.
         FallbackDisallowedError: If fallback fails closed before selection.
     """
     if type(fallback) is not FallbackRequest:
@@ -406,7 +552,29 @@ def resolve_cpu_fallback(fallback: FallbackRequest) -> FallbackResolution:
 
 
 def dispatch_cpu_fallback(fallback: FallbackRequest) -> FallbackDispatchResult:
-    """Resolve and execute one CPU adapter without recovery or retry."""
+    """Resolve and execute one CPU adapter without recovery or retry.
+
+    The adapter's native result and metadata remain unchanged. Provenance is
+    available only on the returned fallback dispatch carrier.
+
+    Args:
+        fallback: Exact explicit fallback carrier to resolve and dispatch.
+
+    Returns:
+        Immutable carrier retaining the resolution, native result, and fallback
+        provenance by identity.
+
+    Raises:
+        TypeError: If fallback or the adapter's result violates a carrier type.
+        ValueError: If selection, result validation, or metadata validation
+            fails.
+        LookupError: If no canonical CPU adapter is registered.
+        ExecutionCapabilityError: The identical original error for default-deny
+            policy.
+        FallbackDisallowedError: If fallback fails closed before selection.
+
+    Adapter exceptions propagate unchanged after the single adapter invocation.
+    """
     resolution = resolve_cpu_fallback(fallback)
     native_result = resolution.adapter.execute(resolution.cpu_state)
     result = validate_execution_result(resolution.cpu_state, native_result)

@@ -4,27 +4,27 @@
 
 E7-F6 extends E7-F1's dependency-neutral execution context. Capability and
 availability resolution is read-only and occurs before adapter selection. A
-typed fallback policy defaults to `ERROR`; an explicit CPU option may select the
+typed fallback policy defaults to `RAISE`; an explicit CPU option may select the
 CPU adapter only while CPU state is authoritative. Runtime exceptions are never
 interpreted as capability misses.
 
 ```text
-ExecutionRequest(requested=gpu, fallback=ERROR|EXPLICIT_CPU)
+FallbackRequest(requested=gpu, policy=RAISE|CPU)
                          |
                          v
        capability + runtime/device availability preflight
                / supported             \ unavailable
               v                         v
-      select GPU adapter       policy is ERROR? -> typed error
+       select GPU adapter       policy is RAISE? -> original typed error
               |                         |
-              |             EXPLICIT_CPU + CPU state authoritative?
+               |              CPU + CPU state authoritative?
               |                    / yes          \ no
               |                   v                v
               |          select CPU adapter   fallback-boundary error
               +-------------------+
                                   v
-              ExecutionResult(requested_backend, selected_backend,
-                              fallback_reason, mutation metadata)
+               FallbackDispatchResult(requested_backend, selected_backend,
+                                      capability_reason, native result)
 
 After adapter invocation starts: propagate every failure; never retry.
 Resident GPU state: checkpoint/finalize explicitly before a new CPU request.
@@ -50,11 +50,18 @@ Resident GPU state: checkpoint/finalize explicitly before a new CPU request.
   Warp native identifiers remain opaque until its lazy runtime/device check.
   The resolver does not select adapters, transfer, synchronize, mutate, or
   launch work, and is not exported from package or top-level surfaces.
-- **Later data model:** Add a typed fallback policy and resolution metadata.
-  Extend E7-F1 request/result only as needed to retain requested versus selected
-  backend and fallback reason. Do not change scientific containers.
-- **API surface:** Export user-actionable errors and fallback policy from
-  `particula.execution` in P4 or later. Re-export only E7-F1-approved
+- **P3 fallback model (implemented):** Direct-only
+  `particula.execution.fallback` defines `FallbackPolicy`, `FallbackBoundary`,
+  `CPUStateAuthority`, and frozen identity-oriented request, resolution, and
+  dispatch carriers. `RAISE` re-raises the original eligible capability error;
+  `CPU` makes exactly one canonical CPU-context lookup and one adapter dispatch.
+  Only `UNKNOWN_DEVICE`, `RUNTIME_UNAVAILABLE`, `DEVICE_UNAVAILABLE`,
+  `PROCESS_UNSUPPORTED`, and `CAPABILITY_UNSUPPORTED` are eligible. The wrapper
+  records requested backend, selected CPU backend, and capability reason without
+  altering adapter-owned `ExecutionResult.metadata` or scientific containers.
+- **API surface:** P3 names remain direct-import-only; no package or top-level
+  exports changed. P4 may export only tested user-actionable errors and policy
+  types from `particula.execution`. Re-export only E7-F1-approved
   high-level execution names from `particula`; do not re-export concrete
   adapters, registries, sidecars, kernel configurations, or direct steps.
 - **Availability:** The implemented concrete resolver provides
@@ -63,8 +70,10 @@ Resident GPU state: checkpoint/finalize explicitly before a new CPU request.
   unsupported process/capability through typed errors; checks must not launch
   physics.
 - **Fallback boundary:** Explicit CPU fallback is selection, not exception
-  recovery. It occurs before upload/mutation or after explicit restore. It does
-  not call conversion/synchronization helpers itself.
+  recovery. P3 accepts only exact `CPUExecutionState` with asserted
+  `CPU_AUTHORITATIVE` authority at `PRE_UPLOAD` or caller-asserted `RESTORED`.
+  It performs no conversion, synchronization, checkpoint/finalize, restore,
+  retry, reclassification, or rollback.
 - **Stability:** High-level execution request/error/policy contracts are stable
   once shipped. Existing low-level `particula.gpu.*` APIs remain callable but
   are documented experimental until E7-F9 full-loop validation. Breaking

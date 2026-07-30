@@ -9,10 +9,13 @@
   `particula/execution/availability.py`.
 - [x] Validate provider recognition, structural declarations, runtime, device,
   then state in the documented deterministic order.
-- [ ] Add `FallbackPolicy` with fail-closed default and explicit CPU option.
-- [ ] Resolve explicit fallback only before upload/mutation or after caller-owned restore.
-- [ ] Record requested backend, selected backend, and fallback reason in resolution/result metadata.
-- [ ] Propagate exceptions raised after adapter invocation begins without retry.
+- [x] Add direct-only `FallbackPolicy` with default-deny `RAISE` and explicit
+  `CPU` option in `particula/execution/fallback.py`.
+- [x] Resolve explicit fallback only at CPU-authoritative `PRE_UPLOAD` or
+  caller-asserted `RESTORED` boundaries, without performing restoration.
+- [x] Record requested backend, selected backend, and capability reason in
+  fallback resolution/dispatch metadata without changing native result metadata.
+- [x] Propagate exceptions raised after adapter invocation begins without retry.
 
 ## Public API and Compatibility
 
@@ -29,7 +32,11 @@
   prove the direct taxonomy module remains neutral.
 - [x] Add co-located P2 availability contract tests in
   `particula/execution/tests/availability_test.py`, including subprocess import
-  neutrality and no execution-seam access.
+    neutrality and no execution-seam access.
+- [x] Add co-located P3 fallback contract tests in
+  `particula/execution/tests/fallback_test.py`, including default-deny identity
+  re-raise, accepted-reason selection, authority rejection, import neutrality,
+  metadata preservation, and no-retry failure propagation.
 - [ ] Add exact export allow/deny tests modeled on `kernel_exports_test.py`.
 - [ ] Add conversion, synchronization, adapter-call, and mutation spies for rejected requests.
 - [ ] Run focused tests, Ruff, mypy for the execution package, and `mkdocs build --strict`.
