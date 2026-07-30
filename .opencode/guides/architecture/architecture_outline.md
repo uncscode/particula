@@ -41,6 +41,11 @@ The exact downstream ordering remains
 - `__init__.py` - Dependency-neutral selection seam. It preserves the exact
   ten-name public selection export surface and does not import Warp, the GPU
   package, or concrete adapters.
+- `errors.py` - Direct-import-only, standard-library execution-capability error
+  taxonomy for future availability and fallback boundaries. Its closed reason
+  enum and structured exception hierarchy provide deterministic context without
+  provider/runtime imports, probing, resolution, fallback behavior, or package
+  and top-level exports.
 - `Backend`, `Device`, `Process`, and `Capability` - Immutable typed metadata;
   `Device.native` is an opaque native identifier.
 - `CapabilityRequirements` and `CapabilityDeclaration` - Immutable exact

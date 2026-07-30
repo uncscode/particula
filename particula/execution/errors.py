@@ -56,7 +56,20 @@ class ExecutionCapabilityError(Exception):
         state: str | None = None,
         fallback_boundary: str | None = None,
     ) -> None:
-        """Initialize the structured capability error."""
+        """Initialize the structured capability error.
+
+        Args:
+            reason: Stable reason code for the error.
+            backend: Optional execution backend context.
+            device: Optional execution device context.
+            process: Optional process context.
+            capability: Optional capability context.
+            state: Optional execution-state context.
+            fallback_boundary: Optional fallback-boundary context.
+
+        Raises:
+            TypeError: If a reason or context field has an unsupported type.
+        """
         if not isinstance(reason, ExecutionCapabilityReason):
             raise TypeError("reason must be an ExecutionCapabilityReason.")
 
@@ -82,7 +95,11 @@ class ExecutionCapabilityError(Exception):
         super().__init__(reason)
 
     def __str__(self) -> str:
-        """Render deterministic structured error context."""
+        """Render deterministic structured error context.
+
+        Returns:
+            Error class name, reason code, and ordered context fields.
+        """
         return (
             f"{type(self).__name__}(reason={self.reason.value}, "
             f"backend={self.backend!r}, device={self.device!r}, "
@@ -108,7 +125,11 @@ class UnknownBackendError(UnknownExecutionTargetError):
     """Report a backend identifier that is not recognized."""
 
     def __init__(self, backend: str) -> None:
-        """Initialize an unknown-backend error."""
+        """Initialize an unknown-backend error.
+
+        Args:
+            backend: Unrecognized execution backend identifier.
+        """
         super().__init__(
             ExecutionCapabilityReason.UNKNOWN_BACKEND,
             backend=backend,
@@ -119,7 +140,12 @@ class UnknownDeviceError(UnknownExecutionTargetError):
     """Report a device identifier that is not recognized."""
 
     def __init__(self, device: str, *, backend: str | None = None) -> None:
-        """Initialize an unknown-device error."""
+        """Initialize an unknown-device error.
+
+        Args:
+            device: Unrecognized execution device identifier.
+            backend: Optional execution backend context.
+        """
         super().__init__(
             ExecutionCapabilityReason.UNKNOWN_DEVICE,
             backend=backend,
@@ -131,7 +157,11 @@ class UnavailableRuntimeError(UnavailableExecutionTargetError):
     """Report an execution backend whose runtime is unavailable."""
 
     def __init__(self, backend: str) -> None:
-        """Initialize an unavailable-runtime error."""
+        """Initialize an unavailable-runtime error.
+
+        Args:
+            backend: Backend whose required runtime is unavailable.
+        """
         super().__init__(
             ExecutionCapabilityReason.RUNTIME_UNAVAILABLE,
             backend=backend,
@@ -142,7 +172,12 @@ class UnavailableDeviceError(UnavailableExecutionTargetError):
     """Report a device that is unavailable for execution."""
 
     def __init__(self, device: str, *, backend: str | None = None) -> None:
-        """Initialize an unavailable-device error."""
+        """Initialize an unavailable-device error.
+
+        Args:
+            device: Device that is unavailable for execution.
+            backend: Optional execution backend context.
+        """
         super().__init__(
             ExecutionCapabilityReason.DEVICE_UNAVAILABLE,
             backend=backend,
@@ -160,7 +195,13 @@ class UnsupportedProcessError(UnsupportedExecutionRequestError):
         backend: str | None = None,
         device: str | None = None,
     ) -> None:
-        """Initialize an unsupported-process error."""
+        """Initialize an unsupported-process error.
+
+        Args:
+            process: Execution process that is not supported.
+            backend: Optional execution backend context.
+            device: Optional execution device context.
+        """
         super().__init__(
             ExecutionCapabilityReason.PROCESS_UNSUPPORTED,
             backend=backend,
@@ -180,7 +221,14 @@ class UnsupportedCapabilityError(UnsupportedExecutionRequestError):
         device: str | None = None,
         process: str | None = None,
     ) -> None:
-        """Initialize an unsupported-capability error."""
+        """Initialize an unsupported-capability error.
+
+        Args:
+            capability: Execution capability that is not supported.
+            backend: Optional execution backend context.
+            device: Optional execution device context.
+            process: Optional process context.
+        """
         super().__init__(
             ExecutionCapabilityReason.CAPABILITY_UNSUPPORTED,
             backend=backend,
@@ -202,7 +250,15 @@ class InvalidExecutionStateError(ExecutionCapabilityError):
         process: str | None = None,
         capability: str | None = None,
     ) -> None:
-        """Initialize an invalid-execution-state error."""
+        """Initialize an invalid-execution-state error.
+
+        Args:
+            state: Execution state that is invalid for the request.
+            backend: Optional execution backend context.
+            device: Optional execution device context.
+            process: Optional process context.
+            capability: Optional capability context.
+        """
         super().__init__(
             ExecutionCapabilityReason.INVALID_STATE,
             backend=backend,
@@ -226,7 +282,16 @@ class FallbackDisallowedError(ExecutionCapabilityError):
         capability: str | None = None,
         state: str | None = None,
     ) -> None:
-        """Initialize a fallback-disallowed error."""
+        """Initialize a fallback-disallowed error.
+
+        Args:
+            fallback_boundary: Boundary that disallows the fallback request.
+            backend: Optional execution backend context.
+            device: Optional execution device context.
+            process: Optional process context.
+            capability: Optional capability context.
+            state: Optional execution-state context.
+        """
         super().__init__(
             ExecutionCapabilityReason.FALLBACK_DISALLOWED,
             backend=backend,

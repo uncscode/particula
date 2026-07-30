@@ -1,5 +1,12 @@
 # Documentation Updates
 
+## P1 Status
+
+Issue #1500 intentionally made no user-documentation changes. The P1 taxonomy
+is direct-import-only and has no package or top-level export; public imports,
+availability behavior, fallback examples, and stability documentation remain
+P4--P6 work.
+
 - Create or update `docs/Features/backend_selection.md` with the public imports,
   exception taxonomy, availability decision table, and fallback examples.
 - Update `docs/Features/Roadmap/data-oriented-gpu.md` Track T6 status and retain

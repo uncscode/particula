@@ -16,6 +16,14 @@ only before mutation or at an explicit restore boundary. It also freezes a
 narrow public execution surface while marking low-level `particula.gpu.*` APIs
 experimental until backend selection and full-loop validation are complete.
 
+## Implementation Status
+
+E7-F6-P1 was implemented for issue #1500 in commit `d1a000769`. It provides a
+dependency-neutral, direct-import-only capability-error taxonomy in
+`particula/execution/errors.py` with co-located contract tests. Availability
+resolution, fallback selection, package exports, and user documentation remain
+deferred to later phases.
+
 ## User Stories
 
 - As a simulation author, I want unsupported GPU requests to fail with a clear,

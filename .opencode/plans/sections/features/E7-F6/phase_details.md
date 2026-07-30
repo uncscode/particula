@@ -1,10 +1,14 @@
 # Phase Details
 
-- [ ] **E7-F6-P1:** Define execution capability error taxonomy with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add stable typed exceptions with deterministic messages and structured context.
+- [x] **E7-F6-P1:** Define execution capability error taxonomy with unit tests
+  - Issue: #1500 | Size: S | Status: Implemented (`d1a000769`)
+  - Goal: Added stable typed exceptions with deterministic messages and structured context.
   - Files: `particula/execution/errors.py`, `particula/execution/tests/errors_test.py`
-  - Tests: Inheritance, fields, messages, and no optional-Warp imports.
+  - Tests: Exact direct-module exports/reason codes, root and concrete fields,
+    hierarchy, deterministic messages, invalid types, chaining, and subprocess
+    import neutrality with Warp and `particula.gpu` blocked.
+  - Scope retained: no package/top-level exports, availability resolution,
+    fallback selection, GPU behavior, or user documentation changed.
 
 - [ ] **E7-F6-P2:** Resolve backend availability before execution with unit tests
   - Issue: TBD | Size: S | Status: Not Started

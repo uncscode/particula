@@ -7,8 +7,14 @@ cleanly when unavailable.
 
 ## Per-Phase Coverage
 
-- **P1:** `particula/execution/tests/errors_test.py` checks hierarchy, reason
-  fields, deterministic messages, exception chaining, and import independence.
+- **P1 (implemented, issue #1500):**
+  `particula/execution/tests/errors_test.py` locks down the exact direct-module
+  `__all__` and eight reason codes; root construction; category hierarchy; each
+  concrete error's fixed reason, omitted/complete fields, and exact rendering;
+  invalid types; ordinary exception chaining; and a subprocess import with
+  Warp and `particula.gpu` imports blocked. The focused module coverage command
+  is `pytest particula/execution/tests/errors_test.py -q -Werror
+  --cov=particula.execution.errors --cov-report=term-missing`.
 - **P2:** Availability/context tests cover missing Warp, unavailable CUDA,
   unknown device, unsupported process/capability, supported CPU, and exact
   validation order. Fakes replace hardware dependence; no kernel is launched.

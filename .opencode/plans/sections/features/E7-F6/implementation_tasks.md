@@ -2,7 +2,7 @@
 
 ## Execution Layer
 
-- [ ] Add the typed hierarchy and stable reason fields in `particula/execution/errors.py`.
+- [x] Add the typed hierarchy and stable reason fields in `particula/execution/errors.py`.
 - [ ] Map E7-F1 matrix failures to unsupported-backend/process/capability errors without string parsing.
 - [ ] Add a lazy availability-provider protocol and CPU/GPU providers in `particula/execution/availability.py`.
 - [ ] Validate backend, device, process, capability, runtime, then state in a documented deterministic order.
@@ -20,8 +20,10 @@
 
 ## Tooling / Tests
 
-- [ ] Add co-located unit tests in `particula/execution/tests/` for every error and policy branch.
-- [ ] Add subprocess import tests with Warp blocked to prove neutral imports remain usable.
+- [x] Add co-located P1 unit tests in `particula/execution/tests/errors_test.py`
+  for the root, all concrete errors, hierarchy, exact rendering, and invalid types.
+- [x] Add a P1 subprocess import test with Warp and `particula.gpu` blocked to
+  prove the direct taxonomy module remains neutral.
 - [ ] Add exact export allow/deny tests modeled on `kernel_exports_test.py`.
 - [ ] Add conversion, synchronization, adapter-call, and mutation spies for rejected requests.
 - [ ] Run focused tests, Ruff, mypy for the execution package, and `mkdocs build --strict`.

@@ -32,14 +32,21 @@ Resident GPU state: checkpoint/finalize explicitly before a new CPU request.
 
 ## Data / API / Workflow Changes
 
-- **Data model:** Add a small exception hierarchy rooted at an execution error,
-  a typed fallback policy, availability/capability reason codes, and resolution
-  metadata. Extend E7-F1 request/result only as needed to retain requested versus
-  selected backend and fallback reason. Do not change scientific containers.
+- **P1 data model (implemented):**
+  `particula.execution.errors` directly defines a standard-library-only
+  `ExecutionCapabilityReason` enum, `ExecutionCapabilityError`, three category
+  bases, and eight concrete fixed-reason errors. The root stores typed optional
+  string context for backend, device, process, capability, state, and fallback
+  boundary; deterministic rendering does not inspect exception chaining.
+  The module is deliberately not exported from `particula.execution` or the
+  top-level package.
+- **Later data model:** Add a typed fallback policy and resolution metadata.
+  Extend E7-F1 request/result only as needed to retain requested versus selected
+  backend and fallback reason. Do not change scientific containers.
 - **API surface:** Export user-actionable errors and fallback policy from
-  `particula.execution`. Re-export only E7-F1-approved high-level execution
-  names from `particula`; do not re-export concrete adapters, registries,
-  sidecars, kernel configurations, or direct steps.
+  `particula.execution` in P4 or later. Re-export only E7-F1-approved
+  high-level execution names from `particula`; do not re-export concrete
+  adapters, registries, sidecars, kernel configurations, or direct steps.
 - **Availability:** CPU availability is dependency-neutral. GPU availability is
   provided lazily by the GPU integration layer and distinguishes missing Warp,
   unavailable device, and unsupported process. Checks must not launch physics.
