@@ -3,9 +3,12 @@
 ## Execution Layer
 
 - [x] Add the typed hierarchy and stable reason fields in `particula/execution/errors.py`.
-- [ ] Map E7-F1 matrix failures to unsupported-backend/process/capability errors without string parsing.
-- [ ] Add a lazy availability-provider protocol and CPU/GPU providers in `particula/execution/availability.py`.
-- [ ] Validate backend, device, process, capability, runtime, then state in a documented deterministic order.
+- [x] Map E7-F1 matrix failures to unsupported process/capability errors without
+  string parsing in the concrete availability resolver.
+- [x] Add a lazy availability-provider protocol and CPU/Warp providers in
+  `particula/execution/availability.py`.
+- [x] Validate provider recognition, structural declarations, runtime, device,
+  then state in the documented deterministic order.
 - [ ] Add `FallbackPolicy` with fail-closed default and explicit CPU option.
 - [ ] Resolve explicit fallback only before upload/mutation or after caller-owned restore.
 - [ ] Record requested backend, selected backend, and fallback reason in resolution/result metadata.
@@ -24,6 +27,9 @@
   for the root, all concrete errors, hierarchy, exact rendering, and invalid types.
 - [x] Add a P1 subprocess import test with Warp and `particula.gpu` blocked to
   prove the direct taxonomy module remains neutral.
+- [x] Add co-located P2 availability contract tests in
+  `particula/execution/tests/availability_test.py`, including subprocess import
+  neutrality and no execution-seam access.
 - [ ] Add exact export allow/deny tests modeled on `kernel_exports_test.py`.
 - [ ] Add conversion, synchronization, adapter-call, and mutation spies for rejected requests.
 - [ ] Run focused tests, Ruff, mypy for the execution package, and `mkdocs build --strict`.

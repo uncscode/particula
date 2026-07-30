@@ -23,6 +23,19 @@
   fallback. In particular, generic `ExecutionAdapter` argument, result, state,
   mutation, and runtime-error semantics are not public. P3/P4 state, result,
   mutation, and concrete CPU execution-adapter types remain direct-module-only.
+- `particula.execution.availability` is the separate concrete, direct-import-only
+  E7-F6 P2 availability boundary. Its `resolve_availability()` first validates
+  an exact CPU/Warp provider registry without optional-runtime work, then
+  short-circuits in this order: pure recognition, structural process
+  declaration, exact capability declaration, lazy runtime status, runtime
+  device status, and request-associated state validation. The frozen decision
+  retains only the exact P1 request. It does not select an adapter or own a
+  runtime handle, device object, execution payload, or state; it never
+  executes, transfers, synchronizes, allocates, or mutates. CPU recognizes only
+  `Device(Backend.CPU, "cpu")`; Warp native strings are opaque and are passed
+  unchanged to the lazy runtime device check. This concrete module remains
+  absent from package and top-level exports. See
+  [ADR-013](decisions/ADR-013-pre-execution-availability-resolution.md).
 - Strategy physics, builder configuration, and existing CPU `RunnableABC`
   behavior are separate from E7-F1 typed selection and downstream process
   adapter/session layers. E7-F4 P1--P7 ships the concrete lifecycle described

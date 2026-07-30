@@ -20,9 +20,15 @@ experimental until backend selection and full-loop validation are complete.
 
 E7-F6-P1 was implemented for issue #1500 in commit `d1a000769`. It provides a
 dependency-neutral, direct-import-only capability-error taxonomy in
-`particula/execution/errors.py` with co-located contract tests. Availability
-resolution, fallback selection, package exports, and user documentation remain
-deferred to later phases.
+`particula/execution/errors.py` with co-located contract tests.
+
+E7-F6-P2 was implemented for issue #1501. The concrete, direct-import-only
+`particula.execution.availability` resolver validates valid E7-F1 request and
+matrix metadata fail-closed in recognition, declarations, runtime, device, and
+state order. It returns a frozen request-only decision, keeps Warp native
+identifiers opaque with lazy optional runtime import, and remains unexported.
+Co-located tests cover its contract. Fallback selection, package exports, and
+user documentation remain deferred.
 
 ## User Stories
 

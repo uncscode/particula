@@ -46,6 +46,18 @@ The exact downstream ordering remains
   enum and structured exception hierarchy provide deterministic context without
   provider/runtime imports, probing, resolution, fallback behavior, or package
   and top-level exports.
+- `availability.py` - Concrete, direct-import-only E7-F6 P2 availability
+  resolver. `resolve_availability()` consumes already-validated P1 request and
+  capability metadata, first fail-closes an exact CPU/Warp provider registry,
+  then short-circuits through device recognition, structural process and exact
+  capability declarations, lazy runtime status, device status, and injected
+  request-associated state validation. Its frozen decision retains only the
+  exact request; it selects no adapter and performs no execution, transfer,
+  synchronization, allocation, or mutation. CPU recognizes only
+  `Device(Backend.CPU, "cpu")`; Warp accepts every validated Warp declaration
+  for recognition and passes its opaque native string unchanged to its lazy
+  runtime device check. This module is not package- or top-level-exported. See
+  [ADR-013](decisions/ADR-013-pre-execution-availability-resolution.md).
 - `Backend`, `Device`, `Process`, and `Capability` - Immutable typed metadata;
   `Device.native` is an opaque native identifier.
 - `CapabilityRequirements` and `CapabilityDeclaration` - Immutable exact

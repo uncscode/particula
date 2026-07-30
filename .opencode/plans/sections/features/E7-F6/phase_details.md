@@ -10,11 +10,18 @@
   - Scope retained: no package/top-level exports, availability resolution,
     fallback selection, GPU behavior, or user documentation changed.
 
-- [ ] **E7-F6-P2:** Resolve backend availability before execution with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Resolve runtime, device, process, and capability support before adapter mutation.
-  - Files: `particula/execution/availability.py`, E7-F1 context/capability modules
-  - Tests: Missing Warp, unavailable CUDA, unknown device, unsupported process, validation order.
+- [x] **E7-F6-P2:** Resolve backend availability before execution with unit tests
+  - Issue: #1501 | Size: S | Status: Implemented
+  - Goal: Resolve valid P1 request/matrix metadata fail-closed before adapter
+    mutation in recognition, declarations, runtime, device, and state order.
+  - Files: `particula/execution/availability.py`,
+    `particula/execution/tests/availability_test.py`
+  - Tests: Dependency-free provider/import fakes cover canonical CPU,
+    opaque-native lazy Warp, typed failure mapping, malformed injected seams,
+    exact short-circuit ordering, immutable request-only decisions, and no
+    adapter/transfer/synchronization/mutation/launch access.
+  - Scope retained: no adapter selection, fallback, package/top-level export,
+    transfer, synchronization, or execution-state mutation.
 
 - [ ] **E7-F6-P3:** Implement opt-in CPU fallback boundary with unit tests
   - Issue: TBD | Size: S | Status: Not Started

@@ -1,8 +1,9 @@
-"""Resolve concrete execution availability without selecting execution work.
+"""Resolve declared execution availability without selecting execution work.
 
-This direct-import-only boundary validates declared request metadata, capability
-support, optional runtime availability, and request-associated state in a fixed
-order.  It does not select adapters, allocate data, or invoke execution.
+This concrete, direct-import-only boundary validates P1 request metadata,
+capability declarations, optional runtime and device status, and
+request-associated state in a fixed order. It neither selects adapters nor
+allocates, transfers, synchronizes, mutates, or executes work.
 """
 
 import importlib
@@ -27,16 +28,38 @@ from particula.execution.errors import (
 
 
 class AvailabilityProvider(Protocol):
-    """Describe pure and lazy availability checks for one backend."""
+    """Describe pure recognition and lazy status checks for one backend.
+
+    Implementations must not execute work. Runtime and device checks run only
+    after the resolver has accepted the request declaration and capabilities.
+    """
 
     def recognizes(self, device: Device) -> bool:
-        """Return whether the declared device is structurally recognized."""
+        """Return whether a declared device is structurally recognized.
+
+        Args:
+            device: Validated device declaration to recognize without probing.
+
+        Returns:
+            ``True`` when the provider recognizes the declaration.
+        """
 
     def runtime_available(self) -> bool:
-        """Return whether the optional backend runtime is available."""
+        """Return whether the optional backend runtime is available.
+
+        Returns:
+            ``True`` when the backend runtime is available for device checking.
+        """
 
     def device_available(self, device: Device) -> bool:
-        """Return whether a recognized runtime device is available."""
+        """Return whether a recognized device is available at runtime.
+
+        Args:
+            device: Structurally recognized device declaration to check.
+
+        Returns:
+            ``True`` when the runtime can resolve the declared device.
+        """
 
 
 StateValidator = Callable[[ExecutionRequest], bool]
@@ -44,37 +67,75 @@ StateValidator = Callable[[ExecutionRequest], bool]
 
 @dataclass(frozen=True)
 class AvailabilityDecision:
-    """Record an availability-validated request without runtime state."""
+    """Record an availability-validated request without runtime ownership.
+
+    Attributes:
+        request: The exact validated request retained by identity. This record
+            owns no adapter, runtime handle, device object, or execution state.
+    """
 
     request: ExecutionRequest
 
 
 class _CPUAvailabilityProvider:
-    """Provide availability checks for the one canonical CPU device."""
+    """Provide no-probe availability checks for the canonical CPU device."""
 
     def recognizes(self, device: Device) -> bool:
-        """Return whether the device is the canonical CPU declaration."""
+        """Return whether the device is the canonical CPU declaration.
+
+        Args:
+            device: Validated device declaration to compare.
+
+        Returns:
+            ``True`` only for ``Device(Backend.CPU, "cpu")``.
+        """
         return device == Device(Backend.CPU, "cpu")
 
     def runtime_available(self) -> bool:
-        """Return CPU runtime availability without probing hardware."""
+        """Return CPU runtime availability without probing hardware.
+
+        Returns:
+            ``True``, because the CPU provider has no optional runtime.
+        """
         return True
 
     def device_available(self, device: Device) -> bool:
-        """Return CPU device availability without probing hardware."""
+        """Return CPU device availability without probing hardware.
+
+        Args:
+            device: Recognized canonical CPU declaration, unused by this check.
+
+        Returns:
+            ``True`` without inspecting hardware.
+        """
         del device
         return True
 
 
 class _WarpAvailabilityProvider:
-    """Provide lazy runtime and device checks for opaque Warp devices."""
+    """Provide lazy runtime and device checks for opaque Warp devices.
+
+    Native identifiers are passed unchanged to Warp after lazy runtime loading;
+    this provider neither parses nor normalizes them.
+    """
 
     def recognizes(self, device: Device) -> bool:
-        """Return whether the device declares the Warp backend."""
+        """Return whether the device declares the Warp backend.
+
+        Args:
+            device: Validated device declaration with an opaque native value.
+
+        Returns:
+            ``True`` when the declaration uses ``Backend.WARP``.
+        """
         return device.backend is Backend.WARP
 
     def runtime_available(self) -> bool:
-        """Return whether Warp can be imported without retaining its module."""
+        """Return whether Warp can be imported lazily.
+
+        Returns:
+            ``True`` when the optional Warp runtime imports successfully.
+        """
         try:
             importlib.import_module("warp")
         except ImportError:
@@ -82,7 +143,14 @@ class _WarpAvailabilityProvider:
         return True
 
     def device_available(self, device: Device) -> bool:
-        """Return whether Warp resolves the opaque native device identifier."""
+        """Return whether Warp resolves the opaque native device identifier.
+
+        Args:
+            device: Recognized Warp declaration whose native value is opaque.
+
+        Returns:
+            ``True`` when Warp resolves the original native identifier.
+        """
         try:
             runtime = importlib.import_module("warp")
             runtime.get_device(device.native)
@@ -98,12 +166,27 @@ _DEFAULT_PROVIDERS: Mapping[Backend, AvailabilityProvider] = {
 
 
 def _always_valid(_: ExecutionRequest) -> bool:
-    """Return the default successful request-associated state validation."""
+    """Return the default successful request-associated state validation.
+
+    Args:
+        _: Validated request intentionally ignored by the default validator.
+
+    Returns:
+        ``True`` for every valid request.
+    """
     return True
 
 
 def _context(request: ExecutionRequest) -> dict[str, str]:
-    """Return shared structured error context for a valid request."""
+    """Build structured error context from a validated request.
+
+    Args:
+        request: Validated request supplying backend, device, process, and
+            capability metadata.
+
+    Returns:
+        Error-context fields for availability failures.
+    """
     return {
         "backend": request.backend.value,
         "device": request.device.native,
@@ -116,7 +199,19 @@ def _validate_providers(
     providers: object,
     request: ExecutionRequest,
 ) -> AvailabilityProvider:
-    """Return the selected provider after fail-closed registry validation."""
+    """Return a selected provider after fail-closed registry validation.
+
+    Args:
+        providers: Candidate registry expected to contain exactly CPU and Warp
+            providers with callable availability methods.
+        request: Validated request selecting one provider.
+
+    Returns:
+        The validated provider for the request backend.
+
+    Raises:
+        UnavailableRuntimeError: If the registry is malformed or inaccessible.
+    """
     if not isinstance(providers, Mapping):
         raise UnavailableRuntimeError(request.backend.value)
     try:
@@ -153,7 +248,20 @@ def _provider_result(
     error_factory: Callable[[], Exception],
     *args: object,
 ) -> bool:
-    """Call one provider phase and map exceptions or malformed results."""
+    """Call a provider phase and map exceptions or malformed results.
+
+    Args:
+        method: Provider status method for one availability phase.
+        error_factory: Creates the typed error for a failed phase.
+        *args: Positional arguments forwarded to ``method``.
+
+    Returns:
+        The validated boolean status returned by ``method``.
+
+    Raises:
+        Exception: The phase-specific error when the method raises or returns
+            a value other than an exact boolean.
+    """
     try:
         result = method(*args)
     except Exception as error:
@@ -172,6 +280,10 @@ def resolve_availability(
 ) -> AvailabilityDecision:
     """Resolve availability in declaration, runtime, device, and state order.
 
+    The resolver is pre-execution only. It validates a provider registry before
+    provider calls, then short-circuits through recognition, capability
+    declarations, runtime status, device status, and request-associated state.
+
     Args:
         request: Validated P1 request declaration.
         matrix: Capability declarations applicable to the exact device.
@@ -183,7 +295,12 @@ def resolve_availability(
 
     Raises:
         TypeError: If a P1 carrier has an invalid type.
-        ExecutionCapabilityError: If any availability phase fails.
+        UnknownDeviceError: If the selected provider rejects the device.
+        UnsupportedProcessError: If no declaration matches the device/process.
+        UnsupportedCapabilityError: If no declaration satisfies requirements.
+        UnavailableRuntimeError: If a registry or runtime is unavailable.
+        UnavailableDeviceError: If the runtime cannot resolve the device.
+        InvalidExecutionStateError: If request-associated state is invalid.
     """
     if not isinstance(request, ExecutionRequest):
         raise TypeError("request must be an ExecutionRequest.")

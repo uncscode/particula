@@ -1,7 +1,7 @@
 # Architecture Reference
 
 **Project:** particula  
-**Last Updated:** 2026-07-29
+**Last Updated:** 2026-07-30
 
 This reference summarizes the particula package structure and key architectural
 conventions migrated from the legacy guide set.
@@ -34,6 +34,20 @@ particula/
 `particula.execution` is a package. Its supported selection surface remains
 the existing exact ten-name public export list; do not promote adapter modules
 or state carriers through it or through top-level `particula`.
+
+`particula.execution.availability` is the concrete, direct-import-only P2
+pre-execution resolver. `resolve_availability()` consumes already-valid P1
+request and capability metadata, validates an exact complete CPU/Warp provider
+registry before provider calls, and short-circuits through recognition,
+structural process declaration, exact capability declaration, lazy runtime
+status, device status, and request-associated state validation. Its immutable
+decision retains only the exact request; it neither selects an adapter nor
+executes, transfers, synchronizes, allocates, or mutates state. CPU recognizes
+only canonical `Device(Backend.CPU, "cpu")`; Warp recognizes validated Warp
+metadata without parsing or normalizing its native string, which remains opaque
+until the lazy runtime device check. This boundary remains absent from
+`particula.execution` and top-level exports. See
+[ADR-013](architecture/decisions/ADR-013-pre-execution-availability-resolution.md).
 
 `particula.execution.adapters.condensation` contains concrete-only P2
 condensation state carriers and shipped P3/P4 selected CPU/Warp adapters. The

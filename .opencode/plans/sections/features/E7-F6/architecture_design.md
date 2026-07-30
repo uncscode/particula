@@ -40,6 +40,16 @@ Resident GPU state: checkpoint/finalize explicitly before a new CPU request.
   boundary; deterministic rendering does not inspect exception chaining.
   The module is deliberately not exported from `particula.execution` or the
   top-level package.
+- **P2 availability model (implemented):**
+  `particula.execution.availability` directly defines the concrete-only
+  availability-provider/state-validator seams and a frozen
+  `AvailabilityDecision` retaining the original `ExecutionRequest` by identity.
+  Its resolver validates injected provider registries before provider work, then
+  orders recognition, structural declarations, lazy runtime, device, and state
+  validation. CPU recognizes only the canonical CPU device without probing;
+  Warp native identifiers remain opaque until its lazy runtime/device check.
+  The resolver does not select adapters, transfer, synchronize, mutate, or
+  launch work, and is not exported from package or top-level surfaces.
 - **Later data model:** Add a typed fallback policy and resolution metadata.
   Extend E7-F1 request/result only as needed to retain requested versus selected
   backend and fallback reason. Do not change scientific containers.
@@ -47,9 +57,11 @@ Resident GPU state: checkpoint/finalize explicitly before a new CPU request.
   `particula.execution` in P4 or later. Re-export only E7-F1-approved
   high-level execution names from `particula`; do not re-export concrete
   adapters, registries, sidecars, kernel configurations, or direct steps.
-- **Availability:** CPU availability is dependency-neutral. GPU availability is
-  provided lazily by the GPU integration layer and distinguishes missing Warp,
-  unavailable device, and unsupported process. Checks must not launch physics.
+- **Availability:** The implemented concrete resolver provides
+  dependency-neutral CPU availability and lazy Warp runtime/device checks. It
+  distinguishes unknown device, missing runtime, unavailable device, and
+  unsupported process/capability through typed errors; checks must not launch
+  physics.
 - **Fallback boundary:** Explicit CPU fallback is selection, not exception
   recovery. It occurs before upload/mutation or after explicit restore. It does
   not call conversion/synchronization helpers itself.

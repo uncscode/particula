@@ -14,3 +14,4 @@
 | [ADR-010](ADR-010-resident-state-update-boundary.md) | Resident State Update Boundary | Accepted | 2026-07-29 |
 | [ADR-011](ADR-011-resident-thermodynamic-freshness-coordinator.md) | Resident Thermodynamic Freshness Coordinator | Accepted | 2026-07-29 |
 | [ADR-012](ADR-012-resident-complete-loop-and-diagnostics.md) | Resident Complete Loop and Closed Diagnostics | Accepted | 2026-07-29 |
+| [ADR-013](ADR-013-pre-execution-availability-resolution.md) | Pre-Execution Availability Resolution | Accepted | 2026-07-30 |

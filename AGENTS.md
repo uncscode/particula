@@ -906,6 +906,17 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 
 ### GPU-resident session lifecycle
 
+- `particula.execution.availability` is a concrete direct-import-only P2
+  pre-execution resolver, not a package or top-level API. It accepts already
+  validated P1 `ExecutionRequest`/`CapabilityMatrix` metadata and returns an
+  immutable request-only decision after recognition, structural capability,
+  lazy runtime, device, and request-associated state checks. It does not select
+  adapters, invoke execution, transfer, synchronize, or mutate state.
+- The default CPU provider recognizes only `Device(Backend.CPU, "cpu")` without
+  probing. Default Warp recognition preserves each validated native string as
+  opaque; lazy runtime/device checks decide availability without parsing or
+  normalizing it. Provider registries must contain exactly usable CPU and Warp
+  providers before any optional runtime work.
 - Import concrete resident seams directly: setup/session/guard from
   `particula.execution.gpu_session`, the registry from
   `particula.execution.gpu_resources`, and records/controller/restart from
@@ -1080,6 +1091,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2026-07-29  
+**Last Updated:** 2026-07-30  
 **For questions about ADW:** See `.opencode/guides/README.md`  
 **For questions about particula:** See main `readme.md`

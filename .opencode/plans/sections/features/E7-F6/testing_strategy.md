@@ -15,9 +15,14 @@ cleanly when unavailable.
   Warp and `particula.gpu` imports blocked. The focused module coverage command
   is `pytest particula/execution/tests/errors_test.py -q -Werror
   --cov=particula.execution.errors --cov-report=term-missing`.
-- **P2:** Availability/context tests cover missing Warp, unavailable CUDA,
-  unknown device, unsupported process/capability, supported CPU, and exact
-  validation order. Fakes replace hardware dependence; no kernel is launched.
+- **P2 (implemented, issue #1501):**
+  `particula/execution/tests/availability_test.py` covers canonical CPU and
+  injected-provider success, frozen request identity, opaque lazy Warp native
+  identifiers, missing runtime, unavailable/unknown device, unsupported
+  process/capability, malformed registries and status results, exception
+  mappings, state validation, and exact short-circuit order. Local fakes and a
+  subprocess import guard keep the suite independent of Warp/CUDA and verify no
+  adapter, transfer, synchronization, mutation, or kernel-launch seam is used.
 - **P3:** Fallback tests cover default rejection, explicit pre-upload CPU
   selection, absent CPU state, active resident state, explicit-restored state,
   and requested/selected/reason result metadata.
