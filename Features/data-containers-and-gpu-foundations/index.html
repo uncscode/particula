@@ -4200,6 +4200,20 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -4308,6 +4322,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../API/particula/execution/diagnostics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.diagnostics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../API/particula/execution/gpu_resources/" class="md-nav__link">
         
   
@@ -4363,6 +4405,174 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../API/particula/execution/process_adapters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.process_adapters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/execution/process_graph/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.process_graph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/execution/resident_scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_scheduler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/execution/scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.scheduler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/execution/state_updates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.state_updates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/execution/thermodynamic_updates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.thermodynamic_updates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -4383,10 +4593,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_12" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_5" id="__nav_2_3_19_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_12" id="__nav_2_3_19_12_label" tabindex="0">
             
   
   
@@ -4404,8 +4614,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_5">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -12253,6 +12463,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#gpu-resident-deterministic-timestep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU-resident deterministic timestep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#complete-direct-process-illustration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -15789,6 +16010,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#gpu-resident-deterministic-timestep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU-resident deterministic timestep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#complete-direct-process-illustration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -16297,9 +16529,72 @@ fresh session, registry, guard, containers, primary arrays, and sidecars. It
 does not select or migrate a device, provide fallback, or guarantee rollback
 after an asynchronous writer launches. See
 <a href="../gpu_resident_checkpoints/">GPU resident checkpoints</a>.</p>
+<h3 id="gpu-resident-deterministic-timestep">GPU-resident deterministic timestep<a class="headerlink" href="#gpu-resident-deterministic-timestep" title="Permanent link">&para;</a></h3>
+<p><code>particula.execution.resident_scheduler</code> and
+<code>particula.execution.diagnostics</code> are concrete-only direct-import seams. They
+are not exported by <code>particula.execution</code> or the top-level package. The
+scheduler accepts one identity-bound active session, pinned registry, closed
+guard, and resolver-produced complete schedule; direct adapters retain the
+resident objects by identity. Diagnostics is a closed two-snapshot protocol,
+not a callback API: it copies only to separate caller-owned outputs and supplies
+no implicit host inspection or transfer.</p>
+<p>The closed schedule contains exactly these node IDs:</p>
+<p><code>environment_update</code>, <code>gas_update</code>, <code>vapor_pressure_refresh</code>,
+<code>saturation_refresh</code>, <code>condensation</code>, <code>brownian_coagulation</code>, <code>dilution</code>,
+<code>wall_loss</code>, <code>nucleation</code>, and <code>diagnostics</code>.</p>
+<p>Its displayed order is resolver-produced and profile/graph-dependent, not a
+universal static order. Authoritative process dependencies come from the
+resolved graph; virtual freshness edges are <code>environment_update -&gt;
+vapor_pressure_refresh</code>, <code>environment_update -&gt; saturation_refresh</code>,
+<code>gas_update -&gt; saturation_refresh</code>, <code>vapor_pressure_refresh -&gt;
+saturation_refresh</code>, and <code>saturation_refresh -&gt; {condensation, diagnostics}</code>.
+The <code>SchedulerProfile</code> selects exactly one reviewed edge:
+<code>condensation -&gt; nucleation</code> or <code>nucleation -&gt; condensation</code>; the latter also
+requires nucleation before the saturation-refresh consumer window.</p>
+<table>
+<thead>
+<tr>
+<th>Resident responsibility</th>
+<th>Authority and boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Environment and gas updates</td>
+<td>Prescribed identity-preserving resident updates</td>
+</tr>
+<tr>
+<td>Vapor pressure and saturation</td>
+<td>Derived virtual freshness state</td>
+</tr>
+<tr>
+<td>Condensation, Brownian coagulation, dilution, wall loss, nucleation</td>
+<td>Direct resident adapters over the resolved process nodes</td>
+</tr>
+<tr>
+<td>Gas-concentration and saturation-ratio diagnostics</td>
+<td>Closed snapshots to separate caller-owned outputs</td>
+</tr>
+</tbody>
+</table>
+<p>The direct scheduler skips virtual refresh-node dispatch. Instead, the
+thermodynamic coordinator refreshes stale state in vapor-pressure-then-
+saturation order immediately before condensation or diagnostics consumer
+callbacks. Environment invalidates vapor pressure and saturation; gas,
+condensation, and nucleation invalidate saturation. <code>ParticleData.volume</code> is
+fixed resident state: transport, mixing, advection, and volume evolution belong
+to E7-F7.</p>
+<p>Normal steps do not convert or transfer data, synchronize, restore, checkpoint,
+finalize, restart, acquire or replace resources, fall back to CPU, retry, resize,
+compact, capture graphs, claim performance, use multiple GPUs, or rewrite
+physics. Preflight rejection leaves active state unchanged. After writer-capable
+dispatch begins, a failure may fault the session and has no rollback or retry
+guarantee. Checkpoint/finalize/restart remain the explicit exact-device boundary
+documented in <a href="../gpu_resident_checkpoints/">GPU resident checkpoints</a>.</p>
 <h3 id="complete-direct-process-illustration">Complete direct-process illustration<a class="headerlink" href="#complete-direct-process-illustration" title="Permanent link">&para;</a></h3>
 <p>The <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py">complete direct-process source</a>
-is illustrative, not a production coordinator. It imports the five direct
+is an illustrative explicit-transfer five-call sequence, not a resident
+scheduler or coordinator example. It imports the five direct
 boundaries from <code>particula.gpu.kernels</code> in order: <code>condensation_step_gpu</code>,
 <code>coagulation_step_gpu</code>, <code>dilution_step_gpu</code>, <code>wall_loss_step_gpu</code>, then
 <code>nucleation_step_gpu</code>. CPU↔Warp conversion helpers remain under

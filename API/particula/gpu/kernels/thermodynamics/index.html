@@ -4210,6 +4210,20 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -4318,6 +4332,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../execution/diagnostics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.diagnostics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../execution/gpu_resources/" class="md-nav__link">
         
   
@@ -4373,6 +4415,174 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../../execution/process_adapters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.process_adapters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../execution/process_graph/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.process_graph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../execution/resident_scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_scheduler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../execution/scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.scheduler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../execution/state_updates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.state_updates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../execution/thermodynamic_updates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.thermodynamic_updates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
       
@@ -4393,10 +4603,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_12" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_5" id="__nav_2_3_19_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_12" id="__nav_2_3_19_12_label" tabindex="0">
             
   
   
@@ -4414,8 +4624,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_5">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15841,17 +16051,7 @@ configuration is invalid. <code>gas.vapor_pressure</code> is unchanged.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/gpu/kernels/thermodynamics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">328</span>
 <span class="normal">329</span>
 <span class="normal">330</span>
 <span class="normal">331</span>
@@ -15900,7 +16100,17 @@ configuration is invalid. <code>gas.vapor_pressure</code> is unchanged.</p>
 <span class="normal">374</span>
 <span class="normal">375</span>
 <span class="normal">376</span>
-<span class="normal">377</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">refresh_vapor_pressure_gpu</span><span class="p">(</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">refresh_vapor_pressure_gpu</span><span class="p">(</span>
     <span class="n">thermodynamics</span><span class="p">:</span> <span class="n">ThermodynamicsConfig</span><span class="p">,</span>
     <span class="n">gas</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -16164,7 +16374,17 @@ ordered molar-mass fingerprint is invalid.</p>
 <span class="normal">218</span>
 <span class="normal">219</span>
 <span class="normal">220</span>
-<span class="normal">221</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_thermodynamics_config</span><span class="p">(</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_thermodynamics_config</span><span class="p">(</span>
     <span class="n">thermodynamics</span><span class="p">:</span> <span class="n">ThermodynamicsConfig</span> <span class="o">|</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">n_species</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">device</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -16249,10 +16469,20 @@ ordered molar-mass fingerprint is invalid.</p>
             <span class="s2">&quot;thermodynamics.parameters must be finite and non-negative in &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">references</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">references</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">references</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">references</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;thermodynamics.molar_mass_reference must be finite and &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;non-negative in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;positive in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">gas_masses</span><span class="p">))</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">gas_masses</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;gas.molar_mass must be finite and positive in </span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="n">constant</span> <span class="o">=</span> <span class="n">modes</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">THERMODYNAMICS_MODE_CONSTANT</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="n">constant</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;constant vapor-pressure parameters must be positive in &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">caller_name</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">references</span><span class="p">,</span> <span class="n">gas_masses</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
