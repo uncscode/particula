@@ -68,58 +68,14 @@ class RecordingProvider:
         return self.device_result
 
 
-class ForbiddenSeams:
-    """Record execution seams that must remain unused by these scenarios."""
-
-    def __init__(self) -> None:
-        """Initialize distinct counters for each forbidden operation."""
-        self.counts = {
-            "conversion": 0,
-            "transfer": 0,
-            "synchronization": 0,
-            "kernel": 0,
-            "mutation": 0,
-            "checkpoint": 0,
-            "restore": 0,
-        }
-
-    def conversion(self) -> None:
-        """Record a forbidden conversion."""
-        self.counts["conversion"] += 1
-
-    def transfer(self) -> None:
-        """Record a forbidden transfer."""
-        self.counts["transfer"] += 1
-
-    def synchronization(self) -> None:
-        """Record a forbidden synchronization."""
-        self.counts["synchronization"] += 1
-
-    def kernel(self) -> None:
-        """Record a forbidden kernel launch."""
-        self.counts["kernel"] += 1
-
-    def mutation(self) -> None:
-        """Record a forbidden mutation."""
-        self.counts["mutation"] += 1
-
-    def checkpoint(self) -> None:
-        """Record a forbidden checkpoint."""
-        self.counts["checkpoint"] += 1
-
-    def restore(self) -> None:
-        """Record a forbidden restore."""
-        self.counts["restore"] += 1
-
-
 class RecordingAdapter:
-    """Return a native result without crossing any forbidden seam."""
+    """Return a native result while recording one CPU adapter call."""
 
-    def __init__(self, seams: ForbiddenSeams) -> None:
-        """Retain a shared forbidden-seam ledger."""
+    def __init__(self, seams: "ForbiddenSeams") -> None:
+        """Initialize the call counter and empty native result."""
         self.calls = 0
-        self.seams = seams
         self.result: ExecutionResult | None = None
+        self.seams = seams
 
     def execute(self, state: CPUExecutionState) -> ExecutionResult:
         """Return a non-mutating result retaining the exact state."""
@@ -133,15 +89,15 @@ class RecordingAdapter:
 
 
 class RecordingGPUAdapter:
-    """Record accidental GPU adapter entry without performing work."""
+    """Fail if explicit fallback dispatch selects the GPU adapter."""
 
-    def __init__(self, seams: ForbiddenSeams) -> None:
-        """Retain a shared forbidden-seam ledger."""
+    def __init__(self, seams: "ForbiddenSeams") -> None:
+        """Initialize the GPU adapter call counter."""
         self.calls = 0
         self.seams = seams
 
     def execute(self, _: CPUExecutionState) -> ExecutionResult:
-        """Record accidental entry, cross its seams, and fail immediately."""
+        """Record accidental entry and fail immediately."""
         self.calls += 1
         self.seams.conversion()
         self.seams.transfer()
@@ -156,8 +112,8 @@ class RecordingGPUAdapter:
 class RaisingAdapter:
     """Raise one exact adapter error after recording the sole invocation."""
 
-    def __init__(self, error: RuntimeError, seams: ForbiddenSeams) -> None:
-        """Store the exact error and shared forbidden-seam ledger."""
+    def __init__(self, error: RuntimeError, seams: "ForbiddenSeams") -> None:
+        """Store the exact error and initialize the call counter."""
         self.calls = 0
         self.error = error
         self.seams = seams
@@ -180,6 +136,48 @@ class CountingContext(ExecutionContext):
         """Count and delegate one adapter lookup."""
         self.lookups += 1
         return super().resolve(request)
+
+
+class ForbiddenSeams:
+    """Count forbidden execution seams that must remain unused."""
+
+    def __init__(self) -> None:
+        """Initialize zero counts for every forbidden seam."""
+        self.conversion_calls = 0
+        self.transfer_calls = 0
+        self.synchronization_calls = 0
+        self.kernel_calls = 0
+        self.mutation_calls = 0
+        self.checkpoint_calls = 0
+        self.restore_calls = 0
+
+    def conversion(self) -> None:
+        """Record a forbidden conversion seam."""
+        self.conversion_calls += 1
+
+    def transfer(self) -> None:
+        """Record a forbidden transfer seam."""
+        self.transfer_calls += 1
+
+    def synchronization(self) -> None:
+        """Record a forbidden synchronization seam."""
+        self.synchronization_calls += 1
+
+    def kernel(self) -> None:
+        """Record a forbidden kernel seam."""
+        self.kernel_calls += 1
+
+    def mutation(self) -> None:
+        """Record a forbidden mutation seam."""
+        self.mutation_calls += 1
+
+    def checkpoint(self) -> None:
+        """Record a forbidden checkpoint seam."""
+        self.checkpoint_calls += 1
+
+    def restore(self) -> None:
+        """Record a forbidden restore seam."""
+        self.restore_calls += 1
 
 
 @dataclass(frozen=True)
@@ -253,6 +251,19 @@ def _providers(log: list[str]) -> dict[Backend, AvailabilityProvider]:
     )
 
 
+def _ledger_counts(seams: ForbiddenSeams) -> tuple[int, ...]:
+    """Return every forbidden seam counter for compact assertions."""
+    return (
+        seams.conversion_calls,
+        seams.transfer_calls,
+        seams.synchronization_calls,
+        seams.kernel_calls,
+        seams.mutation_calls,
+        seams.checkpoint_calls,
+        seams.restore_calls,
+    )
+
+
 def _reject_availability() -> RejectedAvailability:
     """Return fresh P1 data and the exact P2 unavailable-device error."""
     request = _request()
@@ -312,21 +323,8 @@ def _state() -> tuple[CPUExecutionState, list[float], tuple[int, list[float]]]:
     )
 
 
-def _assert_clean(seams: ForbiddenSeams) -> None:
-    """Require that no forbidden seam was crossed."""
-    assert seams.counts == {
-        "conversion": 0,
-        "transfer": 0,
-        "synchronization": 0,
-        "kernel": 0,
-        "mutation": 0,
-        "checkpoint": 0,
-        "restore": 0,
-    }
-
-
-def test_unavailable_device_stops_before_observable_execution_seams() -> None:
-    """P2 device rejection neither validates later state nor dispatches work."""
+def test_unavailable_device_short_circuits_before_dispatch() -> None:
+    """P2 device rejection stops before state validation or adapter lookup."""
     rejected = _reject_availability()
     seams = ForbiddenSeams()
     cpu_adapter = RecordingAdapter(seams)
@@ -350,7 +348,7 @@ def test_unavailable_device_stops_before_observable_execution_seams() -> None:
     assert context.lookups == 0
     assert cpu_adapter.calls == 0
     assert gpu_adapter.calls == 0
-    _assert_clean(seams)
+    assert _ledger_counts(seams) == (0, 0, 0, 0, 0, 0, 0)
 
     fallback = FallbackRequest(
         rejected.request,
@@ -363,9 +361,7 @@ def test_unavailable_device_stops_before_observable_execution_seams() -> None:
     assert context.lookups == 0
 
 
-def test_explicit_cpu_fallback_dispatches_once_without_hidden_movement() -> (
-    None
-):
+def test_explicit_cpu_fallback_dispatches_once_with_provenance() -> None:
     """Caller-authored P3 fallback retains CPU state and exact provenance."""
     rejected = _reject_availability()
     seams = ForbiddenSeams()
@@ -393,7 +389,6 @@ def test_explicit_cpu_fallback_dispatches_once_without_hidden_movement() -> (
     assert context.lookups == 1
     assert cpu_adapter.calls == 1
     assert gpu_adapter.calls == 0
-    _assert_clean(seams)
     assert id(payload) == payload_snapshot[0]
     assert payload == payload_snapshot[1]
     assert dispatch.resolution.original_request is rejected.request
@@ -402,6 +397,7 @@ def test_explicit_cpu_fallback_dispatches_once_without_hidden_movement() -> (
     assert dispatch.result is cpu_adapter.result
     assert dispatch.result.state is cpu_state
     assert dispatch.result.metadata == (("native", "metadata"),)
+    assert _ledger_counts(seams) == (0, 0, 0, 0, 0, 0, 0)
     assert dispatch.metadata == (
         ("requested_backend", "warp"),
         ("selected_backend", "cpu"),
@@ -412,8 +408,8 @@ def test_explicit_cpu_fallback_dispatches_once_without_hidden_movement() -> (
 def test_cpu_adapter_failure_propagates_without_retry_or_reselection() -> None:
     """The selected CPU adapter error escapes unchanged after one call."""
     rejected = _reject_availability()
-    seams = ForbiddenSeams()
     sentinel = RuntimeError("sentinel adapter failure")
+    seams = ForbiddenSeams()
     cpu_adapter = RaisingAdapter(sentinel, seams)
     gpu_adapter = RecordingGPUAdapter(seams)
     context = _context(
@@ -440,6 +436,6 @@ def test_cpu_adapter_failure_propagates_without_retry_or_reselection() -> None:
     assert context.lookups == 1
     assert cpu_adapter.calls == 1
     assert gpu_adapter.calls == 0
-    _assert_clean(seams)
     assert id(payload) == payload_snapshot[0]
     assert payload == payload_snapshot[1]
+    assert _ledger_counts(seams) == (0, 0, 0, 0, 0, 0, 0)
