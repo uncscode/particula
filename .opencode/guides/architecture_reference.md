@@ -40,7 +40,13 @@ identity. The concrete `errors` and `fallback` modules remain direct-import-
 only for mechanics and carriers, but their public values are re-exported.
 Concrete adapter modules, state/result carriers, availability, fallback
 operations and carriers, lifecycle seams, and GPU boundaries remain
-direct-module-only.
+direct-module-only. This frozen value-versus-mechanics policy is recorded in
+[ADR-015](architecture/decisions/ADR-015-execution-public-surface-and-experimental-gpu-policy.md).
+
+`particula.gpu` retains its existing low-level containers, explicit CPU↔GPU
+transfer helpers, and direct-kernel workflow as experimental APIs. Their current
+import paths and caller-owned transfer model remain supported without an
+import-time warning or semantic change.
 
 `particula.execution.availability` is the concrete, direct-import-only P2
 pre-execution resolver. `resolve_availability()` consumes already-valid P1

@@ -15,7 +15,9 @@
   `FallbackPolicy`, `FallbackBoundary`, `CPUStateAuthority`. These names are
   top-level exports by identity; the concrete `errors` and `fallback` modules
   remain direct-import-only for their mechanics, while their public values are
-  re-exported. The per-context backing registry remains private.
+   re-exported. The per-context backing registry remains private.
+   [ADR-015](decisions/ADR-015-execution-public-surface-and-experimental-gpu-policy.md)
+   records this value-versus-mechanics export policy.
 - Declarations and requests are immutable exact metadata. Nonempty requirements
   must match a complete declaration exactly; empty requirements are accepted
   when the matrix contains a declaration for the same `Device` and `Process`.
@@ -341,8 +343,11 @@ kernel-entry responsibilities.
 
 ### GPU package export boundary
 
-- `particula.gpu` remains the public home for Warp availability, context, and
-  explicit CPU↔GPU transfer helpers.
+- `particula.gpu` remains the experimental public home for Warp availability,
+  context, low-level containers, and explicit CPU↔GPU transfer helpers. Its
+  current import paths and caller-owned explicit-transfer/direct-kernel model
+  remain supported without an import-time warning or semantic change. See
+  [ADR-015](decisions/ADR-015-execution-public-surface-and-experimental-gpu-policy.md).
 - Direct GPU step entry points should be imported from
   `particula.gpu.kernels`, not re-exported from top-level `particula.gpu`.
 - Lower-level kernel helpers should stay module-local to

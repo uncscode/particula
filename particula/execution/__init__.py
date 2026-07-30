@@ -23,10 +23,10 @@ availability, imports optional backends, allocates state, or exposes a
 user-facing API.
 
 The public API is a frozen, dependency-neutral 26-name selection, capability
-error, and fallback-policy surface. Concrete fallback mechanics and
-condensation state carriers remain direct-module-only, while the three policy
-enums are re-exported here. Importing this package does not import those
-concrete modules, Warp, or ``particula.gpu``.
+error, and fallback-policy surface. Its three public fallback policy enums are
+``FallbackPolicy``, ``FallbackBoundary``, and ``CPUStateAuthority``. Concrete
+fallback mechanics and their carriers remain direct-module-only. Importing this
+package does not import optional backends, Warp, or ``particula.gpu``.
 """
 
 import inspect

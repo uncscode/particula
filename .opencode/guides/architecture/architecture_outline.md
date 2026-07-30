@@ -43,9 +43,10 @@ The exact downstream ordering remains
 
 **Key Components:**
 - `__init__.py` - Dependency-neutral seam with a frozen ordered 26-name public
-  surface: the 10 selection declarations, the 13-name capability-error
-  taxonomy, and three fallback policy enums. It does not import Warp, the GPU
-  package, or concrete adapters and fallback mechanics.
+   surface: the 10 selection declarations, the 13-name capability-error
+   taxonomy, and three fallback policy enums. It does not import Warp, the GPU
+   package, or concrete adapters and fallback mechanics. See
+   [ADR-015](decisions/ADR-015-execution-public-surface-and-experimental-gpu-policy.md).
 - `errors.py` - Standard-library execution-capability error taxonomy. Its public
   values are re-exported by the package and top level, while this concrete module
   remains absent from their export lists.
@@ -348,8 +349,11 @@ remain concrete-module-only.
 
 ## GPU Package
 
-`particula/gpu/` contains Warp-backed data containers, explicit CPU↔GPU
-transfer helpers, device-side physics helpers, and kernel entry points.
+`particula/gpu/` contains experimental Warp-backed data containers, explicit
+CPU↔GPU transfer helpers, device-side physics helpers, and kernel entry points.
+Its current import paths and caller-owned explicit-transfer/direct-kernel model
+remain supported without a semantic change. See
+[ADR-015](decisions/ADR-015-execution-public-surface-and-experimental-gpu-policy.md).
 
 ### particula/gpu/
 

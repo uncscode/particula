@@ -38,7 +38,10 @@ and planned expansions, see the
 
 ## Public imports
 
-Prefer the currently exported package-level imports:
+Prefer the currently exported package-level imports. The low-level
+`particula.gpu` container, conversion-helper, explicit-transfer, and
+direct-kernel workflow is experimental, but these import paths and its
+caller-owned transfer model are supported:
 
 ```python
 from particula.gas import EnvironmentData, GasData
@@ -140,12 +143,27 @@ fallback from adapter failures.
 ### Selected-condensation ownership and API boundary
 
 This is a non-runnable API and ownership reference. `particula.execution`
-provides a frozen ordered 26-name public surface: the 10 selection declarations,
-the 13-name capability-error taxonomy, and the three public fallback policy
-enums. Top-level `particula` re-exports that execution subset and has broader
-unrelated exports. The concrete fallback module remains direct-import-only for
-mechanics and carriers, while selected condensation state carriers and adapters
-are intentionally concrete-only at
+provides this frozen ordered 26-name public surface, also re-exported by
+top-level `particula` alongside its unrelated APIs:
+
+1. Selection declarations: `Backend`, `Device`, `Process`, `Capability`,
+   `CapabilityRequirements`, `CapabilityDeclaration`, `CapabilityMatrix`,
+   `ExecutionRequest`, `ExecutionAdapter`, and `ExecutionContext`.
+2. Capability errors: `ExecutionCapabilityReason`,
+   `ExecutionCapabilityError`, `UnknownExecutionTargetError`,
+   `UnavailableExecutionTargetError`, `UnsupportedExecutionRequestError`,
+   `UnknownBackendError`, `UnknownDeviceError`, `UnavailableRuntimeError`,
+   `UnavailableDeviceError`, `UnsupportedProcessError`,
+   `UnsupportedCapabilityError`, `InvalidExecutionStateError`, and
+   `FallbackDisallowedError`.
+3. Fallback policy enums: `FallbackPolicy`, `FallbackBoundary`, and
+   `CPUStateAuthority`.
+
+The concrete `particula.execution.errors` and
+`particula.execution.fallback` modules remain direct-import-only; only the
+listed error types and fallback policy enums are public. Fallback mechanics and
+carriers, plus selected-condensation state carriers and adapters, are
+intentionally concrete-only at
 `particula.execution.adapters.condensation` pending E7-F6 policy; there is no
 provisional public selected-condensation import, backend-registration recipe,
 or selected-step workflow.
@@ -318,9 +336,12 @@ if WARP_AVAILABLE:
 
 ## Explicit CPU fallback boundary
 
-`particula.execution.fallback` is a direct-import-only boundary; it is not
-exported from `particula.execution` or top-level `particula`. A caller that
-receives a typed capability error may construct a `FallbackRequest` with the
+`particula.execution.fallback` is a direct-import-only mechanics boundary; the
+module, its operations, and its request/result carriers are not exported from
+`particula.execution` or top-level `particula`. Its three policy enums
+(`FallbackPolicy`, `FallbackBoundary`, and `CPUStateAuthority`) are the
+intentional exception and are public at both boundaries. A caller that receives
+a typed capability error may construct a concrete `FallbackRequest` with the
 default-deny `FallbackPolicy.RAISE`, which re-raises the same eligible error.
 Only an explicit `FallbackPolicy.CPU` request may select the already-registered
 CPU adapter, and only for `UNKNOWN_DEVICE`, `RUNTIME_UNAVAILABLE`,
