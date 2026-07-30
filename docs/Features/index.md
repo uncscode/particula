@@ -70,6 +70,15 @@ Welcome to the Particula Features documentation! This section provides comprehen
 
     [:octicons-arrow-right-24: Learn more](data-containers-and-gpu-foundations.md)
 
+-   __[Backend Selection and Explicit CPU Fallback](backend_selection.md)__
+
+    ---
+
+    Stable execution-value selection and the explicit, caller-visible CPU
+    fallback boundary; concrete mechanics remain direct-module-only.
+
+    [:octicons-arrow-right-24: Learn more](backend_selection.md)
+
 -   __[GPU Resident Checkpoints](gpu_resident_checkpoints.md)__
 
     ---

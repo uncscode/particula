@@ -8,6 +8,8 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 FEATURE_PATH = ROOT / "docs/Features/data-containers-and-gpu-foundations.md"
+BACKEND_SELECTION_PATH = ROOT / "docs/Features/backend_selection.md"
+FEATURE_INDEX_PATH = ROOT / "docs/Features/index.md"
 CONDENSATION_FEATURE_PATH = (
     ROOT / "docs/Features/condensation_strategy_system.md"
 )
@@ -78,6 +80,45 @@ def _normalize(content: str) -> str:
         Content with consecutive whitespace replaced by single spaces.
     """
     return " ".join(content.split())
+
+
+def _python_fence(content: str, marker: str) -> str:
+    """Return the unique Python fence containing a required marker.
+
+    Args:
+        content: Markdown content containing Python fences.
+        marker: Required unique text within the desired fence.
+
+    Returns:
+        The Python source from the matching fence.
+    """
+    fences = re.findall(r"```python\n(.*?)```", content, flags=re.DOTALL)
+    matches = [fence for fence in fences if marker in fence]
+    assert len(matches) == 1, (
+        f"Expected one Python fence containing {marker!r}."
+    )
+    return matches[0]
+
+
+def _markdown_anchor(heading: str) -> str:
+    """Return the MkDocs-compatible anchor for a Markdown heading."""
+    return re.sub(r"[^a-z0-9]+", "-", heading.lower()).strip("-")
+
+
+def _assert_markdown_link_resolves(source: Path, target: str) -> None:
+    """Assert a repository-relative Markdown target and optional anchor exist."""
+    path_text, separator, anchor = target.partition("#")
+    destination = (source.parent / path_text).resolve()
+    assert destination.is_file(), (
+        f"Missing link target {target!r} from {source}."
+    )
+    if separator:
+        headings = re.findall(
+            r"^#{1,6}\s+(.+?)\s*$",
+            destination.read_text(encoding="utf-8"),
+            flags=re.MULTILINE,
+        )
+        assert anchor in {_markdown_anchor(heading) for heading in headings}
 
 
 def _subsection(path: Path, heading: str) -> str:
@@ -153,6 +194,157 @@ def test_execution_selection_documentation_states_selection_and_failure_bounds()
         assert phrase in normalized
     for private_name in ("CPUExecutionState", "CPUExecutionAdapter"):
         assert private_name not in section
+
+
+def test_backend_selection_guide_documents_exact_public_and_private_surface() -> (
+    None
+):
+    """Test the new guide preserves the frozen ordered execution value surface."""
+    import particula.execution as execution
+
+    content = BACKEND_SELECTION_PATH.read_text(encoding="utf-8")
+    stable_values = _section(BACKEND_SELECTION_PATH, "Stable public values")
+
+    assert tuple(execution.__all__) == PUBLIC_NAMES
+    positions = [stable_values.index(f"`{name}`") for name in PUBLIC_NAMES]
+    assert positions == sorted(positions)
+    normalized = _normalize(content)
+    for concrete_name in (
+        "Availability and fallback mechanics",
+        "fallback mechanics",
+        "adapters",
+        "resident session and checkpoint seams",
+        "registries",
+        "GPU sidecars",
+    ):
+        assert concrete_name in normalized
+
+
+def test_backend_selection_guide_closes_reason_and_retry_outcomes() -> None:
+    """Test only the documented five reasons permit explicit CPU fallback."""
+    content = BACKEND_SELECTION_PATH.read_text(encoding="utf-8")
+    eligible = (
+        "UNKNOWN_DEVICE",
+        "RUNTIME_UNAVAILABLE",
+        "DEVICE_UNAVAILABLE",
+        "PROCESS_UNSUPPORTED",
+        "CAPABILITY_UNSUPPORTED",
+    )
+    rejected = ("UNKNOWN_BACKEND", "INVALID_STATE", "FALLBACK_DISALLOWED")
+
+    rows = re.findall(r"^\| `([A-Z_]+)` \| (.+) \|$", content, re.MULTILINE)
+    actions = dict(rows)
+    assert tuple(actions) == (
+        "UNKNOWN_BACKEND",
+        *eligible,
+        "INVALID_STATE",
+        "FALLBACK_DISALLOWED",
+    )
+    assert all(
+        "explicit CPU policy is eligible" in actions[reason]
+        for reason in eligible
+    )
+    assert all(actions[reason].startswith("Reject;") for reason in rejected)
+    assert (
+        "Adapter, kernel, and runtime errors after invocation propagate"
+        in content
+    )
+    assert "without CPU retry" in content
+
+
+def test_backend_selection_guide_states_exact_resolver_and_no_movement() -> (
+    None
+):
+    """Test the concrete resolver order and immutable decision are documented."""
+    content = _normalize(BACKEND_SELECTION_PATH.read_text(encoding="utf-8"))
+
+    assert (
+        "complete provider registry, target recognition, process declaration, "
+        "capability declaration, lazy runtime availability, device availability, "
+        "then request-associated state" in content
+    )
+    assert (
+        "neither selects an adapter nor executes, transfers, synchronizes, "
+        "allocates execution resources, or mutates state" in content
+    )
+
+
+def test_backend_selection_selection_fence_is_public_only_and_noninvoking() -> (
+    None
+):
+    """Test the executable fence selects its adapter without calling execute."""
+    content = BACKEND_SELECTION_PATH.read_text(encoding="utf-8")
+    fence = _python_fence(content, "Selection must not invoke")
+    tree = ast.parse(fence)
+    imports = [
+        node for node in ast.walk(tree) if isinstance(node, ast.ImportFrom)
+    ]
+
+    assert all(node.module == "particula.execution" for node in imports)
+    imported = {alias.name for node in imports for alias in node.names}
+    assert imported <= set(SELECTION_NAMES)
+    namespace: dict[str, object] = {}
+    exec(fence, namespace)  # noqa: S102 -- executes published CPU-only fence
+    assert (
+        namespace["context"].resolve(namespace["request"])
+        is namespace["adapter"]
+    )  # type: ignore[union-attr]
+    assert namespace["adapter"].calls == 0  # type: ignore[union-attr]
+
+
+def test_backend_selection_resident_fence_guards_concrete_imports() -> None:
+    """Test resident pseudocode parses but keeps concrete imports Warp-guarded."""
+    content = BACKEND_SELECTION_PATH.read_text(encoding="utf-8")
+    fence = _python_fence(content, "WARP_AVAILABLE = False")
+    tree = ast.parse(fence)
+    guarded_imports: list[ast.ImportFrom] = []
+
+    for node in tree.body:
+        if isinstance(node, ast.If) and isinstance(node.test, ast.Name):
+            if node.test.id == "WARP_AVAILABLE":
+                guarded_imports.extend(
+                    child
+                    for child in ast.walk(node)
+                    if isinstance(child, ast.ImportFrom)
+                )
+    concrete_imports = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        and node.module
+        in {
+            "particula.execution.checkpoint",
+            "particula.execution.gpu_session",
+        }
+    ]
+    assert concrete_imports
+    assert all(node in guarded_imports for node in concrete_imports)
+    normalized = _normalize(content)
+    for phrase in (
+        "caller-owned checkpoint/finalize snapshot",
+        "separate explicit restore plus CPU-authority declaration",
+        "No component restores, transfers, synchronizes, migrates, or retries silently",
+    ):
+        assert phrase in normalized
+
+
+def test_backend_selection_index_and_roadmap_links_resolve() -> None:
+    """Test the new index card and roadmap link resolve to the feature page."""
+    for source in (FEATURE_INDEX_PATH, ROADMAP_PATH):
+        content = source.read_text(encoding="utf-8")
+        links = re.findall(r"\[[^]]+\]\(([^)]+)\)", content)
+        target = next(link for link in links if "backend_selection.md" in link)
+        _assert_markdown_link_resolves(source, target)
+
+    content = BACKEND_SELECTION_PATH.read_text(encoding="utf-8")
+    links = re.findall(r"\[[^]]+\]\(([^)]+)\)", content)
+    for target in (
+        "data-containers-and-gpu-foundations.md",
+        "Roadmap/data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation",
+        "gpu_resident_checkpoints.md",
+    ):
+        assert target in links
+        _assert_markdown_link_resolves(BACKEND_SELECTION_PATH, target)
 
 
 def test_execution_selection_docs_cover_empty_requirements_base_declaration() -> (
@@ -302,9 +494,9 @@ def test_execution_roadmap_preserves_shipped_and_deferred_boundaries() -> None:
         "E7-F3 supplies coagulation adapters",
         "E7-F4 supplies resident session/container/sidecar lifecycle",
         "E7-F5 is their later scheduling consumer",
-        "E7-F6 owns availability, fallback, error taxonomy, API stability, and export policy",
-        "GPU adapters, resident loops, scheduling, implicit transfer",
-        "fallback, retry, or replacement of direct GPU APIs",
+        "E7-F6 now supplies the shipped availability resolver, typed errors, explicit CPU fallback, frozen stable API, and documentation handoff",
+        "E7-F6/Track T6 is shipped through P6",
+        "Selection, availability, and fallback never upload, restore, synchronize, migrate, retry, or silently switch",
     ):
         assert phrase in normalized
 

@@ -44,6 +44,13 @@ device rejection reaches no execution seam or adapter, that an explicitly
 requested P3 CPU fallback preserves provenance and CPU state without movement,
 and that a selected CPU adapter error is terminal without retry or reselection.
 
+E7-F6-P4 and P6 are implemented for issue #1505. The frozen ordered 26-name
+`particula.execution.__all__` surface and its export test are the P4 evidence.
+The new backend-selection guide documents the stable value API separately from
+direct-module-only availability, fallback, adapter, resident, registry, and
+sidecar mechanics. It records explicit caller-owned CPU authority boundaries
+without adding runtime movement or recovery behavior.
+
 ## User Stories
 
 - As a simulation author, I want unsupported GPU requests to fail with a clear,

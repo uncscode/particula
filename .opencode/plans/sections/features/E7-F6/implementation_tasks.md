@@ -19,10 +19,10 @@
 
 ## Public API and Compatibility
 
-- [ ] Define exact `particula.execution.__all__` and approved top-level re-exports.
-- [ ] Keep concrete adapters, registries, probes, sidecars, and configs non-public.
-- [ ] Add experimental/stability wording to `particula.gpu` module docs without import-time warnings.
-- [ ] Document compatibility and deprecation rules; do not remove existing direct imports.
+- [x] Define exact `particula.execution.__all__` and approved top-level re-exports.
+- [x] Keep concrete adapters, registries, probes, sidecars, and configs non-public.
+- [x] Document supported experimental `particula.gpu` APIs without import-time
+  warnings or removal of existing direct imports.
 
 ## Tooling / Tests
 
@@ -37,10 +37,10 @@
   `particula/execution/tests/fallback_test.py`, including default-deny identity
   re-raise, accepted-reason selection, authority rejection, import neutrality,
   metadata preservation, and no-retry failure propagation.
-- [ ] Add exact export allow/deny tests modeled on `kernel_exports_test.py`.
+- [x] Add exact export allow/deny tests modeled on `kernel_exports_test.py`.
 - [x] Add P5 integration spies in
   `particula/execution/tests/fallback_integration_test.py` for rejected P2
   requests and explicit P3 CPU fallback: conversion, transfer, synchronization,
   kernel, mutation, checkpoint/restore, CPU/GPU adapter calls, state identity,
   provenance, and terminal adapter-error propagation.
-- [ ] Run focused tests, Ruff, mypy for the execution package, and `mkdocs build --strict`.
+- [x] Run focused execution/documentation tests and `mkdocs build --strict`.

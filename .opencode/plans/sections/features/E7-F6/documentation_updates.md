@@ -15,19 +15,16 @@ availability/support reasons, CPU-authoritative `PRE_UPLOAD` and caller-asserted
 and the absence of implicit fallback, movement, lifecycle operations, retry, or
 rollback.
 
-- Create or update `docs/Features/backend_selection.md` with the public imports,
-  exception taxonomy, availability decision table, and fallback examples.
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` Track T6 status and retain
-  the no-silent-movement guardrail.
-- Further update `docs/Features/data-containers-and-gpu-foundations.md` to
-  distinguish stable high-level execution APIs from experimental low-level GPU
-  APIs when P4 exports are settled.
-- Add public fallback examples only after P4 establishes supported import paths;
-  do not imply resident/direct-GPU integration.
-- Document that kernel/runtime failures propagate and never trigger retry.
+- [x] Added `docs/Features/backend_selection.md` with stable values, typed
+  reason outcomes, resolver order, a selection-only CPU fence, and guarded
+  resident-boundary pseudocode.
+- [x] Updated the roadmap and foundation guide with the shipped Track T6 status,
+  stable-versus-experimental distinction, and no-silent-movement guardrail.
+- [x] Documented that kernel/runtime/adapter failures propagate without retry;
+  the guide does not imply resident/direct-GPU integration.
 - Document approved imports and concrete-module-only internals in API reference
   material and `AGENTS.md` if its quick-reference contract changes.
 - Update E7-F1 and E7 epic plan cross-references if final names differ, then mark
   E7-F6 phases/status as shipped through normal plan-update workflow.
-- Validate links and snippets with `mkdocs build --strict`; examples must remain
-  runnable in CPU-only environments unless explicitly Warp-gated.
+- [x] Validated links and snippets with `mkdocs build --strict`; the executable
+  selection fence is CPU-only and resident pseudocode is explicitly Warp-gated.

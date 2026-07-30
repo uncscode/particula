@@ -137,7 +137,7 @@ Your contribution is now part of **Particula**—thank you!
 | **Style** | Detailed rules: [Code Specifications](Code_Specifications/index.md). |
 | **Docstrings** | Follow the templates in [Function docstring format](../contribute/Code_Specifications/Details/Function_docstring_format.md) and [Class docstring format](../contribute/Code_Specifications/Details/Class_docstring_format.md). One‑line summary + details + sections (`Arguments`, `Returns`, `Raises`, `Examples`, `References`). |
 | **Typing** | Use `typing` annotations. Omit types in docstrings. |
-| **Tests** | Every public function/class must have at least one `pytest` test. Add regression coverage for fixes and keep change-scope coverage strong. See [Add Unit Tests](../contribute/Feature_Workflow/Details/Add_Unit_Test.md) and the [testing guide](../../.opencode/guides/testing_guide.md). |
+| **Tests** | Every public function/class must have at least one `pytest` test. Add regression coverage for fixes and keep change-scope coverage strong. See [Add Unit Tests](../contribute/Feature_Workflow/Details/Add_Unit_Test.md) and the repository testing guide. |
 | **Commit messages** | Imperative mood, ≤ 72 chars summary + context body if needed. |
 | **Large changes** | Open a **discussion** first and discuss design before implementation. |
 

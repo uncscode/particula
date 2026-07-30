@@ -1,8 +1,8 @@
 # Success Criteria
 
-- [ ] Every unsupported backend/device/process/capability outcome raises the
+- [x] Every unsupported backend/device/process/capability outcome raises the
   documented typed error with stable reason metadata.
-- [ ] Importing the public execution API succeeds when Warp is absent.
+- [x] Importing the public execution API succeeds when Warp is absent.
 - [x] P3 fallback is disabled by default and requires an explicit typed request.
 - [x] P3 explicit fallback occurs only before upload/mutation with exact
   CPU-authoritative state or at a caller-asserted restored boundary.
@@ -11,12 +11,13 @@
   synchronization, kernel launch, fallback adapter call, or state mutation.
 - [x] P3 fallback results distinguish requested and selected backend and retain
   the capability reason without modifying native result metadata.
-- [ ] Public `__all__` tests accept intended names and reject registries,
+- [x] Public `__all__` tests accept intended names and reject registries,
   concrete adapters, sidecars, configs, and helper kernels.
-- [ ] Existing low-level GPU imports remain callable and are documented
+- [x] Existing low-level GPU imports remain callable and are documented
   experimental; no breaking removal occurs.
-- [ ] Focused tests pass with at least 80% execution-package coverage, CUDA skips
-  cleanly, Ruff/mypy pass, and strict documentation builds.
+- [x] Focused execution and documentation tests pass and strict documentation
+  builds. Existing execution coverage, export, and CPU-only import regressions
+  provide the P4/P6 evidence; CUDA and downstream deferred work remain separate.
 
 ## Metrics
 

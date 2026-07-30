@@ -1482,7 +1482,7 @@ scheduling, resident loops, and transport remain Epic G work.
 
 ## Epic G: Backend Selection and GPU-Resident Simulation
 
-Status: active.
+Status: active; E7-F6/Track T6 is shipped through P6.
 
 E7-F1 is shipped (P1--P6 complete). It provides a separate public,
 dependency-neutral, explicit-selection context with a limited CPU/reference
@@ -1495,18 +1495,20 @@ The full-policy downstream ordering was:
 
 `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`.
 
-E7-F6 owns availability, fallback, error taxonomy, API stability, and export
-policy. E7-F1 supplies neither transfer nor fallback. E7-F2 supplies
-condensation adapters and E7-F3 supplies coagulation adapters. E7-F4 supplies
-resident session/container/sidecar lifecycle; P1--P7 are shipped as its bounded
-concrete-only prerequisite. E7-F5 is their later scheduling consumer, shipped
-as a bounded, concrete-only seam. These consumers do not alter the shipped direct-kernel
-path.
+E7-F6 now supplies the shipped availability resolver, typed errors, explicit
+CPU fallback, frozen stable API, and documentation handoff. See [Backend
+Selection and Explicit CPU Fallback](../backend_selection.md). The historical
+ordering remains context: E7-F6 is the prerequisite already satisfied by the
+downstream shipped seams. E7-F1 supplies neither transfer nor fallback. E7-F2
+supplies condensation adapters and E7-F3 supplies coagulation adapters. E7-F4
+supplies resident session/container/sidecar lifecycle; P1--P7 are shipped as
+its bounded concrete-only prerequisite. E7-F5 is their later scheduling
+consumer, shipped as a bounded, concrete-only seam. These consumers do not
+alter the shipped direct-kernel path.
 
-E7-F3's shipped concrete-only Brownian seam is a bounded exception to this
-full-policy ordering: it has no public export, availability probing, fallback,
-or scheduler dependency, so it can preserve the direct-kernel contract while
-E7-F6 remains deferred. Any broader integration still follows the ordering.
+E7-F3's shipped concrete-only Brownian seam remains bounded: it has no public
+export, availability probing, fallback, or scheduler dependency, preserving the
+direct-kernel contract. Any broader integration still follows the ordering.
 
 ### High-Level Integration
 
@@ -1516,9 +1518,10 @@ E7-F6 remains deferred. Any broader integration still follows the ordering.
   [Data Containers example](../../Examples/Data_Containers/index.md) as the
    current baseline for explicit transfer helpers, `EnvironmentData` ownership,
    and direct-kernel support boundaries.
-- E7-F1 does not introduce GPU adapters, resident loops, scheduling, implicit
-  transfer or synchronization, fallback, retry, or replacement of direct GPU
-  APIs. Those scopes remain deferred and policy questions belong to E7-F6.
+- Selection, availability, and fallback never upload, restore, synchronize,
+  migrate, retry, or silently switch after a runtime, kernel, or adapter
+  failure. E7-F1 does not introduce GPU adapters, resident loops, scheduling,
+  implicit transfer or synchronization, or replacement of direct GPU APIs.
 - E7-F2, E7-F3, and E7-F4 may add bounded consumers after their process-adapter
   or resident-lifecycle contracts are established. E7-F3's shipped
   concrete-only seam is the documented exception to the full-policy ordering;

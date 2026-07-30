@@ -58,7 +58,11 @@ from particula.particles import ParticleData
 
 ## Execution selection
 
-The package-level selection API has a separate, dependency-neutral contract:
+The package-level selection and policy values are stable and dependency-neutral.
+Their complete availability and explicit-fallback contract is in [Backend
+Selection and Explicit CPU Fallback](backend_selection.md). The
+`particula.gpu` containers, conversions, and direct kernels are supported
+experimental APIs with explicit caller-owned transfer and synchronization.
 
 ```python
 from particula import (
@@ -164,9 +168,10 @@ The concrete `particula.execution.errors` and
 listed error types and fallback policy enums are public. Fallback mechanics and
 carriers, plus selected-condensation state carriers and adapters, are
 intentionally concrete-only at
-`particula.execution.adapters.condensation` pending E7-F6 policy; there is no
-provisional public selected-condensation import, backend-registration recipe,
-or selected-step workflow.
+`particula.execution.adapters.condensation`; there is no provisional public
+selected-condensation import, backend-registration recipe, or selected-step
+workflow. Availability and fallback mechanics, adapters, resident seams,
+registries, and GPU sidecars remain concrete-only.
 
 Selected CPU execution retains a caller-owned legacy `Aerosol` and calls a
 caller-owned `MassCondensation`. Selected Warp execution retains supplied
@@ -180,10 +185,15 @@ form.
 Before resident Warp execution, callers explicitly use
 `to_warp_particle_data`, `to_warp_gas_data`, and `to_warp_environment_data`.
 Callers synchronize before host observation and restore only at their
-checkpoint. Adapter dispatch does no hidden upload, restore, retry, or silent
-CPU fallback. Direct-kernel validation may perform permitted device scans or
-status readbacks, and omitted optional scratch or output buffers may use
-direct-kernel fallback allocation.
+checkpoint. Active resident state cannot fall back to CPU without a
+caller-owned checkpoint/finalize snapshot and an explicit restore boundary.
+Checkpoint, finalization, and restart are exact-device lifecycle behavior, not
+a CPU fallback facility; the fallback module neither verifies nor performs
+`RESTORED` recovery. Adapter dispatch does no hidden upload, restore, retry, or
+silent CPU fallback. Direct-kernel validation may perform permitted device
+scans or status readbacks, and omitted optional scratch or output buffers may
+use direct-kernel fallback allocation; this allocation wording is unrelated to
+backend fallback.
 
 Successful Warp calls mutate particle masses, gas concentration, derived
 GPU-only vapor pressure, finalized total transfer, eligible scratch/work
