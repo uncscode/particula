@@ -137,27 +137,6 @@ backend is selected.
 Selection has ended after an adapter is returned and does not catch, retry, or
 fallback from adapter failures.
 
-### Explicit CPU fallback boundary
-
-`particula.execution.fallback` is a direct-import-only boundary; it is not
-exported from `particula.execution` or top-level `particula`. A caller that
-receives a typed capability error may construct a `FallbackRequest` with the
-default-deny `FallbackPolicy.RAISE`, which re-raises the same eligible error.
-Only an explicit `FallbackPolicy.CPU` request may select the already-registered
-CPU adapter, and only for `UNKNOWN_DEVICE`, `RUNTIME_UNAVAILABLE`,
-`DEVICE_UNAVAILABLE`, `PROCESS_UNSUPPORTED`, or `CAPABILITY_UNSUPPORTED`.
-
-The caller must provide exact `CPUExecutionState` at either the
-CPU-authoritative `PRE_UPLOAD` boundary or the caller-asserted `RESTORED`
-boundary. Resident, uploaded, and mutated state claims reject; this boundary
-does not restore or verify restoration. A successful fallback wrapper exposes
-ordered `requested_backend`, `selected_backend`, and `capability_reason`
-provenance while leaving the native `ExecutionResult.metadata` unchanged.
-
-This explicit seam provides no package export, implicit CPU fallback, movement,
-conversion, synchronization, checkpoint/finalize/restore operation, retry, or
-post-writer rollback.
-
 ### Selected-condensation ownership and API boundary
 
 This is a non-runnable API and ownership reference. `particula.execution`
@@ -333,6 +312,27 @@ if WARP_AVAILABLE:
         WarpParticleData,
     )
  ```
+
+## Explicit CPU fallback boundary
+
+`particula.execution.fallback` is a direct-import-only boundary; it is not
+exported from `particula.execution` or top-level `particula`. A caller that
+receives a typed capability error may construct a `FallbackRequest` with the
+default-deny `FallbackPolicy.RAISE`, which re-raises the same eligible error.
+Only an explicit `FallbackPolicy.CPU` request may select the already-registered
+CPU adapter, and only for `UNKNOWN_DEVICE`, `RUNTIME_UNAVAILABLE`,
+`DEVICE_UNAVAILABLE`, `PROCESS_UNSUPPORTED`, or `CAPABILITY_UNSUPPORTED`.
+
+The caller must provide exact `CPUExecutionState` at either the
+CPU-authoritative `PRE_UPLOAD` boundary or the caller-asserted `RESTORED`
+boundary. Resident, uploaded, and mutated state claims reject; this boundary
+does not restore or verify restoration. A successful fallback wrapper exposes
+ordered `requested_backend`, `selected_backend`, and `capability_reason`
+provenance while leaving the native `ExecutionResult.metadata` unchanged.
+
+This explicit seam provides no package export, implicit CPU fallback, movement,
+conversion, synchronization, checkpoint/finalize/restore operation, retry, or
+post-writer rollback.
 
 ## CPU slot diagnostics
 
