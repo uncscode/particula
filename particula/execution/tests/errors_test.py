@@ -172,6 +172,72 @@ def test_concrete_error_hierarchy_has_stable_categories() -> None:
             {"backend": "cpu"},
         ),
         (
+            UnknownDeviceError("cuda:0"),
+            ExecutionCapabilityReason.UNKNOWN_DEVICE,
+            {"device": "cuda:0"},
+        ),
+        (
+            UnavailableRuntimeError("warp"),
+            ExecutionCapabilityReason.RUNTIME_UNAVAILABLE,
+            {"backend": "warp"},
+        ),
+        (
+            UnavailableDeviceError("cuda:0"),
+            ExecutionCapabilityReason.DEVICE_UNAVAILABLE,
+            {"device": "cuda:0"},
+        ),
+        (
+            UnsupportedProcessError("condensation"),
+            ExecutionCapabilityReason.PROCESS_UNSUPPORTED,
+            {"process": "condensation"},
+        ),
+        (
+            UnsupportedCapabilityError("graph_capture"),
+            ExecutionCapabilityReason.CAPABILITY_UNSUPPORTED,
+            {"capability": "graph_capture"},
+        ),
+        (
+            InvalidExecutionStateError("finalized"),
+            ExecutionCapabilityReason.INVALID_STATE,
+            {"state": "finalized"},
+        ),
+        (
+            FallbackDisallowedError("resident"),
+            ExecutionCapabilityReason.FALLBACK_DISALLOWED,
+            {"fallback_boundary": "resident"},
+        ),
+    ],
+)
+def test_concrete_errors_render_omitted_context_as_none(
+    error: ExecutionCapabilityError,
+    reason: ExecutionCapabilityReason,
+    context: dict[str, str],
+) -> None:
+    """Test required-only constructors retain omitted context as ``None``."""
+    fields = (
+        "backend",
+        "device",
+        "process",
+        "capability",
+        "state",
+        "fallback_boundary",
+    )
+
+    assert error.reason is reason
+    for field in fields:
+        assert getattr(error, field) == context.get(field)
+    assert str(error) == _message(type(error).__name__, reason, **context)
+
+
+@pytest.mark.parametrize(
+    ("error", "reason", "context"),
+    [
+        (
+            UnknownBackendError("cpu"),
+            ExecutionCapabilityReason.UNKNOWN_BACKEND,
+            {"backend": "cpu"},
+        ),
+        (
             UnknownDeviceError("cuda:0", backend="warp"),
             ExecutionCapabilityReason.UNKNOWN_DEVICE,
             {"backend": "warp", "device": "cuda:0"},

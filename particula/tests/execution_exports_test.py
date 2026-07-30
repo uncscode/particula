@@ -52,6 +52,23 @@ EXCLUDED_EXPORTS = (
     "WarpCondensationExecutionAdapter",
 )
 
+DIRECT_IMPORT_ONLY_ERRORS = (
+    "errors",
+    "ExecutionCapabilityReason",
+    "ExecutionCapabilityError",
+    "UnknownExecutionTargetError",
+    "UnavailableExecutionTargetError",
+    "UnsupportedExecutionRequestError",
+    "UnknownBackendError",
+    "UnknownDeviceError",
+    "UnavailableRuntimeError",
+    "UnavailableDeviceError",
+    "UnsupportedProcessError",
+    "UnsupportedCapabilityError",
+    "InvalidExecutionStateError",
+    "FallbackDisallowedError",
+)
+
 
 class _Adapter:
     """Record calls that selection and registration must not make."""
@@ -246,9 +263,43 @@ def test_public_registration_uses_static_execute_inspection() -> None:
 
 def test_result_and_cpu_types_remain_off_public_export_boundaries() -> None:
     """Test P3/P4 implementation types remain direct-module-only."""
-    for name in EXCLUDED_EXPORTS:
+    for name in EXCLUDED_EXPORTS + DIRECT_IMPORT_ONLY_ERRORS:
         assert name not in execution.__all__
         assert not hasattr(particula, name)
+
+
+def test_error_taxonomy_remains_direct_import_only_in_fresh_process() -> None:
+    """Test errors stay off package attributes until directly imported."""
+    root = Path(__file__).parents[2]
+    environment = os.environ | {
+        "PYTHONPATH": os.pathsep.join(
+            filter(None, (str(root), os.environ.get("PYTHONPATH")))
+        )
+    }
+    script = f"""
+import particula
+import particula.execution as execution
+
+names = {DIRECT_IMPORT_ONLY_ERRORS!r}
+for name in names:
+    assert name not in execution.__all__
+    assert not hasattr(execution, name)
+    assert not hasattr(particula, name)
+
+from particula.execution.errors import UnknownBackendError
+assert UnknownBackendError("cpu").backend == "cpu"
+"""
+
+    completed = subprocess.run(  # noqa: S603 -- fixed interpreter and script
+        [sys.executable, "-c", script],
+        cwd=root,
+        capture_output=True,
+        check=False,
+        env=environment,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
 
 
 def test_public_execution_import_is_cpu_only_in_a_fresh_guarded_process() -> (
