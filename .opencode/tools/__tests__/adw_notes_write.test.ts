@@ -34,17 +34,24 @@ describe("adw_notes_write wrapper", () => {
     assertContains(String(result), "8-character hex string");
   });
 
-  it("accepts structured fields payloads and preserves deterministic ordering", async () => {
+  it("serializes ordered duplicate fields as JSON without changing Markdown", async () => {
     const execute = await loadToolExecute("../../adw_notes_write.ts");
     await execute({
       command: "write",
       ref: "HEAD",
-      fields: [[" first ", "one"], null, { key: "second", value: "two" }, { key: "third", value: "three" }],
+      fields: [
+        ["plan_summary", "# Heading\n\n- item"],
+        { key: "architecture_notes", value: null },
+        ["plan_summary", "second"],
+      ],
     } as any);
 
-    expect(getInvocations().at(-1)?.args.join(" ")).toContain(
-      "uv run --active adw notes write --ref HEAD --field first one --field second two --field third three",
-    );
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv", "run", "--active", "adw", "notes", "write", "--ref", "HEAD",
+      "--field-json", '["plan_summary","# Heading\\n\\n- item"]',
+      "--field-json", '["architecture_notes",null]',
+      "--field-json", '["plan_summary","second"]',
+    ]);
   });
 
   it("normalizes write-from-state adw_id and supports JSON-string fields", async () => {
@@ -53,12 +60,28 @@ describe("adw_notes_write wrapper", () => {
       command: "write-from-state",
       ref: "HEAD",
       adw_id: "A1B2C3D4",
-      fields: '{"plan_summary":"done"}',
+      fields: '{"plan_summary":"done","review_findings":null}',
     });
 
-    expect(getInvocations().at(-1)?.args.join(" ")).toContain(
-      "uv run --active adw notes write-from-state --ref HEAD --adw-id a1b2c3d4 --field plan_summary done",
-    );
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv", "run", "--active", "adw", "notes", "write-from-state", "--ref", "HEAD", "--adw-id", "a1b2c3d4",
+      "--field-json", '["plan_summary","done"]', "--field-json", '["review_findings",null]',
+    ]);
+  });
+
+  it("preserves empty strings and the literal null string in JSON argv", async () => {
+    const execute = await loadToolExecute("../../adw_notes_write.ts");
+    await execute({
+      command: "write",
+      ref: "HEAD",
+      fields: [["plan_summary", "null"], ["discovered_context", ""]],
+    } as any);
+
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv", "run", "--active", "adw", "notes", "write", "--ref", "HEAD",
+      "--field-json", '["plan_summary","null"]',
+      "--field-json", '["discovered_context",""]',
+    ]);
   });
 
   it("normalizes omitted, null, and blank-string fields to an empty field list", async () => {
@@ -81,7 +104,7 @@ describe("adw_notes_write wrapper", () => {
     assertContains(String(tupleResult), "index 0");
     assertContains(String(tupleResult), "tuple must contain exactly [key, value]");
 
-    const objectResult = await execute({ command: "write", ref: "HEAD", fields: [{ key: "ok" }] } as any);
+    const objectResult = await execute({ command: "write", ref: "HEAD", fields: [{ key: "plan_summary" }] } as any);
     assertContains(String(objectResult), "index 0");
     assertContains(String(objectResult), "value is missing");
   });
@@ -89,11 +112,11 @@ describe("adw_notes_write wrapper", () => {
   it("classifies null and wrong-typed object-style values separately", async () => {
     const execute = await loadToolExecute("../../adw_notes_write.ts");
 
-    const nullResult = await execute({ command: "write", ref: "HEAD", fields: [{ key: "ok", value: null }] } as any);
+    const nullResult = await execute({ command: "write", ref: "HEAD", fields: [{ key: "plan_summary", value: null }] } as any);
     assertContains(String(nullResult), "index 0");
-    assertContains(String(nullResult), "value is null");
+    assertContains(String(nullResult), "does not allow null");
 
-    const wrongTypeResult = await execute({ command: "write", ref: "HEAD", fields: [{ key: "ok", value: 1 }] } as any);
+    const wrongTypeResult = await execute({ command: "write", ref: "HEAD", fields: [{ key: "plan_summary", value: 1 }] } as any);
     assertContains(String(wrongTypeResult), "index 0");
     assertContains(String(wrongTypeResult), "value has wrong type number");
   });
@@ -101,13 +124,21 @@ describe("adw_notes_write wrapper", () => {
   it("reports offending plain-object keys for malformed values", async () => {
     const execute = await loadToolExecute("../../adw_notes_write.ts");
 
-    const nullResult = await execute({ command: "write", ref: "HEAD", fields: { broken: null } } as any);
-    assertContains(String(nullResult), 'object key "broken"');
-    assertContains(String(nullResult), "value is null");
+    const nullResult = await execute({ command: "write", ref: "HEAD", fields: { plan_summary: null } } as any);
+    assertContains(String(nullResult), 'object key "plan_summary"');
+    assertContains(String(nullResult), "does not allow null");
 
     const blankKeyResult = await execute({ command: "write", ref: "HEAD", fields: { "   ": "x" } } as any);
     assertContains(String(blankKeyResult), 'object key "   "');
     assertContains(String(blankKeyResult), "key is blank");
+  });
+
+  it("fails closed before spawning for unallowlisted fields", async () => {
+    const execute = await loadToolExecute("../../adw_notes_write.ts");
+    const result = await execute({ command: "write", ref: "HEAD", fields: [["unknown", "value"]] } as any);
+
+    assertContains(String(result), "is not allowlisted");
+    expect(getInvocations()).toHaveLength(0);
   });
 
   it("rejects malformed fields payload strings", async () => {

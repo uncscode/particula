@@ -49,8 +49,11 @@ permission:
   websearch: deny
   codesearch: deny
   bash: deny
+  validate_notebook_readonly: allow
   validate_notebook: allow
   run_notebook: allow
+  convert_notebook_to_py: allow
+  sync_notebook_pair: allow
 ---
 
 # ADW Docs Notebook Subagent
@@ -114,16 +117,8 @@ task({
 })
 ```
 
-**Direct invocation (without adw_id):**
-```python
-task({
-  "description": "Fix corrupted notebook",
-  "prompt": "Fix corrupted notebook.\n\nTask: fix\nNotebook: docs/Examples/broken.ipynb\nDetails: Notebook fails to open, diagnose and repair",
-  "subagent_type": "adw-docs-notebook"
-})
-```
-
-**Note:** When no `adw_id` is provided, the agent operates in the current working directory.
+**Direct invocation:** Require the caller to resolve and provide an `adw_id`; this agent never
+selects an ambient working directory for notebook reads, writes, or execution.
 
 # Required Reading
 
@@ -151,22 +146,28 @@ This agent has access to specialized notebook tools plus standard file operation
 
 ## Primary Tools
 
+### validate_notebook_readonly
+
+Use this read-only wrapper for validation and check-sync examples. Notebook paths remain
+repo-relative; this wrapper has no `cwd` field.
+
+```python
+validate_notebook_readonly({
+  "notebookPath": "docs/Examples/tutorial.ipynb",
+  "options": "output=full"
+})
+validate_notebook_readonly({
+  "notebookPath": "docs/Examples/",
+  "recursive": true,
+  "checkSync": true
+})
+```
+
 ### validate_notebook
 
 Validate notebook structure, convert to Python, or sync with Jupytext.
 
 ```python
-# Basic validation
-validate_notebook({
-  "notebookPath": "docs/Examples/tutorial.ipynb"
-})
-
-# Validate with recursive directory scan
-validate_notebook({
-  "notebookPath": "docs/Examples/",
-  "recursive": true
-})
-
 # Convert notebook to Python script
 validate_notebook({
   "notebookPath": "docs/Examples/tutorial.ipynb",
@@ -187,13 +188,6 @@ validate_notebook({
   "sync": true
 })
 
-# Check sync status (CI mode - fails if out of sync)
-validate_notebook({
-  "notebookPath": "docs/Examples/",
-  "recursive": true,
-  "checkSync": true
-})
-
 # Skip syntax validation (for debugging invalid notebooks)
 validate_notebook({
   "notebookPath": "docs/Examples/broken.ipynb",
@@ -211,7 +205,7 @@ validate_notebook({
 | `sync` | boolean | Sync notebook with paired script |
 | `checkSync` | boolean | Check if notebook and script are in sync |
 | `skipSyntax` | boolean | Skip Python syntax validation |
-| `outputMode` | string | `summary`, `full`, or `json` |
+| `options` | string | Bounded output token such as `output=full` |
 
 **Exit Codes:**
 - `0` - Success
@@ -267,7 +261,7 @@ run_notebook({
 # Execute in specific working directory
 run_notebook({
   "notebookPath": "docs/Examples/tutorial.ipynb",
-  "cwd": "/path/to/worktree"
+  "cwd": worktree_path
 })
 
 # Skip pre-execution validation (for debugging)
@@ -279,7 +273,7 @@ run_notebook({
 # JSON output for programmatic parsing
 run_notebook({
   "notebookPath": "docs/Examples/tutorial.ipynb",
-  "outputMode": "json"
+  "options": "output=json"
 })
 ```
 
@@ -295,7 +289,7 @@ run_notebook({
 | `expectOutput` | array | Patterns to validate in output |
 | `cwd` | string | Working directory for execution |
 | `skipValidation` | boolean | Skip pre-execution validation |
-| `outputMode` | string | `summary`, `full`, or `json` |
+| `options` | string | `output=<summary|full|json>` |
 
 **Default Behavior:**
 - Overwrites source notebook with executed version
@@ -341,15 +335,15 @@ write({
 Find notebooks by pattern:
 
 ```python
-ripgrep({"pattern": "docs/Examples/**/*.ipynb"})
+find_files({"pattern": "docs/Examples/**/*.ipynb"})
 ```
 
 Search notebook contents:
 
 ```python
-ripgrep({
+ripgrep_advanced({
   "contentPattern": "import pandas",
-  "pattern": "docs/Examples/**/*.ipynb"
+  "path": "docs/Examples/"
 })
 ```
 
@@ -358,7 +352,7 @@ ripgrep({
 List directory contents with ripgrep:
 
 ```python
-ripgrep({"pattern": "**/*", "path": "docs/Examples/"})
+find_files({"pattern": "**/*", "path": "docs/Examples/"})
 ```
 
 ### move
@@ -460,11 +454,9 @@ Extract:
 notebook_full_path = f"{worktree_path}/{notebook_path}"
 ```
 
-**Without adw_id:**
-```python
-# Use paths as provided (current working directory)
-notebook_full_path = notebook_path
-```
+Reject requests without `adw_id` or a resolved `worktree_path`; do not use an ambient working
+directory. Keep wrapper notebook paths repo-relative in `notebook_path`, and use
+`notebook_full_path = f"{worktree_path}/{notebook_path}"` only for confined file-tool edits.
 
 ### 1.4: Validate Path Permissions
 
@@ -522,10 +514,10 @@ For tasks that modify existing notebooks (edit, convert, execute), validate firs
 # Mark todo as in_progress
 todowrite({"todos": [{"id": "1", "status": "in_progress", ...}]})
 
-# Validate the notebook
-validate_notebook({
-  "notebookPath": "{notebook_full_path}",
-  "outputMode": "full"
+# Validate the notebook without mutation
+validate_notebook_readonly({
+  "notebookPath": "{notebook_path}",
+  "options": "output=full"
 })
 ```
 
@@ -617,7 +609,7 @@ write({
 
 # Step 4.3: Validate the created notebook
 validate_notebook({
-  "notebookPath": "{notebook_full_path}"
+  "notebookPath": "{notebook_path}"
 })
 ```
 
@@ -646,9 +638,8 @@ For adding/removing cells or complex changes, use Jupytext workflow:
 
 ```python
 # Step 4.1: Convert notebook to Python script
-validate_notebook({
-  "notebookPath": "{notebook_full_path}",
-  "convertToPy": true
+convert_notebook_to_py({
+  "notebookPath": "{notebook_path}"
 })
 
 # Step 4.2: Read the generated Python script
@@ -663,9 +654,8 @@ edit({
 })
 
 # Step 4.4: Sync changes back to notebook
-validate_notebook({
-  "notebookPath": "{notebook_full_path}",
-  "sync": true
+sync_notebook_pair({
+  "notebookPath": "{notebook_path}"
 })
 
 # Step 4.5: Optionally remove the .py file if not needed
@@ -678,15 +668,14 @@ Validate notebook structure without modifications:
 
 ```python
 # Single notebook validation
-result = validate_notebook({
-  "notebookPath": "{notebook_full_path}",
-  "outputMode": "full"
+result = validate_notebook_readonly({
+  "notebookPath": "{notebook_path}",
+  "options": "output=full"
 })
 
 # Check for syntax issues in code cells
-validate_notebook({
-  "notebookPath": "{notebook_full_path}",
-  "skipSyntax": false  # default - validates Python syntax
+validate_notebook_readonly({
+  "notebookPath": "{notebook_path}"  # default validates Python syntax
 })
 ```
 
@@ -696,21 +685,19 @@ Convert notebook to/from Python script:
 
 ```python
 # Convert to Python
-validate_notebook({
-  "notebookPath": "{notebook_full_path}",
-  "convertToPy": true
+convert_notebook_to_py({
+  "notebookPath": "{notebook_path}"
 })
 
 # Convert with custom output directory
-validate_notebook({
-  "notebookPath": "{notebook_full_path}",
-  "convertToPy": true,
+convert_notebook_to_py({
+  "notebookPath": "{notebook_path}",
   "outputDir": "scripts/"
 })
 
 # Check sync status
-validate_notebook({
-  "notebookPath": "{notebook_full_path}",
+validate_notebook_readonly({
+  "notebookPath": "{notebook_path}",
   "checkSync": true
 })
 ```
@@ -722,20 +709,20 @@ Run the notebook and verify it completes:
 ```python
 # Execute with default settings (overwrites source, creates backup)
 run_notebook({
-  "notebookPath": "{notebook_full_path}",
+  "notebookPath": "{notebook_path}",
   "timeout": 300
 })
 
 # Execute without modifying source
 run_notebook({
-  "notebookPath": "{notebook_full_path}",
+  "notebookPath": "{notebook_path}",
   "noOverwrite": true,
-  "writeExecuted": "{notebook_full_path.replace('.ipynb', '-executed.ipynb')}"
+  "writeExecuted": "docs/Examples/{notebook_name}-executed.ipynb"
 })
 
 # Execute with output validation
 run_notebook({
-  "notebookPath": "{notebook_full_path}",
+  "notebookPath": "{notebook_path}",
   "expectOutput": ["Success", "DataFrame", "plot"]
 })
 ```
@@ -746,22 +733,22 @@ Validate all notebooks in a directory:
 
 ```python
 # Find all notebooks
-notebooks = ripgrep({"pattern": "{directory}/**/*.ipynb"})
+ notebooks = find_files({"pattern": "{directory}/**/*.ipynb"})
 
 # Validate each notebook
 results = []
 for nb in notebooks:
     result = validate_notebook({
       "notebookPath": nb,
-      "outputMode": "json"
+      "options": "output=json"
     })
     results.append({"notebook": nb, "result": result})
 
 # Or use recursive validation
-validate_notebook({
+validate_notebook_readonly({
   "notebookPath": "{directory}",
   "recursive": true,
-  "outputMode": "full"
+  "options": "output=full"
 })
 ```
 
@@ -771,10 +758,9 @@ Attempt to repair a corrupted notebook:
 
 ```python
 # Step 4.1: Try validation to see the error
-validate_notebook({
-  "notebookPath": "{notebook_full_path}",
-  "skipSyntax": true,  # Skip syntax to focus on structure
-  "outputMode": "full"
+validate_notebook_readonly({
+  "notebookPath": "{notebook_path}",
+  "options": "skip-syntax output=full"
 })
 
 # Step 4.2: Read raw file to diagnose
@@ -799,7 +785,7 @@ write({
 
 # Step 4.5: Validate the repair
 validate_notebook({
-  "notebookPath": "{notebook_full_path}"
+  "notebookPath": "{notebook_path}"
 })
 ```
 
@@ -823,8 +809,8 @@ while attempt <= 3:
 todowrite({"todos": [{"id": "3", "status": "in_progress", ...}]})
 
 validate_notebook({
-  "notebookPath": "{notebook_full_path}",
-  "outputMode": "full"
+  "notebookPath": "{notebook_path}",
+  "options": "output=full"
 })
 ```
 
@@ -862,10 +848,10 @@ If the task requested execution verification or if creating/editing a tutorial:
 todowrite({"todos": [{"id": "4", "status": "in_progress", ...}]})
 
 run_notebook({
-  "notebookPath": "{notebook_full_path}",
+  "notebookPath": "{notebook_path}",
   "timeout": 300,
   "noOverwrite": true,  # Don't modify the notebook
-  "outputMode": "full"
+  "options": "output=full"
 })
 ```
 
@@ -875,7 +861,7 @@ If `expectOutput` patterns were specified:
 
 ```python
 run_notebook({
-  "notebookPath": "{notebook_full_path}",
+  "notebookPath": "{notebook_path}",
   "expectOutput": ["DataFrame", "Success", "{pattern}"],
   "noOverwrite": true
 })

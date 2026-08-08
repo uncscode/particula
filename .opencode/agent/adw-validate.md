@@ -49,6 +49,10 @@ permission:
   websearch: deny
   codesearch: deny
   bash: deny
+agent_contract_version: e37-m3-p5-v1
+declared_scope:
+  roots: [adw, scripts]
+  file_kinds: [.py, .md, .json]
 ---
 
 # ADW Validate Agent
@@ -100,7 +104,23 @@ run_bun_test({
   "testPath": ".opencode/tools/__tests__/run_bun_test.test.ts",
   "timeout": 120,
   "minTests": 1,
-  "cwd": "{worktree_path}"
+  "cwd": worktree_path
+})
+```
+
+For read-only Ruff checks, resolve the worktree first and keep every target path canonical
+and repo-relative. Use only `check` or `format-check` modes; do not use `targetDir` or
+an auto-fix option in validator guidance.
+
+```python
+worktree_path = adw_spec_read({
+  "command": "read",
+  "adw_id": "{adw_id}",
+  "field": "worktree_path"
+})
+run_linters({
+  "mode": "check",
+  "targetPaths": ["adw/tests/agent_permission_validation_test.py"]
 })
 ```
 
@@ -110,7 +130,7 @@ and `docs-validator`.
 
 ```python
 run_validate_agent_references({
-  "cwd": "{worktree_path}"
+  "cwd": worktree_path
 })
 ```
 
@@ -236,10 +256,10 @@ Use tools to verify you're operating in the correct worktree:
 ripgrep({"pattern": "**/*", "path": worktree_path})
 
 # Check git status in worktree
-git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "worktree_path": worktree_path})
 
 # Get diff to understand what changed
-git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
+git_diff({"command": "diff", "worktree_path": worktree_path})
 ```
 
 **CRITICAL:** All subsequent file operations MUST use paths relative to or within `worktree_path`.
@@ -291,7 +311,7 @@ Create a mental checklist of intents to verify:
 ### 5.1: Get Changed Files
 
 ```python
-git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
+git_diff({"command": "diff", "worktree_path": worktree_path})
 ```
 
 ### 5.2: Read Changed Code
@@ -377,7 +397,7 @@ run_pytest_advanced({
   "pytestArgs": ["{module}/tests/", "-m", "not slow and not performance"],
   "minTests": 1,
   "timeout": 120,
-  "cwd": worktree_path,
+   "cwd": worktree_path,
   "options": "fail-fast"
 })
 ```
@@ -399,9 +419,8 @@ Check code quality on changed files:
 
 ```python
 run_linters({
-  "targetDir": worktree_path,
-  "autoFix": false,  # Don't auto-fix yet, just detect
-  "outputMode": "summary"
+   "mode": "check",
+   "targetPaths": ["adw/"]
 })
 ```
 
@@ -450,9 +469,8 @@ edit({
 **Lint Gaps:**
 ```python
 run_linters({
-  "targetDir": worktree_path,
-  "autoFix": true,
-  "outputMode": "summary"
+   "mode": "check",
+   "targetPaths": ["adw/"]
 })
 ```
 
@@ -476,7 +494,7 @@ After fixing, verify everything passes:
 run_pytest_advanced({
   "pytestArgs": ["{affected_modules}/tests/", "-m", "not slow and not performance"],
   "minTests": 1,
-  "cwd": worktree_path,
+   "cwd": worktree_path,
   "options": "fail-fast"
 })
 ```
@@ -485,9 +503,8 @@ run_pytest_advanced({
 
 ```python
 run_linters({
-  "targetDir": worktree_path,
-  "autoFix": false,
-  "outputMode": "summary"
+   "mode": "format-check",
+   "targetPaths": ["adw/"]
 })
 ```
 
@@ -513,7 +530,7 @@ If any fixes were made, commit them:
 ### 11.1: Check for Changes
 
 ```python
-git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "worktree_path": worktree_path})
 ```
 
 ### 11.2: Commit via Subagent

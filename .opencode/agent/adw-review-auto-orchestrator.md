@@ -107,8 +107,8 @@ Never invoke `adw-review-feedback-poster` from this auto-only orchestrator.
 
 ## Step 2: Analyze Changed Files
 
-- Use `git_diff` with `command: "diff"`, `base`, and `stat: true` to identify
-  the changed files in the worktree
+- Use bounded `git_diff` output with `command: "diff"`, `base`, and the explicit
+  canonical `worktree_path` loaded from state to identify changed files
 - For accumulate-mode slices where the worktree branch tracks `main`, the diff
   against `base: "main"` may be empty. In this case, resolve the accumulate
   branch name from workflow state or issue context and use an explicit `target`:
@@ -117,7 +117,7 @@ Never invoke `adw-review-feedback-poster` from this auto-only orchestrator.
   git_diff({
     "command": "diff",
     "base": "main",
-    "stat": true
+    "worktree_path": worktree_path
   })
 
   # Accumulate-mode fallback (worktree tracks main, changes on accumulate branch):
@@ -127,7 +127,7 @@ Never invoke `adw-review-feedback-poster` from this auto-only orchestrator.
     "command": "diff",
     "base": "main",
     "target": "origin/{accumulate_branch}",
-    "stat": true
+    "worktree_path": worktree_path
   })
   ```
 - Categorize files into Python, C++, and other buckets

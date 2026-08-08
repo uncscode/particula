@@ -24,7 +24,7 @@ describe("run_linters wrapper", () => {
   it("builds default auto-fix command without target-dir", async () => {
     const execute = await loadToolExecute("../../run_linters.ts");
 
-    await execute({});
+    await execute({ confirmed: true });
 
     const command = getInvocations().at(-1)?.args.join(" ") ?? "";
 
@@ -68,6 +68,69 @@ describe("run_linters wrapper", () => {
     expect(command).toContain("--linters=mypy");
     expect(command).toContain("--no-auto-fix");
     expect(command).not.toContain("--auto-fix");
+  });
+
+  it("forwards explicit Ruff mode and ordered targets without auto-fix", async () => {
+    const execute = await loadToolExecute("../../run_linters.ts");
+
+    await execute({ mode: "format-check", targetPaths: ["adforge_core", ".opencode/tools"] });
+
+    const command = getInvocations().at(-1)?.args.join(" ") ?? "";
+    expect(command).toContain("--mode=format-check");
+    expect(command).toContain('--target-paths-json=["adforge_core",".opencode/tools"]');
+    expect(command).toContain("--linters=ruff");
+    expect(command).not.toContain("--auto-fix");
+    expect(command).not.toContain("--no-auto-fix");
+  });
+
+  it("keeps every explicit mode Ruff-only and never transports legacy mutation selectors", async () => {
+    const execute = await loadToolExecute("../../run_linters.ts");
+
+    await execute({ mode: "check" });
+    await execute({ mode: "format-check" });
+    await execute({ mode: "format", confirmed: true });
+
+    const commands = getInvocations().map((invocation) => invocation.args.join(" "));
+    expect(commands).toHaveLength(3);
+    expect(commands[0]).toContain("--mode=check");
+    expect(commands[1]).toContain("--mode=format-check");
+    expect(commands[2]).toContain("--mode=format");
+    for (const command of commands) {
+      expect(command).toContain("--linters=ruff");
+      expect(command).not.toContain("--auto-fix");
+      expect(command).not.toContain("--no-auto-fix");
+      expect(command).not.toContain("--target-dir=");
+    }
+  });
+
+  it("rejects explicit-mode conflicts and unsafe target paths before subprocess execution", async () => {
+    const execute = await loadToolExecute("../../run_linters.ts");
+
+    expect(await execute({ mode: "check", autoFix: true })).toContain("mode conflicts with autoFix");
+    expect(await execute({ targetPaths: ["adforge_core"] })).toContain("targetPaths requires mode");
+    expect(await execute({ mode: "check", targetPaths: ["../outside"] })).toContain("invalid repository-relative path");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("requires confirmation for mutating format and legacy auto-fix requests", async () => {
+    const execute = await loadToolExecute("../../run_linters.ts");
+
+    expect(await execute({ mode: "format" })).toContain("explicit confirmation");
+    expect(await execute({ autoFix: true })).toContain("explicit confirmation");
+    expect(getInvocations()).toHaveLength(0);
+
+    await execute({ mode: "format", confirmed: true });
+    await execute({ autoFix: true, confirmed: true });
+    expect(getInvocations()).toHaveLength(2);
+  });
+
+  it("accepts an explicit mode with a materialized false auto-fix default", async () => {
+    const execute = await loadToolExecute("../../run_linters.ts");
+
+    await execute({ mode: "check", autoFix: false });
+
+    expect(getInvocations()).toHaveLength(1);
+    expect(getInvocations()[0].args.join(" ")).toContain("--mode=check");
   });
 
   it("rejects unsupported, duplicate, and malformed bounded option tokens before subprocess execution", async () => {

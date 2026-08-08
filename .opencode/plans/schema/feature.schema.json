@@ -114,7 +114,7 @@
     },
     "PlanPhase": {
       "additionalProperties": false,
-      "description": "Structured metadata for a single phase within a plan.\n\nAttributes:\n    id: Stable phase identifier (e.g. ``E17-F1-P1``).\n    title: Human-readable phase title.\n    status: Current phase status.\n    size: Relative implementation size.\n    issue_number: Linked issue number when available.\n    start_date: Phase start date (``YYYY-MM-DD``).\n    completion_date: Phase completion date (``YYYY-MM-DD``).\n    estimates: Optional estimate metadata.\n    actuals: Optional observed metadata.\n    notes_ref: Optional git-notes or reference key for detailed notes.\n    depends_on: Optional list of phase IDs this phase depends on.",
+      "description": "Structured metadata for a single phase within a plan.\n\nAttributes:\n    id: Stable phase identifier (e.g. ``E17-F1-P1``).\n    title: Human-readable phase title.\n    status: Current phase status.\n    size: Relative implementation size.\n    issue_number: Linked issue number when available.\n    start_date: Phase start date (``YYYY-MM-DD``).\n    completion_date: Phase completion date (``YYYY-MM-DD``).\n    estimates: Optional estimate metadata.\n    actuals: Optional observed metadata.\n    notes_ref: Optional git-notes or reference key for detailed notes.\n    depends_on: Optional list of phase IDs this phase depends on.\n    reconciliation_evidence_fingerprint: Optional canonical digest of admitted\n        completion evidence. It is immutable once set by reconciliation;\n        raw evidence and producer output are never persisted.",
       "properties": {
         "actuals": {
           "anyOf": [
@@ -192,6 +192,21 @@
           ],
           "default": null,
           "title": "Notes Ref"
+        },
+        "reconciliation_evidence_fingerprint": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "minLength": 64,
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reconciliation Evidence Fingerprint"
         },
         "size": {
           "enum": [

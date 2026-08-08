@@ -78,11 +78,15 @@ task({
 ## MkDocs Build Validation
 
 Use MkDocs validation to catch broken references and configuration errors without modifying
-the documentation. Prefer strict validation to surface warnings as failures.
+the documentation. Strict validation is intrinsic to this wrapper; do not pass a `strict` option.
 
 ```python
-# Strict validation without writing build artifacts
-build_mkdocs_validate({"options": "strict"})
+worktree_path = adw_spec_read({
+  "command": "read",
+  "adw_id": "{adw_id}",
+  "field": "worktree_path"
+})
+build_mkdocs_validate({"cwd": worktree_path, "options": "output=summary"})
 ```
 
 Review the output for broken cross-references, missing pages, or plugin errors and report
@@ -100,7 +104,7 @@ run_bun_test({
   "testPath": ".opencode/tools/__tests__/run_bun_test.test.ts",
   "timeout": 120,
   "minTests": 1,
-  "cwd": "{worktree_path}"
+  "cwd": worktree_path
 })
 ```
 
@@ -113,7 +117,7 @@ shell commands directly from this agent.
 
 ```python
 run_validate_agent_references({
-  "cwd": "{worktree_path}"
+  "cwd": worktree_path
 })
 ```
 
@@ -166,17 +170,9 @@ Maintain a short checklist in your final response (no tool call), covering:
 
 ## Step 3: Collect Markdown Files
 
-Use repo-safe discovery and search tools already available to this agent
-(`find_files`, `search_content`, `ripgrep_advanced`, plus targeted `read`
-calls).
-
-```python
-# Discover markdown files with find_files scoped to the worktree
-find_files({"pattern": "docs/**/*.md", "path": "{worktree_path}"})
-find_files({"pattern": "README.md", "path": "{worktree_path}"})
-find_files({"pattern": "AGENTS.md", "path": "{worktree_path}"})
-find_files({"pattern": ".opencode/**/*.md", "path": "{worktree_path}"})
-```
+Use repo-safe discovery and search tools already available to this agent.
+Collect markdown files by worktree-scoped discovery, then inspect the matched files
+with targeted reads.
 
 Categorize files:
 - `.opencode/guides/*.md` - Agent guides
@@ -189,14 +185,9 @@ Categorize files:
 
 ### 4.1: Extract All Links
 
-For each markdown file:
-```text
-# Extract markdown links
-search_content({"contentPattern": "\\[([^\\]]+)\\]\\(([^)]+)\\)", "path": "{file}"})
-
-# Extract just the paths
-search_content({"contentPattern": "\\]\\(([^)]+)\\)", "path": "{file}"})
-```
+For each markdown file, extract links using the repository's approved search helpers.
+The exact tool call shape depends on the currently available wrapper contract, but
+the intent is always: locate markdown links and inspect the resolved targets.
 
 ### 4.2: Validate Internal Links
 
@@ -239,10 +230,7 @@ For links with `#anchor`:
 
 ### 6.1: Extract Anchors from File
 
-```text
-# Extract headers (which become anchors)
-search_content({"contentPattern": "^#{1,6} ", "path": "{file}"})
-```
+Use the approved search helper to extract headers (which become anchors).
 
 ### 6.2: Convert Headers to Anchor Format
 
@@ -260,16 +248,8 @@ Check if anchor link target exists in file.
 
 ### 7.1: Check Common Issues
 
-```text
-# Check for broken code blocks (odd number of ```)
-search_content({"contentPattern": "```", "path": "{file}"})  # Count matches in output
-
-# Check for unclosed links
-search_content({"contentPattern": "\\[.*\\]\\([^)]*$", "path": "{file}"})
-
-# Check for empty links
-search_content({"contentPattern": "\\[\\]\\(\\)", "path": "{file}"})
-```
+Use the approved search helper to look for broken code blocks, unclosed links, and
+empty links in the same repository-scoped manner.
 
 ### 7.2: Check Required Elements
 

@@ -192,8 +192,8 @@ Extract from `adw_state.json`:
 Use the `worktree_path` for all operations and validate location with tools (no shell navigation):
 
 ```python
-git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
-git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "worktree_path": worktree_path})
+git_diff({"command": "diff", "worktree_path": worktree_path})
 ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
@@ -289,7 +289,8 @@ After implementing each correction, run a **fast spot-check test** on the affect
 
 ```python
 run_pytest_advanced({
-  "pytestArgs": ["{module}/tests/", "-x", "--maxfail=1", "-q"],
+  "testPath": "{module}/tests/",
+  "options": "fail-fast",
   "options": "output=summary",
   "timeout": 60
 })

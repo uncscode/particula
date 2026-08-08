@@ -41,30 +41,29 @@ adw_spec_read({ "command": "read", "adw_id": "abc12345", "field": "worktree_path
 ## Notes
 
 - `cwd` is required for all mutating commands.
-- Resolve `cwd` from `adw_spec_read read -> worktree_path` so plan writes stay anchored to the
-  active worktree.
+- `cwd` must exactly equal the `worktree_path` returned by
+  `adw_spec_read({"command": "read", "adw_id": ..., "field": "worktree_path"})`;
+  plan writes stay anchored to the active worktree.
 - `plan_type` is passed through as a string so runtime registry-driven plan types (for example `research`) are not wrapper-rejected.
-- Use bounded `options` tokens for optional wrapper aliases (`status=<value>`,
+- Use bounded command-scoped `options` tokens for optional wrapper aliases (`status=<value>`,
   `phase-status=<value>`, `priority=<value>`, `size=<value>`, `after=<phase_id>`, `issue=<n>`,
-  `clear-issue-number`). Direct `status` / `phase_status` are not part of the split-wrapper
-  contract, while raw JSON `patch` stays a direct-field exception.
+  ). `clear_issue_number` is a direct boolean; raw JSON `patch` stays a direct-field exception.
 - Keep payload-bearing or validation-critical fields direct: `plan_id`,
   `phase_id`, `title`, `plan_type`, `cwd`, and raw JSON `patch`.
 - Example of stale shape to avoid on split wrappers: `{ "command": "update",
   "plan_id": "E17-F1", "status": "Ready", "cwd": "/path/to/trees/abc12345" }`.
 - `patch` forwarding/validation semantics are unchanged for the active split wrappers.
-- Compatibility and split wrappers share the same spawned-command failure handling:
+- Active split plan wrappers use the following spawned-command failure handling:
   - `stderr` -> `stdout` -> message/fallback precedence
   - bounded truncation for long diagnostics
   - absolute-path redaction to `<path>`
   - targeted runtime/tooling and cwd/worktree hints when recognized
-- Deterministic required-cwd error example:
-  - `ERROR: update command requires 'cwd'`
+- All callers must use the exact module-admitted workflow root; an unadmitted,
+  sibling, nested, or other repository root is rejected before spawn.
 - Additional deterministic pre-spawn path-validation examples:
   - `ERROR: cwd path does not exist: <path>`
   - `ERROR: cwd path is not a directory: <path>`
-  - `ERROR: cwd path is not a repository/worktree root: <path> (missing .git metadata at <path>)`
-  - `ERROR: cwd path resolves outside repository root: <path> (canonical: <path>)`
+  - `ERROR: cwd path is not this wrapper's admitted worktree root: <path>; use the workflow worktree_path.`
 
 Delegated failure envelope example:
 

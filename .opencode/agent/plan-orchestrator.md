@@ -7,7 +7,7 @@ description: >-
 
   This agent:
   - Reads classifier output via adw_spec_messages messages-read
-  - Creates structured plan records via adw_plans_mutate create (plans must exist before drafters run)
+  - Creates or resumes structured plan records (plans must exist before drafters run)
   - Dispatches plan drafters in deterministic sequence by plan type
   - Continues best-effort on partial drafter subagent failures
   - Writes a final summary including ordered calls and success/failure counts via adw_spec_messages
@@ -35,6 +35,29 @@ permission:
   adw_plans_mutate: allow
   feedback_log: allow
   get_datetime: allow
+agent_contract_version: e37-m3-p5-v1
+declared_scope:
+  roots: [.opencode/plans, .opencode/agent]
+  file_kinds: [.md, .json]
+subagent_type_allowlist: [plan-epic-drafter, plan-feature-drafter, plan-research-drafter, plan-maintenance-drafter]
+task_routes:
+  - child: plan-epic-drafter
+    required_handoff_fields: [adw_id, target_id, plan_type]
+  - child: plan-feature-drafter
+    required_handoff_fields: [adw_id, target_id, plan_type, parent_id]
+  - child: plan-research-drafter
+    required_handoff_fields: [adw_id, target_id, plan_type, parent_id]
+  - child: plan-maintenance-drafter
+    required_handoff_fields: [adw_id, target_id, plan_type, parent_id]
+completion_contract:
+  id: e37-m3-p5-v1
+  role: consumer
+  allowed_owners: [plan-epic-drafter, plan-feature-drafter, plan-research-drafter, plan-maintenance-drafter]
+  reject_invalid_success: true
+  required_fields: [outcome, status, owner, target_id, adw_id, worktree_path, summary, evidence]
+  failure_fields: [failure_reason, rerun_guidance]
+  statuses: [success, failed, blocked]
+  nonempty_success_fields: [evidence]
 ---
 
 # Plan Orchestrator
@@ -53,7 +76,7 @@ input: $ARGUMENTS
 
 1. Parse `adw_id` from arguments
 2. Read scope classification from the workflow message log
-3. Create structured plan records via `adw_plans_mutate create` for every plan identified by the classifier
+3. Resume persisted plan IDs or create structured plan records for every plan identified by the classifier
 4. Dispatch drafter subagents to populate plan content
 5. Write completion/error summary with ordered calls and counts
 
@@ -75,6 +98,13 @@ input: $ARGUMENTS
 Drafters are responsible for adding phases (`adw_plans_mutate add-phase`) and populating
 section content. The orchestrator only creates the plan shell records.
 
+## Static P5 Handoff Metadata
+
+The versioned frontmatter declarations are closed static validation metadata for
+scope, routes, required handoff fields, and completion-envelope shape. They
+grant no runtime authority, do not parse or admit live child results, and only
+describe the static handoff contract.
+
 Research is a first-class plan track. This agent must parse, validate, create,
 and dispatch `research` / `research_tracks` deterministically:
 
@@ -87,10 +117,15 @@ and dispatch `research` / `research_tracks` deterministically:
   maintenance tracks, never a mixture under the same epic;
 - reject mixed epic child-track families before creating any plans.
 
-# Stateless Design Principles
+# Resumable Design Principles
 
 - **Plan creation via tool**: all plan records are created via `adw_plans_mutate create`.
   The orchestrator does not write plan files directly.
+- **Persist resolved IDs immediately**: write the ordered concrete IDs to the
+  `planner_resolved_plan_ids` workflow-state field after every successful create.
+  A retry must reuse this field and must never auto-resolve replacement IDs.
+- **Persist completed drafts immediately**: append each successfully drafted ID
+  to `planner_drafted_plan_ids`. On retry, verify and skip those completed drafts.
 - **Sequential subagent execution**: each subagent completes before the next begins.
 - **Fail-fast on plan creation**: if any `adw_plans_mutate create` call fails, halt the
   entire pipeline. Plans must exist before drafters can populate them.
@@ -373,6 +408,22 @@ Before using any ID from the classifier, enforce sanitization:
 Create structured plan records via `adw_plans_mutate create` for **every** plan
 identified by the classifier. All plans must be created before any drafter runs.
 
+### Resume Preflight (required)
+
+Before any create call, read workflow state and inspect
+`planner_resolved_plan_ids` and `planner_drafted_plan_ids`.
+
+- If `planner_resolved_plan_ids` is nonempty, parse it as the authoritative
+  ordered concrete ID list. Validate every ID with `adw_plans_read show`, confirm
+  plan type and parent relationships match the current classification, and reuse
+  the complete list without any create calls.
+- If any persisted ID is missing or incompatible, fail closed. Do not auto-create
+  a replacement and do not choose a newer ID.
+- If no persisted list exists, create plans normally. After each successful
+  create, immediately write the ordered IDs resolved so far to
+  `planner_resolved_plan_ids` via `adw_spec_write` before the next create.
+- A retry is never a reason to call auto-resolution again.
+
 **If any `adw_plans_mutate create` call fails, halt the entire pipeline immediately.**
 
 ### Epic Scope (`plan_type=epic`)
@@ -649,7 +700,7 @@ After all creates succeed, optionally verify with `adw_plans_read show`:
 adw_plans_read({
   "command": "show",
   "plan_id": "E18",
-  "options": "json",
+  "json": true,
   "cwd": "<worktree_path>"
 })
 ```
@@ -661,6 +712,14 @@ responsible for:
 - Adding phases via `adw_plans_mutate add-phase`
 - Populating section content
 - Expanding plan details
+
+Before each dispatch, inspect `planner_drafted_plan_ids`. For every persisted
+completed ID, verify that the plan still exists, contains phases when its plan
+type supports phases, and has populated canonical sections. Record it as a
+successful resumed draft and skip redispatch. After each new successful drafter
+call, immediately append its ID to `planner_drafted_plan_ids` via
+`adw_spec_write`. Missing or incomplete persisted drafts fail closed rather than
+being silently treated as complete.
 
 ### Dispatch Order
 
@@ -939,24 +998,27 @@ adw_spec_messages({"command": "messages-read", "adw_id": "a1b2c3d4"})
 `feature_tracks` is `auto` — both valid sentinels, bypass ID format check.
 Creation list = `["auto (epic)", "auto (feature)", "auto (feature)"]`.
 
-**Step 4 - Create plans (3 calls, fail pipeline on any error):**
+**Step 4 - Create plans (3 calls, fail pipeline on any error):** First resolve
+the exact absolute worktree path for every mutation:
 ```python
+worktree_path = adw_spec_read({"command": "read", "adw_id": "a1b2c3d4", "field": "worktree_path"})
+
 # 4a: Epic (auto-resolve)
 result = adw_plans_mutate({"command": "create", "plan_type": "epic",
                     "title": "Workflow Improvements", "options": "status=Draft",
-                    "cwd": "./trees/a1b2c3d4"})
+                    "cwd": worktree_path})
 # Output: "plan_id: E5"
 # resolved_epic_id = "E5"
 
 # 4b: Feature tracks (auto-resolve using resolved epic as parent)
 result = adw_plans_mutate({"command": "create", "plan_type": "feature",
                     "title": "Enhanced Scheduling", "parent": "E5",
-                    "options": "status=Draft", "cwd": "./trees/a1b2c3d4"})
+                    "options": "status=Draft", "cwd": worktree_path})
 # Output: "plan_id: E5-F1"
 
 result = adw_plans_mutate({"command": "create", "plan_type": "feature",
                     "title": "Status Dashboard", "parent": "E5",
-                    "options": "status=Draft", "cwd": "./trees/a1b2c3d4"})
+                    "options": "status=Draft", "cwd": worktree_path})
 # Output: "plan_id: E5-F2"
 ```
 
@@ -1010,21 +1072,24 @@ Derive creation list from concrete fields: `[epic_id] + feature_tracks`
 > produces the correct list. The `next_ids` normalization would also extract
 > `["E5", "E5-F1"]` as a fallback.
 
-**Step 4 - Create plans (3 calls, fail pipeline on any error):**
+**Step 4 - Create plans (3 calls, fail pipeline on any error):** First resolve
+the exact absolute worktree path for every mutation:
 ```python
+worktree_path = adw_spec_read({"command": "read", "adw_id": "a1b2c3d4", "field": "worktree_path"})
+
 # 4a: Epic
 adw_plans_mutate({"command": "create", "plan_type": "epic", "plan_id": "E5",
            "title": "Workflow Improvements", "options": "status=Draft",
-           "cwd": "./trees/a1b2c3d4"})
+           "cwd": worktree_path})
 
 # 4b: Feature tracks
 adw_plans_mutate({"command": "create", "plan_type": "feature", "plan_id": "E5-F1",
            "title": "Enhanced Scheduling", "parent": "E5", "options": "status=Draft",
-           "cwd": "./trees/a1b2c3d4"})
+           "cwd": worktree_path})
 
 adw_plans_mutate({"command": "create", "plan_type": "feature", "plan_id": "E5-F2",
            "title": "Status Dashboard", "parent": "E5", "options": "status=Draft",
-           "cwd": "./trees/a1b2c3d4"})
+           "cwd": worktree_path})
 ```
 
 **Step 5 - Dispatch drafters (3 calls, best-effort):**
@@ -1075,9 +1140,11 @@ diagnostics: missing_epic_id
 
 **Step 4 - Create plan (omit plan_id for auto-resolution):**
 ```python
+worktree_path = adw_spec_read({"command": "read", "adw_id": "a1b2c3d4", "field": "worktree_path"})
+
 result = adw_plans_mutate({"command": "create", "plan_type": "feature",
                     "title": "Status Progress Bar Improvements", "options": "status=Draft",
-                    "cwd": "./trees/a1b2c3d4"})
+                    "cwd": worktree_path})
 # Output includes: "plan_id: F8"
 # resolved_id = "F8"
 ```
@@ -1114,9 +1181,11 @@ next_ids: F8
 
 **Step 4 - Create plan:**
 ```python
+worktree_path = adw_spec_read({"command": "read", "adw_id": "a1b2c3d4", "field": "worktree_path"})
+
 adw_plans_mutate({"command": "create", "plan_type": "feature", "plan_id": "F8",
            "title": "Export System", "options": "status=Draft",
-           "cwd": "./trees/a1b2c3d4"})
+           "cwd": worktree_path})
 ```
 
 **Step 5 - Dispatch drafter:**
@@ -1143,9 +1212,11 @@ diagnostics: missing_epic_id
 
 **Step 4 - Create plan (omit plan_id for auto-resolution):**
 ```python
+worktree_path = adw_spec_read({"command": "read", "adw_id": "a1b2c3d4", "field": "worktree_path"})
+
 result = adw_plans_mutate({"command": "create", "plan_type": "maintenance",
                     "title": "Tool Wrapper Contract Fixes", "options": "status=Draft",
-                    "cwd": "./trees/a1b2c3d4"})
+                    "cwd": worktree_path})
 # Output includes: "plan_id: M11"
 # resolved_id = "M11"
 ```

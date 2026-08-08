@@ -59,8 +59,8 @@ behavior for document-level issues unless required workflow state is missing.
 
 - @.opencode/guides/architecture_reference.md - architecture boundaries and integration points
 - @.opencode/guides/code_style.md - deterministic, bounded edits
-- `adw_plans_read({"command": "list", "lifecycle": "active", "options": "json", "cwd": worktree_path})` - optional active-plan sanity source
-- `adw_plans_read({"command": "list-sections", "plan_id": "<id>", "options": "json", "cwd": worktree_path})` - per-plan section resolution source
+- `adw_plans_read({"command": "list", "lifecycle": "active", "json": true, "cwd": worktree_path})` - optional active-plan sanity source
+- `adw_plans_read({"command": "list-sections", "plan_id": "<id>", "json": true, "cwd": worktree_path})` - per-plan section resolution source
 - `.opencode/plans/sections/` - canonical editable plan section root
 
 # Process
@@ -134,7 +134,7 @@ For each `plan_id` in `review_plan_ids`, resolve canonical section files:
 adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "options": "json",
+  "json": true,
   "cwd": worktree_path
 })
 ```

@@ -144,7 +144,7 @@ subagent to persist best-effort workflow context to git notes:
 ```python
 task({
   "description": "Write workflow context note",
-  "prompt": f"Write note from state.\n\nArguments: adw_id={adw_id}",
+  "prompt": f"Write note from state.\n\nArguments: adw_id={adw_id} worktree_path={worktree_path}",
   "subagent_type": "adw-note-writer"
 })
 ```
@@ -209,7 +209,6 @@ The implementation plan (`spec_content`) contains the authoritative list of what
 git_diff({
   "command": "diff",
   "base": "origin/main",  # or target_branch from state
-  "stat": true,
   "worktree_path": "{worktree_path}"
 })
 ```
@@ -219,8 +218,8 @@ git_diff({
 **Optional: Check uncommitted changes:**
 ```python
 # This will likely be empty if prior steps committed - that's OK!
-git_diff({"command": "status", "porcelain": true, "worktree_path": "{worktree_path}"})
-git_diff({"command": "diff", "stat": true, "worktree_path": "{worktree_path}"})
+git_diff({"command": "status", "worktree_path": "{worktree_path}"})
+git_diff({"command": "diff", "worktree_path": "{worktree_path}"})
 ```
 
 **Key insight:** An empty `git diff` (without `--base`) does NOT mean "nothing to ship". It means "nothing uncommitted". The branch still has commits that need a PR. **Always use `--base` to see the full picture.**
@@ -255,7 +254,6 @@ git_diff({"command": "diff", "stat": true, "worktree_path": "{worktree_path}"})
 git_diff({
   "command": "diff",
   "base": "origin/main",  # Use target_branch from state if available
-  "stat": true,
   "worktree_path": "{worktree_path}"
 })
 ```
@@ -852,7 +850,6 @@ Summary:
 git_diff({
   "command": "diff",
   "base": "origin/main",  # or target_branch from state
-  "stat": true,
   "worktree_path": "{worktree_path}"
 })
 ```

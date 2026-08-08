@@ -2,12 +2,12 @@ import { tool } from "@opencode-ai/plugin";
 
 import {
   buildCommandFailureError,
-  hasMeaningfulSplitWrapperAliasValue,
   mergeParsedOptionField,
   parseCommandOptionsString,
   sanitizeSuccessOutput,
   stripDefaultArgs,
   validateAndNormalizePlansCwdPath,
+  validatePlanCommandInput,
   validateUpdatePhaseIssueLinkArgs,
   validateRequiredArgs,
 } from "./adw_plans_contract_shared";
@@ -171,12 +171,8 @@ function isMutateCommand(command: unknown): command is (typeof MUTATE_COMMANDS)[
 // --- Inlined execute logic from adw_plans.ts (mutating commands only) ---
 
 async function executeAdwPlansMutate(args: Record<string, any>): Promise<string> {
-  if (hasMeaningfulSplitWrapperAliasValue(args.status)) {
-    return buildError("'status' is not accepted as a direct field in adw_plans_mutate; use options: \"status=<value>\".");
-  }
-  if (hasMeaningfulSplitWrapperAliasValue(args.phase_status)) {
-    return buildError("'phase_status' is not accepted as a direct field in adw_plans_mutate; use options: \"phase-status=<value>\".");
-  }
+  const matrixValidation = validatePlanCommandInput("adw_plans_mutate", args, buildError);
+  if (matrixValidation.error) return matrixValidation.error;
   const preflightError = validateRequiredArgs(args, REQUIRED_ARGS, buildError);
   if (preflightError) {
     return preflightError;
@@ -221,13 +217,6 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
     buildError,
   );
   if (resolvedIssueNumber.error) return resolvedIssueNumber.error;
-  const resolvedClearIssueNumber = mergeParsedOptionField(
-    undefined,
-    optionValues.clear_issue_number,
-    "clear_issue_number",
-    buildError,
-  );
-  if (resolvedClearIssueNumber.error) return resolvedClearIssueNumber.error;
 
   const lazyNormalizePatch = (): { value?: string; error?: string } => normalizePatch(patch);
 
@@ -375,7 +364,7 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
       }
       const issueLinkValidationError = validateUpdatePhaseIssueLinkArgs(
         resolvedIssueNumber.value,
-        resolvedClearIssueNumber.value,
+         args.clear_issue_number,
         buildError,
       );
       if (issueLinkValidationError) {
@@ -404,7 +393,7 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
         }
         cmdParts.push("--issue", String(resolvedIssueNumber.value));
       }
-      if (resolvedClearIssueNumber.value) {
+       if (args.clear_issue_number === true) {
         cmdParts.push("--clear-issue-number");
       }
       {
@@ -441,16 +430,11 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
       );
   }
 
-  const normalizedCwd = validateAndNormalizePlansCwdPath(cwd);
+  const normalizedCwd = validateAndNormalizePlansCwdPath(cwd, import.meta.dir);
   if (normalizedCwd.error) {
     return normalizedCwd.error;
   }
-  if (MUTATING_COMMANDS.has(executedCommand) && !normalizedCwd.value) {
-    return buildError(`${executedCommand} command requires 'cwd'.`);
-  }
-  if (normalizedCwd.value) {
-    cmdParts.push("--cwd", normalizedCwd.value);
-  }
+  cmdParts.push("--cwd", normalizedCwd.value!);
 
   try {
     const commandTimeout = getTimeout(executedCommand);
@@ -458,8 +442,9 @@ async function executeAdwPlansMutate(args: Record<string, any>): Promise<string>
       cmd: cmdParts,
       stdout: "pipe",
       stderr: "pipe",
-      timeout: commandTimeout,
-      env: sanitizedChildEnv(),
+       timeout: commandTimeout,
+       env: sanitizedChildEnv(),
+       cwd: normalizedCwd.value,
     });
     const stdoutRaw = result.stdout ? decoder.decode(result.stdout) : "";
     const stderrRaw = result.stderr ? decoder.decode(result.stderr) : "";
@@ -528,7 +513,8 @@ Contract parity note: command execution and envelopes are delegated to adw_plans
     options: tool.schema.string().optional(),
     phase_id: tool.schema.string().optional(),
     patch: tool.schema.string().optional(),
-    cwd: tool.schema.string().optional(),
+    cwd: tool.schema.string(),
+    clear_issue_number: tool.schema.boolean().optional(),
   },
 
   async execute(args) {

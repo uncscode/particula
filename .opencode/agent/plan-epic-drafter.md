@@ -35,6 +35,22 @@ permission:
   adw_plans_mutate: allow
   feedback_log: allow
   get_datetime: allow
+agent_contract_version: e37-m3-p5-v1
+declared_scope:
+  roots: [.opencode/plans/templates/epic, .opencode/plans/sections/epics, .opencode/agent, .opencode/plans]
+  file_kinds: [.md, .json]
+subagent_type_allowlist: [codebase-researcher]
+task_routes:
+  - child: codebase-researcher
+    required_handoff_fields: [adw_id, target_id]
+completion_contract:
+  id: e37-m3-p5-v1
+  role: producer
+  owner: plan-epic-drafter
+  required_fields: [outcome, status, owner, target_id, adw_id, worktree_path, summary, evidence]
+  failure_fields: [failure_reason, rerun_guidance]
+  statuses: [success, failed, blocked]
+  nonempty_success_fields: [evidence]
 ---
 
 # Plan Epic Drafter
@@ -142,7 +158,7 @@ The orchestrator already created the plan. Verify it exists:
 adw_plans_read({
   "command": "show",
   "plan_id": "E18",
-  "options": "json",
+  "json": true,
   "cwd": "<worktree_path>"
 })
 ```
@@ -168,7 +184,8 @@ Then list the section paths to know where to write content:
 adw_plans_read({
   "command": "list-sections",
   "plan_id": "E18",
-  "options": "populate json",
+  "json": true,
+  "populate": true,
   "cwd": "<worktree_path>"
 })
 ```

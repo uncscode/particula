@@ -98,7 +98,7 @@ Search for plans related to this issue:
 
 ```python
 # List all active plans to find matches
-adw_plans_read({"command": "list", "lifecycle": "active", "options": "json"})
+adw_plans_read({"command": "list", "lifecycle": "active", "json": true, "cwd": worktree_path})
 ```
 
 Match by:
@@ -108,7 +108,7 @@ Match by:
 
 If no active plans match, check completed plans:
 ```python
-adw_plans_read({"command": "list", "lifecycle": "completed", "options": "json"})
+adw_plans_read({"command": "list", "lifecycle": "completed", "json": true, "cwd": worktree_path})
 ```
 
 ## Step 3: Discover Sections
@@ -116,7 +116,7 @@ adw_plans_read({"command": "list", "lifecycle": "completed", "options": "json"})
 For each matched plan:
 
 ```python
-adw_plans_read({"command": "list-sections", "plan_id": "{plan_id}", "options": "json"})
+adw_plans_read({"command": "list-sections", "plan_id": "{plan_id}", "json": true, "cwd": worktree_path})
 ```
 
 This returns a map of section names to file paths, e.g.:

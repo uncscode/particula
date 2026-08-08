@@ -50,8 +50,18 @@ export function normalizeRef(value: unknown): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+export const NOTE_FIELD_KEYS = [
+  "plan_summary",
+  "architecture_notes",
+  "discovered_context",
+  "review_findings",
+] as const;
+const NOTE_FIELD_KEY_SET = new Set<string>(NOTE_FIELD_KEYS);
+const NULLABLE_NOTE_FIELD_KEY_SET = new Set<string>(["architecture_notes", "review_findings"]);
+
+export type NoteFieldValue = string | null;
 export type ParsedFieldEntriesResult =
-  | { ok: true; entries: [string, string][] }
+  | { ok: true; entries: [string, NoteFieldValue][] }
   | { ok: false; diagnostic: string };
 
 function describeType(value: unknown): string {
@@ -72,6 +82,32 @@ function buildKeyDiagnostic(key: string, message: string): ParsedFieldEntriesRes
   return { ok: false, diagnostic: `invalid fields object key ${stringifyKey(key)}: ${message}` };
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function validateEntry(
+  rawKey: unknown,
+  rawValue: unknown,
+  diagnostic: (message: string) => ParsedFieldEntriesResult,
+): ParsedFieldEntriesResult | { ok: true; entry: [string, NoteFieldValue] } {
+  if (rawKey === null || rawKey === undefined) return diagnostic("key is missing");
+  if (typeof rawKey !== "string") return diagnostic(`key has wrong type ${describeType(rawKey)}`);
+
+  const key = rawKey.trim();
+  if (key.length === 0) return diagnostic("key is blank");
+  if (!NOTE_FIELD_KEY_SET.has(key)) return diagnostic(`key ${stringifyKey(key)} is not allowlisted`);
+  if (rawValue === undefined) return diagnostic("value is missing");
+  if (rawValue === null) {
+    if (!NULLABLE_NOTE_FIELD_KEY_SET.has(key)) return diagnostic(`key ${stringifyKey(key)} does not allow null`);
+    return { ok: true, entry: [key, null] };
+  }
+  if (typeof rawValue !== "string") return diagnostic(`value has wrong type ${describeType(rawValue)}`);
+  return { ok: true, entry: [key, rawValue] };
+}
+
 export function parseFieldEntries(fields: unknown): ParsedFieldEntriesResult {
   if (fields === undefined || fields === null) return { ok: true, entries: [] };
   let parsed: unknown = fields;
@@ -85,7 +121,7 @@ export function parseFieldEntries(fields: unknown): ParsedFieldEntriesResult {
     }
   }
 
-  const normalized: [string, string][] = [];
+  const normalized: [string, NoteFieldValue][] = [];
   if (Array.isArray(parsed)) {
     for (const [index, entry] of parsed.entries()) {
       if (entry === null || entry === undefined) continue;
@@ -93,53 +129,15 @@ export function parseFieldEntries(fields: unknown): ParsedFieldEntriesResult {
         if (entry.length !== 2) {
           return buildIndexDiagnostic(index, "tuple must contain exactly [key, value]");
         }
-        const rawKey = entry[0];
-        const rawValue = entry[1];
-        if (rawKey === null || rawKey === undefined) {
-          return buildIndexDiagnostic(index, "key is missing");
-        }
-        if (rawValue === null) {
-          return buildIndexDiagnostic(index, "value is null");
-        }
-        if (rawValue === undefined) {
-          return buildIndexDiagnostic(index, "value is missing");
-        }
-        if (typeof rawKey !== "string") {
-          return buildIndexDiagnostic(index, `key has wrong type ${describeType(rawKey)}`);
-        }
-        if (typeof rawValue !== "string") {
-          return buildIndexDiagnostic(index, `value has wrong type ${describeType(rawValue)}`);
-        }
-        const key = rawKey.trim();
-        if (key.length === 0) {
-          return buildIndexDiagnostic(index, `key ${stringifyKey(rawKey)} is blank`);
-        }
-        normalized.push([key, rawValue]);
+        const validated = validateEntry(entry[0], entry[1], (message) => buildIndexDiagnostic(index, message));
+        if (!validated.ok) return validated;
+        normalized.push(validated.entry);
         continue;
       }
-      if (entry && typeof entry === "object") {
-        const rawKey = (entry as Record<string, unknown>).key;
-        const rawValue = (entry as Record<string, unknown>).value;
-        if (rawKey === null || rawKey === undefined) {
-          return buildIndexDiagnostic(index, "key is missing");
-        }
-        if (rawValue === null) {
-          return buildIndexDiagnostic(index, "value is null");
-        }
-        if (rawValue === undefined) {
-          return buildIndexDiagnostic(index, "value is missing");
-        }
-        if (typeof rawKey !== "string") {
-          return buildIndexDiagnostic(index, `key has wrong type ${describeType(rawKey)}`);
-        }
-        if (typeof rawValue !== "string") {
-          return buildIndexDiagnostic(index, `value has wrong type ${describeType(rawValue)}`);
-        }
-        const key = rawKey.trim();
-        if (key.length === 0) {
-          return buildIndexDiagnostic(index, `key ${stringifyKey(rawKey)} is blank`);
-        }
-        normalized.push([key, rawValue]);
+      if (isPlainObject(entry)) {
+        const validated = validateEntry(entry.key, entry.value, (message) => buildIndexDiagnostic(index, message));
+        if (!validated.ok) return validated;
+        normalized.push(validated.entry);
         continue;
       }
       return buildIndexDiagnostic(index, `entry has wrong type ${describeType(entry)}`);
@@ -147,22 +145,11 @@ export function parseFieldEntries(fields: unknown): ParsedFieldEntriesResult {
     return { ok: true, entries: normalized };
   }
 
-  if (parsed && typeof parsed === "object") {
+  if (isPlainObject(parsed)) {
     for (const [rawKey, value] of Object.entries(parsed as Record<string, unknown>)) {
-      if (value === null) {
-        return buildKeyDiagnostic(rawKey, "value is null");
-      }
-      if (value === undefined) {
-        return buildKeyDiagnostic(rawKey, "value is missing");
-      }
-      if (typeof value !== "string") {
-        return buildKeyDiagnostic(rawKey, `value has wrong type ${describeType(value)}`);
-      }
-      const key = rawKey.trim();
-      if (key.length === 0) {
-        return buildKeyDiagnostic(rawKey, "key is blank");
-      }
-      normalized.push([key, value]);
+      const validated = validateEntry(rawKey, value, (message) => buildKeyDiagnostic(rawKey, message));
+      if (!validated.ok) return validated;
+      normalized.push(validated.entry);
     }
     return { ok: true, entries: normalized };
   }
@@ -170,8 +157,8 @@ export function parseFieldEntries(fields: unknown): ParsedFieldEntriesResult {
   return { ok: false, diagnostic: "'fields' must decode to an array or plain object" };
 }
 
-export function buildFieldArgs(fields: [string, string][]): string[] {
-  return fields.flatMap(([key, value]) => ["--field", key, value]);
+export function buildFieldArgs(fields: [string, NoteFieldValue][]): string[] {
+  return fields.flatMap(([key, value]) => ["--field-json", JSON.stringify([key, value])]);
 }
 
 export function selectDiagnostic(...candidates: unknown[]): string {

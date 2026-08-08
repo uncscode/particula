@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run repository linters in mutating or validation-only modes.
+"""Run repository linters through legacy and explicit Ruff modes.
 
 This tool runs the configured Ruff and mypy commands for the repository while
 mirroring the lint workflow in `.github/workflows/lint.yml`.
@@ -12,8 +12,12 @@ When auto-fix is enabled, the Ruff path is mutating:
 When auto-fix is disabled, the Ruff path is validation-only and non-mutating:
     1. ruff check
 
-Mypy remains validation-only in both modes. Ruff and mypy subprocesses can also
-run from an explicit working directory via `cwd`.
+Mypy remains validation-only in both legacy modes. Explicit Ruff-only ``check``
+and ``format-check`` modes are read-only, while explicit ``format`` runs one
+mutating formatter command. Explicit modes accept an ordered, bounded JSON
+array of repository-relative targets; legacy invocations continue to use the
+single ``target_dir`` selector. Ruff and mypy subprocesses can also run from an
+explicit working directory via ``cwd``.
 
 Usage:
     python3 run_linters.py
@@ -35,6 +39,10 @@ Examples:
 
     # Disable auto-fix for validation-only, non-mutating checks
     python3 .opencode/tools/run_linters.py --no-auto-fix
+
+    # Check ordered explicit targets without edits
+    python3 .opencode/tools/run_linters.py --mode check \
+        --target-paths-json '["adw","adforge_core/tools"]'
 """
 
 import argparse
@@ -47,6 +55,11 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+MAX_TARGET_PATHS = 64
+MAX_TARGET_PATH_BYTES = 1024
+MAX_TARGET_PATHS_JSON_BYTES = 8192
+EXPLICIT_MODES = {"check", "format-check", "format"}
 
 
 class LinterResult:
@@ -174,6 +187,96 @@ def _resolve_target_arg(target_dir: Optional[str], cwd: str) -> str:
     if resolved_target != cwd_path and cwd_path not in resolved_target.parents:
         raise ValueError(f"target_dir resolves outside cwd: {target_dir}")
     return f"{target_dir}/"
+
+
+def _resolve_target_paths(target_paths: Optional[List[str]], cwd: str) -> List[str]:
+    """Validate explicit Ruff targets while preserving caller order.
+
+    Args:
+        target_paths: Optional ordered repository-relative targets decoded from
+            compact JSON transport.
+        cwd: Canonical repository directory that confines every target.
+
+    Returns:
+        Validated targets in their supplied order, or ``["."]`` when omitted.
+
+    Raises:
+        ValueError: If targets are empty, exceed resource bounds, are malformed,
+            duplicate, or resolve outside ``cwd``.
+    """
+
+    if target_paths is None:
+        return ["."]
+    if (
+        not isinstance(target_paths, list)
+        or not target_paths
+        or len(target_paths) > MAX_TARGET_PATHS
+    ):
+        raise ValueError("targetPaths must be a non-empty bounded array of strings")
+    encoded = json.dumps(target_paths, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    if len(encoded) > MAX_TARGET_PATHS_JSON_BYTES:
+        raise ValueError("targetPaths compact JSON transport exceeds its byte limit")
+    root = Path(cwd).resolve()
+    seen: set[str] = set()
+    for target in target_paths:
+        if not isinstance(target, str) or not target or target.strip() != target:
+            raise ValueError("targetPaths must contain non-empty strings")
+        if len(target.encode("utf-8")) > MAX_TARGET_PATH_BYTES:
+            raise ValueError("targetPaths entry exceeds its UTF-8 byte limit")
+        if target.startswith("-") or Path(target).is_absolute() or "\\" in target:
+            raise ValueError("targetPaths contains an unsafe path")
+        parts = target.split("/")
+        if "" in parts or ".." in parts or target in seen:
+            raise ValueError("targetPaths must contain unique canonical paths")
+        resolved = (root / target).resolve(strict=False)
+        if resolved != root and root not in resolved.parents:
+            raise ValueError("targetPaths resolves outside cwd")
+        seen.add(target)
+    return target_paths
+
+
+def run_explicit_ruff(
+    mode: str, target_paths: Optional[List[str]], timeout: int, cwd: Optional[str]
+) -> LinterResult:
+    """Run one explicit Ruff operation with separator-protected targets.
+
+    Args:
+        mode: Ruff-only operation: ``check``, ``format-check``, or ``format``.
+        target_paths: Optional ordered repository-relative targets for the
+            explicit operation.
+        timeout: Maximum seconds to wait for the Ruff subprocess.
+        cwd: Optional repository working-directory override.
+
+    Returns:
+        Result for exactly one Ruff subprocess. ``check`` and ``format-check``
+        are read-only; ``format`` may edit its targets.
+    """
+
+    result = LinterResult(f"ruff_{mode.replace('-', '_')}")
+    try:
+        if mode not in EXPLICIT_MODES:
+            raise ValueError("mode must be check, format-check, or format")
+        resolved_cwd = _resolve_cwd(cwd)
+        targets = _resolve_target_paths(target_paths, resolved_cwd)
+        command = _resolve_python_tool_command("ruff", "ruff", resolved_cwd)
+        if mode == "check":
+            command.extend(["check", "--", *targets])
+        elif mode == "format-check":
+            command.extend(["format", "--check", "--", *targets])
+        else:
+            command.extend(["format", "--", *targets])
+        proc = subprocess.run(
+            command, capture_output=True, text=True, timeout=timeout, cwd=resolved_cwd
+        )
+        _apply_process_result(result, proc)
+        result.issues_found = _count_ruff_issues(result.stdout)
+    except subprocess.TimeoutExpired:
+        result.success = False
+        result.error_message = f"Timeout after {timeout} seconds"
+    except (ValueError, FileNotFoundError) as exc:
+        result.success = False
+        result.error_message = str(exc)
+    return result
 
 
 def _resolve_cwd(cwd: Optional[str]) -> str:
@@ -509,6 +612,8 @@ def run_linters(
     cwd: Optional[str] = None,
     ruff_timeout: int = 120,
     mypy_timeout: int = 180,
+    mode: Optional[str] = None,
+    target_paths: Optional[List[str]] = None,
 ) -> Tuple[int, str]:
     """Run configured linters and format the combined result.
 
@@ -516,7 +621,10 @@ def run_linters(
     ``auto_fix`` is true, Ruff runs the mutating ``check --fix`` and
     ``format`` steps before a final validation check. When ``auto_fix`` is
     false, Ruff runs only the validation check and must not modify files.
-    Mypy remains validation-only in both modes.
+    Mypy remains validation-only in both legacy modes. An explicit ``mode``
+    selects exactly one Ruff-only subprocess: read-only ``check`` or
+    ``format-check``, or mutating ``format``. Explicit targets are ordered,
+    bounded repository-relative paths; omitted targets use ``."``.
 
     Args:
         target_dir: Directory to lint. If None, uses pyproject.toml config
@@ -534,12 +642,40 @@ def run_linters(
             (found by traversing up to pyproject.toml or .git).
         ruff_timeout: Timeout in seconds for each ruff command (default: 120).
         mypy_timeout: Timeout in seconds for mypy command (default: 180).
+        mode: Optional explicit Ruff-only mode. When provided, legacy selector
+            and auto-fix behavior must have been rejected by the caller.
+        target_paths: Optional ordered targets for an explicit mode.
 
     Returns:
         Tuple of (exit_code, output_string) where exit_code is 0 if all
         linters passed, 1 otherwise.
     """
     resolved_cwd = _resolve_cwd(cwd)
+    if mode is not None:
+        results = [run_explicit_ruff(mode, target_paths, ruff_timeout, cwd=resolved_cwd)]
+        all_passed = results[0].success
+        if output_mode == "json":
+            return (0 if all_passed else 1), json.dumps(
+                {
+                    "results": [
+                        {
+                            "name": results[0].name,
+                            "success": results[0].success,
+                            "exit_code": results[0].exit_code,
+                            "issues_found": results[0].issues_found,
+                            "issues_fixed": results[0].issues_fixed,
+                            "error_message": results[0].error_message,
+                        }
+                    ],
+                    "all_passed": all_passed,
+                },
+                indent=2,
+            )
+        return (0 if all_passed else 1), (
+            format_summary(results, all_passed)
+            if output_mode == "summary"
+            else format_full_output(results, all_passed)
+        )
     _resolve_target_arg(target_dir, resolved_cwd)
 
     # Run linters following .github/workflows/lint.yml
@@ -590,7 +726,8 @@ def run_linters(
 def main() -> int:
     """Main entry point for CLI usage.
 
-    Parses command-line arguments and executes linter suite.
+    Parses command-line arguments, rejects incompatible legacy and explicit
+    selectors, and executes the requested linter suite.
 
     Returns:
         Exit code (0 if all linters pass, 1 otherwise).
@@ -613,6 +750,8 @@ Examples:
         default="summary",
         help="Output mode: summary (default), full (complete output), json",
     )
+    parser.add_argument("--mode", choices=sorted(EXPLICIT_MODES))
+    parser.add_argument("--target-paths-json", type=str)
     parser.add_argument(
         "--target-dir",
         type=str,
@@ -659,9 +798,45 @@ Examples:
         help="Timeout for mypy command in seconds (default: 180 = 3 minutes)",
     )
 
+    raw_argv = sys.argv[1:]
     args = parser.parse_args()
+    explicit_auto_fix = "--auto-fix" in raw_argv or "--no-auto-fix" in raw_argv
+    if args.target_paths_json is not None:
+        if len(args.target_paths_json.encode("utf-8")) > MAX_TARGET_PATHS_JSON_BYTES:
+            print("ERROR: targetPaths compact JSON transport exceeds its byte limit")
+            return 2
+        try:
+            target_paths = json.loads(args.target_paths_json)
+        except json.JSONDecodeError:
+            print("ERROR: targetPaths must be valid JSON")
+            return 2
+        if not isinstance(target_paths, list):
+            print("ERROR: targetPaths must be a JSON array")
+            return 2
+    else:
+        target_paths = None
+    if args.mode is None and args.target_paths_json is not None:
+        print("ERROR: targetPaths requires mode")
+        return 2
+    if args.mode is not None and args.target_dir is not None:
+        print("ERROR: mode conflicts with targetDir")
+        return 2
+    if args.mode is not None and explicit_auto_fix:
+        print("ERROR: mode conflicts with autoFix")
+        return 2
+    if args.target_paths_json is not None and args.target_dir is not None:
+        print("ERROR: targetPaths conflicts with targetDir")
+        return 2
+    explicit_linters = "--linters" in raw_argv
+    if args.mode is not None and explicit_linters and args.linters != "ruff":
+        print("ERROR: linters must be ruff when mode is provided")
+        return 2
 
-    linters = [name.strip() for name in args.linters.split(",")]
+    linters = (
+        ["ruff"]
+        if args.mode is not None and not explicit_linters
+        else [name.strip() for name in args.linters.split(",")]
+    )
 
     exit_code, output = run_linters(
         target_dir=args.target_dir,
@@ -671,6 +846,8 @@ Examples:
         cwd=args.cwd,
         ruff_timeout=args.ruff_timeout,
         mypy_timeout=args.mypy_timeout,
+        mode=args.mode,
+        target_paths=target_paths,
     )
 
     print(output)

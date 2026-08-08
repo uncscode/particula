@@ -42,6 +42,52 @@ describe("ripgrep_shared helper", () => {
     );
   });
 
+  it("parses literal-safe simple and regex-opt-in search requests", async () => {
+    const { parseRipgrepSearchRequest } = await loadHelper();
+
+    expect(parseRipgrepSearchRequest("  a.b  ", "pattern=**/*.ts max-results=2", false)).toEqual({
+      ok: true,
+      request: {
+        contentPattern: "a.b",
+        matchMode: "literal",
+        pattern: "**/*.ts",
+        maxResults: 2,
+      },
+    });
+    expect(parseRipgrepSearchRequest("a.b", "match-mode=regex", false)).toMatchObject({
+      ok: true,
+      request: { matchMode: "regex" },
+    });
+  });
+
+  it("fails closed for duplicate, advanced-only, and incompatible request tokens", async () => {
+    const { parseRipgrepSearchRequest } = await loadHelper();
+
+    expect(parseRipgrepSearchRequest("x", "max-results=2 max-results=3", false)).toMatchObject({
+      ok: false,
+      error: expect.stringContaining("duplicate 'max-results'"),
+    });
+    expect(parseRipgrepSearchRequest("x", "before-context=1", false)).toMatchObject({
+      ok: false,
+      error: expect.stringContaining("not allowed"),
+    });
+    expect(parseRipgrepSearchRequest("x", "files-with-matches context-lines=1", true)).toMatchObject({
+      ok: false,
+      error: expect.stringContaining("files-only modes cannot be combined with context"),
+    });
+  });
+
+  it("rejects malformed glob delimiters before path resolution", async () => {
+    const { parseRipgrepSearchRequest } = await loadHelper();
+
+    for (const token of ["pattern=src]", "pattern=src}", "pattern=[]", "pattern={}"]) {
+      expect(parseRipgrepSearchRequest("x", token, false)).toMatchObject({
+        ok: false,
+        error: expect.stringContaining("invalid glob pattern"),
+      });
+    }
+  });
+
   it("classifies file and directory targets", async () => {
     const { resolveValidatedSearchPath } = await loadHelper();
     const cwd = path.resolve(import.meta.dir, "../..");

@@ -90,6 +90,7 @@ fix_spec_content = adw_spec_read({"command": "read", "adw_id": adw_id, "field": 
 review_feedback = adw_spec_read({"command": "read", "adw_id": adw_id, "field": "review_feedback"})
 review_findings = adw_spec_read({"command": "read", "adw_id": adw_id, "field": "review_findings"})
 worktree_path = adw_spec_read({"command": "read", "adw_id": adw_id, "field": "worktree_path"})
+fix_completed = adw_spec_read({"command": "read", "adw_id": adw_id, "field": "fix_completed"})
 ```
 
 Validation rules:
@@ -98,33 +99,30 @@ Validation rules:
 - `request_fix` must be strict boolean `true`
 - `fix_spec_content` must be non-empty
 - `worktree_path` must be present
+- `fix_completed` must be strict boolean `false` while this step is executing;
+  a legitimate `true` value is handled by the workflow's resume skip gate
 
-If any validation fails, stop with a clear `ADW_BUILD_FIX_FAILED` message.
+If any validation fails, stop with a clear `ADW_BUILD_FIX_FAILED` message. Never
+promote `fix_completed` on an invalid or blocked invocation.
 
-### Step 3: One-Pass Fix Guard
+### Step 3: Resume-Aware Fix Preflight
 
-Before any implementation work, write `fix_completed=true` using an explicit field write:
+While `fix_completed=false`, inspect existing worktree changes and continue the
+fix idempotently. A retry may inherit valid partial edits and completed tests;
+verify them rather than discarding or blindly repeating them.
 
-```python
-adw_spec_write({
-  "command": "write",
-  "adw_id": adw_id,
-  "field": "fix_completed",
-  "content": "true"
-})
-```
-
-Then verify it with read-back. Retry once if necessary; otherwise fail closed.
-
-**Guardrail:** Never call `adw_spec_write` without `field` when updating control-plane flags.
+Do not write `fix_completed=true` before implementation. Missing arguments,
+invalid state, blocked edits, incomplete acceptance criteria, failed tests,
+failed subagents, or stale output must leave the field false and emit
+`ADW_BUILD_FIX_FAILED`.
 
 ### Step 4: Verify Worktree
 
 Use `worktree_path` for all operations:
 
 ```python
-git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
-git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "worktree_path": worktree_path})
+git_diff({"command": "diff", "worktree_path": worktree_path})
 ```
 
 ### Step 5: Parse Fix Plan
@@ -156,7 +154,28 @@ For each fix step:
 
 Call `adw-build-tests` for all changed files to ensure fast tests cover the fix work.
 
-### Step 9: Output
+### Step 9: Validate and Promote Completion
+
+Before promotion, verify all implementation todos are complete, all required
+tests and coverage checks passed, the `adw-build-tests` subagent succeeded, and
+every acceptance criterion in `fix_spec_content` is satisfied. Only then write
+the strict completion boolean using the explicit field form:
+
+```python
+adw_spec_write({
+  "command": "write",
+  "adw_id": adw_id,
+  "field": "fix_completed",
+  "content": "true"
+})
+```
+
+Read `fix_completed` back and require strict boolean `true` before reporting
+success. If promotion or read-back fails, best-effort restore the field to
+`false`, emit `ADW_BUILD_FIX_FAILED`, and stop. Never call `adw_spec_write`
+without `field` when updating control-plane flags.
+
+### Step 10: Output
 
 Emit one of:
 

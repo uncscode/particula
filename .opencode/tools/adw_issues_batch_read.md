@@ -42,7 +42,7 @@ under `.trash/`.
 | Parameter | Type | Required | Notes |
 |---|---|---|---|
 | `adw_id` | string | Yes | 8-character hex workflow ID |
-| `issue` | string | No | Positive integer row index |
+| `issue` | string | No | One-based generated-row index; the only wrapper row selector |
 | `section` | string | No | Non-empty section token |
 | `options` | string | No | Bounded command-scoped tokens; `raw` is supported |
 
@@ -51,3 +51,11 @@ under `.trash/`.
 - Keep payload-bearing fields direct: `adw_id`, `issue`, and `section`.
 - `section: "metadata"` is a supported read-only selector for issue metadata.
 - `options` accepts only bare tokens such as `raw`; `raw=true` is not valid.
+- `issue` always addresses a one-based generated row. It is the only wrapper
+  row selector and does not accept a GitHub source issue number as an
+  alternative.
+- `metadata.github_issue_number` is resolved only by the state service as a
+  positive, unique source ID. It is never an alternative value for wrapper
+  `issue` input.
+- Bounded outcomes remain `success`, `missing`, `uninitialized`, `invalid`,
+  and retryable `execution_failed`.

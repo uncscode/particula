@@ -59,9 +59,9 @@ issues unless required workflow state is missing.
 
 - @.opencode/guides/code_style.md - deterministic, low-risk markdown edits
 - @.opencode/guides/testing_guide.md - plan quality and validation expectations
-- `adw_plans_read({"command": "list", "lifecycle": "active", "options": "json", "cwd": worktree_path})` - optional active-plan sanity source
-- `adw_plans_read({"command": "show", "plan_id": "<id>", "options": "json", "cwd": worktree_path})` - plan metadata source
-- `adw_plans_read({"command": "list-sections", "plan_id": "<id>", "options": "json", "cwd": worktree_path})` - section-file discovery source
+- `adw_plans_read({"command": "list", "lifecycle": "active", "json": true, "cwd": worktree_path})` - optional active-plan sanity source
+- `adw_plans_read({"command": "show", "plan_id": "<id>", "json": true, "cwd": worktree_path})` - plan metadata source
+- `adw_plans_read({"command": "list-sections", "plan_id": "<id>", "json": true, "cwd": worktree_path})` - section-file discovery source
 - `.opencode/plans/sections/` - canonical editable plan section root
 
 # Process
@@ -148,7 +148,7 @@ For each `plan_id` in `review_plan_ids`, resolve section file mapping:
 adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "options": "json",
+  "json": true,
   "cwd": worktree_path
 })
 ```
@@ -186,7 +186,7 @@ For each in-scope plan, validate the following:
       adw_plans_read({
         "command": "show",
         "plan_id": "{plan_id}",
-        "options": "json",
+        "json": true,
         "cwd": worktree_path
       })
       ```

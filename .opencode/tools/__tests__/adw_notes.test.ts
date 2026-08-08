@@ -29,12 +29,27 @@ describe("adw_notes compatibility wrapper", () => {
     expect(result).toBe('{\n  "status": "ok"\n}');
   });
 
-  it("uses shared field normalization for write operations", async () => {
+  it("uses JSON field transport for string and nullable write fields", async () => {
     const execute = await loadToolExecute("../../adw_notes.ts");
-    await execute({ command: "write", ref: "HEAD", fields: { " plan_summary ": "done" } } as any);
-    expect(getInvocations().at(-1)?.args.join(" ")).toContain(
-      "uv run --active adw notes write --ref HEAD --field plan_summary done",
-    );
+    await execute({
+      command: "write",
+      ref: "HEAD",
+      fields: { " plan_summary ": "done", review_findings: null },
+    } as any);
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "notes",
+      "write",
+      "--ref",
+      "HEAD",
+      "--field-json",
+      '["plan_summary","done"]',
+      "--field-json",
+      '["review_findings",null]',
+    ]);
   });
 
   it("preserves sparse omission when fields normalize to empty input", async () => {

@@ -1,0 +1,8 @@
+[
+  {"wrapper":"adw_plans_read","args":{"command":"list","cwd":"<worktree>","json":true}},
+  {"wrapper":"adw_plans_read","args":{"command":"list","cwd":"<worktree>","options":"status=In Progress","json":true}},
+  {"wrapper":"adw_plans_read","args":{"command":"show","plan_id":"E17-F1","cwd":"<worktree>","json":true}},
+  {"wrapper":"adw_plans_read","args":{"command":"schema","cwd":"<worktree>","check":true}},
+  {"wrapper":"adw_plans_mutate","args":{"command":"update","plan_id":"E17-F1","cwd":"<worktree>","options":"status=Ready priority=P1"}},
+  {"wrapper":"adw_plans_mutate","args":{"command":"update-phase","plan_id":"E17-F1","phase_id":"E17-F1-P1","cwd":"<worktree>","clear_issue_number":true}}
+]

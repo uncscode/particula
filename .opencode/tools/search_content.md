@@ -31,7 +31,7 @@ Constrained content-search wrapper for common `ripgrep` workflows.
 
 | Parameter | Type | Required | Description |
 |---|---|---:|---|
-| `contentPattern` | string | ✅ | Regex pattern to search within files (non-empty after trim). |
+| `contentPattern` | string | ✅ | Literal pattern to search within files (non-empty after trim). |
 | `path` | string | ❌ | Scoped search target (default: current working directory). File path = search only that file; directory path = search only that subtree. |
 | `options` | string | ❌ | Bounded token carrier for optional simple-search controls. |
 
@@ -44,6 +44,7 @@ Constrained content-search wrapper for common `ripgrep` workflows.
 - `compact-output` (rewrite matched file paths relative to the scoped target)
 - `max-results=<n>`
 - `max-matches-per-file=<n>`
+- `match-mode=literal|regex` (literal is the default)
 
 ## Path Contract
 
@@ -79,4 +80,7 @@ routed to `ripgrep_advanced` instead:
 - Wrapper execution and invalid-regex failures return deterministic `ERROR:` diagnostics.
 - `compact-output` rewrites file prefixes relative to the scoped file/directory base.
 - Output larger than `maxResults` appends deterministic truncation warning text.
+- Safety-clipped ripgrep stdout appends a deterministic warning so callers know
+  the returned output may be incomplete.
 - Searches are terminated after 30 seconds and return a deterministic timeout error.
+- Numeric result limits are `1..5000`; malformed tokens and globs fail before path resolution or subprocess creation.

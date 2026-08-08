@@ -181,8 +181,8 @@ Extract from `adw_state.json`:
 Use the `worktree_path` for all operations and validate location with tools (no shell navigation):
 
 ```python
-git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
-git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "worktree_path": worktree_path})
+git_diff({"command": "diff", "worktree_path": worktree_path})
 ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
@@ -276,7 +276,8 @@ After implementing each task, run a **fast spot-check test** on the affected mod
 
 ```python
 run_pytest_advanced({
-  "pytestArgs": ["{module}/tests/", "-x", "--maxfail=1", "-q"],
+  "testPath": "{module}/tests/",
+  "options": "fail-fast",
   "options": "output=summary",
   "timeout": 60
 })
@@ -293,7 +294,8 @@ run_pytest_advanced({
 ```python
 # If you modified adw/utils/parser.py
 run_pytest_advanced({
-  "pytestArgs": ["adw/utils/tests/parser_test.py", "-x", "-q"],
+  "testPath": "adw/utils/tests/parser_test.py",
+  "options": "fail-fast",
   "options": "output=summary"
 })
 ```
@@ -486,12 +488,12 @@ Notebooks are fully validated during the documentation workflow:
 
 **Task 1:**
 - Implement validate_input()
-- Spot-check: `run_pytest_advanced({"pytestArgs": ["adw/utils/tests/parser_test.py", "-x"]})` -> PASS
+- Spot-check: `run_pytest_advanced({"testPath": "adw/utils/tests/parser_test.py", "options": "fail-fast"})` -> PASS
 - Mark complete
 
 **Task 2:**
 - Add edge case tests
-- Spot-check: `run_pytest_advanced({"pytestArgs": ["adw/utils/tests/parser_test.py", "-x"]})` -> PASS
+- Spot-check: `run_pytest_advanced({"testPath": "adw/utils/tests/parser_test.py", "options": "fail-fast"})` -> PASS
 - Mark complete
 
 **Step 7:** Comprehensive testing:

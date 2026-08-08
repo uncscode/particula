@@ -65,10 +65,10 @@ const MISSING_SCRIPT_HINT =
 
 const MAX_DIAGNOSTIC_CHARS = 4000;
 const DIAGNOSTIC_TRUNCATION_MARKER = "... [truncated]";
+const STRICT_PROFILE_TIMEOUT_SECONDS = 300;
 type OutputMode = "summary" | "full" | "json";
 type ParsedMkdocsOptions = {
   outputMode?: OutputMode;
-  strict?: true;
   clean?: boolean;
 };
 const OUTPUT_MODES = new Set<OutputMode>(["summary", "full", "json"]);
@@ -81,9 +81,38 @@ const sanitizeAndClipDiagnostic = (value: string): string => {
   return `${sanitized.slice(0, MAX_DIAGNOSTIC_CHARS)}\n${DIAGNOSTIC_TRUNCATION_MARKER}`;
 };
 
+function boundedJsonDiagnostic(value: unknown): string {
+  const sanitizeValue = (item: unknown): unknown => {
+    if (typeof item === "string") return sanitizeAndClipDiagnostic(item);
+    if (Array.isArray(item)) return item.slice(0, 50).map(sanitizeValue);
+    if (item && typeof item === "object") {
+      return Object.fromEntries(
+        Object.entries(item as Record<string, unknown>).slice(0, 50).map(([key, nested]) => [
+          sanitizeAndClipDiagnostic(key),
+          sanitizeValue(nested),
+        ]),
+      );
+    }
+    return item;
+  };
+
+  const serialized = JSON.stringify(sanitizeValue(value));
+  if (serialized.length <= MAX_DIAGNOSTIC_CHARS) return serialized;
+  return JSON.stringify({
+    outcome: "failure",
+    success: false,
+    stage: "wrapper",
+    error: "mkdocs diagnostic exceeded wrapper output limit",
+    truncation: { wrapper_output: true },
+  });
+}
+
 function validateTimeout(timeout: number): string | null {
-  if (!Number.isFinite(timeout) || timeout <= 0) {
-    return `ERROR: Timeout must be a finite positive number (received ${timeout}).`;
+  if (!Number.isFinite(timeout) || timeout <= 0 || timeout > STRICT_PROFILE_TIMEOUT_SECONDS) {
+    return (
+      `ERROR: Timeout must be a finite positive number no greater than ${STRICT_PROFILE_TIMEOUT_SECONDS} ` +
+      `(received ${timeout}).`
+    );
   }
   return null;
 }
@@ -99,35 +128,42 @@ function extractTimeoutDiagnostic(stderr: string, message: string): string | nul
   return (
     "ERROR: MkDocs validation timed out\n\n" +
     `diagnostic: mkdocs validation exceeded the wrapper timeout after ${seconds} seconds\n` +
-    `hint: build_mkdocs_validate defaults to 120 seconds; pass a larger direct timeout for slow validations.`
+    `hint: build_mkdocs_validate defaults to ${STRICT_PROFILE_TIMEOUT_SECONDS} seconds and does not admit longer validation timeouts.`
   );
 }
 
-function formatExecutionError(error: any): string {
+function formatExecutionError(error: any, outputMode: OutputMode): string {
   const stdout = sanitizeAndClipDiagnostic(error?.stdout?.toString?.() || "");
   const stderr = sanitizeAndClipDiagnostic(error?.stderr?.toString?.() || "");
   const message = error?.message || "Unknown error";
   const combinedLower = `${stderr} ${message}`.toLowerCase();
   const timeoutDiagnostic = extractTimeoutDiagnostic(stderr, message);
 
+  let rendered: string;
   if (timeoutDiagnostic) {
-    return timeoutDiagnostic;
-  }
-
-  if (stdout.trim()) {
-    return stdout;
-  }
-
-  if (stderr.trim()) {
+    rendered = timeoutDiagnostic;
+  } else if (stdout.trim()) {
+    rendered = stdout;
+  } else if (stderr.trim()) {
     const hint = combinedLower.includes("enoent") ? `\n${MISSING_SCRIPT_HINT}` : "";
-    return `ERROR: MkDocs build failed\n\n${stderr}${hint}`;
+    rendered = `ERROR: MkDocs build failed\n\n${stderr}${hint}`;
+  } else if (combinedLower.includes("enoent")) {
+    rendered = `ERROR: Failed to run mkdocs build: ${message}\n${MISSING_SCRIPT_HINT}`;
+  } else {
+    rendered = `ERROR: Failed to run mkdocs build: ${message}`;
   }
 
-  if (combinedLower.includes("enoent")) {
-    return `ERROR: Failed to run mkdocs build: ${message}\n${MISSING_SCRIPT_HINT}`;
+  if (outputMode !== "json") return rendered;
+  try {
+    return boundedJsonDiagnostic(JSON.parse(stdout));
+  } catch {
+    return boundedJsonDiagnostic({
+      outcome: "failure",
+      success: false,
+      stage: "wrapper",
+      error: rendered,
+    });
   }
-
-  return `ERROR: Failed to run mkdocs build: ${message}`;
 }
 
 function validatePathWithinRepoRoot(
@@ -165,12 +201,15 @@ function validatePathWithinRepoRoot(
   return undefined;
 }
 
-async function executeMkdocsWrapper(cmdParts: (string | number)[]): Promise<string> {
+async function executeMkdocsWrapper(
+  cmdParts: (string | number)[],
+  outputMode: OutputMode,
+): Promise<string> {
   try {
     const result = await Bun.$`${cmdParts}`.text();
     return result || "mkdocs build completed but returned no output.";
   } catch (error: any) {
-    return formatExecutionError(error);
+    return formatExecutionError(error, outputMode);
   }
 }
 
@@ -200,17 +239,10 @@ function parseMkdocsOptions(rawOptions: unknown):
     }
 
     if (separatorIndex === -1) {
-      if (token !== "strict") {
-        return {
-          ok: false,
-          error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.`,
-        };
-      }
-      if (parsed.strict) {
-        return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate token.` };
-      }
-      parsed.strict = true;
-      continue;
+      return {
+        ok: false,
+        error: `ERROR: Invalid options token '${token}': token requires a non-empty '=value' suffix.`,
+      };
     }
 
     const name = token.slice(0, separatorIndex);
@@ -250,13 +282,6 @@ function parseMkdocsOptions(rawOptions: unknown):
       continue;
     }
 
-    if (name === "strict") {
-      return {
-        ok: false,
-        error: `ERROR: Invalid options token '${token}': token does not accept a value.`,
-      };
-    }
-
     return {
       ok: false,
       error: `ERROR: Invalid options token '${token}': token is not supported.`,
@@ -273,15 +298,14 @@ export default tool({
 
 EXAMPLES:
 - Default validate: build_mkdocs_validate({})
-- Strict validate: build_mkdocs_validate({ options: 'strict' })
-- Custom config: build_mkdocs_validate({ configFile: 'docs/mkdocs.yml' })
+- Custom config: build_mkdocs_validate({ configFile: 'mkdocs.yml' })
 
   IMPORTANT:
   - Always runs validate-only mode (temporary output dir).
   - Uses python3 to run the backing script.
-  - Default timeout is 120 seconds.
-  - The backing Python script supports longer runtimes, but this wrapper intentionally keeps a shorter validation default.
-  - Passing 'strict' escalates MkDocs warnings into failure behavior.`,
+  - Always runs MkDocs strict mode.
+  - Default and maximum timeout is 300 seconds.
+  - Options accept only output=<summary|full|json> and clean=<true|false>.`,
   args: {
     timeout: tool.schema.number().optional(),
     cwd: tool.schema.string().optional(),
@@ -295,7 +319,7 @@ EXAMPLES:
     }
 
     const outputMode = parsedOptions.options.outputMode || "summary";
-    const timeout = args.timeout ?? 120;
+    const timeout = args.timeout ?? STRICT_PROFILE_TIMEOUT_SECONDS;
     const timeoutError = validateTimeout(timeout);
     if (timeoutError) {
       return timeoutError;
@@ -307,6 +331,7 @@ EXAMPLES:
       `--output=${outputMode}`,
       `--timeout=${timeout}`,
       "--validate-only",
+      "--strict",
     ];
 
     const cwdRaw = typeof args.cwd === "string" ? args.cwd.trim() : "";
@@ -324,9 +349,6 @@ EXAMPLES:
     if (cwdRaw) {
       cmdParts.push(`--cwd=${cwdRaw}`);
     }
-    if (parsedOptions.options.strict === true) {
-      cmdParts.push("--strict");
-    }
     if (parsedOptions.options.clean === false) {
       cmdParts.push("--no-clean");
     }
@@ -334,6 +356,6 @@ EXAMPLES:
       cmdParts.push(`--config-file=${configRaw}`);
     }
 
-    return executeMkdocsWrapper(cmdParts);
+    return executeMkdocsWrapper(cmdParts, outputMode);
   },
 });

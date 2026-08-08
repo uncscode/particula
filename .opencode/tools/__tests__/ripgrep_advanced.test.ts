@@ -36,10 +36,24 @@ describe("ripgrep_advanced wrapper", () => {
     expect(definition?.args).toHaveProperty("options");
   });
 
-  it("validates beforeContext", async () => {
+  it("rejects injected direct control fields before resolving a search path", async () => {
+    const execute = await loadToolExecute("../../ripgrep_advanced.ts");
+    const result = await execute({
+      contentPattern: "x",
+      path: "/etc/passwd",
+      beforeContext: 1,
+    });
+
+    expect(result).toBe(
+      "ERROR: Direct search control field 'beforeContext' is not allowed. Use the bounded 'options' string instead.",
+    );
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects malformed bounded context tokens before filesystem access", async () => {
     const execute = await loadToolExecute("../../ripgrep_advanced.ts");
     const result = await execute({ contentPattern: "x", options: "before-context=-1" });
-    assertContains(String(result), "before-context must be a non-negative integer");
+    assertContains(String(result), "before-context must be an integer");
   });
 
   it("parses advanced options and preserves directional context precedence", async () => {
@@ -48,14 +62,13 @@ describe("ripgrep_advanced wrapper", () => {
     await execute({
       contentPattern: "x",
       options:
-        "pattern=**/*.ts file-type=ts context-lines=3 before-context=2 after-context=1 files-with-matches unrestricted=2 include-hidden",
+        "pattern=**/*.ts file-type=ts context-lines=3 before-context=2 after-context=1 unrestricted=2 include-hidden",
     });
     const args = getInvocations().at(-1)?.args ?? [];
     expect(args).toContain("--glob");
     expect(args[args.indexOf("--glob") + 1]).toBe("**/*.ts");
     expect(args).toContain("-t");
     expect(args[args.indexOf("-t") + 1]).toBe("ts");
-    expect(args).toContain("-l");
     expect(args).toContain("-B");
     expect(args[args.indexOf("-B") + 1]).toBe("2");
     expect(args).toContain("-A");
@@ -65,13 +78,20 @@ describe("ripgrep_advanced wrapper", () => {
     expect(args).not.toContain("--hidden");
   });
 
-  it("rejects conflicting file-mode tokens", async () => {
+  it("rejects conflicting files-only tokens", async () => {
     const execute = await loadToolExecute("../../ripgrep_advanced.ts");
     const result = await execute({
       contentPattern: "x",
       options: "files-with-matches files-without-matches",
     });
-    assertContains(String(result), "cannot both be true");
+    assertContains(String(result), "cannot both be enabled");
+  });
+
+  it("rejects files-only modes combined with context", async () => {
+    const execute = await loadToolExecute("../../ripgrep_advanced.ts");
+    const result = await execute({ contentPattern: "x", options: "files-with-matches before-context=1" });
+    assertContains(String(result), "files-only modes cannot be combined with context");
+    expect(getInvocations()).toHaveLength(0);
   });
 
   it("rejects unknown options tokens", async () => {
@@ -83,14 +103,14 @@ describe("ripgrep_advanced wrapper", () => {
   it("rejects unrestricted values above the supported range", async () => {
     const execute = await loadToolExecute("../../ripgrep_advanced.ts");
     const result = await execute({ contentPattern: "x", options: "unrestricted=4" });
-    assertContains(String(result), "Invalid unrestricted value");
+    assertContains(String(result), "unrestricted must be between 1 and 3");
   });
 
   it("assembles content command", async () => {
     setSpawnResponse({ stdout: "a:1:x\n", exitCode: 0 });
     const execute = await loadToolExecute("../../ripgrep_advanced.ts");
     await execute({ contentPattern: "x" });
-    expect(getInvocations().at(-1)?.args.join(" ")).toContain("rg -n -e x");
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain("rg -n -F x");
   });
 
   it("guards option-like contentPattern values from rg flag parsing", async () => {
@@ -98,7 +118,7 @@ describe("ripgrep_advanced wrapper", () => {
     const execute = await loadToolExecute("../../ripgrep_advanced.ts");
     await execute({ contentPattern: "--help" });
     const args = getInvocations().at(-1)?.args ?? [];
-    expect(args.slice(0, 4)).toEqual(["rg", "-n", "-e", "--help"]);
+    expect(args.slice(0, 4)).toEqual(["rg", "-n", "-F", "--help"]);
     expect(args).toContain("--");
   });
 
@@ -117,13 +137,13 @@ describe("ripgrep_advanced wrapper", () => {
     await execute({
       contentPattern: "scoped-search-needle",
       path: FIXTURE_FILE,
-      options: "before-context=2 after-context=1 files-with-matches",
+      options: "before-context=2 after-context=1",
     });
     const args = getInvocations().at(-1)?.args ?? [];
     expect(args.at(-1)).toBe(FIXTURE_FILE);
     expect(args).toContain("-B");
     expect(args).toContain("-A");
-    expect(args).toContain("-l");
+    expect(args).not.toContain("-l");
   });
 
   it("routes directory targets to the requested subtree only", async () => {
@@ -174,6 +194,15 @@ describe("ripgrep_advanced wrapper", () => {
     const args = getInvocations().at(-1)?.args ?? [];
     expect(args).toContain("--with-filename");
     expect(String(result)).toBe("alpha.ts:1:needle");
+  });
+
+  it("warns when stdout is clipped while enforcing the result limit", async () => {
+    setSpawnResponse({ stdoutChunks: ["a:1:first\n", "a:2:second\n", "a:3:third\n"], exitCode: 0 });
+    const execute = await loadToolExecute("../../ripgrep_advanced.ts");
+    const result = await execute({ contentPattern: "needle", options: "max-results=2" });
+
+    expect(String(result)).toContain("Results truncated to 2 lines (at least 3 total found)");
+    expect(String(result)).toContain("Ripgrep stdout was clipped for safety");
   });
 
   it("rejects unsupported inode types without invoking rg", async () => {

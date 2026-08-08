@@ -188,12 +188,13 @@
         "parent",
         "phase_id",
         "patch",
-        "cwd"
+        "cwd",
+        "clear_issue_number"
       ],
       "exempt_fields": [
         "options"
       ],
-      "current_count": 8,
+      "current_count": 9,
       "diagnostic": null,
       "classification": "bounded-options-needed",
       "target_shape": "bounded-options",
@@ -213,12 +214,15 @@
         "plan_type",
         "lifecycle",
         "parent",
-        "cwd"
+        "cwd",
+        "json",
+        "populate",
+        "check"
       ],
       "exempt_fields": [
         "options"
       ],
-      "current_count": 6,
+      "current_count": 9,
       "diagnostic": null,
       "classification": "bounded-options-needed",
       "target_shape": "bounded-options",
@@ -1091,19 +1095,14 @@
       "counted_fields": [
         "command",
         "worktree_path",
-        "porcelain",
-        "stat",
         "base",
         "target",
         "ref",
         "path",
-        "max_count",
-        "oneline"
+        "max_count"
       ],
-      "exempt_fields": [
-        "help"
-      ],
-      "current_count": 10,
+      "exempt_fields": [],
+      "current_count": 7,
       "diagnostic": null,
       "classification": "split-needed",
       "target_shape": "split-wrapper-family",
@@ -2328,19 +2327,22 @@
       "current_shape": "direct_args_object",
       "counted_fields": [
         "autoFix",
+        "confirmed",
         "targetDir",
+        "mode",
+        "targetPaths",
         "ruffTimeout",
         "mypyTimeout"
       ],
       "exempt_fields": [
         "options"
       ],
-      "current_count": 4,
+      "current_count": 7,
       "diagnostic": null,
-      "classification": "already-compliant",
-      "target_shape": "direct_args_object",
-      "target_count": 4,
-      "owner_plan": null,
+      "classification": "split-needed",
+      "target_shape": "split-wrapper-family",
+      "target_count": null,
+      "owner_plan": "E27-M9",
       "nearest_test_path": ".opencode/tools/__tests__/run_linters.test.ts",
       "field_role_audit": [
         {
@@ -2353,6 +2355,11 @@
           "notes": "Mutating vs validation-only mode boundary must remain explicit."
         },
         {
+          "field": "confirmed",
+          "role": "safety-field",
+          "notes": "Explicit confirmation gates mutating lint execution."
+        },
+        {
           "field": "linters",
           "role": "bounded-option-candidate"
         },
@@ -2360,6 +2367,16 @@
           "field": "targetDir",
           "role": "safety-field",
           "notes": "Direct path scope for linter execution."
+        },
+        {
+          "field": "mode",
+          "role": "safety-field",
+          "notes": "Explicit Ruff operation boundary must remain direct."
+        },
+        {
+          "field": "targetPaths",
+          "role": "safety-field",
+          "notes": "Ordered repository-relative Ruff target scope must remain direct."
         },
         {
           "field": "ruffTimeout",
@@ -2482,6 +2499,7 @@
         "timeout",
         "cwd",
         "testPath",
+        "testPaths",
         "pytestArgs",
         "coverage",
         "coverageSource",
@@ -2491,7 +2509,7 @@
       "exempt_fields": [
         "options"
       ],
-      "current_count": 9,
+      "current_count": 10,
       "diagnostic": null,
       "classification": "split-needed",
       "target_shape": "split-wrapper-family",
@@ -2523,6 +2541,11 @@
           "field": "testPath",
           "role": "payload-bearing",
           "notes": "Direct routine/advanced test target operand."
+        },
+        {
+          "field": "testPaths",
+          "role": "payload-bearing",
+          "notes": "Bounded ordered plural advanced test target operands."
         },
         {
           "field": "pytestArgs",

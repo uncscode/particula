@@ -103,8 +103,8 @@ adw_spec_read({"command": "list", "adw_id": "{adw_id}", "options": "json"})
 ## Step 2: Check Worktree
 
 ```python
-git_diff({"command": "status", "worktree_path": "{worktree_path}", "porcelain": true})
-git_diff({"command": "diff", "worktree_path": "{worktree_path}", "stat": true})
+git_diff({"command": "status", "worktree_path": "{worktree_path}"})
+git_diff({"command": "diff", "worktree_path": "{worktree_path}"})
 ```
 
 ## Step 3: Check Platform Context

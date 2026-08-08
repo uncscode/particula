@@ -67,6 +67,9 @@ You are an ADW template maintainer. Your role is to keep template files in sync 
 
 Maintain the bidirectional sync between live files and their template counterparts.
 
+Before Git inspection, require an explicit canonical `worktree_path` from the
+user or validated handoff. Never derive repository authority from ambient cwd.
+
 ## Tracked Folder Mappings
 
 | Live Location | Template Location | Content Type |
@@ -393,7 +396,7 @@ adw_setup({"command": "template", "args": ["validate", "--format", "json"]})
 ### Step 4.2: Check Git Status
 
 ```python
-git_diff({"command": "status", "porcelain": true})
+git_diff({"command": "status", "worktree_path": worktree_path})
 ```
 
 ### Step 4.3: Present Summary

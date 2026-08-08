@@ -36,6 +36,23 @@ describe("search_content wrapper", () => {
     expect(definition?.args).not.toHaveProperty("unrestricted");
   });
 
+  it("rejects injected advanced direct fields before path resolution or dispatch", async () => {
+    const originalStat = fs.promises.stat;
+    fs.promises.stat = (async () => {
+      throw new Error("path resolution must not run");
+    }) as typeof fs.promises.stat;
+    try {
+      const execute = await loadToolExecute("../../search_content.ts");
+      const result = await execute({ contentPattern: "x", beforeContext: 1 });
+      expect(String(result)).toBe(
+        "ERROR: 'beforeContext' is only supported by ripgrep_advanced; use its options field instead.",
+      );
+      expect(getInvocations()).toHaveLength(0);
+    } finally {
+      fs.promises.stat = originalStat;
+    }
+  });
+
   it("accepts bounded simple-search options via options", async () => {
     setSpawnResponse({ stdout: "a:1:x\n", exitCode: 0 });
     const execute = await loadToolExecute("../../search_content.ts");
@@ -59,10 +76,10 @@ describe("search_content wrapper", () => {
     assertContains(String(result), "Invalid options token 'before-context=1'");
   });
 
-  it("rejects invalid max-matches token values", async () => {
+  it("rejects malformed max-matches token values", async () => {
     const execute = await loadToolExecute("../../search_content.ts");
     const result = await execute({ contentPattern: "x", options: "max-matches-per-file=abc" });
-    assertContains(String(result), "max-matches-per-file must be a non-negative integer");
+    assertContains(String(result), "max-matches-per-file must be an integer");
   });
 
   it("rejects unknown options tokens", async () => {
@@ -75,7 +92,7 @@ describe("search_content wrapper", () => {
     setSpawnResponse({ stdout: "a:1:x\n", exitCode: 0 });
     const execute = await loadToolExecute("../../search_content.ts");
     await execute({ contentPattern: "x", path: "." });
-    expect(getInvocations().at(-1)?.args.join(" ")).toContain("rg -n -e x");
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain("rg -n -F x");
   });
 
   it("guards option-like contentPattern values from rg flag parsing", async () => {
@@ -83,7 +100,7 @@ describe("search_content wrapper", () => {
     const execute = await loadToolExecute("../../search_content.ts");
     await execute({ contentPattern: "--help" });
     const args = getInvocations().at(-1)?.args ?? [];
-    expect(args.slice(0, 4)).toEqual(["rg", "-n", "-e", "--help"]);
+    expect(args.slice(0, 4)).toEqual(["rg", "-n", "-F", "--help"]);
     expect(args).toContain("--");
   });
 

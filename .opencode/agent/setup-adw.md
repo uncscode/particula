@@ -88,6 +88,8 @@ This agent runs **inside the target repository** where ADW is installed as a pac
 - ADW package installed (`pip install adw` or `uv pip install adw`)
 - Git repository initialized
 - GitHub or GitLab access configured
+- An explicit canonical `worktree_path` supplied by the user or validated handoff;
+  never derive repository authority from ambient cwd
 
 # Required Reading
 
@@ -519,7 +521,7 @@ workflow_builder({"command": "list"})
 ### Step 5.3: Verify Git Status
 
 ```python
-git_diff({"command": "status", "porcelain": true})
+git_diff({"command": "status", "worktree_path": worktree_path})
 ```
 
 ### Step 5.4: Present Summary

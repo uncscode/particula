@@ -127,13 +127,14 @@ If `epic_id` is missing, report an error and stop.
 Resolve the epic plan via `adw_plans_read`.
 
 ```python
-adw_plans_read({"command": "show", "plan_id": epic_id, "options": "json"})
+adw_plans_read({"command": "show", "plan_id": epic_id, "json": true, "cwd": worktree_path})
 ```
 
-If richer section content is required, load populated sections:
+If richer section content is required, load populated sections. Pass the active
+workflow worktree path as `cwd` for every plan call:
 
 ```python
-adw_plans_read({"command": "list-sections", "plan_id": epic_id, "options": "populate json"})
+adw_plans_read({"command": "list-sections", "plan_id": epic_id, "json": true, "populate": true, "cwd": "<worktree_path>"})
 ```
 
 Read the epic plan payload and extract:
@@ -152,8 +153,8 @@ requested. Apply `--feature` filter and `--skip` list.
 For each feature or maintenance track to process, resolve the plan ID directly:
 
 ```python
-adw_plans_read({"command": "show", "plan_id": feature_id, "options": "json"})
-adw_plans_read({"command": "list-sections", "plan_id": feature_id, "options": "populate json"})
+adw_plans_read({"command": "show", "plan_id": feature_id, "json": true, "cwd": "<worktree_path>"})
+adw_plans_read({"command": "list-sections", "plan_id": feature_id, "json": true, "populate": true, "cwd": "<worktree_path>"})
 ```
 
 From each feature plan, extract:

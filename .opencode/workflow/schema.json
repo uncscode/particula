@@ -152,6 +152,20 @@
           "minimum": 1,
           "default": 600
         },
+        "output_inactivity_seconds": {
+          "title": "Output Inactivity Timeout",
+          "description": "Maximum seconds without output growth; null disables inactivity termination",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": 300
+        },
         "retry": {
           "type": "object",
           "title": "Retry Configuration",
@@ -195,6 +209,16 @@
         "condition": {
           "$ref": "#/definitions/Condition",
           "description": "Optional condition controlling step execution"
+        },
+        "completion_if": {
+          "type": "string",
+          "title": "Completion Condition",
+          "description": "Persisted-state expression that must be True after lifecycle-successful agent execution"
+        },
+        "completion_message": {
+          "type": "string",
+          "title": "Completion Failure Message",
+          "description": "Custom error text used when completion_if is false"
         }
       },
       "additionalProperties": false
@@ -202,7 +226,7 @@
     "Condition": {
       "type": "object",
       "title": "Conditional Execution",
-      "description": "Conditions that control whether a step should execute, be skipped, or fail with error. Evaluation order: fail_if → skip_if → if_condition",
+      "description": "Conditions that control whether a step should execute, be skipped, or fail with error. Evaluation order: if_condition as the outer branch gate, then fail_if, then skip_if",
       "properties": {
         "if_condition": {
           "type": "string",

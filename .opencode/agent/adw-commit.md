@@ -70,7 +70,7 @@ Create a clean git commit by:
 # Input Format
 
 ```
-Arguments: adw_id=<workflow-id>  (optional)
+Arguments: adw_id=<workflow-id>  (optional) worktree_path=<canonical-path>
 ```
 
 **Invocation by adw-build (with adw_id):**
@@ -86,12 +86,13 @@ task({
 ```python
 task({
   "description": "Commit implementation changes",
-  "prompt": "Commit changes to the current branch",
+  "prompt": f"Commit changes.\n\nArguments: worktree_path={worktree_path}",
   "subagent_type": "adw-commit"
 })
 ```
 
-**Note:** If no `adw_id` is provided, the agent will commit to the currently active branch in the current working directory.
+**Note:** If no `adw_id` is provided, require an explicit canonical
+`worktree_path`. Never derive commit authority from ambient cwd.
 
 # Required Reading
 
@@ -157,8 +158,8 @@ or issue-reference footers. Never infer an issue from completed slice lists.
 
 ### If no adw_id is provided:
 
-Use the current working directory:
-- `worktree_path` = current directory (`.`)
+Use the explicit canonical direct-invocation handoff:
+- `worktree_path` = supplied absolute canonical worktree path
 - `issue_number` = None (no footer reference)
 - `issue_title` = Derive from commit changes
 - `spec_content` = Analyze git diff directly
@@ -170,7 +171,7 @@ Use the current working directory:
 ### 2.1: Check Git Status
 
 ```python
-status = git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+status = git_diff({"command": "status", "worktree_path": worktree_path})
 ```
 
 Identify:
@@ -181,7 +182,7 @@ Identify:
 ### 2.2: Get Diff Summary
 
 ```python
-diff_stat = git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
+diff_stat = git_diff({"command": "diff", "worktree_path": worktree_path})
 ```
 
 ### 2.3: Understand Changes
@@ -307,7 +308,7 @@ git_stage({"command": "add", "files": [".trash/"], "worktree_path": worktree_pat
 ### 4.3: Verify Staged Files
 
 ```python
-git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "worktree_path": worktree_path})
 ```
 
 Confirm all intended files are staged, including:
@@ -358,7 +359,7 @@ git_commit({
 
 **After any commit attempt, ALWAYS verify the actual state:**
 ```python
-git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "worktree_path": worktree_path})
 ```
 
 **Decision logic:**
@@ -429,7 +430,7 @@ git_commit({
 ### 5.5: Verify Commit
 
 ```python
-git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "worktree_path": worktree_path})
 ```
 
 Confirm commit was created and working tree is clean.
@@ -719,7 +720,8 @@ Closes #456
 - Agent gets confused and reports failure or retries unnecessarily
 
 **Solution:**
-1. **Always verify actual state**: After any commit attempt, check `git status --porcelain`
+1. **Always verify actual state**: After any commit attempt, call
+   `git_diff({"command": "status", "worktree_path": worktree_path})`
 2. **If working tree is clean**: The commit succeeded - report success
 3. **Do not retry**: Retrying will fail with "nothing to commit"
 4. **Report ADW_COMMIT_SUCCESS**: Even though `git_commit` returned an error

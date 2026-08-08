@@ -195,7 +195,7 @@ When a user invokes this agent, first determine:
 Ask about:
 - **Problem/Goal**: What problem does this solve? What's the desired outcome?
 - **Scope**: What's in scope? What's explicitly out of scope?
-- **Parent Epic**: Is this linked to an existing epic? (Use `adw_plans_read list` to check)
+- **Parent Epic**: Is this linked to an existing epic? (Use `adw_plans_read({ command: "list", plan_type: "epic", cwd: worktree_path })` to check)
 - **Size Estimate**: How many phases? What's the largest phase size?
 - **Dependencies**: What must be done first? What depends on this?
 - **Success Metrics**: How will we know this is done?
@@ -221,23 +221,29 @@ task({
 
 ## Step 3: Query Existing Plans
 
+Resolve `worktree_path` from `adw_spec_read read -> worktree_path` first and pass that exact
+value as `cwd` for every `adw_plans_read` and `adw_plans_mutate` command below.
+The value must equal the split wrapper's module-rooted worktree after canonicalization;
+the caller's current checkout, a nested path, and a sibling worktree are rejected before
+the CLI starts. Use direct booleans such as `json: true`, never `options: "json"`.
+
 Use `adw_plans_read` to understand current state before creating or updating:
 
 ```python
 # List all active features
-adw_plans_read({ command: "list", plan_type: "feature", lifecycle: "active", options: "json" })
+adw_plans_read({ command: "list", plan_type: "feature", lifecycle: "active", json: true, cwd: worktree_path })
 
 # List features under a specific epic
-adw_plans_read({ command: "list", plan_type: "feature", parent: "E17", options: "json" })
+adw_plans_read({ command: "list", plan_type: "feature", parent: "E17", json: true, cwd: worktree_path })
 
 # Show a specific plan
-adw_plans_read({ command: "show", plan_id: "E17-F1", options: "json" })
+adw_plans_read({ command: "show", plan_id: "E17-F1", json: true, cwd: worktree_path })
 
 # List all active epics
-adw_plans_read({ command: "list", plan_type: "epic", lifecycle: "active" })
+adw_plans_read({ command: "list", plan_type: "epic", lifecycle: "active", cwd: worktree_path })
 
 # Filter by status
-adw_plans_read({ command: "list", plan_type: "feature", options: "status=In Progress" })
+adw_plans_read({ command: "list", plan_type: "feature", options: "status=In Progress", cwd: worktree_path })
 ```
 
 ## Step 4: Create New Plan
@@ -351,8 +357,13 @@ adw_plans_mutate({
 Fill in the scaffolded section files with plan-specific content:
 
 ```python
+worktree_path = adw_spec_read({
+  "command": "read",
+  "adw_id": "{adw_id}",
+  "field": "worktree_path",
+})
 write({
-  filePath: ".opencode/plans/sections/features/E15-F4/overview.md",
+  filePath: f"{worktree_path}/.opencode/plans/sections/features/E15-F4/overview.md",
   content: "- **Problem Statement:** API calls to GitHub and GitLab have no rate limiting...\n\n- **Value Proposition:** Prevents rate limit errors and improves reliability...\n\n- **User Stories:**\n  - As a developer, I want automatic rate limiting so API calls don't fail..."
 })
 ```
@@ -360,7 +371,12 @@ write({
 ### 4e. Validate the plan
 
 ```python
-adw_plans_read({ command: "validate" })
+worktree_path = adw_spec_read({
+  "command": "read",
+  "adw_id": "{adw_id}",
+  "field": "worktree_path"
+})
+adw_plans_read({"command": "validate", "cwd": worktree_path})
 ```
 
 ## Step 5: Update Existing Plan
@@ -467,8 +483,13 @@ adw_plans_mutate({
 Edit section markdown files directly:
 
 ```python
+worktree_path = adw_spec_read({
+  "command": "read",
+  "adw_id": "{adw_id}",
+  "field": "worktree_path",
+})
 edit({
-  filePath: ".opencode/plans/sections/features/E17-F1/overview.md",
+  filePath: f"{worktree_path}/.opencode/plans/sections/features/E17-F1/overview.md",
   oldString: "old content",
   newString: "updated content"
 })
@@ -485,8 +506,10 @@ adw_plans_mutate({
 })
 ```
 
-The lifecycle automatically transitions from `active` to `completed` when status
-is set to `Shipped` or `Cancelled`.
+Serialized plan output computes lifecycle as `completed` for `Shipped`, `closed`
+for `Cancelled` and `Superseded`, and `active` for all other statuses. Lifecycle
+is output-only: do not include `lifecycle` in an `update` or `update-phase` raw
+JSON `patch`, because caller-supplied lifecycle patches are rejected before mutation.
 
 ## Step 6: Confirm with User
 
@@ -500,7 +523,7 @@ After completing the operation:
 2. **Suggest next steps**
    - Create GitHub issues for phases
    - Fill in remaining section content
-   - Run `adw plans validate` to verify
+    - Run `adw_plans_read({ command: "validate", cwd: worktree_path })` to verify
 
 # Interactive Conversation Templates
 
@@ -511,7 +534,12 @@ User: "I want to create an epic for refactoring authentication"
 
 Agent: "I'll help create an authentication refactoring epic. Let me check existing epics first.
 
-[runs: adw_plans_read list --type epic --lifecycle active]
+[runs: adw_plans_read({
+  command: "list",
+  plan_type: "epic",
+  lifecycle: "active",
+  cwd: worktree_path,
+})]
 
 Current active epics: E1 through E17. Your new epic would be E18.
 
@@ -534,7 +562,12 @@ User: "I need a feature plan for adding rate limiting"
 
 Agent: "I'll help create a rate limiting feature plan.
 
-[runs: adw_plans_read list --type epic --lifecycle active]
+[runs: adw_plans_read({
+  command: "list",
+  plan_type: "epic",
+  lifecycle: "active",
+  cwd: worktree_path,
+})]
 
 1. **Parent Epic**: Is this part of an existing epic?
    Current active epics: E1-Multi-Platform, E14-CI/CD, E17-Structured Plans, ...
@@ -559,7 +592,11 @@ User: "Update E17-F1 status to In Progress"
 
 Agent: "I'll update E17-F1.
 
-[runs: adw_plans_read show E17-F1]
+[runs: adw_plans_read({
+  command: "show",
+  plan_id: "E17-F1",
+  cwd: worktree_path,
+})]
 
 Current state: Draft, P2, size M, 4 phases (all Not Started).
 
@@ -575,14 +612,20 @@ Or just the top-level status?"
 ```
 User: "Show me all in-progress features"
 
-Agent: [runs: adw_plans_read list --type feature --status "In Progress" --json]
+Agent: [runs: adw_plans_read({
+  command: "list",
+  plan_type: "feature",
+  options: "status=In Progress",
+  json: true,
+  cwd: worktree_path,
+})]
 
 "Here are the in-progress features: ..."
 ```
 
 # Quality Standards
 
-- **Always validate after changes**: Run `adw_plans_read validate` after creating or editing plans
+- **Always validate after changes**: Run `adw_plans_read({ command: "validate", cwd: worktree_path })` after creating or editing plans
 - **Always include phase prefix** in phase IDs (e.g., `E1-F2-P1`)
 - **Always add "Update dev-docs" as final phase** in new plans
 - **Use the tool for plan metadata**: Status, priority, size, title changes go through `adw_plans_mutate update`
@@ -643,7 +686,7 @@ Size: `XS`, `S`, `M`, `L`, `XL`, `XXL`
 If `adw_plans_read show` fails, the plan ID doesn't exist. List plans to find the correct ID:
 
 ```python
-adw_plans_read({ command: "list", plan_type: "feature", options: "json" })
+adw_plans_read({ command: "list", plan_type: "feature", json: true, cwd: worktree_path })
 ```
 
 ## Invalid Parent Epic

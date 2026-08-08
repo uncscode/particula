@@ -140,7 +140,7 @@ After `ADW_COMMIT_SUCCESS` or `ADW_COMMIT_SKIPPED`, call:
 ```python
 task({
   "description": "Write workflow context note",
-  "prompt": f"Write note from state.\n\nArguments: adw_id={adw_id}",
+  "prompt": f"Write note from state.\n\nArguments: adw_id={adw_id} worktree_path={worktree_path}",
   "subagent_type": "adw-note-writer"
 })
 ```

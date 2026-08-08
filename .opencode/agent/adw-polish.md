@@ -146,7 +146,7 @@ Extract from `adw_state.json`:
 Use the `worktree_path` for all operations:
 
 ```python
-git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "worktree_path": worktree_path})
 ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
@@ -157,7 +157,7 @@ Confirm you are operating in the isolated worktree.
 Run the clean tree check before any linting or subagent call:
 
 ```python
-status = git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+status = git_diff({"command": "status", "worktree_path": worktree_path})
 if not status.strip():
     print("ADW_POLISH_SKIPPED: No changes to polish (working tree clean)")
     return

@@ -130,22 +130,21 @@ def resolve_base_branch(state: dict) -> str:
     return state.get("target_branch", "origin/main")
 ```
 
-Get diff stats (best-effort):
+Get bounded diff output (best-effort):
 ```python
-def get_diff_stat(worktree_path: str, base: str) -> dict:
-    """Run git diff --base to summarize changes.
+def get_diff(worktree_path: str, base: str) -> dict:
+    """Run a bounded Git diff against the selected base.
 
     Args:
         worktree_path: Worktree directory.
         base: Base branch reference.
 
     Returns:
-        Diff stat output from git_diff.
+        Bounded output from git_diff.
     """
     return git_diff({
         "command": "diff",
         "base": base,
-        "stat": true,
         "worktree_path": worktree_path,
     })
 ```

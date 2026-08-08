@@ -154,7 +154,7 @@ Extract from `adw_state.json`:
 Use the `worktree_path` for all operations:
 
 ```python
-git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "status", "worktree_path": worktree_path})
 ripgrep({"pattern": "**/*", "path": worktree_path})
 ```
 
@@ -165,8 +165,8 @@ Confirm you are operating in the isolated worktree.
 Get all modified Python files:
 
 ```python
-git_diff({"command": "diff", "stat": true, "worktree_path": worktree_path})
-git_diff({"command": "status", "porcelain": true, "worktree_path": worktree_path})
+git_diff({"command": "diff", "worktree_path": worktree_path})
+git_diff({"command": "status", "worktree_path": worktree_path})
 ```
 
 **File Identification Rules:**

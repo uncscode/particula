@@ -50,14 +50,21 @@ Write a compact workflow-context git note to `HEAD`.
 The caller provides:
 
 - `adw_id` (optional)
+- `worktree_path` (required for the commit-context fallback)
 
-If `adw_id` is provided but malformed, fail closed.
+If `adw_id` is provided but malformed, fail closed. If `adw_id` is absent,
+require an explicit canonical `worktree_path`; never substitute ambient cwd.
 
 ## Best-Effort Contract
 
 - This subagent is **observability-only**.
 - Callers (`shipper`, `shipper-auto`) should continue on `ADW_NOTE_FAILED`.
 - This subagent reports success/failure, but it must not alter ship gating.
+- `ADW_NOTE_FAILED` is observability-only: both the state and bounded
+  commit-context fallback paths remain secret-safe and cannot change ship
+  gating.
+- Its static definition and permissions describe validation metadata only; they
+  do not grant additional runtime authority or admit live child results.
 
 ## Process
 
@@ -80,25 +87,35 @@ If `adw_id` is provided but malformed, fail closed.
    - `architecture_notes`: condense `architecture_review_content` (nullable)
    - `discovered_context`: normalized **single string** summary from recent messages
      (string-only transport contract; join condensed bullets with ` | `)
-   - `review_findings`: condensed `review_feedback` and/or `review_findings` (nullable)
+     - `review_findings`: condensed `review_feedback` and/or `review_findings` (nullable)
+      - Only `architecture_notes` and `review_findings` may be explicitly `null`.
+        In the state-backed path, use that JSON value only to clear a persisted
+        value. Omit a field to retain the persisted state-backed value; use `""`
+        for an intentional empty string, including `discovered_context`. The
+        literal text `"null"` is plain text, not a clear request.
+     - Ordered duplicate fields resolve to the final value. Legacy `--field` and
+       `--field-json` transports remain mutually exclusive compatibility paths.
+     - Derived summaries may be condensed to their field budgets. When forwarding
+       caller-authored Markdown, preserve it verbatim; do not normalize labels,
+       links, fragments, emphasis, or surrounding prose.
 
 ### Path B: Commit-context fallback (`adw_id` missing)
 
 3B. Inspect the most recent commit using git tools only:
-   - `git_diff({"command": "show", "ref": "HEAD", "stat": true})`
-   - If needed, read one commit of history for subject confirmation using
-     `git_diff({"command": "log", "ref": "HEAD", "max_count": 1, "oneline": true})`
+    - `git_diff({"command": "show", "ref": "HEAD", "worktree_path": worktree_path})`
+    - If needed, read one commit of history for subject confirmation using
+      `git_diff({"command": "log", "ref": "HEAD", "max_count": 1, "worktree_path": worktree_path})`
 4B. Derive note fields from commit context:
    - `plan_summary`: summarize the commit message and overall change intent in **2-3 sentences**
    - `architecture_notes`: include only if the commit clearly changes architecture or workflow
-     structure; otherwise set to null/omit
+      structure; otherwise omit it unless an intentional clear is required
    - `discovered_context`: summarize the changed files and change shape as a normalized
      **single string** (for example `README.md condensed quick-start entrypoint | AGENTS.md
      removed duplicated reference material`)
-   - `review_findings`: set to null unless the commit or supplied context explicitly contains
-     review outcomes worth preserving
+   - `review_findings`: omit it unless the commit or supplied context explicitly contains
+      review outcomes worth preserving; use null only for an intentional clear
 5B. Write the fallback note directly:
-   - `adw_notes({"command": "write", "ref": "HEAD", "fields": [...]})`
+    - `adw_notes_write({"command": "write", "ref": "HEAD", "fields": [...]})`
 
 7. Apply pre-size budgets **before first write**:
    - `plan_summary` <= 600 chars
@@ -106,21 +123,24 @@ If `adw_id` is provided but malformed, fail closed.
    - `discovered_context` <= 600 chars
    - `review_findings` <= 400 chars
 8. Write note to `HEAD` using the selected path:
-   - State path: `adw_notes({"command": "write-from-state", "ref": "HEAD", "adw_id": adw_id, "fields": [...]})`
-   - Fallback path: `adw_notes({"command": "write", "ref": "HEAD", "fields": [...]})`
+    - State path: `adw_notes_write({"command": "write-from-state", "ref": "HEAD", "adw_id": adw_id, "fields": [...]})`
+    - Fallback path: `adw_notes_write({"command": "write", "ref": "HEAD", "fields": [...]})`
 9. If output includes a size warning (`>2KB`), condense the longest summary field and retry
     exactly once.
 
 ## Fallback Rules
 
 - Missing `spec_content`: write minimal fallback `plan_summary` from available workflow state.
-- Missing `architecture_review_content`: set `architecture_notes` to null/omit.
+- Missing `architecture_review_content`: omit `architecture_notes` unless an
+  intentional clear is required.
 - Empty message log: set `discovered_context` to empty string `""`.
 - If messages are structured objects, normalize each item to one concise string;
   drop empty/whitespace-only entries.
-- Missing `review_feedback`: set `review_findings` to null.
+- Missing `review_feedback`: omit `review_findings` unless an intentional clear
+  is required.
 - Missing `adw_id`: do **not** fail. Use the commit-context fallback path instead.
-- Missing parent commit or unusual git history: use `git_diff show HEAD --stat` only and
+- Missing parent commit or unusual git history: use the supported structured
+  `git_diff` `show` call with `ref: "HEAD"` and explicit `worktree_path`, then
   summarize the available commit metadata conservatively.
 - If neither ADW state nor commit context can be read, emit `ADW_NOTE_FAILED` with the blocking
   reason.

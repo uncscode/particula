@@ -275,7 +275,7 @@ git_diff({
   "command": "diff",
   "base": "{base_branch}",
   "target": "origin/{head_branch}",
-  "stat": true
+  "worktree_path": worktree_path
 })
 ```
 
@@ -284,7 +284,7 @@ git_diff({
 git_diff({
   "command": "diff",
   "base": "{base_branch}",
-  "stat": true
+  "worktree_path": worktree_path
 })
 ```
 
@@ -294,7 +294,7 @@ git_diff({
   "command": "diff",
   "base": "{base_branch}",
   "target": "origin/{head_branch}",
-  "stat": true
+  "worktree_path": worktree_path
 })
 ```
 
@@ -302,13 +302,15 @@ git_diff({
 ```python
 git_diff({
   "command": "diff",
-  "base": "{base_branch}"
+  "base": "{base_branch}",
+  "worktree_path": worktree_path
 })
 # Or with explicit target for accumulate-mode:
 git_diff({
   "command": "diff",
   "base": "{base_branch}",
-  "target": "origin/{head_branch}"
+  "target": "origin/{head_branch}",
+  "worktree_path": worktree_path
 })
 ```
 

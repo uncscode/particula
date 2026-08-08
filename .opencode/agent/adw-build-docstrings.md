@@ -42,6 +42,10 @@ permission:
   websearch: deny
   codesearch: deny
   bash: deny
+agent_contract_version: e37-m3-p5-v1
+declared_scope:
+  roots: [adw, adforge_core, adforge_voice]
+  file_kinds: [.py]
 ---
 
 # ADW Build Docstrings Subagent

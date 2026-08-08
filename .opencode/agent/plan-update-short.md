@@ -69,6 +69,7 @@ paths; manifest finalization receives a runtime-generated general spec.
 ```python
 adw_spec_read({"command": "list", "adw_id": "{adw_id}"})
 adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "source_branch"})
+adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "worktree_path"})
 adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "auto_mode_plan_id"})
 adw_spec_read({
   "command": "read",
@@ -114,7 +115,12 @@ return `PLAN_UPDATE_SHORT_FAILED` without mutation.
 List active plans and scan phases for a matching `issue_number`:
 
 ```python
-adw_plans_read({"command": "list", "lifecycle": "active", "options": "json"})
+adw_plans_read({
+  "command": "list",
+  "lifecycle": "active",
+  "json": true,
+  "cwd": worktree_path
+})
 ```
 
 For each plan, check its `phases` array for an entry where
@@ -147,7 +153,7 @@ After marking the phase, re-read the plan to check if all phases are now
 Shipped:
 
 ```python
-adw_plans_read({"command": "show", "plan_id": "{plan_id}", "options": "json", "cwd": "{worktree_path}"})
+adw_plans_read({"command": "show", "plan_id": "{plan_id}", "json": true, "cwd": worktree_path})
 ```
 
 If every phase has `status: "Shipped"`:

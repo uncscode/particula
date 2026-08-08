@@ -20,3 +20,5 @@ Apply mode is not transactional. If ast-grep fails mid-run, inspect and recover 
 3. Fix the pattern/rewrite and retry
 
 Execution failures return deterministic `ERROR:` envelopes with remediation hints.
+Paths are lexically and canonically confined to existing regular files or directories
+before ast-grep is started; this confinement does not make mutation transactional.

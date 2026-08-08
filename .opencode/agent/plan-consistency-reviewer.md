@@ -67,8 +67,8 @@ parse issues unless required workflow state is missing.
 
 - @.opencode/guides/code_style.md - deterministic, low-risk markdown edits
 - @.opencode/guides/testing_guide.md - validation expectations and naming conventions
-- `adw_plans_read({"command": "show", "plan_id": "{plan_id}", "options": "json", "cwd": worktree_path})` - canonical plan metadata resolution
-- `adw_plans_read({"command": "list-sections", "plan_id": "{plan_id}", "options": "json", "cwd": worktree_path})` - canonical section path mapping
+- `adw_plans_read({"command": "show", "plan_id": "{plan_id}", "json": true, "cwd": worktree_path})` - canonical plan metadata resolution
+- `adw_plans_read({"command": "list-sections", "plan_id": "{plan_id}", "json": true, "cwd": worktree_path})` - canonical section path mapping
 - `.opencode/plans/sections/` - canonical consistency-review scope
 
 # Process
@@ -137,13 +137,13 @@ For each `plan_id` in `review_plan_ids`, resolve canonical metadata via:
 adw_plans_read({
   "command": "show",
   "plan_id": "{plan_id}",
-  "options": "json",
+  "json": true,
   "cwd": worktree_path
 })
 adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "options": "json",
+  "json": true,
   "cwd": worktree_path
 })
 ```

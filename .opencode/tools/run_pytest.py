@@ -1,18 +1,27 @@
 #!/usr/bin/env python3
-"""Pytest runner with authoritative validation and coverage controls for ADW.
+"""Run pytest through validated, runner-owned controls for ADforge.
 
-Runs pytest with coverage reporting and validation that prevents success-style
-output when pytest fails or when requested coverage data is unusable. Supports
-scoped tests, deterministic coverage source validation, a shared timeout cap of
-1200 seconds (20 minutes), process-group-aware timeout cleanup, and multiple output formats
-for both interactive and programmatic use.
+The runner evaluates test assertions and coverage evidence independently. It
+preserves the repository coverage policy, including its minimum coverage floor,
+while accepting only normalized, repository-confined explicit coverage sources.
+Disabled coverage is reported explicitly rather than as a passing coverage
+result. Coverage-enabled runs acquire an ownership-safe, no-wait lease scoped to
+the canonical worktree; the lease prevents concurrent ``.coverage`` writes
+without disclosing paths, holders, or tokens. Every runner-owned JSON outcome
+also carries the canonical E37-M2 evidence identity; summary and full text
+outputs do not. The advanced route transports caller-owned pytest tokens only as
+a strict JSON string array; runner-owned controls include singular or ordered
+plural targets, filtering, coverage, timeout, collection, and output.
 
 Key features:
-    - Coverage reporting with configurable source and thresholds
-    - Hard-failure handling for unusable pytest-cov diagnostics
+    - Independent assertion and coverage status projections
+    - Coverage reporting with validated sources and retained policy thresholds
+    - Hard-failure handling for unusable pytest-cov diagnostics or missing totals
     - Validation of minimum test counts to catch collection errors
     - Fail-fast mode for quick development feedback
-    - Same-worktree coverage locking to avoid shared .coverage collisions
+    - Canonical-worktree coverage leases to avoid shared ``.coverage`` collisions
+    - Ordered, repository-confined plural test targets
+    - Explicit collect-only projections with collected and zero-executed counts
     - Duration profiling for performance optimization
     - Worktree-aware PYTHONPATH handling for isolated execution
 
@@ -40,29 +49,36 @@ Examples:
     # Show slowest tests for optimization
     python3 .opencode/tools/run_pytest.py --durations 10
 
-    # Skip slow tests
-    python3 .opencode/tools/run_pytest.py -m 'not slow and not performance'
+    # Select tests with a runner-owned filter
+    python3 .opencode/tools/run_pytest.py --test-filter 'not slow and not performance'
 """
 
 import argparse
 import errno
+import fcntl
+import hashlib
 import importlib.util
 import json
 import math
 import os
 import re
+import secrets
 import shlex
 import shutil
 import signal
 import subprocess
 import sys
-import tempfile
 import time
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Pattern, Tuple, Union
-from zlib import crc32
+
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPOSITORY_ROOT))
+
+from adforge_core.runtime.evidence import evidence_identity_projection  # noqa: E402
 
 SECTION_HEADER_PATTERN = re.compile(r"^=+\s*.+\s*=+\s*$")
 DURATIONS_HEADER_PATTERN = re.compile(
@@ -71,7 +87,10 @@ DURATIONS_HEADER_PATTERN = re.compile(
 )
 FAILURES_HEADER_PATTERN = re.compile(r"^=+\s*FAILURES\s*=+\s*$", re.IGNORECASE)
 
-COVERAGE_ADDOPT_PATTERN = re.compile(r"^(--cov(?:=|\b)|--cov-report=|--cov-fail-under=)")
+COVERAGE_ADDOPT_PATTERN = re.compile(
+    r"^(--cov(?:=|\b)|--cov-report(?:=|\b)|--cov-fail-under(?:=|\b)|"
+    r"--cov-config(?:=|\b)|--cov-context(?:=|\b))"
+)
 COVERAGE_PYTEST_ARG_PATTERN = re.compile(
     r"^(--cov(?:=|\b)|--cov-report(?:=|\b)|--cov-fail-under(?:=|\b)|"
     r"--cov-config(?:=|\b)|--cov-context(?:=|\b))"
@@ -81,12 +100,324 @@ MAX_COVERAGE_FILES = 500
 COVERAGE_LOCK_FILENAME = ".run_pytest_coverage.lock"
 MAX_TIMEOUT_SECONDS = 1200
 PYTEST_TIMEOUT_KILL_GRACE_SECONDS = 1.0
+MAX_DIAGNOSTIC_TEXT = 2000
+MAX_FULL_OUTPUT_TEXT = 20_000
+MAX_DIAGNOSTIC_NODE_IDS = 50
+MAX_DIAGNOSTIC_NODE_ID_LENGTH = 512
+MAX_FAILURE_SCAN_TEXT = 20_000
+PYTEST_ARG_VALUE_OPTIONS = {"-k", "-m"}
+PYTEST_ARG_STANDALONE_OPTIONS = {"--collect-only", "-q", "-v", "--verbose"}
+PYTEST_ARG_TB_VALUES = {"short", "long", "line", "native", "no"}
+PYTEST_ARG_RESERVED_PREFIXES = (
+    "--output",
+    "--min-tests",
+    "--timeout",
+    "--cwd",
+    "--test-path",
+    "--test-filter",
+    "--coverage",
+    "--no-coverage",
+    "--coverage-source",
+    "--coverage-threshold",
+    "--cov-report",
+    "--fail-fast",
+    "--durations",
+    "--durations-min",
+    "--pytest-argv-json",
+    "--override-ini-json",
+    "--override-ini",
+    "--coverage-files-only",
+)
 UNUSABLE_COVERAGE_FRAGMENTS = (
     "no data collected",
     "no data was collected",
     "no data to report",
     "module was never imported",
 )
+MODULE_SOURCE_PATTERN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$")
+UNSUPPORTED_COVERAGE_SOURCE_SUFFIXES = (".txt",)
+
+
+class PytestArgumentValidationError(ValueError):
+    """Raised when caller-owned advanced pytest argv violates the fixed grammar."""
+
+
+def _bounded_diagnostic(value: str, limit: int = MAX_DIAGNOSTIC_TEXT) -> tuple[str, int]:
+    """Return a bounded diagnostic tail and its omitted-character count.
+
+    Args:
+        value: Diagnostic text to bound.
+        limit: Maximum number of trailing characters to retain.
+
+    Returns:
+        A pair containing the retained tail and the number of omitted characters.
+    """
+
+    if len(value) <= limit:
+        return value, 0
+    return value[-limit:], len(value) - limit
+
+
+def _redact_diagnostic(value: str) -> str:
+    """Redact absolute paths and JSON transport payloads from diagnostics.
+
+    Args:
+        value: Raw diagnostic text.
+
+    Returns:
+        Diagnostic text safe to render in a bounded failure outcome.
+    """
+
+    value = re.sub(r"(?<![\w.])/(?:[^\s'\"]+/?)+", "<path>", value)
+    return re.sub(r"--(?:pytest-argv-json|override-ini-json)=\S+", "<transport>", value)
+
+
+def _failure_outcome(
+    *,
+    returncode: int,
+    validation_errors: list[str],
+    stdout: str,
+    stderr: str,
+    elapsed_seconds: float,
+    resolved_target: Optional[str],
+) -> dict[str, Any]:
+    """Build the canonical bounded failure projection without command/path leakage.
+
+    Args:
+        returncode: Pytest subprocess exit code.
+        validation_errors: Validation failures found after pytest completes.
+        stdout: Captured pytest standard output.
+        stderr: Captured pytest standard error.
+        elapsed_seconds: Monotonic execution duration in seconds.
+        resolved_target: Runner-owned test target, when one was supplied.
+
+    Returns:
+        Ordered canonical failure data with a classification, reason, bounded
+        diagnostics, and truncation metadata.
+    """
+
+    scan_text, scan_omitted = _bounded_diagnostic(f"{stdout}\n{stderr}", MAX_FAILURE_SCAN_TEXT)
+    combined = scan_text.lower()
+    if "error collecting" in combined or "collection" in combined and returncode == 2:
+        classification = "collection"
+    elif "usage:" in combined or "unrecognized arguments" in combined:
+        classification = "usage"
+    elif "plugin" in combined or "coverage" in combined and "error" in combined:
+        classification = "plugin"
+    elif "failed" in combined or "assert" in combined:
+        classification = "assertion"
+    else:
+        classification = "invocation"
+    bounded_stdout, stdout_omitted = _bounded_diagnostic(stdout)
+    bounded_stderr, stderr_omitted = _bounded_diagnostic(stderr)
+    stdout_tail = _redact_diagnostic(bounded_stdout)
+    stderr_tail = _redact_diagnostic(bounded_stderr)
+    excerpt, excerpt_omitted = _bounded_diagnostic("\n".join(validation_errors) or stdout_tail)
+    raw_node_ids = re.findall(r"[^\s]+::[^\s]+", scan_text)
+    omitted_nodes = max(0, len(raw_node_ids) - MAX_DIAGNOSTIC_NODE_IDS)
+    node_ids = [
+        "<absolute-node-id>"
+        if os.path.isabs(node_id.split("::", 1)[0])
+        else _redact_diagnostic(node_id[:MAX_DIAGNOSTIC_NODE_ID_LENGTH])
+        for node_id in raw_node_ids[:MAX_DIAGNOSTIC_NODE_IDS]
+    ]
+    return {
+        "classification": classification,
+        "reason": validation_errors[0]
+        if validation_errors
+        else f"pytest exited with code {returncode}",
+        "exit_code": returncode,
+        "resolved_target": resolved_target,
+        "elapsed_seconds": round(elapsed_seconds, 3),
+        "phase": "execution",
+        "node_ids": node_ids,
+        "excerpt": excerpt,
+        "stdout_tail": stdout_tail,
+        "stderr_tail": stderr_tail,
+        "truncation": {
+            "node_ids_omitted": omitted_nodes,
+            "excerpt_omitted": excerpt_omitted,
+            "stdout_tail_omitted": stdout_omitted,
+            "stderr_tail_omitted": stderr_omitted,
+            "overall_truncated": any(
+                (omitted_nodes, excerpt_omitted, stdout_omitted, stderr_omitted, scan_omitted)
+            ),
+            "scan_omitted": scan_omitted,
+        },
+    }
+
+
+def _repository_root(cwd: str) -> Path:
+    """Return the nearest repository root for a requested runner directory.
+
+    Args:
+        cwd: Requested runner working directory.
+
+    Returns:
+        The nearest ancestor containing ``pyproject.toml`` or ``.git``, or the
+        resolved requested directory when no ancestor qualifies.
+    """
+
+    current = Path(cwd).resolve(strict=False)
+    while current.parent != current:
+        if (current / "pyproject.toml").exists() or (current / ".git").exists():
+            return current
+        current = current.parent
+    return Path(cwd).resolve(strict=False)
+
+
+def _validate_confined_target(value: str, cwd: str, name: str) -> str:
+    """Validate a repository-relative pytest target without changing its bytes.
+
+    Args:
+        value: Candidate path or node-id target.
+        cwd: Requested runner working directory.
+        name: Argument name used in validation errors.
+
+    Returns:
+        The original validated target.
+
+    Raises:
+        PytestArgumentValidationError: If the target is empty, option-like,
+            absolute, or resolves outside the repository root.
+    """
+
+    if not value or value.startswith("-") or Path(value).is_absolute():
+        raise PytestArgumentValidationError(
+            f"{name} must be a non-empty repository-relative target"
+        )
+    root = _repository_root(cwd)
+    resolved = (root / value.split("::", 1)[0]).resolve(strict=False)
+    try:
+        resolved.relative_to(root)
+    except ValueError:
+        raise PytestArgumentValidationError(
+            f"{name} must stay within the repository/worktree root"
+        ) from None
+    return value
+
+
+def _validate_pytest_argv(pytest_argv: object, cwd: str) -> list[str]:
+    """Validate the ordered caller-owned argv suffix for the advanced route.
+
+    Args:
+        pytest_argv: Decoded JSON value expected to be a list of strings.
+        cwd: Requested runner working directory used for target confinement.
+
+    Returns:
+        A byte-preserving validated copy of the accepted caller token sequence.
+
+    Raises:
+        PytestArgumentValidationError: If the array shape, token grammar, value
+            pairing, reserved controls, or target confinement is invalid.
+    """
+
+    if not isinstance(pytest_argv, list) or any(not isinstance(item, str) for item in pytest_argv):
+        raise PytestArgumentValidationError("pytest argv JSON must decode to an array of strings")
+    validated: list[str] = []
+    index = 0
+    while index < len(pytest_argv):
+        token = pytest_argv[index]
+        if token == "--" or token.startswith("--cov"):
+            raise PytestArgumentValidationError(f"pytest argument {token!r} is not permitted")
+        if token in PYTEST_ARG_STANDALONE_OPTIONS:
+            validated.append(token)
+        elif token.startswith("--tb="):
+            if token.removeprefix("--tb=") not in PYTEST_ARG_TB_VALUES:
+                raise PytestArgumentValidationError(f"pytest argument {token!r} is not permitted")
+            validated.append(token)
+        elif token.startswith("--override-ini="):
+            raise PytestArgumentValidationError(f"pytest argument {token!r} is not permitted")
+        elif token in PYTEST_ARG_VALUE_OPTIONS:
+            if index + 1 >= len(pytest_argv):
+                raise PytestArgumentValidationError(f"pytest argument {token!r} requires a value")
+            value = pytest_argv[index + 1]
+            if value.startswith("-") or not value:
+                raise PytestArgumentValidationError(
+                    f"pytest argument {token!r} has an invalid value"
+                )
+            if token == "-o":
+                raise PytestArgumentValidationError("pytest argument '-o' is not permitted")
+            validated.extend((token, value))
+            index += 1
+        elif token.startswith("-") or token.startswith(PYTEST_ARG_RESERVED_PREFIXES):
+            raise PytestArgumentValidationError(f"pytest argument {token!r} is not permitted")
+        else:
+            validated.append(_validate_confined_target(token, cwd, "pytest argument"))
+        index += 1
+    return validated
+
+
+def _decode_string_array(raw: Optional[str], name: str) -> Optional[list[str]]:
+    """Decode one compact JSON string array without coercion.
+
+    Args:
+        raw: JSON text supplied by a named transport control, if any.
+        name: Human-readable transport name used in validation errors.
+
+    Returns:
+        The decoded string array, or ``None`` when the control was omitted.
+
+    Raises:
+        PytestArgumentValidationError: If ``raw`` is malformed JSON or does not
+            decode to a list containing only strings.
+    """
+
+    if raw is None:
+        return None
+    try:
+        value = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise PytestArgumentValidationError(f"{name} must be valid JSON array") from exc
+    if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
+        raise PytestArgumentValidationError(f"{name} must decode to an array of strings")
+    return value
+
+
+def _validate_test_paths(test_paths: object, cwd: str) -> list[str]:
+    """Validate one through seven ordered canonical repository targets.
+
+    Args:
+        test_paths: Candidate plural target payload expected to be a list of
+            strings.
+        cwd: Requested runner working directory used to locate the repository
+            root for confinement checks.
+
+    Returns:
+        A byte-preserving copy of the validated targets in caller order.
+
+    Raises:
+        PytestArgumentValidationError: If the payload is not a one-through-seven
+            string list, or a target is option-like, noncanonical, or outside the
+            repository root.
+    """
+    if not isinstance(test_paths, list) or not test_paths:
+        raise PytestArgumentValidationError("testPaths must be a non-empty array of strings")
+    if len(test_paths) > 7:
+        raise PytestArgumentValidationError("testPaths must contain at most 7 entries")
+    root = _repository_root(cwd)
+    for index, value in enumerate(test_paths):
+        label = f"testPaths[{index}]"
+        if not isinstance(value, str) or not value or value.startswith("-"):
+            raise PytestArgumentValidationError(
+                f"{label} must be a non-empty repository-relative target"
+            )
+        path_part = value.split("::", 1)[0]
+        if (
+            "\\" in path_part
+            or Path(path_part).is_absolute()
+            or any(not part or part in {".", ".."} for part in path_part.split("/"))
+        ):
+            raise PytestArgumentValidationError(
+                f"{label} must be a canonical relative POSIX target"
+            )
+        try:
+            (root / path_part).resolve(strict=False).relative_to(root)
+        except ValueError:
+            raise PytestArgumentValidationError(
+                f"{label} must stay within the repository/worktree root"
+            ) from None
+    return list(test_paths)
 
 
 def _candidate_tool_dirs(cwd: Optional[str]) -> List[Path]:
@@ -128,13 +459,48 @@ class CoverageLockError(RuntimeError):
     """Raised when a same-worktree coverage run is already in progress."""
 
 
+@dataclass(frozen=True)
+class CoverageLease:
+    """Opaque ownership record for one canonical-worktree coverage lease.
+
+    Attributes:
+        token: Fresh opaque value used to verify lease ownership before removal.
+        pid: Process identifier used only to verify stale-holder liveness.
+        worktree_id: Non-reversible identifier binding the lease to one canonical
+            worktree.
+    """
+
+    token: str
+    pid: int
+    worktree_id: str
+
+    def as_record(self) -> dict[str, object]:
+        """Return the strict on-disk lease representation.
+
+        Returns:
+            JSON-serializable record containing the complete lease identity.
+        """
+
+        return {"token": self.token, "pid": self.pid, "worktree_id": self.worktree_id}
+
+
 class PytestTimeoutValidationError(ValueError):
     """Raised when a timeout argument violates the wrapper contract."""
 
 
 @dataclass(frozen=True)
 class PytestTimeoutDetails:
-    """Structured timeout details for deterministic wrapper diagnostics."""
+    """Structured timeout details for deterministic wrapper diagnostics.
+
+    Attributes:
+        timeout_seconds: Configured timeout limit in seconds.
+        elapsed_seconds: Monotonic duration before timeout handling began.
+        pid: Direct pytest process identifier.
+        process_group_id: Process group terminated during cleanup.
+        cwd: Subprocess working directory before redaction.
+        command: Full subprocess command before argument redaction.
+        sigkill_escalated: Whether graceful termination required ``SIGKILL``.
+    """
 
     timeout_seconds: float
     elapsed_seconds: float
@@ -155,7 +521,13 @@ class PytestTimedOutError(RuntimeError):
 
 @dataclass(frozen=True)
 class PytestSubprocessResult:
-    """Captured subprocess result for pytest execution."""
+    """Captured pytest subprocess result.
+
+    Attributes:
+        returncode: Pytest process exit code.
+        stdout: Captured standard output.
+        stderr: Captured standard error.
+    """
 
     returncode: int
     stdout: str
@@ -300,29 +672,69 @@ def _terminate_process_group(process: subprocess.Popen[str], process_group_id: i
     return sigkill_escalated
 
 
-def _filter_non_coverage_addopts(addopts: str) -> List[str]:
-    """Return non-coverage addopts from a PYTEST_ADDOPTS string."""
-    return [arg for arg in addopts.split() if arg and not COVERAGE_ADDOPT_PATTERN.match(arg)]
-
-
-def _normalize_coverage_source(coverage_source: Optional[object]) -> List[str]:
-    """Normalize coverage source inputs into a clean list.
+def _filter_non_coverage_addopts(addopts: Union[str, List[str]]) -> List[str]:
+    """Remove coverage controls and their operands from configured pytest addopts.
 
     Args:
-        coverage_source: Coverage source from CLI or API. Accepts None, string,
-            or list of strings.
+        addopts: Shell-style addopts text or an already-tokenized addopts list.
 
     Returns:
-        List of normalized coverage sources. Returns an empty list when
-        coverage should fall back to the default configuration.
+        Retained non-coverage pytest tokens in their original order.
+    """
+    tokens = shlex.split(addopts) if isinstance(addopts, str) else list(addopts)
+    filtered: List[str] = []
+
+    index = 0
+    while index < len(tokens):
+        token = tokens[index]
+        if token.startswith("--cov=") or token.startswith("--cov-report="):
+            index += 1
+            continue
+        if token.startswith("--cov-fail-under=") or token.startswith("--cov-config="):
+            index += 1
+            continue
+        if token == "--cov":
+            next_token = tokens[index + 1] if index + 1 < len(tokens) else None
+            if next_token is not None and not next_token.startswith("-"):
+                index += 2
+            else:
+                index += 1
+            continue
+        if token in {"--cov-report", "--cov-fail-under", "--cov-config", "--cov-context"}:
+            next_token = tokens[index + 1] if index + 1 < len(tokens) else None
+            if next_token is None or next_token.startswith("-"):
+                raise CoverageSourceValidationError(
+                    f"configured addopts token '{token}' must be followed by a value"
+                )
+            index += 2
+            continue
+        if COVERAGE_ADDOPT_PATTERN.match(token):
+            index += 1
+            continue
+        filtered.append(token)
+        index += 1
+    return filtered
+
+
+def _normalize_coverage_source(coverage_source: Optional[object], repo_root: Path) -> List[str]:
+    """Normalize coverage sources against the resolved repository root.
+
+    Args:
+        coverage_source: Coverage source from CLI or API. Accepts ``None``, a
+            comma-separated string, or a list or tuple of such strings.
+        repo_root: Resolved repository root that bounds path-form sources.
+
+    Returns:
+        Canonical module names or root-relative POSIX paths in caller order.
+        Returns an empty list when coverage should use repository defaults.
 
     Raises:
-        CoverageSourceValidationError: The input contains empty comma-separated
-            segments or absolute paths.
+        CoverageSourceValidationError: The input has an invalid shape, invalid
+            module or path form, an unsafe path, or a nonexistent/symlink target.
 
     Notes:
-        The special value ``all`` clears explicit sources so pytest-cov falls
-        back to the repository coverage configuration.
+        The case-insensitive special value ``all`` must be the sole source and
+        selects the repository coverage configuration.
     """
     if coverage_source is None:
         return []
@@ -332,12 +744,13 @@ def _normalize_coverage_source(coverage_source: Optional[object]) -> List[str]:
         sources = coverage_source.split(",")
     elif isinstance(coverage_source, (list, tuple)):
         for entry in coverage_source:
-            if entry is None:
-                continue
-            if isinstance(entry, str):
-                sources.extend(entry.split(","))
+            if not isinstance(entry, str):
+                raise CoverageSourceValidationError("coverageSource entries must be strings")
+            sources.extend(entry.split(","))
     else:
-        return []
+        raise CoverageSourceValidationError(
+            "coverageSource must be a string or an array of strings"
+        )
 
     cleaned: List[str] = []
     for source in sources:
@@ -349,89 +762,84 @@ def _normalize_coverage_source(coverage_source: Optional[object]) -> List[str]:
         cleaned.append(stripped)
 
     if any(source.lower() == "all" for source in cleaned):
+        if len(cleaned) != 1:
+            raise CoverageSourceValidationError("coverageSource 'all' must be the sole source")
         return []
 
     normalized: List[str] = []
     for source in cleaned:
-        if Path(source).is_absolute():
+        if source.endswith(UNSUPPORTED_COVERAGE_SOURCE_SUFFIXES):
             raise CoverageSourceValidationError(
-                f"coverageSource must not contain absolute paths: {source}"
+                f"coverageSource has an unsupported file suffix: {source}"
             )
-        normalized.append(source)
+        is_path = "/" in source or source.startswith(".") or source.endswith(".py")
+        if not is_path and MODULE_SOURCE_PATTERN.fullmatch(source):
+            normalized.append(source)
+            continue
+        if not is_path:
+            raise CoverageSourceValidationError(
+                f"coverageSource is not a valid module or path: {source}"
+            )
+        if "\\" in source or Path(source).is_absolute():
+            raise CoverageSourceValidationError(
+                f"coverageSource must be a relative POSIX path: {source}"
+            )
+        parts = source.split("/")
+        if any(not part or part in {".", ".."} for part in parts):
+            raise CoverageSourceValidationError(
+                f"coverageSource has noncanonical path components: {source}"
+            )
+        candidate = repo_root / source
+        try:
+            resolved = candidate.resolve(strict=True)
+            resolved.relative_to(repo_root)
+        except (OSError, ValueError) as exc:
+            raise CoverageSourceValidationError(
+                "coverageSource must be an existing safe path within the "
+                f"repository/worktree root: {source}"
+            ) from exc
+        if candidate.is_symlink() or not (
+            resolved.is_dir() or (resolved.is_file() and resolved.suffix == ".py")
+        ):
+            raise CoverageSourceValidationError(
+                f"coverageSource must be an existing directory or .py file: {source}"
+            )
+        normalized.append(resolved.relative_to(repo_root).as_posix())
     return normalized
 
 
 def _resolve_repo_root_for_coverage(cwd: Optional[str]) -> Path:
-    """Resolve the trusted repository/worktree root used for coverage paths."""
+    """Resolve the trusted repository/worktree root used for coverage paths.
 
-    if cwd:
-        return Path(cwd).resolve()
+    Args:
+        cwd: Requested pytest working directory, when explicitly supplied.
 
-    current = Path.cwd().resolve()
-    while current != current.parent:
+    Returns:
+        Resolved requested directory or the nearest current-directory ancestor
+        containing repository metadata.
+    """
+
+    current = Path(cwd).resolve() if cwd else Path.cwd().resolve()
+    while True:
         if (current / "pyproject.toml").exists() or (current / ".git").exists():
             return current
-        current = current.parent
-    return Path.cwd().resolve()
-
-
-def _validate_coverage_source_scope(source: str, repo_root: Path) -> None:
-    """Reject path-like coverage sources that resolve outside the repo/worktree."""
-
-    if (
-        "/" not in source
-        and "\\" not in source
-        and not source.startswith(".")
-        and not source.endswith(".py")
-    ):
-        return
-
-    resolved_source = (repo_root / Path(source)).resolve(strict=False)
-    try:
-        resolved_source.relative_to(repo_root)
-    except ValueError as exc:
-        raise CoverageSourceValidationError(
-            f"coverageSource must stay within the repository/worktree root: {source}"
-        ) from exc
+        parent = current.parent
+        if parent == current:
+            return Path(cwd).resolve() if cwd else Path.cwd().resolve()
+        current = parent
 
 
 def _contains_coverage_pytest_args(args: List[str]) -> bool:
-    """Return True when passthrough pytest args request coverage behavior."""
-
-    return any(COVERAGE_PYTEST_ARG_PATTERN.match(arg) for arg in args)
-
-
-def _coverage_source_to_rcfile(sources: List[str], cwd: Optional[str] = None) -> Optional[str]:
-    """Create a temporary coveragerc file for explicit coverage sources.
+    """Determine whether passthrough pytest arguments request coverage behavior.
 
     Args:
-        sources: Normalized coverage sources (module names or paths) that should
-            be injected into the coverage configuration.
-        cwd: Base directory used to resolve repo-relative path sources before
-            writing the temporary coverage config.
+        args: Caller-owned pytest argument suffix.
 
     Returns:
-        Absolute path to the generated temporary coveragerc file when sources
-        are provided, otherwise ``None``.
+        ``True`` when an argument is a recognized coverage pytest control.
     """
 
-    if not sources:
-        return None
-    resolved_sources: List[str] = []
-    base_dir = Path(cwd) if cwd else Path.cwd()
-    for source in sources:
-        path = Path(source)
-        if "/" in source or "\\" in source or source.endswith(".py"):
-            resolved_sources.append(str((base_dir / path).resolve()))
-        else:
-            resolved_sources.append(source)
-    temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".coveragerc")
-    temp_file.write("[run]\n")
-    temp_file.write("source =\n")
-    for source in resolved_sources:
-        temp_file.write(f"    {source}\n")
-    temp_file.close()
-    return temp_file.name
+    return any(COVERAGE_PYTEST_ARG_PATTERN.match(arg) for arg in args)
 
 
 def _load_pyproject_addopts(root_dir: Path) -> List[str]:
@@ -450,7 +858,7 @@ def _load_pyproject_addopts(root_dir: Path) -> List[str]:
         return []
     try:
         data = tomllib.loads(pyproject_path.read_text())
-    except tomllib.TOMLDecodeError:
+    except (OSError, tomllib.TOMLDecodeError):
         return []
     addopts = data.get("tool", {}).get("pytest", {}).get("ini_options", {}).get("addopts", "")
     if not isinstance(addopts, str) or not addopts:
@@ -461,8 +869,89 @@ def _load_pyproject_addopts(root_dir: Path) -> List[str]:
         return addopts.split()
 
 
+def _repository_coverage_floor(root_dir: Path, addopts: List[str]) -> float:
+    """Return the effective repository coverage floor without weakening policy.
+
+    Args:
+        root_dir: Repository root containing optional ``pyproject.toml`` policy.
+        addopts: Parsed pytest addopts to inspect for ``--cov-fail-under``.
+
+    Returns:
+        The configured floor, strengthened to the wrapper's minimum of 80.
+
+    Raises:
+        CoverageSourceValidationError: Configured floor values are nonnumeric or
+            conflict between supported configuration locations.
+    """
+    values: List[float] = []
+
+    def append_finite(value: object, description: str) -> None:
+        try:
+            parsed = float(str(value))
+        except (TypeError, ValueError) as exc:
+            raise CoverageSourceValidationError(
+                f"configured {description} must be numeric"
+            ) from exc
+        if not math.isfinite(parsed):
+            raise CoverageSourceValidationError(f"configured {description} must be finite")
+        values.append(parsed)
+
+    for index, token in enumerate(addopts):
+        value: Optional[str] = None
+        if token.startswith("--cov-fail-under="):
+            value = token.split("=", 1)[1]
+        elif token == "--cov-fail-under":
+            if index + 1 >= len(addopts):
+                raise CoverageSourceValidationError(
+                    "configured --cov-fail-under must be followed by a value"
+                )
+            value = addopts[index + 1]
+        if value is not None:
+            append_finite(value, "--cov-fail-under")
+    pyproject = root_dir / "pyproject.toml"
+    if pyproject.exists():
+        try:
+            data = tomllib.loads(pyproject.read_text())
+            value = data.get("tool", {}).get("coverage", {}).get("report", {}).get("fail_under")
+            if value is not None:
+                append_finite(value, "[tool.coverage.report].fail_under")
+        except tomllib.TOMLDecodeError:
+            pass
+        except OSError as exc:
+            raise CoverageSourceValidationError("coverage policy could not be read") from exc
+    if len(set(values)) > 1:
+        raise CoverageSourceValidationError("configured coverage floors are inconsistent")
+    return max(values[0], 80.0) if values else 80.0
+
+
+def _effective_coverage_floor(root_dir: Path, caller_threshold: Optional[object]) -> float:
+    """Combine repository policy with a caller threshold that can only strengthen it.
+
+    Args:
+        root_dir: Repository root used to load coverage policy.
+        caller_threshold: Optional caller-requested minimum coverage percentage.
+
+    Returns:
+        Effective coverage floor that is at least the repository policy floor.
+
+    Raises:
+        CoverageSourceValidationError: The caller threshold is invalid or would
+            weaken repository policy.
+    """
+    floor = _repository_coverage_floor(root_dir, _load_pyproject_addopts(root_dir))
+    if caller_threshold is None:
+        return floor
+    if isinstance(caller_threshold, bool) or not isinstance(caller_threshold, (int, float)):
+        raise CoverageSourceValidationError("coverageThreshold must be a finite number")
+    if not math.isfinite(caller_threshold) or caller_threshold < floor:
+        raise CoverageSourceValidationError(
+            f"coverageThreshold must be a finite number no lower than repository policy ({floor})"
+        )
+    return float(caller_threshold)
+
+
 def _should_apply_coverage_threshold(
-    *, coverage_threshold: Optional[int], cov_args: List[str], pytest_args: List[str]
+    *, coverage_threshold: Optional[float], cov_args: List[str], pytest_args: List[str]
 ) -> bool:
     """Determine if coverage threshold enforcement should run.
 
@@ -713,7 +1202,12 @@ def parse_pytest_output(output: str) -> Dict:
 
 
 def format_summary(
-    metrics: Dict, validation_errors: List[str], coverage_threshold: Optional[int] = None
+    metrics: Dict,
+    validation_errors: List[str],
+    coverage_threshold: Optional[float] = None,
+    assertion: Optional[Dict[str, Any]] = None,
+    coverage: Optional[Dict[str, Any]] = None,
+    collection: Optional[dict[str, int]] = None,
 ) -> str:
     """Format a human-readable summary of test results.
 
@@ -736,6 +1230,15 @@ def format_summary(
     lines.append("=" * 60)
     lines.append("PYTEST SUMMARY")
     lines.append("=" * 60)
+    if assertion:
+        lines.append(f"Assertions: {assertion['status'].upper()}")
+    if coverage:
+        lines.append(f"Coverage: {coverage['status'].upper()}")
+    if collection is not None:
+        lines.append(
+            "Collection: "
+            f"{collection['collected_count']} collected, {collection['executed_count']} executed"
+        )
 
     # Test counts
     lines.append(f"\nTests Run: {metrics['total']}")
@@ -887,14 +1390,103 @@ def validate_results(
     return errors
 
 
+def _evaluate_assertions(
+    metrics: Dict[str, Any],
+    min_test_count: int,
+    returncode: int,
+    *,
+    coverage_only: bool = False,
+) -> Dict[str, Any]:
+    """Produce the bounded assertion projection independently of coverage.
+
+    Args:
+        metrics: Parsed pytest counts and failure indicators.
+        min_test_count: Minimum required number of passing tests.
+        returncode: Pytest subprocess exit code.
+
+    Returns:
+        Assertion status and ordered failure reasons suitable for structured
+        output. A nonzero pytest exit produces a failed status unless it is
+        independently classified as a coverage-only failure.
+    """
+    reasons: List[str] = []
+    if metrics["has_failures"]:
+        reasons.append(f"Found {metrics['failed']} failed test(s)")
+    if metrics["has_errors"]:
+        reasons.append(f"Found {metrics['errors']} test error(s)")
+    if metrics["passed"] < min_test_count:
+        reasons.append(
+            f"Expected at least {min_test_count} passing tests, but only {metrics['passed']} passed"
+        )
+    if metrics["total"] == 0:
+        reasons.append("No tests were collected or run")
+    if returncode != 0 and not coverage_only:
+        reasons.append(
+            f"pytest exited with code {returncode}; inspect failed tests and stderr output"
+        )
+    return {"status": "failed" if reasons else "passed", "reasons": reasons}
+
+
+def _evaluate_coverage(
+    metrics: Dict[str, Any], *, enabled: bool, floor: Optional[float], output: str
+) -> Dict[str, Any]:
+    """Produce the bounded coverage projection independently of assertions.
+
+    Args:
+        metrics: Parsed pytest metrics, including any ``TOTAL`` percentage.
+        enabled: Whether the invocation requested coverage collection.
+        floor: Effective minimum coverage percentage when coverage is enabled.
+        output: Combined pytest standard output and standard error.
+
+    Returns:
+        Coverage status, ordered reasons, and a percentage when numeric evidence
+        is available. Disabled coverage is reported as ``disabled``, not passed.
+    """
+    if not enabled:
+        return {"status": "disabled", "reasons": []}
+    reasons: List[str] = []
+    unusable = _detect_unusable_coverage_diagnostics(output)
+    percentage = metrics.get("coverage_pct")
+    if unusable:
+        reasons.append(unusable)
+    elif percentage is None:
+        reasons.append(
+            "Coverage data is unavailable: pytest-cov did not report a TOTAL coverage percentage."
+        )
+    elif floor is not None and percentage < floor:
+        reasons.append(f"Coverage {percentage}% is below threshold of {floor}%")
+    result: Dict[str, Any] = {"status": "failed" if reasons else "passed", "reasons": reasons}
+    if percentage is not None:
+        result["percentage"] = percentage
+    return result
+
+
+def _collection_projection(output: str) -> Optional[dict[str, int]]:
+    """Parse exactly one pytest collect-only summary without assertion inference.
+
+    Args:
+        output: Combined pytest standard output and standard error.
+
+    Returns:
+        Collected and zero-executed counts when exactly one valid collection
+        summary is present; otherwise, ``None``.
+    """
+
+    matches = re.findall(r"(?:(\d+) tests? collected|(no tests collected))", output, re.I)
+    if len(matches) != 1:
+        return None
+    count, empty = matches[0]
+    return {"collected_count": 0 if empty else int(count), "executed_count": 0}
+
+
 def _resolve_normalized_sources(
     cwd: Optional[str], coverage_source: Optional[Union[str, List[str]]]
 ) -> List[str]:
     """Resolve normalized coverage sources for the current invocation.
 
     Args:
-        cwd: Requested pytest working directory. Included for call-site parity;
-            normalization validates inputs but does not rewrite them.
+        cwd: Requested pytest working directory used to resolve the repository
+            root for path-form source validation.
         coverage_source: Optional coverage source configuration from caller.
 
     Returns:
@@ -902,109 +1494,231 @@ def _resolve_normalized_sources(
         repo-relative directories, and repo-relative file targets.
     """
 
-    normalized_sources = _normalize_coverage_source(coverage_source)
     repo_root = _resolve_repo_root_for_coverage(cwd)
-    for source in normalized_sources:
-        _validate_coverage_source_scope(source, repo_root)
-    return normalized_sources
+    return _normalize_coverage_source(coverage_source, repo_root)
 
 
-def _recover_stale_coverage_lock(lock_path: Path) -> bool:
-    """Recover a stale same-worktree coverage lock when safe to do so."""
+def _coverage_worktree_id(root: Path | str) -> str:
+    """Return a non-reversible identifier for the canonical worktree root.
 
-    try:
-        contents = lock_path.read_text(encoding="utf-8").strip()
-    except OSError as exc:
-        raise CoverageLockError(
-            "coverage lock exists but could not be inspected for stale recovery: "
-            f"{lock_path} ({exc})"
-        ) from exc
+    Args:
+        root: Worktree root to canonicalize before deriving the identifier.
 
-    pid_text = contents.removeprefix("pid=").strip()
-    if not pid_text.isdigit():
-        try:
-            lock_path.unlink()
-        except OSError as exc:
-            raise CoverageLockError(
-                f"coverage lock exists with invalid metadata and could not be removed: {lock_path}"
-            ) from exc
-        return True
+    Returns:
+        SHA-256 digest of the canonical root path for lease-record comparison.
+    """
 
-    pid = int(pid_text)
-    try:
-        os.kill(pid, 0)
-    except OSError as exc:
-        if exc.errno != errno.ESRCH:
-            raise CoverageLockError(
-                "coverage-enabled pytest runs in the same worktree must be serialized; "
-                f"coverage lock holder pid={pid} could not be verified"
-            ) from exc
-        try:
-            lock_path.unlink()
-        except OSError as unlink_exc:
-            raise CoverageLockError(
-                f"stale coverage lock could not be removed: {lock_path}"
-            ) from unlink_exc
-        return True
-
-    return False
+    return hashlib.sha256(str(Path(root).resolve()).encode("utf-8")).hexdigest()
 
 
-def _get_coverage_lock_path(cwd: str) -> Path:
+def _get_coverage_lock_path(root: Path | str) -> Path:
     """Return the repo-local runtime lock path for the given worktree.
 
     Args:
-        cwd: Worktree root used for the pytest run.
+        root: Canonical worktree root used for the pytest run.
 
     Returns:
         Absolute path to the deterministic lock file under ``adforge_local/state``.
     """
 
-    worktree_root = Path(cwd).resolve()
-    runtime_state_dir = worktree_root / "adforge_local" / "state"
-    runtime_state_dir.mkdir(parents=True, exist_ok=True)
-    suffix = f"{crc32(str(worktree_root).encode('utf-8')):08x}"
-    return runtime_state_dir / f"{suffix}-{COVERAGE_LOCK_FILENAME}"
+    runtime_state_dir = Path(root).resolve() / "adforge_local" / "state"
+    for directory in (runtime_state_dir.parent, runtime_state_dir):
+        try:
+            directory.mkdir(exist_ok=True)
+            if directory.is_symlink() or not directory.is_dir():
+                raise CoverageLockError("coverage coordination state is unavailable; retry later")
+        except OSError as exc:
+            raise CoverageLockError(
+                "coverage coordination state is unavailable; retry later"
+            ) from exc
+    return runtime_state_dir / COVERAGE_LOCK_FILENAME
 
 
-def _acquire_coverage_lock(cwd: str) -> str:
+def _coverage_lease_guard(lock_path: Path):
+    """Return an exclusive no-follow mutex for lease record transitions."""
+
+    guard_path = lock_path.with_suffix(".guard")
+    try:
+        fd = os.open(guard_path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+        fcntl.flock(fd, fcntl.LOCK_EX)
+    except OSError as exc:
+        raise CoverageLockError("coverage coordination state is unavailable; retry later") from exc
+    return fd
+
+
+def _close_coverage_lease_guard(fd: int) -> None:
+    """Release a lease transition mutex without surfacing cleanup failures."""
+
+    try:
+        fcntl.flock(fd, fcntl.LOCK_UN)
+    finally:
+        os.close(fd)
+
+
+def _read_coverage_lease(lock_path: Path, worktree_id: str) -> CoverageLease:
+    """Read and strictly validate an existing lease without leaking its details.
+
+    Args:
+        lock_path: Lease record location within the canonical worktree runtime
+            state directory.
+        worktree_id: Expected non-reversible canonical-worktree identifier.
+
+    Returns:
+        Complete validated ownership record.
+
+    Raises:
+        CoverageLockError: The record is unreadable, malformed, or does not
+            belong to the expected worktree.
+    """
+
+    try:
+        fd = os.open(lock_path, os.O_RDONLY | os.O_NOFOLLOW)
+        with os.fdopen(fd, "r", encoding="utf-8") as handle:
+            record = json.load(handle)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CoverageLockError(
+            "coverage coordination record could not be verified; retry later"
+        ) from exc
+    if (
+        not isinstance(record, dict)
+        or set(record) != {"token", "pid", "worktree_id"}
+        or not isinstance(record["token"], str)
+        or len(record["token"]) < 16
+        or not isinstance(record["pid"], int)
+        or isinstance(record["pid"], bool)
+        or record["pid"] <= 0
+        or record["worktree_id"] != worktree_id
+    ):
+        raise CoverageLockError("coverage coordination record could not be verified; retry later")
+    return CoverageLease(record["token"], record["pid"], record["worktree_id"])
+
+
+def _recover_stale_coverage_lock(lock_path: Path, worktree_id: str) -> bool:
+    """Remove only a reread-verified stale lease.
+
+    Args:
+        lock_path: Lease record location to inspect.
+        worktree_id: Expected canonical-worktree identifier.
+
+    Returns:
+        ``True`` if a verified stale lease was removed; ``False`` if its holder
+        is still live.
+
+    Raises:
+        CoverageLockError: The record cannot be verified, its liveness is
+            indeterminate, or it changes during stale recovery.
+    """
+
+    guard_fd = _coverage_lease_guard(lock_path)
+    try:
+        lease = _read_coverage_lease(lock_path, worktree_id)
+        try:
+            os.kill(lease.pid, 0)
+        except OSError as exc:
+            if exc.errno != errno.ESRCH:
+                raise CoverageLockError(
+                    "coverage coordination record liveness could not be verified; retry later"
+                ) from exc
+        else:
+            return False
+        # Every contender holds the same transition guard, so a cooperating
+        # contender cannot replace this verified record between check and unlink.
+        lock_path.unlink()
+        return True
+    except OSError as exc:
+        raise CoverageLockError(
+            "stale coverage coordination record could not be removed; retry later"
+        ) from exc
+    finally:
+        _close_coverage_lease_guard(guard_fd)
+
+
+def _acquire_coverage_lock(root: Path | str) -> tuple[Path, CoverageLease]:
     """Acquire an exclusive same-worktree coverage lock.
 
     Args:
-        cwd: Worktree root where the lock file should be created.
+        root: Canonical worktree root where the lease should be created.
 
     Returns:
-        Absolute path to the created lock file.
+        The created lock path and its opaque ownership lease.
 
     Raises:
         CoverageLockError: Another coverage-enabled pytest run is already active
             in the same worktree.
     """
 
-    lock_path = _get_coverage_lock_path(cwd)
+    canonical_root = Path(root).resolve()
+    lock_path = _get_coverage_lock_path(canonical_root)
+    worktree_id = _coverage_worktree_id(canonical_root)
+    lease = CoverageLease(secrets.token_hex(32), os.getpid(), worktree_id)
     for _ in range(2):
+        temporary_path = lock_path.with_name(f".{lock_path.name}.{secrets.token_hex(16)}.tmp")
         try:
-            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            fd = os.open(
+                temporary_path,
+                os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
+                0o600,
+            )
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                json.dump(lease.as_record(), handle, sort_keys=True, separators=(",", ":"))
+                handle.flush()
+                os.fsync(handle.fileno())
+            # link() publishes a fully-written record without replacing an owner.
+            os.link(temporary_path, lock_path, follow_symlinks=False)
+            temporary_path.unlink()
             break
         except FileExistsError as exc:
-            if _recover_stale_coverage_lock(lock_path):
+            try:
+                temporary_path.unlink(missing_ok=True)
+            except OSError:
+                pass
+            if _recover_stale_coverage_lock(lock_path, worktree_id):
                 continue
             raise CoverageLockError(
                 "coverage-enabled pytest runs in the same worktree must be serialized; "
-                "another coverage run is already active"
+                "another coverage run is active; retry after it completes"
+            ) from exc
+        except OSError as exc:
+            try:
+                temporary_path.unlink(missing_ok=True)
+            except OSError:
+                pass
+            raise CoverageLockError(
+                "coverage coordination state is unavailable; retry later"
             ) from exc
     else:
-        raise CoverageLockError(
-            f"failed to acquire coverage lock after stale-lock recovery: {lock_path}"
-        )
+        raise CoverageLockError("coverage coordination could not acquire a lease; retry later")
+    return lock_path, lease
 
-    with os.fdopen(fd, "w", encoding="utf-8") as handle:
-        handle.write(f"pid={os.getpid()}\n")
-    return str(lock_path)
+
+def _release_coverage_lock(lock_path: Path, lease: CoverageLease) -> None:
+    """Release a lease only when the complete record still belongs to this caller.
+
+    Args:
+        lock_path: Lease record location to remove when ownership still matches.
+        lease: Complete lease identity acquired by this invocation.
+    """
+
+    guard_fd: Optional[int] = None
+    try:
+        guard_fd = _coverage_lease_guard(lock_path)
+        if _read_coverage_lease(lock_path, lease.worktree_id) != lease:
+            return
+        lock_path.unlink()
+    except (CoverageLockError, OSError):
+        return
+    finally:
+        if guard_fd is not None:
+            _close_coverage_lease_guard(guard_fd)
 
 
 def _run_pytest_subprocess(
-    cmd: List[str], *, cwd: str, requested_cwd: Optional[str], timeout: float | int
+    cmd: List[str],
+    *,
+    cwd: str,
+    requested_cwd: Optional[str],
+    timeout: float | int,
+    coverage: bool = True,
 ) -> PytestSubprocessResult:
     """Execute pytest with worktree-aware PYTHONPATH and timeout cleanup.
 
@@ -1020,6 +1734,8 @@ def _run_pytest_subprocess(
             ``PYTHONPATH`` for isolated imports.
         timeout: Maximum runtime in seconds. Values must satisfy the shared
             timeout validation contract.
+        coverage: Whether coverage controls are enabled. When disabled, inherited
+            coverage addopts are removed from the subprocess environment.
 
     Returns:
         Captured subprocess result containing return code, stdout, and stderr.
@@ -1030,6 +1746,12 @@ def _run_pytest_subprocess(
     """
 
     env = os.environ.copy()
+    if not coverage and "PYTEST_ADDOPTS" in env:
+        retained_addopts = _filter_non_coverage_addopts(env["PYTEST_ADDOPTS"])
+        if retained_addopts:
+            env["PYTEST_ADDOPTS"] = shlex.join(retained_addopts)
+        else:
+            env.pop("PYTEST_ADDOPTS")
     if requested_cwd:
         existing_pythonpath = env.get("PYTHONPATH") or ""
         env["PYTHONPATH"] = (
@@ -1083,11 +1805,39 @@ def _build_pytest_command(
     durations_min: Optional[float],
     coverage: bool,
     normalized_sources: List[str],
-    coverage_rcfile: Optional[str],
     cov_report: str,
     override_ini: Optional[List[str]],
+    coverage_floor: Optional[float] = None,
+    root_dir: Optional[Path] = None,
+    test_path: Optional[str] = None,
+    test_paths: Optional[list[str]] = None,
+    test_filter: Optional[str] = None,
 ) -> tuple[List[str], List[str], List[str], str]:
-    """Build the pytest command and related derived coverage/ini state."""
+    """Build the pytest command and derived coverage and ini state.
+
+    Runner-owned controls are added before the caller-owned ``args`` suffix,
+    which is appended unchanged exactly once.
+
+    Args:
+        args: Previously validated caller-owned pytest token suffix.
+        fail_fast: Whether to add pytest's stop-on-first-failure control.
+        durations: Number of slowest tests to report, if requested.
+        durations_min: Minimum duration for reported slow tests, if requested.
+        coverage: Whether runner-owned coverage controls are enabled.
+        normalized_sources: Validated coverage source names or paths.
+        cov_report: Comma-separated runner-owned coverage report formats.
+        override_ini: Validated runner-owned pytest ini override entries.
+        coverage_floor: Effective runner-owned minimum coverage percentage.
+        root_dir: Repository root used to preserve non-coverage pytest addopts.
+        test_path: Validated runner-owned test target, if supplied.
+        test_paths: Validated ordered runner-owned targets, if supplied.
+        test_filter: Runner-owned pytest selection expression, if supplied.
+
+    Returns:
+        The command, generated coverage arguments, effective ini overrides, and
+        effective coverage report configuration. Coverage controls appear only
+        when ``coverage`` is enabled.
+    """
 
     cmd = ["pytest", "-v", "--tb=short"]
 
@@ -1100,30 +1850,28 @@ def _build_pytest_command(
             cmd.append(f"--durations-min={durations_min}")
 
     effective_override_ini = list(override_ini or [])
-    if not any(entry.startswith("addopts=") for entry in effective_override_ini):
-        if not coverage or normalized_sources:
-            effective_override_ini.append("addopts=")
+    root_dir = root_dir or Path.cwd()
+    # Replace configured addopts only after retaining their non-coverage policy.
+    configured_addopts = _filter_non_coverage_addopts(_load_pyproject_addopts(root_dir))
+    if configured_addopts:
+        # ``addopts`` is parsed by pytest as a shell-style argument string.  Re-quote
+        # retained tokens so values such as the configured marker expression remain
+        # one argument instead of becoming accidental positional test targets.
+        effective_override_ini.append("addopts=" + shlex.join(configured_addopts))
 
     if effective_override_ini:
         cmd.extend([f"--override-ini={entry}" for entry in effective_override_ini])
 
     cov_args: List[str] = []
     effective_cov_report = cov_report
-    if coverage and not any("--cov" in arg for arg in args):
+    if coverage:
         if normalized_sources:
             for source in normalized_sources:
                 cov_args.append(f"--cov={source}")
-            if coverage_rcfile:
-                cov_args.append(f"--cov-config={coverage_rcfile}")
-            else:
-                cov_args.append("--cov-config=/dev/null")
-            cov_args.append("--cov-context=test")
-            cov_args.extend(_filter_non_coverage_addopts(os.environ.get("PYTEST_ADDOPTS", "")))
-            if effective_cov_report.strip() == "term-missing":
-                cov_args.append("--cov-report=term-missing")
-                effective_cov_report = ""
         else:
             cov_args.append("--cov")
+        if coverage_floor is not None:
+            cov_args.append(f"--cov-fail-under={coverage_floor:g}")
         for report_format in effective_cov_report.split(","):
             if report_format.strip():
                 cov_args.append(f"--cov-report={report_format.strip()}")
@@ -1131,8 +1879,91 @@ def _build_pytest_command(
     if cov_args:
         cmd.extend(cov_args)
 
+    if test_filter:
+        cmd.extend(["-k", test_filter])
+    if test_path:
+        cmd.append(test_path)
+    if test_paths:
+        cmd.extend(test_paths)
+    # ``args`` is the caller-owned, already validated suffix. Keep it intact.
     cmd.extend(args)
     return cmd, cov_args, effective_override_ini, effective_cov_report
+
+
+def _execution_target(target: str, *, cwd: str) -> str:
+    """Convert a validated repository-relative target to the execution cwd."""
+
+    root = _repository_root(cwd)
+    path_part, separator, node_id = target.partition("::")
+    relative = os.path.relpath(root / path_part, cwd)
+    return f"{relative}{separator}{node_id}" if separator else relative
+
+
+def _execution_pytest_args(args: list[str], *, cwd: str) -> list[str]:
+    """Relativize only validated caller target tokens for a nested execution cwd."""
+
+    converted: list[str] = []
+    value_follows = False
+    for arg in args:
+        if value_follows:
+            converted.append(arg)
+            value_follows = False
+        elif arg in PYTEST_ARG_VALUE_OPTIONS:
+            converted.append(arg)
+            value_follows = True
+        elif not arg.startswith("-"):
+            converted.append(_execution_target(arg, cwd=cwd))
+        else:
+            converted.append(arg)
+    return converted
+
+
+def _json_prelaunch_failure(
+    reason: str,
+    *,
+    resolved_target: Optional[str],
+    phase: str,
+    classification: str = "invocation",
+) -> str:
+    """Render a canonical identity-bearing JSON failure before pytest starts.
+
+    Args:
+        reason: Safe diagnostic reason to include in the bounded outcome.
+        resolved_target: Runner-owned test target, when one was resolved.
+        phase: Execution phase associated with the failure.
+        classification: Stable bounded failure category for the outcome.
+
+    Returns:
+        Serialized JSON failure payload with the canonical top-level E37-M2
+        evidence identity and a redacted bounded outcome.
+    """
+
+    return json.dumps(
+        {
+            "success": False,
+            "evidence_identity": evidence_identity_projection(),
+            "outcome": {
+                "classification": classification,
+                "reason": _redact_diagnostic(reason),
+                "exit_code": 1,
+                "resolved_target": resolved_target,
+                "elapsed_seconds": 0.0,
+                "phase": phase,
+                "node_ids": [],
+                "excerpt": _redact_diagnostic(reason),
+                "stdout_tail": "",
+                "stderr_tail": "",
+                "truncation": {
+                    "node_ids_omitted": 0,
+                    "excerpt_omitted": 0,
+                    "stdout_tail_omitted": 0,
+                    "stderr_tail_omitted": 0,
+                    "overall_truncated": False,
+                    "scan_omitted": 0,
+                },
+            },
+        }
+    )
 
 
 def run_pytest(
@@ -1149,22 +1980,30 @@ def run_pytest(
     durations: Optional[int] = None,
     durations_min: Optional[float] = None,
     override_ini: Optional[List[str]] = None,
+    test_path: Optional[str] = None,
+    test_paths: Optional[list[str]] = None,
+    test_filter: Optional[str] = None,
 ) -> Tuple[int, str]:
-    """Run pytest with coverage and validation.
+    """Run pytest with independently evaluated assertions and coverage.
 
     Executes pytest with the specified options, parses results, and validates
     against expected criteria. Automatically handles worktree PYTHONPATH for
-    isolated execution environments. Non-zero pytest exits always fail
-    validation, and coverage-enabled runs also fail when pytest-cov reports
-    unusable data such as missing imports or no collected coverage.
+    isolated execution environments. Coverage-enabled runs retain repository
+    policy, acquire a no-wait canonical-worktree lease, and fail when pytest-cov
+    reports unusable data, omits ``TOTAL``, or falls below the effective floor.
+    Disabled coverage is returned as ``disabled``. Collect-only runs require
+    disabled coverage and validate collected tests separately from assertions.
 
     Note:
         -v and --tb=short are always included. Do NOT pass these in args.
 
     Args:
-        args: Additional pytest arguments passed through (e.g., test paths,
-            markers like ['-m', 'not slow'], specific tests).
-        output_mode: Output format for results. One of:
+        args: Caller-owned pytest suffix. Advanced callers must validate and
+            transport this ordered sequence through ``--pytest-argv-json``;
+            accepted tokens are appended exactly once without normalization.
+        output_mode: Output format for results. JSON results carry the canonical
+            top-level E37-M2 evidence identity; summary and full text do not.
+            One of:
             - "summary": Human-readable with key metrics (default)
             - "full": Complete pytest output + summary (truncated if >500 lines)
             - "json": Structured data for programmatic use
@@ -1174,27 +2013,38 @@ def run_pytest(
             to PYTHONPATH for worktree isolation. Defaults to project root.
         timeout: Maximum execution time in seconds (default: 600 = 10 min,
             maximum: 1200 = 20 minutes).
-        coverage: Enable coverage reporting (default: True). Uses pytest-cov.
+        coverage: Enable coverage reporting and policy validation (default:
+            ``True``). Disabled coverage rejects coverage-specific controls.
         coverage_source: Source module/path for coverage (for example, ``adw``,
             ``adw.core``, ``adw/``, or a repo-relative ``.py`` file target).
             Comma-separated sources are supported. ``None`` or ``all`` uses the
             repository coverage configuration.
-        coverage_threshold: Minimum coverage percentage (0-100) to enforce.
-            None skips threshold validation.
+        coverage_threshold: Optional minimum coverage percentage. It must be
+            finite and at least the retained repository policy floor.
         cov_report: Coverage report format(s), comma-separated (default: "term-missing").
             Examples: "html", "xml", "term-missing,html:coverage_html".
         fail_fast: Stop on first failure with -x flag (default: False).
         durations: Show N slowest test durations. Use 0 for all, None to skip.
         durations_min: Minimum duration in seconds for inclusion (default: 0.005).
         override_ini: Optional list of ini overrides passed as
-            ``--override-ini=<option>=<value>``. When coverage sources are
-            provided, addopts are cleared to avoid pyproject overrides.
+            ``--override-ini=<option>=<value>``. Repository non-coverage
+            addopts are retained while coverage addopts are runner-owned.
+        test_path: Runner-owned repository-relative test path or node-id target.
+        test_paths: Ordered runner-owned repository-relative test path or node-id
+            targets. Supply one through seven canonical, confined POSIX targets;
+            this is mutually exclusive with ``test_path``.
+        test_filter: Runner-owned pytest ``-k`` selection expression.
 
     Returns:
-        Tuple of (exit_code, output_string) where exit_code is 0 if pytest
-        and validation pass, 1 otherwise. File-target coverage requests preserve
-        explicit ``coverage_files = null`` semantics when per-file numeric detail
-        is not authoritative.
+        Tuple of exit code and rendered output. JSON output includes the
+        canonical top-level E37-M2 evidence identity but does not by itself
+        establish execution success. Ordinary execution exits zero only when
+        assertions pass and coverage either passes or is disabled.
+        Collect-only execution instead requires valid collection evidence that
+        satisfies ``min_test_count`` and reports collected and zero-executed
+        counts without assertion or coverage success evidence. File-target
+        coverage requests preserve explicit ``coverage_files = null`` semantics
+        when per-file numeric detail is not authoritative.
 
     Raises:
         Does not raise; errors are captured and returned in output_string.
@@ -1212,20 +2062,44 @@ def run_pytest(
         if cwd is None:
             cwd = str(Path.cwd())
 
-    coverage_rcfile: Optional[str] = None
-    coverage_lock_path: Optional[str] = None
+    coverage_lease: Optional[tuple[Path, CoverageLease]] = None
+    started_at = time.monotonic()
 
     try:
         _validate_timeout_seconds(timeout)
-        normalized_sources = _resolve_normalized_sources(cwd, coverage_source)
-        file_scoped_coverage = _coverage_request_has_file_target(normalized_sources)
-        coverage_rcfile = _coverage_source_to_rcfile(normalized_sources, cwd) if coverage else None
 
-        if not coverage and _contains_coverage_pytest_args(args):
+        if not coverage and (
+            _contains_coverage_pytest_args(args)
+            or coverage_source is not None
+            or coverage_threshold is not None
+            or cov_report != "term-missing"
+        ):
             raise CoverageSourceValidationError(
-                "coverage-related pytest arguments are not allowed when coverage is disabled"
+                "coverage-specific controls are not allowed when coverage is disabled"
             )
+        collect_only = "--collect-only" in args
+        if collect_only and coverage:
+            raise PytestArgumentValidationError("--collect-only requires coverage: false")
+        if test_path is not None and test_paths is not None:
+            raise PytestArgumentValidationError("testPath and testPaths cannot be combined")
+        root_dir = _resolve_repo_root_for_coverage(cwd)
+        normalized_sources = _normalize_coverage_source(coverage_source, root_dir)
+        file_scoped_coverage = _coverage_request_has_file_target(normalized_sources)
+        effective_floor = (
+            _effective_coverage_floor(root_dir, coverage_threshold) if coverage else None
+        )
 
+        if test_path is not None:
+            _validate_confined_target(test_path, cwd, "testPath")
+            test_path = _execution_target(test_path, cwd=cwd)
+        execution_test_paths: Optional[list[str]] = None
+        if test_paths is not None:
+            execution_test_paths = [
+                _execution_target(value, cwd=cwd) for value in _validate_test_paths(test_paths, cwd)
+            ]
+        args = _execution_pytest_args(args, cwd=cwd)
+        if test_filter is not None and (not isinstance(test_filter, str) or not test_filter):
+            raise PytestArgumentValidationError("testFilter must be a non-empty string")
         cmd, cov_args, _, _ = _build_pytest_command(
             args=args,
             fail_fast=fail_fast,
@@ -1233,20 +2107,25 @@ def run_pytest(
             durations_min=durations_min,
             coverage=coverage,
             normalized_sources=normalized_sources,
-            coverage_rcfile=coverage_rcfile,
             cov_report=cov_report,
             override_ini=override_ini,
+            coverage_floor=effective_floor,
+            root_dir=root_dir,
+            test_path=test_path,
+            test_paths=execution_test_paths,
+            test_filter=test_filter,
         )
         cmd = [*_resolve_python_tool_command("pytest", "pytest", cwd), *cmd[1:]]
 
         if coverage:
-            coverage_lock_path = _acquire_coverage_lock(cwd)
+            coverage_lease = _acquire_coverage_lock(root_dir)
 
         result = _run_pytest_subprocess(
             cmd,
             cwd=cwd,
             requested_cwd=requested_cwd,
             timeout=timeout,
+            coverage=coverage,
         )
 
         # Combine stdout and stderr
@@ -1260,60 +2139,127 @@ def run_pytest(
         if file_scoped_coverage:
             metrics["coverage_files"] = None
 
-        # Validate results (including coverage threshold)
-        threshold = coverage_threshold
-        if not _should_apply_coverage_threshold(
-            coverage_threshold=coverage_threshold,
-            cov_args=cov_args,
-            pytest_args=args,
-        ):
-            threshold = None
-        validation_errors = validate_results(metrics, min_test_count, threshold)
-        if result.returncode != 0:
-            validation_errors.append(
-                "pytest exited with code "
-                f"{result.returncode}; inspect failed tests and stderr output"
-            )
-        if coverage:
-            unusable_coverage_error = _detect_unusable_coverage_diagnostics(full_output)
-            if unusable_coverage_error:
-                validation_errors.append(unusable_coverage_error)
-            elif metrics["coverage_pct"] is None:
-                validation_errors.append(
-                    "Coverage data is unavailable: pytest-cov did not report a TOTAL "
-                    "coverage percentage. "
-                    "Review coverageSource/import targeting."
+        coverage_result = _evaluate_coverage(
+            metrics, enabled=coverage, floor=effective_floor, output=full_output
+        )
+        assertion = _evaluate_assertions(
+            metrics,
+            min_test_count,
+            result.returncode,
+            coverage_only=(
+                result.returncode != 0
+                and coverage_result["status"] == "failed"
+                and not metrics["has_failures"]
+                and not metrics["has_errors"]
+                and metrics["passed"] >= min_test_count
+                and metrics["total"] > 0
+            ),
+        )
+        validation_errors = [*assertion["reasons"], *coverage_result["reasons"]]
+        collection: Optional[dict[str, int]] = None
+        collection_outcome: Optional[dict[str, str]] = None
+        if collect_only:
+            collection = _collection_projection(full_output)
+            collection_errors: list[str] = []
+            if result.returncode != 0:
+                collection_errors.append(
+                    f"pytest exited with code {result.returncode} during collection"
                 )
+            if collection is None:
+                collection_errors.append("pytest collection summary is missing or ambiguous")
+            elif collection["collected_count"] < min_test_count:
+                collection_errors.append(
+                    f"Expected at least {min_test_count} collected tests, but only "
+                    f"{collection['collected_count']} collected"
+                )
+            validation_errors = collection_errors
+            if not collection_errors:
+                collection_outcome = {"classification": "collection", "status": "completed"}
 
         # Determine final exit code (fail if validation fails)
         exit_code = result.returncode
         if validation_errors:
             exit_code = 1
 
+        outcome = None
+        if exit_code != 0:
+            outcome = _failure_outcome(
+                returncode=result.returncode,
+                validation_errors=validation_errors,
+                stdout=result.stdout,
+                stderr=result.stderr,
+                elapsed_seconds=time.monotonic() - started_at,
+                resolved_target=test_path,
+            )
+            if collect_only:
+                outcome["classification"] = "collection"
+
         # Format output based on mode
         if output_mode == "summary":
-            output = format_summary(metrics, validation_errors, coverage_threshold)
-        elif output_mode == "json":
-            output = json.dumps(
-                {
-                    "metrics": metrics,
-                    "durations": metrics.get("durations", []),
-                    "validation_errors": validation_errors,
-                    "success": len(validation_errors) == 0,
-                    "coverage_threshold": coverage_threshold,
-                },
-                indent=2,
+            output = format_summary(
+                metrics,
+                validation_errors,
+                None if collect_only else effective_floor,
+                None if collect_only else assertion,
+                None if collect_only else coverage_result,
+                collection,
             )
+            if outcome is not None:
+                output = f"{output}\nOutcome: {json.dumps(outcome, separators=(',', ':'))}"
+        elif output_mode == "json":
+            payload: dict[str, Any] = {
+                "metrics": metrics,
+                "durations": metrics.get("durations", []),
+                "validation_errors": validation_errors,
+                "success": (collection is not None and not validation_errors)
+                if collect_only
+                else assertion["status"] == "passed"
+                and coverage_result["status"] in {"disabled", "passed"},
+                "coverage_threshold": effective_floor,
+                "evidence_identity": evidence_identity_projection(),
+            }
+            if collect_only:
+                payload.pop("coverage_threshold")
+                if collection is not None:
+                    payload["collection"] = collection
+                if collection_outcome is not None:
+                    payload["outcome"] = collection_outcome
+            else:
+                payload["assertion"] = assertion
+                payload["coverage"] = coverage_result
+            if collection is not None and not collect_only:
+                payload["collection"] = collection
+            if outcome is not None:
+                payload["success"] = False
+                payload["outcome"] = outcome
+            output = json.dumps(payload, indent=2)
         else:  # full
             # Include summary at the end of full output
-            summary = format_summary(metrics, validation_errors, coverage_threshold)
-            output = f"{full_output}\n\n{summary}"
+            summary = format_summary(
+                metrics,
+                validation_errors,
+                None if collect_only else effective_floor,
+                None if collect_only else assertion,
+                None if collect_only else coverage_result,
+                collection,
+            )
+            if outcome is not None:
+                summary = f"{summary}\nOutcome: {json.dumps(outcome, separators=(',', ':'))}"
+            safe_full_output, full_output_omitted = _bounded_diagnostic(
+                _redact_diagnostic(full_output), MAX_FULL_OUTPUT_TEXT
+            )
+            if full_output_omitted:
+                safe_full_output = (
+                    f"[Output truncated: {full_output_omitted} characters omitted.]\n"
+                    f"{safe_full_output}"
+                )
+            output = f"{safe_full_output}\n\n{summary}"
 
             # Fall back to smart truncation if full output is too long (>500 lines)
             max_lines = 500
             line_count = len(output.splitlines())
             if line_count > max_lines:
-                lines = full_output.splitlines()
+                lines = safe_full_output.splitlines()
                 failures_section = _extract_section(
                     lines, FAILURES_HEADER_PATTERN, stop_on_blank=False, max_lines=200
                 )
@@ -1342,39 +2288,62 @@ def run_pytest(
 
         return exit_code, output
 
-    except CoverageSourceValidationError as exc:
-        return 1, f"ERROR: {exc}"
-    except CoverageLockError as exc:
-        return 1, f"ERROR: {exc}"
-    except PytestTimeoutValidationError as exc:
+    except (
+        CoverageSourceValidationError,
+        CoverageLockError,
+        PytestTimeoutValidationError,
+        PytestArgumentValidationError,
+    ) as exc:
+        if output_mode == "json":
+            return 1, _json_prelaunch_failure(
+                str(exc),
+                resolved_target=test_path,
+                phase="pre_spawn",
+                classification="coordination"
+                if isinstance(exc, CoverageLockError)
+                else "invocation",
+            )
         return 1, f"ERROR: {exc}"
     except PytestTimedOutError as exc:
+        if output_mode == "json":
+            return 1, _json_prelaunch_failure(
+                "pytest timed out", resolved_target=test_path, phase="execution"
+            )
         return 1, _format_timeout_error(exc.details)
     except FileNotFoundError:
+        if output_mode == "json":
+            return 1, _json_prelaunch_failure(
+                "pytest command not found", resolved_target=test_path, phase="pre_spawn"
+            )
         return 1, "ERROR: pytest command not found. Is pytest installed?"
-    except Exception as e:
-        return 1, f"ERROR: Unexpected error running pytest: {e}"
+    except Exception:
+        if output_mode == "json":
+            return 1, _json_prelaunch_failure(
+                "pytest runner failed before a safe result could be produced",
+                resolved_target=test_path,
+                phase="pre_spawn",
+                classification="runner",
+            )
+        return 1, "ERROR: Unexpected error running pytest"
     finally:
-        if coverage_lock_path:
-            try:
-                os.unlink(coverage_lock_path)
-            except OSError:
-                pass
-        if coverage_rcfile:
-            try:
-                os.unlink(coverage_rcfile)
-            except OSError:
-                pass
+        if coverage_lease:
+            _release_coverage_lock(*coverage_lease)
 
 
 def main(argv: Optional[List[str]] = None) -> int:
-    """Main entry point for CLI usage.
+    """Parse runner controls and execute pytest.
+
+    The advanced transport accepts caller tokens only through
+    ``--pytest-argv-json`` as a JSON string array. Plural runner-owned targets
+    use ``--test-paths-json`` and remain mutually exclusive with ``--test-path``.
+    It rejects invalid transport or target combinations before coverage leasing
+    or subprocess spawn.
 
     Parses command-line arguments and executes pytest with validation.
 
     Args:
-        argv: Optional argument list. When omitted, arguments are read from
-            ``sys.argv``.
+        argv: Optional CLI argument sequence. When omitted, arguments are read
+            from ``sys.argv``.
 
     Returns:
         Exit code (0 if pytest and validation pass, 1 otherwise).
@@ -1389,7 +2358,6 @@ Examples:
   %(prog)s --fail-fast adw/core/tests/        Stop on first failure
   %(prog)s --durations 10                     Show 10 slowest tests
   %(prog)s --cwd /path/to/worktree            Run in worktree
-  %(prog)s -m 'not slow'                      Skip slow tests
 
 NOTE: -v and --tb=short are always included. Do NOT pass these.
         """,
@@ -1480,7 +2448,7 @@ NOTE: -v and --tb=short are always included. Do NOT pass these.
     parser.add_argument(
         "pytest_args",
         nargs="*",
-        help="Additional pytest arguments (test paths, markers, etc.)",
+        help="Legacy repository-relative pytest targets only (use --test-filter for filtering).",
     )
     parser.add_argument(
         "--override-ini",
@@ -1491,13 +2459,57 @@ NOTE: -v and --tb=short are always included. Do NOT pass these.
             " e.g., --override-ini=addopts=."
         ),
     )
+    parser.add_argument(
+        "--pytest-argv-json",
+        help="Compact JSON array containing the validated caller-owned pytest argv suffix.",
+    )
+    parser.add_argument(
+        "--override-ini-json",
+        help="Compact JSON array containing runner-owned override-ini entries.",
+    )
+    parser.add_argument("--test-path", help="Repository-relative test target owned by the runner.")
+    parser.add_argument(
+        "--test-paths-json", help="Compact JSON array of runner-owned test targets."
+    )
+    parser.add_argument("--test-filter", help="Test filter owned by the runner.")
 
-    args, unknown_args = parser.parse_known_args(argv)
+    args = parser.parse_args(argv)
 
     # Determine coverage setting (--no-coverage overrides --coverage)
     coverage_enabled = not args.no_coverage
 
-    pytest_args = list(args.pytest_args) + list(unknown_args)
+    try:
+        json_pytest_args = _decode_string_array(args.pytest_argv_json, "pytest argv JSON")
+        json_override_ini = _decode_string_array(args.override_ini_json, "override ini JSON")
+        json_test_paths = _decode_string_array(args.test_paths_json, "testPaths JSON")
+        if json_pytest_args is not None and args.pytest_args:
+            raise PytestArgumentValidationError(
+                "--pytest-argv-json cannot be combined with legacy positional pytest arguments"
+            )
+        cwd_for_validation = args.cwd or str(Path.cwd())
+        pytest_args = (
+            _validate_pytest_argv(json_pytest_args, cwd_for_validation)
+            if json_pytest_args is not None
+            else list(args.pytest_args)
+        )
+        override_ini = json_override_ini if json_override_ini is not None else args.override_ini
+        if args.test_path is not None and json_test_paths is not None:
+            raise PytestArgumentValidationError("testPath and testPaths cannot be combined")
+        if json_test_paths is not None:
+            _validate_test_paths(json_test_paths, cwd_for_validation)
+        if override_ini:
+            raise PytestArgumentValidationError("override ini controls are not permitted")
+    except PytestArgumentValidationError as exc:
+        if not args.coverage_files_only:
+            if args.output == "json":
+                print(
+                    _json_prelaunch_failure(
+                        str(exc), resolved_target=None, phase="argument_validation"
+                    )
+                )
+            else:
+                print(f"ERROR: {exc}")
+        return 1
 
     exit_code, output = run_pytest(
         pytest_args,
@@ -1512,7 +2524,10 @@ NOTE: -v and --tb=short are always included. Do NOT pass these.
         fail_fast=args.fail_fast,
         durations=args.durations,
         durations_min=args.durations_min,
-        override_ini=args.override_ini,
+        override_ini=override_ini,
+        test_path=args.test_path,
+        test_paths=json_test_paths,
+        test_filter=args.test_filter,
     )
 
     if args.coverage_files_only:

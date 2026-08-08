@@ -16,40 +16,39 @@ Mutating commands are intentionally rejected. Use `adw_plans_mutate` for writes.
 ## Examples
 
 ```json
-{ "command": "list", "options": "json" }
+{ "command": "list", "json": true, "cwd": "/path/to/trees/abc12345" }
 ```
 
 ```json
-{ "command": "list", "options": "status=In Progress json" }
+{ "command": "list", "options": "status=In Progress", "json": true, "cwd": "/path/to/trees/abc12345" }
 ```
 
 ```json
-{ "command": "show", "plan_id": "E17-F1", "options": "json" }
+{ "command": "show", "plan_id": "E17-F1", "json": true, "cwd": "/path/to/trees/abc12345" }
 ```
 
 ```json
-{ "command": "list-sections", "plan_id": "E17-F1", "options": "json populate" }
+{ "command": "list-sections", "plan_id": "E17-F1", "json": true, "populate": true, "cwd": "/path/to/trees/abc12345" }
 ```
 
 ```json
-{ "command": "schema", "options": "check" }
+{ "command": "schema", "check": true, "cwd": "/path/to/trees/abc12345" }
 ```
 
 ```json
-{ "command": "list", "plan_type": "research", "cwd": "/path/to/trees/abc12345", "options": "json" }
+{ "command": "list", "plan_type": "research", "cwd": "/path/to/trees/abc12345", "json": true }
 ```
 
 ## Notes
 
-- Optional `cwd` is accepted for read commands and validated when provided.
-- Use bounded `options` tokens for optional wrapper aliases (`json`, `check`, `populate`,
-  `status=<value>`). Direct `status` is not part of the split-wrapper contract.
+- `cwd` is required for every command. Obtain `worktree_path` with `adw_spec_read` and pass it unchanged.
+- `json`, `check`, and `populate` are direct booleans. Only `status=<value>` remains an options token.
 - Keep direct fields for required identifiers such as `plan_id` and optional
   direct filters such as `plan_type`, `parent`, and `lifecycle`.
 - Example of stale shape to avoid on split wrappers: `{ "command": "list",
   "status": "In Progress" }`.
 - Success/failure envelopes are preserved by the active split wrapper implementation.
-- Compatibility and split wrappers share the same spawned-command failure handling:
+- Active split plan wrappers use the following spawned-command failure handling:
   - `stderr` -> `stdout` -> message/fallback precedence
   - bounded truncation for long diagnostics
   - absolute-path redaction to `<path>`
@@ -58,8 +57,7 @@ Mutating commands are intentionally rejected. Use `adw_plans_mutate` for writes.
 - Deterministic invalid-cwd errors (when provided):
   - `ERROR: cwd path does not exist: <path>`
   - `ERROR: cwd path is not a directory: <path>`
-  - `ERROR: cwd path is not a repository/worktree root: <path> (missing .git metadata at <path>)`
-  - `ERROR: cwd path resolves outside repository root: <path> (canonical: <path>)`
+  - `ERROR: cwd path is not this wrapper's admitted worktree root: <path>; use the workflow worktree_path.`
 
 Delegated failure envelope example:
 

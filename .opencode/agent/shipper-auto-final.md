@@ -124,7 +124,7 @@ This agent prepares handoff context only; runtime owns final PR creation.
 ## Execution Guidance
 
 - Use `git_diff({"command": "diff", "base": target_branch, "target": source_branch,
-  "stat": true, "worktree_path": worktree_path})` to gather cumulative diff stats.
+  "worktree_path": worktree_path})` to gather bounded cumulative diff output.
 - If `source_branch` or `worktree_path` is missing, fail fast with a deterministic reason.
 - Keep generated summary deterministic and idempotent across retries.
 - Persist state via `adw_spec_write` explicit field writes only. Runtime owns mirroring

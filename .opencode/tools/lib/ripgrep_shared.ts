@@ -10,6 +10,7 @@ export const DEFAULT_RIPGREP_TIMEOUT_MS = 30_000;
 const MAX_STDOUT_CAPTURE_BYTES = 4 * 1024 * 1024;
 
 export interface SearchParams {
+  matchMode?: "literal" | "regex";
   pattern?: string;
   contentPattern?: string;
   searchPath: string;
@@ -31,6 +32,102 @@ export interface SearchParams {
   targetKind?: "file" | "directory";
   /** Internal test override; wrapper callers use DEFAULT_RIPGREP_TIMEOUT_MS. */
   timeoutMs?: number;
+}
+
+export interface NormalizedRipgrepSearchRequest {
+  contentPattern: string;
+  matchMode: "literal" | "regex";
+  pattern?: string;
+  fileType?: string;
+  excludeFileType?: string;
+  globCaseInsensitive?: boolean;
+  compactOutput?: boolean;
+  maxResults: number;
+  maxMatchesPerFile?: number;
+  contextLines?: number;
+  beforeContext?: number;
+  afterContext?: number;
+  filesWithMatches?: boolean;
+  filesWithoutMatches?: boolean;
+  unrestricted?: number;
+  ignoreGitignore?: boolean;
+  includeHidden?: boolean;
+}
+
+type ParseResult = { ok: true; request: NormalizedRipgrepSearchRequest } | { ok: false; error: string };
+const TOKEN_NAME = /^[a-z][a-z0-9-]*$/;
+const SIMPLE_TOKENS = new Set(["pattern", "file-type", "exclude-file-type", "glob-case-insensitive", "compact-output", "max-results", "max-matches-per-file", "match-mode"]);
+const ADVANCED_TOKENS = new Set([...SIMPLE_TOKENS, "context-lines", "before-context", "after-context", "files-with-matches", "files-without-matches", "unrestricted", "ignore-gitignore", "include-hidden"]);
+
+function validGlob(value: string): boolean {
+  let bracket = false;
+  let brace = false;
+  let escaped = false;
+  let bracketContent = false;
+  let braceContent = false;
+  for (const char of value) {
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (char === "\\") {
+      escaped = true;
+      continue;
+    }
+    if (char === "[" && !brace) {
+      if (bracket) return false;
+      bracket = true;
+      continue;
+    }
+    if (char === "]" && !brace) {
+      if (!bracket || !bracketContent) return false;
+      bracket = false;
+      continue;
+    }
+    if (char === "{" && !bracket) {
+      if (brace) return false;
+      brace = true;
+      continue;
+    }
+    if (char === "}" && !bracket) {
+      if (!brace || !braceContent) return false;
+      brace = false;
+      continue;
+    }
+    if (bracket) bracketContent = true;
+    if (brace) braceContent = true;
+  }
+  return !escaped && !bracket && !brace;
+}
+
+/** Parse the bounded, wrapper-independent ripgrep token grammar before filesystem work. */
+export function parseRipgrepSearchRequest(contentValue: unknown, rawOptions: unknown, advanced: boolean): ParseResult {
+  if (typeof contentValue !== "string" || !contentValue.trim()) return { ok: false, error: "ERROR: 'contentPattern' must be a non-empty string." };
+  if (rawOptions !== undefined && typeof rawOptions !== "string") return { ok: false, error: "ERROR: 'options' must be a string when provided." };
+  const request: NormalizedRipgrepSearchRequest = { contentPattern: contentValue.trim(), matchMode: "literal", maxResults: DEFAULT_MAX_RESULTS };
+  const seen = new Set<string>();
+  for (const token of (rawOptions?.trim() ? rawOptions.trim().split(/\s+/) : [])) {
+    const count = token.split("=").length - 1;
+    if (count > 1 || !token) return { ok: false, error: `ERROR: Invalid options token '${token}': tokens must contain exactly zero or one '=' separator.` };
+    const [name, value] = token.split("=");
+    if (!TOKEN_NAME.test(name) || !(advanced ? ADVANCED_TOKENS : SIMPLE_TOKENS).has(name)) return { ok: false, error: `ERROR: Invalid options token '${token}': token is not allowed for this wrapper.` };
+    if (seen.has(name)) return { ok: false, error: `ERROR: Invalid options token '${token}': duplicate '${name}' token is not allowed.` };
+    seen.add(name);
+    const flag = ["glob-case-insensitive", "compact-output", "files-with-matches", "files-without-matches", "ignore-gitignore", "include-hidden"].includes(name);
+    if (flag) { if (count) return { ok: false, error: `ERROR: Invalid options token '${token}': token must be provided without '=value'.` }; (request as Record<string, unknown>)[({ "glob-case-insensitive": "globCaseInsensitive", "compact-output": "compactOutput", "files-with-matches": "filesWithMatches", "files-without-matches": "filesWithoutMatches", "ignore-gitignore": "ignoreGitignore", "include-hidden": "includeHidden" } as Record<string,string>)[name]] = true; continue; }
+    if (!value) return { ok: false, error: `ERROR: Invalid options token '${token}': token value must not be empty.` };
+    if (name === "pattern") { if (!validGlob(value)) return { ok: false, error: `ERROR: Invalid options token '${token}': invalid glob pattern.` }; request.pattern = value; continue; }
+    if (name === "file-type" || name === "exclude-file-type") { if (/\s/.test(value)) return { ok: false, error: `ERROR: Invalid options token '${token}': file type values must not contain whitespace.` }; request[name === "file-type" ? "fileType" : "excludeFileType"] = value.toLowerCase(); continue; }
+    if (name === "match-mode") { if (value !== "literal" && value !== "regex") return { ok: false, error: `ERROR: Invalid options token '${token}': match-mode must be literal or regex.` }; request.matchMode = value; continue; }
+    if (!/^\d+$/.test(value)) return { ok: false, error: `ERROR: Invalid options token '${token}': ${name} must be an integer.` };
+    const number = Number(value), max = name === "unrestricted" ? 3 : name.includes("context") ? 1000 : 5000, min = name === "unrestricted" ? 1 : 1;
+    if (number < min || number > max) return { ok: false, error: `ERROR: Invalid options token '${token}': ${name} must be between ${min} and ${max}.` };
+    const key = ({ "max-results":"maxResults", "max-matches-per-file":"maxMatchesPerFile", "context-lines":"contextLines", "before-context":"beforeContext", "after-context":"afterContext", unrestricted:"unrestricted" } as Record<string,string>)[name];
+    (request as Record<string, unknown>)[key] = number;
+  }
+  if (request.filesWithMatches && request.filesWithoutMatches) return { ok: false, error: "ERROR: files-with-matches and files-without-matches cannot both be enabled." };
+  if ((request.filesWithMatches || request.filesWithoutMatches) && ((request.contextLines ?? 0) || (request.beforeContext ?? 0) || (request.afterContext ?? 0))) return { ok: false, error: "ERROR: files-only modes cannot be combined with context." };
+  return { ok: true, request };
 }
 
 export interface SearchResult {
@@ -202,6 +299,7 @@ export async function executeRipgrepSearch(params: SearchParams): Promise<Search
   const {
     pattern,
     contentPattern,
+    matchMode = "literal",
     searchPath,
     ignoreGitignore,
     includeHidden,
@@ -224,7 +322,7 @@ export async function executeRipgrepSearch(params: SearchParams): Promise<Search
 
   const isContentSearch = contentPattern !== undefined;
   const cmdArgs: string[] = isContentSearch
-    ? ["rg", "-n", "-e", contentPattern]
+    ? ["rg", "-n", matchMode === "literal" ? "-F" : "-e", contentPattern]
     : ["rg", "--files"];
 
   if (isContentSearch && targetKind === "file" && !filesWithMatches && !filesWithoutMatches) {
@@ -384,6 +482,13 @@ export async function executeRipgrepSearch(params: SearchParams): Promise<Search
     });
 
     if (outcome.kind === "timed-out") {
+      // Reap the child before returning so a timed-out search cannot accumulate
+      // zombies. Stream readers are already bounded and are released above.
+      try {
+        await subprocess.exited;
+      } catch {
+        // A failed reap still returns the stable timeout envelope below.
+      }
       const timeoutDescription =
         timeoutMs % 1000 === 0 ? `${timeoutMs / 1000} seconds` : `${timeoutMs}ms`;
       return {

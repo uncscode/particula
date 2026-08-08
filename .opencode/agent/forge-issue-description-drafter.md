@@ -98,7 +98,8 @@ adw_spec_read({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"
 adw_plans_read({
   "command": "list-sections",
   "plan_id": "<plan_id>",
-  "options": "populate json",
+  "json": true,
+  "populate": true,
   "cwd": "<worktree_path>"
 })
 ```

@@ -18,7 +18,8 @@
       "agent": "plan-orchestrator",
       "prompt": "$ARGUMENTS --adw-id ${adw_id}",
       "model": "heavy",
-      "timeout": 1800
+      "timeout": 7200,
+      "output_inactivity_seconds": null
     },
     {
       "type": "agent",

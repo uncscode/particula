@@ -90,7 +90,7 @@ Examples:
       return buildError(adwId.error);
     }
 
-    let fields: [string, string][] = [];
+    let fields: [string, string | null][] = [];
     if (command !== "show") {
       const parsedFields = parseFieldEntries((args as Record<string, unknown>).fields);
       if (!parsedFields.ok) {

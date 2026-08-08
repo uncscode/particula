@@ -112,14 +112,19 @@ approves. This gives the user a clear sense of progress through the template.
 Before starting any conversation, read files and run commands for current state:
 
 - `.opencode/guides/planner_issue_format.md` -- The canonical issue metadata and body structure to fill out
+- Resolve `worktree_path` first with
+  `adw_spec_read({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})`.
+  Pass that exact value as the direct `cwd` field to every plan-wrapper call.
+  The split wrappers admit only their module-rooted worktree; never substitute
+  the caller's current directory, a nested directory, or a sibling worktree.
 - active epics via:
-  `adw_plans_read({"command": "list", "plan_type": "epic", "lifecycle": "active", "options": "json"})`
+  `adw_plans_read({"command": "list", "plan_type": "epic", "lifecycle": "active", "json": true, "cwd": worktree_path})`
 - active features via:
-  `adw_plans_read({"command": "list", "plan_type": "feature", "lifecycle": "active", "options": "json"})`
+  `adw_plans_read({"command": "list", "plan_type": "feature", "lifecycle": "active", "json": true, "cwd": worktree_path})`
 - active maintenance plans via:
-  `adw_plans_read({"command": "list", "plan_type": "maintenance", "lifecycle": "active", "options": "json"})`
+  `adw_plans_read({"command": "list", "plan_type": "maintenance", "lifecycle": "active", "json": true, "cwd": worktree_path})`
 - active research plans via:
-  `adw_plans_read({"command": "list", "plan_type": "research", "lifecycle": "active", "options": "json"})`
+  `adw_plans_read({"command": "list", "plan_type": "research", "lifecycle": "active", "json": true, "cwd": worktree_path})`
 - `.opencode/guides/architecture_reference.md` -- Architecture patterns and module structure
 
 # The Template

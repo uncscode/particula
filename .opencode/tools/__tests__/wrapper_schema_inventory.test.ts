@@ -862,6 +862,7 @@ describe("wrapper schema inventory", () => {
       "timeout",
       "cwd",
       "testPath",
+      "testPaths",
       "pytestArgs",
       "coverage",
       "coverageSource",
@@ -872,6 +873,7 @@ describe("wrapper schema inventory", () => {
     expect(runPytestAdvancedRow?.field_role_audit).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ field: "pytestArgs", role: "payload-bearing" }),
+        expect.objectContaining({ field: "testPaths", role: "payload-bearing" }),
         expect.objectContaining({ field: "coverage", role: "explicit-exception" }),
         expect.objectContaining({ field: "coverageSource", role: "payload-bearing" }),
         expect.objectContaining({ field: "coverageThreshold", role: "explicit-exception" }),
@@ -967,15 +969,18 @@ describe("wrapper schema inventory", () => {
     expect(runLintersRow?.nearest_test_path).toBe(
       ".opencode/tools/__tests__/run_linters.test.ts",
     );
-    expect(runLintersRow?.owner_plan).toBeNull();
-    expect(runLintersRow?.counted_fields).toEqual(["autoFix", "targetDir", "ruffTimeout", "mypyTimeout"]);
+    expect(runLintersRow?.owner_plan).toBe("E27-M9");
+    expect(runLintersRow?.counted_fields).toEqual(["autoFix", "confirmed", "targetDir", "mode", "targetPaths", "ruffTimeout", "mypyTimeout"]);
     expect(runLintersRow?.exempt_fields).toEqual(["options"]);
     expect(runLintersRow?.field_role_audit).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ field: "autoFix", role: "safety-field" }),
+        expect.objectContaining({ field: "confirmed", role: "safety-field" }),
         expect.objectContaining({ field: "linters", role: "bounded-option-candidate" }),
         expect.objectContaining({ field: "options", role: "explicit-exception" }),
         expect.objectContaining({ field: "targetDir", role: "safety-field" }),
+        expect.objectContaining({ field: "mode", role: "safety-field" }),
+        expect.objectContaining({ field: "targetPaths", role: "safety-field" }),
       ]),
     );
 

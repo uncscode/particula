@@ -37,25 +37,28 @@ describe("run_pytest_advanced wrapper", () => {
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
 
     const result = await execute({
-      options: 'output=json fail-fast test-filter="agent smoke" cov-report=term-missing,html:coverage_html durations=0 durations-min=0.25',
+      options: 'output=json fail-fast test-filter="agent smoke" durations=0 durations-min=0.25',
       testPath: "adw/core/tests/agent_test.py",
       coverage: false,
-      overrideIni: ["addopts="],
       pytestArgs: ["-k", "agent"],
     });
 
     expect(result).toBe("ok");
 
-    const cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
-    expect(cmd).toContain("--output=json");
-    expect(cmd).toContain("--fail-fast");
-    expect(cmd).toContain("-k");
-    expect(cmd).toContain("agent smoke");
-    expect(cmd).toContain("adw/core/tests/agent_test.py");
-    expect(cmd).toContain("--no-coverage");
-    expect(cmd).toContain("--durations=0");
-    expect(cmd).toContain("--durations-min=0.25");
-    expect(cmd).toContain("--override-ini=addopts=");
+    expect(getInvocations().at(-1)?.args).toEqual([
+      "python3",
+      expect.stringContaining("/run_pytest.py"),
+      "--output=json",
+      "--min-tests=1",
+      "--timeout=600",
+      "--fail-fast",
+      "--test-filter=agent smoke",
+      "--test-path=adw/core/tests/agent_test.py",
+      "--no-coverage",
+      "--durations=0",
+      "--durations-min=0.25",
+      '--pytest-argv-json=["-k","agent"]',
+    ]);
   });
 
   it("omits legacy direct compatibility fields from the wrapper schema", async () => {
@@ -70,6 +73,7 @@ describe("run_pytest_advanced wrapper", () => {
         "overrideIni",
         "pytestArgs",
         "testPath",
+        "testPaths",
         "timeout",
       ],
       exempt: ["options"],
@@ -154,6 +158,70 @@ describe("run_pytest_advanced wrapper", () => {
     expect(getInvocations()).toHaveLength(0);
   });
 
+  it("transports ordered plural targets once as compact JSON", async () => {
+    setDollarText(buildSuccessOutput("ok"));
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    expect(await execute({ coverage: false, testPaths: ["adw/core/tests/agent_test.py", "adw/utils/tests"] })).toBe("ok");
+    expect(getInvocations().at(-1)?.args).toContain(
+      '--test-paths-json=["adw/core/tests/agent_test.py","adw/utils/tests"]',
+    );
+  });
+
+  it("preserves pytest node-id suffixes in plural target transport", async () => {
+    setDollarText(buildSuccessOutput("ok"));
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    expect(
+      await execute({
+        coverage: false,
+        testPaths: ["adw/core/tests/agent_test.py::test_agent_resolution"],
+      }),
+    ).toBe("ok");
+    expect(getInvocations().at(-1)?.args).toContain(
+      '--test-paths-json=["adw/core/tests/agent_test.py::test_agent_resolution"]',
+    );
+  });
+
+  it("preserves seven plural target order before the caller pytest suffix", async () => {
+    setDollarText(buildSuccessOutput("ok"));
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+    const testPaths = Array.from({ length: 7 }, (_, index) => `adw/tests/case_${index}_test.py`);
+
+    expect(await execute({ coverage: false, testPaths, pytestArgs: ["-q"] })).toBe("ok");
+    expect(getInvocations().at(-1)?.args).toEqual(expect.arrayContaining([
+      `--test-paths-json=${JSON.stringify(testPaths)}`,
+      '--pytest-argv-json=["-q"]',
+    ]));
+    const args = getInvocations().at(-1)?.args ?? [];
+    expect(args.indexOf(`--test-paths-json=${JSON.stringify(testPaths)}`)).toBeLessThan(
+      args.indexOf('--pytest-argv-json=["-q"]'),
+    );
+  });
+
+  it("rejects ambiguous or unsafe plural targets before spawn", async () => {
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    expect(await execute({ testPath: "tests/x.py", testPaths: [] })).toContain("cannot be combined");
+    expect(await execute({ testPaths: [] })).toContain("non-empty array");
+    expect(await execute({ testPaths: ["../outside"] })).toContain("canonical relative POSIX");
+    expect(await execute({ testPaths: Array.from({ length: 8 }, () => "adw/tests/x_test.py") })).toContain("at most 7");
+    expect(await execute({ testPaths: ["adw\\tests\\x_test.py"] })).toContain("canonical relative POSIX");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("requires explicit disabled coverage for collect-only before spawning", async () => {
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    expect(await execute({ pytestArgs: ["--collect-only"] })).toBe(
+      "ERROR: --collect-only requires coverage: false.",
+    );
+    expect(getInvocations()).toHaveLength(0);
+
+    setDollarText(buildSuccessOutput('{"success":true,"collection":{"collected_count":2,"executed_count":0}}'));
+    expect(await execute({ coverage: false, pytestArgs: ["--collect-only"] })).toContain("collected_count");
+  });
+
   it("preserves stdout/stderr/message failure precedence", async () => {
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
 
@@ -167,9 +235,9 @@ describe("run_pytest_advanced wrapper", () => {
     assertErrorPrefix(String(await execute({})), "ERROR:");
   });
 
-  it("returns raw stdout unchanged for JSON failure payloads", async () => {
+  it("preserves valid runner JSON including its producer identity byte-for-byte", async () => {
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
-    const jsonStdout = '{"success":false,"error":"details"}';
+    const jsonStdout = '{"success":false,"evidence_identity":{"contract":"e37-m2-validation-git","version":1},"error":"details"}';
     setDollarError(buildDollarFailure({ stdout: jsonStdout, stderr: "ignored" }));
 
     expect(await execute({ options: "output=json" })).toBe(jsonStdout);
@@ -187,14 +255,17 @@ describe("run_pytest_advanced wrapper", () => {
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
 
     setDollarError(buildDollarFailure({ stdout: "plain stdout diagnostic", stderr: "ignored" }));
-    expect(String(await execute({ options: "output=json" }))).toContain(
-      "stdout did not report failure semantics",
-    );
+    const malformed = JSON.parse(String(await execute({ options: "output=json" })));
+    expect(malformed.outcome.classification).toBe("runner");
+    expect(JSON.stringify(malformed)).not.toContain("plain stdout diagnostic");
+    expect(malformed.evidence_identity).toBeUndefined();
 
     setDollarError(buildDollarFailure({ stdout: '{"success":true}', stderr: "ignored" }));
-    expect(String(await execute({ options: "output=json" }))).toContain(
-      "stdout did not report failure semantics",
+    const invalidSuccess = JSON.parse(String(await execute({ options: "output=json" })));
+    expect(invalidSuccess.outcome.reason).toContain(
+      "invalid failure envelope",
     );
+    expect(invalidSuccess.evidence_identity).toBeUndefined();
   });
 
   it("returns deterministic validation failure stdout unchanged", async () => {
@@ -222,9 +293,7 @@ describe("run_pytest_advanced wrapper", () => {
   it("rejects absolute coverageSource paths before spawn", async () => {
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
 
-    expect(await execute({ coverageSource: `${tmpdir()}/x.py` })).toContain(
-      "must not contain absolute paths",
-    );
+    expect(await execute({ coverageSource: `${tmpdir()}/x.py` })).toContain("relative POSIX path");
     expect(getInvocations()).toHaveLength(0);
   });
 
@@ -237,6 +306,7 @@ describe("run_pytest_advanced wrapper", () => {
     expect(await execute({ coverageSource: "adw/../../outside" })).toContain(
       "coverageSource must stay within the repository/worktree root",
     );
+    expect(await execute({ coverageSource: "pkg/tests.md" })).toContain("unsupported file suffix");
     expect(getInvocations()).toHaveLength(0);
   });
 
@@ -280,14 +350,77 @@ describe("run_pytest_advanced wrapper", () => {
     expect(cmd).not.toContain("--coverage-source=");
   });
 
+  it("rejects coverage controls while disabled before invoking the helper", async () => {
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    for (const args of [
+      { coverage: false, coverageSource: "adw" },
+      { coverage: false, coverageThreshold: 90 },
+      { coverage: false, options: "cov-report=term" },
+      { coverage: false, coverageSource: "module.txt" },
+    ]) {
+      expect(await execute(args)).toBe(
+        "ERROR: coverage-specific controls are not allowed when coverage is disabled.",
+      );
+    }
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects combined coverage controls while disabled without spawning", async () => {
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    expect(await execute({
+      coverage: false,
+      coverageSource: "adw",
+      coverageThreshold: 90,
+      options: "cov-report=term-missing",
+    })).toBe("ERROR: coverage-specific controls are not allowed when coverage is disabled.");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("preserves enabled coverage source order and accepts case-insensitive all", async () => {
+    setDollarText(buildSuccessOutput("ok"));
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    expect(await execute({ coverageSource: "adforge_core,adw" })).toBe("ok");
+    expect(getInvocations().at(-1)?.args).toEqual(expect.arrayContaining([
+      "--coverage-source=adforge_core",
+      "--coverage-source=adw",
+    ]));
+
+    resetSubprocessMocks();
+    setDollarText(buildSuccessOutput("ok"));
+    expect(await execute({ coverageSource: "ALL" })).toBe("ok");
+    expect(getInvocations().at(-1)?.args).toContain("--coverage");
+    expect(getInvocations().at(-1)?.args.join(" ")).not.toContain("--coverage-source=");
+  });
+
+  it("rejects mixed all and malformed lexical coverage sources before spawn", async () => {
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    expect(await execute({ coverageSource: "all,adw" })).toContain("must be the sole source");
+    expect(await execute({ coverageSource: "adw..core" })).toContain("valid module or path");
+    expect(await execute({ coverageSource: "bad-name" })).toContain("valid module or path");
+    expect(await execute({ coverageSource: "module.txt" })).toContain("unsupported file suffix");
+    expect(await execute({ coverageSource: "pkg\\module" })).toContain("relative POSIX path");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
   it("rejects raw coverage pytestArgs when coverage is disabled", async () => {
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
 
     const result = await execute({ coverage: false, pytestArgs: ["--cov=adw"] });
 
-    expect(String(result)).toContain(
-      "coverage-related pytest arguments are not allowed when coverage is disabled",
-    );
+    expect(String(result)).toContain("pytestArgs token '--cov=adw' is not permitted.");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects caller plugin and ini controls before spawn", async () => {
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    expect(String(await execute({ pytestArgs: ["-p", "unsafe_plugin"] }))).toContain("not permitted");
+    expect(String(await execute({ pytestArgs: ["--override-ini=pythonpath=/outside"] }))).toContain("not permitted");
+    expect(String(await execute({ overrideIni: ["pythonpath=/outside"] }))).toContain("not permitted");
     expect(getInvocations()).toHaveLength(0);
   });
 

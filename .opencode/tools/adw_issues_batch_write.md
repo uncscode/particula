@@ -33,7 +33,7 @@ under `.trash/`.
 | Parameter | Type | Required | Notes |
 |---|---|---|---|
 | `adw_id` | string | Yes | 8-character hex workflow ID |
-| `issue` | string | Yes | Positive integer row index |
+| `issue` | string | Yes | One-based generated-row index; the only wrapper row selector |
 | `content` | string | Yes | Payload to write |
 | `section` | string | No | Optional section token |
 | `options` | string | No | No bounded option tokens are currently supported |
@@ -45,3 +45,9 @@ under `.trash/`.
   `section` and send a JSON object with a `metadata` key.
 - `batch-write` accepts `options` only for surface parity; no command-scoped
   tokens are currently defined.
+- `issue` is always the one-based generated-row index and never a source-ID
+  selector. `metadata.github_issue_number` is a state-service-only resolver,
+  valid only for positive, unique values; it is not an alternative wrapper
+  `issue` input.
+- Bounded outcomes remain `success`, `missing`, `uninitialized`, `invalid`,
+  and retryable `execution_failed`.

@@ -135,7 +135,7 @@ Validate each candidate plan ID via `adw_plans_read show`:
 adw_plans_read({
   "command": "show",
   "plan_id": "{candidate_id}",
-  "options": "json",
+  "json": true,
   "cwd": worktree_path
 })
 ```
@@ -179,7 +179,7 @@ Canonical source-of-truth policy:
   content. Do **not** require rendered markdown docs; use canonical structured
   plan files only.
 - `adw_plans_read show` provides plan metadata, phases, and status.
-- `adw_plans_read list-sections` (with `options: "populate json"`) provides section content
+- `adw_plans_read list-sections` (with `json: true`, `populate: true`, and `cwd: worktree_path`) provides section content
   for richer issue bodies.
 
 For each target plan:
@@ -190,9 +190,9 @@ For each target plan:
     adw_plans_read({
      "command": "show",
      "plan_id": "{plan_id}",
-     "options": "json",
-     "cwd": worktree_path
-   })
+      "json": true,
+      "cwd": worktree_path
+    })
    ```
 
    Extract: plan ID, title, type, status, priority, size, phases (with IDs,
@@ -204,9 +204,10 @@ For each target plan:
     adw_plans_read({
      "command": "list-sections",
      "plan_id": "{plan_id}",
-     "options": "populate json",
-     "cwd": worktree_path
-   })
+      "json": true,
+      "populate": true,
+      "cwd": worktree_path
+    })
    ```
 
    Extract relevant section content (overview, scope, testing strategy,

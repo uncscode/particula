@@ -23,7 +23,7 @@ Advanced content-search wrapper for low-level ripgrep controls.
 
 | Parameter | Type | Required | Description |
 |---|---|---:|---|
-| `contentPattern` | string | ✅ | Regex pattern to search within files. |
+| `contentPattern` | string | ✅ | Literal pattern by default; use `match-mode=regex` for regex matching. |
 | `path` | string | ❌ | Scoped search target (default: current working directory). File path = search only that file; directory path = search only that subtree. |
 | `options` | string | ❌ | Bounded token carrier for advanced controls. |
 
@@ -41,7 +41,8 @@ Advanced content-search wrapper for low-level ripgrep controls.
 - `after-context=<n>`
 - `files-with-matches`
 - `files-without-matches`
-- `unrestricted=<0..3>`
+- `unrestricted=<1..3>`
+- `match-mode=literal|regex`
 - `ignore-gitignore`
 - `include-hidden`
 
@@ -61,8 +62,11 @@ Example single-file advanced search:
 
 - `files-with-matches` and `files-without-matches` are mutually exclusive.
 - Directional context takes precedence over `context-lines`.
-- `0` remains inert for numeric controls that already used sparse normalization.
+- Result limits are `1..5000`, context values are `1..1000`, and unrestricted is `1..3`.
+- Files-only modes cannot be combined with context controls.
 - Search paths stay repository-confined via lexical and canonical validation.
 - Scoped path misses never widen back to the repository root.
 - `compact-output` rewrites file prefixes relative to the scoped file/directory base.
 - Searches are terminated after 30 seconds and return a deterministic timeout error.
+- Safety-clipped ripgrep stdout appends a deterministic warning so callers know
+  the returned output may be incomplete.

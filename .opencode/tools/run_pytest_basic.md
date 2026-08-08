@@ -40,4 +40,8 @@ Keep routine targeting and path fields explicit.
 - `timeout` is measured in seconds and must be greater than 0 and less than or equal to 1200 seconds (20 minutes).
 - `cwd` must resolve within the current repository root.
 - Removed legacy direct fields (`outputMode`, `failFast`, `testFilter`) now fail closed and must move through `options`.
-- Use `run_pytest_advanced` for coverage, durations, `overrideIni`, or passthrough `pytestArgs`.
+- Use `run_pytest_advanced` for coverage, durations, or the safe constrained
+  `pytestArgs` grammar. Caller-controlled `overrideIni` settings are rejected.
+- JSON responses from an executed runner carry the top-level `evidence_identity`
+  projection. Wrapper pre-dispatch rejections and wrapper fallback responses are
+  identity-free because they did not preserve a runner-owned result.

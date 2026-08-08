@@ -27,13 +27,13 @@ describe("refactor_astgrep_apply wrapper", () => {
   it("assembles apply command with --update-all", async () => {
     setDollarText(buildSuccessOutput("updated 2 files"));
     const execute = await loadToolExecute("../../refactor_astgrep_apply.ts");
-    const result = await execute({ pattern: "old($$$ARGS)", rewrite: "new($$$ARGS)", lang: "python", path: "adw" });
+    const result = await execute({ pattern: "old($$$ARGS)", rewrite: "new($$$ARGS)", lang: "python", path: "." });
 
     expect(result).toContain("updated 2 files");
     const cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
     expect(cmd).toContain("ast-grep run");
     expect(cmd).toContain("--update-all");
-    expect(cmd).toContain("-- adw");
+    expect(cmd).toMatch(new RegExp(`-- /proc/${process.pid}/fd/\\d+$`));
   });
 
   it("rejects missing required fields", async () => {
@@ -41,7 +41,7 @@ describe("refactor_astgrep_apply wrapper", () => {
     assertErrorPrefix(String(await execute({ rewrite: "x", lang: "python" })), "ERROR:");
     expect(await execute({ rewrite: "x", lang: "python" })).toContain("pattern is required");
     expect(await execute({ pattern: "a", lang: "python" })).toContain("rewrite is required");
-    expect(await execute({ pattern: "a", rewrite: "b" })).toContain("lang is required");
+    expect(await execute({ pattern: "a", rewrite: "b" })).toContain("lang must be one of");
   });
 
   it("rejects invalid lang value", async () => {

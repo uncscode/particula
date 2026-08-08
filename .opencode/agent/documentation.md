@@ -19,12 +19,9 @@ mode: primary
 permission:
   "*": deny
   read: allow
-  edit: allow
-  write: allow
   find_files: allow
   search_content: allow
   ripgrep_advanced: allow
-  move: allow
   todowrite: allow
   task: allow
   adw: deny
@@ -33,7 +30,6 @@ permission:
   workflow_builder: deny
   git_diff: allow
   platform_operations: deny
-  run_linters: allow
   build_mkdocs: deny
   feedback_log: allow
   get_datetime: allow
@@ -42,6 +38,41 @@ permission:
   websearch: deny
   codesearch: deny
   bash: deny
+agent_contract_version: e37-m3-p5-v1
+declared_scope:
+  roots: [docs, .opencode/plans, .opencode/agent]
+  file_kinds: [.md, .json]
+subagent_type_allowlist: [docstring, docs, plan-update-full, examples, adw-docs-notebook, architecture, theory, features, docs-validator, adw-commit]
+task_routes:
+  - child: docstring
+    required_handoff_fields: [adw_id, changed_targets, worktree_path]
+  - child: docs
+    required_handoff_fields: [adw_id, changed_targets, worktree_path]
+  - child: plan-update-full
+    required_handoff_fields: [adw_id, target_id, worktree_path]
+  - child: examples
+    required_handoff_fields: [adw_id, changed_targets, worktree_path]
+  - child: adw-docs-notebook
+    required_handoff_fields: [adw_id, changed_targets, worktree_path]
+  - child: architecture
+    required_handoff_fields: [adw_id, changed_targets, worktree_path]
+  - child: theory
+    required_handoff_fields: [adw_id, changed_targets, worktree_path]
+  - child: features
+    required_handoff_fields: [adw_id, changed_targets, worktree_path]
+  - child: docs-validator
+    required_handoff_fields: [adw_id, changed_targets, worktree_path]
+  - child: adw-commit
+    required_handoff_fields: [adw_id, changed_targets, worktree_path]
+completion_contract:
+  id: e37-m3-p5-v1
+  role: consumer
+  allowed_owners: [docs, plan-update-full, docs-validator]
+  reject_invalid_success: true
+  required_fields: [outcome, status, owner, target_id, adw_id, worktree_path, summary, evidence]
+  failure_fields: [failure_reason, rerun_guidance]
+  statuses: [success, failed, blocked]
+  nonempty_success_fields: [evidence]
 ---
 
 
@@ -99,6 +130,13 @@ to use `build_mkdocs_validate` (validation-only path).
 
 **Safety:** Use atomic wrappers for git interactions. This orchestrator should use `git_diff` for read-only inspection and delegate all commit/push behavior to `adw-commit`.
 
+## Static P5 Handoff Metadata
+
+The versioned frontmatter declarations are closed static validation metadata for
+scope, routes, required handoff fields, and completion-envelope shape. They
+grant no runtime authority, do not parse or admit live child results, and only
+describe the static handoff contract.
+
 # Execution Steps
 
 ## Step 1: Parse Arguments
@@ -135,8 +173,8 @@ Extract from `adw_state.json`:
 Use `git_diff` to validate repository context:
 
 ```python
-git_diff({"command": "status", "worktree_path": worktree_path, "porcelain": true})
-git_diff({"command": "diff", "worktree_path": worktree_path, "stat": true})
+git_diff({"command": "status", "worktree_path": worktree_path})
+git_diff({"command": "diff", "worktree_path": worktree_path})
 ```
 
 Use `branch_name` from `adw_spec_read` to confirm you are on the expected branch.
@@ -146,10 +184,11 @@ Use `branch_name` from `adw_spec_read` to confirm you are on the expected branch
 ### 4.1: Get Git Diff
 
 ```python
-git_diff_result = git_diff({"command": "diff", "worktree_path": worktree_path, "stat": true})
+git_diff_result = git_diff({"command": "diff", "worktree_path": worktree_path})
 ```
 
-Use the diff output to derive changed files (names and stats).
+Use the bounded diff output to derive changed files. Do not add unsupported
+`porcelain` or `stat` fields.
 
 ### 4.2: Parse Implementation Plan
 
@@ -179,33 +218,28 @@ From `spec_content`, identify:
 todowrite({
   "todos": [
     {
-      "id": "1",
       "content": "Analyze changes and determine subagents needed",
       "status": "pending",
       "priority": "high"
     },
     # Based on analysis, add relevant subagent invocations:
     {
-      "id": "2",
       "content": "Invoke docstring subagent for Python files",
       "status": "pending",
       "priority": "high"
     },
     {
-      "id": "3",
       "content": "Invoke docs subagent for general documentation",
       "status": "pending",
       "priority": "high"
     },
     # ... conditional subagents based on changes
     {
-      "id": "N-1",
       "content": "Invoke docs-validator subagent",
       "status": "pending",
       "priority": "high"
     },
     {
-      "id": "N",
       "content": "Invoke adw-commit subagent",
       "status": "pending",
       "priority": "high"
@@ -483,12 +517,23 @@ Check all markdown links, formatting, and cross-references.
 
 **When:** ALWAYS (final step)
 
+Before delegation, derive an explicit, repository-relative `approved_files`
+allowlist from the reviewed documentation changes and validate that every entry
+is an approved changed file. Obtain explicit confirmation for this exact list.
+Do not stage, commit, or push any path outside the confirmed allowlist.
+
 ```python
 task({
   "description": "Commit documentation changes",
   "prompt": f"""Create commit for documentation updates.
 
 Arguments: adw_id={adw_id} commit_type=docs
+
+Approved files (validated and explicitly confirmed):
+{approved_files}
+
+Stage, commit, and push only these approved files. Do not stage, commit, or
+push any other workspace changes.
 """,
   "subagent_type": "adw-commit"
 })

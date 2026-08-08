@@ -82,13 +82,18 @@ const toArgv = (input: unknown[]): string[] =>
   });
 
 export const installSubprocessMocks = (): void => {
-  bunRef.spawnSync = ((args: string[] | { cmd?: string[]; env?: Record<string, string> }) => {
+  bunRef.spawnSync = ((args: string[] | { cmd?: string[]; env?: Record<string, string>; cwd?: string }) => {
     const capturedArgs = Array.isArray(args)
       ? [...args]
       : Array.isArray(args?.cmd)
       ? [...args.cmd]
       : [String(args)];
-    invocations.push({ kind: "spawnSync", args: capturedArgs, env: Array.isArray(args) ? undefined : args?.env });
+    invocations.push({
+      kind: "spawnSync",
+      args: capturedArgs,
+      env: Array.isArray(args) ? undefined : args?.env,
+      cwd: Array.isArray(args) ? undefined : args?.cwd,
+    });
     if (spawnError) {
       const err = new Error(spawnError.message ?? "") as Error & {
         stdout?: Buffer;
@@ -190,10 +195,20 @@ export const setSpawnError = (error: SpawnError): void => {
 export const setDollarText = (value: string): void => {
   dollarError = null;
   dollarText = value;
+  // AST-grep wrappers use Bun.spawn so process lifecycle can be bounded and
+  // reaped; keep the legacy helper convenient for their existing fixtures.
+  spawnError = null;
+  spawnResponse = { stdout: value, stderr: "", exitCode: 0 };
 };
 
 export const setDollarError = (error: BunDollarError): void => {
   dollarError = error;
+  spawnError = null;
+  spawnResponse = {
+    stdout: error.stdout ?? "",
+    stderr: error.stderr ?? "",
+    exitCode: 2,
+  };
 };
 
 export const getInvocations = (): Invocation[] => [...invocations];

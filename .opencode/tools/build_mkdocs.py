@@ -1,103 +1,96 @@
 #!/usr/bin/env python3
-"""MkDocs build runner tool for ADW.
-
-Runs ``mkdocs build`` with configurable options and returns structured output.
-Follows the two-layer tool pattern used across ADW backing scripts.
-
-Usage:
-    python3 .opencode/tools/build_mkdocs.py
-    python3 .opencode/tools/build_mkdocs.py --output json
-    python3 .opencode/tools/build_mkdocs.py --strict --clean
-    python3 .opencode/tools/build_mkdocs.py --config-file docs/mkdocs.yml
-    python3 .opencode/tools/build_mkdocs.py --validate-only
-"""
+"""Bounded, validate-only MkDocs build runner."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
+import queue
+import re
+import signal
 import subprocess
 import sys
 import tempfile
+import threading
+import time
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Optional
 
 DEFAULT_TIMEOUT = 600
 OUTPUT_LINE_LIMIT = 500
 OUTPUT_BYTE_LIMIT = 50_000
+OUTPUT_LINE_BYTE_LIMIT = 4_096
+EVENT_QUEUE_LIMIT = 64
+STREAM_READ_SIZE = 4_096
+TERMINATE_GRACE_SECONDS = 0.2
+DRAIN_REAP_SECONDS = 0.2
+WARNING_LIMIT = 50
+PROGRESS_LIMIT = 25
+REDACTION_MARKER = "[REDACTED]"
+CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+SECRET_PATTERNS = (
+    re.compile(r"\bgh[pousr]_[A-Za-z0-9]{10,}\b"),
+    re.compile(r"\b(token|api[_-]?key|secret|password)\s*[:=]\s*([^\s\"']+)", re.I),
+    re.compile(r"\bAuthorization\s*:\s*Bearer\s+([^\s\"']+)", re.I),
+)
+PROGRESS_PATTERN = re.compile(
+    r"\b(?:Building documentation|Cleaning site directory|Documentation built)\b", re.I
+)
+# MkDocs emits warning records with an explicit leading ``WARNING -`` or
+# ``WARNING:`` prefix.  Do not treat arbitrary diagnostic prose containing the
+# word "warning" as a structured MkDocs warning.
+WARNING_PATTERN = re.compile(r"^\s*WARNING\s*(?:-|:)\s*(.+)$", re.I)
+MARKDOWN_PATH_PATTERN = re.compile(r"(?<![\w/])([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*\.md)(?![\w/])")
 
 
-def _truncate_output(output: str) -> Tuple[str, bool, str]:
-    """Truncate output to bounded lines/bytes with a notice.
+@dataclass(frozen=True)
+class Truncation:
+    """Bounded diagnostic truncation state."""
 
-    Args:
-        output: Raw combined stdout and stderr from mkdocs build.
+    output_lines: bool = False
+    output_bytes: bool = False
+    warnings: bool = False
+    progress: bool = False
 
-    Returns:
-        Tuple of the possibly truncated output, whether truncation occurred,
-        and a truncation notice string.
-    """
 
-    lines = output.splitlines()
-    truncated = False
-    notice_parts: List[str] = []
+@dataclass
+class MkdocsResult:
+    """The single bounded model used by every output mode."""
 
-    if len(lines) > OUTPUT_LINE_LIMIT:
-        lines = lines[:OUTPUT_LINE_LIMIT]
-        truncated = True
-        notice_parts.append(f"Output truncated to {OUTPUT_LINE_LIMIT} lines")
+    outcome: str
+    success: bool
+    exit_code: Optional[int]
+    stage: str
+    progress: list[str] = field(default_factory=list)
+    output: str = ""
+    truncation: Truncation = field(default_factory=Truncation)
+    warnings: list[dict[str, Optional[str]]] = field(default_factory=list)
+    options: dict[str, Any] = field(default_factory=dict)
+    error: Optional[str] = None
 
-    joined = "\n".join(lines)
-    if len(joined.encode("utf-8")) > OUTPUT_BYTE_LIMIT:
-        encoded = joined.encode("utf-8")[:OUTPUT_BYTE_LIMIT]
-        joined = encoded.decode("utf-8", errors="ignore")
-        truncated = True
-        notice_parts.append(f"Output truncated to {OUTPUT_BYTE_LIMIT // 1024}KB")
 
-    notice = "; ".join(notice_parts) if truncated else ""
-    if truncated:
-        joined = f"{joined}\n...\n{notice}"
-    return joined, truncated, notice
+def sanitize(value: str) -> str:
+    """Sanitize control characters, secret-like values, and whitespace."""
+    sanitized = CONTROL_CHARS.sub(" ", value or "")
+    sanitized = SECRET_PATTERNS[0].sub(REDACTION_MARKER, sanitized)
+    sanitized = SECRET_PATTERNS[1].sub(
+        lambda match: f"{match.group(1)}: {REDACTION_MARKER}", sanitized
+    )
+    sanitized = SECRET_PATTERNS[2].sub(f"Authorization: Bearer {REDACTION_MARKER}", sanitized)
+    return re.sub(r"[\t\r ]+", " ", sanitized).strip()
 
 
 def resolve_cwd(cwd: Optional[str]) -> Path:
-    """Resolve the working directory for mkdocs execution.
-
-    Args:
-        cwd: Optional explicit working directory.
-
-    Returns:
-        Path to use as working directory, walking up to find mkdocs.yml or .git
-        when cwd is not provided.
-    """
-
-    if cwd:
-        return Path(cwd)
-
-    current = Path.cwd()
-    while True:
-        if (current / "mkdocs.yml").exists() or (current / ".git").exists():
-            return current
-        if current == current.parent:
-            return Path.cwd()
-        current = current.parent
+    """Resolve explicit cwd, retaining compatibility for direct runner users."""
+    return Path(cwd).resolve() if cwd else Path.cwd().resolve()
 
 
 def resolve_config_path(config_file: str, cwd: Path) -> Path:
-    """Resolve the mkdocs config file path against the working directory.
-
-    Args:
-        config_file: Config file path from CLI arguments.
-        cwd: Working directory to resolve relative paths.
-
-    Returns:
-        Absolute path to the configuration file.
-    """
-
-    config_path = Path(config_file)
-    if not config_path.is_absolute():
-        config_path = cwd / config_path
-    return config_path.resolve()
+    """Resolve a config relative to the supplied working directory."""
+    candidate = Path(config_file)
+    return (candidate if candidate.is_absolute() else cwd / candidate).resolve()
 
 
 def build_command(
@@ -107,155 +100,147 @@ def build_command(
     config_file: str = "mkdocs.yml",
     validate_only: bool = False,
     site_dir: Optional[str] = None,
-) -> List[str]:
-    """Construct mkdocs build command from parameters.
-
-    Args:
-        strict: Whether to enable strict mode.
-        clean: Whether to clean the output directory before building.
-        config_file: Config file path to pass to mkdocs.
-        validate_only: Whether to build to a temporary site directory.
-        site_dir: Temporary site directory for validate-only mode.
-
-    Returns:
-        List of command arguments for subprocess execution.
-
-    Raises:
-        ValueError: If validate_only is True but site_dir is not provided.
-    """
-
-    cmd = ["mkdocs", "build"]
+) -> list[str]:
+    """Build an MkDocs command, requiring a temporary site directory when requested."""
+    command = ["mkdocs", "build"]
     if strict:
-        cmd.append("--strict")
+        command.append("--strict")
     if clean:
-        cmd.append("--clean")
+        command.append("--clean")
     if config_file != "mkdocs.yml":
-        cmd.extend(["--config-file", config_file])
+        command.extend(["--config-file", config_file])
     if validate_only:
         if not site_dir:
             raise ValueError("site_dir is required when validate_only is True")
-        cmd.extend(["--site-dir", site_dir])
-    return cmd
+        command.extend(["--site-dir", site_dir])
+    return command
 
 
-def _combine_output(stdout: str, stderr: str) -> str:
-    """Combine stdout and stderr into a single output string.
+def _bounded_output(lines: list[str]) -> tuple[str, Truncation]:
+    retained: list[str] = []
+    byte_count = 0
+    line_capped = byte_capped = False
+    for line in lines:
+        encoded = (line + "\n").encode("utf-8")
+        if len(retained) >= OUTPUT_LINE_LIMIT:
+            line_capped = True
+            continue
+        if byte_count + len(encoded) > OUTPUT_BYTE_LIMIT:
+            byte_capped = True
+            continue
+        retained.append(line)
+        byte_count += len(encoded)
+    return "\n".join(retained), Truncation(output_lines=line_capped, output_bytes=byte_capped)
 
-    Args:
-        stdout: Captured standard output.
-        stderr: Captured standard error.
 
-    Returns:
-        Combined output including labeled stderr when present.
-    """
-    combined = stdout or ""
-    if stderr:
-        combined += "\n\nSTDERR:\n" + stderr
-    return combined
+def _docs_dir(config: Path) -> Path:
+    """Read docs_dir from MkDocs where available without widening runner output."""
+    try:
+        from mkdocs.config import load_config
+
+        loaded = load_config(config_file=str(config))
+        return Path(loaded["docs_dir"]).resolve()
+    except Exception:
+        return (config.parent / "docs").resolve()
 
 
-def format_summary(
-    *,
-    exit_code: int,
-    stdout: str,
-    stderr: str,
-    error_message: Optional[str] = None,
-) -> str:
-    """Format a human-readable summary of mkdocs build results.
+def _warning(line: str, docs_dir: Path) -> Optional[dict[str, Optional[str]]]:
+    match = WARNING_PATTERN.search(line)
+    if not match:
+        return None
+    candidates: list[Path] = []
+    for raw in MARKDOWN_PATH_PATTERN.findall(match.group(1)):
+        candidate = (docs_dir / raw).resolve()
+        if candidate.is_relative_to(docs_dir):
+            candidates.append(candidate)
+    unique = list(dict.fromkeys(candidates))
+    source = str(unique[0].relative_to(docs_dir)) if len(unique) == 1 else None
+    return {
+        "message": sanitize(match.group(1)),
+        "source": source,
+        "attribution": "attributed" if source else "unattributed",
+    }
 
-    Args:
-        exit_code: Exit code from the mkdocs process.
-        stdout: Captured standard output.
-        stderr: Captured standard error.
-        error_message: Optional error message from exception handling.
 
-    Returns:
-        Multi-line summary string with status and output.
-    """
-
-    status = "PASSED" if exit_code == 0 else "FAILED"
-    lines: List[str] = ["=" * 60, "MKDOCS BUILD SUMMARY", "=" * 60]
-    lines.append(f"\nStatus: {status}")
-    lines.append(f"Exit Code: {exit_code}")
-
-    if error_message:
-        lines.append(f"Error: {error_message}")
-
-    combined = _combine_output(stdout, stderr)
-    if combined.strip():
-        truncated_output, _, _ = _truncate_output(combined)
-        lines.append("\nOutput:")
-        lines.append(truncated_output)
-    else:
-        lines.append("\nOutput: (none)")
-
-    lines.append("\n" + "=" * 60)
+def _render_summary(result: MkdocsResult) -> str:
+    lines = [
+        "MKDOCS VALIDATION SUMMARY",
+        f"Outcome: {result.outcome}",
+        f"Stage: {result.stage}",
+        f"Exit Code: {result.exit_code}",
+    ]
+    if result.output:
+        lines.extend(["Output:", result.output])
+    if any(asdict(result.truncation).values()):
+        lines.append(f"Truncation: {json.dumps(asdict(result.truncation), sort_keys=True)}")
     return "\n".join(lines)
 
 
-def format_full_output(
-    *,
-    stdout: str,
-    stderr: str,
-    error_message: Optional[str] = None,
-) -> str:
-    """Format full mkdocs output with minimal framing.
-
-    Args:
-        stdout: Captured standard output.
-        stderr: Captured standard error.
-        error_message: Optional error message from exception handling.
-
-    Returns:
-        Full output string, truncated if it exceeds size limits.
-    """
-
-    combined = _combine_output(stdout, stderr)
-    if error_message:
-        if combined:
-            combined = f"ERROR: {error_message}\n{combined}"
-        else:
-            combined = f"ERROR: {error_message}"
-    truncated_output, _, _ = _truncate_output(combined)
-    return truncated_output
+def _render_full(result: MkdocsResult) -> str:
+    return (
+        _render_summary(result)
+        + "\nProgress: "
+        + json.dumps(result.progress)
+        + "\nWarnings: "
+        + json.dumps(result.warnings)
+    )
 
 
-def _format_json_output(
-    *,
-    exit_code: int,
-    stdout: str,
-    stderr: str,
-    options: Dict[str, Any],
-    error_message: Optional[str] = None,
-) -> str:
-    """Format mkdocs output as structured JSON.
+def _render(result: MkdocsResult, mode: str) -> str:
+    if mode == "json":
+        return json.dumps(asdict(result), sort_keys=True)
+    return _render_full(result) if mode == "full" else _render_summary(result)
 
-    Args:
-        exit_code: Exit code from mkdocs execution.
-        stdout: Captured standard output.
-        stderr: Captured standard error.
-        options: Options used to construct the mkdocs command.
-        error_message: Optional error message from exception handling.
 
-    Returns:
-        JSON string containing structured results.
-    """
+def _drain(
+    pipe: Any,
+    stream: str,
+    events: queue.Queue[tuple[str, Optional[str]]],
+    stop: threading.Event,
+) -> None:
+    """Drain a stream in bounded chunks, applying backpressure through a bounded queue."""
+    try:
+        while chunk := pipe.read(STREAM_READ_SIZE):
+            while not stop.is_set():
+                try:
+                    events.put((stream, chunk), timeout=0.05)
+                    break
+                except queue.Full:
+                    continue
+    finally:
+        while not stop.is_set():
+            try:
+                events.put((stream, None), timeout=0.05)
+                break
+            except queue.Full:
+                continue
 
-    combined = _combine_output(stdout, stderr)
-    truncated_output, truncated, notice = _truncate_output(combined)
-    payload: Dict[str, Any] = {
-        "success": exit_code == 0,
-        "exit_code": exit_code,
-        "stdout": stdout,
-        "stderr": stderr,
-        "output": truncated_output,
-        "truncated": truncated,
-        "truncation_notice": notice,
-        "options": options,
-    }
-    if error_message:
-        payload["error"] = {"message": error_message}
-    return json.dumps(payload, indent=2)
+
+def _wait_briefly(process: Any, timeout: float) -> None:
+    """Reap a child only for a bounded interval; fake processes may lack timeout support."""
+    try:
+        process.wait(timeout=timeout)
+    except TypeError:
+        # Test doubles without a timeout-aware wait are already reaped when poll succeeds.
+        return
+    except subprocess.TimeoutExpired:
+        return
+
+
+def _terminate_process(process: Any) -> None:
+    """Request graceful termination without assuming process-group support from test doubles."""
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except (AttributeError, OSError):
+        process.terminate()
+
+
+def _kill_process(process: Any) -> None:
+    """Escalate a still-running process without blocking on held pipe descriptors."""
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except (AttributeError, OSError):
+        process.kill()
 
 
 def run_mkdocs(
@@ -267,214 +252,229 @@ def run_mkdocs(
     clean: bool = True,
     config_file: str = "mkdocs.yml",
     validate_only: bool = False,
-) -> Tuple[int, str]:
-    """Run mkdocs build and return (exit_code, formatted_output).
-
-    Args:
-        output_mode: One of ``summary``, ``full``, or ``json``.
-        timeout: Timeout in seconds for mkdocs execution.
-        cwd: Optional working directory override.
-        strict: Whether to enable mkdocs strict mode.
-        clean: Whether to clean the output directory before building.
-        config_file: Path to mkdocs configuration file.
-        validate_only: Whether to build into a temporary directory.
-
-    Returns:
-        Tuple of (exit_code, output_string).
-    """
-
+    process_factory: Callable[..., Any] = subprocess.Popen,
+    clock: Callable[[], float] = time.monotonic,
+    terminate_process: Callable[[Any], None] = _terminate_process,
+    kill_process: Callable[[Any], None] = _kill_process,
+) -> tuple[int, str]:
+    """Run MkDocs with concurrent bounded output draining and stable diagnostics."""
     resolved_cwd = resolve_cwd(cwd)
     resolved_config = resolve_config_path(config_file, resolved_cwd)
-    if not resolved_config.exists():
-        error_message = f"mkdocs config file not found: {resolved_config}"
-        options = {
-            "cwd": str(resolved_cwd),
-            "timeout": timeout,
-            "strict": strict,
-            "clean": clean,
-            "config_file": str(resolved_config),
-            "validate_only": validate_only,
-        }
-        if output_mode == "json":
-            return 1, _format_json_output(
-                exit_code=1,
-                stdout="",
-                stderr=error_message,
-                options=options,
-                error_message=error_message,
-            )
-        if output_mode == "full":
-            return 1, format_full_output(
-                stdout="", stderr=error_message, error_message=error_message
-            )
-        return 1, format_summary(
-            exit_code=1,
-            stdout="",
-            stderr=error_message,
-            error_message=error_message,
-        )
-
-    stdout = ""
-    stderr = ""
-    build_error: Optional[str] = None
-    site_dir: Optional[str] = None
-    if config_file != "mkdocs.yml":
-        command_config_file = str(resolved_config)
-    else:
-        command_config_file = "mkdocs.yml"
-
-    try:
-        if validate_only:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                site_dir = tmpdir
-                cmd = build_command(
-                    strict=strict,
-                    clean=clean,
-                    config_file=command_config_file,
-                    validate_only=True,
-                    site_dir=tmpdir,
-                )
-                process = subprocess.run(
-                    cmd,
-                    cwd=str(resolved_cwd),
-                    capture_output=True,
-                    text=True,
-                    timeout=timeout,
-                )
-        else:
-            cmd = build_command(
-                strict=strict,
-                clean=clean,
-                config_file=command_config_file,
-                validate_only=False,
-            )
-            process = subprocess.run(
-                cmd,
-                cwd=str(resolved_cwd),
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-            )
-
-        stdout = process.stdout or ""
-        stderr = process.stderr or ""
-        exit_code = process.returncode
-    except subprocess.TimeoutExpired:
-        exit_code = 1
-        build_error = f"mkdocs build timed out after {timeout} seconds"
-        stderr = build_error
-    except FileNotFoundError:
-        exit_code = 1
-        build_error = "mkdocs not found - is it installed? Install with: pip install mkdocs"
-        stderr = build_error
-    except Exception as exc:  # pragma: no cover - generic safety net
-        exit_code = 1
-        build_error = f"Unexpected error running mkdocs: {exc}"
-        stderr = build_error
-
-    options = {
+    options: dict[str, Any] = {
         "cwd": str(resolved_cwd),
         "timeout": timeout,
         "strict": strict,
         "clean": clean,
         "config_file": str(resolved_config),
         "validate_only": validate_only,
-        "site_dir": site_dir,
+        "site_dir": None,
     }
-
-    if output_mode == "json":
-        return exit_code, _format_json_output(
-            exit_code=exit_code,
-            stdout=stdout,
-            stderr=stderr,
+    if not resolved_config.exists():
+        result = MkdocsResult(
+            "failure",
+            False,
+            1,
+            "config",
             options=options,
-            error_message=build_error,
+            error="mkdocs config file not found",
+            output="mkdocs config file not found",
         )
-    if output_mode == "full":
-        return exit_code, format_full_output(
-            stdout=stdout, stderr=stderr, error_message=build_error
+        return 1, _render(result, output_mode)
+    if timeout <= 0:
+        result = MkdocsResult(
+            "failure", False, 1, "admission", options=options, error="timeout must be positive"
         )
-    return exit_code, format_summary(
-        exit_code=exit_code,
-        stdout=stdout,
-        stderr=stderr,
-        error_message=build_error,
+        return 1, _render(result, output_mode)
+
+    lines: list[str] = []
+    output_bytes = 0
+    output_lines_capped = output_bytes_capped = False
+    progress: list[str] = []
+    warnings: list[dict[str, Optional[str]]] = []
+    progress_capped = warnings_capped = False
+    outcome = "failure"
+    exit_code: Optional[int] = 1
+    stage = "launch"
+    error: Optional[str] = None
+    docs_dir = _docs_dir(resolved_config)
+    command_config = str(resolved_config) if config_file != "mkdocs.yml" else "mkdocs.yml"
+    try:
+        with tempfile.TemporaryDirectory() as site_dir:
+            options["site_dir"] = "<temporary>"
+            command = build_command(
+                strict=strict,
+                clean=clean,
+                config_file=command_config,
+                validate_only=True,
+                site_dir=site_dir,
+            )
+            process = process_factory(
+                command,
+                cwd=str(resolved_cwd),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                bufsize=1,
+                start_new_session=True,
+            )
+            events: queue.Queue[tuple[str, Optional[str]]] = queue.Queue(maxsize=EVENT_QUEUE_LIMIT)
+            stop_draining = threading.Event()
+            threads = [
+                threading.Thread(
+                    target=_drain, args=(pipe, label, events, stop_draining), daemon=True
+                )
+                for pipe, label in ((process.stdout, "stdout"), (process.stderr, "stderr"))
+            ]
+            for thread in threads:
+                thread.start()
+            deadline, closed = clock() + timeout, 0
+            timed_out = False
+            terminate_deadline = drain_deadline = None
+            partial_lines = {"stdout": "", "stderr": ""}
+
+            def record(raw_line: str) -> None:
+                """Classify one bounded complete stream line without retaining discarded data."""
+                nonlocal output_bytes, output_bytes_capped, output_lines_capped
+                nonlocal progress_capped, warnings_capped, stage
+                line = sanitize(raw_line[:OUTPUT_LINE_BYTE_LIMIT])
+                if len(raw_line.encode("utf-8")) > OUTPUT_LINE_BYTE_LIMIT:
+                    output_bytes_capped = True
+                if not line:
+                    return
+                encoded = (line + "\n").encode("utf-8")
+                if len(lines) >= OUTPUT_LINE_LIMIT:
+                    output_lines_capped = True
+                elif output_bytes + len(encoded) > OUTPUT_BYTE_LIMIT:
+                    output_bytes_capped = True
+                else:
+                    lines.append(line)
+                    output_bytes += len(encoded)
+                if PROGRESS_PATTERN.search(line):
+                    if len(progress) < PROGRESS_LIMIT:
+                        progress.append(line)
+                        stage = "build"
+                    else:
+                        progress_capped = True
+                warning = _warning(line, docs_dir)
+                if warning:
+                    if len(warnings) < WARNING_LIMIT:
+                        warnings.append(warning)
+                    else:
+                        warnings_capped = True
+
+            while True:
+                remaining = deadline - clock()
+                if remaining <= 0 and not timed_out:
+                    timed_out = True
+                    stage = "timeout"
+                    terminate_process(process)
+                    terminate_deadline = clock() + TERMINATE_GRACE_SECONDS
+                if timed_out and terminate_deadline is not None and clock() >= terminate_deadline:
+                    if process.poll() is None:
+                        kill_process(process)
+                    terminate_deadline = None
+                    drain_deadline = clock() + DRAIN_REAP_SECONDS
+                if closed >= 2:
+                    break
+                if drain_deadline is not None and clock() >= drain_deadline:
+                    break
+                try:
+                    stream, raw = events.get(timeout=max(0.01, min(0.05, max(remaining, 0.01))))
+                except queue.Empty:
+                    if process.poll() is not None and all(
+                        not thread.is_alive() for thread in threads
+                    ):
+                        break
+                    continue
+                if raw is None:
+                    record(partial_lines[stream])
+                    partial_lines[stream] = ""
+                    closed += 1
+                    continue
+                partial_lines[stream] += raw
+                complete_lines = partial_lines[stream].splitlines(keepends=True)
+                partial_lines[stream] = ""
+                if complete_lines and not complete_lines[-1].endswith(("\n", "\r")):
+                    partial_lines[stream] = complete_lines.pop()
+                for complete_line in complete_lines:
+                    record(complete_line.rstrip("\r\n"))
+                if len(partial_lines[stream].encode("utf-8")) > OUTPUT_LINE_BYTE_LIMIT:
+                    record(partial_lines[stream])
+                    partial_lines[stream] = ""
+                    output_bytes_capped = True
+            if timed_out and process.poll() is None:
+                kill_process(process)
+            stop_draining.set()
+            for pipe in (process.stdout, process.stderr):
+                try:
+                    pipe.close()
+                except (AttributeError, OSError):
+                    pass
+            for thread in threads:
+                thread.join(timeout=DRAIN_REAP_SECONDS)
+            _wait_briefly(process, DRAIN_REAP_SECONDS)
+            if timed_out:
+                outcome, exit_code, error = (
+                    "timeout",
+                    None,
+                    f"mkdocs build timed out after {timeout} seconds",
+                )
+            else:
+                exit_code = process.returncode
+                outcome = "success" if exit_code == 0 else "failure"
+                stage = "complete" if exit_code == 0 else "build"
+    except FileNotFoundError:
+        error, lines, stage = (
+            "mkdocs not found - install with: pip install mkdocs",
+            ["mkdocs not found"],
+            "launch",
+        )
+    except Exception as exc:
+        error, lines, stage = (
+            f"unexpected mkdocs runner error: {sanitize(str(exc))}",
+            ["mkdocs runner failed"],
+            "launch",
+        )
+
+    output = "\n".join(lines)
+    truncation = Truncation(
+        output_lines_capped,
+        output_bytes_capped,
+        warnings_capped,
+        progress_capped,
     )
+    result = MkdocsResult(
+        outcome,
+        outcome == "success",
+        exit_code,
+        stage,
+        progress,
+        output,
+        truncation,
+        warnings,
+        options,
+        error,
+    )
+    status = 0 if outcome == "success" else 1
+    return status, _render(result, output_mode)
 
 
-def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
-    """Parse CLI arguments for the mkdocs build tool.
-
-    Args:
-        argv: Optional list of arguments to use instead of ``sys.argv``.
-
-    Returns:
-        Parsed namespace containing the CLI options.
-    """
-
-    parser = argparse.ArgumentParser(
-        description="Run mkdocs build with ADW-style output handling",
-        epilog=(
-            "Examples:\n"
-            "  python3 .opencode/tools/build_mkdocs.py\n"
-            "  python3 .opencode/tools/build_mkdocs.py --output json\n"
-            "  python3 .opencode/tools/build_mkdocs.py --strict --clean\n"
-            "  python3 .opencode/tools/build_mkdocs.py --config-file docs/mkdocs.yml\n"
-            "  python3 .opencode/tools/build_mkdocs.py --validate-only"
-        ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    parser.add_argument(
-        "--output",
-        choices=["summary", "full", "json"],
-        default="summary",
-        help="Output format",
-    )
-    parser.add_argument(
-        "--timeout",
-        type=int,
-        default=DEFAULT_TIMEOUT,
-        help=f"Timeout in seconds (default: {DEFAULT_TIMEOUT})",
-    )
-    parser.add_argument("--cwd", help="Working directory for mkdocs build")
-    parser.add_argument("--strict", action="store_true", help="Enable strict mode")
-    parser.add_argument(
-        "--clean",
-        action="store_true",
-        default=True,
-        help="Clean build directory before building (default: true)",
-    )
-    parser.add_argument(
-        "--no-clean",
-        action="store_false",
-        dest="clean",
-        help="Disable cleaning the build directory",
-    )
-    parser.add_argument(
-        "--config-file",
-        default="mkdocs.yml",
-        help="Path to mkdocs configuration file (default: mkdocs.yml)",
-    )
-    parser.add_argument(
-        "--validate-only",
-        action="store_true",
-        help="Build to a temporary directory and discard output",
-    )
+def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run bounded MkDocs validation")
+    parser.add_argument("--output", choices=["summary", "full", "json"], default="summary")
+    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT)
+    parser.add_argument("--cwd")
+    parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--clean", action="store_true", default=True)
+    parser.add_argument("--no-clean", action="store_false", dest="clean")
+    parser.add_argument("--config-file", default="mkdocs.yml")
+    parser.add_argument("--validate-only", action="store_true")
     return parser.parse_args(argv)
 
 
-def main(argv: Optional[List[str]] = None) -> None:
-    """Run mkdocs build tool with parsed arguments and exit with its status.
-
-    Args:
-        argv: Optional list of arguments to override ``sys.argv`` when invoking the tool.
-
-    Raises:
-        SystemExit: Always raised with the exit code returned by ``run_mkdocs``.
-    """
-
+def main(argv: Optional[list[str]] = None) -> None:
     args = _parse_args(argv)
-    exit_code, output = run_mkdocs(
+    code, output = run_mkdocs(
         output_mode=args.output,
         timeout=args.timeout,
         cwd=args.cwd,
@@ -484,7 +484,7 @@ def main(argv: Optional[List[str]] = None) -> None:
         validate_only=args.validate_only,
     )
     print(output)
-    sys.exit(exit_code)
+    sys.exit(code)
 
 
 if __name__ == "__main__":

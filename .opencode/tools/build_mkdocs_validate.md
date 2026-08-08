@@ -15,7 +15,7 @@ Validation-safe MkDocs wrapper.
 ## Compatibility status
 
 - Preferred split wrapper for validator-style flows.
-- Always runs validate-only mode and does not persist build artifacts.
+- Always runs strict, validate-only mode in a cleaned-up temporary site directory.
 
 ## Direct fields
 
@@ -23,22 +23,19 @@ Validation-safe MkDocs wrapper.
 - `cwd`
 - `configFile`
 
-Default wrapper timeout is `120` seconds. The backing Python helper accepts a
-longer runtime budget, but this wrapper intentionally keeps the shorter default
-so validation-only calls fail fast unless the caller opts into a larger timeout.
+The default and maximum wrapper timeout is `300` seconds. Non-finite,
+non-positive, and over-limit values are rejected before the helper launches.
 
 ## Bounded `options` tokens
 
 - `output=<summary|full|json>`
-- `strict`
 - `clean=<true|false>`
 
 ## Examples
 
 ```json
 { }
-{ "options": "strict" }
-{ "configFile": "docs/mkdocs.yml" }
+{ "configFile": "mkdocs.yml" }
 { "cwd": "/path/to/worktree", "options": "output=summary" }
 ```
 
@@ -47,6 +44,8 @@ so validation-only calls fail fast unless the caller opts into a larger timeout.
 - `cwd` must resolve to a directory inside the repository root.
 - `configFile` must resolve inside the repository root.
 - `clean=false` emits `--no-clean` even in validate-only mode.
-- Timeout failures are reported explicitly as validation timeouts, not generic
-  stderr failures.
-- `strict` maps to MkDocs strict mode and escalates warnings into failure.
+- `strict` is not an option: it is always enabled.
+- Every outcome exposes one bounded, sanitized diagnostic model with outcome,
+  stage, progress, combined output, truncation metadata, warnings, and
+  conservative warning attribution. JSON never exposes raw stdout or stderr.
+- A timeout is a failure, never a successful validation result.

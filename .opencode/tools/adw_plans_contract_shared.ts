@@ -37,20 +37,73 @@ export type ParsedOptionsStringResult = {
   error?: string;
 };
 
-export type OptionsStringWrapper = "adw_plans" | "adw_plans_read" | "adw_plans_mutate";
+export type OptionsStringWrapper = "adw_plans_read" | "adw_plans_mutate";
 
-export type OptionsStringDisposition = "token_candidate" | "retained_direct" | "direct_exception";
-
-export type OptionsStringAuditEntry = {
-  wrapper: OptionsStringWrapper;
-  command: string;
-  field: string;
-  cliFlag: string;
-  disposition: OptionsStringDisposition;
-  reason: string;
+export type DirectFieldSpec = {
+  type: "string" | "boolean";
+  required?: boolean;
+  cliFlag?: string;
 };
 
-export const ADW_PLANS_OPTION_STRING_AUDIT: readonly OptionsStringAuditEntry[] = [
+export type PlanCommandMatrixEntry = {
+  wrapper: OptionsStringWrapper;
+  command: string;
+  route: "read" | "mutate";
+  directFields: Record<string, DirectFieldSpec>;
+  optionTokens: readonly string[];
+};
+
+/** The complete active split-wrapper input contract. */
+export const ADW_PLANS_COMMAND_MATRIX: readonly PlanCommandMatrixEntry[] = [
+  { wrapper: "adw_plans_read", command: "list", route: "read", directFields: { cwd: { type: "string", required: true, cliFlag: "--cwd" }, plan_type: { type: "string", cliFlag: "--type" }, lifecycle: { type: "string", cliFlag: "--lifecycle" }, parent: { type: "string", cliFlag: "--parent" }, json: { type: "boolean", cliFlag: "--json" } }, optionTokens: ["status"] },
+  { wrapper: "adw_plans_read", command: "show", route: "read", directFields: { cwd: { type: "string", required: true, cliFlag: "--cwd" }, plan_id: { type: "string", required: true }, json: { type: "boolean", cliFlag: "--json" } }, optionTokens: [] },
+  { wrapper: "adw_plans_read", command: "validate", route: "read", directFields: { cwd: { type: "string", required: true, cliFlag: "--cwd" } }, optionTokens: [] },
+  { wrapper: "adw_plans_read", command: "schema", route: "read", directFields: { cwd: { type: "string", required: true, cliFlag: "--cwd" }, check: { type: "boolean", cliFlag: "--check" } }, optionTokens: [] },
+  { wrapper: "adw_plans_read", command: "list-sections", route: "read", directFields: { cwd: { type: "string", required: true, cliFlag: "--cwd" }, plan_id: { type: "string", required: true }, json: { type: "boolean", cliFlag: "--json" }, populate: { type: "boolean", cliFlag: "--populate" } }, optionTokens: [] },
+  { wrapper: "adw_plans_mutate", command: "create", route: "mutate", directFields: { cwd: { type: "string", required: true, cliFlag: "--cwd" }, plan_type: { type: "string", required: true, cliFlag: "--type" }, title: { type: "string", required: true, cliFlag: "--title" }, plan_id: { type: "string", cliFlag: "--id" }, parent: { type: "string", cliFlag: "--parent" } }, optionTokens: ["status", "priority", "size"] },
+  { wrapper: "adw_plans_mutate", command: "update", route: "mutate", directFields: { cwd: { type: "string", required: true, cliFlag: "--cwd" }, plan_id: { type: "string", required: true }, title: { type: "string", cliFlag: "--title" }, patch: { type: "string", cliFlag: "--patch" } }, optionTokens: ["status", "priority", "size"] },
+  { wrapper: "adw_plans_mutate", command: "add-phase", route: "mutate", directFields: { cwd: { type: "string", required: true, cliFlag: "--cwd" }, plan_id: { type: "string", required: true }, title: { type: "string", required: true, cliFlag: "--title" } }, optionTokens: ["phase-status", "size", "after"] },
+  { wrapper: "adw_plans_mutate", command: "update-phase", route: "mutate", directFields: { cwd: { type: "string", required: true, cliFlag: "--cwd" }, plan_id: { type: "string", required: true }, phase_id: { type: "string", required: true }, title: { type: "string", cliFlag: "--title" }, patch: { type: "string", cliFlag: "--patch" }, clear_issue_number: { type: "boolean", cliFlag: "--clear-issue-number" } }, optionTokens: ["phase-status", "size", "issue"] },
+  { wrapper: "adw_plans_mutate", command: "scaffold-sections", route: "mutate", directFields: { cwd: { type: "string", required: true, cliFlag: "--cwd" }, plan_id: { type: "string", required: true }, plan_type: { type: "string", required: true, cliFlag: "--type" } }, optionTokens: [] },
+] as const;
+
+export function getPlanCommandMatrixEntry(wrapper: OptionsStringWrapper, command: unknown): PlanCommandMatrixEntry | undefined {
+  return ADW_PLANS_COMMAND_MATRIX.find((entry) => entry.wrapper === wrapper && entry.command === command);
+}
+
+/** Reject unknown, cross-command, and incorrectly typed direct inputs before spawn. */
+export function validatePlanCommandInput(
+  wrapper: OptionsStringWrapper,
+  raw: Record<string, unknown>,
+  buildError: BuildError,
+): { entry?: PlanCommandMatrixEntry; error?: string } {
+  const entry = getPlanCommandMatrixEntry(wrapper, raw.command);
+  if (!entry) return { error: buildError(`Unsupported command '${String(raw.command)}'.`) };
+  if (raw.options !== undefined && typeof raw.options !== "string") {
+    return { error: buildError("'options' must be a string when provided.") };
+  }
+  const allowed = new Set(["command", "options", ...Object.keys(entry.directFields)]);
+  for (const [field, value] of Object.entries(raw)) {
+    if (!allowed.has(field) && value !== undefined) return { error: buildError(`'${field}' is not accepted for '${entry.command}'.`) };
+    const spec = entry.directFields[field];
+    if (!spec || value === undefined) continue;
+    if (typeof value !== spec.type) return { error: buildError(`'${field}' must be a ${spec.type}.`) };
+    if (spec.type === "string" && (!value.trim() || value.trim().startsWith("-"))) {
+      return { error: buildError(`'${field}' must be a nonblank string that does not start with '-'.`) };
+    }
+  }
+  for (const [field, spec] of Object.entries(entry.directFields)) {
+    if (spec.required && raw[field] === undefined) return { error: buildError(`${entry.command} command requires '${field}'.`) };
+  }
+  return { entry };
+}
+
+/*
+ * The historical unified-wrapper audit was deliberately retired with
+ * adw_plans.ts.  The active command matrix above is the sole plan-wrapper
+ * schema authority; do not add compatibility entries here.
+ */
+const RETIRED_ADW_PLANS_OPTION_STRING_AUDIT: readonly unknown[] = [
   { wrapper: "adw_plans", command: "list", field: "plan_type", cliFlag: "--type", disposition: "retained_direct", reason: "Registry-driven plan type filtering stays a retained direct field in P1." },
   { wrapper: "adw_plans", command: "list", field: "lifecycle", cliFlag: "--lifecycle", disposition: "retained_direct", reason: "Lifecycle filtering stays a retained direct field to avoid expanding the token grammar in P1." },
   { wrapper: "adw_plans", command: "list", field: "parent", cliFlag: "--parent", disposition: "retained_direct", reason: "Parent identifiers remain retained direct routing/filter values." },
@@ -152,20 +205,20 @@ export const ADW_PLANS_OPTION_STRING_AUDIT: readonly OptionsStringAuditEntry[] =
 ] as const;
 
 export const ADW_PLANS_OPTION_STRING_RULES = {
-  tokenBooleanFlags: ["json", "populate", "check", "clear-issue-number"],
+  tokenBooleanFlags: [],
   tokenKeyValueFields: ["status", "phase-status", "priority", "size", "after", "issue"],
   tokenSeparator: "ascii_whitespace",
   tokenNameStyle: "lowercase-kebab-case",
   tokenValueRule: "exactly one '=' with a non-empty value; status and phase-status may consume subsequent space-separated value words until the next valid bounded token candidate for the selected command",
   commandAllowlist: {
-    list: ["json", "status"],
-    show: ["json"],
+    list: ["status"],
+    show: [],
     create: ["status", "priority", "size"],
     update: ["status", "priority", "size"],
     "add-phase": ["phase-status", "size", "after"],
-    "update-phase": ["phase-status", "size", "issue", "clear-issue-number"],
-    schema: ["check"],
-    "list-sections": ["json", "populate"],
+    "update-phase": ["phase-status", "size", "issue"],
+    schema: [],
+    "list-sections": [],
     validate: [],
     "scaffold-sections": [],
   },
@@ -173,10 +226,9 @@ export const ADW_PLANS_OPTION_STRING_RULES = {
   compatibilityRetainedDirectFields: ["status", "phase_status"],
   splitWrapperOptionOnlyFields: ["status", "phase_status"],
   mutualExclusionRules: [
-    "update-phase tokens 'issue=<n>' and 'clear-issue-number' are mutually exclusive and must fail closed when combined.",
+    "update-phase issue links use the value-bearing 'issue=<n>' token; clearing an issue link uses direct clear_issue_number: true.",
   ],
   duplicateHandling: [
-    "Repeated identical boolean tokens collapse to one effective flag.",
     "Repeated identical key/value tokens collapse to one effective value.",
     "Contradictory duplicates for the same key fail closed before subprocess spawn.",
   ],
@@ -185,13 +237,12 @@ export const ADW_PLANS_OPTION_STRING_RULES = {
     "Missing values after '=' fail closed.",
     "Extra '=' characters in a token fail closed.",
     "issue values must parse as positive safe integers.",
-    "update-phase must not combine 'issue=<n>' with 'clear-issue-number'.",
     "Tokens not allowlisted for the selected command fail closed.",
   ],
   patchExceptionReason:
     "Raw JSON patch payloads remain direct because whitespace, braces, and quotes exceed the bounded token grammar.",
   behaviorNeutralScope:
-    "P2 enables bounded options-string parsing across compatibility and split wrappers while preserving compatibility-only direct status aliases in unified adw_plans, split-wrapper option-only status routing, and direct patch exceptions.",
+    "Active split wrappers accept only value-bearing command-scoped options tokens and direct typed booleans; raw JSON patch payloads remain direct exceptions.",
 } as const;
 
 const TOKEN_NAME_PATTERN = /^[a-z][a-z0-9-]*$/;
@@ -298,17 +349,23 @@ function isStatDirectory(s: ReturnType<typeof statSync>): boolean {
   return (((s as { mode?: number }).mode ?? 0) & S_IFMT) === S_IFDIR;
 }
 
-export function findCurrentRepositoryRoot(): string {
-  let currentPath = realpathSync(process.cwd());
+/** Discover the owning worktree from an active wrapper module, never ambient cwd. */
+export function findWrapperRepositoryRoot(moduleDir: string): { value?: string; error?: string } {
+  let current: string;
+  try {
+    current = realpathSync(moduleDir);
+  } catch {
+    return { error: "ERROR: unable to discover the wrapper worktree boundary." };
+  }
   while (true) {
-    if (existsSync(path.join(currentPath, ".git"))) {
-      return currentPath;
+    if (existsSync(path.join(current, ".git")) && existsSync(path.join(current, ".opencode"))) {
+      return { value: current };
     }
-    const parentPath = path.dirname(currentPath);
-    if (parentPath === currentPath) {
-      return realpathSync(process.cwd());
+    const parent = path.dirname(current);
+    if (parent === current) {
+      return { error: "ERROR: unable to discover the wrapper worktree boundary." };
     }
-    currentPath = parentPath;
+    current = parent;
   }
 }
 
@@ -332,8 +389,11 @@ export function validatePlansCwdPath(cwdPath: string): string | undefined {
   if (!existsSync(gitMetadataPath)) {
     return `ERROR: cwd path is not a repository/worktree root: ${redactedPath} (missing .git metadata at ${redactPathLikeText(gitMetadataPath)})`;
   }
-  const repoRoot = findCurrentRepositoryRoot();
-  if (canonical !== repoRoot) {
+  const repoRoot = findWrapperRepositoryRoot(canonical);
+  if (repoRoot.error || !repoRoot.value) {
+    return `ERROR: unable to discover the wrapper worktree boundary.`;
+  }
+  if (canonical !== repoRoot.value) {
     return `ERROR: cwd path resolves outside repository root: ${redactedPath} (canonical: ${redactPathLikeText(canonical)})`;
   }
   return undefined;
@@ -341,17 +401,16 @@ export function validatePlansCwdPath(cwdPath: string): string | undefined {
 
 export function validateAndNormalizePlansCwdPath(
   raw: unknown,
+  moduleDir?: string,
 ): { value?: string; error?: string } {
-  if (raw === undefined || raw === null) {
-    return {};
-  }
+  if (raw === undefined || raw === null) return { error: "ERROR: 'cwd' is required." };
   if (typeof raw !== "string") {
-    return {};
+    return { error: "ERROR: 'cwd' must be a string." };
   }
 
   const normalized = raw.trim();
   if (!normalized) {
-    return {};
+    return { error: "ERROR: 'cwd' must be a nonblank string." };
   }
   if (normalized.startsWith("-")) {
     return {
@@ -359,12 +418,24 @@ export function validateAndNormalizePlansCwdPath(
     };
   }
 
-  const validationError = validatePlansCwdPath(normalized);
-  if (validationError) {
-    return { error: validationError };
+  if (!moduleDir) return { error: "ERROR: unable to discover the wrapper worktree boundary." };
+  const boundary = findWrapperRepositoryRoot(moduleDir);
+  if (boundary.error || !boundary.value) return { error: boundary.error };
+  if (!existsSync(normalized)) return { error: `ERROR: cwd path does not exist: ${redactPathLikeText(normalized)}` };
+  let canonical: string;
+  try {
+    if (!isStatDirectory(statSync(normalized))) return { error: `ERROR: cwd path is not a directory: ${redactPathLikeText(normalized)}` };
+    canonical = realpathSync(normalized);
+  } catch {
+    return { error: `ERROR: cwd path does not exist: ${redactPathLikeText(normalized)}` };
   }
-
-  return { value: realpathSync(normalized) };
+  if (!existsSync(path.join(canonical, ".git")) || !existsSync(path.join(canonical, ".opencode"))) {
+    return { error: `ERROR: cwd path is not a repository/worktree root: ${redactPathLikeText(normalized)}; use the workflow worktree_path.` };
+  }
+  if (canonical !== boundary.value) {
+    return { error: `ERROR: cwd path is not this wrapper's admitted worktree root: ${redactPathLikeText(normalized)}; use the workflow worktree_path.` };
+  }
+  return { value: canonical };
 }
 
 export function mergeParsedOptionField<T>(
@@ -585,6 +656,16 @@ export function parseCommandOptionsString(
         };
       }
       const parsedIssueNumber = Number(rawValue);
+      if (!Number.isSafeInteger(parsedIssueNumber) || parsedIssueNumber <= 0) {
+        return {
+          error: buildOptionsParseError(
+            command,
+            token,
+            "issue values must be positive safe integers",
+            buildError,
+          ),
+        };
+      }
       const error = setParsedValueToken(
         values,
         command,

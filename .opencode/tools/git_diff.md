@@ -1,55 +1,100 @@
 # git_diff tool
 
-Read-only ADW git inspection wrapper for `status`, `diff`, `log`, and `show`.
+`git_diff` is the narrow OpenCode wrapper for **read-only**, local Git
+diagnostics. It supports `status`, `diff`, `log`, and `show`; it is not an
+arbitrary Git command surface.
 
-## Supported commands
+## Local adapter boundary
 
-- `status`
-  - Optional: `porcelain`, `worktree_path`
-- `diff`
-  - Optional: `stat`, `base`, `target`, `path`, `worktree_path`
-  - Validation: accepts valid Git rev-spec syntax (for example `stash@{1}` and `HEAD^{tree}`), forwards only non-empty repo-relative scoped paths as `--path <value>`, and rejects malformed, absolute, traversal-like, and repo-root-equivalent path payloads before spawn
-- `log`
-  - Optional: `ref`, `max_count`, `oneline`, `stat`, `worktree_path`
-  - `max_count` defaults to `10`
-  - Validation: must be an integer in `1..1000`
-- `show`
-  - Required: `ref` (except when `help: true`)
-  - Optional: `path`, `stat`, `worktree_path`
-  - Validation: accepts valid Git rev-spec syntax (for example `HEAD@{1}`) while rejecting malformed `ref` values and option-like `path` values
+After admitting an explicitly supplied trusted local worktree, the TypeScript wrapper invokes the
+wrapper-local `read_only_git_diagnostics.py` adapter once with one JSON-lines
+request. The adapter reads exactly one bounded UTF-8 JSON object from standard
+input and writes exactly one bounded, newline-terminated JSON response to
+standard output.
 
-## Help behavior
+Every adapter-dispatched core envelope for `status`, `diff`, `log`, and `show`
+has the exact top-level `evidence_identity` object
+`{"contract":"e37-m2-validation-git","version":1}`. Adapter admission and
+unavailable failures are identity-free. The core adds the identity to both
+successful and terminal validation, ref-verification, and execution-failure
+read-only envelopes; protected mutating Git envelopes remain outside this
+contract. The adapter returns a dispatched core mapping unchanged and never
+mints an identity. Rendered TypeScript text remains a display channel, not a
+structured evidence consumer channel.
 
-- `help: true` appends `--help` to the selected command.
-- Help mode relaxes required-argument checks only; malformed refs and option-like paths still fail closed before spawn.
+The identity is a bounded compatibility marker, not proof that an inspection
+executed or authority for state promotion, delegation, Git writes, shell use,
+network access, or lifecycle mutation. Consumers requiring structured evidence
+must use the adapter/core JSON envelope rather than rendered text.
 
-## Success envelope
+The adapter constructs an explicit repository-scoped `ProjectContext` for the
+admitted canonical worktree, denies local internet access, and delegates once
+to `adforge_core.runtime.git_tools.execute_git_tool(...)`. It does not infer
+authority from the ambient current directory.
 
-All non-help command successes return:
+This boundary does **not** import or dispatch the historical workflow CLI, the
+core CLI module, or either CLI root. It has no CLI-root help route, no legacy
+presentation fields, and no debug-log or other persisted diagnostic artifacts.
 
-`Git Command: <command>\n\n<output>`
+## Operation argument matrix
 
-## Deterministic error behavior
+Only the fields in the selected operation's row are admitted. Unsupported
+fields, including legacy `porcelain`, `stat`, `oneline`, and `help` fields, are
+an `invalid_request` failure rather than compatibility aliases.
 
-- Missing `show` ref:
-  - `ERROR: 'show' command requires 'ref'.`
-- Invalid `log` max_count:
-  - `ERROR: 'max_count' must be an integer between 1 and 1000.`
-- Invalid `diff` / `show` refs:
-  - `ERROR: Invalid base: <value>.`
-  - `ERROR: Invalid target: <value>.`
-  - `ERROR: Invalid ref: <value>.`
-- Invalid option-like paths:
-  - `ERROR: Invalid path: <value>.`
-  - `ERROR: Invalid worktree_path: <value>.`
-- Invalid scoped diff paths do not fall back to repo-wide output; blank or omitted `path` is the only unscoped diff form, and `.` / repo-root-equivalent scoped values are rejected.
-- Subprocess failure precedence:
-  1. stderr snippet (`Git Command Failed: <command>\n<stderr>`)
-  2. stdout snippet (`Git Command Failed:\n<stdout>`)
-  3. fallback message / fixed unknown-error envelope
-- When failure diagnostics are truncated, output may also include a repo-local
-  `debug_log: adforge_local/opencode/tmp/git_diff-<command>-...` path.
+| Command | Admitted fields | Additional rules |
+| --- | --- | --- |
+| `status` | `worktree_path` | No revision or path arguments. |
+| `diff` | `worktree_path`, `base`, `target`, `path` | No revisions compares the working tree; `base` compares that revision to the working tree; `base` and `target` compare two revisions. `target` requires `base`. |
+| `log` | `worktree_path`, `ref`, `max_count`, `path` | `max_count` is an integer from `1` through `1000`; its default is `50`. |
+| `show` | `worktree_path`, `ref`, `path` | `ref` is required. A path requires a compatible resolved tree-ish ref. |
 
-## Scope guardrail
+The caller must supply `worktree_path` explicitly. The wrapper canonicalizes an
+existing absolute directory and supplies that path in its adapter request; it
+does not infer authority from its current directory. The adapter then admits
+only its primary checkout or a linked worktree registered under that checkout's
+canonical Git common directory. Admission requires a direct
+`.git/worktrees/<id>` metadata directory, matching `commondir`, and an exact
+back-pointer to the selected worktree's `.git` file. Ordinary sibling
+repositories, foreign worktrees, malformed pointers, and symlinked metadata are
+rejected before core dispatch.
 
-This tool is intentionally read-only and excludes mutating git paths (commit/push/checkout/merge/etc.).
+## Local-only validation and inspection
+
+The core runtime, not the TypeScript wrapper, owns the operation matrix,
+argument validation, revision verification, path confinement, and fixed Git
+argv. Before final inspection it rejects invalid types, unexpected fields,
+blank or option-like revisions, unsafe revision syntax, and invalid revision
+combinations. Supplied revisions are resolved with fixed local verification
+commands before they can reach a final inspection command.
+
+`path` is an optional non-empty literal repository-relative path. It cannot be
+absolute, `.`/`./`, traversal, NUL-containing, option-like, or Git pathspec
+magic; resolution must remain beneath the admitted worktree, including through
+symlink checks. Final fixed commands place an admitted path after `--`.
+
+All Git activity is local-only and non-network. The inspection commands do not
+fetch, contact remotes, run arbitrary Git verbs, invoke a shell, mutate Git or
+worktree state, or persist raw process output. Local upstream divergence uses
+only local refs: it never fetches to refresh them.
+
+## Bounded diagnostic outcomes
+
+Successful responses preserve the `ok`, `operation`, and `data` envelope.
+`data` contains only a capped/redacted command summary, relative worktree
+identifier, optional normalized path, bounded stdout/stderr, and truncation
+flags. It does not expose absolute worktree paths or raw argv.
+
+The available successful classifications are:
+
+| Command | Classification fields |
+| --- | --- |
+| `status` | `status`: `clean` or `changed`; `divergence`: `ahead`, `behind`, `diverged`, `in_sync`, `not_configured`, or `unavailable` |
+| `diff` | `diff`: `no_diff` or `diff_present` |
+| `log`, `show` | No additional diagnostic classification |
+
+Failures preserve the same outer envelope with `ok: false` and a bounded
+`error`. Read-only diagnostic error types are `invalid_request`, `unavailable`,
+`execution_failed`, and `execution_timeout`. Adapter transport or preflight
+failures are rendered as stable bounded wrapper errors; child stdout, stderr,
+tracebacks, raw command argv, tokens, and absolute paths are not rendered.

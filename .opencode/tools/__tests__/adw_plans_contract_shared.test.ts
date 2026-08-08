@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, realpathSync, rmSync, symlinkSync } from "node:f
 import path from "node:path";
 
 import {
-  ADW_PLANS_OPTION_STRING_AUDIT,
+  ADW_PLANS_COMMAND_MATRIX,
   ADW_PLANS_OPTION_STRING_RULES,
   buildCommandFailureError,
   deriveCommandFailureHint,
@@ -16,6 +16,7 @@ import {
   selectCommandFailureDiagnostic,
   stripDefaultArgs,
   validateAndNormalizePlansCwdPath,
+  validatePlanCommandInput,
   validateUpdatePhaseIssueLinkArgs,
   validateRequiredArgs,
 } from "../adw_plans_contract_shared";
@@ -268,149 +269,73 @@ describe("adw_plans_contract_shared", () => {
     symlinkSync(repoRoot, aliasPath, "dir");
 
     try {
-      expect(validateAndNormalizePlansCwdPath(aliasPath)).toEqual({
-        value: realpathSync(repoRoot),
-      });
+      expect(validateAndNormalizePlansCwdPath(aliasPath, path.resolve(import.meta.dir, "..")).value).toBe(
+        realpathSync(repoRoot),
+      );
     } finally {
       rmSync(aliasPath, { recursive: true, force: true });
     }
   });
 
-  it("captures the wrapper-family optional field inventory with explicit dispositions", () => {
-    expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
-      wrapper: "adw_plans",
-      command: "list",
-      field: "status",
-      cliFlag: "--status",
-      disposition: "token_candidate",
-      reason:
-        "Bounded plan status values support options-string status=<value> tokens while remaining accepted as direct wrapper fields.",
-    });
-    expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
-      wrapper: "adw_plans_mutate",
-      command: "update-phase",
-      field: "phase_status",
-      cliFlag: "--status",
-      disposition: "token_candidate",
-      reason:
-        "Bounded phase status values support options-string phase-status=<value> tokens while split wrappers route them through options only.",
-    });
-    expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
-      wrapper: "adw_plans",
-      command: "update",
-      field: "patch",
-      cliFlag: "--patch",
-      disposition: "direct_exception",
-      reason: "Raw JSON patch payloads remain direct because quoting and whitespace exceed bounded token rules.",
-    });
-    expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
-      wrapper: "adw_plans_read",
-      command: "schema",
-      field: "check",
-      cliFlag: "--check",
-      disposition: "token_candidate",
-      reason: "Simple boolean flag forwarding maps to a bare token.",
-    });
-    expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
-      wrapper: "adw_plans_mutate",
-      command: "create",
-      field: "plan_id",
-      cliFlag: "--id",
-      disposition: "retained_direct",
-      reason: "Optional explicit IDs stay retained direct fields because they shape persisted plan identity.",
-    });
-    expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
-      wrapper: "adw_plans",
-      command: "add-phase",
-      field: "title",
-      cliFlag: "--title",
-      disposition: "retained_direct",
-      reason: "Free-form titles remain retained direct fields rather than entering token parsing.",
-    });
-    expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
-      wrapper: "adw_plans",
-      command: "scaffold-sections",
-      field: "cwd",
-      cliFlag: "--cwd",
-      disposition: "retained_direct",
-      reason:
-        "Mutating worktree/repository scoping stays a retained direct field and command-required outside token parsing.",
-    });
-    expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
-      wrapper: "adw_plans_mutate",
-      command: "update-phase",
-      field: "cwd",
-      cliFlag: "--cwd",
-      disposition: "retained_direct",
-      reason:
-        "Mutating worktree/repository scoping stays a retained direct field and command-required outside token parsing.",
-    });
-    expect(ADW_PLANS_OPTION_STRING_AUDIT.filter((entry) => entry.field === "cwd")).toHaveLength(20);
-    expect(ADW_PLANS_OPTION_STRING_AUDIT).toContainEqual({
-      wrapper: "adw_plans_read",
-      command: "list",
-      field: "status",
-      cliFlag: "--status",
-      disposition: "token_candidate",
-      reason:
-        "Bounded plan status values support options-string status=<value> tokens while split wrappers route them through options only.",
-    });
+  it("declares direct required cwd and command-specific direct booleans", () => {
+    for (const entry of ADW_PLANS_COMMAND_MATRIX) {
+      expect(entry.directFields.cwd).toEqual({ type: "string", required: true, cliFlag: "--cwd" });
+    }
+    expect(ADW_PLANS_COMMAND_MATRIX.find((entry) => entry.command === "list")?.directFields.json)
+      .toEqual({ type: "boolean", cliFlag: "--json" });
+    expect(ADW_PLANS_COMMAND_MATRIX.find((entry) => entry.command === "schema")?.directFields.check)
+      .toEqual({ type: "boolean", cliFlag: "--check" });
+    expect(ADW_PLANS_COMMAND_MATRIX.find((entry) => entry.command === "update-phase")?.directFields.clear_issue_number)
+      .toEqual({ type: "boolean", cliFlag: "--clear-issue-number" });
+  });
+
+  it("validates the matrix's direct field and boolean admission before execution", () => {
+    const buildError = (message: string): string => `ERROR: ${message}`;
+
     expect(
-      ADW_PLANS_OPTION_STRING_AUDIT.filter((entry) => entry.disposition === "direct_exception"),
-    ).toEqual([
-      {
-        wrapper: "adw_plans",
-        command: "update",
-        field: "patch",
-        cliFlag: "--patch",
-        disposition: "direct_exception",
-        reason:
-          "Raw JSON patch payloads remain direct because quoting and whitespace exceed bounded token rules.",
-      },
-      {
-        wrapper: "adw_plans",
-        command: "update-phase",
-        field: "patch",
-        cliFlag: "--patch",
-        disposition: "direct_exception",
-        reason:
-          "Raw JSON patch payloads remain direct because quoting and whitespace exceed bounded token rules.",
-      },
-      {
-        wrapper: "adw_plans_mutate",
-        command: "update",
-        field: "patch",
-        cliFlag: "--patch",
-        disposition: "direct_exception",
-        reason:
-          "Raw JSON patch payloads remain direct because quoting and whitespace exceed bounded token rules.",
-      },
-      {
-        wrapper: "adw_plans_mutate",
-        command: "update-phase",
-        field: "patch",
-        cliFlag: "--patch",
-        disposition: "direct_exception",
-        reason:
-          "Raw JSON patch payloads remain direct because quoting and whitespace exceed bounded token rules.",
-      },
-    ]);
+      validatePlanCommandInput(
+        "adw_plans_read",
+        { command: "list", cwd: "/worktree", json: false },
+        buildError,
+      ).entry?.command,
+    ).toBe("list");
+    expect(
+      validatePlanCommandInput(
+        "adw_plans_read",
+        { command: "list", cwd: "/worktree", status: "Ready" },
+        buildError,
+      ).error,
+    ).toBe("ERROR: 'status' is not accepted for 'list'.");
+    expect(
+      validatePlanCommandInput(
+        "adw_plans_mutate",
+        { command: "update-phase", cwd: "/worktree", plan_id: "M1", phase_id: "M1-P1", clear_issue_number: "true" },
+        buildError,
+      ).error,
+    ).toBe("ERROR: 'clear_issue_number' must be a boolean.");
+    expect(
+      validatePlanCommandInput(
+        "adw_plans_mutate",
+        { command: "create", cwd: "/worktree", plan_type: "feature", title: "x", json: true },
+        buildError,
+      ).error,
+    ).toBe("ERROR: 'json' is not accepted for 'create'.");
   });
 
   it("defines the bounded command allowlists and malformed token rules for the later parser slice", () => {
     expect(ADW_PLANS_OPTION_STRING_RULES.commandAllowlist).toEqual({
-      list: ["json", "status"],
-      show: ["json"],
+      list: ["status"],
+      show: [],
       create: ["status", "priority", "size"],
       update: ["status", "priority", "size"],
       "add-phase": ["phase-status", "size", "after"],
-      "update-phase": ["phase-status", "size", "issue", "clear-issue-number"],
-      schema: ["check"],
-      "list-sections": ["json", "populate"],
+      "update-phase": ["phase-status", "size", "issue"],
+      schema: [],
+      "list-sections": [],
       validate: [],
       "scaffold-sections": [],
     });
-    expect(ADW_PLANS_OPTION_STRING_RULES.tokenBooleanFlags).toEqual(["json", "populate", "check", "clear-issue-number"]);
+    expect(ADW_PLANS_OPTION_STRING_RULES.tokenBooleanFlags).toEqual([]);
     expect(ADW_PLANS_OPTION_STRING_RULES.tokenKeyValueFields).toEqual([
       "status",
       "phase-status",
@@ -432,29 +357,18 @@ describe("adw_plans_contract_shared", () => {
     expect(ADW_PLANS_OPTION_STRING_RULES.malformedTokenRules).toContain(
       "issue values must parse as positive safe integers.",
     );
-    expect(ADW_PLANS_OPTION_STRING_RULES.malformedTokenRules).toContain(
-      "update-phase must not combine 'issue=<n>' with 'clear-issue-number'.",
-    );
     expect(ADW_PLANS_OPTION_STRING_RULES.mutualExclusionRules).toEqual([
-      "update-phase tokens 'issue=<n>' and 'clear-issue-number' are mutually exclusive and must fail closed when combined.",
+      "update-phase issue links use the value-bearing 'issue=<n>' token; clearing an issue link uses direct clear_issue_number: true.",
     ]);
     expect(ADW_PLANS_OPTION_STRING_RULES.patchExceptionReason).toContain("whitespace, braces, and quotes");
-    expect(ADW_PLANS_OPTION_STRING_RULES.behaviorNeutralScope).toContain(
-      "compatibility and split wrappers",
-    );
+    expect(ADW_PLANS_OPTION_STRING_RULES.behaviorNeutralScope).toContain("direct typed booleans");
   });
 
   it("parses allowlisted boolean and key-value options", () => {
     const buildError = (message: string): string => `ERROR: ${message}`;
 
-    expect(parseCommandOptionsString("list", "json", buildError)).toEqual({
-      values: { json: true },
-    });
-    expect(parseCommandOptionsString("list", "status=Ready json", buildError)).toEqual({
-      values: { status: "Ready", json: true },
-    });
-    expect(parseCommandOptionsString("list-sections", "json populate", buildError)).toEqual({
-      values: { json: true, populate: true },
+    expect(parseCommandOptionsString("list", "status=Ready", buildError)).toEqual({
+      values: { status: "Ready" },
     });
     expect(parseCommandOptionsString("add-phase", "after=M37-P1 size=M", buildError)).toEqual({
       values: { after: "M37-P1", size: "M" },
@@ -467,15 +381,6 @@ describe("adw_plans_contract_shared", () => {
     ).toEqual({
       values: { phase_status: "In Progress", size: "M", issue_number: 42 },
     });
-    expect(
-      parseCommandOptionsString(
-        "update-phase",
-        "phase-status=Blocked clear-issue-number",
-        buildError,
-      ),
-    ).toEqual({
-      values: { phase_status: "Blocked", clear_issue_number: true },
-    });
     expect(parseCommandOptionsString("update", "status=In Progress json", buildError)).toEqual({
       error:
         "ERROR: Invalid options token 'status=In Progress json' for 'update': status values must be one of: Draft, Proposed, Ready, In Progress, Blocked, Monitoring, Shipped, Cancelled, Superseded",
@@ -484,7 +389,7 @@ describe("adw_plans_contract_shared", () => {
       parseCommandOptionsString("update-phase", "issue=42 clear-issue-number", buildError),
     ).toEqual({
       error:
-        "ERROR: 'issue_number' and 'clear_issue_number' are mutually exclusive for update-phase.",
+        "ERROR: Invalid options token 'clear-issue-number' for 'update-phase': token is not allowed for this command",
     });
   });
 
@@ -497,9 +402,6 @@ describe("adw_plans_contract_shared", () => {
   it("collapses repeated identical options tokens to one effective value", () => {
     const buildError = (message: string): string => `ERROR: ${message}`;
 
-    expect(parseCommandOptionsString("list", "json json", buildError)).toEqual({
-      values: { json: true },
-    });
     expect(parseCommandOptionsString("update", "size=M size=M", buildError)).toEqual({
       values: { size: "M" },
     });
@@ -520,7 +422,7 @@ describe("adw_plans_contract_shared", () => {
     const buildError = (message: string): string => `ERROR: ${message}`;
 
     expect(parseCommandOptionsString("list", "json=true", buildError).error).toContain(
-      "token must be provided without '=value'",
+      "token is not allowed for this command",
     );
     expect(parseCommandOptionsString("list", "priority=P1", buildError).error).toContain(
       "token is not allowed for this command",
@@ -552,7 +454,7 @@ describe("adw_plans_contract_shared", () => {
     expect(
       parseCommandOptionsString("update-phase", "phase-status=Blocked clear-issue-number=no", buildError)
         .error,
-    ).toContain("token must be provided without '=value'");
+    ).toContain("phase-status values must be one of");
     expect(
       parseCommandOptionsString("update-phase", "phase-status=Unknown Value", buildError).error,
     ).toContain("phase-status values must be one of");

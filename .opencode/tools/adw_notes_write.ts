@@ -12,12 +12,14 @@ const COMMANDS = ["write", "write-from-state"] as const;
 type WriteCommand = (typeof COMMANDS)[number];
 
 const USAGE = `Usage:
-  { command: "write", ref: "HEAD", fields?: [["key", "value"], ...] }
-  { command: "write-from-state", ref: "HEAD", adw_id: "abc12345", fields?: [["key", "value"], ...] }
+  { command: "write", ref: "HEAD", fields?: [["plan_summary", "value"], ...] }
+  { command: "write-from-state", ref: "HEAD", adw_id: "abc12345", fields?: [["plan_summary", "value"], ...] }
 
 Notes:
   - fields may be provided as an ordered array of [key, value] pairs (duplicates preserved),
     an array of { key, value } objects, a plain object, or a JSON string containing one of those forms.
+  - Allowed keys are plan_summary, architecture_notes, discovered_context, and review_findings.
+    Only architecture_notes and review_findings may use null values.
   - write-from-state requires adw_id and forwards only --adw-id to CLI state resolution.`;
 
 function buildError(message: string): string {
@@ -50,7 +52,7 @@ Examples:
       .any()
       .optional()
       .describe(
-        "Optional fields payload for write/write-from-state. Accepts ordered [key,value] entries, {key,value} objects, plain object, or JSON string of those forms.",
+        "Optional note fields: ordered [key, string|null] entries, {key,value} objects, plain object, or JSON string. Allowed keys: plan_summary, architecture_notes, discovered_context, review_findings; only architecture_notes/review_findings accept null.",
       ),
   },
 
@@ -73,7 +75,7 @@ Examples:
     const parsedFields = parseFieldEntries((args as Record<string, unknown>).fields);
     if (!parsedFields.ok) {
       return buildError(
-        `'fields' payload is malformed: ${parsedFields.diagnostic}. Accepted forms: ordered [key, value] entries, { key, value } objects, plain object, or JSON string of those forms.`,
+         `'fields' payload is malformed: ${parsedFields.diagnostic}. Accepted forms: ordered [key, string|null] entries, { key, value } objects, plain object, or JSON string of those forms.`,
       );
     }
 

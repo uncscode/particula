@@ -2,12 +2,12 @@ import { tool } from "@opencode-ai/plugin";
 
 import {
   buildCommandFailureError,
-  hasMeaningfulSplitWrapperAliasValue,
   mergeParsedOptionField,
   parseCommandOptionsString,
   sanitizeSuccessOutput,
   stripDefaultArgs,
   validateAndNormalizePlansCwdPath,
+  validatePlanCommandInput,
   validateRequiredArgs,
 } from "./adw_plans_contract_shared";
 
@@ -125,9 +125,8 @@ function isReadCommand(command: unknown): command is (typeof READ_COMMANDS)[numb
 // --- Inlined execute logic from adw_plans.ts (read-only commands only) ---
 
 async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<string> {
-  if (hasMeaningfulSplitWrapperAliasValue(args.status)) {
-    return buildError("'status' is not accepted as a direct field in adw_plans_read; use options: \"status=<value>\".");
-  }
+  const matrixValidation = validatePlanCommandInput("adw_plans_read", args, buildError);
+  if (matrixValidation.error) return matrixValidation.error;
   const preflightError = validateRequiredArgs(args, REQUIRED_ARGS, buildError);
   if (preflightError) {
     return preflightError;
@@ -150,17 +149,6 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
   const optionValues = parsedOptions.values ?? {};
   const resolvedStatus = mergeParsedOptionField(undefined, optionValues.status, "status", buildError);
   if (resolvedStatus.error) return resolvedStatus.error;
-  const resolvedJson = mergeParsedOptionField(undefined, optionValues.json, "json", buildError);
-  if (resolvedJson.error) return resolvedJson.error;
-  const resolvedCheck = mergeParsedOptionField(undefined, optionValues.check, "check", buildError);
-  if (resolvedCheck.error) return resolvedCheck.error;
-  const resolvedPopulate = mergeParsedOptionField(
-    undefined,
-    optionValues.populate,
-    "populate",
-    buildError,
-  );
-  if (resolvedPopulate.error) return resolvedPopulate.error;
 
   const cmdParts = ["uv", "run", "--active", "adw", "plans"];
   const executedCommand = command as PlanCommand;
@@ -190,7 +178,7 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
       if (resolvedStatus.value) {
         cmdParts.push("--status", resolvedStatus.value);
       }
-      if (resolvedJson.value) {
+       if (args.json === true) {
         cmdParts.push("--json");
       }
       break;
@@ -206,7 +194,7 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
         return normalizedPlanId.error;
       }
       cmdParts.push("show", normalizedPlanId.value!);
-      if (resolvedJson.value) {
+       if (args.json === true) {
         cmdParts.push("--json");
       }
       break;
@@ -219,7 +207,7 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
 
     case "schema": {
       cmdParts.push("schema");
-      if (resolvedCheck.value) {
+       if (args.check === true) {
         cmdParts.push("--check");
       }
       break;
@@ -235,10 +223,10 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
         return normalizedPlanId.error;
       }
       cmdParts.push("list-sections", normalizedPlanId.value!);
-      if (resolvedJson.value) {
+       if (args.json === true) {
         cmdParts.push("--json");
       }
-      if (resolvedPopulate.value) {
+       if (args.populate === true) {
         cmdParts.push("--populate");
       }
       break;
@@ -250,7 +238,7 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
       );
   }
 
-  const normalizedCwd = validateAndNormalizePlansCwdPath(cwd);
+  const normalizedCwd = validateAndNormalizePlansCwdPath(cwd, import.meta.dir);
   if (normalizedCwd.error) {
     return normalizedCwd.error;
   }
@@ -264,8 +252,9 @@ async function executeAdwPlansReadOnly(args: Record<string, any>): Promise<strin
       cmd: cmdParts,
       stdout: "pipe",
       stderr: "pipe",
-      timeout: commandTimeout,
-      env: sanitizedChildEnv(),
+       timeout: commandTimeout,
+       env: sanitizedChildEnv(),
+       cwd: normalizedCwd.value,
     });
     const stdoutRaw = result.stdout ? decoder.decode(result.stdout) : "";
     const stderrRaw = result.stderr ? decoder.decode(result.stderr) : "";
@@ -332,7 +321,10 @@ Contract parity note: successful and failed command output envelopes are delegat
     lifecycle: tool.schema.enum(["active", "completed", "closed"]).optional(),
     parent: tool.schema.string().optional(),
     options: tool.schema.string().optional(),
-    cwd: tool.schema.string().optional(),
+    cwd: tool.schema.string(),
+    json: tool.schema.boolean().optional(),
+    populate: tool.schema.boolean().optional(),
+    check: tool.schema.boolean().optional(),
   },
 
   async execute(args) {

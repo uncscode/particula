@@ -566,5 +566,118 @@ def test_main_parses_args_and_prints_tool_output(
         "cwd": "/tmp/worktree",
         "ruff_timeout": 11,
         "mypy_timeout": 22,
+        "mode": None,
+        "target_paths": None,
     }
     assert capsys.readouterr().out.strip() == "mock lint output"
+
+
+def test_run_explicit_ruff_uses_separator_protected_ordered_targets(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+):
+    """Explicit Ruff checks preserve target order and separate targets from flags."""
+
+    calls: list[dict[str, object]] = []
+
+    def fake_run(args, **kwargs):
+        calls.append({"args": list(args), **kwargs})
+        return _completed_process(list(args), stdout="All checks passed\n")
+
+    monkeypatch.setattr(run_linters_tool.subprocess, "run", fake_run)
+
+    result = run_linters_tool.run_explicit_ruff(
+        "format-check", ["adforge_core", ".opencode/tools"], 17, str(tmp_path)
+    )
+
+    assert result.success is True
+    assert _tool_command(_call_args(calls[0])) == [
+        "ruff",
+        "format",
+        "--check",
+        "--",
+        "adforge_core",
+        ".opencode/tools",
+    ]
+    assert calls[0]["timeout"] == 17
+    assert calls[0]["cwd"] == str(tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("mode", "expected_command"),
+    [
+        ("check", ["ruff", "check", "--", "."]),
+        ("format-check", ["ruff", "format", "--check", "--", "."]),
+        ("format", ["ruff", "format", "--", "."]),
+    ],
+)
+def test_run_explicit_ruff_routes_each_mode_once_with_default_target(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    mode: str,
+    expected_command: list[str],
+):
+    """Explicit modes use exactly one separator-protected Ruff invocation."""
+
+    calls: list[list[str]] = []
+
+    def fake_run(args, **kwargs):
+        calls.append(list(args))
+        return _completed_process(list(args), stdout="All checks passed\n")
+
+    monkeypatch.setattr(run_linters_tool.subprocess, "run", fake_run)
+
+    result = run_linters_tool.run_explicit_ruff(mode, None, 17, str(tmp_path))
+
+    assert result.success is True
+    assert [_tool_command(call) for call in calls] == [expected_command]
+    assert "--fix" not in calls[0]
+
+
+@pytest.mark.parametrize(
+    ("argv", "message"),
+    [
+        (["--target-paths-json", '["adforge_core"]'], "targetPaths requires mode"),
+        (["--mode", "check", "--target-dir", "adforge_core"], "mode conflicts with targetDir"),
+        (["--mode", "format", "--no-auto-fix"], "mode conflicts with autoFix"),
+        (["--mode", "check", "--linters", "mypy"], "linters must be ruff"),
+        (["--mode", "check", "--target-paths-json", "{"], "targetPaths must be valid JSON"),
+    ],
+)
+def test_main_rejects_explicit_transport_conflicts_before_linter_dispatch(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    argv: list[str],
+    message: str,
+):
+    """Invalid explicit transports report their field and never call the runner."""
+
+    def fail_run_linters(**kwargs):
+        raise AssertionError("run_linters must not receive invalid CLI input")
+
+    monkeypatch.setattr(run_linters_tool, "run_linters", fail_run_linters)
+    monkeypatch.setattr(run_linters_tool.sys, "argv", ["run_linters.py", *argv])
+
+    assert run_linters_tool.main() == 2
+    assert message in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(
+    ("mode", "target_paths", "message"),
+    [
+        ("format", ["../outside"], "unique canonical paths"),
+        ("invalid", ["adforge_core"], "mode must be check"),
+        ("check", [], "non-empty bounded array"),
+        ("check", ["adforge_core//runtime"], "unique canonical paths"),
+        ("check", ["-unsafe"], "unsafe path"),
+    ],
+)
+def test_run_explicit_ruff_rejects_invalid_mode_or_target_paths(
+    mode: str, target_paths: list[str], message: str, tmp_path: Path
+):
+    """Explicit Ruff mode fails locally without attempting a subprocess for unsafe input."""
+
+    result = run_linters_tool.run_explicit_ruff(mode, target_paths, 17, str(tmp_path))
+
+    assert result.success is False
+    assert result.error_message is not None
+    assert message in result.error_message

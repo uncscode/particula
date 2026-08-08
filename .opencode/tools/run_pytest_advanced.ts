@@ -240,20 +240,78 @@ const validateTestPathWithinRepo = (
 };
 
 const COVERAGE_PYTEST_ARG_PATTERN = /^(--cov(?:=|\b)|--cov-report(?:=|\b)|--cov-fail-under(?:=|\b)|--cov-config(?:=|\b)|--cov-context(?:=|\b))/;
+const PYTEST_VALUE_OPTIONS = new Set(["-k", "-m"]);
+const PYTEST_STANDALONE_OPTIONS = new Set(["--collect-only", "-q", "-v", "--verbose"]);
+const PYTEST_RESERVED_PREFIXES = [
+  "--output", "--min-tests", "--timeout", "--cwd", "--test-path", "--test-filter",
+  "--coverage", "--no-coverage", "--coverage-source", "--coverage-threshold", "--cov-report",
+  "--fail-fast", "--durations", "--durations-min", "--pytest-argv-json", "--override-ini-json",
+  "--override-ini", "--test-paths-json",
+];
+const MAX_TEST_PATHS = 7;
+
+const validatePytestArgs = (value: unknown, cwd: string | undefined): { ok: true; value: string[] } | { ok: false; error: string } => {
+  if (value === undefined) return { ok: true, value: [] };
+  if (!Array.isArray(value) || value.some((entry) => typeof entry !== "string")) {
+    return { ok: false, error: "ERROR: pytestArgs must be an array of strings." };
+  }
+  for (let index = 0; index < value.length; index += 1) {
+    const token = value[index] as string;
+    if (token === "--" || COVERAGE_PYTEST_ARG_PATTERN.test(token) || PYTEST_RESERVED_PREFIXES.some((prefix) => token.startsWith(prefix))) {
+      return { ok: false, error: `ERROR: pytestArgs token '${token}' is not permitted.` };
+    }
+    if (PYTEST_STANDALONE_OPTIONS.has(token) || (/^--tb=(short|long|line|native|no)$/).test(token)) continue;
+    if (token.startsWith("--override-ini=") || token === "-o") {
+      return { ok: false, error: `ERROR: pytestArgs token '${token}' is not permitted.` };
+    }
+    if (PYTEST_VALUE_OPTIONS.has(token)) {
+      const option = value[index + 1];
+      if (typeof option !== "string" || option.startsWith("-") || !option) return { ok: false, error: `ERROR: pytestArgs token '${token}' has an invalid value.` };
+      index += 1;
+      continue;
+    }
+    if (token.startsWith("-") || path.isAbsolute(token) || validatePathWithinRepo(token, "pytestArgs", cwd)) return { ok: false, error: `ERROR: pytestArgs token '${token}' is not permitted.` };
+  }
+  return { ok: true, value: value as string[] };
+};
+
+const validateStringArray = (value: unknown, name: string): { ok: true; value: string[] } | { ok: false; error: string } => {
+  if (value === undefined) return { ok: true, value: [] };
+  if (!Array.isArray(value) || value.some((entry) => typeof entry !== "string")) return { ok: false, error: `ERROR: ${name} must be an array of strings.` };
+  if (value.length > 0) {
+    return { ok: false, error: "ERROR: overrideIni controls are not permitted." };
+  }
+  return { ok: true, value: value as string[] };
+};
+
+const validateTestPaths = (
+  value: unknown,
+  cwd: string | undefined,
+): { ok: true; value: string[] } | { ok: false; error: string } => {
+  if (!Array.isArray(value) || value.length === 0) return { ok: false, error: "ERROR: testPaths must be a non-empty array of strings." };
+  if (value.length > MAX_TEST_PATHS) return { ok: false, error: `ERROR: testPaths must contain at most ${MAX_TEST_PATHS} entries.` };
+  for (let index = 0; index < value.length; index += 1) {
+    const target = value[index];
+    const label = `testPaths[${index}]`;
+    if (typeof target !== "string" || !target || target.startsWith("-")) return { ok: false, error: `ERROR: ${label} must be a non-empty repository-relative target.` };
+    const pathPart = target.split("::", 2)[0];
+    if (pathPart.includes("\\") || path.isAbsolute(pathPart) || pathPart.split("/").some((part) => !part || part === "." || part === "..")) return { ok: false, error: `ERROR: ${label} must be a canonical relative POSIX target.` };
+    const pathError = validatePathWithinRepo(pathPart, label, cwd);
+    if (pathError) return { ok: false, error: pathError };
+  }
+  return { ok: true, value: value as string[] };
+};
 
 const getCoverageRepoRoot = (cwd: string | undefined): string => {
-  if (cwd) {
-    return realpathSync(cwd);
-  }
-
-  let current = realpathSync(process.cwd());
+  const requestedRoot = realpathSync(cwd ?? process.cwd());
+  let current = requestedRoot;
   while (true) {
     if (existsSync(path.join(current, "pyproject.toml")) || existsSync(path.join(current, ".git"))) {
       return current;
     }
     const parent = path.dirname(current);
     if (parent === current) {
-      return realpathSync(process.cwd());
+      return requestedRoot;
     }
     current = parent;
   }
@@ -263,8 +321,24 @@ const validateCoverageSourceEntry = (
   source: string,
   cwd: string | undefined,
 ): string | undefined => {
-  if (!source.includes("/") && !source.includes("\\") && !source.startsWith(".") && !source.endsWith(".py")) {
+  if (source.includes("\\")) {
+    return `ERROR: coverageSource must be a relative POSIX path: ${source}`;
+  }
+  if (source.endsWith(".txt")) {
+    return `ERROR: coverageSource has an unsupported file suffix: ${source}`;
+  }
+  const isPath = source.includes("/") || source.startsWith(".") || source.endsWith(".py");
+  if (!isPath && /^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$/.test(source)) {
     return undefined;
+  }
+  if (!isPath) return `ERROR: coverageSource is not a valid module or path: ${source}`;
+  if (path.isAbsolute(source)) {
+    return `ERROR: coverageSource must be a relative POSIX path: ${source}`;
+  }
+
+  const suffix = path.posix.extname(source);
+  if (suffix && suffix !== ".py") {
+    return `ERROR: coverageSource has an unsupported file suffix: ${source}`;
   }
 
   const repoRoot = getCoverageRepoRoot(cwd);
@@ -272,6 +346,9 @@ const validateCoverageSourceEntry = (
   const rel = path.relative(repoRoot, resolved);
   if (rel.startsWith("..") || path.isAbsolute(rel)) {
     return `ERROR: coverageSource must stay within the repository/worktree root: ${source}`;
+  }
+  if (source.split("/").some((part) => !part || part === "." || part === "..")) {
+    return `ERROR: coverageSource has noncanonical path components: ${source}`;
   }
   return undefined;
 };
@@ -320,7 +397,7 @@ const appendRoutineTargeting = (
   const testPath = typeof args.testPath === "string" ? args.testPath.trim() : undefined;
 
   if (testFilter) {
-    cmdParts.push("-k", testFilter);
+    cmdParts.push(`--test-filter=${testFilter}`);
   }
   if (testPath) {
     if (testPath.startsWith("-")) {
@@ -330,13 +407,13 @@ const appendRoutineTargeting = (
     if (testPathError) {
       return testPathError;
     }
-    cmdParts.push(testPath);
+    cmdParts.push(`--test-path=${testPath}`);
   }
 
   return undefined;
 };
 
-const executePytestCommand = async (cmdParts: (string | number)[]): Promise<string> => {
+const executePytestCommand = async (cmdParts: (string | number)[], outputMode: OutputMode): Promise<string> => {
   try {
     const result = await Bun.$`${cmdParts}`.text();
     return result || "Pytest completed but returned no output.";
@@ -364,12 +441,18 @@ const executePytestCommand = async (cmdParts: (string | number)[]): Promise<stri
       if (stdout.includes("VALIDATION: FAILED") || stdout.trimStart().startsWith("ERROR:")) {
         return stdout;
       }
-      return `ERROR: Failed to run pytest: subprocess exited unexpectedly and stdout did not report failure semantics. ${stdout}`;
+      return outputMode === "json"
+        ? JSON.stringify({ success: false, outcome: { classification: "runner", reason: "pytest runner returned an invalid failure envelope", phase: "pre_spawn" } })
+        : "ERROR: Failed to run pytest: subprocess exited unexpectedly and stdout did not report failure semantics.";
     }
     if (stderr.trim()) {
-      return `ERROR: Failed to run pytest: ${stderr}`;
+      return outputMode === "json"
+        ? JSON.stringify({ success: false, outcome: { classification: "runner", reason: "pytest runner failed without a valid failure envelope", phase: "pre_spawn" } })
+        : `ERROR: Failed to run pytest: ${stderr}`;
     }
-    return `ERROR: Failed to run pytest: ${message}`;
+    return outputMode === "json"
+      ? JSON.stringify({ success: false, outcome: { classification: "runner", reason: "pytest runner failed without a valid failure envelope", phase: "pre_spawn" } })
+      : "ERROR: Failed to run pytest.";
   }
 };
 
@@ -388,12 +471,6 @@ const parseCoverageSources = (
         error: "ERROR: coverageSource must not contain empty comma-separated entries.",
       };
     }
-    if (path.isAbsolute(trimmed)) {
-      return {
-        ok: false,
-        error: `ERROR: coverageSource must not contain absolute paths: ${trimmed}`,
-      };
-    }
     const scopeError = validateCoverageSourceEntry(trimmed, cwd);
     if (scopeError) {
       return { ok: false, error: scopeError };
@@ -402,6 +479,9 @@ const parseCoverageSources = (
   }
 
   if (sources.some((source) => source.toLowerCase() === "all")) {
+    if (sources.length !== 1) {
+      return { ok: false, error: "ERROR: coverageSource 'all' must be the sole source." };
+    }
     return { ok: true, sources: [] };
   }
 
@@ -411,13 +491,14 @@ const parseCoverageSources = (
 // --- Tool definition ---
 
 export default tool({
-  description: "Run pytest with advanced controls (coverage, durations, override-ini, passthrough args).",
+  description: "Run pytest with advanced controls and a validated ordered pytest argv suffix.",
   args: {
     minTests: tool.schema.number().optional(),
     timeout: tool.schema.number().optional(),
     cwd: tool.schema.string().optional(),
     options: tool.schema.string().optional(),
     testPath: tool.schema.string().optional(),
+    testPaths: tool.schema.array(tool.schema.string()).optional(),
     pytestArgs: tool.schema.array(tool.schema.string()).optional(),
     coverage: tool.schema.boolean().optional(),
     coverageSource: tool.schema.string().optional(),
@@ -452,6 +533,15 @@ export default tool({
       return cwdError;
     }
 
+    const rawArgs = args as Record<string, unknown>;
+    if (Object.hasOwn(rawArgs, "testPath") && Object.hasOwn(rawArgs, "testPaths")) {
+      return "ERROR: testPath and testPaths cannot be combined.";
+    }
+    const testPathsResult = Object.hasOwn(rawArgs, "testPaths")
+      ? validateTestPaths(rawArgs.testPaths, getRoutineArgs(rawArgs, parsedOptions.options).cwd)
+      : { ok: true as const, value: [] as string[] };
+    if (!testPathsResult.ok) return testPathsResult.error;
+
     const cmdParts = buildBasePytestCommand(args as Record<string, unknown>, parsedOptions.options);
     const targetingError = appendRoutineTargeting(
       cmdParts,
@@ -461,28 +551,30 @@ export default tool({
     if (targetingError) {
       return targetingError;
     }
+    if (testPathsResult.value.length > 0) cmdParts.push(`--test-paths-json=${JSON.stringify(testPathsResult.value)}`);
 
     const coverage = args.coverage !== false;
     const cwd = getRoutineArgs(args as Record<string, unknown>, parsedOptions.options).cwd;
-    const coverageSource = typeof args.coverageSource === "string" ? args.coverageSource.trim() : "";
     const coverageThreshold = args.coverageThreshold;
-    const covReport = parsedOptions.options.covReport ?? (Array.isArray(args.covReport)
-      ? (args.covReport as string[]).map((entry) => entry.trim()).filter(Boolean)
-      : []);
     const durations = parsedOptions.options.durations ?? args.durations;
     const durationsMin = parsedOptions.options.durationsMin ?? args.durationsMin;
-    const overrideIni = Array.isArray(args.overrideIni)
-      ? (args.overrideIni as string[]).map((entry) => entry.trim()).filter(Boolean)
-      : [];
-    const pytestArgs = Array.isArray(args.pytestArgs)
-      ? (args.pytestArgs as string[]).map((entry) => String(entry).trim()).filter(Boolean)
-      : [];
+    const overrideIniResult = validateStringArray(args.overrideIni, "overrideIni");
+    if (!overrideIniResult.ok) return overrideIniResult.error;
+    const pytestArgsResult = validatePytestArgs(args.pytestArgs, cwd);
+    if (!pytestArgsResult.ok) return pytestArgsResult.error;
+    const overrideIni = overrideIniResult.value;
+    const pytestArgs = pytestArgsResult.value;
 
-    if (!coverage && pytestArgs.some((entry) => COVERAGE_PYTEST_ARG_PATTERN.test(entry))) {
-      return "ERROR: coverage-related pytest arguments are not allowed when coverage is disabled";
+    if (pytestArgs.includes("--collect-only") && args.coverage !== false) {
+      return "ERROR: --collect-only requires coverage: false.";
     }
 
     if (coverage) {
+      const coverageSource = typeof args.coverageSource === "string" ? args.coverageSource.trim() : "";
+      const covReport = parsedOptions.options.covReport ?? (Array.isArray(args.covReport)
+        ? (args.covReport as string[]).map((entry) => entry.trim()).filter(Boolean)
+        : []);
+
       cmdParts.push("--coverage");
       if (coverageSource && coverageSource !== "all") {
         const parsedCoverageSources = parseCoverageSources(coverageSource, cwd);
@@ -498,10 +590,18 @@ export default tool({
         cmdParts.push(`--cov-report=${covReport.join(",")}`);
       }
     } else {
+      if (
+        typeof args.coverageSource === "string"
+        || args.coverageThreshold !== undefined
+        || parsedOptions.options.covReport !== undefined
+        || (Array.isArray(args.covReport) && args.covReport.length > 0)
+      ) {
+        return "ERROR: coverage-specific controls are not allowed when coverage is disabled.";
+      }
       cmdParts.push("--no-coverage");
     }
 
-    if (coverageThreshold !== undefined) {
+    if (coverage && coverageThreshold !== undefined) {
       const thresholdError = validateNonNegativeFiniteNumber("coverageThreshold", coverageThreshold);
       if (thresholdError) {
         return thresholdError;
@@ -524,14 +624,9 @@ export default tool({
       }
     }
 
-    for (const entry of overrideIni) {
-      cmdParts.push(`--override-ini=${entry}`);
-    }
+    if (overrideIni.length > 0) cmdParts.push(`--override-ini-json=${JSON.stringify(overrideIni)}`);
+    if (pytestArgs.length > 0) cmdParts.push(`--pytest-argv-json=${JSON.stringify(pytestArgs)}`);
 
-    if (pytestArgs.length > 0) {
-      cmdParts.push(...pytestArgs);
-    }
-
-    return executePytestCommand(cmdParts);
+    return executePytestCommand(cmdParts, getRoutineArgs(args as Record<string, unknown>, parsedOptions.options).outputMode);
   },
 });

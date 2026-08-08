@@ -9,55 +9,73 @@ import {
 } from "../adw_notes_shared";
 
 describe("adw_notes_shared helpers", () => {
-  it("filters nullish and blank-key field entries while preserving order", () => {
+  it("accepts ordered duplicate entries and nullable allowlisted values", () => {
     expect(
-      parseFieldEntries([[" first ", "one"], null, { key: "second", value: "two" }] as any),
+      parseFieldEntries([
+        ["plan_summary", "# First\n\nMarkdown"],
+        { key: "architecture_notes", value: null },
+        ["plan_summary", "second"],
+        { key: "review_findings", value: null },
+      ] as any),
     ).toEqual({
       ok: true,
       entries: [
-        ["first", "one"],
-        ["second", "two"],
+        ["plan_summary", "# First\n\nMarkdown"],
+        ["architecture_notes", null],
+        ["plan_summary", "second"],
+        ["review_findings", null],
       ],
     });
   });
 
   it("returns structured diagnostics for malformed field entries", () => {
-    expect(parseFieldEntries([["ok", 1]] as any)).toEqual({
+    expect(parseFieldEntries([["plan_summary", 1]] as any)).toEqual({
       ok: false,
       diagnostic: "invalid fields entry at index 0: value has wrong type number",
     });
   });
 
   it("accepts plain-object and JSON-string field payloads", () => {
-    expect(parseFieldEntries({ first: "one", second: "two" } as any)).toEqual({
+    expect(parseFieldEntries({ plan_summary: "one", discovered_context: "two" } as any)).toEqual({
       ok: true,
       entries: [
-        ["first", "one"],
-        ["second", "two"],
+        ["plan_summary", "one"],
+        ["discovered_context", "two"],
       ],
     });
 
-    expect(parseFieldEntries('[{"key":"first","value":"one"},["second","two"]]')).toEqual({
+    expect(parseFieldEntries('[{"key":"plan_summary","value":"one"},["review_findings",null]]')).toEqual({
       ok: true,
       entries: [
-        ["first", "one"],
-        ["second", "two"],
+        ["plan_summary", "one"],
+        ["review_findings", null],
       ],
     });
   });
 
   it("fails closed for malformed non-null tuple/object entries", () => {
-    expect(parseFieldEntries([["ok", "one", "extra"]] as any)).toEqual({
+    expect(parseFieldEntries([["plan_summary", "one", "extra"]] as any)).toEqual({
       ok: false,
       diagnostic: "invalid fields entry at index 0: tuple must contain exactly [key, value]",
     });
-    expect(parseFieldEntries([{ key: "ok" }] as any)).toEqual({
+    expect(parseFieldEntries([{ key: "plan_summary" }] as any)).toEqual({
       ok: false,
       diagnostic: "invalid fields entry at index 0: value is missing",
     });
-    expect(parseFieldEntries([{ key: "ok", value: null }] as any)).toEqual({
+    expect(parseFieldEntries([{ key: "plan_summary", value: null }] as any)).toEqual({
+    ok: false,
+    diagnostic: 'invalid fields entry at index 0: key "plan_summary" does not allow null',
+  });
+  });
+
+  it("rejects unallowlisted keys in all supported forms", () => {
+    expect(parseFieldEntries([["unknown", "value"]] as any)).toEqual({
       ok: false,
-      diagnostic: "invalid fields entry at index 0: value is null",
+      diagnostic: 'invalid fields entry at index 0: key "unknown" is not allowlisted',
+    });
+    expect(parseFieldEntries({ unknown: "value" } as any)).toEqual({
+      ok: false,
+      diagnostic: 'invalid fields object key "unknown": key "unknown" is not allowlisted',
     });
   });
 

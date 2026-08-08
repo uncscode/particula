@@ -126,7 +126,7 @@ For each plan ID from `review_plan_ids`, resolve canonical section files via:
 adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "options": "json",
+  "json": true,
   "cwd": worktree_path
 })
 ```

@@ -53,7 +53,7 @@ input: $ARGUMENTS
 
 - @.opencode/guides/code_style.md - Coding conventions
 - @.opencode/guides/testing_guide.md - Testing and plan-quality expectations
-- `adw_plans_read({"command": "list-sections", "plan_id": "{plan_id}", "options": "json", "cwd": worktree_path})` - scoped section discovery source
+- `adw_plans_read({"command": "list-sections", "plan_id": "{plan_id}", "json": true, "cwd": worktree_path})` - scoped section discovery source
 - @.opencode/guides/code_culture.md - 100 LOC rule and slicing expectations
 - @.opencode/guides/phase-sizing-rules.md - canonical XS/S/M/L/XL sizing behavior
 
@@ -116,7 +116,7 @@ For each plan ID from `review_plan_ids`, resolve canonical section files via:
 adw_plans_read({
   "command": "list-sections",
   "plan_id": "{plan_id}",
-  "options": "json",
+  "json": true,
   "cwd": worktree_path
 })
 ```

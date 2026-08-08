@@ -6,8 +6,11 @@
  */
 
 import { tool } from "@opencode-ai/plugin";
+import { existsSync, realpathSync } from "node:fs";
+import { resolve, relative } from "node:path";
 
 type OutputMode = "summary" | "full" | "json";
+type LinterMode = "check" | "format-check" | "format";
 
 type ParsedLinterOptions = {
   outputMode?: OutputMode;
@@ -16,6 +19,47 @@ type ParsedLinterOptions = {
 
 const OUTPUT_MODES = new Set<OutputMode>(["summary", "full", "json"]);
 const SUPPORTED_LINTERS = new Set(["ruff", "mypy"]);
+const LINTER_MODES = new Set<LinterMode>(["check", "format-check", "format"]);
+// Keep these transport limits in parity with the trusted Python runner and runtime adapter.
+const MAX_TARGET_PATHS = 64;
+const MAX_TARGET_PATH_BYTES = 1024;
+const MAX_TARGET_PATHS_JSON_BYTES = 8192;
+
+function validateTargetPaths(value: unknown): { ok: true; paths: string[] } | { ok: false; error: string } {
+  if (!Array.isArray(value) || value.length === 0 || value.length > MAX_TARGET_PATHS) {
+    return { ok: false, error: "ERROR: targetPaths must be a non-empty bounded array of strings." };
+  }
+  const seen = new Set<string>();
+  for (const path of value) {
+    if (typeof path !== "string" || !path || path.trim() !== path || path.startsWith("-") ||
+      path.startsWith("/") || path.includes("\\") || path.split("/").includes("..") ||
+      path.split("/").includes(".") || path.split("/").includes("") ||
+      Buffer.byteLength(path, "utf8") > MAX_TARGET_PATH_BYTES || seen.has(path)) {
+      return { ok: false, error: "ERROR: targetPaths contains an invalid repository-relative path." };
+    }
+    const root = realpathSync.native(resolve(process.cwd()));
+    const resolved = resolve(root, path);
+    if (relative(root, resolved).startsWith("..")) {
+      return { ok: false, error: "ERROR: targetPaths must stay within the repository root." };
+    }
+    let prefix = root;
+    for (const part of path.split("/")) {
+      prefix = resolve(prefix, part);
+      if (existsSync(prefix)) {
+        prefix = realpathSync.native(prefix);
+        if (relative(root, prefix).startsWith("..")) {
+          return { ok: false, error: "ERROR: targetPaths must stay within the repository root." };
+        }
+      }
+    }
+    seen.add(path);
+  }
+  const encoded = JSON.stringify(value);
+  if (Buffer.byteLength(encoded, "utf8") > MAX_TARGET_PATHS_JSON_BYTES) {
+    return { ok: false, error: "ERROR: targetPaths compact JSON transport exceeds its byte limit." };
+  }
+  return { ok: true, paths: [...value] };
+}
 
 function parseLinterOptions(rawOptions: unknown):
   | { ok: true; options: ParsedLinterOptions }
@@ -113,10 +157,18 @@ export default tool({
       .boolean()
       .optional()
       .describe("Automatically fix issues where possible (default: true). When false, runs validation-only Ruff checking without formatting or fixes."),
+    confirmed: tool.schema
+      .boolean()
+      .optional()
+      .describe("Explicit confirmation required before a mutating format or auto-fix request is dispatched."),
     targetDir: tool.schema
       .string()
       .optional()
       .describe("Target directory to lint. If omitted, uses pyproject.toml config (lints from project root)."),
+    mode: tool.schema.enum(["check", "format-check", "format"]).optional()
+      .describe("Explicit Ruff-only mode: check, format-check, or confirmed format."),
+    targetPaths: tool.schema.array(tool.schema.string()).optional()
+      .describe("Ordered repository-relative Ruff targets for an explicit mode."),
     ruffTimeout: tool.schema
       .number()
       .optional()
@@ -136,9 +188,23 @@ export default tool({
       return parsedOptions.error;
     }
 
+    const mode = args.mode as LinterMode | undefined;
+    if (mode !== undefined && !LINTER_MODES.has(mode)) return "ERROR: mode must be check, format-check, or format.";
+    if (args.targetPaths !== undefined && mode === undefined) return "ERROR: targetPaths requires mode.";
+    // A false autoFix value may be materialized by schema handling even when the
+    // caller omitted the legacy selector. It is compatible with explicit modes;
+    // true remains an unambiguous conflicting mutating legacy request.
+    if (mode !== undefined && args.autoFix === true) return "ERROR: mode conflicts with autoFix.";
+    if (mode !== undefined && args.targetDir !== undefined) return "ERROR: mode conflicts with targetDir.";
+    if (args.targetPaths !== undefined && args.targetDir !== undefined) return "ERROR: targetPaths conflicts with targetDir.";
+    const targetPaths = args.targetPaths === undefined ? undefined : validateTargetPaths(args.targetPaths);
+    if (targetPaths && !targetPaths.ok) return targetPaths.error;
     const outputMode = parsedOptions.options.outputMode || "summary";
     const autoFix = args.autoFix !== false; // Default to true
-    const linters = parsedOptions.options.linters || ["ruff", "mypy"]; // Match CI workflow
+    const linters = parsedOptions.options.linters || (mode ? ["ruff"] : ["ruff", "mypy"]);
+    if (mode && (linters.length !== 1 || linters[0] !== "ruff")) {
+      return "ERROR: mode requires linters=ruff or omitted linters.";
+    }
     const targetDir = args.targetDir;
     const ruffTimeout = args.ruffTimeout ?? 120;
     const mypyTimeout = args.mypyTimeout ?? 180;
@@ -149,6 +215,9 @@ export default tool({
 
     if (!Number.isFinite(mypyTimeout) || mypyTimeout <= 0) {
       return `ERROR: mypyTimeout must be positive (received ${mypyTimeout}).`;
+    }
+    if ((mode === "format" || (mode === undefined && autoFix)) && args.confirmed !== true) {
+      return "ERROR: explicit confirmation is required before mutating lint execution.";
     }
 
     // Build command
@@ -166,7 +235,10 @@ export default tool({
       cmdParts.push(`--target-dir=${targetDir}`);
     }
 
-    if (autoFix) {
+    if (mode) {
+      cmdParts.push(`--mode=${mode}`);
+      if (targetPaths) cmdParts.push(`--target-paths-json=${JSON.stringify(targetPaths.paths)}`);
+    } else if (autoFix) {
       cmdParts.push("--auto-fix");
     } else {
       cmdParts.push("--no-auto-fix");

@@ -70,16 +70,18 @@ describe("build_mkdocs wrapper family", () => {
     expect(getInvocations()).toHaveLength(0);
   });
 
-  it("always keeps validate wrapper in validate-only mode", async () => {
+  it("always keeps validate wrapper in strict validate-only mode", async () => {
     const execute = await loadToolExecute("../../build_mkdocs_validate.ts");
 
-    const result = await execute({ options: "output=full strict" });
+    const result = await execute({ options: "output=full clean=false" });
     expect(result).toBe("ok");
 
     const cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
     expect(cmd).toContain("--validate-only");
     expect(cmd).toContain("--output=full");
     expect(cmd).toContain("--strict");
+    expect(cmd).toContain("--timeout=300");
+    expect(cmd).toContain("--no-clean");
   });
 
   it("returns explicit timeout messaging for validate wrapper failures", async () => {
@@ -90,29 +92,45 @@ describe("build_mkdocs wrapper family", () => {
 
     assertContains(String(result), "ERROR: MkDocs validation timed out");
     assertContains(String(result), "exceeded the wrapper timeout after 120 seconds");
-    assertContains(String(result), "defaults to 120 seconds");
+    assertContains(String(result), "defaults to 300 seconds");
   });
 
   it("does not mislabel ordinary validate-wrapper success output as timeout guidance", async () => {
     const execute = await loadToolExecute("../../build_mkdocs_validate.ts");
     setDollarText("MKDOCS BUILD SUMMARY\nStatus: PASSED");
 
-    const result = await execute({ options: "strict" });
+    const result = await execute({});
 
     expect(result).toBe("MKDOCS BUILD SUMMARY\nStatus: PASSED");
     expect(String(result)).not.toContain("timed out");
   });
 
-  it("forwards strict mode while keeping its failure semantics explicit", async () => {
+  it("always forwards strict mode while keeping its failure semantics explicit", async () => {
     const execute = await loadToolExecute("../../build_mkdocs_validate.ts");
     setDollarError(buildDollarFailure({ stderr: "strict mode enabled: warnings are treated as failures" }));
 
-    const result = await execute({ options: "strict" });
+    const result = await execute({});
 
     assertContains(String(result), "ERROR: MkDocs build failed");
     assertContains(String(result), "strict mode enabled: warnings are treated as failures");
     const cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
     expect(cmd).toContain("--strict");
+  });
+
+  it("returns parseable bounded JSON for validate-wrapper failures in JSON mode", async () => {
+    const execute = await loadToolExecute("../../build_mkdocs_validate.ts");
+    setDollarError(
+      buildDollarFailure({
+        stdout: JSON.stringify({ outcome: "failure", error: `token=secret ${"x".repeat(5000)}` }),
+        stderr: "",
+      }),
+    );
+
+    const result = String(await execute({ options: "output=json" }));
+    const payload = JSON.parse(result);
+    expect(payload.outcome).toBe("failure");
+    expect(result.length).toBeLessThanOrEqual(4000);
+    expect(result).not.toContain("secret");
   });
 
   it("build wrapper omits validate-only flag and rejects unsupported options", async () => {
@@ -132,6 +150,8 @@ describe("build_mkdocs wrapper family", () => {
     const validateExecute = await loadToolExecute("../../build_mkdocs_validate.ts");
 
     expect(await validateExecute({ options: "output=full output=json" })).toContain("duplicate token");
+    expect(await validateExecute({ options: "strict" })).toContain("requires a non-empty");
+    expect(await validateExecute({ options: "strict=true" })).toContain("not supported");
     expect(await validateExecute({ options: "unknown=1" })).toContain("not supported");
     expect(getInvocations()).toHaveLength(0);
   });
@@ -140,6 +160,9 @@ describe("build_mkdocs wrapper family", () => {
     const execute = await loadToolExecute("../../build_mkdocs_validate.ts");
 
     expect(await execute({ timeout: 0 })).toContain("finite positive number");
+    expect(await execute({ timeout: Number.NaN })).toContain("finite positive number");
+    expect(await execute({ timeout: Infinity })).toContain("finite positive number");
+    expect(await execute({ timeout: 300.001 })).toContain("no greater than 300");
     const outsideResult = await execute({ cwd: tmpdir() });
     assertErrorPrefix(String(outsideResult), "ERROR:");
     expect(String(outsideResult)).toContain(`cwd path resolves outside repository root: ${tmpdir()}`);
@@ -152,11 +175,7 @@ describe("build_mkdocs wrapper family", () => {
 
     const result = await execute({});
 
-    expect(result).toBe(
-      "ERROR: MkDocs validation timed out\n\n" +
-        "diagnostic: mkdocs validation exceeded the wrapper timeout after 120.5 seconds\n" +
-        "hint: build_mkdocs_validate defaults to 120 seconds; pass a larger direct timeout for slow validations.",
-    );
+    expect(result).toContain("ERROR: MkDocs validation timed out");
   });
 
   it("rejects cwd file paths before subprocess execution", async () => {
