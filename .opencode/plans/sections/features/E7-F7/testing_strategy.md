@@ -55,7 +55,16 @@ must maintain at least 80% coverage.
   is the installed-Warp baseline; CUDA rows are optional and skip cleanly.
   Assertions use `rtol=1e-12` and documented `atol` declarations and keep
   parity, conservation, and open accounting separate.
-- **P7:** Run strict documentation build and any contract/example regressions.
+- **P7 (shipped, #1513):** Documentation-contract, link/anchor, and plan-state
+  coverage is in `particula/execution/tests/gpu_resident_session_docs_test.py`.
+  The completed publication evidence is limited to the passed focused commands:
+  ```bash
+  pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror
+  pytest particula/tests/execution_selection_docs_test.py -q -Werror
+  mkdocs build --strict
+  ```
+  No runnable example was added; E7-F9 owns complete-loop publication. E7-F8
+  retains per-box scheduled RNG policy ownership.
 
 ## Invariants and Tolerances
 

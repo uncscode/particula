@@ -269,7 +269,11 @@ def test_communication_feature_documentation_preserves_direct_and_resident_contr
         "no fused direct-gas `new_volume` argument",
         "communication first stages with old volumes",
         "invalidates saturation only",
-        "Validated empty or disabled maps and unchanged-volume evolution are successful write-free no-ops.",
+        "required only when its matching open endpoint is enabled",
+        "At the standalone direct-kernel boundaries, validated empty or disabled maps and unchanged final volumes are successful write-free no-ops.",
+        "Resident composition has its own barrier validation and does not make this general no-op guarantee.",
+        "`volume_evolution_step_gpu` is independently callable at its standalone direct-kernel boundary.",
+        "Its use in resident composition is the optional scheduled barrier",
         "exact population match",
         "ascending pre-step free slot",
         "Capacity is deterministically gated",
@@ -307,6 +311,9 @@ def test_communication_roadmap_and_architecture_documentation_preserve_boundarie
     for phrase in (
         "E7-F7/T7 is shipped",
         "concrete-only, caller-owned, explicitly synchronized",
+        "enabled open-source or open-sink edges additionally require",
+        "Direct-boundary empty/disabled maps and unchanged final volumes are write-free no-ops",
+        "resident barriers instead follow their own composition and validation rules.",
         "CFD, pressure/velocity solvers, adaptive meshes",
         "E7-F8 owns scheduled RNG policy while E7-F9 owns complete-loop publication.",
     ):
@@ -317,8 +324,9 @@ def test_communication_roadmap_and_architecture_documentation_preserve_boundarie
         "amount = concentration * volume",
         "new_concentration = final_amount / new_volume",
         "no hidden transfer, synchronization, or CPU fallback",
-        "their matching `(B, S)` accounting ledger",
+        "each enabled open source/sink endpoint additionally requires",
         "Validated empty or disabled maps are write-free no-ops",
+        "`volume_evolution_step_gpu` is independently callable",
     ):
         if phrase not in guide_text:
             pytest.fail(f"architecture guide is missing: {phrase}")
@@ -326,7 +334,8 @@ def test_communication_roadmap_and_architecture_documentation_preserve_boundarie
         "Normal steps validate only that identity and metadata",
         "communication with pre-update volumes before optional prescribed volume evolution",
         "The barriers invalidate saturation ratio only",
-        "Validated empty or disabled maps and unchanged-volume evolution are write-free no-ops.",
+        "Standalone direct-kernel empty or disabled maps and unchanged final volumes are write-free no-ops",
+        "resident barriers instead follow their own composition and validation rules.",
         "exact device; explicit restart creates fresh identities",
     ):
         if phrase not in reference_text:
@@ -355,9 +364,20 @@ def test_communication_documentation_links_and_anchors_resolve() -> None:
         _ROOT / ".opencode" / "guides" / "architecture_reference.md": (
             "architecture/decisions/ADR-018-resident-communication-integration.md",
         ),
+        _ROOT
+        / ".opencode"
+        / "guides"
+        / "architecture"
+        / "architecture_outline.md": (
+            "decisions/ADR-018-resident-communication-integration.md",
+        ),
     }
     for source, links in sources_and_links.items():
+        source_text = source.read_text(encoding="utf-8")
         for link in links:
+            assert f"]({link})" in source_text, (
+                f"{source}: missing source link {link}"
+            )
             target_text, _, anchor = link.partition("#")
             target = source.parent / target_text
             assert target.is_file(), f"{source}: missing link target {link}"
@@ -390,6 +410,8 @@ def test_e7_f7_plan_state_records_only_completed_publication_evidence() -> None:
     ).read_text(encoding="utf-8")
     assert plan["status"] == "Shipped"
     assert plan["lifecycle"] == "completed"
+    assert plan["completion_date"] == "2026-08-09"
+    assert plan["last_updated"] == "2026-08-09"
     assert [phase["status"] for phase in plan["phases"]] == ["Shipped"] * 7
     assert [phase["issue_number"] for phase in plan["phases"]] == list(
         range(1507, 1514)
@@ -410,6 +432,7 @@ def test_e7_f7_plan_state_records_only_completed_publication_evidence() -> None:
         "docs/Features/Roadmap/data-oriented-gpu.md",
         ".opencode/guides/architecture/architecture_guide.md",
         ".opencode/guides/architecture_reference.md",
+        ".opencode/guides/architecture/architecture_outline.md",
         "particula/execution/tests/gpu_resident_session_docs_test.py",
     ):
         assert path in phase_details

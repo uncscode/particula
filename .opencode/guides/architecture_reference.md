@@ -208,8 +208,9 @@ communication maps and open endpoints are not resident forms. See
 Acquisition pins maps, native work, and an optional final-volume sidecar once.
 Normal steps validate only that identity and metadata: they do not inspect map
 payloads, allocate, transfer, synchronize, restore, or replace resources.
-Validated empty or disabled maps and unchanged-volume evolution are write-free
-no-ops. Schema-v1 restart remains noncommunication; schema-v2 permits no family
+Standalone direct-kernel empty or disabled maps and unchanged final volumes are
+write-free no-ops; resident barriers instead follow their own composition and
+validation rules. Schema-v1 restart remains noncommunication; schema-v2 permits no family
 or one complete closed-map family. Both require an ACTIVE valid record and an
 exact device; explicit restart creates fresh identities and is never automatic,
 migratory, or rollback-capable.

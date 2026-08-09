@@ -1,7 +1,7 @@
 # Testing Guide
 
 **Project:** particula  
-**Last Updated:** 2026-07-26
+**Last Updated:** 2026-08-09
 
 particula uses pytest as its primary testing framework. Tests should be close to
 the code they validate and should exercise scientific correctness, edge cases,
@@ -68,9 +68,10 @@ pytest particula/activity/tests/activity_coefficients_test.py
 # Run a single test
 pytest particula/activity/tests/activity_coefficients_test.py::test_function_name
 
-# Match CI warning behavior
-pytest -Werror
 ```
+
+Local runs should not add `-Werror`; the repository's local test tooling
+already applies its configured warning policy.
 
 ## Marker Policy
 
@@ -94,8 +95,12 @@ Use the GPU-oriented markers to describe intent clearly:
 
 ## Warnings
 
-CI treats warnings as errors with `pytest -Werror`. Tests that pass locally may
-fail in CI if they emit `RuntimeWarning`, `DeprecationWarning`, or similar.
+CI/CD may explicitly add `-Werror` to enforce warnings as errors. Local runs
+should rely on the configured warning policy instead of passing `-Werror` on
+the command line. Test wrappers may intentionally reject that redundant
+passthrough flag. Tests that pass locally may still fail in CI if they emit a
+`RuntimeWarning`, `DeprecationWarning`, or similar warning outside the local
+policy.
 
 Preferred handling order:
 
@@ -181,26 +186,26 @@ release-validation commands:
 ```bash
 pytest particula/gpu/tests/cuda_availability_test.py -q
 pytest particula/gpu/kernels/tests/environment_test.py -q
-pytest particula/gpu/kernels/tests/thermodynamics_test.py -q -Werror
-pytest particula/gpu/kernels/tests/dilution_test.py -q -Werror
-pytest particula/gpu/kernels/tests/exhaustion_test.py -q -Werror
-pytest particula/gpu/kernels/tests/nucleation_test.py -q -Werror
-pytest particula/gpu/kernels/tests/slot_management_test.py -q -Werror
-pytest particula/gpu/kernels/tests/wall_loss_test.py particula/gpu/kernels/tests/wall_loss_parity_test.py -q -Werror
-pytest particula/gpu/kernels/tests/condensation_test.py -q -Werror
-pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity" -Werror
-pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda" -Werror
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -Werror
+pytest particula/gpu/kernels/tests/thermodynamics_test.py -q
+pytest particula/gpu/kernels/tests/dilution_test.py -q
+pytest particula/gpu/kernels/tests/exhaustion_test.py -q
+pytest particula/gpu/kernels/tests/nucleation_test.py -q
+pytest particula/gpu/kernels/tests/slot_management_test.py -q
+pytest particula/gpu/kernels/tests/wall_loss_test.py particula/gpu/kernels/tests/wall_loss_parity_test.py -q
+pytest particula/gpu/kernels/tests/condensation_test.py -q
+pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity"
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda"
+pytest particula/gpu/kernels/tests/coagulation_test.py -q
 # Validate private resident composition of shipped direct GPU boundaries.
-pytest particula/gpu/tests/process_sequence_test.py -q -Werror
+pytest particula/gpu/tests/process_sequence_test.py -q
 # Validate the published direct-GPU coagulation example and documentation.
-pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q -Werror
+pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q
 # Validate the explicit-transfer complete-process example.
-pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q -Werror
+pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q
 # Validate documentation links and the closeout projection without Warp or CUDA.
-pytest particula/tests/gpu_coagulation_docs_test.py -q -Werror
+pytest particula/tests/gpu_coagulation_docs_test.py -q
 # Validate the E6 complete-process publication and blocked closeout projection.
-pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q -Werror
+pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q
 ```
 
 Use CUDA-targeted runs only for optional local/manual validation when a
@@ -210,8 +215,8 @@ CUDA is absent:
 
 ```bash
 pytest particula/gpu/kernels/tests/environment_test.py -q -m "warp and cuda"
-pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda" -Werror
-pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and cuda" -Werror
+pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda"
+pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and cuda"
 ```
 
 For the full fixed-mask contract, see the
@@ -244,7 +249,7 @@ available:
 
 ```bash
 pytest particula/gpu/tests/process_sequence_test.py -q \
-  -m "warp and cuda" -Werror
+  -m "warp and cuda"
 ```
 
 ### Resident communication and checkpoint coverage
@@ -268,7 +273,7 @@ pytest particula/execution/tests/gpu_resources_test.py \
   particula/execution/tests/checkpoint_test.py \
   particula/execution/tests/process_graph_test.py \
   particula/execution/tests/resident_communication_test.py \
-  particula/execution/tests/scheduler_test.py -q -Werror
+  particula/execution/tests/scheduler_test.py -q
 ```
 
 `docs/Examples/gpu_complete_process_sequence.py` is a standalone, direct-Warp
@@ -365,7 +370,7 @@ Warp CPU is the baseline; CUDA parity is optional and must skip cleanly when
 unavailable. The complementary CPU contract evidence is:
 
 ```bash
-pytest particula/particles/tests/slot_management_test.py -q -Werror
+pytest particula/particles/tests/slot_management_test.py -q
 ```
 
 This tests the bounded direct-Warp boundary only, not a runnable, implicit
@@ -533,7 +538,7 @@ reference. The mass-precision baseline suite is the reference pattern:
 pytest particula/gpu/tests/mass_precision_cases_test.py -q
 ```
 
-Keep those tests warning-clean under `-Werror`, assert canonical
+Keep those tests warning-clean under the configured policy, assert canonical
 `(n_boxes, n_particles, n_species)` shapes where relevant, and document any
 baseline assumptions in the matching roadmap page.
 
@@ -549,7 +554,7 @@ focused local runs such as:
 
 ```bash
 pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate or conservation" -Werror
+pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate or conservation"
 ```
 
 These checks are intended for seeded regression and warning-clean acceptance
@@ -572,7 +577,9 @@ sanity, not for exact CPU/CUDA equality or user-facing feature documentation.
   `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py --collect-only -q`.
 - If imports fail, install the package in development mode with `pip install -e .[dev]`.
 - If coverage looks wrong, run `pytest --cov=particula --cov-report=term`.
-- If CI fails but local tests pass, rerun locally with `pytest -Werror`.
+- If CI fails but local tests pass, inspect the CI warning and compare it with
+  the configured local warning policy; do not add `-Werror` to local wrapper
+  arguments.
 - If Warp is not installed, Warp-marked suites may skip through
   `pytest.importorskip("warp")`; treat that as the expected missing-Warp path,
   not a regression.

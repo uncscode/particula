@@ -314,7 +314,7 @@ closed-map GAS or PARTICLES family and rejects combined or open forms.
 Direct callers own the same-device fixed-shape primaries, maps, and work
 storage. Gas communication uses caller-owned `(B, S)` `amounts`,
 `amount_deltas`, and `outbound_amounts` `wp.float64` ledgers; a `(B, S)` source
-or sink ledger is required when its corresponding open endpoint exists.
+or sink ledger is required only when its matching open endpoint is enabled.
 Particle transport uses `(B, N)` debit/credit ledgers and `(E, N)` assignment
 and request buffers. Optional final volumes are caller-owned `(B,)`
 `wp.float64` values. Successful direct calls are asynchronous, so callers must
@@ -339,8 +339,10 @@ resize, compaction, implicit activation, or clipping.
 
 Host/schema preflight rejects without primary or buffer mutation. During device
 planning, documented work or planning buffers may change while primaries remain
-gated; rollback is not promised after a writer launches. Validated empty or
-disabled maps and unchanged-volume evolution are successful write-free no-ops.
+gated; rollback is not promised after a writer launches. At the standalone
+direct-kernel boundaries, validated empty or disabled maps and unchanged final
+volumes are successful write-free no-ops. Resident composition has its own
+barrier validation and does not make this general no-op guarantee.
 Invalid map, schema, domain, alias, or device inputs, aggregate gas overdraw,
 and required-but-missing open ledgers reject before primary commit.
 
@@ -356,8 +358,10 @@ thermodynamic coordinator refreshes stale state in vapor-pressure-then-
 saturation order immediately before condensation or diagnostics consumer
 callbacks. Environment invalidates vapor pressure and saturation; gas,
 communication, volume evolution, condensation, and nucleation invalidate
-saturation. Prescribed volume evolution is limited to the optional resident
-barrier; transport, mixing, and advection remain outside this boundary.
+saturation. `volume_evolution_step_gpu` is independently callable at its
+standalone direct-kernel boundary. Its use in resident composition is the
+optional scheduled barrier; transport, mixing, and advection remain outside
+this boundary.
 
 Normal steps do not convert or transfer data, synchronize, restore, checkpoint,
 finalize, restart, acquire or replace resources, fall back to CPU, retry, resize,

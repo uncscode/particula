@@ -453,7 +453,8 @@ private helpers for cross-kernel setup.
    writer launches, makes no hidden transfers, and does not promise rollback
    after a launched writer.
 - `communication.py` - Concrete-only, direct-import, Warp-dependent E7-F7 P2
-   final-volume evolution writer and P4 particle-transport seam.
+   final-volume evolution writer, P3 gas-communication seam, and P4
+   particle-transport seam.
    `volume_evolution_step_gpu` accepts only a
   caller-owned active-device contiguous `wp.float64` final-volume array of
   shape `(B,)` in m³. After complete schema, domain, nonaliasing, factor, and
@@ -464,8 +465,23 @@ private helpers for cross-kernel setup.
   unchanged, while rollback is not promised after an asynchronous writer
   launches. It has no package export, hidden transfer or synchronization, CPU
    fallback, map declaration, transport, scheduler/session binding, resizing,
-   or `Runnable` behavior. `ParticleCommunicationBuffers` and
-   `particle_communication_step_gpu` are likewise concrete-only and accept
+   or `Runnable` behavior. `GasCommunicationBuffers` and
+   `gas_communication_step_gpu` are concrete-only direct imports. The gas seam
+   stages immutable pre-step `amount = concentration * volume` ledgers and
+   makes one primary commit,
+   `gas.concentration = (amounts + amount_deltas) / volume`; it does
+   not accept or fuse a final-volume update. It accepts prescribed GAS maps,
+   including enabled declared `-1` open source/sink endpoints only when their
+   matching caller-owned `(B, S)` accounting ledgers are supplied. Its caller-owned
+   `(B, S)` amount, delta, and outbound ledgers make closed-map extensive
+   conservation and open-boundary inventory changes explicit. Host/schema
+   preflight preserves primaries, although documented ledgers may change during
+   device planning; no rollback is promised after a writer launches. Direct
+   callers retain same-device ownership and synchronize explicitly. It has no
+   hidden transfer, CPU fallback, volume evolution, particle transport,
+   scheduler/session binding, resizing, or package export.
+   `ParticleCommunicationBuffers` and `particle_communication_step_gpu` are
+   likewise concrete-only and accept
    prescribed closed, in-domain `PARTICLES` maps only. P4 plans immutable
    pre-call state, reuses exact destination populations or reserves ascending
    pre-step free slots, then performs one gated commit. It preserves weighted
@@ -474,9 +490,12 @@ private helpers for cross-kernel setup.
    scheduling/resident integration, or RNG is provided. P1 remains separately
    owned by `particula.execution.communication`; P3 retains gas-transfer
    admission, P4 retains particle-plan admission, and P5 retains resident
-   binding. See
+   binding. Resident composition separately pins only one complete closed GAS
+   or PARTICLES family, dispatches communication using old volumes before
+   optional volume evolution, and rejects direct-only open GAS endpoints. See
    [ADR-016](decisions/ADR-016-direct-gpu-volume-evolution-boundary.md) and
-   [ADR-017](decisions/ADR-017-direct-gpu-particle-transport-boundary.md).
+   [ADR-017](decisions/ADR-017-direct-gpu-particle-transport-boundary.md), and
+   [ADR-018](decisions/ADR-018-resident-communication-integration.md).
 - `environment.py` - Shared private normalization and validation for kernel
   environment inputs
 - `tests/` - Test coverage

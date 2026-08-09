@@ -1592,8 +1592,9 @@ and independent from a resident scheduler.
 Resident composition pins exactly one complete closed GAS or PARTICLES family,
 its native work, and optional final volumes by identity. Normal steps validate
 only identity and metadata, run communication before volume evolution using old
-volumes, and invalidate saturation only. Empty/disabled maps and unchanged
-volumes are validated write-free no-ops. See the
+volumes, and invalidate saturation only. Direct-boundary empty/disabled maps
+and unchanged final volumes are write-free no-ops; resident barriers instead
+follow their own composition and validation rules. See the
 [Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
 guide for the amount equations, capacity gating, and checkpoint boundary.
 

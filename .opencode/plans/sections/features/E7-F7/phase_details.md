@@ -107,7 +107,8 @@
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`,
     `.opencode/guides/architecture/architecture_guide.md`,
-    `.opencode/guides/architecture_reference.md`, and
+     `.opencode/guides/architecture_reference.md`,
+     `.opencode/guides/architecture/architecture_outline.md`, and
     `particula/execution/tests/gpu_resident_session_docs_test.py`.
   - Tests: Passed `pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror`,
     `pytest particula/tests/execution_selection_docs_test.py -q -Werror`, and

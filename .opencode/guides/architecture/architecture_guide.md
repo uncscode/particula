@@ -192,7 +192,9 @@
   metadata/identity validation; it neither reacquires nor scans payloads.
   Combined maps and open `-1` endpoints are not resident forms. The executor
   dispatches gas or particle communication using pre-update volumes, then calls
-  prescribed volume evolution only when final volumes are pinned. Both barriers
+  prescribed volume evolution only when final volumes are pinned. The standalone
+  `volume_evolution_step_gpu` is independently callable; this resident use is
+  an optional scheduled barrier with separate composition rules. Both barriers
    invalidate `SATURATION_RATIO` only, leaving vapor pressure fresh. This seam
    has no package or top-level export and no transfer, synchronization, fallback,
    retry, or rollback behavior. See
@@ -432,9 +434,9 @@ kernel-entry responsibilities.
   `particles.volume` and particle/gas concentrations by
   `old_volume / final_volume`, and preserves extensive particle-number, mass,
   charge, and gas inventories. It leaves masses, charge, density, and gas
-  metadata untouched. Equal final volumes are write-free no-ops; rejected calls
-  leave caller-owned state unchanged, but rollback is not promised after an
-  asynchronous writer launches.
+  metadata untouched. At this standalone direct boundary, equal final volumes
+  are write-free no-ops; rejected calls leave caller-owned state unchanged, but
+  rollback is not promised after an asynchronous writer launches.
 - This isolated writer does not create or consume communication maps, perform
   transfer admission or particle transport, bind a resident session or scheduler,
   transfer or synchronize host data, fall back to CPU, resize/compact storage, or
@@ -454,7 +456,7 @@ kernel-entry responsibilities.
   At this direct boundary, `new_volume` is the unchanged current volume; there
   is no fused direct-gas `new_volume` argument or volume-evolution operation.
 - Caller-owned `(B, S)` amount, delta, and outbound work arrays are required;
-  declared open source/sink endpoints additionally require their matching
+  each enabled open source/sink endpoint additionally requires its matching
   `(B, S)` accounting ledger. Closed maps conserve extensive amounts within
   floating-point tolerance, while open ledger entries make inventory changes
   explicit.

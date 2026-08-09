@@ -1,26 +1,27 @@
 # Documentation Updates
 
-- Update `docs/Features/Roadmap/data-oriented-gpu.md` Track T7 status and retain
-  the boundary between prescribed maps and full CFD coupling.
-- Update `docs/Features/data-containers-and-gpu-foundations.md` with volume
-  authority, communication ownership, supported map/representation table,
-  fixed-capacity behavior, and explicit transfer/synchronization rules.
-- Add or update an E7 execution guide under `.opencode/guides/` describing map
-  construction, scheduler ordering, derived-state invalidation, failure
-  boundaries, and checkpoint/restart responsibilities.
-- Document equations for amount-ledger transport and expansion:
+- [x] Updated `docs/Features/Roadmap/data-oriented-gpu.md` Track T7 to shipped
+  prescribed-map and optional-volume-evolution status while retaining the full
+  CFD boundary.
+- [x] Updated `docs/Features/data-containers-and-gpu-foundations.md` with
+  volume authority, direct/resident communication ownership, supported map
+  forms, fixed-capacity behavior, and explicit transfer/synchronization rules.
+- [x] Updated `.opencode/guides/architecture/architecture_guide.md` and
+  `.opencode/guides/architecture_reference.md` with map construction,
+  scheduler ordering, saturation-only invalidation, failure boundaries, and
+  checkpoint/restart responsibilities.
+- [x] Documented amount-ledger transport and expansion equations:
   `amount = concentration * volume` and
   `new_concentration = final_amount / new_volume`.
-- Document particle slot semantics, matching/free-slot rules, capacity errors,
-  conservation diagnostics, and unsupported representation combinations.
-- Document Warp CPU validation as routine evidence and CUDA as optional evidence;
-  avoid performance or exact cross-device replay claims.
-- Add a focused prescribed 1D communication/expansion example only if it can be
-  kept runnable and regression-tested without absorbing E7-F9's complete-loop
-  example ownership.
-- Update `.opencode/plans/sections/features/E7-F7/` with shipped phase status,
-  resolved decisions, exact files, tolerances, and reproduction commands as
-  implementation lands.
+- [x] Documented particle slot semantics, matching/free-slot rules, capacity
+  gating, conservation diagnostics, and unsupported representation combinations.
+- [x] Recorded Warp CPU as routine evidence and CUDA as optional evidence; no
+  performance or exact cross-device replay claim was added.
+- [x] No focused runnable communication/expansion example was added; E7-F9
+  retains complete-loop example and publication ownership.
+- [x] Reconciled `.opencode/plans/sections/features/E7-F7/` with shipped phase
+  status, resolved decisions, exact files, tolerances, and passed reproduction
+  commands.
 - P1 (#1507) updated the structured plan only. No user-facing documentation or
   exports were added because `particula.execution.communication` is a
   concrete-only validation seam; its module and API docstrings record the
@@ -49,10 +50,13 @@
   delivered test-only independent NumPy `float64` multi-box parity and
   conservation evidence in this structured plan.
 - [x] P7 (#1513) published the feature page, T7 roadmap status, and E7
-  architecture/reference guidance. It documents direct open-ledger gas
-  accounting, closed fixed-slot particle transport, separate volume evolution,
-  resident closed-family ordering, exact-device fresh-identity restart, and
-  deferred scope. It adds focused documentation-contract/link/plan-state tests.
+  architecture/reference guidance, including
+  `.opencode/guides/architecture/architecture_outline.md` and its
+  [ADR-018](../../../../guides/architecture/decisions/ADR-018-resident-communication-integration.md)
+  reference. It documents direct open-ledger gas accounting, closed fixed-slot
+  particle transport, separate standalone volume evolution, resident
+  closed-family ordering, exact-device fresh-identity restart, and deferred
+  scope. It adds focused documentation-contract/link/plan-state tests.
   No runnable example was added because E7-F9 owns complete-loop publication.
 - [x] Passed `pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror`,
   `pytest particula/tests/execution_selection_docs_test.py -q -Werror`, and
