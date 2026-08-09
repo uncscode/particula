@@ -51,13 +51,14 @@
   below, not a resident loop or scheduler. The exact downstream ordering is
   `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`: E7-F6 owns availability,
   fallback, error taxonomy, API stability, and export policy. The
-  dependency-neutral `scheduler` remains declaration-only; E7-F5 P6 separately
-   provides a bounded concrete resident complete-loop composer. E7-F7 P1 now
-   provides only a concrete communication-map declaration/read-only validation
-   seam; its later volume-write, transfer-admission, transport, and resident
-   binding phases remain deferred. E7-F8 detailed RNG-stream policy, implicit
-   transfer/synchronization, retry, broad fallback, and replacement of direct
-   GPU APIs also remain deferred.
+   dependency-neutral `scheduler` remains declaration-only; E7-F5 P6 separately
+    provides a bounded concrete resident complete-loop composer. E7-F7 P1
+    remains the concrete communication-map declaration/read-only validation
+    seam, while the separate direct-Warp P2 final-volume writer is now shipped
+    at `particula.gpu.kernels.communication`. P3+ retain transfer admission,
+    transport, and resident binding. E7-F8 detailed RNG-stream policy, implicit
+    transfer/synchronization, retry, broad fallback, and replacement of direct
+    GPU APIs also remain deferred.
 - `particula.execution.fallback` is the sole concrete, direct-import-only E7-F6
   P3 opt-in CPU fallback boundary. Its default `RAISE` policy re-raises the
   exact eligible typed availability/support failure. Explicit CPU policy may
@@ -175,9 +176,10 @@
   fixed-schema nonaliasing. It writes no caller-owned or resident array and
   copies no payload; empty and all-disabled maps remain successful write-free
   cases after complete applicable preflight. Because P1 has neither source
-  inventory nor time-step input, it cannot validate population-dependent
-  outbound overdraw: P3 owns that atomic pre-writer check. P2 owns volume
-  writes, P4 owns particle transport, and P5 owns exact resident
+   inventory nor time-step input, it cannot validate population-dependent
+   outbound overdraw: P3 owns that atomic pre-writer check. The separate GPU
+   kernel P2 owns final-volume writes, P4 owns particle transport, and P5 owns
+   exact resident
   primary/sidecar alias checks. The module provides no transfer,
   synchronization, fallback, or scheduling behavior and is not exported through
   `particula.execution` or top-level `particula`.
@@ -395,7 +397,32 @@ kernel-entry responsibilities.
   or hidden CPU↔GPU transfer; after a writer launches, rollback is not
   promised. This direct boundary does not establish resizing, compaction,
   hidden fallback, or a higher-level runnable API. See
-  [ADR-002](decisions/ADR-002-gpu-fixed-slot-activation-boundary.md).
+   [ADR-002](decisions/ADR-002-gpu-fixed-slot-activation-boundary.md).
+
+### Direct GPU volume-evolution boundary
+
+- `particula.gpu.kernels.communication` provides the concrete-only,
+  direct-import, Warp-dependent E7-F7 P2 final-volume evolution writer:
+  `volume_evolution_step_gpu`. It is deliberately absent from
+  `particula.gpu.kernels`, `particula.gpu`, and top-level exports.
+- It accepts caller-owned, active-device contiguous `wp.float64` final volumes
+  shaped `(B,)` in m³. Complete read-only preflight validates the primary
+  container schemas, domains, device ownership, byte-range nonaliasing, volume
+  factors, and proposed concentration scaling before an apply writer launches.
+- On success it returns the identical particle and gas containers, updates only
+  `particles.volume` and particle/gas concentrations by
+  `old_volume / final_volume`, and preserves extensive particle-number, mass,
+  charge, and gas inventories. It leaves masses, charge, density, and gas
+  metadata untouched. Equal final volumes are write-free no-ops; rejected calls
+  leave caller-owned state unchanged, but rollback is not promised after an
+  asynchronous writer launches.
+- This isolated writer does not create or consume communication maps, perform
+  transfer admission or particle transport, bind a resident session or scheduler,
+  transfer or synchronize host data, fall back to CPU, resize/compact storage, or
+  provide a `Runnable`. P1 map declaration and read-only validation remain
+  exclusively in `particula.execution.communication`; P3+ own transport and
+  other communication phases. See
+  [ADR-016](decisions/ADR-016-direct-gpu-volume-evolution-boundary.md).
 
 ### Direct GPU nucleation boundary
 

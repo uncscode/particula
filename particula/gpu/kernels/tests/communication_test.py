@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import inspect
+import sys
 from types import SimpleNamespace
 
 import numpy as np
@@ -199,7 +201,7 @@ def test_zero_boxes_are_a_write_free_no_op() -> None:
 def test_unchanged_volumes_are_write_free(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Complete preflight without launching an apply writer for equal volumes."""
+    """Keep equal-volume calls write-free while preserving state."""
     wp = _warp()
     from particula.gpu.kernels import communication
 
@@ -207,16 +209,14 @@ def test_unchanged_volumes_are_write_free(
         np.array([2.0]), np.array([[3.0, 0.0]]), np.array([[4.0]])
     )
     final = wp.array([2.0], dtype=wp.float64, device="cpu")
+    launches = []
     original_launch = communication.wp.launch
 
-    def guarded_launch(kernel, *args, **kwargs):
-        assert kernel not in (
-            communication._apply_volume_evolution,
-            communication._apply_scaled_concentration,
-        )
+    def record_launch(kernel, *args, **kwargs):
+        launches.append(kernel)
         return original_launch(kernel, *args, **kwargs)
 
-    monkeypatch.setattr(communication.wp, "launch", guarded_launch)
+    monkeypatch.setattr(communication.wp, "launch", record_launch)
     before = (
         particles.volume.numpy().copy(),
         particles.concentration.numpy().copy(),
@@ -229,8 +229,10 @@ def test_unchanged_volumes_are_write_free(
 
 
 @pytest.mark.parametrize("bad", [0.0, -1.0, np.inf, np.nan])
-def test_invalid_final_volumes_reject_without_mutation(bad: float) -> None:
-    """Reject invalid final-volume domains before applying a writer."""
+def test_invalid_final_volumes_gate_writers_without_mutation(
+    bad: float,
+) -> None:
+    """Invalid device domains suppress writers without a host status readback."""
     wp = _warp()
     from particula.gpu.kernels.communication import volume_evolution_step_gpu
 
@@ -243,8 +245,7 @@ def test_invalid_final_volumes_reject_without_mutation(bad: float) -> None:
         particles.concentration.numpy().copy(),
         gas.concentration.numpy().copy(),
     )
-    with pytest.raises(ValueError, match="finite positive"):
-        volume_evolution_step_gpu(particles, gas, final)
+    volume_evolution_step_gpu(particles, gas, final)
     npt.assert_array_equal(particles.volume.numpy(), before[0])
     npt.assert_array_equal(particles.concentration.numpy(), before[1])
     npt.assert_array_equal(gas.concentration.numpy(), before[2])
@@ -262,28 +263,26 @@ def test_final_volume_alias_rejects_before_mutation() -> None:
 
 
 @pytest.mark.parametrize(
-    ("old_volume", "final_volume", "concentration", "message"),
+    ("old_volume", "final_volume", "concentration"),
     [
-        (0.0, 1.0, 2.0, "finite positive"),
-        (1.0, 1.0, -2.0, "finite and nonnegative"),
-        (1.0, 1.0, np.nan, "finite and nonnegative"),
+        (0.0, 1.0, 2.0),
+        (1.0, 1.0, -2.0),
+        (1.0, 1.0, np.nan),
         (
             np.nextafter(0.0, 1.0),
             np.finfo(np.float64).max,
             2.0,
-            "factor",
         ),
-        (1.0, np.finfo(np.float64).max, np.nextafter(0.0, 1.0), "underflow"),
-        (2.0, 1.0, np.finfo(np.float64).max, "underflow"),
+        (1.0, np.finfo(np.float64).max, np.nextafter(0.0, 1.0)),
+        (2.0, 1.0, np.finfo(np.float64).max),
     ],
 )
 def test_invalid_preflight_preserves_all_mutable_state(
     old_volume: float,
     final_volume: float,
     concentration: float,
-    message: str,
 ) -> None:
-    """Reject invalid domains and unsafe products before mutating containers."""
+    """Invalid device values leave mutable containers unchanged."""
     wp = _warp()
     from particula.gpu.kernels.communication import volume_evolution_step_gpu
 
@@ -299,12 +298,54 @@ def test_invalid_preflight_preserves_all_mutable_state(
         gas.concentration.numpy().copy(),
     )
 
-    with pytest.raises(ValueError, match=message):
-        volume_evolution_step_gpu(particles, gas, final)
+    volume_evolution_step_gpu(particles, gas, final)
 
     npt.assert_array_equal(particles.volume.numpy(), before[0])
     npt.assert_array_equal(particles.concentration.numpy(), before[1])
     npt.assert_array_equal(gas.concentration.numpy(), before[2])
+
+
+def test_factor_first_scaling_accepts_representable_result() -> None:
+    """Avoid an overflowing concentration-times-volume intermediate."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import volume_evolution_step_gpu
+
+    largest = np.finfo(np.float64).max
+    particles, gas = _containers(
+        np.array([largest]), np.array([[2.0, 3.0]]), np.array([[4.0]])
+    )
+    final = wp.array([largest], dtype=wp.float64, device="cpu")
+
+    volume_evolution_step_gpu(particles, gas, final)
+
+    npt.assert_array_equal(particles.concentration.numpy(), [[2.0, 3.0]])
+    npt.assert_array_equal(gas.concentration.numpy(), [[4.0]])
+
+
+def test_direct_path_has_no_host_status_readback_or_synchronization(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Keep validation and writer gating resident on the active device."""
+    wp = _warp()
+    from particula.gpu.kernels import communication
+
+    particles, gas = _containers(
+        np.array([1.0]), np.array([[2.0, 3.0]]), np.array([[4.0]])
+    )
+    final = wp.array([2.0], dtype=wp.float64, device="cpu")
+
+    def reject_synchronization(*_args, **_kwargs):
+        raise AssertionError("direct path must not synchronize")
+
+    monkeypatch.setattr(communication.wp, "synchronize", reject_synchronization)
+    communication.volume_evolution_step_gpu(particles, gas, final)
+
+    source = inspect.getsource(communication.volume_evolution_step_gpu)
+    helpers = inspect.getsource(communication._scan_1d) + inspect.getsource(
+        communication._scan_2d
+    )
+    assert ".numpy(" not in source + helpers
+    assert "synchronize(" not in source + helpers
 
 
 def test_schema_and_missing_field_fail_before_mutation() -> None:
@@ -435,3 +476,55 @@ def test_private_schema_helpers_reject_non_warp_and_invalid_storage() -> None:
     malformed.capacity = 0
     with pytest.raises(ValueError, match="capacity"):
         communication._array_range(malformed, "value")
+
+    malformed.shape = (sys.maxsize, 2)
+    malformed.strides = (16, 8)
+    malformed.capacity = sys.maxsize
+    with pytest.raises(ValueError, match="safe address range"):
+        communication._array_range(malformed, "value")
+
+
+def test_private_schema_helpers_cover_shape_device_and_empty_scan_paths(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Reject schema mismatches and skip launches for empty one-dimensional data."""
+    wp = _warp()
+    from particula.gpu.kernels import communication
+
+    values = wp.array([1.0], dtype=wp.float64, device="cpu")
+    with pytest.raises(ValueError, match="shape"):
+        communication._validate_array(
+            values, "value", wp.float64, 1, shape=(2,)
+        )
+    with pytest.raises(ValueError, match="device"):
+        communication._validate_array(
+            values, "value", wp.float64, 1, device="different-device"
+        )
+
+    launches = []
+    monkeypatch.setattr(
+        communication.wp,
+        "launch",
+        lambda *args, **kwargs: launches.append((args, kwargs)),
+    )
+    communication._scan_1d(
+        wp.empty(0, dtype=wp.float64, device="cpu"),
+        communication._scan_positive_finite,
+        wp.zeros(1, dtype=wp.int32, device="cpu"),
+    )
+    assert launches == []
+
+
+def test_gas_box_count_mismatch_rejects_before_mutation() -> None:
+    """Reject gas concentration storage with a different number of boxes."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import volume_evolution_step_gpu
+
+    particles, gas = _containers(
+        np.array([1.0]), np.array([[2.0, 3.0]]), np.array([[4.0]])
+    )
+    gas.concentration = wp.array([[4.0], [5.0]], dtype=wp.float64, device="cpu")
+    final = wp.array([2.0], dtype=wp.float64, device="cpu")
+
+    with pytest.raises(ValueError, match="shape"):
+        volume_evolution_step_gpu(particles, gas, final)

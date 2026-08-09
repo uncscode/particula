@@ -32,14 +32,16 @@ GPU-resident lifecycle below; it does not ship a resident loop or scheduler.
 The exact downstream ordering remains
   `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`; E7-F6 owns availability,
   fallback, error taxonomy, API stability, and export policy. The
-  dependency-neutral `scheduler` remains declaration-only, while E7-F5 P6 adds
-   a bounded concrete resident complete-loop composer. E7-F7 P1 ships only the
-   concrete communication-map declaration and read-only validation boundary;
-   its P2--P5 volume writes, inventory/time-step transfer admission, particle
-   transport, and resident binding remain deferred. E7-F8 detailed RNG-stream
-   policy also remains deferred, along with implicit transfer/synchronization,
-   retry, broad fallback, and replacement of direct GPU APIs. The sole shipped
-   fallback seam is the explicit, CPU-authoritative,
+   dependency-neutral `scheduler` remains declaration-only, while E7-F5 P6 adds
+    a bounded concrete resident complete-loop composer. E7-F7 P1 remains the
+    concrete communication-map declaration and read-only validation boundary.
+    E7-F7 P2 separately ships the concrete-only direct-Warp final-volume writer
+    at `particula.gpu.kernels.communication`; it neither binds nor changes P1.
+    P3+ retain inventory/time-step transfer admission, particle transport, and
+    resident binding. E7-F8 detailed RNG-stream policy also remains deferred,
+    along with implicit transfer/synchronization, retry, broad fallback, and
+    replacement of direct GPU APIs. The sole shipped fallback seam is the
+    explicit, CPU-authoritative,
   direct-import-only boundary described below.
 
 ### particula/execution/
@@ -236,8 +238,9 @@ The exact downstream ordering remains
   nor resident state and copies no payload. Empty and all-disabled maps still
   receive complete applicable preflight and are write-free on success. P1 has no
   source-inventory or time-step input, so P3—not this module—must atomically
-  reject population-dependent outbound overdraw before writers launch. P2 owns
-  volume writes, P4 owns particle transport, and P5 owns exact resident
+   reject population-dependent outbound overdraw before writers launch. The
+   separate GPU-kernel P2 owns final-volume writes; P4 owns particle transport,
+   and P5 owns exact resident
   primary/sidecar binding and alias checks. This module has no transfer,
   synchronization, fallback, scheduling, or package/top-level export.
 - `thermodynamic_updates.py` - Concrete-only, direct-import Warp-resident
@@ -430,9 +433,23 @@ private helpers for cross-kernel setup.
   `activate_slots_gpu` maps selected request prefixes to ascending
   fixed-capacity free slots. It reads and writes only caller-owned mass,
   concentration, and charge storage; its activation and diagnostics sidecars
-  are caller-owned device `int32` arrays. P4 completes preflight before its
-  writer launches, makes no hidden transfers, and does not promise rollback
-  after a launched writer.
+   are caller-owned device `int32` arrays. P4 completes preflight before its
+   writer launches, makes no hidden transfers, and does not promise rollback
+   after a launched writer.
+- `communication.py` - Concrete-only, direct-import, Warp-dependent E7-F7 P2
+  final-volume evolution writer. `volume_evolution_step_gpu` accepts only a
+  caller-owned active-device contiguous `wp.float64` final-volume array of
+  shape `(B,)` in m³. After complete schema, domain, nonaliasing, factor, and
+  scaled-concentration safety preflight, it mutates only `particles.volume` and
+  particle/gas concentration by `old_volume / final_volume`, preserving
+  extensive inventory and all container/array identities. Equal final volumes
+  are a write-free no-op; rejection before an apply writer leaves caller state
+  unchanged, while rollback is not promised after an asynchronous writer
+  launches. It has no package export, hidden transfer or synchronization, CPU
+   fallback, map declaration, transport, scheduler/session binding, resizing,
+   or `Runnable` behavior. P1 remains separately owned by
+   `particula.execution.communication`; P3+ retain transfer and transport work.
+   See [ADR-016](decisions/ADR-016-direct-gpu-volume-evolution-boundary.md).
 - `environment.py` - Shared private normalization and validation for kernel
   environment inputs
 - `tests/` - Test coverage

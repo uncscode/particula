@@ -13,10 +13,14 @@ must maintain at least 80% coverage.
   preflight identity retention. It also records the deliberate P3 handoff:
   P1 receives neither resident population nor `time_step` and does not validate
   population-dependent outbound overdraw.
-- **P2:** Compare Warp volume normalization with an independent NumPy amount
-  oracle for expansion, compression, unchanged volume, multiple boxes/species,
-  sparse slots, and extreme valid values. Assert masses, density, charge,
-  shapes, and identities remain unchanged.
+- **P2 (shipped, #1508):**
+  `particula/gpu/kernels/tests/communication_test.py` covers the direct
+  device-resident volume operation with expansion/compression, mixed box
+  factors, unchanged-volume write-free behavior, identity/protected-state
+  preservation, particle/gas extensive-inventory invariants, and rejection of
+  invalid schemas, aliases, domains, overflow, and underflow before mutation.
+  The operation remains direct-kernel-only; it does not claim transport or
+  scheduler/session behavior.
 - **P3:** Test one-way advection, symmetric mixing, chains, arbitrary box pairs,
   physical inverse-time rates integrated over varied `time_step` values,
   edge-order permutations, closed-ledger gas conservation, and declared open

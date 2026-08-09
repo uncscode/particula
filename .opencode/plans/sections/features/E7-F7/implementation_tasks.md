@@ -23,10 +23,14 @@
 
 ## GPU Kernels
 
-- [ ] Add `particula/gpu/kernels/communication.py` with staged amount-ledger,
-  volume-normalization, gas-transfer, and particle-plan/commit kernels.
-- [ ] Validate all caller-owned arrays, aliases, devices, dtypes, ranks, values,
-  outbound sums, and destination capacity before any state commit.
+- [x] Add `particula/gpu/kernels/communication.py` with the direct,
+  device-resident P2 volume-normalization operation (E7-F7-P2, #1508).
+- [x] Validate P2 caller-owned final volumes and particle/gas primary storage
+  for schemas, devices, aliases, finite physical domains, and safe scaling
+  before its apply writer launches (E7-F7-P2, #1508).
+- [ ] Add staged amount-ledger gas-transfer and particle-plan/commit kernels.
+- [ ] Validate P3/P4 outbound sums and destination capacity before any state
+  commit.
 - [ ] Keep source reads synchronous by staging from pre-node state; do not make
   results depend on edge declaration order.
 - [ ] Preserve container/array identities and fixed dimensions across successful
@@ -35,15 +39,16 @@
   source/sink accounting without host readback in the normal path.
 - [ ] Preserve per-particle species mass and charge during slot transport and use
   deterministic matching/free-slot selection without resize or compaction.
-- [ ] Ensure empty maps, disabled edges, and unchanged volumes are write-free
-  after complete validation.
+- [x] Ensure unchanged P2 volumes are write-free after complete validation
+  (E7-F7-P2, #1508).
 
 ## Tooling / Tests
 
 - [x] Add `particula/execution/tests/communication_test.py` for P1 declaration
   and validation contracts (E7-F7-P1, #1507).
-- [ ] Add `particula/gpu/kernels/tests/communication_test.py` for volume, gas,
-  particle, capacity, atomicity, identity, and no-op behavior.
+- [x] Add `particula/gpu/kernels/tests/communication_test.py` for P2 volume,
+  particle/gas inventory, rejection atomicity, identity, and no-op behavior
+  (E7-F7-P2, #1508).
 - [ ] Add scheduler/session tests for canonical order, resource reuse, no hidden
   transfer/sync, checkpoint/restart, capability errors, and fault transitions.
 - [ ] Add independent NumPy `float64` oracles in

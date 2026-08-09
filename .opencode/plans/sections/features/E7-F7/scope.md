@@ -1,9 +1,10 @@
 # Scope
 
 E7-F7 supplies the opt-in, prescribed communication layer for E7's resident
-single-device multi-box loop. It operates on fixed-capacity state owned by the
-E7-F4 session and is invoked as explicit E7-F5 scheduler nodes under E7-F6
-capability and failure policy.
+single-device multi-box loop. Its shipped P2 primitive is an isolated direct
+device-resident operation over caller-owned fixed-capacity particle/gas state;
+later phases may place proven communication operations in E7-F5 scheduler nodes
+under E7-F6 capability and failure policy.
 
 ## In Scope
 
@@ -15,7 +16,8 @@ capability and failure policy.
   deliberately defers population-dependent outbound-overdraw and destination
   capacity checks to the writer phases that receive source inventory and time.
 - Prescribed per-box positive volume updates owned by `ParticleData.volume`,
-  including concentration renormalization for expansion/compression.
+  including shipped direct P2 concentration renormalization for
+  expansion/compression and retention of protected fields and identities.
 - Conservative gas advection and simple mixing using extensive amount ledgers.
 - Fixed-capacity particle transport that preserves per-particle mass/species and
   charge state, transfers concentration/count, and fails before commit when the

@@ -6,9 +6,11 @@
   demand remains a P3 criterion because P1 has no inventory or time-step input.
 - [ ] Empty or disabled maps preserve independent-box behavior and perform no
   communication write after validation.
-- [ ] Prescribed positive per-box volume changes update `particles.volume` by
-  identity and conserve particle/gas extensive inventory through concentration
-  renormalization.
+- [x] P2 (#1508) accepts validated positive same-device final `(B,)`
+  `wp.float64` volumes, updates `particles.volume` by identity, and conserves
+  particle/gas extensive inventory through `old_volume / final_volume`
+  concentration renormalization. It rejects invalid schema/alias/domain or
+  unsafe scale inputs before mutation, and equal-volume calls are write-free.
 - [ ] Gas advection and simple mixing are synchronous, edge-order independent,
   and match an independent NumPy reference.
 - [ ] Particle transport preserves population, species mass, and charge for

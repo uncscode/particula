@@ -962,9 +962,14 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   type `"ResidentSession"`, ACTIVE state, complete valid payloads, and an
   exactly equal `Device` restart. E7-F5 scheduling is shipped as this
   concrete-only bounded contract. `ParticleData.volume` remains fixed resident
-  state; E7-F7 owns transport, mixing/advection, and volume evolution. E7-F8
-  owns detailed scheduled RNG/restart policy, and E7-F9 owns final diagnostics,
-  complete examples, and closeout.
+  scheduler state. E7-F7-P2 provides the isolated concrete-only direct import
+  `particula.gpu.kernels.communication.volume_evolution_step_gpu`: callers pass
+  active-device final `(B,)` `wp.float64` volumes in m^3, and it scales particle
+  and gas concentrations in place to preserve extensive inventories. It has no
+  scheduler integration, transport/mixing/advection, hidden transfer,
+  synchronization, CPU fallback, resizing, or package/top-level export.
+  E7-F8 owns detailed scheduled RNG/restart policy, and E7-F9 owns final
+  diagnostics, complete examples, and closeout.
 
 Focused commands:
 

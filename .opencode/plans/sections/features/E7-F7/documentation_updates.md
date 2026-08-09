@@ -24,5 +24,9 @@
 - P1 (#1507) updated the structured plan only. No user-facing documentation or
   exports were added because `particula.execution.communication` is a
   concrete-only validation seam; its module and API docstrings record the
-  read-only and P3-overdraw handoff boundaries.
+   read-only and P3-overdraw handoff boundaries.
+- P2 (#1508) likewise added no user-facing documentation or export. Its
+  concrete-module docstring records the direct active-device volume-evolution
+  contract, complete preflight, write-free equal-volume behavior, and
+  post-launch no-rollback boundary.
 - Run `mkdocs build --strict` and relevant docs tests before completing P7.

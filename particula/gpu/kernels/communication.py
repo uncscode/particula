@@ -10,6 +10,7 @@ transfer, synchronization, resizing, transport, or CPU fallback.
 
 from __future__ import annotations
 
+import sys
 from numbers import Integral
 from typing import Any, cast
 
@@ -46,6 +47,28 @@ def _scan_nonnegative_finite(
         wp.atomic_max(invalid, 0, 1)
 
 
+def _safe_dimension_product(lengths: tuple[int, ...], name: str) -> int:
+    """Return the element count for a shape or raise on overflow."""
+    count = 1
+    for length in lengths:
+        if length != 0 and count > sys.maxsize // length:
+            raise ValueError(f"{name} shape exceeds safe address range.")
+        count *= length
+    return count
+
+
+def _safe_byte_range(
+    pointer: int, count: int, item_size: int, name: str
+) -> tuple[int, int]:
+    """Return a validated inclusive-exclusive byte range for storage."""
+    if count > sys.maxsize // item_size:
+        raise ValueError(f"{name} shape exceeds safe address range.")
+    required = count * item_size
+    if pointer > sys.maxsize - required:
+        raise ValueError(f"{name} storage exceeds safe address range.")
+    return pointer, pointer + required
+
+
 @wp.kernel
 def _validate_factors(
     old_volumes: wp.array(dtype=wp.float64),
@@ -68,23 +91,29 @@ def _validate_scaled_concentration(
     old_volumes: wp.array(dtype=wp.float64),
     final_volumes: wp.array(dtype=wp.float64),
     invalid: wp.array(dtype=wp.int32),
+    changed: wp.array(dtype=wp.int32),
 ) -> None:
     """Reject overflowing or positive-to-zero scaled concentrations."""
     box, column = wp.tid()
     old_value = concentration[box, column]
-    scaled = old_value * old_volumes[box] / final_volumes[box]
-    if not wp.isfinite(scaled) or (old_value > 0.0 and scaled == 0.0):
-        wp.atomic_max(invalid, 0, 1)
+    if invalid[0] == 0 and changed[0] != 0:
+        factor = old_volumes[box] / final_volumes[box]
+        scaled = old_value * factor
+        if not wp.isfinite(scaled) or (old_value > 0.0 and scaled == 0.0):
+            wp.atomic_max(invalid, 0, 1)
 
 
 @wp.kernel
 def _apply_volume_evolution(
     volume: wp.array(dtype=wp.float64),
     final_volumes: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+    changed: wp.array(dtype=wp.int32),
 ) -> None:
     """Write validated final volume values."""
     box = wp.tid()
-    volume[box] = final_volumes[box]
+    if invalid[0] == 0 and changed[0] != 0:
+        volume[box] = final_volumes[box]
 
 
 @wp.kernel
@@ -92,12 +121,14 @@ def _apply_scaled_concentration(
     concentration: wp.array2d(dtype=wp.float64),
     old_volumes: wp.array(dtype=wp.float64),
     final_volumes: wp.array(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+    changed: wp.array(dtype=wp.int32),
 ) -> None:
     """Apply validated per-box concentration scaling."""
     box, column = wp.tid()
-    concentration[box, column] = (
-        concentration[box, column] * old_volumes[box] / final_volumes[box]
-    )
+    if invalid[0] == 0 and changed[0] != 0:
+        factor = old_volumes[box] / final_volumes[box]
+        concentration[box, column] = concentration[box, column] * factor
 
 
 def _get_field(container: Any, field: str, name: str) -> Any:
@@ -116,25 +147,31 @@ def _array_range(array: Any, name: str) -> tuple[int, int] | None:
     expected: list[int] = []
     stride = item_size
     for length in reversed(array.shape):
+        if (
+            isinstance(length, bool)
+            or not isinstance(length, Integral)
+            or length < 0
+            or (stride != 0 and length > sys.maxsize // stride)
+        ):
+            raise ValueError(f"{name} shape exceeds safe address range.")
         expected.insert(0, stride)
         stride *= length
     if getattr(array, "strides", None) != tuple(expected):
         raise ValueError(f"{name} must be contiguous.")
-    count = int(np.prod(array.shape, dtype=np.int64))
+    count = _safe_dimension_product(array.shape, name)
     if count == 0:
         return None
     pointer = getattr(array, "ptr", None)
     capacity = getattr(array, "capacity", None)
-    required = count * item_size
     if not isinstance(pointer, Integral) or pointer <= 0:
         raise ValueError(f"{name} must have a valid pointer.")
     if (
         isinstance(capacity, bool)
         or not isinstance(capacity, Integral)
-        or capacity < required
+        or capacity < count * item_size
     ):
         raise ValueError(f"{name} must have sufficient storage capacity.")
-    return int(pointer), int(pointer) + required
+    return _safe_byte_range(int(pointer), count, item_size, name)
 
 
 def _validate_array(
@@ -175,33 +212,34 @@ def _reject_aliases(
                 raise ValueError("communication primary arrays must not alias.")
 
 
-def _scan_1d(values: Any, kernel: Any, message: str) -> None:
-    """Run a read-only one-dimensional validation scan."""
+def _scan_1d(values: Any, kernel: Any, invalid: Any) -> None:
+    """Launch a device-resident one-dimensional validation scan."""
     if values.shape[0] == 0:
         return
-    invalid = wp.zeros(1, dtype=wp.int32, device=values.device)
     wp.launch(
         kernel,
         dim=values.shape[0],
         inputs=[values, invalid],
         device=values.device,
     )
-    if int(invalid.numpy()[0]):
-        raise ValueError(message)
 
 
 def _scan_2d(
-    values: Any, old_volumes: Any, final_volumes: Any, product: bool
+    values: Any,
+    old_volumes: Any,
+    final_volumes: Any,
+    invalid: Any,
+    changed: Any,
+    product: bool,
 ) -> None:
-    """Run a read-only concentration domain or scaled-product scan."""
+    """Launch a device-resident concentration validation scan."""
     if values.shape[0] == 0 or values.shape[1] == 0:
         return
-    invalid = wp.zeros(1, dtype=wp.int32, device=values.device)
     if product:
         wp.launch(
             _validate_scaled_concentration,
             dim=values.shape,
-            inputs=[values, old_volumes, final_volumes, invalid],
+            inputs=[values, old_volumes, final_volumes, invalid, changed],
             device=values.device,
         )
     else:
@@ -211,13 +249,6 @@ def _scan_2d(
             inputs=[values, invalid],
             device=values.device,
         )
-    if int(invalid.numpy()[0]):
-        message = (
-            "scaled concentration underflow or overflow."
-            if product
-            else "concentration must be finite and nonnegative."
-        )
-        raise ValueError(message)
 
 
 def volume_evolution_step_gpu(
@@ -226,12 +257,35 @@ def volume_evolution_step_gpu(
     """Apply prescribed final volumes while preserving extensive inventories.
 
     ``final_volumes`` must be a caller-owned, contiguous active-device
-    ``wp.float64`` array shaped ``(B,)`` in m^3.  Complete read-only preflight
-    validates schemas, ownership, domains, factors, and proposed products before
-    mutation.  Successful calls update only ``particles.volume`` and particle
-    and gas concentrations by ``old_volume / final_volume`` and return the exact
-    input containers.  Equal final volumes are a write-free no-op. Callers own
-    synchronization; rollback is not promised after an apply writer launches.
+    ``wp.float64`` array shaped ``(B,)`` in m^3. Complete read-only preflight
+    validates schemas and launches device-resident domain, factor, and proposed
+    product checks before gated writers. Invalid device values suppress every
+    writer; errors from asynchronous device execution are observed by the caller
+    at its explicit synchronization boundary. Successful calls update only
+    ``particles.volume`` and particle and gas concentrations by
+    ``old_volume / final_volume``. Equal final volumes are write-free no-ops.
+    This direct kernel performs no hidden transfer, synchronization, or CPU
+    fallback; callers synchronize before inspection.
+
+    Args:
+        particles: Warp particle container with fixed-shape primary fields.
+        gas: Warp gas container with fixed-shape primary fields sharing the
+            particle box count and device.
+        final_volumes: Caller-owned active-device ``wp.float64`` array of final
+            per-box volumes in m^3 with shape ``(B,)``.
+
+    Returns:
+        The exact input ``(particles, gas)`` containers after an in-place update
+        or unchanged after a valid equal-volume no-op.
+
+    Raises:
+        ValueError: If host-observable schemas, devices, or storage ownership
+            are invalid. Invalid device values suppress writers and leave
+            caller-owned inputs unchanged.
+
+    Note:
+        Rollback is not promised if an asynchronous apply writer fails after it
+        launches.
     """
     # Final-volume form intentionally precedes all container access.
     final_volumes_array, final_range = _validate_array(
@@ -342,52 +396,80 @@ def volume_evolution_step_gpu(
             final_range,
         ),
     )
-    _scan_1d(
-        volume,
-        _scan_positive_finite,
-        "particles.volume must be finite positive.",
-    )
-    _scan_1d(
-        final_volumes,
-        _scan_positive_finite,
-        "final_volumes must be finite positive.",
-    )
-    _scan_2d(particle_concentration, volume, final_volumes, False)
-    _scan_2d(gas_concentration, volume, final_volumes, False)
     if n_boxes == 0:
         return particles, gas
-    factor_invalid = wp.zeros(1, dtype=wp.int32, device=device)
+    invalid = wp.zeros(1, dtype=wp.int32, device=device)
     changed = wp.zeros(1, dtype=wp.int32, device=device)
+    _scan_1d(volume, _scan_positive_finite, invalid)
+    _scan_1d(final_volumes, _scan_positive_finite, invalid)
+    _scan_2d(
+        particle_concentration,
+        volume,
+        final_volumes,
+        invalid,
+        changed,
+        False,
+    )
+    _scan_2d(
+        gas_concentration,
+        volume,
+        final_volumes,
+        invalid,
+        changed,
+        False,
+    )
     wp.launch(
         _validate_factors,
         dim=n_boxes,
-        inputs=[volume, final_volumes, factor_invalid, changed],
+        inputs=[volume, final_volumes, invalid, changed],
         device=device,
     )
-    if int(factor_invalid.numpy()[0]):
-        raise ValueError("volume evolution factor must be finite positive.")
-    _scan_2d(particle_concentration, volume, final_volumes, True)
-    _scan_2d(gas_concentration, volume, final_volumes, True)
-    if not int(changed.numpy()[0]):
-        return particles, gas
+    _scan_2d(
+        particle_concentration,
+        volume,
+        final_volumes,
+        invalid,
+        changed,
+        True,
+    )
+    _scan_2d(
+        gas_concentration,
+        volume,
+        final_volumes,
+        invalid,
+        changed,
+        True,
+    )
     if n_particles:
         wp.launch(
             _apply_scaled_concentration,
             dim=(n_boxes, n_particles),
-            inputs=[particle_concentration, volume, final_volumes],
+            inputs=[
+                particle_concentration,
+                volume,
+                final_volumes,
+                invalid,
+                changed,
+            ],
             device=device,
         )
     if n_gas:
         wp.launch(
             _apply_scaled_concentration,
             dim=(n_boxes, n_gas),
-            inputs=[gas_concentration, volume, final_volumes],
+            inputs=[
+                gas_concentration,
+                volume,
+                final_volumes,
+                invalid,
+                changed,
+            ],
             device=device,
         )
     wp.launch(
         _apply_volume_evolution,
         dim=n_boxes,
-        inputs=[volume, final_volumes],
+        inputs=[volume, final_volumes, invalid, changed],
         device=device,
     )
     return particles, gas

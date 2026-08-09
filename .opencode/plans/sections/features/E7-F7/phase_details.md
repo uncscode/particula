@@ -15,11 +15,24 @@
   - Boundary: P1 has no resident-primary or `time_step` input and explicitly
     defers population-dependent outbound-overdraw validation to P3.
 
-- [ ] **E7-F7-P2:** Implement per-box volume evolution and expansion with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Apply prescribed positive volumes and renormalize particle/gas concentrations from extensive inventories without changing particle masses or charge.
+- [x] **E7-F7-P2:** Implement per-box volume evolution and expansion with unit tests
+  - Issue: #1508 | Size: S | Status: Shipped
+  - Delivered: Concrete-only, device-resident
+    `volume_evolution_step_gpu(particles, gas, final_volumes)` validates
+    caller-owned final `(B,)` `wp.float64` m³ volumes plus all container
+    schemas, aliases, and domains. It sets particle volume and rescales particle
+    and gas concentrations by `old_volume / final_volume`, preserving extensive
+    inventory, container/array identity, and protected fields. Equal-volume
+    calls are write-free; rejected preflight leaves caller state unchanged, and
+    rollback is not promised after the apply writer launches.
   - Files: `particula/gpu/kernels/communication.py`, `particula/gpu/kernels/tests/communication_test.py`
-  - Tests: Expansion, compression, unchanged volume, invalid/overflow/underflow cases, identity preservation, and particle-plus-gas amount invariants.
+  - Tests: Co-located Warp contract coverage for expansion/compression, mixed
+    box factors, unchanged-volume no-op, invalid schema/alias/domain and unsafe
+    scale rejection, protected-state and identity preservation, and particle/gas
+    extensive-inventory invariants.
+  - Boundary: P2 is not communication transport or a session/scheduler node;
+    it adds no package export, hidden transfer/synchronization, fallback,
+    resizing, or protected-field mutation.
 
 - [ ] **E7-F7-P3:** Implement conservative gas advection and mixing with unit tests
   - Issue: TBD | Size: S | Status: Not Started

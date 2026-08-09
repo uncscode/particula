@@ -49,8 +49,18 @@ must declare source/sink ledgers so apparent non-conservation is explicit.
   declarations. Its sole entry point validates fixed Warp schemas, metadata,
   ranges/aliases, finite domains, enabled topology, and duplicate directed
   edges without writes, payload copies, primary-state reads, or exports.
-  Population-dependent outbound overdraw is explicitly deferred to P3, which
-  alone has source inventory and `time_step` inputs.
+   Population-dependent outbound overdraw is explicitly deferred to P3, which
+   alone has source inventory and `time_step` inputs.
+- **P2 volume boundary (shipped, #1508):** Concrete-only
+  `particula.gpu.kernels.communication.volume_evolution_step_gpu` accepts
+  caller-owned same-device final `(B,)` `wp.float64` volumes in m³. After
+  read-only validation of all primary storage, aliases, and physical domains,
+  it sets `particles.volume` and scales particle and gas concentrations by
+  `old_volume / final_volume` in place. It preserves containers, arrays, and
+  protected fields by identity; equal-volume calls are write-free. It neither
+  transfers/mixes payloads nor integrates with the resident session or
+  scheduler, and has no export, transfer, fallback, resize, or rollback after
+  an apply writer launches.
 - **Data model (later phases):** The fixed edge capacity, source/destination
   `int32` arrays, enabled mask, finite nonnegative inverse-time rates,
   transport mode, and optional final volumes remain stable for the session.
