@@ -43,10 +43,18 @@ must maintain at least 80% coverage.
   checkpoint restoration and schema-v1 noncommunication restart compatibility,
    no normal-step conversion/readback/synchronization, writer-fault guard/session
    transitions, and concrete-only export boundaries.
-- **P6:** Parameterize independent-box, 1D parcel/advection, mixing, expansion,
-  and combined repeated-step fixtures. Warp CPU is required when Warp is
-  installed; CUDA rows are optional and skip cleanly. Compare equivalent
-  one-box references and independent NumPy ledgers with recorded `rtol`/`atol`.
+- **P6 (shipped, #1512):**
+  `particula/gpu/tests/communication_parity_test.py` and
+  `particula/execution/tests/multi_box_communication_test.py` provide test-only
+  independent NumPy `float64` parity and conservation evidence for direct
+  communication primitives and the concrete resident executor. They cover
+  isolated/one-box-equivalent, padded 1-D, mixing, arbitrary closed,
+  sparse-particle, expansion/compression, complete open work/accounting ledgers
+  (direct-only), edge-permutation, and short repeated-sequence cases. Resident
+  particle results use a test-local immutable-prestate NumPy planner. Warp CPU
+  is the installed-Warp baseline; CUDA rows are optional and skip cleanly.
+  Assertions use `rtol=1e-12` and documented `atol` declarations and keep
+  parity, conservation, and open accounting separate.
 - **P7:** Run strict documentation build and any contract/example regressions.
 
 ## Invariants and Tolerances

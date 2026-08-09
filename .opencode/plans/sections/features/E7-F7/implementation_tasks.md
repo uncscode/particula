@@ -60,12 +60,14 @@
 - [x] Add resident resource, graph, executor, scheduler, checkpoint, and thermal
    update tests for canonical order, resource reuse, no hidden transfer/sync,
    schema-v1/v2 restart, and fault transitions (#1511).
-- [ ] Add independent NumPy `float64` oracles in
-  `particula/gpu/tests/communication_parity_test.py` without importing private
-  production arithmetic.
-- [ ] Cover one-box equivalence, isolated-box metamorphism, 1D chains, arbitrary
-  pairs, sparse slots, expansion/compression, repeated steps, and explicit
-  boundary ledgers on Warp CPU.
-- [ ] Add optional CUDA rows using existing markers and clean skip conventions.
+- [x] Add independent NumPy `float64` oracles in
+  `particula/gpu/tests/communication_parity_test.py` and
+  `particula/execution/tests/multi_box_communication_test.py` without importing
+  private production arithmetic (#1512).
+- [x] Cover one-box equivalence, isolated-box metamorphism, padded 1D chains,
+  edge-order permutations, sparse slots, expansion/compression, sequential
+  repeated calls, and complete direct boundary/work ledgers on Warp CPU (#1512).
+- [x] Add optional CUDA rows using existing markers and clean skip conventions
+  (#1512).
 - [ ] Maintain at least 80% coverage for every changed module and do not lower
   repository thresholds.

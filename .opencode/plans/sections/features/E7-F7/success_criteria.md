@@ -31,9 +31,13 @@
 - [x] P5 (#1511) preserves no runtime retry, hidden transfer, implicit sync, or
    silent fallback. Preflight failure is reusable; writer-path failure closes
    the guard and faults the session without rollback.
-- [ ] Warp CPU parity, equivalent one-box, isolated-box metamorphic, 1D
-  advection/mixing, expansion, and repeated-step tests pass with explicit
-  tolerances; optional CUDA rows skip cleanly when unavailable.
+- [x] P6 (#1512) adds independent NumPy `float64` parity/conservation evidence
+  for direct and resident multi-box communication: equivalent one-box,
+  isolated-box, padded 1D/mixing, expansion/compression, sparse particle,
+  complete open-ledger direct, edge-permutation, and repeated-step cases use
+  immutable-prestate particle planning plus explicit
+  `rtol=1e-12` and documented `atol` declarations; optional CUDA rows skip
+  cleanly.
 - [ ] Changed modules retain at least 80% coverage, repository thresholds are not
   lowered, and strict documentation validation passes.
 - [ ] Full CFD, dynamic capacity, graph capture/performance, autodiff, E7-F8 RNG,

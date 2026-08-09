@@ -17,6 +17,10 @@ can pin exactly one complete closed GAS or PARTICLES map with its native work
 record and optional final volumes. The scheduler executes communication, then
 volume evolution, as the first two nodes of its closed twelve-node schedule.
 
+P6 adds test-only multi-box independent NumPy `float64` parity and conservation
+evidence for both the direct primitives and the resident executor. It does not
+change production behavior or the public API.
+
 Those barriers use pre-update volumes and invalidate saturation ratio only;
 vapor pressure stays fresh until the existing consumer refresh windows. Schema-v2
 checkpoints preserve an optional pinned communication family, while schema-v1

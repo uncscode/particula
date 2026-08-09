@@ -85,11 +85,18 @@
      schema-v1/v2 checkpoint validation; no-transfer/no-sync spies; and
      writer-path guard close/session faulting.
 
-- [ ] **E7-F7-P6:** Validate multi-box parity and conservation across prescribed cases
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F7-P6:** Validate multi-box parity and conservation across prescribed cases
+  - Issue: #1512 | Size: S | Status: Shipped
+  - Delivered: Test-only independent NumPy `float64` parity/conservation evidence
+    for direct communication primitives and the concrete resident executor. No
+    production behavior or public API changed.
   - Goal: Establish issue #1451 evidence for independent boxes, 1D advection/mixing, expansion, and combined communication on Warp CPU with optional CUDA rows.
   - Files: `particula/gpu/tests/communication_parity_test.py`, `particula/execution/tests/multi_box_communication_test.py`
-  - Tests: Independent NumPy/CPU oracles, equivalent one-box metamorphic cases, closed/open ledgers, sparse state, repeated steps, tolerance declarations, and clean CUDA skips.
+  - Tests: Independent immutable-prestate NumPy/CPU `float64` oracles,
+    equivalent one-box and isolated-box metamorphic cases, padded 1D maps,
+    edge-order permutations, complete direct closed/open work ledgers, sparse
+    state, repeated steps, explicit `rtol=1e-12` and documented `atol`
+    declarations, and clean CUDA skips.
 
 - [ ] **E7-F7-P7:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started

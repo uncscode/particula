@@ -45,4 +45,7 @@
   acquisition, communication-then-volume barrier order, saturation-only
   invalidation, and schema-v2/schema-v1 restart boundaries. It adds no public
   export or public complete-loop API.
+- P6 (#1512) adds no user-facing documentation or API change. It records the
+  delivered test-only independent NumPy `float64` multi-box parity and
+  conservation evidence in this structured plan.
 - Run `mkdocs build --strict` and relevant docs tests before completing P7.

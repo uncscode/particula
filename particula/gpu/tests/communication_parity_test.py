@@ -81,6 +81,9 @@ def _configuration(
     source: np.ndarray,
     destination: np.ndarray,
     rates: np.ndarray,
+    *,
+    form: object | None = None,
+    enabled: np.ndarray | None = None,
 ):
     """Build a concrete arbitrary-pair communication configuration."""
     wp = _warp()
@@ -93,12 +96,18 @@ def _configuration(
 
     return CommunicationConfiguration(
         CommunicationMap(
-            CommunicationMapForm.ARBITRARY_PAIRS,
+            CommunicationMapForm.ARBITRARY_PAIRS if form is None else form,
             mode,
             len(source),
             wp.array(source, dtype=wp.int32, device=device),
             wp.array(destination, dtype=wp.int32, device=device),
-            wp.ones(len(source), dtype=wp.int32, device=device),
+            wp.array(
+                np.ones(len(source), dtype=np.int32)
+                if enabled is None
+                else enabled,
+                dtype=wp.int32,
+                device=device,
+            ),
             wp.array(rates, dtype=wp.float64, device=device),
         ),
         PrescribedVolumeUpdate(None),
@@ -113,10 +122,18 @@ def _gas_oracle(
     destination: np.ndarray,
     rates: np.ndarray,
     time_step: float,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+]:
     """Calculate immutable-ledger gas transport independently in NumPy."""
     amounts = concentration * volumes[:, None]
     deltas = np.zeros_like(amounts)
+    outbound = np.zeros_like(amounts)
     source_ledger = np.zeros_like(amounts)
     sink_ledger = np.zeros_like(amounts)
     for left, right, rate in zip(source, destination, rates, strict=True):
@@ -127,14 +144,18 @@ def _gas_oracle(
         elif right == -1:
             transfer = amounts[left] * rate * time_step
             deltas[left] -= transfer
+            outbound[left] += transfer
             sink_ledger[left] += transfer
         else:
             transfer = amounts[left] * rate * time_step
             deltas[left] -= transfer
             deltas[right] += transfer
+            outbound[left] += transfer
     return (
         (amounts + deltas) / volumes[:, None],
+        amounts,
         deltas,
+        outbound,
         source_ledger,
         sink_ledger,
     )
@@ -290,7 +311,7 @@ def test_gas_and_volume_match_independent_multibox_oracle(
     particles, gas = _containers(device)
     initial_gas = gas.concentration.numpy().copy()
     old_volumes = particles.volume.numpy().copy()
-    expected, deltas, _, _ = _gas_oracle(
+    expected, amounts, deltas, outbound, _, _ = _gas_oracle(
         initial_gas, old_volumes, source, destination, rates, 1.0
     )
     work = tuple(
@@ -306,7 +327,17 @@ def test_gas_and_volume_match_independent_multibox_oracle(
     )
     wp.synchronize()
 
+    initial_particle_concentration = np.array(
+        [
+            [4.0, 0.0, 2.0, 0.0],
+            [0.0, 0.0, 3.0, 0.0],
+            [5.0, 0.0, 0.0, 0.0],
+        ],
+        dtype=np.float64,
+    )
+    npt.assert_allclose(work[0].numpy(), amounts, rtol=RTOL, atol=0.0)
     npt.assert_allclose(work[1].numpy(), deltas, rtol=RTOL, atol=0.0)
+    npt.assert_allclose(work[2].numpy(), outbound, rtol=RTOL, atol=0.0)
     npt.assert_allclose(
         gas.concentration.numpy(),
         expected * old_volumes[:, None] / final_volumes[:, None],
@@ -318,6 +349,22 @@ def test_gas_and_volume_match_independent_multibox_oracle(
             axis=0
         ),
         (initial_gas * old_volumes[:, None]).sum(axis=0),
+        rtol=RTOL,
+        atol=INVENTORY_ATOL,
+    )
+    npt.assert_allclose(
+        particles.concentration.numpy(),
+        initial_particle_concentration
+        * old_volumes[:, None]
+        / final_volumes[:, None],
+        rtol=RTOL,
+        atol=0.0,
+    )
+    npt.assert_allclose(
+        (
+            particles.concentration.numpy() * particles.volume.numpy()[:, None]
+        ).sum(),
+        (initial_particle_concentration * old_volumes[:, None]).sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
     )
@@ -341,8 +388,8 @@ def test_open_boundary_accounting_matches_independent_oracle(
     rates = np.array([0.5, 0.25], dtype=np.float64)
     initial = gas.concentration.numpy().copy()
     volumes = particles.volume.numpy().copy()
-    expected, _, source_ledger, sink_ledger = _gas_oracle(
-        initial, volumes, source, destination, rates, 1.0
+    expected, amounts, deltas, outbound, source_ledger, sink_ledger = (
+        _gas_oracle(initial, volumes, source, destination, rates, 1.0)
     )
     buffers = GasCommunicationBuffers(
         *(wp.empty((3, 2), dtype=wp.float64, device=device) for _ in range(5))
@@ -358,17 +405,145 @@ def test_open_boundary_accounting_matches_independent_oracle(
     )
     wp.synchronize()
 
-    npt.assert_allclose(gas.concentration.numpy(), expected, rtol=RTOL)
     npt.assert_allclose(
-        buffers.source_amounts.numpy(), source_ledger, rtol=RTOL
+        gas.concentration.numpy(), expected, rtol=RTOL, atol=0.0
     )
-    npt.assert_allclose(buffers.sink_amounts.numpy(), sink_ledger, rtol=RTOL)
+    npt.assert_allclose(buffers.amounts.numpy(), amounts, rtol=RTOL, atol=0.0)
+    npt.assert_allclose(
+        buffers.amount_deltas.numpy(), deltas, rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        buffers.outbound_amounts.numpy(), outbound, rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        buffers.source_amounts.numpy(), source_ledger, rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        buffers.sink_amounts.numpy(), sink_ledger, rtol=RTOL, atol=0.0
+    )
     npt.assert_allclose(
         (gas.concentration.numpy() * volumes[:, None]).sum(axis=0)
         - (initial * volumes[:, None]).sum(axis=0),
         source_ledger.sum(axis=0) - sink_ledger.sum(axis=0),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
+    )
+
+
+@pytest.mark.parametrize("device", _device_parameters())
+@pytest.mark.parametrize(
+    "order",
+    [np.array([0, 1], dtype=np.int32), np.array([1, 0], dtype=np.int32)],
+    ids=["registered", "permuted"],
+)
+def test_repeated_one_dimensional_calls_match_sequential_oracles(
+    device: str, order: np.ndarray
+) -> None:
+    """Keep padded maps, sparse slots, and an isolated box independent."""
+    wp = _warp()
+    from particula.execution.communication import (
+        CommunicationMapForm,
+        CommunicationTransportMode,
+    )
+    from particula.gpu.kernels.communication import (
+        gas_communication_step_gpu,
+        particle_communication_step_gpu,
+        volume_evolution_step_gpu,
+    )
+
+    map_source = np.array([0, 1], dtype=np.int32)[order]
+    map_destination = np.array([1, 2], dtype=np.int32)[order]
+    map_rates = np.array([0.125, 0.25], dtype=np.float64)[order]
+    enabled = np.array([1, 0], dtype=np.int32)[order]
+    # The disabled padded edge must not change the isolated third box.
+    source = map_source[enabled == 1]
+    destination = map_destination[enabled == 1]
+    rates = map_rates[enabled == 1]
+    particles, gas = _containers(device)
+    old_volumes = particles.volume.numpy().copy()
+    expected_gas = gas.concentration.numpy().copy()
+    final_volumes = np.array([4.0, 2.0, 4.0], dtype=np.float64)
+    configuration = _configuration(
+        device,
+        CommunicationTransportMode.GAS,
+        map_source,
+        map_destination,
+        map_rates,
+        form=CommunicationMapForm.ONE_DIMENSIONAL,
+        enabled=enabled,
+    )
+    work = tuple(
+        wp.empty((3, 2), dtype=wp.float64, device=device) for _ in range(3)
+    )
+    for step in range(2):
+        expected_gas, _, _, _, _, _ = _gas_oracle(
+            expected_gas, old_volumes, source, destination, rates, 1.0
+        )
+        gas_communication_step_gpu(particles, gas, configuration, 1.0, *work)
+        if step == 0:
+            expected_gas *= old_volumes[:, None] / final_volumes[:, None]
+            volume_evolution_step_gpu(
+                particles,
+                gas,
+                wp.array(final_volumes, dtype=wp.float64, device=device),
+            )
+            old_volumes = final_volumes.copy()
+    wp.synchronize()
+    npt.assert_allclose(
+        gas.concentration.numpy(), expected_gas, rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        gas.concentration.numpy()[2], [1.0, 8.0], rtol=0.0, atol=0.0
+    )
+
+    particles, _ = _containers(device)
+    initial = (
+        particles.masses.numpy().copy(),
+        particles.concentration.numpy().copy(),
+        particles.charge.numpy().copy(),
+    )
+    particle_configuration = _configuration(
+        device,
+        CommunicationTransportMode.PARTICLES,
+        map_source,
+        map_destination,
+        map_rates,
+        form=CommunicationMapForm.ONE_DIMENSIONAL,
+        enabled=enabled,
+    )
+    from particula.gpu.kernels.communication import ParticleCommunicationBuffers
+
+    buffers = ParticleCommunicationBuffers(
+        wp.empty((3, 4), dtype=wp.float64, device=device),
+        wp.empty((3, 4), dtype=wp.float64, device=device),
+        wp.empty((2, 4), dtype=wp.int32, device=device),
+        wp.empty((2, 4), dtype=wp.float64, device=device),
+    )
+    expected = initial
+    for _ in range(2):
+        expected = _particle_oracle(
+            *expected,
+            particles.volume.numpy(),
+            source,
+            destination,
+            rates,
+            1.0,
+        )[:3]
+        particle_communication_step_gpu(
+            particles, particle_configuration, 1.0, buffers
+        )
+    wp.synchronize()
+    npt.assert_allclose(
+        particles.masses.numpy(), expected[0], rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        particles.concentration.numpy(), expected[1], rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        particles.charge.numpy(), expected[2], rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        particles.concentration.numpy()[2], initial[1][2], rtol=0.0, atol=0.0
     )
 
 

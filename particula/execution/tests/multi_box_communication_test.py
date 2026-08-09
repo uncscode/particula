@@ -40,6 +40,9 @@ def _request(
     destination: np.ndarray,
     rates: np.ndarray,
     final_volumes: np.ndarray | None,
+    *,
+    form: CommunicationMapForm = CommunicationMapForm.ARBITRARY_PAIRS,
+    enabled: np.ndarray | None = None,
 ) -> ResidentCommunicationRequest:
     """Build a three-box exact resident request with a closed map."""
     wp = pytest.importorskip("warp")
@@ -81,12 +84,18 @@ def _request(
         )
     configuration = CommunicationConfiguration(
         CommunicationMap(
-            CommunicationMapForm.ARBITRARY_PAIRS,
+            form,
             mode,
             len(source),
             wp.array(source, dtype=wp.int32, device="cpu"),
             wp.array(destination, dtype=wp.int32, device="cpu"),
-            wp.ones(len(source), dtype=wp.int32, device="cpu"),
+            wp.array(
+                np.ones(len(source), dtype=np.int32)
+                if enabled is None
+                else enabled,
+                dtype=wp.int32,
+                device="cpu",
+            ),
             wp.array(rates, dtype=wp.float64, device="cpu"),
         ),
         PrescribedVolumeUpdate(
@@ -148,6 +157,75 @@ def _gas_oracle(
     return (amounts + deltas) / volume[:, None]
 
 
+def _particle_oracle(  # noqa: C901
+    masses: np.ndarray,
+    concentration: np.ndarray,
+    charge: np.ndarray,
+    volume: np.ndarray,
+    source: np.ndarray,
+    destination: np.ndarray,
+    rates: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Independently plan immutable-prestate particle transport in NumPy."""
+    final_masses = masses.copy()
+    final_concentration = concentration.copy()
+    final_charge = charge.copy()
+    credits = np.zeros_like(concentration)
+    debits = np.zeros_like(concentration)
+    initial_keys = {
+        (box, slot): (*masses[box, slot], charge[box, slot])
+        for box in range(concentration.shape[0])
+        for slot in range(concentration.shape[1])
+        if concentration[box, slot] > 0.0
+    }
+    occupied = {
+        box: {
+            key: slot
+            for (key_box, slot), key in initial_keys.items()
+            if key_box == box
+        }
+        for box in range(concentration.shape[0])
+    }
+    reserved: dict[tuple[int, tuple[float, ...]], int] = {}
+    used = {box: set() for box in range(concentration.shape[0])}
+    incoming: dict[tuple[int, int], tuple[int, int]] = {}
+    for _edge, (left, right, rate) in enumerate(
+        zip(source, destination, rates, strict=True)
+    ):
+        for slot in range(concentration.shape[1]):
+            request = concentration[left, slot] * rate
+            if request <= 0.0:
+                continue
+            key = initial_keys[left, slot]
+            assigned = occupied[right].get(key)
+            if assigned is None:
+                reservation = (right, key)
+                assigned = reserved.get(reservation)
+                if assigned is None:
+                    assigned = next(
+                        free
+                        for free in range(concentration.shape[1])
+                        if concentration[right, free] == 0.0
+                        and free not in used[right]
+                    )
+                    reserved[reservation] = assigned
+                    used[right].add(assigned)
+            debits[left, slot] += request
+            credits[right, assigned] += request * volume[left] / volume[right]
+            incoming.setdefault((right, assigned), (left, slot))
+    final_concentration += credits - debits
+    for (box, slot), (left, source_slot) in incoming.items():
+        if concentration[box, slot] == 0.0:
+            final_masses[box, slot] = masses[left, source_slot]
+            final_charge[box, slot] = charge[left, source_slot]
+    for box in range(concentration.shape[0]):
+        for slot in range(concentration.shape[1]):
+            if final_concentration[box, slot] == 0.0:
+                final_masses[box, slot] = 0.0
+                final_charge[box, slot] = 0.0
+    return final_masses, final_concentration, final_charge
+
+
 @pytest.mark.warp
 @pytest.mark.gpu_parity
 @pytest.mark.parametrize(
@@ -187,6 +265,7 @@ def test_resident_gas_barriers_match_repeated_numpy_oracle(
     gas = cast(Any, request.session.gas)
     particles = cast(Any, request.session.particles)
     initial = gas.concentration.numpy().copy()
+    initial_particle_concentration = particles.concentration.numpy().copy()
     old_volume = particles.volume.numpy().copy()
     expected = initial.copy()
 
@@ -199,8 +278,30 @@ def test_resident_gas_barriers_match_repeated_numpy_oracle(
         executor.execute_volume_evolution()
     wp.synchronize()
 
-    npt.assert_allclose(gas.concentration.numpy(), expected, rtol=RTOL)
-    npt.assert_allclose(particles.volume.numpy(), final_volumes, rtol=0.0)
+    npt.assert_allclose(
+        gas.concentration.numpy(), expected, rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        particles.volume.numpy(), final_volumes, rtol=0.0, atol=0.0
+    )
+    npt.assert_allclose(
+        particles.concentration.numpy(),
+        initial_particle_concentration
+        * np.array([2.0, 1.0, 4.0])[:, None]
+        / final_volumes[:, None],
+        rtol=RTOL,
+        atol=0.0,
+    )
+    npt.assert_allclose(
+        (
+            particles.concentration.numpy() * particles.volume.numpy()[:, None]
+        ).sum(),
+        (
+            initial_particle_concentration * np.array([2.0, 1.0, 4.0])[:, None]
+        ).sum(),
+        rtol=RTOL,
+        atol=INVENTORY_ATOL,
+    )
     npt.assert_allclose(
         (gas.concentration.numpy() * particles.volume.numpy()[:, None]).sum(
             axis=0
@@ -234,27 +335,27 @@ def test_resident_particle_barrier_conserves_multibox_weighted_state() -> None:
     ResidentCommunicationExecutor(request).execute_communication()
     wp.synchronize()
 
-    # Independent immutable pre-step request calculation.  The first edge
-    # places two distinct populations into box 1's ascending free slots; the
-    # second then places box 1's original population into box 2's next free
-    # slot after its existing nonmatching population.
-    expected_concentration = np.array(
-        [[3.0, 0.0, 1.5, 0.0], [2.0, 1.0, 1.5, 0.0], [5.0, 0.375, 0.0, 0.0]],
-        dtype=np.float64,
+    expected_masses, expected_concentration, expected_charge = _particle_oracle(
+        mass,
+        concentration,
+        charge,
+        volume,
+        source,
+        destination,
+        np.array([0.25, 0.5], dtype=np.float64),
     )
-    expected_masses = mass.copy()
-    expected_charge = charge.copy()
-    expected_masses[1, 0] = mass[0, 0]
-    expected_charge[1, 0] = charge[0, 0]
-    expected_masses[1, 1] = mass[0, 2]
-    expected_charge[1, 1] = charge[0, 2]
-    expected_masses[2, 1] = mass[1, 2]
-    expected_charge[2, 1] = charge[1, 2]
     npt.assert_allclose(
-        particles.concentration.numpy(), expected_concentration, rtol=RTOL
+        particles.concentration.numpy(),
+        expected_concentration,
+        rtol=RTOL,
+        atol=0.0,
     )
-    npt.assert_allclose(particles.masses.numpy(), expected_masses, rtol=RTOL)
-    npt.assert_allclose(particles.charge.numpy(), expected_charge, rtol=RTOL)
+    npt.assert_allclose(
+        particles.masses.numpy(), expected_masses, rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        particles.charge.numpy(), expected_charge, rtol=RTOL, atol=0.0
+    )
 
     npt.assert_allclose(
         (particles.concentration.numpy() * volume[:, None]).sum(),
@@ -283,4 +384,61 @@ def test_resident_particle_barrier_conserves_multibox_weighted_state() -> None:
         (charge * concentration * volume[:, None]).sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+@pytest.mark.parametrize(
+    "order",
+    [np.array([0, 1], dtype=np.int32), np.array([1, 0], dtype=np.int32)],
+    ids=["registered", "permuted"],
+)
+def test_resident_one_dimensional_padded_map_matches_particle_oracle(
+    order: np.ndarray,
+) -> None:
+    """Keep sparse slots and an isolated box independent through residency."""
+    wp = pytest.importorskip("warp")
+    map_source = np.array([0, 1], dtype=np.int32)[order]
+    map_destination = np.array([1, 2], dtype=np.int32)[order]
+    map_rates = np.array([0.25, 0.5], dtype=np.float64)[order]
+    enabled = np.array([1, 0], dtype=np.int32)[order]
+    request = _request(
+        CommunicationTransportMode.PARTICLES,
+        map_source,
+        map_destination,
+        map_rates,
+        None,
+        form=CommunicationMapForm.ONE_DIMENSIONAL,
+        enabled=enabled,
+    )
+    particles = cast(Any, request.session.particles)
+    initial = (
+        particles.masses.numpy().copy(),
+        particles.concentration.numpy().copy(),
+        particles.charge.numpy().copy(),
+        particles.volume.numpy().copy(),
+    )
+    selected = enabled == 1
+    expected = _particle_oracle(
+        *initial[:4],
+        map_source[selected],
+        map_destination[selected],
+        map_rates[selected],
+    )
+
+    ResidentCommunicationExecutor(request).execute_communication()
+    wp.synchronize()
+
+    npt.assert_allclose(
+        particles.masses.numpy(), expected[0], rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        particles.concentration.numpy(), expected[1], rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        particles.charge.numpy(), expected[2], rtol=RTOL, atol=0.0
+    )
+    npt.assert_allclose(
+        particles.concentration.numpy()[2], initial[1][2], rtol=0.0, atol=0.0
     )
