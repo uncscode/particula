@@ -4,6 +4,8 @@ This direct-import-only Warp boundary consumes resolver-produced graph and
 schedule metadata. Callers explicitly report successful ordinary nodes and
 bracket supported consumer callbacks. The coordinator refreshes stale
 vapor-pressure and saturation-ratio fields immediately before a consumer.
+Communication and volume-evolution barriers invalidate saturation ratio
+without invalidating or refreshing vapor pressure.
 
 It does not own lifecycle, resource acquisition, scheduling, transfers,
 fallbacks, or general process dispatch. Refreshing vapor pressure delegates to
@@ -345,7 +347,10 @@ class ResidentThermodynamicUpdateCoordinator:
 
         The node must be the next scheduled graph member and must not be a
         virtual refresh or supported consumer. Its declared invalidations are
-        added to the coordinator-owned stale markers.
+        added to the coordinator-owned stale markers. Thus completed
+        communication and volume barriers mark saturation stale only; neither
+        writes vapor pressure or saturation, launches a refresh, transfers, or
+        synchronizes.
 
         Args:
             node: Exact next canonical graph node, reported only after its

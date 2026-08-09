@@ -8,9 +8,11 @@ of resident payload bytes and the inspection copies.
 
 Restart is explicit and same-device: it creates a fresh compatible session from
 the canonical bytes, never migrates data, serializes to disk, chooses a device,
-or falls back to CPU execution. ``checkpoint()`` is nonterminal; ``finalize()``
-caches a snapshot and terminally ends normal session use. No rollback is
-promised once a device operation has launched.
+or falls back to CPU execution. Schema-v1 checkpoints have no communication
+family; schema-v2 checkpoints can retain one complete closed-map GAS or
+PARTICLES family and its optional final-volume sidecar. ``checkpoint()`` is
+nonterminal; ``finalize()`` caches a snapshot and terminally ends normal
+session use. No rollback is promised once a device operation has launched.
 """
 
 from __future__ import annotations
@@ -68,7 +70,7 @@ class CheckpointPayload:
         dtype: Exact NumPy-compatible dtype spelling.
         shape: Exact array shape.
         data: Immutable contiguous array bytes.
-        capacity: Optional collision capacity metadata.
+        capacity: Optional collision or communication-edge capacity metadata.
     """
 
     family: str
@@ -102,6 +104,8 @@ class ResidentCheckpoint:
         gas: Detached CPU gas inspection carrier without vapor pressure.
         environment: Detached CPU environment inspection carrier.
         payloads: Canonical immutable primary and acquired-sidecar payloads.
+        communication: Optional schema-v2 metadata for one pinned closed-map
+            communication family.
     """
 
     schema_version: int
@@ -121,7 +125,18 @@ class ResidentCheckpoint:
 
 @dataclass(frozen=True)
 class CommunicationCheckpointMetadata:
-    """Describe one optional pinned communication family without live arrays."""
+    """Describe an optional pinned communication family without live arrays.
+
+    This schema-v2 metadata identifies the sole restored communication mode and
+    its fixed edge capacity. It is validated against canonical sidecar payloads
+    before restart setup; it neither owns nor retains source-device arrays.
+
+    Attributes:
+        mode: Canonical ``"gas"`` or ``"particles"`` transport mode.
+        form: Canonical closed-map communication form.
+        edge_capacity: Fixed number of resident communication edges.
+        has_final_volumes: Whether a prescribed-volume payload is present.
+    """
 
     mode: str
     form: str
@@ -156,10 +171,15 @@ def _validate_payload_metadata(item: CheckpointPayload) -> None:
         raise TypeError("checkpoint payload dtype and shape are invalid.")
     if any(type(length) is not int or length < 0 for length in item.shape):
         raise ValueError("checkpoint payload shape is invalid.")
+    communication_family = item.family in (
+        "communication_gas",
+        "communication_particles",
+    )
     if item.capacity is not None and (
         isinstance(item.capacity, bool)
         or not isinstance(item.capacity, Integral)
-        or item.capacity <= 0
+        or item.capacity < 0
+        or (item.capacity == 0 and not communication_family)
     ):
         raise ValueError("checkpoint payload capacity is invalid.")
 
@@ -353,7 +373,12 @@ class ResidentCheckpointController:
         )
 
     def _communication_metadata(self) -> CommunicationCheckpointMetadata | None:
-        """Return metadata for the sole optional communication view."""
+        """Return metadata for the sole optional pinned communication view.
+
+        Returns:
+            Detached metadata for the published gas or particle communication
+            family, or ``None`` when no communication resources are pinned.
+        """
         views = self._registry._views
         resources = views.get("communication_gas") or views.get(
             "communication_particles"
@@ -713,7 +738,24 @@ def _preflight_restart(  # noqa: C901
 def _validate_resource_payloads(  # noqa: C901
     payloads: tuple[CheckpointPayload, ...], dimensions: ResidentDimensions
 ) -> tuple[str | None, bool]:
-    """Validate ordered acquired-sidecar descriptors before resident setup."""
+    """Validate ordered acquired-sidecar descriptors before resident setup.
+
+    Communication payloads may contain exactly one complete gas or particle
+    family and an optional final-volume array. This descriptor-only preflight
+    reads no device payload, creates no session, and rejects mixed, partial, or
+    schema-incompatible families before any restart upload can begin.
+
+    Args:
+        payloads: Ordered immutable sidecar descriptors after primary payloads.
+        dimensions: Restored resident dimensions used to resolve role shapes.
+
+    Returns:
+        Communication family name, if present, and final-volume presence.
+
+    Raises:
+        ValueError: If sidecar order, completeness, capacity, or schema is
+            incompatible with the checkpoint contract.
+    """
     if not payloads:
         return None, False
     index = 0
@@ -729,6 +771,7 @@ def _validate_resource_payloads(  # noqa: C901
             dimensions.n_particles,
             dimensions.n_species,
         ),
+        "status": (1,),
     }
     # The immutable class manifests do not require a live registry.  Their
     # deterministic order is reproduced from a lightweight temporary-free call.

@@ -3,12 +3,16 @@
 ## Resident complete-loop boundary
 
 The shipped concrete-only `particula.execution.resident_scheduler` executes
-only the resolver-produced complete ten-node resident schedule. It binds one
-exact active session, registry, and closed guard; validates schedule provenance
-and thermodynamic refresh windows before opening its one lifecycle token; and
-does not provide a package export, transfer, fallback, checkpoint, restore,
-resize, or rollback guarantee. Its paired concrete-only diagnostics boundary is
-a closed, ordered two-operation protocol for caller-owned gas-concentration and
+only the resolver-produced complete twelve-node resident schedule. Communication
+runs first, followed by optional prescribed volume evolution; communication
+uses pre-update volumes, and both barriers invalidate only saturation ratio.
+The existing vapor-pressure then saturation refresh windows remain immediately
+before condensation and diagnostics. The scheduler binds one exact active
+session, registry, and closed guard; validates schedule provenance and
+thermodynamic refresh windows before opening its one lifecycle token; and does
+not provide a package export, transfer, fallback, checkpoint, restore, resize,
+or rollback guarantee. Its paired concrete-only diagnostics boundary is a
+closed, ordered two-operation protocol for caller-owned gas-concentration and
 saturation-ratio outputs, not callback registration or optional update wiring.
 
 This page tracks the status of the data-oriented container migration and the
@@ -1543,16 +1547,20 @@ seams, closed-guard binding, canonical recovery bytes, and exact-device fresh
 restart contract. It is not a resident loop or a process coordinator.
 
 E7-F5 is shipped as a bounded concrete-only exception: it runs only the complete
-resolver-produced ten-node schedule, retains one exact resident identity binding,
-uses coordinator-owned vapor-pressure/saturation freshness windows, and exposes
-only closed diagnostics snapshots. It adds no hidden transfer, public
-orchestration, or export surface. E7-F4 remains its prerequisite and the
-explicit checkpoint/restart boundary.
+resolver-produced twelve-node schedule, with communication followed by optional
+volume evolution before the existing process nodes. Communication uses
+pre-update volumes; both barriers invalidate saturation ratio only, while the
+coordinator-owned vapor-pressure/saturation refresh windows remain at their
+existing condensation and diagnostics consumers. It retains one exact resident
+identity binding and exposes only closed diagnostics snapshots. It adds no
+hidden transfer, public orchestration, or export surface. E7-F4 remains its
+prerequisite and the explicit checkpoint/restart boundary.
 
 E7-F7 P2 ships concrete-only direct-Warp volume evolution, and P3 ships
-concrete-only direct-Warp synchronous gas communication. Neither seam is
-package-exported or integrated with the resident scheduler, and neither adds
-transfers, synchronization, CPU fallback, resizing, or other orchestration.
+concrete-only direct-Warp synchronous gas communication. P5 integrates their
+closed resident-map forms as the scheduler's communication and optional-volume
+barrier; the direct seams remain unexported and add no transfers,
+synchronization, CPU fallback, resizing, or other orchestration.
 Import P3 only from
 `particula.gpu.kernels.communication.gas_communication_step_gpu`. Callers
 provide complete Warp particle/gas containers and caller-owned `(B, S)`
@@ -1563,8 +1571,7 @@ amount; `-1 -> destination` sources use the destination's pre-step amount and
 record it in the source ledger, while `source -> -1` sinks use and record the
 source amount in the sink ledger. The operation performs one gas-concentration
 commit after preflight.
-The remaining transport, mixing/advection, and scheduler-integration work
-remain deferred.
+The remaining transport and mixing/advection work remain deferred.
 E7-F8 owns scheduled persistent stream identity/reset and checkpoint/restart RNG
 policy. E7-F9 owns final diagnostics products, complete examples, and closeout.
 High-level GPU adapters and user-facing CPU/GPU orchestration remain later

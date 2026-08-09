@@ -250,14 +250,17 @@ as well as detached inspection copies. The first successful finalization caches
 its snapshot; a later exact matching finalization returns that same object.
 
 The implemented compatibility boundary is exact and fail-closed: restart accepts
-only a `ResidentCheckpoint` with schema version `1`, carrier type
-`"ResidentSession"`, lifecycle `ACTIVE`, complete valid payload descriptors and
-payloads, and an exactly equal target `Device`. Other versions or carrier
-schemas, malformed or incomplete records, non-`ACTIVE` checkpoint records, and
-device mismatches are rejected. Restart is explicit, never automatic, and creates
-fresh session, registry, guard, containers, primary arrays, and sidecars. It
-does not select or migrate a device, provide fallback, or guarantee rollback
-after an asynchronous writer launches. See
+a `ResidentCheckpoint` with carrier type `"ResidentSession"`, lifecycle
+`ACTIVE`, complete valid payload descriptors and payloads, and an exactly equal
+target `Device`. Schema version `1` checkpoints must be noncommunication.
+Schema version `2` checkpoints may have no communication family or exactly one
+complete closed-map GAS or PARTICLES family with matching metadata and payloads.
+Other versions or carrier schemas, malformed, incomplete, mixed, or mismatched
+records, non-`ACTIVE` checkpoint records, and device mismatches are rejected.
+Restart is explicit, never automatic, and creates fresh session, registry,
+guard, containers, primary arrays, and sidecars. It does not select or migrate
+a device, provide fallback, or guarantee rollback after an asynchronous writer
+launches. See
 [GPU resident checkpoints](gpu_resident_checkpoints.md).
 
 ### GPU-resident deterministic timestep
@@ -271,24 +274,29 @@ resident objects by identity. Diagnostics is a closed two-snapshot protocol,
 not a callback API: it copies only to separate caller-owned outputs and supplies
 no implicit host inspection or transfer.
 
-The closed schedule contains exactly these node IDs:
+The closed schedule contains exactly these twelve node IDs:
 
-`environment_update`, `gas_update`, `vapor_pressure_refresh`,
-`saturation_refresh`, `condensation`, `brownian_coagulation`, `dilution`,
-`wall_loss`, `nucleation`, and `diagnostics`.
+`communication`, `volume_evolution`, `environment_update`, `gas_update`,
+`vapor_pressure_refresh`, `saturation_refresh`, `condensation`,
+`brownian_coagulation`, `dilution`, `wall_loss`, `nucleation`, and
+`diagnostics`.
 
-Its displayed order is resolver-produced and profile/graph-dependent, not a
-universal static order. Authoritative process dependencies come from the
-resolved graph; virtual freshness edges are `environment_update ->
-vapor_pressure_refresh`, `environment_update -> saturation_refresh`,
-`gas_update -> saturation_refresh`, `vapor_pressure_refresh ->
-saturation_refresh`, and `saturation_refresh -> {condensation, diagnostics}`.
-The `SchedulerProfile` selects exactly one reviewed edge:
-`condensation -> nucleation` or `nucleation -> condensation`; the latter also
-requires nucleation before the saturation-refresh consumer window.
+The resolver-produced canonical order begins with closed-map communication,
+then optional prescribed volume evolution. These barriers use pre-update
+volumes and invalidate saturation only; neither refreshes derived state. The
+remaining order is profile/graph-dependent. Authoritative process dependencies
+come from the resolved graph; virtual freshness edges are
+`environment_update -> vapor_pressure_refresh`,
+`environment_update -> saturation_refresh`, `gas_update -> saturation_refresh`,
+`vapor_pressure_refresh -> saturation_refresh`, and
+`saturation_refresh -> {condensation, diagnostics}`. The `SchedulerProfile`
+selects exactly one reviewed edge: `condensation -> nucleation` or
+`nucleation -> condensation`; the latter also requires nucleation before the
+saturation-refresh consumer window.
 
 | Resident responsibility | Authority and boundary |
 | --- | --- |
+| Closed-map communication and optional volume evolution | Concrete resident barriers using pre-update volumes; saturation invalidation only |
 | Environment and gas updates | Prescribed identity-preserving resident updates |
 | Vapor pressure and saturation | Derived virtual freshness state |
 | Condensation, Brownian coagulation, dilution, wall loss, nucleation | Direct resident adapters over the resolved process nodes |
@@ -298,9 +306,9 @@ The direct scheduler skips virtual refresh-node dispatch. Instead, the
 thermodynamic coordinator refreshes stale state in vapor-pressure-then-
 saturation order immediately before condensation or diagnostics consumer
 callbacks. Environment invalidates vapor pressure and saturation; gas,
-condensation, and nucleation invalidate saturation. `ParticleData.volume` is
-fixed resident state: transport, mixing, advection, and volume evolution belong
-to E7-F7.
+communication, volume evolution, condensation, and nucleation invalidate
+saturation. Prescribed volume evolution is limited to the optional resident
+barrier; transport, mixing, and advection remain outside this boundary.
 
 Normal steps do not convert or transfer data, synchronize, restore, checkpoint,
 finalize, restart, acquire or replace resources, fall back to CPU, retry, resize,

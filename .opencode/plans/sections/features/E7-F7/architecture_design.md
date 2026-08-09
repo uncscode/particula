@@ -3,15 +3,15 @@
 ## High-Level Design
 
 Communication is an explicit, opt-in scheduler operation over authoritative
-resident state. A validated map and preallocated scratch produce a synchronous
-update: every outgoing amount is computed from pre-node state, accumulated into
-ledgers, checked, then committed. This avoids edge-order dependence and in-place
-donor/receiver races.
+resident state. Acquisition validates P1 exactly once, then pins one complete
+closed-map GAS or PARTICLES resource family by identity: configuration/map
+arrays, the matching native buffer record, and optional final volumes. Normal
+steps perform metadata/identity validation only.
 
 ```text
 PrescribedCommunication + PrescribedVolumeUpdate
                     |
-        read-only capability/schema preflight
+       one-time P1 acquisition/schema preflight
                     |
                     v
 E7-F5 communication barrier inside E7-F4 mutation window
@@ -27,12 +27,11 @@ E7-F5 communication barrier inside E7-F4 mutation window
                     |
         validate conservation/capacity/status
                     |
-        apply prescribed positive new volumes
-        concentration = final amount / final volume
+         optional prescribed positive volume evolution
                     |
-        commit once; mark derived gas state stale
+         commit once; mark saturation ratio stale only
                     |
- E7-F5 environment/thermodynamic refresh and process graph
+   ten existing loop nodes and their consumer refresh windows
 ```
 
 Independent boxes are represented by an empty/disabled map and remain bitwise
@@ -85,17 +84,31 @@ must declare source/sink ledgers so apparent non-conservation is explicit.
   accept `-1` endpoints, resize, compact, transfer, synchronize, fall back, or
   integrate with the session or scheduler. The API and buffer carrier remain
   concrete-only and unexported.
-- **Data model (later phases):** The fixed edge capacity, source/destination
+- **Resident resources (P5, shipped):** `gpu_resources.py` exposes frozen
+  `CommunicationResources` and pins exactly one validated closed GAS or
+  PARTICLES family. `acquire_communication()` validates P1 once, validates or
+  allocates omitted required work arrays, rejects aliases, and permits only the
+  identical complete reacquisition. Metadata-only validation performs no P1
+  scan, allocation, transfer, synchronization, or payload readback.
+- **Checkpointing (P5, shipped):** controller-created checkpoints use schema 2.
+  They contain no communication family or one complete family plus matching
+  `CommunicationCheckpointMetadata`; restart recreates fresh configuration,
+  arrays, native buffers, and binding. Schema-v1 remains valid only for
+  noncommunication checkpoints and remains restart-compatible.
+- **Graph/scheduler (P5, shipped):** `communication` then `volume_evolution`
+  are the first two nodes of the canonical twelve-node graph. Both are
+  non-process barriers and invalidate `SATURATION_RATIO` only, preserving fresh
+  vapor pressure for the existing condensation and diagnostics refresh windows.
+  Preflight failures leave the session reusable; a failure after either native
+  writer is about to run closes the guard and faults the session without retry
+  or rollback.
+- **Data model:** The fixed edge capacity, source/destination
   `int32` arrays, enabled mask, finite nonnegative inverse-time rates,
   transport mode, and optional final volumes remain stable for the session.
-- **Resident resources:** Add same-device `float64` amount ledgers for gas,
-  particle concentration and species inventory, `int32` slot plans/status, and
-  documented diagnostics. E7-F4 allocates or validates them once and checkpoints
-  mutable state needed for restart.
 - **API surface:** P1 declarations and validation are direct-import-only from
   `particula.execution.communication`; they are not exported through
-  `particula.execution` or the package. Later scheduler-facing configuration
-  remains deferred.
+  `particula.execution` or the package. The resident executor and scheduler
+  request remain concrete-only direct imports.
 - **Gas semantics:** Treat `gas.concentration` as mass per volume. P3 stages
   `concentration * volume`, transfers synchronously, accounts for open
   boundaries explicitly, and divides final amount by the unchanged validated
@@ -112,10 +125,6 @@ must declare source/sink ledgers so apparent non-conservation is explicit.
   masses, density, and charge do not scale merely because box volume changes;
   concentrations scale through extensive inventory normalization. Construct all
   edge amounts from pre-step volume, then apply final volume and normalize once.
-- **Ordering:** Communication/volume execution is a canonical pre-process
-  barrier. If it changes gas concentration or volume, dependent diagnostics and
-  thermodynamic state are invalidated. E7-F5's environment update and derived
-  vapor-pressure/saturation refresh still precede consuming physics processes.
 - **Lifecycle:** Preflight errors leave resident state reusable. A status failure
   before commit leaves particle/gas/volume arrays unchanged, though documented
   scratch may contain plans. Any failure after a commit launch faults the E7-F4

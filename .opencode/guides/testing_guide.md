@@ -247,6 +247,30 @@ pytest particula/gpu/tests/process_sequence_test.py -q \
   -m "warp and cuda" -Werror
 ```
 
+### Resident communication and checkpoint coverage
+
+Resident communication is concrete-only execution coverage, not a public API or
+an example workflow. Keep its tests under `particula/execution/tests/` and cover
+both closed-map GAS and PARTICLES resource families, optional volume evolution,
+and the canonical twelve-node schedule. Verify that normal-step metadata checks
+do not repeat P1 payload validation, allocate, transfer, inspect host payloads,
+or synchronize. Cover prelaunch rejection as non-mutating; after either barrier
+writer launches, assert lifecycle fault/guard close behavior rather than
+rollback.
+
+Checkpoint tests must preserve schema-v1 noncommunication restart support and
+verify schema-v2 checkpoints with no communication family or one complete
+closed-map family. Restarts must require an exact device and recreate arrays and
+bindings instead of reusing source identities.
+
+```bash
+pytest particula/execution/tests/gpu_resources_test.py \
+  particula/execution/tests/checkpoint_test.py \
+  particula/execution/tests/process_graph_test.py \
+  particula/execution/tests/resident_communication_test.py \
+  particula/execution/tests/scheduler_test.py -q -Werror
+```
+
 `docs/Examples/gpu_complete_process_sequence.py` is a standalone, direct-Warp
 example with a focused regression suite in
 `particula/gpu/tests/gpu_complete_process_sequence_example_test.py`. The suite

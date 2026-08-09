@@ -35,9 +35,14 @@ must maintain at least 80% coverage.
   ledgers and deterministic assignments, closed-map conservation, and gated
   commit behavior. The contract remains concrete-only, with Warp CPU evidence
   and optional CUDA rows where available.
-- **P5:** Test canonical scheduler placement, derived-state invalidation,
-  resource reuse, stable identities, zero normal-step conversion/sync/readback,
-  checkpoint/restart metadata, capability failures, and post-launch faulting.
+- **P5 (shipped, #1511):** `particula/execution/tests/gpu_resources_test.py`,
+  `checkpoint_test.py`, `process_graph_test.py`, `thermodynamic_updates_test.py`,
+  `resident_communication_test.py`, and `scheduler_test.py` cover GAS/PARTICLES
+  resource pinning and nonaliasing, canonical twelve-node barrier ordering,
+  saturation-only invalidation, identity-stable no-op dispatch, schema-v2
+  checkpoint restoration and schema-v1 noncommunication restart compatibility,
+   no normal-step conversion/readback/synchronization, writer-fault guard/session
+   transitions, and concrete-only export boundaries.
 - **P6:** Parameterize independent-box, 1D parcel/advection, mixing, expansion,
   and combined repeated-step fixtures. Warp CPU is required when Warp is
   installed; CUDA rows are optional and skip cleanly. Compare equivalent
@@ -65,6 +70,21 @@ must maintain at least 80% coverage.
   caller-owned map arrays. Scratch mutation during documented planning is
   asserted separately. Rollback after commit launch is not promised.
 
-Likely test locations are `particula/execution/tests/communication_test.py`,
-`particula/gpu/kernels/tests/communication_test.py`, and
-`particula/gpu/tests/communication_parity_test.py`.
+P5 focused validation ran:
+
+```bash
+pytest particula/execution/tests/gpu_resources_test.py \
+  particula/execution/tests/checkpoint_test.py \
+  particula/execution/tests/process_graph_test.py \
+  particula/execution/tests/thermodynamic_updates_test.py \
+  particula/execution/tests/resident_communication_test.py \
+  particula/execution/tests/scheduler_test.py -q -Werror
+pytest particula/execution/tests/exports_test.py -q -Werror
+pytest particula/execution/tests/ --cov=particula.execution \
+  --cov-report=term-missing --cov-fail-under=80 -q -Werror
+ruff check particula/execution/
+ruff format particula/execution/
+ruff check particula/execution/
+mypy particula/execution/ --ignore-missing-imports
+mkdocs build --strict
+```

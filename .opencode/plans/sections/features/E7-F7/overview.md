@@ -11,16 +11,19 @@ host transfers or full CFD coupling.
 
 ## Value Proposition
 
-E7-F7 has shipped validated fixed-shape communication declarations, direct-Warp
-per-box volume evolution, concrete-only synchronous gas communication, and
-fixed-capacity direct-Warp particle transport.
-The gas operation uses caller-owned extensive ledgers, supports declared open
-source/sink endpoints, and commits gas concentration once. The particle
-operation uses immutable pre-step planning, exact population matching or
-ascending pre-step free-slot reservations, caller-owned ledgers, and a gated
-one-kernel commit for closed maps. Resident scheduler integration remains a
-later phase. Independent boxes remain the default; shipped operations preserve
-explicit ownership, synchronization, and failure boundaries.
+E7-F7 has shipped fixed-shape communication declarations, direct-Warp volume,
+gas, and particle primitives, plus P5 resident integration. A resident session
+can pin exactly one complete closed GAS or PARTICLES map with its native work
+record and optional final volumes. The scheduler executes communication, then
+volume evolution, as the first two nodes of its closed twelve-node schedule.
+
+Those barriers use pre-update volumes and invalidate saturation ratio only;
+vapor pressure stays fresh until the existing consumer refresh windows. Schema-v2
+checkpoints preserve an optional pinned communication family, while schema-v1
+noncommunication checkpoints remain restart-compatible. Normal steps retain
+explicit ownership: no transfer, synchronization, fallback, resource
+replacement, retry, or rollback is introduced. Independent boxes remain the
+default.
 
 ## User Stories
 

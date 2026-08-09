@@ -1,7 +1,7 @@
 # Architecture Reference
 
 **Project:** particula  
-**Last Updated:** 2026-07-30
+**Last Updated:** 2026-08-09
 
 This reference summarizes the particula package structure and key architectural
 conventions migrated from the legacy guide set.
@@ -116,14 +116,17 @@ remote, or delta persistence, or guarantee rollback after an asynchronous device
 writer launches. See
 [ADR-007](architecture/decisions/ADR-007-resident-session-checkpoint-finalize-restart.md).
 
-Restart compatibility is exact and fail-closed: schema-v1 noncommunication and
-schema-v2 optional-communication records with carrier type `"ResidentSession"`,
-ACTIVE records, complete valid payload schemas, and an exactly equal `Device` are
-accepted. Other versions, schemas, malformed records, non-ACTIVE checkpoint
-records, and device mismatches reject. Finalization makes
-its source session terminal but returns an ACTIVE checkpoint eligible for explicit
-restart. E7-F5 P2 supplies declaration-only scheduling; E7-F7 transport and
-E7-F8 detailed RNG-stream policy remain future work. E7-F7 P4 particle
+Restart compatibility is exact and fail-closed: schema-v1 records remain
+noncommunication, while schema-v2 permits no communication family or exactly
+one complete matching closed-map GAS or PARTICLES family and metadata. Both
+require carrier type `"ResidentSession"`, ACTIVE records, complete valid payload
+schemas, and an exactly equal `Device`; restart reconstructs fresh communication
+resources rather than reusing source identities. Other versions, partial,
+mixed, malformed, or non-ACTIVE records and device mismatches reject.
+Finalization makes its source session terminal but returns an ACTIVE checkpoint
+eligible for explicit restart. E7-F5 P2 supplies declaration-only scheduling;
+remaining E7-F7 transport work and E7-F8 detailed RNG-stream policy remain
+future work. E7-F7 P4 particle
 transport is shipped as the concrete-only
 ``particula.gpu.kernels.communication.particle_communication_step_gpu`` seam.
 P4 owns immutable pre-step planning, admission, and one gated particle commit;
@@ -170,10 +173,15 @@ dtype/shape/device/contiguity metadata; checks allocation sizes; and rejects
 sidecar-to-sidecar and primary-to-sidecar aliasing. Compatible repeats return the
 same views, records, and Warp arrays by identity. Ownership means pinned role
 identity and nonaliasing, not allocator-provenance inference. Its typed
-manifests and views remain concrete-only and absent from package exports. The
-boundary performs no execution or selection, transfer/synchronization/
-restoration, lifecycle change, transport allocation, process
-physics/configuration, or RNG initialization, advancement, or reset.
+ manifests and views remain concrete-only and absent from package exports. The
+ boundary performs no execution or selection, transfer/synchronization/
+ restoration, lifecycle change, process physics/configuration, or RNG
+ initialization, advancement, or reset. Its communication acquisition seam is
+ the sole exception for fixed-shape transport work storage: it validates one
+ exact closed-map GAS or PARTICLES configuration and pins its native record,
+ map arrays, and optional final-volume sidecar. Omitted required work arrays may
+ be allocated at acquisition; normal resident steps perform metadata-only
+ validation and neither reacquire nor inspect communication payloads.
 Condensation thermodynamic entries are derived scratch storage only, never
 thermodynamic configuration.
 Its narrow `validate_pinned_session()` seam first requires exact session
@@ -187,6 +195,16 @@ requires the exact already-published wall-loss or nucleation view and its pinned
 sidecar bindings by identity. Neither seam acquires or replaces resources,
 inspects payloads, mutates registry state, transfers, synchronizes, nor invokes
 physics.
+
+`particula.execution.resident_communication` is the concrete-only composition
+seam for those pinned closed-map resources. It dispatches communication with
+pre-update volumes before optional prescribed volume evolution, with resident
+containers and records by identity. This canonical barrier precedes all ten
+ordinary nodes in the closed twelve-node schedule. The barriers invalidate
+saturation ratio only, retain fresh vapor pressure, and provide no hidden
+transfer, synchronization, fallback, retry, rollback, or public API. Combined
+communication maps and open endpoints are not resident forms. See
+[ADR-018](architecture/decisions/ADR-018-resident-communication-integration.md).
 
 `particula.execution.process_adapters` is a concrete-only direct-import
 delegation boundary for resident dilution, wall loss, and nucleation. Its frozen
@@ -217,6 +235,8 @@ boundary is package-exported and neither uploads, restores, synchronizes,
 checkpoints, acquires/replaces storage, resizes, or falls back. After a writer
 may launch, a failure closes the token and faults the session without rollback.
 See [ADR-012](architecture/decisions/ADR-012-resident-complete-loop-and-diagnostics.md).
+The resident communication and checkpoint integration is recorded in
+[ADR-018](architecture/decisions/ADR-018-resident-communication-integration.md).
 
 ## Wall Loss
 

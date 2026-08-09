@@ -37,5 +37,12 @@
   and `ParticleCommunicationBuffers` docstrings document the direct-only
   import, exact buffer schemas, immutable pre-step planning, exact-match or
   pre-step-free-slot selection, closed-map conservation, caller synchronization,
-  and gated-commit/no-post-launch-rollback boundary.
+   and gated-commit/no-post-launch-rollback boundary.
+- P5 (#1511) updated the concrete resident-session contract in
+  `.opencode/guides/architecture/architecture_guide.md`,
+  `.opencode/guides/architecture/architecture_outline.md`, and
+  `docs/Features/gpu_resident_checkpoints.md`: direct-only closed-map resource
+  acquisition, communication-then-volume barrier order, saturation-only
+  invalidation, and schema-v2/schema-v1 restart boundaries. It adds no public
+  export or public complete-loop API.
 - Run `mkdocs build --strict` and relevant docs tests before completing P7.

@@ -125,11 +125,38 @@ class NucleationResources:
 
 @dataclass(frozen=True, eq=False)
 class CommunicationResources:
-    """Expose one exact resident communication configuration and work record."""
+    """Expose one exact resident communication configuration and work record.
+
+    The registry publishes this identity-bound view only after P1 configuration
+    validation and complete sidecar schema/nonaliasing checks. The
+    configuration, native work record, and optional final volumes remain
+    caller- or registry-owned device state; this view performs no transfer,
+    synchronization, payload inspection, or mutation. It represents either the
+    GAS or PARTICLES family, never a combined or open-map configuration.
+
+    Attributes:
+        configuration: Exact closed-map configuration retained by identity.
+        buffers: Exact mode-matched native work record retained by identity.
+        final_volumes: Optional pinned ``float64`` per-box target volumes.
+    """
 
     configuration: CommunicationConfiguration
     buffers: GasCommunicationBuffers | ParticleCommunicationBuffers
     final_volumes: Any | None
+    execution_state: "ResidentCommunicationState"
+
+
+@dataclass(frozen=True, eq=False)
+class ResidentCommunicationState:
+    """Expose registry-pinned status and snapshot storage for barriers."""
+
+    invalid: Any
+    active_or_demand: Any
+    volume_invalid: Any
+    volume_changed: Any
+    initial_masses: Any | None = None
+    initial_concentration: Any | None = None
+    initial_charge: Any | None = None
 
 
 def _entry(
@@ -223,6 +250,10 @@ _GAS_COMMUNICATION = ResourceManifest(
         _entry("amounts", "communication_gas", wp.float64, "bs"),
         _entry("amount_deltas", "communication_gas", wp.float64, "bs"),
         _entry("outbound_amounts", "communication_gas", wp.float64, "bs"),
+        _entry("invalid", "communication_gas", wp.int32, "status"),
+        _entry("active_or_demand", "communication_gas", wp.int32, "status"),
+        _entry("volume_invalid", "communication_gas", wp.int32, "status"),
+        _entry("volume_changed", "communication_gas", wp.int32, "status"),
     ),
 )
 _PARTICLE_COMMUNICATION = ResourceManifest(
@@ -243,6 +274,17 @@ _PARTICLE_COMMUNICATION = ResourceManifest(
             wp.float64,
             "en",
         ),
+        _entry("invalid", "communication_particles", wp.int32, "status"),
+        _entry(
+            "active_or_demand", "communication_particles", wp.int32, "status"
+        ),
+        _entry("volume_invalid", "communication_particles", wp.int32, "status"),
+        _entry("volume_changed", "communication_particles", wp.int32, "status"),
+        _entry("initial_masses", "communication_particles", wp.float64, "bns"),
+        _entry(
+            "initial_concentration", "communication_particles", wp.float64, "bn"
+        ),
+        _entry("initial_charge", "communication_particles", wp.float64, "bn"),
     ),
 )
 
@@ -688,13 +730,15 @@ class GPUResourceRegistry:
 
         Args:
             entry: Manifest role whose shape formula is resolved.
-            capacity: Required collision capacity for ``"bc2"`` entries.
+            capacity: Required collision or communication-edge capacity for
+                ``"bc2"``, ``"e"``, and ``"en"`` entries.
 
         Returns:
             Exact Warp-array shape for the entry.
 
         Raises:
-            ValueError: If a collision-pair shape lacks its required capacity.
+            ValueError: If a collision-pair or communication-edge shape lacks
+                its required capacity.
         """
         dimensions = self._session.dimensions
         shapes: dict[str, tuple[int, ...]] = {
@@ -706,6 +750,7 @@ class GPUResourceRegistry:
                 dimensions.n_particles,
                 dimensions.n_species,
             ),
+            "status": (1,),
         }
         if entry.shape_kind == "bc2":
             if capacity is None:
@@ -729,7 +774,8 @@ class GPUResourceRegistry:
         Args:
             entry: Expected dtype and shape specification.
             value: Caller-supplied Warp array to inspect without reading.
-            capacity: Collision capacity for collision-pair entries.
+            capacity: Collision or communication-edge capacity for entries
+                whose schema requires it.
 
         Returns:
             Nonempty half-open byte range, or ``None`` for an empty array.
@@ -810,7 +856,8 @@ class GPUResourceRegistry:
 
         Args:
             entry: Manifest role to allocate.
-            capacity: Collision capacity for collision-pair entries.
+            capacity: Collision or communication-edge capacity for entries
+                whose schema requires it.
 
         Returns:
             Zero-filled Warp array matching the entry's fixed schema.
@@ -967,7 +1014,8 @@ class GPUResourceRegistry:
         Args:
             manifest: Complete schema for the resource family.
             supplied: Role-to-array bindings; ``None`` requests allocation.
-            capacity: Collision capacity for the coagulation family.
+            capacity: Collision or communication-edge capacity for a manifest
+                that requires it.
 
         Returns:
             Pinned role-to-array bindings for the established family.
@@ -1137,9 +1185,28 @@ class GPUResourceRegistry:
     ) -> CommunicationResources:
         """Pin one closed resident communication map and native work record.
 
-        P1 configuration validation is deliberately performed only here. Later
-        execution performs metadata-only identity validation through
-        :meth:`validate_communication_resources`.
+        This is the sole P1 validation and optional-allocation boundary for this
+        family. It accepts only GAS or PARTICLES closed maps, validates the
+        configuration once, then pins maps, work arrays, and optional prescribed
+        volumes by identity after schema and byte-range nonaliasing checks.
+        Reacquisition may return the established binding but never replaces it.
+        It does not execute a communication primitive, inspect payload values,
+        transfer, synchronize, initialize RNG state, or recover a writer error.
+
+        Args:
+            configuration: Exact P1-validated closed resident map and optional
+                prescribed-volume update.
+            buffers: Optional complete native mode-matched work record. Omitted
+                work arrays are allocated on the pinned device.
+
+        Returns:
+            The stable identity-bound published communication resource view.
+
+        Raises:
+            TypeError: If the configuration or supplied buffer record has an
+                inexact or mode-incompatible type.
+            ValueError: If P1 validation, session identity, resource schema,
+                capacity, or nonaliasing checks fail, or a binding is replaced.
         """
         self._validate_session_signature()
         if type(configuration) is not CommunicationConfiguration:
@@ -1181,6 +1248,15 @@ class GPUResourceRegistry:
             raise ValueError(
                 "resident communication supports GAS or PARTICLES only."
             )
+        opposite_family = (
+            "communication_particles"
+            if mode is CommunicationTransportMode.GAS
+            else "communication_gas"
+        )
+        if opposite_family in self._views:
+            raise ValueError(
+                "Only one resident communication family may be bound."
+            )
         family = (
             "communication_gas"
             if mode is CommunicationTransportMode.GAS
@@ -1208,10 +1284,16 @@ class GPUResourceRegistry:
         }
         for entry in manifest.entries[4:]:
             supplied[entry.role] = (
-                None if buffers is None else getattr(buffers, entry.role)
+                None
+                if buffers is None or not hasattr(buffers, entry.role)
+                else getattr(buffers, entry.role)
             )
+        native_roles = {entry.role for entry in manifest.entries[4:]}
         if buffers is not None and any(
-            value is None for value in supplied.values()
+            supplied[role] is None
+            for role in native_roles.intersection(
+                self._record_bindings(buffers)
+            )
         ):
             raise ValueError("communication buffers must be complete.")
         bindings = self._acquire(
@@ -1231,10 +1313,20 @@ class GPUResourceRegistry:
                     bindings["assignments"],
                     bindings["request_concentrations"],
                 )
+            execution_state = ResidentCommunicationState(
+                bindings["invalid"],
+                bindings["active_or_demand"],
+                bindings["volume_invalid"],
+                bindings["volume_changed"],
+                bindings.get("initial_masses"),
+                bindings.get("initial_concentration"),
+                bindings.get("initial_charge"),
+            )
             self._views[family] = CommunicationResources(
                 configuration,
                 native,
                 configuration.prescribed_volume.final_volumes,
+                execution_state,
             )
         view = self._views[family]
         if view.configuration is not configuration:
@@ -1246,7 +1338,24 @@ class GPUResourceRegistry:
     def validate_communication_resources(
         self, session: ResidentSession, resources: CommunicationResources
     ) -> None:
-        """Metadata-validate an established communication resource view."""
+        """Metadata-validate an established communication resource view.
+
+        This execution-time seam requires the exact active pinned session and
+        published view, then rechecks mode, identities, shapes, device,
+        contiguity, and nonaliasing metadata. It intentionally does not repeat
+        P1 payload validation, allocate, acquire, inspect values, transfer,
+        synchronize, mutate bindings, or invoke a native primitive.
+
+        Args:
+            session: Exact active session retained by this registry.
+            resources: Exact published communication resource view.
+
+        Raises:
+            TypeError: If ``resources`` or its configuration has an inexact
+                concrete type.
+            ValueError: If the session, mode, view, sidecar identity, or schema
+                no longer matches the pinned binding.
+        """
         self.validate_pinned_session(session)
         if type(resources) is not CommunicationResources:
             raise TypeError(
@@ -1302,6 +1411,19 @@ class GPUResourceRegistry:
             "rates": configuration.communication_map.rates,
         }
         values.update(self._record_bindings(resources.buffers))
+        values.update(
+            {
+                "invalid": resources.execution_state.invalid,
+                "active_or_demand": resources.execution_state.active_or_demand,
+                "volume_invalid": resources.execution_state.volume_invalid,
+                "volume_changed": resources.execution_state.volume_changed,
+                "initial_masses": resources.execution_state.initial_masses,
+                "initial_concentration": (
+                    resources.execution_state.initial_concentration
+                ),
+                "initial_charge": resources.execution_state.initial_charge,
+            }
+        )
         for entry in manifest.entries:
             if values.get(entry.role) is not bindings[entry.role]:
                 raise ValueError("communication resource bindings changed.")

@@ -1,8 +1,11 @@
 """Declare and validate neutral process-graph plans.
 
 This module validates and normalizes immutable process declarations and
-provides a read-only canonical topological-order helper. It does not resolve
-scheduler policy, execute work, access resources, or load optional backends.
+provides a read-only canonical topological-order helper. Its closed resident
+catalogue declares communication followed by optional volume evolution before
+the ten ordinary loop nodes; both barriers invalidate saturation ratio only.
+It does not resolve scheduler policy, execute work, access resources, or load
+optional backends.
 """
 
 import re
@@ -28,7 +31,8 @@ class NodeKind(str, Enum):
     """Identify the role of a declaration-only process-graph node.
 
     Node kinds describe graph declarations only; they do not select or run an
-    execution backend.
+    execution backend. ``COMMUNICATION`` and ``VOLUME_EVOLUTION`` are the
+    ordered resident barrier declarations, not process or backend APIs.
     """
 
     PROCESS = "process"
@@ -367,7 +371,10 @@ def resolve_timestep_plan(plan: TimestepPlan) -> ResolvedProcessGraph:
     """Validate and deterministically normalize a declaration-only plan.
 
     This pure boundary neither schedules nor executes the declared graph,
-    accesses resources, or selects an execution backend.
+    accesses resources, or selects an execution backend. For complete resident
+    graphs, the closed catalogue permits the communication-to-volume barrier
+    edges before every ordinary loop node; it does not acquire those resources
+    or mutate derived-state freshness.
 
     Args:
         plan: Exact immutable plan declaration to validate and normalize.

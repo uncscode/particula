@@ -1,5 +1,6 @@
 """Tests for concrete resident communication barrier dispatch."""
 
+from dataclasses import replace
 from typing import Any, cast
 
 import numpy as np
@@ -123,7 +124,7 @@ def test_executor_dispatches_only_the_selected_native_primitive(
         calls.append(args)
         return "particles"
 
-    monkeypatch.setattr(native, "gas_communication_step_gpu", gas)
+    monkeypatch.setattr(native, "resident_gas_communication_step_gpu", gas)
     monkeypatch.setattr(native, "particle_communication_step_gpu", particles)
 
     result = ResidentCommunicationExecutor(request).execute_communication()
@@ -131,12 +132,16 @@ def test_executor_dispatches_only_the_selected_native_primitive(
     assert result == mode.value
     assert len(calls) == 1
     if mode is CommunicationTransportMode.GAS:
-        assert calls[0] == (
+        assert calls[0][:5] == (
             request.session.particles,
             request.session.gas,
             request.resources.configuration,
             request.duration,
             request.resources.buffers,
+        )
+        assert calls[0][5:] == (
+            request.resources.execution_state.invalid,
+            request.resources.execution_state.active_or_demand,
         )
     else:
         assert calls[0] == (
@@ -158,12 +163,38 @@ def test_executor_rejects_invalid_duration_before_native_dispatch(
 
     monkeypatch.setattr(
         native,
-        "gas_communication_step_gpu",
+        "resident_gas_communication_step_gpu",
         lambda *_args: pytest.fail("native primitive must not be called"),
     )
 
     with pytest.raises(ValueError, match="finite and nonnegative"):
         ResidentCommunicationExecutor(request).execute_communication()
+
+    np.testing.assert_array_equal(
+        cast(Any, request.session.gas).concentration.numpy(), gas_before
+    )
+
+
+@pytest.mark.warp
+def test_executor_rejects_mismatched_barrier_node_before_native_dispatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Barrier-node identity drift rejects before a native writer is called."""
+    request = _request(CommunicationTransportMode.GAS)
+    invalid_request = replace(
+        request, volume_evolution_node=request.communication_node
+    )
+    gas_before = cast(Any, request.session.gas).concentration.numpy().copy()
+    import particula.gpu.kernels.communication as native
+
+    monkeypatch.setattr(
+        native,
+        "resident_gas_communication_step_gpu",
+        lambda *_args: pytest.fail("native primitive must not be called"),
+    )
+
+    with pytest.raises(ValueError, match="barrier nodes do not match graph"):
+        ResidentCommunicationExecutor(invalid_request).execute_communication()
 
     np.testing.assert_array_equal(
         cast(Any, request.session.gas).concentration.numpy(), gas_before
@@ -180,7 +211,7 @@ def test_volume_dispatch_is_skipped_without_prescribed_volumes(
 
     monkeypatch.setattr(
         native,
-        "volume_evolution_step_gpu",
+        "resident_volume_evolution_step_gpu",
         lambda *_args: pytest.fail("volume primitive must not be called"),
     )
 
@@ -205,7 +236,7 @@ def test_volume_dispatch_retains_final_volume_identity(
     calls: list[tuple[object, ...]] = []
     monkeypatch.setattr(
         native,
-        "volume_evolution_step_gpu",
+        "resident_volume_evolution_step_gpu",
         lambda *args: calls.append(args) or "volume",
     )
 
@@ -214,5 +245,11 @@ def test_volume_dispatch_retains_final_volume_identity(
         == "volume"
     )
     assert calls == [
-        (request.session.particles, request.session.gas, final_volumes)
+        (
+            request.session.particles,
+            request.session.gas,
+            final_volumes,
+            request.resources.execution_state.volume_invalid,
+            request.resources.execution_state.volume_changed,
+        )
     ]

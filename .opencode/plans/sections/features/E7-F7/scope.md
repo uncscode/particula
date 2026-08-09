@@ -1,10 +1,9 @@
 # Scope
 
 E7-F7 supplies the opt-in, prescribed communication layer for E7's resident
-single-device multi-box loop. Its shipped P2 volume and P3 gas primitives are
-isolated direct device-resident operations over caller-owned fixed-capacity
-particle/gas state; later phases may place proven communication operations in
-E7-F5 scheduler nodes under E7-F6 capability and failure policy.
+single-device multi-box loop. P5 integrates the shipped direct primitives using
+one pinned, closed-map resident resource family and E7-F5's deterministic
+twelve-node scheduler barrier.
 
 ## In Scope
 
@@ -32,9 +31,16 @@ E7-F5 scheduler nodes under E7-F6 capability and failure policy.
   a complete representable closed-map plan.
 - Synchronous, registration-order-independent P3 gas updates from pre-step state
   using caller-owned work buffers; reusable resident scratch is deferred.
-- E7-F4 resource registration and checkpoint inclusion, E7-F5 deterministic
-  communication-node placement, and E7-F6 capability/error integration remain
-  deferred; P3 accepts caller-owned work storage rather than resident resources.
+- P5 resident integration: pin exactly one GAS or PARTICLES closed-map
+  configuration, its map arrays, native work record, and optional final-volume
+  sidecar by identity. Acquisition is the sole P1 payload-validation point;
+  normal execution performs metadata/identity validation only.
+- P5 schedule/lifecycle integration: communication then optional volume
+  evolution precede all pre-existing loop nodes in the closed twelve-node graph.
+  Both barriers use pre-update volumes and invalidate only `SATURATION_RATIO`.
+- P5 checkpoints: controller-created schema-v2 checkpoints preserve no family
+  or one complete pinned family and restart into fresh identities; schema-v1
+  noncommunication checkpoints remain restart-compatible.
 - Independent-box no-op behavior, one-dimensional neighbor maps, user-defined
   box pairs, Warp CPU parity, optional CUDA evidence, and explicit conservation
   tests.

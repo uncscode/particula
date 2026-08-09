@@ -57,4 +57,18 @@
       prescribed advection, dilution, expansion, and simple mixing.
     - `particula/gpu/kernels/dilution.py:323` - the shipped sink mutates only
       particle and gas concentrations using a finite-step rate.
-  - Resolved by: E7-F7-P3 / issue #1509.
+   - Resolved by: E7-F7-P3 / issue #1509.
+
+- [x] What resident communication forms and derived state can P5 use?
+  - Resolved 2026-08-09: Resident P5 accepts exactly one complete closed GAS or
+    PARTICLES family; it rejects combined and open-endpoint forms. Communication
+    and optional volume evolution run before all existing nodes and invalidate
+    `SATURATION_RATIO` only. Vapor pressure remains fresh.
+  - Resolved by: E7-F7-P5 / issue #1511.
+
+- [x] How do communication resources participate in restart compatibility?
+  - Resolved 2026-08-09: Controller checkpoints are schema v2 and contain either
+    no communication family or one complete family with matching metadata.
+    Restart reconstructs fresh bindings. Schema-v1 noncommunication checkpoints
+    remain compatible and cannot contain communication metadata or payloads.
+  - Resolved by: E7-F7-P5 / issue #1511.

@@ -37,14 +37,19 @@ target `Device` through `restart_resident_session(checkpoint, device)`.
 same exact compatible device and create fresh session, registry, guard, and
 resident-array identities.
 
-Restart compatibility is intentionally exact and fail-closed. The implementation
-accepts only `ResidentCheckpoint` records with schema version `1`, carrier type
-`"ResidentSession"`, lifecycle `ACTIVE`, complete valid canonical payload
-descriptors, and an exactly equal target `Device`. Finalization terminalizes its
-source session but returns an `ACTIVE`, restartable checkpoint record. Restart
-rejects other versions or carrier schemas, malformed or incomplete payloads,
-non-`ACTIVE` checkpoint records, and device mismatches; it does not promise
-forward or backward compatibility.
+Restart compatibility is intentionally exact and fail-closed. It accepts
+`ResidentCheckpoint` records with carrier type `"ResidentSession"`, lifecycle
+`ACTIVE`, complete valid canonical payload descriptors, and an exactly equal
+target `Device`. Schema-v1 checkpoints must be noncommunication checkpoints.
+Schema-v2 checkpoints may contain no communication family or exactly one
+complete closed-map GAS or PARTICLES communication family with matching
+metadata and payloads. Finalization terminalizes its source session but returns
+an `ACTIVE`, restartable checkpoint record. Restart creates fresh session,
+registry, guard, resident arrays, and communication bindings; it never reuses
+source identities or provides fallback. It rejects other versions or carrier
+schemas, malformed, incomplete, partial, mixed, or mismatched communication
+payloads, non-`ACTIVE` checkpoint records, and device mismatches; it does not
+promise forward or backward compatibility.
 
 Normal resident scheduler calls never checkpoint, finalize, or restart. Those
 operations remain this explicit, concrete-only exact-device boundary; see the

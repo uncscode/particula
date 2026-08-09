@@ -24,7 +24,11 @@ from particula.execution.process_graph import (
 
 
 def _registry_type() -> type[object]:
-    """Return the concrete registry type without an import cycle."""
+    """Return the concrete registry type without an import cycle.
+
+    Returns:
+        The direct-module-only GPU resource registry type.
+    """
     from particula.execution.gpu_resources import GPUResourceRegistry
 
     return GPUResourceRegistry
@@ -32,7 +36,22 @@ def _registry_type() -> type[object]:
 
 @dataclass(frozen=True, eq=False)
 class ResidentCommunicationRequest:
-    """Bind exact resident resources to the two closed barrier nodes."""
+    """Bind exact resident resources to the two closed barrier nodes.
+
+    The request retains the session, registry, graph, published communication
+    view, and graph-node objects by identity. It carries a finite nonnegative
+    duration but does not validate payload physics, allocate, transfer,
+    synchronize, or mutate resident state at construction.
+
+    Attributes:
+        session: Exact active resident session whose containers are dispatched.
+        registry: Exact registry that published ``resources``.
+        graph: Resolver-produced graph owning the two barrier nodes.
+        resources: Exact published closed-map communication resource view.
+        communication_node: Exact ``communication`` graph node.
+        volume_evolution_node: Exact ``volume_evolution`` graph node.
+        duration: Finite nonnegative barrier duration in s.
+    """
 
     session: ResidentSession
     registry: object
@@ -58,10 +77,24 @@ class ResidentCommunicationRequest:
 
 
 class ResidentCommunicationExecutor:
-    """Validate metadata and dispatch resident barrier primitives once."""
+    """Validate metadata and dispatch resident barrier primitives once.
+
+    The executor preserves the closed order: communication uses pre-update
+    volumes, then optional volume evolution applies prescribed final volumes.
+    Neither dispatch path transfers, synchronizes, retries, or recovers from a
+    native writer failure.
+    """
 
     def __init__(self, request: ResidentCommunicationRequest) -> None:
-        """Retain one exact communication request."""
+        """Retain one exact communication request.
+
+        Args:
+            request: Identity-bound closed-map resident barrier request.
+
+        Raises:
+            TypeError: If ``request`` is not an exact
+                ``ResidentCommunicationRequest``.
+        """
         if type(request) is not ResidentCommunicationRequest:
             raise TypeError(
                 "request must be an exact ResidentCommunicationRequest."
@@ -69,7 +102,18 @@ class ResidentCommunicationExecutor:
         self._request = request
 
     def validate(self) -> None:
-        """Validate identity and metadata without P1 scans or allocation."""
+        """Validate identity and metadata without P1 scans or allocation.
+
+        Validation delegates only to the registry's metadata seam and verifies
+        resolver provenance plus exact barrier-node identities. It performs no
+        configuration acquisition or P1 scan, payload readback, transfer,
+        synchronization, allocation, primitive dispatch, or mutation.
+
+        Raises:
+            TypeError: If duration is not a non-boolean real value.
+            ValueError: If duration, registry binding, graph provenance, or
+                barrier-node identity and kind are invalid.
+        """
         request = self._request
         if isinstance(request.duration, bool) or not isinstance(
             request.duration, Real
@@ -95,22 +139,40 @@ class ResidentCommunicationExecutor:
             raise ValueError("communication barrier nodes do not match graph.")
 
     def execute_communication(self) -> object:
-        """Dispatch exactly one native communication primitive by mode."""
+        """Dispatch exactly one native communication primitive by mode.
+
+        The selected GAS or PARTICLES primitive receives resident containers,
+        configuration, duration, and work record by identity. This method never
+        replaces those objects or transfers, reads back, synchronizes, retries,
+        falls back, acquires resources, or rolls back after a native writer
+        launches. Prelaunch validation errors occur before primitive dispatch;
+        native errors propagate unchanged.
+
+        Returns:
+            The selected native primitive's return value.
+
+        Raises:
+            TypeError: If request validation finds an invalid duration type.
+            ValueError: If metadata validation fails or the mode is unsupported.
+            Exception: Propagates a native primitive error without recovery.
+        """
         self.validate()
         request = self._request
         from particula.gpu.kernels.communication import (
-            gas_communication_step_gpu,
             particle_communication_step_gpu,
+            resident_gas_communication_step_gpu,
         )
 
         mode = request.resources.configuration.communication_map.transport_mode
         if mode is CommunicationTransportMode.GAS:
-            return gas_communication_step_gpu(
+            return resident_gas_communication_step_gpu(
                 request.session.particles,
                 request.session.gas,
                 request.resources.configuration,
                 request.duration,
                 request.resources.buffers,
+                request.resources.execution_state.invalid,
+                request.resources.execution_state.active_or_demand,
             )
         if mode is CommunicationTransportMode.PARTICLES:
             return particle_communication_step_gpu(
@@ -124,17 +186,35 @@ class ResidentCommunicationExecutor:
         )
 
     def execute_volume_evolution(self) -> object | None:
-        """Apply the optional prescribed-volume writer without replacement."""
+        """Apply the optional prescribed-volume writer without replacement.
+
+        If present, final volumes and resident particle and gas containers are
+        passed to the native writer by identity. If absent, this is a successful
+        write-free return. The boundary performs no object replacement,
+        transfer, readback, synchronization, acquisition, retry, fallback, or
+        rollback after launch.
+
+        Returns:
+            ``None`` when no final volumes are pinned; otherwise the native
+            volume primitive's return value.
+
+        Raises:
+            TypeError: If request validation finds an invalid duration type.
+            ValueError: If the resident communication binding is invalid.
+            Exception: Propagates a native volume-writer error without recovery.
+        """
         self.validate()
         final_volumes = self._request.resources.final_volumes
         if final_volumes is None:
             return None
         from particula.gpu.kernels.communication import (
-            volume_evolution_step_gpu,
+            resident_volume_evolution_step_gpu,
         )
 
-        return volume_evolution_step_gpu(
+        return resident_volume_evolution_step_gpu(
             self._request.session.particles,
             self._request.session.gas,
             final_volumes,
+            self._request.resources.execution_state.volume_invalid,
+            self._request.resources.execution_state.volume_changed,
         )

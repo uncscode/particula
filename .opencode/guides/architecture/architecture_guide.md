@@ -182,8 +182,21 @@
    kernel P2 owns final-volume writes, the GPU-kernel P4 owns particle
    transport, and P5 owns exact resident
   primary/sidecar alias checks. The module provides no transfer,
-  synchronization, fallback, or scheduling behavior and is not exported through
-  `particula.execution` or top-level `particula`.
+   synchronization, fallback, or scheduling behavior and is not exported through
+   `particula.execution` or top-level `particula`.
+- `particula.execution.resident_communication` is the separate concrete-only,
+  direct-import P5 composition seam. `GPUResourceRegistry.acquire_communication`
+  is the sole P1 payload-validation and allocation point: it pins one exact
+  closed-map `GAS` or `PARTICLES` configuration, its maps, native work record,
+  and optional final-volume sidecar by identity. Normal execution uses only
+  metadata/identity validation; it neither reacquires nor scans payloads.
+  Combined maps and open `-1` endpoints are not resident forms. The executor
+  dispatches gas or particle communication using pre-update volumes, then calls
+  prescribed volume evolution only when final volumes are pinned. Both barriers
+   invalidate `SATURATION_RATIO` only, leaving vapor pressure fresh. This seam
+   has no package or top-level export and no transfer, synchronization, fallback,
+   retry, or rollback behavior. See
+   [ADR-018](decisions/ADR-018-resident-communication-integration.md).
 - `particula.execution.thermodynamic_updates` is a concrete-only,
   direct-import Warp-dependent freshness coordinator. Its exact request binds
   an active `ResidentSession`, pinned `GPUResourceRegistry`, resolver-produced
@@ -209,18 +222,21 @@
   schemas are successful write-free no-ops. It does not expose callbacks,
   arbitrary inspection, registration, or output allocation.
 - `ResidentSimulationScheduler` accepts only the exact resolver-produced
-  ten-node schedule: environment update, gas update, vapor-pressure refresh,
-  saturation refresh, condensation, Brownian coagulation, dilution, wall loss,
-  nucleation, and diagnostics. With exact active session/registry/closed-guard
-  and request bindings, it fully preflights before opening one token, dispatches
-  resolver order, and routes condensation and diagnostics through thermodynamic
-  consumer windows. A complete success calls `complete_step()` once. A failure
-  before writer-capable dispatch leaves the session active; after a writer may
-  launch it closes the token, faults the session, and offers no rollback. Neither
-  seam is package- or top-level-exported and neither transfers, restores,
-  synchronizes, checkpoints, finalizes, acquires/replaces resources, resizes,
-  compacts, or falls back. See
-  [ADR-012](decisions/ADR-012-resident-complete-loop-and-diagnostics.md).
+  twelve-node schedule: communication, optional volume evolution, environment
+  update, gas update, vapor-pressure refresh, saturation refresh, condensation,
+  Brownian coagulation, dilution, wall loss, nucleation, and diagnostics. The
+  closed communication then volume-evolution barrier precedes every ordinary
+  node; communication uses pre-volume-update state. With exact active
+  session/registry/closed-guard and request bindings, it fully preflights before
+  opening one token, dispatches resolver order, and routes condensation and
+  diagnostics through thermodynamic consumer windows. A complete success calls
+  `complete_step()` once. A failure before writer-capable dispatch leaves the
+  session active; after a writer may launch it closes the token, faults the
+  session, and offers no rollback. Neither seam is package- or top-level-exported
+  and neither transfers, restores, synchronizes, checkpoints, finalizes,
+   acquires/replaces resources, resizes, compacts, or falls back. See
+   [ADR-012](decisions/ADR-012-resident-complete-loop-and-diagnostics.md) and
+   [ADR-018](decisions/ADR-018-resident-communication-integration.md).
 - P5 adds a concrete-only in-memory checkpoint boundary in
   `particula.execution.checkpoint`. `ResidentSession.checkpoint(registry, guard)`
   and `.finalize(registry, guard)` bind one controller by exact identity to that
@@ -238,17 +254,19 @@
   inspection `GasData` intentionally omits GPU-only vapor pressure and is not
   authoritative; restart recovers vapor pressure from canonical bytes.
 - `restart_resident_session(checkpoint, device)` is explicit and same-device
-  only. Its preflight fails closed: only an `ACTIVE` checkpoint with schema
-  version `1`, carrier type `"ResidentSession"`, complete valid payload
-  descriptors and bytes, and an exactly equal target `Device` is accepted.
-  After complete host-side preflight it creates fresh session, registry,
-  guard, container, primary-array, and sidecar identities; it never reuses the
-  source binding. It neither chooses nor migrates a device, falls back to CPU,
-  restarts automatically during normal use, provides disk/remote/delta storage,
-  nor promises rollback after an asynchronous device writer launches.
-  Snapshotting requires roughly one additional host copy of resident payload
-  bytes plus detached inspection copies. See
-  [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md).
+  only. Its preflight fails closed: it accepts an `ACTIVE` `ResidentSession`
+  checkpoint with complete valid descriptors and bytes, an exactly equal target
+  `Device`, and either schema-v1 without communication or schema-v2 with no
+  communication family or one complete matching closed-map GAS/PARTICLES family
+  and metadata. Restart creates fresh session, registry, guard, container,
+  primary-array, sidecar, and (when present) communication resource identities;
+  it never reuses the source binding. It neither chooses nor migrates a device,
+  falls back to CPU, restarts automatically during normal use, provides
+  disk/remote/delta storage, nor promises rollback after an asynchronous device
+   writer launches. Snapshotting requires roughly one additional host copy of
+   resident payload bytes plus detached inspection copies. See
+   [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md)
+   and [ADR-018](decisions/ADR-018-resident-communication-integration.md).
 - P6 `ResidentSession.close(registry, guard)` and its `discard()` spelling are
   concrete-only terminal lifecycle operations, not recovery actions. From
   `ACTIVE`, close validates the exact pinned binding once and requires a closed

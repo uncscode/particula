@@ -1,8 +1,9 @@
 """Run the closed twelve-node GPU-resident simulation schedule.
 
-This is a concrete direct-import-only composition boundary. It retains every
-resident object by identity and performs no upload, restore, synchronization,
-fallback, resource acquisition, or rollback.
+This concrete direct-import-only composition boundary dispatches communication,
+then optional volume evolution, before the ten ordinary loop nodes. It retains
+every resident object by identity and performs no upload, restore,
+synchronization, fallback, resource acquisition, retry, or rollback.
 """
 
 from __future__ import annotations
@@ -98,9 +99,9 @@ def _registry_type() -> type[object]:
 class ResidentSimulationRequest:
     """Bind one complete resolved simulation loop to resident resources.
 
-        The request retains all carriers by identity for the canonical
-        twelve-node graph. It is concrete-only and does not acquire resources,
-        begin a step, or validate physical process inputs.
+    The request retains all carriers by identity for the canonical twelve-node
+    graph. It is concrete-only and does not acquire resources, begin a step,
+    transfer, synchronize, or validate physical process inputs.
 
     Attributes:
         session: Exact active resident session.
@@ -117,6 +118,7 @@ class ResidentSimulationRequest:
         diagnostics: Exact closed diagnostics plan.
         environment_update: Optional exact environment update request.
         gas_update: Optional exact gas update request.
+        communication: Exact request for the communication and volume barriers.
     """
 
     session: ResidentSession
@@ -187,9 +189,11 @@ class ResidentSimulationScheduler:
     """Execute one canonical fully resolved resident timestep at a time.
 
     Each successful call opens and completes exactly one lifecycle token while
-    dispatching the resolved twelve-node schedule. It neither transfers nor
-    restores data, acquires resources, synchronizes, falls back, or rolls back
-    after a writer-capable operation may have launched.
+    dispatching the resolved twelve-node schedule. Communication runs with
+    pre-update volumes, optional volume evolution follows it, and both barriers
+    invalidate saturation ratio only. The scheduler neither transfers nor
+    restores data, acquires resources, synchronizes, retries, falls back, or
+    rolls back after a writer-capable operation may have launched.
     """
 
     def __init__(self, request: ResidentSimulationRequest) -> None:
@@ -305,7 +309,9 @@ class ResidentSimulationScheduler:
 
         Raises:
             ValueError: If a state update, diagnostics plan, process request, or
-                execution state does not retain the scheduler's binding.
+            execution state does not retain the scheduler's binding. This
+            metadata preflight does not dispatch, transfer, synchronize, acquire
+            resources, or mutate resident arrays.
         """
         request = self._request
         registry = cast(Any, request.registry)

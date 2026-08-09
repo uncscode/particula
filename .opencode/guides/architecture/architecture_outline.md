@@ -162,8 +162,9 @@ The exact downstream ordering remains
    guarantee rollback after an asynchronous device writer launches. Snapshotting
    requires roughly one additional host copy of resident payload bytes plus
    detached inspection copies. See
-   [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md)
-   and [ADR-008](decisions/ADR-008-resident-session-failure-close-semantics.md).
+    [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md),
+    [ADR-008](decisions/ADR-008-resident-session-failure-close-semantics.md),
+    and [ADR-018](decisions/ADR-018-resident-communication-integration.md).
 - `gpu_resources.py` - Direct-import-only, Warp-dependent concrete registry for
    complete reusable native process sidecars, including one optional closed-map
    communication family. Each registry accepts exactly one
@@ -197,21 +198,24 @@ The exact downstream ordering remains
   sidecars, and each other. Canonical empty outputs are no-dispatch no-ops; it
   exposes neither callbacks nor arbitrary resident inspection.
  - `resident_communication.py` - Concrete direct-import-only E7-F7 P5 barrier
-   executor. It validates an already acquired closed GAS or PARTICLES map by
-   identity, dispatches communication before optional prescribed volume
-   evolution, and has no P1 validation, acquisition, transfer, synchronization,
-   fallback, retry, or rollback behavior.
+    executor. It validates an already acquired closed GAS or PARTICLES map by
+    identity, dispatches communication using pre-update volumes before optional
+    prescribed volume evolution, and has no P1 validation, acquisition,
+    transfer, synchronization, fallback, retry, or rollback behavior. Each
+    barrier invalidates saturation ratio only; vapor pressure remains fresh.
  - `resident_scheduler.py` - Concrete direct-import-only E7-F5 P6 composition
   boundary. It requires the exact active session/registry/closed-guard binding,
-   matching request carriers, and exactly the twelve resolver-produced canonical
-   nodes. It opens one token after complete preflight, dispatches the
-   communication and volume-evolution barriers first, then resolver order,
+    matching request carriers, and exactly the twelve resolver-produced canonical
+    nodes. It opens one token after complete preflight, dispatches the canonical
+    communication then optional volume-evolution barrier (both before the ten
+    ordinary nodes), then resolver order,
   consumes virtual thermodynamic refreshes only through condensation and
   diagnostics consumer windows, and completes the token only after the full
   loop succeeds. It has no package export, transfer, synchronization, fallback,
   resource replacement, or rollback; a possible post-launch failure faults the
   resident session. See
-  [ADR-012](decisions/ADR-012-resident-complete-loop-and-diagnostics.md).
+   [ADR-012](decisions/ADR-012-resident-complete-loop-and-diagnostics.md) and
+   [ADR-018](decisions/ADR-018-resident-communication-integration.md).
 - `process_adapters.py` - Concrete-only, direct-import resident delegation
    boundary for dilution, wall loss, and nucleation. Frozen request carriers
    retain the exact active `ResidentSession`, its pinned

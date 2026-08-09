@@ -10,16 +10,17 @@
   device metadata, aliases, enabled-edge topology, duplicate directed edges,
   rates, and optional final volumes (E7-F7-P1, #1507). Population-dependent
   outbound overdraw is deferred to P3.
-- [ ] Extend E7-F4 resource registration with fixed-shape communication scratch,
-  status, slot-plan, and diagnostic buffers.
-- [ ] Extend E7-F4 checkpoint metadata/resources so restart preserves configured
-  map identity and any documented mutable communication state.
-- [ ] Add typed E7-F5 node kinds for communication and volume evolution and place
-  them at the canonical pre-process barrier independent of registration order.
-- [ ] Mark gas-derived fields stale after communication and route refresh through
-  existing E7-F5 update dependencies rather than refreshing inside transport.
-- [ ] Add E7-F6 capability reasons for unsupported representation/map/device
-  combinations; preserve default error policy and pre-selection-only fallback.
+- [x] Pin one complete closed-map GAS or PARTICLES resource family, including
+   map arrays, native buffers, and optional final volumes, by identity in
+   `particula/execution/gpu_resources.py` (#1511).
+- [x] Add schema-v2 optional communication checkpoint metadata/payload handling
+   with fresh-identity restart and retained schema-v1 noncommunication restart
+   compatibility (#1511).
+- [x] Add typed `communication` and `volume_evolution` E7-F5 barriers and
+   canonicalize the closed twelve-node schedule independent of registration
+   order (#1511).
+- [x] Invalidate only saturation ratio after either barrier; retain existing
+   vapor-pressure and consumer refresh windows (#1511).
 
 ## GPU Kernels
 
@@ -34,8 +35,8 @@
   (E7-F7-P3, #1509); P4 destination capacity remains deferred.
 - [x] Keep P3 source reads synchronous by staging immutable pre-node amounts;
   transfers are registration-order independent (E7-F7-P3, #1509).
-- [ ] Preserve container/array identities and fixed dimensions across successful
-  calls; reuse session scratch rather than allocating in repeated steps.
+- [x] Preserve container/array identities and fixed dimensions across resident
+   calls; reuse pinned session scratch without normal-step allocations (#1511).
 - [x] Implement P3 closed-map ledger conservation and explicit open-boundary
   source/sink accounting without host readback in the normal path (#1509).
 - [x] Preserve per-particle species mass and signed charge during P4 slot
@@ -56,8 +57,9 @@
 - [x] Extend the co-located module for P4 fixed-capacity particle transport,
   immutable planning, deterministic assignments, closed-map conservation, and
   gated commit coverage (#1510).
-- [ ] Add scheduler/session tests for canonical order, resource reuse, no hidden
-  transfer/sync, checkpoint/restart, capability errors, and fault transitions.
+- [x] Add resident resource, graph, executor, scheduler, checkpoint, and thermal
+   update tests for canonical order, resource reuse, no hidden transfer/sync,
+   schema-v1/v2 restart, and fault transitions (#1511).
 - [ ] Add independent NumPy `float64` oracles in
   `particula/gpu/tests/communication_parity_test.py` without importing private
   production arithmetic.

@@ -310,13 +310,14 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   session use. There is no disk, remote, delta, or rollback facility; after an
   asynchronous device writer launches, rollback is not guaranteed. See
   [GPU resident checkpoints](docs/Features/gpu_resident_checkpoints.md).
-- Restart compatibility is fail-closed: only an ACTIVE `ResidentCheckpoint`
-  with schema version `1`, carrier type `"ResidentSession"`, complete valid
-  payload descriptors and bytes, and an exactly equal target `Device` is
-  accepted. E7-F5 scheduling is shipped as a concrete-only resident-scheduler
-  contract; normal scheduler calls never checkpoint, finalize, or restart.
-  E7-F7 transport and E7-F8 detailed scheduled RNG/restart policy remain
-  deferred.
+- Restart compatibility is fail-closed: an ACTIVE `ResidentCheckpoint` with
+  carrier type `"ResidentSession"`, complete valid payload descriptors and
+  bytes, and an exactly equal target `Device` is required. Schema-v1
+  noncommunication checkpoints remain restart-compatible. Controllers create
+  schema-v2 checkpoints, which may contain no communication family or one
+  complete closed-map GAS or PARTICLES family with matching metadata. Restart
+  reconstructs fresh communication arrays and bindings; it never reuses source
+  identities. Normal scheduler calls never checkpoint, finalize, or restart.
 
 ### Complete direct GPU process illustration
 
@@ -919,8 +920,9 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   providers before any optional runtime work.
 - Import concrete resident seams directly: setup/session/guard from
   `particula.execution.gpu_session`, the registry from
-  `particula.execution.gpu_resources`, and records/controller/restart from
-  `particula.execution.checkpoint`. They are not `particula.execution` or
+  `particula.execution.gpu_resources`, communication composition from
+  `particula.execution.resident_communication`, and records/controller/restart
+  from `particula.execution.checkpoint`. They are not `particula.execution` or
   top-level exports.
 - Setup converts CPU particle, gas, then environment data once. The session
   retains fixed dimensions and resident identities; ordered gas names remain
@@ -944,25 +946,30 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   outputs must not alias primaries, published sidecars, or each other. Canonical
   empty `(0, S)`, `(B, 0)`, and `(0, 0)` outputs are successful write-free
   no-ops. Neither module provides callbacks or package/top-level exports.
+- Resident communication is acquired once through the concrete registry as one
+  exact closed-map GAS or PARTICLES configuration, its same-device native work
+  record, and optional final `(B,)` `wp.float64` volumes. Normal-step metadata
+  validation preserves that binding by identity; it does not repeat P1 payload
+  validation, allocate, transfer, inspect payloads, or synchronize. Combined
+  maps and open `-1` endpoints are not resident communication forms.
 - `ResidentSimulationScheduler` accepts only the resolver-produced complete
-  ten-node schedule: environment update, gas update, vapor-pressure refresh,
-  saturation refresh, condensation, Brownian coagulation, dilution, wall loss,
-  nucleation, and diagnostics. It retains one exact active session, pinned
+  twelve-node schedule. Communication runs first, then optional prescribed
+  volume evolution, followed by environment update, gas update, vapor-pressure
+  refresh, saturation refresh, condensation, Brownian coagulation, dilution,
+  wall loss, nucleation, and diagnostics. The barriers use pre-update volumes
+  and invalidate saturation ratio only; vapor pressure remains fresh. The
+  virtual refresh nodes run vapor-pressure then saturation immediately before
+  condensation and diagnostics. It retains one exact active session, pinned
   registry, and closed guard by identity; opens one token only after preflight;
-  dispatches the profile/graph-dependent resolved order; and uses thermodynamic
-  consumer windows for condensation and diagnostics. The virtual refresh nodes
-  run vapor-pressure then saturation immediately before those consumers:
-  environment invalidates vapor pressure and saturation, while gas,
-  condensation, and nucleation invalidate saturation. It performs no transfer,
-  restore, synchronization, checkpoint/finalize, resource acquisition or
-  replacement, fallback, retry, resize, or compaction. A failure after a
-  writer-capable call closes the token, faults the session, and has no rollback
-  or retry guarantee.
-- Compatibility is fail-closed: only checkpoint schema version `1`, carrier
-  type `"ResidentSession"`, ACTIVE state, complete valid payloads, and an
-  exactly equal `Device` restart. E7-F5 scheduling is shipped as this
-  concrete-only bounded contract. `ParticleData.volume` remains fixed resident
-  scheduler state. E7-F7-P2 provides the isolated concrete-only direct import
+  and dispatches the resolved order. It performs no transfer, restore,
+  synchronization, checkpoint/finalize, resource acquisition or replacement,
+  fallback, retry, resize, or compaction. A failure after a writer-capable call
+  closes the token, faults the session, and has no rollback or retry guarantee.
+- Compatibility is fail-closed: schema-v1 noncommunication and schema-v2
+  optional-communication checkpoints require carrier type `"ResidentSession"`,
+  ACTIVE state, complete valid payloads, and an exactly equal `Device` restart.
+  `ParticleData.volume` is fixed resident state except for the optional
+  prescribed volume-evolution barrier. The standalone E7-F7-P2 direct import is
   `particula.gpu.kernels.communication.volume_evolution_step_gpu`: callers pass
   active-device final `(B,)` `wp.float64` volumes in m^3, and it scales particle
   and gas concentrations in place to preserve extensive inventories. It has no
@@ -1004,6 +1011,9 @@ Focused commands:
 
 ```bash
 pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror
+pytest particula/execution/tests/gpu_resources_test.py \
+  particula/execution/tests/checkpoint_test.py \
+  particula/execution/tests/resident_communication_test.py -q -Werror
 pytest particula/execution/tests/scheduler_test.py -q -Werror
 pytest particula/tests/execution_exports_test.py -q -Werror
 ruff check particula/execution/

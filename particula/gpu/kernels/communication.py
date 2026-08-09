@@ -1788,3 +1788,164 @@ def particle_communication_step_gpu(
         device=device,
     )
     return particles
+
+
+@wp.kernel
+def _resident_reset_status(
+    invalid: wp.array(dtype=wp.int32),
+    active: wp.array(dtype=wp.int32),
+    active_value: int,
+) -> None:
+    """Reset registry-pinned one-element status storage."""
+    if wp.tid() == 0:
+        invalid[0] = 0
+        active[0] = active_value
+
+
+def resident_gas_communication_step_gpu(
+    particles: Any,
+    gas: Any,
+    configuration: CommunicationConfiguration,
+    time_step: float,
+    buffers: GasCommunicationBuffers,
+    invalid: Any,
+    active: Any,
+) -> tuple[Any, Any]:
+    """Dispatch acquired closed GAS resources without public P1 validation.
+
+    This private resident seam assumes acquisition has already established every
+    schema, identity, alias, and static map invariant.  It intentionally has no
+    allocations, payload scans, host readback, or synchronization.
+    """
+    map_data = configuration.communication_map
+    concentration = gas.concentration
+    volume = particles.volume
+    boxes, species = concentration.shape
+    edges = int(map_data.edge_capacity)
+    if boxes == 0 or species == 0 or edges == 0 or time_step == 0.0:
+        return particles, gas
+    device = concentration.device
+    wp.launch(
+        _resident_reset_status,
+        dim=1,
+        inputs=[invalid, active, 1],
+        device=device,
+    )
+    # Closed resident maps never need open-boundary accounting arrays.  The
+    # unused ledger arguments are never dereferenced when their flags are zero.
+    wp.launch(
+        _communication_clear_and_stage,
+        dim=(boxes, species),
+        inputs=[
+            concentration,
+            volume,
+            buffers.amounts,
+            buffers.amount_deltas,
+            buffers.outbound_amounts,
+            buffers.amounts,
+            buffers.amounts,
+            0,
+            0,
+            active,
+            invalid,
+        ],
+        device=device,
+    )
+    wp.launch(
+        _communication_propose,
+        dim=(edges, species),
+        inputs=[
+            map_data.source_boxes,
+            map_data.destination_boxes,
+            map_data.enabled,
+            map_data.rates,
+            time_step,
+            buffers.amounts,
+            buffers.amount_deltas,
+            buffers.outbound_amounts,
+            buffers.amounts,
+            buffers.amounts,
+            0,
+            0,
+            active,
+            invalid,
+        ],
+        device=device,
+    )
+    wp.launch(
+        _communication_validate_final,
+        dim=(boxes, species),
+        inputs=[
+            buffers.amounts,
+            buffers.amount_deltas,
+            buffers.outbound_amounts,
+            volume,
+            active,
+            invalid,
+        ],
+        device=device,
+    )
+    wp.launch(
+        _communication_commit,
+        dim=(boxes, species),
+        inputs=[
+            concentration,
+            volume,
+            buffers.amounts,
+            buffers.amount_deltas,
+            active,
+            invalid,
+        ],
+        device=device,
+    )
+    return particles, gas
+
+
+def resident_volume_evolution_step_gpu(
+    particles: Any,
+    gas: Any,
+    final_volumes: Any,
+    invalid: Any,
+    changed: Any,
+) -> tuple[Any, Any]:
+    """Apply acquired prescribed volumes without public P1 validation."""
+    volume = particles.volume
+    particle_concentration = particles.concentration
+    gas_concentration = gas.concentration
+    boxes = volume.shape[0]
+    if boxes == 0:
+        return particles, gas
+    device = volume.device
+    wp.launch(
+        _resident_reset_status,
+        dim=1,
+        inputs=[invalid, changed, 1],
+        device=device,
+    )
+    if particle_concentration.shape[1]:
+        wp.launch(
+            _apply_scaled_concentration,
+            dim=particle_concentration.shape,
+            inputs=[
+                particle_concentration,
+                volume,
+                final_volumes,
+                invalid,
+                changed,
+            ],
+            device=device,
+        )
+    if gas_concentration.shape[1]:
+        wp.launch(
+            _apply_scaled_concentration,
+            dim=gas_concentration.shape,
+            inputs=[gas_concentration, volume, final_volumes, invalid, changed],
+            device=device,
+        )
+    wp.launch(
+        _apply_volume_evolution,
+        dim=boxes,
+        inputs=[volume, final_volumes, invalid, changed],
+        device=device,
+    )
+    return particles, gas

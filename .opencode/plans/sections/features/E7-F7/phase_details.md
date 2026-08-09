@@ -68,11 +68,22 @@
     gas or volume mutation, `-1` endpoints, transfer/synchronization, fallback,
     resizing, compaction, or implicit activation was added.
 
-- [ ] **E7-F7-P5:** Integrate communication nodes with resident sessions and scheduler tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Register reusable resources and execute communication/volume nodes at a canonical scheduler barrier with no normal-step transfer or synchronization.
-  - Files: `particula/execution/session.py`, `particula/execution/scheduler.py`, `particula/execution/tests/session_test.py`, `particula/execution/tests/scheduler_test.py`
-  - Tests: Capability/resource validation, canonical order, disabled-map isolation, stable identities, checkpoint/restart state, transfer spies, and post-launch session faulting.
+- [x] **E7-F7-P5:** Integrate communication nodes with resident sessions and scheduler tests
+   - Issue: #1511 | Size: S | Status: Shipped
+   - Delivered: `CommunicationResources` pins one exact closed GAS or PARTICLES
+     map, matching native work record, and optional final volumes. The concrete
+     executor dispatches the native primitive by identity. The resident scheduler
+     runs communication then volume evolution before the original ten nodes,
+     invalidating saturation ratio only. Schema-v2 checkpoints restore optional
+     communication resources into fresh identities; schema-v1 noncommunication
+     restart remains supported.
+   - Files: `particula/execution/gpu_resources.py`, `checkpoint.py`,
+     `process_graph.py`, `thermodynamic_updates.py`,
+     `resident_communication.py`, `resident_scheduler.py`, and adjacent tests.
+   - Tests: Resource/nonaliasing and identity checks; canonical barrier order;
+     saturation-only invalidation; GAS/PARTICLES dispatch and no-op isolation;
+     schema-v1/v2 checkpoint validation; no-transfer/no-sync spies; and
+     writer-path guard close/session faulting.
 
 - [ ] **E7-F7-P6:** Validate multi-box parity and conservation across prescribed cases
   - Issue: TBD | Size: S | Status: Not Started

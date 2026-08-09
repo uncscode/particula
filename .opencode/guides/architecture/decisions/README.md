@@ -19,3 +19,4 @@
 | [ADR-015](ADR-015-execution-public-surface-and-experimental-gpu-policy.md) | Execution Public Surface and Experimental GPU Policy | Accepted | 2026-07-30 |
 | [ADR-016](ADR-016-direct-gpu-volume-evolution-boundary.md) | Direct GPU Volume-Evolution Boundary | Accepted | 2026-08-08 |
 | [ADR-017](ADR-017-direct-gpu-particle-transport-boundary.md) | Direct GPU Particle-Transport Boundary | Accepted | 2026-08-08 |
+| [ADR-018](ADR-018-resident-communication-integration.md) | Resident Communication Integration | Accepted | 2026-08-09 |

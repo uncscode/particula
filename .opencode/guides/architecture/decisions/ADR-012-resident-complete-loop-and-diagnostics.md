@@ -15,9 +15,11 @@ snapshots without exposing callbacks or mutable resident internals.
 
 ### Problem Statement
 
-Compose one exact ten-node resident timestep and its supported diagnostics
+Compose one exact twelve-node resident timestep and its supported diagnostics
 without broadening package exports, adding hidden transport, or weakening the
-resident lifecycle and post-launch failure contracts.
+resident lifecycle and post-launch failure contracts. The closed communication
+and optional volume-evolution barriers run first, communication uses
+pre-update volumes, and each barrier invalidates saturation ratio only.
 
 ### Forces
 
@@ -40,12 +42,19 @@ Add two concrete, direct-import-only execution seams:
 1. `particula.execution.diagnostics` provides exactly ordered gas-concentration
    and saturation-ratio snapshots into validated caller-owned `(B, S)` outputs.
 2. `particula.execution.resident_scheduler` composes only the resolver-produced
-   ten-node loop, opens one guard token after preflight, dispatches the resolved
-   order, and completes that token only after all work succeeds.
+   twelve-node loop: communication, optional volume evolution, environment
+   update, gas update, vapor-pressure refresh, saturation refresh,
+   condensation, Brownian coagulation, dilution, wall loss, nucleation, and
+   diagnostics. It opens one guard token after preflight, dispatches the
+   resolved order, and completes that token only after all work succeeds.
 
-Virtual vapor-pressure and saturation-refresh nodes are consumed only through
-the thermodynamic consumer windows for condensation and diagnostics. Neither
-module is exported through `particula.execution` or top-level `particula`.
+The closed communication barrier uses pre-update volumes, and the optional
+volume-evolution barrier follows it; both invalidate saturation ratio only and
+leave vapor pressure fresh. Virtual vapor-pressure and saturation-refresh nodes
+are consumed only through the existing thermodynamic consumer windows for
+condensation and diagnostics. Neither module is exported through
+`particula.execution` or top-level `particula`, and neither performs transfer
+or synchronization.
 
 ### Chosen Option
 
@@ -100,7 +109,8 @@ rollback guarantee.
 
 ### Trade-offs Accepted
 
-1. **Fixed scope:** Only the canonical ten-node schedule and two diagnostics
+1. **Fixed scope:** Only the canonical twelve-node schedule, its leading closed
+   communication and optional volume-evolution barriers, and two diagnostics
    are supported.
 2. **Concrete imports:** Runtime carriers and executors remain unexported.
 3. **No transactional recovery:** Observable device mutation may remain after a
@@ -111,6 +121,8 @@ rollback guarantee.
 ### Positive
 
 - Complete resident loops preserve one exact lifecycle and resolved ordering.
+- Communication runs before optional volume evolution using pre-update volumes;
+  both barriers invalidate only saturation ratio.
 - Diagnostics copy current resident state without callbacks or host transfers.
 - Empty valid output schemas are successful write-free no-ops.
 
@@ -123,7 +135,9 @@ rollback guarantee.
 ### Neutral
 
 - Existing state updates, adapters, thermodynamic writes, and direct kernels
-  retain their own validation and mutation authority.
+  retain their own validation and mutation authority; virtual thermodynamic
+  refreshes remain limited to the established condensation and diagnostics
+  consumer windows.
 
 ## Implementation
 
@@ -134,17 +148,22 @@ rollback guarantee.
    - Copy only gas concentration and saturation ratio on the resident device.
 2. **Complete-loop composition** (`particula/execution/resident_scheduler.py`)
    - Preflight exact bindings and duration agreement before one token opens.
-   - Dispatch resolver order and route thermodynamic consumers through their
-     freshness windows.
+   - Dispatch communication then optional volume evolution before ordinary
+     nodes, using pre-update volumes for communication and invalidating only
+     saturation ratio at each barrier.
+   - Route thermodynamic consumers through their existing freshness windows.
 3. **Architecture documentation**
    - Record direct-import-only scope, lifecycle, exclusions, and ADR index.
 
 ### Testing Strategy
 
-Test exact ten-node ordering, one-token success, diagnostic ordering/current
-state, output nonaliasing and empty schemas, pre-dispatch active-session
-failures, post-launch faulting, identity stability, and no implicit transport.
-Use Warp CPU as the baseline and skip CUDA cleanly when unavailable.
+Test exact twelve-node ordering, leading communication and optional
+volume-evolution barriers, pre-update-volume communication, saturation-only
+invalidation, one-token success, diagnostic ordering/current state, output
+nonaliasing and empty schemas, pre-dispatch active-session failures,
+post-launch faulting, identity stability, and no implicit transport or
+synchronization. Use Warp CPU as the baseline and skip CUDA cleanly when
+unavailable.
 
 ### Rollback Plan
 
@@ -155,7 +174,9 @@ container schema, checkpoint format, or direct-kernel API requires migration.
 
 ### Success Criteria
 
-- [x] Only the exact resolver-produced ten-node schedule is accepted.
+- [x] Only the exact resolver-produced twelve-node schedule is accepted;
+  communication then optional volume evolution precede ordinary nodes, use
+  pre-update volumes for communication, and invalidate saturation ratio only.
 - [x] Diagnostics support only ordered gas and saturation snapshots with
   separately owned validated outputs.
 - [x] One successful loop begins and completes one guard token; a possible

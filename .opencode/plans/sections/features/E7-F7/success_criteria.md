@@ -20,12 +20,17 @@
   fixed-capacity plan.
 - [x] P3 (#1509) open boundaries expose caller-owned source/sink amount ledgers;
   no loss or source is silently attributed to numerical transport.
-- [ ] E7-F4 resources remain fixed-shape and identity-stable across repeated
-  steps and checkpoint/restart.
-- [ ] E7-F5 executes communication/volume nodes at the documented canonical
-  barrier and refreshes invalidated derived state before consuming processes.
-- [ ] E7-F6 capability errors and explicit fallback boundary are preserved; no
-  runtime retry, hidden transfer, implicit sync, or silent fallback occurs.
+- [x] P5 (#1511) pins one fixed-shape, nonaliasing closed-map communication
+   resource family by identity across repeated resident steps and recreates
+   fresh resources on schema-v2 restart; schema-v1 noncommunication restart is
+   retained.
+- [x] P5 (#1511) executes communication then volume evolution as the canonical
+   twelve-node pre-process barrier. Both invalidate saturation ratio only;
+   existing consumer windows refresh it without unnecessarily invalidating vapor
+   pressure.
+- [x] P5 (#1511) preserves no runtime retry, hidden transfer, implicit sync, or
+   silent fallback. Preflight failure is reusable; writer-path failure closes
+   the guard and faults the session without rollback.
 - [ ] Warp CPU parity, equivalent one-box, isolated-box metamorphic, 1D
   advection/mixing, expansion, and repeated-step tests pass with explicit
   tolerances; optional CUDA rows skip cleanly when unavailable.

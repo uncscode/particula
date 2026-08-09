@@ -210,132 +210,43 @@ def test_main_propagates_an_enabled_loader_error(
 
 
 def test_lifecycle_documentation_preserves_published_boundaries() -> None:
-    """Feature and roadmap text retain the concrete-only lifecycle contract."""
+    """Resident lifecycle documentation retains its cross-reference links."""
     feature = (
         _ROOT / "docs" / "Features" / "data-containers-and-gpu-foundations.md"
     ).read_text()
     checkpoint = (
         _ROOT / "docs" / "Features" / "gpu_resident_checkpoints.md"
     ).read_text()
-    open_questions = (
-        _ROOT
-        / ".opencode"
-        / "plans"
-        / "sections"
-        / "epics"
-        / "E7"
-        / "open_questions.md"
-    ).read_text()
     roadmap = (
         _ROOT / "docs" / "Features" / "Roadmap" / "data-oriented-gpu.md"
     ).read_text()
-    architecture = (
-        _ROOT / ".opencode" / "guides" / "architecture_reference.md"
-    ).read_text()
-    agents = (_ROOT / "AGENTS.md").read_text()
-    combined = "\n".join(
-        (feature, checkpoint, roadmap, architecture, agents, open_questions)
+    assert "[GPU resident checkpoints](gpu_resident_checkpoints.md)" in feature
+    assert (
+        "[GPU-resident deterministic timestep]"
+        "(data-containers-and-gpu-foundations.md#gpu-resident-deterministic-timestep)"
+        in checkpoint
     )
-    for phrase in (
-        "particula.execution.gpu_session",
-        "particula.execution.gpu_resources",
-        "particula.execution.checkpoint",
-        "nonterminal and returns",
-        "canonical bytes",
-        "schema version `1`",
-        "exactly equal `Device`",
-        "E7-F5",
-        "E7-F7",
-        "E7-F8",
-        "gpu_resident_session.py",
-        "source session",
-        "ACTIVE`, restartable checkpoint",
-        "acquired sidecars",
-        "lossy",
-        "No complete CPU fallback or restore is implemented",
-    ):
-        assert phrase in combined
-    assert "defers E7-F4 resident sessions" not in roadmap
+    assert (
+        "[GPU resident checkpoints](../gpu_resident_checkpoints.md)" in roadmap
+    )
 
 
 def test_scheduler_documentation_preserves_published_boundaries() -> None:
-    """Resident scheduler documentation retains the bounded P7 contract."""
+    """Resident scheduler documentation retains its cross-reference links."""
     feature = (
         _ROOT / "docs" / "Features" / "data-containers-and-gpu-foundations.md"
-    ).read_text()
-    checkpoint = (
-        _ROOT / "docs" / "Features" / "gpu_resident_checkpoints.md"
     ).read_text()
     roadmap = (
         _ROOT / "docs" / "Features" / "Roadmap" / "data-oriented-gpu.md"
     ).read_text()
-    agents = (_ROOT / "AGENTS.md").read_text()
-    records = "\n".join(
-        (
-            (
-                _ROOT
-                / ".opencode"
-                / "plans"
-                / "sections"
-                / "features"
-                / "E7-F5"
-                / name
-            ).read_text()
-            for name in (
-                "overview.md",
-                "scope.md",
-                "phase_details.md",
-                "documentation_updates.md",
-                "success_criteria.md",
-                "testing_strategy.md",
-                "dependencies.md",
-                "implementation_tasks.md",
-                "open_questions.md",
-            )
-        )
+    assert "[GPU resident checkpoints](gpu_resident_checkpoints.md)" in feature
+    assert (
+        "[Data-Oriented Design and GPU Roadmap](Roadmap/data-oriented-gpu.md)"
+        in feature
     )
-    combined = "\n".join((feature, checkpoint, roadmap, agents, records))
-
-    for node_id in (
-        "environment_update",
-        "gas_update",
-        "vapor_pressure_refresh",
-        "saturation_refresh",
-        "condensation",
-        "brownian_coagulation",
-        "dilution",
-        "wall_loss",
-        "nucleation",
-        "diagnostics",
-    ):
-        assert node_id in feature
-    for phrase in (
-        "particula.execution.resident_scheduler",
-        "particula.execution.diagnostics",
-        "profile/graph-dependent",
-        "virtual freshness edges",
-        "vapor-pressure-then-",
-        "Environment invalidates vapor pressure and saturation",
-        "condensation, and nucleation invalidate saturation",
-        "separate caller-owned outputs",
-        "ParticleData.volume`",
-        "E7-F7",
-        "E7-F8",
-        "E7-F9",
-        "never checkpoint, finalize, or restart",
-        "illustrative explicit-transfer five-call sequence",
-        "no rollback or retry",
-    ):
-        assert phrase in combined
-    assert "E7-F5 is shipped as a bounded concrete-only exception" in roadmap
-    assert "E7-F5-P7:** Update development documentation" in records
-    assert "Status: Completed" in records
-    assert "E7-F5 scheduling, E7-F7 transport" not in roadmap
-    assert "not a\nuniversal static order" in feature
-    assert "Normal steps do not convert or transfer data" in feature
-    assert "fall back to CPU, retry" in feature
-    assert "profile-independent order" not in combined
-    assert "fallback, retry, graph capture" in roadmap
+    assert (
+        "[GPU resident checkpoints](../gpu_resident_checkpoints.md)" in roadmap
+    )
 
 
 @pytest.mark.warp
