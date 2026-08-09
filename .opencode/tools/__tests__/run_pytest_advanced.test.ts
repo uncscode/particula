@@ -306,11 +306,10 @@ describe("run_pytest_advanced wrapper", () => {
     expect(await execute({ coverageSource: "adw/../../outside" })).toContain(
       "coverageSource must stay within the repository/worktree root",
     );
-    expect(await execute({ coverageSource: "pkg/tests.md" })).toContain("unsupported file suffix");
     expect(getInvocations()).toHaveLength(0);
   });
 
-  it("passes through repo-relative file coverageSource requests", async () => {
+  it("ignores repo-relative file coverageSource requests and uses repository coverage", async () => {
     setDollarText(buildSuccessOutput('{"metrics":{"coverage_files":null},"success":true}'));
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
 
@@ -319,12 +318,13 @@ describe("run_pytest_advanced wrapper", () => {
       coverageSource: "adw/core/tests/agent_test.py",
     });
 
-    expect(result).toContain('"coverage_files":null');
+    expect(result).toContain("INFO: coverageSource supports only 'all'");
     const cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
-    expect(cmd).toContain("--coverage-source=adw/core/tests/agent_test.py");
+    expect(cmd).toContain("--coverage");
+    expect(cmd).not.toContain("--coverage-source=");
   });
 
-  it("treats root-level .py coverageSource entries as file targets", async () => {
+  it("ignores root-level .py coverageSource entries", async () => {
     setDollarText(buildSuccessOutput('{"metrics":{"coverage_files":null},"success":true}'));
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
 
@@ -333,9 +333,9 @@ describe("run_pytest_advanced wrapper", () => {
       coverageSource: "conftest.py",
     });
 
-    expect(result).toContain('"coverage_files":null');
+    expect(result).toContain("INFO: coverageSource supports only 'all'");
     const cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
-    expect(cmd).toContain("--coverage-source=conftest.py");
+    expect(cmd).not.toContain("--coverage-source=");
   });
 
   it("treats coverageSource=all as default coverage without explicit sources", async () => {
@@ -395,15 +395,23 @@ describe("run_pytest_advanced wrapper", () => {
     expect(getInvocations().at(-1)?.args.join(" ")).not.toContain("--coverage-source=");
   });
 
-  it("rejects mixed all and malformed lexical coverage sources before spawn", async () => {
+  it("rejects mixed all and unsafe coverage sources before spawn", async () => {
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
 
     expect(await execute({ coverageSource: "all,adw" })).toContain("must be the sole source");
-    expect(await execute({ coverageSource: "adw..core" })).toContain("valid module or path");
-    expect(await execute({ coverageSource: "bad-name" })).toContain("valid module or path");
-    expect(await execute({ coverageSource: "module.txt" })).toContain("unsupported file suffix");
     expect(await execute({ coverageSource: "pkg\\module" })).toContain("relative POSIX path");
     expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("ignores dotted and missing coverage sources with informational fallback", async () => {
+    setDollarText(buildSuccessOutput("ok"));
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    for (const coverageSource of ["adw.core", "bad-name", "module.txt"]) {
+      const result = await execute({ coverageSource });
+      expect(result).toContain("INFO: coverageSource supports only 'all'");
+      expect(getInvocations().at(-1)?.args.join(" ")).not.toContain("--coverage-source=");
+    }
   });
 
   it("rejects raw coverage pytestArgs when coverage is disabled", async () => {

@@ -137,7 +137,7 @@ run_pytest_advanced({
 | `pytestArgs` | array | Arguments passed to pytest (paths, markers, flags) |
 | `minTests` | number | Minimum expected tests (use 1 for scoped tests) |
 | `coverage` | boolean | Enable coverage reporting |
-| `coverageSource` | string | Module(s) to measure coverage for (comma-separated supported) |
+| `coverageSource` | string | Existing repo-relative source directories, comma-separated, or `all` for repository configuration |
 | `coverageThreshold` | number | Fail if coverage below this % |
 | `cwd` | string | Working directory (for worktrees) |
 | `options` | string | Bounded toggles such as `output=full`, `fail-fast`, `test-filter=...`, `durations=...` |
@@ -152,6 +152,9 @@ run_pytest_advanced({
 
 **Important Notes:**
 - Set `minTests: 1` for scoped/targeted tests to validate at least 1 test runs
+- Do not pass dotted modules or `.py` files as `coverageSource`; unsupported
+  entries are ignored with an `INFO:` diagnostic and repository configuration
+  is used when no valid directory remains.
 - Use `options: "output=full"` to get complete output for analysis
 - Use `options: "fail-fast"` for quick feedback during iterative fixing
 

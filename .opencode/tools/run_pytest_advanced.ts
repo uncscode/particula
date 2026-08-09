@@ -1,5 +1,5 @@
 import { tool } from "@opencode-ai/plugin";
-import { existsSync, realpathSync } from "node:fs";
+import { existsSync, lstatSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { validateCwdWithinRepo, validatePathWithinRepo } from "./lib/path_validation";
 import { validatePytestTimeoutSeconds } from "./lib/pytest_validation";
@@ -20,6 +20,9 @@ type ParsedAdvancedOptions = {
 type ParsedAdvancedOptionsResult =
   | { ok: true; options: ParsedAdvancedOptions }
   | { ok: false; error: string };
+
+const COVERAGE_SOURCE_INFO =
+  "INFO: coverageSource supports only 'all' or existing repository-relative directories; dotted modules, file targets, and other non-directory entries are ignored.";
 
 const ADVANCED_OPTION_RULES = new Set([
   "output",
@@ -317,40 +320,42 @@ const getCoverageRepoRoot = (cwd: string | undefined): string => {
   }
 };
 
-const validateCoverageSourceEntry = (
+const classifyCoverageSourceEntry = (
   source: string,
   cwd: string | undefined,
-): string | undefined => {
+): { kind: "valid" } | { kind: "unsupported" } | { kind: "error"; error: string } => {
   if (source.includes("\\")) {
-    return `ERROR: coverageSource must be a relative POSIX path: ${source}`;
+    return { kind: "error", error: `ERROR: coverageSource must be a relative POSIX path: ${source}` };
   }
-  if (source.endsWith(".txt")) {
-    return `ERROR: coverageSource has an unsupported file suffix: ${source}`;
-  }
-  const isPath = source.includes("/") || source.startsWith(".") || source.endsWith(".py");
-  if (!isPath && /^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$/.test(source)) {
-    return undefined;
-  }
-  if (!isPath) return `ERROR: coverageSource is not a valid module or path: ${source}`;
   if (path.isAbsolute(source)) {
-    return `ERROR: coverageSource must be a relative POSIX path: ${source}`;
-  }
-
-  const suffix = path.posix.extname(source);
-  if (suffix && suffix !== ".py") {
-    return `ERROR: coverageSource has an unsupported file suffix: ${source}`;
+    return { kind: "error", error: `ERROR: coverageSource must be a relative POSIX path: ${source}` };
   }
 
   const repoRoot = getCoverageRepoRoot(cwd);
   const resolved = path.resolve(repoRoot, source);
   const rel = path.relative(repoRoot, resolved);
   if (rel.startsWith("..") || path.isAbsolute(rel)) {
-    return `ERROR: coverageSource must stay within the repository/worktree root: ${source}`;
+    return {
+      kind: "error",
+      error: `ERROR: coverageSource must stay within the repository/worktree root: ${source}`,
+    };
   }
   if (source.split("/").some((part) => !part || part === "." || part === "..")) {
-    return `ERROR: coverageSource has noncanonical path components: ${source}`;
+    return {
+      kind: "error",
+      error: `ERROR: coverageSource has noncanonical path components: ${source}`,
+    };
   }
-  return undefined;
+  if (!existsSync(resolved)) return { kind: "unsupported" };
+  const target = lstatSync(resolved);
+  if (target.isSymbolicLink()) {
+    return {
+      kind: "error",
+      error: `ERROR: coverageSource must be an existing safe directory: ${source}`,
+    };
+  }
+  if (!target.isDirectory()) return { kind: "unsupported" };
+  return { kind: "valid" };
 };
 
 const getRoutineArgs = (args: Record<string, unknown>, optionArgs: ParsedAdvancedOptions = {}) => {
@@ -459,9 +464,14 @@ const executePytestCommand = async (cmdParts: (string | number)[], outputMode: O
 const parseCoverageSources = (
   coverageSource: string,
   cwd: string | undefined,
-): { ok: true; sources: string[] } | { ok: false; error: string } => {
+): { ok: true; sources: string[]; ignoredUnsupported: boolean } | { ok: false; error: string } => {
   const rawEntries = coverageSource.split(",");
   const sources: string[] = [];
+  let ignoredUnsupported = false;
+
+  if (rawEntries.some((entry) => entry.trim().toLowerCase() === "all") && rawEntries.length !== 1) {
+    return { ok: false, error: "ERROR: coverageSource 'all' must be the sole source." };
+  }
 
   for (const entry of rawEntries) {
     const trimmed = entry.trim();
@@ -471,21 +481,32 @@ const parseCoverageSources = (
         error: "ERROR: coverageSource must not contain empty comma-separated entries.",
       };
     }
-    const scopeError = validateCoverageSourceEntry(trimmed, cwd);
-    if (scopeError) {
-      return { ok: false, error: scopeError };
+    if (trimmed.toLowerCase() === "all") {
+      return { ok: true, sources: [], ignoredUnsupported: false };
+    }
+    const classification = classifyCoverageSourceEntry(trimmed, cwd);
+    if (classification.kind === "error") {
+      return { ok: false, error: classification.error };
+    }
+    if (classification.kind === "unsupported") {
+      ignoredUnsupported = true;
+      continue;
     }
     sources.push(trimmed);
   }
 
-  if (sources.some((source) => source.toLowerCase() === "all")) {
-    if (sources.length !== 1) {
-      return { ok: false, error: "ERROR: coverageSource 'all' must be the sole source." };
-    }
-    return { ok: true, sources: [] };
-  }
+  return { ok: true, sources, ignoredUnsupported };
+};
 
-  return { ok: true, sources };
+const addCoverageSourceInfo = (output: string, outputMode: OutputMode): string => {
+  if (outputMode !== "json") return `${COVERAGE_SOURCE_INFO}\n${output}`;
+  try {
+    const payload = JSON.parse(output);
+    payload.info = [...(Array.isArray(payload.info) ? payload.info : []), COVERAGE_SOURCE_INFO];
+    return JSON.stringify(payload, null, 2);
+  } catch {
+    return output;
+  }
 };
 
 // --- Tool definition ---
@@ -556,6 +577,7 @@ export default tool({
     const coverage = args.coverage !== false;
     const cwd = getRoutineArgs(args as Record<string, unknown>, parsedOptions.options).cwd;
     const coverageThreshold = args.coverageThreshold;
+    let ignoredCoverageSources = false;
     const durations = parsedOptions.options.durations ?? args.durations;
     const durationsMin = parsedOptions.options.durationsMin ?? args.durationsMin;
     const overrideIniResult = validateStringArray(args.overrideIni, "overrideIni");
@@ -581,6 +603,7 @@ export default tool({
         if (!parsedCoverageSources.ok) {
           return parsedCoverageSources.error;
         }
+        ignoredCoverageSources = parsedCoverageSources.ignoredUnsupported;
         const sources = parsedCoverageSources.sources;
         for (const source of sources) {
           cmdParts.push(`--coverage-source=${source}`);
@@ -627,6 +650,8 @@ export default tool({
     if (overrideIni.length > 0) cmdParts.push(`--override-ini-json=${JSON.stringify(overrideIni)}`);
     if (pytestArgs.length > 0) cmdParts.push(`--pytest-argv-json=${JSON.stringify(pytestArgs)}`);
 
-    return executePytestCommand(cmdParts, getRoutineArgs(args as Record<string, unknown>, parsedOptions.options).outputMode);
+    const outputMode = getRoutineArgs(args as Record<string, unknown>, parsedOptions.options).outputMode;
+    const output = await executePytestCommand(cmdParts, outputMode);
+    return ignoredCoverageSources ? addCoverageSourceInfo(output, outputMode) : output;
   },
 });

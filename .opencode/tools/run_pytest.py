@@ -143,8 +143,10 @@ UNUSABLE_COVERAGE_FRAGMENTS = (
     "no data to report",
     "module was never imported",
 )
-MODULE_SOURCE_PATTERN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$")
-UNSUPPORTED_COVERAGE_SOURCE_SUFFIXES = (".txt",)
+COVERAGE_SOURCE_INFO = (
+    "INFO: coverageSource supports only 'all' or existing repository-relative directories; "
+    "dotted modules, file targets, and other non-directory entries are ignored."
+)
 
 
 class PytestArgumentValidationError(ValueError):
@@ -725,7 +727,11 @@ def _filter_non_coverage_addopts(addopts: Union[str, List[str]]) -> List[str]:
     return filtered
 
 
-def _normalize_coverage_source(coverage_source: Optional[object], repo_root: Path) -> List[str]:
+def _normalize_coverage_source(
+    coverage_source: Optional[object],
+    repo_root: Path,
+    info_messages: Optional[List[str]] = None,
+) -> List[str]:
     """Normalize coverage sources against the resolved repository root.
 
     Args:
@@ -734,12 +740,12 @@ def _normalize_coverage_source(coverage_source: Optional[object], repo_root: Pat
         repo_root: Resolved repository root that bounds path-form sources.
 
     Returns:
-        Canonical module names or root-relative POSIX paths in caller order.
+        Canonical root-relative POSIX directory paths in caller order.
         Returns an empty list when coverage should use repository defaults.
 
     Raises:
-        CoverageSourceValidationError: The input has an invalid shape, invalid
-            module or path form, an unsafe path, or a nonexistent/symlink target.
+        CoverageSourceValidationError: The input has an invalid shape or an
+            unsafe path form.
 
     Notes:
         The case-insensitive special value ``all`` must be the sole source and
@@ -777,18 +783,6 @@ def _normalize_coverage_source(coverage_source: Optional[object], repo_root: Pat
 
     normalized: List[str] = []
     for source in cleaned:
-        if source.endswith(UNSUPPORTED_COVERAGE_SOURCE_SUFFIXES):
-            raise CoverageSourceValidationError(
-                f"coverageSource has an unsupported file suffix: {source}"
-            )
-        is_path = "/" in source or source.startswith(".") or source.endswith(".py")
-        if not is_path and MODULE_SOURCE_PATTERN.fullmatch(source):
-            normalized.append(source)
-            continue
-        if not is_path:
-            raise CoverageSourceValidationError(
-                f"coverageSource is not a valid module or path: {source}"
-            )
         if "\\" in source or Path(source).is_absolute():
             raise CoverageSourceValidationError(
                 f"coverageSource must be a relative POSIX path: {source}"
@@ -802,17 +796,23 @@ def _normalize_coverage_source(coverage_source: Optional[object], repo_root: Pat
         try:
             resolved = candidate.resolve(strict=True)
             resolved.relative_to(repo_root)
+        except FileNotFoundError:
+            if info_messages is not None and COVERAGE_SOURCE_INFO not in info_messages:
+                info_messages.append(COVERAGE_SOURCE_INFO)
+            continue
         except (OSError, ValueError) as exc:
             raise CoverageSourceValidationError(
                 "coverageSource must be an existing safe path within the "
                 f"repository/worktree root: {source}"
             ) from exc
-        if candidate.is_symlink() or not (
-            resolved.is_dir() or (resolved.is_file() and resolved.suffix == ".py")
-        ):
+        if candidate.is_symlink():
             raise CoverageSourceValidationError(
-                f"coverageSource must be an existing directory or .py file: {source}"
+                f"coverageSource must be an existing safe directory: {source}"
             )
+        if not resolved.is_dir():
+            if info_messages is not None and COVERAGE_SOURCE_INFO not in info_messages:
+                info_messages.append(COVERAGE_SOURCE_INFO)
+            continue
         normalized.append(resolved.relative_to(repo_root).as_posix())
     return normalized
 
@@ -982,12 +982,6 @@ def _should_apply_coverage_threshold(
         if match and match.group(1):
             return True
     return False
-
-
-def _coverage_request_has_file_target(sources: List[str]) -> bool:
-    """Return True when coverage sources include a repo-relative file target."""
-
-    return any(Path(source).suffix == ".py" for source in sources)
 
 
 def _detect_unusable_coverage_diagnostics(output: str) -> Optional[str]:
@@ -1499,8 +1493,7 @@ def _resolve_normalized_sources(
         coverage_source: Optional coverage source configuration from caller.
 
     Returns:
-        Normalized list of coverage sources that preserves module names,
-        repo-relative directories, and repo-relative file targets.
+        Normalized list of repo-relative coverage directories.
     """
 
     repo_root = _resolve_repo_root_for_coverage(cwd)
@@ -2024,10 +2017,10 @@ def run_pytest(
             maximum: 1200 = 20 minutes).
         coverage: Enable coverage reporting and policy validation (default:
             ``True``). Disabled coverage rejects coverage-specific controls.
-        coverage_source: Source module/path for coverage (for example, ``adw``,
-            ``adw.core``, ``adw/``, or a repo-relative ``.py`` file target).
-            Comma-separated sources are supported. ``None`` or ``all`` uses the
-            repository coverage configuration.
+        coverage_source: Existing repo-relative directories for coverage (for
+            example, ``adw`` or ``adw/core``). Comma-separated directories are
+            supported. ``None`` or ``all`` uses repository coverage configuration;
+            dotted modules and file targets are ignored with an informational message.
         coverage_threshold: Optional minimum coverage percentage. It must be
             finite and at least the retained repository policy floor.
         cov_report: Coverage report format(s), comma-separated (default: "term-missing").
@@ -2051,9 +2044,7 @@ def run_pytest(
         assertions pass and coverage either passes or is disabled.
         Collect-only execution instead requires valid collection evidence that
         satisfies ``min_test_count`` and reports collected and zero-executed
-        counts without assertion or coverage success evidence. File-target
-        coverage requests preserve explicit ``coverage_files = null`` semantics
-        when per-file numeric detail is not authoritative.
+        counts without assertion or coverage success evidence.
 
     Raises:
         Does not raise; errors are captured and returned in output_string.
@@ -2072,6 +2063,7 @@ def run_pytest(
             cwd = str(Path.cwd())
 
     coverage_lease: Optional[tuple[Path, CoverageLease]] = None
+    coverage_info: List[str] = []
     started_at = time.monotonic()
 
     try:
@@ -2092,8 +2084,7 @@ def run_pytest(
         if test_path is not None and test_paths is not None:
             raise PytestArgumentValidationError("testPath and testPaths cannot be combined")
         root_dir = _resolve_repo_root_for_coverage(cwd)
-        normalized_sources = _normalize_coverage_source(coverage_source, root_dir)
-        file_scoped_coverage = _coverage_request_has_file_target(normalized_sources)
+        normalized_sources = _normalize_coverage_source(coverage_source, root_dir, coverage_info)
         effective_floor = (
             _effective_coverage_floor(root_dir, coverage_threshold) if coverage else None
         )
@@ -2145,8 +2136,6 @@ def run_pytest(
         # Parse output
         metrics = parse_pytest_output(full_output)
         metrics["exit_code"] = result.returncode
-        if file_scoped_coverage:
-            metrics["coverage_files"] = None
 
         coverage_result = _evaluate_coverage(
             metrics, enabled=coverage, floor=effective_floor, output=full_output
@@ -2241,6 +2230,8 @@ def run_pytest(
             if outcome is not None:
                 payload["success"] = False
                 payload["outcome"] = outcome
+            if coverage_info:
+                payload["info"] = coverage_info
             output = json.dumps(payload, indent=2)
         else:  # full
             # Include summary at the end of full output
@@ -2295,6 +2286,8 @@ def run_pytest(
                 truncated_lines.append(summary)
                 output = "\n".join(truncated_lines)
 
+        if coverage_info and output_mode != "json":
+            output = f"{' '.join(coverage_info)}\n{output}"
         return exit_code, output
 
     except (
@@ -2414,8 +2407,9 @@ NOTE: -v and --tb=short are always included. Do NOT pass these.
         action="append",
         default=None,
         help=(
-            "Source module for coverage (e.g., 'adw'). Can be repeated or comma-separated. "
-            "Omit or pass 'all' to use pyproject.toml config."
+            "Existing repo-relative directory for coverage (e.g., 'adw/core'). "
+            "Can be repeated or comma-separated. Omit or pass 'all' to use "
+            "pyproject.toml config; dotted modules and file targets are ignored."
         ),
     )
     parser.add_argument(

@@ -6,7 +6,8 @@ description: 'Subagent that validates test coverage and writes missing tests for
   This subagent: - Accepts file, module, or directory scope - Validates tests exist
   for all public and private functions - Writes missing tests following repository
   conventions - Runs FAST tests only (skips slow/performance markers) - Fixes failures
-  (3 internal retries) - Enforces 80% coverage threshold for changed code - Returns
+  (3 internal retries) - Enforces 80% aggregate coverage for the selected source
+  directories or repository configuration - Returns
   structured pass/fail with details
 
   Invoked by: adw-build primary agent (comprehensive test validation)
@@ -55,7 +56,7 @@ Ensure all changed code has comprehensive test coverage by:
 - Validating tests exist for all public AND private functions
 - Writing missing tests following repository conventions
 - Running tests and fixing failures (3 internal retries)
-- Enforcing 80% coverage threshold for changed code
+- Enforcing 80% aggregate coverage for selected source directories or repository configuration
 - Returning structured results for primary agent
 
 This is a test-and-coverage-only agent. Do not run or require Ruff, formatting,
@@ -109,7 +110,7 @@ run_pytest_advanced({
   "options": "output=full fail-fast",
   "minTests": 1,
   "coverage": true,
-  "coverageSource": "{source_module_a},{source_module_b}",
+  "coverageSource": "{source_directory_a},{source_directory_b}",
   "coverageThreshold": 80,
   "cwd": "{worktree_path}"
 })
@@ -119,10 +120,18 @@ run_pytest_advanced({
 **Tool Options:**
 - `minTests: 1` - Set for scoped tests to validate at least 1 test runs
 - `coverage: true` - Enable coverage reporting (default)
-- `coverageSource: "{source_module_a},{source_module_b}"` - Modules to measure (e.g., "adw/core,adw/utils"); whitespace is trimmed
+- `coverageSource: "{source_directory_a},{source_directory_b}"` - Existing repo-relative directories to measure (e.g., "adw/core,adw/utils"); use `all` for repository configuration
 - `coverageThreshold: 80` - Fail if coverage below 80%
 - `options: "fail-fast"` - Stop on first failure for quick feedback
 - `cwd: "{worktree_path}"` - Use when running in worktree
+
+Choose coverage directories from the requested scope. For a file scope, use its
+parent source directory; for module or directory scope, use that existing
+repo-relative directory; for multiple files, use their unique parent source
+directories. Use `all` when repository configuration is the intended scope.
+Never pass dotted module names or individual `.py` files. The wrapper ignores
+those unsupported entries with an `INFO:` diagnostic and falls back to
+repository configuration when no valid directory remains.
 
 **TypeScript wrapper validation:**
 Use `run_bun_test` as the approved path for `.opencode/tools/` wrapper tests instead of
@@ -144,7 +153,7 @@ run_bun_test({
 
 1. **Every public function** must have at least one test
 2. **Every private function** (`_func`) must have at least one test
-3. **Changed lines** must have ≥80% test coverage
+3. **Selected source directories or repository scope** must have at least 80% aggregate coverage
 4. **Test file naming**: `*_test.py` suffix (NOT `test_*.py`)
 5. **Test location**: `{module}/tests/` directory
 
@@ -361,7 +370,7 @@ run_pytest_advanced({
   "options": "output=full fail-fast",
   "minTests": 1,
   "coverage": true,
-  "coverageSource": "{source_module}",
+  "coverageSource": "{source_directory}",
   "coverageThreshold": 80,
   "timeout": 120,
   "cwd": "{worktree_path}"
@@ -371,7 +380,7 @@ run_pytest_advanced({
 **Tool Options Explained:**
 - `minTests: 1` - Validates at least 1 test ran for scoped tests
 - `coverage: true` - Enable coverage measurement
-- `coverageSource: "{source_module_a},{source_module_b}"` - Measure coverage for the changed modules (e.g., "adw/core,adw/utils")
+- `coverageSource: "{source_directory_a},{source_directory_b}"` - Measure existing repo-relative source directories (e.g., "adw/core,adw/utils"); never pass dotted modules or `.py` files
 - `coverageThreshold: 80` - Validation fails if coverage < 80%
 - `options: "fail-fast"` - Stop on first failure (`-x` flag) for faster feedback
 - `cwd: "{worktree_path}"` - Required for every isolated-worktree test run
@@ -382,7 +391,7 @@ run_pytest_advanced({
 Separate repository test failures from validation-infrastructure failures:
 
 - **Test/implementation failure:** pytest started and produced collection,
-  assertion, or changed-code coverage evidence attributable to the target
+  assertion, or directory/repository coverage evidence attributable to the target
   repository. Analyze and retry up to three times.
 - **Infrastructure blocked:** the wrapper or its own runtime failed before
   usable pytest collection/coverage evidence. Examples include a

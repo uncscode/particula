@@ -521,13 +521,11 @@ def test_coverage_source_normalizer_requires_safe_canonical_sources(tmp_path: Pa
     runner = _load_runner()
     (tmp_path / "pkg").mkdir()
     (tmp_path / "module.py").write_text("x = 1\n")
+    info: list[str] = []
 
-    assert runner._normalize_coverage_source("pkg,module.py,adw.core", tmp_path) == [
-        "pkg",
-        "module.py",
-        "adw.core",
-    ]
-    for value in ("all,pkg", "pkg//child", "../outside", "module.txt", "pkg/tests.md", [None]):
+    assert runner._normalize_coverage_source("pkg,module.py,adw.core", tmp_path, info) == ["pkg"]
+    assert info == [runner.COVERAGE_SOURCE_INFO]
+    for value in ("all,pkg", "pkg//child", "../outside", [None]):
         try:
             runner._normalize_coverage_source(value, tmp_path)
         except runner.CoverageSourceValidationError:
@@ -536,22 +534,21 @@ def test_coverage_source_normalizer_requires_safe_canonical_sources(tmp_path: Pa
             raise AssertionError(f"expected source rejection for {value!r}")
 
 
-def test_root_level_python_coverage_source_is_path_validated(tmp_path: Path) -> None:
-    """Root-level Python filenames must not bypass source confinement checks."""
+def test_python_file_coverage_sources_are_ignored_but_symlinks_fail_closed(
+    tmp_path: Path,
+) -> None:
+    """File sources fall back to repository coverage without weakening confinement."""
     runner = _load_runner()
     (tmp_path / "safe.py").write_text("x = 1\n")
     outside = tmp_path.parent / "outside.py"
     outside.write_text("x = 1\n")
     (tmp_path / "linked.py").symlink_to(outside)
 
-    assert runner._normalize_coverage_source("safe.py", tmp_path) == ["safe.py"]
-    for value in ("missing.py", "linked.py"):
-        try:
-            runner._normalize_coverage_source(value, tmp_path)
-        except runner.CoverageSourceValidationError:
-            pass
-        else:
-            raise AssertionError(f"expected source rejection for {value!r}")
+    info: list[str] = []
+    assert runner._normalize_coverage_source("safe.py,missing.py", tmp_path, info) == []
+    assert info == [runner.COVERAGE_SOURCE_INFO]
+    with pytest.raises(runner.CoverageSourceValidationError):
+        runner._normalize_coverage_source("linked.py", tmp_path)
 
 
 def test_coverage_paths_are_resolved_from_repository_root_for_nested_cwd(tmp_path: Path) -> None:
@@ -559,9 +556,36 @@ def test_coverage_paths_are_resolved_from_repository_root_for_nested_cwd(tmp_pat
     nested = tmp_path / "nested"
     nested.mkdir()
     (tmp_path / "pyproject.toml").write_text("[tool.pytest.ini_options]\n")
-    (tmp_path / "root_module.py").write_text("x = 1\n")
+    (tmp_path / "root_module").mkdir()
 
-    assert runner._resolve_normalized_sources(str(nested), "root_module.py") == ["root_module.py"]
+    assert runner._resolve_normalized_sources(str(nested), "root_module") == ["root_module"]
+
+
+def test_unsupported_coverage_source_reports_info_and_uses_repository_config(
+    monkeypatch, tmp_path: Path
+) -> None:
+    runner = _load_runner()
+    captured: dict[str, object] = {}
+
+    def fake_subprocess(command, **_kwargs):
+        captured["command"] = command
+        return runner.PytestSubprocessResult(
+            0,
+            "Name Stmts Miss Cover Missing\nTOTAL 1 0 100%\n===== 1 passed in 0.01s =====",
+            "",
+        )
+
+    monkeypatch.setattr(runner, "_run_pytest_subprocess", fake_subprocess)
+    code, output = runner.run_pytest(
+        [], output_mode="json", cwd=str(tmp_path), coverage_source="pkg.module"
+    )
+    payload = json.loads(output)
+
+    assert code == 0
+    assert payload["info"] == [runner.COVERAGE_SOURCE_INFO]
+    command = cast(list[object], captured["command"])
+    assert "--cov" in command
+    assert not any(str(arg).startswith("--cov=") for arg in command)
 
 
 def test_disabled_coverage_returns_disabled_projection_without_spawn_coverage_args(

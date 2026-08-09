@@ -70,18 +70,18 @@ Keep advanced payload-bearing fields explicit.
   `percentage` only when a numeric `TOTAL` value was reported.
   `disabled` is not a coverage pass; overall success requires passed assertions
   and either disabled or passed coverage.
-- `coverageSource` accepts identifier-style package/module names or canonical,
-  root-confined POSIX directories and existing regular `.py` files. `all` is
-  case-insensitive but must be the only source. Empty segments, absolute paths,
-  backslashes, traversal, noncanonical paths, unsafe/missing filesystem targets,
-  and unsupported suffixes are rejected before spawn.
+- `coverageSource` accepts `all` or canonical, root-confined, existing POSIX
+  directories. `all` is case-insensitive but must be the only source. Dotted
+  modules, file targets, missing paths, and other non-directory entries are
+  ignored with an `INFO:` diagnostic; when no directories remain, coverage uses
+  repository configuration. Empty segments, absolute paths, backslashes,
+  traversal, noncanonical paths, and unsafe symlink targets are rejected before spawn.
 - Explicit sources are forwarded as repeated `--cov` controls. They preserve the
   repository coverage configuration; the runner does not create a temporary
   coverage configuration file.
 - Coverage requires usable numeric `TOTAL` evidence. Missing totals and
   no-data/never-imported diagnostics fail coverage independently. The repository
   80% floor is retained; a caller threshold can strengthen it but cannot lower it.
-- Repo-relative file-target coverage requests may succeed with `"coverage_files": null` when per-file numeric detail is intentionally non-authoritative.
 - Coverage-enabled runs in the same worktree are serialized. If another coverage run already holds the worktree lock, the wrapper fails deterministically instead of sharing `.coverage` artifacts.
 - Coverage coordination uses a canonical-worktree, no-wait ownership lease under
   `adforge_local/state/`. A verified live lease returns bounded retry guidance;
