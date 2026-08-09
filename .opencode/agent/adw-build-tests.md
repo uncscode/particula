@@ -3,7 +3,8 @@
 description: 'Subagent that validates test coverage and writes missing tests for changed
   code. Invoked by adw-build primary agent after implementation completes.
 
-  This subagent: - Accepts file, module, or directory scope - Validates tests exist
+  This subagent: - Requires workflow state with a valid worktree_path before any
+  filesystem access or test execution - Accepts file, module, or directory scope - Validates tests exist
   for all public and private functions - Writes missing tests following repository
   conventions - Runs FAST tests only (skips slow/performance markers) - Fixes failures
   (3 internal retries) - Enforces 80% aggregate coverage for the selected source
@@ -173,21 +174,24 @@ Parse arguments:
 - Scope: `file`, `module`, `dir`, or `files`
 - `Context` - What was implemented
 
-Load workflow state:
+Load the required worktree field explicitly. A fieldless `read` returns the
+default `spec_content` field, not the complete workflow state:
 ```python
 adw_spec_read({
   "command": "read",
-  "adw_id": "{adw_id}"
+  "adw_id": "{adw_id}",
+  "field": "worktree_path"
 })
 ```
 
-Extract `worktree_path` and navigate to worktree.
+Treat an absent, empty, `null`, or error result as unavailable context. Do not
+infer a path from the requested files or the ambient checkout.
 
 `worktree_path` is mandatory validation context. Every `run_pytest_advanced`
 and worktree-scoped `run_bun_test` call must pass it as `cwd`; never rely on the
 ambient process directory. If it is missing, invalid, or rejected by the
-wrapper, return `ADW_BUILD_TESTS_BLOCKED` rather than running against another
-checkout.
+wrapper, return `ADW_BUILD_TESTS_BLOCKED` before reading or editing scoped files
+and before running tests rather than operating against another checkout.
 
 ## Step 2: Identify Functions Needing Tests
 

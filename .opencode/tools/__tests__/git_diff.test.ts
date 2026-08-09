@@ -95,8 +95,8 @@ describe("git_diff wrapper", () => {
   it("does not invoke the adapter when worktree admission fails", async () => {
     const execute = await loadToolExecute("../../git_diff.ts");
 
-    expect(await execute({ command: "status", worktree_path: "-untrusted" })).toBe(
-      "ERROR: invalid or untrusted worktree_path",
+    expect(await execute({ command: "status", worktree_path: "-untrusted" })).toContain(
+      'ERROR: invalid or untrusted worktree_path: "-untrusted"',
     );
     expect(getInvocations()).toHaveLength(0);
   });
@@ -111,21 +111,34 @@ describe("git_diff wrapper", () => {
     expect(getInvocations()).toHaveLength(1);
   });
 
-  it("requires an explicit selected root without a cwd fallback", async () => {
+  it("defaults an omitted worktree to the wrapper repository root", async () => {
+    setSpawnResponse({ stdout: JSON.stringify({ ok: true, data: { stdout: "", status: "clean" } }) });
     const execute = await loadToolExecute("../../git_diff.ts");
 
-    expect(await execute({ command: "status" })).toBe("ERROR: invalid or untrusted worktree_path");
-    expect(getInvocations()).toHaveLength(0);
+    expect(await execute({ command: "status" })).toContain("Git Command: status (clean)");
+    expect(getInvocations().at(-1)?.stdin).toBe(
+      JSON.stringify({ command: "status", worktree_path: testCheckout }),
+    );
   });
 
-  it("rejects relative and missing directories before adapter admission", async () => {
+  it("resolves relative worktree paths against the wrapper repository root", async () => {
+    setSpawnResponse({ stdout: JSON.stringify({ ok: true, data: { stdout: "", status: "clean" } }) });
     const execute = await loadToolExecute("../../git_diff.ts");
 
-    expect(await execute({ command: "status", worktree_path: "." })).toBe(
-      "ERROR: invalid or untrusted worktree_path",
+    expect(await execute({ command: "status", worktree_path: "." })).toContain(
+      "Git Command: status (clean)",
     );
-    expect(await execute({ command: "status", worktree_path: `${selectedRoot}/definitely-missing` })).toBe(
-      "ERROR: invalid or untrusted worktree_path",
+    expect(getInvocations().at(-1)?.stdin).toBe(
+      JSON.stringify({ command: "status", worktree_path: testCheckout }),
+    );
+  });
+
+  it("reports the resolved candidate for a missing relative directory", async () => {
+    const execute = await loadToolExecute("../../git_diff.ts");
+    const missing = join(testCheckout, "definitely-missing");
+
+    expect(await execute({ command: "status", worktree_path: "definitely-missing" })).toBe(
+      `ERROR: invalid or untrusted worktree_path: ${JSON.stringify(missing)}`,
     );
     expect(getInvocations()).toHaveLength(0);
   });

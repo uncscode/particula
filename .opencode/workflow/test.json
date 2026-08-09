@@ -12,6 +12,7 @@
       "prompt": "$ARGUMENTS --adw-id ${adw_id}",
       "model": "base",
       "timeout": 1800,
+      "output_inactivity_seconds": null,
       "retry": {
         "max_retries": 1,
         "initial_delay": 5.0,

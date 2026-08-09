@@ -8,6 +8,7 @@
 import { tool } from "@opencode-ai/plugin";
 import { existsSync, realpathSync } from "node:fs";
 import { resolve, relative } from "node:path";
+import { validateCwdWithinRepo } from "./lib/path_validation";
 
 type OutputMode = "summary" | "full" | "json";
 type LinterMode = "check" | "format-check" | "format";
@@ -25,10 +26,14 @@ const MAX_TARGET_PATHS = 64;
 const MAX_TARGET_PATH_BYTES = 1024;
 const MAX_TARGET_PATHS_JSON_BYTES = 8192;
 
-function validateTargetPaths(value: unknown): { ok: true; paths: string[] } | { ok: false; error: string } {
+function validateTargetPaths(
+  value: unknown,
+  cwd?: string,
+): { ok: true; paths: string[] } | { ok: false; error: string } {
   if (!Array.isArray(value) || value.length === 0 || value.length > MAX_TARGET_PATHS) {
     return { ok: false, error: "ERROR: targetPaths must be a non-empty bounded array of strings." };
   }
+  const root = realpathSync.native(resolve(cwd ?? process.cwd()));
   const seen = new Set<string>();
   for (const path of value) {
     if (typeof path !== "string" || !path || path.trim() !== path || path.startsWith("-") ||
@@ -37,7 +42,6 @@ function validateTargetPaths(value: unknown): { ok: true; paths: string[] } | { 
       Buffer.byteLength(path, "utf8") > MAX_TARGET_PATH_BYTES || seen.has(path)) {
       return { ok: false, error: "ERROR: targetPaths contains an invalid repository-relative path." };
     }
-    const root = realpathSync.native(resolve(process.cwd()));
     const resolved = resolve(root, path);
     if (relative(root, resolved).startsWith("..")) {
       return { ok: false, error: "ERROR: targetPaths must stay within the repository root." };
@@ -165,6 +169,10 @@ export default tool({
       .string()
       .optional()
       .describe("Target directory to lint. If omitted, uses pyproject.toml config (lints from project root)."),
+    cwd: tool.schema
+      .string()
+      .optional()
+      .describe("Working directory for lint execution. Repository-relative targets are resolved from this checkout or worktree."),
     mode: tool.schema.enum(["check", "format-check", "format"]).optional()
       .describe("Explicit Ruff-only mode: check, format-check, or confirmed format."),
     targetPaths: tool.schema.array(tool.schema.string()).optional()
@@ -197,7 +205,10 @@ export default tool({
     if (mode !== undefined && args.autoFix === true) return "ERROR: mode conflicts with autoFix.";
     if (mode !== undefined && args.targetDir !== undefined) return "ERROR: mode conflicts with targetDir.";
     if (args.targetPaths !== undefined && args.targetDir !== undefined) return "ERROR: targetPaths conflicts with targetDir.";
-    const targetPaths = args.targetPaths === undefined ? undefined : validateTargetPaths(args.targetPaths);
+    const cwd = typeof args.cwd === "string" ? args.cwd.trim() || undefined : undefined;
+    const cwdError = validateCwdWithinRepo(cwd);
+    if (cwdError) return cwdError;
+    const targetPaths = args.targetPaths === undefined ? undefined : validateTargetPaths(args.targetPaths, cwd);
     if (targetPaths && !targetPaths.ok) return targetPaths.error;
     const outputMode = parsedOptions.options.outputMode || "summary";
     const autoFix = args.autoFix !== false; // Default to true
@@ -233,6 +244,9 @@ export default tool({
     // Otherwise let ruff/mypy use pyproject.toml config from project root
     if (targetDir) {
       cmdParts.push(`--target-dir=${targetDir}`);
+    }
+    if (cwd) {
+      cmdParts.push(`--cwd=${cwd}`);
     }
 
     if (mode) {

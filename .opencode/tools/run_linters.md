@@ -24,6 +24,11 @@ array of canonical repository-relative file or directory paths. Directories are
 passed to Ruff as supplied; the wrapper does not enumerate them. Omitting
 `targetPaths` with an explicit mode selects `.`.
 
+Use `cwd` to select the checkout or ADW worktree used for lint execution. As
+with `run_pytest_basic` and `run_pytest_advanced`, relative target paths are
+resolved from `cwd`, while `cwd` itself must resolve within the current
+repository root. Omitting `cwd` uses the OpenCode process repository root.
+
 The wrapper preserves target order and transports it internally as one compact
 JSON array through `--target-paths-json`; callers must provide the array field,
 not a space-separated target string. Limits are 64 entries, 1,024 UTF-8 bytes
@@ -56,6 +61,7 @@ only omitted `linters` (normalized to Ruff) or `linters=ruff`. They reject
 
 - `autoFix` (legacy only)
 - `targetDir` (legacy only)
+- `cwd`: checkout or worktree root for lint execution
 - `mode`: `check`, `format-check`, or `format`
 - `targetPaths`: ordered explicit-mode targets
 - `ruffTimeout`
@@ -84,6 +90,12 @@ Explicit read-only checks over ordered targets:
 {"mode":"format-check","targetPaths":["adforge_core/runtime"]}
 ```
 
+Explicit worktree-scoped format validation:
+
+```json
+{"cwd":"/path/to/repository/trees/aef45964","mode":"format-check","targetPaths":["src","tests"]}
+```
+
 The following mutating request requires confirmation:
 
 ```json
@@ -94,6 +106,6 @@ The following mutating request requires confirmation:
 
 Invalid requests fail before confirmation, dispatch, or subprocess execution.
 Errors use deterministic `ERROR:` envelopes that identify the invalid field
-(`mode`, `targetPaths`, `targetDir`, `autoFix`, `linters`, or `options`). A
+(`mode`, `targetPaths`, `targetDir`, `cwd`, `autoFix`, `linters`, or `options`). A
 selector conflict identifies both involved field names. Validation messages do
 not echo unbounded caller input.

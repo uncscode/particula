@@ -2329,6 +2329,7 @@
         "autoFix",
         "confirmed",
         "targetDir",
+        "cwd",
         "mode",
         "targetPaths",
         "ruffTimeout",
@@ -2337,7 +2338,7 @@
       "exempt_fields": [
         "options"
       ],
-      "current_count": 7,
+      "current_count": 8,
       "diagnostic": null,
       "classification": "split-needed",
       "target_shape": "split-wrapper-family",
@@ -2367,6 +2368,11 @@
           "field": "targetDir",
           "role": "safety-field",
           "notes": "Direct path scope for linter execution."
+        },
+        {
+          "field": "cwd",
+          "role": "safety-field",
+          "notes": "Repository/worktree execution root for relative lint targets."
         },
         {
           "field": "mode",
@@ -2503,13 +2509,12 @@
         "pytestArgs",
         "coverage",
         "coverageSource",
-        "coverageThreshold",
-        "overrideIni"
+        "coverageThreshold"
       ],
       "exempt_fields": [
         "options"
       ],
-      "current_count": 10,
+      "current_count": 9,
       "diagnostic": null,
       "classification": "split-needed",
       "target_shape": "split-wrapper-family",
@@ -2565,14 +2570,11 @@
           "field": "coverageThreshold",
           "role": "explicit-exception",
           "notes": "Coverage validation guard retained direct."
-        },
-        {
-          "field": "overrideIni",
-          "role": "payload-bearing"
         }
       ],
       "audit_notes": [
-        "Advanced split wrapper now keeps legacy routine/report toggles off the published schema and requires them through bounded options."
+        "Advanced split wrapper now keeps legacy routine/report toggles off the published schema and requires them through bounded options.",
+        "Caller ini overrides remain prohibited; scoped assertion runs use the explicit coverage=false path."
       ]
     },
     {

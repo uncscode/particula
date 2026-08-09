@@ -83,6 +83,17 @@ describe("run_linters wrapper", () => {
     expect(command).not.toContain("--no-auto-fix");
   });
 
+  it("forwards a worktree cwd with explicit Ruff targets", async () => {
+    const execute = await loadToolExecute("../../run_linters.ts");
+    const cwd = process.cwd();
+
+    await execute({ cwd, mode: "format-check", targetPaths: ["adforge_core", ".opencode/tools"] });
+
+    const command = getInvocations().at(-1)?.args.join(" ") ?? "";
+    expect(command).toContain(`--cwd=${cwd}`);
+    expect(command).toContain('--target-paths-json=["adforge_core",".opencode/tools"]');
+  });
+
   it("keeps every explicit mode Ruff-only and never transports legacy mutation selectors", async () => {
     const execute = await loadToolExecute("../../run_linters.ts");
 
@@ -109,6 +120,7 @@ describe("run_linters wrapper", () => {
     expect(await execute({ mode: "check", autoFix: true })).toContain("mode conflicts with autoFix");
     expect(await execute({ targetPaths: ["adforge_core"] })).toContain("targetPaths requires mode");
     expect(await execute({ mode: "check", targetPaths: ["../outside"] })).toContain("invalid repository-relative path");
+    expect(await execute({ cwd: "..", mode: "check" })).toContain("cwd path resolves outside repository root");
     expect(getInvocations()).toHaveLength(0);
   });
 

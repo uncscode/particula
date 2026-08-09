@@ -14,7 +14,7 @@ perform lifecycle actions.
 
 ## Preferred wrapper
 
-- Use `run_pytest_advanced` when you need coverage controls, durations, restricted `overrideIni`, or ordered `pytestArgs`.
+- Use `run_pytest_advanced` when you need coverage controls, durations, plural targets, or ordered `pytestArgs`.
 
 ## Compatibility status
 
@@ -32,7 +32,6 @@ perform lifecycle actions.
 - `coverage`
 - `coverageSource`
 - `coverageThreshold`
-- `overrideIni`
 
 Keep advanced payload-bearing fields explicit.
 
@@ -53,7 +52,7 @@ Keep advanced payload-bearing fields explicit.
 { "coverage": true, "coverageThreshold": 80, "minTests": 1 }
 { "options": "output=json durations=10", "pytestArgs": ["tests/"], "minTests": 1 }
 { "options": "test-filter=agent fail-fast", "pytestArgs": ["tests/"], "minTests": 1 }
-{ "overrideIni": ["filterwarnings=error"], "minTests": 1 }
+{ "testPaths": ["pkg/tests/test_a.py", "pkg/tests/test_b.py"], "coverage": false, "minTests": 1 }
 ```
 
 ## Notes
@@ -61,9 +60,10 @@ Keep advanced payload-bearing fields explicit.
 - `timeout` is measured in seconds and must be greater than 0 and less than or equal to 1200 seconds (20 minutes).
 - `coverage: false` emits the no-coverage path and rejects `coverageSource`,
   `coverageThreshold`, and `cov-report` controls before subprocess launch.
-  Use it for focused assertion checks, then restore coverage for final
-  comprehensive validation. Raw `--no-cov` and lowered `--cov-fail-under`
-  controls are not accepted through `pytestArgs`.
+  Use it for focused assertion checks, including when repository-wide coverage
+  would make a scoped run fail despite passing assertions. Restore coverage for
+  final comprehensive validation. Raw `--no-cov`, lowered `--cov-fail-under`,
+  `overrideIni`, and other caller ini controls are not accepted.
 - `durations=0` is supported and means show all durations.
 - `durations-min=<n>` only takes effect when `durations=<n>` is also set.
 - `cwd` must resolve within the current repository root.
@@ -95,13 +95,13 @@ Keep advanced payload-bearing fields explicit.
 - `pytestArgs` is a literal ordered array. Accepted entries are transported once as a compact JSON
   array; they are never trimmed, split, joined, or appended as runner arguments.
 - The permitted caller grammar is confined path/node-id targets, `-k VALUE`, `-m VALUE`,
-  `-p VALUE`, restricted non-`addopts` `--override-ini=VALUE`, `--collect-only`, `-q`, `-v`,
-  `--verbose`, and `--tb=short|long|line|native|no`. Caller `-o` and `addopts` controls are rejected.
+  `--collect-only`, `-q`, `-v`, `--verbose`, and
+  `--tb=short|long|line|native|no`. Caller plugin, `-o`, `addopts`, and other ini
+  controls are rejected.
 - Raw coverage and runner controls (output, timeout, cwd, targeting, fail-fast, durations, and
   transport controls) are prohibited in `pytestArgs`; use their dedicated fields/tokens instead.
 - `testPath` and `test-filter` use runner-owned named transport. `testPath` stays repository-relative
-  even when `cwd` is nested; the runner converts it safely for execution. `overrideIni` is independently
-   transported as an array, and caller `addopts` controls are rejected.
+  even when `cwd` is nested; the runner converts it safely for execution.
 - `testPaths` accepts one through seven ordered canonical, repository-confined POSIX
   path/node-id targets and transports them once as compact `--test-paths-json`.
   It cannot be combined with `testPath`, including empty-field ambiguity.

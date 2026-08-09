@@ -40,6 +40,7 @@ const LEGACY_DIRECT_KEYS = new Set([
   "covReport",
   "durations",
   "durationsMin",
+  "overrideIni",
 ]);
 
 const hasLegacyDirectKey = (args: Record<string, unknown>): string | undefined => {
@@ -274,15 +275,6 @@ const validatePytestArgs = (value: unknown, cwd: string | undefined): { ok: true
       continue;
     }
     if (token.startsWith("-") || path.isAbsolute(token) || validatePathWithinRepo(token, "pytestArgs", cwd)) return { ok: false, error: `ERROR: pytestArgs token '${token}' is not permitted.` };
-  }
-  return { ok: true, value: value as string[] };
-};
-
-const validateStringArray = (value: unknown, name: string): { ok: true; value: string[] } | { ok: false; error: string } => {
-  if (value === undefined) return { ok: true, value: [] };
-  if (!Array.isArray(value) || value.some((entry) => typeof entry !== "string")) return { ok: false, error: `ERROR: ${name} must be an array of strings.` };
-  if (value.length > 0) {
-    return { ok: false, error: "ERROR: overrideIni controls are not permitted." };
   }
   return { ok: true, value: value as string[] };
 };
@@ -524,11 +516,13 @@ export default tool({
     coverage: tool.schema.boolean().optional(),
     coverageSource: tool.schema.string().optional(),
     coverageThreshold: tool.schema.number().optional(),
-    overrideIni: tool.schema.array(tool.schema.string()).optional(),
   },
   async execute(args) {
     const legacyDirectKey = hasLegacyDirectKey(args as Record<string, unknown>);
     if (legacyDirectKey) {
+      if (legacyDirectKey === "overrideIni") {
+        return "ERROR: run_pytest_advanced does not accept direct field 'overrideIni'. Use coverage: false for scoped assertion runs; caller ini overrides are prohibited.";
+      }
       return `ERROR: run_pytest_advanced does not accept direct field '${legacyDirectKey}'. Use 'options' instead.`;
     }
 
@@ -580,11 +574,8 @@ export default tool({
     let ignoredCoverageSources = false;
     const durations = parsedOptions.options.durations ?? args.durations;
     const durationsMin = parsedOptions.options.durationsMin ?? args.durationsMin;
-    const overrideIniResult = validateStringArray(args.overrideIni, "overrideIni");
-    if (!overrideIniResult.ok) return overrideIniResult.error;
     const pytestArgsResult = validatePytestArgs(args.pytestArgs, cwd);
     if (!pytestArgsResult.ok) return pytestArgsResult.error;
-    const overrideIni = overrideIniResult.value;
     const pytestArgs = pytestArgsResult.value;
 
     if (pytestArgs.includes("--collect-only") && args.coverage !== false) {
@@ -647,7 +638,6 @@ export default tool({
       }
     }
 
-    if (overrideIni.length > 0) cmdParts.push(`--override-ini-json=${JSON.stringify(overrideIni)}`);
     if (pytestArgs.length > 0) cmdParts.push(`--pytest-argv-json=${JSON.stringify(pytestArgs)}`);
 
     const outputMode = getRoutineArgs(args as Record<string, unknown>, parsedOptions.options).outputMode;

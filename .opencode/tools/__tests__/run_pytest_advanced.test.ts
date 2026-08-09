@@ -70,7 +70,6 @@ describe("run_pytest_advanced wrapper", () => {
         "coverageThreshold",
         "cwd",
         "minTests",
-        "overrideIni",
         "pytestArgs",
         "testPath",
         "testPaths",
@@ -104,6 +103,9 @@ describe("run_pytest_advanced wrapper", () => {
     );
     expect(await execute({ durationsMin: 0.5 })).toContain(
       "does not accept direct field 'durationsMin'",
+    );
+    expect(await execute({ overrideIni: ["addopts="] })).toBe(
+      "ERROR: run_pytest_advanced does not accept direct field 'overrideIni'. Use coverage: false for scoped assertion runs; caller ini overrides are prohibited.",
     );
   });
 
@@ -428,7 +430,6 @@ describe("run_pytest_advanced wrapper", () => {
 
     expect(String(await execute({ pytestArgs: ["-p", "unsafe_plugin"] }))).toContain("not permitted");
     expect(String(await execute({ pytestArgs: ["--override-ini=pythonpath=/outside"] }))).toContain("not permitted");
-    expect(String(await execute({ overrideIni: ["pythonpath=/outside"] }))).toContain("not permitted");
     expect(getInvocations()).toHaveLength(0);
   });
 

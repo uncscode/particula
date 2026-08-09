@@ -6,7 +6,7 @@ arbitrary Git command surface.
 
 ## Local adapter boundary
 
-After admitting an explicitly supplied trusted local worktree, the TypeScript wrapper invokes the
+After resolving and admitting a trusted local worktree, the TypeScript wrapper invokes the
 wrapper-local `read_only_git_diagnostics.py` adapter once with one JSON-lines
 request. The adapter reads exactly one bounded UTF-8 JSON object from standard
 input and writes exactly one bounded, newline-terminated JSON response to
@@ -28,9 +28,10 @@ must use the adapter/core JSON envelope rather than rendered text.
 
 The adapter constructs a minimal explicit repository context for the admitted
 canonical worktree and executes only wrapper-owned fixed local Git commands. It
-uses only the Python standard library and does not import `adw`,
-`adforge_core`, Pydantic, or an application CLI. It does not infer authority
-from the ambient current directory.
+uses only the Python standard library and does not import application runtime
+packages, Pydantic, or an application CLI. Omitted and relative wrapper paths
+resolve against the checkout that owns the wrapper, never the ambient process
+current directory.
 
 This boundary does **not** import or dispatch the historical workflow CLI, the
 core CLI module, or either CLI root. It has no CLI-root help route, no legacy
@@ -49,11 +50,14 @@ an `invalid_request` failure rather than compatibility aliases.
 | `log` | `worktree_path`, `ref`, `max_count`, `path` | `max_count` is an integer from `1` through `1000`; its default is `50`. |
 | `show` | `worktree_path`, `ref`, `path` | `ref` is required. A path requires a compatible resolved tree-ish ref. |
 
-The caller must supply `worktree_path` explicitly. The wrapper canonicalizes an
-existing absolute directory and supplies that path in its adapter request; it
-does not infer authority from its current directory. The adapter then admits
-only its primary checkout or a linked worktree registered under that checkout's
-canonical Git common directory. Admission requires a direct
+When `worktree_path` is omitted, the wrapper selects the repository root that
+owns the wrapper. Relative paths resolve against that same root. The wrapper
+canonicalizes the resulting existing directory and supplies its absolute path
+in the adapter request; it never selects authority from the ambient process
+current directory. Invalid local candidates are rejected with their bounded
+resolved path for diagnosis. The adapter then admits only its primary checkout
+or a linked worktree registered under that checkout's canonical Git common
+directory. Admission requires a direct
 `.git/worktrees/<id>` metadata directory, matching `commondir`, and an exact
 back-pointer to the selected worktree's `.git` file. Ordinary sibling
 repositories, foreign worktrees, malformed pointers, and symlinked metadata are
@@ -101,4 +105,5 @@ Failures preserve the same outer envelope with `ok: false` and a bounded
 `error`. Read-only diagnostic error types are `invalid_request`, `unavailable`,
 `execution_failed`, and `execution_timeout`. Adapter transport or preflight
 failures are rendered as stable bounded wrapper errors; child stdout, stderr,
-tracebacks, raw command argv, tokens, and absolute paths are not rendered.
+tracebacks, raw command argv, and tokens are not rendered. A wrapper preflight
+rejection may identify only its bounded resolved worktree candidate.

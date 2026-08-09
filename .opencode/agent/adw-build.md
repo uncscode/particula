@@ -5,7 +5,8 @@ description: 'Primary agent that orchestrates implementation with spot-check tes
   Executes implementation plans by converting steps to todos, implementing code with
   spot-check testing during build, then running comprehensive tests before completion.
 
-  This agent: - Reads plan from spec_content via adw_spec_read tool - Moves to isolated
+  This agent: - Reads plan and an explicit worktree_path via adw_spec_read before
+  implementation or test delegation - Moves to isolated
   worktree - Converts plan steps to todo list - Implements tasks with spot-check tests
   during build - Calls adw-build-tests for comprehensive test validation - Operates
   fully autonomously with no user input
@@ -156,19 +157,27 @@ Extract from `$ARGUMENTS`:
 ## Step 2: Load Workspace Context
 
 ```python
-adw_spec_read({
+worktree_path = adw_spec_read({
   "command": "read",
-  "adw_id": adw_id
+  "adw_id": adw_id,
+  "field": "worktree_path"
+})
+spec_content = adw_spec_read({
+  "command": "read",
+  "adw_id": adw_id,
+  "field": "spec_content"
 })
 ```
 
-Extract from `adw_state.json`:
+Read other required context fields explicitly rather than treating a fieldless
+`read` result as the complete `adw_state.json` object:
 - `worktree_path` - CRITICAL: isolated workspace location
 - `spec_content` - Implementation plan to execute
 - `issue_number`, `issue_title`, `branch_name` - Context
 
 **Validation:**
-- If `worktree_path` missing: `ADW_BUILD_FAILED: No worktree found`
+- If `worktree_path` is absent, empty, `null`, or an error result:
+  `ADW_BUILD_FAILED: No worktree found`
 - If `spec_content` missing: `ADW_BUILD_FAILED: No implementation plan found`
 
 **Scope note:**
@@ -279,7 +288,8 @@ run_pytest_advanced({
   "testPath": "{module}/tests/",
   "options": "output=summary fail-fast",
   "coverage": false,
-  "timeout": 60
+  "timeout": 60,
+  "cwd": worktree_path
 })
 ```
 
@@ -296,7 +306,8 @@ run_pytest_advanced({
 run_pytest_advanced({
   "testPath": "adw/utils/tests/parser_test.py",
   "options": "output=summary fail-fast",
-  "coverage": false
+  "coverage": false,
+  "cwd": worktree_path
 })
 ```
 
@@ -328,11 +339,17 @@ changed_files = []  # Build this list as you implement each task
 
 After ALL tasks are implemented, run comprehensive tests on all changed files:
 
+Before invoking the subagent, confirm the Step 2 `worktree_path` is still
+non-empty and passed the Step 3 validation. If it is unavailable or invalid,
+return `ADW_BUILD_FAILED: No valid worktree available for test validation` and
+do not delegate. The subagent independently resolves the same explicit state
+field and fails closed if the workflow state is no longer available.
+
 ```python
 # Do not pass session_id on retries - subagents must be fresh to see filesystem changes
 task({
   "description": "Validate and run tests for all files",
-  "prompt": f"Validate tests.\n\nArguments: adw_id={adw_id}\n\nChanged files: {', '.join(changed_files)}",
+  "prompt": f"Validate tests.\n\nArguments: adw_id={adw_id} files={','.join(changed_files)}",
   "subagent_type": "adw-build-tests"
 })
 ```
@@ -340,6 +357,8 @@ task({
 **Parse output:**
 - `ADW_BUILD_TESTS_SUCCESS` -> Proceed to final validation
 - `ADW_BUILD_TESTS_FAILED` -> Fix implementation/tests, retry (max 3 attempts)
+- `ADW_BUILD_TESTS_BLOCKED` -> Stop without retrying tests; restore workflow
+  state and valid `worktree_path`, then rerun the build step
 
 **What adw-build-tests does:**
 - Validates tests exist for all public/private functions

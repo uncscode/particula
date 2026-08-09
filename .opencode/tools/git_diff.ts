@@ -1,16 +1,30 @@
 import { tool } from "@opencode-ai/plugin";
 import { existsSync, realpathSync, statSync } from "node:fs";
-import { isAbsolute, join } from "node:path";
+import { isAbsolute, join, resolve } from "node:path";
 
-const canonicalDirectory = (value: unknown): string | undefined => {
-  if (typeof value !== "string") return undefined;
-  const candidate = value.trim();
-  if (!candidate || candidate.startsWith("-") || !isAbsolute(candidate)) return undefined;
+type DirectoryResolution = { path?: string; rejected?: string };
+
+const REPOSITORY_ROOT = realpathSync(resolve(import.meta.dir, "..", ".."));
+const MAX_REJECTED_PATH = 500;
+
+const canonicalDirectory = (value: unknown): DirectoryResolution => {
+  if (value !== undefined && value !== null && typeof value !== "string") {
+    return { rejected: "<non-string>" };
+  }
+  const supplied = typeof value === "string" ? value.trim() : "";
+  if (supplied.startsWith("-")) return { rejected: supplied };
+  const candidate = supplied
+    ? isAbsolute(supplied)
+      ? supplied
+      : resolve(REPOSITORY_ROOT, supplied)
+    : REPOSITORY_ROOT;
   try {
-    if (!existsSync(candidate) || !statSync(candidate).isDirectory()) return undefined;
-    return realpathSync(candidate);
+    if (!existsSync(candidate) || !statSync(candidate).isDirectory()) {
+      return { rejected: candidate };
+    }
+    return { path: realpathSync(candidate) };
   } catch {
-    return undefined;
+    return { rejected: candidate };
   }
 };
 
@@ -46,8 +60,14 @@ export default tool({
     max_count: tool.schema.number().optional(),
   },
   async execute(rawArgs) {
-    const worktree_path = canonicalDirectory(rawArgs.worktree_path);
-    if (!worktree_path) return "ERROR: invalid or untrusted worktree_path";
+    const resolution = canonicalDirectory(rawArgs.worktree_path);
+    if (!resolution.path) {
+      const rejected = JSON.stringify(
+        (resolution.rejected ?? "<unresolved>").slice(0, MAX_REJECTED_PATH),
+      );
+      return `ERROR: invalid or untrusted worktree_path: ${rejected}`;
+    }
+    const worktree_path = resolution.path;
     const request: Record<string, unknown> = { command: rawArgs.command, worktree_path };
     for (const key of ["base", "target", "ref", "path", "max_count"]) {
       if (rawArgs[key] !== undefined && rawArgs[key] !== null) request[key] = rawArgs[key];

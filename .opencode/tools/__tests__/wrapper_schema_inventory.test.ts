@@ -867,7 +867,6 @@ describe("wrapper schema inventory", () => {
       "coverage",
       "coverageSource",
       "coverageThreshold",
-      "overrideIni",
     ]);
     expect(runPytestAdvancedRow?.exempt_fields).toEqual(["options"]);
     expect(runPytestAdvancedRow?.field_role_audit).toEqual(
@@ -878,12 +877,12 @@ describe("wrapper schema inventory", () => {
         expect.objectContaining({ field: "coverageSource", role: "payload-bearing" }),
         expect.objectContaining({ field: "coverageThreshold", role: "explicit-exception" }),
         expect.objectContaining({ field: "options", role: "explicit-exception" }),
-        expect.objectContaining({ field: "overrideIni", role: "payload-bearing" }),
       ]),
     );
     expect(runPytestAdvancedRow?.audit_notes).toEqual(
       expect.arrayContaining([
         expect.stringContaining("keeps legacy routine/report toggles off the published schema"),
+        expect.stringContaining("scoped assertion runs use the explicit coverage=false path"),
       ]),
     );
 
@@ -970,7 +969,7 @@ describe("wrapper schema inventory", () => {
       ".opencode/tools/__tests__/run_linters.test.ts",
     );
     expect(runLintersRow?.owner_plan).toBe("E27-M9");
-    expect(runLintersRow?.counted_fields).toEqual(["autoFix", "confirmed", "targetDir", "mode", "targetPaths", "ruffTimeout", "mypyTimeout"]);
+    expect(runLintersRow?.counted_fields).toEqual(["autoFix", "confirmed", "targetDir", "cwd", "mode", "targetPaths", "ruffTimeout", "mypyTimeout"]);
     expect(runLintersRow?.exempt_fields).toEqual(["options"]);
     expect(runLintersRow?.field_role_audit).toEqual(
       expect.arrayContaining([
@@ -979,6 +978,7 @@ describe("wrapper schema inventory", () => {
         expect.objectContaining({ field: "linters", role: "bounded-option-candidate" }),
         expect.objectContaining({ field: "options", role: "explicit-exception" }),
         expect.objectContaining({ field: "targetDir", role: "safety-field" }),
+        expect.objectContaining({ field: "cwd", role: "safety-field" }),
         expect.objectContaining({ field: "mode", role: "safety-field" }),
         expect.objectContaining({ field: "targetPaths", role: "safety-field" }),
       ]),

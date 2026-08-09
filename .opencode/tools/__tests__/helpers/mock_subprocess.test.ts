@@ -46,4 +46,16 @@ describe("mock-subprocess", () => {
     await expect(Bun.$`uv run --active adw status`.text()).rejects.toThrow("boom");
     expect(getInvocations().at(-1)?.kind).toBe("$");
   });
+
+  it("keeps dollar execution fixtures isolated from spawnSync trust checks", async () => {
+    installSubprocessMocks();
+    setDollarText("execution output");
+
+    const trustCheck = Bun.spawnSync(["git", "status", "--porcelain=v1"]);
+    const executionOutput = await Bun.$`python3 validator.py`.text();
+
+    expect(Buffer.from(trustCheck.stdout).toString()).toBe("");
+    expect(trustCheck.exitCode).toBe(0);
+    expect(executionOutput).toBe("execution output");
+  });
 });

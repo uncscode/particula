@@ -35,7 +35,9 @@ const originalBun = (globalThis as { Bun?: typeof Bun }).Bun;
 let replacedBun = false;
 
 let spawnResponse: SpawnResponse = { stdout: "", stderr: "", exitCode: 0 };
+let spawnSyncResponse: SpawnResponse = { stdout: "", stderr: "", exitCode: 0 };
 let spawnError: SpawnError | null = null;
+let spawnSyncError: SpawnError | null = null;
 let dollarText = "";
 let dollarError: BunDollarError | null = null;
 
@@ -116,20 +118,20 @@ export const installSubprocessMocks = (): void => {
       stderr: Array.isArray(args) ? undefined : args?.stderr,
       timeout: Array.isArray(args) ? undefined : args?.timeout,
     });
-    if (spawnError) {
-      const err = new Error(spawnError.message ?? "") as Error & {
+    if (spawnSyncError) {
+      const err = new Error(spawnSyncError.message ?? "") as Error & {
         stdout?: Buffer;
         stderr?: Buffer;
       };
-      err.stdout = Buffer.from(spawnError.stdout ?? "");
-      err.stderr = Buffer.from(spawnError.stderr ?? "");
+      err.stdout = Buffer.from(spawnSyncError.stdout ?? "");
+      err.stderr = Buffer.from(spawnSyncError.stderr ?? "");
       throw err;
     }
     return {
-      stdout: Buffer.from(spawnResponse.stdout ?? ""),
-      stderr: Buffer.from(spawnResponse.stderr ?? ""),
-      exitCode: spawnResponse.exitCode ?? 0,
-      timedOut: spawnResponse.timedOut ?? false,
+      stdout: Buffer.from(spawnSyncResponse.stdout ?? ""),
+      stderr: Buffer.from(spawnSyncResponse.stderr ?? ""),
+      exitCode: spawnSyncResponse.exitCode ?? 0,
+      timedOut: spawnSyncResponse.timedOut ?? false,
     };
   }) as typeof bunRef.spawnSync;
 
@@ -207,11 +209,14 @@ export const installSubprocessMocks = (): void => {
 
 export const setSpawnResponse = (response: SpawnResponse): void => {
   spawnError = null;
+  spawnSyncError = null;
   spawnResponse = { stdout: "", stderr: "", exitCode: 0, ...response };
+  spawnSyncResponse = { stdout: "", stderr: "", exitCode: 0, ...response };
 };
 
 export const setSpawnError = (error: SpawnError): void => {
   spawnError = error;
+  spawnSyncError = error;
 };
 
 export const setDollarText = (value: string): void => {
@@ -240,7 +245,9 @@ export const getKillCount = (): number => killCount;
 /** Reset mock behavior/captured calls while keeping monkeypatches installed. */
 export const resetSubprocessMocks = (): void => {
   spawnResponse = { stdout: "", stderr: "", exitCode: 0 };
+  spawnSyncResponse = { stdout: "", stderr: "", exitCode: 0 };
   spawnError = null;
+  spawnSyncError = null;
   dollarText = "";
   dollarError = null;
   invocations.length = 0;

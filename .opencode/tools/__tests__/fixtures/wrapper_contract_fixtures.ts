@@ -26,6 +26,7 @@ export const COMPACT_SCHEMA_FIELD_FIXTURES = {
     "covReport",
     "durations",
     "durationsMin",
+    "overrideIni",
   ],
   runBunTestOmittedKeys: [
     "outputMode",
