@@ -62,6 +62,16 @@ until the lazy runtime device check. This boundary remains absent from
 `particula.execution` and top-level exports. See
 [ADR-013](architecture/decisions/ADR-013-pre-execution-availability-resolution.md).
 
+`particula.execution.rng` is the concrete, direct-import-only E7-F8 P1 RNG
+stream-identity boundary. It owns immutable host metadata and deterministic
+per-process/per-logical-box initial-word derivation, then explicitly initializes
+validated caller-owned Warp state buffers. Initialization allocates temporary
+NumPy/Warp copy sources only and deterministically overwrites retained buffers
+without acquiring, replacing, or rebinding them. It does not advance or reset
+buffers and is not integrated with package or top-level exports, resource
+registries, resident sessions, scheduling, or checkpoints. Those integrations
+and broader RNG policy remain deferred.
+
 `particula.execution.adapters.condensation` contains concrete-only P2
 condensation state carriers and shipped P3/P4 selected CPU/Warp adapters. The
 carriers retain caller-owned CPU or resident Warp resources by identity and
@@ -125,8 +135,8 @@ resources rather than reusing source identities. Other versions, partial,
 mixed, malformed, or non-ACTIVE records and device mismatches reject.
 Finalization makes its source session terminal but returns an ACTIVE checkpoint
 eligible for explicit restart. E7-F5 P2 supplies declaration-only scheduling;
-E7-F7 transport is shipped, while E7-F8 detailed RNG-stream policy remains
-future work. E7-F7 P4 particle
+E7-F7 transport is shipped, while E7-F8 integration and remaining RNG-stream
+policy remain future work. E7-F7 P4 particle
 transport is shipped as the concrete-only
 ``particula.gpu.kernels.communication.particle_communication_step_gpu`` seam.
 P4 owns immutable pre-step planning, admission, and one gated particle commit;

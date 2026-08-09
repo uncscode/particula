@@ -6,6 +6,7 @@ import builtins
 import importlib
 import subprocess
 import sys
+from typing import Any
 
 import pytest
 
@@ -192,12 +193,13 @@ def test_registry_requires_exact_canonical_process_array_manifest() -> None:
     with pytest.raises(ValueError, match="exactly two"):
         StreamRegistry(0, 0, (), (), (("coagulation", object()),))
     with pytest.raises(TypeError, match="entries"):
+        bad_entry: Any = ["wall_loss", object()]
         StreamRegistry(
             0,
             0,
             (),
             (),
-            (("coagulation", object()), ["wall_loss", object()]),
+            (("coagulation", object()), bad_entry),
         )  # type: ignore[arg-type]
 
 
@@ -283,13 +285,13 @@ def test_unavailable_warp_initialization_fails_before_writes(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test optional-backend import failure happens before an array write."""
-    original_import = builtins.__import__
+    original_import: Any = builtins.__import__
 
     def guarded_import(name: str, *args: object, **kwargs: object) -> object:
         """Reject only the initializer's optional Warp import."""
         if name == "warp":
             raise ModuleNotFoundError("warp unavailable")
-        return original_import(name, *args, **kwargs)
+        return original_import(name, *args, **kwargs)  # type: ignore[misc]
 
     monkeypatch.setattr(builtins, "__import__", guarded_import)
     registry = StreamRegistry(0, 1, ("box",), (0,), _arrays())
@@ -365,10 +367,11 @@ def test_initialize_rejects_invalid_schema_before_copy(
 
         def __init__(self, array: object, kind: str) -> None:
             """Expose enough Warp-like metadata for preflight validation."""
-            self.shape = (2,) if kind == "shape" else array.shape
-            self.dtype = wp.float64 if kind == "dtype" else array.dtype
-            self.device = array.device
-            self.ptr = array.ptr
+            array_any: Any = array
+            self.shape = (2,) if kind == "shape" else array_any.shape
+            self.dtype = wp.float64 if kind == "dtype" else array_any.dtype
+            self.device = array_any.device
+            self.ptr = array_any.ptr
             self.is_contiguous = kind != "contiguous"
 
     if failure == "shape":
@@ -392,3 +395,141 @@ def test_initialize_rejects_invalid_schema_before_copy(
 
     assert copy_calls == []
     assert coagulation.numpy().tolist() == [17]
+
+
+def test_initialize_rejects_spoofed_array_before_copy(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test structural lookalikes cannot pass Warp-array preflight."""
+    wp = pytest.importorskip("warp")
+    coagulation = wp.full(1, 17, dtype=wp.uint32, device="cpu")
+    wall_loss = wp.full(1, 19, dtype=wp.uint32, device="cpu")
+
+    class SpoofedArray:
+        """Expose copied Warp metadata without being a Warp array."""
+
+        shape = wall_loss.shape
+        dtype = wall_loss.dtype
+        device = wall_loss.device
+        ptr = wall_loss.ptr
+        is_contiguous = wall_loss.is_contiguous
+
+    registry = StreamRegistry(
+        5,
+        1,
+        ("box",),
+        (0,),
+        (("coagulation", coagulation), ("wall_loss", SpoofedArray())),
+    )
+    copy_calls: list[object] = []
+    monkeypatch.setattr(wp, "copy", lambda *args: copy_calls.append(args))
+
+    with pytest.raises(TypeError, match="wall_loss state array must be a Warp"):
+        registry.initialize()
+
+    assert copy_calls == []
+    assert coagulation.numpy().tolist() == [17]
+
+
+def test_initialize_rejects_identical_and_overlapping_warp_arrays() -> None:
+    """Test retained state arrays must be distinct nonoverlapping Warp arrays."""
+    wp = pytest.importorskip("warp")
+    coagulation = wp.zeros(1, dtype=wp.uint32, device="cpu")
+    overlapping = wp.array(
+        ptr=coagulation.ptr,
+        capacity=coagulation.capacity,
+        dtype=wp.uint32,
+        shape=(1,),
+        device="cpu",
+        copy=False,
+    )
+
+    for wall_loss, message in (
+        (coagulation, "distinct objects"),
+        (overlapping, "must not alias"),
+    ):
+        registry = StreamRegistry(
+            5,
+            1,
+            ("box",),
+            (0,),
+            (("coagulation", coagulation), ("wall_loss", wall_loss)),
+        )
+        with pytest.raises(ValueError, match=message):
+            registry.initialize()
+
+
+def test_initialize_rejects_different_warp_devices_when_available() -> None:
+    """Test distinct real state arrays must be on the same Warp device."""
+    wp = pytest.importorskip("warp")
+    devices = wp.get_devices()
+    if len(devices) < 2:
+        pytest.skip("A second Warp device is unavailable.")
+    coagulation = wp.zeros(1, dtype=wp.uint32, device=devices[0])
+    wall_loss = wp.zeros(1, dtype=wp.uint32, device=devices[1])
+    registry = StreamRegistry(
+        5,
+        1,
+        ("box",),
+        (0,),
+        (("coagulation", coagulation), ("wall_loss", wall_loss)),
+    )
+
+    with pytest.raises(ValueError, match="same device"):
+        registry.initialize()
+
+
+def test_initialize_second_copy_failure_keeps_first_write(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a second-copy failure does not promise rollback or rebinding."""
+    wp = pytest.importorskip("warp")
+    coagulation = wp.full(1, 17, dtype=wp.uint32, device="cpu")
+    wall_loss = wp.full(1, 19, dtype=wp.uint32, device="cpu")
+    registry = StreamRegistry(
+        5,
+        1,
+        ("box",),
+        (0,),
+        (("coagulation", coagulation), ("wall_loss", wall_loss)),
+    )
+    original_copy = wp.copy
+    copy_count = 0
+
+    def fail_second_copy(*args: object) -> None:
+        """Perform the first copy and fail the second copy deterministically."""
+        nonlocal copy_count
+        if args[0] is not coagulation and args[0] is not wall_loss:
+            original_copy(*args)
+            return
+        copy_count += 1
+        if copy_count == 2:
+            raise RuntimeError("second copy failed")
+        original_copy(*args)
+
+    monkeypatch.setattr(wp, "copy", fail_second_copy)
+
+    with pytest.raises(RuntimeError, match="second copy failed"):
+        registry.initialize()
+
+    assert registry.state_array_for("coagulation") is coagulation
+    assert registry.state_array_for("wall_loss") is wall_loss
+    assert coagulation.numpy().tolist() == list(
+        registry.words_by_lane("coagulation")
+    )
+    assert wall_loss.numpy().tolist() == [19]
+
+
+def test_registry_permits_equal_words_for_different_processes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test derived-word collision detection is limited to one process."""
+    rng_module = importlib.import_module("particula.execution.rng")
+    monkeypatch.setattr(
+        rng_module, "_derive_initial_word", lambda _root, _key: 3
+    )
+
+    registry = StreamRegistry(0, 1, ("box",), (0,), _arrays())
+
+    assert registry.words_by_lane("coagulation") == (3,)
+    assert registry.words_by_lane("wall_loss") == (3,)

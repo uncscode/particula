@@ -2,11 +2,11 @@
 
 ## Execution and Backend Integration
 
-- [ ] Add typed stream identity, descriptor, derivation-version, and registry
+- [x] Add typed stream identity, descriptor, derivation-version, and registry
   models in `particula/execution/rng.py`.
-- [ ] Specify deterministic non-`hash()` root-seed/process/logical-box mixing and
+- [x] Specify deterministic non-`hash()` root-seed/process/logical-box mixing and
   freeze known-answer vectors.
-- [ ] Validate unique stable logical box IDs, process namespaces, seed range,
+- [x] Validate unique stable logical box IDs, process namespaces, seed range,
   dimensions, state dtype/device, and registry completeness before mutation.
 - [ ] Extend E7-F4 `SidecarRegistry`/`ResidentSession` to own separate coagulation
   and wall-loss state arrays plus logical-ID-to-lane metadata.
@@ -27,8 +27,9 @@
 
 ## Tooling / Tests
 
-- [ ] Add `particula/execution/tests/rng_test.py` for derivation, validation,
-  registry lifecycle, reset targeting, and known-answer vectors.
+- [x] Add `particula/execution/tests/rng_test.py` for P1 derivation, validation,
+  canonical registry lookup, initializer preflight, host-only import, and
+  known-answer vectors.
 - [ ] Add adapter tests for persistent coagulation and wall-loss state identity,
   initialization count, rejection preservation, and process separation.
 - [ ] Add `particula/execution/tests/rng_invariance_test.py` for unrelated box

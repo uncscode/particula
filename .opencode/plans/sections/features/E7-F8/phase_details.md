@@ -1,10 +1,14 @@
 # Phase Details
 
-- [ ] **E7-F8-P1:** Define stable per-box stream identities and deterministic seeding with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F8-P1:** Define stable per-box stream identities and deterministic seeding with unit tests
+   - Issue: #1520 | Size: S | Status: Complete
   - Goal: Define versioned process/box stream keys and derive reproducible initial `uint32` state without positional coupling.
   - Files: `particula/execution/rng.py`, `particula/execution/tests/rng_test.py`
-  - Tests: Input validation, namespace separation, stable-ID reorder/addition invariance, deterministic seed vectors, and collision handling.
+   - Delivered: direct-only host identity/registration, FNV derivation, lazy
+     NumPy/Warp initializer, caller-buffer preflight/copy, and export-denial
+     coverage; no session, scheduler, or checkpoint integration.
+   - Tests: validation, namespace separation, stable-ID invariance, seed vectors,
+     collision handling, host-only import, initializer preflight, and exports.
 
 - [ ] **E7-F8-P2:** Integrate coagulation streams with resident resources and unit tests
   - Issue: TBD | Size: S | Status: Not Started

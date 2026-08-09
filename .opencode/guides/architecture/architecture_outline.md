@@ -40,8 +40,10 @@ The exact downstream ordering remains
      P3 retains gas inventory/time-step transfer admission. E7-F7 P4 ships a
      separate concrete-only direct-Warp particle-transport seam and owns its
      immutable particle-plan admission; P5 retains
-     resident binding. E7-F8 detailed RNG-stream policy also remains deferred,
-    along with implicit transfer/synchronization, retry, broad fallback, and
+      resident binding. E7-F8 P1 supplies only the isolated RNG stream-identity
+     and explicit caller-buffer initialization boundary below; integration and
+     remaining RNG policy remain deferred, along with implicit
+     transfer/synchronization, retry, broad fallback, and
     replacement of direct GPU APIs. The sole shipped fallback seam is the
     explicit, CPU-authoritative,
   direct-import-only boundary described below.
@@ -68,7 +70,16 @@ The exact downstream ordering remains
   `Device(Backend.CPU, "cpu")`; Warp accepts every validated Warp declaration
    for recognition and passes its opaque native string unchanged to its lazy
    runtime device check. This module is not package- or top-level-exported. See
-   [ADR-013](decisions/ADR-013-pre-execution-availability-resolution.md).
+    [ADR-013](decisions/ADR-013-pre-execution-availability-resolution.md).
+- `rng.py` - Concrete, direct-import-only E7-F8 P1 deterministic RNG
+  stream-identity boundary. It validates immutable host stream metadata,
+  derives per-process/per-logical-box initial `uint32` words without optional
+  GPU imports, and explicitly initializes only validated caller-owned Warp
+  state arrays. Initialization allocates temporary NumPy/Warp copy sources, then
+  deterministically overwrites the retained arrays without acquiring,
+  replacing, or rebinding them. It does not advance or reset those arrays and
+  has no package/top-level export, resource-registry, resident-session,
+  scheduler, or checkpoint integration.
 - `fallback.py` - Concrete, direct-import-only E7-F6 P3 opt-in CPU fallback
   policy boundary. It defaults to re-raising the exact eligible typed
   availability/support error and selects the already-registered canonical CPU

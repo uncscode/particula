@@ -1,10 +1,9 @@
 # Open Questions
 
-- [x] Does a repeated root seed reset an existing stream?
-  - Resolved 2026-07-27: No. Setup seeds once; only an explicit lifecycle-valid
-    reset operation replaces current mutable state.
-  - Evidence: `particula/gpu/kernels/coagulation.py:2215-2222,2341-2356` and
-    E7-F3's resolved RNG contract.
+- [ ] Does a repeated root seed reset an existing resident stream?
+  - Deferred: P1 has no resident ownership or reset API. Calling the direct
+    `StreamRegistry.initialize()` again deterministically overwrites its two
+    caller-owned arrays; P4 must define lifecycle-valid reset semantics.
 
 - [x] Must restart reproduce trajectories across CPU, Warp CPU, and CUDA?
   - Resolved 2026-07-27: No. Exact continuation applies only to a compatible
@@ -12,11 +11,10 @@
     statistical and conservation based.
   - Evidence: issue #1451 explicitly excludes exact CPU/CUDA stochastic equality.
 
-- [x] Is RNG state included in a valid E7-F4 checkpoint?
-  - Resolved 2026-07-27: Yes. Stream descriptors, logical-ID mapping, derivation
-    version, root-seed metadata, and current mutable process states are required
-    restart payloads.
-  - Evidence: issue #1451 T8 completion signal and E7-F4 checkpoint seam.
+- [ ] Is RNG state included in a valid E7-F4 checkpoint?
+  - Deferred: Issue #1520 introduces no checkpoint payload, checkpoint binding,
+    or restart behavior. A later E7-F8 phase must define and validate any stream
+    metadata/state persistence contract.
 
 - [x] What public logical box ID type should the first stable API accept?
   - Resolved 2026-07-27: Accept unique, non-empty UTF-8 strings and define a

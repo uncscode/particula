@@ -1,9 +1,9 @@
 # Infrastructure Reuse
 
-- `initialize_coagulation_rng_states()` and the initialization kernel in
-  `particula/gpu/kernels/coagulation.py:762,1930` provide the existing
-  same-device `(n_boxes,)` `wp.uint32` state boundary. Extend or wrap this path;
-  do not create a second coagulation RNG algorithm.
+- Existing coagulation and wall-loss kernels establish the caller-owned,
+  same-device `(n_boxes,)` `wp.uint32` state-array conventions. P1 does not
+  wrap, replace, or change their RNG algorithms; it only writes validated
+  caller-owned initial state through `wp.copy`.
 - `coagulation_step_gpu()` persistent-state behavior in
   `particula/gpu/kernels/coagulation.py:2215-2222,2341-2356` already seeds only
   on explicit `initialize_rng=True`; preserve its return and mutation contract.
@@ -16,9 +16,9 @@
 - E7-F3's typed Brownian adapter contract requires one setup seed followed by
   `initialize_rng=False`; use its process-resource view rather than bypassing
   backend selection.
-- E7-F4's planned `ResidentSession`, `SidecarRegistry`, and versioned checkpoint
-  model in `particula/execution/session.py` and
-  `particula/execution/checkpoint.py` own allocation, lifecycle, and restore.
+- Resident session/resource and checkpoint seams retain their existing ownership,
+  lifecycle, allocation, and restore responsibilities. P1 deliberately neither
+  acquires arrays from nor binds a `StreamRegistry` to those seams.
 - E7-F5's planned `SimulationScheduler` and canonical process graph own whether
   a stochastic process/box executes. RNG policy must consume resolved execution,
   not registration order.
@@ -28,6 +28,7 @@
 - Conversion and restore helpers in `particula/gpu/conversion.py:120-377,422-626`
   remain the only bulk transfer boundaries; checkpoint should synchronize once
   and restore with `sync=False` thereafter.
-- `particula/gpu/tests/kernel_exports_test.py` protects deliberate exports;
-  stream metadata may be public through `particula.execution`, while concrete
-  kernel helpers remain narrowly exported.
+- `particula/execution/tests/exports_test.py` and
+  `particula/tests/execution_exports_test.py` protect the direct-only boundary:
+  `particula.execution.rng` and its concrete names remain absent from public
+  package exports.

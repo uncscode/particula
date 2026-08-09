@@ -2,29 +2,24 @@
 
 ## Problem Statement
 
-Issue #1451 Track T8 requires stochastic GPU processes to behave as parts of a
-restartable simulation rather than unrelated kernel calls. Coagulation and wall
-loss currently accept mutable per-box `uint32` sidecars, but positional seeding,
-implicit one-shot allocation, or incomplete checkpoints can make a box's random
-sequence depend on neighboring boxes, scheduling changes, or restarts.
+Issue #1520 completes E7-F8-P1's direct RNG ownership seam. Existing stochastic
+sidecars needed stable process-scoped initial words without importing GPU
+dependencies during host-only identity registration or rebinding caller arrays.
 
 ## Value Proposition
 
-E7-F8 gives every stochastic process and logical box a stable stream identity,
-seeds it only by explicit intent, retains it in the E7-F4 resident session, and
-continues it exactly from an explicit checkpoint. E7-F3 coagulation and E7-F5
-scheduling gain reproducible behavior without hidden transfers, synchronization,
-fallback, or claims of exact CPU/CUDA trajectory equality.
+`particula.execution.rng` now supplies immutable stream keys/descriptors and a
+registry for coagulation and wall-loss arrays. It uses deterministic host-only
+FNV derivation and explicit, validated initialization of caller-owned Warp
+buffers. Session, scheduler, checkpoint/restart, and reset integration remain
+deferred.
 
 ## User Stories
 
-- As a simulation user, I want a logical box to reproduce its stochastic path
-  from the same seed even when unrelated boxes are added, disabled, or reordered.
-- As an operator, I want checkpoint/restart to continue each process stream from
-  its saved state so that a split run matches an uninterrupted run on the same
-  backend and device class.
-- As a maintainer, I want initialization and reset to be explicit so that normal
-  scheduler steps cannot silently reseed persistent state.
+- As a direct-API caller, I can register stable logical box IDs and lanes without
+  requiring Warp or NumPy.
+- As a direct-API caller, I can explicitly initialize my existing coagulation and
+  wall-loss state arrays after complete preflight.
 
-Parent epic: E7. Scope authority: issue #1451 Track T8. Upstream feature plans:
-E7-F3, E7-F4, and E7-F5; E7-F9 consumes the resulting closeout evidence.
+Parent epic: E7. Issue #1520 completes P1 only; E7-F8-P2--P7 remain separate
+integration work.

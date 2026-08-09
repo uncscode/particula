@@ -1,6 +1,6 @@
 # Success Criteria
 
-- [ ] Every supported stochastic process/logical-box pair has a unique,
+- [x] Every supported stochastic process/logical-box pair has a unique,
   versioned stream descriptor and deterministic initial state.
 - [ ] Brownian coagulation and wall loss use separate resident `(n_boxes,)`
   `wp.uint32` state arrays and preserve their identities across normal steps.
@@ -13,8 +13,8 @@
 - [ ] Disabled process/box work does not advance its stream.
 - [ ] A compatible checkpoint/restart split exactly matches uninterrupted RNG
   state and stochastic outputs on Warp CPU for covered configurations.
-- [ ] Malformed IDs, seeds, arrays, checkpoint versions, dimensions, devices, or
-  process manifests fail before stream/simulation mutation.
+- [x] Malformed P1 IDs, seeds, arrays, dimensions, devices, or process manifests
+  fail before caller-buffer mutation.
 - [ ] Post-launch uncertainty faults the session and is never advertised as an
   atomic or checkpointable state.
 - [ ] Existing direct kernel APIs, stochastic validation, conservation tests,

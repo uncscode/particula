@@ -1,9 +1,13 @@
-"""Define deterministic, caller-owned resident RNG stream state.
+"""Manage deterministic, caller-owned resident RNG stream state.
 
-This concrete-only module keeps host stream identity independent from optional
-GPU dependencies.  It derives reproducible initial words and can explicitly
-initialize two caller-supplied Warp state arrays without allocating or binding
-resources.
+This concrete-only, direct-import module keeps host stream identity independent
+of optional GPU dependencies. It derives reproducible initial words and
+explicitly initializes caller-supplied Warp state arrays without acquiring,
+replacing, or rebinding resources. Initialization allocates temporary host and
+Warp copy sources only.
+
+This module is intentionally not re-exported through ``particula.execution``
+or the top-level package.
 """
 
 from __future__ import annotations
@@ -32,7 +36,10 @@ _PAYLOAD_PREFIX = b"particula.execution.rng\x00"
 
 @dataclass(frozen=True)
 class StreamKey:
-    """Identify one process-specific logical-box RNG stream.
+    """Identify one process-specific RNG stream for a logical box.
+
+    The logical-box identifier is retained exactly as supplied. It is not
+    normalized before deterministic initial-word derivation.
 
     Args:
         schema_version: Supported stream-schema version.
@@ -45,7 +52,13 @@ class StreamKey:
     logical_box_id: str
 
     def __post_init__(self) -> None:
-        """Validate immutable stream identity metadata."""
+        """Validate immutable stream identity metadata.
+
+        Raises:
+            TypeError: If a field has an unsupported type.
+            ValueError: If the schema version, process, or logical ID is
+                invalid.
+        """
         _validate_integral(self.schema_version, "StreamKey.schema_version")
         if self.schema_version != STREAM_SCHEMA_VERSION:
             raise ValueError("StreamKey.schema_version must be 1.")
@@ -60,7 +73,7 @@ class StreamKey:
 
 @dataclass(frozen=True)
 class StreamDescriptor:
-    """Associate one stream key with a physical state-array lane.
+    """Associate a stream key with a physical caller-owned array lane.
 
     Args:
         key: Valid immutable stream identity.
@@ -72,20 +85,46 @@ class StreamDescriptor:
     lane: int
 
     def __post_init__(self) -> None:
-        """Validate descriptor carrier types without registry context."""
+        """Validate descriptor carrier types without registry context.
+
+        Raises:
+            TypeError: If ``key`` is not a StreamKey or ``lane`` is not a
+                non-boolean integral value.
+        """
         if not isinstance(self.key, StreamKey):
             raise TypeError("StreamDescriptor.key must be a StreamKey.")
         _validate_integral(self.lane, "StreamDescriptor.lane")
 
 
 def _validate_integral(value: object, field_name: str) -> None:
-    """Validate one non-boolean integral metadata value."""
+    """Validate one non-boolean integral metadata value.
+
+    Args:
+        value: Value to validate.
+        field_name: Field name included in a validation error.
+
+    Raises:
+        TypeError: If ``value`` is Boolean or not an integral value.
+    """
     if isinstance(value, bool) or not isinstance(value, Integral):
         raise TypeError(f"{field_name} must be a non-boolean Integral.")
 
 
 def _validate_logical_box_id(value: object, field_name: str) -> bytes:
-    """Validate and return the exact UTF-8 encoding of a logical box ID."""
+    """Validate and encode an exact logical-box identifier as UTF-8.
+
+    Args:
+        value: Candidate logical-box identifier.
+        field_name: Field name included in a validation error.
+
+    Returns:
+        Exact strict UTF-8 encoding of the validated identifier.
+
+    Raises:
+        TypeError: If ``value`` is not a string.
+        ValueError: If the identifier is empty, surrounded by whitespace,
+            not strictly UTF-8 encodable, or outside the byte-length limit.
+    """
     if not isinstance(value, str):
         raise TypeError(f"{field_name} must be a str.")
     if not value or value != value.strip():
@@ -107,7 +146,19 @@ def _validate_logical_box_id(value: object, field_name: str) -> bytes:
 
 
 def _derive_initial_word(root_seed: int, key: StreamKey) -> int:
-    """Derive one stable unsigned 32-bit initial state word."""
+    """Derive a stable unsigned 32-bit initial state word.
+
+    The word depends only on the root seed and stream key, never on the
+    physical lane, registry order, capacity, unrelated identifiers, or
+    Python's randomized hash implementation.
+
+    Args:
+        root_seed: Validated root seed in the unsigned 32-bit range.
+        key: Validated process-specific logical stream identity.
+
+    Returns:
+        Deterministic unsigned 32-bit word for the stream identity.
+    """
     process = key.process_id.encode("ascii")
     logical_id = key.logical_box_id.encode("utf-8", "strict")
     payload = b"".join(
@@ -130,9 +181,20 @@ def _derive_initial_word(root_seed: int, key: StreamKey) -> int:
 class StreamRegistry:
     """Retain one deterministic two-process state-array manifest by identity.
 
-    Construction performs host-only metadata and collision validation. Optional
-    dependencies and state-array schema validation are deferred to
-    :meth:`initialize`.
+    Construction performs host-only metadata and collision validation, without
+    importing optional dependencies or mutating state arrays. State-array
+    schema validation and copying are deferred to :meth:`initialize`. Derived
+    words are keyed only by the root seed and immutable stream identity, then
+    stored by each descriptor's physical lane.
+
+    Attributes:
+        root_seed: Validated root seed used for deterministic derivation.
+        n_boxes: Fixed number of physical state-array lanes.
+        logical_box_ids: Input-order immutable logical-box identifiers.
+        lanes: Input-order immutable physical lanes.
+        descriptors: Canonical process-then-logical-ID stream descriptors.
+        state_arrays: Canonical ordered caller-owned arrays, retained by
+            identity.
     """
 
     def __init__(
@@ -143,7 +205,20 @@ class StreamRegistry:
         lanes: tuple[int, ...],
         state_arrays: tuple[tuple[str, Any], ...],
     ) -> None:
-        """Validate and retain the immutable host manifest."""
+        """Validate and retain an immutable host-only stream manifest.
+
+        Args:
+            root_seed: Non-boolean unsigned 32-bit root seed.
+            n_boxes: Non-boolean number of fixed physical lanes.
+            logical_box_ids: Exact input-order tuple of unique logical IDs.
+            lanes: Exact tuple mapping input-order IDs to physical lanes.
+            state_arrays: Exact canonical two-process tuple of caller arrays.
+
+        Raises:
+            TypeError: If manifest metadata does not have the required types.
+            ValueError: If metadata is out of range, malformed, noncanonical,
+                or produces a same-process derived-word collision.
+        """
         _validate_integral(root_seed, "root_seed")
         if not 0 <= root_seed <= MAX_ROOT_SEED:
             raise ValueError(f"root_seed must be in [0, {MAX_ROOT_SEED}].")
@@ -189,38 +264,75 @@ class StreamRegistry:
 
     @property
     def root_seed(self) -> int:
-        """Return the validated root seed."""
+        """Return the validated root seed.
+
+        Returns:
+            Root seed used for all registry stream derivations.
+        """
         return self._root_seed
 
     @property
     def n_boxes(self) -> int:
-        """Return the fixed physical state-array size."""
+        """Return the fixed physical state-array size.
+
+        Returns:
+            Number of physical lanes in each retained state array.
+        """
         return self._n_boxes
 
     @property
     def logical_box_ids(self) -> tuple[str, ...]:
-        """Return input-order immutable logical IDs."""
+        """Return input-order immutable logical IDs.
+
+        Returns:
+            Exact logical-ID tuple retained during construction.
+        """
         return self._logical_box_ids
 
     @property
     def lanes(self) -> tuple[int, ...]:
-        """Return input-order immutable physical lanes."""
+        """Return input-order immutable physical lanes.
+
+        Returns:
+            Exact input-order tuple of physical state-array lanes.
+        """
         return self._lanes
 
     @property
     def descriptors(self) -> tuple[StreamDescriptor, ...]:
-        """Return canonical process-then-logical-ID stream descriptors."""
+        """Return canonical process-then-logical-ID stream descriptors.
+
+        Returns:
+            Immutable descriptors ordered by process, then input logical ID.
+        """
         return self._descriptors
 
     @property
     def state_arrays(self) -> tuple[tuple[str, Any], ...]:
-        """Return the retained ordered caller-owned arrays by identity."""
+        """Return retained ordered caller-owned arrays by identity.
+
+        Returns:
+            Canonical process-and-array manifest supplied at construction.
+        """
         return self._state_arrays
 
     def descriptor_for(
         self, process_id: str, logical_box_id: str
     ) -> StreamDescriptor:
-        """Return the descriptor for an exact registered process and ID."""
+        """Return the descriptor for an exact registered process and ID.
+
+        Args:
+            process_id: Supported process namespace.
+            logical_box_id: Exact registered logical-box identifier.
+
+        Returns:
+            Immutable descriptor associated with the requested stream.
+
+        Raises:
+            TypeError: If either identity component has an invalid type.
+            ValueError: If the process or logical ID is invalid.
+            LookupError: If the valid stream identity is not registered.
+        """
         key = StreamKey(STREAM_SCHEMA_VERSION, process_id, logical_box_id)
         try:
             return self._descriptor_by_key[key]
@@ -232,7 +344,19 @@ class StreamRegistry:
     get_descriptor = descriptor_for
 
     def lane_for(self, logical_box_id: str) -> int:
-        """Return the physical lane for an exact registered logical ID."""
+        """Return the physical lane for an exact registered logical ID.
+
+        Args:
+            logical_box_id: Exact registered logical-box identifier.
+
+        Returns:
+            Physical state-array lane for the logical ID.
+
+        Raises:
+            TypeError: If ``logical_box_id`` is not a string.
+            ValueError: If the logical ID is malformed.
+            LookupError: If the valid logical ID is not registered.
+        """
         _validate_logical_box_id(logical_box_id, "logical_box_id")
         try:
             return self._lane_by_id[logical_box_id]
@@ -244,26 +368,69 @@ class StreamRegistry:
     get_lane = lane_for
 
     def word_for(self, process_id: str, logical_box_id: str) -> int:
-        """Return the derived word for an exact registered stream."""
+        """Return the derived word for an exact registered stream.
+
+        Args:
+            process_id: Supported process namespace.
+            logical_box_id: Exact registered logical-box identifier.
+
+        Returns:
+            Deterministic unsigned 32-bit initial word for the stream.
+
+        Raises:
+            TypeError: If either identity component has an invalid type.
+            ValueError: If the process or logical ID is invalid.
+            LookupError: If the valid stream identity is not registered.
+        """
         descriptor = self.descriptor_for(process_id, logical_box_id)
         return self._words_by_process[process_id][descriptor.lane]
 
     get_derived_word = word_for
 
     def words_by_lane(self, process_id: str) -> tuple[int, ...]:
-        """Return immutable derived words indexed by physical lane."""
+        """Return immutable derived words indexed by physical lane.
+
+        Args:
+            process_id: Supported process namespace.
+
+        Returns:
+            Lane-indexed deterministic initial words for the process.
+
+        Raises:
+            TypeError: If ``process_id`` is not a string.
+            ValueError: If ``process_id`` is unsupported.
+        """
         _validate_process_id(process_id)
         return self._words_by_process[process_id]
 
     def state_array_for(self, process_id: str) -> Any:
-        """Return the retained caller-owned process state array by identity."""
+        """Return the retained caller-owned process state array by identity.
+
+        Args:
+            process_id: Supported process namespace.
+
+        Returns:
+            Original caller-owned state array for the requested process.
+
+        Raises:
+            TypeError: If ``process_id`` is not a string.
+            ValueError: If ``process_id`` is unsupported.
+        """
         _validate_process_id(process_id)
         return self._state_arrays[PROCESS_IDS.index(process_id)][1]
 
     get_state_array = state_array_for
 
     def _build_words_by_process(self) -> dict[str, tuple[int, ...]]:
-        """Build lane-indexed words and reject first same-process collision."""
+        """Build lane-indexed words and reject same-process collisions.
+
+        Returns:
+            Process-indexed immutable tuples of words by physical lane.
+
+        Raises:
+            ValueError: If two input-order logical IDs derive the same word for
+                one process.
+        """
         words_by_process: dict[str, tuple[int, ...]] = {}
         for process_id in PROCESS_IDS:
             words = [0] * self._n_boxes
@@ -287,7 +454,14 @@ class StreamRegistry:
         return words_by_process
 
     def _validate_state_arrays(self) -> None:
-        """Validate retained Warp arrays fully before initialization writes."""
+        """Validate retained Warp arrays fully before initialization writes.
+
+        Raises:
+            ImportError: If the optional Warp dependency is unavailable.
+            TypeError: If a retained array is not a valid Warp uint32 array.
+            ValueError: If an array has an invalid layout, device, identity, or
+                memory-alias relationship.
+        """
         import warp as wp
 
         arrays = tuple(array for _, array in self._state_arrays)
@@ -303,9 +477,22 @@ class StreamRegistry:
     def initialize(self) -> None:
         """Overwrite retained arrays with deterministic initial words.
 
-        Preflight failures write neither buffer. A device failure after the
-        successful copy has no rollback guarantee; callers may correct the
-        failure and retry without replacing this registry's arrays.
+        NumPy and Warp are imported only after host manifest preflight. The
+        temporary host and Warp copy sources do not change state-array
+        ownership: this method deterministically overwrites retained caller
+        arrays without acquiring, replacing, or rebinding them. Preflight
+        failures write neither buffer. It copies lane-indexed words for
+        coagulation first and wall loss second. A device or copy failure after
+        the first successful copy has no rollback guarantee; callers may correct
+        the failure and retry without replacing this registry's arrays.
+
+        Raises:
+            ImportError: If NumPy or Warp is unavailable.
+            TypeError: If a retained state array has an invalid type or dtype.
+            ValueError: If retained arrays have invalid schemas, devices, or
+                aliasing relationships.
+            RuntimeError: If Warp reports a device-copy failure after
+                validation.
         """
         self._validate_state_arrays()
         import numpy as np
@@ -322,7 +509,15 @@ class StreamRegistry:
 
 
 def _validate_process_id(process_id: object) -> None:
-    """Validate an exact supported process ID."""
+    """Validate an exact supported process ID.
+
+    Args:
+        process_id: Candidate process namespace.
+
+    Raises:
+        TypeError: If ``process_id`` is not a string.
+        ValueError: If ``process_id`` is unsupported.
+    """
     if not isinstance(process_id, str):
         raise TypeError("process_id must be a str.")
     if process_id not in PROCESS_IDS:
@@ -330,7 +525,16 @@ def _validate_process_id(process_id: object) -> None:
 
 
 def _validate_state_manifest(value: object) -> None:
-    """Validate the exact canonical ordered two-process array manifest."""
+    """Validate an exact canonical ordered two-process array manifest.
+
+    Args:
+        value: Candidate process-and-array manifest.
+
+    Raises:
+        TypeError: If the manifest or a pair has an invalid exact tuple type.
+        ValueError: If the manifest does not contain the canonical two-process
+            order.
+    """
     if type(value) is not tuple:
         raise TypeError("state_arrays must be an exact tuple.")
     if len(value) != len(PROCESS_IDS):
@@ -354,11 +558,20 @@ def _validate_state_manifest(value: object) -> None:
 def _validate_warp_state_array(
     array: Any, process_id: str, n_boxes: int, wp: Any
 ) -> None:
-    """Validate one caller-owned contiguous Warp uint32 state vector."""
-    if not all(
-        hasattr(array, name) for name in ("shape", "dtype", "device", "ptr")
-    ):
-        raise TypeError(f"{process_id} state array must be Warp-like.")
+    """Validate one caller-owned contiguous Warp uint32 state vector.
+
+    Args:
+        array: Candidate Warp-like one-dimensional state array.
+        process_id: Process name included in validation errors.
+        n_boxes: Required physical-lane count.
+        wp: Lazily imported Warp module defining the required dtype.
+
+    Raises:
+        TypeError: If the array is not a Warp array or has the wrong dtype.
+        ValueError: If the array shape or memory layout is invalid.
+    """
+    if not isinstance(array, wp.array):
+        raise TypeError(f"{process_id} state array must be a Warp array.")
     if tuple(array.shape) != (n_boxes,):
         raise ValueError(
             f"{process_id} state array must have shape ({n_boxes},)."
@@ -372,7 +585,15 @@ def _validate_warp_state_array(
 
 
 def _arrays_overlap(first: Any, second: Any) -> bool:
-    """Return whether two contiguous uint32 arrays overlap in memory."""
+    """Return whether two contiguous uint32 arrays overlap in memory.
+
+    Args:
+        first: First validated contiguous state array.
+        second: Second validated contiguous state array.
+
+    Returns:
+        True when the nonempty arrays have overlapping byte ranges.
+    """
     if not first.shape or first.shape[0] == 0:
         return False
     byte_count = first.shape[0] * 4

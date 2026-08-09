@@ -5,9 +5,14 @@ thresholds are not lowered; changed modules must retain at least 80% coverage.
 
 ## Per-Phase Tests
 
-- **P1:** `particula/execution/tests/rng_test.py` covers known-answer seed
-  derivation, process namespace separation, duplicate/invalid logical IDs,
-  deterministic ordering, and pre-mutation failures.
+- **P1 (complete, Issue #1520):** `particula/execution/tests/rng_test.py` covers
+  frozen carriers, strict UTF-8 IDs, integral metadata, canonical manifests,
+  lane permutations, collisions, immutable lookup, FNV vectors, and stable-ID
+  reorder/unrelated-ID invariance. A subprocess import hook proves host-only
+  registration does not load Warp or `particula.gpu`; Warp-guarded rows cover
+  caller-buffer identity, initialization, and schema preflight preservation.
+  Execution export tests deny the direct-only module from package and top-level
+  export surfaces.
 - **P2:** Brownian adapter tests assert one setup initialization, identical
   caller/session-owned array identity, repeated advancement without reseeding,
   no-op handling, and validation-state preservation.
