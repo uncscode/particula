@@ -38,9 +38,10 @@
   immutable-prestate particle planning plus explicit
   `rtol=1e-12` and documented `atol` declarations; optional CUDA rows skip
   cleanly.
-- [ ] Changed modules retain at least 80% coverage, repository thresholds are not
-  lowered, and strict documentation validation passes.
-- [ ] Full CFD, dynamic capacity, graph capture/performance, autodiff, E7-F8 RNG,
+- [x] Focused documentation-contract tests and strict documentation validation
+  pass; no repository coverage threshold was lowered. This documentation-only
+  phase adds no production module requiring coverage evidence.
+- [x] Full CFD, dynamic capacity, graph capture/performance, autodiff, E7-F8 RNG,
   and E7-F9 publication work remain outside the delivered claim.
 
 ## Metrics

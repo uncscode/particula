@@ -1581,17 +1581,26 @@ multi-GPU work, or replacement of the direct-kernel APIs.
 
 ### Multi-Box Communication
 
-- Start with prescribed communication, not full CFD coupling.
-- Represent box-to-box transport with fixed-shape maps or sparse edge lists so
-  graph-captured GPU loops can reuse the same allocation layout.
-- Support independent boxes by default; communication should be opt-in per
-  simulation loop.
-- Include per-box volume changes for rising parcel, expansion, and combustion
-  use cases.
-- Keep particle and gas transport rules explicit. Gas concentrations, particle
-  concentrations, and particle slot contents may need different update kernels.
-- Validate simple 1D advection and expansion cases against CPU references before
-  adding more complex coupling.
+E7-F7/T7 is shipped as a fixed-shape, single-device prescribed-map contract.
+Direct gas communication supports closed edges and declared `-1` source/sink
+endpoints with caller-owned amount/accounting ledgers; direct particle transport
+supports closed, particle-resolved fixed-slot maps only. Optional direct volume
+evolution rescales concentrations while preserving extensive inventories. Each
+direct boundary remains concrete-only, caller-owned, explicitly synchronized,
+and independent from a resident scheduler.
+
+Resident composition pins exactly one complete closed GAS or PARTICLES family,
+its native work, and optional final volumes by identity. Normal steps validate
+only identity and metadata, run communication before volume evolution using old
+volumes, and invalidate saturation only. Empty/disabled maps and unchanged
+volumes are validated write-free no-ops. See the
+[Data Containers and GPU Foundations](../data-containers-and-gpu-foundations.md)
+guide for the amount equations, capacity gating, and checkpoint boundary.
+
+CFD, pressure/velocity solvers, adaptive meshes, distributed or multi-GPU
+transport, broad mixing/advection claims, graph capture, performance work, and
+autodiff remain deferred. Independent boxes remain the default, and E7-F8 owns
+scheduled RNG policy while E7-F9 owns complete-loop publication.
 
 Fixed-capacity slot management for these loops is defined in
 [Fixed-Capacity Slot Boundary](#fixed-capacity-slot-boundary) under Epic F.

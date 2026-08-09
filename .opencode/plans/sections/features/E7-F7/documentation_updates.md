@@ -48,4 +48,12 @@
 - P6 (#1512) adds no user-facing documentation or API change. It records the
   delivered test-only independent NumPy `float64` multi-box parity and
   conservation evidence in this structured plan.
-- Run `mkdocs build --strict` and relevant docs tests before completing P7.
+- [x] P7 (#1513) published the feature page, T7 roadmap status, and E7
+  architecture/reference guidance. It documents direct open-ledger gas
+  accounting, closed fixed-slot particle transport, separate volume evolution,
+  resident closed-family ordering, exact-device fresh-identity restart, and
+  deferred scope. It adds focused documentation-contract/link/plan-state tests.
+  No runnable example was added because E7-F9 owns complete-loop publication.
+- [x] Passed `pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror`,
+  `pytest particula/tests/execution_selection_docs_test.py -q -Werror`, and
+  `mkdocs build --strict` for P7 publication.

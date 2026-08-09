@@ -443,6 +443,30 @@ kernel-entry responsibilities.
    other communication phases. See
    [ADR-016](decisions/ADR-016-direct-gpu-volume-evolution-boundary.md).
 
+### Direct GPU gas-communication boundary
+
+- Import this concrete-only direct boundary only from
+  `particula.gpu.kernels.communication.gas_communication_step_gpu`. It is not
+  exported through `particula.gpu.kernels`, `particula.gpu`, or top-level
+  `particula`.
+- It stages immutable pre-step `amount = concentration * volume` ledgers, then
+  makes one gas commit using `new_concentration = final_amount / new_volume`.
+  At this direct boundary, `new_volume` is the unchanged current volume; there
+  is no fused direct-gas `new_volume` argument or volume-evolution operation.
+- Caller-owned `(B, S)` amount, delta, and outbound work arrays are required;
+  declared open source/sink endpoints additionally require their matching
+  `(B, S)` accounting ledger. Closed maps conserve extensive amounts within
+  floating-point tolerance, while open ledger entries make inventory changes
+  explicit.
+- Callers own same-device storage and explicit synchronization. The boundary
+  has no hidden transfer, synchronization, or CPU fallback. Host/schema
+  preflight preserves primaries; documented work ledgers can change during
+  device planning, and no rollback is promised after a writer launches.
+- This is independent of the closed-only particle transport and optional volume
+  evolution boundaries. Validated empty or disabled maps are write-free no-ops;
+  invalid schema, alias, domain, device, overdraw, or required-ledger inputs
+  gate the sole primary gas commit.
+
 ### Direct GPU particle-transport boundary
 
 - `particula.gpu.kernels.communication` also provides the E7-F7 P4

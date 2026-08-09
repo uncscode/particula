@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import builtins
 import importlib
+import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -247,6 +249,179 @@ def test_scheduler_documentation_preserves_published_boundaries() -> None:
     assert (
         "[GPU resident checkpoints](../gpu_resident_checkpoints.md)" in roadmap
     )
+
+
+def test_communication_feature_documentation_preserves_direct_and_resident_contracts() -> (
+    None
+):
+    """Feature guidance retains prescribed communication ownership boundaries."""
+    feature = (
+        _ROOT / "docs" / "Features" / "data-containers-and-gpu-foundations.md"
+    ).read_text(encoding="utf-8")
+    feature_text = " ".join(feature.split())
+
+    for phrase in (
+        "declared `-1` source/sink endpoints",
+        "exactly one complete closed-map GAS or PARTICLES family",
+        "`(B, S)` `amounts`",
+        "amount = concentration * volume",
+        "new_concentration = final_amount / new_volume",
+        "no fused direct-gas `new_volume` argument",
+        "communication first stages with old volumes",
+        "invalidates saturation only",
+        "Validated empty or disabled maps and unchanged-volume evolution are successful write-free no-ops.",
+        "exact population match",
+        "ascending pre-step free slot",
+        "Capacity is deterministically gated",
+        "Host/schema preflight rejects without primary or buffer mutation.",
+        "rollback is not promised after a writer launches.",
+        "Restart remains explicit and exact-device with fresh identities.",
+        "CFD, adaptive/distributed/multi-GPU transport",
+        "E7-F8 RNG policy, graph capture, performance claims, and autodiff.",
+    ):
+        assert phrase in feature_text
+    assert feature_text.count("no fused direct-gas `new_volume` argument") == 1
+
+
+def test_communication_roadmap_and_architecture_documentation_preserve_boundaries() -> (
+    None
+):
+    """Roadmap and architecture guidance retain concrete communication scope."""
+    roadmap = (
+        _ROOT / "docs" / "Features" / "Roadmap" / "data-oriented-gpu.md"
+    ).read_text(encoding="utf-8")
+    guide = (
+        _ROOT
+        / ".opencode"
+        / "guides"
+        / "architecture"
+        / "architecture_guide.md"
+    ).read_text(encoding="utf-8")
+    reference = (
+        _ROOT / ".opencode" / "guides" / "architecture_reference.md"
+    ).read_text(encoding="utf-8")
+    roadmap_text = " ".join(roadmap.split())
+    guide_text = " ".join(guide.split())
+    reference_text = " ".join(reference.split())
+
+    for phrase in (
+        "E7-F7/T7 is shipped",
+        "concrete-only, caller-owned, explicitly synchronized",
+        "CFD, pressure/velocity solvers, adaptive meshes",
+        "E7-F8 owns scheduled RNG policy while E7-F9 owns complete-loop publication.",
+    ):
+        if phrase not in roadmap_text:
+            pytest.fail(f"roadmap is missing: {phrase}")
+    for phrase in (
+        "particula.gpu.kernels.communication.gas_communication_step_gpu",
+        "amount = concentration * volume",
+        "new_concentration = final_amount / new_volume",
+        "no hidden transfer, synchronization, or CPU fallback",
+        "their matching `(B, S)` accounting ledger",
+        "Validated empty or disabled maps are write-free no-ops",
+    ):
+        if phrase not in guide_text:
+            pytest.fail(f"architecture guide is missing: {phrase}")
+    for phrase in (
+        "Normal steps validate only that identity and metadata",
+        "communication with pre-update volumes before optional prescribed volume evolution",
+        "The barriers invalidate saturation ratio only",
+        "Validated empty or disabled maps and unchanged-volume evolution are write-free no-ops.",
+        "exact device; explicit restart creates fresh identities",
+    ):
+        if phrase not in reference_text:
+            pytest.fail(f"architecture reference is missing: {phrase}")
+    assert "no fused direct-gas `new_volume` argument" in guide_text
+
+
+def _normalized_anchor(heading: str) -> str:
+    """Return the MkDocs-style normalized anchor for a Markdown heading."""
+    return re.sub(r"[^a-z0-9 -]", "", heading.lower()).replace(" ", "-")
+
+
+def test_communication_documentation_links_and_anchors_resolve() -> None:
+    """Edited communication-document links resolve to existing targets/anchors."""
+    sources_and_links = {
+        _ROOT
+        / "docs"
+        / "Features"
+        / "data-containers-and-gpu-foundations.md": (
+            "gpu_resident_checkpoints.md",
+            "Roadmap/data-oriented-gpu.md#e6-roadmap-inventory",
+        ),
+        _ROOT / "docs" / "Features" / "Roadmap" / "data-oriented-gpu.md": (
+            "../data-containers-and-gpu-foundations.md",
+        ),
+        _ROOT / ".opencode" / "guides" / "architecture_reference.md": (
+            "architecture/decisions/ADR-018-resident-communication-integration.md",
+        ),
+    }
+    for source, links in sources_and_links.items():
+        for link in links:
+            target_text, _, anchor = link.partition("#")
+            target = source.parent / target_text
+            assert target.is_file(), f"{source}: missing link target {link}"
+            if anchor:
+                headings = re.findall(
+                    r"^#{1,6}\s+(.+?)\s*$",
+                    target.read_text(encoding="utf-8"),
+                    flags=re.MULTILINE,
+                )
+                assert anchor in {
+                    _normalized_anchor(item) for item in headings
+                }, f"{source}: missing anchor {link}"
+
+
+def test_e7_f7_plan_state_records_only_completed_publication_evidence() -> None:
+    """E7-F7 plan records describe the completed documentation publication."""
+    plan = json.loads(
+        (_ROOT / ".opencode" / "plans" / "features" / "E7-F7.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    phase_details = (
+        _ROOT
+        / ".opencode"
+        / "plans"
+        / "sections"
+        / "features"
+        / "E7-F7"
+        / "phase_details.md"
+    ).read_text(encoding="utf-8")
+    assert plan["status"] == "Shipped"
+    assert plan["lifecycle"] == "completed"
+    assert [phase["status"] for phase in plan["phases"]] == ["Shipped"] * 7
+    assert [phase["issue_number"] for phase in plan["phases"]] == list(
+        range(1507, 1514)
+    )
+    assert [phase["completion_date"] for phase in plan["phases"]] == [
+        "2026-08-08",
+        "2026-08-08",
+        "2026-08-08",
+        "2026-08-08",
+        "2026-08-09",
+        "2026-08-09",
+        "2026-08-09",
+    ]
+    assert "Issue: #1513" in phase_details
+    assert "TBD" not in phase_details
+    for path in (
+        "docs/Features/data-containers-and-gpu-foundations.md",
+        "docs/Features/Roadmap/data-oriented-gpu.md",
+        ".opencode/guides/architecture/architecture_guide.md",
+        ".opencode/guides/architecture_reference.md",
+        "particula/execution/tests/gpu_resident_session_docs_test.py",
+    ):
+        assert path in phase_details
+    assert (
+        "pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror"
+        in phase_details
+    )
+    assert (
+        "pytest particula/tests/execution_selection_docs_test.py -q -Werror"
+        in phase_details
+    )
+    assert "mkdocs build --strict" in phase_details
 
 
 @pytest.mark.warp

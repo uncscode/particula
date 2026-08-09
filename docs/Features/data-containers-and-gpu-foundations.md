@@ -302,6 +302,55 @@ saturation-refresh consumer window.
 | Condensation, Brownian coagulation, dilution, wall loss, nucleation | Direct resident adapters over the resolved process nodes |
 | Gas-concentration and saturation-ratio diagnostics | Closed snapshots to separate caller-owned outputs |
 
+### Prescribed communication and volume evolution
+
+E7-F7 ships fixed-shape, single-device prescribed-map boundaries, not CFD or a
+user-facing transport API. Direct gas communication accepts a GAS map with
+closed in-domain edges and declared `-1` source/sink endpoints. Direct particle
+transport accepts only closed in-domain, particle-resolved, fixed-slot
+PARTICLES maps. In contrast, a resident session pins exactly one complete
+closed-map GAS or PARTICLES family and rejects combined or open forms.
+
+Direct callers own the same-device fixed-shape primaries, maps, and work
+storage. Gas communication uses caller-owned `(B, S)` `amounts`,
+`amount_deltas`, and `outbound_amounts` `wp.float64` ledgers; a `(B, S)` source
+or sink ledger is required when its corresponding open endpoint exists.
+Particle transport uses `(B, N)` debit/credit ledgers and `(E, N)` assignment
+and request buffers. Optional final volumes are caller-owned `(B,)`
+`wp.float64` values. Successful direct calls are asynchronous, so callers must
+synchronize before inspection.
+
+Direct gas stages immutable pre-step `amount = concentration * volume`, makes
+one gas commit, and uses `new_concentration = final_amount / new_volume`. At
+this standalone boundary, `new_volume` is the current unchanged volume, so its
+sole normalization is equivalently `(amounts + amount_deltas) / volume`; it has
+no fused direct-gas `new_volume` argument. In a resident schedule,
+communication first stages with old volumes, then optional volume evolution
+rescales particle and gas concentrations by `old_volume / final_volume`. This
+is not a second direct-gas normalization.
+
+Closed gas maps conserve extensive species amounts within floating-point
+tolerance. Open gas inventory changes are intentional and auditable through
+the source/sink ledgers. Closed particle maps conserve concentration-weighted
+particle number, every mass lane, and signed charge. Particle planning reads
+immutable pre-step state, prefers an exact population match, then uses the next
+ascending pre-step free slot. Capacity is deterministically gated: there is no
+resize, compaction, implicit activation, or clipping.
+
+Host/schema preflight rejects without primary or buffer mutation. During device
+planning, documented work or planning buffers may change while primaries remain
+gated; rollback is not promised after a writer launches. Validated empty or
+disabled maps and unchanged-volume evolution are successful write-free no-ops.
+Invalid map, schema, domain, alias, or device inputs, aggregate gas overdraw,
+and required-but-missing open ledgers reject before primary commit.
+
+The resident communication-then-volume barrier retains the twelve node IDs and
+canonical order above: it uses old-volume staging, invalidates saturation only,
+and retains fresh vapor pressure. Restart remains explicit and exact-device with
+fresh identities. This scope excludes CFD, adaptive/distributed/multi-GPU
+transport, hidden transfer or synchronization, CPU fallback, resizing or
+compaction, E7-F8 RNG policy, graph capture, performance claims, and autodiff.
+
 The direct scheduler skips virtual refresh-node dispatch. Instead, the
 thermodynamic coordinator refreshes stale state in vapor-pressure-then-
 saturation order immediately before condensation or diagnostics consumer
@@ -350,7 +399,7 @@ if WARP_AVAILABLE:
         WarpGasData,
         WarpParticleData,
     )
- ```
+```
 
 ## Explicit CPU fallback boundary
 

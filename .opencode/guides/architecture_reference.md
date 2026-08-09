@@ -125,7 +125,7 @@ resources rather than reusing source identities. Other versions, partial,
 mixed, malformed, or non-ACTIVE records and device mismatches reject.
 Finalization makes its source session terminal but returns an ACTIVE checkpoint
 eligible for explicit restart. E7-F5 P2 supplies declaration-only scheduling;
-remaining E7-F7 transport work and E7-F8 detailed RNG-stream policy remain
+E7-F7 transport is shipped, while E7-F8 detailed RNG-stream policy remains
 future work. E7-F7 P4 particle
 transport is shipped as the concrete-only
 ``particula.gpu.kernels.communication.particle_communication_step_gpu`` seam.
@@ -205,6 +205,14 @@ saturation ratio only, retain fresh vapor pressure, and provide no hidden
 transfer, synchronization, fallback, retry, rollback, or public API. Combined
 communication maps and open endpoints are not resident forms. See
 [ADR-018](architecture/decisions/ADR-018-resident-communication-integration.md).
+Acquisition pins maps, native work, and an optional final-volume sidecar once.
+Normal steps validate only that identity and metadata: they do not inspect map
+payloads, allocate, transfer, synchronize, restore, or replace resources.
+Validated empty or disabled maps and unchanged-volume evolution are write-free
+no-ops. Schema-v1 restart remains noncommunication; schema-v2 permits no family
+or one complete closed-map family. Both require an ACTIVE valid record and an
+exact device; explicit restart creates fresh identities and is never automatic,
+migratory, or rollback-capable.
 
 `particula.execution.process_adapters` is a concrete-only direct-import
 delegation boundary for resident dilution, wall loss, and nucleation. Its frozen

@@ -21,6 +21,12 @@ P6 adds test-only multi-box independent NumPy `float64` parity and conservation
 evidence for both the direct primitives and the resident executor. It does not
 change production behavior or the public API.
 
+P7 completes publication of the fixed-shape contract and reconciles this plan
+as shipped. It documents direct open-boundary gas accounting separately from
+closed resident composition, fixed-capacity particle placement, volume ordering,
+failure boundaries, restart, and deferred scope. No runnable example is added:
+E7-F9 retains complete-loop publication ownership.
+
 Those barriers use pre-update volumes and invalidate saturation ratio only;
 vapor pressure stays fresh until the existing consumer refresh windows. Schema-v2
 checkpoints preserve an optional pinned communication family, while schema-v1
