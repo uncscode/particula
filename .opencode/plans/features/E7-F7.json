@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-07-27",
+  "last_updated": "2026-08-09",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E7-F7/architecture_design.md",
@@ -40,20 +40,22 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F7-P2",
       "title": "Implement per-box volume evolution and expansion with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-08-09",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F7-P3",
@@ -66,7 +68,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F7-P4",
@@ -79,7 +82,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F7-P5",
@@ -92,7 +96,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F7-P6",
@@ -105,7 +110,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F7-P7",
@@ -118,7 +124,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     }
   ],
   "totals": null,
