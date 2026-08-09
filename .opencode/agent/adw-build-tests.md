@@ -173,6 +173,12 @@ Parse arguments:
 - `adw_id` - Workflow identifier
 - Scope: `file`, `module`, `dir`, or `files`
 - `Context` - What was implemented
+- `timeout` - Optional pytest timeout in seconds; default `120`, maximum `1200`
+
+Reject a non-integer timeout or a value outside `1..1200`. Keep the default at
+`120` when the caller does not provide one. A primary agent may pass
+`timeout=1200` for a comprehensive fix-validation pass, matching the bounded
+maximum documented by `adw-tester`.
 
 Load the required worktree field explicitly. A fieldless `read` returns the
 default `spec_content` field, not the complete workflow state:
@@ -376,7 +382,7 @@ run_pytest_advanced({
   "coverage": true,
   "coverageSource": "{source_directory}",
   "coverageThreshold": 80,
-  "timeout": 120,
+  "timeout": test_timeout,
   "cwd": "{worktree_path}"
 })
 ```
@@ -387,6 +393,7 @@ run_pytest_advanced({
 - `coverageSource: "{source_directory_a},{source_directory_b}"` - Measure existing repo-relative source directories (e.g., "adw/core,adw/utils"); never pass dotted modules or `.py` files
 - `coverageThreshold: 80` - Validation fails if coverage < 80%
 - `options: "fail-fast"` - Stop on first failure (`-x` flag) for faster feedback
+- `timeout` - Parsed `test_timeout`; defaults to 120 seconds and never exceeds 1200
 - `cwd: "{worktree_path}"` - Required for every isolated-worktree test run
 - `pytestArgs` - Only needs scope path and markers (coverage handled by explicit options)
 

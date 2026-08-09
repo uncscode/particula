@@ -162,16 +162,20 @@ For each fix step:
 ### Step 8: Comprehensive Fast Testing
 
 Call `adw-build-tests` for all changed files to ensure fast tests cover the fix
-work. The delegated prompt must request tests and coverage only:
+work. The Fix workflow has a 3600-second overall step timeout. Give the delegated
+pytest run the same bounded 1200-second maximum documented by `adw-tester`, so a
+slow but valid coverage pass is not constrained by the test subagent's shorter
+default. The delegated prompt must request tests and coverage only:
 
 ```python
 task({
   "description": "Validate fix tests and coverage",
   "prompt": (
     f"Validate tests and changed-code coverage only.\n\n"
-    f"Arguments: adw_id={adw_id} files={','.join(changed_files)}\n\n"
+    f"Arguments: adw_id={adw_id} files={','.join(changed_files)} timeout=1200\n\n"
     "Do not run or require Ruff, formatting, mypy, or other lint/type checks. "
-    "Those belong to the subsequent Validate and Polish workflow steps."
+    "Use timeout=1200 for the scoped final pytest validation. Those lint and "
+    "type checks belong to the subsequent Validate and Polish workflow steps."
   ),
   "subagent_type": "adw-build-tests"
 })
@@ -180,6 +184,9 @@ task({
 Never ask `adw-build-tests` to run a capability denied by its frontmatter.
 Ruff, formatting, and mypy are not prerequisites for this test-only subagent's
 success; the mandatory downstream Validate and Polish steps own them.
+The delegated runner timeout does not extend the parent Fix step's 3600-second
+workflow deadline. Infrastructure timeouts must remain `ADW_BUILD_TESTS_BLOCKED`
+rather than being reported as assertion failures.
 
 Parse the result explicitly:
 
@@ -204,9 +211,11 @@ task({
   "prompt": (
     f"Validate the documentation changed by the fix pass.\n\n"
     f"Arguments: adw_id={adw_id}\n\n"
+    f"Resolved worktree_path: {worktree_path}\n\n"
     f"Changed documentation files: {','.join(changed_documentation_files)}\n\n"
-    "Resolve worktree_path from workflow state, then run strict MkDocs "
-    "validation with build_mkdocs_validate using that path as cwd. Strict "
+    "Use the supplied workflow-state-derived worktree_path; do not reread "
+    "workflow state for this delegation. Run strict MkDocs validation with "
+    "build_mkdocs_validate using that path as cwd. Strict "
     "mode is intrinsic; do not pass a strict option. Also check links, "
     "formatting, and cross-references. Do not use raw shell commands or "
     "delegate this validation to a test subagent."
@@ -222,6 +231,10 @@ strict MkDocs result, or stale output as a failed required subagent: leave
 infrastructure or `ADW_BUILD_FIX_FAILED` for documentation validation failures.
 When no documentation or MkDocs input changed, record that this conditional
 validation was not required.
+
+The delegated `worktree_path` must be the exact non-empty value loaded and
+validated in Step 2. Never reconstruct it from `adw_id`, the ambient checkout,
+or a changed-file path.
 
 Before promotion, verify all implementation todos are complete, all required
 tests and coverage checks passed, the `adw-build-tests` subagent returned

@@ -58,6 +58,7 @@ Ensure documentation quality with:
 
 ```
 Arguments: adw_id=<workflow-id>
+Resolved worktree_path: <absolute-worktree-path>  # preferred when supplied by the caller
 
 Tasks:
 - Check all markdown links (internal and external)
@@ -70,7 +71,7 @@ Tasks:
 ```python
 task({
   "description": "Validate all documentation",
-  "prompt": f"Validate documentation quality and consistency.\n\nArguments: adw_id={adw_id}\n\nTasks:\n- Run strict MkDocs validation with build_mkdocs_validate\n- Check all markdown links\n- Validate formatting\n- Verify cross-references",
+  "prompt": f"Validate documentation quality and consistency.\n\nArguments: adw_id={adw_id}\n\nResolved worktree_path: {worktree_path}\n\nTasks:\n- Run strict MkDocs validation with build_mkdocs_validate\n- Check all markdown links\n- Validate formatting\n- Verify cross-references",
   "subagent_type": "docs-validator"
 })
 ```
@@ -83,6 +84,8 @@ It always invokes validation-only strict mode, so do not pass a `strict` option 
 `build_mkdocs`, `build_mkdocs_build`, a test subagent, or a raw shell command as a fallback.
 
 ```python
+# Prefer the caller-supplied workflow-state-derived worktree_path. Only when it
+# was not supplied, load the field explicitly:
 worktree_path = adw_spec_read({
   "command": "read",
   "adw_id": "{adw_id}",
@@ -162,15 +165,20 @@ briefly record that agent-reference validation was not applicable to the change 
 
 ## Step 1: Load Context
 
-Parse input arguments and load workflow state:
+Parse `adw_id` and the optional caller-supplied `worktree_path`. A supplied
+path is authoritative for this delegation because the parent resolved it from
+workflow state before invoking this agent. If no path was supplied, load the
+required field explicitly:
 ```python
-adw_spec_read({
+worktree_path = adw_spec_read({
   "command": "read",
-  "adw_id": "{adw_id}"
+  "adw_id": "{adw_id}",
+  "field": "worktree_path"
 })
 ```
 
-Extract `worktree_path` and scope every permitted tool call (`read`,
+Do not use a fieldless `read`: it returns the default `spec_content` field, not
+the complete workflow state. Scope every permitted tool call (`read`,
 `find_files`, `search_content`, `ripgrep_advanced`, `build_mkdocs_validate`,
 `run_bun_test`, `run_validate_agent_references`) to that worktree context.
 Reject an absent, empty, `null`, error, or non-directory `worktree_path` before
