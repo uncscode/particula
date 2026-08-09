@@ -68,6 +68,7 @@ reinterpret it during this fix pass.
 | Subagent | Purpose | When Called |
 |----------|---------|-------------|
 | `adw-build-tests` | Validate/write tests and coverage only; never lint or type-check | After all fix implementation completes |
+| `docs-validator` | Validate changed documentation with links, formatting, and strict MkDocs | After test validation when documentation or MkDocs configuration changed |
 
 ## Execution Steps
 
@@ -192,9 +193,40 @@ Parse the result explicitly:
 
 ### Step 9: Validate and Promote Completion
 
+If the fix changed Markdown documentation, `mkdocs.yml`, or other MkDocs input,
+delegate documentation validation to `docs-validator`. Do not ask
+`adw-build-tests` to run MkDocs and do not call an MkDocs wrapper directly from
+this agent:
+
+```python
+task({
+  "description": "Validate fixed documentation",
+  "prompt": (
+    f"Validate the documentation changed by the fix pass.\n\n"
+    f"Arguments: adw_id={adw_id}\n\n"
+    f"Changed documentation files: {','.join(changed_documentation_files)}\n\n"
+    "Resolve worktree_path from workflow state, then run strict MkDocs "
+    "validation with build_mkdocs_validate using that path as cwd. Strict "
+    "mode is intrinsic; do not pass a strict option. Also check links, "
+    "formatting, and cross-references. Do not use raw shell commands or "
+    "delegate this validation to a test subagent."
+  ),
+  "subagent_type": "docs-validator"
+})
+```
+
+Require `DOCS_VALIDATION_COMPLETE` with an explicit successful strict MkDocs
+result. Treat `DOCS_VALIDATION_FAILED`, a blocked/unavailable wrapper, a missing
+strict MkDocs result, or stale output as a failed required subagent: leave
+`fix_completed=false` and emit `ADW_BUILD_FIX_BLOCKED` for unavailable
+infrastructure or `ADW_BUILD_FIX_FAILED` for documentation validation failures.
+When no documentation or MkDocs input changed, record that this conditional
+validation was not required.
+
 Before promotion, verify all implementation todos are complete, all required
 tests and coverage checks passed, the `adw-build-tests` subagent returned
-`ADW_BUILD_TESTS_SUCCESS`, and every acceptance criterion assigned to the Fix
+`ADW_BUILD_TESTS_SUCCESS`, required documentation validation passed when
+applicable, and every acceptance criterion assigned to the Fix
 implementation/test boundary in `fix_spec_content` is satisfied. Lint,
 formatting, and type-check validation remain owned by the downstream Validate
 and Polish steps and must not be added to the test-subagent success gate. Only
@@ -226,4 +258,5 @@ Success output should include:
 
 - files changed
 - targeted tests run
+- strict MkDocs documentation validation result, or why it was not required
 - whether review findings were fully addressed according to `fix_spec_content`

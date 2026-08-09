@@ -70,7 +70,7 @@ Tasks:
 ```python
 task({
   "description": "Validate all documentation",
-  "prompt": f"Validate documentation quality and consistency.\n\nArguments: adw_id={adw_id}\n\nTasks:\n- Check all markdown links\n- Validate formatting\n- Verify cross-references",
+  "prompt": f"Validate documentation quality and consistency.\n\nArguments: adw_id={adw_id}\n\nTasks:\n- Run strict MkDocs validation with build_mkdocs_validate\n- Check all markdown links\n- Validate formatting\n- Verify cross-references",
   "subagent_type": "docs-validator"
 })
 ```
@@ -78,7 +78,9 @@ task({
 ## MkDocs Build Validation
 
 Use MkDocs validation to catch broken references and configuration errors without modifying
-the documentation. Strict validation is intrinsic to this wrapper; do not pass a `strict` option.
+the documentation. `build_mkdocs_validate` is the only permitted MkDocs path for this agent.
+It always invokes validation-only strict mode, so do not pass a `strict` option and do not call
+`build_mkdocs`, `build_mkdocs_build`, a test subagent, or a raw shell command as a fallback.
 
 ```python
 worktree_path = adw_spec_read({
@@ -86,11 +88,17 @@ worktree_path = adw_spec_read({
   "adw_id": "{adw_id}",
   "field": "worktree_path"
 })
-build_mkdocs_validate({"cwd": worktree_path, "options": "output=summary"})
+mkdocs_result = build_mkdocs_validate({
+  "cwd": worktree_path,
+  "options": "output=summary"
+})
 ```
 
-Review the output for broken cross-references, missing pages, or plugin errors and report
-any issues in the validation summary.
+Require a successful wrapper result before reporting successful documentation validation.
+An `ERROR:` response, failure outcome, timeout, unavailable wrapper, missing result, or stale
+result must produce `DOCS_VALIDATION_FAILED` and must not be represented as
+`DOCS_VALIDATION_COMPLETE`. Review successful output for broken cross-references, missing
+pages, or plugin errors and include the strict MkDocs result in the validation summary.
 
 ## TypeScript Wrapper Validation
 
@@ -157,6 +165,8 @@ adw_spec_read({
 Extract `worktree_path` and scope every permitted tool call (`read`,
 `find_files`, `search_content`, `ripgrep_advanced`, `build_mkdocs_validate`,
 `run_bun_test`, `run_validate_agent_references`) to that worktree context.
+Reject an absent, empty, `null`, error, or non-directory `worktree_path` before
+calling `build_mkdocs_validate`; do not fall back to the ambient working directory.
 
 ## Step 2: Create Validation Checklist
 
@@ -289,6 +299,7 @@ Links checked: {total_count}
 - External links: {count} (format validated)
 
 Formatting: ✅ All files pass
+MkDocs strict validation: PASSED
 
 Validation: PASSED
 All documentation is valid and consistent.
@@ -347,6 +358,7 @@ DOCS_VALIDATION_FAILED: {reason}
 
 Error: {specific_error}
 File: {file_causing_error}
+MkDocs strict validation: FAILED or unavailable
 
 Validation could not complete.
 ```
@@ -461,6 +473,7 @@ Validation: COMPLETED WITH WARNINGS
 - Anchor links valid
 - External link format correct
 - Markdown formatting proper
+- Strict MkDocs validation passes through `build_mkdocs_validate`
 
 **Does NOT:**
 - Auto-fix issues
