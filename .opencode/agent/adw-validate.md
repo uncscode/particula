@@ -397,8 +397,9 @@ run_pytest_advanced({
   "pytestArgs": ["{module}/tests/", "-m", "not slow and not performance"],
   "minTests": 1,
   "timeout": 120,
-   "cwd": worktree_path,
-  "options": "fail-fast"
+  "cwd": worktree_path,
+  "options": "fail-fast",
+  "coverage": false
 })
 ```
 
@@ -494,8 +495,9 @@ After fixing, verify everything passes:
 run_pytest_advanced({
   "pytestArgs": ["{affected_modules}/tests/", "-m", "not slow and not performance"],
   "minTests": 1,
-   "cwd": worktree_path,
-  "options": "fail-fast"
+  "cwd": worktree_path,
+  "options": "fail-fast",
+  "coverage": false
 })
 ```
 

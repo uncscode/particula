@@ -49,6 +49,7 @@ Keep advanced payload-bearing fields explicit.
 
 ```json
 { "pytestArgs": ["pkg/tests/"], "minTests": 1 }
+{ "pytestArgs": ["pkg/tests/test_widget.py::test_widget"], "coverage": false, "minTests": 1 }
 { "coverage": true, "coverageThreshold": 80, "minTests": 1 }
 { "options": "output=json durations=10", "pytestArgs": ["tests/"], "minTests": 1 }
 { "options": "test-filter=agent fail-fast", "pytestArgs": ["tests/"], "minTests": 1 }
@@ -60,6 +61,9 @@ Keep advanced payload-bearing fields explicit.
 - `timeout` is measured in seconds and must be greater than 0 and less than or equal to 1200 seconds (20 minutes).
 - `coverage: false` emits the no-coverage path and rejects `coverageSource`,
   `coverageThreshold`, and `cov-report` controls before subprocess launch.
+  Use it for focused assertion checks, then restore coverage for final
+  comprehensive validation. Raw `--no-cov` and lowered `--cov-fail-under`
+  controls are not accepted through `pytestArgs`.
 - `durations=0` is supported and means show all durations.
 - `durations-min=<n>` only takes effect when `durations=<n>` is also set.
 - `cwd` must resolve within the current repository root.

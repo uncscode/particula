@@ -121,7 +121,7 @@ Delegate all test execution, failure analysis, and fixing to the `adw-tester` su
 task({
   "description": "Run tests and fix failures",
   "subagent_type": "adw-tester",
-  "prompt": "Execute comprehensive test validation.\n\nArguments: {arguments}\n\nRun all tests, categorize any failures as spec-related vs unrelated, fix spec-related failures (must fix), attempt one fix for unrelated failures, and report results."
+  "prompt": "Execute comprehensive test validation.\n\nArguments: {arguments}\n\nHonor any requested test_path. Use coverage: false only for focused assertion checks and individual failure reruns; do not pass raw coverage-disabling arguments. Retain repository-policy coverage for final comprehensive validation. Categorize failures as spec-related vs unrelated, fix spec-related failures (must fix), attempt one fix for unrelated failures, and report results."
 })
 ```
 
@@ -181,7 +181,7 @@ All tests passed successfully
 Test Summary:
 - 48 tests collected
 - 48 tests passed
-- Coverage: 75%
+- Coverage: repository policy passed
 ```
 
 ## Partial Success Output (Unrelated Failures Remain):
@@ -192,7 +192,7 @@ Test Summary:
 - 48 tests collected
 - 45 tests passed (all spec-related)
 - 3 unrelated failures remain (pre-existing issues)
-- Coverage: 75% (new code)
+- Coverage: repository policy passed
 
 Spec-related tests passed. Unrelated failures remain:
 - [Unrelated failure 1]: Single fix attempt unsuccessful
@@ -222,6 +222,9 @@ Unrelated failures (not blocking):
 
 - Delegate all test execution to `adw-tester` — do not run pytest tools directly
 - Delegate all commits to `adw-commit` — do not commit directly from this agent
+- Ensure delegated focused checks use `coverage: false` rather than raw
+  `--no-cov` or lowered threshold arguments, and require coverage-enabled final
+  validation
 - If `adw-tester` fails to return, retry once without a session_id
 - If commit fails, retry once before reporting failure
 - Pass through all arguments faithfully to subagents

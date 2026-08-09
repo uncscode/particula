@@ -290,8 +290,8 @@ After implementing each correction, run a **fast spot-check test** on the affect
 ```python
 run_pytest_advanced({
   "testPath": "{module}/tests/",
-  "options": "fail-fast",
-  "options": "output=summary",
+  "options": "output=summary fail-fast",
+  "coverage": false,
   "timeout": 60
 })
 ```

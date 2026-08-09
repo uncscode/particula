@@ -5,7 +5,7 @@ description: >-
   Invoked by the tester primary agent after implementation changes.
 
   This subagent:
-  - Runs pytest with coverage for scoped or full test suites
+  - Runs assertion-only focused checks and coverage-enforced final test suites
   - Categorizes failures as spec-related vs unrelated
   - Fixes spec-related test failures (must fix)
   - Attempts one fix for unrelated failures (best effort)
@@ -98,18 +98,18 @@ run_pytest_advanced({
 run_pytest_advanced({
   "pytestArgs": ["adw/core/tests/"],
   "minTests": 1,
-  "options": "fail-fast"
+  "options": "fail-fast",
+  "coverage": false
 })
 ```
 
-**Run with coverage threshold:**
+**Run scoped coverage under repository policy:**
 ```python
 run_pytest_advanced({
   "pytestArgs": ["adw/utils/tests/"],
   "minTests": 1,
   "coverage": true,
-  "coverageSource": "adw/core,adw/utils",
-  "coverageThreshold": 80
+  "coverageSource": "adw/core,adw/utils"
 })
 ```
 
@@ -136,22 +136,28 @@ run_pytest_advanced({
 |--------|------|-------------|
 | `pytestArgs` | array | Arguments passed to pytest (paths, markers, flags) |
 | `minTests` | number | Minimum expected tests (use 1 for scoped tests) |
-| `coverage` | boolean | Enable coverage reporting |
+| `coverage` | boolean | Enable coverage reporting; defaults to `true` |
 | `coverageSource` | string | Existing repo-relative source directories, comma-separated, or `all` for repository configuration |
-| `coverageThreshold` | number | Fail if coverage below this % |
+| `coverageThreshold` | number | Optionally strengthen, but never lower, repository coverage policy |
 | `cwd` | string | Working directory (for worktrees) |
 | `options` | string | Bounded toggles such as `output=full`, `fail-fast`, `test-filter=...`, `durations=...` |
 | `timeout` | number | Max execution time in seconds (max 1200) |
 
 **What the pytest wrappers provide:**
-- Executes pytest with coverage reporting
+- Executes pytest with repository-policy coverage by default
 - Validates test count to prevent false positives
 - Returns comprehensive output suitable for parsing
-- Includes coverage metrics in output
+- Includes coverage metrics for coverage-enabled runs
 - Non-zero exit code if validation fails
 
 **Important Notes:**
 - Set `minTests: 1` for scoped/targeted tests to validate at least 1 test runs
+- Use `coverage: false` for focused diagnosis and individual failure reruns. This
+  is assertion-only evidence; always restore coverage for final comprehensive
+  validation.
+- Do not pass `--no-cov`, `--cov-fail-under=0`, or other raw coverage controls
+  through `pytestArgs`. Use the dedicated `coverage` fields so repository policy
+  remains authoritative.
 - Do not pass dotted modules or `.py` files as `coverageSource`; unsupported
   entries are ignored with an `INFO:` diagnostic and repository configuration
   is used when no valid directory remains.
@@ -228,19 +234,24 @@ run_pytest_advanced({
 run_pytest_advanced({
   "pytestArgs": ["{test_path}", "-v"],
   "options": "output=full",
-  "minTests": 1
+  "minTests": 1,
+  "coverage": false
 })
 ```
 
-**If running in worktree context** (adw_id provided):
+**If running a specific test in worktree context** (adw_id and test_path provided):
 ```python
 run_pytest_advanced({
   "pytestArgs": ["{test_path}"],
   "cwd": "{worktree_path}",
   "options": "output=full fail-fast",
   "minTests": 1,
+  "coverage": false
 })
 ```
+
+For a full worktree run, omit `pytestArgs` and `coverage` from the call, pass
+`cwd`, and retain the default repository-policy coverage run.
 
 **Capture all output** - Do NOT stop on first failure. Run all tests to get complete picture.
 
@@ -317,8 +328,9 @@ For EACH **[SPEC-RELATED]** item in your fix checklist:
    - Make minimal, targeted fix to resolve issue
    - Follow repository conventions from guides
 3. **Verify the fix**:
-    - Re-run the specific failed test using `run_pytest_advanced`
-   - Confirm test now passes
+    - Re-run the specific failed test using `run_pytest_advanced` with
+      `coverage: false`
+    - Confirm test now passes
 4. **Mark as completed** in your checklist
 5. **Move to next fix**
 
@@ -367,6 +379,9 @@ After all fixes are complete, re-run `run_pytest_advanced` to confirm:
 - No new failures were introduced by fixes
 - Coverage meets requirements for new code
 
+Do not set `coverage: false` for this final run. Omit `coverage` to retain the
+default repository coverage policy, or set `coverage: true` explicitly.
+
 ### Step 4.2: Assess Final State
 
 **Success criteria:**
@@ -402,7 +417,7 @@ All tests passed successfully
 Test Summary:
 - 48 tests collected
 - 48 tests passed
-- Coverage: 75%
+- Coverage: repository policy passed
 ```
 
 ## Partial Success Output (Unrelated Failures Remain):
@@ -413,7 +428,7 @@ Test Summary:
 - 48 tests collected
 - 45 tests passed (all spec-related)
 - 3 unrelated failures remain (pre-existing issues)
-- Coverage: 75% (new code)
+- Coverage: repository policy passed
 
 Spec-related tests passed. Unrelated failures remain:
 - [Unrelated failure 1]: Single fix attempt unsuccessful

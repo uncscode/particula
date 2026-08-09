@@ -277,8 +277,8 @@ After implementing each task, run a **fast spot-check test** on the affected mod
 ```python
 run_pytest_advanced({
   "testPath": "{module}/tests/",
-  "options": "fail-fast",
-  "options": "output=summary",
+  "options": "output=summary fail-fast",
+  "coverage": false,
   "timeout": 60
 })
 ```
@@ -295,8 +295,8 @@ run_pytest_advanced({
 # If you modified adw/utils/parser.py
 run_pytest_advanced({
   "testPath": "adw/utils/tests/parser_test.py",
-  "options": "fail-fast",
-  "options": "output=summary"
+  "options": "output=summary fail-fast",
+  "coverage": false
 })
 ```
 
@@ -488,12 +488,12 @@ Notebooks are fully validated during the documentation workflow:
 
 **Task 1:**
 - Implement validate_input()
-- Spot-check: `run_pytest_advanced({"testPath": "adw/utils/tests/parser_test.py", "options": "fail-fast"})` -> PASS
+- Spot-check: `run_pytest_advanced({"testPath": "adw/utils/tests/parser_test.py", "options": "fail-fast", "coverage": false})` -> PASS
 - Mark complete
 
 **Task 2:**
 - Add edge case tests
-- Spot-check: `run_pytest_advanced({"testPath": "adw/utils/tests/parser_test.py", "options": "fail-fast"})` -> PASS
+- Spot-check: `run_pytest_advanced({"testPath": "adw/utils/tests/parser_test.py", "options": "fail-fast", "coverage": false})` -> PASS
 - Mark complete
 
 **Step 7:** Comprehensive testing:
