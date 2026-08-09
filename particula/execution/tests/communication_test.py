@@ -677,7 +677,7 @@ def test_duplicate_sort_uses_enabled_edges_not_disabled_capacity() -> None:
         (
             "source_boxes",
             "shape",
-            "source_boxes must have shape (2,)",
+            r"source_boxes must have shape \(2,\)",
         ),
         (
             "source_boxes",
@@ -743,7 +743,7 @@ def test_source_schema_preflight_rejects_before_payload_scans(
         )
     elif value == "alignment":
         replacement = wp.array(
-            ptr=4,
+            ptr=2,
             capacity=8,
             dtype=wp.int32,
             shape=(2,),
@@ -853,7 +853,7 @@ def test_rejected_validation_preserves_payload_identity_and_values(
     ("value", "match"),
     [
         ("rank", "final_volumes must have rank 1"),
-        ("shape", "final_volumes must have shape (3,)"),
+        ("shape", r"final_volumes must have shape \(3,\)"),
         ("dtype", "final_volumes must have dtype"),
         ("contiguity", "final_volumes must be contiguous"),
         (
@@ -1081,4 +1081,4 @@ assert 'warp' not in sys.modules
     validator_docstring = (
         communication.validate_communication_configuration.__doc__
     )
-    assert "source inventory" in validator_docstring
+    assert "source-inventory" in validator_docstring
