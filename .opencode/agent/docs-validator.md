@@ -116,11 +116,18 @@ run_bun_test({
 })
 ```
 
-## Agent Reference Validation
+## Optional Agent Reference Validation
 
 Use `run_validate_agent_references` as the approved in-agent path for repository
-agent-reference validation. This permission is intentionally limited to `docs-validator`
-and `adw-validate`. Do not invoke `scripts/validate_agent_references.sh` or raw `python`
+agent-reference validation. This check is optional and should run only when the change
+affects ADW/OpenCode system surfaces such as agent definitions, workflow definitions,
+wrapper contracts or policy, or the reference validator itself. Skip it for deployment
+workflows and ordinary application-code changes, where validating ADW workflow references
+is outside the change scope. A skipped optional check must not fail or block documentation
+validation.
+
+This permission is intentionally limited to `docs-validator` and `adw-validate`. When the
+check is applicable, do not invoke `scripts/validate_agent_references.sh` or raw `python`
 shell commands directly from this agent.
 
 ```python
@@ -132,8 +139,9 @@ run_validate_agent_references({
 The wrapper is root-scoped and trust-gated: `cwd` must equal the active worktree root, and
 the call fails closed if `scripts/validate_agent_references.py` has local uncommitted edits.
 
-Review the output for broken `@path` / `filePath` references and wrapper-policy validation
-failures, then include any findings in the validation summary.
+When run, review the output for broken `@path` / `filePath` references and wrapper-policy
+validation failures, then include any findings in the validation summary. When skipped,
+briefly record that agent-reference validation was not applicable to the change scope.
 
 # Required Reading
 
