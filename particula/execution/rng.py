@@ -312,11 +312,13 @@ class StreamRegistry:
         import warp as wp
 
         for process_id in PROCESS_IDS:
-            source = np.asarray(
+            host_source = np.asarray(
                 self._words_by_process[process_id], dtype=np.uint32
             )
-            host_source = wp.array(source, dtype=wp.uint32, device="cpu")
-            wp.copy(self.state_array_for(process_id), host_source)
+            wp.copy(
+                self.state_array_for(process_id),
+                wp.array(host_source, dtype=wp.uint32, device="cpu"),
+            )
 
 
 def _validate_process_id(process_id: object) -> None:

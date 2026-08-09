@@ -79,6 +79,8 @@ EXCLUDED_EXPORTS = (
     "StreamKey",
     "StreamDescriptor",
     "StreamRegistry",
+    "PROCESS_IDS",
+    "SUPPORTED_PROCESS_IDS",
 )
 
 DIRECT_IMPORT_ONLY_NAMES = (
@@ -92,6 +94,8 @@ DIRECT_IMPORT_ONLY_NAMES = (
     "STREAM_SCHEMA_VERSION",
     "MAX_LOGICAL_BOX_ID_BYTES",
     "MAX_ROOT_SEED",
+    "PROCESS_IDS",
+    "SUPPORTED_PROCESS_IDS",
 )
 
 
