@@ -13,9 +13,13 @@ thresholds are not lowered; changed modules must retain at least 80% coverage.
   caller-buffer identity, initialization, and schema preflight preservation.
   Execution export tests deny the direct-only module from package and top-level
   export surfaces.
-- **P2:** Brownian adapter tests assert one setup initialization, identical
-  caller/session-owned array identity, repeated advancement without reseeding,
-  no-op handling, and validation-state preservation.
+- **P2 (complete, Issue #1521):** `gpu_session_test.py`, `gpu_resources_test.py`,
+  `coagulation_adapter_test.py`, `coagulation_integration_test.py`,
+  `scheduler_test.py`, and `checkpoint_test.py` cover P1 metadata validation;
+  first-acquisition-only coagulation-sidecar initialization and identity;
+  literal-false resident dispatch; consecutive advancement and zero-time/no-active
+  preservation; rejection-before-import/dispatch; and fail-closed checkpoint and
+  finalize behavior after sidecar publication.
 - **P3:** Wall-loss adapter/scheduler tests assert a distinct process stream,
   enabled-box consumption, disabled-box preservation, and existing kernel
   validation/failure behavior.
@@ -25,10 +29,9 @@ thresholds are not lowered; changed modules must retain at least 80% coverage.
 - **P5:** `particula/execution/tests/rng_invariance_test.py` compares each enabled
   logical box against an isolated one-box reference after adding, disabling,
   removing, and permuting unrelated boxes for both stochastic processes.
-- **P6:** `particula/execution/tests/checkpoint_test.py` compares an uninterrupted
-  run with a checkpoint/restart split at several steps. Require exact RNG-state
-  and same-backend stochastic-output equality, one explicit checkpoint sync,
-  version/device/dimension/ID rejection, and no intermediate conversion.
+- **P6:** Remains deferred. P2 deliberately rejects checkpoint/finalize after
+  resident RNG publication, so no RNG split-run continuation is presently
+  supported.
 - **P7:** Run `mkdocs build --strict`, documentation regression tests, export
   checks, and copy-pastable focused commands.
 

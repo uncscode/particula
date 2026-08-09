@@ -725,10 +725,19 @@ class WarpBrownianCoagulationExecutionState:
 
 @dataclass(frozen=True, eq=False)
 class ResidentBrownianCoagulationExecutionState:
-    """Bind an established Brownian request to resident-owned sidecars.
+    """Bind a Brownian request to one established resident RNG stream.
 
-    Resident dispatch never resets or allocates its one persistent coagulation
-    stream; it always forwards ``initialize_rng=False``.
+    The retained registry view owns the exact P1-initialized, coagulation-only
+    ``wp.uint32`` RNG sidecar. Resident dispatch never acquires, allocates,
+    resets, inspects, transfers, or synchronizes that sidecar; it always
+    forwards it with ``initialize_rng=False``. Wall-loss streams and public
+    reset or inspection APIs are outside this concrete-only boundary.
+
+    Attributes:
+        request: Exact direct Brownian request retaining process inputs.
+        session: Exact active resident session owning the primary containers.
+        registry: Exact registry that published ``resources`` for ``session``.
+        resources: Published collision outputs and persistent RNG sidecar.
     """
 
     request: WarpBrownianCoagulationExecutionState
@@ -758,10 +767,32 @@ class ResidentBrownianCoagulationExecutionState:
 
 
 class ResidentBrownianCoagulationExecutionAdapter:
-    """Dispatch one pre-acquired resident Brownian request by identity."""
+    """Dispatch one pre-acquired resident Brownian request by identity.
+
+    The adapter preflights exact session, registry, resource, output, and RNG
+    identities before lazily importing the kernel. It then supplies the
+    resident-owned P1-derived coagulation sidecar with literal
+    ``initialize_rng=False``. It does not acquire, allocate, seed, reset,
+    inspect, transfer, or synchronize the stream.
+    """
 
     def execute(self, state: ExecutionState) -> ExecutionResult:
-        """Preflight resident bindings then forward one forced-no-reset call."""
+        """Preflight bindings and dispatch one forced-no-reset kernel call.
+
+        Args:
+            state: Exact resident Brownian execution state.
+
+        Returns:
+            A result retaining the request and kernel result resources by
+            identity.
+
+        Raises:
+            TypeError: If ``state`` is not the exact resident execution state.
+            ValueError: If reset is requested or resident identities are stale
+                or inconsistent.
+            ImportError: If the optional direct Warp kernel is unavailable after
+                preflight.
+        """
         if type(state) is not ResidentBrownianCoagulationExecutionState:
             raise TypeError(
                 "state must be a ResidentBrownianCoagulationExecutionState."

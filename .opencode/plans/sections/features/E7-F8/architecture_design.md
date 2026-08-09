@@ -34,11 +34,21 @@ root seed + exact StreamKey(process, logical box ID)
   `(n_boxes,)` arrays (including distinctness and nonaliasing), then performs
   canonical coagulation and wall-loss copies. Preflight failures write neither
   buffer; a failure after a successful first copy has no rollback guarantee.
-- **Deferred integration:** P1 does not alter execution or top-level exports,
-  acquire or rebind resource arrays, integrate resident sessions/resources or
-  adapters, initialize during scheduler calls, provide reset APIs, or persist RNG
-  metadata/state in checkpoints. Those lifecycle and restart contracts remain
-  future E7-F8 phases.
+- **Delivered P2 resident lifecycle:** `ResidentStreamMetadata` validates and
+  retains P1 root-seed, logical-ID, and lane metadata without importing Warp.
+  First compatible `acquire_coagulation()` constructs a P1 registry, initializes
+  one same-device coagulation-only `(n_boxes,)` `wp.uint32` array, and pins the
+  registry, resource view, and array by identity. Reacquisition neither allocates
+  nor reseeds it.
+- **Delivered P2 dispatch/checkpoint boundary:** The concrete resident Brownian
+  adapter validates exact session/resource/collision/RNG bindings and dispatches
+  with literal `initialize_rng=False`. It has no reset, transfer, synchronization,
+  or fallback path. Checkpoint and finalize fail closed before payload work when
+  the resident sidecar is published; RNG metadata and words are not serialized,
+  and restart continuation is unsupported.
+- **Deferred integration:** P2 does not add wall-loss resources, generic
+  reset/inspection APIs, box-invariance machinery, public exports, or RNG
+  persistence/restart continuation.
 
 ## Security & Compliance
 

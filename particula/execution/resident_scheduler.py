@@ -16,8 +16,7 @@ from particula.execution import _isfinite_real
 from particula.execution.adapters.coagulation import (
     ResidentBrownianCoagulationExecutionAdapter,
     ResidentBrownianCoagulationExecutionState,
-    WarpBrownianCoagulationExecutionAdapter,
-    WarpBrownianCoagulationExecutionState,
+    WarpBrownianCoagulationExecutionAdapter,  # noqa: F401
 )
 from particula.execution.adapters.condensation import (
     WarpCondensationExecutionAdapter,
@@ -113,7 +112,9 @@ class ResidentSimulationRequest:
         schedule: Canonical resolved schedule for ``graph``.
         thermodynamics: Exact configuration shared by thermal consumers.
         condensation: Exact resident condensation execution state.
-        coagulation: Exact resident Brownian-coagulation execution state.
+        coagulation: Resident Brownian execution state binding the published
+            coagulation-only RNG sidecar by identity and requiring forced-false
+            RNG initialization during dispatch.
         dilution: Exact resident dilution request.
         wall_loss: Exact resident wall-loss request.
         nucleation: Exact resident nucleation request.
@@ -130,10 +131,7 @@ class ResidentSimulationRequest:
     schedule: ResolvedTimestepSchedule
     thermodynamics: ThermodynamicsConfig
     condensation: WarpCondensationExecutionState
-    coagulation: (
-        WarpBrownianCoagulationExecutionState
-        | ResidentBrownianCoagulationExecutionState
-    )
+    coagulation: ResidentBrownianCoagulationExecutionState
     dilution: ResidentDilutionRequest
     wall_loss: ResidentWallLossRequest
     nucleation: ResidentNucleationRequest
@@ -149,6 +147,13 @@ class ResidentSimulationRequest:
             TypeError: If a required component or optional update has an
                 inexact concrete type.
         """
+        if (
+            type(self.coagulation)
+            is not ResidentBrownianCoagulationExecutionState
+        ):
+            raise TypeError(
+                "coagulation must be an exact resident execution state."
+            )
         exact = (
             (self.session, ResidentSession, "session"),
             (self.registry, _registry_type(), "registry"),
@@ -165,13 +170,6 @@ class ResidentSimulationRequest:
         for value, expected, name in exact:
             if type(value) is not expected:
                 raise TypeError(f"{name} must be an exact {expected.__name__}.")
-        if type(self.coagulation) not in (
-            WarpBrownianCoagulationExecutionState,
-            ResidentBrownianCoagulationExecutionState,
-        ):
-            raise TypeError(
-                "coagulation must be an exact resident execution state."
-            )
         if (
             self.environment_update is not None
             and type(self.environment_update)
@@ -200,7 +198,10 @@ class ResidentSimulationScheduler:
     pre-update volumes, optional volume evolution follows it, and both barriers
     invalidate saturation ratio only. The scheduler neither transfers nor
     restores data, acquires resources, synchronizes, retries, falls back, or
-    rolls back after a writer-capable operation may have launched.
+    rolls back after a writer-capable operation may have launched. When given a
+    resident Brownian carrier, it dispatches its already-published
+    coagulation-only RNG sidecar by identity with reset disabled; it neither
+    allocates, reseeds, inspects, nor synchronizes that stream.
     """
 
     def __init__(self, request: ResidentSimulationRequest) -> None:
@@ -387,12 +388,7 @@ class ResidentSimulationScheduler:
                 "condensation state does not match resident binding."
             )
         coagulation_request = request.coagulation
-        coagulation = (
-            coagulation_request.request.state
-            if type(coagulation_request)
-            is ResidentBrownianCoagulationExecutionState
-            else coagulation_request.state
-        )
+        coagulation = coagulation_request.request.state
         if (
             coagulation.particles is not request.session.particles
             or coagulation.environment is not request.session.environment
@@ -422,17 +418,13 @@ class ResidentSimulationScheduler:
             request.session, coagulation_resources
         )
         if (
-            type(coagulation_request)
-            is ResidentBrownianCoagulationExecutionState
+            coagulation_request.session is not request.session
+            or coagulation_request.registry is not request.registry
+            or coagulation_request.resources is not coagulation_resources
         ):
-            if (
-                coagulation_request.session is not request.session
-                or coagulation_request.registry is not request.registry
-                or coagulation_request.resources is not coagulation_resources
-            ):
-                raise ValueError(
-                    "coagulation request does not match resident binding."
-                )
+            raise ValueError(
+                "coagulation request does not match resident binding."
+            )
         registry.validate_wall_loss_resources(
             request.session, request.wall_loss.resources
         )
@@ -452,12 +444,7 @@ class ResidentSimulationScheduler:
         request = self._request
         values = (
             request.condensation.time_step,
-            (
-                request.coagulation.request.state.time_step
-                if type(request.coagulation)
-                is ResidentBrownianCoagulationExecutionState
-                else request.coagulation.state.time_step
-            ),
+            request.coagulation.request.state.time_step,
             request.dilution.time_step,
             request.wall_loss.time_step,
             request.nucleation.time_step,
@@ -497,12 +484,7 @@ class ResidentSimulationScheduler:
             )
         )
         condensation = WarpCondensationExecutionAdapter()
-        coagulation = (
-            ResidentBrownianCoagulationExecutionAdapter()
-            if type(request.coagulation)
-            is ResidentBrownianCoagulationExecutionState
-            else WarpBrownianCoagulationExecutionAdapter()
-        )
+        coagulation = ResidentBrownianCoagulationExecutionAdapter()
         dilution = ResidentDilutionAdapter()
         wall_loss = ResidentWallLossAdapter()
         nucleation = ResidentNucleationAdapter()
@@ -542,7 +524,7 @@ class ResidentSimulationScheduler:
                         node, lambda: condensation.execute(request.condensation)
                     )
                 elif node_id == "brownian_coagulation":
-                    coagulation.execute(request.coagulation)
+                    coagulation.execute(cast(Any, request.coagulation))
                     thermal.record_completed(node)
                 elif node_id == "dilution":
                     dilution.execute(request.dilution)

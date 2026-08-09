@@ -268,8 +268,20 @@ verify schema-v2 checkpoints with no communication family or one complete
 closed-map family. Restarts must require an exact device and recreate arrays and
 bindings instead of reusing source identities.
 
+Resident Brownian-coagulation coverage must keep its one pinned RNG sidecar by
+identity across valid dispatches and verify that normal dispatch never reseeds
+or allocates it. Test the immutable stream metadata during session setup and
+the first resource acquisition separately. When that resident stream has been
+published, checkpoint and finalization must reject before payload work; stream
+checkpoint continuation is intentionally unsupported. Do not extend this
+coverage to wall-loss streams, reset or inspection APIs, hidden transfers, or
+synchronization.
+
 ```bash
-pytest particula/execution/tests/gpu_resources_test.py \
+pytest particula/execution/tests/gpu_session_test.py \
+  particula/execution/tests/gpu_resources_test.py \
+  particula/execution/tests/coagulation_adapter_test.py \
+  particula/execution/tests/coagulation_integration_test.py \
   particula/execution/tests/checkpoint_test.py \
   particula/execution/tests/process_graph_test.py \
   particula/execution/tests/resident_communication_test.py \

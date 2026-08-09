@@ -114,16 +114,18 @@ The exact downstream ordering remains
   `particula.execution.checkpoint`; none of its names are package or top-level
   exports. P1
   `ResidentSession` validates and retains already-resident caller-owned Warp
-  particle, gas, and environment containers, immutable dimensions, `Device`
-  metadata, a CPU gas-name tuple, and lifecycle state by identity. P2's
+   particle, gas, and environment containers, immutable dimensions, `Device`
+   metadata, a CPU gas-name tuple, validated immutable resident stream metadata,
+   and lifecycle state by identity. P2's
   direct-import-only `setup_resident_session` performs local CPU-only carrier,
   shape, name, and exact-Warp-`Device` preflight, then performs exactly one
   particle/gas/environment upload in that order through
   `particula.gpu.conversion`, preserving ordered CPU gas names solely as
   metadata and publishing only a complete `ACTIVE` session. It relies on the
   upstream E7-F6 native-availability precondition and neither probes nor
-  substitutes devices. The boundary has no fallback, synchronization,
-   restoration, sidecars, lifecycle transition, finalization, close, scheduler,
+   substitutes devices. Session setup validates stream metadata before uploads
+   but does not allocate a native RNG sidecar. The boundary has no fallback,
+   synchronization, restoration, sidecars, lifecycle transition, finalization, close, scheduler,
    or migration behavior, and remains absent from package exports. P4 adds
    direct-import-only `ResidentStepGuard` and identity-only
    `ResidentStepToken`: one exact active session/registry binding has at most
@@ -171,8 +173,11 @@ The exact downstream ordering remains
      restores fresh identities. It does not select or migrate devices, automatically
    restart normal session use, fall back to CPU, serialize to disk/remote, or
    guarantee rollback after an asynchronous device writer launches. Snapshotting
-   requires roughly one additional host copy of resident payload bytes plus
-   detached inspection copies. See
+    requires roughly one additional host copy of resident payload bytes plus
+    detached inspection copies. A published resident coagulation RNG stream
+    fail-closes checkpoint and finalize before device or payload work; stream
+    metadata and RNG words are not serialized, so restart continuation is not
+    available. See
     [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md),
     [ADR-008](decisions/ADR-008-resident-session-failure-close-semantics.md),
     and [ADR-018](decisions/ADR-018-resident-communication-integration.md).
@@ -188,7 +193,13 @@ The exact downstream ordering remains
   the exact view, records, and arrays. This validates pinned ownership rather
   than unverifiable allocator provenance. It creates no public package export
   and has no execution/selection, transfer/sync/restore, lifecycle, transport,
-   process-configuration/physics, or RNG reset/advance/initialization behavior.
+   process-configuration/physics, or general RNG reset/advance behavior. On
+   first `acquire_coagulation()`, it creates and initializes exactly one
+   P1-derived coagulation-only `wp.uint32` sidecar from immutable resident stream
+   metadata, then retains its registry, binding, and view by identity. Compatible
+   repeats neither allocate nor reseed it. There is no wall-loss stream,
+   reset/inspection API, hidden transfer/synchronization, package export, or
+   checkpoint continuation.
    `validate_pinned_session()` is the metadata-only integration seam: it
      requires exact retained-session identity and reuses active
      lifecycle/signature/schema validation without acquisition or allocation.
@@ -226,7 +237,9 @@ The exact downstream ordering remains
   diagnostics consumer windows, and completes the token only after the full
   loop succeeds. It has no package export, transfer, synchronization, fallback,
   resource replacement, or rollback; a possible post-launch failure faults the
-  resident session. See
+   resident session. Resident Brownian dispatch uses the exact published
+   coagulation sidecar by identity and forces `initialize_rng=False`; it does
+   not acquire, replace, inspect, synchronize, or reseed the stream. See
    [ADR-012](decisions/ADR-012-resident-complete-loop-and-diagnostics.md) and
    [ADR-018](decisions/ADR-018-resident-communication-integration.md).
 - `process_adapters.py` - Concrete-only, direct-import resident delegation
@@ -312,7 +325,9 @@ The exact downstream ordering remains
   lazily resolves and calls `coagulation_step_gpu`. Neither path selects another
   backend; transfers, converts, restores, synchronizes, allocates, retries,
   falls back, or recovers. The resident-Warp adapter forwards the caller-owned
-  RNG sidecar and its explicit initialization intent unchanged; the direct
+   RNG sidecar and its explicit initialization intent unchanged. The distinct
+   resident-Warp carrier instead requires the registry-published coagulation
+   stream by identity and always forwards `initialize_rng=False`; the direct
   kernel owns native physical/schema validation, RNG advancement/reset, and
   post-launch behavior. CPU and Warp stochastic trajectories are independent.
   All carriers and adapters are absent from `particula.execution`, the adapters

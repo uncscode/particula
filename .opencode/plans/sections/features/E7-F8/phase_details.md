@@ -10,11 +10,20 @@
    - Tests: validation, namespace separation, stable-ID invariance, seed vectors,
      collision handling, host-only import, initializer preflight, and exports.
 
-- [ ] **E7-F8-P2:** Integrate coagulation streams with resident resources and unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Bind E7-F3 Brownian calls to session-owned process/box streams seeded once and advanced in place.
-  - Files: `particula/execution/adapters/coagulation.py`, `particula/execution/session.py`, adapter tests
-  - Tests: Identity retention, explicit first initialization, repeated-step continuation, rejection preservation, and no hidden allocation/reset.
+- [x] **E7-F8-P2:** Integrate coagulation streams with resident resources and unit tests
+  - Issue: #1521 | Size: S | Status: Complete
+  - Goal: Bind E7-F3 Brownian calls to one session-owned P1-derived stream seeded
+    once and advanced in place, without checkpoint persistence.
+  - Files: `particula/execution/gpu_session.py`, `particula/execution/gpu_resources.py`,
+    `particula/execution/adapters/coagulation.py`,
+    `particula/execution/resident_scheduler.py`, `particula/execution/checkpoint.py`,
+    and co-located execution tests.
+  - Delivered: Immutable resident stream metadata; one first-acquisition
+    coagulation-only sidecar pinned by identity; literal-false resident dispatch;
+    and checkpoint/finalize rejection after publication.
+  - Tests: Metadata and sidecar schemas, one-time initialization, identity and
+    advancement, no-op/rejection preservation, scheduler binding, and pre-payload
+    checkpoint/finalize failure.
 
 - [ ] **E7-F8-P3:** Integrate wall-loss streams with scheduler execution and unit tests
   - Issue: TBD | Size: S | Status: Not Started

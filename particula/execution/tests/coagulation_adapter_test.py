@@ -1644,6 +1644,12 @@ def test_resident_adapter_forces_no_rng_reset_and_pins_resources(
         request, session, registry, resources
     )
     calls: list[dict[str, object]] = []
+
+    def record_call(*_args: object, **kwargs: object) -> tuple[Any, Any, Any]:
+        """Record the exact forced-false resident kernel dispatch."""
+        calls.append(dict(kwargs))
+        return particles, pairs, counts
+
     monkeypatch.setattr(
         registry,
         "validate_coagulation_resources",
@@ -1656,13 +1662,11 @@ def test_resident_adapter_forces_no_rng_reset_and_pins_resources(
     monkeypatch.setattr(
         coagulation_adapter,
         "_get_coagulation_step_gpu",
-        lambda: lambda *_args, **kwargs: (
-            calls.append(kwargs) or (particles, pairs, counts)
-        ),
+        lambda: record_call,
     )
 
     result = coagulation_adapter.ResidentBrownianCoagulationExecutionAdapter().execute(
-        state
+        cast(Any, state)
     )
 
     assert result.backend_result is not None

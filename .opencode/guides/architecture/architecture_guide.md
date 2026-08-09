@@ -57,9 +57,13 @@
     seam, while the separate direct-Warp P2 final-volume writer is now shipped
      at `particula.gpu.kernels.communication`. P3 retains transfer admission;
      the separate concrete-only P4 direct-Warp seam owns particle transport; and
-     P5 retains resident binding. E7-F8 detailed RNG-stream policy, implicit
-    transfer/synchronization, retry, broad fallback, and replacement of direct
-    GPU APIs also remain deferred.
+      P5 retains resident binding. E7-F8 P2 integrates one narrow resident
+     Brownian stream: immutable metadata is retained by the session, first
+     coagulation-resource acquisition initializes one P1-derived sidecar, and
+     resident dispatch retains it by identity with `initialize_rng=False`.
+     Stream reset/inspection, wall-loss integration, hidden
+     transfer/synchronization, retry, broad fallback, and replacement of direct
+     GPU APIs remain deferred.
 - `particula.execution.fallback` is the sole concrete, direct-import-only E7-F6
   P3 opt-in CPU fallback boundary. Its default `RAISE` policy re-raises the
   exact eligible typed availability/support failure. Explicit CPU policy may
@@ -84,9 +88,10 @@
   exports; the boundary is not a public resident-process API.
 - `particula.execution.gpu_session` is an intentionally concrete-only,
   unexported P1/P2 boundary. `ResidentSession` retains valid caller-owned Warp
-  particle, gas, and environment containers, immutable dimensions, a Warp
-  `Device`, a CPU-owned gas-name tuple, and one declared lifecycle value by
-  identity. `setup_resident_session` is direct-import-only and must not be
+   particle, gas, and environment containers, immutable dimensions, a Warp
+   `Device`, a CPU-owned gas-name tuple, validated immutable resident stream
+   metadata, and one declared lifecycle value by identity.
+   `setup_resident_session` is direct-import-only and must not be
   promoted through `particula.execution`, `particula.execution.adapters`, or
   top-level `particula`.
 - Construction performs only fixed-cost, read-only carrier and generated Warp
@@ -101,8 +106,9 @@
   E7-F6 precondition: this boundary does not probe, normalize, select, or
   substitute a device. Only after preflight, it calls each established
   `particula.gpu.conversion` upload helper exactly once in particle, gas, and
-  environment order with the unchanged native identifier. It retains only
-  `tuple(gas.name)` as CPU metadata; names are never uploaded to `WarpGasData`.
+   environment order with the unchanged native identifier. It retains
+   `tuple(gas.name)` and validated stream metadata as CPU metadata; neither is
+   uploaded to `WarpGasData`. Setup does not allocate an RNG sidecar.
   A conversion or final session-validation error propagates with no partial
   session publication. P2 has no fallback, synchronization, restoration,
   sidecars, retry, or cleanup behavior.
@@ -132,7 +138,16 @@
   finalize, close, fault, conversion, resize, and rebind boundaries must call
   `assert_step_closed()` before their own work; P5/P6 retain those operations
     and their policy. The gate does not globally intercept raw low-level helpers.
-    See [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md).
+     See [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md).
+- `GPUResourceRegistry.acquire_coagulation()` is the sole resident stream
+  acquisition point. For an exact active session it validates a supplied RNG
+  sidecar before publication, or allocates one, then initializes exactly one
+  P1-derived coagulation-only `wp.uint32` stream from the session metadata.
+  Compatible repeats retain the exact stream and resource view by identity and
+  neither allocate nor reseed. Resident Brownian dispatch requires that exact
+  stream and passes literal `initialize_rng=False`; no wall-loss stream,
+  reset/inspection API, hidden transfer/synchronization, or package/top-level
+  export is introduced.
 - `GPUResourceRegistry.validate_wall_loss_resources()` and
   `.validate_nucleation_resources()` are direct-module-only, metadata-only
   established-view seams. After validating the exact pinned active session,
@@ -253,8 +268,12 @@
   call returns the exact cached snapshot without new validation, synchronization,
   conversion, allocation, or upload. Snapshots include canonical immutable bytes
   for primaries and acquired sidecars and detached CPU inspection carriers. The
-  inspection `GasData` intentionally omits GPU-only vapor pressure and is not
-  authoritative; restart recovers vapor pressure from canonical bytes.
+   inspection `GasData` intentionally omits GPU-only vapor pressure and is not
+   authoritative; restart recovers vapor pressure from canonical bytes. A
+   published resident coagulation RNG stream causes checkpoint and finalize to
+   reject before device synchronization, payload conversion, or sidecar
+   enumeration. Stream metadata and words are intentionally not serialized, so
+   checkpoint restart never continues a resident RNG stream.
 - `restart_resident_session(checkpoint, device)` is explicit and same-device
   only. Its preflight fails closed: it accepts an `ACTIVE` `ResidentSession`
   checkpoint with complete valid descriptors and bytes, an exactly equal target

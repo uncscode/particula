@@ -219,6 +219,64 @@ def test_coagulation_acquisition_initializes_one_persistent_stream() -> None:
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize(
+    "failure_point", ("allocation", "registry", "initialize")
+)
+def test_coagulation_acquisition_failure_is_transactional(
+    monkeypatch: pytest.MonkeyPatch, failure_point: str
+) -> None:
+    """Test failed stream setup leaves no state published and retries cleanly."""
+    registry = GPUResourceRegistry(_session())
+    original_allocate = registry._allocate
+    original_stream_registry: type[Any] = gpu_resources.StreamRegistry
+
+    if failure_point == "allocation":
+        monkeypatch.setattr(
+            registry,
+            "_allocate",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                RuntimeError("allocation failed")
+            ),
+        )
+    elif failure_point == "registry":
+        monkeypatch.setattr(
+            gpu_resources,
+            "StreamRegistry",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                RuntimeError("registry failed")
+            ),
+        )
+    else:
+
+        class FailingStreamRegistry(original_stream_registry):
+            """Fail only the staged initialization before publication."""
+
+            def initialize(self) -> None:
+                raise RuntimeError("initialize failed")
+
+        monkeypatch.setattr(
+            gpu_resources, "StreamRegistry", FailingStreamRegistry
+        )
+
+    with pytest.raises(RuntimeError, match=failure_point):
+        registry.acquire_coagulation(1)
+
+    assert registry._bindings == {}
+    assert registry._capacities == {}
+    assert registry._views == {}
+    assert registry._coagulation_stream_registry is None
+
+    monkeypatch.setattr(registry, "_allocate", original_allocate)
+    monkeypatch.setattr(
+        gpu_resources, "StreamRegistry", original_stream_registry
+    )
+    resources = registry.acquire_coagulation(1)
+
+    assert registry._views["coagulation"] is resources
+    assert registry._coagulation_stream_registry is not None
+
+
+@pytest.mark.warp
 def test_enumerate_resources_returns_established_arrays_in_manifest_order() -> (
     None
 ):

@@ -14,6 +14,12 @@ the session without rollback. ``close`` and ``discard`` only perform terminal
 lifecycle transitions after the guard closes; they never restore, synchronize,
 or mutate resident payloads. Checkpoint, restart, and raw low-level helpers
 remain separate concrete-only boundaries.
+
+Each factory-created session also retains immutable host-only P1 stream
+metadata. Setup validates that metadata before importing conversion helpers or
+uploading CPU carriers; it does not allocate, initialize, inspect, or persist
+an RNG sidecar. First coagulation resource acquisition owns that later,
+coagulation-only initialization.
 """
 
 from dataclasses import dataclass
@@ -200,7 +206,19 @@ class ResidentDimensions:
 
 @dataclass(frozen=True)
 class ResidentStreamMetadata:
-    """Retain immutable P1 stream identity for one resident session."""
+    """Retain immutable host-only P1 stream identity for one session.
+
+    This metadata validates P1 root-seed, logical-box-ID, and lane-permutation
+    rules without importing Warp. It identifies a future resident coagulation
+    stream but does not allocate, initialize, inspect, reset, synchronize, or
+    persist any native RNG state.
+
+    Attributes:
+        n_boxes: Number of resident boxes represented by the metadata.
+        root_seed: Unsigned P1 root seed.
+        logical_box_ids: Unique logical identifiers in box order.
+        lanes: P1 lane permutation for the resident boxes.
+    """
 
     n_boxes: int
     root_seed: int
@@ -208,7 +226,14 @@ class ResidentStreamMetadata:
     lanes: tuple[int, ...]
 
     def __post_init__(self) -> None:
-        """Validate the host-only P1 stream manifest metadata."""
+        """Validate the host-only P1 stream manifest metadata.
+
+        Raises:
+            TypeError: If metadata fields have invalid exact container or scalar
+                types.
+            ValueError: If the seed, ID uniqueness, lengths, or lane permutation
+                violates the P1 contract.
+        """
         from particula.execution.rng import MAX_ROOT_SEED
 
         _validate_dimension(self.n_boxes, "n_boxes", positive=False)
@@ -287,6 +312,7 @@ class ResidentMetadata:
         device: Exact Warp-backed execution device declaration.
         gas_names: Ordered caller-declared gas names; entries are not inspected
             or normalized at this boundary.
+        stream: Immutable host-only P1 stream identity matching resident boxes.
     """
 
     device: Device
@@ -681,7 +707,7 @@ class ResidentSession:
         gas: Caller-owned generated Warp gas container.
         environment: Caller-owned generated Warp environment container.
         dimensions: Immutable dimensions that describe the retained containers.
-        metadata: Immutable Warp-device and ordered gas-name metadata.
+        metadata: Immutable device, gas-name, and host-only stream metadata.
         lifecycle: Current lifecycle value. Checkpoint finalization can change
             ACTIVE to FINALIZED; classified writer failures can fault ACTIVE;
             and close or discard can close ACTIVE or FAULTED.
@@ -1248,14 +1274,19 @@ def setup_resident_session(
         gas: CPU gas carrier to upload; its ordered names remain CPU metadata.
         environment: CPU environment carrier to upload.
         device: Exact, upstream-approved Warp device declaration.
+        root_seed: Unsigned P1 root seed retained in immutable session metadata.
+        logical_box_ids: Optional unique P1 box IDs. ``None`` uses stringified
+            ascending box indices.
+        lanes: Optional P1 lane permutation. ``None`` uses ascending box lanes.
 
     Returns:
         One complete ACTIVE session retaining conversion results by identity.
 
     Raises:
-        TypeError: If a local device, carrier, or gas-name declaration is
+        TypeError: If a local device, carrier, gas-name, or stream declaration
+            is invalid.
+        ValueError: If the backend, CPU schema, or P1 stream metadata is
             invalid.
-        ValueError: If the backend or cross-container CPU schema is invalid.
         RuntimeError: If optional Warp conversion or session validation requires
             an unavailable runtime.
     """

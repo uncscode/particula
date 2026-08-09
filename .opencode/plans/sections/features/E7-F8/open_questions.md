@@ -1,9 +1,10 @@
 # Open Questions
 
-- [ ] Does a repeated root seed reset an existing resident stream?
-  - Deferred: P1 has no resident ownership or reset API. Calling the direct
-    `StreamRegistry.initialize()` again deterministically overwrites its two
-    caller-owned arrays; P4 must define lifecycle-valid reset semantics.
+- [x] Does a repeated root seed reset an existing resident stream?
+  - Resolved 2026-08-09: No. P2 stores immutable P1 metadata on the session and
+    initializes the resident coagulation sidecar only on first acquisition;
+    compatible reacquisition and resident dispatch never reseed it. A generic
+    lifecycle-valid reset API remains deferred to P4.
 
 - [x] Must restart reproduce trajectories across CPU, Warp CPU, and CUDA?
   - Resolved 2026-07-27: No. Exact continuation applies only to a compatible
@@ -11,10 +12,11 @@
     statistical and conservation based.
   - Evidence: issue #1451 explicitly excludes exact CPU/CUDA stochastic equality.
 
-- [ ] Is RNG state included in a valid E7-F4 checkpoint?
-  - Deferred: Issue #1520 introduces no checkpoint payload, checkpoint binding,
-    or restart behavior. A later E7-F8 phase must define and validate any stream
-    metadata/state persistence contract.
+- [x] Is RNG state included in a valid E7-F4 checkpoint?
+  - Resolved 2026-08-09: No. P2 checkpoint and finalize fail closed before
+    payload conversion when the resident coagulation sidecar has been published.
+    No stream metadata or words are serialized, and restart continuation is
+    unsupported; a future persistence design requires a separate contract.
 
 - [x] What public logical box ID type should the first stable API accept?
   - Resolved 2026-07-27: Accept unique, non-empty UTF-8 strings and define a
@@ -41,8 +43,10 @@
   - Resolved by: plan-question-resolver
 
 - [x] Is durable on-disk serialization part of the first RNG checkpoint schema?
-  - Resolved 2026-07-27: No. Store logical stream metadata and synchronized RNG
-    words in the versioned in-memory checkpoint; defer any file encoding.
+  - Resolved 2026-08-09: No. There is currently no RNG checkpoint schema:
+    published resident RNG state rejects checkpoint/finalize and is neither
+    serialized nor restartable. Any future in-memory representation must still
+    defer file encoding.
   - Rationale: Current checkpoint boundaries restore CPU objects, while durable
     format, migration, and filesystem guarantees are explicitly out of scope.
   - Evidence:

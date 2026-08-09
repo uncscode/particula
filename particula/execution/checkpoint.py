@@ -13,6 +13,11 @@ family; schema-v2 checkpoints can retain one complete closed-map GAS or
 PARTICLES family and its optional final-volume sidecar. ``checkpoint()`` is
 nonterminal; ``finalize()`` caches a snapshot and terminally ends normal
 session use. No rollback is promised once a device operation has launched.
+
+A published resident coagulation RNG stream makes checkpoint and finalization
+fail closed before synchronization, conversion, or payload enumeration. Stream
+metadata and RNG words are intentionally not serialized, restored, inspected,
+or continued across restart.
 """
 
 from __future__ import annotations
@@ -221,6 +226,9 @@ class ResidentCheckpointController:
     then atomically changes the session to FINALIZED; later finalizations return
     the cached record without validation, synchronization, transfer, or
     allocation. A failed pre-transition snapshot leaves the source ACTIVE.
+    A published resident coagulation stream instead rejects checkpointing and
+    finalization before device or payload work because stream continuation is
+    intentionally unsupported.
     """
 
     def __init__(
@@ -283,6 +291,10 @@ class ResidentCheckpointController:
 
         Returns:
             A new independent checkpoint record.
+
+        Raises:
+            ValueError: If the lifecycle binding is invalid or a published
+                resident RNG stream would require unsupported continuation.
         """
         self._validate()
         import warp as wp
@@ -407,6 +419,10 @@ class ResidentCheckpointController:
 
         Returns:
             The cached immutable terminal checkpoint.
+
+        Raises:
+            ValueError: If a first finalization has an invalid lifecycle binding
+                or published resident RNG stream. The session remains ACTIVE.
         """
         if self._finalized is not None:
             return self._finalized

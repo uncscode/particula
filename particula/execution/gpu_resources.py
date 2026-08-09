@@ -102,7 +102,15 @@ class CondensationResources:
 
 @dataclass(frozen=True, eq=False)
 class CoagulationResources:
-    """Expose native coagulation output and persistent RNG sidecars."""
+    """Expose native coagulation outputs and one P1-initialized RNG sidecar.
+
+    The registry publishes this identity-bound view only after validating all
+    supplied sidecars and initializing the coagulation-only ``rng_states`` once
+    from immutable resident stream metadata. Repeated compatible acquisition
+    returns this view and its arrays by identity without allocation, reseeding,
+    readback, transfer, or synchronization. The sidecar has no wall-loss,
+    checkpoint-persistence, reset, or inspection API.
+    """
 
     collision_capacity: int
     collision_pairs: Any
@@ -328,7 +336,9 @@ class GPUResourceRegistry:
 
     Publication pins caller- or registry-allocated Warp objects by role. This
     validates identity and nonaliasing, not unverifiable allocator provenance.
-    No payload is read, copied, synchronized, or mutated by acquisition. Its
+    No payload is read, copied, synchronized, or mutated by acquisition, except
+    that first coagulation acquisition initializes its single P1-derived
+    coagulation-only RNG sidecar before publication. Its
     concrete-only :meth:`validate_pinned_session` seam lets lifecycle guards
     verify the exact active binding without resource acquisition or execution.
     Its private checkpoint enumeration reports acquired sidecars in manifest
@@ -1012,11 +1022,13 @@ class GPUResourceRegistry:
             )
         return int(pointer), int(pointer) + required
 
-    def _acquire(
+    def _acquire(  # noqa: C901
         self,
         manifest: ResourceManifest,
         supplied: dict[str, Any],
         capacity: int | None = None,
+        *,
+        publish: bool = True,
     ) -> dict[str, Any]:
         """Validate, allocate, and atomically publish one resource family.
 
@@ -1058,9 +1070,10 @@ class GPUResourceRegistry:
             if candidate[entry.role] is None:
                 candidate[entry.role] = self._allocate(entry, capacity)
         self._validate_nonalias(candidate, manifest.entries, capacity)
-        self._bindings[manifest.family] = candidate
-        if capacity is not None:
-            self._capacities[manifest.family] = capacity
+        if publish:
+            self._bindings[manifest.family] = candidate
+            if capacity is not None:
+                self._capacities[manifest.family] = capacity
         return candidate
 
     def acquire_condensation(
@@ -1112,7 +1125,15 @@ class GPUResourceRegistry:
         n_collisions: Any | None = None,
         rng_states: Any | None = None,
     ) -> CoagulationResources:
-        """Acquire fixed-capacity coagulation output and RNG sidecars.
+        """Acquire fixed-capacity coagulation outputs and one RNG sidecar.
+
+        The first successful acquisition validates supplied sidecars and
+        nonaliasing before allocating omitted arrays. It then initializes the
+        single ``(n_boxes,)`` ``wp.uint32`` coagulation sidecar from immutable
+        session stream metadata and publishes the view. Compatible later calls
+        return that exact view without allocation or reseeding. This is not a
+        wall-loss stream, reset or inspection API, hidden transfer,
+        synchronization, or checkpoint-persistence boundary.
 
         Args:
             collision_capacity: Positive, non-boolean integral collision bound.
@@ -1126,8 +1147,8 @@ class GPUResourceRegistry:
         Raises:
             TypeError: If capacity is not a non-boolean integral or a supplied
                 sidecar is not a Warp array.
-            ValueError: If capacity, schema, aliasing, or session signature is
-                incompatible with the established registry state.
+            ValueError: If capacity, schema, aliasing, session signature, or a
+                replacement request is incompatible with the established state.
         """
         if isinstance(collision_capacity, bool) or not isinstance(
             collision_capacity, Integral
@@ -1157,6 +1178,7 @@ class GPUResourceRegistry:
                 "rng_states": rng_states,
             },
             int(collision_capacity),
+            publish=already_published,
         )
         if not already_published:
             stream = self._session.metadata.stream
@@ -1190,17 +1212,12 @@ class GPUResourceRegistry:
                     ("wall_loss", temporary_wall_loss),
                 ),
             )
-            try:
-                registry.initialize()
-            except BaseException:
-                self._bindings.pop("coagulation", None)
-                self._capacities.pop("coagulation", None)
-                raise
+            registry.initialize()
+            view = CoagulationResources(int(collision_capacity), **bindings)
+            self._bindings["coagulation"] = bindings
+            self._capacities["coagulation"] = int(collision_capacity)
             self._coagulation_stream_registry = registry
-        if "coagulation" not in self._views:
-            self._views["coagulation"] = CoagulationResources(
-                int(collision_capacity), **bindings
-            )
+            self._views["coagulation"] = view
         return self._views["coagulation"]
 
     def acquire_wall_loss(

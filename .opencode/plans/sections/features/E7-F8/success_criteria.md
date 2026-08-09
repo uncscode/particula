@@ -2,6 +2,9 @@
 
 - [x] Every supported stochastic process/logical-box pair has a unique,
   versioned stream descriptor and deterministic initial state.
+- [x] Resident Brownian coagulation retains one P1-derived `(n_boxes,)`
+  `wp.uint32` sidecar by identity, initializes it once on acquisition, and always
+  dispatches with `initialize_rng=False`.
 - [ ] Brownian coagulation and wall loss use separate resident `(n_boxes,)`
   `wp.uint32` state arrays and preserve their identities across normal steps.
 - [ ] Normal scheduler steps never implicitly allocate, initialize, reset,
@@ -13,6 +16,9 @@
 - [ ] Disabled process/box work does not advance its stream.
 - [ ] A compatible checkpoint/restart split exactly matches uninterrupted RNG
   state and stochastic outputs on Warp CPU for covered configurations.
+- [x] Checkpoint and finalize fail closed before payload work after resident
+  coagulation-sidecar publication; no RNG persistence/restart continuation is
+  advertised.
 - [x] Malformed P1 IDs, seeds, arrays, dimensions, devices, or process manifests
   fail before caller-buffer mutation.
 - [ ] Post-launch uncertainty faults the session and is never advertised as an

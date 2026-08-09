@@ -708,6 +708,22 @@ def test_resident_scheduler_preflight_accepts_complete_refresh_window() -> None:
 
 
 @pytest.mark.warp
+def test_resident_scheduler_request_rejects_legacy_coagulation_state() -> None:
+    """Test legacy states cannot enter scheduled resident dispatch."""
+    from particula.execution.adapters.coagulation import (
+        WarpBrownianCoagulationExecutionState,
+    )
+
+    module = _resident_scheduler()
+    request = object.__new__(module.ResidentSimulationRequest)
+    legacy = object.__new__(WarpBrownianCoagulationExecutionState)
+    object.__setattr__(request, "coagulation", legacy)
+
+    with pytest.raises(TypeError, match="exact resident execution state"):
+        request.__post_init__()
+
+
+@pytest.mark.warp
 @pytest.mark.parametrize(
     ("ids", "dependencies"),
     [
@@ -895,7 +911,7 @@ def test_resident_scheduler_dispatches_resolved_nodes_once(
     )
     monkeypatch.setattr(
         module,
-        "WarpBrownianCoagulationExecutionAdapter",
+        "ResidentBrownianCoagulationExecutionAdapter",
         adapter("brownian_coagulation"),
     )
     monkeypatch.setattr(module, "ResidentDilutionAdapter", adapter("dilution"))

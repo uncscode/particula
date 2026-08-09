@@ -67,10 +67,12 @@ stream-identity boundary. It owns immutable host metadata and deterministic
 per-process/per-logical-box initial-word derivation, then explicitly initializes
 validated caller-owned Warp state buffers. Initialization allocates temporary
 NumPy/Warp copy sources only and deterministically overwrites retained buffers
-without acquiring, replacing, or rebinding them. It does not advance or reset
-buffers and is not integrated with package or top-level exports, resource
-registries, resident sessions, scheduling, or checkpoints. Those integrations
-and broader RNG policy remain deferred.
+without acquiring, replacing, or rebinding them. One narrow resident Brownian
+integration retains this metadata in the session: first coagulation-resource
+acquisition initializes one registry-owned sidecar, and scheduled dispatch
+retains it by identity with `initialize_rng=False`. There is no wall-loss RNG
+integration, reset or inspection API, checkpoint persistence, or restart
+continuation; broader RNG policy remains deferred.
 
 `particula.execution.adapters.condensation` contains concrete-only P2
 condensation state carriers and shipped P3/P4 selected CPU/Warp adapters. The
