@@ -32,10 +32,19 @@ from typing import Any, Literal, cast
 
 import warp as wp
 
+from particula.execution.communication import (
+    CommunicationConfiguration,
+    CommunicationTransportMode,
+    validate_communication_configuration,
+)
 from particula.execution.gpu_session import (
     ResidentDimensions,
     ResidentLifecycle,
     ResidentSession,
+)
+from particula.gpu.kernels.communication import (
+    GasCommunicationBuffers,
+    ParticleCommunicationBuffers,
 )
 from particula.gpu.kernels.condensation import CondensationScratchBuffers
 from particula.gpu.kernels.exhaustion import ResamplingBuffers
@@ -54,11 +63,12 @@ __all__ = [
     "CoagulationResources",
     "WallLossResources",
     "NucleationResources",
+    "CommunicationResources",
 ]
 
 _INT32_MAX = 2**31 - 1
 _MAX_SIZE = (1 << 63) - 1
-_ShapeKind = Literal["b", "bn", "bs", "bns", "bc2"]
+_ShapeKind = Literal["b", "bn", "bs", "bns", "bc2", "e", "en"]
 
 
 @dataclass(frozen=True)
@@ -111,6 +121,15 @@ class NucleationResources:
     finalized_demand: NucleationFinalizedDemandBuffers
     diagnostics: NucleationDiagnosticBuffers
     exhaustion: NucleationExhaustionBuffers
+
+
+@dataclass(frozen=True, eq=False)
+class CommunicationResources:
+    """Expose one exact resident communication configuration and work record."""
+
+    configuration: CommunicationConfiguration
+    buffers: GasCommunicationBuffers | ParticleCommunicationBuffers
+    final_volumes: Any | None
 
 
 def _entry(
@@ -194,6 +213,39 @@ _NUCLEATION = ResourceManifest(
     ),
 )
 
+_GAS_COMMUNICATION = ResourceManifest(
+    "communication_gas",
+    (
+        _entry("source_boxes", "communication_gas", wp.int32, "e"),
+        _entry("destination_boxes", "communication_gas", wp.int32, "e"),
+        _entry("enabled", "communication_gas", wp.int32, "e"),
+        _entry("rates", "communication_gas", wp.float64, "e"),
+        _entry("amounts", "communication_gas", wp.float64, "bs"),
+        _entry("amount_deltas", "communication_gas", wp.float64, "bs"),
+        _entry("outbound_amounts", "communication_gas", wp.float64, "bs"),
+    ),
+)
+_PARTICLE_COMMUNICATION = ResourceManifest(
+    "communication_particles",
+    (
+        _entry("source_boxes", "communication_particles", wp.int32, "e"),
+        _entry("destination_boxes", "communication_particles", wp.int32, "e"),
+        _entry("enabled", "communication_particles", wp.int32, "e"),
+        _entry("rates", "communication_particles", wp.float64, "e"),
+        _entry("source_debits", "communication_particles", wp.float64, "bn"),
+        _entry(
+            "destination_credits", "communication_particles", wp.float64, "bn"
+        ),
+        _entry("assignments", "communication_particles", wp.int32, "en"),
+        _entry(
+            "request_concentrations",
+            "communication_particles",
+            wp.float64,
+            "en",
+        ),
+    ),
+)
+
 
 def _primary_arrays(session: ResidentSession) -> tuple[Any, ...]:
     """Return the protected resident primary arrays in canonical order."""
@@ -266,9 +318,17 @@ class GPUResourceRegistry:
         """Return the canonical immutable direct-module manifest set.
 
         Returns:
-            The condensation, coagulation, wall-loss, and nucleation manifests.
+            All established sidecar manifests, including the mutually exclusive
+            gas and particle communication families.
         """
-        return (_CONDENSATION, _COAGULATION, _WALL_LOSS, _NUCLEATION)
+        return (
+            _CONDENSATION,
+            _COAGULATION,
+            _WALL_LOSS,
+            _NUCLEATION,
+            _GAS_COMMUNICATION,
+            _PARTICLE_COMMUNICATION,
+        )
 
     def _session_signature(self) -> tuple[Any, ...]:
         """Build the pinned lifecycle, dimension, device, and identity
@@ -651,6 +711,14 @@ class GPUResourceRegistry:
             if capacity is None:
                 raise ValueError("collision capacity is required.")
             return (dimensions.n_boxes, capacity, 2)
+        if entry.shape_kind == "e":
+            if capacity is None:
+                raise ValueError("communication edge capacity is required.")
+            return (capacity,)
+        if entry.shape_kind == "en":
+            if capacity is None:
+                raise ValueError("communication edge capacity is required.")
+            return (capacity, dimensions.n_particles)
         return shapes[entry.shape_kind]
 
     def _validate_array(
@@ -1058,6 +1126,190 @@ class GPUResourceRegistry:
         if "wall_loss" not in self._views:
             self._views["wall_loss"] = WallLossResources(**bindings)
         return self._views["wall_loss"]
+
+    def acquire_communication(  # noqa: C901
+        self,
+        configuration: CommunicationConfiguration,
+        *,
+        buffers: GasCommunicationBuffers
+        | ParticleCommunicationBuffers
+        | None = None,
+    ) -> CommunicationResources:
+        """Pin one closed resident communication map and native work record.
+
+        P1 configuration validation is deliberately performed only here. Later
+        execution performs metadata-only identity validation through
+        :meth:`validate_communication_resources`.
+        """
+        self._validate_session_signature()
+        if type(configuration) is not CommunicationConfiguration:
+            raise TypeError(
+                "configuration must be an exact CommunicationConfiguration."
+            )
+        validated = validate_communication_configuration(
+            configuration, self._session.dimensions, self._signature[2]
+        )
+        if validated is not configuration:
+            raise ValueError("configuration validation must retain identity.")
+        map_data = configuration.communication_map
+        final_volumes = configuration.prescribed_volume.final_volumes
+        if final_volumes is not None:
+            volume_entry = ManifestEntry(
+                "final_volumes", "communication", wp.float64, "b"
+            )
+            volume_range = self._validate_array(
+                volume_entry, final_volumes, capacity=None
+            )
+            self._reject_primary_aliases([final_volumes])
+            registered = [
+                value
+                for bindings in self._bindings.values()
+                for value in bindings.values()
+            ]
+            if any(final_volumes is value for value in registered) or any(
+                self._ranges_overlap(volume_range, self._array_range(value))
+                for value in registered
+            ):
+                raise ValueError(
+                    "final_volumes must not alias resident resources."
+                )
+        mode = map_data.transport_mode
+        if mode not in (
+            CommunicationTransportMode.GAS,
+            CommunicationTransportMode.PARTICLES,
+        ):
+            raise ValueError(
+                "resident communication supports GAS or PARTICLES only."
+            )
+        family = (
+            "communication_gas"
+            if mode is CommunicationTransportMode.GAS
+            else "communication_particles"
+        )
+        manifest = (
+            _GAS_COMMUNICATION
+            if mode is CommunicationTransportMode.GAS
+            else _PARTICLE_COMMUNICATION
+        )
+        expected = (
+            GasCommunicationBuffers
+            if mode is CommunicationTransportMode.GAS
+            else ParticleCommunicationBuffers
+        )
+        if buffers is not None and type(buffers) is not expected:
+            raise TypeError(
+                "buffers must match the communication transport mode."
+            )
+        supplied = {
+            "source_boxes": map_data.source_boxes,
+            "destination_boxes": map_data.destination_boxes,
+            "enabled": map_data.enabled,
+            "rates": map_data.rates,
+        }
+        for entry in manifest.entries[4:]:
+            supplied[entry.role] = (
+                None if buffers is None else getattr(buffers, entry.role)
+            )
+        if buffers is not None and any(
+            value is None for value in supplied.values()
+        ):
+            raise ValueError("communication buffers must be complete.")
+        bindings = self._acquire(
+            manifest, supplied, int(map_data.edge_capacity)
+        )
+        if family not in self._views:
+            if mode is CommunicationTransportMode.GAS:
+                native = GasCommunicationBuffers(
+                    bindings["amounts"],
+                    bindings["amount_deltas"],
+                    bindings["outbound_amounts"],
+                )
+            else:
+                native = ParticleCommunicationBuffers(
+                    bindings["source_debits"],
+                    bindings["destination_credits"],
+                    bindings["assignments"],
+                    bindings["request_concentrations"],
+                )
+            self._views[family] = CommunicationResources(
+                configuration,
+                native,
+                configuration.prescribed_volume.final_volumes,
+            )
+        view = self._views[family]
+        if view.configuration is not configuration:
+            raise ValueError(
+                "Established communication configuration cannot change."
+            )
+        return view
+
+    def validate_communication_resources(
+        self, session: ResidentSession, resources: CommunicationResources
+    ) -> None:
+        """Metadata-validate an established communication resource view."""
+        self.validate_pinned_session(session)
+        if type(resources) is not CommunicationResources:
+            raise TypeError(
+                "resources must be an exact CommunicationResources."
+            )
+        configuration = resources.configuration
+        if type(configuration) is not CommunicationConfiguration:
+            raise TypeError(
+                "configuration must be an exact CommunicationConfiguration."
+            )
+        mode = configuration.communication_map.transport_mode
+        family = (
+            "communication_gas"
+            if mode is CommunicationTransportMode.GAS
+            else "communication_particles"
+        )
+        manifest = (
+            _GAS_COMMUNICATION
+            if mode is CommunicationTransportMode.GAS
+            else _PARTICLE_COMMUNICATION
+        )
+        if mode not in (
+            CommunicationTransportMode.GAS,
+            CommunicationTransportMode.PARTICLES,
+        ):
+            raise ValueError(
+                "resident communication supports GAS or PARTICLES only."
+            )
+        if resources is not self._views.get(family):
+            raise ValueError(
+                "resources must be the published communication view."
+            )
+        bindings = self._bindings[family]
+        if (
+            resources.final_volumes
+            is not configuration.prescribed_volume.final_volumes
+        ):
+            raise ValueError("communication final volumes binding changed.")
+        if resources.final_volumes is not None:
+            self._validate_array(
+                ManifestEntry(
+                    "final_volumes", "communication", wp.float64, "b"
+                ),
+                resources.final_volumes,
+                capacity=None,
+            )
+        values = {
+            "source_boxes": configuration.communication_map.source_boxes,
+            "destination_boxes": (
+                configuration.communication_map.destination_boxes
+            ),
+            "enabled": configuration.communication_map.enabled,
+            "rates": configuration.communication_map.rates,
+        }
+        values.update(self._record_bindings(resources.buffers))
+        for entry in manifest.entries:
+            if values.get(entry.role) is not bindings[entry.role]:
+                raise ValueError("communication resource bindings changed.")
+            self._validate_array(
+                entry,
+                bindings[entry.role],
+                configuration.communication_map.edge_capacity,
+            )
 
     @staticmethod
     def _record_bindings(record: Any) -> dict[str, Any]:

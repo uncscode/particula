@@ -580,6 +580,8 @@ def test_registry_requires_active_session_and_exposes_all_manifests() -> None:
         "coagulation",
         "wall_loss",
         "nucleation",
+        "communication_gas",
+        "communication_particles",
     )
     assert all(
         entry.role and entry.dtype

@@ -116,10 +116,11 @@ remote, or delta persistence, or guarantee rollback after an asynchronous device
 writer launches. See
 [ADR-007](architecture/decisions/ADR-007-resident-session-checkpoint-finalize-restart.md).
 
-Restart compatibility is exact and fail-closed: only schema version `1`, carrier
-type `"ResidentSession"`, ACTIVE records, complete valid payload schemas, and an
-exactly equal `Device` are accepted. Other versions, schemas, malformed records,
-non-ACTIVE checkpoint records, and device mismatches reject. Finalization makes
+Restart compatibility is exact and fail-closed: schema-v1 noncommunication and
+schema-v2 optional-communication records with carrier type `"ResidentSession"`,
+ACTIVE records, complete valid payload schemas, and an exactly equal `Device` are
+accepted. Other versions, schemas, malformed records, non-ACTIVE checkpoint
+records, and device mismatches reject. Finalization makes
 its source session terminal but returns an ACTIVE checkpoint eligible for explicit
 restart. E7-F5 P2 supplies declaration-only scheduling; E7-F7 transport and
 E7-F8 detailed RNG-stream policy remain future work. E7-F7 P4 particle
@@ -207,9 +208,11 @@ protocol (`GAS_CONCENTRATION_SNAPSHOT` and `SATURATION_RATIO_SNAPSHOT`), not a
 callback API. Its separately caller-owned contiguous float64 `(B, S)` outputs
 are checked against primaries, published sidecars, and one another; canonical
 empty shapes are successful write-free no-ops. The scheduler accepts only the
-complete ten-node resolver-produced schedule and one exact active
-session/registry/closed-guard binding. It dispatches that resolved order, using
-the thermodynamic consumer windows for condensation and diagnostics. Neither
+complete twelve-node resolver-produced schedule and one exact active
+session/registry/closed-guard binding. Communication and optional prescribed
+volume evolution are closed-map barriers that run first and invalidate only
+saturation ratio; it dispatches the remaining resolved order using the
+thermodynamic consumer windows for condensation and diagnostics. Neither
 boundary is package-exported and neither uploads, restores, synchronizes,
 checkpoints, acquires/replaces storage, resizes, or falls back. After a writer
 may launch, a failure closes the token and faults the session without rollback.

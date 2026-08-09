@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from particula.gas import EnvironmentData, GasData
     from particula.particles import ParticleData
 
-_SCHEMA_VERSION = 1
+_SCHEMA_VERSION = 2
 _PRIMARY_ROLES = (
     ("particles", "masses"),
     ("particles", "concentration"),
@@ -116,6 +116,17 @@ class ResidentCheckpoint:
     gas: "GasData"
     environment: "EnvironmentData"
     payloads: tuple[CheckpointPayload, ...]
+    communication: "CommunicationCheckpointMetadata | None" = None
+
+
+@dataclass(frozen=True)
+class CommunicationCheckpointMetadata:
+    """Describe one optional pinned communication family without live arrays."""
+
+    mode: str
+    form: str
+    edge_capacity: int
+    has_final_volumes: bool
 
 
 def _payload(
@@ -304,6 +315,27 @@ class ResidentCheckpointController:
                 self._registry._enumerate_resources()
             )
         )
+        resources = self._registry._views.get("communication_gas") or (
+            self._registry._views.get("communication_particles")
+        )
+        if resources is not None and resources.final_volumes is not None:
+            family = (
+                "communication_gas"
+                if (
+                    resources.configuration.communication_map.transport_mode.value
+                    == "gas"
+                )
+                else "communication_particles"
+            )
+            payloads.append(
+                _payload(
+                    family,
+                    "final_volumes",
+                    resources.final_volumes,
+                    resources.configuration.communication_map.edge_capacity,
+                )
+            )
+        communication = self._communication_metadata()
         return ResidentCheckpoint(
             _SCHEMA_VERSION,
             "ResidentSession",
@@ -317,6 +349,24 @@ class ResidentCheckpointController:
             gas,
             environment,
             tuple(payloads),
+            communication,
+        )
+
+    def _communication_metadata(self) -> CommunicationCheckpointMetadata | None:
+        """Return metadata for the sole optional communication view."""
+        views = self._registry._views
+        resources = views.get("communication_gas") or views.get(
+            "communication_particles"
+        )
+        if resources is None:
+            return None
+        configuration = resources.configuration
+        map_data = configuration.communication_map
+        return CommunicationCheckpointMetadata(
+            map_data.transport_mode.value,
+            map_data.form.value,
+            int(map_data.edge_capacity),
+            resources.final_volumes is not None,
         )
 
     def finalize(self) -> ResidentCheckpoint:
@@ -401,6 +451,7 @@ def restart_resident_session(  # noqa: C901
     restored_gas = cast(Any, session.gas)
     restored_gas.vapor_pressure.assign(unpack("gas", "vapor_pressure"))
     restored_gas.partitioning.assign(unpack("gas", "partitioning"))
+    from particula.execution import gpu_resources
     from particula.execution.gpu_resources import GPUResourceRegistry
 
     registry = GPUResourceRegistry(session)
@@ -409,9 +460,26 @@ def restart_resident_session(  # noqa: C901
         manifests = {
             manifest.family: manifest for manifest in registry.manifests
         }
+        manifests.update(
+            {
+                "communication_gas": gpu_resources._GAS_COMMUNICATION,
+                "communication_particles": (
+                    gpu_resources._PARTICLE_COMMUNICATION
+                ),
+            }
+        )
         grouped: dict[str, dict[str, Any]] = {}
+        final_volumes: dict[str, Any] = {}
         capacities: dict[str, int | None] = {}
         for item in resource_payloads:
+            if item.role == "final_volumes":
+                final_volumes[item.family] = wp.array(
+                    unpack(item.family, item.role),
+                    dtype=wp.float64,
+                    device=target_device.native,
+                )
+                capacities[item.family] = item.capacity
+                continue
             value = unpack(item.family, item.role)
             dtype = {"<f8": wp.float64, "<i4": wp.int32, "<u4": wp.uint32}.get(
                 np.dtype(item.dtype).str
@@ -435,6 +503,41 @@ def restart_resident_session(  # noqa: C901
                 registry.acquire_coagulation(cast(int, capacities[family]))
             elif family == "wall_loss":
                 registry.acquire_wall_loss()
+            elif family in ("communication_gas", "communication_particles"):
+                metadata = checkpoint.communication
+                if metadata is None:
+                    raise ValueError("communication checkpoint lacks metadata.")
+                from particula.execution.communication import (
+                    CommunicationConfiguration,
+                    CommunicationMap,
+                    CommunicationMapForm,
+                    CommunicationTransportMode,
+                    PrescribedVolumeUpdate,
+                )
+
+                mode = CommunicationTransportMode(metadata.mode)
+                if (family == "communication_gas") != (
+                    mode is CommunicationTransportMode.GAS
+                ):
+                    raise ValueError(
+                        "communication checkpoint mode is invalid."
+                    )
+                map_data = CommunicationMap(
+                    CommunicationMapForm(metadata.form),
+                    mode,
+                    metadata.edge_capacity,
+                    bindings["source_boxes"],
+                    bindings["destination_boxes"],
+                    bindings["enabled"],
+                    bindings["rates"],
+                )
+                registry.acquire_communication(
+                    CommunicationConfiguration(
+                        map_data,
+                        PrescribedVolumeUpdate(final_volumes.get(family)),
+                        (),
+                    )
+                )
             else:
                 registry.acquire_nucleation()
     guard = ResidentStepGuard(session, registry)
@@ -452,13 +555,30 @@ def _preflight_restart(  # noqa: C901
         raise TypeError("checkpoint must be an exact ResidentCheckpoint.")
     if (
         type(checkpoint.schema_version) is not int
-        or checkpoint.schema_version != _SCHEMA_VERSION
+        or checkpoint.schema_version not in (1, _SCHEMA_VERSION)
         or type(checkpoint.carrier_type) is not str
         or checkpoint.carrier_type != "ResidentSession"
     ):
         raise ValueError("Unsupported resident checkpoint schema.")
     if checkpoint.lifecycle is not ResidentLifecycle.ACTIVE:
         raise ValueError("checkpoint must describe an active session.")
+    if checkpoint.schema_version == 1 and checkpoint.communication is not None:
+        raise ValueError(
+            "v1 checkpoints cannot contain communication metadata."
+        )
+    if checkpoint.schema_version == _SCHEMA_VERSION:
+        metadata = checkpoint.communication
+        if metadata is not None:
+            if type(metadata) is not CommunicationCheckpointMetadata:
+                raise TypeError("communication metadata is invalid.")
+            if (
+                metadata.mode not in ("gas", "particles")
+                or metadata.form not in ("one_dimensional", "arbitrary_pairs")
+                or type(metadata.edge_capacity) is not int
+                or metadata.edge_capacity < 0
+                or type(metadata.has_final_volumes) is not bool
+            ):
+                raise ValueError("communication metadata is invalid.")
     if type(checkpoint.dimensions) is not ResidentDimensions:
         raise TypeError(
             "checkpoint dimensions must be exact ResidentDimensions."
@@ -558,18 +678,48 @@ def _preflight_restart(  # noqa: C901
             or item.capacity is not None
         ):
             raise ValueError("checkpoint primary payload metadata is invalid.")
-    _validate_resource_payloads(payloads[len(_PRIMARY_ROLES) :], dimensions)
+    communication_family, has_final_volumes = _validate_resource_payloads(
+        payloads[len(_PRIMARY_ROLES) :], dimensions
+    )
+    if checkpoint.schema_version == 1 and communication_family is not None:
+        raise ValueError(
+            "v1 checkpoints cannot contain communication payloads."
+        )
+    if checkpoint.schema_version == _SCHEMA_VERSION:
+        metadata = checkpoint.communication
+        if (metadata is None) != (communication_family is None):
+            raise ValueError(
+                "communication metadata must match communication payloads."
+            )
+        if metadata is not None and (
+            metadata.mode
+            != (
+                "gas"
+                if communication_family == "communication_gas"
+                else "particles"
+            )
+            or metadata.edge_capacity
+            != next(
+                item.capacity
+                for item in payloads
+                if item.family == communication_family
+            )
+            or metadata.has_final_volumes != has_final_volumes
+        ):
+            raise ValueError("communication metadata does not match payloads.")
     return primary
 
 
 def _validate_resource_payloads(  # noqa: C901
     payloads: tuple[CheckpointPayload, ...], dimensions: ResidentDimensions
-) -> None:
+) -> tuple[str | None, bool]:
     """Validate ordered acquired-sidecar descriptors before resident setup."""
     if not payloads:
-        return
+        return None, False
     index = 0
     seen_families: set[str] = set()
+    communication_family: str | None = None
+    has_final_volumes = False
     shape_map = {
         "b": (dimensions.n_boxes,),
         "bn": (dimensions.n_boxes, dimensions.n_particles),
@@ -589,16 +739,37 @@ def _validate_resource_payloads(  # noqa: C901
         gpu_resources._COAGULATION,
         gpu_resources._WALL_LOSS,
         gpu_resources._NUCLEATION,
+        gpu_resources._GAS_COMMUNICATION,
+        gpu_resources._PARTICLE_COMMUNICATION,
     ):
         if index >= len(payloads) or payloads[index].family != manifest.family:
             continue
         if manifest.family in seen_families:
             raise ValueError("checkpoint resource descriptors are duplicated.")
+        if (
+            manifest.family in ("communication_gas", "communication_particles")
+            and communication_family is not None
+        ):
+            raise ValueError(
+                "checkpoint contains multiple communication modes."
+            )
         seen_families.add(manifest.family)
         capacity = payloads[index].capacity
-        if manifest.family == "coagulation" and capacity is None:
+        if (
+            manifest.family
+            in ("coagulation", "communication_gas", "communication_particles")
+            and capacity is None
+        ):
             raise ValueError("coagulation checkpoint lacks capacity.")
-        if manifest.family != "coagulation" and capacity is not None:
+        if (
+            manifest.family
+            not in (
+                "coagulation",
+                "communication_gas",
+                "communication_particles",
+            )
+            and capacity is not None
+        ):
             raise ValueError("checkpoint resource capacity is invalid.")
         for entry in manifest.entries:
             if index >= len(payloads):
@@ -610,6 +781,10 @@ def _validate_resource_payloads(  # noqa: C901
                     cast(int, capacity),
                     2,
                 )
+            elif entry.shape_kind == "e":
+                shape = (cast(int, capacity),)
+            elif entry.shape_kind == "en":
+                shape = (cast(int, capacity), dimensions.n_particles)
             else:
                 shape = shape_map[entry.shape_kind]
             dtype = np.dtype(
@@ -629,8 +804,31 @@ def _validate_resource_payloads(  # noqa: C901
                     "checkpoint resource payload metadata is invalid."
                 )
             index += 1
+        if (
+            manifest.family in ("communication_gas", "communication_particles")
+            and index < len(payloads)
+            and payloads[index].family == manifest.family
+            and payloads[index].role == "final_volumes"
+        ):
+            item = payloads[index]
+            if (
+                item.dtype != np.dtype(np.float64).str
+                or item.shape != (dimensions.n_boxes,)
+                or item.capacity != capacity
+            ):
+                raise ValueError(
+                    "checkpoint communication volume metadata is invalid."
+                )
+            index += 1
+            has_final_volumes = True
+        if manifest.family in (
+            "communication_gas",
+            "communication_particles",
+        ):
+            communication_family = manifest.family
     if index != len(payloads):
         raise ValueError("checkpoint resource family is invalid.")
+    return communication_family, has_final_volumes
 
 
 # The explicit aliases preserve a discoverable concrete-only recovery spelling.

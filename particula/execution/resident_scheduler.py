@@ -1,4 +1,4 @@
-"""Run the closed ten-node GPU-resident simulation schedule.
+"""Run the closed twelve-node GPU-resident simulation schedule.
 
 This is a concrete direct-import-only composition boundary. It retains every
 resident object by identity and performs no upload, restore, synchronization,
@@ -45,6 +45,10 @@ from particula.execution.process_graph import (
     _is_resolver_produced_graph,
     resolve_canonical_topological_order,
 )
+from particula.execution.resident_communication import (
+    ResidentCommunicationExecutor,
+    ResidentCommunicationRequest,
+)
 from particula.execution.scheduler import (
     ResolvedTimestepSchedule,
     is_resolver_produced_schedule,
@@ -62,6 +66,8 @@ from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
 
 _COMPLETE_IDS = frozenset(
     {
+        "communication",
+        "volume_evolution",
         "environment_update",
         "gas_update",
         "vapor_pressure_refresh",
@@ -92,9 +98,9 @@ def _registry_type() -> type[object]:
 class ResidentSimulationRequest:
     """Bind one complete resolved simulation loop to resident resources.
 
-    The request retains all carriers by identity for the canonical ten-node
-    graph. It is concrete-only and does not acquire resources, begin a step, or
-    validate physical process inputs.
+        The request retains all carriers by identity for the canonical
+        twelve-node graph. It is concrete-only and does not acquire resources,
+        begin a step, or validate physical process inputs.
 
     Attributes:
         session: Exact active resident session.
@@ -127,6 +133,7 @@ class ResidentSimulationRequest:
     diagnostics: ResidentDiagnosticsPlan
     environment_update: ResidentEnvironmentUpdateRequest | None = None
     gas_update: ResidentGasUpdateRequest | None = None
+    communication: ResidentCommunicationRequest | None = None
 
     def __post_init__(self) -> None:
         """Validate exact request components and optional update types.
@@ -169,13 +176,18 @@ class ResidentSimulationRequest:
             and type(self.gas_update) is not ResidentGasUpdateRequest
         ):
             raise TypeError("gas_update must be an exact request or None.")
+        if (
+            self.communication is not None
+            and type(self.communication) is not ResidentCommunicationRequest
+        ):
+            raise TypeError("communication must be an exact request or None.")
 
 
 class ResidentSimulationScheduler:
     """Execute one canonical fully resolved resident timestep at a time.
 
     Each successful call opens and completes exactly one lifecycle token while
-    dispatching the resolved ten-node schedule. It neither transfers nor
+    dispatching the resolved twelve-node schedule. It neither transfers nor
     restores data, acquires resources, synchronizes, falls back, or rolls back
     after a writer-capable operation may have launched.
     """
@@ -195,7 +207,7 @@ class ResidentSimulationScheduler:
             )
         self._request = request
 
-    def _validate(self, duration: object) -> None:
+    def _validate(self, duration: object) -> None:  # noqa: C901
         """Preflight the lifecycle, graph, request, and duration bindings.
 
         Args:
@@ -229,9 +241,14 @@ class ResidentSimulationScheduler:
                 "schedule must be produced for the exact resolved graph."
             )
         ids = request.schedule.ordered_node_ids
-        if frozenset(ids) != _COMPLETE_IDS or len(ids) != len(_COMPLETE_IDS):
+        complete_ids = frozenset(ids)
+        if complete_ids != _COMPLETE_IDS or len(ids) != len(complete_ids):
             raise ValueError(
-                "schedule must contain exactly the complete ten-node loop."
+                "schedule must contain exactly the complete resident loop."
+            )
+        if request.communication is None:
+            raise ValueError(
+                "complete barrier schedule requires communication request."
             )
         if ids != resolve_canonical_topological_order(
             request.schedule.nodes, request.schedule.dependencies
@@ -278,7 +295,7 @@ class ResidentSimulationScheduler:
                 "schedule must retain complete thermodynamic refresh windows."
             )
 
-    def _validate_request_nodes(
+    def _validate_request_nodes(  # noqa: C901
         self, graph_by_id: dict[str, ProcessNode]
     ) -> None:
         """Validate request bindings against exact resolved graph nodes.
@@ -330,6 +347,22 @@ class ResidentSimulationScheduler:
                 raise ValueError(
                     "process request does not match resident binding."
                 )
+        communication = request.communication
+        if communication is not None:
+            if (
+                communication.session is not request.session
+                or communication.registry is not request.registry
+                or communication.graph is not request.graph
+                or communication.duration != request.dilution.time_step
+                or communication.communication_node
+                is not graph_by_id.get("communication")
+                or communication.volume_evolution_node
+                is not graph_by_id.get("volume_evolution")
+            ):
+                raise ValueError(
+                    "communication request does not match resolved binding."
+                )
+            ResidentCommunicationExecutor(communication).validate()
         condensation = request.condensation.state
         if (
             condensation.particles is not request.session.particles
@@ -433,6 +466,11 @@ class ResidentSimulationScheduler:
         wall_loss = ResidentWallLossAdapter()
         nucleation = ResidentNucleationAdapter()
         diagnostics = ResidentDiagnosticsExecutor()
+        communication = (
+            None
+            if request.communication is None
+            else ResidentCommunicationExecutor(request.communication)
+        )
         token = request.guard.begin_step(duration)
         writer_called = False
         try:
@@ -442,7 +480,17 @@ class ResidentSimulationScheduler:
                 if node_id in _VIRTUAL_IDS:
                     continue
                 writer_called = True
-                if node_id == "environment_update":
+                if node_id == "communication":
+                    if communication is None:
+                        raise ValueError("communication request is required.")
+                    communication.execute_communication()
+                    thermal.record_completed(node)
+                elif node_id == "volume_evolution":
+                    if communication is None:
+                        raise ValueError("communication request is required.")
+                    communication.execute_volume_evolution()
+                    thermal.record_completed(node)
+                elif node_id == "environment_update":
                     updates.execute(request.environment_update)
                     thermal.record_completed(node)
                 elif node_id == "gas_update":

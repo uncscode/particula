@@ -117,6 +117,28 @@ class ResidentThermodynamicUpdateRequest:
 
 
 _ROLE_SCHEMAS = {
+    "communication": (
+        NodeKind.COMMUNICATION,
+        frozenset(
+            {
+                ResourceRequirement.PARTICLES,
+                ResourceRequirement.GAS,
+                ResourceRequirement.PROCESS_SIDECARS,
+            }
+        ),
+        frozenset({InvalidatedState.SATURATION_RATIO}),
+    ),
+    "volume_evolution": (
+        NodeKind.VOLUME_EVOLUTION,
+        frozenset(
+            {
+                ResourceRequirement.PARTICLES,
+                ResourceRequirement.GAS,
+                ResourceRequirement.PROCESS_SIDECARS,
+            }
+        ),
+        frozenset({InvalidatedState.SATURATION_RATIO}),
+    ),
     "environment_update": (
         NodeKind.ENVIRONMENT_UPDATE,
         frozenset({ResourceRequirement.ENVIRONMENT}),

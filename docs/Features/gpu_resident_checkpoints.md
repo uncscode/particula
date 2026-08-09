@@ -1,5 +1,15 @@
 # GPU resident checkpoints
 
+Current controllers create schema-v2 checkpoints; v1 noncommunication
+checkpoints remain restart-compatible. Resident communication is a concrete-only
+closed-map barrier: communication runs before optional prescribed volume
+evolution, and both invalidate saturation ratio only.
+
+The barrier resources and executor are direct imports under
+`particula.execution`; they are not package or top-level exports. Schema-v2
+restart creates fresh communication arrays and bindings rather than reusing
+source identities.
+
 The direct-import-only checkpoint boundary is available from
 `particula.execution.checkpoint`; it is deliberately not exported by
 `particula.execution` or the top-level package. Create a

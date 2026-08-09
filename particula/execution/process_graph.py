@@ -37,6 +37,8 @@ class NodeKind(str, Enum):
     VAPOR_PRESSURE_REFRESH = "vapor_pressure_refresh"
     SATURATION_REFRESH = "saturation_refresh"
     DIAGNOSTIC = "diagnostic"
+    COMMUNICATION = "communication"
+    VOLUME_EVOLUTION = "volume_evolution"
 
 
 class ResourceRequirement(str, Enum):
@@ -190,6 +192,32 @@ class _NodeSchema:
 
 _NODE_CATALOGUE = (
     _NodeSchema(
+        "communication",
+        NodeKind.COMMUNICATION,
+        None,
+        frozenset(
+            {
+                ResourceRequirement.PARTICLES,
+                ResourceRequirement.GAS,
+                ResourceRequirement.PROCESS_SIDECARS,
+            }
+        ),
+        frozenset({InvalidatedState.SATURATION_RATIO}),
+    ),
+    _NodeSchema(
+        "volume_evolution",
+        NodeKind.VOLUME_EVOLUTION,
+        None,
+        frozenset(
+            {
+                ResourceRequirement.PARTICLES,
+                ResourceRequirement.GAS,
+                ResourceRequirement.PROCESS_SIDECARS,
+            }
+        ),
+        frozenset({InvalidatedState.SATURATION_RATIO}),
+    ),
+    _NodeSchema(
         "environment_update",
         NodeKind.ENVIRONMENT_UPDATE,
         None,
@@ -312,6 +340,12 @@ _NODE_CATALOGUE = (
 
 _ALLOWED_EDGES = frozenset(
     {
+        ("communication", "volume_evolution"),
+        *(
+            ("volume_evolution", schema.node_id)
+            for schema in _NODE_CATALOGUE
+            if schema.node_id not in {"communication", "volume_evolution"}
+        ),
         ("environment_update", "vapor_pressure_refresh"),
         ("environment_update", "saturation_refresh"),
         ("gas_update", "saturation_refresh"),

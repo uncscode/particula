@@ -113,6 +113,28 @@ def _node(node_id: str) -> ProcessNode:
             invalidates,
         )
     declarations = {
+        "communication": (
+            NodeKind.COMMUNICATION,
+            frozenset(
+                {
+                    ResourceRequirement.PARTICLES,
+                    ResourceRequirement.GAS,
+                    ResourceRequirement.PROCESS_SIDECARS,
+                }
+            ),
+            frozenset({InvalidatedState.SATURATION_RATIO}),
+        ),
+        "volume_evolution": (
+            NodeKind.VOLUME_EVOLUTION,
+            frozenset(
+                {
+                    ResourceRequirement.PARTICLES,
+                    ResourceRequirement.GAS,
+                    ResourceRequirement.PROCESS_SIDECARS,
+                }
+            ),
+            frozenset({InvalidatedState.SATURATION_RATIO}),
+        ),
         "environment_update": (
             NodeKind.ENVIRONMENT_UPDATE,
             frozenset({ResourceRequirement.ENVIRONMENT}),
@@ -210,6 +232,8 @@ def test_enums_expose_the_complete_closed_value_sets() -> None:
         "vapor_pressure_refresh",
         "saturation_refresh",
         "diagnostic",
+        "communication",
+        "volume_evolution",
     }
     assert {resource.value for resource in ResourceRequirement} == {
         "particles",
@@ -228,6 +252,8 @@ def test_enums_expose_the_complete_closed_value_sets() -> None:
 def test_every_catalogue_node_resolves_only_with_exact_declaration() -> None:
     """Test each catalogue row is accepted by the closed resolver."""
     node_ids = (
+        "communication",
+        "volume_evolution",
         "environment_update",
         "gas_update",
         "vapor_pressure_refresh",

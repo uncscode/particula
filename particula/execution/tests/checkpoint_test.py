@@ -11,6 +11,7 @@ import pytest
 from particula.execution import Backend, Device
 from particula.execution.checkpoint import (
     CheckpointPayload,
+    CommunicationCheckpointMetadata,
     ResidentCheckpoint,
     _payload,
     _validate_payload,
@@ -303,6 +304,132 @@ def test_restart_restores_each_acquired_resource_family() -> None:
         "nucleation",
     )
     assert restored_registry._capacities["coagulation"] == 1
+
+
+@pytest.mark.warp
+def test_restart_restores_pinned_gas_communication_resources() -> None:
+    """Communication checkpoint payloads restart as fresh pinned resources."""
+    wp = pytest.importorskip("warp")
+    from particula.execution.communication import (
+        CommunicationConfiguration,
+        CommunicationMap,
+        CommunicationMapForm,
+        CommunicationTransportMode,
+        PrescribedVolumeUpdate,
+    )
+
+    session, registry, guard = _resident_binding(n_boxes=2)
+    configuration = CommunicationConfiguration(
+        CommunicationMap(
+            CommunicationMapForm.ONE_DIMENSIONAL,
+            CommunicationTransportMode.GAS,
+            1,
+            wp.array([0], dtype=wp.int32, device="cpu"),
+            wp.array([1], dtype=wp.int32, device="cpu"),
+            wp.array([1], dtype=wp.int32, device="cpu"),
+            wp.array([0.5], dtype=wp.float64, device="cpu"),
+        ),
+        PrescribedVolumeUpdate(None),
+        (),
+    )
+    resources = registry.acquire_communication(configuration)
+
+    checkpoint = session.checkpoint(registry, guard)
+    _, restored_registry, _ = restart_resident_session(
+        checkpoint, Device(Backend.WARP, "cpu")
+    )
+
+    restored = restored_registry._views["communication_gas"]
+    assert restored is not resources
+    assert restored.configuration.communication_map.transport_mode is (
+        CommunicationTransportMode.GAS
+    )
+    np.testing.assert_array_equal(
+        restored.configuration.communication_map.rates.numpy(), [0.5]
+    )
+
+
+@pytest.mark.warp
+def test_restart_restores_pinned_communication_final_volumes() -> None:
+    """Restart restores prescribed-volume state as a fresh resident sidecar."""
+    wp = pytest.importorskip("warp")
+    from particula.execution.communication import (
+        CommunicationConfiguration,
+        CommunicationMap,
+        CommunicationMapForm,
+        CommunicationTransportMode,
+        PrescribedVolumeUpdate,
+    )
+
+    session, registry, guard = _resident_binding(n_boxes=2)
+    final_volumes = wp.array([2.0, 4.0], dtype=wp.float64, device="cpu")
+    configuration = CommunicationConfiguration(
+        CommunicationMap(
+            CommunicationMapForm.ONE_DIMENSIONAL,
+            CommunicationTransportMode.GAS,
+            1,
+            wp.array([0], dtype=wp.int32, device="cpu"),
+            wp.array([1], dtype=wp.int32, device="cpu"),
+            wp.array([1], dtype=wp.int32, device="cpu"),
+            wp.array([0.5], dtype=wp.float64, device="cpu"),
+        ),
+        PrescribedVolumeUpdate(final_volumes),
+        (),
+    )
+    registry.acquire_communication(configuration)
+
+    checkpoint = session.checkpoint(registry, guard)
+    _, restored_registry, _ = restart_resident_session(
+        checkpoint, Device(Backend.WARP, "cpu")
+    )
+
+    restored = restored_registry._views["communication_gas"]
+    assert restored.final_volumes is not final_volumes
+    np.testing.assert_array_equal(restored.final_volumes.numpy(), [2.0, 4.0])
+
+
+@pytest.mark.warp
+def test_restart_rejects_mismatched_communication_checkpoint_metadata() -> None:
+    """Reject v1/v2 communication metadata and payload inconsistencies."""
+    wp = pytest.importorskip("warp")
+    from particula.execution.communication import (
+        CommunicationConfiguration,
+        CommunicationMap,
+        CommunicationMapForm,
+        CommunicationTransportMode,
+        PrescribedVolumeUpdate,
+    )
+
+    session, registry, guard = _resident_binding(n_boxes=2)
+    configuration = CommunicationConfiguration(
+        CommunicationMap(
+            CommunicationMapForm.ONE_DIMENSIONAL,
+            CommunicationTransportMode.GAS,
+            1,
+            wp.array([0], dtype=wp.int32, device="cpu"),
+            wp.array([1], dtype=wp.int32, device="cpu"),
+            wp.array([1], dtype=wp.int32, device="cpu"),
+            wp.array([0.5], dtype=wp.float64, device="cpu"),
+        ),
+        PrescribedVolumeUpdate(None),
+        (),
+    )
+    registry.acquire_communication(configuration)
+    checkpoint = session.checkpoint(registry, guard)
+
+    malformed = (
+        replace(checkpoint, schema_version=1),
+        replace(checkpoint, communication=None),
+        replace(
+            checkpoint,
+            communication=CommunicationCheckpointMetadata(
+                "particles", "one_dimensional", 1, False
+            ),
+        ),
+    )
+    for candidate in malformed:
+        with pytest.raises(ValueError, match="communication"):
+            restart_resident_session(candidate, Device(Backend.WARP, "cpu"))
 
 
 def test_restart_rejects_non_checkpoint_and_terminal_checkpoint() -> None:

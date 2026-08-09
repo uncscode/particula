@@ -624,6 +624,8 @@ def _resident_scheduler() -> Any:
 def _scheduler_request(module: Any) -> tuple[Any, Any]:
     """Build a minimal already-preflighted request for dispatch tests."""
     node_ids = (
+        "communication",
+        "volume_evolution",
         "environment_update",
         "gas_update",
         "vapor_pressure_refresh",
@@ -673,6 +675,7 @@ def _scheduler_request(module: Any) -> tuple[Any, Any]:
     object.__setattr__(request, "session", object())
     object.__setattr__(request, "registry", object())
     object.__setattr__(request, "thermodynamics", object())
+    object.__setattr__(request, "communication", object())
     return request, guard
 
 
@@ -855,6 +858,18 @@ def test_resident_scheduler_dispatches_resolved_nodes_once(
             calls.append(f"consumer:{cast(Any, node).node_id}")
             callback()
 
+    class Communication:
+        """Record the two resident barrier dispatches."""
+
+        def __init__(self, _request: object) -> None:
+            pass
+
+        def execute_communication(self) -> None:
+            calls.append("communication")
+
+        def execute_volume_evolution(self) -> None:
+            calls.append("volume_evolution")
+
     def adapter(name: str) -> type[Any]:
         """Create one adapter that records its corresponding dispatch."""
 
@@ -874,6 +889,7 @@ def test_resident_scheduler_dispatches_resolved_nodes_once(
     monkeypatch.setattr(
         module, "ResidentThermodynamicUpdateCoordinator", Thermal
     )
+    monkeypatch.setattr(module, "ResidentCommunicationExecutor", Communication)
     monkeypatch.setattr(
         module, "WarpCondensationExecutionAdapter", adapter("condensation")
     )
@@ -894,6 +910,10 @@ def test_resident_scheduler_dispatches_resolved_nodes_once(
     scheduler.execute(2.0)
 
     assert calls == [
+        "communication",
+        "communication",
+        "volume_evolution",
+        "volume_evolution",
         "environment_update",
         "environment_update",
         "gas_update",
@@ -933,12 +953,26 @@ def test_resident_scheduler_faults_after_adapter_failure(
     monkeypatch.setattr(scheduler, "_validate", lambda _duration: None)
     monkeypatch.setattr(module, "ResidentStateUpdateExecutor", FailingUpdates)
     monkeypatch.setattr(
+        module,
+        "ResidentCommunicationExecutor",
+        lambda _request: type(
+            "Communication",
+            (),
+            {
+                "execute_communication": lambda self: None,
+                "execute_volume_evolution": lambda self: None,
+            },
+        )(),
+    )
+    monkeypatch.setattr(
         module, "ResidentThermodynamicUpdateRequest", lambda *args: args
     )
     monkeypatch.setattr(
         module,
         "ResidentThermodynamicUpdateCoordinator",
-        lambda _request: object(),
+        lambda _request: type(
+            "Thermal", (), {"record_completed": lambda self, _node: None}
+        )(),
     )
     monkeypatch.setattr(
         module,
