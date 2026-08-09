@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import builtins
+import importlib
 import subprocess
 import sys
 
@@ -215,8 +216,9 @@ def test_registry_collision_rejects_first_input_order_pair(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test same-process derived-word collisions identify the first two IDs."""
+    rng_module = importlib.import_module("particula.execution.rng")
     monkeypatch.setattr(
-        "particula.execution.rng._derive_initial_word", lambda _root, _key: 3
+        rng_module, "_derive_initial_word", lambda _root, _key: 3
     )
 
     with pytest.raises(ValueError, match="'first' and 'second'"):
