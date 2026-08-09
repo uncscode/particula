@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from numbers import Integral
 from typing import TYPE_CHECKING
 
 from particula.execution.gpu_session import ResidentSession
@@ -88,7 +89,10 @@ class ResidentWallLossRequest:
         config: Opaque direct-kernel configuration.
         time_step: Opaque duration for the direct kernel.
         rng_seed: Opaque seed forwarded unchanged to the direct kernel.
-        initialize_rng: Opaque reset flag forwarded unchanged to the kernel.
+        initialize_rng: Legacy reset flag. Resident dispatch accepts only the
+            literal ``False`` and always disables direct-kernel resets.
+        enabled_box_indices: Scheduler-resolved, ascending logical box indices
+            to dispatch. ``None`` retains the legacy all-box selection.
     """
 
     session: ResidentSession
@@ -98,6 +102,7 @@ class ResidentWallLossRequest:
     time_step: object
     rng_seed: object = 0
     initialize_rng: object = False
+    enabled_box_indices: tuple[int, ...] | None = None
 
     def __post_init__(self) -> None:
         """Validate exact dependencies without inspecting kernel arguments.
@@ -113,6 +118,34 @@ class ResidentWallLossRequest:
             raise TypeError("registry must be an exact GPUResourceRegistry.")
         if type(self.resources) is not wall_loss_type:
             raise TypeError("resources must be an exact WallLossResources.")
+        if self.initialize_rng is not False:
+            raise ValueError("resident wall_loss initialize_rng must be False.")
+        self.validate_enabled_box_indices()
+
+    def validate_enabled_box_indices(self) -> tuple[int, ...]:
+        """Validate and return the scheduler-owned wall-loss launch set."""
+        if self.enabled_box_indices is None:
+            return tuple(range(self.session.dimensions.n_boxes))
+        indices = self.enabled_box_indices
+        if type(indices) is not tuple:
+            raise TypeError("enabled_box_indices must be a tuple or None.")
+        previous = -1
+        for index in indices:
+            if isinstance(index, bool) or not isinstance(index, Integral):
+                raise TypeError(
+                    "enabled_box_indices must contain integral indices."
+                )
+            if index <= previous or index < 0:
+                raise ValueError(
+                    "enabled_box_indices must be sorted unique nonnegative "
+                    "indices."
+                )
+            if index >= self.session.dimensions.n_boxes:
+                raise ValueError(
+                    "enabled_box_indices must be within session boxes."
+                )
+            previous = index
+        return tuple(indices)
 
 
 @dataclass(frozen=True, eq=False)
@@ -250,7 +283,27 @@ class ResidentWallLossAdapter:
         request.registry.validate_wall_loss_resources(
             request.session, request.resources
         )
+        enabled_boxes = request.validate_enabled_box_indices()
+        if not enabled_boxes:
+            return request.session.particles
         step = _get_wall_loss_step_gpu()
+        if len(enabled_boxes) != request.session.dimensions.n_boxes:
+            for box_index in enabled_boxes:
+                particles, temperature, pressure, rng_states = (
+                    _wall_loss_box_views(request, box_index)
+                )
+                step(
+                    particles,
+                    temperature,
+                    pressure,
+                    request.time_step,
+                    config=request.config,
+                    rng_seed=request.rng_seed,
+                    rng_states=rng_states,
+                    initialize_rng=False,
+                    environment=None,
+                )
+            return request.session.particles
         return step(
             request.session.particles,
             None,
@@ -259,9 +312,44 @@ class ResidentWallLossAdapter:
             config=request.config,
             rng_seed=request.rng_seed,
             rng_states=request.resources.rng_states,
-            initialize_rng=request.initialize_rng,
+            initialize_rng=False,
             environment=request.session.environment,
         )
+
+
+def _wall_loss_box_views(
+    request: ResidentWallLossRequest, box_index: int
+) -> tuple[object, object, object, object]:
+    """Return one logical box's contiguous resident aliases for direct dispatch.
+
+    The direct wall-loss boundary has no selected-box argument. A one-box view
+    retains the original particle fields and RNG lane by alias, so the direct
+    kernel can only write the scheduler-selected logical box. No host copy,
+    allocation, synchronization, or scatter step is introduced.
+
+    Args:
+        request: Validated resident wall-loss request.
+        box_index: Validated selected logical-box index.
+
+    Returns:
+        One-box particle container plus temperature, pressure, and RNG views.
+    """
+    from particula.gpu.warp_types import WarpParticleData
+
+    source = request.session.particles
+    particles = WarpParticleData()
+    particles.masses = source.masses[box_index : box_index + 1]
+    particles.concentration = source.concentration[box_index : box_index + 1]
+    particles.charge = source.charge[box_index : box_index + 1]
+    particles.density = source.density
+    particles.volume = source.volume[box_index : box_index + 1]
+    environment = request.session.environment
+    return (
+        particles,
+        environment.temperature[box_index : box_index + 1],
+        environment.pressure[box_index : box_index + 1],
+        request.resources.rng_states[box_index : box_index + 1],
+    )
 
 
 class ResidentNucleationAdapter:

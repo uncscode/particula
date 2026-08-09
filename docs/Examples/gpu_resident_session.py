@@ -169,10 +169,6 @@ def run_example(device: str = "cpu") -> ExampleRun:
     )
     registry = runtime.GPUResourceRegistry(session)
     guard = runtime.ResidentStepGuard(session, registry)
-    first_view = registry.acquire_wall_loss()
-    second_view = registry.acquire_wall_loss()
-    assert first_view is second_view
-    assert first_view.rng_states is second_view.rng_states
     for _ in range(2):
         token = guard.begin_step(0.0)
         guard.complete_step(token)

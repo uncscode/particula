@@ -219,6 +219,45 @@ def test_coagulation_acquisition_initializes_one_persistent_stream() -> None:
 
 
 @pytest.mark.warp
+def test_wall_loss_acquisition_initializes_its_distinct_persistent_stream() -> (
+    None
+):
+    """Wall loss uses its own manifest-derived words and stable sidecar."""
+    session = _session(boxes=2)
+    registry = GPUResourceRegistry(session)
+
+    wall_loss = registry.acquire_wall_loss()
+    stream = registry._wall_loss_stream_registry
+
+    assert stream is not None
+    np.testing.assert_array_equal(
+        wall_loss.rng_states.numpy(), stream.words_by_lane("wall_loss")
+    )
+    assert registry.acquire_wall_loss() is wall_loss
+    coagulation = registry.acquire_coagulation(1)
+    assert wall_loss.rng_states is not coagulation.rng_states
+
+
+@pytest.mark.warp
+def test_wall_loss_acquisition_does_not_reseed_coagulation() -> None:
+    """Wall-loss acquisition preserves an already advanced coagulation stream."""
+    session = _session(boxes=2)
+    registry = GPUResourceRegistry(session)
+    coagulation = registry.acquire_coagulation(1)
+    advanced = coagulation.rng_states.numpy().copy()
+    advanced[0] += np.uint32(1)
+    wp = pytest.importorskip("warp")
+    wp.copy(
+        coagulation.rng_states,
+        wp.array(advanced, dtype=wp.uint32, device="cpu"),
+    )
+
+    registry.acquire_wall_loss()
+
+    np.testing.assert_array_equal(coagulation.rng_states.numpy(), advanced)
+
+
+@pytest.mark.warp
 @pytest.mark.parametrize(
     "failure_point", ("allocation", "registry", "initialize")
 )

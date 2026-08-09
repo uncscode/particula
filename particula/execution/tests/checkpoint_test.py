@@ -285,23 +285,22 @@ def test_restart_preserves_distinct_per_box_partitioning() -> None:
 
 
 @pytest.mark.warp
-def test_restart_restores_checkpointable_acquired_resource_families() -> None:
-    """Restart reconstructs non-stream resource families through registry APIs."""
+def test_checkpoint_rejects_wall_loss_stream_without_readback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A persistent wall-loss RNG stream blocks unsupported continuation."""
     session, registry, guard = _resident_binding()
     registry.acquire_condensation()
     registry.acquire_wall_loss()
-    registry.acquire_nucleation()
-
-    checkpoint = session.checkpoint(registry, guard)
-    _, restored_registry, _ = restart_resident_session(
-        checkpoint, Device(Backend.WARP, "cpu")
+    wp = pytest.importorskip("warp")
+    monkeypatch.setattr(
+        wp,
+        "synchronize",
+        lambda: pytest.fail("rejected checkpoint must not synchronize"),
     )
 
-    assert tuple(restored_registry._bindings) == (
-        "condensation",
-        "wall_loss",
-        "nucleation",
-    )
+    with pytest.raises(ValueError, match="RNG stream checkpoint continuation"):
+        session.checkpoint(registry, guard)
 
 
 @pytest.mark.warp

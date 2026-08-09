@@ -194,11 +194,11 @@ The exact downstream ordering remains
   than unverifiable allocator provenance. It creates no public package export
   and has no execution/selection, transfer/sync/restore, lifecycle, transport,
    process-configuration/physics, or general RNG reset/advance behavior. On
-   first `acquire_coagulation()`, it creates and initializes exactly one
-   P1-derived coagulation-only `wp.uint32` sidecar from immutable resident stream
-   metadata, then retains its registry, binding, and view by identity. Compatible
-   repeats neither allocate nor reseed it. There is no wall-loss stream,
-   reset/inspection API, hidden transfer/synchronization, package export, or
+   first `acquire_coagulation()` or `acquire_wall_loss()`, it creates and
+   initializes that process's distinct P1-derived `wp.uint32` sidecar from
+   immutable resident stream metadata, then retains its registry, binding, and
+   view by identity. Compatible repeats neither allocate nor reseed it. There is
+   no reset/inspection API, hidden transfer/synchronization, package export, or
    checkpoint continuation.
    `validate_pinned_session()` is the metadata-only integration seam: it
      requires exact retained-session identity and reuses active

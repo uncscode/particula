@@ -7,6 +7,7 @@ from dataclasses import FrozenInstanceError
 from pathlib import Path
 from typing import Any, cast
 
+import numpy as np
 import pytest
 
 import particula.execution.process_adapters as process_adapters
@@ -34,12 +35,12 @@ def _registry(session: ResidentSession) -> GPUResourceRegistry:
     return GPUResourceRegistry(session)
 
 
-def _session() -> ResidentSession:
+def _session(boxes: int = 1) -> ResidentSession:
     """Build a Warp session only for a Warp-dependent test."""
     pytest.importorskip("warp")
     from particula.execution.tests.gpu_resources_test import _session as build
 
-    return build()
+    return build(boxes=boxes)
 
 
 @pytest.mark.warp
@@ -194,7 +195,6 @@ def test_wall_loss_adapter_delegates_published_rng_once(
         config,
         0,
         rng_seed=41,
-        initialize_rng=True,
     )
     result = object()
     calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
@@ -213,8 +213,132 @@ def test_wall_loss_adapter_delegates_published_rng_once(
     assert kwargs["config"] is config
     assert kwargs["rng_states"] is resources.rng_states
     assert kwargs["rng_seed"] == 41
-    assert kwargs["initialize_rng"] is True
+    assert kwargs["initialize_rng"] is False
     assert kwargs["environment"] is session.environment
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("value", (True, None, 0))
+def test_wall_loss_request_rejects_reset_like_values(value: object) -> None:
+    """Resident wall-loss dispatch must never reset its pinned stream."""
+    session = _session()
+    registry = _registry(session)
+    resources = registry.acquire_wall_loss()
+
+    with pytest.raises(
+        ValueError, match="resident wall_loss initialize_rng must be False"
+    ):
+        ResidentWallLossRequest(
+            session,
+            registry,
+            resources,
+            object(),
+            0,
+            initialize_rng=value,
+        )
+
+
+@pytest.mark.warp
+def test_wall_loss_adapter_skips_empty_resolved_launch_set(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An empty scheduler launch set does not resolve or touch wall-loss RNG."""
+    session = _session()
+    registry = _registry(session)
+    resources = registry.acquire_wall_loss()
+    before = resources.rng_states.numpy().copy()
+    request = ResidentWallLossRequest(
+        session,
+        registry,
+        resources,
+        object(),
+        0,
+        enabled_box_indices=(),
+    )
+    monkeypatch.setattr(
+        process_adapters,
+        "_get_wall_loss_step_gpu",
+        lambda: pytest.fail(
+            "empty launch set must not resolve wall-loss kernel"
+        ),
+    )
+
+    assert ResidentWallLossAdapter().execute(request) is session.particles
+    np.testing.assert_array_equal(resources.rng_states.numpy(), before)
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "indices, exception, match",
+    (
+        ([0], TypeError, "tuple or None"),
+        ((0, 0), ValueError, "sorted unique"),
+        ((-1,), ValueError, "sorted unique"),
+        ((2,), ValueError, "within session boxes"),
+        ((True,), TypeError, "integral indices"),
+    ),
+)
+def test_wall_loss_request_rejects_invalid_enabled_box_indices(
+    indices: object,
+    exception: type[Exception],
+    match: str,
+) -> None:
+    """Scheduler-owned wall-loss launch sets require valid full box indices."""
+    session = _session(boxes=2)
+    registry = _registry(session)
+    resources = registry.acquire_wall_loss()
+
+    with pytest.raises(exception, match=match):
+        ResidentWallLossRequest(
+            session,
+            registry,
+            resources,
+            object(),
+            0,
+            enabled_box_indices=cast(Any, indices),
+        )
+
+
+@pytest.mark.warp
+def test_wall_loss_adapter_dispatches_only_selected_box_views(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Wall loss dispatches only selected logical-box aliases."""
+    session = _session(boxes=2)
+    registry = _registry(session)
+    resources = registry.acquire_wall_loss()
+    request = ResidentWallLossRequest(
+        session,
+        registry,
+        resources,
+        object(),
+        0,
+        enabled_box_indices=(0,),
+    )
+    calls: list[tuple[object, object, object, object]] = []
+
+    def step(
+        particles: object,
+        temperature: object,
+        pressure: object,
+        _time_step: object,
+        **kwargs: object,
+    ) -> object:
+        """Record the selected direct-kernel aliases."""
+        calls.append((particles, temperature, pressure, kwargs["rng_states"]))
+        return particles
+
+    monkeypatch.setattr(
+        process_adapters, "_get_wall_loss_step_gpu", lambda: step
+    )
+
+    assert ResidentWallLossAdapter().execute(request) is session.particles
+    assert len(calls) == 1
+    particles, temperature, pressure, rng_states = calls[0]
+    assert particles.masses.ptr == session.particles.masses.ptr
+    assert temperature.ptr == session.environment.temperature.ptr
+    assert pressure.ptr == session.environment.pressure.ptr
+    assert rng_states.ptr == resources.rng_states.ptr
 
 
 @pytest.mark.warp

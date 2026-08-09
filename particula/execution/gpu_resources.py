@@ -3,16 +3,17 @@
 This direct-import-only, Warp-dependent boundary pins complete fixed-shape
 native sidecar families to one exact ``ACTIVE`` :class:`ResidentSession`.
 It allocates and validates resources only: it neither executes a process nor
-transfers, synchronizes, restores, or resizes. Coagulation acquisition is the
-narrow exception: it initializes its sole P1-derived persistent RNG stream
-exactly once before publishing that resident resource. The
+transfers, synchronizes, restores, or resizes. Coagulation and wall-loss
+acquisition are narrow exceptions: each initializes its distinct P1-derived
+persistent RNG stream exactly once before publishing that resident resource.
+The
 manifests and views here are concrete-only and are deliberately not exported
 from :mod:`particula.execution`.
 
 The registry retains array identities and performs metadata-only schema and
 nonaliasing checks. It does not establish allocator provenance, execute a
-kernel, or change session lifecycle. The coagulation-only stream has no
-wall-loss integration, reset API, hidden transfer, or synchronization.
+kernel, or change session lifecycle. The separate process streams have no
+reset API, hidden transfer, or synchronization.
 ``validate_pinned_session`` is the narrow direct-module-only integration seam
 for resident timestep guards. It requires the exact retained session, then
 revalidates its active lifecycle, pinned container and primary-array identities,
@@ -369,6 +370,7 @@ class GPUResourceRegistry:
         self._capacities: dict[str, int] = {}
         self._open_step_token: Any | None = None
         self._coagulation_stream_registry: StreamRegistry | None = None
+        self._wall_loss_stream_registry: StreamRegistry | None = None
 
     @property
     def manifests(self) -> tuple[ResourceManifest, ...]:
@@ -681,6 +683,13 @@ class GPUResourceRegistry:
     def _has_resident_coagulation_stream(self) -> bool:
         """Return whether an initialized resident coagulation stream exists."""
         return self._coagulation_stream_registry is not None
+
+    def _has_resident_rng_stream(self) -> bool:
+        """Return whether any initialized resident RNG stream exists."""
+        return (
+            self._coagulation_stream_registry is not None
+            or self._wall_loss_stream_registry is not None
+        )
 
     def reserve_open_step(self, token: Any) -> None:
         """Reserve the binding's sole open timestep token by identity.
@@ -1223,7 +1232,7 @@ class GPUResourceRegistry:
     def acquire_wall_loss(
         self, *, rng_states: Any | None = None
     ) -> WallLossResources:
-        """Acquire one persistent wall-loss RNG sidecar.
+        """Acquire one initialized persistent wall-loss RNG sidecar.
 
         Args:
             rng_states: Optional ``uint32`` per-box native RNG sidecar.
@@ -1236,9 +1245,55 @@ class GPUResourceRegistry:
             ValueError: If its schema, aliasing, or session signature is
                 incompatible.
         """
-        bindings = self._acquire(_WALL_LOSS, {"rng_states": rng_states})
-        if "wall_loss" not in self._views:
-            self._views["wall_loss"] = WallLossResources(**bindings)
+        already_published = "wall_loss" in self._bindings
+        bindings = self._acquire(
+            _WALL_LOSS,
+            {"rng_states": rng_states},
+            publish=already_published,
+        )
+        if not already_published:
+            stream = self._session.metadata.stream
+            if stream.n_boxes == 0 and self._session.dimensions.n_boxes:
+                logical_box_ids = tuple(
+                    str(index)
+                    for index in range(self._session.dimensions.n_boxes)
+                )
+                lanes = tuple(range(self._session.dimensions.n_boxes))
+                root_seed = 0
+            else:
+                logical_box_ids = stream.logical_box_ids
+                lanes = stream.lanes
+                root_seed = stream.root_seed
+            coagulation = self._bindings.get("coagulation", {}).get(
+                "rng_states"
+            )
+            has_published_coagulation = coagulation is not None
+            if coagulation is None:
+                coagulation = wp.zeros(
+                    self._shape(_COAGULATION.entries[2]),
+                    dtype=wp.uint32,
+                    device=self._signature[2],
+                )
+            registry = StreamRegistry(
+                root_seed,
+                self._session.dimensions.n_boxes,
+                logical_box_ids,
+                lanes,
+                (
+                    ("coagulation", coagulation),
+                    ("wall_loss", bindings["rng_states"]),
+                ),
+            )
+            if has_published_coagulation:
+                # Do not reseed the existing resident coagulation stream while
+                # initializing this newly acquired independent namespace.
+                registry.initialize_process("wall_loss")
+            else:
+                registry.initialize()
+            view = WallLossResources(**bindings)
+            self._bindings["wall_loss"] = bindings
+            self._wall_loss_stream_registry = registry
+            self._views["wall_loss"] = view
         return self._views["wall_loss"]
 
     def acquire_communication(  # noqa: C901

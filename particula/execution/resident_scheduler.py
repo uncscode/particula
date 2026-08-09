@@ -428,6 +428,7 @@ class ResidentSimulationScheduler:
         registry.validate_wall_loss_resources(
             request.session, request.wall_loss.resources
         )
+        request.wall_loss.validate_enabled_box_indices()
         registry.validate_nucleation_resources(
             request.session, request.nucleation.resources
         )

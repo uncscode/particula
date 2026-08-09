@@ -67,12 +67,18 @@ stream-identity boundary. It owns immutable host metadata and deterministic
 per-process/per-logical-box initial-word derivation, then explicitly initializes
 validated caller-owned Warp state buffers. Initialization allocates temporary
 NumPy/Warp copy sources only and deterministically overwrites retained buffers
-without acquiring, replacing, or rebinding them. One narrow resident Brownian
-integration retains this metadata in the session: first coagulation-resource
-acquisition initializes one registry-owned sidecar, and scheduled dispatch
-retains it by identity with `initialize_rng=False`. There is no wall-loss RNG
-integration, reset or inspection API, checkpoint persistence, or restart
-continuation; broader RNG policy remains deferred.
+without acquiring, replacing, or rebinding them. Resident Brownian coagulation
+and wall loss each retain an independent registry-owned sidecar initialized
+from the canonical process manifest. Scheduled dispatch retains each sidecar by
+identity with `initialize_rng=False`. There is no reset or inspection API,
+checkpoint persistence, or restart continuation; broader RNG policy remains
+deferred.
+Wall-loss dispatch receives its scheduler-resolved ascending logical-box set.
+An empty set is a write-free prelaunch skip; a partial set delegates one-box
+resident aliases so disabled lanes cannot be written. Thus disabled,
+prelaunch-skipped, zero-time, and no-work lanes retain their RNG words. The
+direct kernel signature and physics remain unchanged, and no rollback is
+promised after a selected writer launches.
 
 `particula.execution.adapters.condensation` contains concrete-only P2
 condensation state carriers and shipped P3/P4 selected CPU/Warp adapters. The
@@ -188,14 +194,14 @@ identity and nonaliasing, not allocator-provenance inference. Its typed
  manifests and views remain concrete-only and absent from package exports. The
  boundary performs no execution or selection, transfer/synchronization/
  restoration, lifecycle change, process physics/configuration, or RNG
- initialization, advancement, or reset, except that first coagulation
- acquisition creates and initializes one P1-derived, registry-retained
- coagulation-only ``wp.uint32`` stream from immutable resident stream metadata.
- Resident dispatch always supplies that exact stream with
- ``initialize_rng=False``. It has no wall-loss integration, reset/inspection
- API, hidden transfer/synchronization, package export, or checkpoint
- continuation; checkpoint and finalize reject a published resident stream
- before device or payload work. Its communication acquisition seam is
+  initialization, advancement, or reset, except that first coagulation or wall
+  loss acquisition creates and initializes its distinct P1-derived,
+  registry-retained ``wp.uint32`` stream from immutable resident stream metadata.
+  Resident dispatch always supplies the exact stream with
+  ``initialize_rng=False``. It has no reset/inspection API, hidden
+  transfer/synchronization, package export, or checkpoint continuation;
+  checkpoint and finalize reject a published resident stream before device or
+  payload work. Its communication acquisition seam is
  the sole exception for fixed-shape transport work storage: it validates one
  exact closed-map GAS or PARTICLES configuration and pins its native record,
  map arrays, and optional final-volume sidecar. Omitted required work arrays may

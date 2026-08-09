@@ -495,17 +495,37 @@ class StreamRegistry:
                 validation.
         """
         self._validate_state_arrays()
+
+        for process_id in PROCESS_IDS:
+            self.initialize_process(process_id)
+
+    def initialize_process(self, process_id: str) -> None:
+        """Initialize exactly one validated process state array.
+
+        This narrow internal primitive lets a resident resource publish a new
+        process sidecar without reseeding an already-published sibling stream.
+
+        Args:
+            process_id: Supported process namespace to initialize.
+
+        Raises:
+            TypeError: If the process ID or either manifest array is invalid.
+            ValueError: If either retained array has invalid schema, device, or
+                aliasing metadata.
+            RuntimeError: If Warp reports a device-copy failure.
+        """
+        _validate_process_id(process_id)
+        self._validate_state_arrays()
         import numpy as np
         import warp as wp
 
-        for process_id in PROCESS_IDS:
-            host_source = np.asarray(
-                self._words_by_process[process_id], dtype=np.uint32
-            )
-            wp.copy(
-                self.state_array_for(process_id),
-                wp.array(host_source, dtype=wp.uint32, device="cpu"),
-            )
+        host_source = np.asarray(
+            self._words_by_process[process_id], dtype=np.uint32
+        )
+        wp.copy(
+            self.state_array_for(process_id),
+            wp.array(host_source, dtype=wp.uint32, device="cpu"),
+        )
 
 
 def _validate_process_id(process_id: object) -> None:
