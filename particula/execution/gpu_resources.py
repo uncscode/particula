@@ -68,7 +68,7 @@ __all__ = [
 
 _INT32_MAX = 2**31 - 1
 _MAX_SIZE = (1 << 63) - 1
-_ShapeKind = Literal["b", "bn", "bs", "bns", "bc2", "e", "en"]
+_ShapeKind = Literal["b", "bn", "bs", "bns", "bc2", "e", "en", "status"]
 
 
 @dataclass(frozen=True)
@@ -1300,6 +1300,7 @@ class GPUResourceRegistry:
             manifest, supplied, int(map_data.edge_capacity)
         )
         if family not in self._views:
+            native: GasCommunicationBuffers | ParticleCommunicationBuffers
             if mode is CommunicationTransportMode.GAS:
                 native = GasCommunicationBuffers(
                     bindings["amounts"],

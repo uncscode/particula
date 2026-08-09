@@ -50,16 +50,16 @@ def _request(
     from particula.execution.tests.gpu_resources_test import _session
 
     session = _session(boxes=3, particle_count=4, species=2)
-    session.particles.volume = wp.array(
-        [2.0, 1.0, 4.0], dtype=wp.float64, device="cpu"
-    )
-    session.gas.concentration = wp.array(
+    particles = cast(Any, session.particles)
+    gas = cast(Any, session.gas)
+    particles.volume = wp.array([2.0, 1.0, 4.0], dtype=wp.float64, device="cpu")
+    gas.concentration = wp.array(
         [[10.0, 2.0], [3.0, 4.0], [1.0, 8.0]],
         dtype=wp.float64,
         device="cpu",
     )
     if mode is CommunicationTransportMode.PARTICLES:
-        session.particles.masses = wp.array(
+        particles.masses = wp.array(
             [
                 [[2.0, 3.0], [0.0, 0.0], [5.0, 7.0], [0.0, 0.0]],
                 [[0.0, 0.0], [0.0, 0.0], [11.0, 13.0], [0.0, 0.0]],
@@ -68,12 +68,12 @@ def _request(
             dtype=wp.float64,
             device="cpu",
         )
-        session.particles.concentration = wp.array(
+        particles.concentration = wp.array(
             [[4.0, 0.0, 2.0, 0.0], [0.0, 0.0, 3.0, 0.0], [5.0, 0.0, 0.0, 0.0]],
             dtype=wp.float64,
             device="cpu",
         )
-        session.particles.charge = wp.array(
+        particles.charge = wp.array(
             [
                 [-2.0, 0.0, 1.0, 0.0],
                 [0.0, 0.0, 3.0, 0.0],
@@ -187,7 +187,9 @@ def _particle_oracle(  # noqa: C901
         for box in range(concentration.shape[0])
     }
     reserved: dict[tuple[int, tuple[float, ...]], int] = {}
-    used = {box: set() for box in range(concentration.shape[0])}
+    used: dict[int, set[int]] = {
+        box: set() for box in range(concentration.shape[0])
+    }
     incoming: dict[tuple[int, int], tuple[int, int]] = {}
     for _edge, (left, right, rate) in enumerate(
         zip(source, destination, rates, strict=True)

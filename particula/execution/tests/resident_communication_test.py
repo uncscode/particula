@@ -264,10 +264,16 @@ def test_volume_dispatch_retains_final_volume_identity(
     import particula.gpu.kernels.communication as native
 
     calls: list[tuple[object, ...]] = []
+
+    def volume(*args: object) -> str:
+        """Record the volume primitive's exact arguments."""
+        calls.append(args)
+        return "volume"
+
     monkeypatch.setattr(
         native,
         "resident_volume_evolution_step_gpu",
-        lambda *args: calls.append(args) or "volume",
+        volume,
     )
 
     assert (

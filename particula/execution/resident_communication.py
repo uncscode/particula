@@ -21,6 +21,10 @@ from particula.execution.process_graph import (
     ResolvedProcessGraph,
     _is_resolver_produced_graph,
 )
+from particula.gpu.kernels.communication import (
+    GasCommunicationBuffers,
+    ParticleCommunicationBuffers,
+)
 
 
 def _registry_type() -> type[object]:
@@ -59,7 +63,7 @@ class ResidentCommunicationRequest:
     resources: CommunicationResources
     communication_node: ProcessNode
     volume_evolution_node: ProcessNode
-    duration: Real
+    duration: float
 
     def __post_init__(self) -> None:
         """Validate exact carrier types only."""
@@ -170,7 +174,7 @@ class ResidentCommunicationExecutor:
                 request.session.gas,
                 request.resources.configuration,
                 request.duration,
-                request.resources.buffers,
+                cast(GasCommunicationBuffers, request.resources.buffers),
                 request.resources.execution_state.invalid,
                 request.resources.execution_state.active_or_demand,
             )
@@ -180,7 +184,7 @@ class ResidentCommunicationExecutor:
                 request.session.particles,
                 request.resources.configuration,
                 request.duration,
-                request.resources.buffers,
+                cast(ParticleCommunicationBuffers, request.resources.buffers),
                 state.invalid,
                 state.active_or_demand,
                 state.initial_masses,

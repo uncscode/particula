@@ -202,7 +202,8 @@ class CommunicationConfiguration:
 
 @wp.kernel
 def _scan_enabled(
-    enabled: wp.array(dtype=wp.int32), invalid: wp.array(dtype=wp.int32)
+    enabled: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
+    invalid: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
 ):
     """Flag any enabled-entry value other than 0 or 1.
 
@@ -218,7 +219,8 @@ def _scan_enabled(
 
 @wp.kernel
 def _scan_rates(
-    rates: wp.array(dtype=wp.float64), invalid: wp.array(dtype=wp.int32)
+    rates: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+    invalid: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
 ):
     """Flag any rate that is not finite and nonnegative.
 
@@ -234,7 +236,8 @@ def _scan_rates(
 
 @wp.kernel
 def _scan_volumes(
-    volumes: wp.array(dtype=wp.float64), invalid: wp.array(dtype=wp.int32)
+    volumes: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+    invalid: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
 ):
     """Flag any prescribed volume that is not finite and positive.
 
@@ -250,12 +253,12 @@ def _scan_volumes(
 
 @wp.kernel
 def _scan_topology(
-    source: wp.array(dtype=wp.int32),
-    destination: wp.array(dtype=wp.int32),
-    enabled: wp.array(dtype=wp.int32),
+    source: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
+    destination: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
+    enabled: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
     boxes: int,
     one_dimensional: int,
-    invalid: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
 ):
     """Flag any enabled edge with invalid bounds or one-dimensional gap.
 
@@ -285,7 +288,8 @@ def _scan_topology(
 
 @wp.kernel
 def _count_enabled(
-    enabled: wp.array(dtype=wp.int32), count: wp.array(dtype=wp.int32)
+    enabled: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
+    count: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
 ):
     """Count enabled edges into validator-owned scalar storage."""
     index = wp.tid()
@@ -295,12 +299,12 @@ def _count_enabled(
 
 @wp.kernel
 def _collect_enabled_keys(
-    source: wp.array(dtype=wp.int32),
-    destination: wp.array(dtype=wp.int32),
-    enabled: wp.array(dtype=wp.int32),
+    source: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
+    destination: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
+    enabled: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
     boxes: int,
-    keys: wp.array(dtype=wp.int64),
-    cursor: wp.array(dtype=wp.int32),
+    keys: wp.array(dtype=wp.int64),  # type: ignore[valid-type]
+    cursor: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
 ):
     """Collect enabled directed-pair keys into private compact scratch.
 
@@ -317,9 +321,13 @@ def _collect_enabled_keys(
 
 
 @wp.kernel
-def _bitonic_sort_step(keys: wp.array(dtype=wp.int64), stage: int, offset: int):
+def _bitonic_sort_step(
+    keys: wp.array(dtype=wp.int64),  # type: ignore[valid-type]
+    stage: int,
+    offset: int,
+):
     """Execute one compare-exchange stage of an ascending bitonic sort."""
-    index = wp.tid()
+    index = cast(int, wp.tid())
     partner = index ^ offset
     if partner > index:
         ascending = (index & stage) == 0
@@ -332,12 +340,12 @@ def _bitonic_sort_step(keys: wp.array(dtype=wp.int64), stage: int, offset: int):
 
 @wp.kernel
 def _scan_sorted_duplicates(
-    keys: wp.array(dtype=wp.int64),
+    keys: wp.array(dtype=wp.int64),  # type: ignore[valid-type]
     count: int,
-    invalid: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
 ):
     """Flag adjacent equal valid keys after private sorting."""
-    index = wp.tid()
+    index = cast(int, wp.tid())
     if index > 0 and index < count and keys[index - 1] == keys[index]:
         wp.atomic_max(invalid, 0, 1)
 

@@ -3,12 +3,20 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
+from typing import TYPE_CHECKING
 
 import numpy as np
 import numpy.testing as npt
 import pytest
 
 from particula.gpu.tests.cuda_availability import warp_devices
+
+if TYPE_CHECKING:
+    from particula.execution.communication import (
+        CommunicationConfiguration,
+        CommunicationMapForm,
+        CommunicationTransportMode,
+    )
 
 pytestmark = [pytest.mark.warp, pytest.mark.gpu_parity]
 
@@ -77,14 +85,14 @@ def _containers(device: str) -> tuple[SimpleNamespace, SimpleNamespace]:
 
 def _configuration(
     device: str,
-    mode: object,
+    mode: CommunicationTransportMode,
     source: np.ndarray,
     destination: np.ndarray,
     rates: np.ndarray,
     *,
-    form: object | None = None,
+    form: CommunicationMapForm | None = None,
     enabled: np.ndarray | None = None,
-):
+) -> CommunicationConfiguration:
     """Build a concrete arbitrary-pair communication configuration."""
     wp = _warp()
     from particula.execution.communication import (
@@ -208,7 +216,9 @@ def _particle_oracle(  # noqa: C901
         }
         for box in range(concentration.shape[0])
     }
-    used = {box: set() for box in range(concentration.shape[0])}
+    used: dict[int, set[int]] = {
+        box: set() for box in range(concentration.shape[0])
+    }
     for source_box in range(concentration.shape[0]):
         for destination_box in range(concentration.shape[0]):
             for edge in range(len(source)):
@@ -415,6 +425,8 @@ def test_open_boundary_accounting_matches_independent_oracle(
     npt.assert_allclose(
         buffers.outbound_amounts.numpy(), outbound, rtol=RTOL, atol=0.0
     )
+    assert buffers.source_amounts is not None
+    assert buffers.sink_amounts is not None
     npt.assert_allclose(
         buffers.source_amounts.numpy(), source_ledger, rtol=RTOL, atol=0.0
     )
