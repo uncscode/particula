@@ -4224,6 +4224,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -4340,6 +4344,34 @@
     
   
     particula.execution.checkpoint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API/particula/execution/communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.communication
   
 
     
@@ -4556,6 +4588,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../API/particula/execution/resident_communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../API/particula/execution/resident_scheduler/" class="md-nav__link">
         
   
@@ -4743,10 +4803,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_19" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_17" id="__nav_2_3_19_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_19" id="__nav_2_3_19_19_label" tabindex="0">
             
   
   
@@ -4764,8 +4824,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_17">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6174,6 +6234,8 @@
       
         
       
+        
+      
     
     
     
@@ -6262,6 +6324,34 @@
     
   
     particula.gpu.kernels.coagulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../API/particula/gpu/kernels/communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.communication
   
 
     
@@ -16901,12 +16991,16 @@
 <h1 id="data-oriented-design-and-gpu-roadmap">Data-Oriented Design and GPU Roadmap<a class="headerlink" href="#data-oriented-design-and-gpu-roadmap" title="Permanent link">&para;</a></h1>
 <h2 id="resident-complete-loop-boundary">Resident complete-loop boundary<a class="headerlink" href="#resident-complete-loop-boundary" title="Permanent link">&para;</a></h2>
 <p>The shipped concrete-only <code>particula.execution.resident_scheduler</code> executes
-only the resolver-produced complete ten-node resident schedule. It binds one
-exact active session, registry, and closed guard; validates schedule provenance
-and thermodynamic refresh windows before opening its one lifecycle token; and
-does not provide a package export, transfer, fallback, checkpoint, restore,
-resize, or rollback guarantee. Its paired concrete-only diagnostics boundary is
-a closed, ordered two-operation protocol for caller-owned gas-concentration and
+only the resolver-produced complete twelve-node resident schedule. Communication
+runs first, followed by optional prescribed volume evolution; communication
+uses pre-update volumes, and both barriers invalidate only saturation ratio.
+The existing vapor-pressure then saturation refresh windows remain immediately
+before condensation and diagnostics. The scheduler binds one exact active
+session, registry, and closed guard; validates schedule provenance and
+thermodynamic refresh windows before opening its one lifecycle token; and does
+not provide a package export, transfer, fallback, checkpoint, restore, resize,
+or rollback guarantee. Its paired concrete-only diagnostics boundary is a
+closed, ordered two-operation protocol for caller-owned gas-concentration and
 saturation-ratio outputs, not callback registration or optional update wiring.</p>
 <p>This page tracks the status of the data-oriented container migration and the
 Warp-backed GPU work for particle-resolved aerosol simulations.</p>
@@ -19026,12 +19120,30 @@ in-memory checkpoint/restart prerequisite. See
 seams, closed-guard binding, canonical recovery bytes, and exact-device fresh
 restart contract. It is not a resident loop or a process coordinator.</p>
 <p>E7-F5 is shipped as a bounded concrete-only exception: it runs only the complete
-resolver-produced ten-node schedule, retains one exact resident identity binding,
-uses coordinator-owned vapor-pressure/saturation freshness windows, and exposes
-only closed diagnostics snapshots. It adds no hidden transfer, public
-orchestration, or export surface. E7-F4 remains its prerequisite and the
-explicit checkpoint/restart boundary.</p>
-<p>E7-F7 transport, mixing/advection, and volume evolution remain deferred.
+resolver-produced twelve-node schedule, with communication followed by optional
+volume evolution before the existing process nodes. Communication uses
+pre-update volumes; both barriers invalidate saturation ratio only, while the
+coordinator-owned vapor-pressure/saturation refresh windows remain at their
+existing condensation and diagnostics consumers. It retains one exact resident
+identity binding and exposes only closed diagnostics snapshots. It adds no
+hidden transfer, public orchestration, or export surface. E7-F4 remains its
+prerequisite and the explicit checkpoint/restart boundary.</p>
+<p>E7-F7 P2 ships concrete-only direct-Warp volume evolution, and P3 ships
+concrete-only direct-Warp synchronous gas communication. P5 integrates their
+closed resident-map forms as the scheduler's communication and optional-volume
+barrier; the direct seams remain unexported and add no transfers,
+synchronization, CPU fallback, resizing, or other orchestration.
+Import P3 only from
+<code>particula.gpu.kernels.communication.gas_communication_step_gpu</code>. Callers
+provide complete Warp particle/gas containers and caller-owned <code>(B, S)</code>
+<code>wp.float64</code> amount, delta, and outbound work ledgers; enabled open-source or
+open-sink edges additionally require same-schema source or sink accounting
+ledgers. In-domain edges transfer from the source box's immutable pre-step
+amount; <code>-1 -&gt; destination</code> sources use the destination's pre-step amount and
+record it in the source ledger, while <code>source -&gt; -1</code> sinks use and record the
+source amount in the sink ledger. The operation performs one gas-concentration
+commit after preflight.
+The remaining transport and mixing/advection work remain deferred.
 E7-F8 owns scheduled persistent stream identity/reset and checkpoint/restart RNG
 policy. E7-F9 owns final diagnostics products, complete examples, and closeout.
 High-level GPU adapters and user-facing CPU/GPU orchestration remain later
@@ -19039,19 +19151,25 @@ contracts after E7-F6 establishes policy. They must not imply availability
 probing, fallback, retry, graph capture, performance claims, distributed or
 multi-GPU work, or replacement of the direct-kernel APIs.</p>
 <h3 id="multi-box-communication">Multi-Box Communication<a class="headerlink" href="#multi-box-communication" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Start with prescribed communication, not full CFD coupling.</li>
-<li>Represent box-to-box transport with fixed-shape maps or sparse edge lists so
-  graph-captured GPU loops can reuse the same allocation layout.</li>
-<li>Support independent boxes by default; communication should be opt-in per
-  simulation loop.</li>
-<li>Include per-box volume changes for rising parcel, expansion, and combustion
-  use cases.</li>
-<li>Keep particle and gas transport rules explicit. Gas concentrations, particle
-  concentrations, and particle slot contents may need different update kernels.</li>
-<li>Validate simple 1D advection and expansion cases against CPU references before
-  adding more complex coupling.</li>
-</ul>
+<p>E7-F7/T7 is shipped as a fixed-shape, single-device prescribed-map contract.
+Direct gas communication supports closed edges and declared <code>-1</code> source/sink
+endpoints with caller-owned amount/accounting ledgers; direct particle transport
+supports closed, particle-resolved fixed-slot maps only. Optional direct volume
+evolution rescales concentrations while preserving extensive inventories. Each
+direct boundary remains concrete-only, caller-owned, explicitly synchronized,
+and independent from a resident scheduler.</p>
+<p>Resident composition pins exactly one complete closed GAS or PARTICLES family,
+its native work, and optional final volumes by identity. Normal steps validate
+only identity and metadata, run communication before volume evolution using old
+volumes, and invalidate saturation only. Direct-boundary empty/disabled maps
+and unchanged final volumes are write-free no-ops; resident barriers instead
+follow their own composition and validation rules. See the
+<a href="../../data-containers-and-gpu-foundations/">Data Containers and GPU Foundations</a>
+guide for the amount equations, capacity gating, and checkpoint boundary.</p>
+<p>CFD, pressure/velocity solvers, adaptive meshes, distributed or multi-GPU
+transport, broad mixing/advection claims, graph capture, performance work, and
+autodiff remain deferred. Independent boxes remain the default, and E7-F8 owns
+scheduled RNG policy while E7-F9 owns complete-loop publication.</p>
 <p>Fixed-capacity slot management for these loops is defined in
 <a href="#fixed-capacity-slot-boundary">Fixed-Capacity Slot Boundary</a> under Epic F.</p>
 <h3 id="random-number-strategy">Random Number Strategy<a class="headerlink" href="#random-number-strategy" title="Permanent link">&para;</a></h3>

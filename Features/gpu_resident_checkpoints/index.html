@@ -4224,6 +4224,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -4340,6 +4344,34 @@
     
   
     particula.execution.checkpoint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/execution/communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.communication
   
 
     
@@ -4556,6 +4588,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../API/particula/execution/resident_communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../API/particula/execution/resident_scheduler/" class="md-nav__link">
         
   
@@ -4743,10 +4803,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_19" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_17" id="__nav_2_3_19_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_19" id="__nav_2_3_19_19_label" tabindex="0">
             
   
   
@@ -4764,8 +4824,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_17">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6174,6 +6234,8 @@
       
         
       
+        
+      
     
     
     
@@ -6262,6 +6324,34 @@
     
   
     particula.gpu.kernels.coagulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/gpu/kernels/communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.communication
   
 
     
@@ -15764,6 +15854,14 @@
 
 
 <h1 id="gpu-resident-checkpoints">GPU resident checkpoints<a class="headerlink" href="#gpu-resident-checkpoints" title="Permanent link">&para;</a></h1>
+<p>Current controllers create schema-v2 checkpoints; v1 noncommunication
+checkpoints remain restart-compatible. Resident communication is a concrete-only
+closed-map barrier: communication runs before optional prescribed volume
+evolution, and both invalidate saturation ratio only.</p>
+<p>The barrier resources and executor are direct imports under
+<code>particula.execution</code>; they are not package or top-level exports. Schema-v2
+restart creates fresh communication arrays and bindings rather than reusing
+source identities.</p>
 <p>The direct-import-only checkpoint boundary is available from
 <code>particula.execution.checkpoint</code>; it is deliberately not exported by
 <code>particula.execution</code> or the top-level package. Create a
@@ -15788,14 +15886,19 @@ target <code>Device</code> through <code>restart_resident_session(checkpoint, de
 <code>restart_checkpoint</code> is an equivalent concrete-only alias; both require the
 same exact compatible device and create fresh session, registry, guard, and
 resident-array identities.</p>
-<p>Restart compatibility is intentionally exact and fail-closed. The implementation
-accepts only <code>ResidentCheckpoint</code> records with schema version <code>1</code>, carrier type
-<code>"ResidentSession"</code>, lifecycle <code>ACTIVE</code>, complete valid canonical payload
-descriptors, and an exactly equal target <code>Device</code>. Finalization terminalizes its
-source session but returns an <code>ACTIVE</code>, restartable checkpoint record. Restart
-rejects other versions or carrier schemas, malformed or incomplete payloads,
-non-<code>ACTIVE</code> checkpoint records, and device mismatches; it does not promise
-forward or backward compatibility.</p>
+<p>Restart compatibility is intentionally exact and fail-closed. It accepts
+<code>ResidentCheckpoint</code> records with carrier type <code>"ResidentSession"</code>, lifecycle
+<code>ACTIVE</code>, complete valid canonical payload descriptors, and an exactly equal
+target <code>Device</code>. Schema-v1 checkpoints must be noncommunication checkpoints.
+Schema-v2 checkpoints may contain no communication family or exactly one
+complete closed-map GAS or PARTICLES communication family with matching
+metadata and payloads. Finalization terminalizes its source session but returns
+an <code>ACTIVE</code>, restartable checkpoint record. Restart creates fresh session,
+registry, guard, resident arrays, and communication bindings; it never reuses
+source identities or provides fallback. It rejects other versions or carrier
+schemas, malformed, incomplete, partial, mixed, or mismatched communication
+payloads, non-<code>ACTIVE</code> checkpoint records, and device mismatches; it does not
+promise forward or backward compatibility.</p>
 <p>Normal resident scheduler calls never checkpoint, finalize, or restart. Those
 operations remain this explicit, concrete-only exact-device boundary; see the
 <a href="../data-containers-and-gpu-foundations/#gpu-resident-deterministic-timestep">GPU-resident deterministic timestep</a>

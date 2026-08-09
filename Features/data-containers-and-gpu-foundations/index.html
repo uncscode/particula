@@ -4224,6 +4224,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -4340,6 +4344,34 @@
     
   
     particula.execution.checkpoint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/execution/communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.communication
   
 
     
@@ -4556,6 +4588,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../API/particula/execution/resident_communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.resident_communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../API/particula/execution/resident_scheduler/" class="md-nav__link">
         
   
@@ -4743,10 +4803,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_19" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_17" id="__nav_2_3_19_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_19" id="__nav_2_3_19_19_label" tabindex="0">
             
   
   
@@ -4764,8 +4824,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_17">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6174,6 +6234,8 @@
       
         
       
+        
+      
     
     
     
@@ -6262,6 +6324,34 @@
     
   
     particula.gpu.kernels.coagulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../API/particula/gpu/kernels/communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.gpu.kernels.communication
   
 
     
@@ -12654,6 +12744,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#prescribed-communication-and-volume-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prescribed communication and volume evolution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#complete-direct-process-illustration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -12663,6 +12764,34 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explicit-cpu-fallback-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explicit CPU fallback boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cpu-slot-diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CPU slot diagnostics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CPU slot diagnostics">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#cpu-slot-activation" class="md-nav__link">
@@ -16201,6 +16330,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#prescribed-communication-and-volume-evolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prescribed communication and volume evolution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#complete-direct-process-illustration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -16210,6 +16350,34 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#explicit-cpu-fallback-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explicit CPU fallback boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cpu-slot-diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CPU slot diagnostics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CPU slot diagnostics">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#cpu-slot-activation" class="md-nav__link">
@@ -16731,14 +16899,17 @@ restores, and needs roughly one additional host copy of resident payload bytes
 as well as detached inspection copies. The first successful finalization caches
 its snapshot; a later exact matching finalization returns that same object.</p>
 <p>The implemented compatibility boundary is exact and fail-closed: restart accepts
-only a <code>ResidentCheckpoint</code> with schema version <code>1</code>, carrier type
-<code>"ResidentSession"</code>, lifecycle <code>ACTIVE</code>, complete valid payload descriptors and
-payloads, and an exactly equal target <code>Device</code>. Other versions or carrier
-schemas, malformed or incomplete records, non-<code>ACTIVE</code> checkpoint records, and
-device mismatches are rejected. Restart is explicit, never automatic, and creates
-fresh session, registry, guard, containers, primary arrays, and sidecars. It
-does not select or migrate a device, provide fallback, or guarantee rollback
-after an asynchronous writer launches. See
+a <code>ResidentCheckpoint</code> with carrier type <code>"ResidentSession"</code>, lifecycle
+<code>ACTIVE</code>, complete valid payload descriptors and payloads, and an exactly equal
+target <code>Device</code>. Schema version <code>1</code> checkpoints must be noncommunication.
+Schema version <code>2</code> checkpoints may have no communication family or exactly one
+complete closed-map GAS or PARTICLES family with matching metadata and payloads.
+Other versions or carrier schemas, malformed, incomplete, mixed, or mismatched
+records, non-<code>ACTIVE</code> checkpoint records, and device mismatches are rejected.
+Restart is explicit, never automatic, and creates fresh session, registry,
+guard, containers, primary arrays, and sidecars. It does not select or migrate
+a device, provide fallback, or guarantee rollback after an asynchronous writer
+launches. See
 <a href="../gpu_resident_checkpoints/">GPU resident checkpoints</a>.</p>
 <h3 id="gpu-resident-deterministic-timestep">GPU-resident deterministic timestep<a class="headerlink" href="#gpu-resident-deterministic-timestep" title="Permanent link">&para;</a></h3>
 <p><code>particula.execution.resident_scheduler</code> and
@@ -16749,19 +16920,23 @@ guard, and resolver-produced complete schedule; direct adapters retain the
 resident objects by identity. Diagnostics is a closed two-snapshot protocol,
 not a callback API: it copies only to separate caller-owned outputs and supplies
 no implicit host inspection or transfer.</p>
-<p>The closed schedule contains exactly these node IDs:</p>
-<p><code>environment_update</code>, <code>gas_update</code>, <code>vapor_pressure_refresh</code>,
-<code>saturation_refresh</code>, <code>condensation</code>, <code>brownian_coagulation</code>, <code>dilution</code>,
-<code>wall_loss</code>, <code>nucleation</code>, and <code>diagnostics</code>.</p>
-<p>Its displayed order is resolver-produced and profile/graph-dependent, not a
-universal static order. Authoritative process dependencies come from the
-resolved graph; virtual freshness edges are <code>environment_update -&gt;
-vapor_pressure_refresh</code>, <code>environment_update -&gt; saturation_refresh</code>,
-<code>gas_update -&gt; saturation_refresh</code>, <code>vapor_pressure_refresh -&gt;
-saturation_refresh</code>, and <code>saturation_refresh -&gt; {condensation, diagnostics}</code>.
-The <code>SchedulerProfile</code> selects exactly one reviewed edge:
-<code>condensation -&gt; nucleation</code> or <code>nucleation -&gt; condensation</code>; the latter also
-requires nucleation before the saturation-refresh consumer window.</p>
+<p>The closed schedule contains exactly these twelve node IDs:</p>
+<p><code>communication</code>, <code>volume_evolution</code>, <code>environment_update</code>, <code>gas_update</code>,
+<code>vapor_pressure_refresh</code>, <code>saturation_refresh</code>, <code>condensation</code>,
+<code>brownian_coagulation</code>, <code>dilution</code>, <code>wall_loss</code>, <code>nucleation</code>, and
+<code>diagnostics</code>.</p>
+<p>The resolver-produced canonical order begins with closed-map communication,
+then optional prescribed volume evolution. These barriers use pre-update
+volumes and invalidate saturation only; neither refreshes derived state. The
+remaining order is profile/graph-dependent. Authoritative process dependencies
+come from the resolved graph; virtual freshness edges are
+<code>environment_update -&gt; vapor_pressure_refresh</code>,
+<code>environment_update -&gt; saturation_refresh</code>, <code>gas_update -&gt; saturation_refresh</code>,
+<code>vapor_pressure_refresh -&gt; saturation_refresh</code>, and
+<code>saturation_refresh -&gt; {condensation, diagnostics}</code>. The <code>SchedulerProfile</code>
+selects exactly one reviewed edge: <code>condensation -&gt; nucleation</code> or
+<code>nucleation -&gt; condensation</code>; the latter also requires nucleation before the
+saturation-refresh consumer window.</p>
 <table>
 <thead>
 <tr>
@@ -16770,6 +16945,10 @@ requires nucleation before the saturation-refresh consumer window.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>Closed-map communication and optional volume evolution</td>
+<td>Concrete resident barriers using pre-update volumes; saturation invalidation only</td>
+</tr>
 <tr>
 <td>Environment and gas updates</td>
 <td>Prescribed identity-preserving resident updates</td>
@@ -16788,13 +16967,59 @@ requires nucleation before the saturation-refresh consumer window.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="prescribed-communication-and-volume-evolution">Prescribed communication and volume evolution<a class="headerlink" href="#prescribed-communication-and-volume-evolution" title="Permanent link">&para;</a></h3>
+<p>E7-F7 ships fixed-shape, single-device prescribed-map boundaries, not CFD or a
+user-facing transport API. Direct gas communication accepts a GAS map with
+closed in-domain edges and declared <code>-1</code> source/sink endpoints. Direct particle
+transport accepts only closed in-domain, particle-resolved, fixed-slot
+PARTICLES maps. In contrast, a resident session pins exactly one complete
+closed-map GAS or PARTICLES family and rejects combined or open forms.</p>
+<p>Direct callers own the same-device fixed-shape primaries, maps, and work
+storage. Gas communication uses caller-owned <code>(B, S)</code> <code>amounts</code>,
+<code>amount_deltas</code>, and <code>outbound_amounts</code> <code>wp.float64</code> ledgers; a <code>(B, S)</code> source
+or sink ledger is required only when its matching open endpoint is enabled.
+Particle transport uses <code>(B, N)</code> debit/credit ledgers and <code>(E, N)</code> assignment
+and request buffers. Optional final volumes are caller-owned <code>(B,)</code>
+<code>wp.float64</code> values. Successful direct calls are asynchronous, so callers must
+synchronize before inspection.</p>
+<p>Direct gas stages immutable pre-step <code>amount = concentration * volume</code>, makes
+one gas commit, and uses <code>new_concentration = final_amount / new_volume</code>. At
+this standalone boundary, <code>new_volume</code> is the current unchanged volume, so its
+sole normalization is equivalently <code>(amounts + amount_deltas) / volume</code>; it has
+no fused direct-gas <code>new_volume</code> argument. In a resident schedule,
+communication first stages with old volumes, then optional volume evolution
+rescales particle and gas concentrations by <code>old_volume / final_volume</code>. This
+is not a second direct-gas normalization.</p>
+<p>Closed gas maps conserve extensive species amounts within floating-point
+tolerance. Open gas inventory changes are intentional and auditable through
+the source/sink ledgers. Closed particle maps conserve concentration-weighted
+particle number, every mass lane, and signed charge. Particle planning reads
+immutable pre-step state, prefers an exact population match, then uses the next
+ascending pre-step free slot. Capacity is deterministically gated: there is no
+resize, compaction, implicit activation, or clipping.</p>
+<p>Host/schema preflight rejects without primary or buffer mutation. During device
+planning, documented work or planning buffers may change while primaries remain
+gated; rollback is not promised after a writer launches. At the standalone
+direct-kernel boundaries, validated empty or disabled maps and unchanged final
+volumes are successful write-free no-ops. Resident composition has its own
+barrier validation and does not make this general no-op guarantee.
+Invalid map, schema, domain, alias, or device inputs, aggregate gas overdraw,
+and required-but-missing open ledgers reject before primary commit.</p>
+<p>The resident communication-then-volume barrier retains the twelve node IDs and
+canonical order above: it uses old-volume staging, invalidates saturation only,
+and retains fresh vapor pressure. Restart remains explicit and exact-device with
+fresh identities. This scope excludes CFD, adaptive/distributed/multi-GPU
+transport, hidden transfer or synchronization, CPU fallback, resizing or
+compaction, E7-F8 RNG policy, graph capture, performance claims, and autodiff.</p>
 <p>The direct scheduler skips virtual refresh-node dispatch. Instead, the
 thermodynamic coordinator refreshes stale state in vapor-pressure-then-
 saturation order immediately before condensation or diagnostics consumer
 callbacks. Environment invalidates vapor pressure and saturation; gas,
-condensation, and nucleation invalidate saturation. <code>ParticleData.volume</code> is
-fixed resident state: transport, mixing, advection, and volume evolution belong
-to E7-F7.</p>
+communication, volume evolution, condensation, and nucleation invalidate
+saturation. <code>volume_evolution_step_gpu</code> is independently callable at its
+standalone direct-kernel boundary. Its use in resident composition is the
+optional scheduled barrier; transport, mixing, and advection remain outside
+this boundary.</p>
 <p>Normal steps do not convert or transfer data, synchronize, restore, checkpoint,
 finalize, restart, acquire or replace resources, fall back to CPU, retry, resize,
 compact, capture graphs, claim performance, use multiple GPUs, or rewrite
@@ -16830,39 +17055,31 @@ optional Warp guard:</p>
         <span class="n">WarpGasData</span><span class="p">,</span>
         <span class="n">WarpParticleData</span><span class="p">,</span>
     <span class="p">)</span>
- <span class="err">```</span>
-
-<span class="c1">## Explicit CPU fallback boundary</span>
-
-<span class="err">`</span><span class="n">particula</span><span class="o">.</span><span class="n">execution</span><span class="o">.</span><span class="n">fallback</span><span class="err">`</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">direct</span><span class="o">-</span><span class="n">import</span><span class="o">-</span><span class="n">only</span> <span class="n">mechanics</span> <span class="n">boundary</span><span class="p">;</span> <span class="n">the</span>
-<span class="n">module</span><span class="p">,</span> <span class="n">its</span> <span class="n">operations</span><span class="p">,</span> <span class="ow">and</span> <span class="n">its</span> <span class="n">request</span><span class="o">/</span><span class="n">result</span> <span class="n">carriers</span> <span class="n">are</span> <span class="ow">not</span> <span class="n">exported</span> <span class="kn">from</span>
-<span class="err">`</span><span class="n">particula</span><span class="o">.</span><span class="n">execution</span><span class="err">`</span> <span class="ow">or</span> <span class="n">top</span><span class="o">-</span><span class="n">level</span> <span class="err">`</span><span class="n">particula</span><span class="err">`</span><span class="o">.</span> <span class="n">Its</span> <span class="n">three</span> <span class="n">policy</span> <span class="n">enums</span>
-<span class="p">(</span><span class="err">`</span><span class="n">FallbackPolicy</span><span class="err">`</span><span class="p">,</span> <span class="err">`</span><span class="n">FallbackBoundary</span><span class="err">`</span><span class="p">,</span> <span class="ow">and</span> <span class="err">`</span><span class="n">CPUStateAuthority</span><span class="err">`</span><span class="p">)</span> <span class="n">are</span> <span class="n">the</span>
-<span class="n">intentional</span> <span class="n">exception</span> <span class="ow">and</span> <span class="n">are</span> <span class="n">public</span> <span class="n">at</span> <span class="n">both</span> <span class="n">boundaries</span><span class="o">.</span> <span class="n">A</span> <span class="n">caller</span> <span class="n">that</span> <span class="n">receives</span>
-<span class="n">a</span> <span class="n">typed</span> <span class="n">capability</span> <span class="n">error</span> <span class="n">may</span> <span class="n">construct</span> <span class="n">a</span> <span class="n">concrete</span> <span class="err">`</span><span class="n">FallbackRequest</span><span class="err">`</span> <span class="k">with</span> <span class="n">the</span>
-<span class="n">default</span><span class="o">-</span><span class="n">deny</span> <span class="err">`</span><span class="n">FallbackPolicy</span><span class="o">.</span><span class="n">RAISE</span><span class="err">`</span><span class="p">,</span> <span class="n">which</span> <span class="n">re</span><span class="o">-</span><span class="n">raises</span> <span class="n">the</span> <span class="n">same</span> <span class="n">eligible</span> <span class="n">error</span><span class="o">.</span>
-<span class="n">Only</span> <span class="n">an</span> <span class="n">explicit</span> <span class="err">`</span><span class="n">FallbackPolicy</span><span class="o">.</span><span class="n">CPU</span><span class="err">`</span> <span class="n">request</span> <span class="n">may</span> <span class="n">select</span> <span class="n">the</span> <span class="n">already</span><span class="o">-</span><span class="n">registered</span>
-<span class="n">CPU</span> <span class="n">adapter</span><span class="p">,</span> <span class="ow">and</span> <span class="n">only</span> <span class="k">for</span> <span class="err">`</span><span class="n">UNKNOWN_DEVICE</span><span class="err">`</span><span class="p">,</span> <span class="err">`</span><span class="n">RUNTIME_UNAVAILABLE</span><span class="err">`</span><span class="p">,</span>
-<span class="err">`</span><span class="n">DEVICE_UNAVAILABLE</span><span class="err">`</span><span class="p">,</span> <span class="err">`</span><span class="n">PROCESS_UNSUPPORTED</span><span class="err">`</span><span class="p">,</span> <span class="ow">or</span> <span class="err">`</span><span class="n">CAPABILITY_UNSUPPORTED</span><span class="err">`</span><span class="o">.</span>
-
-<span class="n">The</span> <span class="n">caller</span> <span class="n">must</span> <span class="n">provide</span> <span class="n">exact</span> <span class="err">`</span><span class="n">CPUExecutionState</span><span class="err">`</span> <span class="n">at</span> <span class="n">either</span> <span class="n">the</span>
-<span class="n">CPU</span><span class="o">-</span><span class="n">authoritative</span> <span class="err">`</span><span class="n">PRE_UPLOAD</span><span class="err">`</span> <span class="n">boundary</span> <span class="ow">or</span> <span class="n">the</span> <span class="n">caller</span><span class="o">-</span><span class="n">asserted</span> <span class="err">`</span><span class="n">RESTORED</span><span class="err">`</span>
-<span class="n">boundary</span><span class="o">.</span> <span class="n">Resident</span><span class="p">,</span> <span class="n">uploaded</span><span class="p">,</span> <span class="ow">and</span> <span class="n">mutated</span> <span class="n">state</span> <span class="n">claims</span> <span class="n">reject</span><span class="p">;</span> <span class="n">this</span> <span class="n">boundary</span>
-<span class="n">does</span> <span class="ow">not</span> <span class="n">restore</span> <span class="ow">or</span> <span class="n">verify</span> <span class="n">restoration</span><span class="o">.</span> <span class="n">A</span> <span class="n">successful</span> <span class="n">fallback</span> <span class="n">wrapper</span> <span class="n">exposes</span>
-<span class="n">ordered</span> <span class="err">`</span><span class="n">requested_backend</span><span class="err">`</span><span class="p">,</span> <span class="err">`</span><span class="n">selected_backend</span><span class="err">`</span><span class="p">,</span> <span class="ow">and</span> <span class="err">`</span><span class="n">capability_reason</span><span class="err">`</span>
-<span class="n">provenance</span> <span class="k">while</span> <span class="n">leaving</span> <span class="n">the</span> <span class="n">native</span> <span class="err">`</span><span class="n">ExecutionResult</span><span class="o">.</span><span class="n">metadata</span><span class="err">`</span> <span class="n">unchanged</span><span class="o">.</span>
-
-<span class="n">This</span> <span class="n">explicit</span> <span class="n">seam</span> <span class="n">provides</span> <span class="n">no</span> <span class="n">package</span> <span class="n">export</span><span class="p">,</span> <span class="n">implicit</span> <span class="n">CPU</span> <span class="n">fallback</span><span class="p">,</span> <span class="n">movement</span><span class="p">,</span>
-<span class="n">conversion</span><span class="p">,</span> <span class="n">synchronization</span><span class="p">,</span> <span class="n">checkpoint</span><span class="o">/</span><span class="n">finalize</span><span class="o">/</span><span class="n">restore</span> <span class="n">operation</span><span class="p">,</span> <span class="n">retry</span><span class="p">,</span> <span class="ow">or</span>
-<span class="n">post</span><span class="o">-</span><span class="n">writer</span> <span class="n">rollback</span><span class="o">.</span>
-
-<span class="c1">## CPU slot diagnostics</span>
-
-<span class="err">`</span><span class="n">get_slot_diagnostics</span><span class="p">()</span><span class="err">`</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">public</span> <span class="n">CPU</span><span class="o">-</span><span class="n">only</span><span class="p">,</span> <span class="n">read</span><span class="o">-</span><span class="n">only</span> <span class="n">discovery</span> <span class="n">API</span> <span class="k">for</span>
-<span class="n">fixed</span> <span class="n">particle</span><span class="o">-</span><span class="n">resolved</span> <span class="err">`</span><span class="n">ParticleData</span><span class="err">`</span> <span class="n">storage</span><span class="p">:</span>
-
-<span class="err">```</span><span class="n">python</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_slot_diagnostics</span>
+</code></pre></div>
+<h2 id="explicit-cpu-fallback-boundary">Explicit CPU fallback boundary<a class="headerlink" href="#explicit-cpu-fallback-boundary" title="Permanent link">&para;</a></h2>
+<p><code>particula.execution.fallback</code> is a direct-import-only mechanics boundary; the
+module, its operations, and its request/result carriers are not exported from
+<code>particula.execution</code> or top-level <code>particula</code>. Its three policy enums
+(<code>FallbackPolicy</code>, <code>FallbackBoundary</code>, and <code>CPUStateAuthority</code>) are the
+intentional exception and are public at both boundaries. A caller that receives
+a typed capability error may construct a concrete <code>FallbackRequest</code> with the
+default-deny <code>FallbackPolicy.RAISE</code>, which re-raises the same eligible error.
+Only an explicit <code>FallbackPolicy.CPU</code> request may select the already-registered
+CPU adapter, and only for <code>UNKNOWN_DEVICE</code>, <code>RUNTIME_UNAVAILABLE</code>,
+<code>DEVICE_UNAVAILABLE</code>, <code>PROCESS_UNSUPPORTED</code>, or <code>CAPABILITY_UNSUPPORTED</code>.</p>
+<p>The caller must provide exact <code>CPUExecutionState</code> at either the
+CPU-authoritative <code>PRE_UPLOAD</code> boundary or the caller-asserted <code>RESTORED</code>
+boundary. Resident, uploaded, and mutated state claims reject; this boundary
+does not restore or verify restoration. A successful fallback wrapper exposes
+ordered <code>requested_backend</code>, <code>selected_backend</code>, and <code>capability_reason</code>
+provenance while leaving the native <code>ExecutionResult.metadata</code> unchanged.</p>
+<p>This explicit seam provides no package export, implicit CPU fallback, movement,
+conversion, synchronization, checkpoint/finalize/restore operation, retry, or
+post-writer rollback.</p>
+<h2 id="cpu-slot-diagnostics">CPU slot diagnostics<a class="headerlink" href="#cpu-slot-diagnostics" title="Permanent link">&para;</a></h2>
+<p><code>get_slot_diagnostics()</code> is the public CPU-only, read-only discovery API for
+fixed particle-resolved <code>ParticleData</code> storage:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">particula.particles</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_slot_diagnostics</span>
 
 <span class="n">free_indices</span><span class="p">,</span> <span class="n">active_counts</span><span class="p">,</span> <span class="n">free_counts</span> <span class="o">=</span> <span class="n">get_slot_diagnostics</span><span class="p">(</span><span class="n">particle_data</span><span class="p">)</span>
 </code></pre></div>
