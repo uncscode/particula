@@ -58,6 +58,12 @@ Ensure all changed code has comprehensive test coverage by:
 - Enforcing 80% coverage threshold for changed code
 - Returning structured results for primary agent
 
+This is a test-and-coverage-only agent. Do not run or require Ruff, formatting,
+mypy, or other lint/type checks. Those capabilities are intentionally denied
+and belong to lint-capable validation agents. A caller request for those checks
+does not turn their absence into a test failure; ignore that out-of-contract
+request and report only test/coverage evidence.
+
 # Input Format
 
 ```
@@ -167,6 +173,12 @@ adw_spec_read({
 ```
 
 Extract `worktree_path` and navigate to worktree.
+
+`worktree_path` is mandatory validation context. Every `run_pytest_advanced`
+and worktree-scoped `run_bun_test` call must pass it as `cwd`; never rely on the
+ambient process directory. If it is missing, invalid, or rejected by the
+wrapper, return `ADW_BUILD_TESTS_BLOCKED` rather than running against another
+checkout.
 
 ## Step 2: Identify Functions Needing Tests
 
@@ -351,7 +363,8 @@ run_pytest_advanced({
   "coverage": true,
   "coverageSource": "{source_module}",
   "coverageThreshold": 80,
-  "timeout": 120
+  "timeout": 120,
+  "cwd": "{worktree_path}"
 })
 ```
 
@@ -361,17 +374,38 @@ run_pytest_advanced({
 - `coverageSource: "{source_module_a},{source_module_b}"` - Measure coverage for the changed modules (e.g., "adw/core,adw/utils")
 - `coverageThreshold: 80` - Validation fails if coverage < 80%
 - `options: "fail-fast"` - Stop on first failure (`-x` flag) for faster feedback
-- `cwd: "{worktree_path}"` - Optional, use when running in isolated worktree
+- `cwd: "{worktree_path}"` - Required for every isolated-worktree test run
 - `pytestArgs` - Only needs scope path and markers (coverage handled by explicit options)
 
-### 5.2: Analyze Results
+### 5.2: Classify Runner Outcomes Before Retrying
+
+Separate repository test failures from validation-infrastructure failures:
+
+- **Test/implementation failure:** pytest started and produced collection,
+  assertion, or changed-code coverage evidence attributable to the target
+  repository. Analyze and retry up to three times.
+- **Infrastructure blocked:** the wrapper or its own runtime failed before
+  usable pytest collection/coverage evidence. Examples include a
+  `ModuleNotFoundError` for wrapper-owned `adforge_core` or `adw` dependencies,
+  an unavailable pytest adapter/executable, rejected required `cwd`, or a
+  wrapper startup crash. Return `ADW_BUILD_TESTS_BLOCKED` immediately.
+- **Target import failure:** an import error for the changed repository's own
+  module during pytest collection remains a test/implementation failure, not an
+  infrastructure block.
+
+Infrastructure blocks do not consume the three normal test retries. Do not edit
+application code or tests to compensate for a missing wrapper-owned dependency.
+Log one bounded feedback entry when available; feedback failure is best-effort
+and must not replace the original blocked reason.
+
+### 5.3: Analyze Results
 
 Parse output for:
 - **Passed tests**: Count and list
 - **Failed tests**: Error messages, locations
 - **Coverage**: Percentage for changed files
 
-### 5.3: Fix Failures (If Any)
+### 5.4: Fix Failures (If Any)
 
 For each failure:
 1. Identify root cause (test bug vs implementation bug)
@@ -379,7 +413,7 @@ For each failure:
 3. If **implementation bug**: Note for primary agent (don't fix implementation)
 4. Retry tests
 
-### 5.4: Check Coverage Threshold
+### 5.5: Check Coverage Threshold
 
 The `coverageThreshold: 80` option automatically fails validation if coverage is below 80%.
 The output will show:
@@ -435,6 +469,20 @@ Implementation bugs detected (for adw-build to fix):
 Recommendation: Fix implementation issues listed above and retry
 ```
 
+### Infrastructure-Blocked Case
+
+```
+ADW_BUILD_TESTS_BLOCKED: {bounded infrastructure reason}
+
+Scope: {file/module/dir}
+Tests started: no
+Retries consumed: 0/3
+Dependency or adapter: {wrapper-owned dependency or adapter}
+
+Recommendation: restore the validation runtime, then rerun the same explicit
+worktree-scoped test request
+```
+
 # Test Quality Standards
 
 Each test must have:
@@ -484,6 +532,7 @@ Context: Parser now uses new data models
 **Output Signals:**
 - `ADW_BUILD_TESTS_SUCCESS` → Tests validated, all passing
 - `ADW_BUILD_TESTS_FAILED` → Could not achieve passing tests after 3 retries
+- `ADW_BUILD_TESTS_BLOCKED` → Wrapper/runtime failed before usable test evidence
 
 **Coverage Threshold:** 80% for changed code
 

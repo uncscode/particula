@@ -25,6 +25,10 @@ type Invocation = {
   args: string[];
   env?: Record<string, string>;
   cwd?: string;
+  stdin?: string | Uint8Array;
+  stdout?: "pipe";
+  stderr?: "pipe";
+  timeout?: number;
 };
 
 const originalBun = (globalThis as { Bun?: typeof Bun }).Bun;
@@ -82,7 +86,15 @@ const toArgv = (input: unknown[]): string[] =>
   });
 
 export const installSubprocessMocks = (): void => {
-  bunRef.spawnSync = ((args: string[] | { cmd?: string[]; env?: Record<string, string>; cwd?: string }) => {
+  bunRef.spawnSync = ((args: string[] | {
+    cmd?: string[];
+    env?: Record<string, string>;
+    cwd?: string;
+    stdin?: string | Uint8Array;
+    stdout?: "pipe";
+    stderr?: "pipe";
+    timeout?: number;
+  }) => {
     const capturedArgs = Array.isArray(args)
       ? [...args]
       : Array.isArray(args?.cmd)
@@ -93,6 +105,16 @@ export const installSubprocessMocks = (): void => {
       args: capturedArgs,
       env: Array.isArray(args) ? undefined : args?.env,
       cwd: Array.isArray(args) ? undefined : args?.cwd,
+      stdin: Array.isArray(args)
+        ? undefined
+        : typeof args?.stdin === "string"
+        ? args.stdin
+        : args?.stdin
+        ? Buffer.from(args.stdin).toString("utf8")
+        : undefined,
+      stdout: Array.isArray(args) ? undefined : args?.stdout,
+      stderr: Array.isArray(args) ? undefined : args?.stderr,
+      timeout: Array.isArray(args) ? undefined : args?.timeout,
     });
     if (spawnError) {
       const err = new Error(spawnError.message ?? "") as Error & {

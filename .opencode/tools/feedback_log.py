@@ -600,7 +600,11 @@ def _load_feedback_backend() -> FeedbackBackend:
     try:
         feedback_module = importlib.import_module("adw.utils.feedback")
     except ModuleNotFoundError as exc:
-        if exc.name != "adw.utils.feedback":
+        missing_name = exc.name
+        target_name = "adw.utils.feedback"
+        if not missing_name or not (
+            missing_name == target_name or target_name.startswith(f"{missing_name}.")
+        ):
             raise
         log_dir = _get_repo_root() / "adforge_local" / "agents" / "feedback"
         return FeedbackBackend(

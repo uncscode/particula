@@ -52,9 +52,12 @@
   `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`: E7-F6 owns availability,
   fallback, error taxonomy, API stability, and export policy. The
   dependency-neutral `scheduler` remains declaration-only; E7-F5 P6 separately
-  provides a bounded concrete resident complete-loop composer. E7-F7 transport,
-  E7-F8 detailed RNG-stream policy, implicit transfer/synchronization, retry,
-  broad fallback, and replacement of direct GPU APIs remain deferred.
+   provides a bounded concrete resident complete-loop composer. E7-F7 P1 now
+   provides only a concrete communication-map declaration/read-only validation
+   seam; its later volume-write, transfer-admission, transport, and resident
+   binding phases remain deferred. E7-F8 detailed RNG-stream policy, implicit
+   transfer/synchronization, retry, broad fallback, and replacement of direct
+   GPU APIs also remain deferred.
 - `particula.execution.fallback` is the sole concrete, direct-import-only E7-F6
   P3 opt-in CPU fallback boundary. Its default `RAISE` policy re-raises the
   exact eligible typed availability/support failure. Explicit CPU policy may
@@ -162,7 +165,22 @@
   no-ops. The boundary neither schedules nodes nor refreshes vapor pressure or
   saturation ratio; it does not acquire resources, transport or transfer host
   data, synchronize, alter lifecycle state, fall back, or gain package/top-level
-  exports. See [ADR-010](decisions/ADR-010-resident-state-update-boundary.md).
+   exports. See [ADR-010](decisions/ADR-010-resident-state-update-boundary.md).
+- `particula.execution.communication` is a concrete-only, direct-import,
+  Warp-dependent E7-F7 P1 declaration and read-only validation boundary for
+  fixed-shape communication maps. Its frozen configuration preserves
+  caller-owned map arrays by identity without session or registry binding.
+  Validation checks only map topology, enabled-edge flags, nonnegative finite
+  per-edge rates in 1/s, optional finite positive final volumes in m³, and
+  fixed-schema nonaliasing. It writes no caller-owned or resident array and
+  copies no payload; empty and all-disabled maps remain successful write-free
+  cases after complete applicable preflight. Because P1 has neither source
+  inventory nor time-step input, it cannot validate population-dependent
+  outbound overdraw: P3 owns that atomic pre-writer check. P2 owns volume
+  writes, P4 owns particle transport, and P5 owns exact resident
+  primary/sidecar alias checks. The module provides no transfer,
+  synchronization, fallback, or scheduling behavior and is not exported through
+  `particula.execution` or top-level `particula`.
 - `particula.execution.thermodynamic_updates` is a concrete-only,
   direct-import Warp-dependent freshness coordinator. Its exact request binds
   an active `ResidentSession`, pinned `GPUResourceRegistry`, resolver-produced

@@ -74,11 +74,20 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Pattern, Tuple, Union
 
-_REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPOSITORY_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPOSITORY_ROOT))
+_EVIDENCE_CONTRACT = "e37-m2-validation-git"
+_EVIDENCE_VERSION = 1
 
-from adforge_core.runtime.evidence import evidence_identity_projection  # noqa: E402
+
+def evidence_identity_projection() -> dict[str, object]:
+    """Return the portable validation-evidence identity.
+
+    The OpenCode pytest backend is copied into repositories that do not ship
+    ADforge's Pydantic runtime, so this fixed compatibility marker is owned
+    locally rather than imported from :mod:`adforge_core`.
+    """
+
+    return {"contract": _EVIDENCE_CONTRACT, "version": _EVIDENCE_VERSION}
+
 
 SECTION_HEADER_PATTERN = re.compile(r"^=+\s*.+\s*=+\s*$")
 DURATIONS_HEADER_PATTERN = re.compile(

@@ -8,7 +8,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 
 def _load_adapter():
@@ -112,6 +112,16 @@ def test_adapter_derives_common_directory_when_loaded_from_linked_worktree(
 
     assert result == {"ok": True}
     core.assert_called_once()
+
+
+def test_adapter_derives_primary_checkout_when_loaded_from_linked_worktree(
+    tmp_path: Path,
+) -> None:
+    """Linked adapter sources admit their shared primary checkout."""
+    primary, common, linked = _registered_worktree_topology(tmp_path)
+    adapter = _load_adapter()
+
+    assert adapter._derive_primary_worktree(linked, common) == primary
 
 
 def test_adapter_rejects_oversized_metadata_pointer_without_unbounded_read(
@@ -402,3 +412,61 @@ print(json.dumps(loaded))
     )
 
     assert json.loads(result.stdout) == []
+
+
+def test_adapter_rejects_whitespace_padded_refs() -> None:
+    """Ref admission must reject rather than normalize surrounding whitespace."""
+    adapter = _load_adapter()
+
+    assert adapter._validate_ref("HEAD") == "HEAD"
+    assert adapter._validate_ref(" HEAD ") is None
+
+
+def test_adapter_preserves_confined_posix_backslash_filename(tmp_path: Path) -> None:
+    """A backslash remains a literal filename character on POSIX."""
+    adapter = _load_adapter()
+
+    assert adapter._normalize_path(tmp_path, r"folder\name.py") == r"folder\name.py"
+
+
+def test_adapter_launches_resolved_git_with_literal_pathspecs(tmp_path: Path) -> None:
+    """Fixed Git launches pin the executable and force literal path interpretation."""
+    adapter = _load_adapter()
+    process = MagicMock()
+    process.stdout = io.BytesIO(b"")
+    process.stderr = io.BytesIO(b"")
+    process.returncode = 0
+
+    with (
+        patch.object(adapter.shutil, "which", return_value="/usr/bin/git"),
+        patch.object(adapter.subprocess, "Popen", return_value=process) as popen,
+    ):
+        result = adapter._run_git(["git", "diff", "--", "*.py"], cwd=tmp_path)
+
+    assert result.returncode == 0
+    assert popen.call_args.args[0][:5] == [
+        "/usr/bin/git",
+        "-c",
+        "core.fsmonitor=false",
+        "--literal-pathspecs",
+        "diff",
+    ]
+
+
+def test_adapter_preserves_bounded_details_for_precompletion_failure() -> None:
+    """A failed fixed launch retains the established bounded diagnostic shape."""
+    adapter = _load_adapter()
+    context = adapter._ProjectContext(root=adapter._TRUSTED_WORKTREE)
+
+    with patch.object(adapter, "_run_git", side_effect=FileNotFoundError("git")):
+        result = adapter.execute_git_tool(
+            context,
+            "git_status",
+            {"worktree_path": str(adapter._TRUSTED_WORKTREE)},
+        )
+
+    details = result["error"]["details"]
+    assert result["error"]["type"] == "unavailable"
+    assert details["return_code"] == -1
+    assert details["worktree_path"] == "<worktree>"
+    assert details["stdout"] == ""

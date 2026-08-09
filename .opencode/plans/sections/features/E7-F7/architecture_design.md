@@ -43,18 +43,25 @@ must declare source/sink ledgers so apparent non-conservation is explicit.
 
 ## Data / API / Workflow Changes
 
-- **Data model:** Add immutable communication configuration with fixed edge
-  capacity, source/destination `int32` arrays, enabled mask, finite nonnegative
-  physical inverse-time transfer rates integrated over `time_step`, transport
-  mode, optional boundary accounting, and prescribed final-volume inputs. Shapes
-  and edge capacity remain stable for the session.
+- **P1 declaration boundary (shipped):** Concrete-only
+  `particula.execution.communication` provides frozen, identity-retaining map,
+  transport-mode, resource-shape, optional final-volume, and configuration
+  declarations. Its sole entry point validates fixed Warp schemas, metadata,
+  ranges/aliases, finite domains, enabled topology, and duplicate directed
+  edges without writes, payload copies, primary-state reads, or exports.
+  Population-dependent outbound overdraw is explicitly deferred to P3, which
+  alone has source inventory and `time_step` inputs.
+- **Data model (later phases):** The fixed edge capacity, source/destination
+  `int32` arrays, enabled mask, finite nonnegative inverse-time rates,
+  transport mode, and optional final volumes remain stable for the session.
 - **Resident resources:** Add same-device `float64` amount ledgers for gas,
   particle concentration and species inventory, `int32` slot plans/status, and
   documented diagnostics. E7-F4 allocates or validates them once and checkpoints
   mutable state needed for restart.
-- **API surface:** Expose only high-level immutable declarations and scheduler
-  node configuration through `particula.execution`. Keep concrete Warp kernels,
-  scratch records, status buffers, and slot planners module-local.
+- **API surface:** P1 declarations and validation are direct-import-only from
+  `particula.execution.communication`; they are not exported through
+  `particula.execution` or the package. Later scheduler-facing configuration
+  remains deferred.
 - **Gas semantics:** Treat `gas.concentration` as mass per volume. Stage
   `concentration * old_volume`, transfer synchronously, account for open
   boundaries explicitly, and divide by validated final volume.

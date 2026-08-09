@@ -109,6 +109,29 @@ def test_carriers_are_frozen_and_validate_cheap_metadata() -> None:
         )
 
 
+@pytest.mark.warp
+def test_configuration_retains_all_caller_array_identities() -> None:
+    """Frozen declaration carriers preserve every supplied Warp array."""
+    communication = _communication()
+    wp = pytest.importorskip("warp")
+    volumes = wp.array([1.0, 2.0, 3.0], dtype=wp.float64, device="cpu")
+    configuration, dimensions = _configuration(communication, volumes=volumes)
+
+    result = communication.validate_communication_configuration(
+        configuration, dimensions, wp.get_device("cpu")
+    )
+
+    map_data = result.communication_map
+    assert map_data.source_boxes is configuration.communication_map.source_boxes
+    assert (
+        map_data.destination_boxes
+        is configuration.communication_map.destination_boxes
+    )
+    assert map_data.enabled is configuration.communication_map.enabled
+    assert map_data.rates is configuration.communication_map.rates
+    assert result.prescribed_volume.final_volumes is volumes
+
+
 def test_carrier_metadata_rejects_invalid_enum_nested_and_roles() -> None:
     """Carrier construction rejects malformed metadata before Warp preflight."""
     communication = _communication()
@@ -463,7 +486,7 @@ def test_sparse_duplicate_allocation_scales_with_edges_not_boxes() -> None:
     finally:
         communication.wp.full = original_full  # type: ignore[assignment]
 
-    assert table_sizes == [communication._duplicate_table_size(4)]
+    assert table_sizes == [communication._duplicate_scratch_size(4)]
 
 
 @pytest.mark.warp
@@ -501,6 +524,144 @@ def test_schema_alias_and_empty_preflight() -> None:
         )
         is empty
     )
+
+
+@pytest.mark.warp
+def test_final_volumes_alias_map_storage_rejects_independently() -> None:
+    """Volume storage must not overlap a distinct map array."""
+    communication = _communication()
+    wp = pytest.importorskip("warp")
+    rates = wp.array([1.0, 2.0], dtype=wp.float64, device="cpu")
+    overlapping_volumes = wp.array(
+        ptr=rates.ptr,
+        capacity=24,
+        dtype=wp.float64,
+        shape=(3,),
+        strides=(8,),
+        device="cpu",
+        copy=False,
+    )
+    configuration, dimensions = _configuration(
+        communication, rates=rates, volumes=overlapping_volumes
+    )
+
+    with pytest.raises(ValueError, match="must not alias"):
+        communication.validate_communication_configuration(
+            configuration, dimensions, wp.get_device("cpu")
+        )
+
+
+@pytest.mark.warp
+def test_all_disabled_and_empty_maps_validate_full_rate_volume_domains() -> (
+    None
+):
+    """No-op maps still reject invalid applicable rate and volume domains."""
+    communication = _communication()
+    wp = pytest.importorskip("warp")
+    disabled, dimensions = _configuration(
+        communication,
+        enabled=wp.array([0, 0], dtype=wp.int32, device="cpu"),
+        rates=wp.array([np.nan, 1.0], dtype=wp.float64, device="cpu"),
+    )
+    with pytest.raises(ValueError, match="rates values"):
+        communication.validate_communication_configuration(
+            disabled, dimensions, wp.get_device("cpu")
+        )
+
+    empty_map = communication.CommunicationMap(
+        communication.CommunicationMapForm.ONE_DIMENSIONAL,
+        communication.CommunicationTransportMode.GAS,
+        0,
+        wp.empty(0, dtype=wp.int32, device="cpu"),
+        wp.empty(0, dtype=wp.int32, device="cpu"),
+        wp.empty(0, dtype=wp.int32, device="cpu"),
+        wp.empty(0, dtype=wp.float64, device="cpu"),
+    )
+    empty = communication.CommunicationConfiguration(
+        empty_map,
+        communication.PrescribedVolumeUpdate(
+            wp.array([0.0], dtype=wp.float64, device="cpu")
+        ),
+        (),
+    )
+    from particula.execution.gpu_session import ResidentDimensions
+
+    with pytest.raises(ValueError, match="final_volumes values"):
+        communication.validate_communication_configuration(
+            empty, ResidentDimensions(1, 0, 0), wp.get_device("cpu")
+        )
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("value", "exc_type", "match"),
+    [
+        (True, TypeError, "dimensions.n_boxes must be an integral"),
+        (-1, ValueError, "dimensions.n_boxes must be nonnegative"),
+        (1.5, TypeError, "dimensions.n_boxes must be an integral"),
+    ],
+)
+def test_mutated_dimensions_n_boxes_reject_before_array_preflight(
+    value: object, exc_type: type[Exception], match: str
+) -> None:
+    """Frozen-dataclass bypasses cannot invalidate preflight dimensions."""
+    communication = _communication()
+    wp = pytest.importorskip("warp")
+    configuration, dimensions = _configuration(communication)
+    object.__setattr__(dimensions, "n_boxes", value)
+
+    with pytest.raises(exc_type, match=match):
+        communication.validate_communication_configuration(
+            configuration, dimensions, wp.get_device("cpu")
+        )
+
+
+@pytest.mark.warp
+def test_duplicate_sort_uses_enabled_edges_not_disabled_capacity() -> None:
+    """Collision-prone valid keys and disabled padding use compact scratch."""
+    communication = _communication()
+    wp = pytest.importorskip("warp")
+    from particula.execution.gpu_session import ResidentDimensions
+
+    capacity = 64
+    source = wp.array(
+        [0, 1] + [-1] * (capacity - 2), dtype=wp.int32, device="cpu"
+    )
+    destination = wp.array(
+        [8, 7] + [-1] * (capacity - 2), dtype=wp.int32, device="cpu"
+    )
+    enabled = wp.array(
+        [1, 1] + [0] * (capacity - 2), dtype=wp.int32, device="cpu"
+    )
+    rates = wp.array([1.0] * capacity, dtype=wp.float64, device="cpu")
+    configuration, _ = _configuration(
+        communication,
+        form=communication.CommunicationMapForm.ARBITRARY_PAIRS,
+        edge_capacity=capacity,
+        source=source,
+        destination=destination,
+        enabled=enabled,
+        rates=rates,
+    )
+    sizes: list[int] = []
+    original_full = communication.wp.full
+
+    def tracked_full(*args: object, **kwargs: object) -> Any:
+        sizes.append(cast(int, args[0] if args else kwargs["shape"]))
+        return original_full(*args, **kwargs)
+
+    communication.wp.full = tracked_full  # type: ignore[assignment]
+    try:
+        assert (
+            communication.validate_communication_configuration(
+                configuration, ResidentDimensions(9, 0, 0), wp.get_device("cpu")
+            )
+            is configuration
+        )
+    finally:
+        communication.wp.full = original_full  # type: ignore[assignment]
+
+    assert sizes == [communication._duplicate_scratch_size(2)]
 
 
 @pytest.mark.warp
@@ -887,13 +1048,13 @@ def test_validation_is_read_only_for_all_payloads(
 
 @pytest.mark.warp
 def test_private_range_and_duplicate_helpers_cover_edge_cases() -> None:
-    """Private range overlap and hash sizing preserve bounded-map invariants."""
+    """Private range overlap and sort sizing preserve bounded-map invariants."""
     communication = _communication()
     assert communication._overlaps((4, 8), (8, 12)) is False
     assert communication._overlaps((4, 9), (8, 12)) is True
     assert communication._overlaps(None, (8, 12)) is False
-    assert communication._duplicate_table_size(0) == 2
-    assert communication._duplicate_table_size(3) == 8
+    assert communication._duplicate_scratch_size(0) == 1
+    assert communication._duplicate_scratch_size(3) == 4
 
 
 def test_communication_remains_unexported_and_has_no_overdraw_input() -> None:

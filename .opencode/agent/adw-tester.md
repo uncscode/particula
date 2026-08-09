@@ -141,7 +141,7 @@ run_pytest_advanced({
 | `coverageThreshold` | number | Fail if coverage below this % |
 | `cwd` | string | Working directory (for worktrees) |
 | `options` | string | Bounded toggles such as `output=full`, `fail-fast`, `test-filter=...`, `durations=...` |
-| `timeout` | number | Max execution time in ms |
+| `timeout` | number | Max execution time in seconds (max 1200) |
 
 **What the pytest wrappers provide:**
 - Executes pytest with coverage reporting

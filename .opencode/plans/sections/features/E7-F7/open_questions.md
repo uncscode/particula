@@ -1,5 +1,14 @@
 # Open Questions
 
+- [x] Can P1 reject outbound population overdraw from map rates alone?
+  - Resolved 2026-08-08: No. P1 validates only fixed configuration topology and
+    per-edge rate domains because its validation signature has neither resident
+    source population nor `time_step`.
+  - Rationale: Calculating `rate * dt` or inspecting resident primaries would
+    violate the deliberately read-only P1 boundary.
+  - Resolved by: E7-F7-P1 / issue #1507; P3 owns atomic source-available
+    outbound-overdraw validation before writer launch.
+
 - [x] Which particle representations are enabled in the first public
   communication capability?
   - Resolved 2026-07-27: Enable particle-resolved fixed-slot transport only and

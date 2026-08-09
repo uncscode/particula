@@ -67,7 +67,7 @@ reinterpret it during this fix pass.
 
 | Subagent | Purpose | When Called |
 |----------|---------|-------------|
-| `adw-build-tests` | Validate/write tests, run fast tests, fix failures | After all fix implementation completes |
+| `adw-build-tests` | Validate/write tests and coverage only; never lint or type-check | After all fix implementation completes |
 
 ## Execution Steps
 
@@ -113,8 +113,9 @@ verify them rather than discarding or blindly repeating them.
 
 Do not write `fix_completed=true` before implementation. Missing arguments,
 invalid state, blocked edits, incomplete acceptance criteria, failed tests,
-failed subagents, or stale output must leave the field false and emit
-`ADW_BUILD_FIX_FAILED`.
+failed subagents, blocked validation infrastructure, or stale output must leave
+the field false. Use `ADW_BUILD_FIX_BLOCKED` for unavailable required
+infrastructure and `ADW_BUILD_FIX_FAILED` for implementation or test failures.
 
 ### Step 4: Verify Worktree
 
@@ -124,6 +125,13 @@ Use `worktree_path` for all operations:
 git_diff({"command": "status", "worktree_path": worktree_path})
 git_diff({"command": "diff", "worktree_path": worktree_path})
 ```
+
+If the Git diagnostics adapter is unavailable, log feedback best-effort and
+continue from the explicit fix-plan paths plus direct file reads when that scope
+is sufficient. Do not claim a clean diff, changed-line count, or complete
+worktree inventory without Git evidence. Block only when the fix cannot be
+safely scoped without that evidence. A feedback logger failure never changes
+the primary failure classification.
 
 ### Step 5: Parse Fix Plan
 
@@ -152,14 +160,45 @@ For each fix step:
 
 ### Step 8: Comprehensive Fast Testing
 
-Call `adw-build-tests` for all changed files to ensure fast tests cover the fix work.
+Call `adw-build-tests` for all changed files to ensure fast tests cover the fix
+work. The delegated prompt must request tests and coverage only:
+
+```python
+task({
+  "description": "Validate fix tests and coverage",
+  "prompt": (
+    f"Validate tests and changed-code coverage only.\n\n"
+    f"Arguments: adw_id={adw_id} files={','.join(changed_files)}\n\n"
+    "Do not run or require Ruff, formatting, mypy, or other lint/type checks. "
+    "Those belong to the subsequent Validate and Polish workflow steps."
+  ),
+  "subagent_type": "adw-build-tests"
+})
+```
+
+Never ask `adw-build-tests` to run a capability denied by its frontmatter.
+Ruff, formatting, and mypy are not prerequisites for this test-only subagent's
+success; the mandatory downstream Validate and Polish steps own them.
+
+Parse the result explicitly:
+
+- `ADW_BUILD_TESTS_SUCCESS`: proceed to completion validation.
+- `ADW_BUILD_TESTS_FAILED`: fix the reported implementation/tests and retry
+  within the normal limit.
+- `ADW_BUILD_TESTS_BLOCKED`: required test infrastructure failed before usable
+  test/coverage evidence. Do not consume normal assertion-failure retries, do
+  not promote `fix_completed`, and emit `ADW_BUILD_FIX_BLOCKED` with the
+  dependency or adapter failure.
 
 ### Step 9: Validate and Promote Completion
 
 Before promotion, verify all implementation todos are complete, all required
-tests and coverage checks passed, the `adw-build-tests` subagent succeeded, and
-every acceptance criterion in `fix_spec_content` is satisfied. Only then write
-the strict completion boolean using the explicit field form:
+tests and coverage checks passed, the `adw-build-tests` subagent returned
+`ADW_BUILD_TESTS_SUCCESS`, and every acceptance criterion assigned to the Fix
+implementation/test boundary in `fix_spec_content` is satisfied. Lint,
+formatting, and type-check validation remain owned by the downstream Validate
+and Polish steps and must not be added to the test-subagent success gate. Only
+then write the strict completion boolean using the explicit field form:
 
 ```python
 adw_spec_write({
@@ -181,6 +220,7 @@ Emit one of:
 
 - `ADW_BUILD_FIX_COMPLETE`
 - `ADW_BUILD_FIX_FAILED: {reason}`
+- `ADW_BUILD_FIX_BLOCKED: {infrastructure reason}`
 
 Success output should include:
 

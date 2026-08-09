@@ -21,4 +21,8 @@
 - Update `.opencode/plans/sections/features/E7-F7/` with shipped phase status,
   resolved decisions, exact files, tolerances, and reproduction commands as
   implementation lands.
+- P1 (#1507) updated the structured plan only. No user-facing documentation or
+  exports were added because `particula.execution.communication` is a
+  concrete-only validation seam; its module and API docstrings record the
+  read-only and P3-overdraw handoff boundaries.
 - Run `mkdocs build --strict` and relevant docs tests before completing P7.

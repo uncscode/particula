@@ -1,7 +1,9 @@
 # Success Criteria
 
-- [ ] Fixed-shape communication declarations reject malformed indices, shapes,
-  devices, aliases, values, outbound demand, and unsupported modes before commit.
+- [x] P1 fixed-shape communication declarations reject malformed metadata,
+  indices, schemas, devices, aliases, domains, topology, and duplicate directed
+  edges through a read-only boundary (#1507). Population-dependent outbound
+  demand remains a P3 criterion because P1 has no inventory or time-step input.
 - [ ] Empty or disabled maps preserve independent-box behavior and perform no
   communication write after validation.
 - [ ] Prescribed positive per-box volume changes update `particles.volume` by

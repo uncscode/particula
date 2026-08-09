@@ -55,8 +55,14 @@ export default tool({
     const adapter = join(import.meta.dir, "read_only_git_diagnostics.py");
     if (!existsSync(adapter)) return "ERROR: Git diagnostics adapter unavailable";
     try {
-      const result = Bun.spawnSync(["python3", adapter], {
-        stdin: JSON.stringify(request), stdout: "pipe", stderr: "pipe",
+      const result = Bun.spawnSync({
+        cmd: ["python3", adapter],
+        // Bun's synchronous process API requires byte input for a child stdin.
+        // Supplying a string causes a launch exception in real Bun, while mocks
+        // accept it, so encode the bounded JSON request explicitly.
+        stdin: new TextEncoder().encode(JSON.stringify(request)),
+        stdout: "pipe",
+        stderr: "pipe",
         timeout: 30_000,
       });
       if (result.exitCode !== 0) return "ERROR: Git diagnostics adapter failed";

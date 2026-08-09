@@ -11,8 +11,9 @@ capability and failure policy.
   with explicit source, destination, enabled-edge, transfer, mixing, and volume
   inputs.
 - Read-only validation of indices, shapes, dtypes, devices, aliases, finite
-  physical values, outbound transfer bounds, destination capacity, and session
-  dimensions before mutation.
+  physical values, topology, and resident dimensions before mutation. P1
+  deliberately defers population-dependent outbound-overdraw and destination
+  capacity checks to the writer phases that receive source inventory and time.
 - Prescribed per-box positive volume updates owned by `ParticleData.volume`,
   including concentration renormalization for expansion/compression.
 - Conservative gas advection and simple mixing using extensive amount ledgers.

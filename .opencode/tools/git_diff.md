@@ -12,25 +12,25 @@ request. The adapter reads exactly one bounded UTF-8 JSON object from standard
 input and writes exactly one bounded, newline-terminated JSON response to
 standard output.
 
-Every adapter-dispatched core envelope for `status`, `diff`, `log`, and `show`
+Every adapter-dispatched envelope for `status`, `diff`, `log`, and `show`
 has the exact top-level `evidence_identity` object
 `{"contract":"e37-m2-validation-git","version":1}`. Adapter admission and
-unavailable failures are identity-free. The core adds the identity to both
-successful and terminal validation, ref-verification, and execution-failure
-read-only envelopes; protected mutating Git envelopes remain outside this
-contract. The adapter returns a dispatched core mapping unchanged and never
-mints an identity. Rendered TypeScript text remains a display channel, not a
-structured evidence consumer channel.
+pre-dispatch unavailable failures are identity-free. The wrapper-local Python
+runtime adds the identity to successful and terminal validation,
+ref-verification, and execution-failure read-only envelopes; protected mutating
+Git envelopes remain outside this contract. Rendered TypeScript text remains a
+display channel, not a structured evidence consumer channel.
 
 The identity is a bounded compatibility marker, not proof that an inspection
 executed or authority for state promotion, delegation, Git writes, shell use,
 network access, or lifecycle mutation. Consumers requiring structured evidence
 must use the adapter/core JSON envelope rather than rendered text.
 
-The adapter constructs an explicit repository-scoped `ProjectContext` for the
-admitted canonical worktree, denies local internet access, and delegates once
-to `adforge_core.runtime.git_tools.execute_git_tool(...)`. It does not infer
-authority from the ambient current directory.
+The adapter constructs a minimal explicit repository context for the admitted
+canonical worktree and executes only wrapper-owned fixed local Git commands. It
+uses only the Python standard library and does not import `adw`,
+`adforge_core`, Pydantic, or an application CLI. It does not infer authority
+from the ambient current directory.
 
 This boundary does **not** import or dispatch the historical workflow CLI, the
 core CLI module, or either CLI root. It has no CLI-root help route, no legacy
@@ -61,22 +61,26 @@ rejected before core dispatch.
 
 ## Local-only validation and inspection
 
-The core runtime, not the TypeScript wrapper, owns the operation matrix,
-argument validation, revision verification, path confinement, and fixed Git
-argv. Before final inspection it rejects invalid types, unexpected fields,
-blank or option-like revisions, unsafe revision syntax, and invalid revision
-combinations. Supplied revisions are resolved with fixed local verification
-commands before they can reach a final inspection command.
+The wrapper-local Python adapter owns the operation matrix, argument validation,
+revision verification, path confinement, and fixed Git argv. The TypeScript
+wrapper remains transport and presentation only. Before final inspection the
+adapter rejects invalid types, unexpected fields, blank or option-like
+revisions, unsafe revision syntax, and invalid revision combinations. Supplied
+revisions are resolved with fixed local verification commands before they can
+reach a final inspection command.
 
 `path` is an optional non-empty literal repository-relative path. It cannot be
 absolute, `.`/`./`, traversal, NUL-containing, option-like, or Git pathspec
 magic; resolution must remain beneath the admitted worktree, including through
-symlink checks. Final fixed commands place an admitted path after `--`.
+symlink checks. Final fixed commands enable Git's global `--literal-pathspecs`
+mode and place an admitted path after `--`.
 
 All Git activity is local-only and non-network. The inspection commands do not
 fetch, contact remotes, run arbitrary Git verbs, invoke a shell, mutate Git or
 worktree state, or persist raw process output. Local upstream divergence uses
-only local refs: it never fetches to refresh them.
+only local refs: it never fetches to refresh them. The adapter resolves `git` to
+one absolute executable before each fixed launch rather than asking a shell to
+interpret the command.
 
 ## Bounded diagnostic outcomes
 

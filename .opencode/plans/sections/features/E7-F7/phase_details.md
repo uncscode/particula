@@ -1,10 +1,19 @@
 # Phase Details
 
-- [ ] **E7-F7-P1:** Define fixed-shape communication maps and validation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add immutable edge/map, volume-update, mode, and resource-shape contracts with deterministic read-only validation.
-  - Files: `particula/execution/communication.py`, `particula/execution/tests/communication_test.py`
-  - Tests: Valid 1D and arbitrary-pair maps; malformed indices/shapes/dtypes/devices; duplicate/conflicting edges; transfer bounds; zero-edge no-op; unchanged state on rejection.
+- [x] **E7-F7-P1:** Define fixed-shape communication maps and validation with unit tests
+  - Issue: #1507 | Size: S | Status: Shipped
+  - Delivered: Concrete-only, unexported `particula.execution.communication`
+    declarations and a sole read-only Warp validation boundary. It retains
+    caller arrays by identity and validates resource metadata, schemas,
+    dimensions/device, aliases, enabled/rate/volume domains, topology, and
+    duplicate directed edges without writing caller payloads.
+  - Files: `particula/execution/communication.py`,
+    `particula/execution/tests/communication_test.py`
+  - Tests: Valid 1D/arbitrary-pair maps and all transport modes; malformed
+    metadata/schemas/devices; range aliases; domains; topology/duplicates;
+    zero-edge and all-disabled forms; identity and write-free rejection/success.
+  - Boundary: P1 has no resident-primary or `time_step` input and explicitly
+    defers population-dependent outbound-overdraw validation to P3.
 
 - [ ] **E7-F7-P2:** Implement per-box volume evolution and expansion with unit tests
   - Issue: TBD | Size: S | Status: Not Started

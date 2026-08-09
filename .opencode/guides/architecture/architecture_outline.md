@@ -33,10 +33,13 @@ The exact downstream ordering remains
   `E7-F1 -> E7-F6 -> {E7-F2, E7-F3, E7-F4} -> E7-F5`; E7-F6 owns availability,
   fallback, error taxonomy, API stability, and export policy. The
   dependency-neutral `scheduler` remains declaration-only, while E7-F5 P6 adds
-  a bounded concrete resident complete-loop composer. E7-F7 transport and
-  E7-F8 detailed RNG-stream policy remain deferred, along with implicit
-  transfer/synchronization, retry, broad fallback, and replacement of direct GPU
-  APIs. The sole shipped fallback seam is the explicit, CPU-authoritative,
+   a bounded concrete resident complete-loop composer. E7-F7 P1 ships only the
+   concrete communication-map declaration and read-only validation boundary;
+   its P2--P5 volume writes, inventory/time-step transfer admission, particle
+   transport, and resident binding remain deferred. E7-F8 detailed RNG-stream
+   policy also remains deferred, along with implicit transfer/synchronization,
+   retry, broad fallback, and replacement of direct GPU APIs. The sole shipped
+   fallback seam is the explicit, CPU-authoritative,
   direct-import-only boundary described below.
 
 ### particula/execution/
@@ -222,8 +225,21 @@ The exact downstream ordering remains
   and does not schedule, refresh vapor pressure or saturation ratio, acquire
   registry resources, transfer host data, synchronize, change lifecycle,
   transport, fall back, or export names through `particula.execution` or the
-  top-level package. See
-  [ADR-010](decisions/ADR-010-resident-state-update-boundary.md).
+   top-level package. See
+   [ADR-010](decisions/ADR-010-resident-state-update-boundary.md).
+- `communication.py` - Concrete-only, direct-import, Warp-dependent E7-F7 P1
+  declaration and read-only validation boundary for fixed-shape communication
+  maps. Its frozen carriers retain caller-owned map arrays by identity without
+  binding a resident session or registry. Validation accepts only valid map
+  topology, enabled-edge flags, nonnegative finite rates in 1/s, optional final
+  volumes in m³, and nonaliasing fixed schemas; it writes neither caller arrays
+  nor resident state and copies no payload. Empty and all-disabled maps still
+  receive complete applicable preflight and are write-free on success. P1 has no
+  source-inventory or time-step input, so P3—not this module—must atomically
+  reject population-dependent outbound overdraw before writers launch. P2 owns
+  volume writes, P4 owns particle transport, and P5 owns exact resident
+  primary/sidecar binding and alias checks. This module has no transfer,
+  synchronization, fallback, scheduling, or package/top-level export.
 - `thermodynamic_updates.py` - Concrete-only, direct-import Warp-resident
   freshness coordinator. Its immutable request retains exact session, pinned
   registry, resolver-produced graph, resolved schedule, and thermodynamic
