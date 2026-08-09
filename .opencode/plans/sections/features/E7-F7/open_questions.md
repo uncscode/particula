@@ -46,14 +46,15 @@
   - Resolved by: PR #1452 decision
 
 - [x] Which open-boundary source/sink forms are part of T7?
-  - Resolved 2026-07-27: Support prescribed dilution/outflow sinks for particle
-    and gas concentrations; exclude nonzero-composition inlets, implicit
-    reservoirs, and general source terms.
-  - Rationale: Dilution is explicitly in T7 and has a shipped concentration-only
-    finite-step contract, while no external source or reservoir schema exists.
+  - Resolved 2026-08-08: P3 supports declared `-1` gas source and sink endpoints
+    with explicit caller-owned `source_amounts` and `sink_amounts` ledgers.
+    Boundary transfer is accounted explicitly; no implicit reservoir or source
+    term is created.
+  - Rationale: The synchronous direct-Warp boundary can expose all open-map
+    inventory changes without silently attributing loss or gain to transport.
   - Evidence:
     - `docs/Features/Roadmap/data-oriented-gpu.md:1498` - T7 explicitly includes
       prescribed advection, dilution, expansion, and simple mixing.
     - `particula/gpu/kernels/dilution.py:323` - the shipped sink mutates only
       particle and gas concentrations using a finite-step rate.
-  - Resolved by: plan-question-resolver
+  - Resolved by: E7-F7-P3 / issue #1509.

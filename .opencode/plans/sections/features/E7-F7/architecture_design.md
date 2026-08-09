@@ -59,8 +59,20 @@ must declare source/sink ledgers so apparent non-conservation is explicit.
   `old_volume / final_volume` in place. It preserves containers, arrays, and
   protected fields by identity; equal-volume calls are write-free. It neither
   transfers/mixes payloads nor integrates with the resident session or
-  scheduler, and has no export, transfer, fallback, resize, or rollback after
-  an apply writer launches.
+   scheduler, and has no export, transfer, fallback, resize, or rollback after
+   an apply writer launches.
+- **P3 gas boundary (shipped, #1509):** Concrete-only
+  `particula.gpu.kernels.communication.gas_communication_step_gpu` accepts
+  complete Warp particle/gas containers, an exact P1 GAS configuration, finite
+  nonnegative scalar `time_step`, and caller-owned `GasCommunicationBuffers`
+  (or the corresponding `(B, S)` float64 work/accounting arrays). It stages
+  `amounts = gas.concentration * particles.volume`, computes every enabled
+  transfer from that immutable ledger, atomically accumulates in-domain deltas
+  and declared `-1` boundary source/sink accounting, rejects aggregate
+  overdraw, and makes one gas-concentration commit. It validates optional
+  prescribed-volume metadata but never writes it, particle fields, or volume.
+  It remains unexported and has no scheduler/session integration, transfer,
+  synchronization, fallback, resize, or post-launch rollback.
 - **Data model (later phases):** The fixed edge capacity, source/destination
   `int32` arrays, enabled mask, finite nonnegative inverse-time rates,
   transport mode, and optional final volumes remain stable for the session.
@@ -72,9 +84,10 @@ must declare source/sink ledgers so apparent non-conservation is explicit.
   `particula.execution.communication`; they are not exported through
   `particula.execution` or the package. Later scheduler-facing configuration
   remains deferred.
-- **Gas semantics:** Treat `gas.concentration` as mass per volume. Stage
-  `concentration * old_volume`, transfer synchronously, account for open
-  boundaries explicitly, and divide by validated final volume.
+- **Gas semantics:** Treat `gas.concentration` as mass per volume. P3 stages
+  `concentration * volume`, transfers synchronously, accounts for open
+  boundaries explicitly, and divides final amount by the unchanged validated
+  current volume. Volume evolution is the separate P2 operation.
 - **Particle semantics:** Transfer population represented by particle
   concentration together with immutable per-particle species mass and charge.
   Whole or fractional source populations may be represented only when a

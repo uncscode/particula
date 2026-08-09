@@ -472,10 +472,18 @@ def test_private_schema_helpers_reject_non_warp_and_invalid_storage() -> None:
     with pytest.raises(ValueError, match="valid pointer"):
         communication._array_range(malformed, "value")
 
-    malformed.ptr = 1
+    for pointer in (True, False, 1):
+        malformed.ptr = pointer
+        with pytest.raises(ValueError, match="valid pointer"):
+            communication._array_range(malformed, "value")
+
+    malformed.ptr = 8
     malformed.capacity = 0
     with pytest.raises(ValueError, match="capacity"):
         communication._array_range(malformed, "value")
+
+    malformed.capacity = 8
+    assert communication._array_range(malformed, "value") == (8, 16)
 
     malformed.shape = (sys.maxsize, 2)
     malformed.strides = (16, 8)
@@ -813,6 +821,74 @@ def test_gas_communication_aggregate_overdraw_gates_primary_commit() -> None:
     npt.assert_array_equal(gas.concentration.numpy(), gas_before)
 
 
+def test_gas_communication_duplicate_in_domain_edge_gates_primary_commit() -> (
+    None
+):
+    """Reject duplicate directed edges without mutating primary or map state."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    particles, gas = _containers(
+        np.array([2.0, 1.0]), np.ones((2, 1)), np.array([[4.0], [1.0]])
+    )
+    configuration = _gas_configuration(
+        np.array([0, 0], dtype=np.int32),
+        np.array([1, 1], dtype=np.int32),
+        np.array([0.25, 0.25]),
+    )
+    work = tuple(
+        wp.empty((2, 1), dtype=wp.float64, device="cpu") for _ in range(3)
+    )
+    particle_before = tuple(
+        field.numpy().copy() for field in vars(particles).values()
+    )
+    gas_before = tuple(field.numpy().copy() for field in vars(gas).values())
+    map_before = tuple(
+        field.numpy().copy()
+        for field in vars(configuration.communication_map).values()
+        if hasattr(field, "numpy")
+    )
+
+    gas_communication_step_gpu(particles, gas, configuration, 1.0, *work)
+    wp.synchronize()
+
+    for field, expected in zip(
+        vars(particles).values(), particle_before, strict=True
+    ):
+        npt.assert_array_equal(field.numpy(), expected)
+    for field, expected in zip(vars(gas).values(), gas_before, strict=True):
+        npt.assert_array_equal(field.numpy(), expected)
+    map_fields = (
+        field
+        for field in vars(configuration.communication_map).values()
+        if hasattr(field, "numpy")
+    )
+    for field, expected in zip(map_fields, map_before, strict=True):
+        npt.assert_array_equal(field.numpy(), expected)
+
+
+def test_gas_communication_allows_reciprocal_in_domain_edges() -> None:
+    """Accept distinct directed reciprocal edges as a valid transport map."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    particles, gas = _containers(
+        np.array([2.0, 1.0]), np.ones((2, 1)), np.array([[4.0], [1.0]])
+    )
+    configuration = _gas_configuration(
+        np.array([0, 1], dtype=np.int32),
+        np.array([1, 0], dtype=np.int32),
+        np.array([0.25, 0.5]),
+    )
+    work = tuple(
+        wp.empty((2, 1), dtype=wp.float64, device="cpu") for _ in range(3)
+    )
+
+    gas_communication_step_gpu(particles, gas, configuration, 1.0, *work)
+
+    npt.assert_allclose(gas.concentration.numpy(), [[3.25], [2.5]])
+
+
 def test_gas_communication_invalid_prescribed_volume_gates_commit() -> None:
     """Validate read-only prescribed volumes before the primary writer."""
     wp = _warp()
@@ -1024,6 +1100,238 @@ def test_gas_communication_validates_resource_shapes_and_required_work() -> (
     object.__setattr__(configuration, "resource_shapes", ())
     with pytest.raises(ValueError, match="amount_deltas"):
         gas_communication_step_gpu(particles, gas, configuration, 1.0, amounts)
+
+
+def test_private_communication_schema_helpers_cover_scalar_boundaries() -> None:
+    """Validate private scalar, address-range, and resource metadata branches."""
+    from particula.execution.communication import (
+        CommunicationResourceShape,
+        CommunicationShapeKind,
+    )
+    from particula.gpu.kernels import communication
+
+    # Arrange: valid scalar and resource metadata establish the accepted path.
+    resource = CommunicationResourceShape(
+        "ledger", object(), CommunicationShapeKind.BS
+    )
+
+    # Act and assert: scalar validation preserves NumPy real support.
+    assert communication._validate_time_step(np.float64(1.25)) == 1.25
+    communication._validate_resource_shapes((resource,))
+
+    # Assert: address arithmetic rejects both multiplication and addition wrap.
+    with pytest.raises(ValueError, match="safe address range"):
+        communication._safe_dimension_product((sys.maxsize, 2), "value")
+    with pytest.raises(ValueError, match="safe address range"):
+        communication._safe_byte_range(1, sys.maxsize, 2, "value")
+    with pytest.raises(ValueError, match="safe address range"):
+        communication._safe_byte_range(sys.maxsize, 1, 1, "value")
+
+    # Assert: frozen P1 carriers are still exact-checked defensively.
+    object.__setattr__(resource, "role", " ")
+    with pytest.raises(ValueError, match="nonempty and unpadded"):
+        communication._validate_resource_shapes((resource,))
+    object.__setattr__(resource, "role", "ledger")
+    object.__setattr__(resource, "shape_kind", object())
+    with pytest.raises(TypeError, match="shape_kind"):
+        communication._validate_resource_shapes((resource,))
+
+
+def test_gas_communication_rejects_valid_non_gas_transport_mode() -> None:
+    """Reject a well-typed particle-only configuration before container access."""
+    from particula.execution.communication import CommunicationTransportMode
+    from particula.gpu.kernels import communication
+
+    # Arrange: mutate an exact frozen carrier to a different valid enum member.
+    configuration = _gas_configuration(
+        np.empty(0, dtype=np.int32),
+        np.empty(0, dtype=np.int32),
+        np.empty(0, dtype=np.float64),
+    )
+    object.__setattr__(
+        configuration.communication_map,
+        "transport_mode",
+        CommunicationTransportMode.PARTICLES,
+    )
+
+    # Act and assert: the P3 boundary accepts only gas transport declarations.
+    with pytest.raises(ValueError, match="must be GAS"):
+        communication._validate_gas_communication_configuration(configuration)
+
+
+class _KernelWarpFacade:
+    """Minimal synchronous facade for private kernel branch unit tests."""
+
+    index: int | tuple[int, int] = 0
+    float64 = float
+
+    def tid(self) -> int | tuple[int, int]:
+        """Return the test-controlled emulated Warp thread index."""
+        return self.index
+
+    @staticmethod
+    def isfinite(value: float) -> bool:
+        """Mirror the scalar finiteness predicate used by the kernels."""
+        return bool(np.isfinite(value))
+
+    @staticmethod
+    def abs(value: int) -> int:
+        """Mirror the integer absolute-value operation used by topology checks."""
+        return abs(value)
+
+    @staticmethod
+    def atomic_max(values: np.ndarray, index: int, value: int) -> None:
+        """Apply the status-flag max operation synchronously."""
+        values[index] = max(values[index], value)
+
+    @staticmethod
+    def atomic_add(values: np.ndarray, *indices_and_value: int | float) -> None:
+        """Apply one- and two-dimensional additive atomics synchronously."""
+        *indices, value = indices_and_value
+        values[tuple(indices)] += value
+
+
+def test_private_communication_kernels_cover_valid_and_invalid_branches(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Exercise private kernel arithmetic branches with a synchronous facade."""
+    from particula.gpu.kernels import communication
+
+    # Arrange: use NumPy buffers to unit-test branch logic separately from Warp.
+    facade = _KernelWarpFacade()
+    monkeypatch.setattr(communication, "wp", facade)
+    invalid = np.zeros(1, dtype=np.int32)
+    active = np.zeros(1, dtype=np.int32)
+    volume = np.array([2.0, 1.0])
+    concentration = np.array([[4.0], [3.0]])
+
+    # Act and assert: primary/final-volume scans flag invalid physical values.
+    facade.index = (0, 0)
+    communication._communication_validate_primaries.func(
+        volume, concentration, invalid
+    )
+    facade.index = (1, 0)
+    communication._communication_validate_primaries.func(
+        np.array([2.0, 0.0]), concentration, invalid
+    )
+    assert invalid[0] == 1
+    invalid[0] = 0
+    facade.index = 0
+    communication._communication_validate_final_volumes.func(
+        np.array([np.nan]), invalid
+    )
+    assert invalid[0] == 1
+
+    # Assert: topology recognizes enabled activity, duplicates, and boundaries.
+    invalid[0] = 0
+    facade.index = 1
+    communication._communication_validate_map.func(
+        np.array([0, 0], dtype=np.int32),
+        np.array([1, 1], dtype=np.int32),
+        np.array([1, 1], dtype=np.int32),
+        np.array([0.5, 0.5]),
+        2,
+        0,
+        0,
+        0,
+        active,
+        invalid,
+    )
+    assert active[0] == 1 and invalid[0] == 1
+
+    # Arrange/act: stage then propose in-domain, source, and sink transfers.
+    invalid[0] = 0
+    amounts = np.empty((2, 1))
+    deltas = np.empty((2, 1))
+    outbound = np.empty((2, 1))
+    source_ledger = np.empty((2, 1))
+    sink_ledger = np.empty((2, 1))
+    for index in ((0, 0), (1, 0)):
+        facade.index = index
+        communication._communication_clear_and_stage.func(
+            concentration,
+            volume,
+            amounts,
+            deltas,
+            outbound,
+            source_ledger,
+            sink_ledger,
+            1,
+            1,
+            active,
+            invalid,
+        )
+    source = np.array([0, -1, 0], dtype=np.int32)
+    destination = np.array([1, 1, -1], dtype=np.int32)
+    enabled = np.ones(3, dtype=np.int32)
+    rates = np.array([0.25, 0.5, 0.25])
+    for edge in range(3):
+        facade.index = (edge, 0)
+        communication._communication_propose.func(
+            source,
+            destination,
+            enabled,
+            rates,
+            1.0,
+            amounts,
+            deltas,
+            outbound,
+            source_ledger,
+            sink_ledger,
+            1,
+            1,
+            active,
+            invalid,
+        )
+    npt.assert_allclose(amounts, [[8.0], [3.0]])
+    npt.assert_allclose(deltas, [[-4.0], [3.5]])
+    npt.assert_allclose(outbound, [[4.0], [0.0]])
+    npt.assert_allclose(source_ledger, [[0.0], [1.5]])
+    npt.assert_allclose(sink_ledger, [[2.0], [0.0]])
+
+    # Assert: final validation gates overdraw and the commit writes valid state.
+    for index in ((0, 0), (1, 0)):
+        facade.index = index
+        communication._communication_validate_final.func(
+            amounts, deltas, outbound, volume, active, invalid
+        )
+        communication._communication_commit.func(
+            concentration, volume, amounts, deltas, active, invalid
+        )
+    npt.assert_allclose(concentration, [[2.0], [6.5]])
+    invalid[0] = 0
+    outbound[0, 0] = 9.0
+    facade.index = (0, 0)
+    communication._communication_validate_final.func(
+        amounts, deltas, outbound, volume, active, invalid
+    )
+    assert invalid[0] == 1
+
+    # Assert: scalar scans and volume-evolution writers cover their edge paths.
+    invalid[0] = 0
+    facade.index = 0
+    communication._scan_positive_finite.func(np.array([0.0]), invalid)
+    facade.index = (0, 0)
+    communication._scan_nonnegative_finite.func(np.array([[-1.0]]), invalid)
+    assert invalid[0] == 1
+    invalid[0] = 0
+    changed = np.zeros(1, dtype=np.int32)
+    facade.index = 0
+    old = np.array([2.0])
+    final = np.array([1.0])
+    communication._validate_factors.func(old, final, invalid, changed)
+    scaled = np.array([[3.0]])
+    facade.index = (0, 0)
+    communication._validate_scaled_concentration.func(
+        scaled, old, final, invalid, changed
+    )
+    communication._apply_scaled_concentration.func(
+        scaled, old, final, invalid, changed
+    )
+    facade.index = 0
+    communication._apply_volume_evolution.func(old, final, invalid, changed)
+    npt.assert_allclose(scaled, [[6.0]])
+    npt.assert_allclose(old, [1.0])
 
 
 def test_gas_communication_rejects_gas_box_mismatch_before_work_writes() -> (

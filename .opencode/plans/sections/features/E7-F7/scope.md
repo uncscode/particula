@@ -1,10 +1,10 @@
 # Scope
 
 E7-F7 supplies the opt-in, prescribed communication layer for E7's resident
-single-device multi-box loop. Its shipped P2 primitive is an isolated direct
-device-resident operation over caller-owned fixed-capacity particle/gas state;
-later phases may place proven communication operations in E7-F5 scheduler nodes
-under E7-F6 capability and failure policy.
+single-device multi-box loop. Its shipped P2 volume and P3 gas primitives are
+isolated direct device-resident operations over caller-owned fixed-capacity
+particle/gas state; later phases may place proven communication operations in
+E7-F5 scheduler nodes under E7-F6 capability and failure policy.
 
 ## In Scope
 
@@ -18,14 +18,20 @@ under E7-F6 capability and failure policy.
 - Prescribed per-box positive volume updates owned by `ParticleData.volume`,
   including shipped direct P2 concentration renormalization for
   expansion/compression and retention of protected fields and identities.
-- Conservative gas advection and simple mixing using extensive amount ledgers.
+- Conservative gas advection and simple mixing using immutable extensive amount
+  ledgers: shipped as concrete-only
+  `particula.gpu.kernels.communication.gas_communication_step_gpu` (#1509).
+  It supports closed maps plus declared `-1` source/sink endpoints with
+  caller-owned accounting ledgers, rejects aggregate overdraw, and commits gas
+  concentration once without changing volume or particle state.
 - Fixed-capacity particle transport that preserves per-particle mass/species and
   charge state, transfers concentration/count, and fails before commit when the
   prescribed destination cannot represent transported slots.
-- Synchronous, registration-order-independent updates from pre-step state using
-  reusable resident scratch buffers.
+- Synchronous, registration-order-independent P3 gas updates from pre-step state
+  using caller-owned work buffers; reusable resident scratch is deferred.
 - E7-F4 resource registration and checkpoint inclusion, E7-F5 deterministic
-  communication-node placement, and E7-F6 capability/error integration.
+  communication-node placement, and E7-F6 capability/error integration remain
+  deferred; P3 accepts caller-owned work storage rather than resident resources.
 - Independent-box no-op behavior, one-dimensional neighbor maps, user-defined
   box pairs, Warp CPU parity, optional CUDA evidence, and explicit conservation
   tests.

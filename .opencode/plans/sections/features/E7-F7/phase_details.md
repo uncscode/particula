@@ -34,11 +34,23 @@
     it adds no package export, hidden transfer/synchronization, fallback,
     resizing, or protected-field mutation.
 
-- [ ] **E7-F7-P3:** Implement conservative gas advection and mixing with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Stage and synchronously apply prescribed gas transfers from pre-step volume and concentration ledgers.
+- [x] **E7-F7-P3:** Implement conservative gas advection and mixing with unit tests
+  - Issue: #1509 | Size: S | Status: Shipped
+  - Delivered: Concrete-only direct-Warp `gas_communication_step_gpu` and
+    `GasCommunicationBuffers` stage immutable `concentration * volume` amounts,
+    aggregate synchronous explicit-Euler in-domain and declared `-1` boundary
+    transfers, reject aggregate overdraw, and commit gas concentration once.
+    Caller-owned `(B, S)` work and source/sink accounting ledgers are validated
+    and overwritten only for active work. The operation validates optional final
+    volume metadata but changes neither volume nor particle fields.
   - Files: `particula/gpu/kernels/communication.py`, `particula/gpu/kernels/tests/communication_test.py`
-  - Tests: One-way advection, bidirectional mixing, chains, closed-map conservation, explicit boundary loss/source accounting, order independence, and NumPy parity.
+  - Tests: Co-located immutable-ledger oracle, fan-in/permutation order
+    independence, closed/open accounting, zero-time/all-disabled no-ops,
+    aggregate-overdraw and metadata gating, resource-schema, and invalid-time
+    coverage.
+  - Boundary: No package export, scheduler/session integration, hidden transfer
+    or synchronization, fallback, resize, volume update, particle mutation, or
+    post-launch rollback was added.
 
 - [ ] **E7-F7-P4:** Implement fixed-capacity particle transport with unit tests
   - Issue: TBD | Size: S | Status: Not Started

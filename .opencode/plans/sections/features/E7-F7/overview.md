@@ -11,12 +11,13 @@ host transfers or full CFD coupling.
 
 ## Value Proposition
 
-E7-F7 adds validated, fixed-shape communication descriptions and resident
-operations for conservative gas and particle transport, simple mixing, and
-per-box volume evolution. Independent boxes remain the default; enabling a map
-produces deterministic, identity-stable updates compatible with later graph
-capture while preserving explicit ownership, synchronization, and failure
-boundaries.
+E7-F7 has shipped validated fixed-shape communication declarations, direct-Warp
+per-box volume evolution, and concrete-only synchronous gas communication.
+The gas operation uses caller-owned extensive ledgers, supports declared open
+source/sink endpoints, and commits gas concentration once. Particle transport
+and resident scheduler integration remain later phases. Independent boxes remain
+the default; shipped operations preserve explicit ownership, synchronization,
+and failure boundaries.
 
 ## User Stories
 

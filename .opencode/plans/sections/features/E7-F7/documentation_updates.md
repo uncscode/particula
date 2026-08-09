@@ -28,5 +28,9 @@
 - P2 (#1508) likewise added no user-facing documentation or export. Its
   concrete-module docstring records the direct active-device volume-evolution
   contract, complete preflight, write-free equal-volume behavior, and
-  post-launch no-rollback boundary.
+   post-launch no-rollback boundary.
+- P3 (#1509) added no user-facing documentation or export. The concrete module
+  and `GasCommunicationBuffers` docstrings document caller-owned `(B, S)`
+  amount/work/accounting ledgers, synchronous explicit-Euler closed/open-map
+  semantics, one gas commit, and the no-transfer/no-sync/no-fallback boundary.
 - Run `mkdocs build --strict` and relevant docs tests before completing P7.

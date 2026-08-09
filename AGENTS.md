@@ -968,6 +968,18 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   and gas concentrations in place to preserve extensive inventories. It has no
   scheduler integration, transport/mixing/advection, hidden transfer,
   synchronization, CPU fallback, resizing, or package/top-level export.
+  E7-F7-P3 provides the separate concrete-only direct import
+  `particula.gpu.kernels.communication.gas_communication_step_gpu` for
+  synchronous explicit-Euler gas communication. It requires an exact P1 GAS
+  `CommunicationConfiguration`, complete Warp particle/gas containers, a
+  finite nonnegative time step, and caller-owned `(B, S)` `wp.float64` amount,
+  delta, and outbound work ledgers. `-1` endpoints are explicit open
+  source/sink boundaries and require their matching accounting ledgers. The
+  step stages `concentration * volume`, rejects aggregate overdraw, and commits
+  gas concentration once; it never changes particle fields or volume. It has
+  no scheduler integration, hidden transfer, synchronization, fallback,
+  resizing, or package/top-level export. `GasCommunicationBuffers` is also
+  concrete-only and only packages those caller-owned ledgers.
   E7-F8 owns detailed scheduled RNG/restart policy, and E7-F9 owns final
   diagnostics, complete examples, and closeout.
 

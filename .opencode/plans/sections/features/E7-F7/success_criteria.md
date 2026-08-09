@@ -4,20 +4,21 @@
   indices, schemas, devices, aliases, domains, topology, and duplicate directed
   edges through a read-only boundary (#1507). Population-dependent outbound
   demand remains a P3 criterion because P1 has no inventory or time-step input.
-- [ ] Empty or disabled maps preserve independent-box behavior and perform no
-  communication write after validation.
+- [x] P3 (#1509) empty/disabled and zero-time maps preserve independent-box
+  state and caller-owned work/accounting storage after full validation.
 - [x] P2 (#1508) accepts validated positive same-device final `(B,)`
   `wp.float64` volumes, updates `particles.volume` by identity, and conserves
   particle/gas extensive inventory through `old_volume / final_volume`
   concentration renormalization. It rejects invalid schema/alias/domain or
   unsafe scale inputs before mutation, and equal-volume calls are write-free.
-- [ ] Gas advection and simple mixing are synchronous, edge-order independent,
-  and match an independent NumPy reference.
+- [x] P3 (#1509) gas advection/mixing is synchronous from immutable
+  concentration-times-volume ledgers, edge-order independent, and covered by
+  an independent NumPy oracle.
 - [ ] Particle transport preserves population, species mass, and charge for
   closed maps and fails without partial state commit when fixed capacity cannot
   represent a prescribed transfer.
-- [ ] Open boundaries expose explicit source/sink accounting; no loss or source
-  is silently attributed to numerical transport.
+- [x] P3 (#1509) open boundaries expose caller-owned source/sink amount ledgers;
+  no loss or source is silently attributed to numerical transport.
 - [ ] E7-F4 resources remain fixed-shape and identity-stable across repeated
   steps and checkpoint/restart.
 - [ ] E7-F5 executes communication/volume nodes at the documented canonical

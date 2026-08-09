@@ -21,10 +21,13 @@ must maintain at least 80% coverage.
   invalid schemas, aliases, domains, overflow, and underflow before mutation.
   The operation remains direct-kernel-only; it does not claim transport or
   scheduler/session behavior.
-- **P3:** Test one-way advection, symmetric mixing, chains, arbitrary box pairs,
-  physical inverse-time rates integrated over varied `time_step` values,
-  edge-order permutations, closed-ledger gas conservation, and declared open
-  source/sink accounting. Rejected calls must not commit gas or volume.
+- **P3 (shipped, #1509):** The co-located
+  `particula/gpu/kernels/tests/communication_test.py` tests an independent
+  immutable-ledger oracle, fan-in edge-order independence, closed and open
+  boundary accounting, zero-time/all-disabled write-free no-ops, aggregate
+  overdraw and invalid metadata gating, resource schemas, and invalid-time
+  rejection before container access. It also verifies that P3 does not mutate
+  particle fields, volume, or read-only map/final-volume metadata.
 - **P4:** Test whole and fractional particle populations, matching and free
   destination slots, inactive slots, composition/charge preservation, multiple
   inbound edges, capacity exhaustion, deterministic selection, and no partial

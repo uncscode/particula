@@ -1549,7 +1549,22 @@ only closed diagnostics snapshots. It adds no hidden transfer, public
 orchestration, or export surface. E7-F4 remains its prerequisite and the
 explicit checkpoint/restart boundary.
 
-E7-F7 transport, mixing/advection, and volume evolution remain deferred.
+E7-F7 P2 ships concrete-only direct-Warp volume evolution, and P3 ships
+concrete-only direct-Warp synchronous gas communication. Neither seam is
+package-exported or integrated with the resident scheduler, and neither adds
+transfers, synchronization, CPU fallback, resizing, or other orchestration.
+Import P3 only from
+`particula.gpu.kernels.communication.gas_communication_step_gpu`. Callers
+provide complete Warp particle/gas containers and caller-owned `(B, S)`
+`wp.float64` amount, delta, and outbound work ledgers; enabled open-source or
+open-sink edges additionally require same-schema source or sink accounting
+ledgers. In-domain edges transfer from the source box's immutable pre-step
+amount; `-1 -> destination` sources use the destination's pre-step amount and
+record it in the source ledger, while `source -> -1` sinks use and record the
+source amount in the sink ledger. The operation performs one gas-concentration
+commit after preflight.
+The remaining transport, mixing/advection, and scheduler-integration work
+remain deferred.
 E7-F8 owns scheduled persistent stream identity/reset and checkpoint/restart RNG
 policy. E7-F9 owns final diagnostics products, complete examples, and closeout.
 High-level GPU adapters and user-facing CPU/GPU orchestration remain later

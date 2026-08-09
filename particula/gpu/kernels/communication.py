@@ -1,9 +1,9 @@
-"""Apply prescribed per-box volume evolution to resident Warp containers.
+"""Apply direct-Warp resident volume evolution and gas communication.
 
-This concrete-only direct kernel accepts caller-owned active-device final
-volumes in m^3.  It changes only particle volume and particle and gas
-concentrations, preserving their extensive inventories.  It performs no host
-transfer, synchronization, resizing, transport, or CPU fallback.
+Concrete-only kernels preserve extensive inventories during prescribed
+per-box volume changes and synchronously transport gas using caller-owned
+device-resident ledgers. They perform no hidden host transfer,
+synchronization, resizing, conversion, or CPU fallback.
 """
 
 # mypy: disable-error-code="valid-type, misc, operator"
@@ -43,9 +43,20 @@ class GasCommunicationBuffers:
 
     All arrays are contiguous active-device ``wp.float64`` arrays shaped
     ``(B, S)``. ``amounts``, ``amount_deltas``, and ``outbound_amounts`` are
-    required work storage.  ``source_amounts`` and ``sink_amounts`` are the
-    optional accounting ledgers for maps containing, respectively, a ``-1``
-    source or destination endpoint.
+    required work storage. ``source_amounts`` and ``sink_amounts`` are the
+    optional accounting ledgers required for enabled maps containing,
+    respectively, a ``-1`` source or destination endpoint. The communication
+    step overwrites applicable work and accounting ledgers; callers retain
+    ownership and synchronize before inspection.
+
+    Attributes:
+        amounts: Immutable per-step gas amount ledger.
+        amount_deltas: Net in-domain amount change for each box and species.
+        outbound_amounts: Aggregate amount debited from each in-domain source.
+        source_amounts: Optional positive amount admitted at each destination
+            from declared open sources.
+        sink_amounts: Optional positive amount removed from each source by
+            declared open sinks.
     """
 
     amounts: object
@@ -125,6 +136,14 @@ def _communication_validate_map(
             )
         ):
             wp.atomic_max(invalid, 0, 1)
+        if not source_open and not sink_open:
+            for previous in range(edge):
+                if (
+                    enabled[previous] == 1
+                    and source[previous] == left
+                    and destination[previous] == right
+                ):
+                    wp.atomic_max(invalid, 0, 1)
 
 
 @wp.kernel
@@ -377,7 +396,12 @@ def _array_range(array: Any, name: str) -> tuple[int, int] | None:
         return None
     pointer = getattr(array, "ptr", None)
     capacity = getattr(array, "capacity", None)
-    if not isinstance(pointer, Integral) or pointer <= 0:
+    if (
+        isinstance(pointer, bool)
+        or not isinstance(pointer, Integral)
+        or pointer <= 0
+        or pointer % item_size != 0
+    ):
         raise ValueError(f"{name} must have a valid pointer.")
     if (
         isinstance(capacity, bool)
@@ -772,31 +796,40 @@ def gas_communication_step_gpu(
     source_amounts: object | None = None,
     sink_amounts: object | None = None,
 ) -> tuple[Any, Any]:
-    """Synchronously advect gas using caller-owned extensive amount ledgers.
+    """Synchronously mix gas with caller-owned extensive amount ledgers.
 
     The immutable staged ledger is ``amounts = concentration * volume`` in
-    amount units.  Each enabled directed edge transfers ``amounts[source] *
-    rate * time_step``.  In-domain transfers debit and credit
-    ``amount_deltas``; ``-1 -> box`` and ``box -> -1`` encode declared open
-    sources and sinks and record the corresponding positive amount in
-    ``source_amounts`` and ``sink_amounts``.  The sole primary writer assigns
+    amount units. An in-domain ``source -> destination`` edge transfers
+    ``amounts[source] * rate * time_step``, debiting and crediting
+    ``amount_deltas``. An open sink ``source -> -1`` uses that same source
+    amount, debits ``amount_deltas``, and records a positive ``sink_amounts``
+    entry. An open source ``-1 -> destination`` instead uses the destination
+    box's pre-step amount and records its positive transfer in
+    ``source_amounts``. The sole primary writer assigns
     ``gas.concentration = (amounts + amount_deltas) / volume``.
 
     ``amounts``, ``amount_deltas``, and ``outbound_amounts`` are caller-owned
-    contiguous ``wp.float64 (B, S)`` work arrays. A
-    :class:`GasCommunicationBuffers` may be supplied instead. Open accounting
-    ledgers use that same schema and are required for their respective boundary
-    direction. Closed maps conserve each species' extensive amount up to atomic
-    floating-point tolerance. Particle fields, prescribed volumes, and map
-    metadata are read-only. The direct call performs no hidden transfer,
-    synchronization, conversion, resize, CPU fallback, or post-launch rollback.
+    contiguous ``wp.float64`` arrays shaped ``(B, S)``. A
+    ``GasCommunicationBuffers`` carrier may provide them. Open accounting
+    ledgers have the same schema and are required for enabled edges with their
+    respective boundary direction. Closed maps conserve each species' extensive
+    amount up to atomic floating-point tolerance. Particle fields, prescribed
+    volumes, and map metadata are read-only. Valid zero-size, empty-map, and
+    zero-time calls validate observable schemas then leave all buffers and
+    primaries unchanged.
+
+    The direct call performs no hidden transfer, synchronization, conversion,
+    resize, CPU fallback, or post-launch rollback. It has device work of
+    ``O(E * S + B * S)`` for ``E`` edge slots, ``B`` boxes, and ``S`` gas
+    species. Callers synchronize before inspecting results.
 
     Args:
         particles: Complete caller-owned Warp particle container.
         gas: Complete caller-owned Warp gas container.
         configuration: Exact P1 gas ``CommunicationConfiguration``.
         time_step: Finite nonnegative explicit-Euler step in seconds.
-        amounts: Work ledger or a ``GasCommunicationBuffers`` carrier.
+        amounts: Work ledger or concrete-only ``GasCommunicationBuffers``
+            carrier.
         amount_deltas: Caller-owned net-delta work ledger when no carrier is
             provided.
         outbound_amounts: Caller-owned source-debit work ledger when no carrier
@@ -809,8 +842,14 @@ def gas_communication_step_gpu(
 
     Raises:
         TypeError: If scalar or declaration carrier types are invalid.
-        ValueError: If observable array schemas, devices, aliases, or transport
-            declaration are invalid. Device-domain failures gate primary writes.
+        ValueError: If observable array schemas, devices, aliases, buffer
+            requirements, or transport declaration are invalid. Device-domain
+            failures gate primary writes.
+
+    Note:
+        Applicable work and accounting ledgers may be written before an
+        asynchronous device-domain failure. Rollback is not promised after the
+        primary commit kernel launches.
     """
     step = _validate_time_step(time_step)
     typed = _validate_gas_communication_configuration(configuration)
