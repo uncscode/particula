@@ -606,4 +606,7 @@ def test_testing_guide_publishes_hardware_free_docs_validation() -> None:
         )
     )
 
-    assert _normalized(BASELINE_COMMANDS[-1]) in release_validation
+    assert (
+        "pytest particula/tests/gpu_coagulation_docs_test.py -q"
+        in release_validation
+    )
