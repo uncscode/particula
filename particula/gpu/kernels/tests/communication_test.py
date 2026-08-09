@@ -528,3 +528,528 @@ def test_gas_box_count_mismatch_rejects_before_mutation() -> None:
 
     with pytest.raises(ValueError, match="shape"):
         volume_evolution_step_gpu(particles, gas, final)
+
+
+def _gas_configuration(
+    source: np.ndarray,
+    destination: np.ndarray,
+    rates: np.ndarray,
+    enabled: np.ndarray | None = None,
+):
+    """Build the exact P1 declaration used by direct gas-transport tests."""
+    wp = _warp()
+    from particula.execution.communication import (
+        CommunicationConfiguration,
+        CommunicationMap,
+        CommunicationMapForm,
+        CommunicationTransportMode,
+        PrescribedVolumeUpdate,
+    )
+
+    return CommunicationConfiguration(
+        communication_map=CommunicationMap(
+            form=CommunicationMapForm.ARBITRARY_PAIRS,
+            transport_mode=CommunicationTransportMode.GAS,
+            edge_capacity=len(source),
+            source_boxes=wp.array(source, dtype=wp.int32, device="cpu"),
+            destination_boxes=wp.array(
+                destination, dtype=wp.int32, device="cpu"
+            ),
+            enabled=wp.array(
+                np.ones(len(source), dtype=np.int32)
+                if enabled is None
+                else enabled,
+                dtype=wp.int32,
+                device="cpu",
+            ),
+            rates=wp.array(rates, dtype=wp.float64, device="cpu"),
+        ),
+        prescribed_volume=PrescribedVolumeUpdate(None),
+        resource_shapes=(),
+    )
+
+
+def test_gas_communication_uses_immutable_synchronous_amount_ledger() -> None:
+    """Chain transport reads every proposal from pre-step extensive amounts."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    particles, gas = _containers(
+        np.array([2.0, 4.0, 1.0]),
+        np.ones((3, 1), dtype=np.float64),
+        np.array([[10.0, 2.0], [3.0, 4.0], [1.0, 8.0]]),
+    )
+    configuration = _gas_configuration(
+        np.array([0, 1], dtype=np.int32),
+        np.array([1, 2], dtype=np.int32),
+        np.array([0.25, 0.5]),
+    )
+    amounts = wp.empty((3, 2), dtype=wp.float64, device="cpu")
+    deltas = wp.empty((3, 2), dtype=wp.float64, device="cpu")
+    outbound = wp.empty((3, 2), dtype=wp.float64, device="cpu")
+    before = gas.concentration.numpy().copy()
+    volume = particles.volume.numpy().copy()
+    expected_amounts = before * volume[:, None]
+    expected_deltas = np.array(
+        [
+            -0.25 * expected_amounts[0],
+            0.25 * expected_amounts[0] - 0.5 * expected_amounts[1],
+            0.5 * expected_amounts[1],
+        ]
+    )
+
+    returned = gas_communication_step_gpu(
+        particles, gas, configuration, 1.0, amounts, deltas, outbound
+    )
+
+    assert returned == (particles, gas)
+    npt.assert_allclose(amounts.numpy(), expected_amounts, rtol=1e-12)
+    npt.assert_allclose(deltas.numpy(), expected_deltas, rtol=1e-12)
+    npt.assert_allclose(
+        outbound.numpy(),
+        np.array(
+            [0.25 * expected_amounts[0], 0.5 * expected_amounts[1], [0.0, 0.0]]
+        ),
+        rtol=1e-12,
+    )
+    npt.assert_allclose(
+        gas.concentration.numpy(),
+        (expected_amounts + expected_deltas) / volume[:, None],
+        rtol=1e-12,
+    )
+    npt.assert_allclose(
+        (gas.concentration.numpy() * volume[:, None]).sum(axis=0),
+        expected_amounts.sum(axis=0),
+        rtol=1e-12,
+        atol=1e-30,
+    )
+
+
+@pytest.mark.parametrize(
+    "order",
+    [np.array([0, 1, 2]), np.array([2, 0, 1])],
+)
+def test_gas_communication_fan_in_is_edge_order_independent(
+    order: np.ndarray,
+) -> None:
+    """Aggregate reciprocal and fan-in transfers from the initial ledger."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    source = np.array([0, 1, 2], dtype=np.int32)[order]
+    destination = np.array([2, 2, 0], dtype=np.int32)[order]
+    rates = np.array([0.1, 0.2, 0.25], dtype=np.float64)[order]
+    particles, gas = _containers(
+        np.array([2.0, 1.0, 4.0]),
+        np.ones((3, 1), dtype=np.float64),
+        np.array([[3.0, 2.0], [5.0, 1.0], [2.0, 4.0]]),
+    )
+    work = tuple(
+        wp.empty((3, 2), dtype=wp.float64, device="cpu") for _ in range(3)
+    )
+    initial_amounts = (
+        gas.concentration.numpy() * particles.volume.numpy()[:, None]
+    )
+    expected_deltas = np.zeros_like(initial_amounts)
+    expected_outbound = np.zeros_like(initial_amounts)
+    for left, right, rate in zip(source, destination, rates, strict=True):
+        transfer = initial_amounts[left] * rate
+        expected_deltas[left] -= transfer
+        expected_deltas[right] += transfer
+        expected_outbound[left] += transfer
+
+    gas_communication_step_gpu(
+        particles,
+        gas,
+        _gas_configuration(source, destination, rates),
+        1.0,
+        *work,
+    )
+
+    npt.assert_allclose(work[0].numpy(), initial_amounts, rtol=1e-12)
+    npt.assert_allclose(work[1].numpy(), expected_deltas, rtol=1e-12)
+    npt.assert_allclose(work[2].numpy(), expected_outbound, rtol=1e-12)
+    npt.assert_allclose(
+        gas.concentration.numpy(),
+        (initial_amounts + expected_deltas) / particles.volume.numpy()[:, None],
+        rtol=1e-12,
+    )
+
+
+def test_gas_communication_accounts_for_open_boundary_ledgers() -> None:
+    """Record positive source and sink amounts without changing particle state."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        GasCommunicationBuffers,
+        gas_communication_step_gpu,
+    )
+
+    particles, gas = _containers(
+        np.array([2.0, 1.0]), np.ones((2, 1)), np.array([[4.0], [3.0]])
+    )
+    configuration = _gas_configuration(
+        np.array([-1, 0], dtype=np.int32),
+        np.array([1, -1], dtype=np.int32),
+        np.array([0.5, 0.25]),
+    )
+    buffers = GasCommunicationBuffers(
+        *(wp.empty((2, 1), dtype=wp.float64, device="cpu") for _ in range(5))
+    )
+    particle_before = particles.concentration.numpy().copy()
+
+    gas_communication_step_gpu(particles, gas, configuration, 1.0, buffers)
+
+    npt.assert_allclose(buffers.source_amounts.numpy(), [[0.0], [1.5]])
+    npt.assert_allclose(buffers.sink_amounts.numpy(), [[2.0], [0.0]])
+    npt.assert_allclose(gas.concentration.numpy(), [[3.0], [4.5]])
+    npt.assert_array_equal(particles.concentration.numpy(), particle_before)
+
+
+def test_gas_communication_zero_time_preserves_all_work_storage() -> None:
+    """Keep zero-time gas communication write-free, including ledgers."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    particles, gas = _containers(
+        np.array([2.0, 1.0]), np.ones((2, 1)), np.array([[4.0], [3.0]])
+    )
+    configuration = _gas_configuration(
+        np.array([-1, 0], dtype=np.int32),
+        np.array([1, -1], dtype=np.int32),
+        np.array([0.5, 0.25]),
+    )
+    work = tuple(
+        wp.array(np.full((2, 1), value), dtype=wp.float64, device="cpu")
+        for value in range(1, 6)
+    )
+    before = tuple(values.numpy().copy() for values in work)
+    gas_before = gas.concentration.numpy().copy()
+
+    returned = gas_communication_step_gpu(
+        particles, gas, configuration, 0.0, *work[:3], *work[3:]
+    )
+
+    assert returned == (particles, gas)
+    npt.assert_array_equal(gas.concentration.numpy(), gas_before)
+    for values, expected in zip(work, before, strict=True):
+        npt.assert_array_equal(values.numpy(), expected)
+
+
+def test_gas_communication_all_disabled_map_preserves_work_storage() -> None:
+    """Treat a padded all-disabled map as an exact write-free no-op."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    particles, gas = _containers(
+        np.array([1.0, 2.0]), np.ones((2, 1)), np.array([[4.0], [3.0]])
+    )
+    configuration = _gas_configuration(
+        np.array([0, 1], dtype=np.int32),
+        np.array([1, 0], dtype=np.int32),
+        np.array([0.5, 0.25]),
+        enabled=np.array([0, 0], dtype=np.int32),
+    )
+    work = tuple(
+        wp.array(np.full((2, 1), index), dtype=wp.float64, device="cpu")
+        for index in range(1, 4)
+    )
+    before_work = tuple(values.numpy().copy() for values in work)
+    before_gas = gas.concentration.numpy().copy()
+
+    returned = gas_communication_step_gpu(
+        particles, gas, configuration, 1.0, *work
+    )
+
+    assert returned[0] is particles
+    assert returned[1] is gas
+    npt.assert_array_equal(gas.concentration.numpy(), before_gas)
+    for values, expected in zip(work, before_work, strict=True):
+        npt.assert_array_equal(values.numpy(), expected)
+
+
+def test_gas_communication_invalid_open_map_gates_primary_commit() -> None:
+    """Reject an open sink without its required accounting ledger on device."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    particles, gas = _containers(
+        np.array([1.0]), np.ones((1, 1)), np.array([[4.0]])
+    )
+    configuration = _gas_configuration(
+        np.array([0], dtype=np.int32),
+        np.array([-1], dtype=np.int32),
+        np.array([0.5]),
+    )
+    work = tuple(
+        wp.empty((1, 1), dtype=wp.float64, device="cpu") for _ in range(3)
+    )
+    gas_before = gas.concentration.numpy().copy()
+
+    gas_communication_step_gpu(particles, gas, configuration, 1.0, *work)
+
+    npt.assert_array_equal(gas.concentration.numpy(), gas_before)
+
+
+def test_gas_communication_aggregate_overdraw_gates_primary_commit() -> None:
+    """Reject combined source debits larger than the staged source amount."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    particles, gas = _containers(
+        np.array([2.0, 1.0]), np.ones((2, 1)), np.array([[4.0], [1.0]])
+    )
+    configuration = _gas_configuration(
+        np.array([0, 0], dtype=np.int32),
+        np.array([1, 1], dtype=np.int32),
+        np.array([0.75, 0.75]),
+    )
+    work = tuple(
+        wp.empty((2, 1), dtype=wp.float64, device="cpu") for _ in range(3)
+    )
+    gas_before = gas.concentration.numpy().copy()
+
+    gas_communication_step_gpu(particles, gas, configuration, 1.0, *work)
+
+    npt.assert_array_equal(gas.concentration.numpy(), gas_before)
+
+
+def test_gas_communication_invalid_prescribed_volume_gates_commit() -> None:
+    """Validate read-only prescribed volumes before the primary writer."""
+    wp = _warp()
+    from particula.execution.communication import PrescribedVolumeUpdate
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    particles, gas = _containers(
+        np.array([1.0]), np.ones((1, 1)), np.array([[4.0]])
+    )
+    configuration = _gas_configuration(
+        np.array([0], dtype=np.int32),
+        np.array([-1], dtype=np.int32),
+        np.array([0.5]),
+    )
+    configuration = type(configuration)(
+        configuration.communication_map,
+        PrescribedVolumeUpdate(
+            wp.array([np.nan], dtype=wp.float64, device="cpu")
+        ),
+        configuration.resource_shapes,
+    )
+    work = tuple(
+        wp.empty((1, 1), dtype=wp.float64, device="cpu") for _ in range(4)
+    )
+    gas_before = gas.concentration.numpy().copy()
+
+    gas_communication_step_gpu(
+        particles, gas, configuration, 1.0, *work[:3], sink_amounts=work[3]
+    )
+
+    npt.assert_array_equal(gas.concentration.numpy(), gas_before)
+
+
+def test_buffer_carrier_rejects_individual_open_ledgers() -> None:
+    """Reject ambiguous carrier and individual accounting-ledger arguments."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        GasCommunicationBuffers,
+        gas_communication_step_gpu,
+    )
+
+    particles, gas = _containers(
+        np.array([1.0]), np.ones((1, 1)), np.array([[4.0]])
+    )
+    configuration = _gas_configuration(
+        np.empty(0, dtype=np.int32),
+        np.empty(0, dtype=np.int32),
+        np.empty(0, dtype=np.float64),
+    )
+    buffers = GasCommunicationBuffers(
+        *(wp.empty((1, 1), dtype=wp.float64, device="cpu") for _ in range(3))
+    )
+    source_amounts = wp.empty((1, 1), dtype=wp.float64, device="cpu")
+
+    with pytest.raises(ValueError, match="carrier cannot be combined"):
+        gas_communication_step_gpu(
+            particles,
+            gas,
+            configuration,
+            1.0,
+            buffers,
+            source_amounts=source_amounts,
+        )
+
+
+@pytest.mark.parametrize("time_step", [None, True, "1", -1.0, np.nan])
+def test_gas_communication_rejects_invalid_time_before_container_access(
+    time_step: object,
+) -> None:
+    """Validate the time scalar before reading an incomplete container."""
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    with pytest.raises((TypeError, ValueError), match="time_step"):
+        gas_communication_step_gpu(
+            SimpleNamespace(), SimpleNamespace(), object(), time_step, object()
+        )
+
+
+@pytest.mark.parametrize("no_op", ["zero_boxes", "zero_species", "empty_map"])
+def test_gas_communication_schema_valid_no_ops_preserve_work_storage(
+    no_op: str,
+) -> None:
+    """Preserve primary and work storage for each schema-valid no-op form."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    if no_op == "zero_boxes":
+        volumes = np.empty(0, dtype=np.float64)
+        particle = np.empty((0, 0), dtype=np.float64)
+        gas_values = np.empty((0, 1), dtype=np.float64)
+        source = destination = np.empty(0, dtype=np.int32)
+        rates = np.empty(0, dtype=np.float64)
+    elif no_op == "zero_species":
+        volumes = np.array([1.0])
+        particle = np.ones((1, 1), dtype=np.float64)
+        gas_values = np.empty((1, 0), dtype=np.float64)
+        source = destination = np.empty(0, dtype=np.int32)
+        rates = np.empty(0, dtype=np.float64)
+    else:
+        volumes = np.array([1.0])
+        particle = np.ones((1, 1), dtype=np.float64)
+        gas_values = np.array([[2.0]])
+        source = destination = np.empty(0, dtype=np.int32)
+        rates = np.empty(0, dtype=np.float64)
+    particles, gas = _containers(volumes, particle, gas_values)
+    configuration = _gas_configuration(source, destination, rates)
+    work = tuple(
+        wp.array(
+            np.full(gas_values.shape, index, dtype=np.float64),
+            dtype=wp.float64,
+            device="cpu",
+        )
+        for index in range(1, 4)
+    )
+    before_work = tuple(values.numpy().copy() for values in work)
+    before_gas = gas.concentration.numpy().copy()
+
+    returned = gas_communication_step_gpu(
+        particles, gas, configuration, 1.0, *work
+    )
+
+    assert returned == (particles, gas)
+    npt.assert_array_equal(gas.concentration.numpy(), before_gas)
+    for values, expected in zip(work, before_work, strict=True):
+        npt.assert_array_equal(values.numpy(), expected)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        (("configuration", object()), "exact CommunicationConfiguration"),
+        (("communication_map", object()), "exact CommunicationMap"),
+        (("prescribed_volume", object()), "exact PrescribedVolumeUpdate"),
+        (("form", object()), "map form"),
+        (("transport_mode", object()), "transport_mode"),
+        (("transport_mode", "particles"), "transport_mode"),
+        (("edge_capacity", True), "edge_capacity"),
+        (("resource_shapes", []), "resource_shapes"),
+    ],
+)
+def test_gas_communication_rejects_mutated_declaration_metadata(
+    mutation: tuple[str, object], message: str
+) -> None:
+    """Fail closed for exact P1 declaration metadata before primary mutation."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    particles, gas = _containers(
+        np.array([1.0]), np.ones((1, 1)), np.array([[2.0]])
+    )
+    configuration = _gas_configuration(
+        np.empty(0, dtype=np.int32),
+        np.empty(0, dtype=np.int32),
+        np.empty(0, dtype=np.float64),
+    )
+    target, value = mutation
+    if target == "configuration":
+        configuration = value
+    elif target in {
+        "communication_map",
+        "prescribed_volume",
+        "resource_shapes",
+    }:
+        object.__setattr__(configuration, target, value)
+    else:
+        object.__setattr__(configuration.communication_map, target, value)
+    work = tuple(
+        wp.empty((1, 1), dtype=wp.float64, device="cpu") for _ in range(3)
+    )
+    before = gas.concentration.numpy().copy()
+
+    with pytest.raises((TypeError, ValueError), match=message):
+        gas_communication_step_gpu(particles, gas, configuration, 1.0, *work)
+
+    npt.assert_array_equal(gas.concentration.numpy(), before)
+
+
+def test_gas_communication_validates_resource_shapes_and_required_work() -> (
+    None
+):
+    """Reject duplicate resource roles and omitted required work ledgers."""
+    wp = _warp()
+    from particula.execution.communication import (
+        CommunicationResourceShape,
+        CommunicationShapeKind,
+    )
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    particles, gas = _containers(
+        np.array([1.0]), np.ones((1, 1)), np.array([[2.0]])
+    )
+    configuration = _gas_configuration(
+        np.empty(0, dtype=np.int32),
+        np.empty(0, dtype=np.int32),
+        np.empty(0, dtype=np.float64),
+    )
+    shape = CommunicationResourceShape(
+        "ledger", wp.float64, CommunicationShapeKind.BS
+    )
+    object.__setattr__(configuration, "resource_shapes", (shape, shape))
+    amounts = wp.empty((1, 1), dtype=wp.float64, device="cpu")
+    deltas = wp.empty((1, 1), dtype=wp.float64, device="cpu")
+    outbound = wp.empty((1, 1), dtype=wp.float64, device="cpu")
+
+    with pytest.raises(ValueError, match="roles must be unique"):
+        gas_communication_step_gpu(
+            particles, gas, configuration, 1.0, amounts, deltas, outbound
+        )
+    object.__setattr__(configuration, "resource_shapes", ())
+    with pytest.raises(ValueError, match="amount_deltas"):
+        gas_communication_step_gpu(particles, gas, configuration, 1.0, amounts)
+
+
+def test_gas_communication_rejects_gas_box_mismatch_before_work_writes() -> (
+    None
+):
+    """Reject incompatible gas box counts before modifying caller work arrays."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import gas_communication_step_gpu
+
+    particles, gas = _containers(
+        np.array([1.0]), np.ones((1, 1)), np.array([[2.0]])
+    )
+    gas.concentration = wp.array([[2.0], [3.0]], dtype=wp.float64, device="cpu")
+    configuration = _gas_configuration(
+        np.empty(0, dtype=np.int32),
+        np.empty(0, dtype=np.int32),
+        np.empty(0, dtype=np.float64),
+    )
+    work = tuple(
+        wp.array([[float(index)]], dtype=wp.float64, device="cpu")
+        for index in range(1, 4)
+    )
+    before = tuple(values.numpy().copy() for values in work)
+
+    with pytest.raises(ValueError, match="gas.concentration shape"):
+        gas_communication_step_gpu(particles, gas, configuration, 1.0, *work)
+
+    for values, expected in zip(work, before, strict=True):
+        npt.assert_array_equal(values.numpy(), expected)
