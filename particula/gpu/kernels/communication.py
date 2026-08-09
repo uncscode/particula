@@ -11,7 +11,7 @@ transfer, synchronization, resizing, transport, or CPU fallback.
 from __future__ import annotations
 
 from numbers import Integral
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -234,9 +234,10 @@ def volume_evolution_step_gpu(
     synchronization; rollback is not promised after an apply writer launches.
     """
     # Final-volume form intentionally precedes all container access.
-    final_volumes, final_range = _validate_array(
+    final_volumes_array, final_range = _validate_array(
         final_volumes, "final_volumes", wp.float64, 1
     )
+    final_volumes = cast(Any, final_volumes_array)
     masses, mass_range = _validate_array(
         _get_field(particles, "masses", "particles.masses"),
         "particles.masses",
