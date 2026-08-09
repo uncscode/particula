@@ -197,12 +197,14 @@ The exact downstream ordering remains
   `(B, S)` outputs, which are validated against resident primaries, published
   sidecars, and each other. Canonical empty outputs are no-dispatch no-ops; it
   exposes neither callbacks nor arbitrary resident inspection.
- - `resident_communication.py` - Concrete direct-import-only E7-F7 P5 barrier
-    executor. It validates an already acquired closed GAS or PARTICLES map by
-    identity, dispatches communication using pre-update volumes before optional
-    prescribed volume evolution, and has no P1 validation, acquisition,
+  - `resident_communication.py` - Concrete direct-import-only E7-F7 P5 barrier
+    executor. It validates an already acquired complete closed GAS or PARTICLES
+    map by identity, dispatches communication using pre-update volumes before
+    optional prescribed volume evolution, and has no P1 validation, acquisition,
     transfer, synchronization, fallback, retry, or rollback behavior. Each
     barrier invalidates saturation ratio only; vapor pressure remains fresh.
+    Standalone direct-kernel empty/disabled-map and unchanged-volume no-op
+    behavior does not extend to resident barrier composition.
  - `resident_scheduler.py` - Concrete direct-import-only E7-F5 P6 composition
   boundary. It requires the exact active session/registry/closed-guard binding,
     matching request carriers, and exactly the twelve resolver-produced canonical

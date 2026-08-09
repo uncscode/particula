@@ -1,7 +1,7 @@
 # Documentation Guide
 
 **Project:** particula  
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-08-09
 
 particula documentation is split between agent-facing guides in
 `.opencode/guides/` and user-facing MkDocs content in `docs/`.
@@ -22,6 +22,22 @@ Validate documentation changes with the repository-local wrapper:
 
 ```bash
 python3 .opencode/tools/build_mkdocs.py --validate-only --strict
+```
+
+When the current agent cannot run the wrapper directly, delegate validation to
+the `docs-validator` subagent with the changed documentation paths and request
+strict MkDocs validation. The subagent should check links and anchors, run the
+equivalent of `mkdocs build --strict`, and return a concise pass/fail result with
+the command outcome. Treat a reported strict-validation failure as blocking;
+informational notices outside the changed-file scope should be reported but do
+not require unrelated fixes.
+
+Example task prompt:
+
+```text
+Validate these changed documentation files: <paths>. Check Markdown links and
+anchors, run the equivalent of `mkdocs build --strict`, and report pass/fail
+with the command result. Do not modify files unless a validation fix is needed.
 ```
 
 Build docs directly with MkDocs when you need a full local site build:

@@ -100,10 +100,11 @@
 
 - [x] **E7-F7-P7:** Update development documentation
   - Issue: #1513 | Size: XS | Status: Shipped | Completed: 2026-08-09
-  - Delivered: Published direct gas, particle, and volume-evolution ownership,
-    accounting, conservation, capacity, failure, resident-ordering, restart, and
-    deferred-scope boundaries. No runnable example was added; E7-F9 owns
-    complete-loop publication.
+  - Delivered: Published direct gas, particle, and standalone volume-evolution
+    ownership, accounting, conservation, capacity, failure, resident-ordering,
+    restart, and deferred-scope boundaries, including the architecture outline
+    and its ADR-018 communication reference. No runnable example was added;
+    E7-F9 owns complete-loop publication.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`,
     `.opencode/guides/architecture/architecture_guide.md`,

@@ -304,9 +304,17 @@ def test_communication_roadmap_and_architecture_documentation_preserve_boundarie
     reference = (
         _ROOT / ".opencode" / "guides" / "architecture_reference.md"
     ).read_text(encoding="utf-8")
+    outline = (
+        _ROOT
+        / ".opencode"
+        / "guides"
+        / "architecture"
+        / "architecture_outline.md"
+    ).read_text(encoding="utf-8")
     roadmap_text = " ".join(roadmap.split())
     guide_text = " ".join(guide.split())
     reference_text = " ".join(reference.split())
+    outline_text = " ".join(outline.split())
 
     for phrase in (
         "E7-F7/T7 is shipped",
@@ -340,6 +348,15 @@ def test_communication_roadmap_and_architecture_documentation_preserve_boundarie
     ):
         if phrase not in reference_text:
             pytest.fail(f"architecture reference is missing: {phrase}")
+    for phrase in (
+        "complete closed GAS or PARTICLES map",
+        "optional prescribed volume evolution",
+        "Standalone direct-kernel empty/disabled-map and unchanged-volume no-op",
+        "does not extend to resident barrier composition.",
+        "[ADR-018](decisions/ADR-018-resident-communication-integration.md)",
+    ):
+        if phrase not in outline_text:
+            pytest.fail(f"architecture outline is missing: {phrase}")
     assert "no fused direct-gas `new_volume` argument" in guide_text
 
 
@@ -427,15 +444,23 @@ def test_e7_f7_plan_state_records_only_completed_publication_evidence() -> None:
     ]
     assert "Issue: #1513" in phase_details
     assert "TBD" not in phase_details
-    for path in (
+    expected_p7_files = (
         "docs/Features/data-containers-and-gpu-foundations.md",
         "docs/Features/Roadmap/data-oriented-gpu.md",
         ".opencode/guides/architecture/architecture_guide.md",
         ".opencode/guides/architecture_reference.md",
         ".opencode/guides/architecture/architecture_outline.md",
         "particula/execution/tests/gpu_resident_session_docs_test.py",
-    ):
-        assert path in phase_details
+    )
+    p7_files = re.search(
+        r"E7-F7-P7:.*?\n\s+- Files: (?P<files>.*?)\n\s+- Tests:",
+        phase_details,
+        flags=re.DOTALL,
+    )
+    assert p7_files is not None
+    assert tuple(re.findall(r"`([^`]+)`", p7_files.group("files"))) == (
+        expected_p7_files
+    )
     assert (
         "pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror"
         in phase_details
