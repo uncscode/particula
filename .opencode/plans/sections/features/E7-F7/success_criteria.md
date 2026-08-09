@@ -14,9 +14,10 @@
 - [x] P3 (#1509) gas advection/mixing is synchronous from immutable
   concentration-times-volume ledgers, edge-order independent, and covered by
   an independent NumPy oracle.
-- [ ] Particle transport preserves population, species mass, and charge for
-  closed maps and fails without partial state commit when fixed capacity cannot
-  represent a prescribed transfer.
+- [x] P4 (#1510) particle transport preserves population, species mass, and
+  signed charge for closed maps using immutable pre-step exact matching or
+  free-slot reservations, and gates its one-kernel commit on a representable
+  fixed-capacity plan.
 - [x] P3 (#1509) open boundaries expose caller-owned source/sink amount ledgers;
   no loss or source is silently attributed to numerical transport.
 - [ ] E7-F4 resources remain fixed-shape and identity-stable across repeated

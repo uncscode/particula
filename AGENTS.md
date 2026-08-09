@@ -977,11 +977,28 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
   source/sink boundaries and require their matching accounting ledgers. The
   step stages `concentration * volume`, rejects aggregate overdraw, and commits
   gas concentration once; it never changes particle fields or volume. It has
-  no scheduler integration, hidden transfer, synchronization, fallback,
-  resizing, or package/top-level export. `GasCommunicationBuffers` is also
-  concrete-only and only packages those caller-owned ledgers.
-  E7-F8 owns detailed scheduled RNG/restart policy, and E7-F9 owns final
-  diagnostics, complete examples, and closeout.
+   no scheduler integration, hidden transfer, synchronization, fallback,
+   resizing, or package/top-level export. `GasCommunicationBuffers` is also
+   concrete-only and only packages those caller-owned ledgers.
+   E7-F7-P4 provides the separate concrete-only direct import
+   `particula.gpu.kernels.communication.particle_communication_step_gpu` and
+   its `ParticleCommunicationBuffers` carrier. It accepts an exact P1
+   PARTICLES `CommunicationConfiguration`, a finite nonnegative time step,
+   and same-device buffers: float64 `(B, N)` source-debit and
+   destination-credit ledgers, int32 `(E, N)` assignments, and float64
+   `(E, N)` requests. It transports prescribed closed in-domain maps only: no
+   gas, volume mutation, `-1` endpoints, slot activation, resizing, compaction,
+   transfer, or synchronization. Immutable pre-step planning preserves complete
+   species-mass vectors and signed charge, reuses exact destination population
+   matches or ascending pre-step free slots, then performs one gated commit.
+   Valid no-op calls leave particles and buffers untouched; invalid plans gate
+   particle writes, while planning buffers may change after device planning
+   starts and rollback is not promised after commit launch. Closed-map calls
+   conserve concentration-weighted particle number, each mass lane, and signed
+   charge. Callers own buffer allocation and synchronization; both names remain
+   absent from package and top-level exports.
+   E7-F8 owns detailed scheduled RNG/restart policy, and E7-F9 owns final
+   diagnostics, complete examples, and closeout.
 
 Focused commands:
 

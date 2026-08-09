@@ -24,9 +24,12 @@ E7-F5 scheduler nodes under E7-F6 capability and failure policy.
   It supports closed maps plus declared `-1` source/sink endpoints with
   caller-owned accounting ledgers, rejects aggregate overdraw, and commits gas
   concentration once without changing volume or particle state.
-- Fixed-capacity particle transport that preserves per-particle mass/species and
-  charge state, transfers concentration/count, and fails before commit when the
-  prescribed destination cannot represent transported slots.
+- Fixed-capacity particle transport, shipped as concrete-only
+  `particula.gpu.kernels.communication.particle_communication_step_gpu` (#1510).
+  It preserves per-particle mass/species and signed charge, transfers
+  concentration from immutable pre-step state, uses exact population matching or
+  ascending pre-step free-slot reservations, and gates its one-kernel commit on
+  a complete representable closed-map plan.
 - Synchronous, registration-order-independent P3 gas updates from pre-step state
   using caller-owned work buffers; reusable resident scratch is deferred.
 - E7-F4 resource registration and checkpoint inclusion, E7-F5 deterministic

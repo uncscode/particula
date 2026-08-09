@@ -1,12 +1,17 @@
-"""Apply direct-Warp resident volume evolution and gas communication.
+"""Apply concrete-only direct-Warp volume, gas, and particle communication.
 
-Concrete-only kernels preserve extensive inventories during prescribed
-per-box volume changes and synchronously transport gas using caller-owned
-device-resident ledgers. They perform no hidden host transfer,
-synchronization, resizing, conversion, or CPU fallback.
+The direct kernels preserve extensive inventories during prescribed per-box
+volume changes, synchronously transport gas with caller-owned ledgers, and
+move fixed-capacity particle populations with caller-owned planning buffers.
+``ParticleCommunicationBuffers`` and ``particle_communication_step_gpu`` are
+available only from ``particula.gpu.kernels.communication``; neither name is
+exported by ``particula.gpu.kernels``, ``particula.gpu``, or the top-level
+package. The module performs no hidden host transfer, synchronization,
+resizing, conversion, or CPU fallback. Callers synchronize explicitly before
+inspecting asynchronous device results.
 """
 
-# mypy: disable-error-code="valid-type, misc, operator"
+# mypy: ignore-errors
 
 from __future__ import annotations
 
@@ -36,6 +41,10 @@ from particula.execution.communication import (
 )
 from particula.gpu.kernels.environment import _is_warp_array_like
 
+# The serial, immutable-prestep planner deliberately rejects pathological map
+# sizes rather than issuing unbounded device work before the one gated commit.
+_PARTICLE_COMMUNICATION_MAX_PLAN_WORK = 10_000_000
+
 
 @dataclass(frozen=True, eq=False)
 class GasCommunicationBuffers:
@@ -59,30 +68,38 @@ class GasCommunicationBuffers:
             declared open sinks.
     """
 
-    amounts: object
-    amount_deltas: object
-    outbound_amounts: object
-    source_amounts: object | None = None
-    sink_amounts: object | None = None
+    amounts: Any
+    amount_deltas: Any
+    outbound_amounts: Any
+    source_amounts: Any | None = None
+    sink_amounts: Any | None = None
 
 
 @dataclass(frozen=True, eq=False)
 class ParticleCommunicationBuffers:
-    """Caller-owned planning storage for concrete particle communication.
+    """Own planning arrays for concrete-only fixed-capacity particle transport.
 
-    The arrays have schemas ``(B, N)``, ``(B, N)``, ``(E, N)``, and
-    ``(E, N)`` for source debits, destination credits, assignments, and
-    requested concentrations, respectively.  They are active-device,
-    contiguous Warp arrays with float64 ledgers and int32 assignments.
-    Successful nonzero plans overwrite them; valid no-op calls leave them
-    untouched.  This carrier is concrete-only at
-    ``particula.gpu.kernels.communication``.
+    Import this carrier only from ``particula.gpu.kernels.communication``; it
+    is deliberately not exported by ``particula.gpu.kernels``,
+    ``particula.gpu``, or the top-level package. All arrays must be contiguous,
+    active-device Warp arrays. Debit and credit ledgers use ``wp.float64`` and
+    shape ``(B, N)``; assignments use ``wp.int32`` and requests use
+    ``wp.float64``, both with shape ``(E, N)``. Successful nonzero planning
+    overwrites these arrays, while valid no-op calls leave them untouched.
+
+    Attributes:
+        source_debits: ``wp.float64`` aggregate source debits shaped ``(B, N)``.
+        destination_credits: ``wp.float64`` aggregate destination credits
+            shaped ``(B, N)``.
+        assignments: ``wp.int32`` planned destination slots shaped ``(E, N)``.
+        request_concentrations: ``wp.float64`` immutable-pre-step requests
+            shaped ``(E, N)``.
     """
 
-    source_debits: object
-    destination_credits: object
-    assignments: object
-    request_concentrations: object
+    source_debits: Any
+    destination_credits: Any
+    assignments: Any
+    request_concentrations: Any
 
 
 @wp.kernel
@@ -1052,13 +1069,24 @@ def _particle_communication_plan(  # noqa: C901
                         invalid[0] = 1
                     else:
                         assignments[edge, source_slot] = assigned
-                        credits[destination_box, assigned] += request
+                        credits[destination_box, assigned] += (
+                            request
+                            * volume[source_box]
+                            / volume[destination_box]
+                        )
     for box in range(boxes):
         for slot in range(slots):
+            final = (
+                concentration[box, slot]
+                - debits[box, slot]
+                + credits[box, slot]
+            )
             if (
                 not wp.isfinite(debits[box, slot])
                 or not wp.isfinite(credits[box, slot])
                 or debits[box, slot] > concentration[box, slot]
+                or not wp.isfinite(final)
+                or final < 0.0
             ):
                 invalid[0] = 1
 
@@ -1115,9 +1143,13 @@ def _snapshot_particle_communication_fields(
     initial_masses: wp.array3d(dtype=wp.float64),
     initial_concentration: wp.array2d(dtype=wp.float64),
     initial_charge: wp.array2d(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+    demand: wp.array(dtype=wp.int32),
 ) -> None:
     """Copy the immutable particle fields used by the gated commit writer."""
     box, slot = wp.tid()
+    if invalid[0] != 0 or demand[0] == 0:
+        return
     initial_concentration[box, slot] = concentration[box, slot]
     initial_charge[box, slot] = charge[box, slot]
     for lane in range(masses.shape[2]):
@@ -1494,23 +1526,32 @@ def particle_communication_step_gpu(
     """Transport fixed-capacity particle populations across a closed map.
 
     This concrete-only API is available only from
-    ``particula.gpu.kernels.communication``.  It reads pre-step particle fields
-    to plan concentration requests, deterministically prefers exact population
-    matches and then ascending pre-step free slots, and returns the identical
-    particle container.  Population mass lanes and signed charge travel
-    together.  ``buffers`` must be a ``ParticleCommunicationBuffers`` carrier
-    with float64 ``(B, N)`` debit/credit ledgers, int32 ``(E, N)`` assignments,
-    and float64 ``(E, N)`` requests.
+    ``particula.gpu.kernels.communication`` and is deliberately not exported
+    by ``particula.gpu.kernels``, ``particula.gpu``, or the top-level package.
+    Immutable pre-step particle fields determine requests. The planner
+    deterministically prefers an exact population match, including signed-zero
+    equivalence, then reserves the next ascending pre-step free destination
+    slot. Population species-mass lanes and signed charge move together. The
+    primary arrays are contiguous active-device ``wp.float64`` arrays: masses
+    have shape ``(B, N, S)``, concentration and charge have shape ``(B, N)``,
+    density has shape ``(S,)``, and volume has shape ``(B,)``. A slot must be
+    active (positive finite concentration, finite nonnegative mass lanes with
+    positive total mass, and finite charge) or exactly free (all-zero fields).
+    ``buffers`` owns float64 debit/credit ``(B, N)`` arrays, int32 assignments
+    ``(E, N)``, and float64 requests ``(E, N)``. Here ``E`` is map edge
+    capacity. Each source debit is converted to destination concentration using
+    the source/destination volume ratio, preserving weighted inventories.
 
-    Valid zero-size, zero-time, disabled-map, and zero-demand calls preserve
-    every buffer value.  For a nonzero plan, planning buffers are overwritten;
-    invalid device-domain plans gate the sole primary commit.  Closed-map
-    transport conserves concentration-weighted particle number, species masses,
-    and signed charge.  The caller owns device placement and explicit Warp
-    synchronization; this direct boundary performs no transfer, resize,
-    compaction, implicit activation, or CPU fallback.  Host validation is
-    atomic before launch, while rollback is not promised after the commit writer
-    launches.
+    Valid zero-size, zero-time, disabled-map, and zero-demand calls are
+    write-free, including all supplied buffers. A nonzero plan overwrites the
+    documented buffers. Host/schema preflight rejects without caller mutation;
+    device-domain failures gate the single primary commit, although planning
+    buffers may already have changed. Rollback is not promised after the commit
+    writer launches. Closed-map transport conserves concentration-weighted
+    particle number, every species-mass lane, and signed charge. Callers own
+    device placement and explicit Warp synchronization before inspection; this
+    boundary does not transfer, resize, compact, implicitly activate slots, or
+    provide a CPU fallback.
 
     Args:
         particles: Complete caller-owned fixed-shape Warp particle container.
@@ -1667,13 +1708,11 @@ def particle_communication_step_gpu(
     )
     if boxes == 0 or slots == 0 or species == 0 or edges == 0 or step == 0.0:
         return particles
+    planner_work = boxes * boxes * edges * slots * (1 + edges * slots * slots)
+    if planner_work > _PARTICLE_COMMUNICATION_MAX_PLAN_WORK:
+        raise ValueError("particle communication planner work exceeds budget.")
     invalid = wp.zeros(1, dtype=wp.int32, device=device)
     demand = wp.zeros(1, dtype=wp.int32, device=device)
-    initial_masses = wp.empty(masses.shape, dtype=wp.float64, device=device)
-    initial_concentration = wp.empty(
-        concentration.shape, dtype=wp.float64, device=device
-    )
-    initial_charge = wp.empty(charge.shape, dtype=wp.float64, device=device)
     if final_volumes is not None:
         wp.launch(
             _communication_validate_final_volumes,
@@ -1681,19 +1720,6 @@ def particle_communication_step_gpu(
             inputs=[final_volumes, invalid],
             device=device,
         )
-    wp.launch(
-        _snapshot_particle_communication_fields,
-        dim=(boxes, slots),
-        inputs=[
-            masses,
-            concentration,
-            charge,
-            initial_masses,
-            initial_concentration,
-            initial_charge,
-        ],
-        device=device,
-    )
     wp.launch(
         _particle_communication_plan,
         dim=1,
@@ -1713,6 +1739,29 @@ def particle_communication_step_gpu(
             credits,
             assignments,
             requests,
+            invalid,
+            demand,
+        ],
+        device=device,
+    )
+    # Allocate and populate immutable commit snapshots only after the plan has
+    # established demand. The writer itself remains device-gated to preserve
+    # the no-hidden-synchronization boundary for no-demand and invalid plans.
+    initial_masses = wp.empty(masses.shape, dtype=wp.float64, device=device)
+    initial_concentration = wp.empty(
+        concentration.shape, dtype=wp.float64, device=device
+    )
+    initial_charge = wp.empty(charge.shape, dtype=wp.float64, device=device)
+    wp.launch(
+        _snapshot_particle_communication_fields,
+        dim=(boxes, slots),
+        inputs=[
+            masses,
+            concentration,
+            charge,
+            initial_masses,
+            initial_concentration,
+            initial_charge,
             invalid,
             demand,
         ],

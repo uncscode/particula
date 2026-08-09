@@ -38,8 +38,9 @@
   calls; reuse session scratch rather than allocating in repeated steps.
 - [x] Implement P3 closed-map ledger conservation and explicit open-boundary
   source/sink accounting without host readback in the normal path (#1509).
-- [ ] Preserve per-particle species mass and charge during slot transport and use
-  deterministic matching/free-slot selection without resize or compaction.
+- [x] Preserve per-particle species mass and signed charge during P4 slot
+  transport and use immutable pre-step deterministic exact matching or
+  free-slot selection without resize or compaction (#1510).
 - [x] Ensure unchanged P2 volumes are write-free after complete validation
   (E7-F7-P2, #1508).
 
@@ -51,7 +52,10 @@
   particle/gas inventory, rejection atomicity, identity, and no-op behavior
    (E7-F7-P2, #1508).
 - [x] Extend the co-located module for P3 immutable-ledger, open-boundary,
-  order-independence, no-op, and precommit-gating coverage (#1509).
+   order-independence, no-op, and precommit-gating coverage (#1509).
+- [x] Extend the co-located module for P4 fixed-capacity particle transport,
+  immutable planning, deterministic assignments, closed-map conservation, and
+  gated commit coverage (#1510).
 - [ ] Add scheduler/session tests for canonical order, resource reuse, no hidden
   transfer/sync, checkpoint/restart, capability errors, and fault transitions.
 - [ ] Add independent NumPy `float64` oracles in

@@ -52,11 +52,21 @@
     or synchronization, fallback, resize, volume update, particle mutation, or
     post-launch rollback was added.
 
-- [ ] **E7-F7-P4:** Implement fixed-capacity particle transport with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Move prescribed particle population between boxes while preserving slot composition/charge and rejecting unrepresentable destination plans before commit.
+- [x] **E7-F7-P4:** Implement fixed-capacity particle transport with unit tests
+  - Issue: #1510 | Size: S | Status: Shipped
+  - Delivered: Concrete-only direct-Warp `particle_communication_step_gpu` and
+    frozen `ParticleCommunicationBuffers` plan all movement from immutable
+    pre-step particle state. They aggregate caller-owned source-debit and
+    destination-credit ledgers, preserve full species-mass vectors and signed
+    charge, use exact population matches or ascending pre-step free-slot
+    reservations, and perform one gated commit only for a valid closed-map plan.
   - Files: `particula/gpu/kernels/communication.py`, `particula/gpu/kernels/tests/communication_test.py`
-  - Tests: Whole/partial population transport, free-slot selection, inactive slots, multiple edges, capacity exhaustion, no partial commit, number/species-mass/charge conservation, and identity stability.
+  - Tests: Co-located contract coverage for immutable planning, deterministic
+    matching/free-slot selection, caller-owned ledgers and assignments,
+    closed-map number/species-mass/charge conservation, and gated commits.
+  - Boundary: No package/top-level export, resident scheduler integration,
+    gas or volume mutation, `-1` endpoints, transfer/synchronization, fallback,
+    resizing, compaction, or implicit activation was added.
 
 - [ ] **E7-F7-P5:** Integrate communication nodes with resident sessions and scheduler tests
   - Issue: TBD | Size: S | Status: Not Started

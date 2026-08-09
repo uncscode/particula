@@ -28,10 +28,13 @@ must maintain at least 80% coverage.
   overdraw and invalid metadata gating, resource schemas, and invalid-time
   rejection before container access. It also verifies that P3 does not mutate
   particle fields, volume, or read-only map/final-volume metadata.
-- **P4:** Test whole and fractional particle populations, matching and free
-  destination slots, inactive slots, composition/charge preservation, multiple
-  inbound edges, capacity exhaustion, deterministic selection, and no partial
-  commit. Check number, per-species mass, and charge ledgers.
+- **P4 (shipped, #1510):** The co-located
+  `particula/gpu/kernels/tests/communication_test.py` covers direct
+  fixed-capacity particle transport. Coverage includes immutable pre-step
+  planning, exact population matching and free-slot reservation, caller-owned
+  ledgers and deterministic assignments, closed-map conservation, and gated
+  commit behavior. The contract remains concrete-only, with Warp CPU evidence
+  and optional CUDA rows where available.
 - **P5:** Test canonical scheduler placement, derived-state invalidation,
   resource reuse, stable identities, zero normal-step conversion/sync/readback,
   checkpoint/restart metadata, capability failures, and post-launch faulting.

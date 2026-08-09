@@ -122,7 +122,12 @@ exactly equal `Device` are accepted. Other versions, schemas, malformed records,
 non-ACTIVE checkpoint records, and device mismatches reject. Finalization makes
 its source session terminal but returns an ACTIVE checkpoint eligible for explicit
 restart. E7-F5 P2 supplies declaration-only scheduling; E7-F7 transport and
-E7-F8 detailed RNG-stream policy remain future work.
+E7-F8 detailed RNG-stream policy remain future work. E7-F7 P4 particle
+transport is shipped as the concrete-only
+``particula.gpu.kernels.communication.particle_communication_step_gpu`` seam.
+P4 owns immutable pre-step planning, admission, and one gated particle commit;
+it accepts prescribed closed in-domain maps only and remains absent from package
+and top-level exports.
 
 E7-F5 P2 adds `particula.execution.scheduler`, a concrete direct-import-only
 declaration-only scheduling boundary. It first resolves the complete P1 graph,

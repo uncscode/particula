@@ -37,8 +37,10 @@ The exact downstream ordering remains
     concrete communication-map declaration and read-only validation boundary.
     E7-F7 P2 separately ships the concrete-only direct-Warp final-volume writer
     at `particula.gpu.kernels.communication`; it neither binds nor changes P1.
-    P3+ retain inventory/time-step transfer admission, particle transport, and
-    resident binding. E7-F8 detailed RNG-stream policy also remains deferred,
+     P3 retains gas inventory/time-step transfer admission. E7-F7 P4 ships a
+     separate concrete-only direct-Warp particle-transport seam and owns its
+     immutable particle-plan admission; P5 retains
+     resident binding. E7-F8 detailed RNG-stream policy also remains deferred,
     along with implicit transfer/synchronization, retry, broad fallback, and
     replacement of direct GPU APIs. The sole shipped fallback seam is the
     explicit, CPU-authoritative,
@@ -239,8 +241,8 @@ The exact downstream ordering remains
   receive complete applicable preflight and are write-free on success. P1 has no
   source-inventory or time-step input, so P3—not this module—must atomically
    reject population-dependent outbound overdraw before writers launch. The
-   separate GPU-kernel P2 owns final-volume writes; P4 owns particle transport,
-   and P5 owns exact resident
+   separate GPU-kernel P2 owns final-volume writes; the GPU-kernel P4 owns
+   particle transport, and P5 owns exact resident
   primary/sidecar binding and alias checks. This module has no transfer,
   synchronization, fallback, scheduling, or package/top-level export.
 - `thermodynamic_updates.py` - Concrete-only, direct-import Warp-resident
@@ -437,7 +439,8 @@ private helpers for cross-kernel setup.
    writer launches, makes no hidden transfers, and does not promise rollback
    after a launched writer.
 - `communication.py` - Concrete-only, direct-import, Warp-dependent E7-F7 P2
-  final-volume evolution writer. `volume_evolution_step_gpu` accepts only a
+   final-volume evolution writer and P4 particle-transport seam.
+   `volume_evolution_step_gpu` accepts only a
   caller-owned active-device contiguous `wp.float64` final-volume array of
   shape `(B,)` in m³. After complete schema, domain, nonaliasing, factor, and
   scaled-concentration safety preflight, it mutates only `particles.volume` and
@@ -447,9 +450,19 @@ private helpers for cross-kernel setup.
   unchanged, while rollback is not promised after an asynchronous writer
   launches. It has no package export, hidden transfer or synchronization, CPU
    fallback, map declaration, transport, scheduler/session binding, resizing,
-   or `Runnable` behavior. P1 remains separately owned by
-   `particula.execution.communication`; P3+ retain transfer and transport work.
-   See [ADR-016](decisions/ADR-016-direct-gpu-volume-evolution-boundary.md).
+   or `Runnable` behavior. `ParticleCommunicationBuffers` and
+   `particle_communication_step_gpu` are likewise concrete-only and accept
+   prescribed closed, in-domain `PARTICLES` maps only. P4 plans immutable
+   pre-call state, reuses exact destination populations or reserves ascending
+   pre-step free slots, then performs one gated commit. It preserves weighted
+   particle number, every mass lane, and signed charge without mutating gas or
+   volume. No hidden transfer, synchronization, fallback, resizing, compaction,
+   scheduling/resident integration, or RNG is provided. P1 remains separately
+   owned by `particula.execution.communication`; P3 retains gas-transfer
+   admission, P4 retains particle-plan admission, and P5 retains resident
+   binding. See
+   [ADR-016](decisions/ADR-016-direct-gpu-volume-evolution-boundary.md) and
+   [ADR-017](decisions/ADR-017-direct-gpu-particle-transport-boundary.md).
 - `environment.py` - Shared private normalization and validation for kernel
   environment inputs
 - `tests/` - Test coverage

@@ -5,6 +5,7 @@ from __future__ import annotations
 import inspect
 import sys
 from types import SimpleNamespace
+from typing import Any, cast
 
 import numpy as np
 import numpy.testing as npt
@@ -707,8 +708,12 @@ def test_gas_communication_accounts_for_open_boundary_ledgers() -> None:
 
     gas_communication_step_gpu(particles, gas, configuration, 1.0, buffers)
 
-    npt.assert_allclose(buffers.source_amounts.numpy(), [[0.0], [1.5]])
-    npt.assert_allclose(buffers.sink_amounts.numpy(), [[2.0], [0.0]])
+    source_amounts = buffers.source_amounts
+    sink_amounts = buffers.sink_amounts
+    assert source_amounts is not None
+    assert sink_amounts is not None
+    npt.assert_allclose(source_amounts.numpy(), np.array([[0.0], [1.5]]))
+    npt.assert_allclose(sink_amounts.numpy(), np.array([[2.0], [0.0]]))
     npt.assert_allclose(gas.concentration.numpy(), [[3.0], [4.5]])
     npt.assert_array_equal(particles.concentration.numpy(), particle_before)
 
@@ -915,9 +920,7 @@ def test_gas_communication_invalid_prescribed_volume_gates_commit() -> None:
     )
     gas_before = gas.concentration.numpy().copy()
 
-    gas_communication_step_gpu(
-        particles, gas, configuration, 1.0, *work[:3], sink_amounts=work[3]
-    )
+    gas_communication_step_gpu(particles, gas, configuration, 1.0, *work)
 
     npt.assert_array_equal(gas.concentration.numpy(), gas_before)
 
@@ -1188,7 +1191,7 @@ class _KernelWarpFacade:
     def atomic_add(values: np.ndarray, *indices_and_value: int | float) -> None:
         """Apply one- and two-dimensional additive atomics synchronously."""
         *indices, value = indices_and_value
-        values[tuple(indices)] += value
+        values[tuple(int(index) for index in indices)] += value
 
 
 def test_private_communication_kernels_cover_valid_and_invalid_branches(
@@ -1809,3 +1812,253 @@ def test_private_particle_planner_and_commit_follow_immutable_fields(
     npt.assert_array_equal(concentration, [[0.0, 0.0], [5.0, 0.0]])
     npt.assert_array_equal(masses[0, 0], [0.0, 0.0])
     assert charge[0, 0] == 0.0
+
+
+@pytest.mark.parametrize(
+    ("source_value", "destination_value", "rates"),
+    [
+        (1.0e308, 1.0e308, np.array([1.0])),
+        (1.0, 0.0, np.array([0.75, 0.75])),
+    ],
+)
+def test_particle_communication_invalid_final_concentration_gates_commit(
+    source_value: float, destination_value: float, rates: np.ndarray
+) -> None:
+    """Reject overflow and aggregate overdraw without primary mutation."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        particle_communication_step_gpu,
+    )
+
+    destinations = np.array([1], dtype=np.int32)
+    concentrations = np.array([[source_value], [destination_value]])
+    if len(rates) == 2:
+        destinations = np.array([1, 2], dtype=np.int32)
+        concentrations = np.array([[source_value], [0.0], [0.0]])
+    source = np.zeros(len(rates), dtype=np.int32)
+    particles, _ = _containers(
+        np.ones(len(concentrations)),
+        concentrations,
+        np.empty((len(concentrations), 0)),
+    )
+    particles.masses = wp.full(
+        (len(concentrations), 1, 2), 2.0, dtype=wp.float64, device="cpu"
+    )
+    particles.charge = wp.zeros(
+        (len(concentrations), 1), dtype=wp.float64, device="cpu"
+    )
+    before = tuple(field.numpy().copy() for field in vars(particles).values())
+
+    particle_communication_step_gpu(
+        particles,
+        _particle_configuration(source, destinations, rates),
+        1.0,
+        _particle_buffers(len(concentrations), 1, len(rates)),
+    )
+    wp.synchronize()
+
+    for field, expected in zip(vars(particles).values(), before, strict=True):
+        npt.assert_array_equal(field.numpy(), expected)
+
+
+def test_particle_communication_conserves_weighted_inventories() -> None:
+    """Preserve number, mass lanes, and charge with unequal box volumes."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        particle_communication_step_gpu,
+    )
+
+    particles, _ = _containers(
+        np.array([2.0, 5.0]), np.array([[4.0], [0.0]]), np.empty((2, 0))
+    )
+    particles.masses = wp.array(
+        [[[2.0, 3.0]], [[0.0, 0.0]]], dtype=wp.float64, device="cpu"
+    )
+    particles.charge = wp.array([[-4.0], [0.0]], dtype=wp.float64, device="cpu")
+    old_concentration = particles.concentration.numpy().copy()
+    old_masses = particles.masses.numpy().copy()
+    old_charge = particles.charge.numpy().copy()
+    volumes = particles.volume.numpy().copy()
+
+    particle_communication_step_gpu(
+        particles,
+        _particle_configuration(np.array([0]), np.array([1]), np.array([0.5])),
+        1.0,
+        _particle_buffers(2, 1, 1),
+    )
+    wp.synchronize()
+
+    concentration = particles.concentration.numpy()
+    npt.assert_allclose(concentration, [[2.0], [0.8]], rtol=1e-12, atol=0.0)
+    for values, expected in (
+        (concentration, old_concentration),
+        (
+            concentration * particles.charge.numpy(),
+            old_concentration * old_charge,
+        ),
+    ):
+        npt.assert_allclose(
+            np.sum(values * volumes[:, None]),
+            np.sum(expected * volumes[:, None]),
+            rtol=1e-12,
+            atol=0.0,
+        )
+    for lane in range(2):
+        npt.assert_allclose(
+            np.sum(
+                concentration
+                * particles.masses.numpy()[:, :, lane]
+                * volumes[:, None]
+            ),
+            np.sum(
+                old_concentration * old_masses[:, :, lane] * volumes[:, None]
+            ),
+            rtol=1e-12,
+            atol=0.0,
+        )
+
+
+def test_particle_communication_registration_order_is_semantically_invariant() -> (
+    None
+):
+    """Produce the same primaries and semantic request rows after edge reordering."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        particle_communication_step_gpu,
+    )
+
+    def run(source: np.ndarray, destination: np.ndarray):
+        particles, _ = _containers(
+            np.ones(4), np.array([[4.0], [6.0], [0.0], [0.0]]), np.empty((4, 0))
+        )
+        particles.masses = wp.array(
+            [[[2.0, 3.0]], [[5.0, 7.0]], [[0.0, 0.0]], [[0.0, 0.0]]],
+            dtype=wp.float64,
+            device="cpu",
+        )
+        particles.charge = wp.array(
+            [[-2.0], [3.0], [0.0], [0.0]], dtype=wp.float64, device="cpu"
+        )
+        buffers = _particle_buffers(4, 1, 2)
+        particle_communication_step_gpu(
+            particles,
+            _particle_configuration(source, destination, np.array([0.5, 0.5])),
+            1.0,
+            buffers,
+        )
+        wp.synchronize()
+        semantic_rows = {
+            (int(left), int(right)): (
+                buffers.assignments.numpy()[index].copy(),
+                buffers.request_concentrations.numpy()[index].copy(),
+            )
+            for index, (left, right) in enumerate(
+                zip(source, destination, strict=True)
+            )
+        }
+        return particles, semantic_rows
+
+    first, first_rows = run(
+        np.array([0, 1], dtype=np.int32), np.array([2, 3], dtype=np.int32)
+    )
+    second, second_rows = run(
+        np.array([1, 0], dtype=np.int32), np.array([3, 2], dtype=np.int32)
+    )
+
+    for name in ("masses", "concentration", "charge", "density", "volume"):
+        npt.assert_array_equal(
+            getattr(first, name).numpy(), getattr(second, name).numpy()
+        )
+    assert first_rows.keys() == second_rows.keys()
+    for key in first_rows:
+        for actual, expected in zip(
+            first_rows[key], second_rows[key], strict=True
+        ):
+            npt.assert_array_equal(actual, expected)
+
+
+def test_particle_communication_planner_budget_rejects_before_writes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Fail closed before planning when the bounded-work budget is exceeded."""
+    wp = _warp()
+    from particula.gpu.kernels import communication
+
+    particles, _ = _containers(
+        np.ones(2), np.array([[2.0], [0.0]]), np.empty((2, 0))
+    )
+    particles.masses = wp.array(
+        [[[2.0, 3.0]], [[0.0, 0.0]]], dtype=wp.float64, device="cpu"
+    )
+    particles.charge = wp.array([[-1.0], [0.0]], dtype=wp.float64, device="cpu")
+    buffers = _particle_buffers(2, 1, 1)
+    before = tuple(field.numpy().copy() for field in vars(buffers).values())
+    monkeypatch.setattr(
+        communication, "_PARTICLE_COMMUNICATION_MAX_PLAN_WORK", 0
+    )
+
+    with pytest.raises(ValueError, match="planner work exceeds budget"):
+        communication.particle_communication_step_gpu(
+            particles,
+            _particle_configuration(
+                np.array([0]), np.array([1]), np.array([0.5])
+            ),
+            1.0,
+            buffers,
+        )
+
+    for field, expected in zip(vars(buffers).values(), before, strict=True):
+        npt.assert_array_equal(field.numpy(), expected)
+
+
+def test_particle_communication_boundary_is_concrete_only_and_frozen() -> None:
+    """Keep the particle carrier concrete-only with identity-owned fields."""
+    from dataclasses import FrozenInstanceError
+
+    _warp()
+    from particula.gpu import kernels
+    from particula.gpu.kernels import communication
+
+    fields = (object(), object(), object(), object())
+    buffers = communication.ParticleCommunicationBuffers(*fields)
+
+    assert tuple(vars(buffers).values()) == fields
+    assert not hasattr(kernels, "ParticleCommunicationBuffers")
+    assert not hasattr(kernels, "particle_communication_step_gpu")
+    buffers_any = cast(Any, buffers)
+    with pytest.raises(FrozenInstanceError):
+        buffers_any.source_debits = object()
+
+
+def test_particle_communication_matches_signed_zero_population_keys() -> None:
+    """Treat signed-zero mass and charge lanes as an exact destination match."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        particle_communication_step_gpu,
+    )
+
+    particles, _ = _containers(
+        np.ones(2), np.array([[2.0, 0.0], [3.0, 0.0]]), np.empty((2, 0))
+    )
+    particles.masses = wp.array(
+        [[[2.0, 0.0], [0.0, 0.0]], [[2.0, -0.0], [0.0, 0.0]]],
+        dtype=wp.float64,
+        device="cpu",
+    )
+    particles.charge = wp.array(
+        [[0.0, 0.0], [-0.0, 0.0]], dtype=wp.float64, device="cpu"
+    )
+    buffers = _particle_buffers(2, 2, 1)
+
+    particle_communication_step_gpu(
+        particles,
+        _particle_configuration(np.array([0]), np.array([1]), np.array([1.0])),
+        1.0,
+        buffers,
+    )
+    wp.synchronize()
+
+    npt.assert_array_equal(
+        particles.concentration.numpy(), [[0.0, 0.0], [5.0, 0.0]]
+    )
+    npt.assert_array_equal(buffers.assignments.numpy(), [[0, -1]])

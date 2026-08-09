@@ -32,5 +32,10 @@
 - P3 (#1509) added no user-facing documentation or export. The concrete module
   and `GasCommunicationBuffers` docstrings document caller-owned `(B, S)`
   amount/work/accounting ledgers, synchronous explicit-Euler closed/open-map
-  semantics, one gas commit, and the no-transfer/no-sync/no-fallback boundary.
+   semantics, one gas commit, and the no-transfer/no-sync/no-fallback boundary.
+- P4 (#1510) added no user-facing documentation or export. The concrete module
+  and `ParticleCommunicationBuffers` docstrings document the direct-only
+  import, exact buffer schemas, immutable pre-step planning, exact-match or
+  pre-step-free-slot selection, closed-map conservation, caller synchronization,
+  and gated-commit/no-post-launch-rollback boundary.
 - Run `mkdocs build --strict` and relevant docs tests before completing P7.

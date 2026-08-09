@@ -72,7 +72,19 @@ must declare source/sink ledgers so apparent non-conservation is explicit.
   overdraw, and makes one gas-concentration commit. It validates optional
   prescribed-volume metadata but never writes it, particle fields, or volume.
   It remains unexported and has no scheduler/session integration, transfer,
-  synchronization, fallback, resize, or post-launch rollback.
+   synchronization, fallback, resize, or post-launch rollback.
+- **P4 particle boundary (shipped, #1510):** Concrete-only
+  `particula.gpu.kernels.communication.particle_communication_step_gpu` accepts
+  a complete Warp particle container, an exact P1 PARTICLES configuration, a
+  finite nonnegative `time_step`, and caller-owned
+  `ParticleCommunicationBuffers`. Its immutable pre-step planner aggregates
+  source debits and destination credits, assigns each transferred population to
+  an exact pre-step destination match or the next ascending pre-step free slot,
+  and rejects overdraw or capacity shortage before the gated one-kernel commit.
+  It supports closed in-domain maps only: it does not access gas, change volume,
+  accept `-1` endpoints, resize, compact, transfer, synchronize, fall back, or
+  integrate with the session or scheduler. The API and buffer carrier remain
+  concrete-only and unexported.
 - **Data model (later phases):** The fixed edge capacity, source/destination
   `int32` arrays, enabled mask, finite nonnegative inverse-time rates,
   transport mode, and optional final volumes remain stable for the session.
@@ -92,8 +104,9 @@ must declare source/sink ledgers so apparent non-conservation is explicit.
   concentration together with immutable per-particle species mass and charge.
   Whole or fractional source populations may be represented only when a
   deterministic destination slot can preserve their composition. Exact matching
-  destination slots may accumulate concentration; otherwise use validated free
-  slots. Insufficient fixed capacity rejects before the commit kernel.
+   destination slots may accumulate concentration; otherwise reserve validated
+   ascending pre-step free slots. Slots cleared by the same call are not reused.
+   Insufficient fixed capacity rejects before the gated commit kernel.
 - **Volume semantics:** `particles.volume` remains the sole simulation-volume
   owner. Positive finite prescribed final volumes update in place. Particle
   masses, density, and charge do not scale merely because box volume changes;

@@ -55,8 +55,9 @@
     provides a bounded concrete resident complete-loop composer. E7-F7 P1
     remains the concrete communication-map declaration/read-only validation
     seam, while the separate direct-Warp P2 final-volume writer is now shipped
-    at `particula.gpu.kernels.communication`. P3+ retain transfer admission,
-    transport, and resident binding. E7-F8 detailed RNG-stream policy, implicit
+     at `particula.gpu.kernels.communication`. P3 retains transfer admission;
+     the separate concrete-only P4 direct-Warp seam owns particle transport; and
+     P5 retains resident binding. E7-F8 detailed RNG-stream policy, implicit
     transfer/synchronization, retry, broad fallback, and replacement of direct
     GPU APIs also remain deferred.
 - `particula.execution.fallback` is the sole concrete, direct-import-only E7-F6
@@ -178,8 +179,8 @@
   cases after complete applicable preflight. Because P1 has neither source
    inventory nor time-step input, it cannot validate population-dependent
    outbound overdraw: P3 owns that atomic pre-writer check. The separate GPU
-   kernel P2 owns final-volume writes, P4 owns particle transport, and P5 owns
-   exact resident
+   kernel P2 owns final-volume writes, the GPU-kernel P4 owns particle
+   transport, and P5 owns exact resident
   primary/sidecar alias checks. The module provides no transfer,
   synchronization, fallback, or scheduling behavior and is not exported through
   `particula.execution` or top-level `particula`.
@@ -421,8 +422,30 @@ kernel-entry responsibilities.
   transfer or synchronize host data, fall back to CPU, resize/compact storage, or
   provide a `Runnable`. P1 map declaration and read-only validation remain
   exclusively in `particula.execution.communication`; P3+ own transport and
-  other communication phases. See
-  [ADR-016](decisions/ADR-016-direct-gpu-volume-evolution-boundary.md).
+   other communication phases. See
+   [ADR-016](decisions/ADR-016-direct-gpu-volume-evolution-boundary.md).
+
+### Direct GPU particle-transport boundary
+
+- `particula.gpu.kernels.communication` also provides the E7-F7 P4
+  concrete-only, direct-import `ParticleCommunicationBuffers` carrier and
+  `particle_communication_step_gpu`. Neither name is exported through
+  `particula.gpu.kernels`, `particula.gpu`, or top-level `particula`.
+- The seam accepts only prescribed closed, in-domain `PARTICLES` maps. It plans
+  requests from immutable pre-call particle state, preserves complete mass
+  vectors and signed charge, uses exact destination-population matches or
+  ascending pre-step free slots, and performs one gated primary commit.
+- A successful call preserves concentration-weighted particle number, every
+  species-mass lane, and signed charge. It returns the identical particle
+  container; gas, volume, maps, and primary/buffer identities remain
+  caller-owned. Valid zero-demand cases are write-free after applicable
+  validation. Pre-launch plan failures preserve primaries, while rollback is not
+  promised after the commit writer launches.
+- This direct seam does not transfer or synchronize host data, fall back to CPU,
+  resize or compact slots, implicitly activate slots, use RNG, or bind a
+  scheduler or resident session. P1 remains the declaration/read-only validation
+  owner, P3 owns transfer admission, and P5 owns resident binding. See
+  [ADR-017](decisions/ADR-017-direct-gpu-particle-transport-boundary.md).
 
 ### Direct GPU nucleation boundary
 

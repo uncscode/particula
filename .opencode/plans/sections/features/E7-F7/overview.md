@@ -12,12 +12,15 @@ host transfers or full CFD coupling.
 ## Value Proposition
 
 E7-F7 has shipped validated fixed-shape communication declarations, direct-Warp
-per-box volume evolution, and concrete-only synchronous gas communication.
+per-box volume evolution, concrete-only synchronous gas communication, and
+fixed-capacity direct-Warp particle transport.
 The gas operation uses caller-owned extensive ledgers, supports declared open
-source/sink endpoints, and commits gas concentration once. Particle transport
-and resident scheduler integration remain later phases. Independent boxes remain
-the default; shipped operations preserve explicit ownership, synchronization,
-and failure boundaries.
+source/sink endpoints, and commits gas concentration once. The particle
+operation uses immutable pre-step planning, exact population matching or
+ascending pre-step free-slot reservations, caller-owned ledgers, and a gated
+one-kernel commit for closed maps. Resident scheduler integration remains a
+later phase. Independent boxes remain the default; shipped operations preserve
+explicit ownership, synchronization, and failure boundaries.
 
 ## User Stories
 
