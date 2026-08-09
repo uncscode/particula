@@ -3,13 +3,16 @@
 This direct-import-only, Warp-dependent boundary pins complete fixed-shape
 native sidecar families to one exact ``ACTIVE`` :class:`ResidentSession`.
 It allocates and validates resources only: it neither executes a process nor
-transfers, synchronizes, restores, resizes, or initializes RNG state.  The
+transfers, synchronizes, restores, or resizes. Coagulation acquisition is the
+narrow exception: it initializes its sole P1-derived persistent RNG stream
+exactly once before publishing that resident resource. The
 manifests and views here are concrete-only and are deliberately not exported
 from :mod:`particula.execution`.
 
 The registry retains array identities and performs metadata-only schema and
 nonaliasing checks. It does not establish allocator provenance, execute a
-kernel, or change session lifecycle or random-number-generator policy.
+kernel, or change session lifecycle. The coagulation-only stream has no
+wall-loss integration, reset API, hidden transfer, or synchronization.
 ``validate_pinned_session`` is the narrow direct-module-only integration seam
 for resident timestep guards. It requires the exact retained session, then
 revalidates its active lifecycle, pinned container and primary-array identities,
@@ -42,6 +45,7 @@ from particula.execution.gpu_session import (
     ResidentLifecycle,
     ResidentSession,
 )
+from particula.execution.rng import StreamRegistry
 from particula.gpu.kernels.communication import (
     GasCommunicationBuffers,
     ParticleCommunicationBuffers,
@@ -354,6 +358,7 @@ class GPUResourceRegistry:
         self._nucleation_records: tuple[Any, ...] | None = None
         self._capacities: dict[str, int] = {}
         self._open_step_token: Any | None = None
+        self._coagulation_stream_registry: StreamRegistry | None = None
 
     @property
     def manifests(self) -> tuple[ResourceManifest, ...]:
@@ -662,6 +667,10 @@ class GPUResourceRegistry:
                 for entry in manifest.entries
             )
         return tuple(entries)
+
+    def _has_resident_coagulation_stream(self) -> bool:
+        """Return whether an initialized resident coagulation stream exists."""
+        return self._coagulation_stream_registry is not None
 
     def reserve_open_step(self, token: Any) -> None:
         """Reserve the binding's sole open timestep token by identity.
@@ -1139,6 +1148,7 @@ class GPUResourceRegistry:
                 "collision_capacity must be positive and within resident "
                 "fixed-capacity bounds."
             )
+        already_published = "coagulation" in self._bindings
         bindings = self._acquire(
             _COAGULATION,
             {
@@ -1148,6 +1158,45 @@ class GPUResourceRegistry:
             },
             int(collision_capacity),
         )
+        if not already_published:
+            stream = self._session.metadata.stream
+            if stream.n_boxes == 0 and self._session.dimensions.n_boxes:
+                # Compatibility for direct legacy session construction. Factory
+                # sessions always retain explicit stream metadata.
+                logical_box_ids = tuple(
+                    str(index)
+                    for index in range(self._session.dimensions.n_boxes)
+                )
+                lanes = tuple(range(self._session.dimensions.n_boxes))
+                root_seed = 0
+            else:
+                logical_box_ids = stream.logical_box_ids
+                lanes = stream.lanes
+                root_seed = stream.root_seed
+            # P1 presently defines both process namespaces. The wall-loss array
+            # is temporary P1 initialization storage, never a resident resource.
+            temporary_wall_loss = wp.zeros(
+                self._shape(_WALL_LOSS.entries[0]),
+                dtype=wp.uint32,
+                device=self._signature[2],
+            )
+            registry = StreamRegistry(
+                root_seed,
+                self._session.dimensions.n_boxes,
+                logical_box_ids,
+                lanes,
+                (
+                    ("coagulation", bindings["rng_states"]),
+                    ("wall_loss", temporary_wall_loss),
+                ),
+            )
+            try:
+                registry.initialize()
+            except BaseException:
+                self._bindings.pop("coagulation", None)
+                self._capacities.pop("coagulation", None)
+                raise
+            self._coagulation_stream_registry = registry
         if "coagulation" not in self._views:
             self._views["coagulation"] = CoagulationResources(
                 int(collision_capacity), **bindings

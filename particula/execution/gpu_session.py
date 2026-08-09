@@ -198,6 +198,58 @@ class ResidentDimensions:
         _validate_dimension(self.n_species, "n_species", positive=False)
 
 
+@dataclass(frozen=True)
+class ResidentStreamMetadata:
+    """Retain immutable P1 stream identity for one resident session."""
+
+    n_boxes: int
+    root_seed: int
+    logical_box_ids: tuple[str, ...]
+    lanes: tuple[int, ...]
+
+    def __post_init__(self) -> None:
+        """Validate the host-only P1 stream manifest metadata."""
+        from particula.execution.rng import MAX_ROOT_SEED
+
+        _validate_dimension(self.n_boxes, "n_boxes", positive=False)
+        self._validate_root_seed(MAX_ROOT_SEED)
+        self._validate_stream_arrays()
+
+    def _validate_root_seed(self, maximum: int) -> None:
+        """Validate the immutable root seed against the P1 unsigned range."""
+        if isinstance(self.root_seed, bool) or not isinstance(
+            self.root_seed, Integral
+        ):
+            raise TypeError("root_seed must be a non-boolean Integral.")
+        if not 0 <= self.root_seed <= maximum:
+            raise ValueError(f"root_seed must be in [0, {maximum}].")
+
+    def _validate_stream_arrays(self) -> None:
+        """Validate logical IDs and lane ordering against the box count."""
+        if type(self.logical_box_ids) is not tuple:
+            raise TypeError("logical_box_ids must be an exact tuple.")
+        if type(self.lanes) is not tuple:
+            raise TypeError("lanes must be an exact tuple.")
+        if (
+            len(self.logical_box_ids) != self.n_boxes
+            or len(self.lanes) != self.n_boxes
+        ):
+            raise ValueError(
+                "logical_box_ids and lanes must have n_boxes entries."
+            )
+        from particula.execution.rng import _validate_logical_box_id
+
+        for logical_box_id in self.logical_box_ids:
+            _validate_logical_box_id(logical_box_id, "logical_box_ids entries")
+        if len(set(self.logical_box_ids)) != self.n_boxes:
+            raise ValueError("logical_box_ids must be unique.")
+        for lane in self.lanes:
+            if isinstance(lane, bool) or not isinstance(lane, Integral):
+                raise TypeError("lanes entries must be a non-boolean Integral.")
+        if set(self.lanes) != set(range(self.n_boxes)):
+            raise ValueError("lanes must be a permutation of range(n_boxes).")
+
+
 class ResidentLifecycle(Enum):
     """Declare resident lifecycle vocabulary.
 
@@ -239,6 +291,7 @@ class ResidentMetadata:
 
     device: Device
     gas_names: tuple[str, ...]
+    stream: ResidentStreamMetadata = ResidentStreamMetadata(0, 0, (), ())
 
     def __post_init__(self) -> None:
         """Validate fixed-cost metadata declarations without normalizing names.
@@ -252,6 +305,9 @@ class ResidentMetadata:
         if self.device.backend is not Backend.WARP:
             raise ValueError("device.backend must be Backend.WARP.")
         _validate_gas_names(self.gas_names)
+        if type(self.stream) is not ResidentStreamMetadata:
+            raise TypeError("stream must be an exact ResidentStreamMetadata.")
+        self.stream.__post_init__()
 
 
 def _validate_array(
@@ -574,6 +630,10 @@ def _validate_resident_carriers(
     _validate_gas_names(metadata.gas_names)
     if len(metadata.gas_names) != dimensions.n_species:
         raise ValueError("metadata.gas_names length must match n_species.")
+    if metadata.stream.n_boxes not in (0, dimensions.n_boxes):
+        raise ValueError(
+            "metadata.stream.n_boxes must match dimensions.n_boxes."
+        )
     if type(lifecycle) is not ResidentLifecycle:
         raise TypeError("lifecycle must be an exact ResidentLifecycle.")
     return (
@@ -1166,6 +1226,10 @@ def setup_resident_session(
     gas: "GasData",
     environment: "EnvironmentData",
     device: Device,
+    *,
+    root_seed: int = 0,
+    logical_box_ids: tuple[str, ...] | None = None,
+    lanes: tuple[int, ...] | None = None,
 ) -> ResidentSession:
     """Upload CPU carriers once and publish one active resident session.
 
@@ -1203,6 +1267,16 @@ def setup_resident_session(
         gas_names,
     ) = _preflight_cpu_session(particles, gas, environment, device)
 
+    if logical_box_ids is None:
+        logical_box_ids = tuple(
+            str(index) for index in range(dimensions.n_boxes)
+        )
+    if lanes is None:
+        lanes = tuple(range(dimensions.n_boxes))
+    stream = ResidentStreamMetadata(
+        dimensions.n_boxes, root_seed, logical_box_ids, lanes
+    )
+
     from particula.gpu.conversion import (
         to_warp_environment_data,
         to_warp_gas_data,
@@ -1218,7 +1292,7 @@ def setup_resident_session(
         validated_environment,
         device=device.native,
     )
-    metadata = ResidentMetadata(device, gas_names)
+    metadata = ResidentMetadata(device, gas_names, stream)
     return ResidentSession(
         warp_particles,
         warp_gas,

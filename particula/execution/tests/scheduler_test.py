@@ -935,6 +935,85 @@ def test_resident_scheduler_dispatches_resolved_nodes_once(
 
 
 @pytest.mark.warp
+def test_resident_scheduler_selects_resident_coagulation_adapter(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a resident coagulation request selects the forced-no-reset adapter."""
+    module = _resident_scheduler()
+    request, _ = _scheduler_request(module)
+    resident_state = object.__new__(
+        module.ResidentBrownianCoagulationExecutionState
+    )
+    object.__setattr__(request, "coagulation", resident_state)
+    scheduler = module.ResidentSimulationScheduler(request)
+    selected: list[str] = []
+
+    class ResidentAdapter:
+        """Record selection of the resident-only adapter."""
+
+        def execute(self, _state: object) -> None:
+            selected.append("resident")
+
+    monkeypatch.setattr(scheduler, "_validate", lambda _duration: None)
+    monkeypatch.setattr(
+        module, "ResidentBrownianCoagulationExecutionAdapter", ResidentAdapter
+    )
+    monkeypatch.setattr(
+        module,
+        "WarpBrownianCoagulationExecutionAdapter",
+        lambda: pytest.fail("scheduler selected resettable adapter"),
+    )
+    monkeypatch.setattr(
+        module,
+        "ResidentStateUpdateExecutor",
+        lambda: type("Updates", (), {"execute": lambda *_: None})(),
+    )
+    monkeypatch.setattr(
+        module, "ResidentThermodynamicUpdateRequest", lambda *args: args
+    )
+    monkeypatch.setattr(
+        module,
+        "ResidentThermodynamicUpdateCoordinator",
+        lambda _request: type(
+            "Thermal",
+            (),
+            {
+                "record_completed": lambda *_: None,
+                "execute_consumer": lambda self, _node, callback: callback(),
+            },
+        )(),
+    )
+    monkeypatch.setattr(
+        module,
+        "ResidentCommunicationExecutor",
+        lambda _request: type(
+            "Communication",
+            (),
+            {
+                "execute_communication": lambda *_: None,
+                "execute_volume_evolution": lambda *_: None,
+            },
+        )(),
+    )
+    for name in (
+        "WarpCondensationExecutionAdapter",
+        "ResidentDilutionAdapter",
+        "ResidentWallLossAdapter",
+        "ResidentNucleationAdapter",
+        "ResidentDiagnosticsExecutor",
+    ):
+        monkeypatch.setattr(
+            module,
+            name,
+            lambda: type("Adapter", (), {"execute": lambda *_: None})(),
+        )
+
+    scheduler.execute(1.0)
+
+    assert selected == ["resident"]
+
+
+@pytest.mark.warp
 def test_resident_scheduler_faults_after_adapter_failure(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

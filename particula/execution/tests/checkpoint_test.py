@@ -285,11 +285,10 @@ def test_restart_preserves_distinct_per_box_partitioning() -> None:
 
 
 @pytest.mark.warp
-def test_restart_restores_each_acquired_resource_family() -> None:
-    """Restart reconstructs all resource families through registry APIs."""
+def test_restart_restores_checkpointable_acquired_resource_families() -> None:
+    """Restart reconstructs non-stream resource families through registry APIs."""
     session, registry, guard = _resident_binding()
     registry.acquire_condensation()
-    registry.acquire_coagulation(1)
     registry.acquire_wall_loss()
     registry.acquire_nucleation()
 
@@ -300,11 +299,32 @@ def test_restart_restores_each_acquired_resource_family() -> None:
 
     assert tuple(restored_registry._bindings) == (
         "condensation",
-        "coagulation",
         "wall_loss",
         "nucleation",
     )
-    assert restored_registry._capacities["coagulation"] == 1
+
+
+@pytest.mark.warp
+def test_checkpoint_rejects_resident_coagulation_stream_without_readback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A persistent coagulation RNG stream blocks unsupported continuation."""
+    wp = pytest.importorskip("warp")
+    session, registry, guard = _resident_binding()
+    registry.acquire_coagulation(1)
+    monkeypatch.setattr(
+        wp,
+        "synchronize",
+        lambda: pytest.fail("rejected checkpoint must not synchronize"),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="resident RNG stream checkpoint continuation is unsupported",
+    ):
+        session.checkpoint(registry, guard)
+
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
 
 
 @pytest.mark.warp

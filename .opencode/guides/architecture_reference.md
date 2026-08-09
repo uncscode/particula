@@ -186,7 +186,14 @@ identity and nonaliasing, not allocator-provenance inference. Its typed
  manifests and views remain concrete-only and absent from package exports. The
  boundary performs no execution or selection, transfer/synchronization/
  restoration, lifecycle change, process physics/configuration, or RNG
- initialization, advancement, or reset. Its communication acquisition seam is
+ initialization, advancement, or reset, except that first coagulation
+ acquisition creates and initializes one P1-derived, registry-retained
+ coagulation-only ``wp.uint32`` stream from immutable resident stream metadata.
+ Resident dispatch always supplies that exact stream with
+ ``initialize_rng=False``. It has no wall-loss integration, reset/inspection
+ API, hidden transfer/synchronization, package export, or checkpoint
+ continuation; checkpoint and finalize reject a published resident stream
+ before device or payload work. Its communication acquisition seam is
  the sole exception for fixed-shape transport work storage: it validates one
  exact closed-map GAS or PARTICLES configuration and pins its native record,
  map arrays, and optional final-volume sidecar. Omitted required work arrays may

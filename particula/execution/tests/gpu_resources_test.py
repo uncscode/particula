@@ -190,6 +190,35 @@ def test_all_families_allocate_complete_stable_resources(
 
 
 @pytest.mark.warp
+def test_coagulation_acquisition_initializes_one_persistent_stream() -> None:
+    """Test acquisition initializes manifest-derived words only once."""
+    session = _session(boxes=2)
+    object.__setattr__(
+        session,
+        "metadata",
+        session.metadata.__class__(
+            session.metadata.device,
+            session.metadata.gas_names,
+            session.metadata.stream.__class__(
+                2, 41, ("north", "south"), (1, 0)
+            ),
+        ),
+    )
+    registry = GPUResourceRegistry(session)
+
+    resources = registry.acquire_coagulation(1)
+    stream = registry._coagulation_stream_registry
+
+    assert stream is not None
+    np.testing.assert_array_equal(
+        resources.rng_states.numpy(), stream.words_by_lane("coagulation")
+    )
+    before = resources.rng_states.numpy().copy()
+    assert registry.acquire_coagulation(1) is resources
+    np.testing.assert_array_equal(resources.rng_states.numpy(), before)
+
+
+@pytest.mark.warp
 def test_enumerate_resources_returns_established_arrays_in_manifest_order() -> (
     None
 ):

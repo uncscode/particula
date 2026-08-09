@@ -38,6 +38,11 @@ from particula.execution.adapters.coagulation import (
     _overlaps,
     _validate_ownership,
 )
+from particula.execution.gpu_resources import (
+    CoagulationResources,
+    GPUResourceRegistry,
+)
+from particula.execution.gpu_session import ResidentSession
 
 
 @dataclass(frozen=True)
@@ -1602,3 +1607,83 @@ def test_warp_adapter_preserves_writer_mutation_after_native_failure(
     assert resolver_calls == 1
     assert calls == 1
     np.testing.assert_array_equal(rng_states.numpy(), np.array([101]))
+
+
+@pytest.mark.warp
+def test_resident_adapter_forces_no_rng_reset_and_pins_resources(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test resident dispatch forwards its pinned stream with reset disabled."""
+    wp = pytest.importorskip("warp")
+    particles = _warp_particles()
+    environment = _environment()
+    pairs = wp.zeros((1, 1, 2), dtype=wp.int32, device="cpu")
+    counts = wp.zeros(1, dtype=wp.int32, device="cpu")
+    rng_states = wp.zeros(1, dtype=wp.uint32, device="cpu")
+    request = WarpBrownianCoagulationExecutionState(
+        WarpBrownianCoagulationState(
+            BrownianCoagulationConfig(),
+            particles,
+            None,
+            None,
+            1.0,
+            collision_pairs=pairs,
+            n_collisions=counts,
+            rng_states=rng_states,
+            rng_seed=41,
+            initialize_rng=False,
+            environment=environment,
+        )
+    )
+    session = object.__new__(ResidentSession)
+    object.__setattr__(session, "particles", particles)
+    object.__setattr__(session, "environment", environment)
+    registry = object.__new__(GPUResourceRegistry)
+    resources = CoagulationResources(1, pairs, counts, rng_states)
+    state = coagulation_adapter.ResidentBrownianCoagulationExecutionState(
+        request, session, registry, resources
+    )
+    calls: list[dict[str, object]] = []
+    monkeypatch.setattr(
+        registry,
+        "validate_coagulation_resources",
+        lambda received_session, received_resources: (
+            assert_binding(
+                received_session, received_resources, session, resources
+            )
+        ),
+    )
+    monkeypatch.setattr(
+        coagulation_adapter,
+        "_get_coagulation_step_gpu",
+        lambda: lambda *_args, **kwargs: (
+            calls.append(kwargs) or (particles, pairs, counts)
+        ),
+    )
+
+    result = coagulation_adapter.ResidentBrownianCoagulationExecutionAdapter().execute(
+        state
+    )
+
+    assert result.backend_result is not None
+    assert calls == [
+        {
+            "rng_seed": 41,
+            "collision_pairs": pairs,
+            "n_collisions": counts,
+            "rng_states": rng_states,
+            "initialize_rng": False,
+            "environment": environment,
+        }
+    ]
+
+
+def assert_binding(
+    received_session: object,
+    received_resources: object,
+    session: object,
+    resources: object,
+) -> None:
+    """Assert a test-double registry receives the exact resident binding."""
+    assert received_session is session
+    assert received_resources is resources

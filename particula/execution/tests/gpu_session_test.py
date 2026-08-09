@@ -21,6 +21,7 @@ from particula.execution.gpu_session import (
     ResidentSession,
     ResidentStepGuard,
     ResidentStepToken,
+    ResidentStreamMetadata,
     _handle_failed_resident_operation,
     _ResidentOperationOutcome,
     _validate_contiguous_array,
@@ -242,6 +243,23 @@ def test_metadata_preserves_valid_names_by_identity() -> None:
     metadata = ResidentMetadata(Device(Backend.WARP, "cpu"), names)
 
     assert metadata.gas_names is names
+
+
+def test_resident_stream_metadata_validates_and_is_retained_by_metadata() -> (
+    None
+):
+    """Test stream metadata preserves an explicit nontrivial lane manifest."""
+    stream = ResidentStreamMetadata(2, 41, ("north", "south"), (1, 0))
+    metadata = ResidentMetadata(Device(Backend.WARP, "cpu"), (), stream)
+
+    assert metadata.stream is stream
+    assert stream.root_seed == 41
+    assert stream.logical_box_ids == ("north", "south")
+    assert stream.lanes == (1, 0)
+    with pytest.raises(ValueError, match="permutation"):
+        ResidentStreamMetadata(2, 41, ("north", "south"), (0, 0))
+    with pytest.raises(ValueError, match="unique"):
+        ResidentStreamMetadata(2, 41, ("north", "north"), (0, 1))
 
 
 @pytest.mark.parametrize("names", [("ok", object()), ("ok", 1)])
@@ -1252,6 +1270,26 @@ def test_setup_resident_session_converts_once_and_retains_identity(
     assert session.lifecycle is ResidentLifecycle.ACTIVE
     assert not hasattr(warp_gas, "name")
     assert _snapshot_cpu_resources(particles, gas, environment) == before
+
+
+@pytest.mark.warp
+def test_setup_resident_session_retains_explicit_stream_manifest() -> None:
+    """Test setup publishes caller-selected stream identity without coercion."""
+    particles, gas, environment = _cpu_resources(boxes=2)
+
+    session = setup_resident_session(
+        particles,
+        gas,
+        environment,
+        Device(Backend.WARP, "cpu"),
+        root_seed=41,
+        logical_box_ids=("north", "south"),
+        lanes=(1, 0),
+    )
+
+    assert session.metadata.stream == ResidentStreamMetadata(
+        2, 41, ("north", "south"), (1, 0)
+    )
 
 
 @pytest.mark.parametrize(

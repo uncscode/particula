@@ -18,7 +18,7 @@ concrete boundary provides no seed-by-seed cross-backend trajectory comparison.
 from dataclasses import dataclass
 from math import prod
 from numbers import Integral, Real
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from particula.aerosol import Aerosol
 from particula.dynamics import Coagulation
@@ -37,6 +37,13 @@ from particula.execution import (
 BrownianCoagulationStrategy = (
     brownian_coagulation_strategy.BrownianCoagulationStrategy
 )
+
+if TYPE_CHECKING:
+    from particula.execution.gpu_resources import (
+        CoagulationResources,
+        GPUResourceRegistry,
+    )
+    from particula.execution.gpu_session import ResidentSession
 
 
 @dataclass(frozen=True, eq=False)
@@ -714,6 +721,92 @@ class WarpBrownianCoagulationExecutionState:
             The particle container retained by the P2 state.
         """
         return self.state.backend_payload
+
+
+@dataclass(frozen=True, eq=False)
+class ResidentBrownianCoagulationExecutionState:
+    """Bind an established Brownian request to resident-owned sidecars.
+
+    Resident dispatch never resets or allocates its one persistent coagulation
+    stream; it always forwards ``initialize_rng=False``.
+    """
+
+    request: WarpBrownianCoagulationExecutionState
+    session: "ResidentSession"
+    registry: "GPUResourceRegistry"
+    resources: "CoagulationResources"
+
+    def __post_init__(self) -> None:
+        """Validate concrete carrier types without acquiring resources."""
+        from particula.execution.gpu_resources import (
+            CoagulationResources,
+            GPUResourceRegistry,
+        )
+        from particula.execution.gpu_session import ResidentSession
+
+        if type(self.request) is not WarpBrownianCoagulationExecutionState:
+            raise TypeError(
+                "request must be an exact "
+                "WarpBrownianCoagulationExecutionState."
+            )
+        if type(self.session) is not ResidentSession:
+            raise TypeError("session must be an exact ResidentSession.")
+        if type(self.registry) is not GPUResourceRegistry:
+            raise TypeError("registry must be an exact GPUResourceRegistry.")
+        if type(self.resources) is not CoagulationResources:
+            raise TypeError("resources must be an exact CoagulationResources.")
+
+
+class ResidentBrownianCoagulationExecutionAdapter:
+    """Dispatch one pre-acquired resident Brownian request by identity."""
+
+    def execute(self, state: ExecutionState) -> ExecutionResult:
+        """Preflight resident bindings then forward one forced-no-reset call."""
+        if type(state) is not ResidentBrownianCoagulationExecutionState:
+            raise TypeError(
+                "state must be a ResidentBrownianCoagulationExecutionState."
+            )
+        request = state.request.state
+        if request.initialize_rng is not False:
+            raise ValueError(
+                "resident coagulation initialize_rng must be False."
+            )
+        state.registry.validate_coagulation_resources(
+            state.session, state.resources
+        )
+        if (
+            request.particles is not state.session.particles
+            or request.environment is not state.session.environment
+            or request.collision_pairs is not state.resources.collision_pairs
+            or request.n_collisions is not state.resources.n_collisions
+            or request.rng_states is not state.resources.rng_states
+        ):
+            raise ValueError(
+                "resident coagulation request does not match resources."
+            )
+        coagulation_step_gpu = _get_coagulation_step_gpu()
+        particles, pairs, counts = coagulation_step_gpu(
+            request.particles,
+            request.temperature,
+            request.pressure,
+            request.time_step,
+            request.volume,
+            rng_seed=request.rng_seed,
+            collision_pairs=request.collision_pairs,
+            n_collisions=request.n_collisions,
+            rng_states=request.rng_states,
+            initialize_rng=False,
+            environment=request.environment,
+        )
+        result = WarpBrownianCoagulationResult(
+            request, particles, pairs, counts
+        )
+        return ExecutionResult(
+            state,
+            (),
+            MutationDeclaration(frozenset({MutationScope.STATE})),
+            BackendResult(result),
+        )
 
 
 def _get_coagulation_step_gpu() -> Any:

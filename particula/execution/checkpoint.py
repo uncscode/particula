@@ -267,6 +267,10 @@ class ResidentCheckpointController:
             )
         self._registry.validate_pinned_session(self._session)
         self._registry.assert_step_closed()
+        if self._registry._has_resident_coagulation_stream():
+            raise ValueError(
+                "resident RNG stream checkpoint continuation is unsupported."
+            )
 
     def checkpoint(self) -> ResidentCheckpoint:
         """Return a fresh immutable snapshot while leaving the session active.
