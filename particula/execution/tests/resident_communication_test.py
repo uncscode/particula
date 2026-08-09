@@ -125,7 +125,9 @@ def test_executor_dispatches_only_the_selected_native_primitive(
         return "particles"
 
     monkeypatch.setattr(native, "resident_gas_communication_step_gpu", gas)
-    monkeypatch.setattr(native, "particle_communication_step_gpu", particles)
+    monkeypatch.setattr(
+        native, "resident_particle_communication_step_gpu", particles
+    )
 
     result = ResidentCommunicationExecutor(request).execute_communication()
 
@@ -144,12 +146,40 @@ def test_executor_dispatches_only_the_selected_native_primitive(
             request.resources.execution_state.active_or_demand,
         )
     else:
-        assert calls[0] == (
+        assert calls[0][:4] == (
             request.session.particles,
             request.resources.configuration,
             request.duration,
             request.resources.buffers,
         )
+        assert calls[0][4:] == (
+            request.resources.execution_state.invalid,
+            request.resources.execution_state.active_or_demand,
+            request.resources.execution_state.initial_masses,
+            request.resources.execution_state.initial_concentration,
+            request.resources.execution_state.initial_charge,
+        )
+
+
+@pytest.mark.warp
+def test_particle_dispatch_uses_only_registry_pinned_status_and_snapshots(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Resident particle dispatch does not allocate public-step status buffers."""
+    request = _request(CommunicationTransportMode.PARTICLES)
+    import particula.gpu.kernels.communication as native
+
+    monkeypatch.setattr(
+        native.wp,
+        "zeros",
+        lambda *_args, **_kwargs: pytest.fail(
+            "resident dispatch must not allocate status storage"
+        ),
+    )
+
+    result = ResidentCommunicationExecutor(request).execute_communication()
+
+    assert result is request.session.particles
 
 
 @pytest.mark.warp

@@ -1901,6 +1901,105 @@ def resident_gas_communication_step_gpu(
     return particles, gas
 
 
+def resident_particle_communication_step_gpu(
+    particles: Any,
+    configuration: CommunicationConfiguration,
+    time_step: float,
+    buffers: ParticleCommunicationBuffers,
+    invalid: Any,
+    demand: Any,
+    initial_masses: Any,
+    initial_concentration: Any,
+    initial_charge: Any,
+) -> Any:
+    """Dispatch acquired closed PARTICLES resources without public P1 checks.
+
+    Acquisition owns payload validation and allocation. This resident-only seam
+    uses the registry-pinned planner, status, and snapshot storage by identity.
+    """
+    map_data = configuration.communication_map
+    masses = particles.masses
+    concentration = particles.concentration
+    charge = particles.charge
+    boxes, slots, species = masses.shape
+    edges = int(map_data.edge_capacity)
+    if (
+        boxes == 0
+        or slots == 0
+        or species == 0
+        or edges == 0
+        or time_step == 0.0
+    ):
+        return particles
+    device = masses.device
+    wp.launch(
+        _resident_reset_status,
+        dim=1,
+        inputs=[invalid, demand, 0],
+        device=device,
+    )
+    wp.launch(
+        _particle_communication_plan,
+        dim=1,
+        inputs=[
+            masses,
+            concentration,
+            charge,
+            particles.density,
+            particles.volume,
+            map_data.source_boxes,
+            map_data.destination_boxes,
+            map_data.enabled,
+            map_data.rates,
+            int(map_data.form is CommunicationMapForm.ONE_DIMENSIONAL),
+            time_step,
+            buffers.source_debits,
+            buffers.destination_credits,
+            buffers.assignments,
+            buffers.request_concentrations,
+            invalid,
+            demand,
+        ],
+        device=device,
+    )
+    wp.launch(
+        _snapshot_particle_communication_fields,
+        dim=(boxes, slots),
+        inputs=[
+            masses,
+            concentration,
+            charge,
+            initial_masses,
+            initial_concentration,
+            initial_charge,
+            invalid,
+            demand,
+        ],
+        device=device,
+    )
+    wp.launch(
+        _particle_communication_commit,
+        dim=(boxes, slots),
+        inputs=[
+            masses,
+            concentration,
+            charge,
+            initial_masses,
+            initial_concentration,
+            initial_charge,
+            map_data.source_boxes,
+            map_data.destination_boxes,
+            buffers.source_debits,
+            buffers.destination_credits,
+            buffers.assignments,
+            invalid,
+            demand,
+        ],
+        device=device,
+    )
+    return particles
+
+
 def resident_volume_evolution_step_gpu(
     particles: Any,
     gas: Any,

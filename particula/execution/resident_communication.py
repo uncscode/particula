@@ -159,8 +159,8 @@ class ResidentCommunicationExecutor:
         self.validate()
         request = self._request
         from particula.gpu.kernels.communication import (
-            particle_communication_step_gpu,
             resident_gas_communication_step_gpu,
+            resident_particle_communication_step_gpu,
         )
 
         mode = request.resources.configuration.communication_map.transport_mode
@@ -175,11 +175,17 @@ class ResidentCommunicationExecutor:
                 request.resources.execution_state.active_or_demand,
             )
         if mode is CommunicationTransportMode.PARTICLES:
-            return particle_communication_step_gpu(
+            state = request.resources.execution_state
+            return resident_particle_communication_step_gpu(
                 request.session.particles,
                 request.resources.configuration,
                 request.duration,
                 request.resources.buffers,
+                state.invalid,
+                state.active_or_demand,
+                state.initial_masses,
+                state.initial_concentration,
+                state.initial_charge,
             )
         raise ValueError(
             "resident communication supports GAS or PARTICLES only."

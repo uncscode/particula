@@ -17,6 +17,7 @@ from particula.execution.checkpoint import (
     _validate_payload,
     restart_resident_session,
 )
+from particula.execution.communication import CommunicationTransportMode
 from particula.execution.gpu_session import (
     ResidentDimensions,
     ResidentLifecycle,
@@ -346,6 +347,89 @@ def test_restart_restores_pinned_gas_communication_resources() -> None:
     )
     np.testing.assert_array_equal(
         restored.configuration.communication_map.rates.numpy(), [0.5]
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("mode", "family"),
+    (
+        (CommunicationTransportMode.GAS, "communication_gas"),
+        (CommunicationTransportMode.PARTICLES, "communication_particles"),
+    ),
+)
+def test_restart_restores_zero_edge_communication_resources(
+    mode: Any,
+    family: str,
+) -> None:
+    """Valid empty closed maps retain their family and fresh pinned arrays."""
+    wp = pytest.importorskip("warp")
+    from particula.execution.communication import (
+        CommunicationConfiguration,
+        CommunicationMap,
+        CommunicationMapForm,
+        CommunicationResourceShape,
+        CommunicationShapeKind,
+        PrescribedVolumeUpdate,
+    )
+
+    session, registry, guard = _resident_binding(n_boxes=2)
+    configuration = CommunicationConfiguration(
+        CommunicationMap(
+            CommunicationMapForm.ONE_DIMENSIONAL,
+            mode,
+            0,
+            wp.empty(0, dtype=wp.int32, device="cpu"),
+            wp.empty(0, dtype=wp.int32, device="cpu"),
+            wp.empty(0, dtype=wp.int32, device="cpu"),
+            wp.empty(0, dtype=wp.float64, device="cpu"),
+        ),
+        PrescribedVolumeUpdate(None),
+        (
+            CommunicationResourceShape(
+                "edge_rates", wp.float64, CommunicationShapeKind.E
+            ),
+        ),
+    )
+    resources = registry.acquire_communication(configuration)
+
+    checkpoint = session.checkpoint(registry, guard)
+    _, restored_registry, _ = restart_resident_session(
+        checkpoint, Device(Backend.WARP, "cpu")
+    )
+
+    restored = restored_registry._views[family]
+    assert restored is not resources
+    assert restored.configuration.communication_map.edge_capacity == 0
+    assert restored.configuration.communication_map.rates is not (
+        configuration.communication_map.rates
+    )
+    np.testing.assert_array_equal(
+        restored.configuration.communication_map.rates.numpy(), []
+    )
+
+
+@pytest.mark.warp
+def test_restart_accepts_v1_noncommunication_checkpoint() -> None:
+    """Schema-v1 noncommunication records retain fresh primary identities."""
+    session, registry, guard = _resident_binding()
+    checkpoint = session.checkpoint(registry, guard)
+    legacy = replace(checkpoint, schema_version=1, communication=None)
+
+    restored, restored_registry, restored_guard = restart_resident_session(
+        legacy, Device(Backend.WARP, "cpu")
+    )
+
+    assert restored is not session
+    assert restored_registry is not registry
+    assert restored_guard is not guard
+    assert (
+        cast(Any, restored.particles).masses
+        is not cast(Any, session.particles).masses
+    )
+    np.testing.assert_array_equal(
+        cast(Any, restored.gas).concentration.numpy(),
+        cast(Any, session.gas).concentration.numpy(),
     )
 
 
