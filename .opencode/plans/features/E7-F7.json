@@ -74,11 +74,11 @@
     {
       "id": "E7-F7-P4",
       "title": "Implement fixed-capacity particle transport with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-08-09",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
