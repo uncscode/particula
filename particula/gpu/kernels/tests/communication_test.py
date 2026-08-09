@@ -1361,3 +1361,451 @@ def test_gas_communication_rejects_gas_box_mismatch_before_work_writes() -> (
 
     for values, expected in zip(work, before, strict=True):
         npt.assert_array_equal(values.numpy(), expected)
+
+
+def _particle_configuration(
+    source: np.ndarray,
+    destination: np.ndarray,
+    rates: np.ndarray,
+    enabled: np.ndarray | None = None,
+):
+    """Build an exact P1 particle-only declaration for direct-kernel tests."""
+    wp = _warp()
+    from particula.execution.communication import (
+        CommunicationConfiguration,
+        CommunicationMap,
+        CommunicationMapForm,
+        CommunicationTransportMode,
+        PrescribedVolumeUpdate,
+    )
+
+    return CommunicationConfiguration(
+        communication_map=CommunicationMap(
+            form=CommunicationMapForm.ARBITRARY_PAIRS,
+            transport_mode=CommunicationTransportMode.PARTICLES,
+            edge_capacity=len(source),
+            source_boxes=wp.array(source, dtype=wp.int32, device="cpu"),
+            destination_boxes=wp.array(
+                destination, dtype=wp.int32, device="cpu"
+            ),
+            enabled=wp.array(
+                np.ones(len(source), dtype=np.int32)
+                if enabled is None
+                else enabled,
+                dtype=wp.int32,
+                device="cpu",
+            ),
+            rates=wp.array(rates, dtype=wp.float64, device="cpu"),
+        ),
+        prescribed_volume=PrescribedVolumeUpdate(None),
+        resource_shapes=(),
+    )
+
+
+def _particle_buffers(boxes: int, slots: int, edges: int):
+    """Allocate the concrete particle communication planning carrier."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import ParticleCommunicationBuffers
+
+    return ParticleCommunicationBuffers(
+        wp.full((boxes, slots), -3.0, dtype=wp.float64, device="cpu"),
+        wp.full((boxes, slots), -4.0, dtype=wp.float64, device="cpu"),
+        wp.full((edges, slots), -5, dtype=wp.int32, device="cpu"),
+        wp.full((edges, slots), -6.0, dtype=wp.float64, device="cpu"),
+    )
+
+
+def test_particle_communication_transports_population_to_ascending_free_slot() -> (
+    None
+):
+    """Move a complete population and retain its mass lanes and signed charge."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        particle_communication_step_gpu,
+    )
+
+    particles, _ = _containers(
+        np.ones(2), np.array([[4.0, 0.0], [0.0, 0.0]]), np.empty((2, 0))
+    )
+    particles.masses = wp.array(
+        [[[2.0, 3.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0]]],
+        dtype=wp.float64,
+        device="cpu",
+    )
+    particles.charge = wp.array(
+        [[-2.0, 0.0], [0.0, 0.0]], dtype=wp.float64, device="cpu"
+    )
+    configuration = _particle_configuration(
+        np.array([0], dtype=np.int32),
+        np.array([1], dtype=np.int32),
+        np.array([0.25]),
+    )
+    buffers = _particle_buffers(2, 2, 1)
+    protected = (particles.density, particles.volume)
+
+    returned = particle_communication_step_gpu(
+        particles, configuration, 1.0, buffers
+    )
+    wp.synchronize()
+
+    assert returned is particles
+    npt.assert_allclose(
+        particles.concentration.numpy(), [[3.0, 0.0], [1.0, 0.0]]
+    )
+    npt.assert_allclose(particles.masses.numpy()[1, 0], [2.0, 3.0])
+    npt.assert_allclose(particles.charge.numpy()[1, 0], -2.0)
+    npt.assert_allclose(buffers.source_debits.numpy(), [[1.0, 0.0], [0.0, 0.0]])
+    npt.assert_allclose(
+        buffers.destination_credits.numpy(), [[0.0, 0.0], [1.0, 0.0]]
+    )
+    npt.assert_array_equal(buffers.assignments.numpy(), [[0, -1]])
+    assert (particles.density, particles.volume) == protected
+
+
+def test_particle_communication_valid_no_demand_preserves_buffers() -> None:
+    """Keep caller planning storage untouched for a valid all-disabled map."""
+    from particula.gpu.kernels.communication import (
+        particle_communication_step_gpu,
+    )
+
+    particles, _ = _containers(
+        np.ones(2), np.array([[1.0, 0.0], [0.0, 0.0]]), np.empty((2, 0))
+    )
+    wp = _warp()
+    particles.masses = wp.array(
+        [[[1.0, 1.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0]]],
+        dtype=wp.float64,
+        device="cpu",
+    )
+    particles.charge = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
+    configuration = _particle_configuration(
+        np.array([0]),
+        np.array([1]),
+        np.array([1.0]),
+        np.array([0], dtype=np.int32),
+    )
+    buffers = _particle_buffers(2, 2, 1)
+    before = tuple(field.numpy().copy() for field in vars(buffers).values())
+
+    assert (
+        particle_communication_step_gpu(particles, configuration, 1.0, buffers)
+        is particles
+    )
+    for field, expected in zip(vars(buffers).values(), before, strict=True):
+        npt.assert_array_equal(field.numpy(), expected)
+
+
+def test_particle_communication_rejects_gas_mode_before_container_access() -> (
+    None
+):
+    """Accept only the exact particle transport declaration mode."""
+    from particula.gpu.kernels import communication
+
+    configuration = _gas_configuration(
+        np.empty(0, dtype=np.int32), np.empty(0, dtype=np.int32), np.empty(0)
+    )
+    with pytest.raises(ValueError, match="must be PARTICLES"):
+        communication.particle_communication_step_gpu(
+            SimpleNamespace(), configuration, 1.0, object()
+        )
+
+
+def test_particle_communication_prefers_exact_match_and_clears_source() -> None:
+    """Merge into a matching population and clear an exactly debited source."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        particle_communication_step_gpu,
+    )
+
+    particles, _ = _containers(
+        np.ones(2), np.array([[2.0, 0.0], [3.0, 0.0]]), np.empty((2, 0))
+    )
+    particles.masses = wp.array(
+        [[[2.0, 3.0], [0.0, 0.0]], [[2.0, 3.0], [0.0, 0.0]]],
+        dtype=wp.float64,
+        device="cpu",
+    )
+    particles.charge = wp.array(
+        [[-4.0, 0.0], [-4.0, 0.0]], dtype=wp.float64, device="cpu"
+    )
+    configuration = _particle_configuration(
+        np.array([0], dtype=np.int32),
+        np.array([1], dtype=np.int32),
+        np.array([1.0]),
+    )
+    buffers = _particle_buffers(2, 2, 1)
+
+    particle_communication_step_gpu(particles, configuration, 1.0, buffers)
+    wp.synchronize()
+
+    npt.assert_array_equal(
+        particles.concentration.numpy(), [[0.0, 0.0], [5.0, 0.0]]
+    )
+    npt.assert_array_equal(particles.masses.numpy()[0, 0], [0.0, 0.0])
+    assert particles.charge.numpy()[0, 0] == 0.0
+    npt.assert_array_equal(buffers.assignments.numpy(), [[0, -1]])
+    npt.assert_allclose(buffers.source_debits.numpy(), [[2.0, 0.0], [0.0, 0.0]])
+    npt.assert_allclose(
+        buffers.destination_credits.numpy(), [[0.0, 0.0], [2.0, 0.0]]
+    )
+
+
+def test_particle_communication_cycle_copies_pre_step_populations() -> None:
+    """Use immutable source fields when both outgoing slots clear this step."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        particle_communication_step_gpu,
+    )
+
+    particles, _ = _containers(
+        np.ones(2), np.array([[2.0, 0.0], [3.0, 0.0]]), np.empty((2, 0))
+    )
+    particles.masses = wp.array(
+        [[[2.0, 3.0], [0.0, 0.0]], [[5.0, 7.0], [0.0, 0.0]]],
+        dtype=wp.float64,
+        device="cpu",
+    )
+    particles.charge = wp.array(
+        [[-4.0, 0.0], [6.0, 0.0]], dtype=wp.float64, device="cpu"
+    )
+    configuration = _particle_configuration(
+        np.array([0, 1], dtype=np.int32),
+        np.array([1, 0], dtype=np.int32),
+        np.array([1.0, 1.0]),
+    )
+    buffers = _particle_buffers(2, 2, 2)
+
+    particle_communication_step_gpu(particles, configuration, 1.0, buffers)
+    wp.synchronize()
+
+    npt.assert_array_equal(
+        particles.concentration.numpy(), [[0.0, 3.0], [0.0, 2.0]]
+    )
+    npt.assert_array_equal(
+        particles.masses.numpy(),
+        [[[0.0, 0.0], [5.0, 7.0]], [[0.0, 0.0], [2.0, 3.0]]],
+    )
+    npt.assert_array_equal(particles.charge.numpy(), [[0.0, 6.0], [0.0, -4.0]])
+
+
+def test_particle_communication_invalid_prescribed_volume_gates_plan() -> None:
+    """Reject invalid protected prescribed-volume metadata before buffer writes."""
+    wp = _warp()
+    from particula.execution.communication import PrescribedVolumeUpdate
+    from particula.gpu.kernels.communication import (
+        particle_communication_step_gpu,
+    )
+
+    particles, _ = _containers(
+        np.ones(2), np.array([[2.0], [0.0]]), np.empty((2, 0))
+    )
+    particles.masses = wp.array(
+        [[[2.0, 3.0]], [[0.0, 0.0]]], dtype=wp.float64, device="cpu"
+    )
+    particles.charge = wp.array([[-1.0], [0.0]], dtype=wp.float64, device="cpu")
+    configuration = _particle_configuration(
+        np.array([0], dtype=np.int32),
+        np.array([1], dtype=np.int32),
+        np.array([0.5]),
+    )
+    configuration = type(configuration)(
+        configuration.communication_map,
+        PrescribedVolumeUpdate(
+            wp.array([1.0, np.nan], dtype=wp.float64, device="cpu")
+        ),
+        configuration.resource_shapes,
+    )
+    buffers = _particle_buffers(2, 1, 1)
+    before_particles = tuple(
+        field.numpy().copy() for field in vars(particles).values()
+    )
+    before_buffers = tuple(
+        field.numpy().copy() for field in vars(buffers).values()
+    )
+
+    particle_communication_step_gpu(particles, configuration, 1.0, buffers)
+    wp.synchronize()
+
+    for field, expected in zip(
+        vars(particles).values(), before_particles, strict=True
+    ):
+        npt.assert_array_equal(field.numpy(), expected)
+    for field, expected in zip(
+        vars(buffers).values(), before_buffers, strict=True
+    ):
+        npt.assert_array_equal(field.numpy(), expected)
+
+
+def test_particle_communication_capacity_failure_gates_particle_commit() -> (
+    None
+):
+    """Reject unlike incoming populations when no pre-step free slot exists."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        particle_communication_step_gpu,
+    )
+
+    particles, _ = _containers(
+        np.ones(2), np.array([[2.0], [3.0]]), np.empty((2, 0))
+    )
+    particles.masses = wp.array(
+        [[[2.0, 3.0]], [[5.0, 7.0]]], dtype=wp.float64, device="cpu"
+    )
+    particles.charge = wp.array([[-1.0], [4.0]], dtype=wp.float64, device="cpu")
+    configuration = _particle_configuration(
+        np.array([0], dtype=np.int32),
+        np.array([1], dtype=np.int32),
+        np.array([0.5]),
+    )
+    buffers = _particle_buffers(2, 1, 1)
+    before = tuple(field.numpy().copy() for field in vars(particles).values())
+
+    particle_communication_step_gpu(particles, configuration, 1.0, buffers)
+    wp.synchronize()
+
+    for field, expected in zip(vars(particles).values(), before, strict=True):
+        npt.assert_array_equal(field.numpy(), expected)
+
+
+def test_particle_communication_zero_time_preserves_planning_buffers() -> None:
+    """Validate zero time as a write-free no-op for primaries and buffers."""
+    wp = _warp()
+    from particula.gpu.kernels.communication import (
+        particle_communication_step_gpu,
+    )
+
+    particles, _ = _containers(
+        np.ones(2), np.array([[2.0], [0.0]]), np.empty((2, 0))
+    )
+    particles.masses = wp.array(
+        [[[2.0, 3.0]], [[0.0, 0.0]]], dtype=wp.float64, device="cpu"
+    )
+    particles.charge = wp.array([[-1.0], [0.0]], dtype=wp.float64, device="cpu")
+    configuration = _particle_configuration(
+        np.array([0], dtype=np.int32),
+        np.array([1], dtype=np.int32),
+        np.array([0.5]),
+    )
+    buffers = _particle_buffers(2, 1, 1)
+    particle_before = tuple(
+        field.numpy().copy() for field in vars(particles).values()
+    )
+    buffer_before = tuple(
+        field.numpy().copy() for field in vars(buffers).values()
+    )
+
+    returned = particle_communication_step_gpu(
+        particles, configuration, 0.0, buffers
+    )
+
+    assert returned is particles
+    for field, expected in zip(
+        vars(particles).values(), particle_before, strict=True
+    ):
+        npt.assert_array_equal(field.numpy(), expected)
+    for field, expected in zip(
+        vars(buffers).values(), buffer_before, strict=True
+    ):
+        npt.assert_array_equal(field.numpy(), expected)
+
+
+def test_private_particle_planner_and_commit_follow_immutable_fields(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Unit-test the gated planner and writer with an immutable NumPy fixture."""
+    from particula.gpu.kernels import communication
+
+    facade = _KernelWarpFacade()
+    monkeypatch.setattr(communication, "wp", facade)
+    monkeypatch.setattr(
+        communication,
+        "_particle_key_equal",
+        lambda left,
+        left_box,
+        left_slot,
+        right,
+        right_box,
+        right_slot,
+        charge,
+        species: bool(
+            np.array_equal(
+                left[left_box, left_slot, :species],
+                right[right_box, right_slot, :species],
+            )
+            and charge[left_box, left_slot] == charge[right_box, right_slot]
+        ),
+    )
+    masses = np.array([[[2.0, 3.0], [0.0, 0.0]], [[2.0, 3.0], [0.0, 0.0]]])
+    concentration = np.array([[2.0, 0.0], [3.0, 0.0]])
+    charge = np.array([[-4.0, 0.0], [-4.0, 0.0]])
+    source = np.array([0], dtype=np.int32)
+    destination = np.array([1], dtype=np.int32)
+    enabled = np.array([1], dtype=np.int32)
+    rates = np.array([1.0])
+    debits = np.full((2, 2), -1.0)
+    credits = np.full((2, 2), -1.0)
+    assignments = np.full((1, 2), -2, dtype=np.int32)
+    requests = np.full((1, 2), -3.0)
+    invalid = np.zeros(1, dtype=np.int32)
+    demand = np.zeros(1, dtype=np.int32)
+
+    communication._particle_communication_plan.func(
+        masses,
+        concentration,
+        charge,
+        np.array([1000.0, 1000.0]),
+        np.array([1.0, 1.0]),
+        source,
+        destination,
+        enabled,
+        rates,
+        0,
+        1.0,
+        debits,
+        credits,
+        assignments,
+        requests,
+        invalid,
+        demand,
+    )
+    assert invalid[0] == 0 and demand[0] == 1
+    npt.assert_array_equal(assignments, [[0, -1]])
+    npt.assert_allclose(debits, [[2.0, 0.0], [0.0, 0.0]])
+    npt.assert_allclose(credits, [[0.0, 0.0], [2.0, 0.0]])
+    npt.assert_allclose(requests, [[2.0, 0.0]])
+
+    facade.index = (0, 0)
+    communication._particle_communication_commit.func(
+        masses,
+        concentration,
+        charge,
+        masses.copy(),
+        concentration.copy(),
+        charge.copy(),
+        source,
+        destination,
+        debits,
+        credits,
+        assignments,
+        invalid,
+        demand,
+    )
+    facade.index = (1, 0)
+    communication._particle_communication_commit.func(
+        masses,
+        concentration,
+        charge,
+        np.array([[[2.0, 3.0], [0.0, 0.0]], [[2.0, 3.0], [0.0, 0.0]]]),
+        np.array([[2.0, 0.0], [3.0, 0.0]]),
+        np.array([[-4.0, 0.0], [-4.0, 0.0]]),
+        source,
+        destination,
+        debits,
+        credits,
+        assignments,
+        invalid,
+        demand,
+    )
+    npt.assert_array_equal(concentration, [[0.0, 0.0], [5.0, 0.0]])
+    npt.assert_array_equal(masses[0, 0], [0.0, 0.0])
+    assert charge[0, 0] == 0.0

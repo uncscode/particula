@@ -66,6 +66,25 @@ class GasCommunicationBuffers:
     sink_amounts: object | None = None
 
 
+@dataclass(frozen=True, eq=False)
+class ParticleCommunicationBuffers:
+    """Caller-owned planning storage for concrete particle communication.
+
+    The arrays have schemas ``(B, N)``, ``(B, N)``, ``(E, N)``, and
+    ``(E, N)`` for source debits, destination credits, assignments, and
+    requested concentrations, respectively.  They are active-device,
+    contiguous Warp arrays with float64 ledgers and int32 assignments.
+    Successful nonzero plans overwrite them; valid no-op calls leave them
+    untouched.  This carrier is concrete-only at
+    ``particula.gpu.kernels.communication``.
+    """
+
+    source_debits: object
+    destination_credits: object
+    assignments: object
+    request_concentrations: object
+
+
 @wp.kernel
 def _communication_validate_primaries(
     volume: wp.array(dtype=wp.float64),
@@ -785,6 +804,326 @@ def _validate_gas_communication_configuration(
     return typed
 
 
+def _validate_particle_communication_configuration(
+    configuration: object,
+) -> CommunicationConfiguration:
+    """Exact-check the P1 declaration carriers for particle transport."""
+    if type(configuration) is not CommunicationConfiguration:
+        raise TypeError(
+            "configuration must be an exact CommunicationConfiguration."
+        )
+    typed = cast(CommunicationConfiguration, configuration)
+    if type(typed.communication_map) is not CommunicationMap:
+        raise TypeError("communication_map must be an exact CommunicationMap.")
+    if type(typed.prescribed_volume) is not PrescribedVolumeUpdate:
+        raise TypeError(
+            "prescribed_volume must be an exact PrescribedVolumeUpdate."
+        )
+    map_data = typed.communication_map
+    if type(map_data.form) is not CommunicationMapForm:
+        raise TypeError("map form must be CommunicationMapForm.")
+    if type(map_data.transport_mode) is not CommunicationTransportMode:
+        raise TypeError("transport_mode must be CommunicationTransportMode.")
+    if map_data.transport_mode is not CommunicationTransportMode.PARTICLES:
+        raise ValueError("communication transport_mode must be PARTICLES.")
+    if (
+        isinstance(map_data.edge_capacity, bool)
+        or not isinstance(map_data.edge_capacity, Integral)
+        or map_data.edge_capacity < 0
+    ):
+        raise ValueError("edge_capacity must be a nonnegative integral.")
+    _validate_resource_shapes(typed.resource_shapes)
+    return typed
+
+
+@wp.func
+def _particle_key_equal(
+    left_masses: wp.array3d(dtype=wp.float64),
+    left_box: int,
+    left_slot: int,
+    right_masses: wp.array3d(dtype=wp.float64),
+    right_box: int,
+    right_slot: int,
+    charge: wp.array2d(dtype=wp.float64),
+    species: int,
+) -> bool:
+    """Return equality; floating equality canonicalizes signed zero."""
+    if charge[left_box, left_slot] != charge[right_box, right_slot]:
+        return False
+    for lane in range(species):
+        if (
+            left_masses[left_box, left_slot, lane]
+            != right_masses[right_box, right_slot, lane]
+        ):
+            return False
+    return True
+
+
+@wp.kernel
+def _particle_communication_plan(  # noqa: C901
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    volume: wp.array(dtype=wp.float64),
+    source: wp.array(dtype=wp.int32),
+    destination: wp.array(dtype=wp.int32),
+    enabled: wp.array(dtype=wp.int32),
+    rates: wp.array(dtype=wp.float64),
+    one_dimensional: int,
+    time_step: wp.float64,
+    debits: wp.array2d(dtype=wp.float64),
+    credits: wp.array2d(dtype=wp.float64),
+    assignments: wp.array2d(dtype=wp.int32),
+    requests: wp.array2d(dtype=wp.float64),
+    invalid: wp.array(dtype=wp.int32),
+    demand: wp.array(dtype=wp.int32),
+) -> None:
+    """Plan deterministically, writing public buffers only after demand."""
+    if wp.tid() != 0:
+        return
+    boxes = concentration.shape[0]
+    slots = concentration.shape[1]
+    species = masses.shape[2]
+    edges = source.shape[0]
+    # Validate protected fields and complete fixed-slot representation first.
+    for lane in range(species):
+        if not wp.isfinite(density[lane]) or density[lane] <= 0.0:
+            invalid[0] = 1
+    for box in range(boxes):
+        if not wp.isfinite(volume[box]) or volume[box] <= 0.0:
+            invalid[0] = 1
+        for slot in range(slots):
+            total = wp.float64(0.0)
+            all_zero = bool(
+                concentration[box, slot] == 0.0 and charge[box, slot] == 0.0
+            )
+            valid_mass = bool(True)
+            for lane in range(species):
+                value = masses[box, slot, lane]
+                total += value
+                if value != 0.0:
+                    all_zero = False
+                if not wp.isfinite(value) or value < 0.0:
+                    valid_mass = False
+            active = (
+                wp.isfinite(concentration[box, slot])
+                and concentration[box, slot] > 0.0
+                and wp.isfinite(charge[box, slot])
+                and valid_mass
+                and wp.isfinite(total)
+                and total > 0.0
+            )
+            if not active and not all_zero:
+                invalid[0] = 1
+    for edge in range(edges):
+        if enabled[edge] != 0 and enabled[edge] != 1:
+            invalid[0] = 1
+        if not wp.isfinite(rates[edge]) or rates[edge] < 0.0:
+            invalid[0] = 1
+        if enabled[edge] == 1:
+            left = source[edge]
+            right = destination[edge]
+            if (
+                left < 0
+                or right < 0
+                or left >= boxes
+                or right >= boxes
+                or left == right
+                or (one_dimensional != 0 and wp.abs(left - right) != 1)
+            ):
+                invalid[0] = 1
+            for previous in range(edge):
+                if (
+                    enabled[previous] == 1
+                    and source[previous] == left
+                    and destination[previous] == right
+                ):
+                    invalid[0] = 1
+    if invalid[0] != 0:
+        return
+    # Establish demand before clearing any caller-owned planning buffer.
+    for edge in range(edges):
+        if enabled[edge] == 1:
+            for slot in range(slots):
+                request = (
+                    concentration[source[edge], slot] * rates[edge] * time_step
+                )
+                if not wp.isfinite(request) or request < 0.0:
+                    invalid[0] = 1
+                if request > 0.0:
+                    demand[0] = 1
+    if invalid[0] != 0 or demand[0] == 0:
+        return
+    for box in range(boxes):
+        for slot in range(slots):
+            debits[box, slot] = wp.float64(0.0)
+            credits[box, slot] = wp.float64(0.0)
+    for edge in range(edges):
+        for slot in range(slots):
+            assignments[edge, slot] = -1
+            requests[edge, slot] = wp.float64(0.0)
+    # Canonical source/destination order makes registration permutation inert.
+    for source_box in range(boxes):
+        for destination_box in range(boxes):
+            for edge in range(edges):
+                if (
+                    enabled[edge] != 1
+                    or source[edge] != source_box
+                    or destination[edge] != destination_box
+                ):
+                    continue
+                for source_slot in range(slots):
+                    request = (
+                        concentration[source_box, source_slot]
+                        * rates[edge]
+                        * time_step
+                    )
+                    if request <= 0.0:
+                        continue
+                    requests[edge, source_slot] = request
+                    debits[source_box, source_slot] += request
+                    assigned = int(-1)
+                    # Existing pre-step populations are always preferred.
+                    for target_slot in range(slots):
+                        if concentration[
+                            destination_box, target_slot
+                        ] > 0.0 and _particle_key_equal(
+                            masses,
+                            source_box,
+                            source_slot,
+                            masses,
+                            destination_box,
+                            target_slot,
+                            charge,
+                            species,
+                        ):
+                            assigned = target_slot
+                            break
+                    # Then reuse a previously reserved free population key.
+                    if assigned < 0:
+                        for prior_edge in range(edges):
+                            for prior_slot in range(slots):
+                                prior_target = assignments[
+                                    prior_edge, prior_slot
+                                ]
+                                if (
+                                    prior_target >= 0
+                                    and destination[prior_edge]
+                                    == destination_box
+                                    and concentration[
+                                        destination_box, prior_target
+                                    ]
+                                    == 0.0
+                                    and _particle_key_equal(
+                                        masses,
+                                        source_box,
+                                        source_slot,
+                                        masses,
+                                        source[prior_edge],
+                                        prior_slot,
+                                        charge,
+                                        species,
+                                    )
+                                ):
+                                    assigned = prior_target
+                    if assigned < 0:
+                        for target_slot in range(slots):
+                            if (
+                                concentration[destination_box, target_slot]
+                                == 0.0
+                            ):
+                                used = bool(False)
+                                for prior_edge in range(edges):
+                                    for prior_slot in range(slots):
+                                        if (
+                                            destination[prior_edge]
+                                            == destination_box
+                                            and assignments[
+                                                prior_edge, prior_slot
+                                            ]
+                                            == target_slot
+                                        ):
+                                            used = True
+                                if not used:
+                                    assigned = target_slot
+                                    break
+                    if assigned < 0:
+                        invalid[0] = 1
+                    else:
+                        assignments[edge, source_slot] = assigned
+                        credits[destination_box, assigned] += request
+    for box in range(boxes):
+        for slot in range(slots):
+            if (
+                not wp.isfinite(debits[box, slot])
+                or not wp.isfinite(credits[box, slot])
+                or debits[box, slot] > concentration[box, slot]
+            ):
+                invalid[0] = 1
+
+
+@wp.kernel
+def _particle_communication_commit(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    initial_masses: wp.array3d(dtype=wp.float64),
+    initial_concentration: wp.array2d(dtype=wp.float64),
+    initial_charge: wp.array2d(dtype=wp.float64),
+    source: wp.array(dtype=wp.int32),
+    destination: wp.array(dtype=wp.int32),
+    debits: wp.array2d(dtype=wp.float64),
+    credits: wp.array2d(dtype=wp.float64),
+    assignments: wp.array2d(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),
+    demand: wp.array(dtype=wp.int32),
+) -> None:
+    """Commit a fully validated plan in one gated primary writer."""
+    box, slot = wp.tid()
+    if invalid[0] != 0 or demand[0] == 0:
+        return
+    old = initial_concentration[box, slot]
+    final = old - debits[box, slot] + credits[box, slot]
+    if old == 0.0 and credits[box, slot] > 0.0:
+        for edge in range(source.shape[0]):
+            for source_slot in range(concentration.shape[1]):
+                if (
+                    destination[edge] == box
+                    and assignments[edge, source_slot] == slot
+                ):
+                    for lane in range(masses.shape[2]):
+                        masses[box, slot, lane] = initial_masses[
+                            source[edge], source_slot, lane
+                        ]
+                    charge[box, slot] = initial_charge[
+                        source[edge], source_slot
+                    ]
+    concentration[box, slot] = final
+    if final == 0.0:
+        concentration[box, slot] = wp.float64(0.0)
+        charge[box, slot] = wp.float64(0.0)
+        for lane in range(masses.shape[2]):
+            masses[box, slot, lane] = wp.float64(0.0)
+
+
+@wp.kernel
+def _snapshot_particle_communication_fields(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    initial_masses: wp.array3d(dtype=wp.float64),
+    initial_concentration: wp.array2d(dtype=wp.float64),
+    initial_charge: wp.array2d(dtype=wp.float64),
+) -> None:
+    """Copy the immutable particle fields used by the gated commit writer."""
+    box, slot = wp.tid()
+    initial_concentration[box, slot] = concentration[box, slot]
+    initial_charge[box, slot] = charge[box, slot]
+    for lane in range(masses.shape[2]):
+        initial_masses[box, slot, lane] = masses[box, slot, lane]
+
+
 def gas_communication_step_gpu(
     particles: Any,
     gas: Any,
@@ -1144,3 +1483,259 @@ def gas_communication_step_gpu(
         device=device,
     )
     return particles, gas
+
+
+def particle_communication_step_gpu(
+    particles: Any,
+    configuration: object,
+    time_step: object,
+    buffers: object,
+) -> Any:
+    """Transport fixed-capacity particle populations across a closed map.
+
+    This concrete-only API is available only from
+    ``particula.gpu.kernels.communication``.  It reads pre-step particle fields
+    to plan concentration requests, deterministically prefers exact population
+    matches and then ascending pre-step free slots, and returns the identical
+    particle container.  Population mass lanes and signed charge travel
+    together.  ``buffers`` must be a ``ParticleCommunicationBuffers`` carrier
+    with float64 ``(B, N)`` debit/credit ledgers, int32 ``(E, N)`` assignments,
+    and float64 ``(E, N)`` requests.
+
+    Valid zero-size, zero-time, disabled-map, and zero-demand calls preserve
+    every buffer value.  For a nonzero plan, planning buffers are overwritten;
+    invalid device-domain plans gate the sole primary commit.  Closed-map
+    transport conserves concentration-weighted particle number, species masses,
+    and signed charge.  The caller owns device placement and explicit Warp
+    synchronization; this direct boundary performs no transfer, resize,
+    compaction, implicit activation, or CPU fallback.  Host validation is
+    atomic before launch, while rollback is not promised after the commit writer
+    launches.
+
+    Args:
+        particles: Complete caller-owned fixed-shape Warp particle container.
+        configuration: Exact P1 particle ``CommunicationConfiguration``.
+        time_step: Finite nonnegative explicit-Euler time step in seconds.
+        buffers: Exact concrete ``ParticleCommunicationBuffers`` carrier.
+
+    Returns:
+        The exact input ``particles`` object.
+
+    Raises:
+        TypeError: If scalar, declaration, or buffer-carrier types are invalid.
+        ValueError: If observable schemas, devices, aliases, or declaration
+            metadata are invalid.
+    """
+    step = _validate_time_step(time_step)
+    typed = _validate_particle_communication_configuration(configuration)
+    if type(buffers) is not ParticleCommunicationBuffers:
+        raise TypeError(
+            "buffers must be an exact ParticleCommunicationBuffers."
+        )
+    buffers = cast(ParticleCommunicationBuffers, buffers)
+    map_data = typed.communication_map
+    masses, mass_range = _validate_array(
+        _get_field(particles, "masses", "particles.masses"),
+        "particles.masses",
+        wp.float64,
+        3,
+    )
+    boxes, slots, species = masses.shape
+    device = masses.device
+    concentration, concentration_range = _validate_array(
+        _get_field(particles, "concentration", "particles.concentration"),
+        "particles.concentration",
+        wp.float64,
+        2,
+        (boxes, slots),
+        device,
+    )
+    charge, charge_range = _validate_array(
+        _get_field(particles, "charge", "particles.charge"),
+        "particles.charge",
+        wp.float64,
+        2,
+        (boxes, slots),
+        device,
+    )
+    density, density_range = _validate_array(
+        _get_field(particles, "density", "particles.density"),
+        "particles.density",
+        wp.float64,
+        1,
+        (species,),
+        device,
+    )
+    volume, volume_range = _validate_array(
+        _get_field(particles, "volume", "particles.volume"),
+        "particles.volume",
+        wp.float64,
+        1,
+        (boxes,),
+        device,
+    )
+    edges = int(map_data.edge_capacity)
+    edge_shape = (edges,)
+    source, source_range = _validate_array(
+        map_data.source_boxes, "source_boxes", wp.int32, 1, edge_shape, device
+    )
+    destination, destination_range = _validate_array(
+        map_data.destination_boxes,
+        "destination_boxes",
+        wp.int32,
+        1,
+        edge_shape,
+        device,
+    )
+    enabled, enabled_range = _validate_array(
+        map_data.enabled, "enabled", wp.int32, 1, edge_shape, device
+    )
+    rates, rates_range = _validate_array(
+        map_data.rates, "rates", wp.float64, 1, edge_shape, device
+    )
+    final_volumes = typed.prescribed_volume.final_volumes
+    final_range = None
+    if final_volumes is not None:
+        final_volumes, final_range = _validate_array(
+            final_volumes, "final_volumes", wp.float64, 1, (boxes,), device
+        )
+    debits, debits_range = _validate_array(
+        buffers.source_debits,
+        "source_debits",
+        wp.float64,
+        2,
+        (boxes, slots),
+        device,
+    )
+    credits, credits_range = _validate_array(
+        buffers.destination_credits,
+        "destination_credits",
+        wp.float64,
+        2,
+        (boxes, slots),
+        device,
+    )
+    assignments, assignments_range = _validate_array(
+        buffers.assignments,
+        "assignments",
+        wp.int32,
+        2,
+        (edges, slots),
+        device,
+    )
+    requests, requests_range = _validate_array(
+        buffers.request_concentrations,
+        "request_concentrations",
+        wp.float64,
+        2,
+        (edges, slots),
+        device,
+    )
+    _reject_aliases(
+        (
+            masses,
+            concentration,
+            charge,
+            density,
+            volume,
+            source,
+            destination,
+            enabled,
+            rates,
+            final_volumes,
+            debits,
+            credits,
+            assignments,
+            requests,
+        ),
+        (
+            mass_range,
+            concentration_range,
+            charge_range,
+            density_range,
+            volume_range,
+            source_range,
+            destination_range,
+            enabled_range,
+            rates_range,
+            final_range,
+            debits_range,
+            credits_range,
+            assignments_range,
+            requests_range,
+        ),
+    )
+    if boxes == 0 or slots == 0 or species == 0 or edges == 0 or step == 0.0:
+        return particles
+    invalid = wp.zeros(1, dtype=wp.int32, device=device)
+    demand = wp.zeros(1, dtype=wp.int32, device=device)
+    initial_masses = wp.empty(masses.shape, dtype=wp.float64, device=device)
+    initial_concentration = wp.empty(
+        concentration.shape, dtype=wp.float64, device=device
+    )
+    initial_charge = wp.empty(charge.shape, dtype=wp.float64, device=device)
+    if final_volumes is not None:
+        wp.launch(
+            _communication_validate_final_volumes,
+            dim=boxes,
+            inputs=[final_volumes, invalid],
+            device=device,
+        )
+    wp.launch(
+        _snapshot_particle_communication_fields,
+        dim=(boxes, slots),
+        inputs=[
+            masses,
+            concentration,
+            charge,
+            initial_masses,
+            initial_concentration,
+            initial_charge,
+        ],
+        device=device,
+    )
+    wp.launch(
+        _particle_communication_plan,
+        dim=1,
+        inputs=[
+            masses,
+            concentration,
+            charge,
+            density,
+            volume,
+            source,
+            destination,
+            enabled,
+            rates,
+            int(map_data.form is CommunicationMapForm.ONE_DIMENSIONAL),
+            step,
+            debits,
+            credits,
+            assignments,
+            requests,
+            invalid,
+            demand,
+        ],
+        device=device,
+    )
+    wp.launch(
+        _particle_communication_commit,
+        dim=(boxes, slots),
+        inputs=[
+            masses,
+            concentration,
+            charge,
+            initial_masses,
+            initial_concentration,
+            initial_charge,
+            source,
+            destination,
+            debits,
+            credits,
+            assignments,
+            invalid,
+            demand,
+        ],
+        device=device,
+    )
+    return particles
