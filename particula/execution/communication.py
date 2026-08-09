@@ -15,8 +15,6 @@ This module provides none of those operations, synchronization, host
 conversion, fallback, or scheduling.
 """
 
-# mypy: disable-error-code="valid-type, misc, operator"
-
 from __future__ import annotations
 
 from dataclasses import dataclass
