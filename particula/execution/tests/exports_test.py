@@ -95,6 +95,9 @@ DENIED_PUBLIC_NAMES = (
     "WarpCondensationExecutionState",
     "CPUCondensationExecutionAdapter",
     "WarpCondensationExecutionAdapter",
+    "StreamKey",
+    "StreamDescriptor",
+    "StreamRegistry",
 )
 
 FORBIDDEN_MODULE_PREFIXES = (
@@ -111,6 +114,7 @@ FORBIDDEN_MODULE_PREFIXES = (
     "particula.execution.diagnostics",
     "particula.execution.process_graph",
     "particula.execution.thermodynamic_updates",
+    "particula.execution.rng",
 )
 
 

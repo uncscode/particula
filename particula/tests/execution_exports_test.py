@@ -76,6 +76,9 @@ EXCLUDED_EXPORTS = (
     "ResidentCheckpointController",
     "CheckpointPayload",
     "GPUResourceRegistry",
+    "StreamKey",
+    "StreamDescriptor",
+    "StreamRegistry",
 )
 
 DIRECT_IMPORT_ONLY_NAMES = (
@@ -86,6 +89,9 @@ DIRECT_IMPORT_ONLY_NAMES = (
     "FallbackDispatchResult",
     "resolve_cpu_fallback",
     "dispatch_cpu_fallback",
+    "STREAM_SCHEMA_VERSION",
+    "MAX_LOGICAL_BOX_ID_BYTES",
+    "MAX_ROOT_SEED",
 )
 
 
