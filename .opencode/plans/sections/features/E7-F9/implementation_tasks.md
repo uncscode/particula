@@ -4,13 +4,19 @@
 
 - [ ] Inventory E7-F1 through E7-F8 public contracts and resolve any handoff
   mismatch with the owning track before adding closeout fixtures.
-- [ ] Implement public typed diagnostic descriptors and explicit-boundary
-  observation results in `particula/execution/diagnostics.py` only where E7-F5
-  hooks are insufficient; keep reducers and restart resources private.
-- [ ] Implement device-side total species mass, number concentration,
-  latent-energy, and ledger-aware conservation reductions.
-- [ ] Register diagnostic buffers through E7-F4 resources and preserve their
-  shape, dtype, device, and identity across repeated steps.
+- [x] **P1 / issue #1528 (2026-08-10):** Implemented the concrete-only closed
+  six-operation protocol in `particula/execution/diagnostics.py`: two preserved
+  snapshots plus device-side total species mass, particle-number concentration,
+  latent-energy copy, and ledger-aware conservation residual reductions.
+- [x] **P1 / issue #1528 (2026-08-10):** Generalized diagnostic-registration
+  preflight in `particula/execution/gpu_resources.py` for operation-specific
+  schemas, capacity, device, and non-aliasing validation while retaining
+  caller-owned binding identity.
+- [x] **P1 / issue #1528 (2026-08-10):** Added co-located contract coverage in
+  `particula/execution/tests/diagnostics_test.py` and
+  `particula/execution/tests/gpu_resources_test.py`; no public descriptors,
+  exports, checkpoint changes, scheduler behavior, or public documentation were
+  added.
 - [ ] Freeze checkpoint schema/version and audit physical arrays, gas names,
   logical box IDs, dimensions, counters, capability/config identity, ledgers,
   diagnostics, and RNG streams.

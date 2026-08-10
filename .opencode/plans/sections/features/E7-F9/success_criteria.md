@@ -2,8 +2,10 @@
 
 - [ ] All E7-F1 through E7-F8 contracts are shipped and represented in the
   closeout matrix without contradiction.
-- [ ] Optional GPU reductions report mass, number, latent energy, and
-  conservation diagnostics against independent references with documented units.
+- [x] **P1 / issue #1528:** Concrete-only GPU diagnostics report total species
+  mass, particle-number concentration, latent energy, and conservation residual
+  against co-located contract/oracle coverage; their units and ledger signs are
+  defined at the concrete boundary without public-documentation expansion.
 - [ ] At least one condensation and one Brownian coagulation workflow run through
   backend selection and match CPU references within recorded tolerances.
 - [ ] A multi-box GPU-resident loop runs all supported processes between explicit

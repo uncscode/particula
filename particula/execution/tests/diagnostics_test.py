@@ -347,21 +347,26 @@ def test_diagnostics_launches_each_nonempty_operation_once(
             sink_ledger=_matrix(),
         ),
     )
-    launches: list[str] = []
+    launches: list[tuple[str, list[object]]] = []
     original_launch = diagnostics.wp.launch
 
     def record_launch(
         kernel: object, *args: object, **kwargs: object
     ) -> object:
         """Record the kernel name while preserving normal Warp dispatch."""
-        launches.append(cast(Any, kernel).key)
+        launches.append((cast(Any, kernel).key, kwargs["inputs"]))
         return original_launch(kernel, *args, **kwargs)
 
     monkeypatch.setattr(diagnostics.wp, "launch", record_launch)
 
     ResidentDiagnosticsExecutor().execute(_plan(session, registrations))
 
-    assert launches == [
+    writer_launches = [
+        launch
+        for launch in launches
+        if launch[0] != "_scan_diagnostic_accounting"
+    ]
+    assert [key for key, _ in writer_launches] == [
         "_copy_snapshot",
         "_copy_snapshot",
         "_total_species_mass",
@@ -369,3 +374,50 @@ def test_diagnostics_launches_each_nonempty_operation_once(
         "_copy_snapshot",
         "_conservation_residual",
     ]
+    assert writer_launches[-1][1][0] is registrations[2].output
+
+
+@pytest.mark.warp
+def test_valid_diagnostics_dispatch_avoids_executor_host_boundaries(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test valid dispatch does not synchronize or invoke conversion helpers."""
+    wp = pytest.importorskip("warp")
+    import particula.execution.diagnostics as diagnostics
+
+    session = _session()
+    matrices = tuple(_matrix() for _ in range(5))
+    registrations = (
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT, matrices[0]
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT, matrices[1]
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS, matrices[2]
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
+            wp.zeros(2, dtype=wp.float64, device="cpu"),
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.LATENT_HEAT_ENERGY,
+            matrices[3],
+            energy_transfer=_matrix(),
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.CONSERVATION_RESIDUAL,
+            matrices[4],
+            baseline_total_mass=_matrix(),
+            source_ledger=_matrix(),
+            sink_ledger=_matrix(),
+        ),
+    )
+
+    def forbidden(*args: object, **kwargs: object) -> None:
+        """Fail if dispatch crosses the host synchronization boundary."""
+        raise AssertionError("diagnostics dispatch must not synchronize")
+
+    monkeypatch.setattr(diagnostics.wp, "synchronize", forbidden)
+    ResidentDiagnosticsExecutor().execute(_plan(session, registrations))

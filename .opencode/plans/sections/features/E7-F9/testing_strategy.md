@@ -7,10 +7,14 @@ Warp baseline; CUDA rows are optional and skip cleanly when unavailable.
 
 ## Per-Phase Approach
 
-- **P1:** Unit/contract tests for reductions against independent NumPy float64
-  oracles, public typed descriptors and explicit-boundary observation results,
-  private reducer/restart resources, validation ordering, identity, no host
-  readback, and conservation.
+- **P1 (completed, issue #1528):** `diagnostics_test.py` and
+  `gpu_resources_test.py` cover the concrete six-operation protocol, independent
+  NumPy float64 reducer oracles, identity retention, canonical ordering, empty
+  shapes, invalid schema/device/capacity/alias preflight, and no-write failure
+  boundaries. Coverage includes total particle-plus-gas mass, particle-number
+  concentration, direct latent-energy ledger copy, and source/sink-signed
+  conservation residuals; public descriptors and observation results were not
+  introduced.
 - **P2:** Checkpoint schema and round-trip tests, malformed/versioned payloads,
   metadata preservation, uninterrupted versus restart equivalence.
 - **P3:** Full-loop integration tests for condensation, Brownian coagulation,

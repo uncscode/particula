@@ -33,21 +33,26 @@ CPU reference inputs + BackendRequest + TimestepPlan
 
 ## Data / API / Workflow Changes
 
-- **Data Model:** Add only bounded diagnostic descriptors/results if E7-F5 does
-  not already supply them. Results use fixed `(n_boxes,)`, `(n_boxes, n_species)`,
-  or explicitly documented scalar shapes and same-device float64 storage. Freeze
-  checkpoint schema/version and evidence metadata; do not change core containers.
-- **API Surface:** Expose typed diagnostic descriptors and explicit-boundary
-  observation results through the deliberate `particula.execution` boundary.
-  Keep reducers, restart resources, Warp kernels, status arrays, scratch records,
-  fixture builders, and closeout tooling private/test-only.
-- **Diagnostics semantics:** Total species mass includes concentration-weighted
-  particle inventory and gas amount using box volume. Number is particle number
-  concentration. Energy follows E7-F2 latent-heat sign/unit conventions.
-  Conservation residuals require an explicit baseline and source/sink ledger.
-- **Workflow Hooks:** Diagnostics execute only at declared E7-F5 barriers after
-  relevant updates. Normal-step reducers launch on-device and never call
-  `.numpy()`, conversion helpers, checkpoint, or implicit synchronization.
+- **Data Model:** P1 implements the closed, concrete-only six-operation
+  diagnostics protocol in `particula.execution.diagnostics`: two preserved
+  snapshots followed by total species mass, particle-number concentration,
+  latent-heat energy, and conservation residual. Outputs use fixed `(B, S)` or
+  `(B,)` same-device float64 storage; no core container or checkpoint schema
+  changed.
+- **API Surface:** Registrations, plans, reducer kernels, and validation remain
+  concrete direct-import seams. P1 added no `particula.execution` or top-level
+  exports, public result surface, or user-facing documentation.
+- **Diagnostics semantics:** Total species mass is box volume times
+  concentration-weighted particle mass plus gas concentration; number is the
+  per-box particle concentration sum. Latent energy copies the supplied signed
+  P2-finalized energy ledger. Residual is total mass minus baseline and source
+  ledger plus sink ledger. `gpu_resources.py` now performs operation-specific
+  same-device float64 schema, capacity, and alias preflight for registrations.
+- **Workflow Hooks:** The concrete diagnostics executor is directly callable
+  today after its exact plan preflight. References to E7-F5 barrier placement
+  describe only future scheduler integration. Normal-step reducers launch
+  on-device and never call `.numpy()`, conversion helpers, checkpoint, or
+  implicit synchronization.
 - **Checkpoint:** Host-visible diagnostics are observed only at explicit
   checkpoint/finalization unless the caller requests a named diagnostic readback
   boundary. The versioned payload includes E7-F4 state and E7-F8 stream records.

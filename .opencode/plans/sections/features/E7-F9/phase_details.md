@@ -1,13 +1,18 @@
 # Phase Details
 
-- [ ] **E7-F9-P1:** Add GPU diagnostics reductions and co-located contract tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add optional same-device reductions for mass, number, latent-heat
-    energy, and conservation residuals without host readback in a normal step.
+- [x] **E7-F9-P1:** Add GPU diagnostics reductions and co-located contract tests
+  - Issue: #1528 | Size: S | Status: Completed 2026-08-10
+  - Delivered: Concrete-only six-operation resident diagnostics protocol: two
+    preserved snapshots plus total species mass, particle-number concentration,
+    latent-heat energy, and conservation residual reductions without normal-step
+    host readback or synchronization.
   - Files: `particula/execution/diagnostics.py`,
-    `particula/execution/tests/diagnostics_test.py`
-  - Tests: Shape/dtype/device/alias validation, identity, independent NumPy
-    oracles, inactive slots, multi-species boxes, and no hidden sync/transfer.
+    `particula/execution/gpu_resources.py`,
+    `particula/execution/tests/diagnostics_test.py`, and
+    `particula/execution/tests/gpu_resources_test.py`.
+  - Tests: Contract coverage for reduction equations, identity, canonical order,
+    empty shapes, invalid schema/capacity/alias preflight, and pre-launch
+    no-write boundaries. Public docs and exports remain unchanged.
 
 - [ ] **E7-F9-P2:** Freeze checkpoint schema and add round-trip validation tests
   - Issue: TBD | Size: S | Status: Not Started

@@ -1,5 +1,12 @@
 # Documentation Updates
 
+## P1 Completion (issue #1528)
+
+- Public documentation deliberately remains unchanged. The diagnostics protocol
+  is concrete-only in `particula.execution.diagnostics`, adds no package or
+  top-level exports, and is documented only by its concrete module contract and
+  co-located tests.
+
 - Add `docs/Examples/gpu_resident_multi_timestep.py` as the canonical complete
   E7 example using backend selection, resident state, multiple boxes/processes,
   diagnostics, explicit checkpoints, and finalization.

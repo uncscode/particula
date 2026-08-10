@@ -1457,3 +1457,135 @@ def test_particle_number_output_schema_rejects_before_any_diagnostic_launch(
 
     assert not launches
     np.testing.assert_array_equal(invalid_number.numpy(), [[17.0]])
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    ("field", "value", "match"),
+    (
+        ("baseline_total_mass", np.nan, "must be finite"),
+        ("source_ledger", np.nan, "finite and nonnegative"),
+        ("sink_ledger", np.inf, "finite and nonnegative"),
+        ("source_ledger", -1.0, "finite and nonnegative"),
+        ("sink_ledger", -1.0, "finite and nonnegative"),
+    ),
+)
+def test_diagnostic_accounting_values_reject_before_writer_dispatch(
+    monkeypatch: pytest.MonkeyPatch,
+    field: str,
+    value: float,
+    match: str,
+) -> None:
+    """Test malformed ledger values preserve resident and output sentinels."""
+    wp = pytest.importorskip("warp")
+    import particula.execution.diagnostics as diagnostics
+
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    outputs = (
+        wp.full((1, 1), 11.0, dtype=wp.float64, device="cpu"),
+        wp.full((1, 1), 12.0, dtype=wp.float64, device="cpu"),
+    )
+    plan = _diagnostics_plan(session, registry, outputs)
+    accounting = wp.full((1, 1), value, dtype=wp.float64, device="cpu")
+    residual = plan.registrations[5]
+    invalid_residual = ResidentDiagnosticRegistration(
+        residual.operation,
+        residual.output,
+        baseline_total_mass=(
+            accounting
+            if field == "baseline_total_mass"
+            else residual.baseline_total_mass
+        ),
+        source_ledger=(
+            accounting if field == "source_ledger" else residual.source_ledger
+        ),
+        sink_ledger=(
+            accounting if field == "sink_ledger" else residual.sink_ledger
+        ),
+    )
+    invalid_plan = ResidentDiagnosticsPlan(
+        plan.session,
+        plan.registry,
+        plan.graph,
+        plan.schedule,
+        plan.node,
+        plan.registrations[:5] + (invalid_residual,),
+    )
+    writers = {
+        diagnostics._copy_snapshot,
+        diagnostics._total_species_mass,
+        diagnostics._particle_number,
+        diagnostics._conservation_residual,
+    }
+    launches: list[object] = []
+    original_launch = wp.launch
+
+    def record_writers(
+        kernel: object, *args: object, **kwargs: object
+    ) -> object:
+        """Record diagnostics writers while allowing read-only validation scans."""
+        if kernel in writers:
+            launches.append(kernel)
+        return original_launch(kernel, *args, **kwargs)
+
+    monkeypatch.setattr(wp, "launch", record_writers)
+    before_masses = cast(Any, session.particles).masses.numpy().copy()
+
+    with pytest.raises(ValueError, match=match):
+        ResidentDiagnosticsExecutor().execute(invalid_plan)
+
+    assert launches == []
+    np.testing.assert_array_equal(outputs[0].numpy(), [[11.0]])
+    np.testing.assert_array_equal(outputs[1].numpy(), [[12.0]])
+    np.testing.assert_array_equal(
+        cast(Any, session.particles).masses.numpy(), before_masses
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("use_sidecar", (False, True))
+@pytest.mark.parametrize(
+    "field",
+    ("energy_transfer", "baseline_total_mass", "source_ledger", "sink_ledger"),
+)
+def test_diagnostic_accounting_aliases_reject_before_mutation(
+    use_sidecar: bool, field: str
+) -> None:
+    """Test accounting aliases of primaries and pinned sidecars reject safely."""
+    wp = pytest.importorskip("warp")
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    sidecar = (
+        registry.acquire_nucleation().finalized_demand.precursor_mass_change
+    )
+    protected = sidecar if use_sidecar else cast(Any, session.gas).concentration
+    output = wp.full((1, 1), 13.0, dtype=wp.float64, device="cpu")
+    ordinary = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    if field == "energy_transfer":
+        registration = ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.LATENT_HEAT_ENERGY,
+            output,
+            energy_transfer=protected,
+        )
+    else:
+        registration = ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.CONSERVATION_RESIDUAL,
+            output,
+            baseline_total_mass=(
+                protected if field == "baseline_total_mass" else ordinary
+            ),
+            source_ledger=(protected if field == "source_ledger" else ordinary),
+            sink_ledger=(protected if field == "sink_ledger" else ordinary),
+        )
+    protected_before = protected.numpy().copy()
+    masses_before = cast(Any, session.particles).masses.numpy().copy()
+
+    with pytest.raises(ValueError, match="must not alias resident resources"):
+        registry.validate_diagnostic_registrations(session, (registration,))
+
+    np.testing.assert_array_equal(output.numpy(), [[13.0]])
+    np.testing.assert_array_equal(protected.numpy(), protected_before)
+    np.testing.assert_array_equal(
+        cast(Any, session.particles).masses.numpy(), masses_before
+    )

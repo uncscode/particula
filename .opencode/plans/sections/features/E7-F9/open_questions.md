@@ -1,15 +1,16 @@
 # Open Questions
 
 - [x] What diagnostic result surface is public versus checkpoint-only?
-  - Resolved 2026-07-27: Publish typed diagnostic descriptors and
-    explicit-boundary observation results only; keep reducers and restart
-    resources private.
-  - Rationale: This supports deliberate observation without exposing concrete
-    Warp reducers, scratch sidecars, or restart internals.
+  - Corrected 2026-08-10 by issue #1528: P1 ships a concrete-only closed
+    registration/dispatch protocol in `particula.execution.diagnostics`; it adds
+    no public descriptors, observation results, package exports, or user docs.
+  - Rationale: The resident diagnostic boundary is an internal direct-import
+    seam, so caller-owned same-device bindings can be validated without
+    expanding the public execution API.
   - Evidence:
     - `docs/Features/Roadmap/data-oriented-gpu.md:1568` - diagnostics are
       optional GPU-side reductions, without a prescribed result API.
-  - Resolved by: PR #1452 decision
+  - Resolved by: issue #1528 implementation
 
 - [x] Which checkpoint encoding is durable beyond in-memory round trips?
   - Resolved 2026-07-27: None in Epic G. The supported checkpoint remains a

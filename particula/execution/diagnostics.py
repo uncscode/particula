@@ -1,12 +1,20 @@
-"""Write closed-protocol resident diagnostics into caller-owned Warp outputs.
+"""Write closed resident diagnostics into caller-owned Warp arrays.
 
-This direct-import-only module has no callback registration or package export.
-Its canonical order is gas and saturation snapshots, total species mass,
-particle-number concentration, latent heat energy, and conservation residual.
-Matrix operations use ``(B, S)`` float64 arrays; particle number uses ``(B,)``.
-Masses are extensive kg, energy is signed J, and residual is
-``total - baseline - source + sink``.  Execution has no host readback,
-synchronization, transfer, allocation, or physics mutation.
+This concrete direct-import-only module has no callback registration or package
+export. Registrations execute in this fixed order: gas-concentration snapshot,
+saturation-ratio snapshot, total species mass, particle-number concentration,
+latent heat energy, and conservation residual. Matrix operations use ``(B, S)``
+``wp.float64`` arrays; particle number uses a ``(B,)`` ``wp.float64`` array.
+
+Total species mass is ``V[b] * (Σp(m[b, p, s] * c[b, p]) + g[b, s])`` in kg.
+Particle number is ``Σp(c[b, p])`` in m^-3. Latent energy copies signed
+whole-call P2-finalized energy in J. The residual is
+``total_mass - baseline_total_mass - source_ledger + sink_ledger`` in kg;
+source and sink ledgers are nonnegative accumulated extensive-mass inputs.
+Execution validates caller-owned same-device bindings without host readback,
+synchronization, transfer, allocation, or physics mutation. Empty matrix
+operations are write-free for ``B == 0`` or ``S == 0``; particle number is
+write-free only for ``B == 0``.
 """
 
 from __future__ import annotations
@@ -48,13 +56,16 @@ class ResidentDiagnosticRegistration:
     """Bind one closed diagnostic operation to caller-owned Warp arrays.
 
     Attributes:
-        operation: Exact closed operation that selects the resident source.
-        output: Caller-owned Warp ``float64`` array validated by the executor.
-        energy_transfer: Required signed energy input for latent-energy output.
-        baseline_total_mass: Required extensive baseline for residual output.
+        operation: Exact closed operation that selects the diagnostic reduction.
+        output: Caller-owned Warp ``float64`` output validated by the executor.
+        energy_transfer: Required ``(B, S)`` signed whole-call energy input in
+            J for latent-energy output; forbidden otherwise.
+        baseline_total_mass: Required ``(B, S)`` extensive mass baseline in kg
+            for residual output; forbidden otherwise.
         source_ledger: Required nonnegative extensive source ledger for the
-            residual.
-        sink_ledger: Required nonnegative extensive sink ledger for residual.
+            residual in kg; forbidden otherwise.
+        sink_ledger: Required nonnegative extensive sink ledger for residual in
+            kg; forbidden otherwise.
     """
 
     operation: ResidentDiagnosticOperation
@@ -69,6 +80,8 @@ class ResidentDiagnosticRegistration:
 
         Raises:
             TypeError: If ``operation`` is not an exact supported operation.
+            ValueError: If required accounting inputs are missing or forbidden
+                accounting inputs are supplied for ``operation``.
         """
         if type(self.operation) is not ResidentDiagnosticOperation:
             raise TypeError(
@@ -109,7 +122,8 @@ class ResidentDiagnosticsPlan:
         graph: Resolver-produced graph containing ``node`` by identity.
         schedule: Matching resolved schedule that ends with ``node``.
         node: Canonical ``diagnostics`` process node.
-        registrations: Ordered closed operation and output bindings.
+        registrations: Exact canonical tuple of the six ordered closed
+            operation and output bindings, validated by the executor.
     """
 
     session: ResidentSession
@@ -187,22 +201,16 @@ def _particle_number(concentration: Any, output: Any) -> None:
 
 @wp.kernel
 def _conservation_residual(
-    masses: Any,
-    concentration: Any,
-    gas_concentration: Any,
-    volume: Any,
+    total_mass: Any,
     baseline: Any,
     source: Any,
     sink: Any,
     output: Any,
 ) -> None:
-    """Write the ledger-aware extensive mass residual for one lane."""
+    """Write the ledger-aware residual from the already-reduced total mass."""
     box, species = wp.tid()  # type: ignore[misc]
-    total = gas_concentration[box, species]
-    for particle in range(masses.shape[1]):
-        total += masses[box, particle, species] * concentration[box, particle]
     output[box, species] = (
-        volume[box] * total
+        total_mass[box, species]
         - baseline[box, species]
         - source[box, species]
         + sink[box, species]
@@ -212,10 +220,12 @@ def _conservation_residual(
 class ResidentDiagnosticsExecutor:
     """Execute an already-bound closed diagnostics plan without transfers.
 
-    Validation preserves caller ownership and rejects outputs that alias
-    resident primaries, published sidecars, or another diagnostic output.
-    Execution copies registrations in declared order and is write-free for
-    empty matrices.
+    Validation preserves caller ownership and rejects output or accounting-input
+    aliases with resident primaries, published sidecars, or diagnostic outputs.
+    Execution dispatches the six canonical registrations without host readback,
+    synchronization, transfer, allocation, or physics mutation. Matrix
+    registrations are write-free for empty ``(B, S)`` schemas; particle number
+    remains writable for ``(B, 0)``.
     """
 
     def _validate_graph_and_schedule(
@@ -296,8 +306,16 @@ class ResidentDiagnosticsExecutor:
     def validate(self, plan: object) -> ResidentDiagnosticsPlan:
         """Validate one exact diagnostics plan without dispatching a kernel.
 
+        Args:
+            plan: Candidate concrete diagnostics plan.
+
         Returns:
             The unchanged, exact validated plan.
+
+        Raises:
+            TypeError: If ``plan`` is not an exact diagnostics plan.
+            ValueError: If the plan's graph, bindings, or registration protocol
+                is invalid.
         """
         if type(plan) is not ResidentDiagnosticsPlan:
             raise TypeError("plan must be an exact ResidentDiagnosticsPlan.")
@@ -307,8 +325,10 @@ class ResidentDiagnosticsExecutor:
     def execute(self, plan: object) -> None:
         """Validate and dispatch each registration in declared order.
 
-        Empty matrix schemas complete without their writer launch. Particle
-        number still launches for ``(B, 0)`` because its ``(B,)`` output exists.
+        Matrix schemas complete without their writer launch when ``B == 0`` or
+        ``S == 0``. Particle number still launches for ``(B, 0)`` because its
+        ``(B,)`` output exists. Successful launches are asynchronous; callers
+        synchronize before inspecting outputs on the host.
 
         Args:
             plan: Exact plan selecting the sources and caller-owned outputs.
@@ -324,6 +344,12 @@ class ResidentDiagnosticsExecutor:
         particles = cast(Any, plan.session.particles)
         gas = cast(Any, plan.session.gas)
         environment = cast(Any, plan.session.environment)
+        total_mass_output = next(
+            registration.output
+            for registration in plan.registrations
+            if registration.operation
+            is ResidentDiagnosticOperation.TOTAL_SPECIES_MASS
+        )
         for registration in plan.registrations:
             operation = registration.operation
             if (
@@ -393,10 +419,7 @@ class ResidentDiagnosticsExecutor:
                         _conservation_residual,
                         dim=matrix_dim,
                         inputs=[
-                            particles.masses,
-                            particles.concentration,
-                            gas.concentration,
-                            particles.volume,
+                            total_mass_output,
                             registration.baseline_total_mass,
                             registration.source_ledger,
                             registration.sink_ledger,

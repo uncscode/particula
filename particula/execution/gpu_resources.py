@@ -84,6 +84,19 @@ _MAX_SIZE = (1 << 63) - 1
 _ShapeKind = Literal["b", "bn", "bs", "bns", "bc2", "e", "en", "status"]
 
 
+@wp.kernel
+def _scan_diagnostic_accounting(
+    values: wp.array2d(dtype=wp.float64),
+    require_nonnegative: bool,
+    invalid: wp.array(dtype=wp.int32),
+) -> None:
+    """Record invalid diagnostic accounting values in one device status lane."""
+    box, species = wp.tid()
+    value = values[box, species]
+    if not wp.isfinite(value) or (require_nonnegative and value < 0.0):
+        wp.atomic_max(invalid, 0, 1)
+
+
 @dataclass(frozen=True)
 class ManifestEntry:
     """Describe one fixed-shape concrete sidecar role."""
@@ -787,6 +800,43 @@ class GPUResourceRegistry:
             protected,
             protected_ranges,
         )
+        self._validate_diagnostic_accounting_values(registrations)
+
+    def _validate_diagnostic_accounting_values(
+        self, registrations: tuple[Any, ...]
+    ) -> None:
+        """Reject invalid ledger payloads before any diagnostic writer
+        launch.
+        """
+        dimensions = self._session.dimensions
+        if not dimensions.n_boxes or not dimensions.n_species:
+            return
+        device = cast(Any, self._session.particles).masses.device
+        for registration in registrations:
+            for value, require_nonnegative in (
+                (registration.energy_transfer, False),
+                (registration.baseline_total_mass, False),
+                (registration.source_ledger, True),
+                (registration.sink_ledger, True),
+            ):
+                if value is None:
+                    continue
+                invalid = wp.zeros(1, dtype=wp.int32, device=device)
+                wp.launch(
+                    _scan_diagnostic_accounting,
+                    dim=(dimensions.n_boxes, dimensions.n_species),
+                    inputs=[value, require_nonnegative, invalid],
+                    device=device,
+                )
+                if invalid.numpy()[0] != 0:
+                    if require_nonnegative:
+                        raise ValueError(
+                            "Diagnostic source and sink ledgers must be finite "
+                            "and nonnegative."
+                        )
+                    raise ValueError(
+                        "Diagnostic accounting inputs must be finite."
+                    )
 
     @staticmethod
     def _diagnostic_binding_entries(
