@@ -172,12 +172,18 @@ The exact downstream ordering remains
    first fully validates the record, then creates fresh session, registry,
    guard, containers, primary arrays, and sidecars only on an explicitly exact
     compatible device. Restart compatibility fails closed: it accepts only an
-      `ACTIVE` `ResidentSession` carrier with schema-v1 noncommunication,
-      schema-v2 optional communication, or schema-v3 optional continuation
-      payloads, complete valid descriptors and
-     bytes, and an exactly equal target `Device`. A v2 communication checkpoint
-     retains one complete GAS or PARTICLES family plus matching metadata and
-     restores fresh identities. It does not select or migrate devices, automatically
+    `ACTIVE` `ResidentSession` carrier with complete valid descriptors and bytes,
+    and an exactly equal target `Device`. Schema-v1 is noncommunication and has
+    no RNG continuation; schema-v2 has no RNG continuation and permits no
+    communication or one complete closed-map GAS or PARTICLES family. Schema-v3
+    permits the same communication forms and requires RNG continuation metadata,
+    although its canonical stream-word payload list may be empty. When words are
+    present, they are the continuation authority and must pair fail-closed with
+    the matching acquired coagulation or wall-loss resource family. Canonical
+    primary bytes, acquired registry sidecars, resident ledgers/diagnostics, and
+    at most one complete closed-map family are authoritative; detached inspection
+    carriers and arbitrary caller outputs are not. Restart restores fresh
+    identities. It does not select or migrate devices, automatically
    restart normal session use, fall back to CPU, serialize to disk/remote, or
    guarantee rollback after an asynchronous device writer launches. Snapshotting
     requires roughly one additional host copy of resident payload bytes plus

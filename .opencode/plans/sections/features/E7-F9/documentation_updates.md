@@ -7,6 +7,14 @@
   top-level exports, and is documented only by its concrete module contract and
   co-located tests.
 
+## P2 Completion (issue #1529)
+
+- Public documentation remains unchanged. Concrete checkpoint docstrings now
+  define schema-v3 continuation metadata, including valid empty current-word
+  payloads, and clarify that canonical primary bytes plus registry-owned
+  sidecars, ledgers, diagnostics, and closed-map state are authoritative.
+  Arbitrary caller outputs remain outside checkpoint authority.
+
 - Add `docs/Examples/gpu_resident_multi_timestep.py` as the canonical complete
   E7 example using backend selection, resident state, multiple boxes/processes,
   diagnostics, explicit checkpoints, and finalization.

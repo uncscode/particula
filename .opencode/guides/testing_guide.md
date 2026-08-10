@@ -265,18 +265,25 @@ rollback.
 
 Checkpoint tests must preserve schema-v1 noncommunication restart support and
 verify schema-v2 checkpoints with no communication family or one complete
-closed-map family. Restarts must require an exact device and recreate arrays and
-bindings instead of reusing source identities.
+closed-map family. Schema-v3 checkpoints must always carry continuation metadata,
+even when no published stream has a payload. Cover immutable canonical primary
+bytes; acquired registry-owned sidecars, ledgers, and diagnostics; and at most
+one complete closed-map communication family. Exclude arbitrary caller outputs and
+ordinary `rng_states`. Restarts must require an exact device and recreate arrays
+and bindings instead of reusing source identities.
 
 Resident Brownian-coagulation and wall-loss coverage must keep each pinned RNG
 sidecar by identity across valid dispatches and verify that normal dispatch
 never reseeds or allocates it. Test immutable stream metadata during session
-setup and first resource acquisition separately. When either resident stream
-has been published, schema-v3 checkpoint and finalization coverage must capture
-immutable continuation words after one synchronization and verify exact
-same-device restart without reseeding or allocation during reacquisition. Wall-loss
-coverage must verify canonical-manifest derivation gives wall loss a distinct
-namespace from coagulation without claiming arbitrary 32-bit words cannot
+setup and first resource acquisition separately. Schema-v3 checkpoint and
+finalization coverage must validate required continuation metadata regardless of
+whether it has stream payloads. When a resident stream has been published,
+capture immutable continuation words after one synchronization and verify exact
+same-device restart without reseeding or allocation during reacquisition. Reject
+continuation-only, resource-only, or otherwise incompatible stream/resource
+forms before setup. Wall-loss coverage must verify canonical-manifest derivation
+gives wall loss a distinct namespace from coagulation without claiming arbitrary
+32-bit words cannot
 collide. Test the scheduler-resolved logical-box selection: only selected boxes
 whose operation launches may consume RNG words. Disabled, prelaunch-skipped,
 zero-time, and valid no-work lanes must retain their words exactly, including

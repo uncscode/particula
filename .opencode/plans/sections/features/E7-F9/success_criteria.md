@@ -6,6 +6,12 @@
   mass, particle-number concentration, latent energy, and conservation residual
   against co-located contract/oracle coverage; their units and ledger signs are
   defined at the concrete boundary without public-documentation expansion.
+- [x] **P2 / issue #1529:** Schema-v3 requires continuation metadata while
+  permitting zero current-word payloads; canonical primary bytes and
+  registry-owned continuation fields are authoritative, arbitrary caller outputs
+  are excluded, and coagulation/wall-loss resource-continuation asymmetries fail
+  before restart setup. Focused tests cover primary immutability and schema-v2
+  noncommunication restart.
 - [ ] At least one condensation and one Brownian coagulation workflow run through
   backend selection and match CPU references within recorded tolerances.
 - [ ] A multi-box GPU-resident loop runs all supported processes between explicit

@@ -293,23 +293,31 @@
   are not exported through `particula.execution`, its adapters package, or
   top-level `particula`.
 - `checkpoint()` leaves the session active and returns a fresh immutable host
-  snapshot. The first successful `finalize()` creates and caches the complete
-  snapshot before transitioning the session to terminal `FINALIZED`; every later
-  call returns the exact cached snapshot without new validation, synchronization,
-  conversion, allocation, or upload. Snapshots include canonical immutable bytes
-  for primaries and acquired sidecars and detached CPU inspection carriers. The
-   inspection `GasData` intentionally omits GPU-only vapor pressure and is not
-    authoritative; restart recovers vapor pressure from canonical bytes.
-    Schema-v3 optionally captures published coagulation and wall-loss stream
-    metadata plus current words after the checkpoint's single synchronization;
-    restart creates fresh continued sidecars without reseeding. Normal dispatch
-    and reacquisition retain those words by identity until explicit reset.
+   snapshot. The first successful `finalize()` creates and caches the complete
+   snapshot before transitioning the session to terminal `FINALIZED`; every later
+   call returns the exact cached snapshot without new validation, synchronization,
+   conversion, allocation, or upload. Snapshots include canonical immutable bytes
+   for primaries (including vapor pressure), acquired registry sidecars, resident
+   ledgers and diagnostics, and at most one complete closed-map communication
+   family, as well as detached CPU inspection carriers. Inspection `GasData`
+   intentionally omits GPU-only vapor pressure and is not authoritative; restart
+   recovers canonical primary bytes rather than inspection data. Arbitrary caller
+   output state is not checkpoint authority. Schema-v3 requires published-stream
+   continuation metadata after the checkpoint's single synchronization, but its
+   canonical stream-word payload list may be empty. When present, current
+   coagulation/wall-loss words are continuation authority and must pair
+   fail-closed with the matching acquired process resource family. Restart creates
+   fresh continued sidecars without reseeding; normal dispatch and reacquisition
+   retain restored words by identity until explicit reset.
 - `restart_resident_session(checkpoint, device)` is explicit and same-device
   only. Its preflight fails closed: it accepts an `ACTIVE` `ResidentSession`
-  checkpoint with complete valid descriptors and bytes, an exactly equal target
-   `Device`, and schema-v1 without communication, schema-v2 with optional
-   closed-map communication, or schema-v3 with optional complete RNG
-   continuation. Restart creates fresh session, registry, guard, container,
+   checkpoint with complete valid descriptors and bytes and an exactly equal
+   target `Device`. Schema-v1 allows only noncommunication and has no RNG
+   continuation. Schema-v2 has no RNG continuation and permits no communication
+   or exactly one complete closed-map GAS or PARTICLES family. Schema-v3 permits
+   the same communication forms and always requires valid RNG continuation
+   metadata, even when no stream-word payload is published. Restart creates fresh
+   session, registry, guard, container,
   primary-array, sidecar, and (when present) communication resource identities;
   it never reuses the source binding. It neither chooses nor migrates a device,
   falls back to CPU, restarts automatically during normal use, provides

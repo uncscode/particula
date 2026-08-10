@@ -17,9 +17,16 @@
   `particula/execution/tests/gpu_resources_test.py`; no public descriptors,
   exports, checkpoint changes, scheduler behavior, or public documentation were
   added.
-- [ ] Freeze checkpoint schema/version and audit physical arrays, gas names,
-  logical box IDs, dimensions, counters, capability/config identity, ledgers,
-  diagnostics, and RNG streams.
+- [x] **P2 / issue #1529 (2026-08-10):** Froze checkpoint schema-v3
+  continuation metadata, including the valid zero-current-word form, in
+  `particula/execution/checkpoint.py`. Checkpoint docstrings now identify
+  canonical primary bytes and registry-owned sidecars, ledgers, diagnostics,
+  and optional closed-map state as recovery authority; arbitrary caller outputs
+  remain excluded.
+- [x] **P2 / issue #1529 (2026-08-10):** Added fail-closed bidirectional
+  coagulation and wall-loss resource/continuation pairing validation and focused
+  checkpoint coverage in `particula/execution/tests/checkpoint_test.py` for
+  canonical-primary immutability and schema-v2 noncommunication restart.
 
 ## Integration Regressions
 

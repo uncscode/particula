@@ -43,8 +43,9 @@ Restart compatibility is intentionally exact and fail-closed. It accepts
 target `Device`. Schema-v1 checkpoints must be noncommunication checkpoints.
 Schema-v2 checkpoints may contain no communication family or exactly one
 complete closed-map GAS or PARTICLES communication family with matching
-metadata and payloads. Schema-v3 also permits absent or complete continuation
-for canonical published coagulation and wall-loss streams. Its immutable current
+metadata and payloads. Schema-v3 always requires continuation metadata, though
+its published-stream payload collection may be empty when neither canonical
+coagulation nor wall-loss resource family is acquired. Its immutable current
 `uint32` words are restart authority; normal dispatch and reacquisition neither
 read them back nor reset them, and only explicit stream reset derives new words
 from the root seed for a restored published stream. This does not prevent normal
@@ -64,8 +65,11 @@ words. Those words are the sole continuation authority, rather than lossy CPU
 inspection carriers or ordinary resource payloads. Checkpoint capture is the
 sole explicit synchronization/readback boundary for this continuation. Normal
 scheduling and reacquisition do not inspect, transfer, synchronize, seed, or
-reset streams. When a stream is absent from a checkpoint, normal first
-acquisition still initializes that newly published stream once.
+reset streams. Before setup, the checkpoint validates exact bidirectional
+pairing between acquired coagulation/wall-loss process families and continuation
+payloads; continuation-only and resource-only forms reject. Normal first
+acquisition initializes a stream only when its resource family was absent from
+the checkpoint.
 
 Split-run continuation requires a manual restart into a fresh session with a
 frozen configuration and exactly equal supported `Device`. It excludes CPU,

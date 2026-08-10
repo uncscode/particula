@@ -74,7 +74,8 @@ identity with `initialize_rng=False`. Explicit direct-module lifecycle calls
 alone may inspect frozen host metadata or reset all published streams or valid
 selected lanes under an exact ACTIVE session/registry/closed-guard binding.
 They never read back, synchronize, or affect normal dispatch. Schema-v3
-checkpoints optionally preserve published current words for exact-device
+ checkpoints require continuation metadata and may preserve an empty or
+ nonempty published-current-word collection for exact-device
 continuation; only explicit resets rederive words from the root seed.
 Wall-loss dispatch receives its scheduler-resolved ascending logical-box set.
 An empty set is a write-free prelaunch skip; a partial set delegates one-box
@@ -145,9 +146,12 @@ schemas, and an exactly equal `Device`; restart reconstructs fresh communication
 resources rather than reusing source identities. Other versions, partial,
 mixed, malformed, or non-ACTIVE records and device mismatches reject.
 Finalization makes its source session terminal but returns an ACTIVE checkpoint
-eligible for explicit restart. Schema-v3 additionally permits absent or complete
-canonical published-stream continuation state; immutable current RNG words are
-recovery authority and ordinary payloads exclude RNG sidecars. E7-F5 P2 supplies declaration-only scheduling;
+eligible for explicit restart. Schema-v3 requires canonical published-stream
+continuation metadata, although its current-word payload collection may be
+empty. Immutable current RNG words are recovery authority and ordinary payloads
+exclude RNG sidecars. Before setup, acquired coagulation and wall-loss process
+families must pair bidirectionally with continuation payloads; legacy records
+with acquired RNG process resources reject rather than reseed. E7-F5 P2 supplies declaration-only scheduling;
 E7-F7 transport is shipped, while E7-F8 integration and remaining RNG-stream
 policy remain future work. E7-F7 P4 particle
 transport is shipped as the concrete-only

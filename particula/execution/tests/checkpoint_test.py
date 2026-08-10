@@ -500,6 +500,78 @@ def test_v3_restart_requires_continuation_metadata_before_setup(
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize("process", ("coagulation", "wall_loss"))
+@pytest.mark.parametrize("malformation", ("continuation_only", "resource_only"))
+def test_restart_rejects_rng_process_pairing_before_setup(
+    monkeypatch: pytest.MonkeyPatch,
+    process: str,
+    malformation: str,
+) -> None:
+    """RNG continuation and acquired process inventories pair before setup."""
+    import particula.execution.checkpoint as checkpoint_module
+
+    session, registry, guard = _resident_binding()
+    if process == "coagulation":
+        registry.acquire_coagulation(1)
+    else:
+        registry.acquire_wall_loss()
+    checkpoint = session.checkpoint(registry, guard)
+    if malformation == "continuation_only":
+        malformed = replace(checkpoint, rng_resource_processes=())
+    else:
+        continuation = checkpoint.rng_continuation
+        assert continuation is not None
+        malformed = replace(
+            checkpoint,
+            rng_continuation=replace(
+                continuation,
+                descriptors=(),
+                payloads=(),
+            ),
+        )
+    monkeypatch.setattr(
+        checkpoint_module,
+        "setup_resident_session",
+        lambda *_args, **_kwargs: pytest.fail("restart setup must not run"),
+    )
+
+    with pytest.raises(ValueError, match="RNG .*resource"):
+        restart_resident_session(malformed, Device(Backend.WARP, "cpu"))
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("schema_version", (1, 2))
+@pytest.mark.parametrize("process", ("coagulation", "wall_loss"))
+def test_legacy_restart_rejects_acquired_rng_resources_before_setup(
+    monkeypatch: pytest.MonkeyPatch,
+    schema_version: int,
+    process: str,
+) -> None:
+    """Legacy records cannot restore acquired RNG resources without words."""
+    import particula.execution.checkpoint as checkpoint_module
+
+    session, registry, guard = _resident_binding()
+    if process == "coagulation":
+        registry.acquire_coagulation(1)
+    else:
+        registry.acquire_wall_loss()
+    checkpoint = session.checkpoint(registry, guard)
+    legacy = replace(
+        checkpoint,
+        schema_version=schema_version,
+        rng_continuation=None,
+    )
+    monkeypatch.setattr(
+        checkpoint_module,
+        "setup_resident_session",
+        lambda *_args, **_kwargs: pytest.fail("restart setup must not run"),
+    )
+
+    with pytest.raises(ValueError, match="legacy checkpoints cannot restore"):
+        restart_resident_session(legacy, Device(Backend.WARP, "cpu"))
+
+
+@pytest.mark.warp
 def test_restart_normalizes_numpy_continuation_integers() -> None:
     """V3 restart accepts non-boolean Integral metadata from NumPy carriers."""
     session, registry, guard = _resident_binding(n_boxes=2)

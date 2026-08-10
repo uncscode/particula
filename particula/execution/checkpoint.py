@@ -1,10 +1,12 @@
 """Provide concrete-only immutable in-memory resident-session checkpoints.
 
 This direct-import-only module snapshots an active resident Warp session after
-its guard is closed. A snapshot contains immutable host bytes for every primary
-array and acquired same-device sidecar, plus detached, non-authoritative CPU
-inspection carriers. Checkpointing needs approximately one additional host copy
-of resident payload bytes and the inspection copies.
+its guard is closed. A snapshot contains immutable host bytes for canonical
+primary arrays and ordered registry-owned continuation state: acquired
+sidecars, resident ledgers, diagnostics, and at most one complete closed-map
+communication family. It excludes arbitrary caller-owned outputs. Detached CPU
+inspection carriers are non-authoritative. Checkpointing needs approximately
+one additional host copy of resident payload bytes and the inspection copies.
 
 Restart is explicit and same-device: it creates a fresh compatible session from
 the canonical bytes, never migrates data, serializes to disk, chooses a device,
@@ -16,9 +18,10 @@ session use. No rollback is promised once a device operation has launched.
 
 Schema-v3 always carries published-stream continuation metadata and optionally
 carries its canonical coagulation and wall-loss current-word payloads after the
-single synchronization boundary. Those words are the continuation authority on
-an exact-device restart; normal dispatch and reacquisition retain restored
-arrays by identity until reset is explicitly requested.
+single synchronization boundary. Continuation words and their acquired process
+families must agree. The words are the continuation authority on an exact-device
+restart; normal dispatch and reacquisition retain restored arrays by identity
+until reset is explicitly requested.
 """
 
 from __future__ import annotations
@@ -71,7 +74,8 @@ class CheckpointPayload:
     acquired registry sidecar.
 
     Attributes:
-        family: Primary carrier family or acquired resource family.
+        family: Primary carrier family or acquired registry-owned resource
+            family.
         role: Array role within its family.
         dtype: Exact NumPy-compatible dtype spelling.
         shape: Exact array shape.
@@ -113,12 +117,16 @@ class ResidentCheckpoint:
             acquired registry sidecars, resident ledgers, diagnostics, and at
             most one complete closed-map communication family. Arbitrary
             caller-owned outputs are never checkpoint authority.
-        communication: Optional schema-v2 metadata for one pinned closed-map
-            communication family.
-        rng_continuation: Schema-v3 metadata and optional current ``uint32``
-            words for published coagulation and wall-loss streams. Pre-v3
-            records must omit it. The words are authoritative continuation
-            state on exact-device restart.
+        communication: Optional schema-v2-or-later metadata for one pinned,
+            complete closed-map communication family.
+        rng_continuation: Required schema-v3 metadata with optional current
+            ``uint32`` words for published coagulation and wall-loss streams.
+            Pre-v3 records must omit it. The words are authoritative
+            continuation state on exact-device restart.
+        rng_resource_processes: Canonical process-family inventory for acquired
+            RNG resources. This preserves the wall-loss acquisition boundary,
+            whose sole ``rng_states`` sidecar is intentionally excluded from
+            ordinary payloads.
     """
 
     schema_version: int
@@ -135,6 +143,7 @@ class ResidentCheckpoint:
     payloads: tuple[CheckpointPayload, ...]
     communication: "CommunicationCheckpointMetadata | None" = None
     rng_continuation: "RNGContinuationCheckpoint | None" = None
+    rng_resource_processes: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -177,7 +186,7 @@ class RNGContinuationPayload:
 
 @dataclass(frozen=True)
 class RNGContinuationCheckpoint:
-    """Store optional schema-v3 stream metadata and continuation words.
+    """Store required schema-v3 stream metadata and optional continuation words.
 
     The payloads, rather than root-seed-derived initialization, are the
     authority for restored published stream state. Explicit stream reset is the
@@ -231,7 +240,7 @@ def _payload(
 def _capture_rng_continuation(
     streams: tuple[tuple[str, Any, Any], ...], manifest: Any
 ) -> RNGContinuationCheckpoint:
-    """Copy at most two preflighted published streams after one sync."""
+    """Copy stream metadata and up to two stream states after sync."""
     payloads: list[RNGContinuationPayload] = []
     for process_id, stream_manifest, state in streams:
         if stream_manifest != manifest:
@@ -315,11 +324,12 @@ class ResidentCheckpointController:
     then atomically changes the session to FINALIZED; later finalizations return
     the cached record without validation, synchronization, transfer, or
     allocation. A failed pre-transition snapshot leaves the source ACTIVE.
-    Schema-v3 snapshots optionally capture published coagulation and wall-loss
-    stream metadata and current words at the checkpoint's single synchronization
-    boundary. An exact-device restart restores fresh bindings from those words
-    without reseeding. Explicit reset rederives restored published streams;
-    normal first acquisition still initializes streams absent from a checkpoint.
+    Schema-v3 snapshots always capture published coagulation and wall-loss
+    stream metadata and optionally capture their current words at the
+    checkpoint's single synchronization boundary. An exact-device restart
+    restores fresh bindings from captured words without reseeding. Explicit
+    reset rederives restored published streams; normal first acquisition still
+    initializes streams absent from a checkpoint.
     """
 
     def __init__(
@@ -482,6 +492,7 @@ class ResidentCheckpointController:
                 tuple(payloads),
                 communication,
                 _capture_rng_continuation(rng_streams, rng_manifest),
+                tuple(process_id for process_id, _, _ in rng_streams),
             )
         except BaseException:
             raise
@@ -888,7 +899,12 @@ def _preflight_restart(  # noqa: C901
             raise ValueError("communication metadata does not match payloads.")
     continuation = _validate_rng_continuation(checkpoint, dimensions)
     resource_payloads = payloads[len(_PRIMARY_ROLES) :]
-    _validate_rng_resource_pairing(resource_payloads, continuation)
+    _validate_rng_resource_pairing(
+        resource_payloads,
+        continuation,
+        checkpoint.rng_resource_processes,
+        checkpoint.schema_version,
+    )
     return _RestartPlan(primary, resource_payloads, continuation)
 
 
@@ -1000,20 +1016,42 @@ def _validate_rng_continuation(  # noqa: C901
 def _validate_rng_resource_pairing(
     payloads: tuple[CheckpointPayload, ...],
     continuation: RNGContinuationCheckpoint | None,
+    resource_processes: object,
+    schema_version: int,
 ) -> None:
-    """Require v3 published-stream words and sidecar families to agree."""
-    if continuation is None:
+    """Require acquired RNG families and continuation words to pair exactly.
+
+    The explicit inventory preserves wall-loss acquisition, whose sole
+    ``rng_states`` sidecar is continuation-only. Coagulation ordinary sidecars
+    independently corroborate that inventory for legacy records.
+    """
+    if type(resource_processes) is not tuple or any(
+        type(process) is not str for process in resource_processes
+    ):
+        raise ValueError("checkpoint RNG resource inventory is invalid.")
+    canonical = ("coagulation", "wall_loss")
+    if resource_processes != tuple(
+        process for process in canonical if process in resource_processes
+    ):
+        raise ValueError("checkpoint RNG resource inventory is invalid.")
+    acquired = set(resource_processes)
+    coagulation_acquired = "coagulation" in acquired
+    has_coagulation_payloads = any(
+        payload.family == "coagulation" for payload in payloads
+    )
+    if has_coagulation_payloads != coagulation_acquired:
+        raise ValueError(
+            "RNG resource inventory and coagulation sidecars disagree."
+        )
+    if schema_version < 3:
+        if acquired:
+            raise ValueError("legacy checkpoints cannot restore RNG resources.")
         return
-    processes = {payload.process_id for payload in continuation.payloads}
-    families = {payload.family for payload in payloads}
-    # Coagulation has ordinary collision sidecars that establish its acquired
-    # resource family. Wall loss owns only its published RNG sidecar, which is
-    # deliberately absent from CheckpointPayload and represented solely by its
-    # continuation payload.
-    if ("coagulation" in processes) != ("coagulation" in families):
-        raise ValueError("RNG continuation and coagulation sidecars disagree.")
-    if "wall_loss" in families and "wall_loss" not in processes:
-        raise ValueError("RNG continuation and wall_loss sidecars disagree.")
+    if continuation is None:
+        raise ValueError("v3 checkpoints require RNG continuation metadata.")
+    continued = {payload.process_id for payload in continuation.payloads}
+    if continued != acquired:
+        raise ValueError("RNG continuation and resource families disagree.")
 
 
 def _validate_resource_payloads(  # noqa: C901

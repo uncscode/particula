@@ -15,8 +15,12 @@ Warp baseline; CUDA rows are optional and skip cleanly when unavailable.
   concentration, direct latent-energy ledger copy, and source/sink-signed
   conservation residuals; public descriptors and observation results were not
   introduced.
-- **P2:** Checkpoint schema and round-trip tests, malformed/versioned payloads,
-  metadata preservation, uninterrupted versus restart equivalence.
+- **P2 (completed, issue #1529):** Focused `checkpoint_test.py` coverage freezes
+  schema-v3 continuation metadata with valid empty current-word payloads,
+  asserts bidirectional coagulation/wall-loss resource-to-continuation failure
+  handling, verifies canonical-primary payload immutability, and confirms
+  schema-v2 noncommunication restart. Broader malformed-payload matrices and
+  uninterrupted-versus-restart equivalence remain P2 follow-up evidence.
 - **P3:** Full-loop integration tests for condensation, Brownian coagulation,
   wall loss, dilution, nucleation, environment/gas refresh, exact canonical
   order, one upload, zero intermediate bulk transfers/syncs, and stable shapes.

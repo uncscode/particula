@@ -4,7 +4,8 @@
 **Date:** 2026-07-28
 **Decision Makers:** ADW Development Team
 **Technical Story:** [#1488](https://github.com/Gorkowski/particula/issues/1488),
-[#1525](https://github.com/Gorkowski/particula/issues/1525)
+[#1525](https://github.com/Gorkowski/particula/issues/1525),
+[#1529](https://github.com/Gorkowski/particula/issues/1529)
 
 ## Context
 
@@ -51,10 +52,21 @@ without additional validation, readback, allocation, or upload.
 
 Inspection carriers are detached and non-authoritative. In particular, CPU gas
 inspection intentionally omits GPU-only vapor pressure; canonical immutable
-payload bytes retain it for exact recovery. `restart_resident_session()` is a
-direct-import-only, explicit same-device operation that materializes a fresh
-compatible session, registry, guard, primaries, and sidecars from those
-canonical payloads.
+payload bytes retain it for exact recovery. Canonical primary bytes, acquired
+registry sidecars, resident ledgers/diagnostics, and at most one complete
+closed-map communication family are authoritative; arbitrary caller outputs are
+not. `restart_resident_session()` is a direct-import-only, explicit same-device
+operation that materializes a fresh compatible session, registry, guard,
+primaries, and sidecars from those canonical payloads.
+
+The frozen schema distinguishes continuation authority by version. Schema-v1 is
+noncommunication and has no RNG continuation. Schema-v2 permits no communication
+or one complete closed-map GAS or PARTICLES family, also without RNG
+continuation. Schema-v3 permits the same communication forms and always requires
+RNG continuation metadata, even when its canonical published stream-word payload
+list is empty. When published coagulation or wall-loss words are present, they
+are the sole RNG continuation authority and must pair fail-closed with the
+matching acquired process resource family.
 
 ### Chosen Option
 
@@ -135,11 +147,15 @@ outside the resident-session scope.
       synchronization, allocation, or mutation.
 
 4. **Schema-v3 RNG continuation** (`checkpoint.py`, `gpu_resources.py`)
-   - Capture at most the canonical published coagulation and wall-loss streams
-     after the checkpoint's single synchronization boundary.
+    - Require continuation metadata and capture at most the canonical published
+      coagulation and wall-loss streams after the checkpoint's single
+      synchronization boundary; the stream-word payload list may be empty.
    - Keep stream metadata and current little-endian `uint32` words immutable;
-     current words are restart authority, while ordinary sidecar payloads exclude
-     RNG roles.
+      current words are restart authority, while ordinary sidecar payloads exclude
+      RNG roles.
+    - Reject either a published process stream without its acquired resource
+      family or an acquired coagulation/wall-loss process family without its
+      matching published continuation entry.
    - Reconstruct fresh same-device arrays and stream bindings without reseeding.
      Normal acquisition returns those bindings by identity; explicit reset alone
      derives replacement words from the root seed.
@@ -168,6 +184,8 @@ introduced.
 - [x] Checkpoint APIs remain concrete-only and package exports are unchanged.
 - [x] Schema-v3 continuation preserves current published-stream words without
   normal-dispatch readback or implicit reseeding.
+- [x] Schema-v1/v2 have no RNG continuation, while schema-v3 requires
+  continuation metadata even when it publishes no stream words.
 
 ## References
 
@@ -178,6 +196,7 @@ introduced.
 - [Architecture Outline](../architecture_outline.md)
 - [Issue #1488](https://github.com/Gorkowski/particula/issues/1488)
 - [Issue #1525](https://github.com/Gorkowski/particula/issues/1525)
+- [Issue #1529](https://github.com/Gorkowski/particula/issues/1529)
 
 ## Notes
 

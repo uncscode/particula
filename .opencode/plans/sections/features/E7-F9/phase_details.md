@@ -14,14 +14,18 @@
     empty shapes, invalid schema/capacity/alias preflight, and pre-launch
     no-write boundaries. Public docs and exports remain unchanged.
 
-- [ ] **E7-F9-P2:** Freeze checkpoint schema and add round-trip validation tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Audit and freeze the minimum versioned payload needed to restore all
-    documented physical, semantic, lifecycle, configuration, and RNG state.
+- [x] **E7-F9-P2:** Freeze checkpoint schema and add round-trip validation tests
+  - Issue: #1529 | Size: S | Status: Completed 2026-08-10
+  - Delivered: Froze schema-v3 required continuation metadata while allowing an
+    empty current-word payload. Clarified checkpoint docstrings so canonical
+    primaries and registry-owned sidecars, ledgers, diagnostics, and closed-map
+    state are recovery authority, excluding arbitrary caller-owned outputs.
   - Files: `particula/execution/checkpoint.py`,
-    `particula/execution/tests/checkpoint_test.py`
-  - Tests: Schema/version rejection, ordered metadata, exact same-backend stream
-    continuation, uninterrupted equivalence, and malformed payload safety.
+     `particula/execution/tests/checkpoint_test.py`
+  - Tests: Bidirectional coagulation/wall-loss resource-continuation pairing
+    rejection, canonical-primary immutability, and schema-v2 noncommunication
+    restart. Broader versioned round-trip and uninterrupted-equivalence coverage
+    remains follow-up evidence.
 
 - [ ] **E7-F9-P3:** Add resident full-loop transfer and ordering regressions
   - Issue: TBD | Size: S | Status: Not Started
