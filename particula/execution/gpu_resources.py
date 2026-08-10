@@ -749,6 +749,122 @@ class GPUResourceRegistry:
                         "Diagnostic outputs must not overlap each other."
                     )
 
+    def validate_diagnostic_registrations(
+        self, session: ResidentSession, registrations: tuple[Any, ...]
+    ) -> None:
+        """Validate closed diagnostic bindings without acquiring resources.
+
+        Outputs and accounting inputs are caller-owned, same-device contiguous
+        arrays. Inputs may alias other inputs because they are read-only, but
+        no input or output may overlap resident or acquired storage, and outputs
+        may not overlap any diagnostic binding.
+        """
+        self.validate_pinned_session(session)
+        if type(registrations) is not tuple:
+            raise TypeError("registrations must be an exact tuple.")
+        outputs, output_entries, inputs, input_entries = (
+            self._diagnostic_binding_entries(registrations)
+        )
+        output_ranges = [
+            self._validate_array(entry, value, None)
+            for entry, value in zip(output_entries, outputs, strict=True)
+        ]
+        input_ranges = [
+            self._validate_array(entry, value, None)
+            for entry, value in zip(input_entries, inputs, strict=True)
+        ]
+        protected = list(_primary_arrays(self._session)) + [
+            value
+            for bindings in self._bindings.values()
+            for value in bindings.values()
+        ]
+        protected_ranges = [self._array_range(value) for value in protected]
+        self._validate_diagnostic_binding_nonalias(
+            outputs,
+            output_ranges,
+            inputs,
+            input_ranges,
+            protected,
+            protected_ranges,
+        )
+
+    @staticmethod
+    def _diagnostic_binding_entries(
+        registrations: tuple[Any, ...],
+    ) -> tuple[list[Any], list[ManifestEntry], list[Any], list[ManifestEntry]]:
+        """Return caller-owned diagnostic bindings and their exact schemas."""
+        outputs: list[Any] = []
+        inputs: list[Any] = []
+        output_entries: list[ManifestEntry] = []
+        input_entries: list[ManifestEntry] = []
+        for registration in registrations:
+            shape_kind: Literal["b", "bs"] = (
+                "b"
+                if registration.operation.value
+                == "particle_number_concentration"
+                else "bs"
+            )
+            outputs.append(registration.output)
+            output_entries.append(
+                ManifestEntry(
+                    "diagnostic output", "diagnostics", wp.float64, shape_kind
+                )
+            )
+            for value in (
+                registration.energy_transfer,
+                registration.baseline_total_mass,
+                registration.source_ledger,
+                registration.sink_ledger,
+            ):
+                if value is not None:
+                    inputs.append(value)
+                    input_entries.append(
+                        ManifestEntry(
+                            "diagnostic accounting input",
+                            "diagnostics",
+                            wp.float64,
+                            "bs",
+                        )
+                    )
+        return outputs, output_entries, inputs, input_entries
+
+    def _validate_diagnostic_binding_nonalias(
+        self,
+        outputs: list[Any],
+        output_ranges: list[tuple[int, int] | None],
+        inputs: list[Any],
+        input_ranges: list[tuple[int, int] | None],
+        protected: list[Any],
+        protected_ranges: list[tuple[int, int] | None],
+    ) -> None:
+        """Reject diagnostic bindings that overlap protected/output storage."""
+        bindings = outputs + inputs
+        ranges = output_ranges + input_ranges
+        for index, (value, byte_range) in enumerate(
+            zip(bindings, ranges, strict=True)
+        ):
+            if any(value is protected_value for protected_value in protected):
+                raise ValueError(
+                    "Diagnostic bindings must not alias resident resources."
+                )
+            if any(
+                self._ranges_overlap(byte_range, item)
+                for item in protected_ranges
+            ):
+                raise ValueError(
+                    "Diagnostic binding byte ranges must not overlap."
+                )
+            if index < len(outputs):
+                for other, other_range in zip(
+                    bindings[index + 1 :], ranges[index + 1 :], strict=True
+                ):
+                    if value is other or self._ranges_overlap(
+                        byte_range, other_range
+                    ):
+                        raise ValueError(
+                            "Diagnostic outputs must not overlap bindings."
+                        )
+
     def validate_wall_loss_resources(
         self, session: ResidentSession, resources: WallLossResources
     ) -> None:

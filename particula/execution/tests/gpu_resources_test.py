@@ -130,6 +130,18 @@ def _diagnostics_plan(
         ),
     )
     graph = cast(Any, schedule.source_graph)
+    wp = pytest.importorskip("warp")
+    dimensions = session.dimensions
+    device = cast(Any, session.particles).masses.device
+
+    def matrix() -> Any:
+        """Allocate one local diagnostics matrix for plan construction."""
+        return wp.zeros(
+            (dimensions.n_boxes, dimensions.n_species),
+            dtype=wp.float64,
+            device=device,
+        )
+
     return ResidentDiagnosticsPlan(
         session,
         registry,
@@ -144,6 +156,26 @@ def _diagnostics_plan(
             ResidentDiagnosticRegistration(
                 ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT,
                 outputs[1],
+            ),
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
+                matrix(),
+            ),
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
+                wp.zeros(dimensions.n_boxes, dtype=wp.float64, device=device),
+            ),
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.LATENT_HEAT_ENERGY,
+                matrix(),
+                energy_transfer=matrix(),
+            ),
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.CONSERVATION_RESIDUAL,
+                matrix(),
+                baseline_total_mass=matrix(),
+                source_ledger=matrix(),
+                sink_ledger=matrix(),
             ),
         ),
     )
@@ -1230,22 +1262,34 @@ def test_diagnostics_executor_snapshots_closed_operations_in_order() -> None:
 @pytest.mark.warp
 @pytest.mark.parametrize("shape", [(0, 1), (1, 0), (0, 0)])
 def test_diagnostics_accepts_canonical_empty_outputs_without_dispatch(
-    shape: tuple[int, int],
+    shape: tuple[int, int], monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Test canonical empty diagnostic schemas are successful no-ops."""
     wp = pytest.importorskip("warp")
+    import particula.execution.diagnostics as diagnostics
+
     session = _session(boxes=shape[0], particle_count=1, species=shape[1])
     registry = GPUResourceRegistry(session)
     outputs = (
         wp.zeros(shape, dtype=wp.float64, device="cpu"),
         wp.zeros(shape, dtype=wp.float64, device="cpu"),
     )
+    launches: list[object] = []
+    original_launch = diagnostics.wp.launch
+
+    def record_launch(*args: object, **kwargs: object) -> object:
+        """Record nonempty writer dispatches without changing their behavior."""
+        launches.append(args[0])
+        return original_launch(*args, **kwargs)
+
+    monkeypatch.setattr(diagnostics.wp, "launch", record_launch)
 
     ResidentDiagnosticsExecutor().execute(
         _diagnostics_plan(session, registry, outputs)
     )
 
     assert tuple(output.shape for output in outputs) == (shape, shape)
+    assert len(launches) == (1 if shape == (1, 0) else 0)
 
 
 @pytest.mark.warp
@@ -1277,3 +1321,139 @@ def test_diagnostics_rejects_duplicate_operations_before_writing() -> None:
 
     np.testing.assert_array_equal(first.numpy(), np.zeros((1, 1)))
     np.testing.assert_array_equal(second.numpy(), np.zeros((1, 1)))
+
+
+@pytest.mark.warp
+def test_diagnostic_accounting_inputs_may_alias_each_other() -> None:
+    """Test read-only accounting inputs may share one caller-owned array."""
+    wp = pytest.importorskip("warp")
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    shared = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    output = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    registrations = (
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.CONSERVATION_RESIDUAL,
+            output,
+            baseline_total_mass=shared,
+            source_ledger=shared,
+            sink_ledger=shared,
+        ),
+    )
+
+    registry.validate_diagnostic_registrations(session, registrations)
+
+
+@pytest.mark.warp
+def test_diagnostic_output_cannot_alias_accounting_input() -> None:
+    """Test output/input aliasing is rejected during registry preflight."""
+    wp = pytest.importorskip("warp")
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    shared = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    registrations = (
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.LATENT_HEAT_ENERGY,
+            shared,
+            energy_transfer=shared,
+        ),
+    )
+
+    with pytest.raises(ValueError, match="outputs must not overlap"):
+        registry.validate_diagnostic_registrations(session, registrations)
+
+
+@pytest.mark.warp
+def test_diagnostic_input_schema_rejects_before_executor_launch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test invalid accounting metadata prevents any diagnostics writer launch."""
+    wp = pytest.importorskip("warp")
+    import particula.execution.diagnostics as diagnostics
+
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    outputs = (
+        wp.zeros((1, 1), dtype=wp.float64, device="cpu"),
+        wp.zeros((1, 1), dtype=wp.float64, device="cpu"),
+    )
+    plan = _diagnostics_plan(session, registry, outputs)
+    invalid_energy = wp.zeros((1, 1), dtype=wp.float32, device="cpu")
+    invalid_registration = ResidentDiagnosticRegistration(
+        ResidentDiagnosticOperation.LATENT_HEAT_ENERGY,
+        plan.registrations[4].output,
+        energy_transfer=invalid_energy,
+    )
+    invalid_plan = ResidentDiagnosticsPlan(
+        plan.session,
+        plan.registry,
+        plan.graph,
+        plan.schedule,
+        plan.node,
+        plan.registrations[:4]
+        + (invalid_registration,)
+        + plan.registrations[5:],
+    )
+    launches: list[object] = []
+    monkeypatch.setattr(
+        diagnostics.wp,
+        "launch",
+        lambda *args, **kwargs: launches.append((args, kwargs)),
+    )
+
+    with pytest.raises(
+        ValueError, match="accounting input has incompatible schema"
+    ):
+        ResidentDiagnosticsExecutor().execute(invalid_plan)
+
+    assert not launches
+
+
+@pytest.mark.warp
+def test_particle_number_output_schema_rejects_before_any_diagnostic_launch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test the vector-only particle-number output cannot use a matrix schema."""
+    wp = pytest.importorskip("warp")
+    import particula.execution.diagnostics as diagnostics
+
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    outputs = (
+        wp.zeros((1, 1), dtype=wp.float64, device="cpu"),
+        wp.zeros((1, 1), dtype=wp.float64, device="cpu"),
+    )
+    plan = _diagnostics_plan(session, registry, outputs)
+    invalid_number = wp.full((1, 1), 17.0, dtype=wp.float64, device="cpu")
+    registrations = (
+        plan.registrations[:3]
+        + (
+            ResidentDiagnosticRegistration(
+                ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
+                invalid_number,
+            ),
+        )
+        + plan.registrations[4:]
+    )
+    invalid_plan = ResidentDiagnosticsPlan(
+        plan.session,
+        plan.registry,
+        plan.graph,
+        plan.schedule,
+        plan.node,
+        registrations,
+    )
+    launches: list[object] = []
+    monkeypatch.setattr(
+        diagnostics.wp,
+        "launch",
+        lambda *args, **kwargs: launches.append((args, kwargs)),
+    )
+
+    with pytest.raises(
+        ValueError, match="diagnostic output has incompatible schema"
+    ):
+        ResidentDiagnosticsExecutor().execute(invalid_plan)
+
+    assert not launches
+    np.testing.assert_array_equal(invalid_number.numpy(), [[17.0]])

@@ -1,7 +1,12 @@
-"""Copy closed-protocol resident diagnostics into caller-owned Warp outputs.
+"""Write closed-protocol resident diagnostics into caller-owned Warp outputs.
 
 This direct-import-only module has no callback registration or package export.
-It snapshots only resident gas concentration and environment saturation ratio.
+Its canonical order is gas and saturation snapshots, total species mass,
+particle-number concentration, latent heat energy, and conservation residual.
+Matrix operations use ``(B, S)`` float64 arrays; particle number uses ``(B,)``.
+Masses are extensive kg, energy is signed J, and residual is
+``total - baseline - source + sink``.  Execution has no host readback,
+synchronization, transfer, allocation, or physics mutation.
 """
 
 from __future__ import annotations
@@ -28,27 +33,36 @@ from particula.execution.scheduler import (
 
 
 class ResidentDiagnosticOperation(str, Enum):
-    """Enumerate the only resident diagnostic snapshot operations.
-
-    The protocol permits snapshots of current gas concentration and saturation
-    ratio only. It does not accept callbacks or arbitrary resident inspection.
-    """
+    """Enumerate the closed resident diagnostic operations in launch order."""
 
     GAS_CONCENTRATION_SNAPSHOT = "gas_concentration_snapshot"
     SATURATION_RATIO_SNAPSHOT = "saturation_ratio_snapshot"
+    TOTAL_SPECIES_MASS = "total_species_mass"
+    PARTICLE_NUMBER_CONCENTRATION = "particle_number_concentration"
+    LATENT_HEAT_ENERGY = "latent_heat_energy"
+    CONSERVATION_RESIDUAL = "conservation_residual"
 
 
 @dataclass(frozen=True, eq=False)
 class ResidentDiagnosticRegistration:
-    """Bind one closed diagnostic operation to one caller-owned output.
+    """Bind one closed diagnostic operation to caller-owned Warp arrays.
 
     Attributes:
         operation: Exact closed operation that selects the resident source.
         output: Caller-owned Warp ``float64`` array validated by the executor.
+        energy_transfer: Required signed energy input for latent-energy output.
+        baseline_total_mass: Required extensive baseline for residual output.
+        source_ledger: Required nonnegative extensive source ledger for the
+            residual.
+        sink_ledger: Required nonnegative extensive sink ledger for residual.
     """
 
     operation: ResidentDiagnosticOperation
     output: object
+    energy_transfer: object | None = None
+    baseline_total_mass: object | None = None
+    source_ledger: object | None = None
+    sink_ledger: object | None = None
 
     def __post_init__(self) -> None:
         """Validate the exact closed diagnostic operation.
@@ -60,6 +74,29 @@ class ResidentDiagnosticRegistration:
             raise TypeError(
                 "operation must be an exact ResidentDiagnosticOperation."
             )
+        inputs = (
+            self.energy_transfer,
+            self.baseline_total_mass,
+            self.source_ledger,
+            self.sink_ledger,
+        )
+        if self.operation is ResidentDiagnosticOperation.LATENT_HEAT_ENERGY:
+            if self.energy_transfer is None or any(
+                item is not None for item in inputs[1:]
+            ):
+                raise ValueError("latent energy requires only energy_transfer.")
+        elif (
+            self.operation is ResidentDiagnosticOperation.CONSERVATION_RESIDUAL
+        ):
+            if (
+                any(item is None for item in inputs[1:])
+                or self.energy_transfer is not None
+            ):
+                raise ValueError(
+                    "residual requires baseline, source, and sink ledgers."
+                )
+        elif any(item is not None for item in inputs):
+            raise ValueError("diagnostic operation forbids accounting inputs.")
 
 
 @dataclass(frozen=True, eq=False)
@@ -120,6 +157,56 @@ def _copy_snapshot(source: Any, output: Any) -> None:
     """Copy one resident diagnostic matrix element to its output."""
     box, species = wp.tid()  # type: ignore[misc]
     output[box, species] = source[box, species]
+
+
+@wp.kernel
+def _total_species_mass(
+    masses: Any,
+    concentration: Any,
+    gas_concentration: Any,
+    volume: Any,
+    output: Any,
+) -> None:
+    """Reduce concentration-weighted particle and gas mass for one lane."""
+    box, species = wp.tid()  # type: ignore[misc]
+    total = gas_concentration[box, species]
+    for particle in range(masses.shape[1]):
+        total += masses[box, particle, species] * concentration[box, particle]
+    output[box, species] = volume[box] * total
+
+
+@wp.kernel
+def _particle_number(concentration: Any, output: Any) -> None:
+    """Reduce particle number concentration for one box."""
+    box = wp.tid()  # type: ignore[misc]
+    total = wp.float64(0.0)
+    for particle in range(concentration.shape[1]):
+        total += concentration[box, particle]
+    output[box] = total
+
+
+@wp.kernel
+def _conservation_residual(
+    masses: Any,
+    concentration: Any,
+    gas_concentration: Any,
+    volume: Any,
+    baseline: Any,
+    source: Any,
+    sink: Any,
+    output: Any,
+) -> None:
+    """Write the ledger-aware extensive mass residual for one lane."""
+    box, species = wp.tid()  # type: ignore[misc]
+    total = gas_concentration[box, species]
+    for particle in range(masses.shape[1]):
+        total += masses[box, particle, species] * concentration[box, particle]
+    output[box, species] = (
+        volume[box] * total
+        - baseline[box, species]
+        - source[box, species]
+        + sink[box, species]
+    )
 
 
 class ResidentDiagnosticsExecutor:
@@ -188,8 +275,8 @@ class ResidentDiagnosticsExecutor:
     def _validate_outputs(self, plan: ResidentDiagnosticsPlan) -> None:
         """Validate caller-owned diagnostic outputs against resident state."""
         registry = cast(Any, plan.registry)
-        registry.validate_diagnostic_outputs(
-            plan.session, tuple(item.output for item in plan.registrations)
+        registry.validate_diagnostic_registrations(
+            plan.session, plan.registrations
         )
 
     def _validate(self, plan: ResidentDiagnosticsPlan) -> None:
@@ -218,9 +305,10 @@ class ResidentDiagnosticsExecutor:
         return plan
 
     def execute(self, plan: object) -> None:
-        """Validate and snapshot each registration in declared order.
+        """Validate and dispatch each registration in declared order.
 
-        Empty ``(B, S)`` output schemas complete without a kernel launch.
+        Empty matrix schemas complete without their writer launch. Particle
+        number still launches for ``(B, 0)`` because its ``(B,)`` output exists.
 
         Args:
             plan: Exact plan selecting the sources and caller-owned outputs.
@@ -231,20 +319,88 @@ class ResidentDiagnosticsExecutor:
         """
         plan = self.validate(plan)
         dimensions = plan.session.dimensions
-        if not dimensions.n_boxes or not dimensions.n_species:
+        if not dimensions.n_boxes:
             return
+        particles = cast(Any, plan.session.particles)
         gas = cast(Any, plan.session.gas)
         environment = cast(Any, plan.session.environment)
         for registration in plan.registrations:
-            source = (
-                gas.concentration
-                if registration.operation
-                is ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT
-                else environment.saturation_ratio
-            )
-            wp.launch(
-                _copy_snapshot,
-                dim=(dimensions.n_boxes, dimensions.n_species),
-                inputs=[source, registration.output],
-                device=source.device,
-            )
+            operation = registration.operation
+            if (
+                operation
+                is ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION
+            ):
+                wp.launch(
+                    _particle_number,
+                    dim=dimensions.n_boxes,
+                    inputs=[particles.concentration, registration.output],
+                    device=particles.concentration.device,
+                )
+            elif dimensions.n_species:
+                matrix_dim = (dimensions.n_boxes, dimensions.n_species)
+                if (
+                    operation
+                    is ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT
+                ):
+                    wp.launch(
+                        _copy_snapshot,
+                        dim=matrix_dim,
+                        inputs=[gas.concentration, registration.output],
+                        device=gas.concentration.device,
+                    )
+                elif (
+                    operation
+                    is ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT
+                ):
+                    wp.launch(
+                        _copy_snapshot,
+                        dim=matrix_dim,
+                        inputs=[
+                            environment.saturation_ratio,
+                            registration.output,
+                        ],
+                        device=environment.saturation_ratio.device,
+                    )
+                elif (
+                    operation is ResidentDiagnosticOperation.TOTAL_SPECIES_MASS
+                ):
+                    wp.launch(
+                        _total_species_mass,
+                        dim=matrix_dim,
+                        inputs=[
+                            particles.masses,
+                            particles.concentration,
+                            gas.concentration,
+                            particles.volume,
+                            registration.output,
+                        ],
+                        device=particles.masses.device,
+                    )
+                elif (
+                    operation is ResidentDiagnosticOperation.LATENT_HEAT_ENERGY
+                ):
+                    wp.launch(
+                        _copy_snapshot,
+                        dim=matrix_dim,
+                        inputs=[
+                            registration.energy_transfer,
+                            registration.output,
+                        ],
+                        device=particles.masses.device,
+                    )
+                else:
+                    wp.launch(
+                        _conservation_residual,
+                        dim=matrix_dim,
+                        inputs=[
+                            particles.masses,
+                            particles.concentration,
+                            gas.concentration,
+                            particles.volume,
+                            registration.baseline_total_mass,
+                            registration.source_ledger,
+                            registration.sink_ledger,
+                            registration.output,
+                        ],
+                        device=particles.masses.device,
+                    )
