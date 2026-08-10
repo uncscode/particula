@@ -61,9 +61,10 @@ adw_id=<workflow-id> [worktree_path=<path>] [target_dir=<directory>]
 
 **Parameters:**
 - **adw_id** (required): 8-character workflow identifier
-- **worktree_path** (optional): Loaded from state if not provided
+- **worktree_path** (optional): Must be confirmed from workflow state if not
+  provided
 - **target_dir** (optional): Narrower directory to lint when explicitly requested;
-  otherwise lint the repository's canonical targets
+  otherwise lint the repository's canonical `particula/` target
 
 **Invocation:**
 ```python
@@ -90,13 +91,34 @@ task({
 
 ## Step 1: Load Context
 - Parse arguments: `adw_id`, `worktree_path`, `target_dir`
-- Load workflow state via `adw_spec_read({"command": "read", "adw_id": adw_id})`
-- Extract: `worktree_path` and any explicitly requested `target_dir`
-- Change to worktree directory
+- Load the workflow worktree explicitly; a fieldless read returns
+  `spec_content`, not the complete state:
+  ```python
+  adw_spec_read({
+    "command": "read",
+    "adw_id": adw_id,
+    "field": "worktree_path"
+  })
+  ```
+- Treat an absent, empty, `null`, or error result as unavailable. Stop with
+  `LINTING_FAILED` before reading, editing, formatting, or running linters; do
+  not infer a worktree from the ambient checkout or `target_dir`.
+- Confirm the supplied or state-loaded `worktree_path` is the worktree used for
+  every subsequent operation.
+- When supplied, validate `target_dir` is a non-empty repository-relative path
+  inside that confirmed worktree, contains no traversal components, and resolves
+  to an existing directory. Otherwise stop before mutation. When omitted, set
+  `target_dir` to the canonical `particula/` target.
 - Run `git_diff({"command": "status", "worktree_path": worktree_path})` and
-  `git_diff({"command": "diff", "worktree_path": worktree_path})`
-- Record the pre-existing changed files so fixes preserve concurrent edits and
-  the final report distinguishes existing changes from linter-applied changes
+   `git_diff({"command": "diff", "worktree_path": worktree_path})`
+- Record the pre-run status and diff. Before mutation, require either a clean
+  worktree or pre-existing changed paths wholly within `target_dir`; otherwise
+  stop with `LINTING_FAILED` to avoid mutating an unisolated scope.
+- After every autofix/format run, capture status and diff again. Fail with
+  `LINTING_FAILED` if any newly changed path is outside `target_dir`, or if a
+  pre-existing path outside `target_dir` changed. Report the approved target,
+  pre-existing paths, and linter-applied paths; never claim concurrent edits
+  were preserved without this comparison.
 
 ## Step 2: Run Linters
 ```python
@@ -104,16 +126,17 @@ run_linters({
   "autoFix": true,
   "confirmed": true,
   "cwd": worktree_path,
-  "targetDir": target_dir,  # Omit unless the caller explicitly narrows scope.
+  "targetDir": target_dir,
   "options": "output=summary linters=ruff,mypy"
 })
 ```
-With no explicit `target_dir`, validation must cover the CI target set:
-`adw/`, `adforge_core/`, `adforge_voice/`, and `.opencode/tools/`. In
-particular, the required mypy command is:
+With no explicit `target_dir`, validation covers the CI target `particula/`.
+The corresponding targeted commands are:
 
 ```bash
-mypy adw/ adforge_core/ adforge_voice/ .opencode/tools/ --ignore-missing-imports
+ruff check particula/
+ruff format particula/ --check
+mypy particula/ --ignore-missing-imports
 ```
 
 **Parse result:** "ALL LINTERS PASSED ✓" or "LINTING FAILED ✗"
@@ -149,7 +172,7 @@ All linters passed.
 LINTING_SUCCESS
 
 Linters: ruff (passed), mypy (passed)
-Targets: adw/, adforge_core/, adforge_voice/, .opencode/tools/
+Target: particula/
 Fixes applied: <count>
 ```
 
@@ -208,7 +231,7 @@ adw_id=abc12345
 LINTING_SUCCESS
 
 Linters: ruff (passed), mypy (passed)
-Target: adw/
+Target: particula/
 Fixes applied: 5
 - Fixed F401: unused imports (3 files)
 - Fixed E501: line too long (2 files)

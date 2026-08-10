@@ -78,9 +78,12 @@ The ADW workflow maintains metadata in `agents/{adw_id}/`:
 - Package/module names to test
 
 The testing guide and the repository's active test configuration (for example,
-pytest and coverage settings in `pyproject.toml`) are the sources of truth for
-repository-specific testing details. Inspect both before running tests. Do not
-invent or pass an explicit coverage threshold from this prompt.
+pytest and coverage settings in `pyproject.toml`) define repository-specific
+testing details. `.opencode/tools/run_pytest.py` owns the effective coverage
+policy: it retains configured floors and supplies an 80% fallback when neither
+repository configuration nor the invocation provides one. Inspect these sources
+before running tests. Do not invent or pass an explicit coverage threshold from
+this prompt.
 
 # Python Projects: Using the Pytest Tools
 
@@ -146,7 +149,8 @@ run_pytest_advanced({
 | `timeout` | number | Max execution time in seconds (max 1200) |
 
 **What the pytest wrappers provide:**
-- Executes pytest with repository-policy coverage by default
+- Executes pytest with runner-owned repository-policy coverage by default,
+  including its 80% fallback floor when no configured floor exists
 - Validates test count to prevent false positives
 - Returns comprehensive output suitable for parsing
 - Includes coverage metrics for coverage-enabled runs
@@ -158,8 +162,9 @@ run_pytest_advanced({
   is assertion-only evidence; always restore coverage for final comprehensive
   validation.
 - Do not override configured coverage policy through raw pytest arguments or
-  wrapper fields. Use the dedicated `coverage` toggle only to distinguish
-  focused assertion checks from configuration-driven final validation.
+  wrapper fields. `run_pytest.py` owns configured and fallback floors; use the
+  dedicated `coverage` toggle only to distinguish focused assertion checks from
+  configuration-driven final validation.
 - Do not pass dotted modules or `.py` files as `coverageSource`; unsupported
   entries are ignored with an `INFO:` diagnostic and repository configuration
   is used when no valid directory remains.

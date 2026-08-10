@@ -96,8 +96,10 @@ task({
 
 Before test execution, read the testing guide and inspect the repository's
 active test configuration (for example, pytest and coverage settings in
-`pyproject.toml`). Treat those sources as authoritative. Do not invent or pass
-an explicit coverage threshold from this prompt.
+`pyproject.toml`). The runner `.opencode/tools/run_pytest.py` resolves the
+effective coverage policy: it retains configured floors and applies its 80%
+fallback floor when neither repository configuration nor the invocation supplies
+one. Do not invent or pass an explicit coverage threshold from this prompt.
 
 # Test Duration Tiers (IMPORTANT)
 
@@ -129,8 +131,8 @@ run_pytest_advanced({
 - `options: "fail-fast"` - Stop on first failure for quick feedback
 - `cwd: "{worktree_path}"` - Use when running in worktree
 
-Do not pass a coverage threshold. Let the repository's active pytest and
-coverage configuration determine the required policy.
+Do not pass a coverage threshold. Let `.opencode/tools/run_pytest.py` apply the
+repository policy and its effective fallback floor.
 
 Choose coverage directories from the requested scope. For a file scope, use its
 parent source directory; for module or directory scope, use that existing
@@ -442,7 +444,7 @@ For each failure:
 
 ### 5.5: Check Coverage Policy
 
-Use the runner's coverage result to determine whether the active repository
+Use the runner's coverage result to determine whether its effective repository
 policy passed. Do not compare against a value embedded in this prompt.
 
 If coverage policy fails:
@@ -558,8 +560,9 @@ Context: Parser now uses new data models
 - `ADW_BUILD_TESTS_FAILED` → Could not achieve passing tests after 3 retries
 - `ADW_BUILD_TESTS_BLOCKED` → Wrapper/runtime failed before usable test evidence
 
-**Coverage Policy:** Read `.opencode/guides/testing_guide.md` and the active
-repository test configuration; do not embed or pass a threshold here
+**Coverage Policy:** Read `.opencode/guides/testing_guide.md` and active
+repository configuration. `.opencode/tools/run_pytest.py` owns the effective
+policy, including its 80% fallback; do not embed or pass a threshold here.
 
 **Test Requirements:**
 - All public functions: >=1 test
