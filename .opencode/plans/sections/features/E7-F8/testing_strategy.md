@@ -52,10 +52,12 @@ thresholds are not lowered; changed modules must retain at least 80% coverage.
    records before setup/allocation, and exercise capture/readback and fresh
    restart construction recovery lifecycles. CUDA remains optional.
 - **P7 (complete, Issue #1526):**
-  `gpu_resident_session_docs_test.py` reads the final foundations, checkpoint,
-  roadmap, contributor reference, and feature narratives with UTF-8 normalized
-  prose. It verifies the documented ownership and continuation boundaries plus
-  the shipped feature record; `mkdocs build --strict` checks publication links.
+   `gpu_resident_session_docs_test.py` reads the final foundations, checkpoint,
+   roadmap, contributor reference, and feature narratives with UTF-8 normalized
+   prose. It verifies P7/#1526 documents already-shipped ownership and
+   continuation boundaries, rather than a new API or runtime implementation,
+   plus the shipped feature record; `mkdocs build --strict` checks publication
+   links.
 
 ## Validation Matrix
 

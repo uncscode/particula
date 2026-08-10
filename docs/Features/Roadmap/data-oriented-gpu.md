@@ -1609,22 +1609,31 @@ Fixed-capacity slot management for these loops is defined in
 
 ### Random Number Strategy
 
-E7-F8 is shipped with two deliberately separate ownership models. Direct kernels
-retain caller-owned supplied `rng_states`; omitted state is call-local convenience
-state, and only `initialize_rng=True` resets supplied state. A resident session
-and its registry instead own distinct nonaliasing `(n_boxes,)` streams for the
-`coagulation` and `wall_loss` namespaces. Schema-versioned stable logical box
-IDs, root seed, and namespace determine identity, rather than physical lanes or
-registry order. First acquisition initializes each published stream once;
-scheduled dispatch does not reseed, and a repeated root seed does not reset it.
+E7-F8 is shipped with two deliberately separate ownership models. Direct
+kernels retain caller-owned supplied `rng_states`; omitted state is call-local
+convenience state, and only `initialize_rng=True` resets supplied state. A
+resident session and its registry instead own distinct, persistent, nonaliasing
+`(n_boxes,)` `wp.uint32` sidecars for the `coagulation` and `wall_loss`
+namespaces. Schema-versioned stable logical box IDs, root seed, and namespace
+determine identity, rather than physical lanes, physical layout, or registry
+order. Unrelated added, disabled/no-work, removed, or reordered boxes do not
+define a covered stream's identity. First acquisition initializes each published
+stream once; scheduled dispatch uses `initialize_rng=False`, does not reseed,
+and a repeated root seed does not reset it.
 
-Concrete-only lifecycle calls provide metadata-only inspection and explicit
-all/selected reset under the exact active session/registry/closed-guard binding.
-They add no public orchestration, hidden transfer, readback, synchronization, or
-fallback. Same-device invariance is covered only for frozen configurations and
-covered enabled boxes. Schema-v3 checkpoint current words provide manual fresh,
+Concrete-only `inspect_streams`, `initialize_streams`, and `reset_streams`
+lifecycle calls provide metadata-only inspection and explicit all/selected
+reset or initialization under the exact ACTIVE session/registry/closed-guard
+binding. Inspection exposes no current arrays or words and does no readback or
+synchronization. Normal dispatch does not inspect, transfer, read back,
+synchronize, seed, reset, checkpoint, restart, fall back, or promise rollback.
+Same-device invariance is covered only for frozen configurations of covered
+enabled boxes; unrelated added, disabled/no-work, removed, or reordered boxes
+do not alter a covered stream's identity. Schema-v3 checkpoint current words
+provide manual, fresh,
 exact-device continuation; cross-backend replay, migration, automatic restart,
-durable serialization, and implicit reseeding are excluded. See the
+durable serialization, implicit reseeding, and hidden transfer are excluded.
+See the
 [foundations guide](../data-containers-and-gpu-foundations.md) and
 [GPU resident checkpoints](../gpu_resident_checkpoints.md).
 

@@ -333,13 +333,30 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   `wp.uint32` sidecars for `coagulation` and `wall_loss`; these names are not
   package or top-level APIs.
 - Schema-versioned stable logical box IDs, the root seed, and namespace define
-  stream identity, not physical lane or registry order. First acquisition
-  initializes a published stream once, and scheduled dispatch uses
-  `initialize_rng=False`; repeating a root seed does not reset resident state.
+  stream identity, not physical lane or registry order. Covered enabled boxes
+  retain state only for a frozen configuration on the same supported device;
+  unrelated added, disabled/no-work, removed, or reordered boxes do not define
+  identity.
+- In contrast, direct kernels use omitted RNG state as call-local convenience
+  state and use supplied state owned by their caller; there,
+  `initialize_rng=True` is the only reset. Resident first acquisition
+  initializes a newly published stream once, scheduled dispatch always uses
+  `initialize_rng=False`, and repeating a root seed does not reset resident
+  state.
 - `inspect_streams`, `initialize_streams`, and `reset_streams` are concrete-only
-  explicit lifecycle operations. Inspection is metadata-only, and selected or
-  all-stream reset is deliberate; neither operation performs normal-step
-  readback or synchronization.
+  explicit lifecycle operations requiring that exact ACTIVE binding. Inspection
+  is metadata-only: it exposes no current arrays or words and does no readback
+  or synchronization. Selected or all-stream initialization/reset is
+  deliberate; normal scheduling does not inspect, transfer, synchronize,
+  reseed, checkpoint, restart, fall back, or promise rollback.
+- Schema-v3 checkpoints make immutable current words for the published streams
+  the continuation authority, separate from lossy CPU inspection carriers.
+  Continuation is manual through a fresh session on an exactly equal supported
+  `Device`; it excludes cross-backend or cross-device replay, migration,
+  durable serialization, automatic restart, and implicit reseeding. See
+  [GPU resident checkpoints](docs/Features/gpu_resident_checkpoints.md).
+- Warp CPU is the installed-Warp baseline. CUDA validation is optional and
+  skips cleanly when unavailable.
 - Validate with:
 
   ```bash
@@ -347,6 +364,7 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
     particula/execution/tests/rng_invariance_test.py \
     particula/execution/tests/checkpoint_test.py -q
   pytest particula/execution/tests/gpu_resident_session_docs_test.py -q
+  mkdocs build --strict
   ```
 
 ### Complete direct GPU process illustration
@@ -1040,6 +1058,10 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 Focused commands:
 
 ```bash
+pytest particula/execution/tests/rng_test.py \
+  particula/execution/tests/rng_invariance_test.py \
+  particula/execution/tests/checkpoint_test.py -q
+pytest particula/execution/tests/gpu_resident_session_docs_test.py -q
 pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror
 pytest particula/execution/tests/gpu_resources_test.py \
   particula/execution/tests/checkpoint_test.py \
@@ -1165,6 +1187,6 @@ adw workflow list         # List available workflows
 
 ---
 
-**Last Updated:** 2026-07-30  
+**Last Updated:** 2026-08-09  
 **For questions about ADW:** See `.opencode/guides/README.md`  
 **For questions about particula:** See main `readme.md`

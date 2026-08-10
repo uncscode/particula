@@ -1,8 +1,9 @@
 # Scope
 
 Issues #1520--#1526 completed E7-F8-P1--P7: concrete-only resident RNG
-lifecycle support, same-device invariance coverage, and P7 documentation for
-Brownian coagulation and wall loss built on P1 registration and initialization.
+lifecycle support and same-device invariance coverage for Brownian coagulation
+and wall loss. P7/#1526 documents that already-shipped behavior; it adds no
+new API or runtime implementation.
 
 ## In Scope
 
@@ -54,7 +55,8 @@ Brownian coagulation and wall loss built on P1 registration and initialization.
   Brownian and selected neutral wall-loss regression matrix.
 - Durable file serialization, arbitrary-object deserialization, remote
   checkpoint storage, migration, and cross-device RNG replay. Continuation is
-  in-memory, schema-v3-only, and exact-device only.
+  in-memory, schema-v3 RNG-stream continuation, and exact-device only;
+  schema-v1 and schema-v2 checkpoints remain restart-compatible.
 - Rewriting coagulation or wall-loss physics, random algorithms, direct-kernel
   signatures, host readback, transfer, or synchronization behavior.
 - RNG for deterministic processes, unsupported mechanisms, CPU runnable redesign,

@@ -58,19 +58,20 @@ payloads, non-`ACTIVE` checkpoint records, and device mismatches; it does not
 promise forward or backward compatibility.
 
 Schema-v3 continuation covers the canonical published `coagulation` and
-`wall_loss` streams. Each retained record includes stable-logical-ID and
-namespace metadata plus immutable current `uint32` words; those words are the
-sole continuation authority, rather than lossy CPU inspection carriers or
-ordinary resource payloads. Checkpoint capture is the sole explicit
-synchronization/readback boundary for this continuation. Normal scheduling and
-reacquisition do not inspect, transfer, synchronize, seed, or reset streams.
-When a stream is absent from a checkpoint, normal first acquisition still
-initializes that newly published stream once.
+`wall_loss` streams. Each retained record includes schema-versioned stable
+logical-ID, root-seed, and namespace metadata plus immutable current `uint32`
+words. Those words are the sole continuation authority, rather than lossy CPU
+inspection carriers or ordinary resource payloads. Checkpoint capture is the
+sole explicit synchronization/readback boundary for this continuation. Normal
+scheduling and reacquisition do not inspect, transfer, synchronize, seed, or
+reset streams. When a stream is absent from a checkpoint, normal first
+acquisition still initializes that newly published stream once.
 
 Split-run continuation requires a manual restart into a fresh session with a
-frozen configuration and exactly equal supported `Device`. It excludes CPU/Warp/
-CUDA or other cross-backend replay, cross-device migration, durable
-serialization, automatic restart, implicit reseeding, and hidden transfer.
+frozen configuration and exactly equal supported `Device`. It excludes CPU,
+Warp, CUDA, or other cross-backend replay, cross-device migration; durable
+serialization; automatic restart; implicit reseeding, and hidden transfer;
+fallback; and rollback after a writer launch.
 
 Normal resident scheduler calls never checkpoint, finalize, or restart. Those
 operations remain this explicit, concrete-only exact-device boundary; see the

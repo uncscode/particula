@@ -334,7 +334,7 @@ def test_rng_lifecycle_documentation_preserves_published_boundaries() -> None:
         "roadmap": (
             "E7-F8 is shipped with two deliberately separate ownership models.",
             "metadata-only inspection and explicit all/selected reset",
-            "Schema-v3 checkpoint current words provide manual fresh",
+            "Schema-v3 checkpoint current words provide manual, fresh",
             "cross-backend replay, migration, automatic restart",
             "CUDA evidence is optional and skips cleanly when unavailable",
         ),
@@ -363,6 +363,16 @@ def test_rng_lifecycle_documentation_preserves_published_boundaries() -> None:
         assert "#1526" in texts[name], f"{name} is missing #1526 evidence"
     assert "docs/Features/gpu_resident_checkpoints.md" in texts["phase_details"]
     assert "gpu_resident_session_docs_test.py" in texts["phase_details"]
+    assert "P7/#1526 documents that already-shipped behavior" in texts["scope"]
+    assert "it adds no new API or runtime implementation" in texts["scope"]
+    assert (
+        "P7/#1526 documents already-shipped ownership"
+        in texts["testing_strategy"]
+    )
+    assert (
+        "rather than a new API or runtime implementation"
+        in texts["testing_strategy"]
+    )
 
     plan = json.loads(
         (_ROOT / ".opencode" / "plans" / "features" / "E7-F8.json").read_text(
