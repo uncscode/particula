@@ -765,6 +765,11 @@ class ResidentBrownianCoagulationExecutionState:
         if type(self.resources) is not CoagulationResources:
             raise TypeError("resources must be an exact CoagulationResources.")
 
+    @property
+    def backend_payload(self) -> object:
+        """Return the exact caller-owned resident particle payload."""
+        return self.request.backend_payload
+
 
 class ResidentBrownianCoagulationExecutionAdapter:
     """Dispatch one pre-acquired resident Brownian request by identity.

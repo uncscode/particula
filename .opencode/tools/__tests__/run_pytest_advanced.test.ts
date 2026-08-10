@@ -425,6 +425,15 @@ describe("run_pytest_advanced wrapper", () => {
     expect(getInvocations()).toHaveLength(0);
   });
 
+  it("directs raw --no-cov callers to the dedicated coverage field", async () => {
+    const execute = await loadToolExecute("../../run_pytest_advanced.ts");
+
+    const result = await execute({ pytestArgs: ["--no-cov"] });
+
+    expect(String(result)).toContain("set the wrapper field coverage: false instead");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
   it("rejects caller plugin and ini controls before spawn", async () => {
     const execute = await loadToolExecute("../../run_pytest_advanced.ts");
 

@@ -12,7 +12,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from numbers import Integral
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from particula.execution.gpu_session import ResidentSession
 
@@ -330,7 +330,7 @@ class ResidentWallLossAdapter:
                     stream.lanes[index] for index in enabled_logical_boxes
                 )
             )
-            selected_boxes = wp.array(
+            selected_boxes: Any = wp.array(
                 enabled_physical_lanes,
                 dtype=wp.int32,
                 device=request.resources.rng_states.device,

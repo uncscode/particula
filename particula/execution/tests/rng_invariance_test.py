@@ -7,7 +7,7 @@ logical-ID to physical-lane boundary rather than through a direct kernel call.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 from typing import Any
 
 import numpy as np
@@ -108,7 +108,9 @@ def _make_session(
 
 
 @pytest.fixture
-def resident_factory() -> Callable[..., tuple[Any, GPUResourceRegistry]]:
+def resident_factory() -> Generator[
+    Callable[..., tuple[Any, GPUResourceRegistry]], None, None
+]:
     """Create resident sessions and close every created binding at teardown."""
     bindings: list[tuple[Any, GPUResourceRegistry, ResidentStepGuard]] = []
 

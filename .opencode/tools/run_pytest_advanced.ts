@@ -261,6 +261,9 @@ const validatePytestArgs = (value: unknown, cwd: string | undefined): { ok: true
   }
   for (let index = 0; index < value.length; index += 1) {
     const token = value[index] as string;
+    if (token === "--no-cov") {
+      return { ok: false, error: "ERROR: pytestArgs token '--no-cov' is not permitted; set the wrapper field coverage: false instead." };
+    }
     if (token === "--" || COVERAGE_PYTEST_ARG_PATTERN.test(token) || PYTEST_RESERVED_PREFIXES.some((prefix) => token.startsWith(prefix))) {
       return { ok: false, error: `ERROR: pytestArgs token '${token}' is not permitted.` };
     }

@@ -50,7 +50,7 @@ input: $ARGUMENTS
 
 # Required Reading
 
-- `.opencode/guides/testing_guide.md` — test naming (`*_test.py`), co-located placement, markers
+- `.opencode/guides/testing_guide.md` — repository test framework, discovery, placement, markers, and validation policy
 - `.opencode/guides/code_culture.md` — tests-ship-with-code policy
 - `.opencode/guides/code_style.md` — naming conventions for test functions
 
@@ -158,7 +158,8 @@ for source detail, then re-draft and write the corrected content.
   "follow-up issue".
 - If an issue is documentation-only or configuration-only, state that clearly
   and include the appropriate smoke or validation check.
-- Test files must use `*_test.py` suffix and live in module-level `tests/` dirs.
+- Test paths, names, commands, markers, and valid exceptions must come from the
+  current repository's testing guide and active configuration.
 
 # Required Writes
 
@@ -167,7 +168,7 @@ adw_issues_batch_write({
   "adw_id": "<adw_id>",
   "issue": "<index>",
   "section": "testing_strategy",
-  "content": "## Testing Strategy\n\n- Test file: `adw/module/tests/feature_test.py`\n- Scenarios: ...\n- Run: `pytest adw/module/tests/feature_test.py -v`"
+  "content": "## Testing Strategy\n\n- Test target: `<repository-policy test target>`\n- Scenarios: ...\n- Run: `<repository-policy validation command>`"
 })
 ```
 

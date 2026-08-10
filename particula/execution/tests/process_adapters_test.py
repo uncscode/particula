@@ -332,7 +332,9 @@ def test_wall_loss_adapter_dispatches_selected_lanes_once(
     assert args[:4] == (session.particles, None, None, 0)
     assert kwargs["environment"] is session.environment
     assert kwargs["rng_states"] is resources.rng_states
-    np.testing.assert_array_equal(kwargs["selected_boxes"].numpy(), [0])
+    np.testing.assert_array_equal(
+        cast(Any, kwargs["selected_boxes"]).numpy(), [0]
+    )
 
 
 @pytest.mark.warp

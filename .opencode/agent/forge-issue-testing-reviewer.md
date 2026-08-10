@@ -50,7 +50,7 @@ input: $ARGUMENTS
 
 # Required Reading
 
-- `.opencode/guides/testing_guide.md` — test naming (`*_test.py`), co-located placement, markers
+- `.opencode/guides/testing_guide.md` — repository test framework, discovery, placement, markers, and validation policy
 - `.opencode/guides/code_culture.md` — tests-ship-with-code policy
 
 # Output Signals
@@ -84,7 +84,8 @@ Mark each todo `in_progress` when starting and `completed` when done.
 - No deferred-testing language
 - Smoke-test exceptions are explicit and justified
 - Commands or suites are included when known
-- Test files must use `*_test.py` suffix per `.opencode/guides/testing_guide.md`
+- Test paths, names, commands, markers, and exceptions must follow the current
+  repository's testing guide and active configuration
 
 # Process
 

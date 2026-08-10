@@ -308,6 +308,18 @@ class _RestoredStreamRegistry:
             self._root_seed, StreamKey(1, process_id, logical_box_id)
         )
 
+    def words_by_lane(self, process_id: str) -> tuple[int, ...]:
+        """Return derived initial words indexed by physical lane."""
+        words = [0] * len(self._lanes)
+        for logical_box_id, lane in zip(
+            self._logical_box_ids, self._lanes, strict=True
+        ):
+            words[lane] = self.word_for(process_id, logical_box_id)
+        return tuple(words)
+
+
+_PublishedStreamRegistry = StreamRegistry | _RestoredStreamRegistry
+
 
 def _entry(
     role: str, family: str, dtype: Any, shape_kind: _ShapeKind
@@ -508,8 +520,10 @@ class GPUResourceRegistry:
         self._nucleation_records: tuple[Any, ...] | None = None
         self._capacities: dict[str, int] = {}
         self._open_step_token: Any | None = None
-        self._coagulation_stream_registry: StreamRegistry | None = None
-        self._wall_loss_stream_registry: StreamRegistry | None = None
+        self._coagulation_stream_registry: _PublishedStreamRegistry | None = (
+            None
+        )
+        self._wall_loss_stream_registry: _PublishedStreamRegistry | None = None
 
     @property
     def manifests(self) -> tuple[ResourceManifest, ...]:
@@ -589,7 +603,7 @@ class GPUResourceRegistry:
 
     def _published_stream_registry(
         self, process_id: str
-    ) -> StreamRegistry | None:
+    ) -> _PublishedStreamRegistry | None:
         """Return the published process registry without exposing sidecars."""
         if process_id == "coagulation":
             return self._coagulation_stream_registry
@@ -648,7 +662,7 @@ class GPUResourceRegistry:
         for process_id in selected_processes:
             if process_id not in published:
                 raise ValueError("Requested RNG stream has not been acquired.")
-        selected_registries: list[tuple[str, StreamRegistry]] = []
+        selected_registries: list[tuple[str, _PublishedStreamRegistry]] = []
         for process_id in selected_processes:
             registry = self._published_stream_registry(process_id)
             if registry is None:

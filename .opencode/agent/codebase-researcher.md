@@ -317,7 +317,7 @@ Document observed patterns relevant to the issue:
 - Type hints required on all fields
 
 ### Testing
-- Test files use `*_test.py` suffix
+- Test files follow the discovery pattern in `.opencode/guides/testing_guide.md`
 - Tests live in module-level `tests/` directories
 - Use pytest fixtures from `conftest.py`
 ```

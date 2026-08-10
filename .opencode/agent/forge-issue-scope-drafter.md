@@ -53,7 +53,7 @@ input: $ARGUMENTS
 
 - `.opencode/guides/code_culture.md` — 100-line rule and vertical-slice sizing
 - `.opencode/guides/code_style.md` — naming and file-path conventions
-- `.opencode/guides/testing_guide.md` — co-located test file naming (`*_test.py`)
+- `.opencode/guides/testing_guide.md` — repository test discovery and placement policy
 
 # Output Signals
 

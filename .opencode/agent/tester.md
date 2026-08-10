@@ -55,15 +55,13 @@ Orchestrate test validation by invoking the `adw-tester` subagent for test execu
 When invoked as part of an ADW (Agent Development Workflow), you operate within a specific environment structure:
 
 ## Git Worktree Environment
-- **Working Directory**: You execute in an isolated git worktree at `/trees/{adw_id}/`
-  - Example: `/home/kyle/Code/Agent/trees/af477c67/`
-  - This is a separate working tree for the feature branch
-  - All file paths are relative to this worktree root
+- **Working Directory**: Resolve the isolated workflow worktree from state.
+- All repository reads, edits, and delegated test runs must use that resolved root.
+- Never infer a repository path from the ambient checkout or from an example.
 
 ## Agent Directory Structure
-The ADW workflow maintains metadata in `agents/{adw_id}/`:
-- **State file**: `agents/{adw_id}/adw_state.json` - Workflow state and metadata
-- **Test reports**: Test output and failure logs
+Workflow state is accessed through `adw_spec_read`; do not construct or read a
+repository-specific state path directly.
 
 # Arguments
 
@@ -87,14 +85,14 @@ $ARGUMENTS = "" or not provided
 $ARGUMENTS = "adw_id=abc12345"
 ```
 
-**Run specific test file:**
+**Run a repository-policy test target:**
 ```
-$ARGUMENTS = "test_path=adw/core/tests/agent_test.py"
+$ARGUMENTS = "test_path=<repo-relative-test-target>"
 ```
 
 **Run specific test in ADW workflow context:**
 ```
-$ARGUMENTS = "adw_id=abc12345 test_path=adw/workflows/tests/plan_test.py"
+$ARGUMENTS = "adw_id=abc12345 test_path=<repo-relative-test-target>"
 ```
 
 # Orchestration Process
@@ -103,9 +101,10 @@ $ARGUMENTS = "adw_id=abc12345 test_path=adw/workflows/tests/plan_test.py"
 
 Before delegating test execution, read
 `@.opencode/guides/testing_guide.md` and inspect the repository's active test
-configuration (for example, pytest and coverage settings in `pyproject.toml`).
-Treat those sources as authoritative. Do not invent or pass an explicit
-coverage threshold from this prompt.
+configuration, the applicable pytest wrapper companion document, and
+`.opencode/tools/run_pytest.py`. Treat those sources as the effective policy
+boundary, including any runner-owned fallback coverage floor. Do not invent or
+pass an explicit coverage threshold from this prompt.
 
 ## Phase 1: Load Context
 
@@ -129,7 +128,7 @@ Delegate all test execution, failure analysis, and fixing to the `adw-tester` su
 task({
   "description": "Run tests and fix failures",
   "subagent_type": "adw-tester",
-  "prompt": "Execute comprehensive test validation.\n\nArguments: {arguments}\n\nRead @.opencode/guides/testing_guide.md and inspect the repository's active test configuration before running tests. Honor any requested test_path. Use coverage: false only for focused assertion checks and individual failure reruns; do not override repository coverage policy. Retain configuration-driven coverage for final comprehensive validation. Categorize failures as spec-related vs unrelated, fix spec-related failures (must fix), attempt one fix for unrelated failures, and report results."
+  "prompt": "Execute comprehensive test validation.\n\nArguments: {arguments}\n\nRead @.opencode/guides/testing_guide.md, the active test configuration, the applicable pytest wrapper companion document, and .opencode/tools/run_pytest.py before running tests. Honor any requested test_path. Use coverage: false only for focused assertion checks and individual failure reruns; do not override repository or runner coverage policy. Retain policy-driven coverage for final comprehensive validation. Categorize failures as spec-related vs unrelated, fix spec-related failures (must fix), attempt one fix for unrelated failures, and report results."
 })
 ```
 

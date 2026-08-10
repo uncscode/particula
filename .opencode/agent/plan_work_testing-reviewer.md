@@ -107,14 +107,15 @@ From the plan, identify:
 
 ### 3.1: Check Test File Locations
 
-Verify planned test files follow pattern:
-- `adw/{module}/tests/{name}_test.py`
-- NOT `test_{name}.py` (wrong prefix)
+Read the testing guide before evaluating planned test paths. Verify that every
+planned test file follows the repository's configured discovery pattern and
+location policy. Do not embed a framework-specific prefix, suffix, package root,
+or test directory in this prompt.
 
 ```python
 ripgrep({
-  "pattern": "**/tests/*_test.py",
-  "path": "{worktree_path}/adw"
+  "pattern": "{repository_test_discovery_pattern}",
+  "path": "{worktree_path}/{repository_test_root}"
 })
 ```
 
@@ -194,7 +195,7 @@ Verified:
 - ✅ Test files in correct locations
 - ✅ Happy path and error cases covered
 - ✅ Edge cases addressed
-- ✅ Follows pytest patterns
+- ✅ Follows repository testing patterns
 
 No changes made to spec_content.
 ```
@@ -209,7 +210,7 @@ Status: REVISED
 Assessment: INCOMPLETE → COMPREHENSIVE after fixes
 
 Changes Made:
-1. Fixed test file name: test_parser.py → parser_test.py
+1. Corrected a test path to match repository discovery policy
 2. Added error case tests for ValueError, TypeError
 3. Added edge case tests for empty input, None
 4. Specified test assertions
@@ -230,21 +231,18 @@ Error: {specific_error}
 spec_content NOT modified.
 ```
 
-# ADW Testing Conventions
+# Repository Testing Conventions
 
-- **File naming**: `*_test.py` suffix (NOT `test_*.py` prefix)
-- **Location**: Module's `tests/` subdirectory
-- **Framework**: pytest (not unittest)
-- **Mocking**: Use `pytest-mock` or `unittest.mock`
-- **Fixtures**: Define in `conftest.py`
-- **Coverage**: Minimum 50% required
+Do not define repository conventions here. Read
+`@.opencode/guides/testing_guide.md` and the active test configuration for file
+naming, locations, framework, mocking, fixtures, markers, and coverage policy.
 
 # Common Testing Issues
 
 ## Issue: Wrong Test Naming
 
-**Before:** `test_parser.py`
-**After:** `parser_test.py`
+Revise the planned path to the discovery convention documented by the current
+repository. Do not assume either a prefix or suffix convention.
 
 ## Issue: No Error Tests
 
@@ -268,8 +266,8 @@ spec_content NOT modified.
 
 ## Issue: No Mocking
 
-**Before:** Tests call real GitHub API
-**After:** Mock `adw.github.client` for API tests
+**Before:** Tests call a real external service
+**After:** Replace the external boundary with the repository's established test double
 
 # Review Checklist
 
@@ -299,8 +297,8 @@ spec_content NOT modified.
 # Quality Checklist
 
 - [ ] spec_content read successfully
-- [ ] Test file naming verified (`*_test.py`)
-- [ ] Test locations verified (`{module}/tests/`)
+- [ ] Test file naming verified against repository policy
+- [ ] Test locations verified against repository policy
 - [ ] Happy path tests present
 - [ ] Error case tests present
 - [ ] Edge case tests present

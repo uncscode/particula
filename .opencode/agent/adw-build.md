@@ -279,37 +279,26 @@ todowrite({
 - **Never ask questions:** Make reasonable decisions autonomously
 - **Follow existing patterns:** Match code style of surrounding code
 
-### 6.3: Spot-Check Test (FAST)
+### 6.3: Policy-Scoped Spot-Check
 
-After implementing each task, run a **fast spot-check test** on the affected module:
+After implementing each task, read the testing guide and run the smallest
+repository-policy target that exercises the changed behavior:
 
 ```python
 run_pytest_advanced({
-  "testPath": "{module}/tests/",
+  "testPath": resolved_test_target,
   "options": "output=summary fail-fast",
   "coverage": false,
-  "timeout": 60,
+  "timeout": resolved_focused_timeout,
   "cwd": worktree_path
 })
 ```
 
 **Spot-Check Rules:**
-- Run only the **module-level tests** for the changed code
-- Use `-x` to fail fast on first error
-- Timeout: 60 seconds max
-- Focus on **fast tests only** (skip slow/performance markers)
+- Derive the target, markers, and timeout from the repository testing guide
+- Keep the run focused and use `coverage: false` for assertion-only evidence
+- Do not assume tests are module-local or use a particular directory layout
 - If spot-check fails: Fix the immediate issue, re-run
-
-**Example:**
-```python
-# If you modified adw/utils/parser.py
-run_pytest_advanced({
-  "testPath": "adw/utils/tests/parser_test.py",
-  "options": "output=summary fail-fast",
-  "coverage": false,
-  "cwd": worktree_path
-})
-```
 
 **Why Spot-Checks:**
 - Catch obvious errors early (before comprehensive testing)
@@ -361,15 +350,15 @@ task({
   state and valid `worktree_path`, then rerun the build step
 
 **What adw-build-tests does:**
-- Validates tests exist for all public/private functions
-- Writes missing tests
-- Runs **fast tests** (skips `@pytest.mark.slow` and `@pytest.mark.performance`)
-- Enforces 80% coverage for changed code
+- Reads the repository testing guide and active runner policy
+- Identifies behavior that lacks required test evidence
+- Writes missing tests using repository naming and placement conventions
+- Runs the guide-defined focused suite and enforces effective coverage policy
 
 **Retry Strategy:**
 - **Attempt 1:** Fix test failures, add missing tests
 - **Attempt 2:** Adjust implementation if tests reveal issues
-- **Attempt 3:** Minimal viable tests to achieve coverage
+- **Attempt 3:** Add the smallest meaningful missing scenarios required by policy
 
 ## Step 8: Output Completion Signal
 
@@ -452,8 +441,8 @@ Recommendation: {specific fix suggestion}
 # Quality Standards
 
 - **Code Quality:** Syntactically correct, follows conventions
-- **Test Coverage:** >=80% for changed code, all functions tested
-- **Fast Tests:** Focus on tests that run in <=1 second
+- **Test Coverage:** Meets the effective repository and runner policy for changed behavior
+- **Test Scope:** Uses the duration tiers and marker selection defined by the repository testing guide
 
 **NOTE:** Spec validation is handled by `adw-validate` agent.
 Docstrings and linting are handled by `adw-polish` agent.
@@ -507,16 +496,16 @@ Notebooks are fully validated during the documentation workflow:
 
 **Task 1:**
 - Implement validate_input()
-- Spot-check: `run_pytest_advanced({"testPath": "adw/utils/tests/parser_test.py", "options": "fail-fast", "coverage": false})` -> PASS
+- Spot-check the repository-policy target with coverage disabled -> PASS
 - Mark complete
 
 **Task 2:**
 - Add edge case tests
-- Spot-check: `run_pytest_advanced({"testPath": "adw/utils/tests/parser_test.py", "options": "fail-fast", "coverage": false})` -> PASS
+- Re-run the repository-policy focused target -> PASS
 - Mark complete
 
 **Step 7:** Comprehensive testing:
-- Call adw-build-tests -> SUCCESS (all tests pass, 85% coverage)
+- Call adw-build-tests -> SUCCESS (effective coverage policy passed)
 
 **Step 8:** Output:
 ```

@@ -164,7 +164,7 @@ For each discovered plan document:
 3. Evaluate for:
    - tests-with-feature policy adherence on code-bearing phases
    - explicit test descriptions (what to test, how to test, where tests live)
-   - test naming and location alignment (for example `*_test.py` and module `tests/` folders)
+   - test naming and location alignment with the current repository testing guide
    - coverage/validation expectations tied to changed implementation
 
 If target section keys are missing/unmapped:

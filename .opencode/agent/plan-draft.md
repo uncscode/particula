@@ -195,7 +195,7 @@ find_files({"pattern": "**/*.py", "path": "{worktree_path}/adw/{module}"})
 Note observed patterns in the codebase:
 - Error handling approach (exception hierarchy)
 - Data model patterns (Pydantic BaseModel usage)
-- Test naming and location conventions (`*_test.py` in `tests/` dirs)
+- Test naming and location conventions from the repository testing guide
 - Import organization
 
 Compile your research findings — they feed directly into Step 3.

@@ -120,7 +120,8 @@ worktree_path = adw_spec_read({
 })
 run_linters({
   "mode": "check",
-  "targetPaths": ["adw/tests/agent_permission_validation_test.py"]
+  "targetPaths": resolved_repository_lint_targets,
+  "cwd": worktree_path
 })
 ```
 
@@ -142,6 +143,8 @@ the call fails closed if `scripts/validate_agent_references.py` has local uncomm
 - @.opencode/guides/code_style.md - Coding conventions
 - @.opencode/guides/testing_guide.md - Testing framework and patterns
 - @.opencode/guides/linting_guide.md - Code quality standards
+- @.opencode/tools/run_pytest_advanced.md - Pytest wrapper contract when applicable
+- `.opencode/tools/run_pytest.py` - Effective pytest coverage and fallback policy
 
 # Execution Flow
 
@@ -378,25 +381,26 @@ Gap 1:
 
 ## Step 7: Run Scoped Tests
 
-Run tests ONLY for affected modules (not full suite):
+Run the repository-policy focused tests for affected behavior, not an assumed
+module directory or full suite:
 
 ### 7.1: Identify Test Directories
 
-Map changed files to test directories:
+Map changed files to test targets using the testing guide, active discovery
+configuration, and existing nearby tests:
 ```
-Changed: adw/utils/parser.py → Test: adw/utils/tests/
-Changed: adw/core/models.py → Test: adw/core/tests/
+Changed: <source path> -> Test: <repository-policy target>
 ```
 
 ### 7.2: Run Module Tests
 
-For each affected module:
+For each affected behavior:
 
 ```python
 run_pytest_advanced({
-  "pytestArgs": ["{module}/tests/", "-m", "not slow and not performance"],
+  "testPath": resolved_test_target,
   "minTests": 1,
-  "timeout": 120,
+  "timeout": resolved_focused_timeout,
   "cwd": worktree_path,
   "options": "fail-fast",
   "coverage": false
@@ -421,7 +425,8 @@ Check code quality on changed files:
 ```python
 run_linters({
    "mode": "check",
-   "targetPaths": ["adw/"]
+   "targetPaths": resolved_repository_lint_targets,
+   "cwd": worktree_path
 })
 ```
 
@@ -431,9 +436,9 @@ Add lint errors to gaps list:
 ```
 Gap 3:
 - Type: Lint error
-- File: adw/utils/parser.py:45
-- Error: F401 - 'os' imported but unused
-- Fix: Remove unused import
+- File: <changed source path and line>
+- Error: <repository linter diagnostic>
+- Fix: <minimal source correction>
 ```
 
 ## Step 9: Fix All Gaps
@@ -471,7 +476,8 @@ edit({
 ```python
 run_linters({
    "mode": "check",
-   "targetPaths": ["adw/"]
+   "targetPaths": resolved_repository_lint_targets,
+   "cwd": worktree_path
 })
 ```
 
@@ -493,8 +499,9 @@ After fixing, verify everything passes:
 
 ```python
 run_pytest_advanced({
-  "pytestArgs": ["{affected_modules}/tests/", "-m", "not slow and not performance"],
+  "testPaths": resolved_test_targets,
   "minTests": 1,
+  "timeout": resolved_focused_timeout,
   "cwd": worktree_path,
   "options": "fail-fast",
   "coverage": false
@@ -506,7 +513,8 @@ run_pytest_advanced({
 ```python
 run_linters({
    "mode": "format-check",
-   "targetPaths": ["adw/"]
+   "targetPaths": resolved_repository_lint_targets,
+   "cwd": worktree_path
 })
 ```
 

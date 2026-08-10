@@ -283,20 +283,24 @@ todowrite({
 - Implement targeted fixes for the identified gap
 - Add proper error handling, type hints, and docstrings
 
-### 6.3: Spot-Check Test (FAST)
+### 6.3: Policy-Scoped Spot-Check
 
-After implementing each correction, run a **fast spot-check test** on the affected module:
+After implementing each correction, read the testing guide and run the smallest
+repository-policy target that exercises the changed behavior:
 
 ```python
 run_pytest_advanced({
-  "testPath": "{module}/tests/",
+  "testPath": resolved_test_target,
   "options": "output=summary fail-fast",
   "coverage": false,
-  "timeout": 60
+  "timeout": resolved_focused_timeout,
+  "cwd": worktree_path
 })
 ```
 
-If spot-check fails: Fix the immediate issue, re-run (max 2 retries per gap).
+Derive the target, marker selection, and timeout from
+`@.opencode/guides/testing_guide.md`; do not assume a module-level test layout.
+If the spot-check fails, fix the immediate issue and re-run (max 2 retries per gap).
 
 ### 6.4: Mark Gap Completed
 
@@ -403,7 +407,7 @@ Recommendation: {specific fix suggestion}
 # Quality Standards
 
 - **Code Quality:** Syntactically correct, follows conventions
-- **Test Coverage:** >=80% for changed code, all functions tested
-- **Fast Tests:** Focus on tests that run in <=1 second
+- **Test Coverage:** Meets the effective repository and runner policy for changed behavior
+- **Test Scope:** Uses the duration tiers and marker selection defined by the repository testing guide
 
 This agent should produce commit-ready code: spec-complete, tested, documented, and lint-clean.

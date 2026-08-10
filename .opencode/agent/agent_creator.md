@@ -610,7 +610,7 @@ tools:
 
 Even with `write: true`, specify in the agent's markdown instructions what file types it should modify:
 - Documentation agents: Only `.md`, `.txt`, `.rst` files
-- Test agents: Only `*_test.py` files
+- Test agents: Use the current repository's testing guide and discovery configuration
 - Config agents: Only `.yaml`, `.json`, `.toml` files
 
 **Example restriction in agent instructions:**
