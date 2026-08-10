@@ -70,9 +70,11 @@ NumPy/Warp copy sources only and deterministically overwrites retained buffers
 without acquiring, replacing, or rebinding them. Resident Brownian coagulation
 and wall loss each retain an independent registry-owned sidecar initialized
 from the canonical process manifest. Scheduled dispatch retains each sidecar by
-identity with `initialize_rng=False`. There is no reset or inspection API,
-checkpoint persistence, or restart continuation; broader RNG policy remains
-deferred.
+identity with `initialize_rng=False`. Explicit direct-module lifecycle calls
+alone may inspect frozen host metadata or reset all published streams or valid
+selected lanes under an exact ACTIVE session/registry/closed-guard binding.
+They never read back, synchronize, affect normal dispatch, or persist through
+checkpoint/restart; broader RNG policy remains deferred.
 Wall-loss dispatch receives its scheduler-resolved ascending logical-box set.
 An empty set is a write-free prelaunch skip; a partial set delegates one-box
 resident aliases so disabled lanes cannot be written. Thus disabled,
@@ -198,8 +200,10 @@ identity and nonaliasing, not allocator-provenance inference. Its typed
   loss acquisition creates and initializes its distinct P1-derived,
   registry-retained ``wp.uint32`` stream from immutable resident stream metadata.
   Resident dispatch always supplies the exact stream with
-  ``initialize_rng=False``. It has no reset/inspection API, hidden
-  transfer/synchronization, package export, or checkpoint continuation;
+  ``initialize_rng=False``. Its direct-only published-stream inspection and
+  explicit selected reset APIs expose frozen metadata only and require a closed
+  ACTIVE binding; they have no hidden transfer/synchronization, package export,
+  or checkpoint continuation;
   checkpoint and finalize reject a published resident stream before device or
   payload work. Its communication acquisition seam is
  the sole exception for fixed-shape transport work storage: it validates one

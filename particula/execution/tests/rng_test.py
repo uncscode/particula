@@ -15,6 +15,7 @@ from particula.execution.rng import (
     STREAM_SCHEMA_VERSION,
     StreamDescriptor,
     StreamKey,
+    StreamManifest,
     StreamRegistry,
     _arrays_overlap,
     _derive_initial_word,
@@ -240,6 +241,87 @@ def test_registry_returns_immutable_metadata_and_retained_identity() -> None:
     assert registry.n_boxes == 1
     with pytest.raises(AttributeError):
         registry.descriptors.append(None)  # type: ignore[attr-defined]
+
+
+def test_registry_inspection_is_frozen_host_metadata() -> None:
+    """Test inspection retains only immutable identity metadata."""
+    registry = StreamRegistry(3, 1, ("box",), (0,), _arrays())
+
+    manifest = registry.inspect()
+
+    assert type(manifest) is StreamManifest
+    assert manifest.root_seed == 3
+    assert manifest.logical_box_ids == ("box",)
+    assert manifest.descriptors is registry.descriptors
+    assert not hasattr(manifest, "state_arrays")
+
+
+@pytest.mark.warp
+def test_initialize_selected_updates_only_requested_lanes() -> None:
+    """Test selected initialization does not copy or restore other lanes."""
+    wp = pytest.importorskip("warp")
+    coagulation = wp.full(3, 17, dtype=wp.uint32, device="cpu")
+    wall_loss = wp.full(3, 19, dtype=wp.uint32, device="cpu")
+    registry = StreamRegistry(
+        5,
+        3,
+        ("first", "second", "third"),
+        (2, 0, 1),
+        (("coagulation", coagulation), ("wall_loss", wall_loss)),
+    )
+
+    registry.initialize_selected(
+        process_ids=("coagulation",), logical_box_ids=("third", "first")
+    )
+
+    assert coagulation.numpy().tolist() == [
+        17,
+        registry.word_for("coagulation", "third"),
+        registry.word_for("coagulation", "first"),
+    ]
+    assert wall_loss.numpy().tolist() == [19, 19, 19]
+
+
+def test_initialize_selected_rejects_nonexact_or_duplicate_selectors() -> None:
+    """Test selector validation stays host-only and occurs before Warp work."""
+    registry = StreamRegistry(3, 1, ("box",), (0,), _arrays())
+
+    class TupleSubclass(tuple):
+        """Provide an inexact tuple selector."""
+
+    with pytest.raises(TypeError, match="exact tuple"):
+        registry.initialize_selected(process_ids=["coagulation"])  # type: ignore[arg-type]
+    with pytest.raises(TypeError, match="exact tuple"):
+        registry.initialize_selected(
+            process_ids=TupleSubclass(("coagulation",))
+        )
+    with pytest.raises(ValueError, match="unique"):
+        registry.initialize_selected(logical_box_ids=("box", "box"))
+
+
+@pytest.mark.warp
+def test_empty_selected_initialization_validates_complete_schema_before_writing() -> (
+    None
+):
+    """Test an empty request still rejects an invalid unselected sibling."""
+    wp = pytest.importorskip("warp")
+    coagulation = wp.full(1, 17, dtype=wp.uint32, device="cpu")
+    invalid_wall_loss = wp.full(1, 19.0, dtype=wp.float64, device="cpu")
+    registry = StreamRegistry(
+        5,
+        1,
+        ("box",),
+        (0,),
+        (("coagulation", coagulation), ("wall_loss", invalid_wall_loss)),
+    )
+
+    with pytest.raises(
+        TypeError, match="wall_loss state array must have dtype"
+    ):
+        registry.initialize_selected(process_ids=())
+
+    assert coagulation.numpy().tolist() == [17]
+    assert invalid_wall_loss.numpy().tolist() == [19.0]
 
 
 @pytest.mark.parametrize("process_id", (None, 1, "unknown"))

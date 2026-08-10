@@ -154,9 +154,11 @@
   bound, or reused. Compatible repeats retain the exact stream and resource
   view by identity and neither allocate nor reseed. Resident Brownian and wall
   loss dispatch require their respective exact streams with literal
-  `initialize_rng=False`; no reset/inspection API, hidden
+  `initialize_rng=False`. Direct-only lifecycle calls can inspect frozen
+  metadata or explicitly reset published selected lanes only under an exact
+  ACTIVE session/registry/closed-guard binding; they introduce no hidden
   transfer/synchronization, package/top-level export, checkpoint persistence,
-  or restart continuation is introduced.
+  or restart continuation.
 - `GPUResourceRegistry.validate_wall_loss_resources()` and
   `.validate_nucleation_resources()` are direct-module-only, metadata-only
   established-view seams. After validating the exact pinned active session,

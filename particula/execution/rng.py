@@ -29,6 +29,7 @@ __all__ = [
     "SUPPORTED_PROCESS_IDS",
     "StreamKey",
     "StreamDescriptor",
+    "StreamManifest",
     "StreamRegistry",
 ]
 _PAYLOAD_PREFIX = b"particula.execution.rng\x00"
@@ -94,6 +95,20 @@ class StreamDescriptor:
         if not isinstance(self.key, StreamKey):
             raise TypeError("StreamDescriptor.key must be a StreamKey.")
         _validate_integral(self.lane, "StreamDescriptor.lane")
+
+
+@dataclass(frozen=True)
+class StreamManifest:
+    """Expose immutable host-only stream identity metadata.
+
+    This carrier deliberately contains no state arrays, pointers, device values,
+    or current RNG words.
+    """
+
+    root_seed: int
+    logical_box_ids: tuple[str, ...]
+    lanes: tuple[int, ...]
+    descriptors: tuple[StreamDescriptor, ...]
 
 
 def _validate_integral(value: object, field_name: str) -> None:
@@ -422,6 +437,63 @@ class StreamRegistry:
 
     get_state_array = state_array_for
 
+    def inspect(self) -> StreamManifest:
+        """Return this registry's immutable host-only stream manifest."""
+        return StreamManifest(
+            self._root_seed,
+            self._logical_box_ids,
+            self._lanes,
+            self._descriptors,
+        )
+
+    def initialize_selected(
+        self,
+        *,
+        process_ids: tuple[str, ...] | None = None,
+        logical_box_ids: tuple[str, ...] | None = None,
+    ) -> None:
+        """Reinitialize only selected process and logical-box stream lanes.
+
+        Full retained-array schema and nonaliasing preflight always precedes a
+        writer, including for an explicitly empty selection.
+        """
+        selected_processes, selected_ids = _resolve_stream_selection(
+            process_ids,
+            logical_box_ids,
+            registered_logical_box_ids=self._logical_box_ids,
+        )
+        self._validate_state_arrays()
+        if not selected_processes or not selected_ids:
+            return
+        import numpy as np
+        import warp as wp
+
+        kernel = _selected_write_kernel(wp)
+        lanes = np.asarray(
+            [
+                self._lane_by_id[logical_box_id]
+                for logical_box_id in selected_ids
+            ],
+            dtype=np.int32,
+        )
+        lane_source = wp.array(lanes, dtype=wp.int32, device="cpu")
+        for process_id in selected_processes:
+            words = np.asarray(
+                [
+                    self.word_for(process_id, logical_box_id)
+                    for logical_box_id in selected_ids
+                ],
+                dtype=np.uint32,
+            )
+            word_source = wp.array(words, dtype=wp.uint32, device="cpu")
+            state = self.state_array_for(process_id)
+            wp.launch(
+                kernel,
+                dim=len(selected_ids),
+                inputs=[state, lane_source, word_source],
+                device=state.device,
+            )
+
     def _build_words_by_process(self) -> dict[str, tuple[int, ...]]:
         """Build lane-indexed words and reject same-process collisions.
 
@@ -544,6 +616,57 @@ def _validate_process_id(process_id: object) -> None:
         raise TypeError("process_id must be a str.")
     if process_id not in PROCESS_IDS:
         raise ValueError("process_id is unsupported.")
+
+
+def _resolve_stream_selection(
+    process_ids: tuple[str, ...] | None,
+    logical_box_ids: tuple[str, ...] | None,
+    *,
+    registered_logical_box_ids: tuple[str, ...],
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Validate selectors and return canonical registered process/ID choices."""
+    if process_ids is not None and type(process_ids) is not tuple:
+        raise TypeError("process_ids must be an exact tuple.")
+    if logical_box_ids is not None and type(logical_box_ids) is not tuple:
+        raise TypeError("logical_box_ids must be an exact tuple.")
+    selected_processes = PROCESS_IDS if process_ids is None else process_ids
+    selected_ids = (
+        registered_logical_box_ids
+        if logical_box_ids is None
+        else logical_box_ids
+    )
+    for process_id in selected_processes:
+        _validate_process_id(process_id)
+    for logical_box_id in selected_ids:
+        _validate_logical_box_id(logical_box_id, "logical_box_ids entries")
+        if logical_box_id not in registered_logical_box_ids:
+            raise LookupError("No lane is registered for logical_box_id.")
+    if len(set(selected_processes)) != len(selected_processes):
+        raise ValueError("process_ids must be unique.")
+    if len(set(selected_ids)) != len(selected_ids):
+        raise ValueError("logical_box_ids must be unique.")
+    return tuple(selected_processes), tuple(selected_ids)
+
+
+_SELECTED_WRITE_KERNEL: Any | None = None
+
+
+def _selected_write_kernel(wp: Any) -> Any:
+    """Lazily create the indexed selected-lane Warp writer."""
+    global _SELECTED_WRITE_KERNEL
+    if _SELECTED_WRITE_KERNEL is None:
+
+        @wp.kernel
+        def selected_write(
+            state: wp.array(dtype=wp.uint32),
+            lanes: wp.array(dtype=wp.int32),
+            words: wp.array(dtype=wp.uint32),
+        ) -> None:
+            index = wp.tid()
+            state[lanes[index]] = words[index]
+
+        _SELECTED_WRITE_KERNEL = selected_write
+    return _SELECTED_WRITE_KERNEL
 
 
 def _validate_state_manifest(value: object) -> None:

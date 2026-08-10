@@ -280,11 +280,14 @@ collide. Test the scheduler-resolved logical-box selection: only selected boxes
 whose operation launches may consume RNG words. Disabled, prelaunch-skipped,
 zero-time, and valid no-work lanes must retain their words exactly, including
 when another logical box launches. Verify reset-like values reject before
-direct-kernel resolution and that an empty resolved launch set is a no-op. For
-a failure after a writer-capable launch, assert the established guard-close and
-session-fault lifecycle rather than RNG rollback. Do not add reset or inspection
-APIs, hidden transfers, synchronization, checkpoint persistence, or restart
-continuation.
+direct-kernel resolution and that an empty resolved launch set is a no-op.
+ Explicit direct-module stream lifecycle coverage must require the exact ACTIVE
+ session/registry/closed-guard binding, validate selectors before writers, and
+ verify inspection returns frozen metadata without arrays, readback, or
+ synchronization. Resets may target only published sidecars and must not change
+ ordinary dispatch; checkpoint persistence and restart continuation remain
+ unsupported. For a failure after a writer-capable launch, assert the established
+ guard-close and session-fault lifecycle rather than RNG rollback.
 
 ```bash
 pytest particula/execution/tests/gpu_session_test.py \

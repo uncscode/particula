@@ -2157,3 +2157,87 @@ def test_finalized_close_is_write_free_without_binding_validation() -> None:
     assert session.lifecycle is ResidentLifecycle.FINALIZED
     assert guard._open_token is None
     assert guard.completed_steps == 0
+
+
+@pytest.mark.warp
+def test_session_stream_lifecycle_requires_closed_active_binding() -> None:
+    """Test stream inspection/reset compose only through an exact closed guard."""
+    from particula.execution.gpu_resources import GPUResourceRegistry
+
+    particles, gas, environment = _warp_resources()
+    session = ResidentSession(
+        particles,
+        gas,
+        environment,
+        ResidentDimensions(1, 2, 1),
+        _metadata(),
+        ResidentLifecycle.ACTIVE,
+    )
+    registry = GPUResourceRegistry(session)
+    guard = ResidentStepGuard(session, registry)
+    resources = registry.acquire_coagulation(1)
+
+    manifest = session.inspect_streams(registry, guard)
+    assert manifest.published_process_ids == ("coagulation",)
+    session.reset_streams(registry, guard, logical_box_ids=("0",))
+    token = guard.begin_step(1.0)
+    before = resources.rng_states.numpy().copy()
+    with pytest.raises(RuntimeError, match="open"):
+        session.initialize_streams(registry, guard)
+    np.testing.assert_array_equal(resources.rng_states.numpy(), before)
+    guard.complete_step(token)
+
+
+@pytest.mark.warp
+def test_session_stream_lifecycle_rejects_invalid_binding_and_selectors() -> (
+    None
+):
+    """Test stream lifecycle calls validate before changing published words."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+
+    empty_manifest = session.inspect_streams(registry, guard)
+    assert empty_manifest.published_process_ids == ()
+    resources = registry.acquire_coagulation(1)
+    before = resources.rng_states.numpy().copy()
+
+    other_guard = _guard()
+    with pytest.raises(ValueError, match="guard must match"):
+        session.inspect_streams(registry, other_guard)
+    with pytest.raises(ValueError, match="has not been acquired"):
+        session.initialize_streams(registry, guard, process_ids=("wall_loss",))
+    with pytest.raises(LookupError, match="No lane"):
+        session.reset_streams(registry, guard, logical_box_ids=("missing",))
+
+    np.testing.assert_array_equal(resources.rng_states.numpy(), before)
+
+
+@pytest.mark.warp
+def test_stream_lifecycle_binding_rejection_precedes_registry_delegation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a mismatched guard cannot inspect or reset through the registry."""
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    other_guard = _guard()
+    calls: list[str] = []
+
+    monkeypatch.setattr(
+        registry,
+        "inspect_published_streams",
+        lambda _session: calls.append("inspect"),
+    )
+    monkeypatch.setattr(
+        registry,
+        "initialize_published_streams",
+        lambda *_args, **_kwargs: calls.append("initialize"),
+    )
+
+    with pytest.raises(ValueError, match="guard must match"):
+        session.inspect_streams(registry, other_guard)
+    with pytest.raises(ValueError, match="guard must match"):
+        session.reset_streams(registry, other_guard)
+
+    assert calls == []

@@ -102,7 +102,9 @@ DENIED_PUBLIC_NAMES = (
     "SUPPORTED_PROCESS_IDS",
     "StreamKey",
     "StreamDescriptor",
+    "StreamManifest",
     "StreamRegistry",
+    "PublishedStreamManifest",
 )
 
 FORBIDDEN_MODULE_PREFIXES = (

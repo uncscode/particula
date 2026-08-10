@@ -219,6 +219,95 @@ def test_coagulation_acquisition_initializes_one_persistent_stream() -> None:
 
 
 @pytest.mark.warp
+def test_published_stream_reset_targets_only_selected_sidecars_and_lanes() -> (
+    None
+):
+    """Test explicit resets retain sidecar identity and skip unselected lanes."""
+    wp = pytest.importorskip("warp")
+    session = _session(boxes=2)
+    registry = GPUResourceRegistry(session)
+    coagulation = registry.acquire_coagulation(1)
+    wall_loss = registry.acquire_wall_loss()
+    wp.copy(
+        coagulation.rng_states,
+        wp.array(
+            np.full(2, 17, dtype=np.uint32), dtype=wp.uint32, device="cpu"
+        ),
+    )
+    wp.copy(
+        wall_loss.rng_states,
+        wp.array(
+            np.full(2, 19, dtype=np.uint32), dtype=wp.uint32, device="cpu"
+        ),
+    )
+
+    registry.initialize_published_streams(
+        session,
+        process_ids=("coagulation",),
+        logical_box_ids=("0",),
+    )
+
+    stream = registry._coagulation_stream_registry
+    assert stream is not None
+    assert coagulation.rng_states.numpy().tolist() == [
+        stream.word_for("coagulation", "0"),
+        17,
+    ]
+    assert wall_loss.rng_states.numpy().tolist() == [19, 19]
+    inspection = registry.inspect_published_streams(session)
+    assert inspection.published_process_ids == ("coagulation", "wall_loss")
+    assert not hasattr(inspection, "rng_states")
+
+
+@pytest.mark.warp
+def test_published_stream_reset_rejects_empty_registry_selectors_without_allocation() -> (
+    None
+):
+    """Test empty publication still validates selectors before sidecar work."""
+    session = _session(boxes=1)
+    registry = GPUResourceRegistry(session)
+
+    with pytest.raises(ValueError, match="has not been acquired"):
+        registry.initialize_published_streams(
+            session, process_ids=("coagulation",)
+        )
+    with pytest.raises(LookupError, match="No lane"):
+        registry.initialize_published_streams(
+            session, logical_box_ids=("missing",)
+        )
+
+    assert registry._bindings == {}
+    assert (
+        registry.inspect_published_streams(session).published_process_ids == ()
+    )
+
+
+@pytest.mark.warp
+def test_unpublished_process_rejection_precedes_published_stream_write() -> (
+    None
+):
+    """Test a mixed request cannot partially reset an acquired process."""
+    wp = pytest.importorskip("warp")
+    session = _session(boxes=1)
+    registry = GPUResourceRegistry(session)
+    coagulation = registry.acquire_coagulation(1)
+    wp.copy(
+        coagulation.rng_states,
+        wp.array(
+            np.array([17], dtype=np.uint32), dtype=wp.uint32, device="cpu"
+        ),
+    )
+
+    with pytest.raises(ValueError, match="has not been acquired"):
+        registry.initialize_published_streams(
+            session,
+            process_ids=("coagulation", "wall_loss"),
+        )
+
+    assert coagulation.rng_states.numpy().tolist() == [17]
+
+
+@pytest.mark.warp
 def test_wall_loss_acquisition_initializes_its_distinct_persistent_stream() -> (
     None
 ):

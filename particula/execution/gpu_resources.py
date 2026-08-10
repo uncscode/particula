@@ -12,8 +12,9 @@ from :mod:`particula.execution`.
 
 The registry retains array identities and performs metadata-only schema and
 nonaliasing checks. It does not establish allocator provenance, execute a
-kernel, or change session lifecycle. The separate process streams have no
-reset API, hidden transfer, or synchronization.
+kernel, or change session lifecycle. Explicit lifecycle methods may inspect
+frozen stream metadata or reset selected published lanes without hidden
+transfer or synchronization.
 ``validate_pinned_session`` is the narrow direct-module-only integration seam
 for resident timestep guards. It requires the exact retained session, then
 revalidates its active lifecycle, pinned container and primary-array identities,
@@ -46,7 +47,11 @@ from particula.execution.gpu_session import (
     ResidentLifecycle,
     ResidentSession,
 )
-from particula.execution.rng import StreamRegistry
+from particula.execution.rng import (
+    StreamManifest,
+    StreamRegistry,
+    _resolve_stream_selection,
+)
 from particula.gpu.kernels.communication import (
     GasCommunicationBuffers,
     ParticleCommunicationBuffers,
@@ -63,6 +68,7 @@ from particula.gpu.kernels.nucleation import (
 __all__ = [
     "ManifestEntry",
     "ResourceManifest",
+    "PublishedStreamManifest",
     "GPUResourceRegistry",
     "CondensationResources",
     "CoagulationResources",
@@ -92,6 +98,19 @@ class ResourceManifest:
 
     family: str
     entries: tuple[ManifestEntry, ...]
+
+
+@dataclass(frozen=True)
+class PublishedStreamManifest:
+    """Describe immutable identity metadata for currently published streams.
+
+    No live device arrays, pointers, device values, or current stream words are
+    exposed by this inspection carrier.
+    """
+
+    stream: StreamManifest
+    published_process_ids: tuple[str, ...]
+    sidecar_roles: tuple[tuple[str, str], ...]
 
 
 @dataclass(frozen=True, eq=False)
@@ -442,6 +461,85 @@ class GPUResourceRegistry:
         if session is not self._session:
             raise ValueError("session must be the pinned ResidentSession.")
         self._validate_session_signature()
+
+    def _stream_metadata(self) -> tuple[int, tuple[str, ...], tuple[int, ...]]:
+        """Return normalized host stream identity for sessions."""
+        stream = self._session.metadata.stream
+        if stream.n_boxes == 0 and self._session.dimensions.n_boxes:
+            boxes = self._session.dimensions.n_boxes
+            return (
+                0,
+                tuple(str(index) for index in range(boxes)),
+                tuple(range(boxes)),
+            )
+        return stream.root_seed, stream.logical_box_ids, stream.lanes
+
+    def _published_stream_registry(
+        self, process_id: str
+    ) -> StreamRegistry | None:
+        """Return the published process registry without exposing sidecars."""
+        if process_id == "coagulation":
+            return self._coagulation_stream_registry
+        return self._wall_loss_stream_registry
+
+    def inspect_published_streams(
+        self, session: ResidentSession
+    ) -> PublishedStreamManifest:
+        """Return frozen metadata for currently published resident streams."""
+        self.validate_pinned_session(session)
+        root_seed, logical_box_ids, lanes = self._stream_metadata()
+        published = tuple(
+            process_id
+            for process_id in ("coagulation", "wall_loss")
+            if self._published_stream_registry(process_id) is not None
+        )
+        descriptors = tuple(
+            descriptor
+            for process_id in published
+            for descriptor in self._published_stream_registry(process_id)
+            .inspect()
+            .descriptors
+            if descriptor.key.process_id == process_id
+        )
+        roles = tuple((process_id, "rng_states") for process_id in published)
+        return PublishedStreamManifest(
+            StreamManifest(root_seed, logical_box_ids, lanes, descriptors),
+            published,
+            roles,
+        )
+
+    def initialize_published_streams(
+        self,
+        session: ResidentSession,
+        *,
+        process_ids: tuple[str, ...] | None = None,
+        logical_box_ids: tuple[str, ...] | None = None,
+    ) -> None:
+        """Explicitly reinitialize selected currently published stream lanes."""
+        self.validate_pinned_session(session)
+        self.assert_step_closed()
+        _, registered_ids, _ = self._stream_metadata()
+        published = tuple(
+            process_id
+            for process_id in ("coagulation", "wall_loss")
+            if self._published_stream_registry(process_id) is not None
+        )
+        requested = published if process_ids is None else process_ids
+        selected_processes, selected_ids = _resolve_stream_selection(
+            requested,
+            logical_box_ids,
+            registered_logical_box_ids=registered_ids,
+        )
+        for process_id in selected_processes:
+            if process_id not in published:
+                raise ValueError("Requested RNG stream has not been acquired.")
+        for process_id in selected_processes:
+            registry = self._published_stream_registry(process_id)
+            if registry is None:
+                raise AssertionError("published stream registry is unavailable")
+            registry.initialize_selected(
+                process_ids=(process_id,), logical_box_ids=selected_ids
+            )
 
     def validate_diagnostic_outputs(
         self, session: ResidentSession, outputs: tuple[Any, ...]

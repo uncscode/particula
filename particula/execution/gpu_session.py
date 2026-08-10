@@ -820,6 +820,45 @@ class ResidentSession:
         """
         return self._checkpoint_controller(registry, guard).finalize()
 
+    def inspect_streams(
+        self, registry: "GPUResourceRegistry", guard: "ResidentStepGuard"
+    ) -> Any:
+        """Return immutable metadata for published binding RNG streams."""
+        _validate_active_stream_binding(self, registry, guard)
+        return registry.inspect_published_streams(self)
+
+    def initialize_streams(
+        self,
+        registry: "GPUResourceRegistry",
+        guard: "ResidentStepGuard",
+        *,
+        process_ids: tuple[str, ...] | None = None,
+        logical_box_ids: tuple[str, ...] | None = None,
+    ) -> None:
+        """Explicitly reinitialize selected published resident RNG streams."""
+        _validate_active_stream_binding(self, registry, guard)
+        registry.initialize_published_streams(
+            self,
+            process_ids=process_ids,
+            logical_box_ids=logical_box_ids,
+        )
+
+    def reset_streams(
+        self,
+        registry: "GPUResourceRegistry",
+        guard: "ResidentStepGuard",
+        *,
+        process_ids: tuple[str, ...] | None = None,
+        logical_box_ids: tuple[str, ...] | None = None,
+    ) -> None:
+        """Alias :meth:`initialize_streams` for deliberate stream resets."""
+        self.initialize_streams(
+            registry,
+            guard,
+            process_ids=process_ids,
+            logical_box_ids=logical_box_ids,
+        )
+
     def _finalize_checkpoint(self) -> None:
         """Transition this exact active session to its terminal lifecycle.
 
@@ -1165,6 +1204,33 @@ def _validate_terminal_binding(
         or guard._registry is not registry
     ):
         raise ValueError("guard must match the resident session and registry.")
+
+
+def _validate_active_stream_binding(
+    session: ResidentSession,
+    registry: "GPUResourceRegistry",
+    guard: ResidentStepGuard,
+) -> None:
+    """Require an exact active, closed session/registry/guard stream binding."""
+    from particula.execution.gpu_resources import GPUResourceRegistry
+
+    if type(session) is not ResidentSession:
+        raise TypeError("session must be an exact ResidentSession.")
+    if type(registry) is not GPUResourceRegistry:
+        raise TypeError("registry must be an exact GPUResourceRegistry.")
+    if type(guard) is not ResidentStepGuard:
+        raise TypeError("guard must be an exact ResidentStepGuard.")
+    if (
+        registry._session is not session
+        or guard._session is not session
+        or guard._registry is not registry
+    ):
+        raise ValueError("guard must match the resident session and registry.")
+    if session.lifecycle is not ResidentLifecycle.ACTIVE:
+        raise ValueError("session.lifecycle must be ACTIVE.")
+    registry.validate_pinned_session(session)
+    guard.assert_step_closed()
+    registry.assert_step_closed()
 
 
 def _fault_resident_session(session: ResidentSession) -> None:

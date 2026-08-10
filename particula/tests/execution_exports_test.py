@@ -78,7 +78,9 @@ EXCLUDED_EXPORTS = (
     "GPUResourceRegistry",
     "StreamKey",
     "StreamDescriptor",
+    "StreamManifest",
     "StreamRegistry",
+    "PublishedStreamManifest",
     "PROCESS_IDS",
     "SUPPORTED_PROCESS_IDS",
 )
