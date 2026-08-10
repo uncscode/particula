@@ -9,7 +9,7 @@
   "start_date": null,
   "target_date": null,
   "completion_date": null,
-  "last_updated": "2026-08-09",
+  "last_updated": "2026-08-10",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E7-F8/architecture_design.md",
@@ -74,11 +74,11 @@
     {
       "id": "E7-F8-P4",
       "title": "Add explicit initialize reset and stream inspection APIs with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-08-10",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
