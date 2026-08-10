@@ -539,9 +539,8 @@ class ResidentSimulationScheduler:
                     wall_loss.execute(request.wall_loss)
                     thermal.record_completed(node)
                 elif node_id == "nucleation":
-                    thermal.execute_consumer(
-                        node, lambda: nucleation.execute(request.nucleation)
-                    )
+                    nucleation.execute(request.nucleation)
+                    thermal.record_completed(node)
                 elif node_id == "diagnostics":
                     thermal.execute_consumer(
                         node, lambda: diagnostics.execute(request.diagnostics)

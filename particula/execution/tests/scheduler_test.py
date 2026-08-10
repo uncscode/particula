@@ -942,7 +942,7 @@ def test_resident_scheduler_dispatches_resolved_nodes_once(
         "dilution",
         "wall_loss",
         "wall_loss",
-        "consumer:nucleation",
+        "nucleation",
         "nucleation",
         "consumer:diagnostics",
         "diagnostics",
