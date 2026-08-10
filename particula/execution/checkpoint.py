@@ -14,10 +14,11 @@ PARTICLES family and its optional final-volume sidecar. ``checkpoint()`` is
 nonterminal; ``finalize()`` caches a snapshot and terminally ends normal
 session use. No rollback is promised once a device operation has launched.
 
-A published resident coagulation or wall-loss RNG stream makes checkpoint and
-finalization fail closed before synchronization, conversion, or payload
-enumeration. Stream metadata and RNG words are intentionally not serialized,
-restored, inspected, or continued across restart.
+Schema-v3 optionally captures published resident coagulation and wall-loss RNG
+stream metadata and current words after the single synchronization boundary.
+Those words are the continuation authority on an exact-device restart; normal
+dispatch and reacquisition retain restored arrays by identity until reset is
+explicitly requested.
 """
 
 from __future__ import annotations
@@ -44,7 +45,7 @@ if TYPE_CHECKING:
     from particula.gas import EnvironmentData, GasData
     from particula.particles import ParticleData
 
-_SCHEMA_VERSION = 2
+_SCHEMA_VERSION = 3
 _PRIMARY_ROLES = (
     ("particles", "masses"),
     ("particles", "concentration"),
@@ -126,6 +127,7 @@ class ResidentCheckpoint:
     environment: "EnvironmentData"
     payloads: tuple[CheckpointPayload, ...]
     communication: "CommunicationCheckpointMetadata | None" = None
+    rng_continuation: "RNGContinuationCheckpoint | None" = None
 
 
 @dataclass(frozen=True)
@@ -149,6 +151,28 @@ class CommunicationCheckpointMetadata:
     has_final_volumes: bool
 
 
+@dataclass(frozen=True)
+class RNGContinuationPayload:
+    """Store one immutable current-word payload for a published process."""
+
+    process_id: str
+    dtype: str
+    shape: tuple[int, ...]
+    data: bytes
+
+
+@dataclass(frozen=True)
+class RNGContinuationCheckpoint:
+    """Store optional schema-v3 RNG metadata and continuation words."""
+
+    stream_schema_version: int
+    root_seed: int
+    logical_box_ids: tuple[str, ...]
+    lanes: tuple[int, ...]
+    descriptors: tuple[Any, ...]
+    payloads: tuple[RNGContinuationPayload, ...]
+
+
 def _payload(
     family: str,
     role: str,
@@ -165,6 +189,33 @@ def _payload(
         tuple(array.shape),
         array.tobytes(),
         capacity,
+    )
+
+
+def _capture_rng_continuation(
+    streams: tuple[tuple[str, Any, Any], ...],
+) -> RNGContinuationCheckpoint | None:
+    """Copy at most two preflighted published streams after one sync."""
+    if not streams:
+        return None
+    manifest = streams[0][1]
+    payloads: list[RNGContinuationPayload] = []
+    for process_id, stream_manifest, state in streams:
+        if stream_manifest != manifest:
+            raise ValueError("published RNG stream metadata is inconsistent.")
+        value = np.ascontiguousarray(state.numpy())
+        payloads.append(
+            RNGContinuationPayload(
+                process_id, value.dtype.str, tuple(value.shape), value.tobytes()
+            )
+        )
+    return RNGContinuationCheckpoint(
+        manifest.descriptors[0].key.schema_version,
+        manifest.root_seed,
+        manifest.logical_box_ids,
+        manifest.lanes,
+        manifest.descriptors,
+        tuple(payloads),
     )
 
 
@@ -275,10 +326,6 @@ class ResidentCheckpointController:
             )
         self._registry.validate_pinned_session(self._session)
         self._registry.assert_step_closed()
-        if self._registry._has_resident_rng_stream():
-            raise ValueError(
-                "resident RNG stream checkpoint continuation is unsupported."
-            )
 
     def checkpoint(self) -> ResidentCheckpoint:
         """Return a fresh immutable snapshot while leaving the session active.
@@ -297,6 +344,7 @@ class ResidentCheckpointController:
                 resident RNG stream would require unsupported continuation.
         """
         self._validate()
+        rng_streams = self._registry._enumerate_published_rng_streams()
         import warp as wp
 
         from particula.gpu.conversion import (
@@ -310,83 +358,91 @@ class ResidentCheckpointController:
         except BaseException:
             _fault_resident_session(self._session)
             raise
-        particles = from_warp_particle_data(
-            cast(Any, self._session.particles), sync=False
-        )
-        gas = from_warp_gas_data(
-            cast(Any, self._session.gas),
-            name=list(self._session.metadata.gas_names),
-            sync=False,
-            allow_per_box_partitioning=True,
-        )
-        environment = from_warp_environment_data(
-            cast(Any, self._session.environment), sync=False
-        )
-        resident_gas = cast(Any, self._session.gas)
-        # Reuse conversion readbacks for inspection and canonical payloads. The
-        # CPU GasData carrier intentionally has no vapor pressure and collapses
-        # partitioning to shared species state, so only those two canonical GPU
-        # fields need their own readback.
-        primary_values = {
-            ("particles", "masses"): particles.masses,
-            ("particles", "concentration"): particles.concentration,
-            ("particles", "charge"): particles.charge,
-            ("particles", "density"): particles.density,
-            ("particles", "volume"): particles.volume,
-            ("gas", "molar_mass"): gas.molar_mass,
-            ("gas", "concentration"): gas.concentration,
-            ("gas", "vapor_pressure"): resident_gas.vapor_pressure,
-            ("gas", "partitioning"): resident_gas.partitioning,
-            ("environment", "temperature"): environment.temperature,
-            ("environment", "pressure"): environment.pressure,
-            ("environment", "saturation_ratio"): environment.saturation_ratio,
-        }
-        payloads = [
-            _payload(family, role, primary_values[(family, role)])
-            for family, role in _PRIMARY_ROLES
-        ]
-        payloads.extend(
-            _payload(family, role, value, capacity)
-            for family, role, value, capacity in (
-                self._registry._enumerate_resources()
+        try:
+            particles = from_warp_particle_data(
+                cast(Any, self._session.particles), sync=False
             )
-        )
-        resources = self._registry._views.get("communication_gas") or (
-            self._registry._views.get("communication_particles")
-        )
-        if resources is not None and resources.final_volumes is not None:
-            family = (
-                "communication_gas"
-                if (
-                    resources.configuration.communication_map.transport_mode.value
-                    == "gas"
-                )
-                else "communication_particles"
+            gas = from_warp_gas_data(
+                cast(Any, self._session.gas),
+                name=list(self._session.metadata.gas_names),
+                sync=False,
+                allow_per_box_partitioning=True,
             )
-            payloads.append(
-                _payload(
-                    family,
-                    "final_volumes",
-                    resources.final_volumes,
-                    resources.configuration.communication_map.edge_capacity,
+            environment = from_warp_environment_data(
+                cast(Any, self._session.environment), sync=False
+            )
+            resident_gas = cast(Any, self._session.gas)
+            # Reuse conversion readbacks for inspection and canonical payloads.
+            # The CPU GasData carrier intentionally has no vapor pressure and
+            # collapses partitioning to shared species state, so only those two
+            # canonical GPU fields need their own readback.
+            primary_values = {
+                ("particles", "masses"): particles.masses,
+                ("particles", "concentration"): particles.concentration,
+                ("particles", "charge"): particles.charge,
+                ("particles", "density"): particles.density,
+                ("particles", "volume"): particles.volume,
+                ("gas", "molar_mass"): gas.molar_mass,
+                ("gas", "concentration"): gas.concentration,
+                ("gas", "vapor_pressure"): resident_gas.vapor_pressure,
+                ("gas", "partitioning"): resident_gas.partitioning,
+                ("environment", "temperature"): environment.temperature,
+                ("environment", "pressure"): environment.pressure,
+                (
+                    "environment",
+                    "saturation_ratio",
+                ): environment.saturation_ratio,
+            }
+            payloads = [
+                _payload(family, role, primary_values[(family, role)])
+                for family, role in _PRIMARY_ROLES
+            ]
+            payloads.extend(
+                _payload(family, role, value, capacity)
+                for family, role, value, capacity in (
+                    self._registry._enumerate_resources()
                 )
             )
-        communication = self._communication_metadata()
-        return ResidentCheckpoint(
-            _SCHEMA_VERSION,
-            "ResidentSession",
-            self._session.dimensions,
-            self._session.metadata.device,
-            self._session.metadata.gas_names,
-            self._guard.completed_steps,
-            self._guard.simulated_time,
-            ResidentLifecycle.ACTIVE,
-            particles,
-            gas,
-            environment,
-            tuple(payloads),
-            communication,
-        )
+            resources = self._registry._views.get("communication_gas") or (
+                self._registry._views.get("communication_particles")
+            )
+            if resources is not None and resources.final_volumes is not None:
+                family = (
+                    "communication_gas"
+                    if (
+                        resources.configuration.communication_map.transport_mode.value
+                        == "gas"
+                    )
+                    else "communication_particles"
+                )
+                payloads.append(
+                    _payload(
+                        family,
+                        "final_volumes",
+                        resources.final_volumes,
+                        resources.configuration.communication_map.edge_capacity,
+                    )
+                )
+            communication = self._communication_metadata()
+            return ResidentCheckpoint(
+                _SCHEMA_VERSION,
+                "ResidentSession",
+                self._session.dimensions,
+                self._session.metadata.device,
+                self._session.metadata.gas_names,
+                self._guard.completed_steps,
+                self._guard.simulated_time,
+                ResidentLifecycle.ACTIVE,
+                particles,
+                gas,
+                environment,
+                tuple(payloads),
+                communication,
+                _capture_rng_continuation(rng_streams),
+            )
+        except BaseException:
+            _fault_resident_session(self._session)
+            raise
 
     def _communication_metadata(self) -> CommunicationCheckpointMetadata | None:
         """Return metadata for the sole optional pinned communication view.
@@ -490,7 +546,17 @@ def restart_resident_session(  # noqa: C901
     # Repeat complete descriptor validation at the allocation boundary. Frozen
     # records can still be maliciously forged with low-level attribute writes.
     _preflight_restart(checkpoint, device)
-    session = setup_resident_session(particles, gas, environment, target_device)
+    continuation = checkpoint.rng_continuation
+    setup_kwargs: dict[str, Any] = {}
+    if continuation is not None:
+        setup_kwargs = {
+            "root_seed": continuation.root_seed,
+            "logical_box_ids": continuation.logical_box_ids,
+            "lanes": continuation.lanes,
+        }
+    session = setup_resident_session(
+        particles, gas, environment, target_device, **setup_kwargs
+    )
     import warp as wp
 
     restored_gas = cast(Any, session.gas)
@@ -501,7 +567,23 @@ def restart_resident_session(  # noqa: C901
 
     registry = GPUResourceRegistry(session)
     resource_payloads = tuple(checkpoint.payloads[len(_PRIMARY_ROLES) :])
-    if resource_payloads:
+    restored_processes: tuple[str, ...] = ()
+    rng_values: dict[str, Any] = {}
+    if continuation is not None:
+        restored_processes = tuple(
+            item.process_id for item in continuation.payloads
+        )
+        rng_values = {
+            item.process_id: wp.array(
+                np.frombuffer(item.data, dtype=np.dtype(item.dtype))
+                .reshape(item.shape)
+                .copy(),
+                dtype=wp.uint32,
+                device=target_device.native,
+            )
+            for item in continuation.payloads
+        }
+    if resource_payloads or rng_values:
         manifests = {
             manifest.family: manifest for manifest in registry.manifests
         }
@@ -535,19 +617,29 @@ def restart_resident_session(  # noqa: C901
                 value, dtype=dtype, device=target_device.native
             )
             capacities[item.family] = item.capacity
+        if "coagulation" in rng_values:
+            grouped.setdefault("coagulation", {})["rng_states"] = rng_values[
+                "coagulation"
+            ]
+        if "wall_loss" in rng_values:
+            grouped.setdefault("wall_loss", {})["rng_states"] = rng_values[
+                "wall_loss"
+            ]
         for family, bindings in grouped.items():
             manifest = manifests[family]
             if set(bindings) != {entry.role for entry in manifest.entries}:
                 raise ValueError("checkpoint resource payloads are incomplete.")
-            registry._acquire(manifest, bindings, capacities[family])
+            registry._acquire(manifest, bindings, capacities.get(family))
             if family == "condensation":
                 registry.acquire_condensation()
             elif family == "coagulation":
                 if capacities[family] is None:
                     raise ValueError("coagulation checkpoint lacks capacity.")
-                registry.acquire_coagulation(cast(int, capacities[family]))
+                if family not in restored_processes:
+                    registry.acquire_coagulation(cast(int, capacities[family]))
             elif family == "wall_loss":
-                registry.acquire_wall_loss()
+                if family not in restored_processes:
+                    registry.acquire_wall_loss()
             elif family in ("communication_gas", "communication_particles"):
                 metadata = checkpoint.communication
                 if metadata is None:
@@ -585,6 +677,8 @@ def restart_resident_session(  # noqa: C901
                 )
             else:
                 registry.acquire_nucleation()
+    if restored_processes:
+        registry._restore_published_rng_views(restored_processes)
     guard = ResidentStepGuard(session, registry)
     guard._restore_checkpoint_counters(
         int(checkpoint.completed_steps), checkpoint.simulated_time
@@ -600,7 +694,7 @@ def _preflight_restart(  # noqa: C901
         raise TypeError("checkpoint must be an exact ResidentCheckpoint.")
     if (
         type(checkpoint.schema_version) is not int
-        or checkpoint.schema_version not in (1, _SCHEMA_VERSION)
+        or checkpoint.schema_version not in (1, 2, _SCHEMA_VERSION)
         or type(checkpoint.carrier_type) is not str
         or checkpoint.carrier_type != "ResidentSession"
     ):
@@ -611,7 +705,7 @@ def _preflight_restart(  # noqa: C901
         raise ValueError(
             "v1 checkpoints cannot contain communication metadata."
         )
-    if checkpoint.schema_version == _SCHEMA_VERSION:
+    if checkpoint.schema_version >= 2:
         metadata = checkpoint.communication
         if metadata is not None:
             if type(metadata) is not CommunicationCheckpointMetadata:
@@ -730,7 +824,7 @@ def _preflight_restart(  # noqa: C901
         raise ValueError(
             "v1 checkpoints cannot contain communication payloads."
         )
-    if checkpoint.schema_version == _SCHEMA_VERSION:
+    if checkpoint.schema_version >= 2:
         metadata = checkpoint.communication
         if (metadata is None) != (communication_family is None):
             raise ValueError(
@@ -752,7 +846,96 @@ def _preflight_restart(  # noqa: C901
             or metadata.has_final_volumes != has_final_volumes
         ):
             raise ValueError("communication metadata does not match payloads.")
+    _validate_rng_continuation(checkpoint, dimensions)
     return primary
+
+
+def _validate_rng_continuation(  # noqa: C901
+    checkpoint: ResidentCheckpoint, dimensions: ResidentDimensions
+) -> None:
+    """Fail closed on malformed v3 continuation metadata before setup."""
+    continuation = checkpoint.rng_continuation
+    if checkpoint.schema_version < 3:
+        if continuation is not None:
+            raise ValueError(
+                "pre-v3 checkpoints cannot contain RNG continuation."
+            )
+        return
+    if continuation is None:
+        return
+    if type(continuation) is not RNGContinuationCheckpoint:
+        raise TypeError("RNG continuation metadata is invalid.")
+    from particula.execution.rng import (
+        MAX_ROOT_SEED,
+        PROCESS_IDS,
+        STREAM_SCHEMA_VERSION,
+        StreamDescriptor,
+        StreamKey,
+    )
+
+    if (
+        continuation.stream_schema_version != STREAM_SCHEMA_VERSION
+        or type(continuation.root_seed) is not int
+        or not 0 <= continuation.root_seed <= MAX_ROOT_SEED
+        or type(continuation.logical_box_ids) is not tuple
+        or type(continuation.lanes) is not tuple
+        or len(continuation.logical_box_ids) != dimensions.n_boxes
+        or len(continuation.lanes) != dimensions.n_boxes
+    ):
+        raise ValueError("RNG continuation metadata is invalid.")
+    if type(continuation.payloads) is not tuple:
+        raise ValueError("RNG continuation metadata is invalid.")
+    if any(
+        type(payload) is not RNGContinuationPayload
+        for payload in continuation.payloads
+    ):
+        raise ValueError("RNG continuation payload is invalid.")
+    try:
+        logical_ids_are_valid = all(
+            type(name) is str and name.encode("utf-8")
+            for name in continuation.logical_box_ids
+        )
+    except UnicodeEncodeError as error:
+        raise ValueError("RNG continuation metadata is invalid.") from error
+    if (
+        not logical_ids_are_valid
+        or len(set(continuation.logical_box_ids))
+        != len(continuation.logical_box_ids)
+        or any(type(lane) is not int for lane in continuation.lanes)
+        or set(continuation.lanes) != set(range(dimensions.n_boxes))
+    ):
+        raise ValueError("RNG continuation metadata is invalid.")
+    process_ids = tuple(item.process_id for item in continuation.payloads)
+    if not process_ids or process_ids != tuple(
+        process for process in PROCESS_IDS if process in process_ids
+    ):
+        raise ValueError("RNG continuation payload order is invalid.")
+    try:
+        expected = tuple(
+            StreamDescriptor(
+                StreamKey(STREAM_SCHEMA_VERSION, process, name), lane
+            )
+            for process in process_ids
+            for name, lane in zip(
+                continuation.logical_box_ids, continuation.lanes, strict=True
+            )
+        )
+    except (TypeError, ValueError) as error:
+        raise ValueError("RNG continuation metadata is invalid.") from error
+    if (
+        type(continuation.descriptors) is not tuple
+        or continuation.descriptors != expected
+    ):
+        raise ValueError("RNG continuation metadata is invalid.")
+    for payload in continuation.payloads:
+        if (
+            type(payload) is not RNGContinuationPayload
+            or payload.dtype != "<u4"
+            or payload.shape != (dimensions.n_boxes,)
+            or type(payload.data) is not bytes
+            or len(payload.data) != dimensions.n_boxes * 4
+        ):
+            raise ValueError("RNG continuation payload is invalid.")
 
 
 def _validate_resource_payloads(  # noqa: C901
@@ -778,10 +961,8 @@ def _validate_resource_payloads(  # noqa: C901
     """
     if not payloads:
         return None, False
-    if any(item.family in ("coagulation", "wall_loss") for item in payloads):
-        raise ValueError(
-            "checkpoint RNG resource payloads are not restartable."
-        )
+    if any(item.role == "rng_states" for item in payloads):
+        raise ValueError("checkpoint RNG resource payloads are invalid.")
     index = 0
     seen_families: set[str] = set()
     communication_family: str | None = None
@@ -839,6 +1020,8 @@ def _validate_resource_payloads(  # noqa: C901
         ):
             raise ValueError("checkpoint resource capacity is invalid.")
         for entry in manifest.entries:
+            if entry.role == "rng_states":
+                continue
             if index >= len(payloads):
                 raise ValueError("checkpoint resource payloads are incomplete.")
             item = payloads[index]

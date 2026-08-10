@@ -296,17 +296,17 @@
   conversion, allocation, or upload. Snapshots include canonical immutable bytes
   for primaries and acquired sidecars and detached CPU inspection carriers. The
    inspection `GasData` intentionally omits GPU-only vapor pressure and is not
-   authoritative; restart recovers vapor pressure from canonical bytes. A
-    published resident coagulation or wall-loss RNG stream causes checkpoint and
-    finalize to reject before device synchronization, payload conversion, or
-    sidecar enumeration. Stream metadata and words are intentionally not
-    serialized, so checkpoint restart never continues a resident RNG stream.
+    authoritative; restart recovers vapor pressure from canonical bytes.
+    Schema-v3 optionally captures published coagulation and wall-loss stream
+    metadata plus current words after the checkpoint's single synchronization;
+    restart creates fresh continued sidecars without reseeding. Normal dispatch
+    and reacquisition retain those words by identity until explicit reset.
 - `restart_resident_session(checkpoint, device)` is explicit and same-device
   only. Its preflight fails closed: it accepts an `ACTIVE` `ResidentSession`
   checkpoint with complete valid descriptors and bytes, an exactly equal target
-  `Device`, and either schema-v1 without communication or schema-v2 with no
-  communication family or one complete matching closed-map GAS/PARTICLES family
-  and metadata. Restart creates fresh session, registry, guard, container,
+   `Device`, and schema-v1 without communication, schema-v2 with optional
+   closed-map communication, or schema-v3 with optional complete RNG
+   continuation. Restart creates fresh session, registry, guard, container,
   primary-array, sidecar, and (when present) communication resource identities;
   it never reuses the source binding. It neither chooses nor migrates a device,
   falls back to CPU, restarts automatically during normal use, provides

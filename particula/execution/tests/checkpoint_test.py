@@ -213,6 +213,7 @@ def test_checkpoint_is_detached_and_preserves_active_session() -> None:
     checkpoint = session.checkpoint(registry, guard)
 
     assert checkpoint.lifecycle is ResidentLifecycle.ACTIVE
+    assert checkpoint.rng_continuation is None
     assert session.lifecycle is ResidentLifecycle.ACTIVE
     assert checkpoint.dimensions == ResidentDimensions(1, 1, 1)
     assert checkpoint.gas_names == ("water",)
@@ -285,45 +286,171 @@ def test_restart_preserves_distinct_per_box_partitioning() -> None:
 
 
 @pytest.mark.warp
-def test_checkpoint_rejects_wall_loss_stream_without_readback(
+def test_checkpoint_captures_wall_loss_stream_continuation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A persistent wall-loss RNG stream blocks unsupported continuation."""
+    """A persistent wall-loss stream is captured as schema-v3 state."""
     session, registry, guard = _resident_binding()
     registry.acquire_condensation()
     registry.acquire_wall_loss()
-    wp = pytest.importorskip("warp")
-    monkeypatch.setattr(
-        wp,
-        "synchronize",
-        lambda: pytest.fail("rejected checkpoint must not synchronize"),
-    )
+    checkpoint = session.checkpoint(registry, guard)
 
-    with pytest.raises(ValueError, match="RNG stream checkpoint continuation"):
-        session.checkpoint(registry, guard)
+    assert checkpoint.schema_version == 3
+    assert checkpoint.rng_continuation is not None
+    assert [
+        item.process_id for item in checkpoint.rng_continuation.payloads
+    ] == ["wall_loss"]
 
 
 @pytest.mark.warp
-def test_checkpoint_rejects_resident_coagulation_stream_without_readback(
+def test_checkpoint_captures_coagulation_stream_continuation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A persistent coagulation RNG stream blocks unsupported continuation."""
-    wp = pytest.importorskip("warp")
+    """A persistent coagulation stream is captured as schema-v3 state."""
     session, registry, guard = _resident_binding()
     registry.acquire_coagulation(1)
+    checkpoint = session.checkpoint(registry, guard)
+
+    assert checkpoint.rng_continuation is not None
+    assert [
+        item.process_id for item in checkpoint.rng_continuation.payloads
+    ] == ["coagulation"]
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("process", ("coagulation", "wall_loss"))
+def test_restart_restores_published_rng_words_by_identity(process: str) -> None:
+    """Restart restores current words without invoking stream initialization."""
+    session, registry, guard = _resident_binding(n_boxes=2)
+    if process == "coagulation":
+        source = registry.acquire_coagulation(1).rng_states
+    else:
+        source = registry.acquire_wall_loss().rng_states
+    source.assign(np.array([17, 29], dtype=np.uint32))
+
+    checkpoint = session.checkpoint(registry, guard)
+    _, restored_registry, _ = restart_resident_session(
+        checkpoint, Device(Backend.WARP, "cpu")
+    )
+    if process == "coagulation":
+        restored = restored_registry.acquire_coagulation(1).rng_states
+    else:
+        restored = restored_registry.acquire_wall_loss().rng_states
+
+    assert restored is not source
+    np.testing.assert_array_equal(restored.numpy(), [17, 29])
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+
+
+@pytest.mark.warp
+def test_restart_continues_all_published_rng_streams_without_reinitializing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A v3 restart retains both advanced streams without reset writers."""
+    import particula.execution.gpu_resources as gpu_resources
+
+    session, registry, guard = _resident_binding(n_boxes=2)
+    coagulation = registry.acquire_coagulation(1)
+    wall_loss = registry.acquire_wall_loss()
+    coagulation_words = np.array([17, 29], dtype=np.uint32)
+    wall_loss_words = np.array([31, 43], dtype=np.uint32)
+    coagulation.rng_states.assign(coagulation_words)
+    wall_loss.rng_states.assign(wall_loss_words)
+
+    checkpoint = session.checkpoint(registry, guard)
+    continuation = checkpoint.rng_continuation
+
+    assert continuation is not None
+    assert [item.process_id for item in continuation.payloads] == [
+        "coagulation",
+        "wall_loss",
+    ]
     monkeypatch.setattr(
-        wp,
-        "synchronize",
-        lambda: pytest.fail("rejected checkpoint must not synchronize"),
+        gpu_resources.StreamRegistry,
+        "initialize",
+        lambda _self: pytest.fail("restart must not initialize RNG streams"),
+    )
+    monkeypatch.setattr(
+        gpu_resources.StreamRegistry,
+        "initialize_process",
+        lambda _self, _process: pytest.fail(
+            "restart must not initialize an RNG stream"
+        ),
     )
 
-    with pytest.raises(
-        ValueError,
-        match="resident RNG stream checkpoint continuation is unsupported",
-    ):
-        session.checkpoint(registry, guard)
+    restored, restored_registry, _ = restart_resident_session(
+        checkpoint, Device(Backend.WARP, "cpu")
+    )
+    restored_coagulation = restored_registry.acquire_coagulation(1)
+    restored_wall_loss = restored_registry.acquire_wall_loss()
 
-    assert session.lifecycle is ResidentLifecycle.ACTIVE
+    assert restored.metadata.stream.root_seed == continuation.root_seed
+    assert (
+        restored.metadata.stream.logical_box_ids == continuation.logical_box_ids
+    )
+    assert restored.metadata.stream.lanes == continuation.lanes
+    assert restored_coagulation is restored_registry.acquire_coagulation(1)
+    assert restored_wall_loss is restored_registry.acquire_wall_loss()
+    assert restored_coagulation.rng_states is not coagulation.rng_states
+    assert restored_wall_loss.rng_states is not wall_loss.rng_states
+    np.testing.assert_array_equal(
+        restored_coagulation.rng_states.numpy(), coagulation_words
+    )
+    np.testing.assert_array_equal(
+        restored_wall_loss.rng_states.numpy(), wall_loss_words
+    )
+
+
+@pytest.mark.warp
+def test_finalize_caches_immutable_rng_continuation() -> None:
+    """Finalization retains the first captured current RNG words."""
+    session, registry, guard = _resident_binding(n_boxes=2)
+    words = np.array([17, 29], dtype=np.uint32)
+    stream = registry.acquire_wall_loss().rng_states
+    stream.assign(words)
+
+    finalized = session.finalize(registry, guard)
+    stream.assign(np.array([31, 43], dtype=np.uint32))
+
+    assert session.finalize(registry, guard) is finalized
+    assert finalized.rng_continuation is not None
+    np.testing.assert_array_equal(
+        np.frombuffer(
+            finalized.rng_continuation.payloads[0].data,
+            dtype=np.dtype("<u4"),
+        ),
+        words,
+    )
+
+
+@pytest.mark.warp
+def test_restart_rejects_malformed_rng_continuation_before_setup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A malformed v3 continuation fails before resident setup or uploads."""
+    import particula.execution.checkpoint as checkpoint_module
+
+    session, registry, guard = _resident_binding()
+    registry.acquire_wall_loss()
+    checkpoint = session.checkpoint(registry, guard)
+    continuation = checkpoint.rng_continuation
+
+    assert continuation is not None
+    malformed = replace(
+        checkpoint,
+        rng_continuation=replace(
+            continuation,
+            payloads=(replace(continuation.payloads[0], dtype="<i4"),),
+        ),
+    )
+    monkeypatch.setattr(
+        checkpoint_module,
+        "setup_resident_session",
+        lambda *_args, **_kwargs: pytest.fail("restart setup must not run"),
+    )
+
+    with pytest.raises(ValueError, match="RNG continuation payload"):
+        restart_resident_session(malformed, Device(Backend.WARP, "cpu"))
 
 
 @pytest.mark.warp

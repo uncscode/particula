@@ -1,7 +1,7 @@
 # GPU resident checkpoints
 
-Current controllers create schema-v2 checkpoints; v1 noncommunication
-checkpoints remain restart-compatible. Resident communication is a concrete-only
+Current controllers create schema-v3 checkpoints; v1 noncommunication and v2
+communication checkpoints remain restart-compatible. Resident communication is a concrete-only
 closed-map barrier: communication runs before optional prescribed volume
 evolution, and both invalidate saturation ratio only.
 
@@ -43,7 +43,11 @@ Restart compatibility is intentionally exact and fail-closed. It accepts
 target `Device`. Schema-v1 checkpoints must be noncommunication checkpoints.
 Schema-v2 checkpoints may contain no communication family or exactly one
 complete closed-map GAS or PARTICLES communication family with matching
-metadata and payloads. Finalization terminalizes its source session but returns
+metadata and payloads. Schema-v3 also permits absent or complete continuation
+for canonical published coagulation and wall-loss streams. Its immutable current
+`uint32` words are restart authority; normal dispatch and reacquisition neither
+read them back nor reset them, and only explicit stream reset derives new words
+from the root seed. Finalization terminalizes its source session but returns
 an `ACTIVE`, restartable checkpoint record. Restart creates fresh session,
 registry, guard, resident arrays, and communication bindings; it never reuses
 source identities or provides fallback. It rejects other versions or carrier

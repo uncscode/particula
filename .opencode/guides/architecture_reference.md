@@ -73,8 +73,9 @@ from the canonical process manifest. Scheduled dispatch retains each sidecar by
 identity with `initialize_rng=False`. Explicit direct-module lifecycle calls
 alone may inspect frozen host metadata or reset all published streams or valid
 selected lanes under an exact ACTIVE session/registry/closed-guard binding.
-They never read back, synchronize, affect normal dispatch, or persist through
-checkpoint/restart; broader RNG policy remains deferred.
+They never read back, synchronize, or affect normal dispatch. Schema-v3
+checkpoints optionally preserve published current words for exact-device
+continuation; only explicit resets rederive words from the root seed.
 Wall-loss dispatch receives its scheduler-resolved ascending logical-box set.
 An empty set is a write-free prelaunch skip; a partial set delegates one-box
 resident aliases so disabled lanes cannot be written. Thus disabled,
@@ -137,14 +138,16 @@ writer launches. See
 [ADR-007](architecture/decisions/ADR-007-resident-session-checkpoint-finalize-restart.md).
 
 Restart compatibility is exact and fail-closed: schema-v1 records remain
-noncommunication, while schema-v2 permits no communication family or exactly
+noncommunication, schema-v2 permits no communication family or exactly
 one complete matching closed-map GAS or PARTICLES family and metadata. Both
 require carrier type `"ResidentSession"`, ACTIVE records, complete valid payload
 schemas, and an exactly equal `Device`; restart reconstructs fresh communication
 resources rather than reusing source identities. Other versions, partial,
 mixed, malformed, or non-ACTIVE records and device mismatches reject.
 Finalization makes its source session terminal but returns an ACTIVE checkpoint
-eligible for explicit restart. E7-F5 P2 supplies declaration-only scheduling;
+eligible for explicit restart. Schema-v3 additionally permits absent or complete
+canonical published-stream continuation state; immutable current RNG words are
+recovery authority and ordinary payloads exclude RNG sidecars. E7-F5 P2 supplies declaration-only scheduling;
 E7-F7 transport is shipped, while E7-F8 integration and remaining RNG-stream
 policy remain future work. E7-F7 P4 particle
 transport is shipped as the concrete-only
@@ -203,9 +206,9 @@ identity and nonaliasing, not allocator-provenance inference. Its typed
   ``initialize_rng=False``. Its direct-only published-stream inspection and
   explicit selected reset APIs expose frozen metadata only and require a closed
   ACTIVE binding; they have no hidden transfer/synchronization, package export,
-  or checkpoint continuation;
-  checkpoint and finalize reject a published resident stream before device or
-  payload work. Its communication acquisition seam is
+  or arbitrary checkpoint continuation. Schema-v3 capture privately enumerates
+  published streams, reads their current words after its one synchronization,
+  and restart rebinds fresh arrays without reseeding. Its communication acquisition seam is
  the sole exception for fixed-shape transport work storage: it validates one
  exact closed-map GAS or PARTICLES configuration and pins its native record,
  map arrays, and optional final-volume sidecar. Omitted required work arrays may

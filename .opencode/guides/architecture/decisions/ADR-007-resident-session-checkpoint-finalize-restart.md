@@ -131,7 +131,17 @@ outside the resident-session scope.
    - Permit counter restoration only on an exact fresh, closed guard binding.
 3. **Registry enumeration seam** (`particula/execution/gpu_resources.py`)
    - Enumerate already-acquired bindings deterministically without copying,
-     synchronization, allocation, or mutation.
+      synchronization, allocation, or mutation.
+
+4. **Schema-v3 RNG continuation** (`checkpoint.py`, `gpu_resources.py`)
+   - Capture at most the canonical published coagulation and wall-loss streams
+     after the checkpoint's single synchronization boundary.
+   - Keep stream metadata and current little-endian `uint32` words immutable;
+     current words are restart authority, while ordinary sidecar payloads exclude
+     RNG roles.
+   - Reconstruct fresh same-device arrays and stream bindings without reseeding.
+     Normal acquisition returns those bindings by identity; explicit reset alone
+     derives replacement words from the root seed.
 
 ### Testing Strategy
 

@@ -170,18 +170,18 @@ The exact downstream ordering remains
    first fully validates the record, then creates fresh session, registry,
    guard, containers, primary arrays, and sidecars only on an explicitly exact
     compatible device. Restart compatibility fails closed: it accepts only an
-     `ACTIVE` `ResidentSession` carrier with schema-v1 noncommunication or
-     schema-v2 optional-communication payloads, complete valid descriptors and
+      `ACTIVE` `ResidentSession` carrier with schema-v1 noncommunication,
+      schema-v2 optional communication, or schema-v3 optional continuation
+      payloads, complete valid descriptors and
      bytes, and an exactly equal target `Device`. A v2 communication checkpoint
      retains one complete GAS or PARTICLES family plus matching metadata and
      restores fresh identities. It does not select or migrate devices, automatically
    restart normal session use, fall back to CPU, serialize to disk/remote, or
    guarantee rollback after an asynchronous device writer launches. Snapshotting
     requires roughly one additional host copy of resident payload bytes plus
-    detached inspection copies. A published resident coagulation RNG stream
-    fail-closes checkpoint and finalize before device or payload work; stream
-    metadata and RNG words are not serialized, so restart continuation is not
-    available. See
+     detached inspection copies. Schema-v3 captures canonical published RNG
+     stream metadata and current words after its single synchronization; restart
+     creates fresh continued bindings without reseeding. See
     [ADR-007](decisions/ADR-007-resident-session-checkpoint-finalize-restart.md),
     [ADR-008](decisions/ADR-008-resident-session-failure-close-semantics.md),
     and [ADR-018](decisions/ADR-018-resident-communication-integration.md).
@@ -205,7 +205,8 @@ The exact downstream ordering remains
    Direct-only inspection returns frozen host metadata, while explicit selected
    reset targets only published sidecars after selector preflight and an exact
    ACTIVE closed binding. These APIs have no hidden transfer/synchronization,
-   package export, or checkpoint continuation.
+    package export, or arbitrary checkpoint continuation. Schema-v3's private
+    checkpoint seam alone captures and restores published current words.
    `validate_pinned_session()` is the metadata-only integration seam: it
      requires exact retained-session identity and reuses active
      lifecycle/signature/schema validation without acquisition or allocation.

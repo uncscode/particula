@@ -797,8 +797,27 @@ class GPUResourceRegistry:
             entries.extend(
                 (manifest.family, entry.role, bindings[entry.role], capacity)
                 for entry in manifest.entries
+                if entry.role != "rng_states"
             )
         return tuple(entries)
+
+    def _enumerate_published_rng_streams(
+        self,
+    ) -> tuple[tuple[str, StreamManifest, Any], ...]:
+        """Return live published RNG bindings in canonical order.
+
+        This checkpoint-private preflight performs only metadata and identity
+        validation.  It deliberately does not read state words or synchronize.
+        """
+        self.validate_pinned_session(self._session)
+        manifest = self.inspect_published_streams(self._session).stream
+        result: list[tuple[str, StreamManifest, Any]] = []
+        for process_id in ("coagulation", "wall_loss"):
+            bindings = self._bindings.get(process_id)
+            stream = self._published_stream_registry(process_id)
+            if bindings is not None and stream is not None:
+                result.append((process_id, manifest, bindings["rng_states"]))
+        return tuple(result)
 
     def _has_resident_coagulation_stream(self) -> bool:
         """Return whether an initialized resident coagulation stream exists."""
@@ -810,6 +829,54 @@ class GPUResourceRegistry:
             self._coagulation_stream_registry is not None
             or self._wall_loss_stream_registry is not None
         )
+
+    def _restore_published_rng_views(
+        self, process_ids: tuple[str, ...]
+    ) -> None:
+        """Publish prevalidated restored stream bindings without reseeding.
+
+        Checkpoint restart calls this only after it has bulk-uploaded and bound
+        the ordinary sidecars and current-word arrays.  It deliberately creates
+        no initial words and invokes no acquisition API.
+        """
+        self.validate_pinned_session(self._session)
+        root_seed, logical_box_ids, lanes = self._stream_metadata()
+        coagulation = self._bindings.get("coagulation", {}).get("rng_states")
+        wall_loss = self._bindings.get("wall_loss", {}).get("rng_states")
+        if "coagulation" in process_ids and coagulation is None:
+            raise ValueError("restored coagulation RNG binding is missing.")
+        if "wall_loss" in process_ids and wall_loss is None:
+            raise ValueError("restored wall-loss RNG binding is missing.")
+        if coagulation is None:
+            coagulation = wp.zeros(
+                self._shape(_COAGULATION.entries[2]),
+                dtype=wp.uint32,
+                device=self._signature[2],
+            )
+        if wall_loss is None:
+            wall_loss = wp.zeros(
+                self._shape(_WALL_LOSS.entries[0]),
+                dtype=wp.uint32,
+                device=self._signature[2],
+            )
+        stream = StreamRegistry(
+            root_seed,
+            self._session.dimensions.n_boxes,
+            logical_box_ids,
+            lanes,
+            (("coagulation", coagulation), ("wall_loss", wall_loss)),
+        )
+        if "coagulation" in process_ids:
+            bindings = self._bindings["coagulation"]
+            self._views["coagulation"] = CoagulationResources(
+                self._capacities["coagulation"], **bindings
+            )
+            self._coagulation_stream_registry = stream
+        if "wall_loss" in process_ids:
+            self._views["wall_loss"] = WallLossResources(
+                **self._bindings["wall_loss"]
+            )
+            self._wall_loss_stream_registry = stream
 
     def reserve_open_step(self, token: Any) -> None:
         """Reserve the binding's sole open timestep token by identity.

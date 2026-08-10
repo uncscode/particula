@@ -534,10 +534,11 @@ def test_enumerate_resources_returns_established_arrays_in_manifest_order() -> (
             gpu_resources._COAGULATION,
         )
         for entry in manifest.entries
+        if entry.role != "rng_states"
     ]
     assert [(family, role) for family, role, _, _ in entries] == expected
     assert entries[0][2] is condensation.scratch_buffers.work_mass_transfer
-    assert entries[-1][2] is coagulation.rng_states
+    assert entries[-1][2] is coagulation.n_collisions
     assert all(capacity is None for *_, capacity in entries[:7])
     assert all(capacity == 2 for *_, capacity in entries[7:])
 

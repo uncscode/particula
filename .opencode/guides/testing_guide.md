@@ -272,8 +272,9 @@ Resident Brownian-coagulation and wall-loss coverage must keep each pinned RNG
 sidecar by identity across valid dispatches and verify that normal dispatch
 never reseeds or allocates it. Test immutable stream metadata during session
 setup and first resource acquisition separately. When either resident stream
-has been published, checkpoint and finalization must reject before payload
-work; stream checkpoint continuation is intentionally unsupported. Wall-loss
+has been published, schema-v3 checkpoint and finalization coverage must capture
+immutable continuation words after one synchronization and verify exact
+same-device restart without reseeding or allocation during reacquisition. Wall-loss
 coverage must verify canonical-manifest derivation gives wall loss a distinct
 namespace from coagulation without claiming arbitrary 32-bit words cannot
 collide. Test the scheduler-resolved logical-box selection: only selected boxes
@@ -285,8 +286,8 @@ direct-kernel resolution and that an empty resolved launch set is a no-op.
  session/registry/closed-guard binding, validate selectors before writers, and
  verify inspection returns frozen metadata without arrays, readback, or
  synchronization. Resets may target only published sidecars and must not change
- ordinary dispatch; checkpoint persistence and restart continuation remain
- unsupported. For a failure after a writer-capable launch, assert the established
+  ordinary dispatch; only explicit reset may replace continued words. For a
+  failure after a writer-capable launch, assert the established
  guard-close and session-fault lifecycle rather than RNG rollback.
 
 ```bash
