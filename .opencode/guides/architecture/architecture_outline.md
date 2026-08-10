@@ -252,8 +252,8 @@ The exact downstream ordering remains
     `GPUResourceRegistry`, and (for wall loss/nucleation) an exact established
     published resource view by identity. Wall-loss requests also retain the
     scheduler-resolved ascending logical-box selection. An empty selection is a
-    prelaunch skip; a partial selection dispatches one-box aliases of selected
-    state and RNG lanes, so disabled lanes cannot be written. After metadata-only
+    prelaunch skip; a partial selection uses a private selected-box launch, so
+    disabled lanes cannot be written. After metadata-only
     session/view/selection validation, each adapter lazily resolves and invokes
     the supported direct GPU kernel, forwarding resident containers, sidecars,
     controls, and persistent RNG state unchanged and returning the native result.

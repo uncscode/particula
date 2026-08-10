@@ -1088,3 +1088,97 @@ def test_resident_scheduler_faults_after_adapter_failure(
             module._ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
         )
     ]
+
+
+@pytest.mark.warp
+def test_resident_scheduler_faults_after_wall_loss_dispatch_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Wall-loss writer failures preserve error and writer-capable cleanup."""
+    module = _resident_scheduler()
+    request, guard = _scheduler_request(module)
+    scheduler = module.ResidentSimulationScheduler(request)
+    cleanup: list[tuple[object, object, object, object, object]] = []
+    failure = RuntimeError("wall-loss writer failed")
+
+    class Updates:
+        """Accept state updates before the wall-loss dispatch."""
+
+        def execute(self, _request: object) -> None:
+            pass
+
+    class Thermal:
+        """Accept completed nodes and consumer callbacks before wall loss."""
+
+        def __init__(self, _request: object) -> None:
+            pass
+
+        def record_completed(self, _node: object) -> None:
+            pass
+
+        def execute_consumer(self, _node: object, callback: Any) -> None:
+            callback()
+
+    class Communication:
+        """Accept the two pre-wall-loss resident barriers."""
+
+        def __init__(self, _request: object) -> None:
+            pass
+
+        def execute_communication(self) -> None:
+            pass
+
+        def execute_volume_evolution(self) -> None:
+            pass
+
+    class Adapter:
+        """Accept non-wall-loss adapter calls."""
+
+        def execute(self, _request: object) -> None:
+            pass
+
+    class FailingWallLossAdapter:
+        """Model failure after wall-loss writer dispatch begins."""
+
+        def execute(self, _request: object) -> None:
+            raise failure
+
+    monkeypatch.setattr(scheduler, "_validate", lambda _duration: None)
+    monkeypatch.setattr(module, "ResidentStateUpdateExecutor", Updates)
+    monkeypatch.setattr(
+        module, "ResidentThermodynamicUpdateRequest", lambda *args: args
+    )
+    monkeypatch.setattr(
+        module, "ResidentThermodynamicUpdateCoordinator", Thermal
+    )
+    monkeypatch.setattr(module, "ResidentCommunicationExecutor", Communication)
+    monkeypatch.setattr(module, "WarpCondensationExecutionAdapter", Adapter)
+    monkeypatch.setattr(
+        module, "ResidentBrownianCoagulationExecutionAdapter", Adapter
+    )
+    monkeypatch.setattr(module, "ResidentDilutionAdapter", Adapter)
+    monkeypatch.setattr(
+        module, "ResidentWallLossAdapter", FailingWallLossAdapter
+    )
+    monkeypatch.setattr(module, "ResidentNucleationAdapter", Adapter)
+    monkeypatch.setattr(module, "ResidentDiagnosticsExecutor", Adapter)
+    monkeypatch.setattr(
+        module,
+        "_handle_failed_resident_operation",
+        lambda *args: cleanup.append(args),
+    )
+
+    with pytest.raises(RuntimeError) as caught:
+        scheduler.execute(1.0)
+
+    assert caught.value is failure
+    assert guard.calls == [("begin", 1.0)]
+    assert cleanup == [
+        (
+            request.session,
+            request.registry,
+            request.guard,
+            guard.token,
+            module._ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED,
+        )
+    ]

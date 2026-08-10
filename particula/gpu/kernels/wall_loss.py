@@ -1370,15 +1370,9 @@ def wall_loss_selected_boxes_step_gpu(
         raise ValueError(
             "selected_boxes must be a nonempty same-device int32 array."
         )
-    selected_host = selected_boxes.numpy()
-    if (
-        np.any(selected_host < 0)
-        or np.any(selected_host >= n_boxes)
-        or np.any(selected_host[1:] <= selected_host[:-1])
-    ):
-        raise ValueError(
-            "selected_boxes must be sorted unique resident indices."
-        )
+    # The resident adapter validates selected logical indices before allocating
+    # this private same-device view. Avoid host inspection here so selected
+    # dispatch retains the resident no-readback boundary.
     _validate_charged_rectangular_field(validated_config, device)
     _validate_particle_values(particles)
     validated_time_step = _validate_time_step(time_step)

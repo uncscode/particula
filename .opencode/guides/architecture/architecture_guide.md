@@ -64,8 +64,9 @@
       initialized sidecar by identity, and resident dispatch always supplies it
       with `initialize_rng=False`. Wall loss receives the scheduler-resolved,
       ascending enabled logical-box set; an empty set skips kernel resolution,
-      while a partial set uses one-box resident aliases so disabled lanes cannot
-      be written. Disabled, prelaunch-skipped, zero-time, and valid no-work
+      while a partial set uses a private selected-box dispatch so disabled lanes
+      cannot be written. Disabled, prelaunch-skipped, zero-time, and valid
+      no-work
       lanes retain their supplied RNG words. Stream reset/inspection, hidden
       transfer/synchronization, retry, broad fallback, direct-kernel API or
       physics changes, and replacement of direct GPU APIs remain deferred.
@@ -172,8 +173,9 @@
   unchanged. It forwards resident containers, published sidecars, controls, and
   persistent RNG state by identity. Wall-loss requests additionally retain the
   scheduler-owned ascending enabled logical-box set. An empty set is a
-  prelaunch skip; a partial set dispatches selected one-box aliases, preserving
-  disabled logical-box particle and RNG lanes without a gather/scatter copy.
+  prelaunch skip; a partial set dispatches a private selected-box launch,
+  preserving disabled logical-box particle and RNG lanes without a
+  gather/scatter copy.
   Direct-kernel zero-time and valid no-work behavior preserves supplied selected
   RNG lanes. It does not acquire resources, transfer, synchronize, retry, roll
   back, fall back, inspect physics, or recover direct writer failures. These

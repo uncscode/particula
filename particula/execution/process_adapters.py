@@ -282,8 +282,9 @@ class ResidentWallLossAdapter:
 
     This concrete-only adapter resolves one supported direct kernel after
     metadata-only preflight. It preserves container and sidecar identity and
-    dispatches selected logical boxes through one-box aliases when selection is
-    not all boxes, preventing disabled lanes from reaching the direct kernel.
+    dispatches selected logical boxes through a private selected-box kernel when
+    selection is not all boxes, preventing disabled lanes from reaching the
+    public direct kernel.
     It provides no acquisition, transfer, synchronization, rollback, or
     recovery.
     """
@@ -305,10 +306,9 @@ class ResidentWallLossAdapter:
                 registry-pinned publication.
 
         An empty selection returns without resolving the kernel. For a partial
-        selection, direct dispatch receives only one-box aliases of selected
-        particle, environment, and RNG lanes. Direct-kernel exceptions and
-        mutations propagate without adapter retry, rollback, recovery,
-        transfer, or synchronization.
+        selection, direct dispatch receives a private selected-box launch set.
+        Direct-kernel exceptions and mutations propagate without adapter retry,
+        rollback, recovery, transfer, or synchronization.
         """
         if type(request) is not ResidentWallLossRequest:
             raise TypeError("request must be an exact ResidentWallLossRequest.")
