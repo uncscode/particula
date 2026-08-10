@@ -14,11 +14,11 @@ PARTICLES family and its optional final-volume sidecar. ``checkpoint()`` is
 nonterminal; ``finalize()`` caches a snapshot and terminally ends normal
 session use. No rollback is promised once a device operation has launched.
 
-Schema-v3 optionally captures published resident coagulation and wall-loss RNG
-stream metadata and current words after the single synchronization boundary.
-Those words are the continuation authority on an exact-device restart; normal
-dispatch and reacquisition retain restored arrays by identity until reset is
-explicitly requested.
+Schema-v3 always carries published-stream continuation metadata and optionally
+carries its canonical coagulation and wall-loss current-word payloads after the
+single synchronization boundary. Those words are the continuation authority on
+an exact-device restart; normal dispatch and reacquisition retain restored
+arrays by identity until reset is explicitly requested.
 """
 
 from __future__ import annotations
@@ -109,12 +109,16 @@ class ResidentCheckpoint:
         particles: Detached CPU particle inspection carrier.
         gas: Detached CPU gas inspection carrier without vapor pressure.
         environment: Detached CPU environment inspection carrier.
-        payloads: Canonical immutable primary and acquired-sidecar payloads.
+        payloads: Canonical immutable primaries followed by the exact ordered
+            acquired registry sidecars, resident ledgers, diagnostics, and at
+            most one complete closed-map communication family. Arbitrary
+            caller-owned outputs are never checkpoint authority.
         communication: Optional schema-v2 metadata for one pinned closed-map
             communication family.
-        rng_continuation: Optional schema-v3 metadata and current ``uint32``
-            words for published coagulation and wall-loss streams. The words
-            are authoritative continuation state on exact-device restart.
+        rng_continuation: Schema-v3 metadata and optional current ``uint32``
+            words for published coagulation and wall-loss streams. Pre-v3
+            records must omit it. The words are authoritative continuation
+            state on exact-device restart.
     """
 
     schema_version: int
@@ -1002,8 +1006,14 @@ def _validate_rng_resource_pairing(
         return
     processes = {payload.process_id for payload in continuation.payloads}
     families = {payload.family for payload in payloads}
+    # Coagulation has ordinary collision sidecars that establish its acquired
+    # resource family. Wall loss owns only its published RNG sidecar, which is
+    # deliberately absent from CheckpointPayload and represented solely by its
+    # continuation payload.
     if ("coagulation" in processes) != ("coagulation" in families):
         raise ValueError("RNG continuation and coagulation sidecars disagree.")
+    if "wall_loss" in families and "wall_loss" not in processes:
+        raise ValueError("RNG continuation and wall_loss sidecars disagree.")
 
 
 def _validate_resource_payloads(  # noqa: C901

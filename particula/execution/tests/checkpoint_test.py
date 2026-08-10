@@ -10,6 +10,7 @@ import pytest
 
 from particula.execution import Backend, Device
 from particula.execution.checkpoint import (
+    _PRIMARY_ROLES,
     CheckpointPayload,
     CommunicationCheckpointMetadata,
     ResidentCheckpoint,
@@ -238,6 +239,30 @@ def test_checkpoint_is_detached_and_preserves_active_session() -> None:
     np.testing.assert_array_equal(masses.numpy(), np.array([[[1.0]]]))
     np.testing.assert_array_equal(
         checkpoint.gas.concentration, np.array([[3.0]])
+    )
+
+
+@pytest.mark.warp
+def test_checkpoint_primary_descriptors_are_canonical_and_immutable() -> None:
+    """Canonical primary bytes remain independent of later resident writes."""
+    session, registry, guard = _resident_binding()
+    checkpoint = session.checkpoint(registry, guard)
+    masses = cast(Any, session.particles).masses
+    masses.assign(np.array([[[9.0]]]))
+
+    assert (
+        tuple(
+            (payload.family, payload.role)
+            for payload in checkpoint.payloads[: len(_PRIMARY_ROLES)]
+        )
+        == _PRIMARY_ROLES
+    )
+    payload = checkpoint.payloads[0]
+    np.testing.assert_array_equal(
+        np.frombuffer(payload.data, dtype=np.dtype(payload.dtype)).reshape(
+            payload.shape
+        ),
+        np.array([[[1.0]]]),
     )
 
 
@@ -666,6 +691,31 @@ def test_restart_accepts_v1_noncommunication_checkpoint() -> None:
     np.testing.assert_array_equal(
         cast(Any, restored.gas).concentration.numpy(),
         cast(Any, session.gas).concentration.numpy(),
+    )
+
+
+@pytest.mark.warp
+def test_restart_accepts_v2_noncommunication_checkpoint() -> None:
+    """Schema-v2 permits a record without communication or RNG continuation."""
+    session, registry, guard = _resident_binding()
+    checkpoint = session.checkpoint(registry, guard)
+    legacy = replace(
+        checkpoint,
+        schema_version=2,
+        communication=None,
+        rng_continuation=None,
+    )
+
+    restored, restored_registry, restored_guard = restart_resident_session(
+        legacy, Device(Backend.WARP, "cpu")
+    )
+
+    assert restored is not session
+    assert restored_registry is not registry
+    assert restored_guard is not guard
+    np.testing.assert_array_equal(
+        cast(Any, restored.gas).vapor_pressure.numpy(),
+        cast(Any, session.gas).vapor_pressure.numpy(),
     )
 
 
