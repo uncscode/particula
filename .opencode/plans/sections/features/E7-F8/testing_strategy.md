@@ -34,9 +34,14 @@ thresholds are not lowered; changed modules must retain at least 80% coverage.
   preflight preservation; ACTIVE closed-binding restrictions; empty-published
   write-free behavior; identity retention; repeated-seed non-reset; and guards
   against readback, synchronization, scheduling, acquisition, or allocation.
-- **P5:** `particula/execution/tests/rng_invariance_test.py` compares each enabled
-  logical box against an isolated one-box reference after adding, disabling,
-  removing, and permuting unrelated boxes for both stochastic processes.
+- **P5 (complete, Issue #1524, commit `727f8b471`):**
+  `particula/execution/tests/rng_invariance_test.py` compares the `box-a`
+  logical lane with an isolated same-device reference across active, removed,
+  no-work, and physically permuted unrelated-box arrangements. It covers
+  resident Brownian particle, collision-output, and RNG snapshots; selected
+  neutral wall-loss particle and RNG snapshots; zero-time and empty-selection
+  no-ops; prelaunch `initialize_rng=True` rejection; and distinct process
+  sidecar identity. Warp CPU is required and CUDA rows remain optional.
 - **P6:** Remains deferred. P2 deliberately rejects checkpoint/finalize after
   resident RNG publication, so no RNG split-run continuation is presently
   supported.

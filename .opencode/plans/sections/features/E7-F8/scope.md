@@ -1,8 +1,8 @@
 # Scope
 
-Issues #1520--#1522 completed E7-F8-P1--P3: concrete-only resident RNG
-lifecycle support for Brownian coagulation and wall loss built on P1
-registration and initialization.
+Issues #1520--#1524 completed E7-F8-P1--P5: concrete-only resident RNG
+lifecycle support and same-device invariance coverage for Brownian coagulation
+and wall loss built on P1 registration and initialization.
 
 ## In Scope
 
@@ -33,13 +33,16 @@ registration and initialization.
   session/registry/closed-guard composition through `ResidentSession`.
 - Exact-tuple process/logical-box selector validation before writers, including
   write-free empty selections and explicit unpublished-process rejection.
+- Same-device resident adapter regressions proving `box-a` stream/output
+  invariance across active, removed, no-work, and physical-lane-permuted
+  unrelated-box arrangements, plus wall-loss selected/no-op/rejection gating.
 
 ## Out of Scope
 
 - Exact CPU/Warp/CUDA stochastic trajectory equality or cross-device restart
   bitwise equivalence.
-- Full add/remove/reorder box-invariance work and stream advancement policy
-  beyond the shipped Brownian and selected-box wall-loss calls.
+- Full-box invariance guarantees beyond the covered same-device resident
+  Brownian and selected neutral wall-loss regression matrix.
 - RNG serialization, checkpoint persistence, and restart continuation. A
   checkpoint or finalize attempt after coagulation-sidecar publication rejects
   before payload conversion or enumeration.

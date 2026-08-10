@@ -14,8 +14,9 @@
 - [x] Inspection returns only frozen host metadata and explicit reset requires an
   exact ACTIVE session/registry/closed-guard binding before selector handling or
   writer work.
-- [ ] Adding, removing, disabling, or reordering unrelated boxes leaves each
-  enabled logical box's same-backend stream and outputs unchanged.
+- [x] Adding, removing, disabling/no-work, or physically reordering unrelated
+  boxes leaves the covered enabled logical box's same-backend stream and outputs
+  unchanged for resident Brownian coagulation and selected neutral wall loss.
 - [x] Disabled, prelaunch-skipped, zero-time, and valid no-work wall-loss boxes
   do not advance their supplied stream lanes.
 - [ ] A compatible checkpoint/restart split exactly matches uninterrupted RNG

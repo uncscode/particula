@@ -32,6 +32,9 @@ restart continuation are not implemented.
 - As a direct resident-session caller, I can inspect frozen stream metadata or
   deliberately reset all published streams or valid selected process/box lanes
   without changing ordinary dispatch behavior.
+- As a resident-session user, I have same-device regression evidence that the
+  covered logical box's Brownian and selected neutral wall-loss stream/output is
+  unchanged by active, removed, no-work, or physically permuted unrelated boxes.
 
-Parent epic: E7. Issues #1520--#1523 completed P1--P4; broader invariance,
-persistence/restart, and documentation phases remain separate work.
+Parent epic: E7. Issues #1520--#1524 completed P1--P5; checkpoint
+persistence/restart and documentation phases remain separate work.

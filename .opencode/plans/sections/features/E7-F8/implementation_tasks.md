@@ -42,8 +42,9 @@
 - [x] Add P4 RNG/resource/session regressions for frozen manifests, selected
   reset preflight and preservation, published-only scope, exact lifecycle
   binding, empty selections, and direct-only export denial.
-- [ ] Add `particula/execution/tests/rng_invariance_test.py` for unrelated box
-  insertion, disablement, removal, and permutation.
+- [x] Add `particula/execution/tests/rng_invariance_test.py` for unrelated box
+  insertion, disablement/no-work, removal, and physical-lane permutation across
+  resident Brownian coagulation and neutral wall loss.
 - [ ] Extend `particula/execution/tests/checkpoint_test.py` with exact
   uninterrupted-versus-restart stream and stochastic-output comparisons.
 - [ ] Add transfer/synchronization spies proving normal steps and reset-free

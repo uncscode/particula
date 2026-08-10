@@ -316,14 +316,22 @@ class ResidentWallLossAdapter:
         request.registry.validate_wall_loss_resources(
             request.session, request.resources
         )
-        enabled_boxes = request.validate_enabled_box_indices()
-        if not enabled_boxes:
+        enabled_logical_boxes = request.validate_enabled_box_indices()
+        if not enabled_logical_boxes:
             return request.session.particles
-        if len(enabled_boxes) != request.session.dimensions.n_boxes:
+        if len(enabled_logical_boxes) != request.session.dimensions.n_boxes:
             import warp as wp
 
+            stream = request.session.metadata.stream
+            enabled_physical_lanes = (
+                enabled_logical_boxes
+                if stream.n_boxes == 0
+                else tuple(
+                    stream.lanes[index] for index in enabled_logical_boxes
+                )
+            )
             selected_boxes = wp.array(
-                enabled_boxes,
+                enabled_physical_lanes,
                 dtype=wp.int32,
                 device=request.resources.rng_states.device,
             )

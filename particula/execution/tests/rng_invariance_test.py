@@ -49,6 +49,7 @@ def _make_session(
     lanes: tuple[int, ...],
     *,
     unrelated_active: bool = True,
+    legacy_empty_stream: bool = False,
 ) -> tuple[Any, GPUResourceRegistry, ResidentStepGuard]:
     """Create a mapped resident fixture with ``box-a`` at its metadata lane.
 
@@ -93,6 +94,15 @@ def _make_session(
         logical_box_ids=logical_box_ids,
         lanes=lanes,
     )
+    if legacy_empty_stream:
+        object.__setattr__(
+            session,
+            "metadata",
+            session.metadata.__class__(
+                session.metadata.device,
+                session.metadata.gas_names,
+            ),
+        )
     registry = GPUResourceRegistry(session)
     return session, registry, ResidentStepGuard(session, registry)
 
@@ -116,12 +126,23 @@ def resident_factory() -> Callable[..., tuple[Any, GPUResourceRegistry]]:
 def _target_lane(session: Any) -> int:
     """Resolve ``box-a`` through immutable stream metadata only."""
     stream = session.metadata.stream
-    return stream.lanes[stream.logical_box_ids.index("box-a")]
+    return stream.lanes[_target_logical_index(session)]
+
+
+def _target_logical_index(session: Any) -> int:
+    """Return ``box-a``'s scheduler-owned logical index."""
+    return session.metadata.stream.logical_box_ids.index("box-a")
+
+
+def _synchronize_owning_device(array: Any) -> None:
+    """Synchronize the Warp device that owns an array before host readback."""
+    wp = pytest.importorskip("warp")
+    wp.synchronize_device(array.device)
 
 
 def _particle_snapshot(session: Any, lane: int) -> tuple[np.ndarray, ...]:
     """Copy the target particle fields after explicit device synchronization."""
-    _require_device("cpu").synchronize()
+    _synchronize_owning_device(session.particles.masses)
     return (
         session.particles.masses.numpy()[lane].copy(),
         session.particles.concentration.numpy()[lane].copy(),
@@ -131,7 +152,7 @@ def _particle_snapshot(session: Any, lane: int) -> tuple[np.ndarray, ...]:
 
 def _all_particle_snapshot(session: Any) -> tuple[np.ndarray, ...]:
     """Copy every mutable particle field after explicit synchronization."""
-    _require_device("cpu").synchronize()
+    _synchronize_owning_device(session.particles.masses)
     return (
         session.particles.masses.numpy().copy(),
         session.particles.concentration.numpy().copy(),
@@ -141,19 +162,19 @@ def _all_particle_snapshot(session: Any) -> tuple[np.ndarray, ...]:
 
 def _rng_snapshot(resources: Any) -> np.ndarray:
     """Copy resident RNG words after explicit device synchronization."""
-    _require_device("cpu").synchronize()
+    _synchronize_owning_device(resources.rng_states)
     return resources.rng_states.numpy().copy()
 
 
 def _collision_snapshot(resources: Any) -> np.ndarray:
     """Copy collision-pair sidecar rows after explicit synchronization."""
-    _require_device("cpu").synchronize()
+    _synchronize_owning_device(resources.collision_pairs)
     return resources.collision_pairs.numpy().copy()
 
 
 def _collision_count_snapshot(resources: Any) -> np.ndarray:
     """Copy collision-count sidecar rows after explicit synchronization."""
-    _require_device("cpu").synchronize()
+    _synchronize_owning_device(resources.n_collisions)
     return resources.n_collisions.numpy().copy()
 
 
@@ -215,6 +236,7 @@ def _dispatch_wall_loss(
         (("box-a", "box-b"), (0, 1), True),
         (("box-a", "box-b"), (0, 1), False),
         (("box-b", "box-a"), (1, 0), True),
+        (("box-a", "box-b"), (1, 0), True),
     ],
 )
 def test_brownian_stream_follows_logical_box_across_arrangements(
@@ -230,6 +252,8 @@ def test_brownian_stream_follows_logical_box_across_arrangements(
     candidate, candidate_registry = resident_factory(
         device, ids, lanes, unrelated_active=unrelated_active
     )
+    reference_resources = reference_registry.acquire_coagulation(1)
+    reference_initial_rng = _rng_snapshot(reference_resources)
     reference_resources = _dispatch_coagulation(reference, reference_registry)
     candidate_initial_rng = _rng_snapshot(
         candidate_registry.acquire_coagulation(1)
@@ -241,7 +265,9 @@ def test_brownian_stream_follows_logical_box_across_arrangements(
     )
 
     reference_lane = _target_lane(reference)
+    candidate_logical_index = _target_logical_index(candidate)
     candidate_lane = _target_lane(candidate)
+    assert candidate_lane == lanes[candidate_logical_index]
     for actual, expected in zip(
         _particle_snapshot(candidate, candidate_lane),
         _particle_snapshot(reference, reference_lane),
@@ -259,6 +285,14 @@ def test_brownian_stream_follows_logical_box_across_arrangements(
     assert (
         _rng_snapshot(candidate_resources)[candidate_lane]
         == _rng_snapshot(reference_resources)[reference_lane]
+    )
+    assert (
+        _rng_snapshot(candidate_resources)[candidate_lane]
+        != (candidate_initial_rng[candidate_lane])
+    )
+    assert (
+        _rng_snapshot(reference_resources)[reference_lane]
+        != (reference_initial_rng[reference_lane])
     )
     if not unrelated_active and len(ids) > 1:
         other_lane = 1 - candidate_lane
@@ -280,6 +314,7 @@ def test_brownian_stream_follows_logical_box_across_arrangements(
         (("box-a", "box-b"), (0, 1), True),
         (("box-a", "box-b"), (0, 1), False),
         (("box-b", "box-a"), (1, 0), True),
+        (("box-a", "box-b"), (1, 0), True),
     ],
 )
 def test_wall_loss_selected_logical_lane_is_stream_invariant(
@@ -295,15 +330,32 @@ def test_wall_loss_selected_logical_lane_is_stream_invariant(
     candidate, candidate_registry = resident_factory(
         device, ids, lanes, unrelated_active=unrelated_active
     )
+    reference_resources = reference_registry.acquire_wall_loss()
+    reference_initial_rng = _rng_snapshot(reference_resources)
     reference_resources = _dispatch_wall_loss(
         reference, reference_registry, 1.0
     )
+    candidate_logical_index = _target_logical_index(candidate)
     candidate_lane = _target_lane(candidate)
+    assert candidate_lane == lanes[candidate_logical_index]
     candidate_initial_rng = _rng_snapshot(
         candidate_registry.acquire_wall_loss()
     )
+    other_lane = (
+        next(lane for lane in range(len(ids)) if lane != candidate_lane)
+        if len(ids) > 1
+        else None
+    )
+    other_particles = (
+        _particle_snapshot(candidate, other_lane)
+        if other_lane is not None
+        else None
+    )
     candidate_resources = _dispatch_wall_loss(
-        candidate, candidate_registry, 1.0, (candidate_lane,)
+        candidate,
+        candidate_registry,
+        1.0,
+        (candidate_logical_index,),
     )
     assert (
         candidate_resources.rng_states
@@ -320,14 +372,69 @@ def test_wall_loss_selected_logical_lane_is_stream_invariant(
         _rng_snapshot(candidate_resources)[candidate_lane]
         == _rng_snapshot(reference_resources)[_target_lane(reference)]
     )
-    if not unrelated_active and len(ids) > 1:
-        other_lane = next(
-            lane for lane in range(len(ids)) if lane != candidate_lane
-        )
+    assert (
+        _rng_snapshot(candidate_resources)[candidate_lane]
+        != (candidate_initial_rng[candidate_lane])
+    )
+    assert (
+        _rng_snapshot(reference_resources)[_target_lane(reference)]
+        != (reference_initial_rng[_target_lane(reference)])
+    )
+    if other_lane is not None:
+        assert other_particles is not None
+        for actual, expected in zip(
+            _particle_snapshot(candidate, other_lane),
+            other_particles,
+            strict=True,
+        ):
+            np.testing.assert_array_equal(actual, expected)
         assert (
             _rng_snapshot(candidate_resources)[other_lane]
             == candidate_initial_rng[other_lane]
         )
+
+
+@pytest.mark.warp
+def test_wall_loss_legacy_empty_stream_selects_identity_physical_lane(
+    resident_factory: Callable[..., tuple[Any, GPUResourceRegistry]],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test legacy empty stream metadata maps selected indices to physical lanes."""
+    _require_device("cpu")
+    session, registry = resident_factory(
+        "cpu",
+        ("box-a", "box-b"),
+        (1, 0),
+        legacy_empty_stream=True,
+    )
+    resources = registry.acquire_wall_loss()
+    selected_lanes: list[np.ndarray] = []
+
+    def step(*args: Any, **kwargs: Any) -> Any:
+        """Record the private selected physical lanes without launching a writer."""
+        selected_lanes.append(kwargs["selected_boxes"].numpy().copy())
+        return args[0]
+
+    import particula.execution.process_adapters as adapters
+
+    monkeypatch.setattr(
+        adapters, "_get_wall_loss_selected_boxes_step_gpu", lambda: step
+    )
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    request = ResidentWallLossRequest(
+        session,
+        registry,
+        resources,
+        NeutralWallLossConfig("spherical", 1.0, chamber_radius=1.0),
+        1.0,
+        enabled_box_indices=(1,),
+    )
+
+    assert ResidentWallLossAdapter().execute(request) is session.particles
+    assert session.metadata.stream.n_boxes == 0
+    assert len(selected_lanes) == 1
+    np.testing.assert_array_equal(selected_lanes[0], [1])
 
 
 @pytest.mark.warp
@@ -342,7 +449,27 @@ def test_wall_loss_noop_and_rejection_preserve_every_stream_word(
     resources = registry.acquire_wall_loss()
     before_rng = _rng_snapshot(resources)
     before_particles = _all_particle_snapshot(session)
-    _dispatch_wall_loss(session, registry, 0.0, (_target_lane(session),))
+    from particula.gpu.kernels import wall_loss
+
+    writer_launched = False
+    original_launch = wall_loss.wp.launch
+
+    def spy_writer(*args: Any, **kwargs: Any) -> Any:
+        """Fail if the zero-time selected dispatch launches its writer."""
+        nonlocal writer_launched
+        if args[0] is wall_loss._wall_loss_remove_selected:
+            writer_launched = True
+            pytest.fail("zero-time selected work must not launch a writer")
+        return original_launch(*args, **kwargs)
+
+    monkeypatch.setattr(wall_loss.wp, "launch", spy_writer)
+    _dispatch_wall_loss(
+        session,
+        registry,
+        0.0,
+        (_target_logical_index(session),),
+    )
+    assert not writer_launched
     np.testing.assert_array_equal(_rng_snapshot(resources), before_rng)
     for actual, expected in zip(
         _all_particle_snapshot(session), before_particles, strict=True

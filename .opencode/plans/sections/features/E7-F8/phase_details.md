@@ -59,11 +59,19 @@
     strict selector rejection, empty-published no-op, preservation before
     writers, and faulted/finalized rejection.
 
-- [ ] **E7-F8-P5:** Guarantee disabled added and reordered box stream invariance with regressions
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Prove logical identity, not storage position or neighboring activity, determines each enabled stream.
-  - Files: `particula/execution/tests/rng_invariance_test.py`, scheduler/adapter files as needed
-  - Tests: Added, removed, disabled, and permuted boxes for coagulation and wall loss on Warp CPU; optional CUDA rows.
+- [x] **E7-F8-P5:** Guarantee disabled added and reordered box stream invariance with regressions
+   - Issue: #1524 | Size: S | Status: Complete
+   - Goal: Prove logical identity, not storage position or neighboring activity, determines each enabled stream.
+   - Files: `particula/execution/tests/rng_invariance_test.py`
+   - Delivered: Added regression-only resident adapter coverage; production code
+     was unchanged. The matrix resolves `box-a` through immutable metadata and
+     compares same-device isolated references with active, no-work, removed,
+     and physical-lane-permuted arrangements for Brownian and selected neutral
+     wall loss.
+   - Tests: Brownian particle/collision/RNG and wall-loss particle/RNG exact
+     snapshots, selected-lane gating, zero-time and empty-selection no-ops,
+     prelaunch reset rejection, and process-sidecar nonaliasing on Warp CPU;
+     CUDA rows are optional.
 
 - [ ] **E7-F8-P6:** Implement checkpoint restart RNG continuation semantics with integration tests
   - Issue: TBD | Size: S | Status: Not Started
