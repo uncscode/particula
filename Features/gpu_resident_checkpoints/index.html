@@ -4228,6 +4228,8 @@
       
         
       
+        
+      
     
     
     
@@ -4644,6 +4646,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../API/particula/execution/rng/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.rng
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../API/particula/execution/scheduler/" class="md-nav__link">
         
   
@@ -4803,10 +4833,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_19" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_20" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_19" id="__nav_2_3_19_19_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_20" id="__nav_2_3_19_20_label" tabindex="0">
             
   
   
@@ -4824,8 +4854,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_19_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_19">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_20">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15854,8 +15884,8 @@
 
 
 <h1 id="gpu-resident-checkpoints">GPU resident checkpoints<a class="headerlink" href="#gpu-resident-checkpoints" title="Permanent link">&para;</a></h1>
-<p>Current controllers create schema-v2 checkpoints; v1 noncommunication
-checkpoints remain restart-compatible. Resident communication is a concrete-only
+<p>Current controllers create schema-v3 checkpoints; v1 noncommunication and v2
+communication checkpoints remain restart-compatible. Resident communication is a concrete-only
 closed-map barrier: communication runs before optional prescribed volume
 evolution, and both invalidate saturation ratio only.</p>
 <p>The barrier resources and executor are direct imports under
@@ -15892,13 +15922,33 @@ resident-array identities.</p>
 target <code>Device</code>. Schema-v1 checkpoints must be noncommunication checkpoints.
 Schema-v2 checkpoints may contain no communication family or exactly one
 complete closed-map GAS or PARTICLES communication family with matching
-metadata and payloads. Finalization terminalizes its source session but returns
+metadata and payloads. Schema-v3 also permits absent or complete continuation
+for canonical published coagulation and wall-loss streams. Its immutable current
+<code>uint32</code> words are restart authority; normal dispatch and reacquisition neither
+read them back nor reset them, and only explicit stream reset derives new words
+from the root seed for a restored published stream. This does not prevent normal
+first acquisition from deriving words for a stream that was absent from the
+checkpoint. Finalization terminalizes its source session but returns
 an <code>ACTIVE</code>, restartable checkpoint record. Restart creates fresh session,
 registry, guard, resident arrays, and communication bindings; it never reuses
 source identities or provides fallback. It rejects other versions or carrier
 schemas, malformed, incomplete, partial, mixed, or mismatched communication
 payloads, non-<code>ACTIVE</code> checkpoint records, and device mismatches; it does not
 promise forward or backward compatibility.</p>
+<p>Schema-v3 continuation covers the canonical published <code>coagulation</code> and
+<code>wall_loss</code> streams. Each retained record includes schema-versioned stable
+logical-ID, root-seed, and namespace metadata plus immutable current <code>uint32</code>
+words. Those words are the sole continuation authority, rather than lossy CPU
+inspection carriers or ordinary resource payloads. Checkpoint capture is the
+sole explicit synchronization/readback boundary for this continuation. Normal
+scheduling and reacquisition do not inspect, transfer, synchronize, seed, or
+reset streams. When a stream is absent from a checkpoint, normal first
+acquisition still initializes that newly published stream once.</p>
+<p>Split-run continuation requires a manual restart into a fresh session with a
+frozen configuration and exactly equal supported <code>Device</code>. It excludes CPU,
+Warp, CUDA, or other cross-backend replay, cross-device migration; durable
+serialization; automatic restart; implicit reseeding, and hidden transfer;
+fallback; and rollback after a writer launch.</p>
 <p>Normal resident scheduler calls never checkpoint, finalize, or restart. Those
 operations remain this explicit, concrete-only exact-device boundary; see the
 <a href="../data-containers-and-gpu-foundations/#gpu-resident-deterministic-timestep">GPU-resident deterministic timestep</a>
@@ -15907,8 +15957,14 @@ contract for normal-step limits.</p>
 see the
 <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_resident_session.py">GPU-resident session lifecycle source</a>.</p>
 <p>Validate documentation with:</p>
-<div class="highlight"><pre><span></span><code>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/execution/tests/rng_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/rng_invariance_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/checkpoint_test.py<span class="w"> </span>-q
+pytest<span class="w"> </span>particula/execution/tests/gpu_resident_session_docs_test.py<span class="w"> </span>-q
+mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
 </code></pre></div>
+<p>Warp CPU is the installed-Warp baseline. CUDA evidence is optional and skips
+cleanly when unavailable.</p>
 
 
 

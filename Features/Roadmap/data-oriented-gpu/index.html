@@ -4228,6 +4228,8 @@
       
         
       
+        
+      
     
     
     
@@ -4644,6 +4646,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../API/particula/execution/rng/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    particula.execution.rng
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../API/particula/execution/scheduler/" class="md-nav__link">
         
   
@@ -4803,10 +4833,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_19" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_19_20" >
         
           
-          <label class="md-nav__link" for="__nav_2_3_19_19" id="__nav_2_3_19_19_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3_19_20" id="__nav_2_3_19_20_label" tabindex="0">
             
   
   
@@ -4824,8 +4854,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_19_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_3_19_19">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_3_19_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_19_20">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19109,9 +19139,9 @@ direct-kernel contract. Any broader integration still follows the ordering.</p>
 <li>E7-F3 P6 has shipped bounded selected-Brownian adapter documentation and
   evidence in the <a href="../../coagulation_strategy_system/">coagulation strategy guide</a>
   and its <a href="../../../Examples/gpu_coagulation_direct/">explicit-transfer example</a>.
-  It preserves the direct-kernel contract and defers E7-F8 detailed RNG stream
-  policy, public exports,
-  fallback, and hidden transfer.</li>
+   It preserves the direct-kernel contract. E7-F8's shipped resident-stream
+   policy remains concrete-only and adds no public exports, fallback, or hidden
+   transfer.</li>
 </ul>
 <h3 id="full-gpu-resident-simulation">Full GPU-Resident Simulation<a class="headerlink" href="#full-gpu-resident-simulation" title="Permanent link">&para;</a></h3>
 <p>E7-F4 P1--P7 ships the bounded concrete-only resident-session lifecycle and
@@ -19144,8 +19174,9 @@ record it in the source ledger, while <code>source -&gt; -1</code> sinks use and
 source amount in the sink ledger. The operation performs one gas-concentration
 commit after preflight.
 The remaining transport and mixing/advection work remain deferred.
-E7-F8 owns scheduled persistent stream identity/reset and checkpoint/restart RNG
-policy. E7-F9 owns final diagnostics products, complete examples, and closeout.
+E7-F8 is shipped: it owns the bounded scheduled persistent-stream identity,
+reset, and checkpoint/restart policy. E7-F9 owns final diagnostics products,
+complete examples, and closeout.
 High-level GPU adapters and user-facing CPU/GPU orchestration remain later
 contracts after E7-F6 establishes policy. They must not imply availability
 probing, fallback, retry, graph capture, performance claims, distributed or
@@ -19168,22 +19199,39 @@ follow their own composition and validation rules. See the
 guide for the amount equations, capacity gating, and checkpoint boundary.</p>
 <p>CFD, pressure/velocity solvers, adaptive meshes, distributed or multi-GPU
 transport, broad mixing/advection claims, graph capture, performance work, and
-autodiff remain deferred. Independent boxes remain the default, and E7-F8 owns
-scheduled RNG policy while E7-F9 owns complete-loop publication.</p>
+autodiff remain deferred. Independent boxes remain the default; E7-F8 supplies
+the shipped scheduled RNG policy while E7-F9 owns complete-loop publication.</p>
 <p>Fixed-capacity slot management for these loops is defined in
 <a href="#fixed-capacity-slot-boundary">Fixed-Capacity Slot Boundary</a> under Epic F.</p>
 <h3 id="random-number-strategy">Random Number Strategy<a class="headerlink" href="#random-number-strategy" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Define deterministic RNG seeding for stochastic coagulation on GPU. The
-  shipped baseline is seed-once initialization for caller-owned persistent
-  <code>rng_states</code>, while omitted <code>rng_states</code> still use a convenience
-  allocate-and-seed path per call.</li>
-<li>Support per-box RNG streams so independent boxes remain reproducible when the
-  number of boxes changes or when selected boxes are disabled.</li>
-<li>Track caller-owned RNG state on the GPU between timesteps and include it in
-  graph-captured execution tests.</li>
-<li>Document expected reproducibility limits across CPU, Warp CPU, and CUDA.</li>
-</ul>
+<p>E7-F8 is shipped with two deliberately separate ownership models. Direct
+kernels retain caller-owned supplied <code>rng_states</code>; omitted state is call-local
+convenience state, and only <code>initialize_rng=True</code> resets supplied state. A
+resident session and its registry instead own distinct, persistent, nonaliasing
+<code>(n_boxes,)</code> <code>wp.uint32</code> sidecars for the <code>coagulation</code> and <code>wall_loss</code>
+namespaces. Schema-versioned stable logical box IDs, root seed, and namespace
+determine identity, rather than physical lanes, physical layout, or registry
+order. Unrelated added, disabled/no-work, removed, or reordered boxes do not
+define a covered stream's identity. First acquisition initializes each published
+stream once; scheduled dispatch uses <code>initialize_rng=False</code>, does not reseed,
+and a repeated root seed does not reset it.</p>
+<p>Concrete-only <code>inspect_streams</code>, <code>initialize_streams</code>, and <code>reset_streams</code>
+lifecycle calls provide metadata-only inspection and explicit all/selected
+reset or initialization under the exact ACTIVE session/registry/closed-guard
+binding. Inspection exposes no current arrays or words and does no readback or
+synchronization. Normal dispatch does not inspect, transfer, read back,
+synchronize, seed, reset, checkpoint, restart, fall back, or promise rollback.
+Same-device invariance is covered only for frozen configurations of covered
+enabled boxes; unrelated added, disabled/no-work, removed, or reordered boxes
+do not alter a covered stream's identity. Schema-v3 checkpoint current words
+provide manual, fresh,
+exact-device continuation; cross-backend replay, migration, automatic restart,
+durable serialization, implicit reseeding, and hidden transfer are excluded.
+See the
+<a href="../../data-containers-and-gpu-foundations/">foundations guide</a> and
+<a href="../../gpu_resident_checkpoints/">GPU resident checkpoints</a>.</p>
+<p>Warp CPU is the baseline when installed. CUDA evidence is optional and skips
+cleanly when unavailable; no CPU/Warp/CUDA replay guarantee is made.</p>
 <p><strong>Exit bar:</strong> E7-F1 remains a bounded selection seam and E7-F5 remains a
 bounded concrete-only resident scheduler. E7-F7--E7-F9 and any public,
 availability-policy, fallback/retry, graph-capture, performance, or distributed
