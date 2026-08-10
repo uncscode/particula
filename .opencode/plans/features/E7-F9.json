@@ -46,11 +46,11 @@
     {
       "id": "E7-F9-P2",
       "title": "Freeze checkpoint schema and add round-trip validation tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-08-10",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
