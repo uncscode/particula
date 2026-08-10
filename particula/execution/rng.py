@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from numbers import Integral
-from typing import Any
+from typing import Any, no_type_check
 
 STREAM_SCHEMA_VERSION = 1
 MAX_LOGICAL_BOX_ID_BYTES = 256
@@ -476,7 +476,7 @@ class StreamRegistry:
             ],
             dtype=np.int32,
         )
-        lane_source = wp.array(lanes, dtype=wp.int32, device="cpu")
+        lane_source: Any = wp.array(lanes, dtype=wp.int32, device="cpu")
         for process_id in selected_processes:
             words = np.asarray(
                 [
@@ -485,7 +485,7 @@ class StreamRegistry:
                 ],
                 dtype=np.uint32,
             )
-            word_source = wp.array(words, dtype=wp.uint32, device="cpu")
+            word_source: Any = wp.array(words, dtype=wp.uint32, device="cpu")
             state = self.state_array_for(process_id)
             wp.launch(
                 kernel,
@@ -656,6 +656,7 @@ def _selected_write_kernel(wp: Any) -> Any:
     global _SELECTED_WRITE_KERNEL
     if _SELECTED_WRITE_KERNEL is None:
 
+        @no_type_check
         @wp.kernel
         def selected_write(
             state: wp.array(dtype=wp.uint32),

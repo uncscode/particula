@@ -493,14 +493,16 @@ class GPUResourceRegistry:
             for process_id in ("coagulation", "wall_loss")
             if self._published_stream_registry(process_id) is not None
         )
-        descriptors = tuple(
-            descriptor
-            for process_id in published
-            for descriptor in self._published_stream_registry(process_id)
-            .inspect()
-            .descriptors
-            if descriptor.key.process_id == process_id
-        )
+        descriptors: tuple[Any, ...] = ()
+        for process_id in published:
+            registry = self._published_stream_registry(process_id)
+            if registry is None:
+                raise AssertionError("published stream registry is unavailable")
+            descriptors += tuple(
+                descriptor
+                for descriptor in registry.inspect().descriptors
+                if descriptor.key.process_id == process_id
+            )
         roles = tuple((process_id, "rng_states") for process_id in published)
         return PublishedStreamManifest(
             StreamManifest(root_seed, logical_box_ids, lanes, descriptors),
