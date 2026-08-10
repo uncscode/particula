@@ -99,6 +99,14 @@ $ARGUMENTS = "adw_id=abc12345 test_path=adw/workflows/tests/plan_test.py"
 
 # Orchestration Process
 
+## Required Testing Policy
+
+Before delegating test execution, read
+`@.opencode/guides/testing_guide.md` and inspect the repository's active test
+configuration (for example, pytest and coverage settings in `pyproject.toml`).
+Treat those sources as authoritative. Do not invent or pass an explicit
+coverage threshold from this prompt.
+
 ## Phase 1: Load Context
 
 ### Step 1.1: Parse Arguments
@@ -121,7 +129,7 @@ Delegate all test execution, failure analysis, and fixing to the `adw-tester` su
 task({
   "description": "Run tests and fix failures",
   "subagent_type": "adw-tester",
-  "prompt": "Execute comprehensive test validation.\n\nArguments: {arguments}\n\nHonor any requested test_path. Use coverage: false only for focused assertion checks and individual failure reruns; do not pass raw coverage-disabling arguments. Retain repository-policy coverage for final comprehensive validation. Categorize failures as spec-related vs unrelated, fix spec-related failures (must fix), attempt one fix for unrelated failures, and report results."
+  "prompt": "Execute comprehensive test validation.\n\nArguments: {arguments}\n\nRead @.opencode/guides/testing_guide.md and inspect the repository's active test configuration before running tests. Honor any requested test_path. Use coverage: false only for focused assertion checks and individual failure reruns; do not override repository coverage policy. Retain configuration-driven coverage for final comprehensive validation. Categorize failures as spec-related vs unrelated, fix spec-related failures (must fix), attempt one fix for unrelated failures, and report results."
 })
 ```
 
@@ -223,7 +231,7 @@ Unrelated failures (not blocking):
 - Delegate all test execution to `adw-tester` — do not run pytest tools directly
 - Delegate all commits to `adw-commit` — do not commit directly from this agent
 - Ensure delegated focused checks use `coverage: false` rather than raw
-  `--no-cov` or lowered threshold arguments, and require coverage-enabled final
+  coverage overrides, and require configuration-driven coverage for final
   validation
 - If `adw-tester` fails to return, retry once without a session_id
 - If commit fails, retry once before reporting failure

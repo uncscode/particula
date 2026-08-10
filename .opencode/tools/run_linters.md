@@ -72,12 +72,21 @@ only omitted `linters` (normalized to Ruff) or `linters=ruff`. They reject
 - `output=<summary|full|json>`
 - `linters=<ruff|mypy comma-list>`
 
+Separate multiple option tokens with spaces, not commas. Commas are used only
+inside the `linters` value, such as `linters=ruff,mypy`.
+
 ## Examples
 
 Legacy validation-only request:
 
 ```json
 {"autoFix":false}
+```
+
+Legacy validation-only Ruff request with summary output:
+
+```json
+{"autoFix":false,"options":"output=summary linters=ruff"}
 ```
 
 Explicit read-only checks over ordered targets:

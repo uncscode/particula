@@ -69,15 +69,18 @@ The ADW workflow maintains metadata in `agents/{adw_id}/`:
 
 # Testing Guide Reference
 
-**IMPORTANT**: Before executing tests, read `.opencode/guides/testing_guide.md` to understand:
+**IMPORTANT**: Before executing tests, read `@.opencode/guides/testing_guide.md` to understand:
 - Test framework name and version
 - Test discovery patterns and file naming conventions
 - Test execution commands and options
-- Coverage commands and thresholds
+- Coverage commands and repository policy
 - Test directory structure requirements
 - Package/module names to test
 
-The testing guide is the single source of truth for all repository-specific testing details.
+The testing guide and the repository's active test configuration (for example,
+pytest and coverage settings in `pyproject.toml`) are the sources of truth for
+repository-specific testing details. Inspect both before running tests. Do not
+invent or pass an explicit coverage threshold from this prompt.
 
 # Python Projects: Using the Pytest Tools
 
@@ -138,7 +141,6 @@ run_pytest_advanced({
 | `minTests` | number | Minimum expected tests (use 1 for scoped tests) |
 | `coverage` | boolean | Enable coverage reporting; defaults to `true` |
 | `coverageSource` | string | Existing repo-relative source directories, comma-separated, or `all` for repository configuration |
-| `coverageThreshold` | number | Optionally strengthen, but never lower, repository coverage policy |
 | `cwd` | string | Working directory (for worktrees) |
 | `options` | string | Bounded toggles such as `output=full`, `fail-fast`, `test-filter=...`, `durations=...` |
 | `timeout` | number | Max execution time in seconds (max 1200) |
@@ -155,9 +157,9 @@ run_pytest_advanced({
 - Use `coverage: false` for focused diagnosis and individual failure reruns. This
   is assertion-only evidence; always restore coverage for final comprehensive
   validation.
-- Do not pass `--no-cov`, `--cov-fail-under=0`, or other raw coverage controls
-  through `pytestArgs`. Use the dedicated `coverage` fields so repository policy
-  remains authoritative.
+- Do not override configured coverage policy through raw pytest arguments or
+  wrapper fields. Use the dedicated `coverage` toggle only to distinguish
+  focused assertion checks from configuration-driven final validation.
 - Do not pass dotted modules or `.py` files as `coverageSource`; unsupported
   entries are ignored with an `INFO:` diagnostic and repository configuration
   is used when no valid directory remains.

@@ -7,8 +7,8 @@ description: 'Subagent that validates test coverage and writes missing tests for
   filesystem access or test execution - Accepts file, module, or directory scope - Validates tests exist
   for all public and private functions - Writes missing tests following repository
   conventions - Runs FAST tests only (skips slow/performance markers) - Fixes failures
-  (3 internal retries) - Enforces 80% aggregate coverage for the selected source
-  directories or repository configuration - Returns
+  (3 internal retries) - Enforces the repository-configured coverage policy for
+  the selected source directories or repository scope - Returns
   structured pass/fail with details
 
   Invoked by: adw-build primary agent (comprehensive test validation)
@@ -57,7 +57,7 @@ Ensure all changed code has comprehensive test coverage by:
 - Validating tests exist for all public AND private functions
 - Writing missing tests following repository conventions
 - Running tests and fixing failures (3 internal retries)
-- Enforcing 80% aggregate coverage for selected source directories or repository configuration
+- Enforcing the repository-configured coverage policy for selected source directories or repository scope
 - Returning structured results for primary agent
 
 This is a test-and-coverage-only agent. Do not run or require Ruff, formatting,
@@ -94,6 +94,11 @@ task({
 - @.opencode/guides/testing_guide.md - Test framework, patterns, conventions, **test duration tiers**
 - @.opencode/guides/code_style.md - Naming conventions for test files
 
+Before test execution, read the testing guide and inspect the repository's
+active test configuration (for example, pytest and coverage settings in
+`pyproject.toml`). Treat those sources as authoritative. Do not invent or pass
+an explicit coverage threshold from this prompt.
+
 # Test Duration Tiers (IMPORTANT)
 
 This subagent focuses on **fast tests** to provide quick feedback. See `.opencode/guides/testing_guide.md` for complete details.
@@ -112,7 +117,6 @@ run_pytest_advanced({
   "minTests": 1,
   "coverage": true,
   "coverageSource": "{source_directory_a},{source_directory_b}",
-  "coverageThreshold": 80,
   "cwd": "{worktree_path}"
 })
 
@@ -122,9 +126,11 @@ run_pytest_advanced({
 - `minTests: 1` - Set for scoped tests to validate at least 1 test runs
 - `coverage: true` - Enable coverage reporting (default)
 - `coverageSource: "{source_directory_a},{source_directory_b}"` - Existing repo-relative directories to measure (e.g., "adw/core,adw/utils"); use `all` for repository configuration
-- `coverageThreshold: 80` - Fail if coverage below 80%
 - `options: "fail-fast"` - Stop on first failure for quick feedback
 - `cwd: "{worktree_path}"` - Use when running in worktree
+
+Do not pass a coverage threshold. Let the repository's active pytest and
+coverage configuration determine the required policy.
 
 Choose coverage directories from the requested scope. For a file scope, use its
 parent source directory; for module or directory scope, use that existing
@@ -154,7 +160,7 @@ run_bun_test({
 
 1. **Every public function** must have at least one test
 2. **Every private function** (`_func`) must have at least one test
-3. **Selected source directories or repository scope** must have at least 80% aggregate coverage
+3. **Selected source directories or repository scope** must satisfy the repository-configured coverage policy
 4. **Test file naming**: `*_test.py` suffix (NOT `test_*.py`)
 5. **Test location**: `{module}/tests/` directory
 
@@ -381,7 +387,6 @@ run_pytest_advanced({
   "minTests": 1,
   "coverage": true,
   "coverageSource": "{source_directory}",
-  "coverageThreshold": 80,
   "timeout": test_timeout,
   "cwd": "{worktree_path}"
 })
@@ -391,11 +396,13 @@ run_pytest_advanced({
 - `minTests: 1` - Validates at least 1 test ran for scoped tests
 - `coverage: true` - Enable coverage measurement
 - `coverageSource: "{source_directory_a},{source_directory_b}"` - Measure existing repo-relative source directories (e.g., "adw/core,adw/utils"); never pass dotted modules or `.py` files
-- `coverageThreshold: 80` - Validation fails if coverage < 80%
 - `options: "fail-fast"` - Stop on first failure (`-x` flag) for faster feedback
 - `timeout` - Parsed `test_timeout`; defaults to 120 seconds and never exceeds 1200
 - `cwd: "{worktree_path}"` - Required for every isolated-worktree test run
 - `pytestArgs` - Only needs scope path and markers (coverage handled by explicit options)
+
+Do not pass a coverage threshold through the wrapper. Use the policy loaded
+from the testing guide and active repository configuration.
 
 ### 5.2: Classify Runner Outcomes Before Retrying
 
@@ -433,15 +440,12 @@ For each failure:
 3. If **implementation bug**: Note for primary agent (don't fix implementation)
 4. Retry tests
 
-### 5.5: Check Coverage Threshold
+### 5.5: Check Coverage Policy
 
-The `coverageThreshold: 80` option automatically fails validation if coverage is below 80%.
-The output will show:
-```
-Coverage: 65% (threshold: 80% FAILED)
-```
+Use the runner's coverage result to determine whether the active repository
+policy passed. Do not compare against a value embedded in this prompt.
 
-If coverage threshold fails:
+If coverage policy fails:
 - Identify uncovered lines from `--cov-report=term-missing` output
 - Write additional tests for uncovered code
 - Re-run tests
@@ -458,7 +462,7 @@ Tests validated: {count}
 Tests written: {count}
 Tests fixed: {count}
 
-Coverage: {percentage}% (threshold: 80%)
+Coverage: repository policy passed ({percentage}%)
 
 Functions tested:
 - validate_input() ✓
@@ -480,7 +484,7 @@ Failures:
 - test_validate_input: AssertionError - expected X got Y
 - test_parse_line: ImportError - cannot import 'missing_module'
 
-Coverage: {percentage}% (required: 80%)
+Coverage: repository policy failed ({percentage}%)
 
 Implementation bugs detected (for adw-build to fix):
 - validate_input() returns wrong type on line 45
@@ -554,7 +558,8 @@ Context: Parser now uses new data models
 - `ADW_BUILD_TESTS_FAILED` → Could not achieve passing tests after 3 retries
 - `ADW_BUILD_TESTS_BLOCKED` → Wrapper/runtime failed before usable test evidence
 
-**Coverage Threshold:** 80% for changed code
+**Coverage Policy:** Read `.opencode/guides/testing_guide.md` and the active
+repository test configuration; do not embed or pass a threshold here
 
 **Test Requirements:**
 - All public functions: >=1 test

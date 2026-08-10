@@ -14,7 +14,7 @@
       "name": "Plan Fix",
       "agent": "review-fix-planner",
       "prompt": "$ARGUMENTS --adw-id ${adw_id}",
-      "model": "base",
+      "model": "heavy",
       "timeout": 900,
       "retry": {
         "max_retries": 1,
@@ -30,7 +30,7 @@
       "name": "Fix",
       "agent": "adw-build-fix",
       "prompt": "$ARGUMENTS --adw-id ${adw_id}",
-      "model": "base",
+      "model": "heavy",
       "timeout": 3600,
       "retry": {
         "max_retries": 1,

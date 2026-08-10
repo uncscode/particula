@@ -188,7 +188,9 @@ export default tool({
     options: tool.schema
       .string()
       .optional()
-      .describe("Bounded options: output=<summary|full|json>, linters=<ruff|mypy comma-list>."),
+      .describe(
+        'Bounded options: output=<summary|full|json>, linters=<ruff|mypy comma-list>. Separate multiple option tokens with spaces, not commas. Example: options: "output=summary linters=ruff".',
+      ),
   },
   async execute(args) {
     const parsedOptions = parseLinterOptions(args.options);

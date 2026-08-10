@@ -5,8 +5,9 @@ description: 'Subagent that runs linters and auto-fixes code quality issues foll
   to validate code quality before committing.
 
   This subagent: - Loads workflow context from adw_spec_read tool - Runs configured linters
-  (ruff, mypy, etc.) - Auto-fixes issues where possible - Creates todo list for manual
-  fixes - Reports linting success or failure
+  (ruff, mypy, etc.) - Inspects the current git status and diff - Auto-fixes issues
+  where possible - Creates todo list for manual fixes - Reports linting success or
+  failure
 
   Linter permissions: - ruff check --fix: ALLOW - ruff format: ALLOW - mypy: ALLOW
   - Read/write code files: ALLOW - Modify linter config: DENY'
@@ -29,6 +30,7 @@ permission:
   create_workspace: deny
   workflow_builder: deny
   platform_operations: deny
+  git_diff: allow
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -60,7 +62,8 @@ adw_id=<workflow-id> [worktree_path=<path>] [target_dir=<directory>]
 **Parameters:**
 - **adw_id** (required): 8-character workflow identifier
 - **worktree_path** (optional): Loaded from state if not provided
-- **target_dir** (optional): Directory to lint (default: adw)
+- **target_dir** (optional): Narrower directory to lint when explicitly requested;
+  otherwise lint the repository's canonical targets
 
 **Invocation:**
 ```python
@@ -88,17 +91,31 @@ task({
 ## Step 1: Load Context
 - Parse arguments: `adw_id`, `worktree_path`, `target_dir`
 - Load workflow state via `adw_spec_read({"command": "read", "adw_id": adw_id})`
-- Extract: `worktree_path`, `target_dir` (default: adw)
+- Extract: `worktree_path` and any explicitly requested `target_dir`
 - Change to worktree directory
+- Run `git_diff({"command": "status", "worktree_path": worktree_path})` and
+  `git_diff({"command": "diff", "worktree_path": worktree_path})`
+- Record the pre-existing changed files so fixes preserve concurrent edits and
+  the final report distinguishes existing changes from linter-applied changes
 
 ## Step 2: Run Linters
 ```python
 run_linters({
-  "outputMode": "summary",
   "autoFix": true,
-  "targetDir": target_dir
+  "confirmed": true,
+  "cwd": worktree_path,
+  "targetDir": target_dir,  # Omit unless the caller explicitly narrows scope.
+  "options": "output=summary linters=ruff,mypy"
 })
 ```
+With no explicit `target_dir`, validation must cover the CI target set:
+`adw/`, `adforge_core/`, `adforge_voice/`, and `.opencode/tools/`. In
+particular, the required mypy command is:
+
+```bash
+mypy adw/ adforge_core/ adforge_voice/ .opencode/tools/ --ignore-missing-imports
+```
+
 **Parse result:** "ALL LINTERS PASSED ✓" or "LINTING FAILED ✗"
 
 ## Step 3: Handle Results
@@ -132,7 +149,7 @@ All linters passed.
 LINTING_SUCCESS
 
 Linters: ruff (passed), mypy (passed)
-Target: adw/
+Targets: adw/, adforge_core/, adforge_voice/, .opencode/tools/
 Fixes applied: <count>
 ```
 
@@ -203,10 +220,10 @@ Fixes applied: 5
 1. `LINTING_SUCCESS` → Continue to commit
 2. `LINTING_FAILED` → Stop workflow
 
-**Linters:** ruff (check + format), mypy (type checking)
+**Linters:** ruff (check + format), mypy (type checking) across all canonical targets
 
 **Auto-fix:** Always enabled, creates todos for manual fixes
 
-**Permissions:** ✅ Run linters, edit code | ❌ Modify config files
+**Permissions:** ✅ Inspect git diff, run linters, edit code | ❌ Modify config files
 
 **References:** `.opencode/guides/linting_guide.md`, `.github/workflows/lint.yml`
