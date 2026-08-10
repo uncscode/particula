@@ -43,5 +43,6 @@ continuation.
   resume an exact-device split run with the same stochastic state as an
   uninterrupted run; ordinary reacquisition and dispatch do not reseed it.
 
-Parent epic: E7. Issues #1520--#1525 completed P1--P6; broad P7 development
-documentation remains separate work.
+Issue #1526 completed P7: development documentation now records the shipped
+concrete-only ownership, explicit reset/inspection, same-device invariance, and
+checkpoint/restart boundaries without claiming new runtime APIs. Parent epic: E7.

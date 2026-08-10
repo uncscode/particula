@@ -231,6 +231,28 @@ one exact active session and owns fixed-shape, same-device, nonaliasing sidecar
 families. Registry acquisition validates or allocates resources only: it does
 not execute, transfer, synchronize, or choose an RNG policy.
 
+Resident stochastic state is concrete-only and session/registry-owned. Each
+published process has one nonaliasing `(n_boxes,)` `wp.uint32` sidecar: the
+separate `coagulation` and `wall_loss` namespaces never share one. A stream
+identity is its schema-versioned stable logical box ID, root seed, and namespace,
+not a physical lane, registry order, or the presence, activity, removal, or
+reordering of unrelated boxes. Covered enabled boxes retain same-supported-device
+state under those unrelated changes; this is not a cross-device replay claim.
+
+This differs from direct kernels. Omitted direct-kernel RNG state is call-local
+convenience state, while supplied state remains caller-owned and only
+`initialize_rng=True` resets it. Resident first acquisition initializes a newly
+published stream once; scheduled dispatch uses `initialize_rng=False`. Repeating
+a resident root seed does not reset a stream. Only concrete-only
+`inspect_streams`, `initialize_streams`, and `reset_streams` lifecycle calls can
+inspect frozen metadata or explicitly reset all or selected streams, and require
+the exact ACTIVE session/registry/closed-guard binding. Inspection exposes no
+current arrays or words and performs no readback or synchronization.
+
+Normal resident steps do not transfer, read back, synchronize, reseed, restart,
+fall back, or promise rollback. Checkpointing is the separate explicit boundary
+for continuation; see [GPU resident checkpoints](gpu_resident_checkpoints.md).
+
 A guard permits one token at a time. Checkpoint, finalization, close, and
 discard require the exact session/registry/guard binding and a closed guard.
 Normal guard bookkeeping neither bulk-transfers nor synchronizes. A read-only

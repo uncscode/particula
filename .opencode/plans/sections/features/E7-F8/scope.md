@@ -1,8 +1,8 @@
 # Scope
 
-Issues #1520--#1525 completed E7-F8-P1--P6: concrete-only resident RNG
-lifecycle support and same-device invariance coverage for Brownian coagulation
-and wall loss built on P1 registration and initialization.
+Issues #1520--#1526 completed E7-F8-P1--P7: concrete-only resident RNG
+lifecycle support, same-device invariance coverage, and P7 documentation for
+Brownian coagulation and wall loss built on P1 registration and initialization.
 
 ## In Scope
 

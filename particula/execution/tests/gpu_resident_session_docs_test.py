@@ -233,6 +233,154 @@ def test_lifecycle_documentation_preserves_published_boundaries() -> None:
     )
 
 
+def test_rng_lifecycle_documentation_preserves_published_boundaries() -> None:
+    """Resident RNG documentation retains lifecycle and continuation limits."""
+    paths = {
+        "foundations": _ROOT
+        / "docs"
+        / "Features"
+        / "data-containers-and-gpu-foundations.md",
+        "checkpoint": _ROOT
+        / "docs"
+        / "Features"
+        / "gpu_resident_checkpoints.md",
+        "roadmap": _ROOT
+        / "docs"
+        / "Features"
+        / "Roadmap"
+        / "data-oriented-gpu.md",
+        "agents": _ROOT / "AGENTS.md",
+        "overview": _ROOT
+        / ".opencode"
+        / "plans"
+        / "sections"
+        / "features"
+        / "E7-F8"
+        / "overview.md",
+        "scope": _ROOT
+        / ".opencode"
+        / "plans"
+        / "sections"
+        / "features"
+        / "E7-F8"
+        / "scope.md",
+        "phase_details": _ROOT
+        / ".opencode"
+        / "plans"
+        / "sections"
+        / "features"
+        / "E7-F8"
+        / "phase_details.md",
+        "documentation_updates": _ROOT
+        / ".opencode"
+        / "plans"
+        / "sections"
+        / "features"
+        / "E7-F8"
+        / "documentation_updates.md",
+        "testing_strategy": _ROOT
+        / ".opencode"
+        / "plans"
+        / "sections"
+        / "features"
+        / "E7-F8"
+        / "testing_strategy.md",
+        "success_criteria": _ROOT
+        / ".opencode"
+        / "plans"
+        / "sections"
+        / "features"
+        / "E7-F8"
+        / "success_criteria.md",
+        "change_log": _ROOT
+        / ".opencode"
+        / "plans"
+        / "sections"
+        / "features"
+        / "E7-F8"
+        / "change_log.md",
+    }
+    texts = {
+        name: " ".join(path.read_text(encoding="utf-8").split())
+        for name, path in paths.items()
+    }
+    required_phrases = {
+        "foundations": (
+            "stable logical box ID, root seed, and namespace",
+            "not a physical lane, registry order",
+            "`coagulation` and `wall_loss` namespaces",
+            "session/registry-owned",
+            "scheduled dispatch uses `initialize_rng=False`",
+            "Repeating a resident root seed does not reset a stream.",
+            "Inspection exposes no current arrays or words",
+            "Normal resident steps do not transfer, read back, synchronize",
+        ),
+        "checkpoint": (
+            "immutable current `uint32` words",
+            "sole continuation authority",
+            "sole explicit synchronization/readback boundary",
+            "manual restart into a fresh session",
+            "exactly equal supported `Device`",
+            "cross-backend replay, cross-device migration",
+            "implicit reseeding, and hidden transfer",
+            "Warp CPU is the installed-Warp baseline.",
+            "CUDA evidence is optional and skips cleanly when unavailable.",
+            "particula/execution/tests/rng_test.py",
+            "particula/execution/tests/rng_invariance_test.py",
+            "particula/execution/tests/checkpoint_test.py -q",
+            "particula/execution/tests/gpu_resident_session_docs_test.py -q",
+            "mkdocs build --strict",
+        ),
+        "roadmap": (
+            "E7-F8 is shipped with two deliberately separate ownership models.",
+            "metadata-only inspection and explicit all/selected reset",
+            "Schema-v3 checkpoint current words provide manual fresh",
+            "cross-backend replay, migration, automatic restart",
+            "CUDA evidence is optional and skips cleanly when unavailable",
+        ),
+        "agents": (
+            "### Resident RNG stream lifecycle",
+            "stable logical box IDs, the root seed, and namespace define",
+            "repeating a root seed does not reset resident state.",
+            "Inspection is metadata-only",
+            "particula/execution/tests/rng_invariance_test.py",
+        ),
+    }
+    for name, phrases in required_phrases.items():
+        for phrase in phrases:
+            assert phrase in texts[name], f"{name} is missing: {phrase}"
+
+    for name in (
+        "overview",
+        "scope",
+        "phase_details",
+        "documentation_updates",
+        "testing_strategy",
+        "success_criteria",
+        "change_log",
+    ):
+        assert "P7" in texts[name], f"{name} is missing P7 evidence"
+        assert "#1526" in texts[name], f"{name} is missing #1526 evidence"
+    assert "docs/Features/gpu_resident_checkpoints.md" in texts["phase_details"]
+    assert "gpu_resident_session_docs_test.py" in texts["phase_details"]
+
+    plan = json.loads(
+        (_ROOT / ".opencode" / "plans" / "features" / "E7-F8.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert plan["status"] == "Shipped"
+    assert plan["lifecycle"] == "completed"
+    assert [phase["status"] for phase in plan["phases"]] == ["Shipped"] * 7
+    assert [phase["issue_number"] for phase in plan["phases"]] == list(
+        range(1520, 1527)
+    )
+    completion_date = plan["phases"][-1]["completion_date"]
+    assert completion_date
+    assert plan["completion_date"] == completion_date
+    assert plan["last_updated"] == completion_date
+
+
 def test_scheduler_documentation_preserves_published_boundaries() -> None:
     """Resident scheduler documentation retains its cross-reference links."""
     feature = (
@@ -323,7 +471,7 @@ def test_communication_roadmap_and_architecture_documentation_preserve_boundarie
         "Direct-boundary empty/disabled maps and unchanged final volumes are write-free no-ops",
         "resident barriers instead follow their own composition and validation rules.",
         "CFD, pressure/velocity solvers, adaptive meshes",
-        "E7-F8 owns scheduled RNG policy while E7-F9 owns complete-loop publication.",
+        "E7-F8 supplies the shipped scheduled RNG policy while E7-F9 owns complete-loop publication.",
     ):
         if phrase not in roadmap_text:
             pytest.fail(f"roadmap is missing: {phrase}")

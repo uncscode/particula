@@ -91,8 +91,13 @@
      explicit-reset behavior, malformed pre-allocation rejection, capture and
      fresh-restart recovery, and bounded synchronization/readback assertions.
 
-- [ ] **E7-F8-P7:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
-  - Goal: Publish ownership, seeding, reset, invariance, checkpoint, restart, and support boundaries.
-  - Files: `docs/Features/data-containers-and-gpu-foundations.md`, `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`
-  - Tests: `mkdocs build --strict`, documentation links, snippets, and focused command verification.
+- [x] **E7-F8-P7:** Update development documentation
+   - Issue: #1526 | Size: XS | Status: Shipped
+   - Goal: Document shipped ownership, seeding, reset, invariance, checkpoint,
+     restart, and support boundaries without adding runtime behavior or APIs.
+   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
+     `docs/Features/gpu_resident_checkpoints.md`,
+     `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`, and
+     `particula/execution/tests/gpu_resident_session_docs_test.py`
+   - Tests: `pytest particula/execution/tests/gpu_resident_session_docs_test.py -q`,
+     `mkdocs build --strict`, and the focused RNG/checkpoint commands.

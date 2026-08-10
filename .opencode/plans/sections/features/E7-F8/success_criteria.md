@@ -33,6 +33,8 @@
   atomic or checkpointable state.
 - [x] Existing direct wall-loss kernel API/physics, stochastic validation,
   narrow exports, and issue #1451 exclusions remain intact.
+- [x] Issue #1526 P7 documents the completed resident RNG lifecycle and
+  checkpoint continuation evidence without claiming new public APIs.
 
 ## Metrics
 

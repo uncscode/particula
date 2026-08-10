@@ -326,6 +326,29 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   bindings; it never reuses source identities. Normal scheduler calls never
   checkpoint, finalize, or restart.
 
+### Resident RNG stream lifecycle
+
+- Resident streams are concrete-only lifecycle state. The exact active
+  session/registry/closed-guard binding owns separate nonaliasing `(n_boxes,)`
+  `wp.uint32` sidecars for `coagulation` and `wall_loss`; these names are not
+  package or top-level APIs.
+- Schema-versioned stable logical box IDs, the root seed, and namespace define
+  stream identity, not physical lane or registry order. First acquisition
+  initializes a published stream once, and scheduled dispatch uses
+  `initialize_rng=False`; repeating a root seed does not reset resident state.
+- `inspect_streams`, `initialize_streams`, and `reset_streams` are concrete-only
+  explicit lifecycle operations. Inspection is metadata-only, and selected or
+  all-stream reset is deliberate; neither operation performs normal-step
+  readback or synchronization.
+- Validate with:
+
+  ```bash
+  pytest particula/execution/tests/rng_test.py \
+    particula/execution/tests/rng_invariance_test.py \
+    particula/execution/tests/checkpoint_test.py -q
+  pytest particula/execution/tests/gpu_resident_session_docs_test.py -q
+  ```
+
 ### Complete direct GPU process illustration
 
 - `docs/Examples/gpu_complete_process_sequence.py` is an illustrative,

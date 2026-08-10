@@ -28,3 +28,9 @@ exact-device reconstruction, current-word authority, explicit-only reset,
 v1/v2 compatibility, normal-dispatch no-readback/no-reseed behavior, and
 construction cleanup/no-post-writer-rollback boundaries. Public exports and
 direct-kernel APIs remain unchanged.
+
+Issue #1526 completed P7 documentation evidence in the foundations, checkpoint,
+roadmap, and contributor references. It records stable logical IDs and separate
+namespaces, one-time resident acquisition, metadata-only inspection, explicit
+reset, non-reseeding dispatch, schema-v3 current-word continuation, and bounded
+fresh exact-device restart without adding a public API or runtime implementation.

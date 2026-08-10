@@ -51,8 +51,11 @@ thresholds are not lowered; changed modules must retain at least 80% coverage.
    synchronization and bounded stream readbacks, reject malformed continuation
    records before setup/allocation, and exercise capture/readback and fresh
    restart construction recovery lifecycles. CUDA remains optional.
-- **P7:** Run `mkdocs build --strict`, documentation regression tests, export
-  checks, and copy-pastable focused commands.
+- **P7 (complete, Issue #1526):**
+  `gpu_resident_session_docs_test.py` reads the final foundations, checkpoint,
+  roadmap, contributor reference, and feature narratives with UTF-8 normalized
+  prose. It verifies the documented ownership and continuation boundaries plus
+  the shipped feature record; `mkdocs build --strict` checks publication links.
 
 ## Validation Matrix
 

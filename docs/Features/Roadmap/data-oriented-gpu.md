@@ -1534,9 +1534,9 @@ direct-kernel contract. Any broader integration still follows the ordering.
 - E7-F3 P6 has shipped bounded selected-Brownian adapter documentation and
   evidence in the [coagulation strategy guide](../coagulation_strategy_system.md)
   and its [explicit-transfer example](../../Examples/gpu_coagulation_direct.py).
-  It preserves the direct-kernel contract and defers E7-F8 detailed RNG stream
-  policy, public exports,
-  fallback, and hidden transfer.
+   It preserves the direct-kernel contract. E7-F8's shipped resident-stream
+   policy remains concrete-only and adds no public exports, fallback, or hidden
+   transfer.
 
 ### Full GPU-Resident Simulation
 
@@ -1572,8 +1572,9 @@ record it in the source ledger, while `source -> -1` sinks use and record the
 source amount in the sink ledger. The operation performs one gas-concentration
 commit after preflight.
 The remaining transport and mixing/advection work remain deferred.
-E7-F8 owns scheduled persistent stream identity/reset and checkpoint/restart RNG
-policy. E7-F9 owns final diagnostics products, complete examples, and closeout.
+E7-F8 is shipped: it owns the bounded scheduled persistent-stream identity,
+reset, and checkpoint/restart policy. E7-F9 owns final diagnostics products,
+complete examples, and closeout.
 High-level GPU adapters and user-facing CPU/GPU orchestration remain later
 contracts after E7-F6 establishes policy. They must not imply availability
 probing, fallback, retry, graph capture, performance claims, distributed or
@@ -1600,23 +1601,35 @@ guide for the amount equations, capacity gating, and checkpoint boundary.
 
 CFD, pressure/velocity solvers, adaptive meshes, distributed or multi-GPU
 transport, broad mixing/advection claims, graph capture, performance work, and
-autodiff remain deferred. Independent boxes remain the default, and E7-F8 owns
-scheduled RNG policy while E7-F9 owns complete-loop publication.
+autodiff remain deferred. Independent boxes remain the default; E7-F8 supplies
+the shipped scheduled RNG policy while E7-F9 owns complete-loop publication.
 
 Fixed-capacity slot management for these loops is defined in
 [Fixed-Capacity Slot Boundary](#fixed-capacity-slot-boundary) under Epic F.
 
 ### Random Number Strategy
 
-- Define deterministic RNG seeding for stochastic coagulation on GPU. The
-  shipped baseline is seed-once initialization for caller-owned persistent
-  `rng_states`, while omitted `rng_states` still use a convenience
-  allocate-and-seed path per call.
-- Support per-box RNG streams so independent boxes remain reproducible when the
-  number of boxes changes or when selected boxes are disabled.
-- Track caller-owned RNG state on the GPU between timesteps and include it in
-  graph-captured execution tests.
-- Document expected reproducibility limits across CPU, Warp CPU, and CUDA.
+E7-F8 is shipped with two deliberately separate ownership models. Direct kernels
+retain caller-owned supplied `rng_states`; omitted state is call-local convenience
+state, and only `initialize_rng=True` resets supplied state. A resident session
+and its registry instead own distinct nonaliasing `(n_boxes,)` streams for the
+`coagulation` and `wall_loss` namespaces. Schema-versioned stable logical box
+IDs, root seed, and namespace determine identity, rather than physical lanes or
+registry order. First acquisition initializes each published stream once;
+scheduled dispatch does not reseed, and a repeated root seed does not reset it.
+
+Concrete-only lifecycle calls provide metadata-only inspection and explicit
+all/selected reset under the exact active session/registry/closed-guard binding.
+They add no public orchestration, hidden transfer, readback, synchronization, or
+fallback. Same-device invariance is covered only for frozen configurations and
+covered enabled boxes. Schema-v3 checkpoint current words provide manual fresh,
+exact-device continuation; cross-backend replay, migration, automatic restart,
+durable serialization, and implicit reseeding are excluded. See the
+[foundations guide](../data-containers-and-gpu-foundations.md) and
+[GPU resident checkpoints](../gpu_resident_checkpoints.md).
+
+Warp CPU is the baseline when installed. CUDA evidence is optional and skips
+cleanly when unavailable; no CPU/Warp/CUDA replay guarantee is made.
 
 **Exit bar:** E7-F1 remains a bounded selection seam and E7-F5 remains a
 bounded concrete-only resident scheduler. E7-F7--E7-F9 and any public,

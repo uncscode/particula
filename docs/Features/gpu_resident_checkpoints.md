@@ -57,6 +57,21 @@ schemas, malformed, incomplete, partial, mixed, or mismatched communication
 payloads, non-`ACTIVE` checkpoint records, and device mismatches; it does not
 promise forward or backward compatibility.
 
+Schema-v3 continuation covers the canonical published `coagulation` and
+`wall_loss` streams. Each retained record includes stable-logical-ID and
+namespace metadata plus immutable current `uint32` words; those words are the
+sole continuation authority, rather than lossy CPU inspection carriers or
+ordinary resource payloads. Checkpoint capture is the sole explicit
+synchronization/readback boundary for this continuation. Normal scheduling and
+reacquisition do not inspect, transfer, synchronize, seed, or reset streams.
+When a stream is absent from a checkpoint, normal first acquisition still
+initializes that newly published stream once.
+
+Split-run continuation requires a manual restart into a fresh session with a
+frozen configuration and exactly equal supported `Device`. It excludes CPU/Warp/
+CUDA or other cross-backend replay, cross-device migration, durable
+serialization, automatic restart, implicit reseeding, and hidden transfer.
+
 Normal resident scheduler calls never checkpoint, finalize, or restart. Those
 operations remain this explicit, concrete-only exact-device boundary; see the
 [GPU-resident deterministic timestep](data-containers-and-gpu-foundations.md#gpu-resident-deterministic-timestep)
@@ -69,5 +84,12 @@ see the
 Validate documentation with:
 
 ```bash
+pytest particula/execution/tests/rng_test.py \
+  particula/execution/tests/rng_invariance_test.py \
+  particula/execution/tests/checkpoint_test.py -q
+pytest particula/execution/tests/gpu_resident_session_docs_test.py -q
 mkdocs build --strict
 ```
+
+Warp CPU is the installed-Warp baseline. CUDA evidence is optional and skips
+cleanly when unavailable.
