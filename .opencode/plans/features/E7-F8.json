@@ -102,11 +102,11 @@
     {
       "id": "E7-F8-P6",
       "title": "Implement checkpoint restart RNG continuation semantics with integration tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-08-10",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
