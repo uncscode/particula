@@ -14,10 +14,10 @@
   - Evidence: issue #1451 explicitly excludes exact CPU/CUDA stochastic equality.
 
 - [x] Is RNG state included in a valid E7-F4 checkpoint?
-  - Resolved 2026-08-09: No. P2 checkpoint and finalize fail closed before
-    payload conversion when the resident coagulation sidecar has been published.
-    No stream metadata or words are serialized, and restart continuation is
-    unsupported; a future persistence design requires a separate contract.
+  - Resolved 2026-08-09 (updated by issue #1525): Schema-v3 optionally includes
+    complete canonical metadata and immutable current words for published
+    coagulation and wall-loss streams. These payloads are the sole RNG-byte
+    authority; schemas v1/v2 have no continuation and remain compatible.
 
 - [x] What public logical box ID type should the first stable API accept?
   - Resolved 2026-07-27: Accept unique, non-empty UTF-8 strings and define a
@@ -47,10 +47,9 @@
   - Resolved by: issue #1522, commit `ca21d45d8`
 
 - [x] Is durable on-disk serialization part of the first RNG checkpoint schema?
-  - Resolved 2026-08-09: No. There is currently no RNG checkpoint schema:
-    published resident RNG state rejects checkpoint/finalize and is neither
-    serialized nor restartable. Any future in-memory representation must still
-    defer file encoding.
+  - Resolved 2026-08-09 (updated by issue #1525): No. Schema-v3 provides only
+    in-memory immutable continuation payloads for exact-device restart; file
+    encoding and durable storage remain deferred.
   - Rationale: Current checkpoint boundaries restore CPU objects, while durable
     format, migration, and filesystem guarantees are explicitly out of scope.
   - Evidence:

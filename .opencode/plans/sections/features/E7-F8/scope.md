@@ -1,6 +1,6 @@
 # Scope
 
-Issues #1520--#1524 completed E7-F8-P1--P5: concrete-only resident RNG
+Issues #1520--#1525 completed E7-F8-P1--P6: concrete-only resident RNG
 lifecycle support and same-device invariance coverage for Brownian coagulation
 and wall loss built on P1 registration and initialization.
 
@@ -17,8 +17,7 @@ and wall loss built on P1 registration and initialization.
   `(n_boxes,)` `wp.uint32` coagulation sidecar initialized on first compatible
   resource acquisition and retained by identity.
 - Resident Brownian adapter/scheduler dispatch with the exact published sidecar
-  and literal `initialize_rng=False`; fail-closed checkpoint/finalize rejection
-  once that sidecar is published.
+  and literal `initialize_rng=False`.
 - One independently initialized, session-owned wall-loss `(n_boxes,)`
   `wp.uint32` sidecar with canonical-manifest initialization, exact resource
   identity, and coagulation nonaliasing.
@@ -35,7 +34,17 @@ and wall loss built on P1 registration and initialization.
   write-free empty selections and explicit unpublished-process rejection.
 - Same-device resident adapter regressions proving `box-a` stream/output
   invariance across active, removed, no-work, and physical-lane-permuted
-  unrelated-box arrangements, plus wall-loss selected/no-op/rejection gating.
+   unrelated-box arrangements, plus wall-loss selected/no-op/rejection gating.
+- Schema-v3 optional checkpoint continuation for the canonical published
+  `coagulation` and `wall_loss` streams: immutable metadata and little-endian
+  `(n_boxes,)` `uint32` current-word payloads are the sole RNG-byte authority.
+- One-synchronization bounded RNG capture, fail-closed v3 preflight, and fresh
+  exact-device restoration without stream acquisition or reseeding. Schema-v1
+  and schema-v2 (including valid communication records) retain their existing
+  compatible restart behavior.
+- Checkpoint/restart preflight, split-run continuation, reset-after-restart,
+  malformed-record rejection, capture/readback failure, and fresh-construction
+  recovery coverage in the execution test suite.
 
 ## Out of Scope
 
@@ -43,9 +52,9 @@ and wall loss built on P1 registration and initialization.
   bitwise equivalence.
 - Full-box invariance guarantees beyond the covered same-device resident
   Brownian and selected neutral wall-loss regression matrix.
-- RNG serialization, checkpoint persistence, and restart continuation. A
-  checkpoint or finalize attempt after coagulation-sidecar publication rejects
-  before payload conversion or enumeration.
+- Durable file serialization, arbitrary-object deserialization, remote
+  checkpoint storage, migration, and cross-device RNG replay. Continuation is
+  in-memory, schema-v3-only, and exact-device only.
 - Rewriting coagulation or wall-loss physics, random algorithms, direct-kernel
   signatures, host readback, transfer, or synchronization behavior.
 - RNG for deterministic processes, unsupported mechanisms, CPU runnable redesign,
@@ -53,5 +62,3 @@ and wall loss built on P1 registration and initialization.
 - Hidden host readback, per-step synchronization, automatic reseeding, silent
   fallback, dynamic particle capacity, graph capture/performance work (Epic H),
   or autodiff work (Epic I).
-- A durable file format, arbitrary-object deserialization, remote checkpoint
-  storage, or long-term compatibility beyond the declared checkpoint schema.

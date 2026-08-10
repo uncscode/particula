@@ -43,10 +43,12 @@ The exact downstream ordering remains
        resident binding. E7-F8 P1 supplies the isolated RNG stream-identity and
       explicit caller-buffer initialization boundary below; P4 adds concrete-only
       resident inspection and explicit reset of published streams or selected
-      lanes under an exact ACTIVE session/registry/closed-guard binding. Normal
-      dispatch still uses `initialize_rng=False`; reset/inspection has no hidden
-      readback/synchronization or checkpoint/restart persistence. Remaining RNG
-      policy, implicit transfer/synchronization, retry, broad fallback, and
+       lanes under an exact ACTIVE session/registry/closed-guard binding. Normal
+       dispatch still uses `initialize_rng=False`; reset/inspection has no hidden
+       readback/synchronization. Schema-v3 checkpoint/restart separately preserves
+       complete published-stream continuation state, while arbitrary stream
+       persistence remains excluded. Remaining RNG policy, implicit
+       transfer/synchronization, retry, broad fallback, and
      replacement of direct GPU APIs remain deferred. The sole shipped fallback seam is the
     explicit, CPU-authoritative,
   direct-import-only boundary described below.

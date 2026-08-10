@@ -16,8 +16,12 @@ initialize one sidecar per process on first acquisition. Both are retained by
 identity and nonaliasing; resident dispatch forces `initialize_rng=False`. P4
 adds deliberate direct-only inspection and reset calls, gated by an exact ACTIVE
 session/registry/closed-guard binding and limited to published sidecars.
-Checkpoint/finalize rejects published resident RNG state; persistence and
-restart continuation are not implemented.
+Issue #1525 completes P6: schema-v3 checkpoints optionally own immutable,
+canonical continuation metadata and current `uint32` words for published
+coagulation and wall-loss streams. Exact-device restart builds fresh session,
+registry, guard, containers, sidecars, and stream arrays from those words,
+without reseeding. Schemas v1/v2 remain restart-compatible without RNG
+continuation.
 
 ## User Stories
 
@@ -34,7 +38,10 @@ restart continuation are not implemented.
   without changing ordinary dispatch behavior.
 - As a resident-session user, I have same-device regression evidence that the
   covered logical box's Brownian and selected neutral wall-loss stream/output is
-  unchanged by active, removed, no-work, or physically permuted unrelated boxes.
+   unchanged by active, removed, no-work, or physically permuted unrelated boxes.
+- As a resident-session user, I can checkpoint one or both published streams and
+  resume an exact-device split run with the same stochastic state as an
+  uninterrupted run; ordinary reacquisition and dispatch do not reseed it.
 
-Parent epic: E7. Issues #1520--#1524 completed P1--P5; checkpoint
-persistence/restart and documentation phases remain separate work.
+Parent epic: E7. Issues #1520--#1525 completed P1--P6; broad P7 development
+documentation remains separate work.

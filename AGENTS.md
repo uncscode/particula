@@ -297,10 +297,12 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
   and transitions the session to `FINALIZED`; later calls return that exact
   cached object.
 - A checkpoint owns immutable canonical primary-array and acquired-sidecar
-  bytes, plus detached CPU inspection carriers. Inspection `GasData` has no
-  GPU vapor-pressure field and is intentionally lossy; restart restores the
-  canonical device vapor-pressure bytes rather than treating inspection data as
-  authoritative. Snapshotting needs roughly one additional host copy of
+  bytes, plus detached CPU inspection carriers. Schema-v3 optionally owns the
+  current words for published coagulation and wall-loss RNG streams as its sole
+  RNG authority; ordinary resource payloads exclude those stream states.
+  Inspection `GasData` has no GPU vapor-pressure field and is intentionally
+  lossy; restart restores canonical device bytes rather than treating inspection
+  data as authoritative. Snapshotting needs roughly one additional host copy of
   resident payload bytes as well as the detached inspection copies.
 - Restart is explicit and same-device only:
   `restart_resident_session(checkpoint, device)` requires an exactly compatible
@@ -313,11 +315,16 @@ aerosol = dilution.execute(aerosol, time_step=10.0, sub_steps=2)
 - Restart compatibility is fail-closed: an ACTIVE `ResidentCheckpoint` with
   carrier type `"ResidentSession"`, complete valid payload descriptors and
   bytes, and an exactly equal target `Device` is required. Schema-v1
-  noncommunication checkpoints remain restart-compatible. Controllers create
-  schema-v2 checkpoints, which may contain no communication family or one
-  complete closed-map GAS or PARTICLES family with matching metadata. Restart
-  reconstructs fresh communication arrays and bindings; it never reuses source
-  identities. Normal scheduler calls never checkpoint, finalize, or restart.
+  noncommunication and schema-v2 optional-communication checkpoints remain
+  restart-compatible. Controllers create schema-v3 checkpoints, which may also
+  carry complete continuation for canonical published coagulation and wall-loss
+  streams. Fresh exact-device restore uses those words without reseeding; normal
+  dispatch and reacquisition preserve them, and only an explicit stream reset
+  rederives root-seed words for restored published streams. Normal first
+  acquisition still initializes a stream absent from the checkpoint. Restart
+  reconstructs fresh communication arrays and
+  bindings; it never reuses source identities. Normal scheduler calls never
+  checkpoint, finalize, or restart.
 
 ### Complete direct GPU process illustration
 

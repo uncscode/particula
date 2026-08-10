@@ -47,7 +47,9 @@ metadata and payloads. Schema-v3 also permits absent or complete continuation
 for canonical published coagulation and wall-loss streams. Its immutable current
 `uint32` words are restart authority; normal dispatch and reacquisition neither
 read them back nor reset them, and only explicit stream reset derives new words
-from the root seed. Finalization terminalizes its source session but returns
+from the root seed for a restored published stream. This does not prevent normal
+first acquisition from deriving words for a stream that was absent from the
+checkpoint. Finalization terminalizes its source session but returns
 an `ACTIVE`, restartable checkpoint record. Restart creates fresh session,
 registry, guard, resident arrays, and communication bindings; it never reuses
 source identities or provides fallback. It rejects other versions or carrier

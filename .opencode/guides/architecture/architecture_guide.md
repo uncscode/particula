@@ -71,9 +71,11 @@
        provide immutable host-metadata inspection and explicit resets of all
        published streams or selected process/logical-box lanes. They require an
        exact ACTIVE session/registry/closed-guard binding and selector preflight;
-       normal dispatch still supplies `initialize_rng=False`. The calls expose no
-       device words or arrays and perform no readback or synchronization; they
-       have no package/top-level export or checkpoint/restart persistence.
+        normal dispatch still supplies `initialize_rng=False`. The calls expose no
+        device words or arrays and perform no readback or synchronization; they
+        have no package/top-level export or arbitrary checkpoint/restart
+        persistence. Schema-v3 separately captures complete published-stream
+        continuation state at the checkpoint boundary.
        Hidden transfer/synchronization, retry, broad fallback, direct-kernel API
        or physics changes, and replacement of direct GPU APIs remain deferred.
 - `particula.execution.fallback` is the sole concrete, direct-import-only E7-F6
@@ -162,9 +164,10 @@
   loss dispatch require their respective exact streams with literal
   `initialize_rng=False`. Direct-only lifecycle calls can inspect frozen
   metadata or explicitly reset published selected lanes only under an exact
-  ACTIVE session/registry/closed-guard binding; they introduce no hidden
-  transfer/synchronization, package/top-level export, checkpoint persistence,
-  or restart continuation.
+   ACTIVE session/registry/closed-guard binding; they introduce no hidden
+   transfer/synchronization, package/top-level export, arbitrary checkpoint
+   persistence, or arbitrary restart continuation. Schema-v3's separate private
+   checkpoint seam captures complete published-stream continuation state.
 - `GPUResourceRegistry.validate_wall_loss_resources()` and
   `.validate_nucleation_resources()` are direct-module-only, metadata-only
   established-view seams. After validating the exact pinned active session,

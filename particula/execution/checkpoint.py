@@ -112,6 +112,9 @@ class ResidentCheckpoint:
         payloads: Canonical immutable primary and acquired-sidecar payloads.
         communication: Optional schema-v2 metadata for one pinned closed-map
             communication family.
+        rng_continuation: Optional schema-v3 metadata and current ``uint32``
+            words for published coagulation and wall-loss streams. The words
+            are authoritative continuation state on exact-device restart.
     """
 
     schema_version: int
@@ -153,7 +156,14 @@ class CommunicationCheckpointMetadata:
 
 @dataclass(frozen=True)
 class RNGContinuationPayload:
-    """Store one immutable current-word payload for a published process."""
+    """Store immutable current RNG words for one published process.
+
+    Attributes:
+        process_id: Canonical published process identifier.
+        dtype: Exact NumPy dtype spelling for the current-word array.
+        shape: Exact current-word array shape.
+        data: Immutable little-endian ``uint32`` current-word bytes.
+    """
 
     process_id: str
     dtype: str
@@ -163,7 +173,20 @@ class RNGContinuationPayload:
 
 @dataclass(frozen=True)
 class RNGContinuationCheckpoint:
-    """Store optional schema-v3 RNG metadata and continuation words."""
+    """Store optional schema-v3 stream metadata and continuation words.
+
+    The payloads, rather than root-seed-derived initialization, are the
+    authority for restored published stream state. Explicit stream reset is the
+    only operation that may subsequently derive new words from this metadata.
+
+    Attributes:
+        stream_schema_version: Exact RNG stream schema version.
+        root_seed: Seed used only by explicit stream initialization or reset.
+        logical_box_ids: Ordered unique logical resident-box identifiers.
+        lanes: Ordered unique stream lanes corresponding to logical box IDs.
+        descriptors: Canonical descriptors for published process streams.
+        payloads: Immutable current-word payloads in canonical process order.
+    """
 
     stream_schema_version: int
     root_seed: int
@@ -171,6 +194,15 @@ class RNGContinuationCheckpoint:
     lanes: tuple[int, ...]
     descriptors: tuple[Any, ...]
     payloads: tuple[RNGContinuationPayload, ...]
+
+
+@dataclass(frozen=True)
+class _RestartPlan:
+    """Retain normalized, fully validated restart inputs."""
+
+    primary: dict[tuple[str, str], CheckpointPayload]
+    resource_payloads: tuple[CheckpointPayload, ...]
+    continuation: RNGContinuationCheckpoint | None
 
 
 def _payload(
@@ -193,12 +225,9 @@ def _payload(
 
 
 def _capture_rng_continuation(
-    streams: tuple[tuple[str, Any, Any], ...],
-) -> RNGContinuationCheckpoint | None:
+    streams: tuple[tuple[str, Any, Any], ...], manifest: Any
+) -> RNGContinuationCheckpoint:
     """Copy at most two preflighted published streams after one sync."""
-    if not streams:
-        return None
-    manifest = streams[0][1]
     payloads: list[RNGContinuationPayload] = []
     for process_id, stream_manifest, state in streams:
         if stream_manifest != manifest:
@@ -210,11 +239,16 @@ def _capture_rng_continuation(
             )
         )
     return RNGContinuationCheckpoint(
-        manifest.descriptors[0].key.schema_version,
+        1,
         manifest.root_seed,
         manifest.logical_box_ids,
         manifest.lanes,
-        manifest.descriptors,
+        tuple(
+            descriptor
+            for descriptor in manifest.descriptors
+            if descriptor.key.process_id
+            in {item.process_id for item in payloads}
+        ),
         tuple(payloads),
     )
 
@@ -277,9 +311,11 @@ class ResidentCheckpointController:
     then atomically changes the session to FINALIZED; later finalizations return
     the cached record without validation, synchronization, transfer, or
     allocation. A failed pre-transition snapshot leaves the source ACTIVE.
-    A published resident coagulation or wall-loss stream instead rejects
-    checkpointing and finalization before device or payload work because stream
-    continuation is intentionally unsupported.
+    Schema-v3 snapshots optionally capture published coagulation and wall-loss
+    stream metadata and current words at the checkpoint's single synchronization
+    boundary. An exact-device restart restores fresh bindings from those words
+    without reseeding. Explicit reset rederives restored published streams;
+    normal first acquisition still initializes streams absent from a checkpoint.
     """
 
     def __init__(
@@ -340,11 +376,14 @@ class ResidentCheckpointController:
             A new independent checkpoint record.
 
         Raises:
-            ValueError: If the lifecycle binding is invalid or a published
-                resident RNG stream would require unsupported continuation.
+            ValueError: If the lifecycle binding or published stream metadata
+                is invalid.
         """
         self._validate()
         rng_streams = self._registry._enumerate_published_rng_streams()
+        rng_manifest = self._registry.inspect_published_streams(
+            self._session
+        ).stream
         import warp as wp
 
         from particula.gpu.conversion import (
@@ -438,10 +477,9 @@ class ResidentCheckpointController:
                 environment,
                 tuple(payloads),
                 communication,
-                _capture_rng_continuation(rng_streams),
+                _capture_rng_continuation(rng_streams, rng_manifest),
             )
         except BaseException:
-            _fault_resident_session(self._session)
             raise
 
     def _communication_metadata(self) -> CommunicationCheckpointMetadata | None:
@@ -477,8 +515,8 @@ class ResidentCheckpointController:
             The cached immutable terminal checkpoint.
 
         Raises:
-            ValueError: If a first finalization has an invalid lifecycle binding
-                or published resident RNG stream. The session remains ACTIVE.
+            ValueError: If a first finalization has an invalid lifecycle or
+                stream binding. The session remains ACTIVE.
         """
         if self._finalized is not None:
             return self._finalized
@@ -512,7 +550,8 @@ def restart_resident_session(  # noqa: C901
         ValueError: If compatibility, lifecycle, counters, or payload schemas
             are invalid, or the device does not exactly match.
     """
-    primary = _preflight_restart(checkpoint, device)
+    plan = _preflight_restart(checkpoint, device)
+    primary = plan.primary
     target_device = cast(Device, device)
 
     def unpack(family: str, role: str) -> np.ndarray:
@@ -543,10 +582,7 @@ def restart_resident_session(  # noqa: C901
         unpack("environment", "pressure"),
         unpack("environment", "saturation_ratio"),
     )
-    # Repeat complete descriptor validation at the allocation boundary. Frozen
-    # records can still be maliciously forged with low-level attribute writes.
-    _preflight_restart(checkpoint, device)
-    continuation = checkpoint.rng_continuation
+    continuation = plan.continuation
     setup_kwargs: dict[str, Any] = {}
     if continuation is not None:
         setup_kwargs = {
@@ -566,7 +602,7 @@ def restart_resident_session(  # noqa: C901
     from particula.execution.gpu_resources import GPUResourceRegistry
 
     registry = GPUResourceRegistry(session)
-    resource_payloads = tuple(checkpoint.payloads[len(_PRIMARY_ROLES) :])
+    resource_payloads = plan.resource_payloads
     restored_processes: tuple[str, ...] = ()
     rng_values: dict[str, Any] = {}
     if continuation is not None:
@@ -688,7 +724,7 @@ def restart_resident_session(  # noqa: C901
 
 def _preflight_restart(  # noqa: C901
     checkpoint: object, device: object
-) -> dict[tuple[str, str], CheckpointPayload]:
+) -> _RestartPlan:
     """Validate every descriptor before resident setup or Warp writes."""
     if type(checkpoint) is not ResidentCheckpoint:
         raise TypeError("checkpoint must be an exact ResidentCheckpoint.")
@@ -846,13 +882,15 @@ def _preflight_restart(  # noqa: C901
             or metadata.has_final_volumes != has_final_volumes
         ):
             raise ValueError("communication metadata does not match payloads.")
-    _validate_rng_continuation(checkpoint, dimensions)
-    return primary
+    continuation = _validate_rng_continuation(checkpoint, dimensions)
+    resource_payloads = payloads[len(_PRIMARY_ROLES) :]
+    _validate_rng_resource_pairing(resource_payloads, continuation)
+    return _RestartPlan(primary, resource_payloads, continuation)
 
 
 def _validate_rng_continuation(  # noqa: C901
     checkpoint: ResidentCheckpoint, dimensions: ResidentDimensions
-) -> None:
+) -> RNGContinuationCheckpoint | None:
     """Fail closed on malformed v3 continuation metadata before setup."""
     continuation = checkpoint.rng_continuation
     if checkpoint.schema_version < 3:
@@ -860,9 +898,9 @@ def _validate_rng_continuation(  # noqa: C901
             raise ValueError(
                 "pre-v3 checkpoints cannot contain RNG continuation."
             )
-        return
+        return None
     if continuation is None:
-        return
+        raise ValueError("v3 checkpoints require RNG continuation metadata.")
     if type(continuation) is not RNGContinuationCheckpoint:
         raise TypeError("RNG continuation metadata is invalid.")
     from particula.execution.rng import (
@@ -874,9 +912,12 @@ def _validate_rng_continuation(  # noqa: C901
     )
 
     if (
-        continuation.stream_schema_version != STREAM_SCHEMA_VERSION
-        or type(continuation.root_seed) is not int
-        or not 0 <= continuation.root_seed <= MAX_ROOT_SEED
+        isinstance(continuation.stream_schema_version, bool)
+        or not isinstance(continuation.stream_schema_version, Integral)
+        or int(continuation.stream_schema_version) != STREAM_SCHEMA_VERSION
+        or isinstance(continuation.root_seed, bool)
+        or not isinstance(continuation.root_seed, Integral)
+        or not 0 <= int(continuation.root_seed) <= MAX_ROOT_SEED
         or type(continuation.logical_box_ids) is not tuple
         or type(continuation.lanes) is not tuple
         or len(continuation.logical_box_ids) != dimensions.n_boxes
@@ -901,12 +942,16 @@ def _validate_rng_continuation(  # noqa: C901
         not logical_ids_are_valid
         or len(set(continuation.logical_box_ids))
         != len(continuation.logical_box_ids)
-        or any(type(lane) is not int for lane in continuation.lanes)
-        or set(continuation.lanes) != set(range(dimensions.n_boxes))
+        or any(
+            isinstance(lane, bool) or not isinstance(lane, Integral)
+            for lane in continuation.lanes
+        )
+        or {int(lane) for lane in continuation.lanes}
+        != set(range(dimensions.n_boxes))
     ):
         raise ValueError("RNG continuation metadata is invalid.")
     process_ids = tuple(item.process_id for item in continuation.payloads)
-    if not process_ids or process_ids != tuple(
+    if process_ids != tuple(
         process for process in PROCESS_IDS if process in process_ids
     ):
         raise ValueError("RNG continuation payload order is invalid.")
@@ -917,7 +962,9 @@ def _validate_rng_continuation(  # noqa: C901
             )
             for process in process_ids
             for name, lane in zip(
-                continuation.logical_box_ids, continuation.lanes, strict=True
+                continuation.logical_box_ids,
+                tuple(int(lane) for lane in continuation.lanes),
+                strict=True,
             )
         )
     except (TypeError, ValueError) as error:
@@ -936,6 +983,27 @@ def _validate_rng_continuation(  # noqa: C901
             or len(payload.data) != dimensions.n_boxes * 4
         ):
             raise ValueError("RNG continuation payload is invalid.")
+    return RNGContinuationCheckpoint(
+        int(continuation.stream_schema_version),
+        int(continuation.root_seed),
+        continuation.logical_box_ids,
+        tuple(int(lane) for lane in continuation.lanes),
+        continuation.descriptors,
+        continuation.payloads,
+    )
+
+
+def _validate_rng_resource_pairing(
+    payloads: tuple[CheckpointPayload, ...],
+    continuation: RNGContinuationCheckpoint | None,
+) -> None:
+    """Require v3 published-stream words and sidecar families to agree."""
+    if continuation is None:
+        return
+    processes = {payload.process_id for payload in continuation.payloads}
+    families = {payload.family for payload in payloads}
+    if ("coagulation" in processes) != ("coagulation" in families):
+        raise ValueError("RNG continuation and coagulation sidecars disagree.")
 
 
 def _validate_resource_payloads(  # noqa: C901

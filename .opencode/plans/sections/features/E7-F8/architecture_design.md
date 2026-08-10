@@ -41,12 +41,10 @@ root seed + exact StreamKey(process, logical box ID)
   one same-device coagulation-only `(n_boxes,)` `wp.uint32` array, and pins the
   registry, resource view, and array by identity. Reacquisition neither allocates
   nor reseeds it.
-- **Delivered P2 dispatch/checkpoint boundary:** The concrete resident Brownian
+- **Delivered P2 dispatch boundary:** The concrete resident Brownian
   adapter validates exact session/resource/collision/RNG bindings and dispatches
   with literal `initialize_rng=False`. It has no reset, transfer, synchronization,
-  or fallback path. Checkpoint and finalize fail closed before payload work when
-  the resident sidecar is published; RNG metadata and words are not serialized,
-   and restart continuation is unsupported.
+   or fallback path.
 - **Delivered P3 wall-loss lifecycle:** First compatible wall-loss acquisition
   creates and initializes only its candidate `(n_boxes,)` `wp.uint32` sidecar
   from the canonical manifest, using `initialize_process("wall_loss")` when a
@@ -73,10 +71,20 @@ root seed + exact StreamKey(process, logical box ID)
   direct-only `inspect_streams()`, `initialize_streams()`, and deliberate alias
   `reset_streams()` only after exact ACTIVE session/registry/closed-guard
   validation. These paths neither acquire, read back, synchronize, schedule,
-  nor persist RNG state.
-- **Deferred integration:** Full box-invariance machinery, public exports, RNG
-  persistence/restart continuation, hidden transfer/synchronization, and
-  direct-kernel API or physics changes remain deferred.
+   nor persist RNG state.
+- **Delivered P6 checkpoint/restart boundary:** Schema-v3 adds an optional,
+   frozen continuation carrier after the compatible v1/v2 checkpoint fields.
+   Checkpoint preflights canonical published bindings, synchronizes once, and
+   bulk-captures at most two little-endian `(n_boxes,)` `uint32` payloads. RNG
+   roles are excluded from ordinary resource payloads. Fail-closed restart
+   validates v1/v2/v3 before setup/allocation, reconstructs fresh exact-device
+   arrays and registry bindings from validated metadata, and publishes restored
+   current words without calling normal acquisition or initialization. Explicit
+   `initialize_streams()`/`reset_streams()` alone rederive root-seed words;
+   normal dispatch and reacquisition retain restored identities and words.
+- **Deferred integration:** Full box-invariance machinery, public exports,
+   durable persistence/migration, hidden transfer/synchronization, and
+   direct-kernel API or physics changes remain deferred.
 
 ## Security & Compliance
 

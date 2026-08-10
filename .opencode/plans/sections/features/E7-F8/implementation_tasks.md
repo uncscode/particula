@@ -19,9 +19,12 @@
   disabled/prelaunch-skipped boxes do not enter a launch and cannot advance RNG.
 - [x] Add explicit initialize/reset operations with session lifecycle guards;
   prohibit implicit reset from repeated seed values.
-- [x] Fail closed before checkpoint/finalize payload work when a resident
-  coagulation sidecar is published; do not serialize descriptors/state or support
-  restart continuation in P2.
+- [x] Add schema-v3 optional published-stream continuation to checkpoint/finalize:
+  capture immutable metadata/current words after one synchronization, exclude RNG
+  roles from ordinary payloads, and retain v1/v2 compatibility.
+- [x] Restore v3 continuation through a private registry seam into fresh
+  exact-device arrays/bindings without normal acquisition or reseeding; reject
+  malformed records before setup/allocation and clean up failed fresh restarts.
 - [x] Preserve the existing writer-capable wall-loss failure path: close the
   token, fault the session, propagate the error, and make no reset/rollback
   promise after launch.
@@ -45,9 +48,9 @@
 - [x] Add `particula/execution/tests/rng_invariance_test.py` for unrelated box
   insertion, disablement/no-work, removal, and physical-lane permutation across
   resident Brownian coagulation and neutral wall loss.
-- [ ] Extend `particula/execution/tests/checkpoint_test.py` with exact
+- [x] Extend `particula/execution/tests/checkpoint_test.py` with exact
   uninterrupted-versus-restart stream and stochastic-output comparisons.
-- [ ] Add transfer/synchronization spies proving normal steps and reset-free
+- [x] Add transfer/synchronization spies proving normal steps and reset-free
   execution perform no hidden bulk transfer or host synchronization.
-- [ ] Run Warp CPU as required baseline, optional CUDA parametrization, export
-  tests, focused coverage at or above 80%, and strict documentation validation.
+- [x] Run focused execution, RNG, lint, type, and strict documentation validation
+  for the shipped continuation contract.

@@ -3,7 +3,8 @@
 **Status:** Accepted
 **Date:** 2026-07-28
 **Decision Makers:** ADW Development Team
-**Technical Story:** [#1488](https://github.com/Gorkowski/particula/issues/1488)
+**Technical Story:** [#1488](https://github.com/Gorkowski/particula/issues/1488),
+[#1525](https://github.com/Gorkowski/particula/issues/1525)
 
 ## Context
 
@@ -114,7 +115,7 @@ outside the resident-session scope.
 ### Neutral
 
 - No package exports, scheduler, fallback, migration, disk/remote serialization,
-  RNG-stream policy, or execution-adapter behavior is added.
+  broader RNG-stream policy, or execution-adapter behavior is added.
 - Failures before restart setup publish no session; there is no rollback guarantee
   after a successful asynchronous device launch.
 
@@ -146,9 +147,10 @@ outside the resident-session scope.
 ### Testing Strategy
 
 Verify immutable payloads, detached inspection data, canonical vapor-pressure
-recovery, identity freshness after restart, terminal-cache identity, closed-step
-rejection, malformed-checkpoint preflight, and absence from package exports.
-Run the focused checkpoint/session/resource tests and `mkdocs build --strict`.
+recovery, schema-v3 current-word continuation, identity freshness after restart,
+explicit-reset-only reseeding, terminal-cache identity, closed-step rejection,
+malformed-checkpoint preflight, and absence from package exports. Run the focused
+checkpoint/session/resource tests and `mkdocs build --strict`.
 
 ### Rollback Plan
 
@@ -164,6 +166,8 @@ introduced.
 - [x] Finalization returns its terminal cached checkpoint by identity.
 - [x] Restart is explicit, same-device, and recovers canonical vapor pressure.
 - [x] Checkpoint APIs remain concrete-only and package exports are unchanged.
+- [x] Schema-v3 continuation preserves current published-stream words without
+  normal-dispatch readback or implicit reseeding.
 
 ## References
 
@@ -173,6 +177,7 @@ introduced.
 - [Architecture Guide](../architecture_guide.md)
 - [Architecture Outline](../architecture_outline.md)
 - [Issue #1488](https://github.com/Gorkowski/particula/issues/1488)
+- [Issue #1525](https://github.com/Gorkowski/particula/issues/1525)
 
 ## Notes
 

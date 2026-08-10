@@ -2,11 +2,11 @@
 
 This direct-import-only, Warp-dependent boundary pins complete fixed-shape
 native sidecar families to one exact ``ACTIVE`` :class:`ResidentSession`.
-It allocates and validates resources only: it neither executes a process nor
-transfers, synchronizes, restores, or resizes. Coagulation and wall-loss
-acquisition are narrow exceptions: each initializes its distinct P1-derived
-persistent RNG stream exactly once before publishing that resident resource.
-The
+It allocates and validates resources only: it neither executes a process,
+transfers, synchronizes, nor resizes. Coagulation and wall-loss acquisition
+initialize distinct P1-derived persistent RNG streams exactly once before
+publishing their resident resources. The checkpoint-private restoration seam
+instead publishes prevalidated current stream words without reseeding. The
 manifests and views here are concrete-only and are deliberately not exported
 from :mod:`particula.execution`.
 
@@ -35,6 +35,7 @@ from dataclasses import dataclass, fields
 from numbers import Integral
 from typing import Any, Literal, cast
 
+import numpy as np
 import warp as wp
 
 from particula.execution.communication import (
@@ -130,7 +131,8 @@ class CoagulationResources:
     from immutable resident stream metadata. Repeated compatible acquisition
     returns this view and its arrays by identity without allocation, reseeding,
     readback, transfer, or synchronization. The sidecar has no wall-loss,
-    checkpoint-persistence, reset, or inspection API.
+    public checkpoint, reset, or inspection API. Schema-v3 checkpoint restart
+    can privately restore fresh bindings from captured current words.
     """
 
     collision_capacity: int
@@ -147,7 +149,8 @@ class WallLossResources:
     ``rng_states`` once from the wall-loss process namespace. Compatible
     reacquisition returns the same view and sidecar by identity without
     allocation or reseeding. The sidecar is distinct from coagulation state and
-    has no reset, inspection, or checkpoint-persistence API.
+    has no public reset or inspection API. Schema-v3 checkpoint restart can
+    privately restore fresh bindings from captured current words.
     """
 
     rng_states: Any
@@ -197,6 +200,113 @@ class ResidentCommunicationState:
     initial_masses: Any | None = None
     initial_concentration: Any | None = None
     initial_charge: Any | None = None
+
+
+class _RestoredStreamRegistry:
+    """Represent one restored published stream without a sibling allocation."""
+
+    def __init__(
+        self,
+        root_seed: int,
+        logical_box_ids: tuple[str, ...],
+        lanes: tuple[int, ...],
+        process_id: str,
+        state: Any,
+    ) -> None:
+        """Retain validated continuation metadata and authoritative state."""
+        self._root_seed = root_seed
+        self._logical_box_ids = logical_box_ids
+        self._lanes = lanes
+        self._process_id = process_id
+        self._state = state
+
+    def inspect(self) -> StreamManifest:
+        """Return the frozen descriptor metadata for the restored process."""
+        from particula.execution.rng import StreamDescriptor, StreamKey
+
+        return StreamManifest(
+            self._root_seed,
+            self._logical_box_ids,
+            self._lanes,
+            tuple(
+                StreamDescriptor(StreamKey(1, self._process_id, name), lane)
+                for name, lane in zip(
+                    self._logical_box_ids, self._lanes, strict=True
+                )
+            ),
+        )
+
+    def preflight_selected(
+        self, *, process_ids: tuple[str, ...], logical_box_ids: tuple[str, ...]
+    ) -> None:
+        """Validate explicit reset selectors and the retained state binding."""
+        selected, ids = _resolve_stream_selection(
+            process_ids,
+            logical_box_ids,
+            registered_logical_box_ids=self._logical_box_ids,
+        )
+        if selected != (self._process_id,) or not ids:
+            raise ValueError("Requested RNG stream has not been acquired.")
+        from particula.execution.rng import _validate_warp_state_array
+
+        _validate_warp_state_array(
+            self._state, self._process_id, len(self._lanes), wp
+        )
+
+    def initialize_selected(
+        self, *, process_ids: tuple[str, ...], logical_box_ids: tuple[str, ...]
+    ) -> None:
+        """Explicitly derive and reset only selected restored stream lanes."""
+        self.preflight_selected(
+            process_ids=process_ids, logical_box_ids=logical_box_ids
+        )
+        from particula.execution.rng import StreamKey, _derive_initial_word
+
+        lane_by_id = dict(zip(self._logical_box_ids, self._lanes, strict=True))
+        words = np.asarray(
+            [
+                _derive_initial_word(
+                    self._root_seed, StreamKey(1, self._process_id, name)
+                )
+                for name in logical_box_ids
+            ],
+            dtype=np.uint32,
+        )
+        lanes = np.asarray(
+            [lane_by_id[name] for name in logical_box_ids], dtype=np.int32
+        )
+        from particula.execution.rng import _selected_write_kernel
+
+        wp.launch(
+            _selected_write_kernel(wp),
+            dim=len(logical_box_ids),
+            inputs=[
+                self._state,
+                wp.array(lanes, dtype=wp.int32, device="cpu"),
+                wp.array(words, dtype=wp.uint32, device="cpu"),
+            ],
+            device=self._state.device,
+        )
+
+    def state_array_for(self, process_id: str) -> Any:
+        """Return the sole restored state binding by identity."""
+        if process_id != self._process_id:
+            raise ValueError("process_id is unsupported.")
+        return self._state
+
+    def word_for(self, process_id: str, logical_box_id: str) -> int:
+        """Derive one initial word for explicit reset inspection only."""
+        if process_id != self._process_id:
+            raise ValueError("process_id is unsupported.")
+        if logical_box_id not in self._logical_box_ids:
+            raise LookupError(
+                "No stream is registered for process and logical ID."
+            )
+        from particula.execution.rng import StreamKey, _derive_initial_word
+
+        return _derive_initial_word(
+            self._root_seed, StreamKey(1, process_id, logical_box_id)
+        )
 
 
 def _entry(
@@ -369,8 +479,10 @@ class GPUResourceRegistry:
     P1-derived RNG sidecar before publication. Its
     concrete-only :meth:`validate_pinned_session` seam lets lifecycle guards
     verify the exact active binding without resource acquisition or execution.
-    Its private checkpoint enumeration reports acquired sidecars in manifest
-    order without changing their ownership or creating host copies.
+    Its private checkpoint enumeration reports ordinary acquired sidecars in
+    manifest order and published RNG bindings in canonical process order,
+    without changing ownership or creating host copies. Checkpoint restart may
+    privately publish prevalidated fresh RNG bindings without reseeding.
     """
 
     def __init__(self, session: ResidentSession) -> None:
@@ -816,6 +928,50 @@ class GPUResourceRegistry:
             bindings = self._bindings.get(process_id)
             stream = self._published_stream_registry(process_id)
             if bindings is not None and stream is not None:
+                state = bindings.get("rng_states")
+                if (
+                    state is None
+                    or stream.state_array_for(process_id) is not state
+                ):
+                    raise ValueError(
+                        "published RNG binding identity is invalid."
+                    )
+                entry = (
+                    _COAGULATION.entries[2]
+                    if process_id == "coagulation"
+                    else _WALL_LOSS.entries[0]
+                )
+                self._validate_array(
+                    entry,
+                    state,
+                    self._capacities.get(process_id),
+                )
+                self._reject_primary_aliases([state])
+                expected_descriptors = tuple(
+                    descriptor
+                    for descriptor in manifest.descriptors
+                    if descriptor.key.process_id == process_id
+                )
+                actual_descriptors = tuple(
+                    descriptor
+                    for descriptor in stream.inspect().descriptors
+                    if descriptor.key.process_id == process_id
+                )
+                if actual_descriptors != expected_descriptors:
+                    raise ValueError("published RNG stream schema is invalid.")
+                state_range = self._array_range(state)
+                for family, other_bindings in self._bindings.items():
+                    for role, other in other_bindings.items():
+                        if other is state:
+                            if family != process_id or role != "rng_states":
+                                raise ValueError(
+                                    "published RNG sidecars alias."
+                                )
+                            continue
+                        if self._ranges_overlap(
+                            state_range, self._array_range(other)
+                        ):
+                            raise ValueError("published RNG sidecars alias.")
                 result.append((process_id, manifest, bindings["rng_states"]))
         return tuple(result)
 
@@ -841,42 +997,27 @@ class GPUResourceRegistry:
         """
         self.validate_pinned_session(self._session)
         root_seed, logical_box_ids, lanes = self._stream_metadata()
-        coagulation = self._bindings.get("coagulation", {}).get("rng_states")
-        wall_loss = self._bindings.get("wall_loss", {}).get("rng_states")
-        if "coagulation" in process_ids and coagulation is None:
-            raise ValueError("restored coagulation RNG binding is missing.")
-        if "wall_loss" in process_ids and wall_loss is None:
-            raise ValueError("restored wall-loss RNG binding is missing.")
-        if coagulation is None:
-            coagulation = wp.zeros(
-                self._shape(_COAGULATION.entries[2]),
-                dtype=wp.uint32,
-                device=self._signature[2],
-            )
-        if wall_loss is None:
-            wall_loss = wp.zeros(
-                self._shape(_WALL_LOSS.entries[0]),
-                dtype=wp.uint32,
-                device=self._signature[2],
-            )
-        stream = StreamRegistry(
-            root_seed,
-            self._session.dimensions.n_boxes,
-            logical_box_ids,
-            lanes,
-            (("coagulation", coagulation), ("wall_loss", wall_loss)),
-        )
         if "coagulation" in process_ids:
             bindings = self._bindings["coagulation"]
+            state = bindings.get("rng_states")
+            if state is None:
+                raise ValueError("restored coagulation RNG binding is missing.")
             self._views["coagulation"] = CoagulationResources(
                 self._capacities["coagulation"], **bindings
             )
-            self._coagulation_stream_registry = stream
+            self._coagulation_stream_registry = _RestoredStreamRegistry(
+                root_seed, logical_box_ids, lanes, "coagulation", state
+            )
         if "wall_loss" in process_ids:
+            state = self._bindings["wall_loss"].get("rng_states")
+            if state is None:
+                raise ValueError("restored wall-loss RNG binding is missing.")
             self._views["wall_loss"] = WallLossResources(
                 **self._bindings["wall_loss"]
             )
-            self._wall_loss_stream_registry = stream
+            self._wall_loss_stream_registry = _RestoredStreamRegistry(
+                root_seed, logical_box_ids, lanes, "wall_loss", state
+            )
 
     def reserve_open_step(self, token: Any) -> None:
         """Reserve the binding's sole open timestep token by identity.
@@ -1233,6 +1374,7 @@ class GPUResourceRegistry:
             supplied: Role-to-array bindings; ``None`` requests allocation.
             capacity: Collision or communication-edge capacity for a manifest
                 that requires it.
+            publish: Whether to register a newly validated family immediately.
 
         Returns:
             Pinned role-to-array bindings for the established family.
@@ -1329,7 +1471,9 @@ class GPUResourceRegistry:
         session stream metadata and publishes the view. Compatible later calls
         return that exact view without allocation or reseeding. This is not a
         wall-loss stream, reset or inspection API, hidden transfer,
-        synchronization, or checkpoint-persistence boundary.
+        synchronization, or public checkpoint-persistence boundary. A
+        schema-v3 restart privately restores captured current words without
+        invoking this acquisition method or reseeding.
 
         Args:
             collision_capacity: Positive, non-boolean integral collision bound.
@@ -1425,8 +1569,9 @@ class GPUResourceRegistry:
         ``(n_boxes,)`` ``wp.uint32`` sidecar, initializes it from the wall-loss
         namespace, then publishes the view. Compatible later calls return the
         exact view without allocation or reseeding. Initializing this sidecar
-        does not reseed a published coagulation stream, and no stream state is
-        checkpointed or recoverable.
+        does not reseed a published coagulation stream. Schema-v3 checkpoint
+        restart can privately restore captured current words without invoking
+        this acquisition method or reseeding.
 
         Args:
             rng_states: Optional ``uint32`` per-box native RNG sidecar.

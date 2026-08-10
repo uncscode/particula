@@ -42,9 +42,15 @@ thresholds are not lowered; changed modules must retain at least 80% coverage.
   neutral wall-loss particle and RNG snapshots; zero-time and empty-selection
   no-ops; prelaunch `initialize_rng=True` rejection; and distinct process
   sidecar identity. Warp CPU is required and CUDA rows remain optional.
-- **P6:** Remains deferred. P2 deliberately rejects checkpoint/finalize after
-  resident RNG publication, so no RNG split-run continuation is presently
-  supported.
+- **P6 (complete, Issue #1525):** `checkpoint_test.py` and
+   `gpu_resources_test.py` cover schema-v3 absent, single-stream, and
+   two-stream continuation; exact Warp-CPU split-run equivalence for Brownian
+   coagulation and neutral wall loss; fresh restored identities; no reseed on
+   restart/reacquisition/dispatch; and explicit-reset-only rederivation. They
+   retain v1/v2 and v2 communication compatibility, assert one capture
+   synchronization and bounded stream readbacks, reject malformed continuation
+   records before setup/allocation, and exercise capture/readback and fresh
+   restart construction recovery lifecycles. CUDA remains optional.
 - **P7:** Run `mkdocs build --strict`, documentation regression tests, export
   checks, and copy-pastable focused commands.
 
@@ -62,4 +68,5 @@ thresholds are not lowered; changed modules must retain at least 80% coverage.
   every expected pre-launch failure. Post-launch failures assert session faulting
   rather than rollback.
 - Transfer spies reject `to_warp_*`, `from_warp_*`, `.numpy()`, or
-  `wp.synchronize()` during normal scheduler steps.
+   `wp.synchronize()` during normal scheduler steps; checkpoint capture is the
+   explicit one-synchronization/readback exception.

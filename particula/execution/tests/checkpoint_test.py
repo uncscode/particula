@@ -213,7 +213,8 @@ def test_checkpoint_is_detached_and_preserves_active_session() -> None:
     checkpoint = session.checkpoint(registry, guard)
 
     assert checkpoint.lifecycle is ResidentLifecycle.ACTIVE
-    assert checkpoint.rng_continuation is None
+    assert checkpoint.rng_continuation is not None
+    assert checkpoint.rng_continuation.payloads == ()
     assert session.lifecycle is ResidentLifecycle.ACTIVE
     assert checkpoint.dimensions == ResidentDimensions(1, 1, 1)
     assert checkpoint.gas_names == ("water",)
@@ -454,6 +455,90 @@ def test_restart_rejects_malformed_rng_continuation_before_setup(
 
 
 @pytest.mark.warp
+def test_v3_restart_requires_continuation_metadata_before_setup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A v3 record without even empty stream metadata cannot start setup."""
+    import particula.execution.checkpoint as checkpoint_module
+
+    session, registry, guard = _resident_binding()
+    checkpoint = session.checkpoint(registry, guard)
+    malformed = replace(checkpoint, rng_continuation=None)
+    monkeypatch.setattr(
+        checkpoint_module,
+        "setup_resident_session",
+        lambda *_args, **_kwargs: pytest.fail("restart setup must not run"),
+    )
+
+    with pytest.raises(ValueError, match="require RNG continuation"):
+        restart_resident_session(malformed, Device(Backend.WARP, "cpu"))
+
+
+@pytest.mark.warp
+def test_restart_normalizes_numpy_continuation_integers() -> None:
+    """V3 restart accepts non-boolean Integral metadata from NumPy carriers."""
+    session, registry, guard = _resident_binding(n_boxes=2)
+    checkpoint = session.checkpoint(registry, guard)
+    continuation = checkpoint.rng_continuation
+    assert continuation is not None
+    normalized_input = replace(
+        continuation,
+        stream_schema_version=np.int64(1),
+        root_seed=np.uint32(17),
+        lanes=(np.int64(0), np.int64(1)),
+    )
+    restored, _, _ = restart_resident_session(
+        replace(checkpoint, rng_continuation=normalized_input),
+        Device(Backend.WARP, "cpu"),
+    )
+
+    assert restored.metadata.stream.root_seed == 17
+    assert restored.metadata.stream.lanes == (0, 1)
+
+
+@pytest.mark.warp
+def test_restored_stream_changes_only_after_explicit_reset() -> None:
+    """Restored continuation words remain authoritative until reset is requested."""
+    session, registry, guard = _resident_binding()
+    source = registry.acquire_wall_loss().rng_states
+    source.assign(np.array([17], dtype=np.uint32))
+    checkpoint = session.checkpoint(registry, guard)
+    restored, restored_registry, _ = restart_resident_session(
+        checkpoint, Device(Backend.WARP, "cpu")
+    )
+    restored_words = restored_registry.acquire_wall_loss().rng_states
+
+    np.testing.assert_array_equal(restored_words.numpy(), [17])
+    restored_registry.initialize_published_streams(
+        restored,
+        process_ids=("wall_loss",),
+        logical_box_ids=("0",),
+    )
+
+    assert restored_words.numpy()[0] != 17
+
+
+@pytest.mark.warp
+def test_checkpoint_conversion_failure_leaves_session_active(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Read-only carrier conversion errors do not fault an active source."""
+    import particula.execution.checkpoint as checkpoint_module
+
+    session, registry, guard = _resident_binding()
+    monkeypatch.setattr(
+        checkpoint_module,
+        "_payload",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("copy")),
+    )
+
+    with pytest.raises(RuntimeError, match="copy"):
+        session.checkpoint(registry, guard)
+
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+
+
+@pytest.mark.warp
 def test_restart_restores_pinned_gas_communication_resources() -> None:
     """Communication checkpoint payloads restart as fresh pinned resources."""
     wp = pytest.importorskip("warp")
@@ -560,7 +645,12 @@ def test_restart_accepts_v1_noncommunication_checkpoint() -> None:
     """Schema-v1 noncommunication records retain fresh primary identities."""
     session, registry, guard = _resident_binding()
     checkpoint = session.checkpoint(registry, guard)
-    legacy = replace(checkpoint, schema_version=1, communication=None)
+    legacy = replace(
+        checkpoint,
+        schema_version=1,
+        communication=None,
+        rng_continuation=None,
+    )
 
     restored, restored_registry, restored_guard = restart_resident_session(
         legacy, Device(Backend.WARP, "cpu")

@@ -19,11 +19,14 @@
   unchanged for resident Brownian coagulation and selected neutral wall loss.
 - [x] Disabled, prelaunch-skipped, zero-time, and valid no-work wall-loss boxes
   do not advance their supplied stream lanes.
-- [ ] A compatible checkpoint/restart split exactly matches uninterrupted RNG
+- [x] A compatible checkpoint/restart split exactly matches uninterrupted RNG
   state and stochastic outputs on Warp CPU for covered configurations.
-- [x] Checkpoint and finalize fail closed before payload work after resident
-  coagulation-sidecar publication; no RNG persistence/restart continuation is
-  advertised.
+- [x] Schema-v3 optionally captures canonical published-stream metadata and
+  current words after one synchronization, restores fresh exact-device state
+  without reseeding, and preserves schema-v1/v2 compatibility.
+- [x] Malformed v3 records reject before setup/allocation; capture/readback and
+  fresh-restart failures expose no partial checkpoint/session and retain the
+  established source/fresh-resource lifecycle boundaries.
 - [x] Malformed P1 IDs, seeds, arrays, dimensions, devices, or process manifests
   fail before caller-buffer mutation.
 - [x] Post-launch uncertainty faults the session and is never advertised as an

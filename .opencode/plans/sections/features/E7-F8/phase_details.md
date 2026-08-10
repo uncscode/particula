@@ -73,11 +73,23 @@
      prelaunch reset rejection, and process-sidecar nonaliasing on Warp CPU;
      CUDA rows are optional.
 
-- [ ] **E7-F8-P6:** Implement checkpoint restart RNG continuation semantics with integration tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Snapshot and restore all stream metadata/state so split and uninterrupted same-backend runs agree exactly.
-  - Files: `particula/execution/checkpoint.py`, `particula/execution/session.py`, `particula/execution/tests/checkpoint_test.py`
-  - Tests: Checkpoint schema validation, one-sync boundary, exact continuation, reset-after-restart, incompatibility rejection, and no intermediate transfer.
+- [x] **E7-F8-P6:** Implement checkpoint restart RNG continuation semantics with integration tests
+   - Issue: #1525 | Size: S | Status: Complete
+   - Goal: Snapshot and restore published stream metadata/current words so split
+     and uninterrupted same-device runs agree exactly.
+   - Files: `particula/execution/checkpoint.py`,
+     `particula/execution/gpu_resources.py`,
+     `particula/execution/tests/checkpoint_test.py`, and
+     `particula/execution/tests/gpu_resources_test.py`.
+   - Delivered: Schema-v3 optional immutable continuation for canonical
+     coagulation/wall-loss streams; one-sync bounded capture; fail-closed linear
+     restart preflight; fresh exact-device containers, sidecars, registry, and
+     guard without normal acquisition/reseeding; v1/v2 compatibility; and
+     architecture/testing checkpoint documentation.
+   - Tests: schema-v3 absent/single/both stream records, v1/v2 and communication
+     compatibility, exact split-run continuation, restored identity/no-reseed and
+     explicit-reset behavior, malformed pre-allocation rejection, capture and
+     fresh-restart recovery, and bounded synchronization/readback assertions.
 
 - [ ] **E7-F8-P7:** Update development documentation
   - Issue: TBD | Size: XS | Status: Not Started
