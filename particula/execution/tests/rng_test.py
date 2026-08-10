@@ -282,6 +282,34 @@ def test_initialize_selected_updates_only_requested_lanes() -> None:
     assert wall_loss.numpy().tolist() == [19, 19, 19]
 
 
+@pytest.mark.warp
+def test_default_selected_initialization_resets_all_large_registered_lanes() -> (
+    None
+):
+    """Test default all-lane selection retains lane order without lookup scans."""
+    wp = pytest.importorskip("warp")
+    ids = tuple(f"box-{index}" for index in range(64))
+    lanes = tuple(reversed(range(64)))
+    coagulation = wp.full(64, 17, dtype=wp.uint32, device="cpu")
+    wall_loss = wp.full(64, 19, dtype=wp.uint32, device="cpu")
+    registry = StreamRegistry(
+        91,
+        64,
+        ids,
+        lanes,
+        (("coagulation", coagulation), ("wall_loss", wall_loss)),
+    )
+
+    registry.initialize_selected()
+
+    assert coagulation.numpy().tolist() == list(
+        registry.words_by_lane("coagulation")
+    )
+    assert wall_loss.numpy().tolist() == list(
+        registry.words_by_lane("wall_loss")
+    )
+
+
 def test_initialize_selected_rejects_nonexact_or_duplicate_selectors() -> None:
     """Test selector validation stays host-only and occurs before Warp work."""
     registry = StreamRegistry(3, 1, ("box",), (0,), _arrays())

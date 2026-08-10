@@ -64,10 +64,19 @@ root seed + exact StreamKey(process, logical box ID)
   Empty selection avoids lazy kernel resolution. Disabled, prelaunch-skipped,
   zero-time, and valid no-work lanes are not written; a writer-capable failure
   retains the established close-token/fault-session behavior without rollback.
-- **Deferred integration:** Generic reset/inspection APIs, full box-invariance
-  machinery, public exports, RNG persistence/restart continuation, hidden
-  transfer/synchronization, and direct-kernel API or physics changes remain
-  deferred.
+- **Delivered P4 lifecycle boundary:** `StreamRegistry.inspect()` returns frozen
+  host-only identity metadata; `initialize_selected()` validates exact-tuple
+  selectors and the complete retained two-array schema before writing only the
+  selected lanes. `GPUResourceRegistry` exposes inspection and initialization
+  only for published process sidecars, in canonical process order, and rejects
+  an explicitly unacquired target before any writer. `ResidentSession` exposes
+  direct-only `inspect_streams()`, `initialize_streams()`, and deliberate alias
+  `reset_streams()` only after exact ACTIVE session/registry/closed-guard
+  validation. These paths neither acquire, read back, synchronize, schedule,
+  nor persist RNG state.
+- **Deferred integration:** Full box-invariance machinery, public exports, RNG
+  persistence/restart continuation, hidden transfer/synchronization, and
+  direct-kernel API or physics changes remain deferred.
 
 ## Security & Compliance
 

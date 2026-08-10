@@ -27,9 +27,13 @@ thresholds are not lowered; changed modules must retain at least 80% coverage.
   and repeat acquisition without reseeding, scheduler-selected one-box dispatch,
   disabled/empty/prelaunch-skipped/zero-time/no-work preservation, reset-like
   request rejection, checkpoint guard, and post-dispatch scheduler faulting.
-- **P4:** Registry/session tests cover complete and targeted reset, repeated-seed
-  non-reset, lifecycle restrictions, immutable inspection metadata, faulted and
-  finalized sessions, and no normal-step host readback.
+- **P4 (complete, Issue #1523):** `rng_test.py`, `gpu_resources_test.py`,
+  `gpu_session_test.py`, and execution export tests cover frozen host manifests;
+  complete and selected process/box resets; exact-tuple, duplicate, malformed,
+  unregistered, and unpublished selector rejection before writers; full-schema
+  preflight preservation; ACTIVE closed-binding restrictions; empty-published
+  write-free behavior; identity retention; repeated-seed non-reset; and guards
+  against readback, synchronization, scheduling, acquisition, or allocation.
 - **P5:** `particula/execution/tests/rng_invariance_test.py` compares each enabled
   logical box against an isolated one-box reference after adding, disabling,
   removing, and permuting unrelated boxes for both stochastic processes.

@@ -3,8 +3,9 @@
 - [x] Does a repeated root seed reset an existing resident stream?
   - Resolved 2026-08-09: No. P2 stores immutable P1 metadata on the session and
     initializes the resident coagulation sidecar only on first acquisition;
-    compatible reacquisition and resident dispatch never reseed it. A generic
-    lifecycle-valid reset API remains deferred to P4.
+    compatible reacquisition and resident dispatch never reseed it. Issue #1523
+    provides the separate explicit, lifecycle-valid P4 reset API for published
+    streams or selected registered lanes.
 
 - [x] Must restart reproduce trajectories across CPU, Warp CPU, and CUDA?
   - Resolved 2026-07-27: No. Exact continuation applies only to a compatible

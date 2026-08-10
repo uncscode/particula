@@ -26,14 +26,20 @@ registration and initialization.
   direct-kernel interface. Disabled, prelaunch-skipped, zero-time, and valid
   no-work lanes preserve particle/RNG state; post-launch failure retains the
   existing scheduler fault lifecycle without rollback.
+- Direct-only frozen `StreamManifest` and published-stream inspection metadata;
+  inspection exposes no arrays, pointers, current words, or device state.
+- Explicit selected-lane initialization in `rng.py`, published-sidecar-only
+  initialization in `gpu_resources.py`, and ACTIVE exact
+  session/registry/closed-guard composition through `ResidentSession`.
+- Exact-tuple process/logical-box selector validation before writers, including
+  write-free empty selections and explicit unpublished-process rejection.
 
 ## Out of Scope
 
 - Exact CPU/Warp/CUDA stochastic trajectory equality or cross-device restart
   bitwise equivalence.
-- Generic reset/inspection APIs, full add/remove/reorder box-invariance work,
-  and stream advancement policy beyond the shipped Brownian and selected-box
-  wall-loss calls.
+- Full add/remove/reorder box-invariance work and stream advancement policy
+  beyond the shipped Brownian and selected-box wall-loss calls.
 - RNG serialization, checkpoint persistence, and restart continuation. A
   checkpoint or finalize attempt after coagulation-sidecar publication rejects
   before payload conversion or enumeration.

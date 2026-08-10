@@ -308,6 +308,116 @@ def test_unpublished_process_rejection_precedes_published_stream_write() -> (
 
 
 @pytest.mark.warp
+def test_published_stream_reset_preflights_every_registry_before_writing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a malformed later stream prevents every selected writer launch."""
+    wp = pytest.importorskip("warp")
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    coagulation = registry.acquire_coagulation(1)
+    wall_loss = registry.acquire_wall_loss()
+    stream = registry._wall_loss_stream_registry
+    assert stream is not None
+    invalid = wp.full(1, 19.0, dtype=wp.float64, device="cpu")
+    object.__setattr__(
+        stream,
+        "_state_arrays",
+        (("coagulation", wall_loss.rng_states), ("wall_loss", invalid)),
+    )
+    writes: list[object] = []
+    monkeypatch.setattr(
+        wp, "launch", lambda *args, **kwargs: writes.append(args)
+    )
+
+    with pytest.raises(
+        TypeError, match="wall_loss state array must have dtype"
+    ):
+        registry.initialize_published_streams(session)
+
+    assert writes == []
+    assert coagulation.rng_states.numpy().tolist() != [19]
+    assert session.lifecycle is ResidentLifecycle.ACTIVE
+
+
+@pytest.mark.warp
+def test_published_stream_reset_writer_failure_faults_bound_session(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test a later stream writer failure faults without rolling back prior work."""
+    wp = pytest.importorskip("warp")
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    coagulation = registry.acquire_coagulation(1)
+    wall_loss = registry.acquire_wall_loss()
+    wp.copy(
+        coagulation.rng_states, wp.full(1, 17, dtype=wp.uint32, device="cpu")
+    )
+    wp.copy(wall_loss.rng_states, wp.full(1, 19, dtype=wp.uint32, device="cpu"))
+    original_launch = wp.launch
+    launches = 0
+
+    def fail_second_launch(*args: object, **kwargs: object) -> object:
+        """Launch the first selected writer and fail the second deterministically."""
+        nonlocal launches
+        launches += 1
+        if launches == 2:
+            raise RuntimeError("second reset writer failed")
+        return original_launch(*args, **kwargs)
+
+    monkeypatch.setattr(wp, "launch", fail_second_launch)
+    with pytest.raises(RuntimeError, match="second reset writer failed"):
+        registry.initialize_published_streams(session)
+
+    stream = registry._coagulation_stream_registry
+    assert stream is not None
+    assert coagulation.rng_states.numpy().tolist() == list(
+        stream.words_by_lane("coagulation")
+    )
+    assert wall_loss.rng_states.numpy().tolist() == [19]
+    assert session.lifecycle is ResidentLifecycle.FAULTED
+
+
+@pytest.mark.warp
+def test_published_stream_default_reset_uses_nondefault_root_seed() -> None:
+    """Test all published streams reset every lane from their retained root."""
+    session = _session(boxes=2)
+    object.__setattr__(
+        session,
+        "metadata",
+        session.metadata.__class__(
+            session.metadata.device,
+            session.metadata.gas_names,
+            session.metadata.stream.__class__(
+                2, 73, ("north", "south"), (1, 0)
+            ),
+        ),
+    )
+    registry = GPUResourceRegistry(session)
+    coagulation = registry.acquire_coagulation(1)
+    wall_loss = registry.acquire_wall_loss()
+    coagulation.rng_states.assign(np.full(2, 17, dtype=np.uint32))
+    wall_loss.rng_states.assign(np.full(2, 19, dtype=np.uint32))
+
+    registry.initialize_published_streams(session)
+
+    for process_id, states, stream in (
+        (
+            "coagulation",
+            coagulation.rng_states,
+            registry._coagulation_stream_registry,
+        ),
+        (
+            "wall_loss",
+            wall_loss.rng_states,
+            registry._wall_loss_stream_registry,
+        ),
+    ):
+        assert stream is not None
+        assert states.numpy().tolist() == list(stream.words_by_lane(process_id))
+
+
+@pytest.mark.warp
 def test_wall_loss_acquisition_initializes_its_distinct_persistent_stream() -> (
     None
 ):
@@ -916,6 +1026,25 @@ def test_established_view_validators_require_exact_published_views() -> None:
     assert registry._bindings == bindings
     assert registry._views == views
     assert registry._capacities == capacities
+
+
+@pytest.mark.warp
+def test_condensation_and_coagulation_validators_accept_published_views() -> (
+    None
+):
+    """Test established condensation and coagulation views validate by identity."""
+    session = _session()
+    registry = GPUResourceRegistry(session)
+    condensation = registry.acquire_condensation()
+    coagulation = registry.acquire_coagulation(1)
+    bindings = registry._bindings.copy()
+    views = registry._views.copy()
+
+    registry.validate_condensation_resources(session, condensation)
+    registry.validate_coagulation_resources(session, coagulation)
+
+    assert registry._bindings == bindings
+    assert registry._views == views
 
 
 @pytest.mark.warp

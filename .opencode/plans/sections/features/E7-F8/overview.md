@@ -9,14 +9,15 @@ per-logical-box protection from unrelated wall-loss dispatches.
 
 ## Value Proposition
 
-`particula.execution.rng` supplies immutable stream keys/descriptors and a
-registry for coagulation and wall-loss arrays. P2/P3 carry P1 metadata into the
-resident session and initialize one sidecar per process on first acquisition.
-Both are retained by identity and nonaliasing; resident dispatch forces
-`initialize_rng=False`. P3 passes scheduler-resolved wall-loss selection to a
-one-box adapter path, so only selected boxes whose work launches can consume
-wall-loss words. Checkpoint/finalize rejects published resident RNG state;
-persistence and restart continuation are not implemented.
+`particula.execution.rng` supplies immutable stream keys/descriptors, frozen
+inspection manifests, and selected-lane initialization for coagulation and
+wall-loss arrays. P2/P3 carry P1 metadata into the resident session and
+initialize one sidecar per process on first acquisition. Both are retained by
+identity and nonaliasing; resident dispatch forces `initialize_rng=False`. P4
+adds deliberate direct-only inspection and reset calls, gated by an exact ACTIVE
+session/registry/closed-guard binding and limited to published sidecars.
+Checkpoint/finalize rejects published resident RNG state; persistence and
+restart continuation are not implemented.
 
 ## User Stories
 
@@ -27,8 +28,10 @@ persistence and restart continuation are not implemented.
 - As a resident-session user, I get one P1-derived coagulation stream initialized
   once and advanced in place across scheduled Brownian calls.
 - As a resident-session user, I get an independent P1-derived wall-loss stream;
-  disabled, skipped, zero-time, and no-work logical boxes retain their words.
+   disabled, skipped, zero-time, and no-work logical boxes retain their words.
+- As a direct resident-session caller, I can inspect frozen stream metadata or
+  deliberately reset all published streams or valid selected process/box lanes
+  without changing ordinary dispatch behavior.
 
-Parent epic: E7. Issues #1520, #1521, and #1522 completed P1--P3;
-reset/inspection, broader invariance, persistence/restart, and documentation
-phases remain separate work.
+Parent epic: E7. Issues #1520--#1523 completed P1--P4; broader invariance,
+persistence/restart, and documentation phases remain separate work.

@@ -51,6 +51,7 @@ from particula.execution.rng import (
     StreamManifest,
     StreamRegistry,
     _resolve_stream_selection,
+    _StreamWriterError,
 )
 from particula.gpu.kernels.communication import (
     GasCommunicationBuffers,
@@ -535,13 +536,25 @@ class GPUResourceRegistry:
         for process_id in selected_processes:
             if process_id not in published:
                 raise ValueError("Requested RNG stream has not been acquired.")
+        selected_registries: list[tuple[str, StreamRegistry]] = []
         for process_id in selected_processes:
             registry = self._published_stream_registry(process_id)
             if registry is None:
                 raise AssertionError("published stream registry is unavailable")
-            registry.initialize_selected(
+            registry.preflight_selected(
                 process_ids=(process_id,), logical_box_ids=selected_ids
             )
+            selected_registries.append((process_id, registry))
+        try:
+            for process_id, registry in selected_registries:
+                registry.initialize_selected(
+                    process_ids=(process_id,), logical_box_ids=selected_ids
+                )
+        except _StreamWriterError as error:
+            from particula.execution.gpu_session import _fault_resident_session
+
+            _fault_resident_session(self._session)
+            raise error.error from error
 
     def validate_diagnostic_outputs(
         self, session: ResidentSession, outputs: tuple[Any, ...]

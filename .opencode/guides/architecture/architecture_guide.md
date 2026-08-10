@@ -66,10 +66,16 @@
       ascending enabled logical-box set; an empty set skips kernel resolution,
       while a partial set uses a private selected-box dispatch so disabled lanes
       cannot be written. Disabled, prelaunch-skipped, zero-time, and valid
-      no-work
-      lanes retain their supplied RNG words. Stream reset/inspection, hidden
-      transfer/synchronization, retry, broad fallback, direct-kernel API or
-      physics changes, and replacement of direct GPU APIs remain deferred.
+       no-work
+       lanes retain their supplied RNG words. Concrete-only P4 lifecycle calls
+       provide immutable host-metadata inspection and explicit resets of all
+       published streams or selected process/logical-box lanes. They require an
+       exact ACTIVE session/registry/closed-guard binding and selector preflight;
+       normal dispatch still supplies `initialize_rng=False`. The calls expose no
+       device words or arrays and perform no readback or synchronization; they
+       have no package/top-level export or checkpoint/restart persistence.
+       Hidden transfer/synchronization, retry, broad fallback, direct-kernel API
+       or physics changes, and replacement of direct GPU APIs remain deferred.
 - `particula.execution.fallback` is the sole concrete, direct-import-only E7-F6
   P3 opt-in CPU fallback boundary. Its default `RAISE` policy re-raises the
   exact eligible typed availability/support failure. Explicit CPU policy may

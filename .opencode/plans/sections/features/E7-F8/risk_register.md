@@ -6,7 +6,7 @@
 | Coagulation and wall loss accidentally share or correlate a namespace | Closed | High | P3 publishes independently derived canonical-manifest sidecars and rejects cross-family identity/aliasing; regressions cover both arrays | E7-F8-P1/P3 owner |
 | Disabled boxes still consume RNG inside a full-box kernel launch | Closed for P3 selection | High | P3 validates scheduler selection and invokes the unchanged kernel on selected one-box aliases only; disabled/skipped/no-work lane preservation is regression-covered | E7-F8-P3/P5 owner |
 | Checkpoint omits current stream state or logical-ID mapping | Medium | High | Version a complete stream manifest and compare split versus uninterrupted runs exactly | E7-F8-P6 owner |
-| Reset occurs after partial validation or on a faulted session | Low | High | Validate complete target set/lifecycle first; snapshot all state in negative tests | E7-F8-P4 owner |
+| Reset occurs after partial validation or on a faulted session | Closed for P4 | High | P4 validates exact ACTIVE closed bindings, complete selectors, publication scope, and retained schemas before writers; negative tests preserve observable state | E7-F8-P4 owner |
 | Seed mixer changes across Python/platform versions | Medium | High | Use specified fixed-width integer operations, never `hash()`, and freeze known-answer vectors | E7-F8-P1 owner |
 | New abstraction adds hidden synchronization or per-step readback | Medium | High | Keep state device-resident and enforce conversion/sync/`.numpy()` spies | E7-F8 reviewer |
 | Exact reproducibility is overclaimed across CPU, Warp CPU, and CUDA | Medium | Medium | Limit exact guarantee to compatible same-backend/device-class restarts; retain statistical cross-backend evidence | Documentation owner |

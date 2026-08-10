@@ -2189,6 +2189,27 @@ def test_session_stream_lifecycle_requires_closed_active_binding() -> None:
 
 
 @pytest.mark.warp
+def test_session_stream_inspection_never_synchronizes_or_reads_state(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test inspection returns frozen metadata without device synchronization."""
+    wp = pytest.importorskip("warp")
+    guard = _guard()
+    session = guard._session
+    registry = guard._registry
+    registry.acquire_coagulation(1)
+
+    def forbidden_sync(*_args: object, **_kwargs: object) -> None:
+        """Fail if metadata inspection attempts a device synchronization."""
+        raise AssertionError("stream inspection must not synchronize")
+
+    monkeypatch.setattr(wp, "synchronize", forbidden_sync)
+    manifest = session.inspect_streams(registry, guard)
+
+    assert manifest.published_process_ids == ("coagulation",)
+
+
+@pytest.mark.warp
 def test_session_stream_lifecycle_rejects_invalid_binding_and_selectors() -> (
     None
 ):

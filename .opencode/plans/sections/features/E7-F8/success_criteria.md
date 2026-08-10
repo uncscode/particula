@@ -9,8 +9,11 @@
   `wp.uint32` state arrays and preserve their identities across normal steps.
 - [x] Normal scheduler steps never implicitly allocate, initialize, reset,
   synchronize, restore, or read back persistent streams.
-- [ ] Repeating a root seed does not reset state; only an explicit valid reset
-  operation does so.
+- [x] Repeating a root seed does not reset state; only an explicit valid reset
+  operation does so for published streams or selected registered lanes.
+- [x] Inspection returns only frozen host metadata and explicit reset requires an
+  exact ACTIVE session/registry/closed-guard binding before selector handling or
+  writer work.
 - [ ] Adding, removing, disabling, or reordering unrelated boxes leaves each
   enabled logical box's same-backend stream and outputs unchanged.
 - [x] Disabled, prelaunch-skipped, zero-time, and valid no-work wall-loss boxes

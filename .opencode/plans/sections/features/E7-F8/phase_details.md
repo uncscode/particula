@@ -45,11 +45,19 @@
      reset-like request rejection, no-launch/no-work preservation, checkpoint
      guard, and post-dispatch fault propagation.
 
-- [ ] **E7-F8-P4:** Add explicit initialize reset and stream inspection APIs with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F8-P4:** Add explicit initialize reset and stream inspection APIs with unit tests
+  - Issue: #1523 | Size: S | Status: Complete
   - Goal: Expose deliberate setup/reset operations and immutable stream metadata without normal-step readback.
-  - Files: `particula/execution/rng.py`, `particula/execution/session.py`, execution API tests
-  - Tests: Lifecycle guards, selected-process/box reset, idempotent inspection, malformed IDs/seeds, and faulted/finalized rejection.
+  - Files: `particula/execution/rng.py`, `particula/execution/gpu_resources.py`,
+    `particula/execution/gpu_session.py`, and co-located execution tests.
+  - Delivered: Frozen host-only stream manifests, selected-lane writes after full
+    preflight, published-sidecar-only resource operations, and exact ACTIVE
+    session/registry/closed-guard lifecycle composition. `reset_streams()` is a
+    deliberate alias of `initialize_streams()`; neither changes normal dispatch,
+    public exports, checkpointing, or restart.
+  - Tests: Lifecycle guards, selected-process/box reset, idempotent inspection,
+    strict selector rejection, empty-published no-op, preservation before
+    writers, and faulted/finalized rejection.
 
 - [ ] **E7-F8-P5:** Guarantee disabled added and reordered box stream invariance with regressions
   - Issue: TBD | Size: S | Status: Not Started

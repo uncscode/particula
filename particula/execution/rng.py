@@ -487,12 +487,29 @@ class StreamRegistry:
             )
             word_source: Any = wp.array(words, dtype=wp.uint32, device="cpu")
             state = self.state_array_for(process_id)
-            wp.launch(
-                kernel,
-                dim=len(selected_ids),
-                inputs=[state, lane_source, word_source],
-                device=state.device,
-            )
+            try:
+                wp.launch(
+                    kernel,
+                    dim=len(selected_ids),
+                    inputs=[state, lane_source, word_source],
+                    device=state.device,
+                )
+            except BaseException as error:
+                raise _StreamWriterError(error) from error
+
+    def preflight_selected(
+        self,
+        *,
+        process_ids: tuple[str, ...] | None = None,
+        logical_box_ids: tuple[str, ...] | None = None,
+    ) -> None:
+        """Validate a selected reset without allocating or launching writers."""
+        _resolve_stream_selection(
+            process_ids,
+            logical_box_ids,
+            registered_logical_box_ids=self._logical_box_ids,
+        )
+        self._validate_state_arrays()
 
     def _build_words_by_process(self) -> dict[str, tuple[int, ...]]:
         """Build lane-indexed words and reject same-process collisions.
@@ -637,15 +654,29 @@ def _resolve_stream_selection(
     )
     for process_id in selected_processes:
         _validate_process_id(process_id)
+    registered_id_set = frozenset(registered_logical_box_ids)
     for logical_box_id in selected_ids:
         _validate_logical_box_id(logical_box_id, "logical_box_ids entries")
-        if logical_box_id not in registered_logical_box_ids:
+        if logical_box_id not in registered_id_set:
             raise LookupError("No lane is registered for logical_box_id.")
     if len(set(selected_processes)) != len(selected_processes):
         raise ValueError("process_ids must be unique.")
     if len(set(selected_ids)) != len(selected_ids):
         raise ValueError("logical_box_ids must be unique.")
     return tuple(selected_processes), tuple(selected_ids)
+
+
+class _StreamWriterError(Exception):
+    """Retain a reset writer error for resource-lifecycle classification."""
+
+    def __init__(self, error: BaseException) -> None:
+        """Store the original writer error.
+
+        The original exception is preserved for caller-facing re-raising after
+        writer classification.
+        """
+        super().__init__(str(error))
+        self.error = error
 
 
 _SELECTED_WRITE_KERNEL: Any | None = None

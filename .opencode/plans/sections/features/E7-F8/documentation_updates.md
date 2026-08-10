@@ -9,7 +9,14 @@ rejection after sidecar publication.
 Issue #1522 shipped the corresponding wall-loss implementation contract in the
 concrete execution modules and regression suite: an independent canonical-manifest
 sidecar, exact resource identity/nonaliasing, scheduler-resolved selected-box
-gating, and unchanged disabled/prelaunch-skipped/zero-time/no-work lanes. P3 did
-not add a reset/inspection API, direct-kernel API or physics change, hidden
-transfer/synchronization, public export, persistence, or restart continuation;
-the broader documentation phase remains P7.
+gating, and unchanged disabled/prelaunch-skipped/zero-time/no-work lanes.
+
+Issue #1523 updated `.opencode/guides/architecture_reference.md`,
+`.opencode/guides/architecture/architecture_outline.md`, and
+`.opencode/guides/testing_guide.md` for the concrete-only P4 boundary:
+immutable metadata inspection; explicit selected reset; exact ACTIVE,
+session/registry/closed-guard binding; published-sidecar-only scope; selector
+preflight; no ordinary-dispatch reset, readback, or synchronization; and no
+checkpoint/restart persistence. `architecture_guide.md` still describes
+reset/inspection as deferred and must be reconciled in P7. Public exports and
+direct-kernel APIs remain unchanged.

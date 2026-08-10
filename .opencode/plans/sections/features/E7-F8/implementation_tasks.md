@@ -17,7 +17,7 @@
   exact published stream view; preserve direct-kernel signatures and physics.
 - [x] Thread scheduler-resolved selected box indices to the wall-loss adapter so
   disabled/prelaunch-skipped boxes do not enter a launch and cannot advance RNG.
-- [ ] Add explicit initialize/reset operations with session lifecycle guards;
+- [x] Add explicit initialize/reset operations with session lifecycle guards;
   prohibit implicit reset from repeated seed values.
 - [x] Fail closed before checkpoint/finalize payload work when a resident
   coagulation sidecar is published; do not serialize descriptors/state or support
@@ -25,7 +25,7 @@
 - [x] Preserve the existing writer-capable wall-loss failure path: close the
   token, fault the session, propagate the error, and make no reset/rollback
   promise after launch.
-- [ ] Keep public exports limited to stable execution-layer types; retain concrete
+- [x] Keep public exports limited to stable execution-layer types; retain concrete
   kernel initialization helpers in their current narrow modules.
 
 ## Tooling / Tests
@@ -39,6 +39,9 @@
 - [x] Add wall-loss resource/adapter/scheduler/checkpoint regressions for
   canonical initialization, identity/nonaliasing, selected-box gating,
   disabled/zero/no-work preservation, rejection, and fault lifecycle.
+- [x] Add P4 RNG/resource/session regressions for frozen manifests, selected
+  reset preflight and preservation, published-only scope, exact lifecycle
+  binding, empty selections, and direct-only export denial.
 - [ ] Add `particula/execution/tests/rng_invariance_test.py` for unrelated box
   insertion, disablement, removal, and permutation.
 - [ ] Extend `particula/execution/tests/checkpoint_test.py` with exact
