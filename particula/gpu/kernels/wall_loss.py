@@ -511,8 +511,8 @@ def _initialize_rng_states(seed: Any, rng_states: Any) -> None:
 
 
 @no_type_check
-@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-def _wall_loss_remove(  # noqa: C901
+@wp.func  # pragma: no cover - device function executes outside Python coverage
+def _wall_loss_remove_impl(  # noqa: C901
     masses: wp.array3d(dtype=wp.float64),
     concentration: wp.array2d(dtype=wp.float64),
     charge: wp.array2d(dtype=wp.float64),
@@ -531,9 +531,9 @@ def _wall_loss_remove(  # noqa: C901
     rng_states: wp.array(dtype=wp.uint32),
     rng_seed: wp.int32,
     initialize_rng: wp.int32,
+    box: wp.int32,
 ) -> None:
     """Select and clear neutral wall-loss slots in one device launch."""
-    box = wp.tid()
     state = rng_states[box]
     has_usable_slot = wp.int32(0)
     dynamic_viscosity = dynamic_viscosity_wp(
@@ -621,8 +621,8 @@ def _wall_loss_remove(  # noqa: C901
 
 
 @no_type_check
-@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-def _charged_spherical_wall_loss_remove(  # noqa: C901
+@wp.func  # pragma: no cover - device function executes outside Python coverage
+def _charged_spherical_wall_loss_remove_impl(  # noqa: C901
     masses: wp.array3d(dtype=wp.float64),
     concentration: wp.array2d(dtype=wp.float64),
     charge: wp.array2d(dtype=wp.float64),
@@ -639,9 +639,9 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
     rng_states: wp.array(dtype=wp.uint32),
     rng_seed: wp.int32,
     initialize_rng: wp.int32,
+    box: wp.int32,
 ) -> None:
     """Select and clear charged spherical wall-loss slots in one launch."""
-    box = wp.tid()
     state = rng_states[box]
     has_draw_eligible_slot = wp.int32(0)
     geometry_scale = _geometry_scale_wp(
@@ -749,8 +749,8 @@ def _charged_spherical_wall_loss_remove(  # noqa: C901
 
 
 @no_type_check
-@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
-def _charged_rectangular_wall_loss_remove(  # noqa: C901
+@wp.func  # pragma: no cover - device function executes outside Python coverage
+def _charged_rectangular_wall_loss_remove_impl(  # noqa: C901
     masses: wp.array3d(dtype=wp.float64),
     concentration: wp.array2d(dtype=wp.float64),
     charge: wp.array2d(dtype=wp.float64),
@@ -769,9 +769,9 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
     rng_states: wp.array(dtype=wp.uint32),
     rng_seed: wp.int32,
     initialize_rng: wp.int32,
+    box: wp.int32,
 ) -> None:
     """Select and clear charged rectangular wall-loss slots in one launch."""
-    box = wp.tid()
     state = rng_states[box]
     has_draw_eligible_slot = wp.int32(0)
     geometry_scale = _geometry_scale_wp(
@@ -882,6 +882,277 @@ def _charged_rectangular_wall_loss_remove(  # noqa: C901
             charge[box, particle] = wp.float64(0.0)
     if has_draw_eligible_slot != wp.int32(0):
         rng_states[box] = state
+
+
+@no_type_check
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+def _wall_loss_remove(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_radius: wp.float64,
+    chamber_length: wp.float64,
+    chamber_width: wp.float64,
+    chamber_height: wp.float64,
+    geometry_mode: wp.int32,
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_states: wp.array(dtype=wp.uint32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
+) -> None:
+    """Run neutral wall loss for the direct all-box boundary."""
+    _wall_loss_remove_impl(
+        masses,
+        concentration,
+        charge,
+        density,
+        temperature,
+        pressure,
+        time_step,
+        wall_eddy_diffusivity,
+        chamber_radius,
+        chamber_length,
+        chamber_width,
+        chamber_height,
+        geometry_mode,
+        n_particles,
+        n_species,
+        rng_states,
+        rng_seed,
+        initialize_rng,
+        wp.tid(),
+    )
+
+
+@no_type_check
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+def _wall_loss_remove_selected(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_radius: wp.float64,
+    chamber_length: wp.float64,
+    chamber_width: wp.float64,
+    chamber_height: wp.float64,
+    geometry_mode: wp.int32,
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_states: wp.array(dtype=wp.uint32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
+    selected_boxes: wp.array(dtype=wp.int32),
+) -> None:
+    """Run neutral wall loss once for the selected logical-box lanes."""
+    _wall_loss_remove_impl(
+        masses,
+        concentration,
+        charge,
+        density,
+        temperature,
+        pressure,
+        time_step,
+        wall_eddy_diffusivity,
+        chamber_radius,
+        chamber_length,
+        chamber_width,
+        chamber_height,
+        geometry_mode,
+        n_particles,
+        n_species,
+        rng_states,
+        rng_seed,
+        initialize_rng,
+        selected_boxes[wp.tid()],
+    )
+
+
+@no_type_check
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+def _charged_spherical_wall_loss_remove(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_radius: wp.float64,
+    wall_potential: wp.float64,
+    wall_electric_field: wp.float64,
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_states: wp.array(dtype=wp.uint32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
+) -> None:
+    """Run charged spherical wall loss for the direct all-box boundary."""
+    _charged_spherical_wall_loss_remove_impl(
+        masses,
+        concentration,
+        charge,
+        density,
+        temperature,
+        pressure,
+        time_step,
+        wall_eddy_diffusivity,
+        chamber_radius,
+        wall_potential,
+        wall_electric_field,
+        n_particles,
+        n_species,
+        rng_states,
+        rng_seed,
+        initialize_rng,
+        wp.tid(),
+    )
+
+
+@no_type_check
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+def _charged_spherical_wall_loss_remove_selected(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_radius: wp.float64,
+    wall_potential: wp.float64,
+    wall_electric_field: wp.float64,
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_states: wp.array(dtype=wp.uint32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
+    selected_boxes: wp.array(dtype=wp.int32),
+) -> None:
+    """Run charged spherical wall loss for selected logical-box lanes."""
+    _charged_spherical_wall_loss_remove_impl(
+        masses,
+        concentration,
+        charge,
+        density,
+        temperature,
+        pressure,
+        time_step,
+        wall_eddy_diffusivity,
+        chamber_radius,
+        wall_potential,
+        wall_electric_field,
+        n_particles,
+        n_species,
+        rng_states,
+        rng_seed,
+        initialize_rng,
+        selected_boxes[wp.tid()],
+    )
+
+
+@no_type_check
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+def _charged_rectangular_wall_loss_remove(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_length: wp.float64,
+    chamber_width: wp.float64,
+    chamber_height: wp.float64,
+    wall_potential: wp.float64,
+    wall_electric_field: wp.array(dtype=wp.float64),
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_states: wp.array(dtype=wp.uint32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
+) -> None:
+    """Run charged rectangular wall loss for the direct all-box boundary."""
+    _charged_rectangular_wall_loss_remove_impl(
+        masses,
+        concentration,
+        charge,
+        density,
+        temperature,
+        pressure,
+        time_step,
+        wall_eddy_diffusivity,
+        chamber_length,
+        chamber_width,
+        chamber_height,
+        wall_potential,
+        wall_electric_field,
+        n_particles,
+        n_species,
+        rng_states,
+        rng_seed,
+        initialize_rng,
+        wp.tid(),
+    )
+
+
+@no_type_check
+@wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
+def _charged_rectangular_wall_loss_remove_selected(
+    masses: wp.array3d(dtype=wp.float64),
+    concentration: wp.array2d(dtype=wp.float64),
+    charge: wp.array2d(dtype=wp.float64),
+    density: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    pressure: wp.array(dtype=wp.float64),
+    time_step: wp.float64,
+    wall_eddy_diffusivity: wp.float64,
+    chamber_length: wp.float64,
+    chamber_width: wp.float64,
+    chamber_height: wp.float64,
+    wall_potential: wp.float64,
+    wall_electric_field: wp.array(dtype=wp.float64),
+    n_particles: wp.int32,
+    n_species: wp.int32,
+    rng_states: wp.array(dtype=wp.uint32),
+    rng_seed: wp.int32,
+    initialize_rng: wp.int32,
+    selected_boxes: wp.array(dtype=wp.int32),
+) -> None:
+    """Run charged rectangular wall loss for selected logical-box lanes."""
+    _charged_rectangular_wall_loss_remove_impl(
+        masses,
+        concentration,
+        charge,
+        density,
+        temperature,
+        pressure,
+        time_step,
+        wall_eddy_diffusivity,
+        chamber_length,
+        chamber_width,
+        chamber_height,
+        wall_potential,
+        wall_electric_field,
+        n_particles,
+        n_species,
+        rng_states,
+        rng_seed,
+        initialize_rng,
+        selected_boxes[wp.tid()],
+    )
 
 
 def wall_loss_step_gpu(
@@ -1063,6 +1334,158 @@ def wall_loss_step_gpu(
                 execution_rng_states,
                 int(rng_seed),
                 int(initialize_rng),
+            ],
+            device=device,
+        )
+    return particles
+
+
+def wall_loss_selected_boxes_step_gpu(
+    particles: Any,
+    temperature: float | Any | None,
+    pressure: float | Any | None,
+    time_step: float | Any,
+    *,
+    config: NeutralWallLossConfig,
+    rng_seed: int,
+    rng_states: Any,
+    selected_boxes: Any,
+    environment: Any | None = None,
+) -> Any:
+    """Privately dispatch one validated wall-loss writer over selected boxes.
+
+    This resident-only seam is deliberately not re-exported.  Its index buffer
+    is prevalidated by the caller and maps one writer thread to each selected
+    logical box, avoiding repeated direct-boundary preflight and launches.
+    """
+    validated_config = _validate_config(config)
+    n_boxes, device = _validate_particle_schema(particles)
+    if (
+        not _is_warp_array_like(selected_boxes)
+        or selected_boxes.dtype != wp.int32
+        or selected_boxes.ndim != 1
+        or selected_boxes.shape[0] == 0
+        or str(selected_boxes.device) != str(device)
+    ):
+        raise ValueError(
+            "selected_boxes must be a nonempty same-device int32 array."
+        )
+    selected_host = selected_boxes.numpy()
+    if (
+        np.any(selected_host < 0)
+        or np.any(selected_host >= n_boxes)
+        or np.any(selected_host[1:] <= selected_host[:-1])
+    ):
+        raise ValueError(
+            "selected_boxes must be sorted unique resident indices."
+        )
+    _validate_charged_rectangular_field(validated_config, device)
+    _validate_particle_values(particles)
+    validated_time_step = _validate_time_step(time_step)
+    validate_environment_inputs(
+        temperature,
+        pressure,
+        environment,
+        n_boxes,
+        device,
+        caller_name="wall_loss_selected_boxes_step_gpu",
+    )
+    _validate_rng(rng_seed, rng_states, False, n_boxes, device)
+    if validated_time_step == 0.0:
+        return particles
+    temperature_array, pressure_array = _ensure_environment_arrays(
+        temperature,
+        pressure,
+        environment,
+        n_boxes,
+        device,
+        caller_name="wall_loss_selected_boxes_step_gpu",
+    )
+    temperature_array = _normalize_execution_environment_array(
+        temperature_array, n_boxes
+    )
+    pressure_array = _normalize_execution_environment_array(
+        pressure_array, n_boxes
+    )
+    n_particles = particles.masses.shape[1]
+    n_species = particles.masses.shape[2]
+    dimensions = validated_config.chamber_dimensions or (0.0, 0.0, 0.0)
+    if validated_config.mode == "neutral":
+        wp.launch(
+            _wall_loss_remove_selected,
+            dim=selected_boxes.shape[0],
+            inputs=[
+                particles.masses,
+                particles.concentration,
+                particles.charge,
+                particles.density,
+                temperature_array,
+                pressure_array,
+                validated_time_step,
+                float(validated_config.wall_eddy_diffusivity),
+                float(validated_config.chamber_radius or 0.0),
+                float(dimensions[0]),
+                float(dimensions[1]),
+                float(dimensions[2]),
+                0 if validated_config.geometry == "spherical" else 1,
+                n_particles,
+                n_species,
+                rng_states,
+                int(rng_seed),
+                0,
+                selected_boxes,
+            ],
+            device=device,
+        )
+    elif validated_config.geometry == "spherical":
+        wp.launch(
+            _charged_spherical_wall_loss_remove_selected,
+            dim=selected_boxes.shape[0],
+            inputs=[
+                particles.masses,
+                particles.concentration,
+                particles.charge,
+                particles.density,
+                temperature_array,
+                pressure_array,
+                validated_time_step,
+                float(validated_config.wall_eddy_diffusivity),
+                float(validated_config.chamber_radius or 0.0),
+                float(validated_config.wall_potential),
+                float(validated_config.wall_electric_field),
+                n_particles,
+                n_species,
+                rng_states,
+                int(rng_seed),
+                0,
+                selected_boxes,
+            ],
+            device=device,
+        )
+    else:
+        wp.launch(
+            _charged_rectangular_wall_loss_remove_selected,
+            dim=selected_boxes.shape[0],
+            inputs=[
+                particles.masses,
+                particles.concentration,
+                particles.charge,
+                particles.density,
+                temperature_array,
+                pressure_array,
+                validated_time_step,
+                float(validated_config.wall_eddy_diffusivity),
+                float(dimensions[0]),
+                float(dimensions[1]),
+                float(dimensions[2]),
+                float(validated_config.wall_potential),
+                validated_config.wall_electric_field,
+                n_particles,
+                n_species,
+                rng_states,
+                int(rng_seed),
+                0,
+                selected_boxes,
             ],
             device=device,
         )

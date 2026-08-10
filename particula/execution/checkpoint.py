@@ -14,10 +14,10 @@ PARTICLES family and its optional final-volume sidecar. ``checkpoint()`` is
 nonterminal; ``finalize()`` caches a snapshot and terminally ends normal
 session use. No rollback is promised once a device operation has launched.
 
-A published resident coagulation RNG stream makes checkpoint and finalization
-fail closed before synchronization, conversion, or payload enumeration. Stream
-metadata and RNG words are intentionally not serialized, restored, inspected,
-or continued across restart.
+A published resident coagulation or wall-loss RNG stream makes checkpoint and
+finalization fail closed before synchronization, conversion, or payload
+enumeration. Stream metadata and RNG words are intentionally not serialized,
+restored, inspected, or continued across restart.
 """
 
 from __future__ import annotations
@@ -226,9 +226,9 @@ class ResidentCheckpointController:
     then atomically changes the session to FINALIZED; later finalizations return
     the cached record without validation, synchronization, transfer, or
     allocation. A failed pre-transition snapshot leaves the source ACTIVE.
-    A published resident coagulation stream instead rejects checkpointing and
-    finalization before device or payload work because stream continuation is
-    intentionally unsupported.
+    A published resident coagulation or wall-loss stream instead rejects
+    checkpointing and finalization before device or payload work because stream
+    continuation is intentionally unsupported.
     """
 
     def __init__(
@@ -778,6 +778,10 @@ def _validate_resource_payloads(  # noqa: C901
     """
     if not payloads:
         return None, False
+    if any(item.family in ("coagulation", "wall_loss") for item in payloads):
+        raise ValueError(
+            "checkpoint RNG resource payloads are not restartable."
+        )
     index = 0
     seen_families: set[str] = set()
     communication_family: str | None = None

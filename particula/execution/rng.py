@@ -185,7 +185,8 @@ class StreamRegistry:
     importing optional dependencies or mutating state arrays. State-array
     schema validation and copying are deferred to :meth:`initialize`. Derived
     words are keyed only by the root seed and immutable stream identity, then
-    stored by each descriptor's physical lane.
+    stored by each descriptor's physical lane. The canonical manifest has
+    independent coagulation and wall-loss namespaces for every logical box.
 
     Attributes:
         root_seed: Validated root seed used for deterministic derivation.
@@ -503,7 +504,8 @@ class StreamRegistry:
         """Initialize exactly one validated process state array.
 
         This narrow internal primitive lets a resident resource publish a new
-        process sidecar without reseeding an already-published sibling stream.
+        process sidecar without reseeding an already-published sibling stream,
+        such as wall loss after coagulation.
 
         Args:
             process_id: Supported process namespace to initialize.

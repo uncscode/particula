@@ -20,9 +20,13 @@ thresholds are not lowered; changed modules must retain at least 80% coverage.
   literal-false resident dispatch; consecutive advancement and zero-time/no-active
   preservation; rejection-before-import/dispatch; and fail-closed checkpoint and
   finalize behavior after sidecar publication.
-- **P3:** Wall-loss adapter/scheduler tests assert a distinct process stream,
-  enabled-box consumption, disabled-box preservation, and existing kernel
-  validation/failure behavior.
+- **P3 (complete, Issue #1522):** `gpu_resources_test.py`,
+  `process_adapters_test.py`, `scheduler_test.py`, `checkpoint_test.py`, and
+  direct `wall_loss_test.py` cover canonical-manifest wall-loss initialization,
+  distinct namespace/array identity and nonaliasing, transactional acquisition
+  and repeat acquisition without reseeding, scheduler-selected one-box dispatch,
+  disabled/empty/prelaunch-skipped/zero-time/no-work preservation, reset-like
+  request rejection, checkpoint guard, and post-dispatch scheduler faulting.
 - **P4:** Registry/session tests cover complete and targeted reset, repeated-seed
   non-reset, lifecycle restrictions, immutable inspection metadata, faulted and
   finalized sessions, and no normal-step host readback.

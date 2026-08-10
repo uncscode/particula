@@ -574,6 +574,36 @@ def test_restart_rejects_duplicate_payload_before_setup() -> None:
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize("family", ("coagulation", "wall_loss"))
+def test_restart_rejects_rng_resource_payload_before_setup(
+    family: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Restart rejects non-reconstructable resident RNG sidecars at preflight."""
+    import particula.execution.checkpoint as checkpoint_module
+
+    wp = pytest.importorskip("warp")
+    session, registry, guard = _resident_binding()
+    checkpoint = session.checkpoint(registry, guard)
+    rng_payload = _payload(
+        family,
+        "rng_states",
+        wp.zeros(1, dtype=wp.uint32, device="cpu"),
+        1 if family == "coagulation" else None,
+    )
+    malformed = replace(
+        checkpoint, payloads=checkpoint.payloads + (rng_payload,)
+    )
+
+    monkeypatch.setattr(
+        checkpoint_module,
+        "setup_resident_session",
+        lambda *_args: pytest.fail("restart setup must not run"),
+    )
+    with pytest.raises(ValueError, match="RNG resource payloads"):
+        restart_resident_session(malformed, Device(Backend.WARP, "cpu"))
+
+
+@pytest.mark.warp
 @pytest.mark.parametrize(
     ("field", "value", "exception", "match"),
     [

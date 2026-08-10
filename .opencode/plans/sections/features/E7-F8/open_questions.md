@@ -31,16 +31,19 @@
 
 - [x] How should disabled per-box execution reach kernels that currently launch
   across all boxes?
-  - Resolved 2026-07-27: Add an optional same-device binary `wp.int32` enable
-    mask shaped `(n_boxes,)`; false lanes must return before physical-state or
-    RNG reads/writes, and omission means all boxes enabled.
-  - Rationale: A fixed-shape mask preserves row identity and stable launches,
-    unlike gather/scatter compaction that would remap stochastic streams.
+  - Resolved 2026-08-09: Keep the direct kernel unchanged. P3 passes the
+    scheduler-resolved selected logical-box indices to the resident adapter,
+    which invokes the kernel on aliased one-box views only for selected boxes.
+    Empty/prelaunch-skipped boxes do not resolve the kernel; zero-time and valid
+    no-work behavior remains the direct-kernel no-op contract.
+  - Rationale: One-box aliases preserve the published logical lane identity
+    without exposing a new direct-kernel mask/signature or allowing disabled
+    lanes into a full-box launch.
   - Evidence:
     - `particula/gpu/warp_types.py:135` - binary GPU masks use `wp.int32`.
     - `docs/Features/Roadmap/data-oriented-gpu.md:1596` - disabled boxes must not
       perturb independent per-box streams.
-  - Resolved by: plan-question-resolver
+  - Resolved by: issue #1522, commit `ca21d45d8`
 
 - [x] Is durable on-disk serialization part of the first RNG checkpoint schema?
   - Resolved 2026-08-09: No. There is currently no RNG checkpoint schema:

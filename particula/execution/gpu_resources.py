@@ -121,7 +121,14 @@ class CoagulationResources:
 
 @dataclass(frozen=True, eq=False)
 class WallLossResources:
-    """Expose the native persistent wall-loss RNG sidecar."""
+    """Expose one independently initialized wall-loss RNG sidecar.
+
+    The registry publishes this identity-bound view only after initializing its
+    ``rng_states`` once from the wall-loss process namespace. Compatible
+    reacquisition returns the same view and sidecar by identity without
+    allocation or reseeding. The sidecar is distinct from coagulation state and
+    has no reset, inspection, or checkpoint-persistence API.
+    """
 
     rng_states: Any
 
@@ -338,8 +345,8 @@ class GPUResourceRegistry:
     Publication pins caller- or registry-allocated Warp objects by role. This
     validates identity and nonaliasing, not unverifiable allocator provenance.
     No payload is read, copied, synchronized, or mutated by acquisition, except
-    that first coagulation acquisition initializes its single P1-derived
-    coagulation-only RNG sidecar before publication. Its
+    that first coagulation or wall-loss acquisition initializes its distinct
+    P1-derived RNG sidecar before publication. Its
     concrete-only :meth:`validate_pinned_session` seam lets lifecycle guards
     verify the exact active binding without resource acquisition or execution.
     Its private checkpoint enumeration reports acquired sidecars in manifest
@@ -1234,6 +1241,13 @@ class GPUResourceRegistry:
     ) -> WallLossResources:
         """Acquire one initialized persistent wall-loss RNG sidecar.
 
+        The first successful acquisition validates or allocates the single
+        ``(n_boxes,)`` ``wp.uint32`` sidecar, initializes it from the wall-loss
+        namespace, then publishes the view. Compatible later calls return the
+        exact view without allocation or reseeding. Initializing this sidecar
+        does not reseed a published coagulation stream, and no stream state is
+        checkpointed or recoverable.
+
         Args:
             rng_states: Optional ``uint32`` per-box native RNG sidecar.
 
@@ -1242,8 +1256,8 @@ class GPUResourceRegistry:
 
         Raises:
             TypeError: If a supplied sidecar is not a Warp array.
-            ValueError: If its schema, aliasing, or session signature is
-                incompatible.
+            ValueError: If the sidecar schema, aliasing, session signature, or
+                an established binding is incompatible.
         """
         already_published = "wall_loss" in self._bindings
         bindings = self._acquire(

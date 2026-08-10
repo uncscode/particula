@@ -274,9 +274,17 @@ never reseeds or allocates it. Test immutable stream metadata during session
 setup and first resource acquisition separately. When either resident stream
 has been published, checkpoint and finalization must reject before payload
 work; stream checkpoint continuation is intentionally unsupported. Wall-loss
-coverage must also verify reset-like values reject before direct-kernel
-resolution and that an empty resolved launch set is a no-op. Do not add reset
-or inspection APIs, hidden transfers, or synchronization.
+coverage must verify canonical-manifest derivation gives wall loss a distinct
+namespace from coagulation without claiming arbitrary 32-bit words cannot
+collide. Test the scheduler-resolved logical-box selection: only selected boxes
+whose operation launches may consume RNG words. Disabled, prelaunch-skipped,
+zero-time, and valid no-work lanes must retain their words exactly, including
+when another logical box launches. Verify reset-like values reject before
+direct-kernel resolution and that an empty resolved launch set is a no-op. For
+a failure after a writer-capable launch, assert the established guard-close and
+session-fault lifecycle rather than RNG rollback. Do not add reset or inspection
+APIs, hidden transfers, synchronization, checkpoint persistence, or restart
+continuation.
 
 ```bash
 pytest particula/execution/tests/gpu_session_test.py \

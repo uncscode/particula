@@ -116,7 +116,10 @@ class ResidentSimulationRequest:
             coagulation-only RNG sidecar by identity and requiring forced-false
             RNG initialization during dispatch.
         dilution: Exact resident dilution request.
-        wall_loss: Exact resident wall-loss request.
+        wall_loss: Exact resident wall-loss request retaining the published
+            wall-loss RNG sidecar by identity. Its reset flag must be literal
+            ``False`` and its scheduler-owned selected logical-box indices must
+            be validated in ascending order before dispatch.
         nucleation: Exact resident nucleation request.
         diagnostics: Exact closed diagnostics plan.
         environment_update: Optional exact environment update request.
@@ -198,10 +201,12 @@ class ResidentSimulationScheduler:
     pre-update volumes, optional volume evolution follows it, and both barriers
     invalidate saturation ratio only. The scheduler neither transfers nor
     restores data, acquires resources, synchronizes, retries, falls back, or
-    rolls back after a writer-capable operation may have launched. When given a
-    resident Brownian carrier, it dispatches its already-published
-    coagulation-only RNG sidecar by identity with reset disabled; it neither
-    allocates, reseeds, inspects, nor synchronizes that stream.
+    rolls back after a writer-capable operation may have launched. It dispatches
+    already-published coagulation and wall-loss RNG sidecars by identity with
+    reset disabled. Scheduler-resolved wall-loss selection reaches the adapter,
+    which excludes disabled logical-box lanes from direct dispatch. The
+    scheduler neither allocates, reseeds, inspects, nor synchronizes either
+    stream.
     """
 
     def __init__(self, request: ResidentSimulationRequest) -> None:

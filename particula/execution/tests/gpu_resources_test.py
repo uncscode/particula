@@ -911,6 +911,31 @@ def test_registry_allocation_failure_does_not_publish_partial_family(
 
 
 @pytest.mark.warp
+@pytest.mark.parametrize("coagulation_first", (False, True))
+def test_wall_loss_initialization_failure_is_transactional_and_retryable(
+    coagulation_first: bool, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A failed stream initialization leaves wall loss unpublished for retry."""
+    registry = GPUResourceRegistry(_session())
+    if coagulation_first:
+        registry.acquire_coagulation(1)
+
+    def fail_initialize(*_args: object) -> None:
+        """Inject a failure before an unpublished wall-loss view is published."""
+        raise RuntimeError("stream initialization failed")
+
+    target = "initialize_process" if coagulation_first else "initialize"
+    monkeypatch.setattr(gpu_resources.StreamRegistry, target, fail_initialize)
+    with pytest.raises(RuntimeError, match="stream initialization failed"):
+        registry.acquire_wall_loss()
+
+    assert "wall_loss" not in registry._bindings
+    assert "wall_loss" not in registry._views
+    monkeypatch.undo()
+    assert registry.acquire_wall_loss().rng_states is not None
+
+
+@pytest.mark.warp
 def test_registry_partial_allocation_failure_does_not_publish_family(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

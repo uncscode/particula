@@ -1,7 +1,7 @@
 # Scope
 
-Issue #1520 completed E7-F8-P1, and issue #1521 completed E7-F8-P2: a
-concrete-only resident Brownian-coagulation stream lifecycle built on P1
+Issues #1520--#1522 completed E7-F8-P1--P3: concrete-only resident RNG
+lifecycle support for Brownian coagulation and wall loss built on P1
 registration and initialization.
 
 ## In Scope
@@ -19,18 +19,26 @@ registration and initialization.
 - Resident Brownian adapter/scheduler dispatch with the exact published sidecar
   and literal `initialize_rng=False`; fail-closed checkpoint/finalize rejection
   once that sidecar is published.
+- One independently initialized, session-owned wall-loss `(n_boxes,)`
+  `wp.uint32` sidecar with canonical-manifest initialization, exact resource
+  identity, and coagulation nonaliasing.
+- Scheduler-resolved selected-box wall-loss dispatch through the unchanged
+  direct-kernel interface. Disabled, prelaunch-skipped, zero-time, and valid
+  no-work lanes preserve particle/RNG state; post-launch failure retains the
+  existing scheduler fault lifecycle without rollback.
 
 ## Out of Scope
 
 - Exact CPU/Warp/CUDA stochastic trajectory equality or cross-device restart
   bitwise equivalence.
-- Wall-loss resident RNG ownership, enable-mask/invariance work, generic
-  reset/inspection APIs, and stream advancement policy beyond Brownian calls.
+- Generic reset/inspection APIs, full add/remove/reorder box-invariance work,
+  and stream advancement policy beyond the shipped Brownian and selected-box
+  wall-loss calls.
 - RNG serialization, checkpoint persistence, and restart continuation. A
   checkpoint or finalize attempt after coagulation-sidecar publication rejects
   before payload conversion or enumeration.
-- Rewriting coagulation or wall-loss physics, random algorithms, or selection
-  order beyond the minimum interface needed for per-box enablement.
+- Rewriting coagulation or wall-loss physics, random algorithms, direct-kernel
+  signatures, host readback, transfer, or synchronization behavior.
 - RNG for deterministic processes, unsupported mechanisms, CPU runnable redesign,
   transport randomness, multi-GPU/distributed streams, or cryptographic RNG.
 - Hidden host readback, per-step synchronization, automatic reseeding, silent

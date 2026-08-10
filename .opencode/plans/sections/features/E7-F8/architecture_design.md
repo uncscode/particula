@@ -4,7 +4,8 @@
 
 P1 is a direct-only, caller-owned boundary. `StreamRegistry` retains a canonical
 two-process tuple of state arrays by identity and keeps key/descriptor/lane
-registration host-only. `initialize()` is the sole optional-dependency operation.
+registration host-only. `initialize_process()` is the optional-dependency
+operation used when only one process stream is being initialized.
 
 ```text
 root seed + exact StreamKey(process, logical box ID)
@@ -45,10 +46,28 @@ root seed + exact StreamKey(process, logical box ID)
   with literal `initialize_rng=False`. It has no reset, transfer, synchronization,
   or fallback path. Checkpoint and finalize fail closed before payload work when
   the resident sidecar is published; RNG metadata and words are not serialized,
-  and restart continuation is unsupported.
-- **Deferred integration:** P2 does not add wall-loss resources, generic
-  reset/inspection APIs, box-invariance machinery, public exports, or RNG
-  persistence/restart continuation.
+   and restart continuation is unsupported.
+- **Delivered P3 wall-loss lifecycle:** First compatible wall-loss acquisition
+  creates and initializes only its candidate `(n_boxes,)` `wp.uint32` sidecar
+  from the canonical manifest, using `initialize_process("wall_loss")` when a
+  coagulation stream is already published. Manifest initialization may allocate
+  temporary peer-process storage only to satisfy the two-process manifest; that
+  storage is unpublished, unbound, unexposed, and never reused as a resident
+  resource. The published view, bindings, and array are exact
+  session/device/schema-bound identities and cannot alias coagulation.
+  Reacquisition retains the original advanced array without allocation or
+  reseeding.
+- **Delivered P3 dispatch boundary:** The resolved scheduler validates and
+  supplies the authoritative wall-loss logical-box selection before opening its
+  token. The adapter validates that selection and the published wall-loss view,
+  then calls one private indexed batch writer with literal `initialize_rng=False`.
+  Empty selection avoids lazy kernel resolution. Disabled, prelaunch-skipped,
+  zero-time, and valid no-work lanes are not written; a writer-capable failure
+  retains the established close-token/fault-session behavior without rollback.
+- **Deferred integration:** Generic reset/inspection APIs, full box-invariance
+  machinery, public exports, RNG persistence/restart continuation, hidden
+  transfer/synchronization, and direct-kernel API or physics changes remain
+  deferred.
 
 ## Security & Compliance
 

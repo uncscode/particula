@@ -300,10 +300,10 @@ def test_wall_loss_request_rejects_invalid_enabled_box_indices(
 
 
 @pytest.mark.warp
-def test_wall_loss_adapter_dispatches_only_selected_box_views(
+def test_wall_loss_adapter_dispatches_selected_lanes_once(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Wall loss dispatches only selected logical-box aliases."""
+    """Wall loss dispatches one private batched call for selected lanes."""
     session = _session(boxes=2)
     registry = _registry(session)
     resources = registry.acquire_wall_loss()
@@ -315,30 +315,61 @@ def test_wall_loss_adapter_dispatches_only_selected_box_views(
         0,
         enabled_box_indices=(0,),
     )
-    calls: list[tuple[object, object, object, object]] = []
+    calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
 
-    def step(
-        particles: object,
-        temperature: object,
-        pressure: object,
-        _time_step: object,
-        **kwargs: object,
-    ) -> object:
-        """Record the selected direct-kernel aliases."""
-        calls.append((particles, temperature, pressure, kwargs["rng_states"]))
-        return particles
+    def step(*args: object, **kwargs: object) -> object:
+        """Record the selected private kernel call."""
+        calls.append((args, kwargs))
+        return args[0]
 
     monkeypatch.setattr(
-        process_adapters, "_get_wall_loss_step_gpu", lambda: step
+        process_adapters, "_get_wall_loss_selected_boxes_step_gpu", lambda: step
     )
 
     assert ResidentWallLossAdapter().execute(request) is session.particles
     assert len(calls) == 1
-    particles, temperature, pressure, rng_states = calls[0]
-    assert particles.masses.ptr == session.particles.masses.ptr
-    assert temperature.ptr == session.environment.temperature.ptr
-    assert pressure.ptr == session.environment.pressure.ptr
-    assert rng_states.ptr == resources.rng_states.ptr
+    args, kwargs = calls[0]
+    assert args[:4] == (session.particles, None, None, 0)
+    assert kwargs["environment"] is session.environment
+    assert kwargs["rng_states"] is resources.rng_states
+    np.testing.assert_array_equal(kwargs["selected_boxes"].numpy(), [0])
+
+
+@pytest.mark.warp
+def test_wall_loss_selected_lanes_preserve_disabled_and_no_work_rng() -> None:
+    """Only a selected lane with eligible work may advance its RNG word."""
+    wp = pytest.importorskip("warp")
+    from particula.gpu.kernels.wall_loss import NeutralWallLossConfig
+
+    session = _session(boxes=3)
+    registry = _registry(session)
+    resources = registry.acquire_wall_loss()
+    particles = cast(Any, session.particles)
+    particles.concentration.assign(
+        np.array([[1.0, 1.0], [0.0, 0.0], [1.0, 1.0]])
+    )
+    particles.masses.assign(
+        np.array([[[1.0], [1.0]], [[1.0], [1.0]], [[0.0], [0.0]]])
+    )
+    before_rng = resources.rng_states.numpy().copy()
+    before_particles = particles.masses.numpy().copy()
+    request = ResidentWallLossRequest(
+        session,
+        registry,
+        resources,
+        NeutralWallLossConfig("spherical", 1.0, chamber_radius=1.0),
+        1.0,
+        enabled_box_indices=(0, 2),
+    )
+
+    assert ResidentWallLossAdapter().execute(request) is particles
+    wp.synchronize()
+
+    after_rng = resources.rng_states.numpy()
+    np.testing.assert_array_equal(after_rng[1:], before_rng[1:])
+    np.testing.assert_array_equal(
+        particles.masses.numpy()[1:], before_particles[1:]
+    )
 
 
 @pytest.mark.warp

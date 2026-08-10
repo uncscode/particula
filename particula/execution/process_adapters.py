@@ -75,9 +75,11 @@ class ResidentDilutionRequest:
 class ResidentWallLossRequest:
     """Retain one wall-loss call and its established RNG resource view.
 
-    This concrete-only carrier preserves every reference by identity and leaves
-    physical validation, RNG behavior, and writer failures to the direct step.
-    It neither copies retained state nor provides recovery.
+    This concrete-only carrier preserves every reference by identity. It
+    validates scheduler-owned logical-box selection and requires direct-kernel
+    RNG reset to remain disabled; physical validation and writer failure
+    semantics remain with the direct step. It neither copies retained state nor
+    provides recovery.
 
     Attributes:
         session: Exact concrete resident-session reference. Execution validates
@@ -123,7 +125,23 @@ class ResidentWallLossRequest:
         self.validate_enabled_box_indices()
 
     def validate_enabled_box_indices(self) -> tuple[int, ...]:
-        """Validate and return the scheduler-owned wall-loss launch set."""
+        """Validate and return the scheduler-owned wall-loss launch set.
+
+        ``None`` selects every logical box in ascending order. An explicit tuple
+        must already be strictly ascending, unique, and within the resident
+        box range; this preserves the one-to-one logical-lane mapping used by
+        the persistent wall-loss RNG sidecar.
+
+        Returns:
+            Ascending selected logical-box indices. ``None`` returns all
+            resident boxes in ascending order.
+
+        Raises:
+            TypeError: If an explicit selection is not a tuple or contains a
+                non-integral or boolean index.
+            ValueError: If an index is negative, repeated, unordered, or
+                outside the resident box range.
+        """
         if self.enabled_box_indices is None:
             return tuple(range(self.session.dimensions.n_boxes))
         indices = self.enabled_box_indices
@@ -205,6 +223,15 @@ def _get_wall_loss_step_gpu() -> Callable[..., object]:
     return wall_loss_step_gpu
 
 
+def _get_wall_loss_selected_boxes_step_gpu() -> Callable[..., object]:
+    """Lazily import the private batched resident wall-loss dispatch seam."""
+    from particula.gpu.kernels.wall_loss import (
+        wall_loss_selected_boxes_step_gpu,
+    )
+
+    return wall_loss_selected_boxes_step_gpu
+
+
 def _get_nucleation_step_gpu() -> Callable[..., object]:
     """Lazily import the sole supported direct nucleation boundary."""
     from particula.gpu.kernels import nucleation_step_gpu
@@ -254,8 +281,11 @@ class ResidentWallLossAdapter:
     """Delegate one wall-loss request through its exact published view.
 
     This concrete-only adapter resolves one supported direct kernel after
-    metadata-only preflight. It preserves container, sidecar, and RNG identity
-    and provides no acquisition, transfer, synchronization, or recovery.
+    metadata-only preflight. It preserves container and sidecar identity and
+    dispatches selected logical boxes through one-box aliases when selection is
+    not all boxes, preventing disabled lanes from reaching the direct kernel.
+    It provides no acquisition, transfer, synchronization, rollback, or
+    recovery.
     """
 
     def execute(self, request: object) -> object:
@@ -274,8 +304,11 @@ class ResidentWallLossAdapter:
             ValueError: If the session or resource view is no longer the active
                 registry-pinned publication.
 
-        Direct-kernel exceptions and mutations propagate without adapter retry,
-        rollback, recovery, transfer, or synchronization.
+        An empty selection returns without resolving the kernel. For a partial
+        selection, direct dispatch receives only one-box aliases of selected
+        particle, environment, and RNG lanes. Direct-kernel exceptions and
+        mutations propagate without adapter retry, rollback, recovery,
+        transfer, or synchronization.
         """
         if type(request) is not ResidentWallLossRequest:
             raise TypeError("request must be an exact ResidentWallLossRequest.")
@@ -286,24 +319,26 @@ class ResidentWallLossAdapter:
         enabled_boxes = request.validate_enabled_box_indices()
         if not enabled_boxes:
             return request.session.particles
-        step = _get_wall_loss_step_gpu()
         if len(enabled_boxes) != request.session.dimensions.n_boxes:
-            for box_index in enabled_boxes:
-                particles, temperature, pressure, rng_states = (
-                    _wall_loss_box_views(request, box_index)
-                )
-                step(
-                    particles,
-                    temperature,
-                    pressure,
-                    request.time_step,
-                    config=request.config,
-                    rng_seed=request.rng_seed,
-                    rng_states=rng_states,
-                    initialize_rng=False,
-                    environment=None,
-                )
-            return request.session.particles
+            import warp as wp
+
+            selected_boxes = wp.array(
+                enabled_boxes,
+                dtype=wp.int32,
+                device=request.resources.rng_states.device,
+            )
+            return _get_wall_loss_selected_boxes_step_gpu()(
+                request.session.particles,
+                None,
+                None,
+                request.time_step,
+                config=request.config,
+                rng_seed=request.rng_seed,
+                rng_states=request.resources.rng_states,
+                selected_boxes=selected_boxes,
+                environment=request.session.environment,
+            )
+        step = _get_wall_loss_step_gpu()
         return step(
             request.session.particles,
             None,
@@ -315,41 +350,6 @@ class ResidentWallLossAdapter:
             initialize_rng=False,
             environment=request.session.environment,
         )
-
-
-def _wall_loss_box_views(
-    request: ResidentWallLossRequest, box_index: int
-) -> tuple[object, object, object, object]:
-    """Return one logical box's contiguous resident aliases for direct dispatch.
-
-    The direct wall-loss boundary has no selected-box argument. A one-box view
-    retains the original particle fields and RNG lane by alias, so the direct
-    kernel can only write the scheduler-selected logical box. No host copy,
-    allocation, synchronization, or scatter step is introduced.
-
-    Args:
-        request: Validated resident wall-loss request.
-        box_index: Validated selected logical-box index.
-
-    Returns:
-        One-box particle container plus temperature, pressure, and RNG views.
-    """
-    from particula.gpu.warp_types import WarpParticleData
-
-    source = request.session.particles
-    particles = WarpParticleData()
-    particles.masses = source.masses[box_index : box_index + 1]
-    particles.concentration = source.concentration[box_index : box_index + 1]
-    particles.charge = source.charge[box_index : box_index + 1]
-    particles.density = source.density
-    particles.volume = source.volume[box_index : box_index + 1]
-    environment = request.session.environment
-    return (
-        particles,
-        environment.temperature[box_index : box_index + 1],
-        environment.pressure[box_index : box_index + 1],
-        request.resources.rng_states[box_index : box_index + 1],
-    )
 
 
 class ResidentNucleationAdapter:

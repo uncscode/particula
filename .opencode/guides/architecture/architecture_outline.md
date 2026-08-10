@@ -236,24 +236,31 @@ The exact downstream ordering remains
   consumes virtual thermodynamic refreshes only through condensation and
   diagnostics consumer windows, and completes the token only after the full
   loop succeeds. It has no package export, transfer, synchronization, fallback,
-  resource replacement, or rollback; a possible post-launch failure faults the
-   resident session. Resident Brownian dispatch uses the exact published
-   coagulation sidecar by identity and forces `initialize_rng=False`; it does
-   not acquire, replace, inspect, synchronize, or reseed the stream. See
+   resource replacement, or rollback; a possible post-launch failure faults the
+    resident session. Resident Brownian dispatch uses the exact published
+    coagulation sidecar by identity and forces `initialize_rng=False`; resident
+    wall loss does the same with its independent wall-loss namespace. The
+    resolved wall-loss selection is authoritative: disabled, prelaunch-skipped,
+    zero-time, and valid no-work lanes retain their supplied RNG state, while
+    only selected lanes whose work launches may consume it. The scheduler does
+    not acquire, replace, inspect, synchronize, or reseed either stream. See
    [ADR-012](decisions/ADR-012-resident-complete-loop-and-diagnostics.md) and
    [ADR-018](decisions/ADR-018-resident-communication-integration.md).
 - `process_adapters.py` - Concrete-only, direct-import resident delegation
    boundary for dilution, wall loss, and nucleation. Frozen request carriers
    retain the exact active `ResidentSession`, its pinned
-   `GPUResourceRegistry`, and (for wall loss/nucleation) an exact established
-   published resource view by identity. After metadata-only session/view
-   validation, each adapter lazily resolves and invokes exactly one supported
-   direct GPU kernel, forwarding resident containers, sidecars, controls, and
-   persistent RNG state unchanged and returning the native result. It never
-   transfers, synchronizes, acquires or replaces resources, retries, rolls
-   back, falls back, or performs physics; direct-kernel validation, mutation,
-   and post-launch failure semantics remain authoritative. No name is exported
-   through `particula.execution`, its adapters package, or top-level
+    `GPUResourceRegistry`, and (for wall loss/nucleation) an exact established
+    published resource view by identity. Wall-loss requests also retain the
+    scheduler-resolved ascending logical-box selection. An empty selection is a
+    prelaunch skip; a partial selection dispatches one-box aliases of selected
+    state and RNG lanes, so disabled lanes cannot be written. After metadata-only
+    session/view/selection validation, each adapter lazily resolves and invokes
+    the supported direct GPU kernel, forwarding resident containers, sidecars,
+    controls, and persistent RNG state unchanged and returning the native result.
+    It never transfers, synchronizes, acquires or replaces resources, retries,
+    rolls back, falls back, or performs physics; direct-kernel validation,
+     mutation, and post-launch failure semantics remain authoritative. No name
+    is exported through `particula.execution`, its adapters package, or top-level
     `particula`. See
     [ADR-009](decisions/ADR-009-resident-process-delegation-adapters.md).
 - `state_updates.py` - Concrete-only, direct-import Warp-resident state-update

@@ -57,13 +57,18 @@
     seam, while the separate direct-Warp P2 final-volume writer is now shipped
      at `particula.gpu.kernels.communication`. P3 retains transfer admission;
      the separate concrete-only P4 direct-Warp seam owns particle transport; and
-      P5 retains resident binding. E7-F8 P2 integrates one narrow resident
-     Brownian stream: immutable metadata is retained by the session, first
-     coagulation-resource acquisition initializes one P1-derived sidecar, and
-     resident dispatch retains it by identity with `initialize_rng=False`.
-     Stream reset/inspection, wall-loss integration, hidden
-     transfer/synchronization, retry, broad fallback, and replacement of direct
-     GPU APIs remain deferred.
+      P5 retains resident binding. E7-F8 integrates distinct resident Brownian
+      coagulation and wall-loss streams: immutable session metadata and the
+      canonical stream manifest derive one independent per-logical-box sidecar
+      for each process on first registry acquisition. The registry pins each
+      initialized sidecar by identity, and resident dispatch always supplies it
+      with `initialize_rng=False`. Wall loss receives the scheduler-resolved,
+      ascending enabled logical-box set; an empty set skips kernel resolution,
+      while a partial set uses one-box resident aliases so disabled lanes cannot
+      be written. Disabled, prelaunch-skipped, zero-time, and valid no-work
+      lanes retain their supplied RNG words. Stream reset/inspection, hidden
+      transfer/synchronization, retry, broad fallback, direct-kernel API or
+      physics changes, and replacement of direct GPU APIs remain deferred.
 - `particula.execution.fallback` is the sole concrete, direct-import-only E7-F6
   P3 opt-in CPU fallback boundary. Its default `RAISE` policy re-raises the
   exact eligible typed availability/support failure. Explicit CPU policy may
@@ -139,15 +144,18 @@
   `assert_step_closed()` before their own work; P5/P6 retain those operations
     and their policy. The gate does not globally intercept raw low-level helpers.
      See [ADR-006](decisions/ADR-006-resident-gpu-step-lifecycle-guard.md).
-- `GPUResourceRegistry.acquire_coagulation()` is the sole resident stream
-  acquisition point. For an exact active session it validates a supplied RNG
-  sidecar before publication, or allocates one, then initializes exactly one
-  P1-derived coagulation-only `wp.uint32` stream from the session metadata.
-  Compatible repeats retain the exact stream and resource view by identity and
-  neither allocate nor reseed. Resident Brownian dispatch requires that exact
-  stream and passes literal `initialize_rng=False`; no wall-loss stream,
-  reset/inspection API, hidden transfer/synchronization, or package/top-level
-  export is introduced.
+- `GPUResourceRegistry.acquire_coagulation()` and `.acquire_wall_loss()` are the
+  sole resident stream acquisition points. For an exact active session, each
+  validates or allocates its supplied `(n_boxes,)` `wp.uint32` sidecar, derives
+  its distinct process namespace through the canonical stream manifest, and
+  initializes it before publishing its identity-bound view. Manifest storage
+  for an unacquired peer process is temporary only: it is never published,
+  bound, or reused. Compatible repeats retain the exact stream and resource
+  view by identity and neither allocate nor reseed. Resident Brownian and wall
+  loss dispatch require their respective exact streams with literal
+  `initialize_rng=False`; no reset/inspection API, hidden
+  transfer/synchronization, package/top-level export, checkpoint persistence,
+  or restart continuation is introduced.
 - `GPUResourceRegistry.validate_wall_loss_resources()` and
   `.validate_nucleation_resources()` are direct-module-only, metadata-only
   established-view seams. After validating the exact pinned active session,
@@ -162,9 +170,14 @@
   adapter completes metadata-only preflight, lazily resolves one supported
   direct kernel, invokes it exactly once, and returns its native result
   unchanged. It forwards resident containers, published sidecars, controls, and
-  persistent RNG state by identity. It does not acquire resources, transfer,
-  synchronize, retry, roll back, fall back, inspect physics, or recover direct
-  writer failures. These names remain absent from `particula.execution`, its
+  persistent RNG state by identity. Wall-loss requests additionally retain the
+  scheduler-owned ascending enabled logical-box set. An empty set is a
+  prelaunch skip; a partial set dispatches selected one-box aliases, preserving
+  disabled logical-box particle and RNG lanes without a gather/scatter copy.
+  Direct-kernel zero-time and valid no-work behavior preserves supplied selected
+  RNG lanes. It does not acquire resources, transfer, synchronize, retry, roll
+  back, fall back, inspect physics, or recover direct writer failures. These
+  names remain absent from `particula.execution`, its
   adapters package, and top-level `particula`; the direct kernel retains
   numerical validation and post-launch semantics. See
    [ADR-009](decisions/ADR-009-resident-process-delegation-adapters.md).
@@ -249,7 +262,11 @@
   diagnostics through thermodynamic consumer windows. A complete success calls
   `complete_step()` once. A failure before writer-capable dispatch leaves the
   session active; after a writer may launch it closes the token, faults the
-  session, and offers no rollback. Neither seam is package- or top-level-exported
+  session, and offers no rollback. The resolved wall-loss request is the
+  authoritative owner of its logical-box selection; the scheduler validates and
+  forwards that selection before opening the token, without deriving selection
+  from particle state or reseeding/inspecting the pinned wall-loss stream.
+  Neither seam is package- or top-level-exported
   and neither transfers, restores, synchronizes, checkpoints, finalizes,
    acquires/replaces resources, resizes, compacts, or falls back. See
    [ADR-012](decisions/ADR-012-resident-complete-loop-and-diagnostics.md) and
@@ -270,10 +287,10 @@
   for primaries and acquired sidecars and detached CPU inspection carriers. The
    inspection `GasData` intentionally omits GPU-only vapor pressure and is not
    authoritative; restart recovers vapor pressure from canonical bytes. A
-   published resident coagulation RNG stream causes checkpoint and finalize to
-   reject before device synchronization, payload conversion, or sidecar
-   enumeration. Stream metadata and words are intentionally not serialized, so
-   checkpoint restart never continues a resident RNG stream.
+    published resident coagulation or wall-loss RNG stream causes checkpoint and
+    finalize to reject before device synchronization, payload conversion, or
+    sidecar enumeration. Stream metadata and words are intentionally not
+    serialized, so checkpoint restart never continues a resident RNG stream.
 - `restart_resident_session(checkpoint, device)` is explicit and same-device
   only. Its preflight fails closed: it accepts an `ACTIVE` `ResidentSession`
   checkpoint with complete valid descriptors and bytes, an exactly equal target

@@ -25,11 +25,25 @@
     advancement, no-op/rejection preservation, scheduler binding, and pre-payload
     checkpoint/finalize failure.
 
-- [ ] **E7-F8-P3:** Integrate wall-loss streams with scheduler execution and unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Give wall loss a distinct persistent stream namespace and consume it only for enabled scheduled boxes.
-  - Files: `particula/execution/adapters/wall_loss.py`, `particula/execution/scheduler.py`, adapter tests
-  - Tests: Process namespace independence, enabled/disabled execution, no-op behavior, identity, and failure propagation.
+- [x] **E7-F8-P3:** Integrate wall-loss streams with scheduler execution and unit tests
+   - Issue: #1522 | Size: S | Status: Complete
+   - Goal: Give wall loss a distinct persistent stream namespace and consume it
+     only for scheduler-selected boxes whose direct work launches.
+   - Files: `particula/execution/gpu_resources.py`,
+     `particula/execution/process_adapters.py`,
+     `particula/execution/resident_scheduler.py`,
+     `particula/execution/checkpoint.py`, and co-located execution tests.
+   - Delivered: Canonical-manifest initialization publishes one independent,
+     session-owned wall-loss `wp.uint32` sidecar retained by identity and
+     nonaliasing with coagulation. The resolved scheduler selection reaches the
+     adapter, which invokes the unchanged direct kernel through one-box views;
+     disabled, prelaunch-skipped, zero-time, and no-work lanes remain unchanged.
+     Checkpoint rejection and post-launch scheduler fault/token lifecycle are
+     preserved.
+   - Tests: Namespace/initial-word derivation, transactional acquisition and
+     reacquisition, resource/view nonaliasing, selected-box identity and gating,
+     reset-like request rejection, no-launch/no-work preservation, checkpoint
+     guard, and post-dispatch fault propagation.
 
 - [ ] **E7-F8-P4:** Add explicit initialize reset and stream inspection APIs with unit tests
   - Issue: TBD | Size: S | Status: Not Started
