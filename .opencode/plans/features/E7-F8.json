@@ -88,11 +88,11 @@
     {
       "id": "E7-F8-P5",
       "title": "Guarantee disabled added and reordered box stream invariance with regressions",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-08-10",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
