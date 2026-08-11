@@ -567,7 +567,7 @@ def test_execution_roadmap_preserves_shipped_and_deferred_boundaries() -> None:
         "E7-F4 supplies resident session/container/sidecar lifecycle",
         "E7-F5 is their later scheduling consumer",
         "E7-F6 now supplies the shipped availability resolver, typed errors, explicit CPU fallback, frozen stable API, and documentation handoff",
-        "E7-F6/Track T6 is shipped through P6",
+        "E7-F6/Track T6 is shipped through P7",
         "Selection, availability, and fallback never upload, restore, synchronize, migrate, retry, or silently switch",
     ):
         assert phrase in normalized

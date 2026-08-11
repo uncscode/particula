@@ -1,6 +1,7 @@
 """Publication regressions for the supported CPU nucleation documentation."""
 
 import ast
+import re
 import runpy
 import subprocess
 import sys
@@ -37,7 +38,9 @@ def _assert_local_links_resolve(document: Path) -> None:
         assert target_path.is_file(), f"Missing link target: {target_path}"
         if anchor:
             headings = target_path.read_text(encoding="utf-8").lower()
-            assert anchor.replace("-", " ") in headings
+            normalized_anchor = " ".join(re.split(r"[^a-z0-9]+", anchor))
+            normalized_headings = " ".join(re.split(r"[^a-z0-9]+", headings))
+            assert normalized_anchor in normalized_headings
 
 
 def test_cpu_nucleation_example_uses_public_api_and_conserves_mass() -> None:
