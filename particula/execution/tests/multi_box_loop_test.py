@@ -17,7 +17,10 @@ import numpy.testing as npt
 import pytest
 
 from particula.execution import (
+    CONDENSATION_CAPABILITY_MATRIX,
+    CONDENSATION_PROCESS,
     Backend,
+    CapabilityRequirements,
     CondensationActivityMode,
     CondensationConfiguration,
     CondensationExecutionMode,
@@ -59,6 +62,11 @@ from particula.execution.process_adapters import (
     ResidentNucleationRequest,
     ResidentWallLossRequest,
 )
+from particula.execution.process_graph import (
+    DependencyEdge,
+    ProcessNode,
+    TimestepPlan,
+)
 from particula.execution.resident_communication import (
     ResidentCommunicationRequest,
 )
@@ -66,11 +74,16 @@ from particula.execution.resident_scheduler import (
     ResidentSimulationRequest,
     ResidentSimulationScheduler,
 )
+from particula.execution.scheduler import (
+    EnabledNodeSelection,
+    NucleationCondensationDirection,
+    SchedulerProfile,
+    resolve_timestep_schedule,
+)
 from particula.execution.state_updates import (
     ResidentEnvironmentUpdateRequest,
     ResidentGasUpdateRequest,
 )
-from particula.execution.tests.full_loop_test import _build_resident_graph
 from particula.gas import EnvironmentData, GasData
 from particula.gpu.kernels.thermodynamics import ThermodynamicsConfig
 from particula.gpu.tests.cuda_availability import CUDA_SKIP_REASON, warp_devices
@@ -80,6 +93,21 @@ PARITY_RTOL = 1e-12
 PARITY_ATOL = 1e-30
 INVENTORY_RTOL = 1e-12
 INVENTORY_ATOL = 1e-30
+
+_NODE_IDS = (
+    "communication",
+    "volume_evolution",
+    "environment_update",
+    "gas_update",
+    "vapor_pressure_refresh",
+    "saturation_refresh",
+    "condensation",
+    "brownian_coagulation",
+    "dilution",
+    "wall_loss",
+    "nucleation",
+    "diagnostics",
+)
 
 
 @pytest.fixture(autouse=True)
@@ -193,16 +221,25 @@ def resident_factory() -> Generator[Any, None, None]:
     """Close each created binding in reverse order, including failed cases."""
     bindings: list[tuple[Any, GPUResourceRegistry, ResidentStepGuard]] = []
 
-    def create(*args: Any, **kwargs: Any) -> tuple[Any, GPUResourceRegistry]:
+    def create(
+        *args: Any, **kwargs: Any
+    ) -> tuple[Any, GPUResourceRegistry, ResidentStepGuard]:
         session, registry, guard = _binding(*args, **kwargs)
         bindings.append((session, registry, guard))
-        return session, registry
+        return session, registry, guard
 
-    yield create
-    _close_bindings(bindings)
+    try:
+        yield create
+    except BaseException:
+        _close_bindings(bindings, raise_errors=False)
+        raise
+    else:
+        _close_bindings(bindings)
 
 
-def _close_bindings(bindings: list[tuple[Any, Any, Any]]) -> None:
+def _close_bindings(
+    bindings: list[tuple[Any, Any, Any]], *, raise_errors: bool = True
+) -> None:
     """Attempt every binding close and then surface the first cleanup error."""
     cleanup_errors: list[BaseException] = []
     for session, registry, guard in reversed(bindings):
@@ -210,7 +247,7 @@ def _close_bindings(bindings: list[tuple[Any, Any, Any]]) -> None:
             session.close(registry, guard)
         except BaseException as error:  # pragma: no cover - defensive teardown
             cleanup_errors.append(error)
-    if cleanup_errors:
+    if cleanup_errors and raise_errors:
         raise cleanup_errors[0]
 
 
@@ -246,12 +283,18 @@ def _temporary_binding(
     device: str,
     manifest: tuple[tuple[str, int], ...],
     root_seed: int,
-) -> Generator[tuple[Any, GPUResourceRegistry], None, None]:
+) -> Generator[tuple[Any, GPUResourceRegistry, ResidentStepGuard], None, None]:
     """Yield one binding and release it before the next aggregate iteration."""
     session, registry, guard = _binding(device, manifest, root_seed)
     try:
-        yield session, registry
-    finally:
+        yield session, registry, guard
+    except BaseException:
+        try:
+            session.close(registry, guard)
+        except BaseException as cleanup_error:
+            _ = cleanup_error
+        raise
+    else:
         session.close(registry, guard)
 
 
@@ -326,7 +369,62 @@ def _communication_configuration(session: Any, wp: Any) -> Any:
 @cache
 def _resident_graph() -> tuple[Any, Any, dict[str, Any]]:
     """Reuse one resolver-produced complete graph across repeated seed rows."""
-    return _build_resident_graph()
+    from particula.execution import process_graph
+
+    def node(node_id: str) -> ProcessNode:
+        """Build one canonical resident node with its capability requirements."""
+        schema = next(
+            item
+            for item in process_graph._NODE_CATALOGUE
+            if item.node_id == node_id
+        )
+        requirements = (
+            next(
+                declaration.requirements
+                for declaration in CONDENSATION_CAPABILITY_MATRIX.declarations
+                if declaration.process == CONDENSATION_PROCESS
+            )
+            if node_id == "condensation"
+            else CapabilityRequirements(frozenset())
+        )
+        return ProcessNode(
+            schema.node_id,
+            schema.kind,
+            schema.process,
+            requirements,
+            schema.resources,
+            schema.invalidates,
+        )
+
+    nodes = tuple(node(node_id) for node_id in _NODE_IDS)
+    dependencies = (
+        (DependencyEdge("communication", "volume_evolution"),)
+        + tuple(
+            DependencyEdge("volume_evolution", node_id)
+            for node_id in _NODE_IDS
+            if node_id not in {"communication", "volume_evolution"}
+        )
+        + tuple(
+            DependencyEdge(node_id, "diagnostics")
+            for node_id in (
+                "condensation",
+                "brownian_coagulation",
+                "dilution",
+                "wall_loss",
+                "nucleation",
+            )
+        )
+    )
+    schedule = resolve_timestep_schedule(
+        TimestepPlan(nodes, dependencies),
+        EnabledNodeSelection(frozenset(_NODE_IDS)),
+        SchedulerProfile(
+            NucleationCondensationDirection.CONDENSATION_THEN_NUCLEATION
+        ),
+    )
+    graph = schedule.source_graph
+    assert graph is not None
+    return graph, schedule, {node.node_id: node for node in graph.nodes}
 
 
 def _diagnostics_plan(
@@ -387,6 +485,7 @@ def _diagnostics_plan(
 def _scheduler_request(
     session: Any,
     registry: GPUResourceRegistry,
+    guard: ResidentStepGuard,
     duration: float,
     selected: tuple[int, ...] | None,
 ) -> tuple[ResidentSimulationRequest, Any, Any]:
@@ -478,7 +577,7 @@ def _scheduler_request(
     request = ResidentSimulationRequest(
         session,
         registry,
-        ResidentStepGuard(session, registry),
+        guard,
         graph,
         schedule,
         thermodynamics,
@@ -520,12 +619,13 @@ def _scheduler_request(
 def _wall_loss(
     session: Any,
     registry: GPUResourceRegistry,
+    guard: ResidentStepGuard,
     duration: float,
     selected: tuple[int, ...] | None = None,
 ) -> Any:
     """Execute real neutral wall loss through the complete resident scheduler."""
     request, wall_loss, coagulation = _scheduler_request(
-        session, registry, duration, selected
+        session, registry, guard, duration, selected
     )
     assert wall_loss.rng_states is not coagulation.rng_states
     ResidentSimulationScheduler(request).execute(duration)
@@ -540,7 +640,7 @@ def test_multi_box_zero_duration_matches_independent_sessions_and_conserves_inve
 ) -> None:
     """Zero-duration selected dispatch preserves four logical rows and inventory."""
     manifest = tuple((f"box-{index}", index) for index in range(4))
-    multi, multi_registry = resident_factory("cpu", manifest)
+    multi, multi_registry, multi_guard = resident_factory("cpu", manifest)
     initial_inventory = _inventory(multi)
     before = _primary_snapshot(multi)
     wall_before = _rng_snapshot(
@@ -549,7 +649,9 @@ def test_multi_box_zero_duration_matches_independent_sessions_and_conserves_inve
     coagulation_before = _rng_snapshot(
         multi, multi_registry.acquire_coagulation(1).rng_states
     )
-    resources = _wall_loss(multi, multi_registry, 0.0, (0, 1, 2, 3))
+    resources = _wall_loss(
+        multi, multi_registry, multi_guard, 0.0, (0, 1, 2, 3)
+    )
     assert resources.rng_states is multi_registry.acquire_wall_loss().rng_states
     after = _primary_snapshot(multi)
     for actual, expected in zip(after, before, strict=True):
@@ -568,8 +670,10 @@ def test_multi_box_zero_duration_matches_independent_sessions_and_conserves_inve
         coagulation_before,
     )
     for logical_id, _ in manifest:
-        single, single_registry = resident_factory("cpu", ((logical_id, 0),))
-        _wall_loss(single, single_registry, 0.0, (0,))
+        single, single_registry, single_guard = resident_factory(
+            "cpu", ((logical_id, 0),)
+        )
+        _wall_loss(single, single_registry, single_guard, 0.0, (0,))
         lane = _lane(multi, logical_id)
         for actual, expected in zip(
             _snapshot(multi), _snapshot(single), strict=True
@@ -585,14 +689,16 @@ def test_multi_box_logical_id_permutation_addition_and_wall_loss_selection_are_i
     resident_factory: Any,
 ) -> None:
     """Positive scheduler work is stable across logical reorder and addition."""
-    reference, reference_registry = resident_factory(
+    reference, reference_registry, reference_guard = resident_factory(
         "cpu", (("box-a", 0), ("box-b", 1), ("box-c", 2), ("box-d", 3))
     )
-    candidate, candidate_registry = resident_factory(
+    candidate, candidate_registry, candidate_guard = resident_factory(
         "cpu",
         (("box-c", 2), ("extra", 4), ("box-a", 0), ("box-d", 3), ("box-b", 1)),
     )
-    _wall_loss(reference, reference_registry, 1.0, (0, 1, 2, 3))
+    _wall_loss(
+        reference, reference_registry, reference_guard, 1.0, (0, 1, 2, 3)
+    )
     reference_wall = _rng_snapshot(
         reference, reference_registry.acquire_wall_loss().rng_states
     )
@@ -603,7 +709,9 @@ def test_multi_box_logical_id_permutation_addition_and_wall_loss_selection_are_i
     coagulation_before = _rng_snapshot(
         candidate, candidate_registry.acquire_coagulation(1).rng_states
     )
-    _wall_loss(candidate, candidate_registry, 1.0, (0, 2, 3, 4))
+    _wall_loss(
+        candidate, candidate_registry, candidate_guard, 1.0, (0, 2, 3, 4)
+    )
     after = _primary_snapshot(candidate)
     extra_lane = _lane(candidate, "extra")
     for actual, expected in zip(after, before, strict=True):
@@ -632,6 +740,22 @@ def test_multi_box_logical_id_permutation_addition_and_wall_loss_selection_are_i
                 rtol=PARITY_RTOL,
                 atol=PARITY_ATOL,
             )
+    empty, empty_registry, empty_guard = resident_factory(
+        "cpu", (("box-a", 0), ("box-b", 1), ("box-c", 2), ("box-d", 3))
+    )
+    before_empty = _primary_snapshot(empty)
+    rng_before_empty = _rng_snapshot(
+        empty, empty_registry.acquire_wall_loss().rng_states
+    )
+    _wall_loss(empty, empty_registry, empty_guard, 1.0, ())
+    for actual, expected in zip(
+        _primary_snapshot(empty), before_empty, strict=True
+    ):
+        npt.assert_equal(actual, expected)
+    npt.assert_equal(
+        _rng_snapshot(empty, empty_registry.acquire_wall_loss().rng_states),
+        rng_before_empty,
+    )
 
 
 @pytest.mark.warp
@@ -640,14 +764,14 @@ def test_resident_scheduler_streams_continue_per_logical_box_without_no_work_con
     resident_factory: Any,
 ) -> None:
     """Selected active rows advance their wall-loss stream; free rows do not."""
-    session, registry = resident_factory(
+    session, registry, guard = resident_factory(
         "cpu", (("active", 0), ("free", 1), ("other", 2), ("one", 3))
     )
     resources = registry.acquire_wall_loss()
     coagulation = registry.acquire_coagulation(1)
     before = _rng_snapshot(session, resources.rng_states)
     coagulation_before = _rng_snapshot(session, coagulation.rng_states)
-    _wall_loss(session, registry, 1.0, (0, 1))
+    _wall_loss(session, registry, guard, 1.0, (0, 1))
     after = _rng_snapshot(session, resources.rng_states)
     assert after[0] != before[0]
     assert after[1] == before[1]
@@ -684,9 +808,9 @@ def test_resident_wall_loss_removal_matches_cpu_binomial_aggregate() -> None:
     trials = 0
     for seed in range(100):
         with _temporary_binding("cpu", (("box", 0),), seed) as binding:
-            session, registry = binding
+            session, registry, guard = binding
             before = _snapshot(session)[1]
-            _wall_loss(session, registry, time_step, (0,))
+            _wall_loss(session, registry, guard, time_step, (0,))
             after = _snapshot(session)[1]
             removed += int(np.count_nonzero((before > 0.0) & (after == 0.0)))
             trials += int(np.count_nonzero(before > 0.0))
@@ -707,9 +831,9 @@ def test_resident_wall_loss_cuda_smoke_has_finite_bounded_removal() -> None:
     trials = 0
     for seed in range(12):
         with _temporary_binding("cuda", (("box", 0),), seed) as binding:
-            session, registry = binding
+            session, registry, guard = binding
             before = _snapshot(session)[1]
-            _wall_loss(session, registry, 1.0, (0,))
+            _wall_loss(session, registry, guard, 1.0, (0,))
             after = _snapshot(session)[1]
             assert np.all(np.isfinite(after))
             removed += int(np.count_nonzero((before > 0.0) & (after == 0.0)))
