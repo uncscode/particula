@@ -42,13 +42,20 @@
     writer-failure regression proving token closure, `FAULTED` lifecycle, and
     later-dispatch rejection without asserting rollback.
 
-- [ ] **E7-F9-P4:** Add independent multi-box parity and isolation regressions
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Compare a larger particle-resolved multi-box loop with equivalent
-    one-box references and prove unrelated/disabled boxes remain isolated.
+- [x] **E7-F9-P4:** Add independent multi-box parity and isolation regressions
+  - Issue: #1531 | Size: S | Status: Completed 2026-08-10
+  - Delivered: Added only `particula/execution/tests/multi_box_loop_test.py`.
+    The internal regressions retain real resident lifecycle/scheduler boundaries
+    while covering logical-ID rather than lane-based equivalence, independent
+    multi-box decomposition, added/reordered/no-work isolation, resident stream
+    ownership, and neutral wall-loss aggregate behavior.
   - Files: `particula/execution/tests/multi_box_loop_test.py`
-  - Tests: One-box decomposition, reordered/disabled/added-box metamorphic rows,
-    deterministic fields, stochastic statistics/stream contracts, and capacity.
+  - Tests: 4-box, 16-slot, 2-species fixed-capacity zero-duration parity and
+    tight closed inventory; selected/empty wall-loss and all-free no-work stream
+    preservation; positive-duration same-backend stream continuity; 100-seed
+    Warp-CPU binomial aggregate evidence; and optional 12-seed CUDA bounded
+    smoke coverage. No production code, exports, checkpoints, or public docs
+    changed.
 
 - [ ] **E7-F9-P5:** Add transport expansion conservation and restart regressions
   - Issue: TBD | Size: S | Status: Not Started

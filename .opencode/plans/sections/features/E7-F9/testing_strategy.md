@@ -30,9 +30,16 @@ Warp baseline; CUDA rows are optional and skip cleanly when unavailable.
   A controlled late wall-loss writer failure verifies token closure, session
   faulting, and later lifecycle rejection. The regression also covers the
   corrected ordinary nucleation dispatch; no public ordering change is claimed.
-- **P4:** Independent multi-box versus decomposed one-box parity; unrelated-box
-  addition, disablement, and reordering metamorphic tests; a 4-box,
-  16-particle-slot, 2-species fixed-capacity particle-resolved fixture.
+- **P4 (completed, issue #1531):** `multi_box_loop_test.py` exercises the real
+  resident scheduler with a 4-box, 16-slot, 2-species fixed-capacity fixture.
+  It compares zero-duration multi-box state with decomposed one-box sessions and
+  checks tight closed per-box/species inventory (`rtol=1e-12`, `atol=1e-30`).
+  Logical-ID permutation, unrelated valid-box addition, selected and empty
+  wall-loss rows, and all-free no-work rows prove isolation without relying on
+  physical lane order. Positive-duration cases verify separate pinned
+  coagulation/wall-loss streams and same-backend logical-box continuity. Neutral
+  wall loss has Warp-CPU 100-seed aggregate binomial evidence; CUDA has a
+  12-seed finite, bounded smoke row that skips cleanly when unavailable.
 - **P5:** CPU extensive-amount oracles for advection/mixing/dilution/expansion,
   open/closed ledgers, conservation, checkpoint/restart, and RNG continuation.
 - **P6:** Execute the published example with warnings as errors; assert public

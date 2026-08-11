@@ -86,12 +86,12 @@ _ShapeKind = Literal["b", "bn", "bs", "bns", "bc2", "e", "en", "status"]
 
 @wp.kernel
 def _scan_diagnostic_accounting(
-    values: wp.array2d(dtype=wp.float64),
+    values: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
     require_nonnegative: bool,
-    invalid: wp.array(dtype=wp.int32),
+    invalid: wp.array(dtype=wp.int32),  # type: ignore[valid-type]
 ) -> None:
     """Record invalid diagnostic accounting values in one device status lane."""
-    box, species = wp.tid()
+    box, species = wp.tid()  # type: ignore[misc]
     value = values[box, species]
     if not wp.isfinite(value) or (require_nonnegative and value < 0.0):
         wp.atomic_max(invalid, 0, 1)

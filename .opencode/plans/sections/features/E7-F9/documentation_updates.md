@@ -15,6 +15,13 @@
   sidecars, ledgers, diagnostics, and closed-map state are authoritative.
   Arbitrary caller outputs remain outside checkpoint authority.
 
+## P4 Completion (issue #1531)
+
+- Public documentation remains unchanged. The implementation adds only internal
+  resident multi-box lifecycle, logical-ID, RNG, and wall-loss regression
+  coverage in `particula/execution/tests/multi_box_loop_test.py`; it introduces
+  no production or public behavior.
+
 - Add `docs/Examples/gpu_resident_multi_timestep.py` as the canonical complete
   E7 example using backend selection, resident state, multiple boxes/processes,
   diagnostics, explicit checkpoints, and finalization.

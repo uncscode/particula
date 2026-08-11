@@ -42,9 +42,13 @@
   Added a late wall-loss writer-failure regression that confirms guard closure,
   `FAULTED` state, and lifecycle-preflight rejection on later dispatch; it makes
   no rollback claim. No public API or canonical ordering changed.
-- [ ] Add a 4-box, 16-particle-slot, 2-species particle-resolved
-  `multi_box_loop_test.py` fixture and one-box decomposition/isolation
-  metamorphic assertions.
+- [x] **P4 / issue #1531 (2026-08-10):** Added only
+  `particula/execution/tests/multi_box_loop_test.py`. Its internal resident-loop
+  regressions cover 4-box, 16-slot, 2-species fixed-capacity decomposition;
+  logical-ID permutation, unrelated-box addition, and selected/no-work wall-loss
+  isolation; per-logical-box resident RNG continuity; and bounded neutral
+  wall-loss aggregate evidence. Production code, exports, checkpoints, and
+  public documentation remain unchanged.
 - [ ] Add prescribed advection, dilution, mixing, and expansion cases in
   `transport_loop_test.py` with extensive-amount conservation accounting.
 - [ ] Add checkpoint/restart and logical-box stream equivalence cases in

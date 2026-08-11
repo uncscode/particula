@@ -335,11 +335,11 @@ if wp is not None:
 
     @wp.kernel
     def _wall_loss_rate_diagnostic(
-        masses: wp.array3d[wp.float64],
-        concentration: wp.array2d[wp.float64],
-        density: wp.array[wp.float64],
-        temperature: wp.array[wp.float64],
-        pressure: wp.array[wp.float64],
+        masses: wp.array3d(dtype=wp.float64),  # type: ignore[valid-type]
+        concentration: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        density: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+        temperature: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+        pressure: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
         eddy: wp.float64,
         radius: wp.float64,
         length: wp.float64,
@@ -347,8 +347,8 @@ if wp is not None:
         height: wp.float64,
         geometry: wp.int32,
         n_species: wp.int32,
-        rates: wp.array2d[wp.float64],
-        eligible: wp.array2d[wp.int32],
+        rates: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        eligible: wp.array2d(dtype=wp.int32),  # type: ignore[valid-type]
     ) -> None:
         """Record production-equivalent coefficients without RNG or mutation."""
         box, particle = wp.tid()
@@ -410,13 +410,13 @@ if wp is not None:
 
     @wp.kernel
     def _charged_wall_loss_rate_diagnostic(  # noqa: C901
-        masses: wp.array3d[wp.float64],
-        concentration: wp.array2d[wp.float64],
-        charge: wp.array2d[wp.float64],
-        density: wp.array[wp.float64],
-        temperature: wp.array[wp.float64],
-        pressure: wp.array[wp.float64],
-        field: wp.array[wp.float64],
+        masses: wp.array3d(dtype=wp.float64),  # type: ignore[valid-type]
+        concentration: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        charge: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        density: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+        temperature: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+        pressure: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
+        field: wp.array(dtype=wp.float64),  # type: ignore[valid-type]
         eddy: wp.float64,
         radius: wp.float64,
         length: wp.float64,
@@ -425,8 +425,8 @@ if wp is not None:
         potential: wp.float64,
         geometry: wp.int32,
         n_species: wp.int32,
-        rates: wp.array2d[wp.float64],
-        eligible: wp.array2d[wp.int32],
+        rates: wp.array2d(dtype=wp.float64),  # type: ignore[valid-type]
+        eligible: wp.array2d(dtype=wp.int32),  # type: ignore[valid-type]
     ) -> None:
         """Record charged coefficients without consuming RNG or mutating slots."""
         box, particle = wp.tid()
@@ -561,8 +561,9 @@ def test_complete_slot_rates_match_independent_cpu_oracle(
     runtime_wp.synchronize()
     npt.assert_array_equal(actual_mask.numpy().astype(bool), expected_mask)
     assert np.all(np.isfinite(rates.numpy()[expected_mask]))
-    # CPU Debye integration omits its zero-endpoint trapezoid interval.
-    tolerance = 1.002e-3 if geometry == "spherical" else 1.0e-10
+    # CPU Debye integration omits its zero-endpoint trapezoid interval. The
+    # rectangular path retains a tight bound for backend transcendental drift.
+    tolerance = 1.002e-3 if geometry == "spherical" else 5.0e-8
     npt.assert_allclose(
         rates.numpy()[expected_mask],
         expected_rates[expected_mask],

@@ -481,15 +481,15 @@ def _build_loop_fixture(  # noqa: C901
 
     def particle_upload(value: object, *, device: str) -> object:
         upload_calls.append(("particles", device))
-        return original_particle_upload(value, device=device)
+        return cast(Any, original_particle_upload)(value, device=device)
 
     def gas_upload(value: object, *, device: str) -> object:
         upload_calls.append(("gas", device))
-        return original_gas_upload(value, device=device)
+        return cast(Any, original_gas_upload)(value, device=device)
 
     def environment_upload(value: object, *, device: str) -> object:
         upload_calls.append(("environment", device))
-        return original_environment_upload(value, device=device)
+        return cast(Any, original_environment_upload)(value, device=device)
 
     monkeypatch.setattr(conversion, "to_warp_particle_data", particle_upload)
     monkeypatch.setattr(conversion, "to_warp_gas_data", gas_upload)
@@ -535,7 +535,9 @@ def _build_loop_fixture(  # noqa: C901
             [[800.0, 0.0, 0.0, 0.0]], dtype=wp.float64, device="cpu"
         ),
         molar_mass_reference=wp.array(
-            session.gas.molar_mass.numpy(), dtype=wp.float64, device="cpu"
+            cast(Any, session.gas).molar_mass.numpy(),
+            dtype=wp.float64,
+            device="cpu",
         ),
     )
     condensation_state = _build_condensation_state(
@@ -619,13 +621,13 @@ def _build_loop_fixture(  # noqa: C901
 
         def execute(self, item: object) -> object:
             trace.append(cast(Any, item).node.node_id)
-            return self._inner.execute(item)
+            return cast(Any, self._inner).execute(item)
 
     class SpyCommunication:
         """Record resident communication dispatches and preserve execution."""
 
         def __init__(self, request: object) -> None:
-            self._inner = ResidentCommunicationExecutor(request)
+            self._inner = ResidentCommunicationExecutor(cast(Any, request))
 
         def execute_communication(self) -> object:
             trace.append("communication")
@@ -635,15 +637,17 @@ def _build_loop_fixture(  # noqa: C901
             trace.append("volume_evolution")
             return self._inner.execute_volume_evolution()
 
-        def validate(self, *args: object, **kwargs: object) -> object:
+        def validate(self, *args: object, **kwargs: object) -> None:
             """Delegate resident-request validation unchanged."""
-            return self._inner.validate(*args, **kwargs)
+            cast(Any, self._inner).validate(*args, **kwargs)
 
     class SpyThermalCoordinator:
         """Record thermodynamic coordinator use and keep real freshness logic."""
 
         def __init__(self, request: object) -> None:
-            self._inner = ResidentThermodynamicUpdateCoordinator(request)
+            self._inner = ResidentThermodynamicUpdateCoordinator(
+                cast(Any, request)
+            )
 
         def record_completed(self, node: object) -> None:
             node_id = cast(Any, node).node_id
@@ -654,10 +658,10 @@ def _build_loop_fixture(  # noqa: C901
                 "gas_update",
             }:
                 trace.append(node_id)
-            return self._inner.record_completed(node)
+            self._inner.record_completed(cast(Any, node))
 
         def execute_consumer(self, node: object, callback: Any) -> object:
-            return self._inner.execute_consumer(node, callback)
+            return self._inner.execute_consumer(cast(Any, node), callback)
 
         def _refresh_saturation_ratio(self) -> None:
             return self._inner._refresh_saturation_ratio()
@@ -668,9 +672,9 @@ def _build_loop_fixture(  # noqa: C901
         def __init__(self) -> None:
             self._inner = ResidentDiagnosticsExecutor()
 
-        def execute(self, plan: object) -> object:
+        def execute(self, plan: object) -> None:
             trace.append("diagnostics")
-            result = self._inner.execute(plan)
+            self._inner.execute(cast(Any, plan))
             wp.synchronize()
             diagnostics_windows.append(tuple(refresh_events))
             refresh_events.clear()
@@ -683,11 +687,10 @@ def _build_loop_fixture(  # noqa: C901
                 expected_vapor_pressure=expected_vapor_pressure,
                 expected_saturation_ratio=expected_saturation_ratio,
             )
-            return result
 
-        def validate(self, *args: object, **kwargs: object) -> object:
+        def validate(self, *args: object, **kwargs: object) -> None:
             """Delegate resident diagnostics validation unchanged."""
-            return self._inner.validate(*args, **kwargs)
+            cast(Any, self._inner).validate(*args, **kwargs)
 
     class NoOpCondensation:
         """Record a condensation completion without native kernel launch."""
@@ -740,12 +743,12 @@ def _build_loop_fixture(  # noqa: C901
     def spy_refresh_vapor_pressure(*args: object, **kwargs: object) -> object:
         """Record the vapor-pressure refresh boundary before delegating."""
         refresh_events.append("vapor_pressure_refresh")
-        return original_refresh_vapor_pressure(*args, **kwargs)
+        return cast(Any, original_refresh_vapor_pressure)(*args, **kwargs)
 
     def spy_refresh_saturation_ratio(self: object) -> None:
         """Record the saturation-ratio refresh boundary before delegating."""
         refresh_events.append("saturation_refresh")
-        return original_refresh_saturation_ratio(self)
+        cast(Any, original_refresh_saturation_ratio)(self)
 
     def spy_sync() -> None:
         """Count explicit host synchronization boundaries in the row."""

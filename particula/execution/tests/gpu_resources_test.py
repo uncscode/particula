@@ -395,7 +395,7 @@ def test_published_stream_reset_writer_failure_faults_bound_session(
         launches += 1
         if launches == 2:
             raise RuntimeError("second reset writer failed")
-        return original_launch(*args, **kwargs)
+        return cast(Any, original_launch)(*args, **kwargs)
 
     monkeypatch.setattr(wp, "launch", fail_second_launch)
     with pytest.raises(RuntimeError, match="second reset writer failed"):
@@ -1275,7 +1275,7 @@ def test_diagnostics_accepts_canonical_empty_outputs_without_dispatch(
         wp.zeros(shape, dtype=wp.float64, device="cpu"),
     )
     launches: list[object] = []
-    original_launch = diagnostics.wp.launch
+    original_launch: Any = diagnostics.wp.launch
 
     def record_launch(*args: object, **kwargs: object) -> object:
         """Record nonempty writer dispatches without changing their behavior."""

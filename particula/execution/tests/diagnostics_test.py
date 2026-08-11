@@ -354,8 +354,10 @@ def test_diagnostics_launches_each_nonempty_operation_once(
         kernel: object, *args: object, **kwargs: object
     ) -> object:
         """Record the kernel name while preserving normal Warp dispatch."""
-        launches.append((cast(Any, kernel).key, kwargs["inputs"]))
-        return original_launch(kernel, *args, **kwargs)
+        launches.append(
+            (cast(Any, kernel).key, cast(list[object], kwargs["inputs"]))
+        )
+        return cast(Any, original_launch)(kernel, *args, **kwargs)
 
     monkeypatch.setattr(diagnostics.wp, "launch", record_launch)
 
