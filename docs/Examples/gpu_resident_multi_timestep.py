@@ -1,0 +1,549 @@
+"""Run a complete multi-box GPU-resident scheduler example.
+
+Warp and the concrete resident seams are optional at import time.  When Warp is
+enabled, this example uploads CPU data once, runs two resident timesteps,
+observes caller-owned diagnostics, then manually checkpoints and restarts on the
+same device.  It is a bounded resident-loop example, not a CPU fallback,
+automatic restart facility, direct-kernel orchestration, graph-capture example,
+or performance claim.
+"""
+
+from __future__ import annotations
+
+import importlib
+import os
+from dataclasses import dataclass
+from types import SimpleNamespace
+from typing import Any
+
+import numpy as np
+from particula.gas import EnvironmentData, GasData
+from particula.particles import ParticleData
+
+_FORCE_NO_WARP_ENV = "PARTICULA_EXAMPLE_FORCE_NO_WARP"
+_NODE_IDS = (
+    "communication",
+    "volume_evolution",
+    "environment_update",
+    "gas_update",
+    "vapor_pressure_refresh",
+    "saturation_refresh",
+    "condensation",
+    "brownian_coagulation",
+    "dilution",
+    "wall_loss",
+    "nucleation",
+    "diagnostics",
+)
+
+
+@dataclass
+class ExampleRun:
+    """Retain address-free observations from the resident-loop example.
+
+    Attributes:
+        output: Deterministic status and ownership statements.
+        session: Source resident session, or ``None`` without Warp.
+        registry: Source registry, or ``None`` without Warp.
+        guard: Source closed step guard, or ``None`` without Warp.
+        checkpoint: Active source checkpoint created before restart.
+        restarted: Fresh restarted ``(session, registry, guard)`` binding.
+        terminal_checkpoint: Cached checkpoint from source finalization.
+        gas_snapshot: Caller-owned gas diagnostic with shape ``(3, 1)``.
+        saturation_snapshot: Caller-owned saturation diagnostic with shape
+            ``(3, 1)``.
+        source_steps: Completed source scheduler steps.
+        restarted_steps: Completed restarted scheduler steps.
+    """
+
+    output: list[str]
+    session: Any | None = None
+    registry: Any | None = None
+    guard: Any | None = None
+    checkpoint: Any | None = None
+    restarted: tuple[Any, Any, Any] | None = None
+    terminal_checkpoint: Any | None = None
+    gas_snapshot: np.ndarray | None = None
+    saturation_snapshot: np.ndarray | None = None
+    source_steps: int = 0
+    restarted_steps: int = 0
+
+
+def _warp_enabled() -> bool:
+    """Return whether optional Warp is explicitly enabled and importable."""
+    if os.getenv(_FORCE_NO_WARP_ENV) == "1":
+        return False
+    try:
+        importlib.import_module("warp")
+    except ModuleNotFoundError as error:
+        if error.name == "warp":
+            return False
+        raise
+    return True
+
+
+def _disabled_output() -> list[str]:
+    """Return deterministic guidance for the intentional no-Warp path."""
+    return [
+        "Canonical path: docs/Examples/gpu_resident_multi_timestep.py",
+        "Warp is unavailable or disabled; install warp-lang or enable Warp.",
+        "No CPU fallback ran; no fixture, upload, diagnostics, or restart ran.",
+    ]
+
+
+def _load_enabled_runtime() -> SimpleNamespace:
+    """Load Warp and concrete resident seams only for enabled execution."""
+    names = (
+        "warp",
+        "particula.execution",
+        "particula.execution.availability",
+        "particula.execution.gpu_session",
+        "particula.execution.gpu_resources",
+        "particula.execution.checkpoint",
+        "particula.execution.process_graph",
+        "particula.execution.scheduler",
+        "particula.execution.resident_scheduler",
+        "particula.execution.diagnostics",
+        "particula.execution.state_updates",
+        "particula.execution.process_adapters",
+        "particula.execution.communication",
+        "particula.execution.resident_communication",
+        "particula.execution.adapters.condensation",
+        "particula.execution.adapters.coagulation",
+        "particula.gpu.kernels.thermodynamics",
+        "particula.gpu.kernels.wall_loss",
+        "particula.gpu.kernels.nucleation",
+    )
+    loaded = {
+        name.rsplit(".", 1)[-1]: importlib.import_module(name) for name in names
+    }
+    return SimpleNamespace(**loaded)
+
+
+def _build_cpu_state() -> tuple[ParticleData, GasData, EnvironmentData]:
+    """Build a deterministic float64 three-box fixture for one source upload."""
+    return (
+        ParticleData(
+            masses=np.array(
+                [
+                    [[1.0e-18], [2.0e-18]],
+                    [[3.0e-18], [4.0e-18]],
+                    [[5.0e-18], [6.0e-18]],
+                ],
+                dtype=np.float64,
+            ),
+            concentration=np.array(
+                [[1.0, 0.5], [2.0, 1.0], [3.0, 1.5]], dtype=np.float64
+            ),
+            charge=np.zeros((3, 2), dtype=np.float64),
+            density=np.array([1000.0], dtype=np.float64),
+            volume=np.array([1.0, 2.0, 3.0], dtype=np.float64),
+        ),
+        GasData(
+            name=["water"],
+            molar_mass=np.array([0.018], dtype=np.float64),
+            concentration=np.array([[0.25], [0.5], [0.75]], dtype=np.float64),
+            partitioning=np.array([True], dtype=np.bool_),
+        ),
+        EnvironmentData(
+            temperature=np.array([295.0, 296.0, 297.0], dtype=np.float64),
+            pressure=np.array([101325.0, 100800.0, 100000.0], dtype=np.float64),
+            saturation_ratio=np.ones((3, 1), dtype=np.float64),
+        ),
+    )
+
+
+def _resolved_graph(
+    runtime: SimpleNamespace,
+) -> tuple[Any, Any, dict[str, Any]]:
+    """Create the resolver-produced canonical twelve-node graph and schedule."""
+    execution = runtime.execution
+    graph_module = runtime.process_graph
+    schemas = {item.node_id: item for item in graph_module._NODE_CATALOGUE}
+    condensation_requirements = next(
+        item.requirements
+        for item in execution.CONDENSATION_CAPABILITY_MATRIX.declarations
+        if item.process == execution.CONDENSATION_PROCESS
+    )
+    nodes = tuple(
+        graph_module.ProcessNode(
+            schemas[node_id].node_id,
+            schemas[node_id].kind,
+            schemas[node_id].process,
+            condensation_requirements
+            if node_id == "condensation"
+            else execution.CapabilityRequirements(frozenset()),
+            schemas[node_id].resources,
+            schemas[node_id].invalidates,
+        )
+        for node_id in _NODE_IDS
+    )
+    dependencies = (
+        (graph_module.DependencyEdge("communication", "volume_evolution"),)
+        + tuple(
+            graph_module.DependencyEdge("volume_evolution", node_id)
+            for node_id in _NODE_IDS
+            if node_id not in {"communication", "volume_evolution"}
+        )
+        + tuple(
+            graph_module.DependencyEdge(node_id, "diagnostics")
+            for node_id in (
+                "condensation",
+                "brownian_coagulation",
+                "dilution",
+                "wall_loss",
+                "nucleation",
+            )
+        )
+    )
+    schedule = runtime.scheduler.resolve_timestep_schedule(
+        graph_module.TimestepPlan(nodes, dependencies),
+        runtime.scheduler.EnabledNodeSelection(frozenset(_NODE_IDS)),
+        runtime.scheduler.SchedulerProfile(
+            runtime.scheduler.NucleationCondensationDirection.CONDENSATION_THEN_NUCLEATION
+        ),
+    )
+    graph = schedule.source_graph
+    assert graph is not None
+    return graph, schedule, {node.node_id: node for node in graph.nodes}
+
+
+def _diagnostics_plan(
+    runtime: SimpleNamespace,
+    session: Any,
+    registry: Any,
+    graph: Any,
+    schedule: Any,
+    nodes: dict[str, Any],
+) -> tuple[Any, Any, Any]:
+    """Bind all closed diagnostics, retaining two caller-owned observations."""
+    wp = runtime.warp
+    diagnostics = runtime.diagnostics
+    shape = (session.dimensions.n_boxes, session.dimensions.n_species)
+    device = session.particles.masses.device
+
+    def matrix() -> Any:
+        """Allocate one caller-owned diagnostic matrix."""
+        return wp.zeros(shape, dtype=wp.float64, device=device)
+
+    gas_snapshot, saturation_snapshot, total = matrix(), matrix(), matrix()
+    registrations = (
+        diagnostics.ResidentDiagnosticRegistration(
+            diagnostics.ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT,
+            gas_snapshot,
+        ),
+        diagnostics.ResidentDiagnosticRegistration(
+            diagnostics.ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT,
+            saturation_snapshot,
+        ),
+        diagnostics.ResidentDiagnosticRegistration(
+            diagnostics.ResidentDiagnosticOperation.TOTAL_SPECIES_MASS,
+            total,
+        ),
+        diagnostics.ResidentDiagnosticRegistration(
+            diagnostics.ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION,
+            wp.zeros(shape[0], dtype=wp.float64, device=device),
+        ),
+        diagnostics.ResidentDiagnosticRegistration(
+            diagnostics.ResidentDiagnosticOperation.LATENT_HEAT_ENERGY,
+            matrix(),
+            energy_transfer=matrix(),
+        ),
+        diagnostics.ResidentDiagnosticRegistration(
+            diagnostics.ResidentDiagnosticOperation.CONSERVATION_RESIDUAL,
+            matrix(),
+            baseline_total_mass=matrix(),
+            source_ledger=matrix(),
+            sink_ledger=matrix(),
+        ),
+    )
+    return (
+        diagnostics.ResidentDiagnosticsPlan(
+            session,
+            registry,
+            graph,
+            schedule,
+            nodes["diagnostics"],
+            registrations,
+        ),
+        gas_snapshot,
+        saturation_snapshot,
+    )
+
+
+def _request(
+    runtime: SimpleNamespace,
+    session: Any,
+    registry: Any,
+    guard: Any,
+    duration: float,
+    cpu_gas: GasData,
+    cpu_environment: EnvironmentData,
+) -> tuple[Any, Any, Any]:  # noqa: C901
+    """Build fresh exact request carriers from the binding's resource views."""
+    wp = runtime.warp
+    execution = runtime.execution
+    graph, schedule, nodes = _resolved_graph(runtime)
+    device = session.particles.masses.device
+    communication_view = registry._views.get("communication_gas")
+    if communication_view is None:
+        map_data = runtime.communication.CommunicationMap(
+            runtime.communication.CommunicationMapForm.ARBITRARY_PAIRS,
+            runtime.communication.CommunicationTransportMode.GAS,
+            0,
+            wp.zeros(0, dtype=wp.int32, device=device),
+            wp.zeros(0, dtype=wp.int32, device=device),
+            wp.zeros(0, dtype=wp.int32, device=device),
+            wp.zeros(0, dtype=wp.float64, device=device),
+        )
+        communication_view = registry.acquire_communication(
+            runtime.communication.CommunicationConfiguration(
+                map_data,
+                runtime.communication.PrescribedVolumeUpdate(
+                    wp.array([1.0, 2.0, 3.0], dtype=wp.float64, device=device)
+                ),
+                (
+                    runtime.communication.CommunicationResourceShape(
+                        "edge_rates",
+                        wp.float64,
+                        runtime.communication.CommunicationShapeKind.E,
+                    ),
+                ),
+            ),
+        )
+    condensation_view = registry.acquire_condensation()
+    coagulation_view = registry.acquire_coagulation(1)
+    wall_loss_view = registry.acquire_wall_loss()
+    nucleation_view = registry.acquire_nucleation()
+    exhaustion = nucleation_view.exhaustion
+    unit_scale = wp.ones(
+        session.dimensions.n_boxes, dtype=wp.float64, device=device
+    )
+    wp.copy(exhaustion.requested_scale, unit_scale)
+    wp.copy(exhaustion.minimum_scale, unit_scale)
+    wp.copy(exhaustion.minimum_volume, unit_scale)
+    thermodynamics = runtime.thermodynamics.ThermodynamicsConfig(
+        modes=wp.zeros(1, dtype=wp.int32, device=device),
+        parameters=wp.array(
+            [[800.0, 0.0, 0.0, 0.0]], dtype=wp.float64, device=device
+        ),
+        molar_mass_reference=wp.array(
+            cpu_gas.molar_mass, dtype=wp.float64, device=device
+        ),
+    )
+    condensation = runtime.condensation.WarpCondensationExecutionState(
+        runtime.condensation.WarpCondensationState(
+            runtime.condensation.CondensationExecutionConfig(
+                execution.CondensationConfiguration(
+                    execution.CondensationExecutionMode.EQUAL_STEP,
+                    False,
+                    execution.CondensationActivityMode.IDEAL,
+                    execution.CondensationSurfaceMode.STATIC,
+                )
+            ),
+            session.particles,
+            session.gas,
+            session.environment,
+            thermodynamics,
+            scratch_buffers=condensation_view.scratch_buffers,
+        ),
+        duration,
+    )
+    coagulation = runtime.coagulation.ResidentBrownianCoagulationExecutionState(
+        runtime.coagulation.WarpBrownianCoagulationExecutionState(
+            runtime.coagulation.WarpBrownianCoagulationState(
+                runtime.coagulation.BrownianCoagulationConfig(),
+                session.particles,
+                None,
+                None,
+                duration,
+                collision_pairs=coagulation_view.collision_pairs,
+                n_collisions=coagulation_view.n_collisions,
+                rng_states=coagulation_view.rng_states,
+                initialize_rng=False,
+                environment=session.environment,
+            )
+        ),
+        session,
+        registry,
+        coagulation_view,
+    )
+    diagnostics, gas_snapshot, saturation_snapshot = _diagnostics_plan(
+        runtime, session, registry, graph, schedule, nodes
+    )
+    request = runtime.resident_scheduler.ResidentSimulationRequest(
+        session,
+        registry,
+        guard,
+        graph,
+        schedule,
+        thermodynamics,
+        condensation,
+        coagulation,
+        runtime.process_adapters.ResidentDilutionRequest(
+            session, registry, 0.0, duration
+        ),
+        runtime.process_adapters.ResidentWallLossRequest(
+            session,
+            registry,
+            wall_loss_view,
+            runtime.wall_loss.NeutralWallLossConfig(
+                "spherical", 1.0, chamber_radius=1.0
+            ),
+            duration,
+            enabled_box_indices=(0, 1, 2),
+        ),
+        runtime.process_adapters.ResidentNucleationRequest(
+            session,
+            registry,
+            nucleation_view,
+            runtime.nucleation.NucleationConfig(
+                "activation",
+                0.0,
+                1.0,
+                0,
+                (1,),
+                1e-9,
+                0.0,
+                1e30,
+                200.0,
+                400.0,
+            ),
+            duration,
+            runtime.nucleation.NucleationExhaustionControls(False, False),
+        ),
+        diagnostics,
+        runtime.state_updates.ResidentEnvironmentUpdateRequest(
+            session,
+            registry,
+            graph,
+            nodes["environment_update"],
+            wp.array(
+                cpu_environment.temperature, dtype=wp.float64, device=device
+            ),
+            wp.array(cpu_environment.pressure, dtype=wp.float64, device=device),
+        ),
+        runtime.state_updates.ResidentGasUpdateRequest(
+            session,
+            registry,
+            graph,
+            nodes["gas_update"],
+            wp.array(cpu_gas.concentration, dtype=wp.float64, device=device),
+        ),
+        runtime.resident_communication.ResidentCommunicationRequest(
+            session,
+            registry,
+            graph,
+            communication_view,
+            nodes["communication"],
+            nodes["volume_evolution"],
+            duration,
+        ),
+    )
+    return request, gas_snapshot, saturation_snapshot
+
+
+def run_example(device: str = "cpu") -> ExampleRun:
+    """Run the bounded complete resident loop and explicit checkpoint restart.
+
+    Device arrays and diagnostic buffers remain caller-owned.  This example
+    synchronizes only to observe diagnostics; setup, ordinary dispatch, and
+    restart do not hide transfers or host inspection.
+    """
+    if not _warp_enabled():
+        return ExampleRun(output=_disabled_output())
+    runtime = _load_enabled_runtime()
+    selected_device = runtime.execution.Device(
+        runtime.execution.Backend.WARP, device
+    )
+    requirements = runtime.execution.CapabilityRequirements(frozenset())
+    process = runtime.execution.Process("resident_simulation")
+    request = runtime.execution.ExecutionRequest(
+        runtime.execution.Backend.WARP, selected_device, process, requirements
+    )
+    matrix = runtime.execution.CapabilityMatrix(
+        frozenset(
+            {
+                runtime.execution.CapabilityDeclaration(
+                    selected_device, process, requirements
+                )
+            }
+        )
+    )
+    assert (
+        runtime.availability.resolve_availability(request, matrix).request
+        is request
+    )
+    particles, gas, environment = _build_cpu_state()
+    session = runtime.gpu_session.setup_resident_session(
+        particles, gas, environment, selected_device
+    )
+    registry = runtime.gpu_resources.GPUResourceRegistry(session)
+    guard = runtime.gpu_session.ResidentStepGuard(session, registry)
+    source_request, gas_output, saturation_output = _request(
+        runtime, session, registry, guard, 1.0, gas, environment
+    )
+    scheduler = runtime.resident_scheduler.ResidentSimulationScheduler(
+        source_request
+    )
+    for _ in range(2):
+        scheduler.execute(1.0)
+        guard.assert_step_closed()
+    runtime.warp.synchronize_device(session.particles.masses.device)
+    gas_snapshot, saturation_snapshot = (
+        gas_output.numpy().copy(),
+        saturation_output.numpy().copy(),
+    )
+    checkpoint = session.checkpoint(registry, guard)
+    assert session.lifecycle is runtime.gpu_session.ResidentLifecycle.ACTIVE
+    restarted_session, restarted_registry, restarted_guard = (
+        runtime.checkpoint.restart_resident_session(checkpoint, selected_device)
+    )
+    assert (
+        restarted_session is not session and restarted_registry is not registry
+    )
+    assert restarted_guard is not guard
+    restart_request, _, _ = _request(
+        runtime,
+        restarted_session,
+        restarted_registry,
+        restarted_guard,
+        1.0,
+        gas,
+        environment,
+    )
+    runtime.resident_scheduler.ResidentSimulationScheduler(
+        restart_request
+    ).execute(1.0)
+    restarted_guard.assert_step_closed()
+    terminal_checkpoint = session.finalize(registry, guard)
+    assert session.finalize(registry, guard) is terminal_checkpoint
+    return ExampleRun(
+        output=[
+            "Warp CPU is the installed-Warp baseline; CUDA is optional.",
+            "Caller owns resident data and diagnostic buffers; synchronization is explicit.",
+            "Restart is manual, exact-device, and uses canonical checkpoint bytes.",
+            "No CPU fallback, hidden transfer, automatic restart, graph capture, or performance guarantee.",
+            "Unsupported physics and exact cross-backend RNG replay are not claimed.",
+        ],
+        session=session,
+        registry=registry,
+        guard=guard,
+        checkpoint=checkpoint,
+        restarted=(restarted_session, restarted_registry, restarted_guard),
+        terminal_checkpoint=terminal_checkpoint,
+        gas_snapshot=gas_snapshot,
+        saturation_snapshot=saturation_snapshot,
+        source_steps=2,
+        restarted_steps=1,
+    )
+
+
+def main() -> None:
+    """Run the example and print its deterministic status lines."""
+    for line in run_example().output:
+        print(line)
+
+
+if __name__ == "__main__":
+    main()
