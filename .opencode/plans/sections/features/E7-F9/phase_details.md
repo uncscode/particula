@@ -27,14 +27,20 @@
     restart. Broader versioned round-trip and uninterrupted-equivalence coverage
     remains follow-up evidence.
 
-- [ ] **E7-F9-P3:** Add resident full-loop transfer and ordering regressions
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Exercise all supported processes over repeated steps while proving one
-    setup upload, stable identities, current derived state, and no transfer or
-    synchronization before an explicit checkpoint.
-  - Files: `particula/execution/tests/full_loop_test.py`
-  - Tests: Independent CPU/Warp CPU results, exact call order, transfer spies,
-    shape/identity stability, conservation, errors, and fault propagation.
+- [x] **E7-F9-P3:** Add resident full-loop transfer and ordering regressions
+  - Issue: #1530 | Size: S | Status: Completed 2026-08-10
+  - Delivered: Corrected the private resident-scheduler nucleation branch to
+    execute `ResidentNucleationAdapter` and then record ordinary completion.
+    Nucleation is not a thermodynamic consumer; `_CONSUMER_IDS` and the
+    canonical twelve-node order remain unchanged.
+  - Files: `particula/execution/resident_scheduler.py` and
+    `particula/execution/tests/full_loop_test.py`.
+  - Tests: Added repeated real resident-loop rows for closed GAS and PARTICLES
+    maps, exact ordinary-node traces, refresh windows and NumPy derived-state
+    observations, one-upload/identity-schema assertions, and tight closed GAS
+    inventory conservation (`rtol=1e-12`, `atol=1e-30`). Added a late wall-loss
+    writer-failure regression proving token closure, `FAULTED` lifecycle, and
+    later-dispatch rejection without asserting rollback.
 
 - [ ] **E7-F9-P4:** Add independent multi-box parity and isolation regressions
   - Issue: TBD | Size: S | Status: Not Started

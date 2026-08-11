@@ -842,7 +842,7 @@ def test_resident_scheduler_rejects_preflight_before_begin_step(
 
 
 @pytest.mark.warp
-def test_resident_scheduler_dispatches_resolved_nodes_once(
+def test_resident_scheduler_dispatches_resolved_nodes_once(  # noqa: C901
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Complete loops dispatch resolved nonvirtual nodes and close one token."""

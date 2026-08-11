@@ -30,8 +30,18 @@
 
 ## Integration Regressions
 
-- [ ] Add `particula/execution/tests/full_loop_test.py` with independent CPU
-  references, transfer/sync spies, canonical order, and derived-state checks.
+- [x] **P3 / issue #1530 (2026-08-10):** Added
+  `particula/execution/tests/full_loop_test.py` with two-dispatch closed GAS and
+  PARTICLES resident-loop regressions. The rows assert canonical ordinary-node
+  traces, virtual refresh placement, NumPy float64 derived-state observations,
+  one setup upload per CPU container, stable resident identity/schema, and
+  closed GAS inventory conservation at `rtol=1e-12`, `atol=1e-30`.
+- [x] **P3 / issue #1530 (2026-08-10):** Corrected the private `nucleation`
+  scheduler branch in `particula/execution/resident_scheduler.py` to execute the
+  ordinary nucleation adapter followed by `thermal.record_completed(node)`.
+  Added a late wall-loss writer-failure regression that confirms guard closure,
+  `FAULTED` state, and lifecycle-preflight rejection on later dispatch; it makes
+  no rollback claim. No public API or canonical ordering changed.
 - [ ] Add a 4-box, 16-particle-slot, 2-species particle-resolved
   `multi_box_loop_test.py` fixture and one-box decomposition/isolation
   metamorphic assertions.

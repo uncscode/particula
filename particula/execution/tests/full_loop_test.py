@@ -60,6 +60,7 @@ from particula.execution.process_adapters import (
     ResidentWallLossRequest,
 )
 from particula.execution.process_graph import (
+    DependencyEdge,
     ProcessNode,
     TimestepPlan,
 )
@@ -72,7 +73,10 @@ from particula.execution.resident_scheduler import (
     ResidentSimulationScheduler,
 )
 from particula.execution.scheduler import (
-    ResolvedTimestepSchedule,
+    EnabledNodeSelection,
+    NucleationCondensationDirection,
+    SchedulerProfile,
+    resolve_timestep_schedule,
 )
 from particula.execution.state_updates import (
     ResidentEnvironmentUpdateRequest,
@@ -101,6 +105,17 @@ _NODE_IDS = (
     "nucleation",
     "diagnostics",
 )
+
+
+@pytest.fixture(autouse=True)
+def _remove_resolver_schedule_registrations() -> Any:
+    """Remove resolver registrations created by each isolated full-loop test."""
+    import particula.execution.scheduler as scheduler_module
+
+    schedules = scheduler_module._RESOLVER_SCHEDULES
+    initial_count = len(schedules)
+    yield
+    del schedules[initial_count:]
 
 
 @dataclass
@@ -285,31 +300,35 @@ def _communication_configuration(
 
 def _build_resident_graph() -> tuple[Any, Any, dict[str, Any]]:
     """Resolve the canonical twelve-node resident graph and schedule."""
-    import particula.execution.scheduler as scheduler_module
-
     nodes = tuple(_node(node_id) for node_id in _NODE_IDS)
-    graph = cast(
-        Any, scheduler_module.resolve_timestep_plan(TimestepPlan(nodes, ()))
+    dependencies = (
+        (DependencyEdge("communication", "volume_evolution"),)
+        + tuple(
+            DependencyEdge("volume_evolution", node_id)
+            for node_id in _NODE_IDS
+            if node_id not in {"communication", "volume_evolution"}
+        )
+        + tuple(
+            DependencyEdge(node_id, "diagnostics")
+            for node_id in (
+                "condensation",
+                "brownian_coagulation",
+                "dilution",
+                "wall_loss",
+                "nucleation",
+            )
+        )
     )
-    dependencies = tuple(
-        scheduler_module.DependencyEdge(before_id, after_id)
-        for before_id, after_id in zip(_NODE_IDS, _NODE_IDS[1:], strict=False)
+    schedule = resolve_timestep_schedule(
+        TimestepPlan(nodes, dependencies),
+        EnabledNodeSelection(frozenset(_NODE_IDS)),
+        SchedulerProfile(
+            NucleationCondensationDirection.CONDENSATION_THEN_NUCLEATION
+        ),
     )
-    dependencies += (
-        scheduler_module.DependencyEdge("saturation_refresh", "diagnostics"),
-    )
-    dependencies = tuple(
-        sorted(dependencies, key=lambda edge: (edge.before_id, edge.after_id))
-    )
-    schedule = ResolvedTimestepSchedule(
-        graph.nodes,
-        dependencies,
-        _NODE_IDS,
-        source_graph=graph,
-        _provenance=scheduler_module._SCHEDULE_PROVENANCE,
-    )
+    graph = cast(Any, schedule.source_graph)
+    assert graph is not None
     by_id = {node.node_id: node for node in graph.nodes}
-    scheduler_module._RESOLVER_SCHEDULES.append(schedule)
     return graph, schedule, by_id
 
 
@@ -713,7 +732,7 @@ def _build_loop_fixture(  # noqa: C901
                 raise RuntimeError("wall-loss writer failed")
 
     class NoOpNucleation:
-        """Record the resident nucleation completion without mutation."""
+        """Record ordinary nucleation completion without mutation."""
 
         def execute(self, _request: object) -> None:
             return None
@@ -889,17 +908,10 @@ def test_complete_loop_repeats_canonical_order_without_bulk_transfer(
     fixture.scheduler.execute(0.0)
     fixture.scheduler.execute(0.0)
 
-    ordinary_nodes = (
-        "communication",
-        "volume_evolution",
-        "environment_update",
-        "gas_update",
-        "condensation",
-        "brownian_coagulation",
-        "dilution",
-        "wall_loss",
-        "nucleation",
-        "diagnostics",
+    ordinary_nodes = tuple(
+        node_id
+        for node_id in fixture.request.schedule.ordered_node_ids
+        if node_id not in {"vapor_pressure_refresh", "saturation_refresh"}
     )
     assert fixture.trace == list(ordinary_nodes * 2)
     assert fixture.condensation_windows == [

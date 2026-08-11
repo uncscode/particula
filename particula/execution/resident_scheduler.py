@@ -199,7 +199,9 @@ class ResidentSimulationScheduler:
     Each successful call opens and completes exactly one lifecycle token while
     dispatching the resolved twelve-node schedule. Communication runs with
     pre-update volumes, optional volume evolution follows it, and both barriers
-    invalidate saturation ratio only. The scheduler neither transfers nor
+    invalidate saturation ratio only. Nucleation completes through its ordinary
+    adapter; only condensation and diagnostics are thermodynamic consumers.
+    The scheduler neither transfers nor
     restores data, acquires resources, synchronizes, retries, falls back, or
     rolls back after a writer-capable operation may have launched. It dispatches
     already-published coagulation and wall-loss RNG sidecars by identity with

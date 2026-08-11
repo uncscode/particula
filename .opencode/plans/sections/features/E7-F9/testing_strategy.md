@@ -21,9 +21,15 @@ Warp baseline; CUDA rows are optional and skip cleanly when unavailable.
   handling, verifies canonical-primary payload immutability, and confirms
   schema-v2 noncommunication restart. Broader malformed-payload matrices and
   uninterrupted-versus-restart equivalence remain P2 follow-up evidence.
-- **P3:** Full-loop integration tests for condensation, Brownian coagulation,
-  wall loss, dilution, nucleation, environment/gas refresh, exact canonical
-  order, one upload, zero intermediate bulk transfers/syncs, and stable shapes.
+- **P3 (completed, issue #1530):** `full_loop_test.py` runs two real
+  resident-scheduler dispatches for independently constructed closed GAS and
+  PARTICLES maps. It covers the twelve-node ordinary trace, vapor-pressure and
+  saturation-refresh windows, current NumPy float64 thermodynamic observations,
+  one CPU-to-resident upload per container, stable resident identities/schemas,
+  and closed GAS particle-plus-gas inventory at `rtol=1e-12`, `atol=1e-30`.
+  A controlled late wall-loss writer failure verifies token closure, session
+  faulting, and later lifecycle rejection. The regression also covers the
+  corrected ordinary nucleation dispatch; no public ordering change is claimed.
 - **P4:** Independent multi-box versus decomposed one-box parity; unrelated-box
   addition, disablement, and reordering metamorphic tests; a 4-box,
   16-particle-slot, 2-species fixed-capacity particle-resolved fixture.

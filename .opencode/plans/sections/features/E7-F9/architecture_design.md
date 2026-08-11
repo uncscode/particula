@@ -53,6 +53,12 @@ CPU reference inputs + BackendRequest + TimestepPlan
   describe only future scheduler integration. Normal-step reducers launch
   on-device and never call `.numpy()`, conversion helpers, checkpoint, or
   implicit synchronization.
+- **Private scheduler correction:** P3 routes the canonical `nucleation` node
+  directly to `ResidentNucleationAdapter.execute(...)` and records it as an
+  ordinary thermal completion. It does not route nucleation through the
+  thermodynamic-consumer path, whose consumer set remains condensation and
+  diagnostics. This fixes private dispatch only; the schedule and public API
+  are unchanged.
 - **Checkpoint:** Host-visible diagnostics are observed only at explicit
   checkpoint/finalization unless the caller requests a named diagnostic readback
   boundary. The versioned payload includes E7-F4 state and E7-F8 stream records.

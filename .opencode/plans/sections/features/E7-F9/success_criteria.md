@@ -10,8 +10,15 @@
   permitting zero current-word payloads; canonical primary bytes and
   registry-owned continuation fields are authoritative, arbitrary caller outputs
   are excluded, and coagulation/wall-loss resource-continuation asymmetries fail
-  before restart setup. Focused tests cover primary immutability and schema-v2
-  noncommunication restart.
+   before restart setup. Focused tests cover primary immutability and schema-v2
+   noncommunication restart.
+- [x] **P3 / issue #1530:** Real repeated resident-loop regressions cover closed
+  GAS and PARTICLES maps, canonical ordinary-node ordering, current derived
+  state, one setup upload per CPU container, stable resident identities/schemas,
+  and tight closed GAS inventory conservation. A late writer failure closes the
+  guard, faults the session, and rejects later dispatch; rollback is not claimed.
+  Private nucleation dispatch now executes its adapter and records completion,
+  without changing the public API or canonical order.
 - [ ] At least one condensation and one Brownian coagulation workflow run through
   backend selection and match CPU references within recorded tolerances.
 - [ ] A multi-box GPU-resident loop runs all supported processes between explicit
