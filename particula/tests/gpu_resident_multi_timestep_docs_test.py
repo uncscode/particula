@@ -20,6 +20,13 @@ _DISABLED = [
     "Warp is unavailable or disabled; install warp-lang or enable Warp.",
     "No CPU fallback ran; no fixture, upload, diagnostics, or restart ran.",
 ]
+_ENABLED = [
+    "Warp CPU is the installed-Warp baseline; CUDA is optional.",
+    "Caller owns resident data and diagnostic buffers; synchronization is explicit.",
+    "Restart is manual, exact-device, and uses canonical checkpoint bytes.",
+    "No CPU fallback, hidden transfer, automatic restart, graph capture, or performance guarantee.",
+    "Unsupported physics and exact cross-backend RNG replay are not claimed.",
+]
 
 
 @pytest.fixture
@@ -126,6 +133,26 @@ def test_forced_disabled_script_has_exact_output() -> None:
         timeout=10,
     )
     assert result.stdout == "\n".join(_DISABLED) + "\n"
+
+
+@pytest.mark.warp
+def test_enabled_script_runs_warning_free_without_cuda_requirement() -> None:
+    """The enabled subprocess path is warning-clean and CPU-device only."""
+    pytest.importorskip("warp")
+    result = subprocess.run(  # noqa: S603
+        [sys.executable, "-Werror", str(_EXAMPLE)],
+        check=True,
+        capture_output=True,
+        text=True,
+        env={
+            k: v
+            for k, v in os.environ.items()
+            if k != "PARTICULA_EXAMPLE_FORCE_NO_WARP"
+        },
+        timeout=30,
+    )
+    assert result.stderr == ""
+    assert result.stdout.endswith("\n".join(_ENABLED) + "\n")
 
 
 def test_loader_requests_only_concrete_resident_seams(
