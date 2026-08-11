@@ -324,9 +324,12 @@ changed_files = []  # Build this list as you implement each task
 # Will be used in Step 7
 ```
 
-## Step 7: Comprehensive Testing (ALL FILES)
+## Step 7: Final Test Validation
 
-After ALL tasks are implemented, run comprehensive tests on all changed files:
+After all tasks are implemented, pass the changed files to `adw-build-tests` for
+test mapping. The subagent must run focused checks with coverage disabled, then
+run the full applicable suite with repository-configured full-package coverage
+and the normal threshold:
 
 Before invoking the subagent, confirm the Step 2 `worktree_path` is still
 non-empty and passed the Step 3 validation. If it is unavailable or invalid,
@@ -338,7 +341,7 @@ field and fails closed if the workflow state is no longer available.
 # Do not pass session_id on retries - subagents must be fresh to see filesystem changes
 task({
   "description": "Validate and run tests for all files",
-  "prompt": f"Validate tests.\n\nArguments: adw_id={adw_id} files={','.join(changed_files)}",
+  "prompt": f"Validate tests.\n\nArguments: adw_id={adw_id} files={','.join(changed_files)}\n\nUse changed files only to map behavior to focused tests. Run focused checks with coverage: false. Obtain coverage only from the full applicable suite using active repository configuration; a focused target plus full-package coverage is invalid evidence, not a fix failure.",
   "subagent_type": "adw-build-tests"
 })
 ```
@@ -353,7 +356,8 @@ task({
 - Reads the repository testing guide and active runner policy
 - Identifies behavior that lacks required test evidence
 - Writes missing tests using repository naming and placement conventions
-- Runs the guide-defined focused suite and enforces effective coverage policy
+- Runs focused fix tests with coverage disabled, then the full applicable suite
+  with repository-configured full-package coverage and the normal threshold
 
 **Retry Strategy:**
 - **Attempt 1:** Fix test failures, add missing tests
@@ -505,7 +509,8 @@ Notebooks are fully validated during the documentation workflow:
 - Mark complete
 
 **Step 7:** Comprehensive testing:
-- Call adw-build-tests -> SUCCESS (effective coverage policy passed)
+- Call adw-build-tests -> focused assertions PASS; full applicable suite and
+  repository-configured coverage PASS
 
 **Step 8:** Output:
 ```

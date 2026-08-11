@@ -37,8 +37,8 @@ permission:
 
 # ADW Build Tests Subagent
 
-Validate changed-code test coverage, write missing tests, and run the
-repository-policy test scope.
+Validate tests for changed behavior, write missing tests, run focused checks
+without coverage, and obtain coverage from the full repository-policy suite.
 
 This is a test-and-coverage-only agent. Do not run or require Ruff, formatting,
 mypy, or other lint/type checks. Those checks belong to lint-capable validation
@@ -104,7 +104,7 @@ Use the testing guide and existing nearby tests to determine:
 - the repository's expected test location and naming;
 - required success, error, boundary, and regression scenarios;
 - whether generated, declarative, documentation, or trivial code is exempt;
-- the appropriate focused test target and coverage source scope.
+- the appropriate focused test target and full applicable suite.
 
 Do not require one test per private helper unless repository policy says so.
 Prefer observable behavior and critical branches over mechanical function-name
@@ -126,27 +126,52 @@ For each todo:
 If analysis reveals an implementation bug, report it to the primary agent. Do
 not expand this test-only assignment into unrelated implementation work.
 
-## Step 4: Run the Policy-Required Focused Suite
+## Step 4: Run Focused Fix Tests Without Coverage
 
 For pytest repositories, construct the request from the guide and wrapper
-contract. A representative policy-driven shape is:
+contract. Use the resolved test target only to validate the changed behavior:
 
 ```python
 run_pytest_advanced({
   "pytestArgs": ["{resolved_test_scope}"],
   "options": "output=full fail-fast",
   "minTests": 1,
-  "coverage": true,
-  "coverageSource": "{resolved_source_directories_or_all}",
+  "coverage": false,
   "timeout": test_timeout,
   "cwd": "{worktree_path}"
 })
 ```
 
 Add marker filters only when the repository testing guide requires them for this
-agent's scope. Coverage sources must follow the wrapper contract and repository
-policy. Keep configured coverage and the runner-owned fallback floor active;
-never lower either or pass a threshold copied from another repository.
+agent's scope. This run supplies assertion evidence only. It must not be used as
+coverage evidence or judged against the repository coverage threshold.
+
+## Step 5: Run the Full Applicable Suite With Configured Coverage
+
+After the focused tests pass, run the full applicable suite identified by the
+repository testing guide and active configuration. For a pytest repository whose
+configuration defines the comprehensive suite, the representative shape is:
+
+```python
+run_pytest_advanced({
+  "options": "output=full",
+  "minTests": 1,
+  "timeout": test_timeout,
+  "cwd": "{worktree_path}"
+})
+```
+
+Do not combine a focused `testPath`, `testPaths`, or target-bearing `pytestArgs`
+with full-package coverage. Do not pass `coverageSource` or
+`coverageThreshold`. Let the active repository configuration select the package
+coverage scope and normal threshold, with only wrapper-owned fallback policy
+where applicable.
+
+A focused test file plus full-package coverage is invalid evidence because it
+necessarily undercovers unrelated modules. If such a run is encountered, do not
+treat its coverage result as a test, implementation, or fix failure. Discard the
+coverage result and rerun the focused target with `coverage: false`, then run the
+full applicable suite for coverage.
 
 Use `run_bun_test` only when the guide identifies a Bun-owned test scope. Use
 the guide's repository-relative target and pass `cwd=worktree_path`.
@@ -154,12 +179,13 @@ the guide's repository-relative target and pass `cwd=worktree_path`.
 If repository policy requires an unsupported runner, return
 `ADW_BUILD_TESTS_BLOCKED` rather than substituting a different framework.
 
-## Step 5: Retry and Classify
+## Step 6: Retry and Classify
 
 Retry test/implementation failures up to three times after minimal test fixes.
 
-- **Test/implementation failure:** the repository runner produced collection,
-  assertion, or usable coverage evidence attributable to the target scope.
+- **Test/implementation failure:** the repository runner produced collection or
+  assertion evidence attributable to the focused target, or valid coverage
+  evidence from the full applicable suite.
 - **Infrastructure blocked:** the wrapper/runtime failed before usable evidence,
   including a `ModuleNotFoundError` for wrapper-owned dependencies, an
   unavailable adapter or executable, a rejected required `cwd`, or wrapper
@@ -174,7 +200,9 @@ the original reason.
 
 For each ordinary failure, identify whether the test or implementation is
 incorrect. Fix test defects within scope; report implementation defects to the
-primary agent. Add missing scenarios when policy coverage fails, then rerun.
+primary agent. Add missing scenarios when valid full-suite policy coverage
+fails, then rerun the focused checks without coverage and the full applicable
+suite with configured coverage.
 
 # Output Signals
 
@@ -212,5 +240,7 @@ the same explicit worktree-scoped request
 - Never infer `worktree_path` or rely on ambient cwd.
 - Keep repository paths, framework choices, naming, markers, and thresholds out
   of this reusable prompt.
+- Run focused fix tests with coverage disabled; obtain coverage evidence only
+  from the full applicable suite and active repository configuration.
 - Validate behavior, not documentation prose or transient plan content.
 - Do not run lint or type-check capabilities from this test-only agent.

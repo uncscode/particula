@@ -682,6 +682,14 @@ When designing an agent, go through each tool and decide if it's needed:
 - `create_workspace` - Only for workspace management
 - `workflow_builder` - Only for workflow creation
 
+When designing pytest execution instructions, use `run_pytest_advanced` with
+`coverage: false` for focused fix tests. Use the repository-defined full
+applicable suite and active full-package coverage configuration for coverage
+validation. Never generate an agent that combines a focused target with
+full-package coverage or treats the resulting undercoverage as a fix failure.
+Keep concrete test paths, package names, markers, and thresholds in the current
+repository's testing guide and configuration.
+
 **Almost Always Disabled:**
 - `webfetch` - External web access (security risk)
 - `websearch` - Web search (security risk)

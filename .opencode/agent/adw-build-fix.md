@@ -171,10 +171,13 @@ default. The delegated prompt must request tests and coverage only:
 task({
   "description": "Validate fix tests and coverage",
   "prompt": (
-    f"Validate tests and changed-code coverage only.\n\n"
+    f"Validate tests and repository-configured coverage only.\n\n"
     f"Arguments: adw_id={adw_id} files={','.join(changed_files)} timeout=1200\n\n"
     "Do not run or require Ruff, formatting, mypy, or other lint/type checks. "
-    "Use timeout=1200 for the scoped final pytest validation. Those lint and "
+    "Use coverage: false for focused fix tests. For coverage, clear focused "
+    "targets and run the full applicable suite using repository-configured "
+    "full-package coverage and the normal threshold. Use timeout=1200 for "
+    "that final pytest validation. Those lint and "
     "type checks belong to the subsequent Validate and Polish workflow steps."
   ),
   "subagent_type": "adw-build-tests"

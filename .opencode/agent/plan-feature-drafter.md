@@ -102,6 +102,7 @@ cwd: "."
 # Required Reading
 
 - `.opencode/plans/templates/feature/` (authoritative section template source)
+- `.opencode/guides/testing_guide.md` and active test configuration
 - Prior workflow messages for classifier/orchestrator context
 
 # Core Mission
@@ -316,6 +317,10 @@ On validation failure, stop with `PLAN_FEATURE_DRAFTER_FAILED`.
 
 - Use the `write` tool for full-file overwrite of each section file.
 - Do not append. Preserve idempotent reruns.
+- In `testing_strategy`, separate coverage-disabled focused fix checks from the
+  full applicable suite that supplies repository-configured full-package
+  coverage and the normal threshold. Reject focused-target coverage as invalid
+  evidence, not a fix failure.
 - Keep content actionable for follow-up reviewers. No blank sections.
 - Phase details must align with phases added in Step 6.
 

@@ -128,7 +128,7 @@ Delegate all test execution, failure analysis, and fixing to the `adw-tester` su
 task({
   "description": "Run tests and fix failures",
   "subagent_type": "adw-tester",
-  "prompt": "Execute comprehensive test validation.\n\nArguments: {arguments}\n\nRead @.opencode/guides/testing_guide.md, the active test configuration, the applicable pytest wrapper companion document, and .opencode/tools/run_pytest.py before running tests. Honor any requested test_path. Use coverage: false only for focused assertion checks and individual failure reruns; do not override repository or runner coverage policy. Retain policy-driven coverage for final comprehensive validation. Categorize failures as spec-related vs unrelated, fix spec-related failures (must fix), attempt one fix for unrelated failures, and report results."
+  "prompt": "Execute comprehensive test validation.\n\nArguments: {arguments}\n\nRead @.opencode/guides/testing_guide.md, the active test configuration, the applicable pytest wrapper companion document, and .opencode/tools/run_pytest.py before running tests. Honor any requested test_path only for focused assertion checks and individual failure reruns, always with coverage: false. For coverage, clear the focused target and run the full applicable suite with full-package coverage and the normal repository-configured threshold; do not pass coverageSource or coverageThreshold. A focused test file plus full-package coverage is invalid evidence, not a fix failure. Categorize failures as spec-related vs unrelated, fix spec-related failures (must fix), attempt one fix for unrelated failures, and report results."
 })
 ```
 
@@ -230,8 +230,10 @@ Unrelated failures (not blocking):
 - Delegate all test execution to `adw-tester` — do not run pytest tools directly
 - Delegate all commits to `adw-commit` — do not commit directly from this agent
 - Ensure delegated focused checks use `coverage: false` rather than raw
-  coverage overrides, and require configuration-driven coverage for final
-  validation
+  coverage overrides. Require the full applicable suite with repository-
+  configured full-package coverage and the normal threshold for final coverage
+  validation; a focused target plus full-package coverage is invalid evidence,
+  not a fix failure
 - If `adw-tester` fails to return, retry once without a session_id
 - If commit fails, retry once before reporting failure
 - Pass through all arguments faithfully to subagents

@@ -86,6 +86,11 @@ Mark each todo `in_progress` when starting and `completed` when done.
 - Commands or suites are included when known
 - Test paths, names, commands, markers, and exceptions must follow the current
   repository's testing guide and active configuration
+- Focused fix commands explicitly disable coverage
+- Coverage validation uses the full applicable suite with repository-configured
+  full-package coverage and the normal threshold
+- A focused target plus full-package coverage is identified as invalid evidence,
+  not a fix failure
 
 # Process
 

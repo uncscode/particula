@@ -102,6 +102,7 @@ cwd: "."
 # Required Reading
 
 - `.opencode/plans/templates/maintenance/` (authoritative section template source)
+- `.opencode/guides/testing_guide.md` and active test configuration
 - Prior workflow messages for classifier/orchestrator context
 - Relevant maintenance examples discovered with split search wrappers / `read`
 
@@ -296,7 +297,11 @@ Each resolved section path must match:
 
 - Use the `write` tool for full-file overwrite of each section file.
 - Do not append. Preserve idempotent reruns.
-- Apply testing-policy language in `testing_requirements` section.
+- Apply testing-policy language in `testing_requirements`: focused fix checks use
+  coverage-disabled assertion evidence, while coverage comes only from the full
+  applicable suite using repository-configured full-package coverage and the
+  normal threshold. Focused-target coverage is invalid evidence, not a fix
+  failure.
 - Phase details must align with phases added in Step 5.
 - Keep content actionable for follow-up reviewers. No blank sections.
 

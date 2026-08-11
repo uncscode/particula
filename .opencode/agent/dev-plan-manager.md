@@ -636,6 +636,10 @@ Agent: [runs: adw_plans_read({
 
 **Every phase that adds, modifies, or removes code MUST include corresponding test updates in the same phase.**
 
+Read `.opencode/guides/testing_guide.md` and active test configuration before
+writing test commands or coverage criteria. Keep repository-specific paths,
+markers, package coverage scope, and thresholds there rather than in plans.
+
 ## Anti-Pattern (DO NOT DO THIS)
 ```json
 { "id": "E9-F7-P1", "title": "Add new validation logic", "size": "M" },
@@ -667,7 +671,11 @@ A phase is NOT complete until:
 - All modified code has updated tests (full tests required for refactors)
 - All removed code has removed/updated tests (required - no exceptions)
 - CI passes with no expected failures
-- Test coverage for changed files meets threshold (80%+)
+- Focused fix tests pass with coverage disabled
+- The full applicable suite passes with repository-configured full-package
+  coverage and its normal threshold
+- A focused target plus full-package coverage is never accepted as evidence or
+  treated as a fix failure
 
 # Valid Status Values
 

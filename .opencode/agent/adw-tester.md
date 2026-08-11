@@ -121,8 +121,18 @@ assertion-only evidence and is appropriate for focused diagnosis or individual
 reruns. Omit it for final comprehensive validation so repository configuration
 and runner fallback policy remain active.
 
-Do not pass raw coverage controls, lower a configured or runner-owned floor, or
-treat disabled coverage as a coverage pass.
+For final coverage validation, run the full applicable suite selected by the
+testing guide and active repository configuration. Do not retain a focused
+`testPath`, `testPaths`, or target-bearing `pytestArgs`, and do not pass
+`coverageSource` or `coverageThreshold`. The repository configuration owns the
+full-package coverage scope and normal threshold.
+
+A focused test file plus full-package coverage is invalid evidence because it
+necessarily undercovers unrelated modules. Do not classify that coverage result
+as a source, test, or fix failure and do not spend a fix retry on it. Rerun the
+focused target with `coverage: false`, then run the full applicable suite for
+coverage. Do not pass raw coverage controls, lower a configured or runner-owned
+floor, or treat disabled coverage as a coverage pass.
 
 ## 3. Classify Failures
 
@@ -154,9 +164,10 @@ unrelated changes merely to obtain a green suite.
 ## 5. Final Validation
 
 After fixes, run the repository-policy final suite or the comprehensive scope
-required by the guide. Coverage must remain enabled through configuration and
-runner policy. Verify test count, collection status, assertion status, and
-coverage status independently before reporting success.
+required by the guide without retaining a focused target. Coverage must remain
+enabled through configuration and runner policy. Verify test count, collection
+status, assertion status, and coverage status independently before reporting
+success.
 
 # Output Contract
 
@@ -194,5 +205,7 @@ Spec-related failures (BLOCKING):
 - Use explicit workflow `cwd`; never infer it from examples or ambient state.
 - Keep repository paths, naming, markers, and coverage values out of this prompt.
 - Focused coverage-disabled checks do not replace final policy validation.
+- Coverage evidence comes only from the full applicable suite using active
+  repository configuration and its normal threshold.
 - Unrelated pre-existing failures do not become implementation blockers, but
   they must be reported accurately.

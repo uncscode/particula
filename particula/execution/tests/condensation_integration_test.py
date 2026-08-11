@@ -237,7 +237,6 @@ def _cases() -> tuple[_WarpCase, ...]:
             mass_atol=1.0e-30,
             gas_rtol=1.0e-8,
             gas_atol=1.0e-30,
-            protected_gas_mask=np.ones((1, 1), dtype=bool),
             **common,
         ),
         _WarpCase(

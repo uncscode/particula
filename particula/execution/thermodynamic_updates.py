@@ -39,6 +39,8 @@ from particula.gpu.kernels.thermodynamics import (
 )
 from particula.util.constants import GAS_CONSTANT
 
+_GAS_CONSTANT = wp.constant(wp.float64(GAS_CONSTANT))
+
 
 @wp.kernel
 def _refresh_saturation_ratio_kernel(
@@ -58,7 +60,7 @@ def _refresh_saturation_ratio_kernel(
     box_idx, species_idx = wp.tid()  # type: ignore[misc]
     saturation_ratio[box_idx, species_idx] = (
         concentration[box_idx, species_idx]
-        * wp.float64(GAS_CONSTANT)
+        * _GAS_CONSTANT
         * temperature[box_idx]
         / (molar_mass[species_idx] * vapor_pressure[box_idx, species_idx])
     )

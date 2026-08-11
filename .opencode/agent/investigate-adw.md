@@ -39,7 +39,7 @@ permission:
   git_diff: allow
   platform_issue_read: allow
   platform_pr_read: allow
-  run_pytest_basic: allow
+  run_pytest_advanced: allow
   run_linters: allow
   get_datetime: allow
   get_version: allow
@@ -179,12 +179,18 @@ adw_status_health({"command": "health"})
 # Read specific field
 adw_spec_read({"command": "read", "adw_id": "{adw_id}", "field": "workflow_checkpoint"})
 
-# Run tests in worktree
-run_pytest_basic({"testPath": "{path}", "cwd": "{worktree_path}", "minTests": 1, "options": "fail-fast"})
+# Run a focused diagnostic test in the worktree
+run_pytest_advanced({"testPath": "{path}", "cwd": "{worktree_path}", "minTests": 1, "options": "fail-fast", "coverage": false})
 
 # Check linting
 run_linters({"targetDir": "{worktree_path}", "autoFix": false})
 ```
+
+Focused diagnostic tests provide assertion evidence only and must keep coverage
+disabled. A focused target with full-package coverage is invalid evidence, not a
+workflow fix failure. Delegate final coverage validation to `adw-tester`, which
+runs the full applicable suite using the testing guide and active repository
+configuration.
 
 # Subagents
 

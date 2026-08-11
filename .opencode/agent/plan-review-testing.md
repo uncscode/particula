@@ -166,6 +166,13 @@ For each discovered plan document:
    - explicit test descriptions (what to test, how to test, where tests live)
    - test naming and location alignment with the current repository testing guide
    - coverage/validation expectations tied to changed implementation
+   - focused fix checks explicitly using coverage-disabled assertion evidence
+   - final coverage validation using the full applicable suite and active
+     repository configuration, without a focused target or coverage override
+
+Treat a focused target plus full-package coverage as invalid evidence, not a fix
+failure. Repository-specific targets, package scope, markers, and thresholds
+must remain in the testing guide and active configuration.
 
 If target section keys are missing/unmapped:
 - record a concern,

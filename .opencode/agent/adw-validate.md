@@ -384,6 +384,12 @@ Gap 1:
 Run the repository-policy focused tests for affected behavior, not an assumed
 module directory or full suite:
 
+These are assertion-only fix checks and must use `coverage: false`. A focused
+target plus full-package coverage is invalid evidence because it undercovers
+unrelated modules; do not interpret that result as a validation or fix failure.
+Full coverage evidence belongs to the testing agent's full applicable suite
+using active repository configuration.
+
 ### 7.1: Identify Test Directories
 
 Map changed files to test targets using the testing guide, active discovery

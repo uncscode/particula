@@ -237,6 +237,13 @@ Do not define repository conventions here. Read
 `@.opencode/guides/testing_guide.md` and the active test configuration for file
 naming, locations, framework, mocking, fixtures, markers, and coverage policy.
 
+Require executable validation plans to separate focused assertion checks from
+coverage evidence. Focused fix tests run with coverage disabled. Coverage runs
+use the full applicable suite, repository-configured full-package coverage, and
+the normal threshold. A focused target plus full-package coverage is invalid
+evidence and must not be planned as a fix-failure gate. Do not copy concrete
+paths, package names, or thresholds into this reusable prompt.
+
 # Common Testing Issues
 
 ## Issue: Wrong Test Naming

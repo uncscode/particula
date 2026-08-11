@@ -310,15 +310,18 @@ todowrite({
 })
 ```
 
-## Step 7: Comprehensive Testing (ALL FILES)
+## Step 7: Final Test Validation
 
-After ALL refinement work completes, run comprehensive tests on all changed files:
+After all refinement work completes, pass changed files to `adw-build-tests` for
+test mapping. They are not the final coverage target. The subagent must run
+focused checks with coverage disabled, then run the full applicable suite with
+repository-configured full-package coverage and the normal threshold:
 
 ```python
 # Do not pass session_id on retries - subagents must be fresh to see filesystem changes
 task({
   "description": "Validate and run tests for all files",
-  "prompt": f"Validate tests.\n\nArguments: adw_id={adw_id}\n\nChanged files: {', '.join(changed_files)}",
+  "prompt": f"Validate tests.\n\nArguments: adw_id={adw_id}\n\nChanged files for behavior-to-test mapping: {', '.join(changed_files)}\n\nRun focused checks with coverage: false. Obtain coverage only from the full applicable suite using active repository configuration; a focused target plus full-package coverage is invalid evidence, not a fix failure.",
   "subagent_type": "adw-build-tests"
 })
 ```
@@ -362,8 +365,8 @@ Summary:
 
 Testing:
 - Spot-checks during refinement: All passed
-- Comprehensive tests: All passed
-- Coverage: {percentage}%
+- Full applicable suite: All passed
+- Coverage: repository-configured full-package policy passed
 
 Commit: {commit_hash} - {commit_message}
 Files changed: {count} (+{insertions}/-{deletions})

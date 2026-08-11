@@ -142,7 +142,8 @@ For each issue row, classify as implementation, docs-only, or config-only.
 Write `testing_strategy` with:
 - test file paths or expected co-located test locations
 - test scenarios
-- command or suite to run when known
+- focused command or target to run with coverage disabled when known
+- full applicable suite for repository-configured full-package coverage
 - coverage or marker notes from repository policy
 
 ## Step 4: Verify
@@ -160,6 +161,11 @@ for source detail, then re-draft and write the corrected content.
   and include the appropriate smoke or validation check.
 - Test paths, names, commands, markers, and valid exceptions must come from the
   current repository's testing guide and active configuration.
+- Keep focused assertion validation separate from coverage validation. A focused
+  target uses coverage disabled; coverage evidence comes from the full applicable
+  suite and normal repository-configured threshold.
+- A focused target plus full-package coverage is invalid evidence, not a fix
+  failure.
 
 # Required Writes
 
@@ -168,7 +174,7 @@ adw_issues_batch_write({
   "adw_id": "<adw_id>",
   "issue": "<index>",
   "section": "testing_strategy",
-  "content": "## Testing Strategy\n\n- Test target: `<repository-policy test target>`\n- Scenarios: ...\n- Run: `<repository-policy validation command>`"
+  "content": "## Testing Strategy\n\n- Focused target: `<repository-policy test target>` with coverage disabled\n- Scenarios: ...\n- Coverage validation: `<repository-policy full applicable suite>` using configured full-package coverage and the normal threshold"
 })
 ```
 
