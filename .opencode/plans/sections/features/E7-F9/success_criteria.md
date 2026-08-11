@@ -57,6 +57,14 @@
   not lowered, export tests pass, and `mkdocs build --strict` passes.
 - [ ] Epic H performance/graph capture and Epic I autodiff remain deferred.
 
+## P7 Gate Status (2026-08-11)
+
+Focused assertions (289), exports (15), resident-fast assertions (891),
+full-package coverage (93%), execution-scope coverage (95%; P1--P6 aggregate
+86%), and optional CUDA rows (1 and 5) passed. The exact required
+`mkdocs build --strict` command was unavailable, though the equivalent strict
+wrapper passed. Therefore the unchecked P7 criteria and Epic G remain active.
+
 ## Metrics
 
 | Metric | Baseline | Target | Source |

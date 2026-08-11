@@ -24,6 +24,16 @@ Validate documentation changes with the repository-local wrapper:
 python3 .opencode/tools/build_mkdocs.py --validate-only --strict
 ```
 
+For a dated feature closeout, also run and record the exact required command:
+
+```bash
+mkdocs build --strict
+```
+
+Closeout tables must report actual dated command outcomes, including required
+coverage and optional-device pass-or-clean-skip results. Do not mark a phase
+shipped from planned commands or inferred evidence.
+
 When the current agent cannot run the wrapper directly, delegate validation to
 the `docs-validator` subagent with the changed documentation paths and request
 strict MkDocs validation. The subagent should check links and anchors, run the

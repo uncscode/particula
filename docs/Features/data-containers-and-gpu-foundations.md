@@ -399,6 +399,44 @@ dispatch begins, a failure may fault the session and has no rollback or retry
 guarantee. Checkpoint/finalize/restart remain the explicit exact-device boundary
 documented in [GPU resident checkpoints](gpu_resident_checkpoints.md).
 
+### E7-F9 resident support validation matrix (2026-08-11)
+
+The supported resident example is the
+[multi-timestep resident source](../Examples/gpu_resident_multi_timestep.py).
+This closeout is scoped to [issue #1451](https://github.com/Gorkowski/particula/issues/1451).
+It records the Warp CPU qualification used for all required rows; CUDA rows are
+additional evidence, not a CPU fallback result. The P1--P6 executable coverage
+target is `particula/execution/diagnostics.py`, `gpu_resources.py`,
+`checkpoint.py`, and `resident_scheduler.py`. Documentation-only P7 files are
+not executable coverage targets.
+
+| Concern | Command group | Outcome |
+|---|---|---|
+| Selection/parity, lifecycle/identity, scheduling/freshness, diagnostics, transport, continuation, errors/no fallback, and example | `pytest particula/execution/tests/diagnostics_test.py particula/execution/tests/gpu_resources_test.py particula/execution/tests/checkpoint_test.py particula/execution/tests/rng_invariance_test.py particula/execution/tests/full_loop_test.py particula/execution/tests/multi_box_loop_test.py particula/execution/tests/transport_loop_test.py particula/execution/tests/restart_loop_test.py particula/execution/tests/condensation_integration_test.py particula/execution/tests/coagulation_integration_test.py particula/execution/tests/errors_test.py particula/execution/tests/fallback_test.py particula/execution/tests/fallback_integration_test.py particula/tests/gpu_resident_multi_timestep_docs_test.py -q` | PASS: 289 assertions. |
+| Frozen export boundary | `pytest particula/execution/tests/exports_test.py particula/tests/execution_exports_test.py -q` | PASS: 15 assertions. |
+| Resident fast suite | `pytest particula/execution/tests/ -q` | PASS: 891 assertions. |
+| Full package coverage | `pytest --cov=particula --cov-report=term-missing` | PASS: 6,254 passed, 9 skipped; 93% total coverage (80% threshold). |
+| P1--P6 changed-module coverage | `pytest particula/execution/tests/ -q --cov=particula.execution.diagnostics,particula.execution.gpu_resources,particula.execution.checkpoint,particula.execution.resident_scheduler --cov-report=term-missing --cov-fail-under=80` | PASS: recorded four-module aggregate 86% (>=80%): diagnostics 79%, resources 87%, checkpoint 87%, scheduler 86%; term-missing rows are retained by the command output. |
+| Strict documentation | `mkdocs build --strict` | BLOCKED: the equivalent repository strict wrapper passed, but the exact required command was unavailable to this build environment; P7 remains open. |
+| Optional CUDA | `pytest multi_box_loop_test.py -q -m "warp and cuda"`; `pytest condensation_integration_test.py coagulation_integration_test.py -q -m "warp and cuda"` | PASS: 1 multi-box and 5 integration assertions. CUDA is optional evidence. |
+
+Deterministic comparisons keep their owning explicit `rtol`/`atol` bounds.
+Closed concentration-weighted inventory and ledger checks remain separate at
+`rtol=1e-12`, `atol=1e-30`. Stochastic wall-loss evidence is the P4
+100-seed Warp-CPU aggregate/binomial result (with the bounded optional CUDA
+smoke), never exact per-seed or cross-backend replay.
+
+Resident seams remain concrete-only direct imports. Setup uploads each CPU
+container once; registry resources are identity-pinned; diagnostic output is
+caller-owned; and schema-v3 current words, rather than lossy inspection
+carriers, are continuation authority. Manual restart is in-memory, exact-device,
+and creates fresh identities; source finalization caches its first snapshot.
+There is no export expansion, automatic restart, device selection or migration,
+hidden transfer/synchronization, CPU fallback, retry or rollback after a writer
+launch, open/unsupported resident communication, graph capture, performance or
+scaling claim, autodiff, multi-GPU/distributed work, or cross-backend exact RNG
+replay.
+
 ### Complete direct-process illustration
 
 The [complete direct-process source](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py)

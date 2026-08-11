@@ -1066,20 +1066,39 @@ pytest particula/gpu/tests/benchmark_test.py --benchmark -k mass_precision -v -s
 Focused commands:
 
 ```bash
-pytest particula/execution/tests/rng_test.py \
+pytest particula/execution/tests/diagnostics_test.py \
+  particula/execution/tests/gpu_resources_test.py \
   particula/execution/tests/rng_invariance_test.py \
-  particula/execution/tests/checkpoint_test.py -q
-pytest particula/execution/tests/gpu_resident_session_docs_test.py -q
-pytest particula/execution/tests/gpu_resident_session_docs_test.py -q -Werror
-pytest particula/execution/tests/gpu_resources_test.py \
   particula/execution/tests/checkpoint_test.py \
-  particula/execution/tests/resident_communication_test.py -q -Werror
-pytest particula/execution/tests/scheduler_test.py -q -Werror
-pytest particula/tests/execution_exports_test.py -q -Werror
-ruff check particula/execution/
-mypy particula/execution/ --ignore-missing-imports
+  particula/execution/tests/full_loop_test.py \
+  particula/execution/tests/multi_box_loop_test.py \
+  particula/execution/tests/transport_loop_test.py \
+  particula/execution/tests/restart_loop_test.py \
+  particula/execution/tests/condensation_integration_test.py \
+  particula/execution/tests/coagulation_integration_test.py \
+  particula/execution/tests/errors_test.py \
+  particula/execution/tests/fallback_test.py \
+  particula/execution/tests/fallback_integration_test.py \
+  particula/tests/gpu_resident_multi_timestep_docs_test.py -q
+pytest particula/execution/tests/exports_test.py \
+  particula/tests/execution_exports_test.py -q
+pytest particula/execution/tests/ -q
+pytest --cov=particula --cov-report=term-missing
+pytest particula/execution/tests/ -q \
+  --cov=particula.execution.diagnostics,particula.execution.gpu_resources,particula.execution.checkpoint,particula.execution.resident_scheduler \
+  --cov-report=term-missing --cov-fail-under=80
 mkdocs build --strict
+pytest particula/execution/tests/multi_box_loop_test.py -q -m "warp and cuda"
+pytest particula/execution/tests/condensation_integration_test.py \
+  particula/execution/tests/coagulation_integration_test.py -q \
+  -m "warp and cuda"
 ```
+
+The resident validation target list is `diagnostics.py`, `gpu_resources.py`,
+`checkpoint.py`, and `resident_scheduler.py`; retain its >=80% aggregate gate.
+The canonical runnable resident example is
+`docs/Examples/gpu_resident_multi_timestep.py`. Warp CPU is the baseline;
+CUDA is optional pass-or-clean-skip evidence, never CPU fallback.
 
 ## ADW Workflows
 

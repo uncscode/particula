@@ -254,6 +254,43 @@ pytest particula/gpu/tests/process_sequence_test.py -q \
 
 ### Resident communication and checkpoint coverage
 
+E7-F9 closeout uses the resident focused assertion and export groups, then the
+resident fast suite, full-package coverage, changed-module coverage, strict
+documentation build, and optional CUDA groups below. Record actual dated
+outcomes and the executable target list; changed executable modules must meet
+the aggregate 80% threshold. Local commands omit `-Werror`; Warp CPU is the
+installed-Warp baseline, and CUDA must pass when available or cleanly skip.
+Markers describe intent and stochastic bounds never relax conservation.
+
+```bash
+pytest particula/execution/tests/diagnostics_test.py \
+  particula/execution/tests/gpu_resources_test.py \
+  particula/execution/tests/checkpoint_test.py \
+  particula/execution/tests/rng_invariance_test.py \
+  particula/execution/tests/full_loop_test.py \
+  particula/execution/tests/multi_box_loop_test.py \
+  particula/execution/tests/transport_loop_test.py \
+  particula/execution/tests/restart_loop_test.py \
+  particula/execution/tests/condensation_integration_test.py \
+  particula/execution/tests/coagulation_integration_test.py \
+  particula/execution/tests/errors_test.py \
+  particula/execution/tests/fallback_test.py \
+  particula/execution/tests/fallback_integration_test.py \
+  particula/tests/gpu_resident_multi_timestep_docs_test.py -q
+pytest particula/execution/tests/exports_test.py \
+  particula/tests/execution_exports_test.py -q
+pytest particula/execution/tests/ -q
+pytest --cov=particula --cov-report=term-missing
+pytest particula/execution/tests/ -q \
+  --cov=particula.execution.diagnostics,particula.execution.gpu_resources,particula.execution.checkpoint,particula.execution.resident_scheduler \
+  --cov-report=term-missing --cov-fail-under=80
+mkdocs build --strict
+pytest particula/execution/tests/multi_box_loop_test.py -q -m "warp and cuda"
+pytest particula/execution/tests/condensation_integration_test.py \
+  particula/execution/tests/coagulation_integration_test.py -q \
+  -m "warp and cuda"
+```
+
 Resident communication is concrete-only execution coverage, not a public API or
 an example workflow. Keep its tests under `particula/execution/tests/` and cover
 both closed-map GAS and PARTICLES resource families, optional volume evolution,

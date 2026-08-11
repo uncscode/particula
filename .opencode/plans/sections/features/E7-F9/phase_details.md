@@ -87,10 +87,13 @@
     restart/finalization semantics, and warning-clean subprocess behavior.
 
 - [ ] **E7-F9-P7:** Publish support contract validation matrix and closeout evidence
-  - Issue: TBD | Size: XS | Status: Not Started
+  - Issue: #1534 | Size: XS | Status: Blocked 2026-08-11
   - Goal: Update user/developer documentation, record tolerances and commands,
     run the required matrix, and publish dated evidence for every Epic G exit item.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
     `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`, `.opencode/guides/`
-  - Tests: Focused and full fast suites, coverage >=80% for changed modules,
-    optional CUDA rows, export checks, and `mkdocs build --strict`.
+  - Evidence: Focused 289 assertions, exports 15, resident suite 891,
+    full-package coverage 93%, execution scope 95% (P1--P6 aggregate 86%), and
+    optional CUDA rows 1 and 5 all passed. The equivalent strict wrapper passed,
+    but the exact required `mkdocs build --strict` command could not run in this
+    build environment. Do not mark P7 or Epic G shipped until it passes.

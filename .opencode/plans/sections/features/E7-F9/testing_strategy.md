@@ -59,8 +59,11 @@ Warp baseline; CUDA rows are optional and skip cleanly when unavailable.
   ordinary-step identities, manual exact-device restart into fresh identities,
   and cached source finalization. A warnings-as-errors subprocess remains
   optional-Warp and does not require CUDA.
-- **P7:** Run focused regressions, full fast suite, export checks, optional CUDA
-  rows, coverage, and `mkdocs build --strict`; publish reproducible commands.
+- **P7 / issue #1534 (2026-08-11, blocked):** Focused regressions (289), exports
+  (15), resident fast suite (891), full-package coverage (93%), execution-scope
+  coverage (95%; recorded P1--P6 aggregate 86%), and optional CUDA rows (1 and
+  5) passed. The equivalent strict wrapper passed, but the exact required
+  `mkdocs build --strict` command remains required before closeout.
 
 ## Required Validation Matrix
 

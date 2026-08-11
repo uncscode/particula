@@ -57,3 +57,13 @@
 Documentation must not describe graph capture, performance, CUDA availability,
 cross-backend exact RNG replay, hidden fallback, or unsupported process modes as
 shipped capabilities.
+
+## P7 Evidence Attempt (issue #1534, 2026-08-11)
+
+- Added the dated support matrix and aligned resident command guidance. Focused,
+  export, resident-fast, full-package coverage, execution-scope coverage, and
+  optional CUDA results are recorded in the matrix.
+- The equivalent strict documentation wrapper passed, but the exact required
+  `mkdocs build --strict` command was unavailable to this build environment.
+  P7 and Epic G deliberately remain active; rerun that literal command before
+  changing lifecycle status.
