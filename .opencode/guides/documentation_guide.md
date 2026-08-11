@@ -34,6 +34,18 @@ Closeout tables must report actual dated command outcomes, including required
 coverage and optional-device pass-or-clean-skip results. Do not mark a phase
 shipped from planned commands or inferred evidence.
 
+For resident-GPU closeouts, run the required groups sequentially and record the
+date, Warp availability, qualified devices, literal commands, test counts,
+coverage percentages, and per-target term-missing rows. Derive coverage targets
+from the completed phases' executable-module diff; documentation, examples, and
+tests are not executable coverage targets. A missing artifact, failed required
+command, unavailable required runner, or aggregate coverage below the required
+threshold blocks shipment. CUDA is optional pass-or-clean-skip evidence, never
+CPU-fallback evidence. Do not claim a status of shipped or complete until the
+actual strict-build and required test outcomes are available. A Not Started to
+Active transition is allowed when recording a valid blocker or in-progress
+remediation.
+
 When the current agent cannot run the wrapper directly, delegate validation to
 the `docs-validator` subagent with the changed documentation paths and request
 strict MkDocs validation. The subagent should check links and anchors, run the

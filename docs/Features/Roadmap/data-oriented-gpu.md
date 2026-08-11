@@ -1486,7 +1486,10 @@ scheduling, resident loops, and transport remain Epic G work.
 
 ## Epic G: Backend Selection and GPU-Resident Simulation
 
-Status: shipped; E7-F6/Track T6 is shipped through P7, and E7-F9 closeout is shipped.
+Status: shipped. E7-F9 P7 validation passed on 2026-08-11 after the required
+focused, export, resident-fast, full-package-coverage, changed-module-coverage,
+strict MkDocs, and optional-CUDA gates passed. Epic G is shipped. Epics H and I
+remain deferred.
 
 E7-F1 is shipped (P1--P6 complete). It provides a separate public,
 dependency-neutral, explicit-selection context with a limited CPU/reference
@@ -1502,11 +1505,13 @@ The full-policy downstream ordering was:
 E7-F6 now supplies the shipped availability resolver, typed errors, explicit
 CPU fallback, frozen stable API, and documentation handoff. See [Backend
 Selection and Explicit CPU Fallback](../backend_selection.md). The historical
-ordering remains context: E7-F6 is the prerequisite already satisfied by the
+ordering remains context: E7-F6/Track T6 is shipped through P7. E7-F6 is the
+prerequisite already satisfied by the
 downstream shipped seams. E7-F1 supplies neither transfer nor fallback. E7-F2
 supplies condensation adapters and E7-F3 supplies coagulation adapters. E7-F4
-supplies resident session/container/sidecar lifecycle; P1--P7 are shipped as
-its bounded concrete-only prerequisite. E7-F5 is their later scheduling
+supplies resident session/container/sidecar lifecycle; P1--P6 are shipped as
+its bounded concrete-only prerequisite, while P7 is blocked and unshipped.
+E7-F5 is their later scheduling
 consumer, shipped as a bounded, concrete-only seam. These consumers do not
 alter the shipped direct-kernel path.
 
@@ -1540,8 +1545,8 @@ direct-kernel contract. Any broader integration still follows the ordering.
 
 ### Full GPU-Resident Simulation
 
-E7-F4 P1--P7 ships the bounded concrete-only resident-session lifecycle and
-in-memory checkpoint/restart prerequisite. See
+E7-F4 P1--P6 ship the bounded concrete-only resident-session lifecycle and
+in-memory checkpoint/restart prerequisite; P7 is blocked and unshipped. See
 [GPU resident checkpoints](../gpu_resident_checkpoints.md) for its direct-import
 seams, closed-guard binding, canonical recovery bytes, and exact-device fresh
 restart contract. It is not a resident loop or a process coordinator.
@@ -1574,7 +1579,7 @@ commit after preflight.
 The remaining transport and mixing/advection work remain deferred.
 E7-F8 is shipped: it owns the bounded scheduled persistent-stream identity,
 reset, and checkpoint/restart policy. E7-F9 owns final diagnostics products,
-complete examples, and closeout.
+complete examples, and closeout; its P7 validation gate is shipped.
 High-level GPU adapters and user-facing CPU/GPU orchestration remain later
 contracts after E7-F6 establishes policy. They must not imply availability
 probing, fallback, retry, graph capture, performance claims, distributed or
@@ -1641,8 +1646,13 @@ Warp CPU is the baseline when installed. CUDA evidence is optional and skips
 cleanly when unavailable; no CPU/Warp/CUDA replay guarantee is made.
 
 **Exit bar:** E7-F1 remains a bounded selection seam and E7-F5 remains a
-bounded concrete-only resident scheduler. E7-F7--E7-F9 are shipped on
-2026-08-11; see the [support matrix](../data-containers-and-gpu-foundations.md#e7-f9-resident-support-validation-matrix-2026-08-11), the [multi-timestep resident source](../../Examples/gpu_resident_multi_timestep.py), and [issue #1451](https://github.com/Gorkowski/particula/issues/1451) for the P1--P7 closeout evidence. Any public, availability-policy, fallback/retry, graph-capture, performance, or distributed integration must establish their own contract. The direct GPU path remains explicit and unchanged.
+bounded concrete-only resident scheduler. E7-F7 and E7-F8 are shipped; E7-F9
+P7 is shipped as of 2026-08-11. See the
+[support matrix](../data-containers-and-gpu-foundations.md#e7-f9-resident-support-validation-matrix-2026-08-11)
+for the dated evidence. Epic G is shipped. Epics H and I remain deferred. Any
+public, availability-policy, fallback/retry, graph-capture, performance, or
+distributed integration must establish its own contract. The direct GPU path
+remains explicit and unchanged.
 
 ## Epic H: Graph Capture and Performance
 

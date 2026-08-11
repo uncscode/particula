@@ -57,12 +57,20 @@
   not lowered, export tests pass, and `mkdocs build --strict` passes.
 - [ ] Epic H performance/graph capture and Epic I autodiff remain deferred.
 
-## P7 Gate Status (2026-08-11)
+## P7 Gate Status (2026-08-11 — shipped)
 
-Focused assertions (289), exports (15), resident-fast assertions (891),
-full-package coverage (93%), execution-scope coverage (95%; P1--P6 aggregate
-86%), optional CUDA rows (1 and 5), and exact `mkdocs build --strict` passed.
-Therefore P7 and Epic G are shipped.
+P1--P6 artifacts are verified. P7 is shipped with recorded validation evidence.
+Warp CPU was available and the CUDA-guarded rows passed. The focused assertion,
+export boundary, resident-fast-suite, full-package-coverage,
+changed-module-coverage, strict-`mkdocs build --strict`, and optional-CUDA
+command groups all have results recorded.
+
+The changed executable module target list, derived from P1--P6, is
+`particula/execution/diagnostics.py`,
+`particula/execution/gpu_resources.py`,
+`particula/execution/checkpoint.py`, and
+`particula/execution/resident_scheduler.py`. Its aggregate >=80% gate passed;
+P7 Markdown-only work is excluded. No remediation remains.
 
 ## Metrics
 

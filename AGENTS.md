@@ -1068,8 +1068,8 @@ Focused commands:
 ```bash
 pytest particula/execution/tests/diagnostics_test.py \
   particula/execution/tests/gpu_resources_test.py \
-  particula/execution/tests/rng_invariance_test.py \
   particula/execution/tests/checkpoint_test.py \
+  particula/execution/tests/rng_invariance_test.py \
   particula/execution/tests/full_loop_test.py \
   particula/execution/tests/multi_box_loop_test.py \
   particula/execution/tests/transport_loop_test.py \
@@ -1094,8 +1094,18 @@ pytest particula/execution/tests/condensation_integration_test.py \
   -m "warp and cuda"
 ```
 
-The resident validation target list is `diagnostics.py`, `gpu_resources.py`,
-`checkpoint.py`, and `resident_scheduler.py`; retain its >=80% aggregate gate.
+Before this sequence, record the date, Warp availability, qualified devices, and
+the exact target list derived from the P1--P6 implementation records and their
+executable-module diff. For this closeout, the list is `diagnostics.py`,
+`gpu_resources.py`, `checkpoint.py`, and `resident_scheduler.py`: P1 changed
+the first two modules, P2 changed `checkpoint.py`, P3 changed
+`resident_scheduler.py`, and P4--P6 changed only tests, an example, or
+documentation. Retain the per-target term-missing rows and the >=80% aggregate
+gate; documentation-only changes are never coverage targets. Run each command
+group sequentially and record literal command output. If a required command
+cannot run, record it as unavailable and keep the closeout unshipped rather than
+inferring a passing result. The optional CUDA groups are pass-or-clean-skip
+evidence only, never CPU fallback.
 The canonical runnable resident example is
 `docs/Examples/gpu_resident_multi_timestep.py`. Warp CPU is the baseline;
 CUDA is optional pass-or-clean-skip evidence, never CPU fallback.
@@ -1196,7 +1206,7 @@ python3 .opencode/tools/run_notebook.py docs/Examples/path/to/file.ipynb
 - Execute after sync to validate code and generate website outputs
 - Commit both files to keep them paired when the example includes a notebook
 
-**Full documentation:** `.opencode/guides/documentation_guide.md` (Jupytext Paired Sync Workflow section)
+**Full documentation:** `.opencode/guides/documentation_guide.md` (Example Source Workflow section)
 
 ## Getting Help
 

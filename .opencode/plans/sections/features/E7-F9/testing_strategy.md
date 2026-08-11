@@ -59,10 +59,33 @@ Warp baseline; CUDA rows are optional and skip cleanly when unavailable.
   ordinary-step identities, manual exact-device restart into fresh identities,
   and cached source finalization. A warnings-as-errors subprocess remains
   optional-Warp and does not require CUDA.
-- **P7 / issue #1534 (2026-08-11, shipped):** Focused regressions (289), exports
-  (15), resident fast suite (891), full-package coverage (93%), execution-scope
-  coverage (95%; recorded P1--P6 aggregate 86%), optional CUDA rows (1 and 5),
-  and exact `mkdocs build --strict` all passed.
+- **P7 / issue #1534 (2026-08-11, shipped):** Required artifacts and validation
+  evidence are recorded. Focused assertions (289), export boundary (15),
+  resident fast suite (891), full-package coverage (6,254 tests, 93%),
+  changed-executable-module coverage (891 tests, 95%; `diagnostics.py` 79%,
+  `gpu_resources.py` 87%, `checkpoint.py` 87%, `resident_scheduler.py` 86%),
+  strict MkDocs, and optional CUDA rows all passed. Warp CPU was available.
+
+  Changed-module coverage targets the P1--P6 executable modules
+  `particula/execution/diagnostics.py`,
+  `particula/execution/gpu_resources.py`,
+  `particula/execution/checkpoint.py`, and
+  `particula/execution/resident_scheduler.py`; its aggregate >=80% gate passed.
+  P7 Markdown-only changes are not coverage targets. CUDA remains optional
+  pass-or-clean-skip evidence.
+
+  Required rerun commands (run sequentially and retain literal output):
+
+  ```bash
+  pytest particula/execution/tests/diagnostics_test.py particula/execution/tests/gpu_resources_test.py particula/execution/tests/checkpoint_test.py particula/execution/tests/rng_invariance_test.py particula/execution/tests/full_loop_test.py particula/execution/tests/multi_box_loop_test.py particula/execution/tests/transport_loop_test.py particula/execution/tests/restart_loop_test.py particula/execution/tests/condensation_integration_test.py particula/execution/tests/coagulation_integration_test.py particula/execution/tests/errors_test.py particula/execution/tests/fallback_test.py particula/execution/tests/fallback_integration_test.py particula/tests/gpu_resident_multi_timestep_docs_test.py -q
+  pytest particula/execution/tests/exports_test.py particula/tests/execution_exports_test.py -q
+  pytest particula/execution/tests/ -q
+  pytest --cov=particula --cov-report=term-missing
+  pytest particula/execution/tests/ -q --cov=particula.execution.diagnostics,particula.execution.gpu_resources,particula.execution.checkpoint,particula.execution.resident_scheduler --cov-report=term-missing --cov-fail-under=80
+  mkdocs build --strict
+  pytest particula/execution/tests/multi_box_loop_test.py -q -m "warp and cuda"
+  pytest particula/execution/tests/condensation_integration_test.py particula/execution/tests/coagulation_integration_test.py -q -m "warp and cuda"
+  ```
 
 ## Required Validation Matrix
 

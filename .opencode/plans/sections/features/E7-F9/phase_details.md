@@ -90,9 +90,20 @@
   - Issue: #1534 | Size: XS | Status: Completed 2026-08-11
   - Goal: Update user/developer documentation, record tolerances and commands,
     run the required matrix, and publish dated evidence for every Epic G exit item.
-  - Files: `docs/Features/data-containers-and-gpu-foundations.md`,
-    `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`, `.opencode/guides/`
-  - Evidence: Focused 289 assertions, exports 15, resident suite 891,
-    full-package coverage 93%, execution scope 95% (P1--P6 aggregate 86%), and
-    optional CUDA rows 1 and 5 all passed. Exact `mkdocs build --strict` also
-    passed, so P7 and Epic G are shipped.
+  - Verified artifacts: P1--P6 artifacts exist, and the P7 documentation/status
+    deliverables are published with dated validation evidence.
+  - Evidence: Focused assertions (289), exports (15), resident fast suite (891),
+    full-package coverage (6,254 tests, 93%), changed-module coverage (891 tests,
+    95%; `diagnostics.py` 79%, `gpu_resources.py` 87%, `checkpoint.py` 87%,
+    `resident_scheduler.py` 86%), strict MkDocs, and optional CUDA rows passed.
+    Warp CPU was available.
+  - Affected command groups: focused assertions; export boundary; resident fast
+    suite; full-package coverage; changed-executable-module coverage; exact
+    `mkdocs build --strict`; and optional CUDA guarded suites.
+  - Changed-module coverage targets (derived from P1--P6 executable changes):
+    `particula/execution/diagnostics.py`,
+    `particula/execution/gpu_resources.py`,
+    `particula/execution/checkpoint.py`, and
+    `particula/execution/resident_scheduler.py`. The aggregate >=80% gate passed;
+    documentation-only P7 files are not coverage targets.
+  - Remediation: None; only evidenced P7/Epic G status is published.

@@ -257,10 +257,18 @@ pytest particula/gpu/tests/process_sequence_test.py -q \
 E7-F9 closeout uses the resident focused assertion and export groups, then the
 resident fast suite, full-package coverage, changed-module coverage, strict
 documentation build, and optional CUDA groups below. Record actual dated
-outcomes and the executable target list; changed executable modules must meet
-the aggregate 80% threshold. Local commands omit `-Werror`; Warp CPU is the
-installed-Warp baseline, and CUDA must pass when available or cleanly skip.
-Markers describe intent and stochastic bounds never relax conservation.
+outcomes, Warp availability, qualified devices, and the executable target list.
+Derive the list from the P1--P6 executable-module diff, not the Markdown-only
+P7 diff: this closeout covers `particula.execution.diagnostics`,
+`particula.execution.gpu_resources`, `particula.execution.checkpoint`, and
+`particula.execution.resident_scheduler`. P4--P6 changed tests, an example, or
+documentation only, so they add no executable coverage target. Changed
+executable modules must meet the aggregate 80% threshold, with per-target
+term-missing rows retained. Run these groups sequentially; a required command
+that is unavailable or fails blocks shipment. Local commands omit `-Werror`;
+Warp CPU is the installed-Warp baseline, and CUDA must pass when available or
+cleanly skip. Markers describe intent and stochastic bounds never relax
+conservation.
 
 ```bash
 pytest particula/execution/tests/diagnostics_test.py \
