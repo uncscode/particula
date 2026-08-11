@@ -705,6 +705,9 @@ def test_gas_communication_accounts_for_open_boundary_ledgers() -> None:
         *(wp.empty((2, 1), dtype=wp.float64, device="cpu") for _ in range(5))
     )
     particle_before = particles.concentration.numpy().copy()
+    initial_total = np.sum(
+        gas.concentration.numpy() * particles.volume.numpy()[:, None], axis=0
+    )
 
     gas_communication_step_gpu(particles, gas, configuration, 1.0, buffers)
 
@@ -716,6 +719,15 @@ def test_gas_communication_accounts_for_open_boundary_ledgers() -> None:
     npt.assert_allclose(sink_amounts.numpy(), np.array([[2.0], [0.0]]))
     npt.assert_allclose(gas.concentration.numpy(), [[3.0], [4.5]])
     npt.assert_array_equal(particles.concentration.numpy(), particle_before)
+    final_total = np.sum(
+        gas.concentration.numpy() * particles.volume.numpy()[:, None], axis=0
+    )
+    npt.assert_allclose(
+        final_total - initial_total,
+        source_amounts.numpy().sum(axis=0) - sink_amounts.numpy().sum(axis=0),
+        rtol=1e-12,
+        atol=1e-30,
+    )
 
 
 def test_gas_communication_zero_time_preserves_all_work_storage() -> None:
