@@ -53,7 +53,7 @@
 - [x] The complete example uses explicit caller diagnostic observation and
   checkpoint/restart boundaries, and is protected by an executable documentation
   regression.
-- [ ] Changed executable modules retain >=80% coverage, repository thresholds are
+- [x] Changed executable modules retain >=80% coverage, repository thresholds are
   not lowered, export tests pass, and `mkdocs build --strict` passes.
 - [ ] Epic H performance/graph capture and Epic I autodiff remain deferred.
 
@@ -61,9 +61,8 @@
 
 Focused assertions (289), exports (15), resident-fast assertions (891),
 full-package coverage (93%), execution-scope coverage (95%; P1--P6 aggregate
-86%), and optional CUDA rows (1 and 5) passed. The exact required
-`mkdocs build --strict` command was unavailable, though the equivalent strict
-wrapper passed. Therefore the unchecked P7 criteria and Epic G remain active.
+86%), optional CUDA rows (1 and 5), and exact `mkdocs build --strict` passed.
+Therefore P7 and Epic G are shipped.
 
 ## Metrics
 

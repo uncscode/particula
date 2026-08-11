@@ -417,7 +417,7 @@ not executable coverage targets.
 | Resident fast suite | `pytest particula/execution/tests/ -q` | PASS: 891 assertions. |
 | Full package coverage | `pytest --cov=particula --cov-report=term-missing` | PASS: 6,254 passed, 9 skipped; 93% total coverage (80% threshold). |
 | P1--P6 changed-module coverage | `pytest particula/execution/tests/ -q --cov=particula.execution.diagnostics,particula.execution.gpu_resources,particula.execution.checkpoint,particula.execution.resident_scheduler --cov-report=term-missing --cov-fail-under=80` | PASS: recorded four-module aggregate 86% (>=80%): diagnostics 79%, resources 87%, checkpoint 87%, scheduler 86%; term-missing rows are retained by the command output. |
-| Strict documentation | `mkdocs build --strict` | BLOCKED: the equivalent repository strict wrapper passed, but the exact required command was unavailable to this build environment; P7 remains open. |
+| Strict documentation | `mkdocs build --strict` | PASS: exact required command completed cleanly. |
 | Optional CUDA | `pytest multi_box_loop_test.py -q -m "warp and cuda"`; `pytest condensation_integration_test.py coagulation_integration_test.py -q -m "warp and cuda"` | PASS: 1 multi-box and 5 integration assertions. CUDA is optional evidence. |
 
 Deterministic comparisons keep their owning explicit `rtol`/`atol` bounds.

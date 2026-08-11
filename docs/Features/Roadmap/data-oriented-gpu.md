@@ -1486,7 +1486,7 @@ scheduling, resident loops, and transport remain Epic G work.
 
 ## Epic G: Backend Selection and GPU-Resident Simulation
 
-Status: active; E7-F6/Track T6 is shipped through P6.
+Status: shipped; E7-F6/Track T6 is shipped through P7, and E7-F9 closeout is shipped.
 
 E7-F1 is shipped (P1--P6 complete). It provides a separate public,
 dependency-neutral, explicit-selection context with a limited CPU/reference
@@ -1641,10 +1641,8 @@ Warp CPU is the baseline when installed. CUDA evidence is optional and skips
 cleanly when unavailable; no CPU/Warp/CUDA replay guarantee is made.
 
 **Exit bar:** E7-F1 remains a bounded selection seam and E7-F5 remains a
-bounded concrete-only resident scheduler. E7-F7--E7-F9 and any public,
-availability-policy, fallback/retry, graph-capture, performance, or distributed
-integration must establish their own contract. The direct GPU path remains
-explicit and unchanged.
+bounded concrete-only resident scheduler. E7-F7--E7-F9 are shipped on
+2026-08-11; see the [support matrix](../data-containers-and-gpu-foundations.md#e7-f9-resident-support-validation-matrix-2026-08-11), the [multi-timestep resident source](../../Examples/gpu_resident_multi_timestep.py), and [issue #1451](https://github.com/Gorkowski/particula/issues/1451) for the P1--P7 closeout evidence. Any public, availability-policy, fallback/retry, graph-capture, performance, or distributed integration must establish their own contract. The direct GPU path remains explicit and unchanged.
 
 ## Epic H: Graph Capture and Performance
 

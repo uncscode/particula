@@ -81,15 +81,13 @@
   import, availability, setup, and dispatch failure paths and enabled behavior,
   including upload/identity/diagnostic/checkpoint/restart/finalization assertions
   and warning-clean execution when Warp is installed.
-- [ ] Update the feature guide with support matrix, ownership, diagnostics,
+- [x] Update the feature guide with support matrix, ownership, diagnostics,
   checkpoint/restart, errors, reproducibility, and limitations.
-- [ ] Update the Epic G roadmap with dated phase/exit-bar evidence while leaving
+- [x] Update the Epic G roadmap with dated phase/exit-bar evidence while leaving
   Epic H graph-capture/performance and Epic I autodiff scope unclaimed.
-- [ ] Publish the exact validation matrix and commands, run focused/full fast
+- [x] Publish the exact validation matrix and commands, run focused/full fast
   suites and strict docs, and link results from issue #1451 closeout evidence.
-- [ ] **P7 / issue #1534 (2026-08-11, blocked):** Focused assertions (289),
+- [x] **P7 / issue #1534 (2026-08-11, shipped):** Focused assertions (289),
   exports (15), resident fast suite (891), full package coverage (93%), and
   execution-scope coverage (95%; recorded P1--P6 aggregate 86%) passed; optional
-  CUDA rows passed (1 and 5). The equivalent strict wrapper passed, but the exact
-  required `mkdocs build --strict` command was unavailable, so P7/Epic G remain
-  unshipped pending that literal command.
+  CUDA rows passed (1 and 5); and exact `mkdocs build --strict` passed.
