@@ -26,6 +26,12 @@
   open-boundary source-minus-sink ledger reconciliation at `rtol=1e-12`,
   `atol=1e-30`. No production API, checkpoint schema, scheduler ordering,
   exports, or user documentation changed.
+- [x] **P6 / issue #1533:** The canonical
+  `docs/Examples/gpu_resident_multi_timestep.py` uses availability validation and
+  the resident scheduler for a three-box source session, one setup upload, two
+  source steps, caller-owned diagnostics, manual exact-device restart, and cached
+  source finalization. Its documentation regression covers disabled, import,
+  failure, and enabled behavior without claiming CPU fallback or required CUDA.
 - [ ] At least one condensation and one Brownian coagulation workflow run through
   backend selection and match CPU references within recorded tolerances.
 - [ ] A multi-box GPU-resident loop runs all supported processes between explicit
@@ -44,8 +50,9 @@
   fallback boundary; no failure triggers silent movement.
 - [ ] Warp CPU matrix passes; optional CUDA rows pass where available or skip
   cleanly; no mandatory CUDA CI is introduced.
-- [ ] The complete example transfers back only at checkpoints/finalization and
-  is protected by an executable documentation regression.
+- [x] The complete example uses explicit caller diagnostic observation and
+  checkpoint/restart boundaries, and is protected by an executable documentation
+  regression.
 - [ ] Changed executable modules retain >=80% coverage, repository thresholds are
   not lowered, export tests pass, and `mkdocs build --strict` passes.
 - [ ] Epic H performance/graph capture and Epic I autodiff remain deferred.

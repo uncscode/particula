@@ -102,7 +102,7 @@ def test_restart_restores_closed_transport_and_published_stream_words(
     source_particle_concentration = (
         cast(Any, session.particles).concentration.numpy().copy()
     )
-    source_final_volumes = resources.final_volumes.numpy().copy()
+    source_final_volumes = cast(Any, resources.final_volumes).numpy().copy()
 
     monkeypatch.setattr(
         gpu_resources.StreamRegistry,

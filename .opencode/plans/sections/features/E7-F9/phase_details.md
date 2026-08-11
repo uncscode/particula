@@ -71,14 +71,20 @@
     direct open-boundary source-minus-sink ledger reconciliation at
     `rtol=1e-12`, `atol=1e-30`.
 
-- [ ] **E7-F9-P6:** Publish complete multi-timestep example with documentation regression
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Publish one user-facing loop using backend selection, all supported
-    process categories, multi-box state, diagnostics, and explicit checkpoints.
+- [x] **E7-F9-P6:** Publish complete multi-timestep example with documentation regression
+  - Issue: #1533 | Size: S | Status: Completed 2026-08-11
+  - Delivered: Published a runnable three-box resident-scheduler example with
+    lazy no-Warp guidance, availability validation, one source setup upload, two
+    source dispatches, caller-owned diagnostics, manual exact-device
+    checkpoint/restart, and cached source finalization. It uses concrete resident
+    seams and no direct process-kernel orchestration or CPU fallback.
   - Files: `docs/Examples/gpu_resident_multi_timestep.py`,
-    `particula/tests/gpu_resident_multi_timestep_docs_test.py`
-  - Tests: Execute on Warp CPU when available, validate import behavior without
-    Warp, assert checkpoint-only restores, and treat warnings as errors.
+     `particula/tests/gpu_resident_multi_timestep_docs_test.py`
+  - Tests: Documentation regression covers forced-disabled, missing-Warp, broken
+    enabled-import, availability, setup, and dispatch-failure behavior, plus real
+    Warp-CPU enabled execution when available. It asserts one source upload per
+    CPU container, resident identity preservation, diagnostic shapes, manual
+    restart/finalization semantics, and warning-clean subprocess behavior.
 
 - [ ] **E7-F9-P7:** Publish support contract validation matrix and closeout evidence
   - Issue: TBD | Size: XS | Status: Not Started

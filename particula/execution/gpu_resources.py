@@ -1970,7 +1970,7 @@ class GPUResourceRegistry:
                 native,
                 configuration.prescribed_volume.final_volumes,
                 execution_state,
-                not bool(np.any(map_data.enabled.numpy())),
+                not bool(np.any(cast(Any, map_data.enabled).numpy())),
             )
         view = self._views[family]
         if view.configuration is not configuration:

@@ -70,9 +70,17 @@
 
 ## Documentation and Closeout
 
-- [ ] Publish `docs/Examples/gpu_resident_multi_timestep.py` through the
-  user-facing execution API; avoid direct kernel orchestration.
-- [ ] Add an executable docs regression proving setup/checkpoint transfer counts.
+- [x] **P6 / issue #1533 (2026-08-11):** Published
+  `docs/Examples/gpu_resident_multi_timestep.py`, a lazy-Warp, three-box
+  resident-scheduler example. It validates availability before fixture setup,
+  uploads source state once, runs two source steps, exposes caller-owned
+  diagnostics, manually checkpoints/restarts on the exact device, and verifies
+  cached source finalization without direct-kernel orchestration or CPU fallback.
+- [x] **P6 / issue #1533 (2026-08-11):** Added
+  `particula/tests/gpu_resident_multi_timestep_docs_test.py`. It covers disabled,
+  import, availability, setup, and dispatch failure paths and enabled behavior,
+  including upload/identity/diagnostic/checkpoint/restart/finalization assertions
+  and warning-clean execution when Warp is installed.
 - [ ] Update the feature guide with support matrix, ownership, diagnostics,
   checkpoint/restart, errors, reproducibility, and limitations.
 - [ ] Update the Epic G roadmap with dated phase/exit-bar evidence while leaving

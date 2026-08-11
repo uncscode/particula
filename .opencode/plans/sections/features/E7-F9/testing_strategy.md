@@ -50,8 +50,15 @@ Warp baseline; CUDA rows are optional and skip cleanly when unavailable.
   `communication_test.py` row reconciles open-boundary total change with
   source-minus-sink ledgers at `rtol=1e-12`, `atol=1e-30`. These are test-only
   changes; no production or public-contract behavior changed.
-- **P6:** Execute the published example with warnings as errors; assert public
-  imports, checkpoint-only transfer counts, clean no-Warp guidance, and outputs.
+- **P6 (completed, issue #1533):**
+  `particula/tests/gpu_resident_multi_timestep_docs_test.py` covers deterministic
+  forced-disabled and missing-Warp guidance; broken enabled imports; resolver,
+  setup, and dispatch failures without fallback; and the real Warp-CPU example
+  when available. Enabled coverage asserts one source upload per CPU container,
+  two source and one restarted dispatch, `(3, 1)` caller diagnostics, preserved
+  ordinary-step identities, manual exact-device restart into fresh identities,
+  and cached source finalization. A warnings-as-errors subprocess remains
+  optional-Warp and does not require CUDA.
 - **P7:** Run focused regressions, full fast suite, export checks, optional CUDA
   rows, coverage, and `mkdocs build --strict`; publish reproducible commands.
 

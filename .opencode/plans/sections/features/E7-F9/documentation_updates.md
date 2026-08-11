@@ -28,13 +28,20 @@
   regression coverage in `particula/execution/tests/transport_loop_test.py`,
   `particula/execution/tests/restart_loop_test.py`, and
   `particula/gpu/kernels/tests/communication_test.py`; it changes no production
-  API, checkpoint schema, scheduler ordering, or exports.
+   API, checkpoint schema, scheduler ordering, or exports.
 
-- Add `docs/Examples/gpu_resident_multi_timestep.py` as the canonical complete
-  E7 example using backend selection, resident state, multiple boxes/processes,
-  diagnostics, explicit checkpoints, and finalization.
-- Add `particula/tests/gpu_resident_multi_timestep_docs_test.py` to execute and
-  inspect the example, including transfer-boundary assertions.
+## P6 Completion (issue #1533)
+
+- Added `docs/Examples/gpu_resident_multi_timestep.py` as the canonical runnable
+  three-box resident-scheduler example. It gives actionable lazy no-Warp guidance
+  with no CPU fallback; validates availability; performs one source setup upload,
+  two source steps, caller-owned diagnostic observation, manual exact-device
+  checkpoint/restart, and cached source finalization.
+- Added `particula/tests/gpu_resident_multi_timestep_docs_test.py` as the
+  executable documentation regression for disabled/import/failure/enabled paths,
+  transfer boundaries, resident identities, diagnostics, restart, and
+  finalization. CUDA remains optional.
+
 - Update `docs/Features/data-containers-and-gpu-foundations.md` with the public
   execution/session imports, state authority, diagnostic shapes/units,
   checkpoint payload, restart guarantees, support matrix, and limitations.
