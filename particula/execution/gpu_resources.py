@@ -194,12 +194,14 @@ class CommunicationResources:
         configuration: Exact closed-map configuration retained by identity.
         buffers: Exact mode-matched native work record retained by identity.
         final_volumes: Optional pinned ``float64`` per-box target volumes.
+        all_disabled: Whether the pinned map has no enabled transport routes.
     """
 
     configuration: CommunicationConfiguration
     buffers: GasCommunicationBuffers | ParticleCommunicationBuffers
     final_volumes: Any | None
     execution_state: "ResidentCommunicationState"
+    all_disabled: bool
 
 
 @dataclass(frozen=True, eq=False)
@@ -1968,6 +1970,7 @@ class GPUResourceRegistry:
                 native,
                 configuration.prescribed_volume.final_volumes,
                 execution_state,
+                not bool(np.any(map_data.enabled.numpy())),
             )
         view = self._views[family]
         if view.configuration is not configuration:

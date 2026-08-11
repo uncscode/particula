@@ -40,8 +40,16 @@ Warp baseline; CUDA rows are optional and skip cleanly when unavailable.
   coagulation/wall-loss streams and same-backend logical-box continuity. Neutral
   wall loss has Warp-CPU 100-seed aggregate binomial evidence; CUDA has a
   12-seed finite, bounded smoke row that skips cleanly when unavailable.
-- **P5:** CPU extensive-amount oracles for advection/mixing/dilution/expansion,
-  open/closed ledgers, conservation, checkpoint/restart, and RNG continuation.
+- **P5 (completed, issue #1532):** `transport_loop_test.py` uses an independent
+  NumPy float64 extensive-amount oracle for two-step directed expansion and
+  reciprocal mixing with dilution, sparse closed-map conservation, and
+  empty/disabled write-free barriers. `restart_loop_test.py` verifies
+  exact-device closed-transport restart, fresh restored identities, preserved
+  published coagulation/wall-loss stream words without initialization, continued
+  transport equivalence, and nonexact-device rejection. The direct
+  `communication_test.py` row reconciles open-boundary total change with
+  source-minus-sink ledgers at `rtol=1e-12`, `atol=1e-30`. These are test-only
+  changes; no production or public-contract behavior changed.
 - **P6:** Execute the published example with warnings as errors; assert public
   imports, checkpoint-only transfer counts, clean no-Warp guidance, and outputs.
 - **P7:** Run focused regressions, full fast suite, export checks, optional CUDA

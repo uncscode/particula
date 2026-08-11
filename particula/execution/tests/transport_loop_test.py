@@ -308,18 +308,27 @@ def test_empty_closed_map_is_a_write_free_resident_barrier() -> None:
 def test_disabled_closed_map_leaves_transport_ledgers_unchanged() -> None:
     """An all-disabled closed map is write-free before independent dilution."""
     wp, session, registry, resources, request = _binding(
-        np.array([0.0, 0.0]), final_volumes=None
+        np.array([0.25, 0.5]),
+        final_volumes=None,
+        enabled=np.zeros(2, dtype=np.int32),
     )
+    gas = cast(Any, session.gas)
+    before_gas = gas.concentration.numpy().copy()
     buffers = resources.buffers
-    before = tuple(
-        getattr(buffers, name).numpy().copy()
-        for name in ("amount_deltas", "outbound_amounts")
-    )
+    before_ledgers = {
+        name: np.full_like(getattr(buffers, name).numpy(), index + 1.0)
+        for index, name in enumerate(
+            ("amounts", "amount_deltas", "outbound_amounts")
+        )
+    }
+    for name, sentinel in before_ledgers.items():
+        getattr(buffers, name).assign(sentinel)
+
     ResidentCommunicationExecutor(request).execute_communication()
+
     wp.synchronize()
-    for name, expected in zip(
-        ("amount_deltas", "outbound_amounts"), before, strict=True
-    ):
-        npt.assert_array_equal(getattr(buffers, name).numpy(), expected)
+    npt.assert_array_equal(gas.concentration.numpy(), before_gas)
+    for name, sentinel in before_ledgers.items():
+        npt.assert_array_equal(getattr(buffers, name).numpy(), sentinel)
     assert registry._views["communication_gas"] is resources
     assert session.lifecycle.value == "active"

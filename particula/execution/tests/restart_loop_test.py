@@ -99,6 +99,9 @@ def test_restart_restores_closed_transport_and_published_stream_words(
     wall_loss.rng_states.assign(np.array([31, 43], dtype=np.uint32))
     checkpoint = session.checkpoint(registry, guard)
     source_gas = cast(Any, session.gas).concentration.numpy().copy()
+    source_particle_concentration = (
+        cast(Any, session.particles).concentration.numpy().copy()
+    )
     source_final_volumes = resources.final_volumes.numpy().copy()
 
     monkeypatch.setattr(
@@ -122,12 +125,32 @@ def test_restart_restores_closed_transport_and_published_stream_words(
     assert restored_registry is not registry
     assert restored_guard is not guard
     assert restored_resources is not resources
+    assert restored_resources.configuration is not resources.configuration
+    assert (
+        restored_resources.configuration.communication_map
+        is not resources.configuration.communication_map
+    )
+    for name in ("source_boxes", "destination_boxes", "enabled", "rates"):
+        assert getattr(
+            restored_resources.configuration.communication_map, name
+        ) is not getattr(resources.configuration.communication_map, name)
+    assert restored_resources.buffers is not resources.buffers
+    for name in ("amounts", "amount_deltas", "outbound_amounts"):
+        assert getattr(restored_resources.buffers, name) is not getattr(
+            resources.buffers, name
+        )
     assert restored_resources.final_volumes is not resources.final_volumes
     assert restored_coagulation.rng_states is not coagulation.rng_states
     assert restored_wall_loss.rng_states is not wall_loss.rng_states
     npt.assert_allclose(
         cast(Any, restored.gas).concentration.numpy(),
         source_gas,
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    npt.assert_allclose(
+        cast(Any, restored.particles).concentration.numpy(),
+        source_particle_concentration,
         rtol=1e-12,
         atol=1e-30,
     )
@@ -151,6 +174,12 @@ def test_restart_restores_closed_transport_and_published_stream_words(
     npt.assert_allclose(
         cast(Any, restored.gas).concentration.numpy(),
         cast(Any, session.gas).concentration.numpy(),
+        rtol=1e-12,
+        atol=1e-30,
+    )
+    npt.assert_allclose(
+        cast(Any, restored.particles).concentration.numpy(),
+        cast(Any, session.particles).concentration.numpy(),
         rtol=1e-12,
         atol=1e-30,
     )

@@ -49,10 +49,20 @@
   isolation; per-logical-box resident RNG continuity; and bounded neutral
   wall-loss aggregate evidence. Production code, exports, checkpoints, and
   public documentation remain unchanged.
-- [ ] Add prescribed advection, dilution, mixing, and expansion cases in
-  `transport_loop_test.py` with extensive-amount conservation accounting.
-- [ ] Add checkpoint/restart and logical-box stream equivalence cases in
-  `restart_loop_test.py`.
+- [x] **P5 / issue #1532 (2026-08-11):** Added
+  `particula/execution/tests/transport_loop_test.py` with test-only closed-map
+  transport regressions. Independent NumPy float64 extensive-amount oracles
+  cover two-step directed expansion and reciprocal mixing with dilution, sparse
+  arbitrary-pair conservation, and write-free empty/disabled map barriers.
+- [x] **P5 / issue #1532 (2026-08-11):** Added
+  `particula/execution/tests/restart_loop_test.py` with exact-device closed
+  transport restart coverage, fresh restored resource identities, preserved
+  published coagulation/wall-loss stream words without reseeding, continued
+  transport equivalence, and nonexact-device rejection without source mutation.
+- [x] **P5 / issue #1532 (2026-08-11):** Extended
+  `particula/gpu/kernels/tests/communication_test.py` to reconcile direct
+  open-boundary gas totals against source-minus-sink ledgers at `rtol=1e-12`,
+  `atol=1e-30`.
 - [ ] Parametrize Warp CPU as baseline and CUDA as optional cleanly skipped rows;
   record deterministic tolerances and stochastic acceptance rules explicitly.
 - [ ] Retain export, unavailable-device, unsupported-physics, no-fallback, and

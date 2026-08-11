@@ -18,7 +18,14 @@
   and tight closed GAS inventory conservation. A late writer failure closes the
   guard, faults the session, and rejects later dispatch; rollback is not claimed.
   Private nucleation dispatch now executes its adapter and records completion,
-  without changing the public API or canonical order.
+   without changing the public API or canonical order.
+- [x] **P5 / issue #1532:** Test-only transport/restart evidence covers independent
+  NumPy float64 closed-map amount oracles for expansion, mixing, dilution, sparse
+  maps, and empty/disabled barriers; exact-device transport restart with fresh
+  resource identities and preserved published stream words; and direct
+  open-boundary source-minus-sink ledger reconciliation at `rtol=1e-12`,
+  `atol=1e-30`. No production API, checkpoint schema, scheduler ordering,
+  exports, or user documentation changed.
 - [ ] At least one condensation and one Brownian coagulation workflow run through
   backend selection and match CPU references within recorded tolerances.
 - [ ] A multi-box GPU-resident loop runs all supported processes between explicit

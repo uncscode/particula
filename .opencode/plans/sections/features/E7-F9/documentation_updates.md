@@ -20,7 +20,15 @@
 - Public documentation remains unchanged. The implementation adds only internal
   resident multi-box lifecycle, logical-ID, RNG, and wall-loss regression
   coverage in `particula/execution/tests/multi_box_loop_test.py`; it introduces
-  no production or public behavior.
+   no production or public behavior.
+
+## P5 Completion (issue #1532)
+
+- Public and user documentation remain unchanged. The implementation adds only
+  regression coverage in `particula/execution/tests/transport_loop_test.py`,
+  `particula/execution/tests/restart_loop_test.py`, and
+  `particula/gpu/kernels/tests/communication_test.py`; it changes no production
+  API, checkpoint schema, scheduler ordering, or exports.
 
 - Add `docs/Examples/gpu_resident_multi_timestep.py` as the canonical complete
   E7 example using backend selection, resident state, multiple boxes/processes,

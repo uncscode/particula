@@ -57,14 +57,19 @@
     smoke coverage. No production code, exports, checkpoints, or public docs
     changed.
 
-- [ ] **E7-F9-P5:** Add transport expansion conservation and restart regressions
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Validate prescribed advection, dilution, mixing, and volume evolution
-    plus checkpoint/restart against independent CPU extensive-amount oracles.
+- [x] **E7-F9-P5:** Add transport expansion conservation and restart regressions
+  - Issue: #1532 | Size: S | Status: Completed 2026-08-11
+  - Delivered: Test-only regression coverage; production APIs, checkpoint schema,
+    scheduler ordering, exports, and user documentation are unchanged.
   - Files: `particula/execution/tests/transport_loop_test.py`,
-    `particula/execution/tests/restart_loop_test.py`
-  - Tests: Closed conservation, open ledgers, sparse/disconnected maps, expansion,
-    no overdraw, same-backend restart, and persistent per-box RNG.
+    `particula/execution/tests/restart_loop_test.py`, and
+    `particula/gpu/kernels/tests/communication_test.py`.
+  - Tests: Independent NumPy float64 extensive-amount oracle checks for two-step
+    directed expansion/reciprocal mixing with dilution, sparse closed-map
+    conservation, and empty/disabled write-free barriers; exact-device restart
+    with fresh restored identities and preserved published stream words; and
+    direct open-boundary source-minus-sink ledger reconciliation at
+    `rtol=1e-12`, `atol=1e-30`.
 
 - [ ] **E7-F9-P6:** Publish complete multi-timestep example with documentation regression
   - Issue: TBD | Size: S | Status: Not Started
