@@ -1,9 +1,10 @@
 """Run a complete multi-box GPU-resident scheduler example.
 
 Warp and the concrete resident seams are optional at import time.  When Warp is
-enabled, this example uploads CPU data once, runs two resident timesteps,
-observes caller-owned diagnostics, then manually checkpoints and restarts on the
-same device.  It is a bounded resident-loop example, not a CPU fallback,
+enabled, this example uploads primary CPU state once during setup, stages
+per-request gas and environment forcing, runs two resident timesteps, observes
+caller-owned diagnostics, then manually checkpoints and restarts on the same
+device.  It is a bounded resident-loop example, not a CPU fallback,
 automatic restart facility, direct-kernel orchestration, graph-capture example,
 or performance claim.
 """
@@ -52,6 +53,9 @@ class ExampleRun:
         gas_snapshot: Caller-owned gas diagnostic with shape ``(3, 1)``.
         saturation_snapshot: Caller-owned saturation diagnostic with shape
             ``(3, 1)``.
+        restart_gas_before_physics: Restarted gas observed before dispatch.
+        restart_temperature_before_physics: Restarted temperature observed
+            before dispatch.
         source_steps: Completed source scheduler steps.
         restarted_steps: Completed restarted scheduler steps.
     """
@@ -65,6 +69,8 @@ class ExampleRun:
     terminal_checkpoint: Any | None = None
     gas_snapshot: np.ndarray | None = None
     saturation_snapshot: np.ndarray | None = None
+    restart_gas_before_physics: np.ndarray | None = None
+    restart_temperature_before_physics: np.ndarray | None = None
     source_steps: int = 0
     restarted_steps: int = 0
 
@@ -159,7 +165,127 @@ def _resolved_graph(
     """Create the resolver-produced canonical twelve-node graph and schedule."""
     execution = runtime.execution
     graph_module = runtime.process_graph
-    schemas = {item.node_id: item for item in graph_module._NODE_CATALOGUE}
+    resource = graph_module.ResourceRequirement
+    invalidated = graph_module.InvalidatedState
+    schemas = {
+        "communication": (
+            graph_module.NodeKind.COMMUNICATION,
+            None,
+            frozenset(
+                {resource.PARTICLES, resource.GAS, resource.PROCESS_SIDECARS}
+            ),
+            frozenset({invalidated.SATURATION_RATIO}),
+        ),
+        "volume_evolution": (
+            graph_module.NodeKind.VOLUME_EVOLUTION,
+            None,
+            frozenset(
+                {resource.PARTICLES, resource.GAS, resource.PROCESS_SIDECARS}
+            ),
+            frozenset({invalidated.SATURATION_RATIO}),
+        ),
+        "environment_update": (
+            graph_module.NodeKind.ENVIRONMENT_UPDATE,
+            None,
+            frozenset({resource.ENVIRONMENT}),
+            frozenset(
+                {invalidated.VAPOR_PRESSURE, invalidated.SATURATION_RATIO}
+            ),
+        ),
+        "gas_update": (
+            graph_module.NodeKind.GAS_UPDATE,
+            None,
+            frozenset({resource.GAS}),
+            frozenset({invalidated.SATURATION_RATIO}),
+        ),
+        "vapor_pressure_refresh": (
+            graph_module.NodeKind.VAPOR_PRESSURE_REFRESH,
+            None,
+            frozenset(
+                {resource.GAS, resource.ENVIRONMENT, resource.THERMODYNAMICS}
+            ),
+            frozenset(),
+        ),
+        "saturation_refresh": (
+            graph_module.NodeKind.SATURATION_REFRESH,
+            None,
+            frozenset(
+                {resource.GAS, resource.ENVIRONMENT, resource.THERMODYNAMICS}
+            ),
+            frozenset(),
+        ),
+        "condensation": (
+            graph_module.NodeKind.PROCESS,
+            execution.CONDENSATION_PROCESS,
+            frozenset(
+                {
+                    resource.PARTICLES,
+                    resource.GAS,
+                    resource.ENVIRONMENT,
+                    resource.THERMODYNAMICS,
+                    resource.PROCESS_SIDECARS,
+                }
+            ),
+            frozenset({invalidated.SATURATION_RATIO}),
+        ),
+        "brownian_coagulation": (
+            graph_module.NodeKind.PROCESS,
+            execution.Process("brownian_coagulation"),
+            frozenset(
+                {
+                    resource.PARTICLES,
+                    resource.ENVIRONMENT,
+                    resource.PROCESS_SIDECARS,
+                }
+            ),
+            frozenset(),
+        ),
+        "dilution": (
+            graph_module.NodeKind.PROCESS,
+            execution.Process("dilution"),
+            frozenset({resource.PARTICLES, resource.GAS}),
+            frozenset(),
+        ),
+        "wall_loss": (
+            graph_module.NodeKind.PROCESS,
+            execution.Process("wall_loss"),
+            frozenset(
+                {
+                    resource.PARTICLES,
+                    resource.ENVIRONMENT,
+                    resource.PROCESS_SIDECARS,
+                }
+            ),
+            frozenset(),
+        ),
+        "nucleation": (
+            graph_module.NodeKind.PROCESS,
+            execution.Process("nucleation"),
+            frozenset(
+                {
+                    resource.PARTICLES,
+                    resource.GAS,
+                    resource.ENVIRONMENT,
+                    resource.PROCESS_SIDECARS,
+                }
+            ),
+            frozenset({invalidated.SATURATION_RATIO}),
+        ),
+        "diagnostics": (
+            graph_module.NodeKind.DIAGNOSTIC,
+            None,
+            frozenset(
+                {
+                    resource.PARTICLES,
+                    resource.GAS,
+                    resource.ENVIRONMENT,
+                    resource.THERMODYNAMICS,
+                    resource.DIAGNOSTICS,
+                }
+            ),
+            frozenset(),
+        ),
+    }
     condensation_requirements = next(
         item.requirements
         for item in execution.CONDENSATION_CAPABILITY_MATRIX.declarations
@@ -167,14 +293,14 @@ def _resolved_graph(
     )
     nodes = tuple(
         graph_module.ProcessNode(
-            schemas[node_id].node_id,
-            schemas[node_id].kind,
-            schemas[node_id].process,
+            node_id,
+            schemas[node_id][0],
+            schemas[node_id][1],
             condensation_requirements
             if node_id == "condensation"
             else execution.CapabilityRequirements(frozenset()),
-            schemas[node_id].resources,
-            schemas[node_id].invalidates,
+            schemas[node_id][2],
+            schemas[node_id][3],
         )
         for node_id in _NODE_IDS
     )
@@ -204,7 +330,8 @@ def _resolved_graph(
         ),
     )
     graph = schedule.source_graph
-    assert graph is not None
+    if graph is None:
+        raise RuntimeError("resolved schedule did not produce a source graph.")
     return graph, schedule, {node.node_id: node for node in graph.nodes}
 
 
@@ -285,7 +412,7 @@ def _request(
     execution = runtime.execution
     graph, schedule, nodes = _resolved_graph(runtime)
     device = session.particles.masses.device
-    communication_view = registry._views.get("communication_gas")
+    communication_view = registry.get_communication_resources()
     if communication_view is None:
         map_data = runtime.communication.CommunicationMap(
             runtime.communication.CommunicationMapForm.ARBITRARY_PAIRS,
@@ -309,7 +436,7 @@ def _request(
                         runtime.communication.CommunicationShapeKind.E,
                     ),
                 ),
-            ),
+            )
         )
     condensation_view = registry.acquire_condensation()
     coagulation_view = registry.acquire_coagulation(1)
@@ -470,10 +597,11 @@ def run_example(device: str = "cpu") -> ExampleRun:
             }
         )
     )
-    assert (
-        runtime.availability.resolve_availability(request, matrix).request
-        is request
-    )
+    decision = runtime.availability.resolve_availability(request, matrix)
+    if decision.request is not request:
+        raise RuntimeError(
+            "availability resolution returned a different request."
+        )
     particles, gas, environment = _build_cpu_state()
     session = runtime.gpu_session.setup_resident_session(
         particles, gas, environment, selected_device
@@ -495,29 +623,56 @@ def run_example(device: str = "cpu") -> ExampleRun:
         saturation_output.numpy().copy(),
     )
     checkpoint = session.checkpoint(registry, guard)
-    assert session.lifecycle is runtime.gpu_session.ResidentLifecycle.ACTIVE
+    if session.lifecycle is not runtime.gpu_session.ResidentLifecycle.ACTIVE:
+        raise RuntimeError(
+            "source session did not remain active at checkpoint."
+        )
     restarted_session, restarted_registry, restarted_guard = (
         runtime.checkpoint.restart_resident_session(checkpoint, selected_device)
     )
-    assert (
-        restarted_session is not session and restarted_registry is not registry
-    )
-    assert restarted_guard is not guard
-    restart_request, _, _ = _request(
-        runtime,
-        restarted_session,
-        restarted_registry,
-        restarted_guard,
-        1.0,
-        gas,
-        environment,
-    )
-    runtime.resident_scheduler.ResidentSimulationScheduler(
-        restart_request
-    ).execute(1.0)
-    restarted_guard.assert_step_closed()
+    if restarted_session is session or restarted_registry is registry:
+        raise RuntimeError("restart reused source identities.")
+    if restarted_guard is guard:
+        raise RuntimeError("restart reused the source guard.")
+    restart_gas_before_physics: np.ndarray | None = None
+    restart_temperature_before_physics: np.ndarray | None = None
+    try:
+        restart_request, _, _ = _request(
+            runtime,
+            restarted_session,
+            restarted_registry,
+            restarted_guard,
+            1.0,
+            checkpoint.gas,
+            checkpoint.environment,
+        )
+        runtime.warp.synchronize_device(
+            restarted_session.particles.masses.device
+        )
+        restart_gas_before_physics = (
+            restarted_session.gas.concentration.numpy().copy()
+        )
+        restart_temperature_before_physics = (
+            restarted_session.environment.temperature.numpy().copy()
+        )
+        if not np.array_equal(
+            restart_gas_before_physics, checkpoint.gas.concentration
+        ) or not np.array_equal(
+            restart_temperature_before_physics,
+            checkpoint.environment.temperature,
+        ):
+            raise RuntimeError(
+                "restart forcing does not match checkpoint state."
+            )
+        runtime.resident_scheduler.ResidentSimulationScheduler(
+            restart_request
+        ).execute(1.0)
+        restarted_guard.assert_step_closed()
+    finally:
+        restarted_session.close(restarted_registry, restarted_guard)
     terminal_checkpoint = session.finalize(registry, guard)
-    assert session.finalize(registry, guard) is terminal_checkpoint
+    if session.finalize(registry, guard) is not terminal_checkpoint:
+        raise RuntimeError("finalization did not return the cached checkpoint.")
     return ExampleRun(
         output=[
             "Warp CPU is the installed-Warp baseline; CUDA is optional.",
@@ -534,6 +689,8 @@ def run_example(device: str = "cpu") -> ExampleRun:
         terminal_checkpoint=terminal_checkpoint,
         gas_snapshot=gas_snapshot,
         saturation_snapshot=saturation_snapshot,
+        restart_gas_before_physics=restart_gas_before_physics,
+        restart_temperature_before_physics=restart_temperature_before_physics,
         source_steps=2,
         restarted_steps=1,
     )

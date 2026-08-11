@@ -11,6 +11,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Mapping, Sequence
 
+import numpy.testing as npt
 import pytest
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -152,6 +153,25 @@ def test_enabled_script_runs_warning_free_without_cuda_requirement() -> None:
         timeout=30,
     )
     assert result.stderr == ""
+    assert result.stdout.endswith("\n".join(_ENABLED) + "\n")
+
+
+@pytest.mark.warp
+def test_optimized_enabled_script_keeps_availability_validation() -> None:
+    """Optimized execution retains explicit availability validation."""
+    pytest.importorskip("warp")
+    result = subprocess.run(  # noqa: S603
+        [sys.executable, "-O", str(_EXAMPLE)],
+        check=True,
+        capture_output=True,
+        text=True,
+        env={
+            key: value
+            for key, value in os.environ.items()
+            if key != "PARTICULA_EXAMPLE_FORCE_NO_WARP"
+        },
+        timeout=30,
+    )
     assert result.stdout.endswith("\n".join(_ENABLED) + "\n")
 
 
@@ -374,9 +394,29 @@ def test_real_warp_cpu_example_has_resident_lifecycle_observations() -> None:
     )
     result.guard.assert_step_closed()
     restarted_guard.assert_step_closed()
+    assert restarted_session.lifecycle.value == "closed"
     assert restarted_session is not result.session
     assert restarted_registry is not result.registry
     assert restarted_guard is not result.guard
+    importlib.import_module("warp").synchronize_device(
+        result.session.particles.masses.device
+    )
+    npt.assert_allclose(
+        result.gas_snapshot,
+        result.session.gas.concentration.numpy(),
+    )
+    npt.assert_allclose(
+        result.saturation_snapshot,
+        result.session.environment.saturation_ratio.numpy(),
+    )
+    npt.assert_allclose(
+        result.restart_gas_before_physics,
+        result.checkpoint.gas.concentration,
+    )
+    npt.assert_allclose(
+        result.restart_temperature_before_physics,
+        result.checkpoint.environment.temperature,
+    )
 
 
 def test_example_documents_resident_ownership_limits() -> None:
@@ -392,3 +432,5 @@ def test_example_documents_resident_ownership_limits() -> None:
     ):
         assert phrase in text
     assert "_step_gpu" not in text
+    assert "_NODE_CATALOGUE" not in text
+    assert "registry._views" not in text

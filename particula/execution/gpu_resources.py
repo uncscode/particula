@@ -1979,6 +1979,22 @@ class GPUResourceRegistry:
             )
         return view
 
+    def get_communication_resources(self) -> CommunicationResources | None:
+        """Return the established concrete communication view, if any.
+
+        This metadata-only accessor exposes the single identity-pinned resident
+        communication family so an explicit checkpoint restart can reuse its
+        restored configuration without accessing registry internals.
+        """
+        self._validate_session_signature()
+        gas = self._views.get("communication_gas")
+        particles = self._views.get("communication_particles")
+        if gas is not None and particles is not None:
+            raise ValueError(
+                "Only one resident communication family may be bound."
+            )
+        return gas if gas is not None else particles
+
     def validate_communication_resources(
         self, session: ResidentSession, resources: CommunicationResources
     ) -> None:
