@@ -272,6 +272,30 @@ with the production helper under test. Compare each meaningful output
 separately so an aggregate total cannot hide a component error. Keep direct
 kernel tests separate from resident scheduler and integration tests.
 
+### Resident execution closeout coverage
+
+When resident lifecycle or communication changes affect diagnostics,
+resources, checkpoints, scheduling, or resident communication, retain the
+per-target term-missing rows and require the aggregate 80% gate for these
+changed-module targets: `diagnostics.py`, `gpu_resources.py`,
+`checkpoint.py`, `resident_scheduler.py`, and `resident_communication.py`.
+
+```bash
+pytest particula/execution/tests/ -q \
+  --cov=particula.execution.diagnostics,particula.execution.gpu_resources,particula.execution.checkpoint,particula.execution.resident_scheduler,particula.execution.resident_communication \
+  --cov-report=term-missing --cov-fail-under=80
+```
+
+### Release-validation command sets
+
+Run the hardware-free GPU documentation contract test during release
+validation, alongside the applicable focused tests and the repository's
+untargeted coverage runner:
+
+```bash
+pytest particula/tests/gpu_coagulation_docs_test.py -q
+```
+
 ### Device-aware tolerance policy
 
 Keep GPU assertions in three separate classes. Deterministic parity,
