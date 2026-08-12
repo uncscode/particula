@@ -16200,9 +16200,21 @@
 
     <div class="doc doc-contents first">
 
-        <p>Copy closed-protocol resident diagnostics into caller-owned Warp outputs.</p>
-<p>This direct-import-only module has no callback registration or package export.
-It snapshots only resident gas concentration and environment saturation ratio.</p>
+        <p>Write closed resident diagnostics into caller-owned Warp arrays.</p>
+<p>This concrete direct-import-only module has no callback registration or package
+export. Registrations execute in this fixed order: gas-concentration snapshot,
+saturation-ratio snapshot, total species mass, particle-number concentration,
+latent heat energy, and conservation residual. Matrix operations use <code>(B, S)</code>
+<code>wp.float64</code> arrays; particle number uses a <code>(B,)</code> <code>wp.float64</code> array.</p>
+<p>Total species mass is <code>V[b] * (Σp(m[b, p, s] * c[b, p]) + g[b, s])</code> in kg.
+Particle number is <code>Σp(c[b, p])</code> in m^-3. Latent energy copies signed
+whole-call P2-finalized energy in J. The residual is
+<code>total_mass - baseline_total_mass - source_ledger + sink_ledger</code> in kg;
+source and sink ledgers are nonnegative accumulated extensive-mass inputs.
+Execution validates caller-owned same-device bindings without host readback,
+synchronization, transfer, allocation, or physics mutation. Empty matrix
+operations are write-free for <code>B == 0</code> or <code>S == 0</code>; particle number is
+write-free only for <code>B == 0</code>.</p>
 
 
 
@@ -16240,9 +16252,7 @@ It snapshots only resident gas concentration and environment saturation ratio.</
 
 
 
-        <p>Enumerate the only resident diagnostic snapshot operations.</p>
-<p>The protocol permits snapshots of current gas concentration and saturation
-ratio only. It does not accept callbacks or arbitrary resident inspection.</p>
+        <p>Enumerate the closed resident diagnostic operations in launch order.</p>
 
 
 
@@ -16286,14 +16296,14 @@ ratio only. It does not accept callbacks or arbitrary resident inspection.</p>
   </span>
 
 <a href="#particula.execution.diagnostics.ResidentDiagnosticRegistration" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ResidentDiagnosticRegistration</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">ResidentDiagnosticOperation</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ResidentDiagnosticRegistration</span><span class="p">(</span><span class="n">operation</span><span class="p">:</span> <span class="n">ResidentDiagnosticOperation</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">energy_transfer</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">baseline_total_mass</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">source_ledger</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sink_ledger</span><span class="p">:</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
 
 
-        <p>Bind one closed diagnostic operation to one caller-owned output.</p>
+        <p>Bind one closed diagnostic operation to caller-owned Warp arrays.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -16303,7 +16313,7 @@ ratio only. It does not accept callbacks or arbitrary resident inspection.</p>
               (<code><a class="autorefs autorefs-internal" title="            ResidentDiagnosticOperation (particula.execution.diagnostics.ResidentDiagnosticOperation)" href="#particula.execution.diagnostics.ResidentDiagnosticOperation">ResidentDiagnosticOperation</a></code>)
           –
           <div class="doc-md-description">
-            <p>Exact closed operation that selects the resident source.</p>
+            <p>Exact closed operation that selects the diagnostic reduction.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -16311,7 +16321,43 @@ ratio only. It does not accept callbacks or arbitrary resident inspection.</p>
               (<code><span title="object">object</span></code>)
           –
           <div class="doc-md-description">
-            <p>Caller-owned Warp <code>float64</code> array validated by the executor.</p>
+            <p>Caller-owned Warp <code>float64</code> output validated by the executor.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.diagnostics.ResidentDiagnosticRegistration.energy_transfer">energy_transfer</span></code></b>
+              (<code><span title="object">object</span> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>Required <code>(B, S)</code> signed whole-call energy input in
+J for latent-energy output; forbidden otherwise.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.diagnostics.ResidentDiagnosticRegistration.baseline_total_mass">baseline_total_mass</span></code></b>
+              (<code><span title="object">object</span> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>Required <code>(B, S)</code> extensive mass baseline in kg
+for residual output; forbidden otherwise.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.diagnostics.ResidentDiagnosticRegistration.source_ledger">source_ledger</span></code></b>
+              (<code><span title="object">object</span> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>Required nonnegative extensive source ledger for the
+residual in kg; forbidden otherwise.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+          <b><code><span title="particula.execution.diagnostics.ResidentDiagnosticRegistration.sink_ledger">sink_ledger</span></code></b>
+              (<code><span title="object">object</span> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>Required nonnegative extensive sink ledger for residual in
+kg; forbidden otherwise.</p>
           </div>
         </li>
     </ul>
@@ -16362,30 +16408,88 @@ ratio only. It does not accept callbacks or arbitrary resident inspection.</p>
             <p>If <code>operation</code> is not an exact supported operation.</p>
           </div>
         </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If required accounting inputs are missing or forbidden
+accounting inputs are supplied for <code>operation</code>.</p>
+          </div>
+        </li>
     </ul>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/diagnostics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate the exact closed diagnostic operation.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        TypeError: If ``operation`` is not an exact supported operation.</span>
+<span class="sd">        ValueError: If required accounting inputs are missing or forbidden</span>
+<span class="sd">            accounting inputs are supplied for ``operation``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentDiagnosticOperation</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="s2">&quot;operation must be an exact ResidentDiagnosticOperation.&quot;</span>
         <span class="p">)</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_transfer</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseline_total_mass</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_ledger</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sink_ledger</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation</span> <span class="ow">is</span> <span class="n">ResidentDiagnosticOperation</span><span class="o">.</span><span class="n">LATENT_HEAT_ENERGY</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_transfer</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;latent energy requires only energy_transfer.&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation</span> <span class="ow">is</span> <span class="n">ResidentDiagnosticOperation</span><span class="o">.</span><span class="n">CONSERVATION_RESIDUAL</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">(</span><span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_transfer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;residual requires baseline, source, and sink ledgers.&quot;</span>
+            <span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;diagnostic operation forbids accounting inputs.&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16416,10 +16520,12 @@ ratio only. It does not accept callbacks or arbitrary resident inspection.</p>
 
 
         <p>Execute an already-bound closed diagnostics plan without transfers.</p>
-<p>Validation preserves caller ownership and rejects outputs that alias
-resident primaries, published sidecars, or another diagnostic output.
-Execution copies registrations in declared order and is write-free for
-empty matrices.</p>
+<p>Validation preserves caller ownership and rejects output or accounting-input
+aliases with resident primaries, published sidecars, or diagnostic outputs.
+Execution dispatches the six canonical registrations without host readback,
+synchronization, transfer, allocation, or physics mutation. Matrix
+registrations are write-free for empty <code>(B, S)</code> schemas; particle number
+remains writable for <code>(B, 0)</code>.</p>
 
 
 
@@ -16455,8 +16561,11 @@ empty matrices.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Validate and snapshot each registration in declared order.</p>
-<p>Empty <code>(B, S)</code> output schemas complete without a kernel launch.</p>
+        <p>Validate and dispatch each registration in declared order.</p>
+<p>Matrix schemas complete without their writer launch when <code>B == 0</code> or
+<code>S == 0</code>. Particle number still launches for <code>(B, 0)</code> because its
+<code>(B,)</code> output exists. Successful launches are asynchronous; callers
+synchronize before inspecting outputs on the host.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -16493,40 +16602,29 @@ empty matrices.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/diagnostics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span>
-<span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and snapshot each registration in declared order.</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and dispatch each registration in declared order.</span>
 
-<span class="sd">    Empty ``(B, S)`` output schemas complete without a kernel launch.</span>
+<span class="sd">    Matrix schemas complete without their writer launch when ``B == 0`` or</span>
+<span class="sd">    ``S == 0``. Particle number still launches for ``(B, 0)`` because its</span>
+<span class="sd">    ``(B,)`` output exists. Successful launches are asynchronous; callers</span>
+<span class="sd">    synchronize before inspecting outputs on the host.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        plan: Exact plan selecting the sources and caller-owned outputs.</span>
@@ -16536,24 +16634,7 @@ empty matrices.</p>
 <span class="sd">        ValueError: If its bindings or output metadata are invalid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">plan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
-    <span class="n">dimensions</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">dimensions</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">dimensions</span><span class="o">.</span><span class="n">n_boxes</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">dimensions</span><span class="o">.</span><span class="n">n_species</span><span class="p">:</span>
-        <span class="k">return</span>
-    <span class="n">gas</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">plan</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">gas</span><span class="p">)</span>
-    <span class="n">environment</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="n">plan</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">environment</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">registration</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">registrations</span><span class="p">:</span>
-        <span class="n">source</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">gas</span><span class="o">.</span><span class="n">concentration</span>
-            <span class="k">if</span> <span class="n">registration</span><span class="o">.</span><span class="n">operation</span>
-            <span class="ow">is</span> <span class="n">ResidentDiagnosticOperation</span><span class="o">.</span><span class="n">GAS_CONCENTRATION_SNAPSHOT</span>
-            <span class="k">else</span> <span class="n">environment</span><span class="o">.</span><span class="n">saturation_ratio</span>
-        <span class="p">)</span>
-        <span class="n">wp</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-            <span class="n">_copy_snapshot</span><span class="p">,</span>
-            <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="n">dimensions</span><span class="o">.</span><span class="n">n_boxes</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">.</span><span class="n">n_species</span><span class="p">),</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">source</span><span class="p">,</span> <span class="n">registration</span><span class="o">.</span><span class="n">output</span><span class="p">],</span>
-            <span class="n">device</span><span class="o">=</span><span class="n">source</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-        <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_execute_validated</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -16576,6 +16657,19 @@ empty matrices.</p>
         <p>Validate one exact diagnostics plan without dispatching a kernel.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>plan</code></b>
+              (<code><span title="object">object</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Candidate concrete diagnostics plan.</p>
+          </div>
+        </li>
+    </ul>
+
+
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
@@ -16593,22 +16687,58 @@ empty matrices.</p>
     </ul>
 
 
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="TypeError">TypeError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If <code>plan</code> is not an exact diagnostics plan.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+              <code><span title="ValueError">ValueError</span></code>
+            –
+          <div class="doc-md-description">
+            <p>If the plan's graph, bindings, or registration protocol
+is invalid.</p>
+          </div>
+        </li>
+    </ul>
+
+
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/diagnostics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResidentDiagnosticsPlan</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResidentDiagnosticsPlan</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate one exact diagnostics plan without dispatching a kernel.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        plan: Candidate concrete diagnostics plan.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The unchanged, exact validated plan.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If ``plan`` is not an exact diagnostics plan.</span>
+<span class="sd">        ValueError: If the plan&#39;s graph, bindings, or registration protocol</span>
+<span class="sd">            is invalid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ResidentDiagnosticsPlan</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;plan must be an exact ResidentDiagnosticsPlan.&quot;</span><span class="p">)</span>
@@ -16723,7 +16853,8 @@ empty matrices.</p>
    (particula.execution.diagnostics.ResidentDiagnosticRegistration)" href="#particula.execution.diagnostics.ResidentDiagnosticRegistration">ResidentDiagnosticRegistration</a>, ...]</code>)
           –
           <div class="doc-md-description">
-            <p>Ordered closed operation and output bindings.</p>
+            <p>Exact canonical tuple of the six ordered closed
+operation and output bindings, validated by the executor.</p>
           </div>
         </li>
     </ul>
@@ -16781,37 +16912,37 @@ executor so plan construction does not inspect Warp-array metadata.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>particula/execution/diagnostics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate exact types for the resident diagnostics binding.</span>
 
 <span class="sd">    Structural graph, lifecycle, and output validation is deferred to the</span>

@@ -12785,6 +12785,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#e7-f9-resident-support-validation-matrix-2026-08-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E7-F9 resident support validation matrix (2026-08-11)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#complete-direct-process-illustration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -16371,6 +16382,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#e7-f9-resident-support-validation-matrix-2026-08-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E7-F9 resident support validation matrix (2026-08-11)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#complete-direct-process-illustration" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -16972,9 +16994,12 @@ launches. See
 are not exported by <code>particula.execution</code> or the top-level package. The
 scheduler accepts one identity-bound active session, pinned registry, closed
 guard, and resolver-produced complete schedule; direct adapters retain the
-resident objects by identity. Diagnostics is a closed two-snapshot protocol,
-not a callback API: it copies only to separate caller-owned outputs and supplies
-no implicit host inspection or transfer.</p>
+resident objects by identity. Diagnostics accepts either the legacy ordered
+two-snapshot plan (gas concentration, then saturation ratio) or the current
+ordered six-operation plan, which appends total species mass, particle number,
+latent energy, and conservation residual. Other subsets and orderings fail
+closed. This migration rule retains old callers without creating a callback API
+or implicit host inspection or transfer.</p>
 <p>The closed schedule contains exactly these twelve node IDs:</p>
 <p><code>communication</code>, <code>volume_evolution</code>, <code>environment_update</code>, <code>gas_update</code>,
 <code>vapor_pressure_refresh</code>, <code>saturation_refresh</code>, <code>condensation</code>,
@@ -17082,6 +17107,121 @@ physics. Preflight rejection leaves active state unchanged. After writer-capable
 dispatch begins, a failure may fault the session and has no rollback or retry
 guarantee. Checkpoint/finalize/restart remain the explicit exact-device boundary
 documented in <a href="../gpu_resident_checkpoints/">GPU resident checkpoints</a>.</p>
+<h3 id="e7-f9-resident-support-validation-matrix-2026-08-11">E7-F9 resident support validation matrix (2026-08-11)<a class="headerlink" href="#e7-f9-resident-support-validation-matrix-2026-08-11" title="Permanent link">&para;</a></h3>
+<p>The supported resident example is the repository-relative
+<a href="../../Examples/gpu_resident_multi_timestep/">multi-timestep resident source</a>.
+This closeout is scoped to <a href="https://github.com/Gorkowski/particula/issues/1451">issue #1451</a>.</p>
+<p><strong>Status: closeout validation pending.</strong> The historical four-module evidence
+passed, but shipment now requires the corrected five-module coverage command
+below to complete and record its literal result. Epic H and Epic I remain
+deferred.</p>
+<p>The P1--P6 changed executable-module coverage target list is:</p>
+<ul>
+<li><code>particula/execution/diagnostics.py</code></li>
+<li><code>particula/execution/gpu_resources.py</code></li>
+<li><code>particula/execution/checkpoint.py</code></li>
+<li><code>particula/execution/resident_communication.py</code></li>
+<li><code>particula/execution/resident_scheduler.py</code></li>
+</ul>
+<p>Documentation-only P7 files are not executable coverage targets. The required
+changed-module aggregate gate is <strong>at least 80%</strong>. The historical four-module
+closeout passed at 95%; the updated five-module command below must retain its
+literal aggregate and per-target term-missing rows.</p>
+<table>
+<thead>
+<tr>
+<th>Evidence category</th>
+<th>Required command group</th>
+<th>Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Selection/parity; lifecycle/identity; canonical scheduling/freshness; diagnostic ownership; closed-map transport and conservation; stream/checkpoint continuation; errors/no fallback; example/docs</td>
+<td>Focused assertions</td>
+<td>Passed: 289 assertions, 289 passed; coverage disabled.</td>
+</tr>
+<tr>
+<td>Export boundary</td>
+<td>Frozen export assertions</td>
+<td>Passed: 15 assertions, 15 passed; coverage disabled.</td>
+</tr>
+<tr>
+<td>Resident fast suite</td>
+<td>Full resident suite</td>
+<td>Passed: 891 tests, 891 passed; coverage disabled.</td>
+</tr>
+<tr>
+<td>Full-package coverage</td>
+<td>Whole-package coverage</td>
+<td>Passed: 6,254 tests, 9 skipped, 93% coverage.</td>
+</tr>
+<tr>
+<td>P1--P6 changed-module coverage</td>
+<td>Five-target coverage gate, <code>&gt;=80%</code> aggregate</td>
+<td>Run the command below and retain its literal aggregate and per-target term-missing rows, including <code>resident_communication.py</code>.</td>
+</tr>
+<tr>
+<td>Strict documentation</td>
+<td>Strict MkDocs build</td>
+<td>Passed: <code>mkdocs build --strict</code> validated successfully.</td>
+</tr>
+<tr>
+<td>Optional CUDA</td>
+<td>CUDA guarded suites</td>
+<td>Passed: <code>multi_box_loop_test.py</code> row and <code>condensation_integration_test.py</code> / <code>coagulation_integration_test.py</code> rows passed under <code>-m "warp and cuda"</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Run the groups sequentially; retain literal output, Warp availability, qualified
+devices, test counts, coverage results, and per-target term-missing rows:</p>
+<div class="highlight"><pre><span></span><code>pytest<span class="w"> </span>particula/execution/tests/diagnostics_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/gpu_resources_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/checkpoint_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/rng_invariance_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/full_loop_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/multi_box_loop_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/transport_loop_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/restart_loop_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/condensation_integration_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/coagulation_integration_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/errors_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/fallback_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/fallback_integration_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/tests/gpu_resident_multi_timestep_docs_test.py<span class="w"> </span>-q
+pytest<span class="w"> </span>particula/execution/tests/exports_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/tests/execution_exports_test.py<span class="w"> </span>-q
+pytest<span class="w"> </span>particula/execution/tests/<span class="w"> </span>-q
+pytest<span class="w"> </span>--cov<span class="o">=</span>particula<span class="w"> </span>--cov-report<span class="o">=</span>term-missing
+pytest<span class="w"> </span>particula/execution/tests/<span class="w"> </span>-q<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cov<span class="o">=</span>particula.execution.diagnostics<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cov<span class="o">=</span>particula.execution.gpu_resources<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cov<span class="o">=</span>particula.execution.checkpoint<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cov<span class="o">=</span>particula.execution.resident_communication<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cov<span class="o">=</span>particula.execution.resident_scheduler<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cov-report<span class="o">=</span>term-missing<span class="w"> </span>--cov-fail-under<span class="o">=</span><span class="m">80</span>
+mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
+pytest<span class="w"> </span>particula/execution/tests/multi_box_loop_test.py<span class="w"> </span>-q<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span>
+pytest<span class="w"> </span>particula/execution/tests/condensation_integration_test.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>particula/execution/tests/coagulation_integration_test.py<span class="w"> </span>-q<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-m<span class="w"> </span><span class="s2">&quot;warp and cuda&quot;</span>
+</code></pre></div>
+<p>Acceptance classes remain separate: deterministic comparisons use their owning
+explicit <code>rtol</code>/<code>atol</code>; closed concentration-weighted inventory and ledger
+checks use <code>rtol=1e-12, atol=1e-30</code>; and stochastic evidence is P4's 100-seed
+Warp-CPU aggregate/binomial evidence with an optional 12-seed CUDA bounded
+smoke—not exact per-seed or cross-backend replay.</p>
+<p>The supported boundary remains concrete-only and caller-owned: setup uploads
+each CPU container once; registry resources are identity-pinned; diagnostics
+copy only to caller-owned outputs; schema-v3/v4 current words, not lossy inspection
+carriers, are continuation authority; manual in-memory restart requires the
+exact device and creates fresh identities; and source finalization caches its
+first snapshot. Export expansion, automatic restart, device selection or
+migration, hidden transfer/synchronization, CPU fallback, retry or rollback
+after writer launch, open or unsupported resident communication, graph capture,
+performance/scaling claims, autodiff, multi-GPU/distributed work, and
+cross-backend exact RNG replay remain deferred.</p>
 <h3 id="complete-direct-process-illustration">Complete direct-process illustration<a class="headerlink" href="#complete-direct-process-illustration" title="Permanent link">&para;</a></h3>
 <p>The <a href="https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_complete_process_sequence.py">complete direct-process source</a>
 is an illustrative explicit-transfer five-call sequence, not a resident
