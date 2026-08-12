@@ -8,6 +8,7 @@ work.
 """
 
 import importlib
+import warnings
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Protocol, cast
@@ -158,7 +159,13 @@ class _WarpAvailabilityProvider:
         """
         try:
             runtime = importlib.import_module("warp")
-            runtime.get_device(device.native)
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message="Due to '_pack_'.*",
+                    category=DeprecationWarning,
+                )
+                runtime.get_device(device.native)
         except Exception:
             return False
         return True

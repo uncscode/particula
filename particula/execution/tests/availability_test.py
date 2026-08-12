@@ -3,6 +3,7 @@
 import subprocess
 import sys
 import textwrap
+import warnings
 from collections.abc import Iterator, Mapping
 from dataclasses import FrozenInstanceError
 from typing import cast
@@ -667,6 +668,62 @@ def test_warp_lazy_import_and_opaque_device(
     availability.resolve_availability(request, _matrix(request))
 
     assert imports == ["opaque:0"]
+
+
+def test_warp_device_ignores_python_314_pack_warning(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Known Warp ctypes deprecation does not hide an available device."""
+    request = _request(Backend.WARP)
+
+    class Runtime:
+        """Warn while successfully resolving the requested device."""
+
+        def get_device(self, _: str) -> None:
+            """Emit Warp's Python 3.14 ctypes warning."""
+            warnings.warn(
+                "Due to '_pack_', the 'APICLaunchParamRecord' Structure will "
+                "use memory layout compatible with MSVC (Windows).",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
+    monkeypatch.setattr(
+        availability.importlib, "import_module", lambda _: Runtime()
+    )
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        decision = availability.resolve_availability(request, _matrix(request))
+
+    assert decision.request is request
+
+
+def test_warp_device_preserves_unrelated_warning_errors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Unrelated warning errors still make device resolution fail closed."""
+    request = _request(Backend.WARP)
+
+    class Runtime:
+        """Warn unexpectedly while resolving the requested device."""
+
+        def get_device(self, _: str) -> None:
+            """Emit an unrelated dependency deprecation."""
+            warnings.warn(
+                "unexpected dependency deprecation",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
+    monkeypatch.setattr(
+        availability.importlib, "import_module", lambda _: Runtime()
+    )
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        with pytest.raises(UnavailableDeviceError):
+            availability.resolve_availability(request, _matrix(request))
 
 
 def test_warp_import_failure_maps_to_unavailable_runtime(
