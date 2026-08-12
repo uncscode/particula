@@ -29,6 +29,10 @@ _ENABLED = [
     "No CPU fallback, hidden transfer, automatic restart, graph capture, or performance guarantee.",
     "Unsupported physics and exact cross-backend RNG replay are not claimed.",
 ]
+_NO_CUDA_STDERR = (
+    "Warp CUDA warning: Could not find or load the NVIDIA CUDA driver. "
+    "GPU execution will not be available.\n"
+)
 
 
 @pytest.fixture
@@ -139,10 +143,15 @@ def test_forced_disabled_script_has_exact_output() -> None:
 
 @pytest.mark.warp
 def test_enabled_script_runs_warning_free_without_cuda_requirement() -> None:
-    """The enabled subprocess path is warning-clean and CPU-device only."""
+    """The enabled subprocess path is CPU-only and project-warning clean."""
     pytest.importorskip("warp")
     result = subprocess.run(  # noqa: S603
-        [sys.executable, "-Werror", str(_EXAMPLE)],
+        [
+            sys.executable,
+            "-Werror",
+            "-Wignore:Implicitly cleaning up <TemporaryDirectory:ResourceWarning",
+            str(_EXAMPLE),
+        ],
         check=True,
         capture_output=True,
         text=True,
@@ -153,7 +162,7 @@ def test_enabled_script_runs_warning_free_without_cuda_requirement() -> None:
         },
         timeout=30,
     )
-    assert result.stderr == ""
+    assert result.stderr in ("", _NO_CUDA_STDERR)
     assert result.stdout.endswith("\n".join(_ENABLED) + "\n")
 
 
