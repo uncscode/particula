@@ -298,9 +298,12 @@ launches. See
 are not exported by `particula.execution` or the top-level package. The
 scheduler accepts one identity-bound active session, pinned registry, closed
 guard, and resolver-produced complete schedule; direct adapters retain the
-resident objects by identity. Diagnostics is a closed two-snapshot protocol,
-not a callback API: it copies only to separate caller-owned outputs and supplies
-no implicit host inspection or transfer.
+resident objects by identity. Diagnostics accepts either the legacy ordered
+two-snapshot plan (gas concentration, then saturation ratio) or the current
+ordered six-operation plan, which appends total species mass, particle number,
+latent energy, and conservation residual. Other subsets and orderings fail
+closed. This migration rule retains old callers without creating a callback API
+or implicit host inspection or transfer.
 
 The closed schedule contains exactly these twelve node IDs:
 
@@ -405,20 +408,23 @@ The supported resident example is the repository-relative
 [multi-timestep resident source](../Examples/gpu_resident_multi_timestep.py).
 This closeout is scoped to [issue #1451](https://github.com/Gorkowski/particula/issues/1451).
 
-**Status: shipped on 2026-08-11.** P1--P6 artifacts were verified, Warp CPU was
-available, the CUDA-guarded rows passed, and the required strict documentation
-validation passed. Epic G is shipped; Epic H and Epic I remain deferred.
+**Status: closeout validation pending.** The historical four-module evidence
+passed, but shipment now requires the corrected five-module coverage command
+below to complete and record its literal result. Epic H and Epic I remain
+deferred.
 
 The P1--P6 changed executable-module coverage target list is:
 
 - `particula/execution/diagnostics.py`
 - `particula/execution/gpu_resources.py`
 - `particula/execution/checkpoint.py`
+- `particula/execution/resident_communication.py`
 - `particula/execution/resident_scheduler.py`
 
 Documentation-only P7 files are not executable coverage targets. The required
-changed-module aggregate gate is **at least 80%** and passed at 95%, with the
-per-target term-missing rows recorded below.
+changed-module aggregate gate is **at least 80%**. The historical four-module
+closeout passed at 95%; the updated five-module command below must retain its
+literal aggregate and per-target term-missing rows.
 
 | Evidence category | Required command group | Outcome |
 | --- | --- | --- |
@@ -426,7 +432,7 @@ per-target term-missing rows recorded below.
 | Export boundary | Frozen export assertions | Passed: 15 assertions, 15 passed; coverage disabled. |
 | Resident fast suite | Full resident suite | Passed: 891 tests, 891 passed; coverage disabled. |
 | Full-package coverage | Whole-package coverage | Passed: 6,254 tests, 9 skipped, 93% coverage. |
-| P1--P6 changed-module coverage | Four-target coverage gate, `>=80%` aggregate | Passed: 891 tests, 95% aggregate coverage. Term-missing rows: `diagnostics.py` 79%, `gpu_resources.py` 87%, `checkpoint.py` 87%, `resident_scheduler.py` 86%. |
+| P1--P6 changed-module coverage | Five-target coverage gate, `>=80%` aggregate | Run the command below and retain its literal aggregate and per-target term-missing rows, including `resident_communication.py`. |
 | Strict documentation | Strict MkDocs build | Passed: `mkdocs build --strict` validated successfully. |
 | Optional CUDA | CUDA guarded suites | Passed: `multi_box_loop_test.py` row and `condensation_integration_test.py` / `coagulation_integration_test.py` rows passed under `-m "warp and cuda"`. |
 
@@ -453,7 +459,11 @@ pytest particula/execution/tests/exports_test.py \
 pytest particula/execution/tests/ -q
 pytest --cov=particula --cov-report=term-missing
 pytest particula/execution/tests/ -q \
-  --cov=particula.execution.diagnostics,particula.execution.gpu_resources,particula.execution.checkpoint,particula.execution.resident_scheduler \
+  --cov=particula.execution.diagnostics \
+  --cov=particula.execution.gpu_resources \
+  --cov=particula.execution.checkpoint \
+  --cov=particula.execution.resident_communication \
+  --cov=particula.execution.resident_scheduler \
   --cov-report=term-missing --cov-fail-under=80
 mkdocs build --strict
 pytest particula/execution/tests/multi_box_loop_test.py -q \
@@ -471,7 +481,7 @@ smoke—not exact per-seed or cross-backend replay.
 
 The supported boundary remains concrete-only and caller-owned: setup uploads
 each CPU container once; registry resources are identity-pinned; diagnostics
-copy only to caller-owned outputs; schema-v3 current words, not lossy inspection
+copy only to caller-owned outputs; schema-v3/v4 current words, not lossy inspection
 carriers, are continuation authority; manual in-memory restart requires the
 exact device and creates fresh identities; and source finalization caches its
 first snapshot. Export expansion, automatic restart, device selection or

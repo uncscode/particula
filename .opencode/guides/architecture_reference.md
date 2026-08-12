@@ -150,10 +150,11 @@ eligible for explicit restart. Schema-v3 requires canonical published-stream
 continuation metadata, although its current-word payload collection may be
 empty. Immutable current RNG words are recovery authority and ordinary payloads
 exclude RNG sidecars. Before setup, acquired coagulation and wall-loss process
-families must pair bidirectionally with continuation payloads; legacy records
-with acquired RNG process resources reject rather than reseed. E7-F5 P2 supplies declaration-only scheduling;
-E7-F7 transport is shipped, while E7-F8 integration and remaining RNG-stream
-policy remain future work. E7-F7 P4 particle
+ families must pair bidirectionally with continuation payloads. Authentic
+ schema-v1/v2 in-family RNG payloads restore their words, while legacy records
+ lacking historical words reject rather than reseed. E7-F5 P2
+ supplies declaration-only scheduling; E7-F7 transport and E7-F8 RNG-stream
+ integration are shipped. E7-F7 P4 particle
 transport is shipped as the concrete-only
 ``particula.gpu.kernels.communication.particle_communication_step_gpu`` seam.
 P4 owns immutable pre-step planning, admission, and one gated particle commit;
@@ -266,9 +267,11 @@ semantics remain authoritative. No process-adapter name is exported through
 
 E7-F5 P6 adds two further direct-import-only resident boundaries:
 `particula.execution.diagnostics` and
-`particula.execution.resident_scheduler`. Diagnostics is a closed two-operation
-protocol (`GAS_CONCENTRATION_SNAPSHOT` and `SATURATION_RATIO_SNAPSHOT`), not a
-callback API. Its separately caller-owned contiguous float64 `(B, S)` outputs
+`particula.execution.resident_scheduler`. Diagnostics accepts the legacy closed
+two-snapshot protocol (`GAS_CONCENTRATION_SNAPSHOT` then
+`SATURATION_RATIO_SNAPSHOT`) and the current ordered six-operation protocol;
+other subsets and orderings fail closed. It is not a callback API. Its
+separately caller-owned contiguous float64 `(B, S)` outputs
 are checked against primaries, published sidecars, and one another; canonical
 empty shapes are successful write-free no-ops. The scheduler accepts only the
 complete twelve-node resolver-produced schedule and one exact active

@@ -22,6 +22,11 @@ single synchronization boundary. Continuation words and their acquired process
 families must agree. The words are the continuation authority on an exact-device
 restart; normal dispatch and reacquisition retain restored arrays by identity
 until reset is explicitly requested.
+
+Schema-v4 adds an explicit acquired RNG-process inventory. Schema-v3 records
+created before that inventory existed infer it from their continuation payloads;
+schema-v1/v2 records may retain their historical in-family ``rng_states``
+payloads.
 """
 
 from __future__ import annotations
@@ -48,7 +53,7 @@ if TYPE_CHECKING:
     from particula.gas import EnvironmentData, GasData
     from particula.particles import ParticleData
 
-_SCHEMA_VERSION = 3
+_SCHEMA_VERSION = 4
 _PRIMARY_ROLES = (
     ("particles", "masses"),
     ("particles", "concentration"),
@@ -119,14 +124,15 @@ class ResidentCheckpoint:
             caller-owned outputs are never checkpoint authority.
         communication: Optional schema-v2-or-later metadata for one pinned,
             complete closed-map communication family.
-        rng_continuation: Required schema-v3 metadata with optional current
-            ``uint32`` words for published coagulation and wall-loss streams.
+        rng_continuation: Required schema-v3-or-later metadata with optional
+            current ``uint32`` words for published coagulation and wall-loss
+            streams.
             Pre-v3 records must omit it. The words are authoritative
             continuation state on exact-device restart.
-        rng_resource_processes: Canonical process-family inventory for acquired
-            RNG resources. This preserves the wall-loss acquisition boundary,
-            whose sole ``rng_states`` sidecar is intentionally excluded from
-            ordinary payloads.
+        rng_resource_processes: Schema-v4 canonical process-family inventory
+            for acquired RNG resources. This preserves the wall-loss
+            acquisition boundary, whose sole ``rng_states`` sidecar is
+            intentionally excluded from ordinary payloads.
     """
 
     schema_version: int
@@ -745,7 +751,7 @@ def _preflight_restart(  # noqa: C901
         raise TypeError("checkpoint must be an exact ResidentCheckpoint.")
     if (
         type(checkpoint.schema_version) is not int
-        or checkpoint.schema_version not in (1, 2, _SCHEMA_VERSION)
+        or checkpoint.schema_version not in (1, 2, 3, _SCHEMA_VERSION)
         or type(checkpoint.carrier_type) is not str
         or checkpoint.carrier_type != "ResidentSession"
     ):
@@ -868,8 +874,14 @@ def _preflight_restart(  # noqa: C901
             or item.capacity is not None
         ):
             raise ValueError("checkpoint primary payload metadata is invalid.")
+    resource_payloads = payloads[len(_PRIMARY_ROLES) :]
+    continuation = _validate_rng_continuation(checkpoint, dimensions)
+    if checkpoint.schema_version < 3:
+        resource_payloads, continuation = _normalize_legacy_rng_payloads(
+            resource_payloads, dimensions
+        )
     communication_family, has_final_volumes = _validate_resource_payloads(
-        payloads[len(_PRIMARY_ROLES) :], dimensions
+        resource_payloads, dimensions
     )
     if checkpoint.schema_version == 1 and communication_family is not None:
         raise ValueError(
@@ -897,8 +909,6 @@ def _preflight_restart(  # noqa: C901
             or metadata.has_final_volumes != has_final_volumes
         ):
             raise ValueError("communication metadata does not match payloads.")
-    continuation = _validate_rng_continuation(checkpoint, dimensions)
-    resource_payloads = payloads[len(_PRIMARY_ROLES) :]
     _validate_rng_resource_pairing(
         resource_payloads,
         continuation,
@@ -920,7 +930,9 @@ def _validate_rng_continuation(  # noqa: C901
             )
         return None
     if continuation is None:
-        raise ValueError("v3 checkpoints require RNG continuation metadata.")
+        raise ValueError(
+            "schema-v3-or-later checkpoints require RNG continuation metadata."
+        )
     if type(continuation) is not RNGContinuationCheckpoint:
         raise TypeError("RNG continuation metadata is invalid.")
     from particula.execution.rng import (
@@ -1013,7 +1025,7 @@ def _validate_rng_continuation(  # noqa: C901
     )
 
 
-def _validate_rng_resource_pairing(
+def _validate_rng_resource_pairing(  # noqa: C901
     payloads: tuple[CheckpointPayload, ...],
     continuation: RNGContinuationCheckpoint | None,
     resource_processes: object,
@@ -1025,6 +1037,32 @@ def _validate_rng_resource_pairing(
     ``rng_states`` sidecar is continuation-only. Coagulation ordinary sidecars
     independently corroborate that inventory for legacy records.
     """
+    if schema_version < 3 and resource_processes == ():
+        continued = (
+            set()
+            if continuation is None
+            else {payload.process_id for payload in continuation.payloads}
+        )
+        has_coagulation_payloads = any(
+            payload.family == "coagulation" for payload in payloads
+        )
+        if has_coagulation_payloads != ("coagulation" in continued):
+            raise ValueError(
+                "legacy RNG payloads and coagulation sidecars disagree."
+            )
+        return
+    if schema_version == 3 and resource_processes == ():
+        if continuation is None:
+            raise ValueError("schema-v3 checkpoints require RNG continuation.")
+        inferred = tuple(item.process_id for item in continuation.payloads)
+        has_coagulation_payloads = any(
+            payload.family == "coagulation" for payload in payloads
+        )
+        if has_coagulation_payloads != ("coagulation" in inferred):
+            raise ValueError(
+                "RNG continuation and coagulation sidecars disagree."
+            )
+        return
     if type(resource_processes) is not tuple or any(
         type(process) is not str for process in resource_processes
     ):
@@ -1044,14 +1082,78 @@ def _validate_rng_resource_pairing(
             "RNG resource inventory and coagulation sidecars disagree."
         )
     if schema_version < 3:
-        if acquired:
-            raise ValueError("legacy checkpoints cannot restore RNG resources.")
+        continued = (
+            set()
+            if continuation is None
+            else {payload.process_id for payload in continuation.payloads}
+        )
+        if acquired or continued:
+            raise ValueError(
+                "legacy checkpoints cannot restore RNG resources without "
+                "historical payloads."
+            )
         return
     if continuation is None:
-        raise ValueError("v3 checkpoints require RNG continuation metadata.")
+        raise ValueError(
+            "current checkpoints require RNG continuation metadata."
+        )
     continued = {payload.process_id for payload in continuation.payloads}
     if continued != acquired:
         raise ValueError("RNG continuation and resource families disagree.")
+
+
+def _normalize_legacy_rng_payloads(
+    payloads: tuple[CheckpointPayload, ...], dimensions: ResidentDimensions
+) -> tuple[tuple[CheckpointPayload, ...], RNGContinuationCheckpoint | None]:
+    """Extract authentic schema-v1/v2 RNG sidecars into restart authority."""
+    rng_payloads = tuple(item for item in payloads if item.role == "rng_states")
+    if not rng_payloads:
+        return payloads, None
+    canonical = ("coagulation", "wall_loss")
+    processes = tuple(item.family for item in rng_payloads)
+    if processes != tuple(
+        process for process in canonical if process in processes
+    ):
+        raise ValueError("legacy checkpoint RNG payload order is invalid.")
+    for item in rng_payloads:
+        if (
+            item.family not in canonical
+            or item.dtype != "<u4"
+            or item.shape != (dimensions.n_boxes,)
+            or (item.family == "wall_loss" and item.capacity is not None)
+        ):
+            raise ValueError(
+                "legacy checkpoint RNG payload metadata is invalid."
+            )
+    from particula.execution.rng import (
+        STREAM_SCHEMA_VERSION,
+        StreamDescriptor,
+        StreamKey,
+    )
+
+    logical_box_ids = tuple(str(index) for index in range(dimensions.n_boxes))
+    lanes = tuple(range(dimensions.n_boxes))
+    continuation_payloads = tuple(
+        RNGContinuationPayload(item.family, item.dtype, item.shape, item.data)
+        for item in rng_payloads
+    )
+    descriptors = tuple(
+        StreamDescriptor(StreamKey(STREAM_SCHEMA_VERSION, process, name), lane)
+        for process in processes
+        for name, lane in zip(logical_box_ids, lanes, strict=True)
+    )
+    continuation = RNGContinuationCheckpoint(
+        STREAM_SCHEMA_VERSION,
+        0,
+        logical_box_ids,
+        lanes,
+        descriptors,
+        continuation_payloads,
+    )
+    return (
+        tuple(item for item in payloads if item.role != "rng_states"),
+        continuation,
+    )
 
 
 def _validate_resource_payloads(  # noqa: C901

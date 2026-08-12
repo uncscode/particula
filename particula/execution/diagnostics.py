@@ -174,29 +174,45 @@ def _copy_snapshot(source: Any, output: Any) -> None:
 
 
 @wp.kernel
-def _total_species_mass(
-    masses: Any,
-    concentration: Any,
-    gas_concentration: Any,
-    volume: Any,
-    output: Any,
+def _initialize_total_species_mass(
+    gas_concentration: Any, volume: Any, output: Any
 ) -> None:
-    """Reduce concentration-weighted particle and gas mass for one lane."""
+    """Initialize each extensive-mass lane from resident gas."""
     box, species = wp.tid()  # type: ignore[misc]
-    total = gas_concentration[box, species]
-    for particle in range(masses.shape[1]):
-        total += masses[box, particle, species] * concentration[box, particle]
-    output[box, species] = volume[box] * total
+    output[box, species] = volume[box] * gas_concentration[box, species]
 
 
 @wp.kernel
-def _particle_number(concentration: Any, output: Any) -> None:
-    """Reduce particle number concentration for one box."""
+def _accumulate_particle_species_mass(
+    masses: Any,
+    concentration: Any,
+    volume: Any,
+    output: Any,
+) -> None:
+    """Accumulate one concentration-weighted particle lane in parallel."""
+    box, particle, species = wp.tid()  # type: ignore[misc]
+    wp.atomic_add(
+        output,
+        box,
+        species,
+        volume[box]
+        * masses[box, particle, species]
+        * concentration[box, particle],
+    )
+
+
+@wp.kernel
+def _clear_particle_number(output: Any) -> None:
+    """Clear one particle-number output lane before staged accumulation."""
     box = wp.tid()  # type: ignore[misc]
-    total = wp.float64(0.0)
-    for particle in range(concentration.shape[1]):
-        total += concentration[box, particle]
-    output[box] = total
+    output[box] = wp.float64(0.0)
+
+
+@wp.kernel
+def _accumulate_particle_number(concentration: Any, output: Any) -> None:
+    """Accumulate one particle concentration lane in parallel."""
+    box, particle = wp.tid()  # type: ignore[misc]
+    wp.atomic_add(output, box, concentration[box, particle])
 
 
 @wp.kernel
@@ -276,10 +292,14 @@ class ResidentDiagnosticsExecutor:
     def _validate_registrations(self, plan: ResidentDiagnosticsPlan) -> None:
         """Validate diagnostic registration ordering and uniqueness."""
         operations = tuple(item.operation for item in plan.registrations)
-        if operations != tuple(ResidentDiagnosticOperation):
+        legacy_operations = tuple(ResidentDiagnosticOperation)[:2]
+        if operations not in (
+            legacy_operations,
+            tuple(ResidentDiagnosticOperation),
+        ):
             raise ValueError(
-                "diagnostic operations must be unique and match the closed "
-                "canonical tuple."
+                "diagnostic operations must be unique and match the legacy "
+                "two-snapshot or current six-operation canonical tuple."
             )
 
     def _validate_outputs(self, plan: ResidentDiagnosticsPlan) -> None:
@@ -338,6 +358,12 @@ class ResidentDiagnosticsExecutor:
             ValueError: If its bindings or output metadata are invalid.
         """
         plan = self.validate(plan)
+        self._execute_validated(plan)
+
+    def _execute_validated(  # noqa: C901
+        self, plan: ResidentDiagnosticsPlan
+    ) -> None:
+        """Dispatch a plan already validated by its owning scheduler step."""
         dimensions = plan.session.dimensions
         if not dimensions.n_boxes:
             return
@@ -345,10 +371,13 @@ class ResidentDiagnosticsExecutor:
         gas = cast(Any, plan.session.gas)
         environment = cast(Any, plan.session.environment)
         total_mass_output = next(
-            registration.output
-            for registration in plan.registrations
-            if registration.operation
-            is ResidentDiagnosticOperation.TOTAL_SPECIES_MASS
+            (
+                registration.output
+                for registration in plan.registrations
+                if registration.operation
+                is ResidentDiagnosticOperation.TOTAL_SPECIES_MASS
+            ),
+            None,
         )
         for registration in plan.registrations:
             operation = registration.operation
@@ -357,11 +386,18 @@ class ResidentDiagnosticsExecutor:
                 is ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION
             ):
                 wp.launch(
-                    _particle_number,
+                    _clear_particle_number,
                     dim=dimensions.n_boxes,
-                    inputs=[particles.concentration, registration.output],
+                    inputs=[registration.output],
                     device=particles.concentration.device,
                 )
+                if dimensions.n_particles:
+                    wp.launch(
+                        _accumulate_particle_number,
+                        dim=(dimensions.n_boxes, dimensions.n_particles),
+                        inputs=[particles.concentration, registration.output],
+                        device=particles.concentration.device,
+                    )
             elif dimensions.n_species:
                 matrix_dim = (dimensions.n_boxes, dimensions.n_species)
                 if (
@@ -391,17 +427,31 @@ class ResidentDiagnosticsExecutor:
                     operation is ResidentDiagnosticOperation.TOTAL_SPECIES_MASS
                 ):
                     wp.launch(
-                        _total_species_mass,
+                        _initialize_total_species_mass,
                         dim=matrix_dim,
                         inputs=[
-                            particles.masses,
-                            particles.concentration,
                             gas.concentration,
                             particles.volume,
                             registration.output,
                         ],
                         device=particles.masses.device,
                     )
+                    if dimensions.n_particles:
+                        wp.launch(
+                            _accumulate_particle_species_mass,
+                            dim=(
+                                dimensions.n_boxes,
+                                dimensions.n_particles,
+                                dimensions.n_species,
+                            ),
+                            inputs=[
+                                particles.masses,
+                                particles.concentration,
+                                particles.volume,
+                                registration.output,
+                            ],
+                            device=particles.masses.device,
+                        )
                 elif (
                     operation is ResidentDiagnosticOperation.LATENT_HEAT_ENERGY
                 ):
@@ -415,6 +465,10 @@ class ResidentDiagnosticsExecutor:
                         device=particles.masses.device,
                     )
                 else:
+                    if total_mass_output is None:
+                        raise ValueError(
+                            "conservation residual requires total species mass."
+                        )
                     wp.launch(
                         _conservation_residual,
                         dim=matrix_dim,

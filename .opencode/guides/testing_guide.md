@@ -1,7 +1,7 @@
 # Testing Guide
 
 **Project:** particula  
-**Last Updated:** 2026-08-09
+**Last Updated:** 2026-08-11
 
 particula uses pytest as its primary testing framework. Tests should be close to
 the code they validate and should exercise scientific correctness, edge cases,
@@ -53,22 +53,43 @@ Integration tests live in `particula/integration_tests/`.
 ## Commands
 
 ```bash
-# Run all tests
-pytest
+# Run the full suite with repository-configured coverage
+.opencode/tools/run_pytest.py
 
-# Run with coverage
-pytest --cov=particula --cov-report=term-missing
-
-# Run a module's tests
+# Run a module's assertions
 pytest particula/activity/tests/
 
-# Run a single file
+# Run a single file's assertions
 pytest particula/activity/tests/activity_coefficients_test.py
 
-# Run a single test
+# Run a single assertion
 pytest particula/activity/tests/activity_coefficients_test.py::test_function_name
 
 ```
+
+For local development and agent validation, invoke the repository test runner
+without a test target for the canonical full-suite coverage check:
+
+```bash
+.opencode/tools/run_pytest.py
+```
+
+The runner applies the repository coverage defaults, including the full-package
+scope, terminal report, and minimum threshold. Do not pass local
+`coverageSource`, `coverageThreshold`, or raw `--cov` controls for comprehensive
+validation.
+
+Folder, file, node, marker, and name-filter selections are focused assertion
+checks. They do not support coverage evidence in this repository. Run them with
+direct `pytest` and do not interpret them as coverage results. After focused
+checks pass, run the untargeted repository test runner for comprehensive
+coverage.
+
+CI/CD may split tests and coverage into multiple steps for efficiency. Those
+pipeline controls are implementation details and do not need to be reproduced
+during local validation. A local wrapper's inability to express a CI/CD-only
+coverage target does not block validation when the canonical untargeted run is
+available.
 
 Local runs should not add `-Werror`; the repository's local test tooling
 already applies its configured warning policy.
@@ -159,318 +180,97 @@ stepping is expected.
 
 ## Wall Loss Coverage
 
-Wall loss strategy tests should cover both package export paths where relevant:
+The full suite collects wall-loss strategy coverage from:
 
-- `particula/dynamics/wall_loss/tests/wall_loss_strategies_test.py`
 - `particula/dynamics/tests/wall_loss_strategies_test.py`
 
-Coverage should include spherical and rectangular geometry, rectangular chamber
-dimension validation, supported distribution types, zero concentration, empty
-particle-resolved inputs, and parity with helper functions.
+`particula/dynamics/wall_loss/tests/` is excluded from normal recursive
+collection. When changing the concrete wall-loss strategy module, also run its
+additional suite directly:
+
+```bash
+pytest particula/dynamics/wall_loss/tests/wall_loss_strategies_test.py
+```
+
+Keep geometry, distribution-type, empty-input, and helper-parity scenarios in
+the adjacent suites rather than restating their detailed cases here.
 
 ## NVIDIA Warp Tests
 
-GPU code must match Python/NumPy reference implementations. Warp CPU is the
-default parity backend whenever Warp is installed. CUDA coverage is optional
-and local/manual when a CUDA-capable device is available; standard CI must skip
-cleanly when CUDA is unavailable. Use the existing markers exactly as
-registered: `warp`, `cuda`, `gpu_parity`, and `stochastic`.
+GPU code should be checked against independent Python or NumPy references.
+Warp CPU is the required parity baseline whenever Warp is installed. CUDA is
+optional local evidence and must skip cleanly when unavailable. Use the
+registered `warp`, `cuda`, `gpu_parity`, and `stochastic` markers to describe
+test intent; markers do not select a device by themselves.
 
-### Release-validation command sets
+Keep tests close to the layer they validate:
 
-Use focused Warp runs for the default supported validation path. Warp CPU is
-the required baseline whenever Warp is installed; the deterministic focused
-command also exercises CUDA when it is available. These are the shipped
-release-validation commands:
+- `particula/gpu/kernels/tests/`: direct kernel behavior and parity.
+- `particula/gpu/properties/tests/`: GPU property helpers.
+- `particula/gpu/tests/`: conversions, exports, examples, and process sequences.
+- `particula/execution/tests/`: resident sessions, scheduling, communication,
+  checkpoints, restart, diagnostics, and integration.
+- Adjacent CPU `tests/` directories: independent reference behavior.
 
-```bash
-pytest particula/gpu/tests/cuda_availability_test.py -q
-pytest particula/gpu/kernels/tests/environment_test.py -q
-pytest particula/gpu/kernels/tests/thermodynamics_test.py -q
-pytest particula/gpu/kernels/tests/dilution_test.py -q
-pytest particula/gpu/kernels/tests/exhaustion_test.py -q
-pytest particula/gpu/kernels/tests/nucleation_test.py -q
-pytest particula/gpu/kernels/tests/slot_management_test.py -q
-pytest particula/gpu/kernels/tests/wall_loss_test.py particula/gpu/kernels/tests/wall_loss_parity_test.py -q
-pytest particula/gpu/kernels/tests/condensation_test.py -q
-pytest particula/gpu/kernels/tests/coagulation_validation_test.py -q -m "warp and gpu_parity"
-pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and stochastic and not cuda"
-pytest particula/gpu/kernels/tests/coagulation_test.py -q
-# Validate private resident composition of shipped direct GPU boundaries.
-pytest particula/gpu/tests/process_sequence_test.py -q
-# Validate the published direct-GPU coagulation example and documentation.
-pytest particula/gpu/tests/gpu_coagulation_direct_example_test.py -q
-# Validate the explicit-transfer complete-process example.
-pytest particula/gpu/tests/gpu_complete_process_sequence_example_test.py -q
-# Validate documentation links and the closeout projection without Warp or CUDA.
-pytest particula/tests/gpu_coagulation_docs_test.py -q
-# Validate the E6 complete-process publication and blocked closeout projection.
-pytest particula/tests/gpu_complete_process_sequence_docs_test.py -q
-```
+Use the maintained examples and their regression tests as the source of truth
+for concrete workflows and expected output. Update an example and its test
+together instead of copying its detailed contract into this guide:
 
-Use CUDA-targeted runs only for optional local/manual validation when a
-CUDA-capable device is available. CUDA is additive evidence, not the default
-path, and the same Warp-marked modules should continue to collect safely when
-CUDA is absent:
+- Data containers: `docs/Examples/data_containers_and_gpu_foundations.py` and
+  `particula/gpu/tests/data_containers_example_test.py`.
+- Direct kernels: `docs/Examples/gpu_direct_kernels_quick_start.py` and
+  `particula/gpu/tests/gpu_direct_kernels_example_test.py`.
+- Direct coagulation: `docs/Examples/gpu_coagulation_direct.py` and
+  `particula/gpu/tests/gpu_coagulation_direct_example_test.py`.
+- Direct nucleation: `docs/Examples/Nucleation/gpu_direct_nucleation.py` and
+  `particula/gpu/tests/gpu_direct_nucleation_example_test.py`.
+- Complete direct sequence: `docs/Examples/gpu_complete_process_sequence.py`
+  and `particula/gpu/tests/gpu_complete_process_sequence_example_test.py`.
+- Resident session: `docs/Examples/gpu_resident_session.py` and
+  `particula/execution/tests/gpu_resident_session_docs_test.py`.
+- Resident loop: `docs/Examples/gpu_resident_multi_timestep.py` and
+  `particula/tests/gpu_resident_multi_timestep_docs_test.py`.
+
+`particula/gpu/tests/process_sequence_test.py` is the maintained reference for
+composing direct GPU boundaries without restoring CPU state between calls.
+
+Use focused, coverage-free commands while developing GPU code:
 
 ```bash
-pytest particula/gpu/kernels/tests/environment_test.py -q -m "warp and cuda"
-pytest particula/gpu/kernels/tests/condensation_test.py -q -m "warp and cuda"
-pytest particula/gpu/kernels/tests/coagulation_stochastic_validation_test.py -q -m "warp and cuda"
-```
+# Direct GPU code
+pytest particula/gpu/ -q
 
-For the full fixed-mask contract, see the
-[GPU coagulation validation record](../../docs/Features/Roadmap/coagulation-validation.md).
-These commands match the shipped marker and helper contract:
-
-- Warp CPU is the baseline parity backend when Warp is installed.
-- CUDA validation is additional local/manual evidence until dedicated CI exists.
-- Missing Warp or missing CUDA should produce expected skips, not release
-  failures, when a command reaches a guarded suite.
-- Warp-marked tests should avoid eager module-level `pytest.importorskip("warp")`
-  patterns so marker deselection does not force a collection-time Warp
-  dependency.
-- Benchmark coverage stays opt-in behind `--benchmark` and remains separate
-  from the default release-validation path above.
-- Marker selection describes test intent; it does not select a device. In
-  particular, deterministic P2 public-step checks enumerate available Warp
-  devices, so they exercise CUDA when it is available as well as the Warp CPU
-  baseline.
-
-`particula/gpu/tests/process_sequence_test.py` provides private, test-only
-resident composition coverage for the existing exported direct condensation,
-coagulation, dilution, wall-loss, and nucleation boundaries. It keeps the same
-caller-owned Warp containers and sidecars resident between calls, checks
-identity, accounting, no-op/preflight, and RNG-sidecar contracts, and guards
-against intermediate CPU restoration. This is contributor test evidence only:
-it does not create a production coordinator, public integration API, hidden
-transfer, CPU fallback, or runnable. Run its CUDA-marked row separately when
-available:
-
-```bash
-pytest particula/gpu/tests/process_sequence_test.py -q \
-  -m "warp and cuda"
-```
-
-### Resident communication and checkpoint coverage
-
-E7-F9 closeout uses the resident focused assertion and export groups, then the
-resident fast suite, full-package coverage, changed-module coverage, strict
-documentation build, and optional CUDA groups below. Record actual dated
-outcomes, Warp availability, qualified devices, and the executable target list.
-Derive the list from the P1--P6 executable-module diff, not the Markdown-only
-P7 diff: this closeout covers `particula.execution.diagnostics`,
-`particula.execution.gpu_resources`, `particula.execution.checkpoint`, and
-`particula.execution.resident_scheduler`. P4--P6 changed tests, an example, or
-documentation only, so they add no executable coverage target. Changed
-executable modules must meet the aggregate 80% threshold, with per-target
-term-missing rows retained. Run these groups sequentially; a required command
-that is unavailable or fails blocks shipment. Local commands omit `-Werror`;
-Warp CPU is the installed-Warp baseline, and CUDA must pass when available or
-cleanly skip. Markers describe intent and stochastic bounds never relax
-conservation.
-
-```bash
-pytest particula/execution/tests/diagnostics_test.py \
-  particula/execution/tests/gpu_resources_test.py \
-  particula/execution/tests/checkpoint_test.py \
-  particula/execution/tests/rng_invariance_test.py \
-  particula/execution/tests/full_loop_test.py \
-  particula/execution/tests/multi_box_loop_test.py \
-  particula/execution/tests/transport_loop_test.py \
-  particula/execution/tests/restart_loop_test.py \
-  particula/execution/tests/condensation_integration_test.py \
-  particula/execution/tests/coagulation_integration_test.py \
-  particula/execution/tests/errors_test.py \
-  particula/execution/tests/fallback_test.py \
-  particula/execution/tests/fallback_integration_test.py \
-  particula/tests/gpu_resident_multi_timestep_docs_test.py -q
-pytest particula/execution/tests/exports_test.py \
-  particula/tests/execution_exports_test.py -q
+# Resident execution
 pytest particula/execution/tests/ -q
-pytest --cov=particula --cov-report=term-missing
-pytest particula/execution/tests/ -q \
-  --cov=particula.execution.diagnostics,particula.execution.gpu_resources,particula.execution.checkpoint,particula.execution.resident_scheduler \
-  --cov-report=term-missing --cov-fail-under=80
-mkdocs build --strict
-pytest particula/execution/tests/multi_box_loop_test.py -q -m "warp and cuda"
-pytest particula/execution/tests/condensation_integration_test.py \
-  particula/execution/tests/coagulation_integration_test.py -q \
-  -m "warp and cuda"
+
+# Optional CUDA-only evidence
+pytest particula/gpu/ particula/execution/tests/ -q -m "warp and cuda"
 ```
 
-Resident communication is concrete-only execution coverage, not a public API or
-an example workflow. Keep its tests under `particula/execution/tests/` and cover
-both closed-map GAS and PARTICLES resource families, optional volume evolution,
-and the canonical twelve-node schedule. Verify that normal-step metadata checks
-do not repeat P1 payload validation, allocate, transfer, inspect host payloads,
-or synchronize. Cover prelaunch rejection as non-mutating; after either barrier
-writer launches, assert lifecycle fault/guard close behavior rather than
-rollback.
+After focused checks pass, run `.opencode/tools/run_pytest.py` without a target
+for repository-wide assertions and coverage. Run `mkdocs build --strict` when
+GPU examples or user-facing documentation change.
 
-Checkpoint tests must preserve schema-v1 noncommunication restart support and
-verify schema-v2 checkpoints with no communication family or one complete
-closed-map family. Schema-v3 checkpoints must always carry continuation metadata,
-even when no published stream has a payload. Cover immutable canonical primary
-bytes; acquired registry-owned sidecars, ledgers, and diagnostics; and at most
-one complete closed-map communication family. Exclude arbitrary caller outputs and
-ordinary `rng_states`. Restarts must require an exact device and recreate arrays
-and bindings instead of reusing source identities.
+Warp-dependent modules should skip clearly when Warp or CUDA is missing. Use a
+fixture or test-local `pytest.importorskip("warp")` when a module also contains
+CPU-only or collection-only checks. A module-level skip is appropriate only
+when every test in that module requires Warp.
 
-Resident Brownian-coagulation and wall-loss coverage must keep each pinned RNG
-sidecar by identity across valid dispatches and verify that normal dispatch
-never reseeds or allocates it. Test immutable stream metadata during session
-setup and first resource acquisition separately. Schema-v3 checkpoint and
-finalization coverage must validate required continuation metadata regardless of
-whether it has stream payloads. When a resident stream has been published,
-capture immutable continuation words after one synchronization and verify exact
-same-device restart without reseeding or allocation during reacquisition. Reject
-continuation-only, resource-only, or otherwise incompatible stream/resource
-forms before setup. Wall-loss coverage must verify canonical-manifest derivation
-gives wall loss a distinct namespace from coagulation without claiming arbitrary
-32-bit words cannot
-collide. Test the scheduler-resolved logical-box selection: only selected boxes
-whose operation launches may consume RNG words. Disabled, prelaunch-skipped,
-zero-time, and valid no-work lanes must retain their words exactly, including
-when another logical box launches. Verify reset-like values reject before
-direct-kernel resolution and that an empty resolved launch set is a no-op.
- Explicit direct-module stream lifecycle coverage must require the exact ACTIVE
- session/registry/closed-guard binding, validate selectors before writers, and
- verify inspection returns frozen metadata without arrays, readback, or
- synchronization. Resets may target only published sidecars and must not change
-  ordinary dispatch; only explicit reset may replace continued words. For a
-  failure after a writer-capable launch, assert the established
- guard-close and session-fault lifecycle rather than RNG rollback.
+GPU tests should cover the following behavior where applicable:
 
-```bash
-pytest particula/execution/tests/gpu_session_test.py \
-  particula/execution/tests/gpu_resources_test.py \
-  particula/execution/tests/coagulation_adapter_test.py \
-  particula/execution/tests/coagulation_integration_test.py \
-  particula/execution/tests/checkpoint_test.py \
-  particula/execution/tests/process_graph_test.py \
-  particula/execution/tests/resident_communication_test.py \
-  particula/execution/tests/scheduler_test.py -q
-```
+- Single-box and multi-box inputs, including empty and inactive state.
+- Supported scalar and device-array inputs, shapes, dtypes, and devices.
+- Caller-owned array identity and fields that must remain unchanged.
+- Exact no-op behavior for zero time, zero work, or disabled operations.
+- Read-only preflight rejection before mutation.
+- Conservation of mass, concentration, count, or charge as appropriate.
+- Persistent RNG state across calls and explicit reset behavior.
+- Export boundaries and runnable examples when public imports or docs change.
 
-`docs/Examples/gpu_complete_process_sequence.py` is a standalone, direct-Warp
-example with a focused regression suite in
-`particula/gpu/tests/gpu_complete_process_sequence_example_test.py`. The suite
-checks the deterministic no-Warp path without requiring Warp, then checks the
-enabled path's one explicit conversion of each CPU container, five-call order,
-one synchronization, and one final restore. It also verifies that direct errors
-propagate without an intermediate restore or CPU fallback. This example is
-documentation for explicit caller-owned transfers and sidecars; it does not
-create a scheduler, high-level runnable, backend selector, or integration API.
-
-The coagulation validation matrix supports exactly the singleton masks `1`,
-`2`, `4`, and `8`; two-way masks `3`, `5`, `6`, `9`, `10`, and `12`; and
-four-way mask `15`. The three-way masks `7`, `11`, `13`, and `14` remain
-deferred/fail closed. P1 uses `rtol=1e-7, atol=0` for Brownian pair-rate
-comparisons. Brownian property and selector-majorant checks, along with other
-applicable positive/additive rate, property, and majorant comparisons, use
-`rtol=1e-6, atol=0`; physical zeros are exact. P2 keeps concentration-weighted,
-per-box/per-species inventory at `rtol=1e-12, atol=1e-30` and separates that
-ownership evidence from stochastic acceptance.
-
-The P3 coagulation stochastic-validation matrix uses 100 fresh seeds for every
-executable row and device. It compares aggregate accepted collisions with an
-independent initial-state expectation using `3 * sqrt(expected_mean)`. This
-bound is neither conservation evidence nor an exact accepted-pair, seed, RNG,
-CPU/Warp, or CUDA replay requirement.
-
-The record is limited to the existing direct path: it makes no mandatory-CUDA,
-production-API, new-physics, performance, CPU-fallback, runnable, graph-capture,
-autodiff, or adaptive-stepping conclusion.
-
-GPU thermodynamics refresh coverage belongs in
-`particula/gpu/kernels/tests/thermodynamics_test.py`. Test explicit
-device-resident refresh behavior against CPU vapor-pressure references, cover
-constant and canonical Buck modes across the freezing boundary, and verify
-invalid inputs leave the caller-owned vapor-pressure buffer unchanged. The
-refresh primitive remains a concrete-module API and is not condensation
-integration coverage.
-
-GPU dilution P2--P4 coverage belongs in
-`particula/gpu/kernels/tests/dilution_test.py`. Mark it `warp`, defer Warp
-imports so missing Warp skips cleanly, and import `dilution_step_gpu` from
-`particula.gpu.kernels`. Cover scalar and metadata-valid per-box coefficient
-forms, identity return, protected-field preservation, write-free scalar-zero
-and zero-time paths, and the independent finite-step oracle
-`c_new = c * exp(-alpha * time_step)` for particle and gas concentrations.
-P4 runs a deterministic float64 one-/multi-box matrix against that NumPy
-oracle on Warp CPU, with matching CUDA rows that skip cleanly when unavailable.
-Keep particle and gas parity assertions separate, preserve caller-owned per-box
-coefficient identity and values, and use exact equality for no-op checks. This
-is direct-kernel test evidence only; it does not establish CPU-runnable parity.
-
-GPU resampling coverage belongs in
-`particula/gpu/kernels/tests/exhaustion_test.py`. Mark device cases `warp` and
-`gpu_parity`, defer Warp imports, and import only `resampling_step_gpu` from
-`particula.gpu.kernels`; `ResamplingBuffers` remains concrete-module-only at
-`particula.gpu.kernels.exhaustion`. Test against an independent NumPy P2
-equal-weight remapping oracle, including stable source ordering, original-slot
-retention/release, diagnostics, and separate tight inventory conservation.
-Preflight failures must preserve every caller array. Planning failures may alter
-documented buffer lanes but must skip commit and preserve particles; all-zero
-demand and empty-box calls must be exact write-free no-ops. Warp CPU is the
-baseline and CUDA is optional with clean skips. Keep scaling evidence marked
-`slow`, `performance`, and `benchmark`, behind `--benchmark`; it must not imply
-a CPU fallback, resizing, policy-resolution, runnable, or broad performance
-claim.
-
-Private GPU nucleation P2 coverage belongs in
-`particula/gpu/kernels/tests/nucleation_test.py`. Test the concrete module seam
-only; do not add a package export, runnable, or user-facing example. Use an
-independent NumPy float64 oracle for survival-included activation or kinetic
-rate, `E_pot = J * dt`, common inventory admission, removal, and gate-code
-precedence. Assert that successful planning changes only its documented
-caller-owned planning, finalized-demand, and diagnostic sidecars; particle and
-gas fields, plus P3-owned sidecar lanes, must remain unchanged. Exercise Warp
-CPU when installed and optional CUDA with clean skips. Keep invalid-preflight
-and derived-demand failures non-mutating, and keep this evidence separate from
-future activation or transaction behavior.
-
-GPU slot activation P4 coverage belongs in
-`particula/gpu/kernels/tests/slot_management_test.py`. Defer Warp imports so
-missing Warp skips cleanly, import only `activate_slots_gpu` from
-`particula.gpu.kernels`, and retain `get_slot_diagnostics_gpu` as a
-concrete-module-only P3 test helper. Compare deterministic float64 copies and
-all caller-owned int32 sidecars exactly against independent CPU activation and
-post-call diagnostics. Cover ascending-free-slot mapping, selected-prefix-only
-validation, zero prefixes, zero boxes, zero capacity, exact capacity, repeated
-activation, and sparse capacity. Reusable fixed-slot coverage should keep an
-independent CPU oracle and separately assert exact values, shapes, dtypes,
-devices, and sidecar identity. Include selected-prefix coverage and snapshot
-accessible particle, request, and output arrays for preflight rejection.
-Warp CPU is the baseline; CUDA parity is optional and must skip cleanly when
-unavailable. The complementary CPU contract evidence is:
-
-```bash
-pytest particula/particles/tests/slot_management_test.py -q
-```
-
-This tests the bounded direct-Warp boundary only, not a runnable, implicit
-transfer, storage resizing, or rollback after writer launch.
-
-Direct GPU wall-loss parity coverage belongs in
-`particula/gpu/kernels/tests/wall_loss_parity_test.py`. Keep the NumPy
-CPU/system-state oracle independent of GPU helpers and compare complete
-particle-resolved slots with the CPU system-state wall-loss functions. The Warp
-diagnostic intentionally uses approved production GPU property helpers to mirror
-the supported GPU calculation path; it is not independently derived. Cover
-spherical and rectangular geometries, one- and multi-box inputs, per-box
-environment state, particle scales, and inactive or unusable slots. Charged
-coverage must use an independent charged CPU oracle, retain exact neutral
-fallback checks for zero-charge slots, and preserve caller-owned rectangular
-field storage. Keep deterministic coefficient agreement separate from
-stochastic evidence. For stochastic removal, use aggregate survival counts
-across repeated fresh seeds and a documented binomial bound; do not require
-CPU/Warp RNG-stream, per-seed, or trajectory replay. Include distinct exact
-no-op and invalid-preflight non-mutation checks for zero time and all-inactive
-inputs, including caller-owned RNG state. This suite validates the existing
-direct-kernel boundary only and must not imply a new public API or physics
-capability.
+Use an independent oracle for parity tests. Do not calculate expected values
+with the production helper under test. Compare each meaningful output
+separately so an aggregate total cannot hide a component error. Keep direct
+kernel tests separate from resident scheduler and integration tests.
 
 ### Device-aware tolerance policy
 
@@ -492,150 +292,16 @@ imply exact replay requirements.
    those bounded aggregate expectations instead of exact per-seed equality
    across CPU, Warp CPU, or CUDA.
 
-Document the chosen tolerances in the test body or nearby comments when they
-are not already obvious from the physics or baseline study.
+Document chosen tolerances in the test body or nearby comments when they are not
+obvious from the physics or a referenced baseline. A seeded range may gather
+stochastic evidence, but its pass condition must use the documented aggregate
+bound rather than exact seed-by-seed replay.
 
-For GPU coagulation acceptance work, including charged-hard-sphere-only and
-canonical Brownian-plus-charged coverage, keep attempted-vs-accepted collision
-instrumentation private to `particula/gpu/kernels/tests/coagulation_test.py`.
-The shipped `coagulation_step_gpu(...)` API and production synchronization
-behavior should stay unchanged when the work is diagnostic-only.
-
-The direct ST1956 turbulent-shear singleton uses explicit positive finite
-`turbulent_dissipation` (m²/s³) and `fluid_density` (kg/m³) P2 inputs. Cover
-scalar and active-device `wp.float64` `(n_boxes,)` inputs. Executable masks are
-the singletons `1`, `2`, `4`, and `8`; two-term masks `3`, `5`, `6`, `9`, `10`,
-and `12`; and the four-term mask `15`. The three-term masks are deferred:
-mask `7` rejects at capability preflight before particle metadata or enabled-term
-validation, while masks `11`, `13`, and `14` validate particle metadata and all
-enabled terms (including turbulent P2 inputs where enabled) before raising
-`ValueError("Additive coagulation execution is deferred.")`. Deferred errors
-occur before downstream normalization, output/RNG work, executable launches, or
-mutation. Test turbulent, charged, and sedimentation validation according to the
-enabled mechanism bits, while proving non-turbulent masks ignore turbulent
-arguments and caller-owned particle, collision-output, and persistent-RNG state
-is unchanged after preflight errors. Test the turbulent singleton's O(A)
-two-largest-active-radii majorant against an independent NumPy oracle. For every
-executable additive mask, public-path multi-pair tests must independently sum
-enabled component rates and use finite, discriminating timesteps so omission of
-one contribution changes bounded selection outcomes. Keep mass conservation
-separate from stochastic acceptance checks and use aggregate tolerance or sigma
-bounds rather than exact seeded pair replay.
-
-For the GPU condensation suite, keep shared helpers in support modules only when
-discoverable `*_test.py` wrappers expose the runnable cases. The current entry
-points are:
-
-- `particula/gpu/kernels/tests/condensation_test.py`
-- `particula/gpu/kernels/tests/condensation_stiffness_test.py`
-- `particula/gpu/kernels/tests/condensation_graph_capture_test.py`
-- `particula/gpu/kernels/tests/condensation_autodiff_test.py`
-
-```python
-import numpy as np
-import numpy.testing as npt
-import pytest
-
-wp = pytest.importorskip("warp")
-
-
-def test_gpu_matches_numpy():
-    """Warp computation matches the NumPy reference."""
-    expected = numpy_reference(...)
-    result = warp_result(...)
-    npt.assert_allclose(result, expected, rtol=1e-10, atol=0.0)
-```
-
-For conservation checks, keep the assertion separate and tight:
-
-```python
-def test_total_mass_is_conserved():
-    """Accepted collisions conserve total mass."""
-    initial_total = np.sum(initial_mass)
-    final_total = np.sum(final_mass)
-    npt.assert_allclose(final_total, initial_total, rtol=1e-12, atol=0.0)
-```
-
-The direct GPU condensation hook has deterministic fp64 parity-matrix coverage
-in `particula/gpu/kernels/tests/condensation_test.py`. It runs one-box and
-multi-box/multi-species fixtures against an independent NumPy fixed-four-
-substep, P2 inventory-finalized, gas-coupled oracle. Compare final particle
-masses and gas concentrations independently, with explicit tolerance bounds;
-do not replace these checks with an aggregate inventory assertion. The matrix
-covers uptake, evaporation, disabled partitioning, latent heat, zero gas, and
-inactive particle slots. Warp CPU is required whenever Warp is installed;
-the matching CUDA matrix is optional and must skip cleanly when unavailable.
-This is scoped direct-kernel evidence, not CPU-strategy or runnable parity.
-
-The public GPU condensation hook also has separate deterministic per-box,
-per-species inventory regression coverage. Compare the change in particle
-inventory (particle mass weighted by particle concentration) plus the gas
-change against zero at `rtol=1e-12, atol=1e-30`. Keep this conservation
-assertion separate from CPU-oracle particle and gas parity.
-
-For direct-condensation P1--P4 coverage, keep parity, conservation, capture,
-and derivative assertions separate. Warp CPU is the baseline for supported P1
-parity/P2 conservation and bounded P4 raw-rate autodiff probes when Warp is
-installed; CUDA is optional local/manual evidence. P3 is the exception: CPU
-graph capture is capability-skipped, and only the CUDA public-step host
-validation readback within capture is a strict expected failure because it is
-not capture-safe. Setup and normal calls remain ordinary assertions. These
-precise guarded skips/xfails document an unsupported capture capability, not a
-CPU-baseline or replay-support claim. The P4 wrapper covers only an interior,
-out-of-place raw-rate Tape derivative; it does not relax P2 boundary or
-in-place-mutation limits.
-
-For stochastic kernels, assert bounded aggregate behavior instead of replaying
-exact accepted-collision sequences or per-seed trajectories. A seeded range can
-be used to gather repeated evidence, but the pass condition should be a
-documented aggregate bound such as a tolerance interval or `3-sigma` window
-around the expected mean rather than exact seed-by-seed replay.
-
-Use constants from `particula.util.constants`; do not hardcode physical
-constants in kernels.
-
-For CPU↔GPU container helpers, add round-trip coverage that checks exact value
-and shape preservation on the Warp CPU backend. For `EnvironmentData`, cover
-single-box and multi-box cases, the default synchronized path, any supported
-manual `sync=False` path, and malformed-schema failures surfaced by CPU-side
-validation.
-
-When evaluating experimental GPU integrator candidates, keep prototypes
-test-local until they are production-qualified. Prefer deterministic fixed-shape
-helpers, caller-owned scratch or buffer reuse, repeated-run equality checks,
-finite and non-negative mass assertions, and explicit CPU-reference error bounds
-recorded in the test or companion study note. If public runtime behavior is
-unchanged, say so directly in the related documentation.
-
-For deterministic GPU baseline studies, prefer explicit `np.float64` fixture
-construction over random inputs so later precision comparisons have a stable
-reference. The mass-precision baseline suite is the reference pattern:
-
-```bash
-pytest particula/gpu/tests/mass_precision_cases_test.py -q
-```
-
-Keep those tests warning-clean under the configured policy, assert canonical
-`(n_boxes, n_particles, n_species)` shapes where relevant, and document any
-baseline assumptions in the matching roadmap page.
-
-For the mixed NPF/droplet coagulation diagnostic coverage added in
-`particula/gpu/kernels/tests/coagulation_test.py`, keep selector-validity and
-low-active regressions focused on seeded invariants: accepted pairs stay
-sorted, in bounds, and limited to originally active slots; zero/one-active
-inputs early-return cleanly; exactly-two-active inputs fall back to the only
-valid pair; and accepted collisions conserve total mass. For exact charged-only
-coverage, also assert signed-charge conservation and test aggregate stochastic
-behavior against an independent oracle rather than exact pair replay. Use
-focused local runs such as:
-
-```bash
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -k mixed_scale
-pytest particula/gpu/kernels/tests/coagulation_test.py -q -k "mixed_scale or sparse or degenerate or conservation"
-```
-
-These checks are intended for seeded regression and warning-clean acceptance
-sanity, not for exact CPU/CUDA equality or user-facing feature documentation.
+Prefer explicit `np.float64` fixtures for deterministic GPU baselines. Keep
+diagnostic instrumentation test-local, and do not change production APIs solely
+to expose test internals. Tests marked `benchmark` must remain opt-in behind
+`--benchmark`; use the `slow` and `performance` markers for other expensive
+tests.
 
 ## Test Quality
 
@@ -648,24 +314,18 @@ sanity, not for exact CPU/CUDA equality or user-facing feature documentation.
 ## Troubleshooting
 
 - If tests are not discovered, check `*_test.py` naming and run `pytest --collect-only`.
-- For the GPU condensation suite, verify collection via
-  `pytest particula/gpu/kernels/tests/condensation_test.py --collect-only -q`
-  and
-  `pytest particula/gpu/kernels/tests/condensation_stiffness_test.py --collect-only -q`.
 - If imports fail, install the package in development mode with `pip install -e .[dev]`.
-- If coverage looks wrong, run `pytest --cov=particula --cov-report=term`.
+- If coverage looks wrong, rerun `.opencode/tools/run_pytest.py` without a
+  focused target and inspect its full-package report.
 - If CI fails but local tests pass, inspect the CI warning and compare it with
   the configured local warning policy; do not add `-Werror` to local wrapper
   arguments.
-- If Warp is not installed, Warp-marked suites may skip through
-  `pytest.importorskip("warp")`; treat that as the expected missing-Warp path,
-  not a regression.
-- If CUDA is unavailable, CUDA-targeted coverage should skip cleanly instead of
-  failing CPU-only or CI validation. Some guarded paths use the shared
-  `Warp/CUDA not available` message, while others keep more specific skip
-  reasons when that context is more useful.
+- If Warp is not installed, Warp-dependent tests should skip through their
+  fixture, test-local, or module-level guard; treat that as the expected path.
+- If CUDA is unavailable, CUDA-targeted tests should skip cleanly instead of
+  failing CPU-only validation.
 - Use marker selection such as `-m "warp and gpu_parity"`,
   `-m "warp and stochastic"`, or `-m "warp and cuda"` for targeted local GPU
   validation, and keep `pytest particula/gpu/tests/benchmark_test.py
   --benchmark -v -s` separate as opt-in benchmark evidence rather than default
-  release validation.
+  validation.

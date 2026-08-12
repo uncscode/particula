@@ -162,8 +162,6 @@ class ResidentCommunicationExecutor:
         """
         self.validate()
         request = self._request
-        if request.resources.all_disabled:
-            return request.session.particles, request.session.gas
         from particula.gpu.kernels.communication import (
             resident_gas_communication_step_gpu,
             resident_particle_communication_step_gpu,

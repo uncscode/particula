@@ -321,7 +321,7 @@ def test_checkpoint_captures_wall_loss_stream_continuation(
     registry.acquire_wall_loss()
     checkpoint = session.checkpoint(registry, guard)
 
-    assert checkpoint.schema_version == 3
+    assert checkpoint.schema_version == 4
     assert checkpoint.rng_continuation is not None
     assert [
         item.process_id for item in checkpoint.rng_continuation.payloads
@@ -500,6 +500,25 @@ def test_v3_restart_requires_continuation_metadata_before_setup(
 
 
 @pytest.mark.warp
+def test_pre_inventory_v3_checkpoint_infers_rng_resources() -> None:
+    """Authentic pre-change v3 records infer the absent process inventory."""
+    session, registry, guard = _resident_binding()
+    registry.acquire_coagulation(1).rng_states.assign(
+        np.array([17], dtype=np.uint32)
+    )
+    checkpoint = session.checkpoint(registry, guard)
+    legacy_v3 = replace(checkpoint, schema_version=3, rng_resource_processes=())
+
+    _, restored_registry, _ = restart_resident_session(
+        legacy_v3, Device(Backend.WARP, "cpu")
+    )
+
+    np.testing.assert_array_equal(
+        restored_registry.acquire_coagulation(1).rng_states.numpy(), [17]
+    )
+
+
+@pytest.mark.warp
 @pytest.mark.parametrize("process", ("coagulation", "wall_loss"))
 @pytest.mark.parametrize("malformation", ("continuation_only", "resource_only"))
 def test_restart_rejects_rng_process_pairing_before_setup(
@@ -569,6 +588,55 @@ def test_legacy_restart_rejects_acquired_rng_resources_before_setup(
 
     with pytest.raises(ValueError, match="legacy checkpoints cannot restore"):
         restart_resident_session(legacy, Device(Backend.WARP, "cpu"))
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize("schema_version", (1, 2))
+@pytest.mark.parametrize("process", ("coagulation", "wall_loss"))
+def test_authentic_legacy_rng_payloads_restart(
+    schema_version: int, process: str
+) -> None:
+    """Historical in-family RNG sidecars remain exact restart authority."""
+    session, registry, guard = _resident_binding()
+    resources = (
+        registry.acquire_coagulation(1)
+        if process == "coagulation"
+        else registry.acquire_wall_loss()
+    )
+    resources.rng_states.assign(np.array([29], dtype=np.uint32))
+    checkpoint = session.checkpoint(registry, guard)
+    continuation = checkpoint.rng_continuation
+    assert continuation is not None
+    current_words = next(
+        item for item in continuation.payloads if item.process_id == process
+    )
+    capacity = 1 if process == "coagulation" else None
+    historical_rng = CheckpointPayload(
+        process,
+        "rng_states",
+        current_words.dtype,
+        current_words.shape,
+        current_words.data,
+        capacity,
+    )
+    legacy = replace(
+        checkpoint,
+        schema_version=schema_version,
+        payloads=checkpoint.payloads + (historical_rng,),
+        communication=None,
+        rng_continuation=None,
+        rng_resource_processes=(),
+    )
+
+    _, restored_registry, _ = restart_resident_session(
+        legacy, Device(Backend.WARP, "cpu")
+    )
+    restored = (
+        restored_registry.acquire_coagulation(1)
+        if process == "coagulation"
+        else restored_registry.acquire_wall_loss()
+    )
+    np.testing.assert_array_equal(restored.rng_states.numpy(), [29])
 
 
 @pytest.mark.warp

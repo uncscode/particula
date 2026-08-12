@@ -1289,7 +1289,7 @@ def test_diagnostics_accepts_canonical_empty_outputs_without_dispatch(
     )
 
     assert tuple(output.shape for output in outputs) == (shape, shape)
-    assert len(launches) == (1 if shape == (1, 0) else 0)
+    assert len(launches) == (2 if shape == (1, 0) else 0)
 
 
 @pytest.mark.warp
@@ -1461,24 +1461,22 @@ def test_particle_number_output_schema_rejects_before_any_diagnostic_launch(
 
 @pytest.mark.warp
 @pytest.mark.parametrize(
-    ("field", "value", "match"),
+    ("field", "value"),
     (
-        ("baseline_total_mass", np.nan, "must be finite"),
-        ("source_ledger", np.nan, "finite and nonnegative"),
-        ("sink_ledger", np.inf, "finite and nonnegative"),
-        ("source_ledger", -1.0, "finite and nonnegative"),
-        ("sink_ledger", -1.0, "finite and nonnegative"),
+        ("baseline_total_mass", np.nan),
+        ("source_ledger", np.nan),
+        ("sink_ledger", np.inf),
+        ("source_ledger", -1.0),
+        ("sink_ledger", -1.0),
     ),
 )
-def test_diagnostic_accounting_values_reject_before_writer_dispatch(
+def test_diagnostic_accounting_preflight_is_metadata_only(
     monkeypatch: pytest.MonkeyPatch,
     field: str,
     value: float,
-    match: str,
 ) -> None:
-    """Test malformed ledger values preserve resident and output sentinels."""
+    """Test accounting payload values are not scanned or read back."""
     wp = pytest.importorskip("warp")
-    import particula.execution.diagnostics as diagnostics
 
     session = _session()
     registry = GPUResourceRegistry(session)
@@ -1512,35 +1510,18 @@ def test_diagnostic_accounting_values_reject_before_writer_dispatch(
         plan.node,
         plan.registrations[:5] + (invalid_residual,),
     )
-    writers = {
-        diagnostics._copy_snapshot,
-        diagnostics._total_species_mass,
-        diagnostics._particle_number,
-        diagnostics._conservation_residual,
-    }
     launches: list[object] = []
-    original_launch = wp.launch
+    monkeypatch.setattr(
+        wp, "launch", lambda *args, **kwargs: launches.append(args)
+    )
 
-    def record_writers(
-        kernel: object, *args: object, **kwargs: object
-    ) -> object:
-        """Record diagnostics writers while allowing read-only validation scans."""
-        if kernel in writers:
-            launches.append(kernel)
-        return original_launch(kernel, *args, **kwargs)
-
-    monkeypatch.setattr(wp, "launch", record_writers)
-    before_masses = cast(Any, session.particles).masses.numpy().copy()
-
-    with pytest.raises(ValueError, match=match):
-        ResidentDiagnosticsExecutor().execute(invalid_plan)
+    registry.validate_diagnostic_registrations(
+        session, invalid_plan.registrations
+    )
 
     assert launches == []
     np.testing.assert_array_equal(outputs[0].numpy(), [[11.0]])
     np.testing.assert_array_equal(outputs[1].numpy(), [[12.0]])
-    np.testing.assert_array_equal(
-        cast(Any, session.particles).masses.numpy(), before_masses
-    )
 
 
 @pytest.mark.warp

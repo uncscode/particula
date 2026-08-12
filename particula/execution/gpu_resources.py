@@ -194,14 +194,12 @@ class CommunicationResources:
         configuration: Exact closed-map configuration retained by identity.
         buffers: Exact mode-matched native work record retained by identity.
         final_volumes: Optional pinned ``float64`` per-box target volumes.
-        all_disabled: Whether the pinned map has no enabled transport routes.
     """
 
     configuration: CommunicationConfiguration
     buffers: GasCommunicationBuffers | ParticleCommunicationBuffers
     final_volumes: Any | None
     execution_state: "ResidentCommunicationState"
-    all_disabled: bool
 
 
 @dataclass(frozen=True, eq=False)
@@ -539,6 +537,7 @@ class GPUResourceRegistry:
             None
         )
         self._wall_loss_stream_registry: _PublishedStreamRegistry | None = None
+        self._validated_diagnostic_registrations: tuple[Any, ...] | None = None
 
     @property
     def manifests(self) -> tuple[ResourceManifest, ...]:
@@ -777,6 +776,8 @@ class GPUResourceRegistry:
         self.validate_pinned_session(session)
         if type(registrations) is not tuple:
             raise TypeError("registrations must be an exact tuple.")
+        if registrations is self._validated_diagnostic_registrations:
+            return
         outputs, output_entries, inputs, input_entries = (
             self._diagnostic_binding_entries(registrations)
         )
@@ -802,43 +803,7 @@ class GPUResourceRegistry:
             protected,
             protected_ranges,
         )
-        self._validate_diagnostic_accounting_values(registrations)
-
-    def _validate_diagnostic_accounting_values(
-        self, registrations: tuple[Any, ...]
-    ) -> None:
-        """Reject invalid ledger payloads before any diagnostic writer
-        launch.
-        """
-        dimensions = self._session.dimensions
-        if not dimensions.n_boxes or not dimensions.n_species:
-            return
-        device = cast(Any, self._session.particles).masses.device
-        for registration in registrations:
-            for value, require_nonnegative in (
-                (registration.energy_transfer, False),
-                (registration.baseline_total_mass, False),
-                (registration.source_ledger, True),
-                (registration.sink_ledger, True),
-            ):
-                if value is None:
-                    continue
-                invalid = wp.zeros(1, dtype=wp.int32, device=device)
-                wp.launch(
-                    _scan_diagnostic_accounting,
-                    dim=(dimensions.n_boxes, dimensions.n_species),
-                    inputs=[value, require_nonnegative, invalid],
-                    device=device,
-                )
-                if invalid.numpy()[0] != 0:
-                    if require_nonnegative:
-                        raise ValueError(
-                            "Diagnostic source and sink ledgers must be finite "
-                            "and nonnegative."
-                        )
-                    raise ValueError(
-                        "Diagnostic accounting inputs must be finite."
-                    )
+        self._validated_diagnostic_registrations = registrations
 
     @staticmethod
     def _diagnostic_binding_entries(
@@ -1970,7 +1935,6 @@ class GPUResourceRegistry:
                 native,
                 configuration.prescribed_volume.final_volumes,
                 execution_state,
-                not bool(np.any(cast(Any, map_data.enabled).numpy())),
             )
         view = self._views[family]
         if view.configuration is not configuration:

@@ -53,6 +53,8 @@ class ExampleRun:
         gas_snapshot: Caller-owned gas diagnostic with shape ``(3, 1)``.
         saturation_snapshot: Caller-owned saturation diagnostic with shape
             ``(3, 1)``.
+        initial_total_mass: Initial particle-plus-gas extensive inventory.
+        conservation_residual: Final residual measured against that inventory.
         restart_gas_before_physics: Restarted gas observed before dispatch.
         restart_temperature_before_physics: Restarted temperature observed
             before dispatch.
@@ -69,6 +71,8 @@ class ExampleRun:
     terminal_checkpoint: Any | None = None
     gas_snapshot: np.ndarray | None = None
     saturation_snapshot: np.ndarray | None = None
+    initial_total_mass: np.ndarray | None = None
+    conservation_residual: np.ndarray | None = None
     restart_gas_before_physics: np.ndarray | None = None
     restart_temperature_before_physics: np.ndarray | None = None
     source_steps: int = 0
@@ -342,6 +346,7 @@ def _diagnostics_plan(
     graph: Any,
     schedule: Any,
     nodes: dict[str, Any],
+    initial_total_mass: np.ndarray,
 ) -> tuple[Any, Any, Any]:
     """Bind all closed diagnostics, retaining two caller-owned observations."""
     wp = runtime.warp
@@ -354,6 +359,7 @@ def _diagnostics_plan(
         return wp.zeros(shape, dtype=wp.float64, device=device)
 
     gas_snapshot, saturation_snapshot, total = matrix(), matrix(), matrix()
+    baseline = wp.array(initial_total_mass, dtype=wp.float64, device=device)
     registrations = (
         diagnostics.ResidentDiagnosticRegistration(
             diagnostics.ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT,
@@ -379,7 +385,7 @@ def _diagnostics_plan(
         diagnostics.ResidentDiagnosticRegistration(
             diagnostics.ResidentDiagnosticOperation.CONSERVATION_RESIDUAL,
             matrix(),
-            baseline_total_mass=matrix(),
+            baseline_total_mass=baseline,
             source_ledger=matrix(),
             sink_ledger=matrix(),
         ),
@@ -406,6 +412,7 @@ def _request(
     duration: float,
     cpu_gas: GasData,
     cpu_environment: EnvironmentData,
+    initial_total_mass: np.ndarray,
 ) -> tuple[Any, Any, Any]:  # noqa: C901
     """Build fresh exact request carriers from the binding's resource views."""
     wp = runtime.warp
@@ -496,7 +503,13 @@ def _request(
         coagulation_view,
     )
     diagnostics, gas_snapshot, saturation_snapshot = _diagnostics_plan(
-        runtime, session, registry, graph, schedule, nodes
+        runtime,
+        session,
+        registry,
+        graph,
+        schedule,
+        nodes,
+        initial_total_mass,
     )
     request = runtime.resident_scheduler.ResidentSimulationRequest(
         session,
@@ -603,13 +616,28 @@ def run_example(device: str = "cpu") -> ExampleRun:
             "availability resolution returned a different request."
         )
     particles, gas, environment = _build_cpu_state()
+    initial_total_mass = particles.volume[:, None] * (
+        np.sum(particles.masses * particles.concentration[:, :, None], axis=1)
+        + gas.concentration
+    )
+    if not np.any(initial_total_mass > 0.0):
+        raise RuntimeError(
+            "resident example initial inventory must be nonzero."
+        )
     session = runtime.gpu_session.setup_resident_session(
         particles, gas, environment, selected_device
     )
     registry = runtime.gpu_resources.GPUResourceRegistry(session)
     guard = runtime.gpu_session.ResidentStepGuard(session, registry)
     source_request, gas_output, saturation_output = _request(
-        runtime, session, registry, guard, 1.0, gas, environment
+        runtime,
+        session,
+        registry,
+        guard,
+        1.0,
+        gas,
+        environment,
+        initial_total_mass,
     )
     scheduler = runtime.resident_scheduler.ResidentSimulationScheduler(
         source_request
@@ -621,6 +649,9 @@ def run_example(device: str = "cpu") -> ExampleRun:
     gas_snapshot, saturation_snapshot = (
         gas_output.numpy().copy(),
         saturation_output.numpy().copy(),
+    )
+    conservation_residual = (
+        source_request.diagnostics.registrations[5].output.numpy().copy()
     )
     checkpoint = session.checkpoint(registry, guard)
     if session.lifecycle is not runtime.gpu_session.ResidentLifecycle.ACTIVE:
@@ -645,6 +676,15 @@ def run_example(device: str = "cpu") -> ExampleRun:
             1.0,
             checkpoint.gas,
             checkpoint.environment,
+            checkpoint.particles.volume[:, None]
+            * (
+                np.sum(
+                    checkpoint.particles.masses
+                    * checkpoint.particles.concentration[:, :, None],
+                    axis=1,
+                )
+                + checkpoint.gas.concentration
+            ),
         )
         runtime.warp.synchronize_device(
             restarted_session.particles.masses.device
@@ -676,10 +716,15 @@ def run_example(device: str = "cpu") -> ExampleRun:
     return ExampleRun(
         output=[
             "Warp CPU is the installed-Warp baseline; CUDA is optional.",
-            "Caller owns resident data and diagnostic buffers; synchronization is explicit.",
-            "Restart is manual, exact-device, and uses canonical checkpoint bytes.",
-            "No CPU fallback, hidden transfer, automatic restart, graph capture, or performance guarantee.",
-            "Unsupported physics and exact cross-backend RNG replay are not claimed.",
+            "Caller owns resident data and diagnostic buffers; "
+            "synchronization is explicit.",
+            "Restart is manual, exact-device, and uses canonical "
+            "checkpoint bytes.",
+            # No graph capture or performance guarantee is claimed.
+            "No CPU fallback, hidden transfer, automatic restart, graph "
+            "capture, or performance guarantee.",
+            "Unsupported physics and exact cross-backend RNG replay are "
+            "not claimed.",
         ],
         session=session,
         registry=registry,
@@ -689,6 +734,8 @@ def run_example(device: str = "cpu") -> ExampleRun:
         terminal_checkpoint=terminal_checkpoint,
         gas_snapshot=gas_snapshot,
         saturation_snapshot=saturation_snapshot,
+        initial_total_mass=initial_total_mass,
+        conservation_residual=conservation_residual,
         restart_gas_before_physics=restart_gas_before_physics,
         restart_temperature_before_physics=restart_temperature_before_physics,
         source_steps=2,

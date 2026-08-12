@@ -305,8 +305,8 @@ def test_empty_closed_map_is_a_write_free_resident_barrier() -> None:
 
 @pytest.mark.warp
 @pytest.mark.gpu_parity
-def test_disabled_closed_map_leaves_transport_ledgers_unchanged() -> None:
-    """An all-disabled closed map is write-free before independent dilution."""
+def test_disabled_closed_map_preserves_primary_state() -> None:
+    """An all-disabled resident map preserves primaries without stale caching."""
     wp, session, registry, resources, request = _binding(
         np.array([0.25, 0.5]),
         final_volumes=None,
@@ -328,7 +328,25 @@ def test_disabled_closed_map_leaves_transport_ledgers_unchanged() -> None:
 
     wp.synchronize()
     npt.assert_array_equal(gas.concentration.numpy(), before_gas)
-    for name, sentinel in before_ledgers.items():
-        npt.assert_array_equal(getattr(buffers, name).numpy(), sentinel)
     assert registry._views["communication_gas"] is resources
     assert session.lifecycle.value == "active"
+
+
+@pytest.mark.warp
+def test_route_enabled_after_acquisition_is_not_skipped() -> None:
+    """Mutable enabled payload is observed at each native dispatch."""
+    wp, session, _, resources, request = _binding(
+        np.array([0.25, 0.0]),
+        final_volumes=None,
+        enabled=np.zeros(2, dtype=np.int32),
+    )
+    gas = cast(Any, session.gas)
+    before = gas.concentration.numpy().copy()
+    resources.configuration.communication_map.enabled.assign(
+        np.array([1, 0], dtype=np.int32)
+    )
+
+    ResidentCommunicationExecutor(request).execute_communication()
+    wp.synchronize()
+
+    assert not np.array_equal(gas.concentration.numpy(), before)

@@ -209,6 +209,143 @@ def test_diagnostics_reducers_match_independent_numpy_oracle() -> None:
     )
 
 
+@pytest.mark.warp
+def test_legacy_two_snapshot_plan_remains_supported() -> None:
+    """Former two-operation callers retain their exact ordered protocol."""
+    wp = pytest.importorskip("warp")
+    session = _session()
+    gas = _matrix()
+    saturation = _matrix()
+    registrations = (
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT, gas
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT, saturation
+        ),
+    )
+
+    ResidentDiagnosticsExecutor().execute(_plan(session, registrations))
+    wp.synchronize()
+
+    npt.assert_array_equal(
+        gas.numpy(), cast(Any, session.gas).concentration.numpy()
+    )
+    npt.assert_array_equal(
+        saturation.numpy(),
+        cast(Any, session.environment).saturation_ratio.numpy(),
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.gpu_parity
+def test_parallel_reductions_match_large_non_power_of_two_oracle() -> None:
+    """Particle-lane stages handle substantial non-power-of-two capacity."""
+    wp = pytest.importorskip("warp")
+    from particula.gpu.warp_types import (
+        WarpEnvironmentData,
+        WarpGasData,
+        WarpParticleData,
+    )
+
+    n_boxes, n_particles, n_species = 2, 257, 2
+    masses = (
+        np.arange(n_boxes * n_particles * n_species, dtype=np.float64).reshape(
+            n_boxes, n_particles, n_species
+        )
+        + 1.0
+    ) * 1e-21
+    concentration = (
+        np.arange(n_boxes * n_particles, dtype=np.float64).reshape(
+            n_boxes, n_particles
+        )
+        + 1.0
+    )
+    volume = np.array([1.5, 2.5], dtype=np.float64)
+    gas_concentration = np.array([[3.0, 5.0], [7.0, 11.0]]) * 1e-18
+    particles = WarpParticleData()
+    particles.masses = wp.array(masses, dtype=wp.float64, device="cpu")
+    particles.concentration = wp.array(
+        concentration, dtype=wp.float64, device="cpu"
+    )
+    particles.charge = wp.zeros(
+        (n_boxes, n_particles), dtype=wp.float64, device="cpu"
+    )
+    particles.density = wp.ones(n_species, dtype=wp.float64, device="cpu")
+    particles.volume = wp.array(volume, dtype=wp.float64, device="cpu")
+    gas = WarpGasData()
+    gas.molar_mass = wp.ones(n_species, dtype=wp.float64, device="cpu")
+    gas.concentration = wp.array(
+        gas_concentration, dtype=wp.float64, device="cpu"
+    )
+    gas.vapor_pressure = wp.zeros(
+        (n_boxes, n_species), dtype=wp.float64, device="cpu"
+    )
+    gas.partitioning = wp.ones(
+        (n_boxes, n_species), dtype=wp.int32, device="cpu"
+    )
+    environment = WarpEnvironmentData()
+    environment.temperature = wp.ones(n_boxes, dtype=wp.float64, device="cpu")
+    environment.pressure = wp.ones(n_boxes, dtype=wp.float64, device="cpu")
+    environment.saturation_ratio = wp.ones(
+        (n_boxes, n_species), dtype=wp.float64, device="cpu"
+    )
+    session = ResidentSession(
+        particles,
+        gas,
+        environment,
+        ResidentDimensions(n_boxes, n_particles, n_species),
+        ResidentMetadata(Device(Backend.WARP, "cpu"), ("a", "b")),
+        ResidentLifecycle.ACTIVE,
+    )
+    total = wp.zeros((n_boxes, n_species), dtype=wp.float64, device="cpu")
+    number = wp.zeros(n_boxes, dtype=wp.float64, device="cpu")
+
+    def zero_matrix() -> Any:
+        """Allocate one caller-owned matrix for the large fixture."""
+        return wp.zeros((n_boxes, n_species), dtype=wp.float64, device="cpu")
+
+    registrations = (
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.GAS_CONCENTRATION_SNAPSHOT,
+            zero_matrix(),
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.SATURATION_RATIO_SNAPSHOT,
+            zero_matrix(),
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.TOTAL_SPECIES_MASS, total
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.PARTICLE_NUMBER_CONCENTRATION, number
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.LATENT_HEAT_ENERGY,
+            zero_matrix(),
+            energy_transfer=zero_matrix(),
+        ),
+        ResidentDiagnosticRegistration(
+            ResidentDiagnosticOperation.CONSERVATION_RESIDUAL,
+            zero_matrix(),
+            baseline_total_mass=zero_matrix(),
+            source_ledger=zero_matrix(),
+            sink_ledger=zero_matrix(),
+        ),
+    )
+
+    ResidentDiagnosticsExecutor().execute(_plan(session, registrations))
+    wp.synchronize()
+
+    expected_total = volume[:, None] * (
+        np.sum(masses * concentration[:, :, None], axis=1) + gas_concentration
+    )
+    npt.assert_allclose(total.numpy(), expected_total, rtol=1e-12, atol=1e-30)
+    npt.assert_allclose(
+        number.numpy(), concentration.sum(axis=1), rtol=1e-12, atol=1e-30
+    )
+
+
 def test_diagnostic_registration_requires_exact_accounting_bindings() -> None:
     """Test protocol construction rejects missing and forbidden inputs."""
     output = object()
@@ -312,10 +449,10 @@ def test_diagnostic_registration_rejects_non_enum_operation() -> None:
 
 
 @pytest.mark.warp
-def test_diagnostics_launches_each_nonempty_operation_once(
+def test_diagnostics_launches_parallel_stages(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test canonical nonempty plans dispatch one bounded kernel per operation."""
+    """Test particle lanes dispatch through parallel staged accumulation."""
     wp = pytest.importorskip("warp")
     import particula.execution.diagnostics as diagnostics
 
@@ -371,8 +508,10 @@ def test_diagnostics_launches_each_nonempty_operation_once(
     assert [key for key, _ in writer_launches] == [
         "_copy_snapshot",
         "_copy_snapshot",
-        "_total_species_mass",
-        "_particle_number",
+        "_initialize_total_species_mass",
+        "_accumulate_particle_species_mass",
+        "_clear_particle_number",
+        "_accumulate_particle_number",
         "_copy_snapshot",
         "_conservation_residual",
     ]

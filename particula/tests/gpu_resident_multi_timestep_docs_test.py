@@ -11,6 +11,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Mapping, Sequence
 
+import numpy as np
 import numpy.testing as npt
 import pytest
 
@@ -387,6 +388,9 @@ def test_real_warp_cpu_example_has_resident_lifecycle_observations() -> None:
     assert result.restarted_steps == 1
     assert result.gas_snapshot.shape == (3, 1)
     assert result.saturation_snapshot.shape == (3, 1)
+    assert result.initial_total_mass.shape == (3, 1)
+    assert np.any(result.initial_total_mass > 0.0)
+    assert result.conservation_residual.shape == (3, 1)
     assert result.checkpoint.lifecycle.value == "active"
     assert result.session.lifecycle.value == "finalized"
     assert result.terminal_checkpoint is result.session.finalize(
