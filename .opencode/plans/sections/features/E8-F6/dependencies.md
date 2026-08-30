@@ -16,10 +16,10 @@
 
 ## Downstream
 
-- **E8-F7** uses measured setup/replay limitations and memory-budget examples in
-  the runnable graph-capture documentation.
-- **E8-F8** consumes raw timings, summaries, memory observations, and unavailable
-  rows for CUDA profiling and Epic H closeout.
+- **E8-F7** consumes raw timings, summaries, memory observations, and unavailable
+  rows for CUDA profiling.
+- **E8-F8** uses measured setup/replay limitations and memory-budget examples in
+  the runnable graph-capture documentation, runbook, and Epic H closeout.
 - **Epic I** consumes the labeled tape-memory projections and later replaces
   them with measured differentiable-loop evidence.
 

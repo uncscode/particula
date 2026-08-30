@@ -13,6 +13,6 @@
 - Add or update documentation contract assertions under `particula/tests/` or
   `particula/execution/tests/` when user-facing contract text changes.
 - Update all E8-F2 plan sections and parent E8 child/dependency status during
-  phase shipping. E8-F7, not this feature, owns the complete runnable capture
+  phase shipping. E8-F8, not this feature, owns the complete runnable capture
   example and end-user limitations guide.
 - Validate links and rendering with `mkdocs build --strict`.

@@ -4,6 +4,9 @@
   CPU oracle and uncaptured Warp CPU path; every Warp-visible CUDA device runs
   captured qualification or records an independent unavailable result without
   fallback.
+- [ ] The CUDA device designated for E8-F8 closeout completes the final E8-F5
+  capture and correctness rows at the closeout revision; results from additional
+  independently qualified devices are supplemental.
 - [ ] Primary particle, gas, and environment fields and every registered
   diagnostic are compared separately with explicit deterministic tolerances.
 - [ ] Per-box/per-species concentration-weighted inventory satisfies tight

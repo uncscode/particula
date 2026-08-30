@@ -8,8 +8,9 @@
   benchmark schema, fair captured/uncaptured timing boundary, configured budget,
   structured unavailable rows, and how to interpret logical versus observed
   versus projected bytes.
-- Link E8-F7's graph-capture example/limits page to the published evidence but
-  leave runnable lifecycle ownership in E8-F7.
+- Hand the published evidence to E8-F7 for profiling and link E8-F8's
+  graph-capture example/limits page to it; leave runnable lifecycle ownership
+  in E8-F8.
 - Update `.opencode/guides/testing_guide.md` only if the concrete resident
   benchmark command or artifact convention adds a reusable repository policy;
   preserve `--benchmark` as the only collection-affecting option.

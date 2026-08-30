@@ -23,10 +23,10 @@
   and captured prepared sequences; it must not invoke validation during capture.
 - **E8-F5/E8-F6:** benchmark and memory accounting use the final prepared
   sequence and exact resource inventory.
-- **E8-F7:** documents setup, capture, replay, teardown, and recapture triggers
-  after the executable split is validated.
-- **E8-F8:** profiles and closes the final path without redefining the setup or
-  enqueue contract.
+- **E8-F7:** profiles the validated setup/replay path without redefining the
+  setup or enqueue contract.
+- **E8-F8:** documents setup, capture, replay, teardown, recapture triggers,
+  the runnable example, and final closeout.
 
 ## Phase Ordering
 

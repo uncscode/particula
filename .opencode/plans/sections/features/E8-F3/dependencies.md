@@ -22,10 +22,10 @@
 - **E8-F5:** uses the stable inventory while measuring multi-box scaling.
 - **E8-F6:** consumes deterministic role/family logical bytes as one component
   of the broader state, inactive-slot, checkpoint, and future-tape budget.
-- **E8-F7:** documents ownership, setup, byte-report meaning, limitations, and
-  recapture triggers only after this contract is validated.
-- **E8-F8:** profiles the final allocation-free replay path and must not replace
+- **E8-F7:** profiles the final allocation-free replay path and must not replace
   registry ownership or accounting semantics.
+- **E8-F8:** documents ownership, setup, byte-report meaning, limitations,
+  recapture triggers, the runnable example, and final closeout.
 
 ## Phase Ordering
 

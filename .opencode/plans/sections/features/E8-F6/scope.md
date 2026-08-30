@@ -32,5 +32,5 @@ to the exact E8 resource inventory.
   CPU fallback, or allocator-specific guarantees across Warp/CUDA versions.
 - Implementing autodiff or allocating a real tape; tape values are labeled
   projections for Epic I until measured evidence exists.
-- CUDA occupancy/kernel profiling and final Epic H closeout, which belong to
-  E8-F8, and the runnable lifecycle example, which belongs to E8-F7.
+- CUDA occupancy/kernel profiling, which belongs to E8-F7, and the runnable
+  lifecycle example, runbook, and final Epic H closeout, which belong to E8-F8.

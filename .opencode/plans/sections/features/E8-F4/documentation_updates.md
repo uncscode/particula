@@ -15,5 +15,5 @@
   implementation decisions, and handoffs to E8-F5 through E8-F8.
 - Add or update hardware-free documentation contract assertions for all new
   claims and run `mkdocs build --strict`.
-- Defer the runnable graph-capture example and user-facing tutorial to E8-F7;
+- Defer the runnable graph-capture example and user-facing tutorial to E8-F8;
   E8-F4 documentation is an implementation and validation contract only.

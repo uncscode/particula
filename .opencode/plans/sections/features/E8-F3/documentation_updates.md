@@ -14,7 +14,7 @@
 - Cross-reference E8-F1 lifecycle and E8-F2 prepared-enqueue documentation, and
   hand deterministic byte records to E8-F6 without claiming allocator-reserved,
   checkpoint-copy, or future autodiff-tape totals.
-- Do not add a user-facing example in this track; E8-F7 owns the complete graph
+- Do not add a user-facing example in this track; E8-F8 owns the complete graph
   capture example and limitation guide.
 - Promote phase statuses and update this plan's change log after each shipped
   increment. Validate all links with `mkdocs build --strict`.

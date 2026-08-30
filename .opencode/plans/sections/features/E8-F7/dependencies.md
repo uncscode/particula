@@ -31,8 +31,6 @@ P1 freezes records and workload IDs before P2 or P3 emits artifacts. P2 and P3
 may then run independently on identical fixtures. P4 requires both artifact
 families or explicit unavailable records. P5 publishes only verified P1-P4
 outputs. Profiling starts only after E8-F4 through E8-F6 contracts are stable.
-
-The current parent `child_plans.md` and dependency map place profiling in E8-F8,
-while the orchestrator explicitly assigns T7 profiling to E8-F7 and the plan
-record title agrees. Implementation must resolve that metadata mismatch before
-using sibling status as a closeout gate.
+The E8 child-plan table and dependency map assign profiling to E8-F7; E8-F8
+consumes only E8-F7's verified normalized artifacts, provenance, and bounded
+recommendations for its example, runbook, and closeout gates.

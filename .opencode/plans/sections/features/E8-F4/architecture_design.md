@@ -65,9 +65,9 @@ faults both graph and resident session; rollback and retry are not promised.
   operations under `particula.execution.graph_capture`. Do not export them from
   `particula.execution`, `particula.gpu.kernels`, or top-level `particula`.
 - **Workflow hooks:** E8-F4 consumes E8-F1 lifecycle/signature, E8-F2 prepared
-  enqueue, and E8-F3 resource publication. E8-F5 benchmarks the accepted replay
-  path; E8-F6 uses its resource/graph lifetime; E8-F7 documents user usage; and
-  E8-F8 profiles and closes the epic.
+  enqueue, and E8-F3 resource publication. E8-F5 validates the accepted replay
+  path; E8-F6 benchmarks its resource/graph lifetime; E8-F7 profiles the
+  correctness-qualified path; and E8-F8 documents and closes the epic.
 - **Lifecycle:** Capture requires exact ACTIVE/READY/closed bindings. Replay
   requires REPLAYABLE. Finalize, close, fault, explicit teardown, or structural
   drift prevent launch. Recapture always creates a fresh record and native

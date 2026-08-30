@@ -27,10 +27,11 @@
   captured replay implementation.
 - **E8-F6:** models graph-lifetime resources and memory using the finalized
   ownership and teardown contract.
-- **E8-F7:** publishes the runnable graph-capture example, limitations, and
-  recapture triggers after E8-F4 behavior is executable.
-- **E8-F8:** profiles this replay path and performs final validation/closeout;
-  it must not redefine E8-F4 launch or lifecycle semantics.
+- **E8-F7:** profiles the correctness-qualified replay path and publishes
+  machine-bounded performance evidence.
+- **E8-F8:** publishes the runnable graph-capture example, limitations,
+  recapture runbook, and final closeout; it must not redefine E8-F4 launch or
+  lifecycle semantics.
 
 ## External Dependencies
 

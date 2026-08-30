@@ -28,8 +28,9 @@
 ## Phase Ordering
 
 P1 fixes the shared oracle before either GPU path. P2 establishes the uncaptured
-baseline. P3 compares capture against both prior paths. P4 extends the stable
-fixture to RNG and rejection semantics. P5 records integrated evidence and docs
-last. The parent child-plan table labels captured validation as E8-F4 while this
-created record and orchestrator handoff assign it to E8-F5; implementation should
-follow this plan ID unless orchestration metadata is corrected before issue split.
+baseline. P3 depends on P1, P2, and the completed E8-F4 capture path, then
+compares capture against both prior paths. P4 extends the stable fixture to RNG
+and rejection semantics. P5 records integrated evidence and documentation last.
+The E8 child-plan table and dependency map assign captured replay implementation
+to E8-F4 and captured full-loop validation to E8-F5; downstream E8-F6 benchmark
+rows and E8-F7 profiling must consume E8-F5 correctness-qualified results.

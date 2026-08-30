@@ -30,8 +30,8 @@ logical byte accounting.
 - Graph capture/replay lifecycle itself (E8-F1) or process enqueue refactoring
   (E8-F2).
 - CPU/uncaptured/captured physics parity (E8-F4), scaling benchmarks (E8-F5),
-  the broader state/checkpoint/tape memory model (E8-F6), examples (E8-F7), or
-  profiling/closeout (E8-F8).
+  the broader state/checkpoint/tape memory model (E8-F6), profiling (E8-F7), or
+  examples, runbook, and closeout (E8-F8).
 - Runtime resizing, compaction, automatic recapture, fallback, migration,
   allocator-pool tuning, or claims about allocator overhead/reserved bytes.
 - New public package exports or changes to direct-kernel ownership contracts.

@@ -56,7 +56,8 @@ retired.
   explicit invalidation, recapture eligibility, and teardown.
 - **Workflow hooks:** E8-F2 consumes `READY` to perform capture-safe setup;
   E8-F3 guarantees all signature resources are preallocated; E8-F4 validates
-  execution parity; E8-F7 documents user-facing recapture triggers. The
+  execution parity; E8-F7 profiles the validated replay path; E8-F8 documents
+  user-facing recapture triggers. The
   existing uncaptured scheduler remains authoritative for process order and
   writer-failure semantics.
 - **Error behavior:** Unsupported capture capability is distinct from invalid

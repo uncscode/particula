@@ -29,10 +29,10 @@
   to compare CPU, uncaptured GPU, and captured GPU execution.
 - **E8-F5/E8-F6:** benchmark and memory models rely on the finalized capture
   lifetime and resource inventory.
-- **E8-F7:** publishes user-facing lifecycle, limitations, and recapture
-  triggers only after they are executable and validated.
-- **E8-F8:** profiles and closes the final implementation; it must not redefine
-  E8-F1 lifecycle or invalidation semantics.
+- **E8-F7:** profiles the validated replay path without redefining E8-F1
+  lifecycle or invalidation semantics.
+- **E8-F8:** publishes the user-facing lifecycle, limitations, recapture
+  triggers, runnable example, runbook, and final closeout.
 
 ## External Dependencies
 
