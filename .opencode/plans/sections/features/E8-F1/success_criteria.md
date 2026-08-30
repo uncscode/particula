@@ -13,13 +13,15 @@
 - [x] P1 comparison reports deterministic first drift for the implemented
   signature groups and leaves stable RNG-array identity compatible; exhaustive
   drift and active-slot coverage remains P3 test scope.
-- [ ] Lifecycle transition tests cover all legal transitions and reject replay
-  or recapture from invalid, faulted, terminal, or open-step bindings.
+- [x] P2 lifecycle metadata covers all six states, legal host-only transitions,
+  exact carrier validation, first-reason retention, and idempotent paths; it
+  rejects every other lifecycle transition without inspecting a resident binding.
 - [ ] Recapture is explicit and creates a new record only after eligibility
   checks; there is no automatic replacement, migration, fallback, retry, or
   graph-handle checkpointing.
-- [ ] Read-only preflight failures preserve active resident and capture state;
-  possible post-launch writer failures retain existing no-rollback fault rules.
+- [x] P2 read-only classification preserves accepted lifecycle metadata by
+  identity, while writer-may-have-launched classification produces immutable
+  fault metadata without asserting resident-session mutation or rollback.
 - [ ] Persistent coagulation and wall-loss RNG sidecars advance by identity and
   are never implicitly initialized or reset by replay/recapture checks.
 - [ ] Focused execution tests pass; the untargeted repository runner supplies

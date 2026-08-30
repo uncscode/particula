@@ -2,6 +2,7 @@
 
 | Date | Change | Author |
 |------|--------|--------|
+| 2026-08-30 | Delivered E8-F1-P2 for issue #1548: added Warp-free immutable host lifecycle metadata and explicit transitions in `particula/execution/graph_capture.py`, with hardware-free lifecycle/import-boundary coverage in `particula/execution/tests/graph_capture_test.py`; native capture/replay and resident-binding integration remain P3 work | implementation |
 | 2026-08-30 | Delivered E8-F1-P1 for issue #1547: added the Warp-import-free concrete graph-capture capability/signature declarations and focused unit tests; capture/replay and lifecycle remain deferred to P2-P3 | implementation |
 | 2026-08-30 | Resolved graph teardown to always retire the Particula owner and call native release only through a documented, version-qualified public Warp API | user decision |
 | 2026-08-30 | Created first-pass E8-F1 plan with four issue-sized phases covering graph-capture capability, compatibility signatures, lifecycle/invalidation, recapture gates, co-located tests, and documentation | plan-feature-drafter |

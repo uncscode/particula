@@ -901,6 +901,26 @@ def test_invalidation_and_failure_paths_preserve_first_reason_and_identity() -> 
         )
 
 
+def test_retirement_is_idempotent_and_retains_first_invalidation_reason() -> (
+    None
+):
+    """Repeated retirement preserves the original retired lifecycle record."""
+    captured = complete_graph_capture(_available_lifecycle())
+    invalidated = invalidate_graph_capture(
+        captured,
+        GraphCaptureCompatibility(False, GraphCaptureDriftReason.REQUEST),
+    )
+    retired = retire_graph_capture(invalidated)
+
+    repeated = retire_graph_capture(retired)
+
+    assert repeated is retired
+    assert (
+        repeated.first_invalidation_reason
+        is invalidated.first_invalidation_reason
+    )
+
+
 @pytest.mark.parametrize(
     ("state", "reason"),
     [
@@ -1069,6 +1089,11 @@ def test_lifecycle_operations_reject_inexact_carriers_before_attribute_access() 
         )
     with pytest.raises(TypeError):
         classify_graph_capture_failure(
+            cast(GraphCaptureLifecycle, AttributeTrap()),
+            GraphCaptureFailureClassification.READ_ONLY,
+        )
+    with pytest.raises(TypeError):
+        classify_graph_capture_failure(
             lifecycle, cast(GraphCaptureFailureClassification, AttributeTrap())
         )
     with pytest.raises(TypeError):
@@ -1081,6 +1106,49 @@ def test_lifecycle_operations_reject_inexact_carriers_before_attribute_access() 
         )
     with pytest.raises(TypeError):
         close_graph_capture(cast(GraphCaptureLifecycle, AttributeTrap()))
+
+
+def test_binary_lifecycle_apis_reject_left_argument_before_second_access() -> (
+    None
+):
+    """Binary lifecycle APIs reject their first invalid carrier left-to-right."""
+    accesses: list[str] = []
+
+    class AttributeTrap:
+        """Record and reject any attribute access to an invalid carrier."""
+
+        def __init__(self, label: str) -> None:
+            """Store the label used to identify this invalid carrier."""
+            self.label = label
+
+        def __getattribute__(self, name: str) -> object:
+            if name == "label":
+                return object.__getattribute__(self, name)
+            accesses.append(object.__getattribute__(self, "label"))
+            raise AssertionError(f"unexpected attribute access: {name}")
+
+    with pytest.raises(TypeError):
+        create_graph_capture_lifecycle(
+            cast(GraphCaptureCapability, AttributeTrap("first")),
+            cast(ResidentGraphCaptureSignature, AttributeTrap("second")),
+        )
+    with pytest.raises(TypeError):
+        invalidate_graph_capture(
+            cast(GraphCaptureLifecycle, AttributeTrap("first")),
+            cast(GraphCaptureCompatibility, AttributeTrap("second")),
+        )
+    with pytest.raises(TypeError):
+        classify_graph_capture_failure(
+            cast(GraphCaptureLifecycle, AttributeTrap("first")),
+            cast(GraphCaptureFailureClassification, AttributeTrap("second")),
+        )
+    with pytest.raises(TypeError):
+        renew_retired_graph_capture(
+            cast(GraphCaptureLifecycle, AttributeTrap("first")),
+            cast(ResidentGraphCaptureSignature, AttributeTrap("second")),
+        )
+
+    assert accesses == []
 
 
 @pytest.mark.parametrize(

@@ -17,15 +17,14 @@ resolved ResidentSimulationRequest
 build CaptureCompatibilitySignature (metadata + identities only)
         |
         v
-CaptureLifecycle: READY -> CAPTURED -> REPLAYABLE
-        |                        |
-        | structural drift       | writer may have launched and failed
-        v                        v
-    INVALIDATED               FAULTED
-        |
-        | explicit validate-for-recapture on a closed active binding
-        v
-      READY (new record; old graph retired)
+GraphCaptureLifecycle: READY -> CAPTURED
+                               | \
+                  incompatibility  \ writer may have launched
+                               v    v
+                         INVALIDATED FAULTED
+                               |
+                               v
+                            RETIRED -> READY (new metadata record)
 
 Any state -> CLOSED only through explicit teardown.
 ```
@@ -66,7 +65,7 @@ retired.
   failure after a writer may have launched faults both the capture record and
   resident session, with no rollback or retry guarantee.
 
-## Implemented P1 Boundary
+## Implemented P1-P2 Boundary
 
 Issue #1547 delivered the declaration-only portion in
 `particula/execution/graph_capture.py`. It provides capability outcomes for
@@ -77,8 +76,17 @@ It also provides immutable identity-only signatures and deterministic first
 drift comparison for the request, session, device, dimensions, containers,
 primary arrays, resource views, graph, schedule/order, diagnostics,
 communication, configurations, and RNG sidecars. The implementation retains
-existing request-owned references only; it does not create lifecycle records or
-perform capture/replay. Those operations remain P2-P3 scope.
+existing request-owned references only; it does not perform capture/replay.
+
+P2 added exact immutable `GraphCaptureLifecycle` metadata and the closed
+transition API in the same module. `CAPTURED` declares replayability only;
+there is no native handle or replay operation. Compatible invalidation and
+read-only failure paths return the existing record by identity where specified;
+the first incompatible drift reason is retained. `WRITER_MAY_HAVE_LAUNCHED`
+transitions accepted active metadata to `FAULTED`, while close is explicit and
+idempotent. P2 deliberately does not compare a resident request, validate an
+active session/registry/guard binding, capture a graph, or fault a session;
+those operations remain P3 scope.
 
 ## Security & Compliance
 

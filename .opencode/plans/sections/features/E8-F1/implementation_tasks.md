@@ -15,8 +15,10 @@
   identities.
 - [x] Compare current bindings against a signature in deterministic field order
   and return/raise the first documented recapture reason without payload reads.
-- [ ] Implement lifecycle transitions for ready, captured/replayable,
-  invalidated, faulted, retired, and closed states with explicit teardown.
+- [x] Implement host-only immutable lifecycle transitions for ready, captured,
+  invalidated, faulted, retired, and closed states with explicit close metadata.
+- [x] Preserve the first incompatible P1 drift reason and retained capability/
+  signature identities through lifecycle successors; do not perform native work.
 - [ ] Require active session plus closed guard/registry gates before capture or
   recapture eligibility; reject finalized, faulted, and closed sessions.
 - [ ] Preserve existing scheduler failure classification: read-only rejection
@@ -44,6 +46,9 @@
   physics parity before E8-F4.
 - [x] Add/retain graph-capture test assertions proving internals are
   concrete-only.
+- [x] Add hardware-free P2 coverage for legal and illegal transitions, exact
+  argument validation, first-reason retention, failure classification, and a
+  lifecycle subprocess that forbids Warp and resident-module imports.
 - [ ] Run focused assertions with coverage disabled, then run the untargeted
   `.opencode/tools/run_pytest.py` suite for repository-configured full-package
   coverage; focused-target coverage is invalid evidence.

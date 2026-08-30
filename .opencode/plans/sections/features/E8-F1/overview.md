@@ -30,8 +30,16 @@ Warp-import-free `particula/execution/graph_capture.py` declaration boundary
 and `particula/execution/tests/graph_capture_test.py`. The delivered boundary
 resolves caller-probed capability and creates/compares exact identity-based
 `ResidentSimulationRequest` signatures without capture, replay, acquisition,
-payload inspection, transfer, or synchronization. Lifecycle, invalidation, and
-recapture behavior remain P2-P3 work.
+payload inspection, transfer, or synchronization.
+
+E8-F1-P2 was delivered for issue #1548. The same direct-import-only module now
+provides immutable host-only lifecycle metadata for `READY`, `CAPTURED`,
+`INVALIDATED`, `FAULTED`, `RETIRED`, and `CLOSED` states. Explicit transition
+operations preserve P1 capability/signature identities, retain the first drift
+reason, classify read-only versus writer-may-have-launched failures, and permit
+renewal only after retirement. They neither capture nor replay a native graph,
+inspect a resident binding, nor mutate a resident session; those integration
+gates remain P3 work.
 
 ## User Stories
 

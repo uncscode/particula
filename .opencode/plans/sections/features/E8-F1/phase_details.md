@@ -13,16 +13,21 @@
     carrier validation, real Warp-guarded request compatibility, representative
     drift reasons, and stable RNG-array identity.
 
-- [ ] **E8-F1-P2:** Implement capture lifecycle and explicit invalidation with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
-  - Goal: Add legal capture-state transitions and deterministic invalidation
-    reasons while preserving active-session, closed-guard, and no-hidden-work
-    constraints.
+- [x] **E8-F1-P2:** Implement capture lifecycle and explicit invalidation with unit tests
+  - Issue: #1548 | Size: S | Status: Delivered
+  - Goal: Add host-only immutable capture-state transitions and deterministic
+    invalidation reasons without native capture, replay, or resident mutation.
   - Files: `particula/execution/graph_capture.py`,
     `particula/execution/tests/graph_capture_test.py`
-  - Tests: Transition table, idempotent invalidation/close, illegal replay and
-    recapture transitions, no mutation on read-only preflight rejection, and
-    writer-failure fault classification.
+  - Delivered: Exact lifecycle metadata covers `READY`, `CAPTURED`,
+    `INVALIDATED`, `FAULTED`, `RETIRED`, and `CLOSED`. The direct-module API
+    retains P1 carrier identities, implements first-reason-wins invalidation,
+    explicit renewal after retirement, failure classification, and idempotent
+    paths where specified. It does not inspect resident bindings or perform
+    native graph work.
+  - Tests: Hardware-free transition-table, exact-type, identity, first-reason,
+    failure-classification, direct-import-only, and forbidden-import subprocess
+    coverage in `graph_capture_test.py`.
 
 - [ ] **E8-F1-P3:** Define recapture gates and resident binding validation with integration tests
   - Issue: TBD | Size: S | Status: Not Started

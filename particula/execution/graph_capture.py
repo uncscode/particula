@@ -524,7 +524,7 @@ def compare_resident_graph_capture_signature(
 
 
 class GraphCaptureLifecycleState(str, Enum):
-    """Enumerate host-side graph-capture lifecycle declarations."""
+    """Enumerate host-only graph-capture lifecycle metadata states."""
 
     READY = "ready"
     CAPTURED = "captured"
@@ -535,7 +535,7 @@ class GraphCaptureLifecycleState(str, Enum):
 
 
 class GraphCaptureFailureClassification(str, Enum):
-    """Classify whether a graph-capture failure may follow a writer launch."""
+    """Classify whether a host-recorded failure may follow a writer launch."""
 
     READ_ONLY = "read_only"
     WRITER_MAY_HAVE_LAUNCHED = "writer_may_have_launched"
@@ -550,7 +550,8 @@ class GraphCaptureLifecycle:
     session.
 
     Attributes:
-        capability: Exact available graph-capture capability declaration.
+        capability: Exact graph-capture capability declaration retained by
+            identity. Lifecycle creation requires it to be available.
         signature: Exact resident graph-capture identity signature.
         state: Current lifecycle declaration.
         first_invalidation_reason: First structural drift reason, if recorded.

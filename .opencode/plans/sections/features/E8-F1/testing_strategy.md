@@ -15,10 +15,15 @@ must not be lowered. Test files use the repository's `*_test.py` convention in
   outcomes and no-Warp-import subprocess coverage, plus Warp-guarded real
   resident-request signature, representative drift, and stable RNG-array
   identity cases. The declaration test cases do not require CUDA.
-- **P2 — Lifecycle and invalidation:** Parametrize every legal and illegal state
-  transition, deterministic first invalidation reason, idempotent teardown, and
-  read-only rejection behavior. Verify no implicit recapture, launch, transfer,
-  synchronization, allocation, reset, or fallback occurs.
+- **P2 — Lifecycle and invalidation (delivered for #1548):**
+  `particula/execution/tests/graph_capture_test.py` hardware-free coverage
+  exercises every legal and illegal metadata transition, exact argument order,
+  deterministic first-reason retention, idempotent invalidation/fault/close
+  paths, and read-only versus writer-may-have-launched classification. An
+  isolated subprocess proves a legal lifecycle sequence imports neither Warp
+  nor resident execution modules. These tests establish metadata behavior only;
+  they do not claim native capture, replay, transfer, synchronization, or
+  resident-session mutation.
 - **P3 — Resident recapture integration:** Exercise exact session/registry/guard
   identity, closed-step gates, all structural drift triggers, active-slot
   payload changes that remain compatible, terminal/faulted resident states,
