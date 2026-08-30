@@ -17,6 +17,11 @@ from typing import TYPE_CHECKING, Protocol, cast
 from particula.execution import Backend, Device
 
 if TYPE_CHECKING:
+    from particula.execution.gpu_resources import GPUResourceRegistry
+    from particula.execution.gpu_session import (
+        ResidentSession,
+        ResidentStepGuard,
+    )
     from particula.execution.resident_scheduler import ResidentSimulationRequest
     from particula.gpu.warp_types import (
         WarpEnvironmentData,
@@ -939,17 +944,32 @@ def _validate_resident_binding(
     lifecycle: object,
 ) -> None:
     """Validate retained identity links without reading resident payloads."""
-    request = _require_exact_resident_carrier(
-        request, "request", "ResidentSimulationRequest", _resident_request_type
+    request = cast(
+        "ResidentSimulationRequest",
+        _require_exact_resident_carrier(
+            request,
+            "request",
+            "ResidentSimulationRequest",
+            _resident_request_type,
+        ),
     )
-    session = _require_exact_resident_carrier(
-        session, "session", "ResidentSession", _resident_session_type
+    session = cast(
+        "ResidentSession",
+        _require_exact_resident_carrier(
+            session, "session", "ResidentSession", _resident_session_type
+        ),
     )
-    registry = _require_exact_resident_carrier(
-        registry, "registry", "GPUResourceRegistry", _registry_type
+    registry = cast(
+        "GPUResourceRegistry",
+        _require_exact_resident_carrier(
+            registry, "registry", "GPUResourceRegistry", _registry_type
+        ),
     )
-    guard = _require_exact_resident_carrier(
-        guard, "guard", "ResidentStepGuard", _resident_guard_type
+    guard = cast(
+        "ResidentStepGuard",
+        _require_exact_resident_carrier(
+            guard, "guard", "ResidentStepGuard", _resident_guard_type
+        ),
     )
     lifecycle = _require_lifecycle(lifecycle)
     if (
@@ -978,8 +998,14 @@ def _attach_resident_graph_capture_binding(
     request: object, binding: object
 ) -> None:
     """Attach one exact binding to a final frozen request exactly once."""
-    request = _require_exact_resident_carrier(
-        request, "request", "ResidentSimulationRequest", _resident_request_type
+    request = cast(
+        "ResidentSimulationRequest",
+        _require_exact_resident_carrier(
+            request,
+            "request",
+            "ResidentSimulationRequest",
+            _resident_request_type,
+        ),
     )
     binding = _require_binding(binding)
     _validate_resident_binding(
@@ -1020,10 +1046,10 @@ def gate_resident_graph_capture(binding: object) -> None:
         binding._guard,
         binding._lifecycle,
     )
-    request = binding._request
-    session = binding._session
-    registry = binding._registry
-    guard = binding._guard
+    request = cast("ResidentSimulationRequest", binding._request)
+    session = cast("ResidentSession", binding._session)
+    registry = cast("GPUResourceRegistry", binding._registry)
+    guard = cast("ResidentStepGuard", binding._guard)
     if request.graph_capture_binding is not binding:
         raise ValueError("request graph-capture attachment does not match.")
     guard.assert_step_closed()

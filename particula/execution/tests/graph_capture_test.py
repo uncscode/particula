@@ -44,6 +44,7 @@ from particula.execution.graph_capture import (
 )
 
 if TYPE_CHECKING:
+    from particula.execution.gpu_resources import GPUResourceRegistry
     from particula.execution.graph_capture import GraphCaptureRuntimeProbe
     from particula.execution.resident_scheduler import ResidentSimulationRequest
 
@@ -1316,8 +1317,10 @@ def test_binding_rejects_a_swapped_equivalent_guard(
         ResidentGraphCaptureBinding(
             request,
             request.session,
-            request.registry,
-            ResidentStepGuard(request.session, request.registry),
+            cast("GPUResourceRegistry", request.registry),
+            ResidentStepGuard(
+                request.session, cast("GPUResourceRegistry", request.registry)
+            ),
             lifecycle,
         )
 
