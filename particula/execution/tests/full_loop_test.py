@@ -54,6 +54,16 @@ from particula.execution.gpu_session import (
     ResidentStepGuard,
     setup_resident_session,
 )
+from particula.execution.graph_capture import (
+    GraphCaptureAvailability,
+    GraphCaptureCapability,
+    GraphCaptureLifecycleState,
+    ResidentGraphCaptureBinding,
+    _attach_resident_graph_capture_binding,
+    complete_graph_capture,
+    create_graph_capture_lifecycle,
+    create_resident_graph_capture_signature,
+)
 from particula.execution.process_adapters import (
     ResidentDilutionRequest,
     ResidentNucleationRequest,
@@ -970,3 +980,77 @@ def test_wall_loss_failure_faults_session_and_blocks_later_dispatch(
     assert fixture.session.lifecycle is ResidentLifecycle.FAULTED
     with pytest.raises(ValueError, match="ACTIVE"):
         fixture.scheduler.execute(0.0)
+
+
+@pytest.mark.warp
+def test_writer_failure_faults_attached_graph_capture_lifecycle(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A dispatched writer failure faults the attached capture lifecycle."""
+    fixture = _build_loop_fixture(
+        monkeypatch,
+        CommunicationTransportMode.GAS,
+        wall_loss_failure=True,
+    )
+    request = fixture.request
+    lifecycle = complete_graph_capture(
+        create_graph_capture_lifecycle(
+            GraphCaptureCapability(
+                Device(Backend.WARP, "cuda:0"),
+                GraphCaptureAvailability.AVAILABLE,
+            ),
+            create_resident_graph_capture_signature(request),
+        )
+    )
+    binding = ResidentGraphCaptureBinding(
+        request,
+        fixture.session,
+        fixture.registry,
+        fixture.guard,
+        lifecycle,
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+    monkeypatch.setattr(
+        _scheduler_module(),
+        "gate_resident_graph_capture",
+        lambda _binding: None,
+    )
+
+    with pytest.raises(RuntimeError, match="wall-loss writer failed"):
+        fixture.scheduler.execute(0.0)
+
+    assert binding.lifecycle.state is GraphCaptureLifecycleState.FAULTED
+
+
+@pytest.mark.warp
+def test_unsupported_capture_binding_rejects_before_token_or_dispatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An optional gate rejects unsupported residency before scheduler entry."""
+    fixture = _build_loop_fixture(monkeypatch, CommunicationTransportMode.GAS)
+    request = fixture.request
+    signature = create_resident_graph_capture_signature(request)
+    lifecycle = complete_graph_capture(
+        create_graph_capture_lifecycle(
+            GraphCaptureCapability(
+                Device(Backend.WARP, "cpu"),
+                GraphCaptureAvailability.AVAILABLE,
+            ),
+            signature,
+        )
+    )
+    binding = ResidentGraphCaptureBinding(
+        request,
+        fixture.session,
+        fixture.registry,
+        fixture.guard,
+        lifecycle,
+    )
+    _attach_resident_graph_capture_binding(request, binding)
+
+    with pytest.raises(ValueError, match="CUDA"):
+        fixture.scheduler.execute(0.0)
+
+    assert fixture.trace == []
+    assert fixture.guard.completed_steps == 0
+    assert fixture.session.lifecycle is ResidentLifecycle.ACTIVE

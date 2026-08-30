@@ -32,6 +32,10 @@ from particula.execution.gpu_session import (
     _handle_failed_resident_operation,
     _ResidentOperationOutcome,
 )
+from particula.execution.graph_capture import (
+    classify_resident_graph_capture_writer_failure,
+    gate_resident_graph_capture,
+)
 from particula.execution.process_adapters import (
     ResidentDilutionAdapter,
     ResidentDilutionRequest,
@@ -96,6 +100,13 @@ def _registry_type() -> type[object]:
     return GPUResourceRegistry
 
 
+def _graph_capture_binding_type() -> type[object]:
+    """Return the concrete optional graph-capture binding type lazily."""
+    from particula.execution.graph_capture import ResidentGraphCaptureBinding
+
+    return ResidentGraphCaptureBinding
+
+
 @dataclass(frozen=True, eq=False)
 class ResidentSimulationRequest:
     """Bind one complete resolved simulation loop to resident resources.
@@ -142,6 +153,7 @@ class ResidentSimulationRequest:
     environment_update: ResidentEnvironmentUpdateRequest | None = None
     gas_update: ResidentGasUpdateRequest | None = None
     communication: ResidentCommunicationRequest | None = None
+    graph_capture_binding: object | None = None
 
     def __post_init__(self) -> None:
         """Validate exact request components and optional update types.
@@ -191,6 +203,14 @@ class ResidentSimulationRequest:
             and type(self.communication) is not ResidentCommunicationRequest
         ):
             raise TypeError("communication must be an exact request or None.")
+        if (
+            self.graph_capture_binding is not None
+            and type(self.graph_capture_binding)
+            is not _graph_capture_binding_type()
+        ):
+            raise TypeError(
+                "graph_capture_binding must be an exact binding or None."
+            )
 
 
 class ResidentSimulationScheduler:
@@ -253,6 +273,8 @@ class ResidentSimulationScheduler:
             )
         request.guard.assert_step_closed()
         registry.validate_pinned_session(request.session)
+        if request.graph_capture_binding is not None:
+            gate_resident_graph_capture(request.graph_capture_binding)
         if not _is_resolver_produced_graph(request.graph):
             raise ValueError("graph must be produced by plan resolution.")
         if not is_resolver_produced_schedule(request.schedule, request.graph):
@@ -565,4 +587,14 @@ class ResidentSimulationScheduler:
                 )
             except BaseException as cleanup_error:
                 raise error from cleanup_error
+            if (
+                outcome is _ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED
+                and request.graph_capture_binding is not None
+            ):
+                try:
+                    classify_resident_graph_capture_writer_failure(
+                        request.graph_capture_binding
+                    )
+                except BaseException:  # noqa: S110
+                    pass
             raise

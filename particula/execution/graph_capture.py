@@ -278,6 +278,27 @@ def _resident_request_type() -> type[object]:
     return ResidentSimulationRequest
 
 
+def _resident_session_type() -> type[object]:
+    """Lazily return the exact resident-session carrier type."""
+    from particula.execution.gpu_session import ResidentSession
+
+    return ResidentSession
+
+
+def _resident_guard_type() -> type[object]:
+    """Lazily return the exact resident-step-guard carrier type."""
+    from particula.execution.gpu_session import ResidentStepGuard
+
+    return ResidentStepGuard
+
+
+def _registry_type() -> type[object]:
+    """Lazily return the exact pinned-resource-registry carrier type."""
+    from particula.execution.gpu_resources import GPUResourceRegistry
+
+    return GPUResourceRegistry
+
+
 def _identity_tuple(*values: object) -> tuple[object, ...]:
     """Build a tuple whose members are compared by identity."""
     return values
@@ -863,3 +884,214 @@ def close_graph_capture(
         GraphCaptureLifecycleState.CLOSED,
         lifecycle.first_invalidation_reason,
     )
+
+
+@dataclass(eq=False)
+class ResidentGraphCaptureBinding:
+    """Retain one exact resident binding and its mutable lifecycle metadata.
+
+    This direct-module-only carrier owns lifecycle successors.  It is metadata
+    only: it neither captures nor replays a graph and never accesses resident
+    payloads.
+    """
+
+    _request: object
+    _session: object
+    _registry: object
+    _guard: object
+    _lifecycle: GraphCaptureLifecycle
+
+    def __post_init__(self) -> None:
+        """Require the exact, mutually identity-bound resident carriers."""
+        _validate_resident_binding(
+            self._request,
+            self._session,
+            self._registry,
+            self._guard,
+            self._lifecycle,
+        )
+
+    @property
+    def lifecycle(self) -> GraphCaptureLifecycle:
+        """Return the lifecycle currently owned by this binding."""
+        return self._lifecycle
+
+
+def _require_exact_resident_carrier(
+    value: object,
+    name: str,
+    expected_name: str,
+    resolver: Callable[[], type[object]],
+) -> object:
+    """Reject obvious inexact input before lazily importing resident modules."""
+    if value is None or type(value).__name__ != expected_name:
+        raise TypeError(f"{name} must be an exact {expected_name}.")
+    if type(value) is not resolver():
+        raise TypeError(f"{name} must be an exact {expected_name}.")
+    return value
+
+
+def _validate_resident_binding(
+    request: object,
+    session: object,
+    registry: object,
+    guard: object,
+    lifecycle: object,
+) -> None:
+    """Validate retained identity links without reading resident payloads."""
+    request = _require_exact_resident_carrier(
+        request, "request", "ResidentSimulationRequest", _resident_request_type
+    )
+    session = _require_exact_resident_carrier(
+        session, "session", "ResidentSession", _resident_session_type
+    )
+    registry = _require_exact_resident_carrier(
+        registry, "registry", "GPUResourceRegistry", _registry_type
+    )
+    guard = _require_exact_resident_carrier(
+        guard, "guard", "ResidentStepGuard", _resident_guard_type
+    )
+    lifecycle = _require_lifecycle(lifecycle)
+    if (
+        request.session is not session
+        or request.registry is not registry
+        or request.guard is not guard
+        or guard._session is not session
+        or guard._registry is not registry
+        or registry._session is not session
+        or lifecycle.signature.request is not request
+        or lifecycle.signature.session is not session
+    ):
+        raise ValueError(
+            "resident graph-capture binding identities do not match."
+        )
+
+
+def _require_binding(binding: object) -> ResidentGraphCaptureBinding:
+    """Require an exact graph-capture binding before reading its fields."""
+    if type(binding) is not ResidentGraphCaptureBinding:
+        raise TypeError("binding must be an exact ResidentGraphCaptureBinding.")
+    return binding
+
+
+def _attach_resident_graph_capture_binding(
+    request: object, binding: object
+) -> None:
+    """Attach one exact binding to a final frozen request exactly once."""
+    request = _require_exact_resident_carrier(
+        request, "request", "ResidentSimulationRequest", _resident_request_type
+    )
+    binding = _require_binding(binding)
+    _validate_resident_binding(
+        binding._request,
+        binding._session,
+        binding._registry,
+        binding._guard,
+        binding._lifecycle,
+    )
+    if binding._request is not request:
+        raise ValueError("binding must retain the exact request.")
+    if request.graph_capture_binding is not None:
+        raise ValueError("request already has a graph-capture binding.")
+    object.__setattr__(request, "graph_capture_binding", binding)
+
+
+def complete_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
+    """Explicitly declare capture completion on one retained binding."""
+    binding = _require_binding(binding)
+    _validate_resident_binding(
+        binding._request,
+        binding._session,
+        binding._registry,
+        binding._guard,
+        binding._lifecycle,
+    )
+    binding._lifecycle = complete_graph_capture(binding._lifecycle)
+    return binding._lifecycle
+
+
+def gate_resident_graph_capture(binding: object) -> None:
+    """Fail closed unless a captured binding remains exactly dispatchable."""
+    binding = _require_binding(binding)
+    _validate_resident_binding(
+        binding._request,
+        binding._session,
+        binding._registry,
+        binding._guard,
+        binding._lifecycle,
+    )
+    request = binding._request
+    session = binding._session
+    registry = binding._registry
+    guard = binding._guard
+    if request.graph_capture_binding is not binding:
+        raise ValueError("request graph-capture attachment does not match.")
+    guard.assert_step_closed()
+    registry.validate_pinned_session(session)
+    if session.lifecycle.name != "ACTIVE":
+        raise ValueError("resident session must be ACTIVE.")
+    capability = binding._lifecycle.capability
+    if capability.device != session.metadata.device:
+        raise ValueError(
+            "graph-capture capability device does not match session."
+        )
+    if capability.availability is not GraphCaptureAvailability.AVAILABLE:
+        raise ValueError("graph capture capability must be available.")
+    if (
+        capability.device.backend is not Backend.WARP
+        or capability.device.native == "cpu"
+    ):
+        raise ValueError("graph capture requires a CUDA resident device.")
+    if binding._lifecycle.state is not GraphCaptureLifecycleState.CAPTURED:
+        raise ValueError("graph capture lifecycle must be captured.")
+    compatibility = compare_resident_graph_capture_signature(
+        binding._lifecycle.signature, request
+    )
+    if not compatibility.compatible:
+        binding._lifecycle = invalidate_graph_capture(
+            binding._lifecycle, compatibility
+        )
+        raise ValueError("resident graph-capture signature is incompatible.")
+
+
+def classify_resident_graph_capture_writer_failure(binding: object) -> None:
+    """Record a scheduler-confirmed possible writer failure on a binding."""
+    binding = _require_binding(binding)
+    binding._lifecycle = classify_graph_capture_failure(
+        binding._lifecycle,
+        GraphCaptureFailureClassification.WRITER_MAY_HAVE_LAUNCHED,
+    )
+
+
+def retire_resident_graph_capture(binding: object) -> GraphCaptureLifecycle:
+    """Explicitly retire invalidated lifecycle metadata on one binding."""
+    binding = _require_binding(binding)
+    binding._lifecycle = retire_graph_capture(binding._lifecycle)
+    return binding._lifecycle
+
+
+def renew_resident_graph_capture(
+    binding: object, signature: object
+) -> GraphCaptureLifecycle:
+    """Explicitly renew a retired exact binding with a new request signature."""
+    binding = _require_binding(binding)
+    if type(signature) is not ResidentGraphCaptureSignature:
+        raise TypeError(
+            "signature must be an exact ResidentGraphCaptureSignature."
+        )
+    _validate_resident_binding(
+        binding._request,
+        binding._session,
+        binding._registry,
+        binding._guard,
+        binding._lifecycle,
+    )
+    if (
+        signature.request is not binding._request
+        or signature.session is not binding._session
+    ):
+        raise ValueError("renewal signature must retain the exact binding.")
+    binding._lifecycle = renew_retired_graph_capture(
+        binding._lifecycle, signature
+    )
+    return binding._lifecycle
