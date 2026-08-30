@@ -545,6 +545,10 @@ class GraphCaptureFailureClassification(str, Enum):
 class GraphCaptureLifecycle:
     """Retain immutable host metadata for one graph-capture lifecycle.
 
+    This declaration records lifecycle intent only. It does not import Warp,
+    allocate or capture a native graph, replay work, or act on a resident
+    session.
+
     Attributes:
         capability: Exact available graph-capture capability declaration.
         signature: Exact resident graph-capture identity signature.
@@ -558,7 +562,14 @@ class GraphCaptureLifecycle:
     first_invalidation_reason: GraphCaptureDriftReason | None
 
     def __post_init__(self) -> None:
-        """Validate exact lifecycle metadata and reason-state invariants."""
+        """Validate lifecycle metadata types and reason-state invariants.
+
+        Raises:
+            TypeError: If a carrier, state, or invalidation reason has an
+                inexact type.
+            ValueError: If the invalidation reason is inconsistent with the
+                lifecycle state.
+        """
         if type(self.capability) is not GraphCaptureCapability:
             raise TypeError(
                 "capability must be an exact GraphCaptureCapability."
@@ -626,6 +637,13 @@ def create_graph_capture_lifecycle(
     This declaration-only operation does not import Warp, allocate a graph, or
     validate or mutate a resident binding.
 
+    Args:
+        capability: Available graph-capture capability metadata.
+        signature: Identity signature for the resident request.
+
+    Returns:
+        A new ready lifecycle record retaining both input carriers by identity.
+
     Raises:
         TypeError: If either P1 carrier is inexact.
         ValueError: If graph capture is not available.
@@ -649,7 +667,18 @@ def create_graph_capture_lifecycle(
 def complete_graph_capture(
     lifecycle: GraphCaptureLifecycle,
 ) -> GraphCaptureLifecycle:
-    """Declare capture completion without native or resident-session work."""
+    """Declare capture completion without native or resident-session work.
+
+    Args:
+        lifecycle: Ready lifecycle metadata to transition.
+
+    Returns:
+        A captured successor retaining the capability and signature identities.
+
+    Raises:
+        TypeError: If ``lifecycle`` is not an exact lifecycle record.
+        ValueError: If the lifecycle is not ready.
+    """
     lifecycle = _require_lifecycle(lifecycle)
     if lifecycle.state is not GraphCaptureLifecycleState.READY:
         raise ValueError("graph capture can complete only from ready.")
@@ -667,6 +696,18 @@ def invalidate_graph_capture(
     """Record structural invalidation host metadata without comparing requests.
 
     This operation neither imports Warp nor acts on a resident session.
+
+    Args:
+        lifecycle: Captured or already-invalidated lifecycle metadata.
+        compatibility: P1 compatibility result containing the drift outcome.
+
+    Returns:
+        The original record for compatible or repeated invalidation, otherwise
+        an invalidated successor retaining the first drift reason.
+
+    Raises:
+        TypeError: If either argument has an inexact type.
+        ValueError: If the lifecycle is not captured or invalidated.
     """
     lifecycle = _require_lifecycle(lifecycle)
     if type(compatibility) is not GraphCaptureCompatibility:
@@ -698,6 +739,18 @@ def classify_graph_capture_failure(
 
     This declaration-only operation does not import Warp or act on a resident
     session.
+
+    Args:
+        lifecycle: Lifecycle metadata associated with the failure.
+        classification: Whether a writer may have launched before failure.
+
+    Returns:
+        The original record for read-only or faulted outcomes, or a faulted
+        successor when a writer may have launched.
+
+    Raises:
+        TypeError: If either argument has an inexact type.
+        ValueError: If the lifecycle is retired or closed.
     """
     lifecycle = _require_lifecycle(lifecycle)
     if type(classification) is not GraphCaptureFailureClassification:
@@ -726,7 +779,19 @@ def classify_graph_capture_failure(
 def retire_graph_capture(
     lifecycle: GraphCaptureLifecycle,
 ) -> GraphCaptureLifecycle:
-    """Retire invalidated host metadata without native graph or session work."""
+    """Retire invalidated host metadata without native graph or session work.
+
+    Args:
+        lifecycle: Invalidated lifecycle metadata to retire.
+
+    Returns:
+        A retired successor, or the original retired record for repeated
+        retirement.
+
+    Raises:
+        TypeError: If ``lifecycle`` is not an exact lifecycle record.
+        ValueError: If the lifecycle is not invalidated or retired.
+    """
     lifecycle = _require_lifecycle(lifecycle)
     if lifecycle.state is GraphCaptureLifecycleState.RETIRED:
         return lifecycle
@@ -743,7 +808,23 @@ def renew_retired_graph_capture(
     lifecycle: GraphCaptureLifecycle,
     signature: ResidentGraphCaptureSignature,
 ) -> GraphCaptureLifecycle:
-    """Prepare ready host metadata without recapture or session work."""
+    """Prepare ready host metadata without recapture or session work.
+
+    This is the sole preparation path for a new declaration after retirement;
+    it does not create a native graph or replace the predecessor.
+
+    Args:
+        lifecycle: Retired lifecycle metadata to renew.
+        signature: New identity signature to retain in the ready record.
+
+    Returns:
+        A distinct ready lifecycle with the retired capability and new
+        signature identities.
+
+    Raises:
+        TypeError: If either argument has an inexact type.
+        ValueError: If the lifecycle is not retired.
+    """
     lifecycle = _require_lifecycle(lifecycle)
     if type(signature) is not ResidentGraphCaptureSignature:
         raise TypeError(
@@ -762,7 +843,17 @@ def renew_retired_graph_capture(
 def close_graph_capture(
     lifecycle: GraphCaptureLifecycle,
 ) -> GraphCaptureLifecycle:
-    """Close host metadata without releasing native resources or a session."""
+    """Close host metadata without releasing native resources or a session.
+
+    Args:
+        lifecycle: Lifecycle metadata to close.
+
+    Returns:
+        A closed successor, or the original record when already closed.
+
+    Raises:
+        TypeError: If ``lifecycle`` is not an exact lifecycle record.
+    """
     lifecycle = _require_lifecycle(lifecycle)
     if lifecycle.state is GraphCaptureLifecycleState.CLOSED:
         return lifecycle
