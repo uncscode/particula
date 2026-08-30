@@ -1,0 +1,49 @@
+# Phase Details
+
+- [ ] **E8-F5-P1:** Shared full-loop fixtures and independent CPU oracle with unit tests
+  - Issue: TBD | Size: S | Status: Not Started
+  - Goal: Build one immutable scenario specification and independent CPU/NumPy
+    oracle used to compare all execution paths without production-helper leakage.
+  - Files: `particula/execution/tests/captured_full_loop_test.py`, optional shared
+    support under `particula/execution/tests/`.
+  - Tests: Fixture schema, multiple timesteps, per-field expected values,
+    concentration-weighted inventory, no-op rows, and deterministic setup.
+
+- [ ] **E8-F5-P2:** Uncaptured Warp full-loop parity and conservation validation
+  - Issue: TBD | Size: S | Status: Not Started
+  - Goal: Run the prepared uncaptured sequence on Warp CPU and compare every
+    observable field and diagnostic with the P1 oracle.
+  - Files: `particula/execution/tests/captured_full_loop_test.py`, existing
+    `full_loop_test.py` and `multi_box_loop_test.py` helpers as appropriate.
+  - Tests: Multi-box/multi-step state parity, canonical order, stable identities,
+    no hidden transfers, separate diagnostic assertions, and tight conservation.
+
+- [ ] **E8-F5-P3:** Captured CUDA communication diagnostics and parity validation
+  - Issue: TBD | Size: S | Status: Not Started
+  - Goal: Replay the exact P2 scenario through E8-F4 capture and validate GAS and
+    PARTICLES communication, volume updates, diagnostics, and final state.
+  - Files: `particula/execution/tests/captured_full_loop_test.py` and capture test
+    support from `particula/execution/tests/graph_capture_test.py`.
+  - Tests: Captured-versus-uncaptured and CPU comparisons, both closed-map
+    families, diagnostic outputs, no replay allocation/readback/sync, and clean
+    CUDA skip with no CPU fallback.
+
+- [ ] **E8-F5-P4:** RNG continuation and lifecycle rejection matrix with tests
+  - Issue: TBD | Size: S | Status: Not Started
+  - Goal: Prove stream advancement/reset/continuation and fail-closed captured
+    replay across structural drift and terminal lifecycle states.
+  - Files: `particula/execution/tests/captured_full_loop_test.py`,
+    `rng_invariance_test.py`, `checkpoint_test.py`, `graph_capture_test.py`.
+  - Tests: Coagulation/wall-loss stream identity and advancement, explicit reset,
+    checkpoint/restart continuation, stale handle, signature drift, finalize,
+    close, fault, teardown, writer-failure, and fresh-only recapture.
+
+- [ ] **E8-F5-P5:** Integrated validation matrix and documentation updates
+  - Issue: TBD | Size: S | Status: Not Started
+  - Goal: Consolidate the default and optional validation commands, document
+    tolerances and evidence boundaries, and publish the downstream handoff.
+  - Files: `.opencode/guides/testing_guide.md`,
+    `docs/Features/Roadmap/data-oriented-gpu.md`, `AGENTS.md`, E8 plan sections.
+  - Tests: Focused resident assertions, optional CUDA pass-or-clean-skip rows,
+    untargeted repository coverage runner, documentation contract tests, and
+    `mkdocs build --strict`.
