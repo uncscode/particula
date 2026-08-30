@@ -2,14 +2,14 @@
   "id": "E7-F4",
   "type": "feature",
   "title": "GPU-Resident Session State and Checkpoints",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-07-29",
+  "completion_date": "2026-07-29",
+  "last_updated": "2026-08-30",
   "dependencies": [
     "E7-F1",
     "E7-F6"
@@ -43,7 +43,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F4-P2",
@@ -56,20 +57,22 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F4-P3",
       "title": "Add fixed-shape reusable sidecar registry with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-28",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F4-P4",
@@ -82,7 +85,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F4-P5",
@@ -95,7 +99,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F4-P6",
@@ -108,7 +113,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F4-P7",
@@ -121,9 +127,10 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

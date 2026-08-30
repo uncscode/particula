@@ -481,7 +481,7 @@ def test_communication_roadmap_and_architecture_documentation_preserve_boundarie
         "Direct-boundary empty/disabled maps and unchanged final volumes are write-free no-ops",
         "resident barriers instead follow their own composition and validation rules.",
         "CFD, pressure/velocity solvers, adaptive meshes",
-        "E7-F8 supplies the shipped scheduled RNG policy while E7-F9 owns complete-loop publication.",
+        "E7-F8 supplies the shipped scheduled RNG policy and E7-F9 closes complete-loop publication.",
     ):
         if phrase not in roadmap_text:
             pytest.fail(f"roadmap is missing: {phrase}")

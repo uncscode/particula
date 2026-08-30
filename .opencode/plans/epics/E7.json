@@ -2,14 +2,14 @@
   "id": "E7",
   "type": "epic",
   "title": "Backend Selection and GPU-Resident Simulation",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": null,
+  "completion_date": "2026-08-30",
+  "last_updated": "2026-08-30",
   "dependencies": [],
   "section_files": {
     "appendix": ".opencode/plans/sections/epics/E7/appendix.md",
@@ -27,9 +27,46 @@
     "vision_problem": ".opencode/plans/sections/epics/E7/vision_problem.md"
   },
   "schema_version": "1.0",
-  "child_plans": [],
+  "child_plans": [
+    {
+      "id": "E7-F1",
+      "type": "feature"
+    },
+    {
+      "id": "E7-F2",
+      "type": "feature"
+    },
+    {
+      "id": "E7-F3",
+      "type": "feature"
+    },
+    {
+      "id": "E7-F4",
+      "type": "feature"
+    },
+    {
+      "id": "E7-F5",
+      "type": "feature"
+    },
+    {
+      "id": "E7-F6",
+      "type": "feature"
+    },
+    {
+      "id": "E7-F7",
+      "type": "feature"
+    },
+    {
+      "id": "E7-F8",
+      "type": "feature"
+    },
+    {
+      "id": "E7-F9",
+      "type": "feature"
+    }
+  ],
   "milestones": [],
   "governance_log": [],
   "risk_register": [],
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

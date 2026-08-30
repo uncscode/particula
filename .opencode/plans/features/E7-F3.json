@@ -8,8 +8,8 @@
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-07-28",
+  "completion_date": "2026-07-28",
+  "last_updated": "2026-08-30",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E7-F3/architecture_design.md",
@@ -40,7 +40,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F3-P2",
@@ -53,7 +54,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F3-P3",
@@ -66,7 +68,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F3-P4",
@@ -79,7 +82,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F3-P5",
@@ -92,7 +96,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F3-P6",
@@ -105,7 +110,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     }
   ],
   "totals": null,

@@ -2,14 +2,14 @@
   "id": "E7-F5",
   "type": "feature",
   "title": "Deterministic Full-Process Scheduling",
-  "status": "Draft",
+  "status": "Shipped",
   "priority": "P2",
   "size": "M",
   "owners": [],
   "start_date": null,
   "target_date": null,
-  "completion_date": null,
-  "last_updated": "2026-07-29",
+  "completion_date": "2026-07-29",
+  "last_updated": "2026-08-30",
   "dependencies": [],
   "section_files": {
     "architecture_design": ".opencode/plans/sections/features/E7-F5/architecture_design.md",
@@ -32,15 +32,16 @@
     {
       "id": "E7-F5-P1",
       "title": "Define typed process capability nodes and validation with unit tests",
-      "status": "Not Started",
+      "status": "Shipped",
       "size": "S",
       "issue_number": null,
       "start_date": null,
-      "completion_date": null,
+      "completion_date": "2026-07-29",
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F5-P2",
@@ -53,7 +54,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F5-P3",
@@ -66,7 +68,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F5-P4",
@@ -79,7 +82,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F5-P5",
@@ -92,7 +96,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F5-P6",
@@ -105,7 +110,8 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     },
     {
       "id": "E7-F5-P7",
@@ -118,9 +124,10 @@
       "estimates": null,
       "actuals": null,
       "notes_ref": null,
-      "depends_on": null
+      "depends_on": null,
+      "reconciliation_evidence_fingerprint": null
     }
   ],
   "totals": null,
-  "lifecycle": "active"
+  "lifecycle": "completed"
 }

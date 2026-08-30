@@ -58,8 +58,8 @@
     unsupported-profile preflight; and no transfer, synchronization, fallback,
     or recovery.
 
-- [ ] **E7-F2-P5:** Prove CPU and Warp condensation parity, conservation, and transfer boundaries
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F2-P5:** Prove CPU and Warp condensation parity, conservation, and transfer boundaries
+  - Issue: #1474 | Size: S | Status: Shipped | Completed: 2026-07-27
   - Goal: Record bounded parity and conservation evidence for selected one-box and multi-box fixtures on Warp CPU, with optional CUDA rows.
   - Files: `particula/execution/tests/condensation_adapter_test.py`,
     `particula/execution/tests/condensation_integration_test.py`

@@ -1,6 +1,6 @@
 # Success Criteria
 
-- [ ] All E7-F1 through E7-F8 contracts are shipped and represented in the
+- [x] All E7-F1 through E7-F8 contracts are shipped and represented in the
   closeout matrix without contradiction.
 - [x] **P1 / issue #1528:** Concrete-only GPU diagnostics report total species
   mass, particle-number concentration, latent energy, and conservation residual
@@ -33,29 +33,34 @@
   source finalization. Its documentation regression covers disabled, import,
   failure, and enabled behavior without claiming CPU fallback or required CUDA.
 - [ ] At least one condensation and one Brownian coagulation workflow run through
+- [x] Optional GPU reductions report mass, number, latent energy, and
+  conservation diagnostics against independent references with documented units.
+- [x] At least one condensation and one Brownian coagulation workflow run through
   backend selection and match CPU references within recorded tolerances.
-- [ ] A multi-box GPU-resident loop runs all supported processes between explicit
+- [x] A multi-box GPU-resident loop runs all supported processes between explicit
   checkpoints with per-box RNG and no hidden CPU transfer or synchronization.
-- [ ] Repeated steps preserve container, array, sidecar, diagnostic, capacity,
+- [x] Repeated steps preserve container, array, sidecar, diagnostic, capacity,
   and stream identities/shapes.
-- [ ] Environment and derived gas state are refreshed in canonical order before
+- [x] Environment and derived gas state are refreshed in canonical order before
   consumers; no stale-state fixture passes accidentally.
-- [ ] Independent boxes match one-box references; unrelated box additions,
+- [x] Independent boxes match one-box references; unrelated box additions,
   disabling, and reordering do not perturb enabled logical streams.
-- [ ] Prescribed advection, dilution, mixing, expansion, and volume updates match
+- [x] Prescribed advection, dilution, mixing, expansion, and volume updates match
   CPU oracles and satisfy explicit conservation/source-sink accounting.
-- [ ] Same-backend checkpoint/restart preserves required metadata and continues
+- [x] Same-backend checkpoint/restart preserves required metadata and continues
   deterministic and stochastic state as documented.
-- [ ] Missing devices/unsupported physics fail clearly or cross only an explicit
+- [x] Missing devices/unsupported physics fail clearly or cross only an explicit
   fallback boundary; no failure triggers silent movement.
-- [ ] Warp CPU matrix passes; optional CUDA rows pass where available or skip
+- [x] Warp CPU matrix passes; optional CUDA rows pass where available or skip
   cleanly; no mandatory CUDA CI is introduced.
 - [x] The complete example uses explicit caller diagnostic observation and
   checkpoint/restart boundaries, and is protected by an executable documentation
   regression.
+- [x] The complete example transfers back only at checkpoints/finalization and
+  is protected by an executable documentation regression.
 - [x] Changed executable modules retain >=80% coverage, repository thresholds are
   not lowered, export tests pass, and `mkdocs build --strict` passes.
-- [ ] Epic H performance/graph capture and Epic I autodiff remain deferred.
+- [x] Epic H performance/graph capture and Epic I autodiff remain deferred.
 
 ## P7 Gate Status (2026-08-11 — shipped)
 

@@ -40,8 +40,8 @@ documentation conventions.
 | 4 | [Epic D: GPU Condensation Physics Parity](#epic-d-gpu-condensation-physics-parity) | Shipped | E4 |
 | 5 | [Epic E: GPU Coagulation Physics Coverage](#epic-e-gpu-coagulation-physics-coverage) | Shipped | E5 |
 | 6 | [Epic F: GPU Process Completeness](#epic-f-gpu-process-completeness) | Shipped | E6 |
-| 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Active | not scheduled |
-| 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Pending | not scheduled |
+| 7 | [Epic G: Backend Selection and GPU-Resident Simulation](#epic-g-backend-selection-and-gpu-resident-simulation) | Shipped | E7 |
+| 8 | [Epic H: Graph Capture and Performance](#epic-h-graph-capture-and-performance) | Active | not scheduled |
 | 9 | [Epic I: Differentiability and Global Optimization](#epic-i-differentiability-and-global-optimization) | Pending | not scheduled |
 
 The former suggested milestones are absorbed into the per-epic exit bars:
@@ -1064,8 +1064,8 @@ it does not change production capability. The caller-owned, write-only
 ## Epic E: GPU Coagulation Physics Coverage
 
 Status: shipped. E5-F9 P3 completed no later than its P4 closeout, and Epic E
-completed its bounded direct-kernel coagulation scope. Epic F subsequently
-shipped, and Epic G is active.
+completed its bounded direct-kernel coagulation scope. Epics F and G subsequently
+shipped, and Epic H is active.
 
 ### E5 roadmap inventory
 
@@ -1213,7 +1213,8 @@ establish CPU-strategy parity. E5-F6 ships the additive contract and
 documentation; no additional planned work remains for the shipped approved
 additive combinations. E5-F7 is shipped with the cross-mechanism validation
 record. E5-F9 is shipped: its completed P3/P4 publish the consolidated direct
-example and closeout gate. Epic F subsequently shipped, and Epic G is active.
+example and closeout gate. Epics F and G subsequently shipped, and Epic H is
+active.
 
 Planned features:
 
@@ -1480,9 +1481,9 @@ Delivered nucleation boundaries and deferred GPU scope:
   contract.
 
 **Exit bar:** E6-F1--E6-F8 and E6-F9 P1–P4 are shipped with dated completion
-evidence, so E6 is shipped and Epic G is active. Warp CPU remains the baseline
-and CUDA optional. Backend selection, high-level GPU runnables, deterministic
-scheduling, resident loops, and transport remain Epic G work.
+evidence, so E6 is shipped. Epic G subsequently shipped, and Epic H is active.
+Warp CPU remains the baseline and CUDA optional. Graph capture, performance
+validation, profiling, and memory-budget work remain Epic H scope.
 
 ## Epic G: Backend Selection and GPU-Resident Simulation
 
@@ -1490,6 +1491,23 @@ Status: shipped. E7-F9 P7 validation passed on 2026-08-11 after the required
 focused, export, resident-fast, full-package-coverage, changed-module-coverage,
 strict MkDocs, and optional-CUDA gates passed. Epic G is shipped. Epics H and I
 remain deferred.
+Status: shipped as ADW plan E7 on 2026-08-30. All nine child plans E7-F1
+through E7-F9 are shipped, and Epic H is active next.
+
+### E7 roadmap inventory
+
+| ID | Title | Status text |
+| --- | --- | --- |
+| `E7` | Backend Selection and GPU-Resident Simulation | Shipped |
+| `E7-F1` | Backend-Selection and Execution-Context API | Shipped |
+| `E7-F2` | Backend-Selected Condensation | Shipped |
+| `E7-F3` | Backend-Selected Brownian Coagulation | Shipped |
+| `E7-F4` | GPU-Resident Session State and Checkpoints | Shipped |
+| `E7-F5` | Deterministic Full-Process Scheduling | Shipped |
+| `E7-F6` | Fallback, Capability Errors, and API Stability | Shipped |
+| `E7-F7` | Multi-Box Communication and Volume Evolution | Shipped |
+| `E7-F8` | Persistent Per-Box RNG Streams and Restart Semantics | Shipped |
+| `E7-F9` | Diagnostics, Full-Loop Regressions, Documentation, and Closeout | Shipped |
 
 E7-F1 is shipped (P1--P6 complete). It provides a separate public,
 dependency-neutral, explicit-selection context with a limited CPU/reference
@@ -1576,10 +1594,12 @@ amount; `-1 -> destination` sources use the destination's pre-step amount and
 record it in the source ledger, while `source -> -1` sinks use and record the
 source amount in the sink ledger. The operation performs one gas-concentration
 commit after preflight.
-The remaining transport and mixing/advection work remain deferred.
+Broader transport and mixing/advection work remain deferred.
 E7-F8 is shipped: it owns the bounded scheduled persistent-stream identity,
 reset, and checkpoint/restart policy. E7-F9 owns final diagnostics products,
 complete examples, and closeout; its P7 validation gate is shipped.
+reset, and checkpoint/restart policy. E7-F9 shipped the final diagnostics,
+full-loop regression, documentation, and closeout scope.
 High-level GPU adapters and user-facing CPU/GPU orchestration remain later
 contracts after E7-F6 establishes policy. They must not imply availability
 probing, fallback, retry, graph capture, performance claims, distributed or
@@ -1607,7 +1627,7 @@ guide for the amount equations, capacity gating, and checkpoint boundary.
 CFD, pressure/velocity solvers, adaptive meshes, distributed or multi-GPU
 transport, broad mixing/advection claims, graph capture, performance work, and
 autodiff remain deferred. Independent boxes remain the default; E7-F8 supplies
-the shipped scheduled RNG policy while E7-F9 owns complete-loop publication.
+the shipped scheduled RNG policy and E7-F9 closes complete-loop publication.
 
 Fixed-capacity slot management for these loops is defined in
 [Fixed-Capacity Slot Boundary](#fixed-capacity-slot-boundary) under Epic F.
@@ -1653,8 +1673,17 @@ for the dated evidence. Epic G is shipped. Epics H and I remain deferred. Any
 public, availability-policy, fallback/retry, graph-capture, performance, or
 distributed integration must establish its own contract. The direct GPU path
 remains explicit and unchanged.
+**Exit bar:** Satisfied on 2026-08-30. E7-F1 remains a bounded selection seam,
+E7-F5 remains a bounded concrete-only resident scheduler, and E7-F7--E7-F9
+close the communication, RNG/restart, diagnostics, validation, documentation,
+and epic publication scope. The direct GPU path remains explicit and unchanged.
+Graph capture, performance profiling and targets, memory-budget evidence,
+distributed execution, and autodiff remain deferred to Epics H and I.
 
 ## Epic H: Graph Capture and Performance
+
+Status: active. This is the next roadmap step after E7; its ADW plan and child
+feature decomposition are not yet scheduled.
 
 Reduce launch overhead with graph capture and establish performance and memory
 targets aligned with the multi-box scaling goal.

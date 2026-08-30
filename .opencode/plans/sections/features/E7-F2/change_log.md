@@ -13,6 +13,13 @@
   support matrix, ownership and failure language, and required links; strict
   MkDocs rendering validates the documentation targets.
 
+## 2026-07-27 — E7-F2-P5 shipped (Issue #1474)
+
+- Added bounded CPU/Warp condensation parity, conservation, and explicit
+  transfer-boundary evidence in the adapter integration suite.
+- Covered the selected supported profiles with recorded tolerances while
+  preserving the direct-kernel ownership and failure contracts.
+
 ## 2026-07-27 — E7-F2-P4 shipped (Issue #1473)
 
 - Enabled selected Warp condensation dispatch to forward caller-owned

@@ -23,8 +23,8 @@
     freshness closure, both direction profiles, P1-first rejection,
     effective-cycle rejection, and guarded no-backend imports.
 
-- [ ] **E7-F5-P3:** Integrate dilution, wall loss, and nucleation adapters with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F5-P3:** Integrate dilution, wall loss, and nucleation adapters with unit tests
+  - Issue: #1494 | Size: S | Status: Shipped | Completed: 2026-07-29
   - Goal: Invoke shipped direct boundaries through E7-F4 resource views with no transfer, sync, fallback, or physics rewrite.
   - Files: `particula/execution/process_adapters.py`, `particula/execution/tests/process_adapters_test.py`
   - Tests: identity, exact delegation, sidecars/RNG, validation, no-op, and failure propagation.

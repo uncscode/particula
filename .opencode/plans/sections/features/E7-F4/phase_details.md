@@ -25,8 +25,8 @@
     and input immutability. No unavailable-device test was added because the
     E7-F6 availability API is not present.
 
-- [ ] **E7-F4-P3:** Add fixed-shape reusable sidecar registry with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E7-F4-P3:** Add fixed-shape reusable sidecar registry with unit tests
+  - Issue: #1486 | Size: S | Status: Shipped | Completed: 2026-07-28
   - Goal: Allocate or accept validated process resources once and preserve all
     array identities across repeated acquisitions and steps.
   - Files: `particula/execution/gpu_resources.py`,
@@ -71,8 +71,8 @@
     exception propagation, explicit discard/close, and no-runtime-work
     idempotency.
 
-- [ ] **E7-F4-P7:** Update development documentation
-  - Issue: TBD | Size: XS | Status: Not Started
+- [x] **E7-F4-P7:** Update development documentation
+  - Issue: #1490 | Size: XS | Status: Shipped | Completed: 2026-07-29
   - Goal: Document setup, ownership, sidecar, checkpoint, restart, failure, and
     explicit-transfer contracts plus E7-F5/E7-F8 extension seams.
   - Files: `docs/Features/data-containers-and-gpu-foundations.md`,

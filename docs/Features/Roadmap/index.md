@@ -15,9 +15,14 @@ schedule.
 - **GPU process completeness**: Maintain the shipped GPU dilution, wall loss,
   nucleation, and fixed-capacity slot-management contracts from
   [Epic F](data-oriented-gpu.md#epic-f-gpu-process-completeness).
-- **GPU-resident user workflows**: Advance backend selection and high-level
-  simulation integration through active
+- **GPU-resident user workflows**: Maintain the shipped backend-selection,
+  resident scheduling, communication, checkpoint/restart, diagnostics, and RNG
+  contracts from
   [Epic G](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation).
+- **Graph capture and performance**: Begin active
+  [Epic H](data-oriented-gpu.md#epic-h-graph-capture-and-performance) with an
+  ADW plan and feature decomposition, then address capture boundaries,
+  preallocated buffers, scaling benchmarks, profiling, and memory budgets.
 - **Documentation and examples**: Expand practical examples that connect feature
   guides, theory pages, and runnable notebooks.
 
@@ -140,6 +145,12 @@ meets its exit bar, the next pending epic in the sequence becomes active.
   The release supplies the bounded direct dilution, wall-loss, fixed-slot,
   exhaustion, and nucleation contracts plus explicit five-call sequence
   evidence. High-level GPU orchestration remains deferred to Epic G.
+- [Epic G: Backend Selection and GPU-Resident Simulation](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
+  (ADW plan E7) and all nine feature plans E7-F1 through E7-F9 shipped on
+  2026-08-30. The release closes backend selection, explicit fallback policy,
+  bounded process adapters, resident sessions and checkpoints, deterministic
+  scheduling, prescribed communication and volume evolution, persistent RNG
+  restart semantics, diagnostics, full-loop regressions, and documentation.
 
 ### E6 roadmap inventory
 
@@ -191,20 +202,34 @@ All E5 features are shipped. The public E5 cross-links are:
   and
   [direct GPU coagulation example](https://github.com/Gorkowski/particula/blob/main/docs/Examples/gpu_coagulation_direct.py).
 
-E5, E6, and all of their feature plans are shipped. Epic G is active next.
+### E7 roadmap inventory
+
+| ID | Title | Status text |
+| --- | --- | --- |
+| `E7` | Backend Selection and GPU-Resident Simulation | Shipped |
+| `E7-F1` | Backend-Selection and Execution-Context API | Shipped |
+| `E7-F2` | Backend-Selected Condensation | Shipped |
+| `E7-F3` | Backend-Selected Brownian Coagulation | Shipped |
+| `E7-F4` | GPU-Resident Session State and Checkpoints | Shipped |
+| `E7-F5` | Deterministic Full-Process Scheduling | Shipped |
+| `E7-F6` | Fallback, Capability Errors, and API Stability | Shipped |
+| `E7-F7` | Multi-Box Communication and Volume Evolution | Shipped |
+| `E7-F8` | Persistent Per-Box RNG Streams and Restart Semantics | Shipped |
+| `E7-F9` | Diagnostics, Full-Loop Regressions, Documentation, and Closeout | Shipped |
+
+E5, E6, E7, and all of their feature plans are shipped. Epic H is active next.
 
 ### Active
 
-- [Epic G: Backend Selection and GPU-Resident Simulation](data-oriented-gpu.md#epic-g-backend-selection-and-gpu-resident-simulation)
-  follows Epic F. It will expose backend selection through user-facing APIs and
-  keep complete simulation loops resident on the selected device between
-  checkpoints.
+- [Epic H: Graph Capture and Performance](data-oriented-gpu.md#epic-h-graph-capture-and-performance)
+  follows shipped Epic G. Its ADW plan is not yet scheduled; the first step is
+  to create the E8 feature decomposition and define graph-capture, benchmark,
+  profiling, and memory-budget boundaries.
 
 ### Pending
 
 Listed in execution order; each becomes active when the previous epic ships.
 
-- [Epic H: Graph Capture and Performance](data-oriented-gpu.md#epic-h-graph-capture-and-performance)
 - [Epic I: Differentiability and Global Optimization](data-oriented-gpu.md#epic-i-differentiability-and-global-optimization)
   — implementation companion:
   [Warp autodiff limitations](warp-autodiff-limitations.md)
