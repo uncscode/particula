@@ -10,8 +10,11 @@ must not be lowered. Test files use the repository's `*_test.py` convention in
   deterministic capability outcomes, complete signature construction, and
   malformed or replaced binding rejection in
   `particula/execution/tests/graph_capture_test.py`. Use fakes for hardware-free
-  API-presence tests. Warp CPU must report capture unsupported; CUDA-specific
-  checks are marked `warp` and `cuda` and cleanly skip if unavailable.
+  API-presence tests. Warp CPU must report capture unsupported. Issue #1547
+  delivered these cases in `graph_capture_test.py`: hardware-free ordered probe
+  outcomes and no-Warp-import subprocess coverage, plus Warp-guarded real
+  resident-request signature, representative drift, and stable RNG-array
+  identity cases. The declaration test cases do not require CUDA.
 - **P2 — Lifecycle and invalidation:** Parametrize every legal and illegal state
   transition, deterministic first invalidation reason, idempotent teardown, and
   read-only rejection behavior. Verify no implicit recapture, launch, transfer,
@@ -47,7 +50,7 @@ must not be lowered. Test files use the repository's `*_test.py` convention in
 Focused development checks are assertion-only and run with coverage disabled:
 
 ```bash
-pytest particula/execution/tests/graph_capture_test.py -q
+pytest particula/execution/tests/graph_capture_test.py -q --no-cov
 pytest particula/execution/tests/full_loop_test.py -q
 pytest particula/execution/tests/exports_test.py \
   particula/tests/execution_exports_test.py -q

@@ -64,6 +64,8 @@ from particula.util.constants import (  # noqa: E402
     STANDARD_GRAVITY,
 )
 
+_BOLTZMANN_CONSTANT = wp.constant(wp.float64(BOLTZMANN_CONSTANT))
+
 
 @wp.kernel
 def _knudsen_number_kernel(
@@ -281,7 +283,7 @@ def _diffusion_kernel(temperatures: Any, mobilities: Any, result: Any) -> None:
     """Evaluate Stokes-Einstein diffusion coefficients."""
     tid = wp.tid()
     result[tid] = diffusion_coefficient_wp(
-        temperatures[tid], mobilities[tid], wp.float64(BOLTZMANN_CONSTANT)
+        temperatures[tid], mobilities[tid], _BOLTZMANN_CONSTANT
     )
 
 

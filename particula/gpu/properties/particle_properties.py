@@ -23,6 +23,40 @@ _CUNNINGHAM_EXPONENTIAL_RATE = wp.constant(wp.float64(1.1))
 _STANDARD_GRAVITY = wp.constant(wp.float64(STANDARD_GRAVITY))
 _MIN_NORMAL_FLOAT64 = wp.constant(wp.float64(2.2250738585072014e-308))
 _PI_SQUARED_OVER_SIX = wp.constant(wp.float64(1.6449340668482264))
+_FUCHS_SUTUGIN_NUMERATOR = wp.constant(wp.float64(0.75))
+_FUCHS_SUTUGIN_DENOMINATOR = wp.constant(wp.float64(0.283))
+_DEBYE_NODE_01 = wp.constant(wp.float64(0.0483076656877383))
+_DEBYE_WEIGHT_01 = wp.constant(wp.float64(0.0965400885147278))
+_DEBYE_NODE_02 = wp.constant(wp.float64(0.1444719615827965))
+_DEBYE_WEIGHT_02 = wp.constant(wp.float64(0.0956387200792749))
+_DEBYE_NODE_03 = wp.constant(wp.float64(0.2392873622521371))
+_DEBYE_WEIGHT_03 = wp.constant(wp.float64(0.0938443990808046))
+_DEBYE_NODE_04 = wp.constant(wp.float64(0.3318686022821277))
+_DEBYE_WEIGHT_04 = wp.constant(wp.float64(0.0911738786957639))
+_DEBYE_NODE_05 = wp.constant(wp.float64(0.4213512761306353))
+_DEBYE_WEIGHT_05 = wp.constant(wp.float64(0.0876520930044038))
+_DEBYE_NODE_06 = wp.constant(wp.float64(0.5068999089322294))
+_DEBYE_WEIGHT_06 = wp.constant(wp.float64(0.0833119242269468))
+_DEBYE_NODE_07 = wp.constant(wp.float64(0.5877157572407623))
+_DEBYE_WEIGHT_07 = wp.constant(wp.float64(0.0781938957870703))
+_DEBYE_NODE_08 = wp.constant(wp.float64(0.6630442669302152))
+_DEBYE_WEIGHT_08 = wp.constant(wp.float64(0.0723457941088485))
+_DEBYE_NODE_09 = wp.constant(wp.float64(0.7321821187402897))
+_DEBYE_WEIGHT_09 = wp.constant(wp.float64(0.0658222227763618))
+_DEBYE_NODE_10 = wp.constant(wp.float64(0.7944837959679424))
+_DEBYE_WEIGHT_10 = wp.constant(wp.float64(0.0586840934785355))
+_DEBYE_NODE_11 = wp.constant(wp.float64(0.84936761373257))
+_DEBYE_WEIGHT_11 = wp.constant(wp.float64(0.0509980592623762))
+_DEBYE_NODE_12 = wp.constant(wp.float64(0.8963211557660521))
+_DEBYE_WEIGHT_12 = wp.constant(wp.float64(0.0428358980222267))
+_DEBYE_NODE_13 = wp.constant(wp.float64(0.9349060759377397))
+_DEBYE_WEIGHT_13 = wp.constant(wp.float64(0.0342738629130214))
+_DEBYE_NODE_14 = wp.constant(wp.float64(0.9647622555875064))
+_DEBYE_WEIGHT_14 = wp.constant(wp.float64(0.0253920653092621))
+_DEBYE_NODE_15 = wp.constant(wp.float64(0.9856115115452684))
+_DEBYE_WEIGHT_15 = wp.constant(wp.float64(0.0162743947309057))
+_DEBYE_NODE_16 = wp.constant(wp.float64(0.9972638618494816))
+_DEBYE_WEIGHT_16 = wp.constant(wp.float64(0.0070186100094701))
 
 
 @wp.func
@@ -389,98 +423,98 @@ def debye_1_wp(x: wp.float64) -> wp.float64:
     integral = _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.0483076656877383),
-        wp.float64(0.0965400885147278),
+        _DEBYE_NODE_01,
+        _DEBYE_WEIGHT_01,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.1444719615827965),
-        wp.float64(0.0956387200792749),
+        _DEBYE_NODE_02,
+        _DEBYE_WEIGHT_02,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.2392873622521371),
-        wp.float64(0.0938443990808046),
+        _DEBYE_NODE_03,
+        _DEBYE_WEIGHT_03,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.3318686022821277),
-        wp.float64(0.0911738786957639),
+        _DEBYE_NODE_04,
+        _DEBYE_WEIGHT_04,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.4213512761306353),
-        wp.float64(0.0876520930044038),
+        _DEBYE_NODE_05,
+        _DEBYE_WEIGHT_05,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.5068999089322294),
-        wp.float64(0.0833119242269468),
+        _DEBYE_NODE_06,
+        _DEBYE_WEIGHT_06,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.5877157572407623),
-        wp.float64(0.0781938957870703),
+        _DEBYE_NODE_07,
+        _DEBYE_WEIGHT_07,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.6630442669302152),
-        wp.float64(0.0723457941088485),
+        _DEBYE_NODE_08,
+        _DEBYE_WEIGHT_08,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.7321821187402897),
-        wp.float64(0.0658222227763618),
+        _DEBYE_NODE_09,
+        _DEBYE_WEIGHT_09,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.7944837959679424),
-        wp.float64(0.0586840934785355),
+        _DEBYE_NODE_10,
+        _DEBYE_WEIGHT_10,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.84936761373257),
-        wp.float64(0.0509980592623762),
+        _DEBYE_NODE_11,
+        _DEBYE_WEIGHT_11,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.8963211557660521),
-        wp.float64(0.0428358980222267),
+        _DEBYE_NODE_12,
+        _DEBYE_WEIGHT_12,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.9349060759377397),
-        wp.float64(0.0342738629130214),
+        _DEBYE_NODE_13,
+        _DEBYE_WEIGHT_13,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.9647622555875064),
-        wp.float64(0.0253920653092621),
+        _DEBYE_NODE_14,
+        _DEBYE_WEIGHT_14,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.9856115115452684),
-        wp.float64(0.0162743947309057),
+        _DEBYE_NODE_15,
+        _DEBYE_WEIGHT_15,
     )
     integral += _debye_gauss_pair_wp(
         half_x,
         half_x,
-        wp.float64(0.9972638618494816),
-        wp.float64(0.0070186100094701),
+        _DEBYE_NODE_16,
+        _DEBYE_WEIGHT_16,
     )
     return half_x * integral / x
 
@@ -616,17 +650,15 @@ def vapor_transition_correction_wp(
         Vapor transition correction factor (dimensionless).
     """
     numerator = (
-        wp.float64(0.75)  # Fuchs-Sutugin model coefficient.
+        _FUCHS_SUTUGIN_NUMERATOR
         * mass_accommodation
         * (wp.float64(1.0) + knudsen_number)
     )
     denominator = (
         knudsen_number * knudsen_number
         + knudsen_number
-        + wp.float64(0.283)  # Fuchs-Sutugin model coefficient.
-        * mass_accommodation
-        * knudsen_number
-        + wp.float64(0.75) * mass_accommodation
+        + _FUCHS_SUTUGIN_DENOMINATOR * mass_accommodation * knudsen_number
+        + _FUCHS_SUTUGIN_NUMERATOR * mass_accommodation
     )
     return numerator / denominator
 

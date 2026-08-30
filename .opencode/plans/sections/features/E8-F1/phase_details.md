@@ -1,14 +1,17 @@
 # Phase Details
 
-- [ ] **E8-F1-P1:** Declare graph-capture capability and compatibility signature with unit tests
-  - Issue: TBD | Size: S | Status: Not Started
+- [x] **E8-F1-P1:** Declare graph-capture capability and compatibility signature with unit tests
+  - Issue: #1547 | Size: S | Status: Delivered
   - Goal: Define a concrete-only capture capability result and immutable
     resident compatibility signature without importing Warp at declaration
     time or claiming capture support on CPU.
   - Files: `particula/execution/graph_capture.py`,
     `particula/execution/tests/graph_capture_test.py`
-  - Tests: Exact carrier validation; CUDA-capable versus CPU/unsupported
-    outcomes; complete signature fields; identity drift and malformed metadata.
+  - Delivered: `graph_capture.py` is Warp-import-free and declares
+    caller-probed capability plus exact identity-based request signatures.
+    `graph_capture_test.py` covers capability ordering, import/export boundaries,
+    carrier validation, real Warp-guarded request compatibility, representative
+    drift reasons, and stable RNG-array identity.
 
 - [ ] **E8-F1-P2:** Implement capture lifecycle and explicit invalidation with unit tests
   - Issue: TBD | Size: S | Status: Not Started

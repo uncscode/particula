@@ -142,12 +142,10 @@ def spherical_wall_loss_coefficient_from_transport_wp(
     )
     transport_scale = wp.sqrt(wall_eddy_diffusivity * diffusion_coefficient)
     debye_argument = (
-        wp.float64(3.141592653589793)
-        * settling_velocity
-        / (wp.float64(2.0) * transport_scale)
+        _PI * settling_velocity / (wp.float64(2.0) * transport_scale)
     )
     return wp.float64(6.0) * transport_scale / (
-        wp.float64(3.141592653589793) * chamber_radius
+        _PI * chamber_radius
     ) * debye_1_wp(debye_argument) + wp.float64(3.0) * settling_velocity / (
         wp.float64(4.0) * chamber_radius
     )
@@ -258,15 +256,11 @@ def rectangle_wall_loss_coefficient_from_transport_wp(
     transport_scale = wp.sqrt(wall_eddy_diffusivity * diffusion_coefficient)
     if transport_scale == wp.float64(0.0):
         return settling_velocity / chamber_height
-    x = (
-        wp.float64(3.141592653589793)
-        * settling_velocity
-        / (wp.float64(4.0) * transport_scale)
-    )
+    x = _PI * settling_velocity / (wp.float64(4.0) * transport_scale)
     return (
         wp.float64(4.0)
         * transport_scale
-        / wp.float64(3.141592653589793)
+        / _PI
         * (
             wp.float64(1.0) / chamber_length
             + wp.float64(1.0) / chamber_width

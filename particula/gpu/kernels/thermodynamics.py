@@ -42,6 +42,20 @@ THERMODYNAMICS_MODE_CONSTANT = wp.int32(0)
 THERMODYNAMICS_MODE_BUCK = wp.int32(1)
 """Canonical Buck water/ice mode; all four parameter slots are unused."""
 
+# Warp 1.11 narrows numeric literals in device code before applying an
+# explicit ``wp.float64`` constructor.  Materialize Buck coefficients on the
+# host so the device evaluator retains their declared fp64 precision.
+_CELSIUS_OFFSET = wp.constant(wp.float64(273.15))
+_BUCK_ICE_SCALE = wp.constant(wp.float64(6.1115))
+_BUCK_ICE_NUMERATOR = wp.constant(wp.float64(23.036))
+_BUCK_ICE_CORRECTION = wp.constant(wp.float64(333.7))
+_BUCK_ICE_DENOMINATOR = wp.constant(wp.float64(279.82))
+_BUCK_WATER_SCALE = wp.constant(wp.float64(6.1121))
+_BUCK_WATER_NUMERATOR = wp.constant(wp.float64(18.678))
+_BUCK_WATER_CORRECTION = wp.constant(wp.float64(234.5))
+_BUCK_WATER_DENOMINATOR = wp.constant(wp.float64(257.14))
+_PASCALS_PER_HECTOPASCAL = wp.constant(wp.float64(100.0))
+
 
 @dataclass(frozen=True)
 class ThermodynamicsConfig:
@@ -243,25 +257,31 @@ def _constant_vapor_pressure(
 @wp.func
 def _buck_vapor_pressure(temperature: wp.float64) -> wp.float64:
     """Return canonical Buck water/ice vapor pressure in Pa."""
-    temperature_celsius = temperature - wp.float64(273.15)
+    temperature_celsius = temperature - _CELSIUS_OFFSET
     if temperature_celsius < wp.float64(0.0):
         return (
-            wp.float64(6.1115)
+            _BUCK_ICE_SCALE
             * wp.exp(
-                (wp.float64(23.036) - temperature_celsius / wp.float64(333.7))
+                (
+                    _BUCK_ICE_NUMERATOR
+                    - temperature_celsius / _BUCK_ICE_CORRECTION
+                )
                 * temperature_celsius
-                / (wp.float64(279.82) + temperature_celsius)
+                / (_BUCK_ICE_DENOMINATOR + temperature_celsius)
             )
-            * wp.float64(100.0)
+            * _PASCALS_PER_HECTOPASCAL
         )
     return (
-        wp.float64(6.1121)
+        _BUCK_WATER_SCALE
         * wp.exp(
-            (wp.float64(18.678) - temperature_celsius / wp.float64(234.5))
+            (
+                _BUCK_WATER_NUMERATOR
+                - temperature_celsius / _BUCK_WATER_CORRECTION
+            )
             * temperature_celsius
-            / (wp.float64(257.14) + temperature_celsius)
+            / (_BUCK_WATER_DENOMINATOR + temperature_celsius)
         )
-        * wp.float64(100.0)
+        * _PASCALS_PER_HECTOPASCAL
     )
 
 

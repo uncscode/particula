@@ -23,6 +23,16 @@ E8-F3 can then separate setup work and complete resource pinning against a
 stable contract, while E8-F4 through E8-F8 can validate, document, benchmark,
 and profile the same lifecycle without inventing incompatible rules.
 
+## Implementation Status
+
+E8-F1-P1 was delivered for issue #1547. It adds the concrete-only,
+Warp-import-free `particula/execution/graph_capture.py` declaration boundary
+and `particula/execution/tests/graph_capture_test.py`. The delivered boundary
+resolves caller-probed capability and creates/compares exact identity-based
+`ResidentSimulationRequest` signatures without capture, replay, acquisition,
+payload inspection, transfer, or synchronization. Lifecycle, invalidation, and
+recapture behavior remain P2-P3 work.
+
 ## User Stories
 
 - As a resident-simulation developer, I want an immutable capture signature so

@@ -66,6 +66,20 @@ retired.
   failure after a writer may have launched faults both the capture record and
   resident session, with no rollback or retry guarantee.
 
+## Implemented P1 Boundary
+
+Issue #1547 delivered the declaration-only portion in
+`particula/execution/graph_capture.py`. It provides capability outcomes for
+CPU, Warp CPU, unavailable runtime/device, unsupported API, and availability;
+the resolver uses caller-provided lazy probes and imports no Warp module.
+
+It also provides immutable identity-only signatures and deterministic first
+drift comparison for the request, session, device, dimensions, containers,
+primary arrays, resource views, graph, schedule/order, diagnostics,
+communication, configurations, and RNG sidecars. The implementation retains
+existing request-owned references only; it does not create lifecycle records or
+perform capture/replay. Those operations remain P2-P3 scope.
+
 ## Security & Compliance
 
 No new network, credential, file-deserialization, or permission boundary is

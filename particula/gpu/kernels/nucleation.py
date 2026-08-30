@@ -54,6 +54,10 @@ from particula.gpu.kernels.slot_management import (
 )
 from particula.util.constants import AVOGADRO_NUMBER
 
+_AVOGADRO_NUMBER = wp.constant(wp.float64(AVOGADRO_NUMBER))
+_MIN_NORMAL_FLOAT64 = wp.constant(wp.float64(2.2250738585072014e-308))
+_MIN_SUBNORMAL_FLOAT64 = wp.constant(wp.float64(4.9406564584124654e-324))
+
 _P2_GATE_ELIGIBLE = 0
 _P2_GATE_ZERO_TIME = 1
 _P2_GATE_ZERO_COEFFICIENT = 2
@@ -768,7 +772,7 @@ def _precursor_status(
     box = wp.tid()
     number_concentration = (
         concentration[box, precursor_index]
-        * wp.float64(AVOGADRO_NUMBER)
+        * _AVOGADRO_NUMBER
         / molar_mass[precursor_index]
     )
     if number_concentration == 0.0:
@@ -1444,12 +1448,10 @@ def _float64_predecessor(value: wp.float64) -> wp.float64:
     Returns:
         Largest representable binary64 value strictly less than ``value``.
     """
-    minimum_normal = wp.float64(2.2250738585072014e-308)
-    minimum_subnormal = wp.float64(4.9406564584124654e-324)
-    if value < minimum_normal:
-        return value - minimum_subnormal
+    if value < _MIN_NORMAL_FLOAT64:
+        return value - _MIN_SUBNORMAL_FLOAT64
 
-    binade = minimum_normal
+    binade = _MIN_NORMAL_FLOAT64
     for _exponent in range(2046):
         doubled = binade * wp.float64(2.0)
         if value >= doubled:
@@ -1457,7 +1459,7 @@ def _float64_predecessor(value: wp.float64) -> wp.float64:
     ulp = binade
     for _fraction_bit in range(52):
         ulp = ulp * wp.float64(0.5)
-    if value == binade and binade > minimum_normal:
+    if value == binade and binade > _MIN_NORMAL_FLOAT64:
         ulp = ulp * wp.float64(0.5)
     return value - ulp
 
@@ -1525,7 +1527,7 @@ def _plan_demand_work(  # noqa: C901
     box = wp.tid()
     precursor = (
         concentration[box, precursor_index]
-        * wp.float64(AVOGADRO_NUMBER)
+        * _AVOGADRO_NUMBER
         / molar_mass[precursor_index]
     )
     number_concentration[box] = precursor
@@ -1561,7 +1563,7 @@ def _plan_demand_work(  # noqa: C901
                 event_mass = (
                     wp.float64(molecule_counts[species])
                     * molar_mass[species]
-                    / wp.float64(AVOGADRO_NUMBER)
+                    / _AVOGADRO_NUMBER
                 )
                 if not wp.isfinite(event_mass) or event_mass <= 0.0:
                     wp.atomic_add(invalid, 0, 1)
@@ -1585,7 +1587,7 @@ def _plan_demand_work(  # noqa: C901
                     event_mass = (
                         wp.float64(molecule_counts[species])
                         * molar_mass[species]
-                        / wp.float64(AVOGADRO_NUMBER)
+                        / _AVOGADRO_NUMBER
                     )
                     if demand * event_mass > concentration[box, species]:
                         safe = wp.int32(0)
@@ -1597,7 +1599,7 @@ def _plan_demand_work(  # noqa: C901
                 event_mass = (
                     wp.float64(molecule_counts[species])
                     * molar_mass[species]
-                    / wp.float64(AVOGADRO_NUMBER)
+                    / _AVOGADRO_NUMBER
                 )
                 removal[box, species] = demand * event_mass
                 if (
@@ -2732,7 +2734,7 @@ def _validate_p5_handoff(  # noqa: C901
             event_mass = (
                 wp.float64(molecule_counts[species])
                 * molar_mass[species]
-                / wp.float64(AVOGADRO_NUMBER)
+                / _AVOGADRO_NUMBER
             )
             if (
                 partitioning[box, species] != 1
@@ -2771,7 +2773,7 @@ def _commit_nucleation_p5_kernel(
             masses[box, particle, species] = (
                 wp.float64(molecule_counts[species])
                 * molar_mass[species]
-                / wp.float64(AVOGADRO_NUMBER)
+                / _AVOGADRO_NUMBER
             )
         concentration[box, particle] = wp.float64(1.0) / volume[box]
         charge[box, particle] = wp.float64(0.0)
@@ -2781,7 +2783,7 @@ def _commit_nucleation_p5_kernel(
             gas_concentration[box, species] -= final_demand[box] * (
                 wp.float64(molecule_counts[species])
                 * molar_mass[species]
-                / wp.float64(AVOGADRO_NUMBER)
+                / _AVOGADRO_NUMBER
             )
 
 

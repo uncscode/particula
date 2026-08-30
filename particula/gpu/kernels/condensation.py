@@ -86,6 +86,13 @@ from particula.gpu.properties.particle_properties import (
 _DEFAULT_SURFACE_TENSION = 0.072
 _DEFAULT_MASS_ACCOMMODATION = 1.0
 _DEFAULT_DIFFUSION_COEFFICIENT = 2.0e-5
+_GAS_CONSTANT = wp.constant(wp.float64(constants.GAS_CONSTANT))
+_MOLECULAR_WEIGHT_AIR = wp.constant(wp.float64(constants.MOLECULAR_WEIGHT_AIR))
+_REF_VISCOSITY_AIR_STP = wp.constant(
+    wp.float64(constants.REF_VISCOSITY_AIR_STP)
+)
+_REF_TEMPERATURE_STP = wp.constant(wp.float64(constants.REF_TEMPERATURE_STP))
+_SUTHERLAND_CONSTANT = wp.constant(wp.float64(constants.SUTHERLAND_CONSTANT))
 
 ACTIVITY_MODE_IDEAL = wp.int32(0)
 ACTIVITY_MODE_KAPPA = wp.int32(1)
@@ -727,17 +734,17 @@ def _prepare_environment_properties_kernel(
     pressure_value = pressure[box_idx]
     viscosity_value = dynamic_viscosity_wp(
         temperature_value,
-        wp.float64(constants.REF_VISCOSITY_AIR_STP),
-        wp.float64(constants.REF_TEMPERATURE_STP),
-        wp.float64(constants.SUTHERLAND_CONSTANT),
+        _REF_VISCOSITY_AIR_STP,
+        _REF_TEMPERATURE_STP,
+        _SUTHERLAND_CONSTANT,
     )
     dynamic_viscosity[box_idx] = viscosity_value
     mean_free_path[box_idx] = molecule_mean_free_path_wp(
-        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
+        _MOLECULAR_WEIGHT_AIR,
         temperature_value,
         pressure_value,
         viscosity_value,
-        wp.float64(constants.GAS_CONSTANT),
+        _GAS_CONSTANT,
     )
 
 
@@ -798,18 +805,18 @@ def _accumulate_energy_transfer_kernel(
 ) -> None:
     """Accumulate signed energy from the finalized whole-call transfer.
 
-    Parallel particle lanes add each finalized whole-call particle transfer
-    multiplied by its species latent heat to the per-box, per-species output.
+    One lane per box and species sums particle transfers in fp64 before adding
+    the substep energy to the whole-call output.
     """
-    box_idx, particle_idx = wp.tid()  # type: ignore[misc]
-    for species_idx in range(total_mass_transfer.shape[2]):
-        wp.atomic_add(
-            energy_transfer,
-            box_idx,
-            species_idx,
-            total_mass_transfer[box_idx, particle_idx, species_idx]
-            * latent_heat[species_idx],
-        )
+    box_idx, species_idx = wp.tid()  # type: ignore[misc]
+    species_transfer = wp.float64(0.0)
+    for particle_idx in range(total_mass_transfer.shape[1]):
+        species_transfer += total_mass_transfer[
+            box_idx, particle_idx, species_idx
+        ]
+    energy_transfer[box_idx, species_idx] = (
+        species_transfer * latent_heat[species_idx]
+    )
 
 
 @wp.kernel  # pragma: no cover - device kernels execute outside Python coverage
@@ -2445,7 +2452,9 @@ def condensation_step_gpu(  # noqa: C901
         )
     substep_time_step = wp.float64(time_step / 4.0)
     for _ in range(4):
-        if surface_tension_mode == SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED:
+        if int(surface_tension_mode) == int(
+            SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED
+        ):
             wp.launch(
                 _effective_surface_tension_kernel,
                 dim=(n_boxes, n_particles),
@@ -2577,8 +2586,8 @@ def condensation_step_gpu(  # noqa: C901
         if energy_transfer is not None:
             wp.launch(
                 _accumulate_energy_transfer_kernel,
-                dim=(n_boxes, n_particles),
-                inputs=[finalized, latent_heat, energy_transfer],
+                dim=(n_boxes, n_species),
+                inputs=[total_mass_transfer, latent_heat, energy_transfer],
                 device=device,
             )
 

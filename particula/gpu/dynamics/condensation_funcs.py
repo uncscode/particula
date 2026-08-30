@@ -11,6 +11,7 @@ driving pressure; zero latent heat retains the isothermal rate.
 
 import warp as wp
 
+_PI = wp.constant(wp.float64(3.141592653589793))
 _THERMAL_CONDUCTIVITY_SCALE = wp.constant(wp.float64(1.0e-3))
 _THERMAL_CONDUCTIVITY_INTERCEPT = wp.constant(wp.float64(4.39))
 _THERMAL_CONDUCTIVITY_GRADIENT = wp.constant(wp.float64(0.071))
@@ -35,10 +36,9 @@ def first_order_mass_transport_k_wp(
     Returns:
         First-order mass transport coefficient [m³/s].
     """
-    pi_value = wp.float64(3.141592653589793)
     return (
         wp.float64(4.0)
-        * pi_value
+        * _PI
         * particle_radius
         * diffusion_coefficient
         * vapor_transition

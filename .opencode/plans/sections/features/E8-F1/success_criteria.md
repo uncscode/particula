@@ -1,16 +1,18 @@
 # Success Criteria
 
-- [ ] One concrete-only graph-capture contract module defines capability,
-  compatibility, lifecycle, invalidation, and recapture vocabulary without new
-  public package exports.
-- [ ] Capability resolution distinguishes unsupported Warp CPU, unavailable
-  Warp/CUDA runtime or device, missing capture APIs, and invalid resident state.
-- [ ] A compatibility signature covers every documented structural field:
+- [x] P1 provides one concrete-only graph-capture declaration module defining
+  capability and compatibility vocabulary without new public package exports.
+  Lifecycle, invalidation, and recapture vocabulary remain P2-P3 scope.
+- [x] P1 capability resolution distinguishes CPU and Warp CPU, unavailable
+  runtime or device, missing capture API, and availability without importing
+  Warp or falling back.
+- [x] P1 compatibility signatures cover every documented structural field:
   device, dimensions, primary identities, exact request/graph/schedule/order,
   process configuration, sidecars, diagnostics, communication, and RNG state
   identities.
-- [ ] Every structural drift case deterministically invalidates before launch;
-  stable-shape payload changes and active-slot occupancy changes do not.
+- [x] P1 comparison reports deterministic first drift for the implemented
+  signature groups and leaves stable RNG-array identity compatible; exhaustive
+  drift and active-slot coverage remains P3 test scope.
 - [ ] Lifecycle transition tests cover all legal transitions and reject replay
   or recapture from invalid, faulted, terminal, or open-step bindings.
 - [ ] Recapture is explicit and creates a new record only after eligibility

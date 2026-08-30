@@ -2,18 +2,18 @@
 
 ## Backend
 
-- [ ] Create `particula/execution/graph_capture.py` as a concrete-only module;
+- [x] Create `particula/execution/graph_capture.py` as a concrete-only module;
   keep all names absent from package and top-level exports.
-- [ ] Define exact immutable capability and compatibility carriers, closed
-  lifecycle/invalidation enums, and deterministic field validation.
-- [ ] Implement a metadata-only capture-capability resolver that separates
+- [x] Define exact immutable capability and compatibility carriers and
+  deterministic field validation. Lifecycle carriers remain P2 work.
+- [x] Implement a metadata-only capture-capability resolver that separates
   Warp runtime/device availability, CUDA capture API support, and structural
   resident compatibility; do not import Warp from dependency-neutral modules.
-- [ ] Build a compatibility signature from one exact
+- [x] Build a compatibility signature from one exact
   `ResidentSimulationRequest`, including session/device/dimensions, graph and
   schedule, primary arrays, resource views, diagnostics, communication, and RNG
   identities.
-- [ ] Compare current bindings against a signature in deterministic field order
+- [x] Compare current bindings against a signature in deterministic field order
   and return/raise the first documented recapture reason without payload reads.
 - [ ] Implement lifecycle transitions for ready, captured/replayable,
   invalidated, faulted, retired, and closed states with explicit teardown.
@@ -28,8 +28,9 @@
 
 ## Tooling / Tests
 
-- [ ] Add `particula/execution/tests/graph_capture_test.py` using `*_test.py`
-  naming and hardware-free fakes for capability and lifecycle unit tests.
+- [x] Add `particula/execution/tests/graph_capture_test.py` using `*_test.py`
+  naming, hardware-free capability/import fakes, and Warp-guarded real-request
+  signature cases.
 - [ ] Parametrize all signature drift triggers: backend/native device,
   dimensions, container/array identity, graph, schedule/order, process config,
   sidecar, diagnostics, communication map/buffer, and RNG resource.
@@ -41,7 +42,8 @@
 - [ ] Extend `particula/execution/tests/full_loop_test.py` with exact resident
   binding and recapture-gate integration assertions, without claiming captured
   physics parity before E8-F4.
-- [ ] Add/retain export tests proving graph-capture internals are concrete-only.
+- [x] Add/retain graph-capture test assertions proving internals are
+  concrete-only.
 - [ ] Run focused assertions with coverage disabled, then run the untargeted
   `.opencode/tools/run_pytest.py` suite for repository-configured full-package
   coverage; focused-target coverage is invalid evidence.

@@ -1,10 +1,10 @@
-"""Declare concrete resident graph-capture compatibility metadata.
+"""Declare resident graph-capture capability and compatibility metadata.
 
-This direct-import-only, declaration-only boundary reports whether graph capture
-could be used and records identity-based compatibility for an already-built
-resident request.  It neither captures nor replays graphs, imports Warp, probes
-devices itself, acquires resources, launches work, transfers data, or
-synchronizes.
+This concrete, direct-import-only, declaration-only boundary resolves whether a
+caller-provided probe reports graph-capture support and records identity-based
+compatibility for an already-built resident request. It neither captures nor
+replays graphs, imports Warp, probes devices itself, acquires resources,
+launches work, transfers data, or synchronizes.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 
 class GraphCaptureAvailability(str, Enum):
-    """Enumerate graph-capture availability outcomes."""
+    """Enumerate graph-capture availability outcomes from a lazy probe."""
 
     UNSUPPORTED_CPU = "unsupported_cpu"
     UNSUPPORTED_WARP_CPU = "unsupported_warp_cpu"
@@ -38,13 +38,23 @@ class GraphCaptureAvailability(str, Enum):
 
 @dataclass(frozen=True, eq=False)
 class GraphCaptureCapability:
-    """Retain one exact device declaration and graph-capture availability."""
+    """Retain an exact device declaration and its capture availability.
+
+    Attributes:
+        device: Exact device declaration assessed by the resolver.
+        availability: Availability outcome for ``device``.
+    """
 
     device: Device
     availability: GraphCaptureAvailability
 
     def __post_init__(self) -> None:
-        """Validate exact declaration types."""
+        """Validate exact device and availability declaration types.
+
+        Raises:
+            TypeError: If either declaration does not have its required exact
+                type.
+        """
         if type(self.device) is not Device:
             raise TypeError("device must be an exact Device.")
         if type(self.availability) is not GraphCaptureAvailability:
@@ -54,16 +64,28 @@ class GraphCaptureCapability:
 
 
 class GraphCaptureRuntimeProbe(Protocol):
-    """Declare the lazy runtime checks needed for graph capture."""
+    """Declare caller-owned lazy runtime checks for graph-capture support.
+
+    Implementations must return literal ``bool`` values. The resolver invokes
+    methods only after the preceding availability condition succeeds.
+    """
 
     def runtime_available(self) -> bool:
         """Return whether the optional runtime is available."""
 
     def device_available(self, device: Device) -> bool:
-        """Return whether ``device`` is available."""
+        """Return whether a declared device is available.
+
+        Args:
+            device: Exact device declaration to assess.
+        """
 
     def capture_api_available(self, device: Device) -> bool:
-        """Return whether the device exposes a capture API."""
+        """Return whether a declared device exposes a capture API.
+
+        Args:
+            device: Exact device declaration to assess.
+        """
 
 
 def _require_probe_method(probe: object, name: str) -> Callable[..., object]:
@@ -84,7 +106,11 @@ def _require_bool(result: object, name: str) -> bool:
 def resolve_graph_capture_capability(
     device: Device, probe: GraphCaptureRuntimeProbe
 ) -> GraphCaptureCapability:
-    """Resolve graph-capture capability without loading a runtime.
+    """Resolve graph-capture capability without importing a runtime.
+
+    CPU and Warp CPU declarations resolve without invoking ``probe``. Other
+    devices invoke the caller-owned runtime, device, and capture-API checks in
+    that order. Probe exceptions propagate unchanged.
 
     Args:
         device: Exact declared device to assess.
@@ -92,14 +118,13 @@ def resolve_graph_capture_capability(
 
     Returns:
         Immutable capability declaration for ``device``.
+
+    Raises:
+        TypeError: If ``device`` is inexact, a probe method is not callable, or
+            a probe does not return a literal ``bool``.
     """
     if type(device) is not Device:
         raise TypeError("device must be an exact Device.")
-    runtime_available = _require_probe_method(probe, "runtime_available")
-    device_available = _require_probe_method(probe, "device_available")
-    capture_api_available = _require_probe_method(
-        probe, "capture_api_available"
-    )
     if device.backend is Backend.CPU:
         return GraphCaptureCapability(
             device, GraphCaptureAvailability.UNSUPPORTED_CPU
@@ -108,6 +133,11 @@ def resolve_graph_capture_capability(
         return GraphCaptureCapability(
             device, GraphCaptureAvailability.UNSUPPORTED_WARP_CPU
         )
+    runtime_available = _require_probe_method(probe, "runtime_available")
+    device_available = _require_probe_method(probe, "device_available")
+    capture_api_available = _require_probe_method(
+        probe, "capture_api_available"
+    )
     if not _require_bool(runtime_available(), "runtime_available"):
         return GraphCaptureCapability(
             device, GraphCaptureAvailability.UNAVAILABLE_RUNTIME
@@ -126,7 +156,7 @@ def resolve_graph_capture_capability(
 
 
 class GraphCaptureDriftReason(str, Enum):
-    """Enumerate compatibility groups in deterministic comparison order."""
+    """Enumerate signature groups in deterministic first-drift order."""
 
     REQUEST = "request"
     SESSION = "session"
@@ -146,13 +176,24 @@ class GraphCaptureDriftReason(str, Enum):
 
 @dataclass(frozen=True, eq=False)
 class GraphCaptureCompatibility:
-    """State whether a request remains compatible with a signature."""
+    """State whether a request remains compatible with a signature.
+
+    Attributes:
+        compatible: Whether every tracked group retains object identity.
+        reason: First changed group, or ``None`` only when compatible.
+    """
 
     compatible: bool
     reason: GraphCaptureDriftReason | None
 
     def __post_init__(self) -> None:
-        """Require the compatible/reason invariant."""
+        """Validate exact types and the compatible/reason invariant.
+
+        Raises:
+            TypeError: If a field does not have its required exact type.
+            ValueError: If ``reason`` is absent or present inconsistently with
+                ``compatible``.
+        """
         if type(self.compatible) is not bool:
             raise TypeError("compatible must be bool.")
         if (
@@ -172,9 +213,25 @@ class GraphCaptureCompatibility:
 class ResidentGraphCaptureSignature:
     """Retain immutable identity metadata for one resident request.
 
-    Every tuple holds references rather than payload values.  The names mirror
+    Every tuple holds references rather than payload values. The names mirror
     the ordered drift groups used by
     :func:`compare_resident_graph_capture_signature`.
+
+    Attributes:
+        request: Exact resident request instance.
+        session: Request-bound resident session.
+        device: Session metadata device declaration.
+        dimensions: Session resident dimensions.
+        primary_containers: Particle, gas, and environment containers.
+        primary_arrays: Primary container arrays in schema order.
+        resource_views: Request-owned published process and communication views.
+        graph: Graph and its declaration tuples.
+        schedule: Schedule and its declaration tuples.
+        schedule_order: Resolved ordered schedule-node identifiers.
+        diagnostics: Diagnostic plan, registrations, and output identities.
+        communication: Optional communication declaration and view identities.
+        configurations: Request-bound process configuration identities.
+        rng_resources: Coagulation and wall-loss RNG array identities.
     """
 
     request: object
@@ -193,7 +250,11 @@ class ResidentGraphCaptureSignature:
     rng_resources: tuple[object, ...]
 
     def __post_init__(self) -> None:
-        """Require immutable metadata groups used by identity comparison."""
+        """Require exact immutable tuples for grouped identity metadata.
+
+        Raises:
+            TypeError: If a grouped metadata field is not an exact tuple.
+        """
         for name in (
             "primary_containers",
             "primary_arrays",
@@ -225,7 +286,22 @@ def _identity_tuple(*values: object) -> tuple[object, ...]:
 def create_resident_graph_capture_signature(
     request: object,
 ) -> ResidentGraphCaptureSignature:
-    """Create an identity-only structural signature for an exact request."""
+    """Create an identity-only structural signature for an exact request.
+
+    The concrete request type is imported lazily after early inexact-request
+    rejection. This function retains existing request metadata and published
+    views only; it does not inspect array payloads or acquire resources.
+
+    Args:
+        request: Exact ``ResidentSimulationRequest`` to describe.
+
+    Returns:
+        Immutable identity metadata grouped in comparison precedence order.
+
+    Raises:
+        TypeError: If ``request`` is not an exact
+            ``ResidentSimulationRequest``.
+    """
     # Built-in values cannot be exact requests, so reject them before loading
     # Warp-dependent concrete request modules or touching arbitrary attributes.
     if (
@@ -403,7 +479,22 @@ def _same_identity(left: object, right: object) -> bool:
 def compare_resident_graph_capture_signature(
     signature: ResidentGraphCaptureSignature, request: object
 ) -> GraphCaptureCompatibility:
-    """Return the first structural identity drift for ``request``."""
+    """Compare a request with a signature and return its first identity drift.
+
+    A fresh metadata-only signature is created without recapturing, mutating,
+    inspecting payload values, or replacing resident resources.
+
+    Args:
+        signature: Exact baseline signature to compare.
+        request: Exact ``ResidentSimulationRequest`` to assess.
+
+    Returns:
+        Compatibility result containing the first changed group, if any.
+
+    Raises:
+        TypeError: If ``signature`` is inexact or ``request`` is not an exact
+            ``ResidentSimulationRequest``.
+    """
     if type(signature) is not ResidentGraphCaptureSignature:
         raise TypeError(
             "signature must be an exact ResidentGraphCaptureSignature."

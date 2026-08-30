@@ -47,6 +47,8 @@ PLANNING_SURFACE_FAILURE = 4
 PLANNING_DIVERSITY_FAILURE = 5
 PLANNING_NONFINITE_FAILURE = 6
 
+_PI = wp.constant(wp.float64(np.pi))
+
 
 @dataclass(frozen=True)
 class ResamplingBuffers:
@@ -117,7 +119,7 @@ def _radius(
     for species in range(species_count):
         volume += masses[box, particle, species] / density[species]
     return wp.pow(
-        wp.float64(3.0) * volume / (wp.float64(4.0) * wp.float64(wp.pi)),
+        wp.float64(3.0) * volume / (wp.float64(4.0) * _PI),
         wp.float64(1.0) / wp.float64(3.0),
     )
 
@@ -550,7 +552,7 @@ def _plan_resampling(  # noqa: C901, PLR0915
         source_surface += (
             concentration[box, particle]
             * wp.float64(4.0)
-            * wp.float64(wp.pi)
+            * _PI
             * radius
             * radius
         )
@@ -569,14 +571,12 @@ def _plan_resampling(  # noqa: C901, PLR0915
                 replacement_values_finite = False
             volume += replacement_masses[box, item, species] / density[species]
         radius = wp.pow(
-            wp.float64(3.0) * volume / (wp.float64(4.0) * wp.float64(wp.pi)),
+            wp.float64(3.0) * volume / (wp.float64(4.0) * _PI),
             wp.float64(1.0) / wp.float64(3.0),
         )
         replacement_moment += equal * radius * radius * radius
         replacement_mean += equal * radius
-        replacement_surface += (
-            equal * wp.float64(4.0) * wp.float64(wp.pi) * radius * radius
-        )
+        replacement_surface += equal * wp.float64(4.0) * _PI * radius * radius
     replacement_diversity = _riemer_diversity_dense(
         replacement_masses,
         replacement_concentration,

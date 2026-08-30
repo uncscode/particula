@@ -127,6 +127,23 @@ if wp is not None:
 
 BROWNIAN_COAGULATION_MASK_INPUT_INDEX = 28
 
+_TEST_BOLTZMANN_CONSTANT = wp.constant(wp.float64(constants.BOLTZMANN_CONSTANT))
+_TEST_ELEMENTARY_CHARGE = wp.constant(
+    wp.float64(constants.ELEMENTARY_CHARGE_VALUE)
+)
+_TEST_ELECTRIC_PERMITTIVITY = wp.constant(
+    wp.float64(constants.ELECTRIC_PERMITTIVITY)
+)
+_TEST_GAS_CONSTANT = wp.constant(wp.float64(constants.GAS_CONSTANT))
+_TEST_MOLECULAR_WEIGHT_AIR = wp.constant(
+    wp.float64(constants.MOLECULAR_WEIGHT_AIR)
+)
+_TEST_REF_VISCOSITY = wp.constant(wp.float64(constants.REF_VISCOSITY_AIR_STP))
+_TEST_REF_TEMPERATURE = wp.constant(wp.float64(constants.REF_TEMPERATURE_STP))
+_TEST_SUTHERLAND_CONSTANT = wp.constant(
+    wp.float64(constants.SUTHERLAND_CONSTANT)
+)
+
 
 def test_mechanism_default_matches_explicit_brownian() -> None:
     """Default mechanism configuration matches explicit Brownian selection."""
@@ -2225,14 +2242,14 @@ def _additive_helper_probe_kernel(
         charges[0, 1],
         temperature[0],
         pressure[0],
-        wp.float64(constants.BOLTZMANN_CONSTANT),
-        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
-        wp.float64(constants.ELECTRIC_PERMITTIVITY),
-        wp.float64(constants.GAS_CONSTANT),
-        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
-        wp.float64(constants.REF_VISCOSITY_AIR_STP),
-        wp.float64(constants.REF_TEMPERATURE_STP),
-        wp.float64(constants.SUTHERLAND_CONSTANT),
+        _TEST_BOLTZMANN_CONSTANT,
+        _TEST_ELEMENTARY_CHARGE,
+        _TEST_ELECTRIC_PERMITTIVITY,
+        _TEST_GAS_CONSTANT,
+        _TEST_MOLECULAR_WEIGHT_AIR,
+        _TEST_REF_VISCOSITY,
+        _TEST_REF_TEMPERATURE,
+        _TEST_SUTHERLAND_CONSTANT,
     )
     majorant[0] = _total_majorant(
         mechanism_mask,
@@ -2255,14 +2272,14 @@ def _additive_helper_probe_kernel(
         charges,
         temperature,
         pressure,
-        wp.float64(constants.BOLTZMANN_CONSTANT),
-        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
-        wp.float64(constants.ELECTRIC_PERMITTIVITY),
-        wp.float64(constants.GAS_CONSTANT),
-        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
-        wp.float64(constants.REF_VISCOSITY_AIR_STP),
-        wp.float64(constants.REF_TEMPERATURE_STP),
-        wp.float64(constants.SUTHERLAND_CONSTANT),
+        _TEST_BOLTZMANN_CONSTANT,
+        _TEST_ELEMENTARY_CHARGE,
+        _TEST_ELECTRIC_PERMITTIVITY,
+        _TEST_GAS_CONSTANT,
+        _TEST_MOLECULAR_WEIGHT_AIR,
+        _TEST_REF_VISCOSITY,
+        _TEST_REF_TEMPERATURE,
+        _TEST_SUTHERLAND_CONSTANT,
     )
     sanitized[0] = _sanitize_positive_finite(values[8])
 
@@ -2304,14 +2321,14 @@ def _all_mask_additive_probe_kernel(
         charges[0, 1],
         temperature[0],
         pressure[0],
-        wp.float64(constants.BOLTZMANN_CONSTANT),
-        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
-        wp.float64(constants.ELECTRIC_PERMITTIVITY),
-        wp.float64(constants.GAS_CONSTANT),
-        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
-        wp.float64(constants.REF_VISCOSITY_AIR_STP),
-        wp.float64(constants.REF_TEMPERATURE_STP),
-        wp.float64(constants.SUTHERLAND_CONSTANT),
+        _TEST_BOLTZMANN_CONSTANT,
+        _TEST_ELEMENTARY_CHARGE,
+        _TEST_ELECTRIC_PERMITTIVITY,
+        _TEST_GAS_CONSTANT,
+        _TEST_MOLECULAR_WEIGHT_AIR,
+        _TEST_REF_VISCOSITY,
+        _TEST_REF_TEMPERATURE,
+        _TEST_SUTHERLAND_CONSTANT,
     )
     majorant[0] = _total_majorant(
         mechanism_mask,
@@ -2334,14 +2351,14 @@ def _all_mask_additive_probe_kernel(
         charges,
         temperature,
         pressure,
-        wp.float64(constants.BOLTZMANN_CONSTANT),
-        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
-        wp.float64(constants.ELECTRIC_PERMITTIVITY),
-        wp.float64(constants.GAS_CONSTANT),
-        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
-        wp.float64(constants.REF_VISCOSITY_AIR_STP),
-        wp.float64(constants.REF_TEMPERATURE_STP),
-        wp.float64(constants.SUTHERLAND_CONSTANT),
+        _TEST_BOLTZMANN_CONSTANT,
+        _TEST_ELEMENTARY_CHARGE,
+        _TEST_ELECTRIC_PERMITTIVITY,
+        _TEST_GAS_CONSTANT,
+        _TEST_MOLECULAR_WEIGHT_AIR,
+        _TEST_REF_VISCOSITY,
+        _TEST_REF_TEMPERATURE,
+        _TEST_SUTHERLAND_CONSTANT,
     )
 
 
@@ -2370,14 +2387,14 @@ def _charged_majorant_probe_kernel(
         charges,
         temperature,
         pressure,
-        wp.float64(constants.BOLTZMANN_CONSTANT),
-        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
-        wp.float64(constants.ELECTRIC_PERMITTIVITY),
-        wp.float64(constants.GAS_CONSTANT),
-        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
-        wp.float64(constants.REF_VISCOSITY_AIR_STP),
-        wp.float64(constants.REF_TEMPERATURE_STP),
-        wp.float64(constants.SUTHERLAND_CONSTANT),
+        _TEST_BOLTZMANN_CONSTANT,
+        _TEST_ELEMENTARY_CHARGE,
+        _TEST_ELECTRIC_PERMITTIVITY,
+        _TEST_GAS_CONSTANT,
+        _TEST_MOLECULAR_WEIGHT_AIR,
+        _TEST_REF_VISCOSITY,
+        _TEST_REF_TEMPERATURE,
+        _TEST_SUTHERLAND_CONSTANT,
     )
     majorants[box_idx] = direct
     dispatched_majorants[box_idx] = _total_majorant(
@@ -2401,14 +2418,14 @@ def _charged_majorant_probe_kernel(
         charges,
         temperature,
         pressure,
-        wp.float64(constants.BOLTZMANN_CONSTANT),
-        wp.float64(constants.ELEMENTARY_CHARGE_VALUE),
-        wp.float64(constants.ELECTRIC_PERMITTIVITY),
-        wp.float64(constants.GAS_CONSTANT),
-        wp.float64(constants.MOLECULAR_WEIGHT_AIR),
-        wp.float64(constants.REF_VISCOSITY_AIR_STP),
-        wp.float64(constants.REF_TEMPERATURE_STP),
-        wp.float64(constants.SUTHERLAND_CONSTANT),
+        _TEST_BOLTZMANN_CONSTANT,
+        _TEST_ELEMENTARY_CHARGE,
+        _TEST_ELECTRIC_PERMITTIVITY,
+        _TEST_GAS_CONSTANT,
+        _TEST_MOLECULAR_WEIGHT_AIR,
+        _TEST_REF_VISCOSITY,
+        _TEST_REF_TEMPERATURE,
+        _TEST_SUTHERLAND_CONSTANT,
     )
 
 
@@ -5693,7 +5710,7 @@ def test_coagulation_step_gpu_explicit_brownian_matches_default_and_dispatches_m
     npt.assert_allclose(default[3].charge, explicit[3].charge)
     assert not np.array_equal(default[3].masses, initial_masses)
     assert not np.array_equal(default[3].concentration, initial_concentration)
-    assert masks == [wp.int32(BROWNIAN_MECHANISM_FLAG)] * 2
+    assert [int(mask) for mask in masks] == [BROWNIAN_MECHANISM_FLAG] * 2
 
 
 def test_coagulation_step_gpu_scalar_positional_call_remains_valid(
