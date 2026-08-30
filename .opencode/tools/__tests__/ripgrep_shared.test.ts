@@ -10,6 +10,7 @@ import {
 } from "./helpers/mock-subprocess";
 
 const HELPER_MODULE_PATH = path.join(import.meta.dir, "../lib/ripgrep_shared.ts");
+const TEST_TEMP_ROOT = path.resolve(import.meta.dir, "../../../adforge_local/opencode/tmp");
 let importCounter = 0;
 
 const loadHelper = async () => {
@@ -103,6 +104,38 @@ describe("ripgrep_shared helper", () => {
     expect(dirResult.error).toBeUndefined();
     expect(dirResult.targetKind).toBe("directory");
     expect(dirResult.compactOutputBase).toBe(dirResult.canonicalPath);
+  });
+
+  it("accepts descendants but rejects a sibling root for the supplied cwd", async () => {
+    const { resolveValidatedSearchPath } = await loadHelper();
+    await fs.promises.mkdir(TEST_TEMP_ROOT, { recursive: true });
+    const fixtureRoot = await fs.promises.mkdtemp(path.join(TEST_TEMP_ROOT, "ripgrep-fixtures-"));
+    const parentRoot = await fs.promises.mkdtemp(path.join(fixtureRoot, "ripgrep-scope-"));
+    const descendantRoot = path.join(parentRoot, "trees", "workflow-worktree");
+    const siblingRoot = await fs.promises.mkdtemp(path.join(fixtureRoot, "ripgrep-sibling-"));
+    const descendantFile = path.join(descendantRoot, "descendant-sentinel.ts");
+    const siblingFile = path.join(siblingRoot, "sibling-sentinel.ts");
+    await fs.promises.mkdir(descendantRoot, { recursive: true });
+    await Promise.all([
+      Bun.write(descendantFile, "descendant-sentinel"),
+      Bun.write(siblingFile, "sibling-sentinel"),
+    ]);
+
+    try {
+      await expect(resolveValidatedSearchPath(descendantFile, parentRoot)).resolves.toMatchObject({
+        canonicalPath: descendantFile,
+        targetKind: "file",
+      });
+      await expect(resolveValidatedSearchPath(siblingFile, parentRoot)).resolves.toEqual({
+        error: `ERROR: Search path is outside the repository: ${siblingFile}\n\nHint: All searches must stay within the repository root (${parentRoot}).`,
+      });
+      await expect(resolveValidatedSearchPath(siblingFile, siblingRoot)).resolves.toMatchObject({
+        canonicalPath: siblingFile,
+        targetKind: "file",
+      });
+    } finally {
+      await fs.promises.rm(fixtureRoot, { force: true, recursive: true });
+    }
   });
 
   it("fails closed when canonical resolution fails after stat succeeds", async () => {

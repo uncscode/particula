@@ -12,6 +12,8 @@
       "prompt": "$ARGUMENTS --adw-id ${adw_id}",
       "model": "light",
       "timeout": 900,
+      "completion_if": "state.branch_merged == True",
+      "completion_message": "Branch accumulation did not complete; worktree retained for recovery",
       "retry": {
         "max_retries": 1,
         "initial_delay": 1.0,

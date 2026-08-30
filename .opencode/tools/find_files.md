@@ -47,8 +47,21 @@ Discovery-only file search tool for simple glob-based file listing.
 
 ## Path Contract
 
-- File `path` values discover only the requested file.
-- Directory `path` values discover only the requested subtree.
+- `path` is the sole filesystem target selector. Absolute values are normalized;
+  relative values resolve from the wrapper process `process.cwd()`; omitted
+  `path` searches that same cwd.
+- The resolved canonical target must remain under the repository rooted at that
+  cwd. File `path` values discover only the requested file, and directory values
+  discover only the requested subtree.
+- For workflow-local discovery, the execution runtime must already have launched
+  the process in the resolved `{worktree_path}`. Only then use an explicit
+  `{worktree_path}` or `{worktree_path}/<child>` target, for example:
+  - `{ "pattern": "**/*.ts", "path": "{worktree_path}" }`
+  - `{ "pattern": "**/*.ts", "path": "{worktree_path}/src" }`
+- With a process cwd of the repository root, `{ "pattern": "**/*.ts", "path": ".opencode/tools" }`
+  resolves relative to that cwd; omitting `path` searches the same cwd.
+- An absolute sibling-worktree path does not switch authority and is rejected
+  when it is outside the repository rooted at the process cwd.
 - Missing, invalid, or out-of-repo `path` values fail closed with deterministic `ERROR:` output.
 - `compact-output` stays relative to the searched directory for directory targets and to the file's parent directory for file targets.
 

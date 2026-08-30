@@ -1,4 +1,4 @@
-import { existsSync, realpathSync, statSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 
 /**
@@ -342,11 +342,47 @@ function isPotentialBoundedTokenCandidate(
 
 const S_IFMT = 0o170000;
 const S_IFDIR = 0o040000;
+const MAX_GIT_METADATA_BYTES = 4_096;
 
 function isStatDirectory(s: ReturnType<typeof statSync>): boolean {
   if (typeof s.isDirectory === "function") return s.isDirectory();
   if (typeof s.isDirectory === "boolean") return s.isDirectory;
   return (((s as { mode?: number }).mode ?? 0) & S_IFMT) === S_IFDIR;
+}
+
+function readBoundedGitMetadata(metadataPath: string): string | undefined {
+  try {
+    const metadata = lstatSync(metadataPath);
+    if (!metadata.isFile() || metadata.size > MAX_GIT_METADATA_BYTES) return undefined;
+    return readFileSync(metadataPath, "utf8").trim();
+  } catch {
+    return undefined;
+  }
+}
+
+function resolveGitCommonDirectory(repositoryRoot: string): string | undefined {
+  const dotGitPath = path.join(repositoryRoot, ".git");
+  try {
+    const dotGitMetadata = lstatSync(dotGitPath);
+    if (dotGitMetadata.isDirectory()) return realpathSync(dotGitPath);
+    if (!dotGitMetadata.isFile()) return undefined;
+
+    const dotGitValue = readBoundedGitMetadata(dotGitPath);
+    const match = dotGitValue?.match(/^gitdir:\s*(\S(?:.*\S)?)$/);
+    if (!match) return undefined;
+    const gitDirectory = realpathSync(path.resolve(repositoryRoot, match[1]));
+    if (!lstatSync(gitDirectory).isDirectory()) return undefined;
+
+    const commonDirectoryValue = readBoundedGitMetadata(path.join(gitDirectory, "commondir"));
+    const backLinkValue = readBoundedGitMetadata(path.join(gitDirectory, "gitdir"));
+    if (!commonDirectoryValue || !backLinkValue) return undefined;
+    const commonDirectory = realpathSync(path.resolve(gitDirectory, commonDirectoryValue));
+    const expectedBackLink = path.join(repositoryRoot, ".git");
+    if (path.resolve(gitDirectory, backLinkValue) !== expectedBackLink) return undefined;
+    return commonDirectory;
+  } catch {
+    return undefined;
+  }
 }
 
 /** Discover the owning worktree from an active wrapper module, never ambient cwd. */
@@ -432,8 +468,16 @@ export function validateAndNormalizePlansCwdPath(
   if (!existsSync(path.join(canonical, ".git")) || !existsSync(path.join(canonical, ".opencode"))) {
     return { error: `ERROR: cwd path is not a repository/worktree root: ${redactPathLikeText(normalized)}; use the workflow worktree_path.` };
   }
-  if (canonical !== boundary.value) {
-    return { error: `ERROR: cwd path is not this wrapper's admitted worktree root: ${redactPathLikeText(normalized)}; use the workflow worktree_path.` };
+  const boundaryCommonDirectory = resolveGitCommonDirectory(boundary.value);
+  const cwdCommonDirectory = resolveGitCommonDirectory(canonical);
+  if (
+    !boundaryCommonDirectory
+    || !cwdCommonDirectory
+    || cwdCommonDirectory !== boundaryCommonDirectory
+  ) {
+    return {
+      error: `ERROR: cwd path is not an admitted root or linked worktree for this repository: ${redactPathLikeText(normalized)}; use the repository root or workflow worktree_path.`,
+    };
   }
   return { value: canonical };
 }
@@ -910,7 +954,11 @@ export function deriveCommandFailureHint(diagnostic: string): string | undefined
     return "hint: verify the required runtime/tooling is installed and the backend script exists in this repository.";
   }
 
-  if (/(?:\bcwd path does not exist\b|\bcwd path is not a directory\b|\bcwd path resolves outside repository root\b|\b--cwd\b)/i.test(diagnostic)) {
+  if (
+    /(?:\bcwd path does not exist\b|\bcwd path is not a directory\b|\bcwd path resolves outside repository root\b|\bcwd path is not an admitted root or linked worktree\b|\b--cwd\b)/i.test(
+      diagnostic,
+    )
+  ) {
     return "hint: verify --cwd points to an existing in-repository repository/worktree root.";
   }
 

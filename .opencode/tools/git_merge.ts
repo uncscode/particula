@@ -207,6 +207,7 @@ const OPTIONAL_KEYS = [
   "slice_branch",
   "tracking_branch",
   "recover_missing_worktree",
+  "remote_fast_forward",
   "ref",
   "hard",
   "worktree_path",
@@ -239,6 +240,7 @@ Advanced onto:  { command: "rebase", upstream: "old-base", onto: "main", branch:
 Fetch:      { command: "fetch", remote: "origin", branch: "main" }
 Sync:       { command: "sync", source: "upstream", target: "main" }
 Accumulate: { command: "accumulate", slice_branch: "issue-1", tracking_branch: "accumulate/F1" }
+Remote fast-forward: { command: "accumulate", slice_branch: "issue-1", tracking_branch: "accumulate/F1", remote_fast_forward: true }
 Abort:      { command: "abort" }
 Continue:   { command: "continue" }
 Reset:      { command: "reset", ref: "HEAD~1", hard: true }
@@ -250,6 +252,7 @@ RULES:
 - rebase onto requires an explicit target branch.
 - continue reuses the existing merge/rebase message without opening an editor.
 - accumulate requires slice_branch and tracking_branch unless help: true.
+- accumulate remote_fast_forward rejects worktree_path and recover_missing_worktree.
 - reset requires ref unless help: true.
 - Set help: true to view CLI help for any command.`,
 
@@ -276,6 +279,7 @@ RULES:
     slice_branch: tool.schema.string().optional(),
     tracking_branch: tool.schema.string().optional(),
     recover_missing_worktree: tool.schema.boolean().optional(),
+    remote_fast_forward: tool.schema.boolean().optional(),
     ref: tool.schema.string().optional(),
     hard: tool.schema.boolean().optional(),
     worktree_path: tool.schema.string().optional(),
@@ -301,6 +305,7 @@ RULES:
       slice_branch,
       tracking_branch,
       recover_missing_worktree,
+      remote_fast_forward,
       ref,
       hard,
       worktree_path,
@@ -319,6 +324,7 @@ RULES:
       slice_branch?: string;
       tracking_branch?: string;
       recover_missing_worktree?: boolean;
+      remote_fast_forward?: boolean;
       ref?: string;
       hard?: boolean;
       worktree_path?: string;
@@ -486,6 +492,9 @@ RULES:
           if (normalizedTrackingBranch && !isValidRefToken(normalizedTrackingBranch)) {
             return `ERROR: Invalid tracking_branch: ${tracking_branch}.`;
           }
+          if (remote_fast_forward && (normalizedWorktree.value || recover_missing_worktree)) {
+            return "ERROR: 'accumulate' remote_fast_forward requires no worktree_path and no recover_missing_worktree.";
+          }
           if (normalizedSliceBranch) {
             cmdParts.push("--slice-branch", normalizedSliceBranch);
           }
@@ -495,6 +504,9 @@ RULES:
           cmdParts.push("--json");
           if (recover_missing_worktree) {
             cmdParts.push("--recover-missing-worktree");
+          }
+          if (remote_fast_forward) {
+            cmdParts.push("--remote-fast-forward");
           }
           if (normalizedWorktree.value) {
             cmdParts.push("--worktree-path", normalizedWorktree.value);

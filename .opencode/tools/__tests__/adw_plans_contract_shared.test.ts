@@ -1,5 +1,12 @@
 import { describe, expect, it } from "bun:test";
-import { existsSync, mkdirSync, realpathSync, rmSync, symlinkSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  realpathSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import path from "node:path";
 
 import {
@@ -153,6 +160,9 @@ describe("adw_plans_contract_shared", () => {
     expect(
       deriveCommandFailureHint("cwd path resolves outside repository root"),
     ).toContain("--cwd");
+    expect(
+      deriveCommandFailureHint("cwd path is not an admitted root or linked worktree"),
+    ).toContain("--cwd");
     expect(deriveCommandFailureHint("plan worktree metadata is stale")).toBeUndefined();
     expect(deriveCommandFailureHint("target file does not exist")).toBeUndefined();
     expect(deriveCommandFailureHint("plain failure")).toBeUndefined();
@@ -274,6 +284,92 @@ describe("adw_plans_contract_shared", () => {
       );
     } finally {
       rmSync(aliasPath, { recursive: true, force: true });
+    }
+  });
+
+  it("admits the repository root and linked worktrees from the same Git common directory", () => {
+    const fixtureRoot = path.resolve(
+      process.cwd(),
+      `adforge_local/opencode/tmp/adw-plans-worktree-${process.pid}`,
+    );
+    const repositoryRoot = path.join(fixtureRoot, "repository");
+    const linkedWorktree = path.join(fixtureRoot, "linked");
+    const unrelatedRoot = path.join(fixtureRoot, "unrelated");
+    const linkedGitDirectory = path.join(repositoryRoot, ".git/worktrees/linked");
+    const moduleDir = path.join(repositoryRoot, ".opencode/tools");
+
+    rmSync(fixtureRoot, { recursive: true, force: true });
+    mkdirSync(moduleDir, { recursive: true });
+    mkdirSync(linkedGitDirectory, { recursive: true });
+    mkdirSync(path.join(linkedWorktree, ".opencode"), { recursive: true });
+    mkdirSync(path.join(unrelatedRoot, ".git"), { recursive: true });
+    mkdirSync(path.join(unrelatedRoot, ".opencode"), { recursive: true });
+    writeFileSync(
+      path.join(linkedWorktree, ".git"),
+      `gitdir: ${linkedGitDirectory}\n`,
+      "utf8",
+    );
+    writeFileSync(path.join(linkedGitDirectory, "commondir"), "../..\n", "utf8");
+    writeFileSync(
+      path.join(linkedGitDirectory, "gitdir"),
+      `${path.join(linkedWorktree, ".git")}\n`,
+      "utf8",
+    );
+
+    try {
+      expect(validateAndNormalizePlansCwdPath(repositoryRoot, moduleDir).value).toBe(
+        realpathSync(repositoryRoot),
+      );
+      expect(validateAndNormalizePlansCwdPath(linkedWorktree, moduleDir).value).toBe(
+        realpathSync(linkedWorktree),
+      );
+      expect(validateAndNormalizePlansCwdPath(unrelatedRoot, moduleDir).error).toContain(
+        "not an admitted root or linked worktree",
+      );
+    } finally {
+      rmSync(fixtureRoot, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects a worktree metadata pointer whose protected backlink names another root", () => {
+    const fixtureRoot = path.resolve(
+      process.cwd(),
+      `adforge_local/opencode/tmp/adw-plans-spoof-${process.pid}`,
+    );
+    const repositoryRoot = path.join(fixtureRoot, "repository");
+    const realWorktree = path.join(fixtureRoot, "real-worktree");
+    const spoofedWorktree = path.join(fixtureRoot, "spoofed-worktree");
+    const linkedGitDirectory = path.join(repositoryRoot, ".git/worktrees/linked");
+    const moduleDir = path.join(repositoryRoot, ".opencode/tools");
+
+    rmSync(fixtureRoot, { recursive: true, force: true });
+    mkdirSync(moduleDir, { recursive: true });
+    mkdirSync(linkedGitDirectory, { recursive: true });
+    mkdirSync(path.join(realWorktree, ".opencode"), { recursive: true });
+    mkdirSync(path.join(spoofedWorktree, ".opencode"), { recursive: true });
+    writeFileSync(
+      path.join(realWorktree, ".git"),
+      `gitdir: ${linkedGitDirectory}\n`,
+      "utf8",
+    );
+    writeFileSync(
+      path.join(spoofedWorktree, ".git"),
+      `gitdir: ${linkedGitDirectory}\n`,
+      "utf8",
+    );
+    writeFileSync(path.join(linkedGitDirectory, "commondir"), "../..\n", "utf8");
+    writeFileSync(
+      path.join(linkedGitDirectory, "gitdir"),
+      `${path.join(realWorktree, ".git")}\n`,
+      "utf8",
+    );
+
+    try {
+      expect(validateAndNormalizePlansCwdPath(spoofedWorktree, moduleDir).error).toContain(
+        "not an admitted root or linked worktree",
+      );
+    } finally {
+      rmSync(fixtureRoot, { recursive: true, force: true });
     }
   });
 

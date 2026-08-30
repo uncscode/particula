@@ -19,6 +19,7 @@ permission:
   adw: deny
   adw_spec_read: allow
   adw_spec_write: allow
+  adw_plans_mutate: allow
   feedback_log: allow
   create_workspace: deny
   workflow_builder: deny
@@ -126,6 +127,27 @@ Use `worktree_path` for all operations:
 git_diff({"command": "status", "worktree_path": worktree_path})
 git_diff({"command": "diff", "worktree_path": worktree_path})
 ```
+
+For `search_content`, `ripgrep_advanced`, and `find_files`, tool process cwd is
+separate from the `path` field. These wrappers expose no `cwd` argument and
+cannot change process cwd. Perform workflow-local searches only when the
+execution runtime has already launched this agent in the state-loaded
+`worktree_path`; then make scope explicit with `path: worktree_path` or a child
+path:
+
+```python
+search_content({"contentPattern": "needle", "path": worktree_path})
+ripgrep_advanced({"contentPattern": "needle", "path": worktree_path})
+find_files({"pattern": "**/*.py", "path": worktree_path})
+```
+
+Omitted paths and relative paths use process cwd. An absolute sibling-worktree
+target is not a cwd or authority switch and is rejected by repository
+confinement when called from another root.
+
+If you need to search a workflow-local tree from these wrappers, the process
+must already be running in that resolved worktree. The `path` argument only
+selects the search target; it does not move the process or widen authority.
 
 If the Git diagnostics adapter is unavailable, log feedback best-effort and
 continue from the explicit fix-plan paths plus direct file reads when that scope

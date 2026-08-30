@@ -13,6 +13,7 @@ Structured wrapper for auto-mode manifest operations.
 | `delete` | `branch` | Remove one manifest registry entry by exact source branch |
 | `prune` | `completed=true` | Remove all registry entries whose top-level status is `completed` |
 | `reset` | `issue` | Reset one issue's manifest state |
+| `rearm-finalization` | `branch` | Re-arm completed accumulation for normal cron finalization |
 | `complete` | `issue`, `adw_id` | Mark one issue completed for accumulate-mode handoff |
 
 ## Preferred Usage
@@ -45,6 +46,12 @@ command-scoped `options` tokens, while payload-bearing fields stay direct.
 // Reset an issue and resume downstream work
 { "command": "reset", "issue": "42", "branch": "feature/F42", "options": "resume force" }
 
+// Preview state-only recovery for a completed accumulation missing its final PR
+{ "command": "rearm-finalization", "branch": "accumulate/E7-F7", "options": "dry-run" }
+
+// Re-arm it; the next cron cycle runs the normal finalization path
+{ "command": "rearm-finalization", "branch": "accumulate/E7-F7", "options": "force" }
+
 // Complete an issue without PR/commit actions
 { "command": "complete", "issue": "42", "adw_id": "abc12345", "branch": "feature/F42", "completed_at": "2026-06-27T23:59:59Z", "detail": "Issue completed (branch accumulation).", "options": "branch-merged dry-run" }
 ```
@@ -60,6 +67,7 @@ command-scoped `options` tokens, while payload-bearing fields stay direct.
 | `delete` | `dry-run`, `force` |
 | `prune` | `dry-run`, `force` |
 | `reset` | `resume`, `force` |
+| `rearm-finalization` | `dry-run`, `force` |
 | `complete` | `force`, `dry-run`, `branch-merged`, `no-branch-merged` |
 
 ## Direct Payload-Bearing Fields
@@ -88,8 +96,13 @@ Keep these fields direct:
   `options: "dry-run"`, `options: "force"`, or both. Calls that omit both are
   rejected before spawn so agents never hang on a confirmation prompt.
 - Wrapper-routed `branch` inputs for `status`, `validate`, `delete`, `reset`,
-  and `complete` must be non-blank after trimming; whitespace-only values are
+  `rearm-finalization`, and `complete` must be non-blank after trimming; whitespace-only values are
   rejected before spawn.
+- `rearm-finalization` is state-only. It requires all accumulate-mode issues to
+  be completed with `branch_merged=true`, refuses manifests with persisted final
+  PR identity or success checkpoints, sets `status=running`, resets cleanup
+  attempt state, and lets the next cron cycle execute the normal idempotent
+  `AllComplete` finalization path.
 - `delete` and `prune` remove manifest registry entries only. They do **not**
   delete Git branches, remotes, or worktrees; mutate platform issue state; or
   touch per-workflow ADW state.

@@ -28,6 +28,7 @@ permission:
   todowrite: allow
   adw_spec_read: allow
   adw_plans_read: allow
+  adw_plans_mutate: allow
   feedback_log: allow
   get_datetime: allow
   get_version: allow
@@ -70,7 +71,7 @@ task({
 
 **DENIED:**
 - Everything outside `.opencode/plans/sections/`
-- Plan JSON metadata files (use `adw_plans_mutate` tool for metadata mutations)
+- Direct edits to plan JSON metadata files (use `adw_plans_mutate` for authorized metadata mutations)
 - Source code, tests, other documentation
 
 # Process

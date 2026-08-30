@@ -51,6 +51,14 @@ Arguments: adw_id=<workflow-id> <scope-selector> [timeout=<seconds>]
 Context: <implemented behavior>
 ```
 
+The canonical source is `adw_id=<workflow-id>` in `Arguments`. As a backup,
+parse the complete Task handoff, including its `command` metadata and prompt,
+for an explicit `--adw-id <workflow-id>` or `--adw-id=<workflow-id>` when the
+canonical form is absent. Accept only an eight-character hexadecimal workflow
+ID. If multiple occurrences resolve to the same ID, use that ID; if no valid ID
+is present or distinct IDs conflict, return `ADW_BUILD_TESTS_BLOCKED`. Do not
+infer an ID from a worktree name, path, issue number, or ambient state.
+
 Accept the scope selectors defined by the caller contract, such as a file,
 module, directory, or explicit file list. At least one scope selector is
 required. Treat all paths as repository-relative and validate them beneath the
@@ -74,6 +82,12 @@ Do not invent or pass a coverage threshold.
 # Process
 
 ## Step 1: Resolve Worktree and Scope
+
+Resolve `adw_id` from the canonical `Arguments: adw_id=...` field first. If it
+is absent, perform the bounded full-handoff fallback described above before
+reporting missing workflow context. This fallback exists because Task has no
+dedicated `adw_id` field and callers may carry the explicit ID in Task command
+metadata. Never guess or silently choose between conflicting IDs.
 
 Load the required field explicitly:
 

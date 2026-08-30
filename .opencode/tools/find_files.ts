@@ -177,7 +177,8 @@ function parseFindFilesOptions(rawOptions: unknown):
 // --- Tool definition ---
 
 export default tool({
-  description: `Search for files by glob pattern using discovery-only ripgrep mode. Only include parameters you need — omit all others.
+  description:
+    `Search for files by glob pattern using discovery-only ripgrep mode. Only include parameters you need — omit all others.
 
 SIMPLE EXAMPLES (copy these patterns):
 
@@ -193,7 +194,10 @@ RULES:
 - Required 'pattern' must be a non-empty string after trim.
 - Results are sorted by mtime (most recent first).
 - No matches return a deterministic non-error message.
-- Searches are constrained to repository boundaries.`,
+- The optional path is the sole filesystem target selector: absolute values are normalized, relative values resolve from process.cwd(), and omission selects process.cwd().` +
+    ` The canonical target must remain under the repository rooted at that cwd.
+- Workflow-local searches require the process already be launched in the resolved workflow worktree; then use its absolute worktree_path or a child path.` +
+    ` An absolute sibling-worktree path is not an authority switch and is rejected when outside the cwd-rooted repository.`,
 
   args: {
     pattern: tool.schema.string(),

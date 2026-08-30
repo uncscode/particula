@@ -109,22 +109,24 @@ approves. This gives the user a clear sense of progress through the template.
 
 # Required Reading
 
-Before starting any conversation, read files and run commands for current state:
+Before starting any conversation, read files and query current plan state:
 
 - `.opencode/guides/planner_issue_format.md` -- The canonical issue metadata and body structure to fill out
-- Resolve `worktree_path` first with
-  `adw_spec_read({"command": "read", "adw_id": "<adw_id>", "field": "worktree_path"})`.
-  Pass that exact value as the direct `cwd` field to every plan-wrapper call.
-  The split wrappers admit only their module-rooted worktree; never substitute
-  the caller's current directory, a nested directory, or a sibling worktree.
+- Planner intake normally runs interactively from the repository root, outside
+  an ADW workflow and without an `adw_id`. Do not require or query workflow
+  state. Set `workspace_root` to the absolute workspace root reported by the
+  session environment and pass that exact value as the direct `cwd` field to
+  every plan-wrapper call. If the environment does not report a workspace root,
+  ask the user for the absolute repository root instead of guessing from a
+  nested directory or sibling worktree.
 - active epics via:
-  `adw_plans_read({"command": "list", "plan_type": "epic", "lifecycle": "active", "json": true, "cwd": worktree_path})`
+  `adw_plans_read({"command": "list", "plan_type": "epic", "lifecycle": "active", "json": true, "cwd": workspace_root})`
 - active features via:
-  `adw_plans_read({"command": "list", "plan_type": "feature", "lifecycle": "active", "json": true, "cwd": worktree_path})`
+  `adw_plans_read({"command": "list", "plan_type": "feature", "lifecycle": "active", "json": true, "cwd": workspace_root})`
 - active maintenance plans via:
-  `adw_plans_read({"command": "list", "plan_type": "maintenance", "lifecycle": "active", "json": true, "cwd": worktree_path})`
+  `adw_plans_read({"command": "list", "plan_type": "maintenance", "lifecycle": "active", "json": true, "cwd": workspace_root})`
 - active research plans via:
-  `adw_plans_read({"command": "list", "plan_type": "research", "lifecycle": "active", "json": true, "cwd": worktree_path})`
+  `adw_plans_read({"command": "list", "plan_type": "research", "lifecycle": "active", "json": true, "cwd": workspace_root})`
 - `.opencode/guides/architecture_reference.md` -- Architecture patterns and module structure
 
 # The Template
@@ -510,18 +512,20 @@ The planner pipeline will:
 
 # Feedback Awareness
 
-Use `feedback_log` to log new friction and use the CLI for read-mode feedback:
+Use `feedback_log` to log new friction:
 
-- **Read feedback** at the start of a session to check for known issues that
-  might affect the planner intake workflow. The `feedback_log` tool wrapper is
-  write-only in this environment, so use the Python CLI for read mode:
-  `python3 .opencode/tools/feedback_log.py --command read --severity-filter high`
+- **Do not require feedback reads at startup.** This agent has no command
+  execution tool or read-capable feedback wrapper. Feedback awareness is
+  best-effort and must not block intake.
+- **Use supplied feedback** when the user includes feedback entries in the
+  conversation; summarize relevant findings and incorporate them as constraints
+  or risks.
 - **Log friction** reactively if a tool call fails unexpectedly, requires 3+
   retries, or behaves differently than documented.
 
-If the user asks you to address or review feedback entries, read and summarize
-them, then incorporate relevant findings into the planning conversation (e.g.,
-if feedback mentions a broken module, flag it as a constraint or risk).
+If the user asks you to review feedback that was not supplied in the
+conversation, explain that read mode is unavailable in this agent session and
+ask them to provide the entries. Do not attempt a Python CLI workaround.
 
 # Duplicate Detection
 
@@ -648,4 +652,4 @@ Let's scope this out!"
 - `todoread`, `todowrite` -- Track conversation progress through template sections
 - `get_datetime` -- Timestamps for issue content
 - `get_version` -- Check package version for context
-- `feedback_log` -- Log new tool friction (read existing entries via Python CLI)
+- `feedback_log` -- Log new tool friction; existing-entry read mode is unavailable

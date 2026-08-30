@@ -24,6 +24,7 @@ const COMMANDS = [
   "delete",
   "prune",
   "reset",
+  "rearm-finalization",
   "complete",
 ] as const;
 const MAX_ISSUES = 500;
@@ -41,6 +42,7 @@ const COMMAND_OPTION_TOKENS = {
   delete: ["dry-run", "force"],
   prune: ["dry-run", "force"],
   reset: ["resume", "force"],
+  "rearm-finalization": ["dry-run", "force"],
   complete: ["force", "dry-run", "branch-merged", "no-branch-merged"],
 } as const satisfies Record<AutoModeCommand, readonly string[]>;
 
@@ -52,6 +54,7 @@ const USAGE_EXAMPLE = `Example usage:
   auto_mode_manifest({ command: "delete", branch: "epic/e14-auto", options: "dry-run" })
   auto_mode_manifest({ command: "prune", completed: true, options: "force" })
   auto_mode_manifest({ command: "reset", issue: "42", branch: "epic/e14-auto", options: "resume force" })
+  auto_mode_manifest({ command: "rearm-finalization", branch: "accumulate/E7-F7", options: "dry-run" })
   auto_mode_manifest({ command: "complete", issue: "42", adw_id: "abc12345", branch: "epic/e14-auto", completed_at: "2026-06-27T23:59:59Z", detail: "Issue completed (branch accumulation).", options: "branch-merged dry-run" })`;
 
 const COMMAND_DESCRIPTIONS = `AVAILABLE COMMANDS:
@@ -77,6 +80,10 @@ const COMMAND_DESCRIPTIONS = `AVAILABLE COMMANDS:
 
 • reset: Reset manifest issue state
   Usage: { command: "reset", issue: "42", branch?: "epic/e14-auto", options?: "resume force" }
+
+• rearm-finalization: Re-arm completed accumulation for the next cron finalization cycle
+  Usage: { command: "rearm-finalization", branch: "accumulate/E7-F7", options: "dry-run" }
+  Note: one of options: "dry-run" or options: "force" is required. This mutates manifest state only and does not open a PR.
 
 • complete: Mark an issue completed for accumulate-mode handoff
   Usage: { command: "complete", issue: "42", adw_id: "abc12345", branch?: "epic/e14-auto", completed_at?: "2026-06-27T23:59:59Z", detail?: "Issue completed (branch accumulation).", options?: "force dry-run branch-merged" }
@@ -564,6 +571,31 @@ function buildResetCommand(
   return null;
 }
 
+function buildRearmFinalizationCommand(
+  cmdParts: (string | number)[],
+  args: AutoModeManifestArgs,
+  options: ParsedCommandOptions,
+): string | null {
+  if (!options["dry-run"] && !options.force) {
+    return `Non-interactive 'rearm-finalization' calls require options: "dry-run" or options: "force".`;
+  }
+  if (!args.branch) {
+    return "'branch' is required for rearm-finalization.";
+  }
+  cmdParts.push("rearm-finalization");
+  const branchError = appendBranchFilter(cmdParts, args.branch);
+  if (branchError) {
+    return branchError;
+  }
+  if (options["dry-run"]) {
+    cmdParts.push("--dry-run");
+  }
+  if (options.force) {
+    cmdParts.push("--force");
+  }
+  return null;
+}
+
 function requireNonInteractiveMutationOptions(
   command: "delete" | "prune",
   options: ParsedCommandOptions,
@@ -706,6 +738,7 @@ REQUIRED PARAMETERS BY COMMAND:
 • delete: branch, options with one of dry-run/force
 • prune: completed=true, options with one of dry-run/force
 • reset: issue
+• rearm-finalization: branch, options with one of dry-run/force
 • complete: issue, adw_id`),
 
     adw_id: tool.schema
@@ -754,6 +787,7 @@ SUPPORTED TOKENS:
 • init: force
 • status: json
 • reset: resume, force
+• rearm-finalization: dry-run, force (one required)
 • delete: dry-run, force (one required)
 • prune: dry-run, force (one required)
 • complete: force, dry-run, branch-merged, no-branch-merged
@@ -815,7 +849,7 @@ ALLOWED: pr, accumulate`),
       .optional()
       .describe(`Branch name filter for manifest operations.
 
-APPLIES TO: status, validate, delete, reset, complete
+APPLIES TO: status, validate, delete, reset, rearm-finalization, complete
 Whitespace-only values are rejected.
 MAPS TO: --branch`),
 
@@ -894,6 +928,11 @@ MAPS TO: --detail`),
 
       case "reset": {
         buildErrorMessage = buildResetCommand(cmdParts, args, optionValues);
+        break;
+      }
+
+      case "rearm-finalization": {
+        buildErrorMessage = buildRearmFinalizationCommand(cmdParts, args, optionValues);
         break;
       }
 

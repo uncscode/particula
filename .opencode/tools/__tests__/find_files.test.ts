@@ -20,6 +20,8 @@ const FIXTURE_DIR = path.join(import.meta.dir, "fixtures/search_scope");
 const FIXTURE_FILE = path.join(FIXTURE_DIR, "alpha.ts");
 const NESTED_DIR = path.join(FIXTURE_DIR, "nested");
 const TRASH_DIR = path.join(FIXTURE_DIR, ".trash");
+const PARENT_SCOPE_DIR = path.resolve(import.meta.dir, "../..");
+const DESCENDANT_SCOPE_PATH = "tools/__tests__/fixtures/search_scope";
 
 describe("find_files wrapper", () => {
   beforeEach(() => {
@@ -55,6 +57,57 @@ describe("find_files wrapper", () => {
       actualCounted: row.counted_fields,
       actualExempt: row.exempt_fields,
     });
+  });
+
+  it("publishes the exact schema and cwd-confined path contract", async () => {
+    await loadToolExecute("../../find_files.ts");
+    const definition = getCapturedToolDefinition();
+    expect(Object.keys(definition?.args ?? {}).sort()).toEqual(["options", "path", "pattern"]);
+    expect(definition?.args).not.toHaveProperty("cwd");
+    expect(definition?.args).not.toHaveProperty("worktree_path");
+    expect(definition?.description).toBe(
+      `Search for files by glob pattern using discovery-only ripgrep mode. Only include parameters you need — omit all others.
+
+SIMPLE EXAMPLES (copy these patterns):
+
+Basic search:      { pattern: "**/*.ts" }
+Search in folder:  { pattern: "**/*.py", path: "adw" }
+Limit results:     { pattern: "**/*", options: "max-results=100" }
+Compact output:    { pattern: "**/*.md", path: "docs", options: "compact-output" }
+File type include: { pattern: "**/*", options: "file-type=py" }
+File type exclude: { pattern: "**/*", options: "exclude-file-type=json" }
+
+RULES:
+- Discovery only: content-search parameters are rejected (use search_content for simple content search or ripgrep_advanced for advanced controls).
+- Required 'pattern' must be a non-empty string after trim.
+- Results are sorted by mtime (most recent first).
+- No matches return a deterministic non-error message.
+- The optional path is the sole filesystem target selector: absolute values are normalized, relative values resolve from process.cwd(), and omission selects process.cwd(). The canonical target must remain under the repository rooted at that cwd.
+- Workflow-local searches require the process already be launched in the resolved workflow worktree; then use its absolute worktree_path or a child path. An absolute sibling-worktree path is not an authority switch and is rejected when outside the cwd-rooted repository.`,
+    );
+  });
+
+  it("resolves omitted, relative, and absolute descendant paths from the process cwd", async () => {
+    const originalCwd = process.cwd();
+    process.chdir(PARENT_SCOPE_DIR);
+    try {
+      const execute = await loadToolExecute("../../find_files.ts");
+      setSpawnResponse({ stdout: `${FIXTURE_FILE}\n`, exitCode: 0 });
+      const parentResult = await execute({ pattern: "**/*.ts" });
+      expect(parentResult).toBe("tools/__tests__/fixtures/search_scope/alpha.ts");
+      expect(getInvocations().at(-1)?.args.at(-1)).toBe(PARENT_SCOPE_DIR);
+
+      setSpawnResponse({ stdout: `${FIXTURE_FILE}\n`, exitCode: 0 });
+      const relativeResult = await execute({ pattern: "**/*.ts", path: `./${DESCENDANT_SCOPE_PATH}` });
+      expect(relativeResult).toBe("tools/__tests__/fixtures/search_scope/alpha.ts");
+      expect(getInvocations().at(-1)?.args.at(-1)).toBe(FIXTURE_DIR);
+
+      const absoluteResult = await execute({ pattern: "**/*.ts", path: FIXTURE_DIR });
+      expect(absoluteResult).toBe("tools/__tests__/fixtures/search_scope/alpha.ts");
+      expect(getInvocations().at(-1)?.args.at(-1)).toBe(FIXTURE_DIR);
+    } finally {
+      process.chdir(originalCwd);
+    }
   });
 
   it("accepts bounded discovery options via options", async () => {

@@ -164,7 +164,7 @@
               "type": "null"
             }
           ],
-          "default": 300
+          "default": 1800
         },
         "retry": {
           "type": "object",

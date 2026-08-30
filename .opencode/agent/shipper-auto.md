@@ -82,6 +82,19 @@ Required fields:
 - `worktree_path`
 - `branch_name`
 
+Treat the persisted `worktree_path` value as authoritative. Preserve it verbatim:
+do not resolve, normalize, reconstruct, or replace it from the current working
+directory, `adw_id`, or repository layout. Pass that exact persisted string to
+every delegated task or tool call that accepts `worktree_path`.
+
+Before Step 1.5, reset stale accumulation state for this attempt:
+```python
+adw_spec_write({"command": "write", "adw_id": adw_id, "field": "branch_merged", "content": "false"})
+```
+This write is mandatory. If it fails, emit `SHIPPER_AUTO_FAILED` and stop before
+plan updates, commits, notes, or accumulation. Never rely on a persisted
+`branch_merged=true` value from an earlier attempt.
+
 Branch-target resolution fields:
 - `source_branch` (preferred)
 - `target_branch` (legacy fallback only when `source_branch` is missing)
@@ -123,7 +136,7 @@ Delegate commit and push using the `adw-commit` subagent:
 ```python
 task({
   "description": "Commit and push changes",
-  "prompt": f"Commit changes and push to remote.\n\nArguments: adw_id={adw_id}",
+  "prompt": f"Commit changes and push to remote.\n\nArguments: adw_id={adw_id} worktree_path={worktree_path}",
   "subagent_type": "adw-commit"
 })
 ```
@@ -171,6 +184,26 @@ git_merge({
   "recover_missing_worktree": true,
 })
 ```
+
+Do not replace this primary worktree-scoped call with `remote_fast_forward`.
+The worktree-free mode is an additional constrained recovery path; it does not
+relax this agent's persisted-path or completion-state requirements.
+
+Only when the primary result reports that the persisted worktree is missing and
+no clean fallback worktree exists, retry once without either worktree option:
+```python
+git_merge({
+  "command": "accumulate",
+  "slice_branch": slice_branch,
+  "tracking_branch": resolved_tracking_branch,
+  "remote_fast_forward": true,
+})
+```
+
+Use this second structured result as authoritative. Do not invoke the remote
+fallback for rebase conflicts, push failures, malformed refs, protected targets,
+or other errors. Remote divergence or concurrent-update rejection is final and
+must persist `branch_merged=false`.
 
 Interpret the returned JSON payload as the authoritative source for
 success/failure. Expected fields:

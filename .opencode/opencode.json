@@ -7,6 +7,9 @@
     },
     "general": {
       "disable": true
+    },
+    "scout": {
+      "disable": true
     }
   },
   "tools": {
@@ -40,7 +43,10 @@
       "{env:ADW_PROJECT_ROOT}/plans/**": "allow",
       "{env:ADW_PROJECT_ROOT}/generated/**": "allow"
     },
-    "edit": "allow",
+    "edit": {
+      "*": "allow",
+      "{env:ADW_PROJECT_ROOT}/README.md": "deny"
+    },
     "webfetch": "ask",
     "external_directory": "deny",
     "bash": {

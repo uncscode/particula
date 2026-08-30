@@ -72,3 +72,14 @@ Practical guardrail:
 
 - Classify `read` results by command context first. A non-empty payload that
   starts with `ERROR:` can still be a successful `read` result.
+
+## Native runtime boundary
+
+This wrapper remains a separate CLI transport surface. E39-F5's executable
+native subset is only `adw_spec_read`, `adw_plans_show`, and
+`adw_plans_list_sections`; wrapper availability does not grant native
+`ToolBridge` activation or execution. Native calls require a caller-selected
+canonical `ProjectContext.root`, final-narrowed exact activation, and an
+effective grant, and return bounded/redacted results. Correct a denied explicit
+request, context, or grant through its owning surface, then make a fresh
+request; do not infer generic reads, writes, network access, fallback, or retry.

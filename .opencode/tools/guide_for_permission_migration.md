@@ -3,6 +3,10 @@
 Reference for migrating agent frontmatter from the deprecated `tools:` format
 to the current `permission:` format in `.opencode/agent/*.md` files.
 
+For ongoing permission design, including file-path edit restrictions and
+delegation boundaries, use the canonical
+[Agent Permission Reference](../guides/agents/agent-permissions.md).
+
 ---
 
 ## Current Policy (Repository)

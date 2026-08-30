@@ -245,7 +245,7 @@ const appendRoutineTargeting = (
   const testPath = typeof args.testPath === "string" ? args.testPath.trim() : undefined;
 
   if (testFilter) {
-    cmdParts.push("-k", testFilter);
+    cmdParts.push(`--test-filter=${testFilter}`);
   }
   if (testPath) {
     if (testPath.startsWith("-")) {

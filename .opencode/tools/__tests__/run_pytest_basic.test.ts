@@ -47,14 +47,15 @@ describe("run_pytest_basic wrapper", () => {
     });
     expect(result).toBe("ok");
 
-    const cmd = getInvocations().at(-1)?.args.join(" ") ?? "";
+    const args = getInvocations().at(-1)?.args ?? [];
+    const cmd = args.join(" ");
     expect(cmd).toContain("python3");
     expect(cmd).toContain("run_pytest.py");
     expect(cmd).toContain("--output=full");
     expect(cmd).toContain("--fail-fast");
-    expect(cmd).toContain("-k");
-    expect(cmd).toContain("agent smoke");
-    expect(cmd).toContain("adw/core/tests");
+    expect(args).toContain("--test-filter=agent smoke");
+    expect(args).toContain("adw/core/tests");
+    expect(args).not.toContain("-k");
   });
 
   it("rejects advanced option keys by presence", async () => {
@@ -224,9 +225,9 @@ describe("run_pytest_basic wrapper", () => {
       const args = invocation?.args ?? [];
       expect(args[0]).toBe("python3");
       expect(args).toContain("--fail-fast");
-      expect(args).toContain("-k");
-      expect(args).toContain("agent");
+      expect(args).toContain("--test-filter=agent");
       expect(args).toContain("adw/core/tests");
+      expect(args).not.toContain("-k");
 
       const scriptArg = args[1] ?? "";
       expect(normalizePathForAssertion(scriptArg)).toContain("/run_pytest.py");

@@ -276,6 +276,46 @@ describe("auto_mode_manifest wrapper", () => {
     ]);
   });
 
+  it("routes state-only finalization recovery with bounded mutation options", async () => {
+    const execute = await loadToolExecute("../../auto_mode_manifest.ts");
+
+    const previewResult = await execute({
+      command: "rearm-finalization",
+      branch: "accumulate/E7-F7",
+      options: "dry-run",
+    });
+    const applyResult = await execute({
+      command: "rearm-finalization",
+      branch: "accumulate/E7-F7",
+      options: "force",
+    });
+
+    expect(previewResult).toBe("ok");
+    expect(applyResult).toBe("ok");
+    expect(getInvocations()[0]?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "auto-mode",
+      "rearm-finalization",
+      "--branch",
+      "accumulate/E7-F7",
+      "--dry-run",
+    ]);
+    expect(getInvocations()[1]?.args).toEqual([
+      "uv",
+      "run",
+      "--active",
+      "adw",
+      "auto-mode",
+      "rearm-finalization",
+      "--branch",
+      "accumulate/E7-F7",
+      "--force",
+    ]);
+  });
+
   it("routes delete --force and prune --dry-run symmetrically", async () => {
     const execute = await loadToolExecute("../../auto_mode_manifest.ts");
 
@@ -427,6 +467,23 @@ describe("auto_mode_manifest wrapper", () => {
 
     expect(String(deleteResult)).toContain("Interactive 'delete' calls are not allowed via wrapper");
     expect(String(pruneResult)).toContain("Interactive 'prune' calls are not allowed via wrapper");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
+  it("rejects implicit or branchless finalization recovery before spawn", async () => {
+    const execute = await loadToolExecute("../../auto_mode_manifest.ts");
+
+    const implicitResult = await execute({
+      command: "rearm-finalization",
+      branch: "accumulate/E7-F7",
+    });
+    const branchlessResult = await execute({
+      command: "rearm-finalization",
+      options: "force",
+    });
+
+    expect(String(implicitResult)).toContain("require options");
+    expect(String(branchlessResult)).toContain("'branch' is required for rearm-finalization");
     expect(getInvocations()).toHaveLength(0);
   });
 

@@ -201,6 +201,37 @@ describe("git_merge wrapper", () => {
     );
   });
 
+  it("assembles worktree-free remote fast-forward accumulation", async () => {
+    setDollarText('{"success":true}\n');
+    const execute = await loadToolExecute("../../git_merge.ts");
+
+    const result = await execute({
+      command: "accumulate",
+      slice_branch: "issue-1017-adw-7d2b99aa",
+      tracking_branch: "accumulate/E25-F1",
+      remote_fast_forward: true,
+    });
+
+    expect(String(result)).toBe('{"success":true}');
+    expect(getInvocations().at(-1)?.args.join(" ")).toContain(
+      "uv run --active adw git accumulate --slice-branch issue-1017-adw-7d2b99aa --tracking-branch accumulate/E25-F1 --json --remote-fast-forward",
+    );
+  });
+
+  it("rejects worktree options with remote fast-forward", async () => {
+    const execute = await loadToolExecute("../../git_merge.ts");
+    const result = await execute({
+      command: "accumulate",
+      slice_branch: "issue-1",
+      tracking_branch: "accumulate/F1",
+      remote_fast_forward: true,
+      worktree_path: "./trees/abc",
+    });
+
+    assertContains(String(result), "requires no worktree_path");
+    expect(getInvocations()).toHaveLength(0);
+  });
+
   it("rejects blank accumulate identifiers before spawn", async () => {
     const execute = await loadToolExecute("../../git_merge.ts");
     const result = await execute({ command: "accumulate", slice_branch: "   ", tracking_branch: "track" });

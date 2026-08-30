@@ -10,6 +10,8 @@ const FIXTURE_DIR = path.join(import.meta.dir, "fixtures/search_scope");
 const FIXTURE_FILE = path.join(FIXTURE_DIR, "alpha.ts");
 const NESTED_DIR = path.join(FIXTURE_DIR, "nested");
 const TRASH_DIR = path.join(FIXTURE_DIR, ".trash");
+const PARENT_SCOPE_DIR = path.resolve(import.meta.dir, "../..");
+const DESCENDANT_SCOPE_PATH = "tools/__tests__/fixtures/search_scope";
 
 describe("ripgrep_advanced wrapper", () => {
   beforeEach(() => {
@@ -34,6 +36,44 @@ describe("ripgrep_advanced wrapper", () => {
     expect(definition?.args).not.toHaveProperty("filesWithMatches");
     expect(definition?.args).not.toHaveProperty("unrestricted");
     expect(definition?.args).toHaveProperty("options");
+  });
+
+  it("publishes the exact schema and cwd-confined path contract", async () => {
+    await loadToolExecute("../../ripgrep_advanced.ts");
+    const definition = getCapturedToolDefinition();
+    expect(Object.keys(definition?.args ?? {}).sort()).toEqual(["contentPattern", "options", "path"]);
+    expect(definition?.args).not.toHaveProperty("cwd");
+    expect(definition?.args).not.toHaveProperty("worktree_path");
+    expect(definition?.description).toBe(
+      "Search file content using bounded advanced ripgrep controls. Matching is literal by default; use match-mode=regex to opt in." +
+      " The optional path is the sole filesystem target selector: absolute values are normalized, relative values resolve from process.cwd()," +
+      " and omission selects process.cwd(). The canonical target must remain under the repository rooted at that cwd." +
+      " Workflow-local searches require the process already be launched in the resolved workflow worktree; then use its absolute worktree_path" +
+      " or a child path. An absolute sibling-worktree path is not an authority switch and is rejected when outside the cwd-rooted repository.",
+    );
+  });
+
+  it("resolves omitted, relative, and absolute descendant paths from the process cwd", async () => {
+    const originalCwd = process.cwd();
+    process.chdir(PARENT_SCOPE_DIR);
+    try {
+      const execute = await loadToolExecute("../../ripgrep_advanced.ts");
+      setSpawnResponse({ stdout: "parent-sentinel\n", exitCode: 0 });
+      const parentResult = await execute({ contentPattern: "parent-sentinel" });
+      expect(parentResult).toBe("parent-sentinel");
+      expect(getInvocations().at(-1)?.args.at(-1)).toBe(PARENT_SCOPE_DIR);
+
+      setSpawnResponse({ stdout: "descendant-sentinel\n", exitCode: 0 });
+      const relativeResult = await execute({ contentPattern: "descendant-sentinel", path: `./${DESCENDANT_SCOPE_PATH}` });
+      expect(relativeResult).toBe("descendant-sentinel");
+      expect(getInvocations().at(-1)?.args.at(-1)).toBe(FIXTURE_DIR);
+
+      const absoluteResult = await execute({ contentPattern: "descendant-sentinel", path: FIXTURE_DIR });
+      expect(absoluteResult).toBe("descendant-sentinel");
+      expect(getInvocations().at(-1)?.args.at(-1)).toBe(FIXTURE_DIR);
+    } finally {
+      process.chdir(originalCwd);
+    }
   });
 
   it("rejects injected direct control fields before resolving a search path", async () => {

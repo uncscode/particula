@@ -3,7 +3,12 @@ import * as path from "node:path";
 import { buildTruncationWarning, executeRipgrepSearch, parseRipgrepSearchRequest, resolveValidatedSearchPath } from "./lib/ripgrep_shared";
 
 export default tool({
-  description: "Search file content using bounded ripgrep options. Matching is literal by default; use match-mode=regex to opt in.",
+  description:
+    "Search file content using bounded ripgrep options. Matching is literal by default; use match-mode=regex to opt in." +
+    " The optional path is the sole filesystem target selector: absolute values are normalized, relative values resolve from process.cwd()," +
+    " and omission selects process.cwd(). The canonical target must remain under the repository rooted at that cwd." +
+    " Workflow-local searches require the process already be launched in the resolved workflow worktree; then use its absolute worktree_path" +
+    " or a child path. An absolute sibling-worktree path is not an authority switch and is rejected when outside the cwd-rooted repository.",
   args: { contentPattern: tool.schema.string(), path: tool.schema.string().optional(), options: tool.schema.string().optional() },
   async execute(args) {
     const directArgs = args as Record<string, unknown>;
